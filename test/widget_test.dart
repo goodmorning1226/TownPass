@@ -1,38 +1,50 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:town_pass/main.dart';
-
-/// Helper function to verify the counter's displayed text in the widget tree.
-/// This function specifically checks for the presence of [expectedCount]
-/// and the absence of the *other* number (assuming a simple 0-1 counter based on the test).
-void _verifyCounterValue(WidgetTester tester, int expectedCount) {
-  expect(find.text('$expectedCount'), findsOneWidget);
-  // Also verify that the *other* possible counter value (0 or 1) is not present.
-  final unexpectedCount = expectedCount == 0 ? 1 : 0;
-  expect(find.text('$unexpectedCount'), findsNothing);
-}
+import 'package:get/get.dart';
+import 'package:town_pass/page/bill/bill_view.dart';
+import 'package:town_pass/util/tp_route.dart';
+import 'package:town_pass/util/tp_web_view.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  setUp(() => Get.testMode = true);
+  tearDown(() => Get.reset());
 
-    // Verify that our counter starts at 0.
-    _verifyCounterValue(tester, 0);
+  testWidgets('Bill screen opens payment with the existing WebView contract', (
+    tester,
+  ) async {
+    await tester.binding.setSurfaceSize(const Size(400, 900));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    await tester.pumpWidget(
+      GetMaterialApp(
+        home: const BillView(),
+        getPages: [
+          GetPage(
+            name: TPRoute.webView,
+            // Test navigation arguments without opening a native WebView or
+            // contacting the external payment service.
+            page: () {
+              final arguments = Get.arguments as WebViewArgument;
+              return Scaffold(body: Text(arguments.url!));
+            },
+          ),
+        ],
+      ),
+    );
+    await tester.pumpAndSettle();
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+    expect(find.text('帳務'), findsOneWidget);
+    expect(find.text('熱門繳費'), findsOneWidget);
+    await tester.ensureVisible(find.text('停車費'));
+    await tester.tap(find.text('停車費'));
+    await tester.pumpAndSettle();
 
-    // Verify that our counter has incremented.
-    _verifyCounterValue(tester, 1);
+    expect(Get.currentRoute, TPRoute.webView);
+    expect(
+      find.text(
+        'https://taipei-pass-service.vercel.app/fee-payment/detail/fee-5/',
+      ),
+      findsOneWidget,
+    );
+    expect(tester.takeException(), isNull);
   });
 }
