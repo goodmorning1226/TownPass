@@ -35,6 +35,7 @@ migrate_working_dir/
 **/android/**/gradle-wrapper.jar
 **/android/app/.cxx/
 **/android/.gradle
+**/android/.kotlin/
 **/android/captures/
 **/android/gradlew
 **/android/gradlew.bat
