@@ -86,6 +86,20 @@ class WorkflowTests(unittest.TestCase):
         self.assertEqual(result['kind'], 'unsupported')
         self.assertIsNone(result['destination'])
 
+    def test_single_exact_unavailable_states_reason_without_model(self):
+        for text, capability in (('幫我掛號', 'medicalAppointment'), ('動物園', 'zoo'), ('我要登出', 'logout'),
+                                 ('不要借書，幫我掛號', 'medicalAppointment')):
+            result = self.turn(text)
+            self.assertEqual(result['kind'], 'unsupported')
+            self.assertIsNone(result['destination'])
+            self.assertIn(Registry().by_id[capability]['reason'], result['message'])
+        self.assertEqual(self.calls, [])
+
+    def test_ambiguous_set_with_unavailable_items_still_confirms(self):
+        result = self.turn('案件進度')
+        self.assertEqual(result['kind'], 'confirm_candidates')
+        self.assertTrue(any(not choice['enabled'] for choice in result['choices']))
+
     def test_numeric_identifier_not_fuzzily_rewritten(self):
         self.assertEqual(book_fuzzy('9786263350718', FakeCatalog().books()), [])
 

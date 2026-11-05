@@ -16,22 +16,24 @@
 8. App 用內建目錄解析能力 ID，模型無法指定任意 URL、JS、原生路由或交易工具。圖書詳情 ID 另有核對白名單與資料雜湊。
 9. 正常返回層級：書籍詳情 → 圖書總覽；使用者手動從搜尋進入詳情則保留搜尋歷史。WebView 先載父頁再載目標，不把後端檢索當頁面歷史。
 10. 最新修正：每次**新的助理導航**先清除 `TPRoute.main` 之上的舊頁，再建新服務正常父頁。案件進度 → 助理開圖書 → 按叉叉／圖書首頁按返回，回 App 主畫面，不回舊案件頁。一般回覆、候選確認、取消、無效目標不清頁。
-11. Debug 開放助理、release 預設關閉；debug cleartext 僅限 localhost／127.0.0.1／10.0.2.2。USB／模擬器用 adb reverse，不必開放區網端口。
+11. 單一精確命中且停用的功能（如「幫我掛號」）由程式直接回目錄內的未串接原因，不呼叫模型；多候選仍走確認。
+12. Debug 開放助理、release 預設關閉；debug cleartext 僅限 localhost／127.0.0.1／10.0.2.2。USB／模擬器用 adb reverse，不必開放區網端口。
 
 ## 尚未完成與下一步
 
 - 所有表單的欄位 schema、型別／enum 選項抽取、模糊欄位確認與受控預填 adapter；目前主要是導頁與圖書檢索。
 - 語音輸入／Whisper、朗讀、正式城市通會員與服務 API、實際借閱／預約／付款／送件、動作結果稽核。
 - 缺 API、金鑰、空回呼、依賴前頁 store 的功能仍停用。不能靠新增關鍵字就改為已啟用。
-- 全功能版本的 live-model 自動回歸集待補；`assistant_backend/evaluate.py` 仍保留第一階段預期，多本書曾預期搜尋頁、水費曾預期未支援，和目前 contract 2 行為不同。
-- 最新「新導航清舊頁」已完成自動回歸，尚待使用者重新 Run 後實際按叉叉／Android 返回驗收。使用者先前回報第一批整體測試沒有明顯問題，不能推論最後修正已實機驗收。
+- `assets/assistant/capabilities.json` 的 `police.online` 之 `mode` 是陣列而非 `demo` 字串，導覽回覆因此少了示範資料提示，待核對。
+- 「新導航清舊頁」已由使用者於 2026-11-05 實機驗收（叉叉／Android 返回），回報沒有問題。
 - 後續依 [全功能分步計畫](AI_ALL_FEATURES_ROLLOUT_PLAN.md) 推進；新 agent 先讀 [交接文件](AI_AGENT_HANDOFF.md)。
 
 ## 實際執行的驗證
 
 | 檢查 | 最近結果與限制 |
 | --- | --- |
-| Python unittest | 30 個通過；fake model 驗證流程、候選隔離與規則，不當作模型準確率 |
+| Python unittest | 36 個通過；fake model 驗證流程、候選隔離與規則，不當作模型準確率 |
+| contract 2 live-model 回歸 | `evaluate.py` 88 個案例／109 輪全數通過，非預期導航 0、錯誤目的地 0。開發集，不是 held-out 準確率 |
 | Flutter tests | 17 個通過；包含案件 → 圖書關閉／系統返回、Web → 原生父頁與取消遲到回覆 |
 | 實際 Ministral 開發案例 | 第一批 6 個一般／候選／排行案例符合預期；不是 held-out 準確率 |
 | App Dart client → HTTP → 模型 | 中文 UTF-8 bytes/contentLength 傳輸與圖書導覽通過 |
@@ -54,7 +56,8 @@ TownPass/
 │  ├─ workflow.py                              # 一般回覆、分頁、候選確認與 session 狀態
 │  ├─ test_server.py                           # 圖書與 HTTP／工具白名單回歸
 │  ├─ test_workflow.py                         # 全功能目錄、歧義、候選生命週期回歸
-│  ├─ evaluate.py                              # 第一階段 live-model 開發集，待更新到 contract 2
+│  ├─ evaluate.py                              # contract 2 live-model 回歸集（HTTP、多輪候選情境）
+│  ├─ test_evaluate.py                         # 回歸集本身的離線檢查，不呼叫模型
 │  └─ README.md                                # 後端啟動與契約說明
 ├─ lib/
 │  ├─ main.dart                                # 助理開關、GetX 初始化、overlay 與路由 observer

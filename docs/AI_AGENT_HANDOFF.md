@@ -53,12 +53,14 @@ Vue 網頁不在此 repo；需要受控表單 adapter 時需另外處理 TownPas
 - `AssistantActionExecutor` 先驗目標，確認有效後才 `Get.until(TPRoute.main)`，再開新服務。不要改回直接連續 push。原生子頁要驗整條父頁鏈。
 - GetX + asset 的 widget tests：capability 開啟涉及 rootBundle，使用 `tester.runAsync` 包含開啟動作，避免快取 Future 留在不同 fake-async zone；測試間 reset GetX。
 - `/health` 不會測模型或所有遠端頁；不可以拿 health 200 當作完整串線成功。
-- `evaluate.py` 是舊的開發集，預期需更新後才可用於 contract 2 gate；輸出 evaluation.json 已忽略。不是新功能壞掉就把 validator 放寬。
+- `evaluate.py` 已是 contract 2 的 live-model 回歸集（需先啟動後端與 Ollama）；輸出 evaluation.json 已忽略。
+  目前 88 個案例全數通過；之後出現失敗先查後端行為，不要為了全綠把預期或 validator 放寬。
+- 單一精確命中的停用能力由 `Workflow.handle` 直接回原因、不呼叫模型（3b 模型遇到不可用候選傾向回補問）。
 
 ## 建議接續順序
 
 1. 查看 Git 狀態、目前版本，回報理解的進度與本次要處理的範圍；不要自行重做已完成的泡泡或改框架。
-2. 若使用者未指定新功能，先協助驗收最新導航修正，並把 live-model 評估集更新為 contract 2：一般回覆、歧義確認、選擇後落點、否定／複合需求、無候選、未知輸入與取消。
+2. 最新導航修正已由使用者實機驗收，live-model 評估集已更新為 contract 2 且全數通過。
 3. 依計畫補 service/provider 與內部 operation schema；優先選可在原頁確認、具備資料來源的唯讀操作。
 4. 再做欄位抽取／模糊 enum 確認及受控預填。先明確欄位名稱、型別、合法值、來源與寫入邊界，再實作，不用任意 JS 尋找／點擊欄位。
 5. 各批提供單元／widget／wire 測試及人工測試表，更新最新進度。外部 API／認證沒到，留停用原因，不造完成狀態。
@@ -75,7 +77,7 @@ fvm flutter build apk --debug
 git diff --check
 ```
 
-目前基線：Python 30／Flutter 17 通過；analyze 零 error、7 warning、16 info，皆在既有非助理檔案。
+目前基線：Python 36／Flutter 17 通過；analyze 零 error、7 warning、16 info，皆在既有非助理檔案。
 變更 asset／模型／pubspec 時執行 `fvm dart run build_runner build`，不手改或提交被忽略產生碼。
 串線可先啟後端，再 `fvm dart run tool/smoke_assistant.dart`；實際 UI 由使用者測。
 Hot reload 不會更新 Python 程式；有新 asset／dart-define 時 Stop 再 Run。
@@ -87,5 +89,5 @@ Hot reload 不會更新 Python 程式；有新 asset／dart-define 時 Stop 再 
 ```text
 請接續此 TownPass fork 的地端服務助理開發。先讀 AGENTS.md、docs/AI_ASSISTANT_PROGRESS.md、docs/AI_AGENT_HANDOFF.md、docs/AI_ALL_FEATURES_ROLLOUT_PLAN.md，再檢查 Git 分支、status 與目前程式，不覆蓋未提交工作。
 目前使用 ministral-3:3b、Python stdlib 後端、Flutter/GetX 與原 WebView；有 70 項目錄、41 項允許導頁，表單預填與正式交易未完成。保留候選確認、防遲到回覆、UTF-8 HTTP 及新助理跳轉清除舊服務歷史的行為。
-先簡短回報目前完成／待辦與功能相關檔案位置，再依我接下來指定的任務分步實作。若未指定，先協助驗收最新導航並規劃更新 contract 2 的模型回歸集。實際 UI 操作由我做，請給輸入、預期落點及返回結果；不要把未測項目當通過。不要自行升級架構、改用中國開發模型或 push。
+先簡短回報目前完成／待辦與功能相關檔案位置，再依我接下來指定的任務分步實作。若未指定，先依計畫提出下一批範圍。實際 UI 操作由我做，請給輸入、預期落點及返回結果；不要把未測項目當通過。不要自行升級架構、改用中國開發模型或 push。
 ```

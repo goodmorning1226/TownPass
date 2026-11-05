@@ -177,6 +177,11 @@ class Workflow:
                     return None  # Existing, validated library tool pipeline.
         if matches:
             entries = [m["entry"] for m in matches]
+            if len(matches) == 1 and not matches[0]["fuzzy"] and not entries[0]["enabled"]:
+                # A single exact match to a disconnected capability has nothing to
+                # decide: state the reviewed reason instead of asking the model,
+                # which tended to answer such candidates with a clarification.
+                return self._navigate(payload, entries[0])
             ambiguous = len(entries) > 1 or any(m["fuzzy"] for m in matches)
             name, args = self._decide(text, entries, ambiguous)
             if name == "confirm_candidates":
