@@ -1,0 +1,1335 @@
+{
+  "version": 1,
+  "source": "TownPass e4fbd3c / TownPass-Services 3274852a; reviewed 2026-11-05",
+  "capabilities": [
+    {
+      "id": "app.home",
+      "title": "首頁",
+      "category": "App",
+      "keywords": [
+        "回首頁",
+        "主畫面"
+      ],
+      "features": [],
+      "enabled": true,
+      "reason": "",
+      "mode": "local",
+      "navigation": {
+        "type": "tab",
+        "index": 1
+      }
+    },
+    {
+      "id": "app.services",
+      "title": "服務總覽",
+      "category": "App",
+      "keywords": [
+        "服務選單",
+        "所有服務"
+      ],
+      "features": [],
+      "enabled": true,
+      "reason": "",
+      "mode": "local",
+      "navigation": {
+        "type": "tab",
+        "index": 0
+      }
+    },
+    {
+      "id": "app.perks",
+      "title": "優惠",
+      "category": "優惠票券",
+      "keywords": [
+        "優惠",
+        "優惠券",
+        "折扣"
+      ],
+      "features": [],
+      "enabled": true,
+      "reason": "",
+      "mode": "demo",
+      "navigation": {
+        "type": "tab",
+        "index": 2
+      }
+    },
+    {
+      "id": "app.bills",
+      "title": "帳務",
+      "category": "帳務",
+      "keywords": [
+        "帳務",
+        "帳單",
+        "繳費"
+      ],
+      "features": [],
+      "enabled": true,
+      "reason": "",
+      "mode": "demo",
+      "navigation": {
+        "type": "tab",
+        "index": 3
+      }
+    },
+    {
+      "id": "account",
+      "title": "帳號",
+      "category": "帳號設定",
+      "keywords": [
+        "我的帳號",
+        "帳戶"
+      ],
+      "features": [],
+      "enabled": true,
+      "reason": "",
+      "mode": "demo",
+      "navigation": {
+        "type": "native",
+        "route": "/account",
+        "parents": []
+      }
+    },
+    {
+      "id": "settings",
+      "title": "設定",
+      "category": "帳號設定",
+      "keywords": [
+        "設定",
+        "偏好"
+      ],
+      "features": [],
+      "enabled": true,
+      "reason": "",
+      "mode": "local",
+      "navigation": {
+        "type": "native",
+        "route": "/setting",
+        "parents": [
+          "/account"
+        ]
+      }
+    },
+    {
+      "id": "profile",
+      "title": "基本資料",
+      "category": "帳號設定",
+      "keywords": [
+        "基本資料",
+        "個人資料",
+        "電子郵件",
+        "手機號碼",
+        "住址"
+      ],
+      "features": [],
+      "enabled": true,
+      "reason": "",
+      "mode": "demo",
+      "navigation": {
+        "type": "native",
+        "route": "/basic_info",
+        "parents": [
+          "/account",
+          "/setting"
+        ]
+      }
+    },
+    {
+      "id": "start_page",
+      "title": "App 起始頁面",
+      "category": "帳號設定",
+      "keywords": [
+        "起始頁",
+        "預設頁面",
+        "啟動頁"
+      ],
+      "features": [],
+      "enabled": true,
+      "reason": "",
+      "mode": "local",
+      "navigation": {
+        "type": "native",
+        "route": "/setting_start_page",
+        "parents": [
+          "/account",
+          "/setting"
+        ]
+      }
+    },
+    {
+      "id": "pinned",
+      "title": "我的服務與置頂",
+      "category": "App",
+      "keywords": [
+        "置頂",
+        "常用服務",
+        "我的服務"
+      ],
+      "features": [],
+      "enabled": true,
+      "reason": "",
+      "mode": "local",
+      "navigation": {
+        "type": "native",
+        "route": "/service_edit",
+        "parents": []
+      }
+    },
+    {
+      "id": "messages",
+      "title": "訊息",
+      "category": "App",
+      "keywords": [
+        "訊息",
+        "通知內容"
+      ],
+      "features": [],
+      "enabled": true,
+      "reason": "",
+      "mode": "demo",
+      "navigation": {
+        "type": "native",
+        "route": "/message",
+        "parents": [
+          "/account"
+        ]
+      }
+    },
+    {
+      "id": "activities",
+      "title": "活動資訊",
+      "category": "App",
+      "keywords": [
+        "活動資訊",
+        "活動列表"
+      ],
+      "features": [],
+      "enabled": true,
+      "reason": "",
+      "mode": "demo",
+      "navigation": {
+        "type": "native",
+        "route": "/activity_list",
+        "parents": []
+      }
+    },
+    {
+      "id": "invoice",
+      "title": "手機載具",
+      "category": "帳號設定",
+      "keywords": [
+        "手機載具",
+        "發票"
+      ],
+      "features": [
+        "查看示範載具頁"
+      ],
+      "enabled": true,
+      "reason": "",
+      "mode": "demo",
+      "navigation": {
+        "type": "native",
+        "route": "/invoice_receipt",
+        "parents": [
+          "/account",
+          "/setting"
+        ]
+      }
+    },
+    {
+      "id": "feedback",
+      "title": "意見回饋",
+      "category": "帳號設定",
+      "keywords": [
+        "意見回饋",
+        "App問題"
+      ],
+      "features": [
+        "開啟表單；送出尚未實作"
+      ],
+      "enabled": true,
+      "reason": "",
+      "mode": "demo",
+      "navigation": {
+        "type": "native",
+        "route": "/feedback",
+        "parents": [
+          "/account"
+        ]
+      }
+    },
+    {
+      "id": "language",
+      "title": "語言",
+      "category": "待串接",
+      "keywords": [
+        "語言",
+        "英文介面"
+      ],
+      "features": [],
+      "enabled": false,
+      "reason": "原語言切換尚未實作。",
+      "mode": "demo",
+      "navigation": null
+    },
+    {
+      "id": "notification_settings",
+      "title": "通知提醒設定",
+      "category": "待串接",
+      "keywords": [
+        "通知設定",
+        "提醒開關"
+      ],
+      "features": [],
+      "enabled": false,
+      "reason": "通知偏好儲存尚待串接驗證。",
+      "mode": "demo",
+      "navigation": null
+    },
+    {
+      "id": "quick_login",
+      "title": "快速登入",
+      "category": "待串接",
+      "keywords": [
+        "快速登入",
+        "生物辨識"
+      ],
+      "features": [],
+      "enabled": false,
+      "reason": "正式登入與快速登入尚未串接。",
+      "mode": "demo",
+      "navigation": null
+    },
+    {
+      "id": "authorization",
+      "title": "歷程與授權管理",
+      "category": "待串接",
+      "keywords": [
+        "授權管理",
+        "使用歷程"
+      ],
+      "features": [],
+      "enabled": false,
+      "reason": "目前只有示範標籤，未提供正式紀錄。",
+      "mode": "demo",
+      "navigation": null
+    },
+    {
+      "id": "logout",
+      "title": "登出",
+      "category": "待串接",
+      "keywords": [
+        "登出"
+      ],
+      "features": [],
+      "enabled": false,
+      "reason": "正式帳號登入／登出尚未串接。",
+      "mode": "demo",
+      "navigation": null
+    },
+    {
+      "id": "suspend",
+      "title": "停用帳號",
+      "category": "待串接",
+      "keywords": [
+        "停用帳號",
+        "刪除帳號"
+      ],
+      "features": [],
+      "enabled": false,
+      "reason": "正式停用功能尚未串接。",
+      "mode": "demo",
+      "navigation": null
+    },
+    {
+      "id": "news",
+      "title": "市政新聞",
+      "category": "待串接",
+      "keywords": [
+        "市政新聞"
+      ],
+      "features": [],
+      "enabled": false,
+      "reason": "原入口尚未接上。",
+      "mode": "demo",
+      "navigation": null
+    },
+    {
+      "id": "bill_settings",
+      "title": "我的帳務設定",
+      "category": "待串接",
+      "keywords": [
+        "新增帳務",
+        "帳務設定"
+      ],
+      "features": [],
+      "enabled": false,
+      "reason": "原設定及新增卡片尚未實作。",
+      "mode": "demo",
+      "navigation": null
+    },
+    {
+      "id": "1999",
+      "title": "1999",
+      "category": "城市服務",
+      "keywords": [
+        "1999",
+        "市民熱線"
+      ],
+      "features": [
+        "服務說明",
+        "電話入口"
+      ],
+      "enabled": false,
+      "reason": "服務清單入口空白；助理不自動撥號。",
+      "mode": "demo",
+      "navigation": null
+    },
+    {
+      "id": "districtOffice",
+      "title": "申辦服務",
+      "category": "城市服務",
+      "keywords": [
+        "申辦",
+        "申請",
+        "市政府服務"
+      ],
+      "features": [
+        "申請分類",
+        "表單",
+        "案件進度"
+      ],
+      "enabled": true,
+      "reason": "",
+      "mode": "demo",
+      "navigation": {
+        "type": "web",
+        "path": "/",
+        "parents": [],
+        "query": {}
+      }
+    },
+    {
+      "id": "reportIssue",
+      "title": "有話要說",
+      "category": "城市服務",
+      "keywords": [
+        "有話要說",
+        "陳情",
+        "申訴"
+      ],
+      "features": [
+        "分類",
+        "案件查詢",
+        "地點",
+        "標題",
+        "描述"
+      ],
+      "enabled": true,
+      "reason": "",
+      "mode": "demo",
+      "navigation": {
+        "type": "web",
+        "path": "/citizen-report/",
+        "parents": [],
+        "query": {}
+      }
+    },
+    {
+      "id": "reservation",
+      "title": "臨櫃叫號",
+      "category": "城市服務",
+      "keywords": [
+        "臨櫃",
+        "叫號",
+        "候號",
+        "櫃檯",
+        "現在幾號"
+      ],
+      "features": [
+        "單位",
+        "櫃檯",
+        "候號",
+        "常用單位"
+      ],
+      "enabled": true,
+      "reason": "",
+      "mode": "demo",
+      "navigation": {
+        "type": "web",
+        "path": "/counter-calling/",
+        "parents": [],
+        "query": {}
+      }
+    },
+    {
+      "id": "iVoting",
+      "title": "網路投票",
+      "category": "城市服務",
+      "keywords": [
+        "網路投票",
+        "投票"
+      ],
+      "features": [
+        "投票主題",
+        "選項"
+      ],
+      "enabled": false,
+      "reason": "原服務未提供入口。",
+      "mode": "demo",
+      "navigation": null
+    },
+    {
+      "id": "dashboard",
+      "title": "市政資訊儀表板",
+      "category": "城市服務",
+      "keywords": [
+        "儀表板",
+        "市政數據"
+      ],
+      "features": [
+        "資料主題",
+        "圖表"
+      ],
+      "enabled": false,
+      "reason": "外部網域連線尚待重新驗證。",
+      "mode": "demo",
+      "navigation": null
+    },
+    {
+      "id": "survey",
+      "title": "意見調查",
+      "category": "城市服務",
+      "keywords": [
+        "問卷",
+        "意見調查"
+      ],
+      "features": [
+        "問卷",
+        "題目",
+        "選項"
+      ],
+      "enabled": false,
+      "reason": "原服務未提供入口。",
+      "mode": "demo",
+      "navigation": null
+    },
+    {
+      "id": "police",
+      "title": "警政服務",
+      "category": "城市服務",
+      "keywords": [
+        "警政",
+        "報案",
+        "警察"
+      ],
+      "features": [
+        "線上報案",
+        "案件紀錄",
+        "電話說明"
+      ],
+      "enabled": true,
+      "reason": "",
+      "mode": "demo",
+      "navigation": {
+        "type": "native",
+        "route": "/online_police",
+        "parents": []
+      }
+    },
+    {
+      "id": "neighborhood",
+      "title": "里辦服務",
+      "category": "城市服務",
+      "keywords": [
+        "里辦",
+        "里長"
+      ],
+      "features": [
+        "區里",
+        "聯絡資訊"
+      ],
+      "enabled": false,
+      "reason": "原服務未提供入口。",
+      "mode": "demo",
+      "navigation": null
+    },
+    {
+      "id": "disasterReport",
+      "title": "災情通報",
+      "category": "城市服務",
+      "keywords": [
+        "災情",
+        "災害通報"
+      ],
+      "features": [
+        "災情類別",
+        "地點",
+        "描述"
+      ],
+      "enabled": true,
+      "reason": "",
+      "mode": "demo",
+      "navigation": {
+        "type": "web",
+        "path": "/disaster-report",
+        "parents": [],
+        "query": {}
+      }
+    },
+    {
+      "id": "vaccineAppointment",
+      "title": "疫苗預約",
+      "category": "城市服務",
+      "keywords": [
+        "疫苗",
+        "接種"
+      ],
+      "features": [
+        "疫苗",
+        "院所",
+        "日期"
+      ],
+      "enabled": false,
+      "reason": "尚無實際服務入口或預約 API。",
+      "mode": "demo",
+      "navigation": null
+    },
+    {
+      "id": "medicalAppointment",
+      "title": "聯醫掛號",
+      "category": "城市服務",
+      "keywords": [
+        "掛號",
+        "聯醫",
+        "看診"
+      ],
+      "features": [
+        "院區",
+        "科別",
+        "醫師",
+        "日期"
+      ],
+      "enabled": false,
+      "reason": "尚無正式掛號入口與 API。",
+      "mode": "demo",
+      "navigation": null
+    },
+    {
+      "id": "cityRadio",
+      "title": "台北電台",
+      "category": "城市服務",
+      "keywords": [
+        "電台",
+        "廣播",
+        "收聽"
+      ],
+      "features": [
+        "節目",
+        "頻道"
+      ],
+      "enabled": false,
+      "reason": "尚無核對過的播放入口。",
+      "mode": "demo",
+      "navigation": null
+    },
+    {
+      "id": "familyCenter",
+      "title": "親子館",
+      "category": "城市服務",
+      "keywords": [
+        "親子館",
+        "親子活動"
+      ],
+      "features": [
+        "館別",
+        "活動",
+        "報名"
+      ],
+      "enabled": false,
+      "reason": "原服務未提供入口。",
+      "mode": "demo",
+      "navigation": null
+    },
+    {
+      "id": "greenMap",
+      "title": "簡單森呼吸",
+      "category": "城市服務",
+      "keywords": [
+        "森呼吸",
+        "綠化地圖"
+      ],
+      "features": [
+        "綠地",
+        "地圖"
+      ],
+      "enabled": false,
+      "reason": "尚無核對過的地點資料。",
+      "mode": "demo",
+      "navigation": null
+    },
+    {
+      "id": "petFriendlyMap",
+      "title": "寵物安心遛",
+      "category": "城市服務",
+      "keywords": [
+        "寵物",
+        "遛狗"
+      ],
+      "features": [
+        "友善地點",
+        "地圖"
+      ],
+      "enabled": false,
+      "reason": "原服務未提供入口。",
+      "mode": "demo",
+      "navigation": null
+    },
+    {
+      "id": "waterMeter",
+      "title": "用水服務",
+      "category": "城市服務",
+      "keywords": [
+        "用水",
+        "自報度數",
+        "水表"
+      ],
+      "features": [
+        "用水查詢",
+        "度數"
+      ],
+      "enabled": false,
+      "reason": "用水服務尚未串接；可另使用水費示範頁。",
+      "mode": "demo",
+      "navigation": null
+    },
+    {
+      "id": "essentialGoods",
+      "title": "民生物資",
+      "category": "城市服務",
+      "keywords": [
+        "物資",
+        "交易量"
+      ],
+      "features": [
+        "類別",
+        "交易量",
+        "金額"
+      ],
+      "enabled": false,
+      "reason": "原服務未提供資料來源。",
+      "mode": "demo",
+      "navigation": null
+    },
+    {
+      "id": "library",
+      "title": "圖書借閱",
+      "category": "城市服務",
+      "keywords": [
+        "圖書",
+        "借書",
+        "借閱",
+        "找書",
+        "館藏",
+        "ISBN",
+        "作者",
+        "取書館",
+        "冊次"
+      ],
+      "features": [
+        "書名搜尋",
+        "書籍詳情",
+        "借閱紀錄",
+        "排行榜",
+        "公告"
+      ],
+      "enabled": true,
+      "reason": "",
+      "mode": "demo",
+      "navigation": {
+        "type": "web",
+        "path": "/library-service/",
+        "parents": [],
+        "query": {}
+      }
+    },
+    {
+      "id": "locationSearch",
+      "title": "找地點",
+      "category": "城市服務",
+      "keywords": [
+        "找地點",
+        "周邊",
+        "鄰近",
+        "附近地點"
+      ],
+      "features": [
+        "地點類別",
+        "附近資訊",
+        "地圖"
+      ],
+      "enabled": false,
+      "reason": "地圖金鑰、定位與資料來源尚未完成驗證。",
+      "mode": "demo",
+      "navigation": null
+    },
+    {
+      "id": "zoo",
+      "title": "愛遊動物園",
+      "category": "城市服務",
+      "keywords": [
+        "動物園",
+        "園區導覽"
+      ],
+      "features": [
+        "園區",
+        "地圖"
+      ],
+      "enabled": false,
+      "reason": "原服務未提供入口。",
+      "mode": "demo",
+      "navigation": null
+    },
+    {
+      "id": "library.ranking",
+      "title": "圖書點閱排行榜",
+      "category": "圖書子功能",
+      "keywords": [
+        "圖書排行榜",
+        "熱門書",
+        "點閱排行",
+        "排行"
+      ],
+      "features": [],
+      "enabled": true,
+      "reason": "",
+      "mode": "demo",
+      "navigation": {
+        "type": "web",
+        "path": "/library-service/ranking-list",
+        "parents": [
+          "/library-service/"
+        ],
+        "query": {}
+      }
+    },
+    {
+      "id": "library.notices",
+      "title": "圖書公告",
+      "category": "圖書子功能",
+      "keywords": [
+        "圖書公告",
+        "圖書館消息"
+      ],
+      "features": [],
+      "enabled": true,
+      "reason": "",
+      "mode": "demo",
+      "navigation": {
+        "type": "web",
+        "path": "/library-service/notice-list",
+        "parents": [
+          "/library-service/"
+        ],
+        "query": {}
+      }
+    },
+    {
+      "id": "library.records",
+      "title": "我的借閱紀錄",
+      "category": "圖書子功能",
+      "keywords": [
+        "借閱紀錄",
+        "我的借閱",
+        "還書日期",
+        "借閱歷史"
+      ],
+      "features": [],
+      "enabled": true,
+      "reason": "",
+      "mode": "demo",
+      "navigation": {
+        "type": "web",
+        "path": "/library-service/",
+        "parents": [
+          "/library-service/"
+        ],
+        "query": {
+          "type": "1"
+        }
+      }
+    },
+    {
+      "id": "library.reservations",
+      "title": "圖書預約清單",
+      "category": "圖書子功能",
+      "keywords": [
+        "預約清單",
+        "取書通知"
+      ],
+      "features": [],
+      "enabled": false,
+      "reason": "可從圖書頁的我的借閱查看；指定預約子標籤尚無受控接口。",
+      "mode": "demo",
+      "navigation": null
+    },
+    {
+      "id": "library.map",
+      "title": "圖書館地圖",
+      "category": "圖書子功能",
+      "keywords": [
+        "圖書館地圖",
+        "找圖書館"
+      ],
+      "features": [],
+      "enabled": false,
+      "reason": "地圖金鑰與定位尚待驗證。",
+      "mode": "demo",
+      "navigation": null
+    },
+    {
+      "id": "library.prefill",
+      "title": "冊次與取書館選擇",
+      "category": "圖書子功能",
+      "keywords": [
+        "選冊次",
+        "選取書館",
+        "預填取書館"
+      ],
+      "features": [],
+      "enabled": false,
+      "reason": "可在原書籍頁手動選擇；自動預填 Adapter 尚未完成。",
+      "mode": "demo",
+      "navigation": null
+    },
+    {
+      "id": "coupon.list",
+      "title": "優惠列表",
+      "category": "優惠票券",
+      "keywords": [
+        "優惠列表",
+        "找優惠"
+      ],
+      "features": [],
+      "enabled": true,
+      "reason": "",
+      "mode": "demo",
+      "navigation": {
+        "type": "web",
+        "path": "/coupon/list",
+        "parents": [
+          "/coupon/"
+        ],
+        "query": {}
+      }
+    },
+    {
+      "id": "wallet",
+      "title": "票夾",
+      "category": "優惠票券",
+      "keywords": [
+        "票夾",
+        "我的票券",
+        "取票"
+      ],
+      "features": [],
+      "enabled": true,
+      "reason": "",
+      "mode": "demo",
+      "navigation": {
+        "type": "web",
+        "path": "/ticket-wallet",
+        "parents": [
+          "/coupon/"
+        ],
+        "query": {}
+      }
+    },
+    {
+      "id": "subscription",
+      "title": "訂閱總覽",
+      "category": "訂閱",
+      "keywords": [
+        "訂閱",
+        "訂閱服務"
+      ],
+      "features": [],
+      "enabled": true,
+      "reason": "",
+      "mode": "demo",
+      "navigation": {
+        "type": "web",
+        "path": "/subscription",
+        "parents": [],
+        "query": {}
+      }
+    },
+    {
+      "id": "subscription.items",
+      "title": "訂閱項目",
+      "category": "訂閱",
+      "keywords": [
+        "訂閱項目",
+        "訂閱內容"
+      ],
+      "features": [],
+      "enabled": true,
+      "reason": "",
+      "mode": "demo",
+      "navigation": {
+        "type": "web",
+        "path": "/subscription/item-list",
+        "parents": [
+          "/subscription"
+        ],
+        "query": {}
+      }
+    },
+    {
+      "id": "fees.history",
+      "title": "帳務紀錄",
+      "category": "帳務",
+      "keywords": [
+        "繳費紀錄",
+        "帳務紀錄",
+        "付款紀錄"
+      ],
+      "features": [],
+      "enabled": true,
+      "reason": "",
+      "mode": "demo",
+      "navigation": {
+        "type": "web",
+        "path": "/fee-payment/history/",
+        "parents": [],
+        "query": {},
+        "tab_parent": 3
+      }
+    },
+    {
+      "id": "fees.scan",
+      "title": "掃描繳費",
+      "category": "帳務",
+      "keywords": [
+        "掃描繳費",
+        "掃帳單"
+      ],
+      "features": [],
+      "enabled": true,
+      "reason": "",
+      "mode": "demo",
+      "navigation": {
+        "type": "web",
+        "path": "/fee-payment/scan/",
+        "parents": [],
+        "query": {},
+        "tab_parent": 3
+      }
+    },
+    {
+      "id": "fees.parking",
+      "title": "停車費",
+      "category": "帳務",
+      "keywords": [
+        "停車費",
+        "停車繳費"
+      ],
+      "features": [],
+      "enabled": true,
+      "reason": "",
+      "mode": "demo",
+      "navigation": {
+        "type": "web",
+        "path": "/fee-payment/detail/fee-5/",
+        "parents": [],
+        "query": {},
+        "tab_parent": 3
+      }
+    },
+    {
+      "id": "fees.water",
+      "title": "水費",
+      "category": "帳務",
+      "keywords": [
+        "水費"
+      ],
+      "features": [],
+      "enabled": true,
+      "reason": "",
+      "mode": "demo",
+      "navigation": {
+        "type": "web",
+        "path": "/fee-payment/detail/fee-6/",
+        "parents": [],
+        "query": {},
+        "tab_parent": 3
+      }
+    },
+    {
+      "id": "fees.tax",
+      "title": "地方稅",
+      "category": "帳務",
+      "keywords": [
+        "地方稅"
+      ],
+      "features": [],
+      "enabled": true,
+      "reason": "",
+      "mode": "demo",
+      "navigation": {
+        "type": "web",
+        "path": "/fee-payment/detail/tax-1/",
+        "parents": [],
+        "query": {},
+        "tab_parent": 3
+      }
+    },
+    {
+      "id": "fees.tuition",
+      "title": "學雜費",
+      "category": "帳務",
+      "keywords": [
+        "學雜費"
+      ],
+      "features": [],
+      "enabled": true,
+      "reason": "",
+      "mode": "demo",
+      "navigation": {
+        "type": "web",
+        "path": "/fee-payment/detail/fee-7/",
+        "parents": [],
+        "query": {},
+        "tab_parent": 3
+      }
+    },
+    {
+      "id": "fees.housing",
+      "title": "國／社宅租金維管費",
+      "category": "帳務",
+      "keywords": [
+        "國／社宅租金維管費"
+      ],
+      "features": [],
+      "enabled": true,
+      "reason": "",
+      "mode": "demo",
+      "navigation": {
+        "type": "web",
+        "path": "/fee-payment/detail/fee-8/",
+        "parents": [],
+        "query": {},
+        "tab_parent": 3
+      }
+    },
+    {
+      "id": "fees.hospital",
+      "title": "聯醫醫療費",
+      "category": "帳務",
+      "keywords": [
+        "聯醫醫療費"
+      ],
+      "features": [],
+      "enabled": true,
+      "reason": "",
+      "mode": "demo",
+      "navigation": {
+        "type": "web",
+        "path": "/fee-payment/detail/fee-9/",
+        "parents": [],
+        "query": {},
+        "tab_parent": 3
+      }
+    },
+    {
+      "id": "fees.maintenance",
+      "title": "平價住宅維護費",
+      "category": "帳務",
+      "keywords": [
+        "平價住宅維護費"
+      ],
+      "features": [],
+      "enabled": true,
+      "reason": "",
+      "mode": "demo",
+      "navigation": {
+        "type": "web",
+        "path": "/fee-payment/detail/fee-10/",
+        "parents": [],
+        "query": {},
+        "tab_parent": 3
+      }
+    },
+    {
+      "id": "fees.course",
+      "title": "公訓處自費課程",
+      "category": "帳務",
+      "keywords": [
+        "公訓處自費課程"
+      ],
+      "features": [],
+      "enabled": true,
+      "reason": "",
+      "mode": "demo",
+      "navigation": {
+        "type": "web",
+        "path": "/fee-payment/detail/fee-11/",
+        "parents": [],
+        "query": {},
+        "tab_parent": 3
+      }
+    },
+    {
+      "id": "fees.other",
+      "title": "其他繳費",
+      "category": "帳務",
+      "keywords": [
+        "其他繳費"
+      ],
+      "features": [],
+      "enabled": true,
+      "reason": "",
+      "mode": "demo",
+      "navigation": {
+        "type": "web",
+        "path": "/fee-payment/others/",
+        "parents": [],
+        "query": {},
+        "tab_parent": 3
+      }
+    },
+    {
+      "id": "police.online",
+      "title": "線上報案",
+      "category": "警政",
+      "keywords": [
+        "線上報案",
+        "網路報案"
+      ],
+      "features": [],
+      "enabled": true,
+      "reason": "",
+      "mode": [
+        "示範表單，正式報案未串接"
+      ],
+      "navigation": {
+        "type": "web",
+        "path": "/police-report",
+        "parents": [],
+        "query": {}
+      }
+    },
+    {
+      "id": "police.records",
+      "title": "報案紀錄",
+      "category": "警政",
+      "keywords": [
+        "報案紀錄",
+        "警政案件紀錄"
+      ],
+      "features": [],
+      "enabled": true,
+      "reason": "",
+      "mode": "demo",
+      "navigation": {
+        "type": "web",
+        "path": "/police-report/record",
+        "parents": [
+          "/police-report"
+        ],
+        "query": {}
+      }
+    },
+    {
+      "id": "districtOffice.progress",
+      "title": "申辦案件進度",
+      "category": "案件查詢",
+      "keywords": [
+        "申辦進度",
+        "案件進度",
+        "案件查詢"
+      ],
+      "features": [],
+      "enabled": true,
+      "reason": "",
+      "mode": "demo",
+      "navigation": {
+        "type": "web",
+        "path": "/",
+        "parents": [],
+        "query": {
+          "isSearch": "1"
+        }
+      }
+    },
+    {
+      "id": "reportIssue.progress",
+      "title": "陳情案件進度",
+      "category": "案件查詢",
+      "keywords": [
+        "陳情進度",
+        "案件進度",
+        "案件查詢"
+      ],
+      "features": [],
+      "enabled": false,
+      "reason": "原頁分類與查詢依賴頁面狀態；請由有話要說首頁手動查詢。",
+      "mode": "demo",
+      "navigation": null
+    },
+    {
+      "id": "disasterReport.progress",
+      "title": "災情案件進度",
+      "category": "案件查詢",
+      "keywords": [
+        "災情進度",
+        "案件進度",
+        "案件查詢"
+      ],
+      "features": [],
+      "enabled": false,
+      "reason": "原示範資料尚無可核對的案件查詢接口。",
+      "mode": "demo",
+      "navigation": null
+    },
+    {
+      "id": "police.progress",
+      "title": "警政案件進度",
+      "category": "案件查詢",
+      "keywords": [
+        "警政進度",
+        "案件進度",
+        "案件查詢"
+      ],
+      "features": [],
+      "enabled": true,
+      "reason": "",
+      "mode": "demo",
+      "navigation": {
+        "type": "web",
+        "path": "/police-report/record",
+        "parents": [
+          "/police-report"
+        ],
+        "query": {}
+      }
+    },
+    {
+      "id": "reportIssue.prefill",
+      "title": "陳情表單預填",
+      "category": "待串接",
+      "keywords": [
+        "陳情預填",
+        "路燈",
+        "道路",
+        "地址",
+        "陳情描述"
+      ],
+      "features": [],
+      "enabled": false,
+      "reason": "原表單尚未提供受控預填與回讀 Adapter；可先開有話要說。",
+      "mode": "demo",
+      "navigation": null
+    }
+  ]
+}

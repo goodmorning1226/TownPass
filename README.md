@@ -8,6 +8,11 @@ Open source is a key driver of technological progress and social development. Th
 
 # Getting Started
 
+For this fork's local AI assistant, start with [team setup](docs/TEAM_LOCAL_SETUP.md),
+[current progress and feature files](docs/AI_ASSISTANT_PROGRESS.md), and
+[agent handoff](docs/AI_AGENT_HANDOFF.md). Read [AGENTS.md](AGENTS.md) before changing code.
+These additions describe this fork; the upstream introduction and guides remain below.
+
 We highly recommend to read through our [document](https://tpe-guideline.web.app/en/docs/) for more detail.
 
 Here are some quick setup guide.

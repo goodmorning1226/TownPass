@@ -13,10 +13,18 @@ import 'package:town_pass/util/web_message_handler/tp_web_message_listener.dart'
 class WebViewArgument {
   final String? url;
   final String? forceTitle;
+  final void Function(String? error)? onAssistantPageLoaded;
+  final List<String>? assistantNavigation;
+  final bool Function()? onAssistantBack;
+  final bool Function()? isAssistantActionCurrent;
 
   const WebViewArgument({
     this.url,
     this.forceTitle,
+    this.onAssistantPageLoaded,
+    this.assistantNavigation,
+    this.onAssistantBack,
+    this.isAssistantActionCurrent,
   });
 }
 
@@ -26,79 +34,148 @@ class WebViewArgument {
 /// ```
 /// Get.toNamed(TPRoute.webView, arguments: url);
 /// ```
-class TPWebView extends StatelessWidget {
+class TPWebView extends StatefulWidget {
   final TPAppBarController? titleController;
 
-  TPWebView({
-    super.key,
-    this.titleController,
-  });
+  const TPWebView({super.key, this.titleController});
 
-  String get url => (Get.arguments as WebViewArgument?)?.url ?? '';
+  @override
+  State<TPWebView> createState() => _TPWebViewState();
+}
 
-  String? get forceTitle => (Get.arguments as WebViewArgument?)?.forceTitle;
+class _TPWebViewState extends State<TPWebView> {
+  late final WebViewArgument? pageArgument = Get.arguments as WebViewArgument?;
+  bool assistantLoadFailed = false;
+  bool navigationCompleted = false;
+  int navigationIndex = 0;
+  late final navigation = List<String>.of(
+    pageArgument?.assistantNavigation ?? [pageArgument?.url ?? ''],
+  );
+
+  String get url => pageArgument?.url ?? '';
+
+  String? get forceTitle => pageArgument?.forceTitle;
 
   final TPAppBarController _defaultTitleController = TPAppBarController();
 
-  TPAppBarController get appBarController => titleController ?? _defaultTitleController;
+  TPAppBarController get appBarController =>
+      widget.titleController ?? _defaultTitleController;
 
-  final Rxn<InAppWebViewController> webViewController = Rxn<InAppWebViewController>();
+  final Rxn<InAppWebViewController> webViewController =
+      Rxn<InAppWebViewController>();
 
   final RxBool canGoBack = RxBool(false);
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: TPAppBar(
-        backgroundColor: TPColors.primary500,
-        foregroundColor: TPColors.white,
-        leading: Obx(
-          () => switch (canGoBack.value) {
-            true => IconButton(
+    Future<void> handleBack() async {
+      if (pageArgument?.onAssistantBack?.call() == true) return;
+      if (await webViewController.value?.canGoBack() == true) {
+        await webViewController.value?.goBack();
+      } else {
+        Get.back();
+      }
+    }
+
+    return PopScope(
+      canPop: pageArgument?.assistantNavigation == null,
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop && pageArgument?.assistantNavigation != null) handleBack();
+      },
+      child: Scaffold(
+        appBar: TPAppBar(
+          backgroundColor: TPColors.primary500,
+          foregroundColor: TPColors.white,
+          leading: Obx(
+            () => switch (canGoBack.value) {
+              true => IconButton(
                 icon: Assets.svg.expand.svg(),
-                onPressed: () async => await webViewController.value?.goBack(),
+                onPressed: () async => await handleBack(),
                 style: const ButtonStyle(
                   iconSize: WidgetStatePropertyAll<double>(24),
                 ),
               ),
-            false => const SizedBox.shrink(),
-          },
-        ),
-        actions: [
-          CloseButton(
-            color: TPColors.white,
-            onPressed: () => Get.back(),
-            style: const ButtonStyle(
-              iconSize: WidgetStatePropertyAll<double>(24),
-            ),
+              false => const SizedBox.shrink(),
+            },
           ),
-        ],
-        title: appBarController.title.value,
-        controller: appBarController,
-      ),
-      body: TPInAppWebView(
-        onWebViewCreated: (controller) {
-          webViewController.value = controller;
-          try {
-            controller.loadUrl(urlRequest: URLRequest(url: WebUri(url)));
-          } catch (_) {
-            controller.loadData(data: _failedToLoadUrlData(url: url));
-          }
-        },
-        onUpdateVisitedHistory: (_, __, ___) async {
-          canGoBack.value = await webViewController.value?.canGoBack() ?? false;
-        },
-        onTitleChanged: (_, title) {
-          appBarController.title.value = switch (forceTitle == null) {
-            true => title,
-            false => forceTitle,
-          };
-        },
-        onGeolocationPermissionsShowPrompt: (controller, origin) async {
-          // should be deal individually (ask for user agreement)
-          return GeolocationPermissionShowPromptResponse(origin: origin, allow: true, retain: true);
-        },
-        onCloseWindow: (_) => Get.back(),
+          actions: [
+            CloseButton(
+              color: TPColors.white,
+              onPressed: () => Get.back(),
+              style: const ButtonStyle(
+                iconSize: WidgetStatePropertyAll<double>(24),
+              ),
+            ),
+          ],
+          title: appBarController.title.value,
+          controller: appBarController,
+        ),
+        body: TPInAppWebView(
+          onLoadStop: (controller, loadedUrl) async {
+            if (!mounted) return;
+            if (navigationCompleted) return;
+            if (pageArgument?.isAssistantActionCurrent?.call() == false) return;
+            if (loadedUrl.toString() != navigation[navigationIndex]) return;
+            if (!assistantLoadFailed &&
+                navigationIndex + 1 < navigation.length) {
+              navigationIndex++;
+              await controller.loadUrl(
+                urlRequest: URLRequest(
+                  url: WebUri(navigation[navigationIndex]),
+                ),
+              );
+              return;
+            }
+            if (!assistantLoadFailed) {
+              navigationCompleted = true;
+              pageArgument?.onAssistantPageLoaded?.call(null);
+            }
+          },
+          onReceivedError: (_, request, error) {
+            if (request.isForMainFrame == true) {
+              assistantLoadFailed = true;
+              pageArgument?.onAssistantPageLoaded?.call(error.description);
+            }
+          },
+          onReceivedHttpError: (_, request, response) {
+            if (request.isForMainFrame == true &&
+                (response.statusCode ?? 200) >= 400) {
+              assistantLoadFailed = true;
+              pageArgument?.onAssistantPageLoaded?.call(
+                'HTTP ${response.statusCode}',
+              );
+            }
+          },
+          onWebViewCreated: (controller) {
+            webViewController.value = controller;
+            try {
+              controller.loadUrl(
+                urlRequest: URLRequest(url: WebUri(navigation.first)),
+              );
+            } catch (_) {
+              controller.loadData(data: _failedToLoadUrlData(url: url));
+            }
+          },
+          onUpdateVisitedHistory: (_, _, _) async {
+            canGoBack.value =
+                await webViewController.value?.canGoBack() ?? false;
+          },
+          onTitleChanged: (_, title) {
+            appBarController.title.value = switch (forceTitle == null) {
+              true => title,
+              false => forceTitle,
+            };
+          },
+          onGeolocationPermissionsShowPrompt: (controller, origin) async {
+            // should be deal individually (ask for user agreement)
+            return GeolocationPermissionShowPromptResponse(
+              origin: origin,
+              allow: true,
+              retain: true,
+            );
+          },
+          onCloseWindow: (_) => Get.back(),
+        ),
       ),
     );
   }

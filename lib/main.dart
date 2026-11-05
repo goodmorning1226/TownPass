@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:town_pass/gen/assets.gen.dart';
@@ -11,6 +12,13 @@ import 'package:town_pass/service/shared_preferences_service.dart';
 import 'package:town_pass/service/subscription_service.dart';
 import 'package:town_pass/util/tp_colors.dart';
 import 'package:town_pass/util/tp_route.dart';
+import 'package:town_pass/page/assistant/assistant_view_controller.dart';
+import 'package:town_pass/page/assistant/widget/assistant_host.dart';
+
+const assistantEnabled = bool.fromEnvironment(
+  'ASSISTANT_ENABLED',
+  defaultValue: kDebugMode,
+);
 
 const _transparentStatusBar = SystemUiOverlayStyle(
   statusBarColor: Colors.transparent,
@@ -33,11 +41,23 @@ Future<void> initServices() async {
   await Get.putAsync<AccountService>(() async => await AccountService().init());
   await Get.putAsync<DeviceService>(() async => await DeviceService().init());
   await Get.putAsync<PackageService>(() async => await PackageService().init());
-  await Get.putAsync<SharedPreferencesService>(() async => await SharedPreferencesService().init());
-  await Get.putAsync<GeoLocatorService>(() async => await GeoLocatorService().init());
-  await Get.putAsync<NotificationService>(() async => await NotificationService().init());
+  await Get.putAsync<SharedPreferencesService>(
+    () async => await SharedPreferencesService().init(),
+  );
+  await Get.putAsync<GeoLocatorService>(
+    () async => await GeoLocatorService().init(),
+  );
+  await Get.putAsync<NotificationService>(
+    () async => await NotificationService().init(),
+  );
 
   Get.put<SubscriptionService>(SubscriptionService());
+  if (assistantEnabled) {
+    Get.put<AssistantViewController>(
+      AssistantViewController(),
+      permanent: true,
+    );
+  }
 }
 
 class MyApp extends StatelessWidget {
@@ -73,6 +93,23 @@ class MyApp extends StatelessWidget {
         NotificationService.requestPermission();
       },
       getPages: TPRoute.page,
+      navigatorObservers: [
+        if (assistantEnabled)
+          AssistantNavigationObserver(Get.find<AssistantViewController>()),
+      ],
+      routingCallback: (routing) {
+        if (assistantEnabled && Get.isRegistered<AssistantViewController>()) {
+          Get.find<AssistantViewController>().routeChanged(
+            routing?.current ?? '',
+          );
+        }
+      },
+      builder: (context, child) => assistantEnabled
+          ? AssistantHost(
+              controller: Get.find<AssistantViewController>(),
+              child: child ?? const SizedBox.shrink(),
+            )
+          : child ?? const SizedBox.shrink(),
     );
   }
 }

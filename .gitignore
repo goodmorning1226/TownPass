@@ -90,3 +90,6 @@ app.*.map.json
 
 # FVM Version Cache
 .fvm/
+
+# Generated local assistant evaluation output
+/assistant_backend/evaluation.json

@@ -3,6 +3,8 @@
 所有 agent 修改前先讀根目錄 [AGENTS.md](../AGENTS.md)。本文件是本 fork 的操作紀錄，
 不是官方認證，也不是正式 API 串接規格。
 
+地端助理的新成員入口：[clone 後建置](TEAM_LOCAL_SETUP.md)、[最新進度與功能檔案架構](AI_ASSISTANT_PROGRESS.md)、[Agent 交接](AI_AGENT_HANDOFF.md)。
+
 ## 來源及分支
 
 - `origin`：團隊的 fork（目前為 `goodmorning1226/TownPass`）。
@@ -91,3 +93,14 @@ App 路由、WebView bridge object／訊息名稱、帳號 JSON schema 不任意
 - [網頁微服務](https://github.com/taipei-doit/TownPass-Services)
 
 本次驗證結果另見 [UPSTREAM_SYNC_20261103.md](UPSTREAM_SYNC_20261103.md)。
+
+## 地端圖書助理（2026-11-05）
+
+第一階段使用非中國開發的 Ministral 3 3B，沿用原圖書頁面。
+啟動方式見 [助理後端 README](../assistant_backend/README.md)，
+驗證結果與未完成範圍見 [第一階段實作紀錄](AI_PHASE1_IMPLEMENTATION.md)。
+Debug 預設有右下角泡泡；可用 `--dart-define=ASSISTANT_ENABLED=false` 停用。
+Release 預設不啟用，正式 API 尚未串接。
+後續擴充依 [全功能助理分步計畫](AI_ALL_FEATURES_ROLLOUT_PLAN.md)，
+先完成目錄與一般對話，再做共同模糊確認及原頁面返回層級。
+第一批擴充已加入，範圍、限制及裝置驗收清單見 [全功能實作紀錄](AI_EXPANSION_IMPLEMENTATION.md)。
