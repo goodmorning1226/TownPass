@@ -1,13 +1,28 @@
 # 地端服務助理
 
 模型固定使用 **Mistral AI `ministral-3:3b`**。不使用 Qwen，也不在失敗時改呼叫其他模型或雲端。
-採 Python 3.11+ 標準函式庫，與 Flutter 分開啟動；無須 pip 安裝套件。
+主後端採 Python 3.11+ 標準函式庫，與 Flutter 分開啟動，無須 pip 安裝套件；
+選用的語音辨識服務（`asr_server.py`）另需 faster-whisper。
 這是本機開發服務，不是正式上線的多使用者 API。
 
 ## 啟動
 
-1. 確認 Ollama 正在執行，`ollama list` 中有 `ministral-3:3b`。
-2. 在專案根目錄開一個 PowerShell，保留視窗：
+先確認 Ollama 正在執行，`ollama list` 中有 `ministral-3:3b`，並啟動 Android 模擬器或接上 USB 實機。
+
+**一鍵啟動（建議）**，在專案根目錄：
+
+```powershell
+.\scripts\start_all.ps1 -Model '<轉換後的 Breeze-ASR-25 資料夾>' -DeviceId <裝置ID>
+```
+
+它會依序檢查 Ollama 與模型、在各自視窗開主後端（:8765）與語音辨識（:8770，已在跑就沿用）、
+等到都正常、替模擬器開電腦麥克風，最後執行 App；任何一步失敗會直接說明原因。
+不給 `-Model`（也沒設 `TOWNPASS_ASR_MODEL`）時只能打字並會提示；`-NoVoice` 刻意不開語音，`-SkipApp` 只啟動並檢查服務。
+開出來的服務視窗要保持開著，關掉就會停止；修改 Python 程式後要關掉該視窗再啟動一次。
+
+**手動逐步啟動**（各開一個 PowerShell，保留視窗）：
+
+1. 主後端：
 
    ```powershell
    .\scripts\start_assistant.ps1
@@ -15,7 +30,15 @@
 
    亦可直接 `python assistant_backend/server.py`。預設只監聽 `127.0.0.1:8765`。
 
-3. 啟動 Android 模擬器或 USB 實機，在另一個 PowerShell 執行：
+2. 語音辨識（選用，按住說話需要；模型轉換見 [TEAM_LOCAL_SETUP.md](../docs/TEAM_LOCAL_SETUP.md) 5.1）：
+
+   ```powershell
+   .\scripts\start_asr.ps1 -Model '<轉換後的 Breeze-ASR-25 資料夾>'
+   ```
+
+   約 30–40 秒載入，只監聽 `127.0.0.1:8770`。沒開時 App 的語音會回「語音辨識服務未啟動」，打字不受影響。
+
+3. App：
 
    ```powershell
    .\scripts\run_assistant_android.ps1
