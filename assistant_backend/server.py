@@ -22,6 +22,9 @@ MODEL = "ministral-3:3b"
 CATALOG_URL = "https://taipei-pass-service.vercel.app/mock/library/library_book_list.json"
 CATALOG_VERSION = "570531a9244c3dba1e1f09907468ca55875ccc4b1af6fe1e5115cfdb2252f4ac"
 CONTRACT = 2
+# Avoid a multi-second model reload after a short idle period during a demo.
+# The model keeps ~3 GB of VRAM while loaded; override with an Ollama duration.
+KEEP_ALIVE = os.environ.get("TOWNPASS_ASSISTANT_KEEP_ALIVE", "30m")
 # Keep one module identity when the standalone entry point imports workflow.
 if __name__ == "__main__":
     sys.modules.setdefault("server", sys.modules[__name__])
@@ -181,6 +184,14 @@ def tools_for(context):
     return tools
 
 
+def proposal_schema(tools):
+    """One branch per tool, so each name can only carry its own arguments."""
+    return {"anyOf": [{"type": "object", "properties": {
+        "name": {"type": "string", "enum": [t["function"]["name"]]},
+        "arguments": t["function"]["parameters"]},
+        "required": ["name", "arguments"], "additionalProperties": False} for t in tools]}
+
+
 def validate_call(call, tools):
     if not isinstance(call, dict) or not isinstance(call.get("function"), dict):
         raise AssistantError("模型回覆格式不正確，請重試或使用原圖書頁面。")
@@ -229,6 +240,7 @@ class Assistant:
         self.model_lock = threading.Lock()
         self.sessions = {}
         self.session_lock = threading.Lock()
+        self.usage = threading.local()  # per-request model call log for metrics
         self.workflow = None
         if expanded:
             from workflow import Workflow
@@ -239,14 +251,7 @@ class Assistant:
             # Ministral's empty-argument native tool calls were unreliable in the
             # local smoke test. Constrain the same proposal contract as JSON, then
             # pass through the SAME tool allowlist/argument validator.
-            names = [t["function"]["name"] for t in tools]
-            properties = {}
-            for item in tools:
-                properties.update(item["function"]["parameters"]["properties"])
-            schema = {"type": "object", "properties": {
-                "name": {"type": "string", "enum": names},
-                "arguments": {"type": "object", "properties": properties, "additionalProperties": False}},
-                "required": ["name", "arguments"], "additionalProperties": False}
+            schema = proposal_schema(tools)
             library_decision = messages[0].get("content") == SYSTEM
             instruction = "Use only the supplied tools and IDs. Follow the system policy and preserve user confirmation for ambiguous/fuzzy candidates. Do not invent operations or claim completion."
             if library_decision:
@@ -256,7 +261,7 @@ class Assistant:
                 "instruction": instruction})}]
             result = fetch_json("http://127.0.0.1:11434/api/chat", {
                 "model": MODEL, "stream": False, "messages": request_messages, "format": schema,
-                "options": {"temperature": 0, "num_ctx": 4096, "num_predict": 180}, "keep_alive": "5m",
+                "options": {"temperature": 0, "num_ctx": 4096, "num_predict": 180}, "keep_alive": KEEP_ALIVE,
             }, timeout=70)
             proposal = json.loads(result.get("message", {}).get("content", ""))
             result["message"] = {"tool_calls": [{"function": proposal}]}
@@ -276,8 +281,14 @@ class Assistant:
             if not isinstance(text, str) or len(text) > 500:
                 raise AssistantError("請輸入最多 500 字的需求。")
             payload = {**payload, "session_id": session, "text": text}
+            started = time.monotonic()
+            self.usage.calls = []
             result = self.workflow.handle(payload)
             if result is not None:
+                tokens = [count for count in self.usage.calls if count is not None]
+                result["metrics"] = {"elapsed_ms": round((time.monotonic() - started) * 1000),
+                    "model_calls": len(self.usage.calls), "prompt_tokens": sum(tokens) if tokens else None,
+                    "model": MODEL if self.usage.calls else None}
                 return result
         result = self._library_turn(payload)
         result["kind"] = "navigate" if result["destination"] else "reply"

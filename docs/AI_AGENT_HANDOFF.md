@@ -2,7 +2,8 @@
 
 交接日期：2026-11-05。先閱讀根目錄 [AGENTS.md](../AGENTS.md)，再讀
 [最新進度與功能檔案架構](AI_ASSISTANT_PROGRESS.md)、[全功能分步計畫](AI_ALL_FEATURES_ROLLOUT_PLAN.md)
-及 [本批實作與人工驗收](AI_EXPANSION_IMPLEMENTATION.md)。新機先走 [TEAM_LOCAL_SETUP.md](TEAM_LOCAL_SETUP.md)。
+、[本批實作與人工驗收](AI_EXPANSION_IMPLEMENTATION.md)
+及 [介面與語音規劃](AI_VOICE_UI_PLAN.md)。新機先走 [TEAM_LOCAL_SETUP.md](TEAM_LOCAL_SETUP.md)。
 若文件有差異，以使用者最新要求、目前原始碼／測試及最新進度為準；第一階段文件是歷史，不是全部當前行為。
 
 ## 產品目標與不可遺失的要求
@@ -77,7 +78,7 @@ fvm flutter build apk --debug
 git diff --check
 ```
 
-目前基線：Python 36／Flutter 17 通過；analyze 零 error、7 warning、16 info，皆在既有非助理檔案。
+目前基線：Python 40／Flutter 17 通過；analyze 零 error、7 warning、16 info，皆在既有非助理檔案。
 變更 asset／模型／pubspec 時執行 `fvm dart run build_runner build`，不手改或提交被忽略產生碼。
 串線可先啟後端，再 `fvm dart run tool/smoke_assistant.dart`；實際 UI 由使用者測。
 Hot reload 不會更新 Python 程式；有新 asset／dart-define 時 Stop 再 Run。

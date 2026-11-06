@@ -1206,12 +1206,12 @@
         "線上報案",
         "網路報案"
       ],
-      "features": [],
-      "enabled": true,
-      "reason": "",
-      "mode": [
+      "features": [
         "示範表單，正式報案未串接"
       ],
+      "enabled": true,
+      "reason": "",
+      "mode": "demo",
       "navigation": {
         "type": "web",
         "path": "/police-report",

@@ -47,11 +47,22 @@ class Workflow:
         if not self.owner.model_lock.acquire(timeout=.1):
             raise self.error("目前有一個需求正在處理，請稍後再試。")
         try:
-            result = self.owner.model_call(messages, tools)
-            calls = result.get("message", {}).get("tool_calls", [])
-            if len(calls) != 1:
-                raise self.error("模型沒有提供有效決策，請重試或查看功能列表。")
-            return self.validate(calls[0], tools)
+            # One normal decision plus at most one correction, as in the library path.
+            for attempt in range(2):
+                result = self.owner.model_call(messages, tools)
+                usage = getattr(self.owner.usage, "calls", None)
+                if usage is not None:
+                    usage.append(result.get("prompt_eval_count"))
+                try:
+                    calls = result.get("message", {}).get("tool_calls", [])
+                    if len(calls) != 1:
+                        raise self.error("模型沒有提供有效決策，請重試或查看功能列表。")
+                    return self.validate(calls[0], tools)
+                except self.error:
+                    if attempt:
+                        raise
+                    messages.append({"role": "user", "content": "Invalid output. Return exactly ONE tool proposal "
+                                     "with the provided schema. No prose or invented values."})
         finally:
             self.owner.model_lock.release()
 

@@ -109,9 +109,34 @@ class WorkflowTests(unittest.TestCase):
         self.assertIsNone(result['destination'])
 
     def test_multiple_intents_require_selection(self):
-        result = self.turn('我要借書又要繳水費')
-        self.assertEqual(result['kind'], 'confirm_candidates')
-        self.assertIsNone(result['destination'])
+        for text in ('我要借書又要繳水費', '借書，然後繳水費', '借書跟繳水費', '先借書再繳水費'):
+            result = self.turn(text)
+            self.assertEqual(result['kind'], 'confirm_candidates', text)
+            self.assertIsNone(result['destination'])
+
+    def test_one_correction_then_fail_closed(self):
+        replies = []
+        def model(messages, tools):
+            replies.append(messages[-1]['content'])
+            if len(replies) == 1:
+                return {'message': {'content': 'done'}}
+            return response('select_capability', {'capability_id': 'fees.water'})
+        result = Assistant(FakeCatalog(), model, expanded=True).turn(
+            {'text': '我要繳水費', 'request_id': 'r', 'session_id': 's'})
+        self.assertEqual(result['destination'], {'kind': 'capability', 'id': 'fees.water'})
+        self.assertIn('Invalid output', replies[1])
+        self.assertEqual(result['metrics']['model_calls'], 2)
+        broken = Assistant(FakeCatalog(), lambda *_: {'message': {'content': 'done'}}, expanded=True)
+        with self.assertRaises(AssistantError):
+            broken.turn({'text': '我要繳水費', 'request_id': 'r', 'session_id': 's'})
+
+    def test_workflow_replies_carry_metrics(self):
+        greeting = self.turn('你好')['metrics']
+        self.assertEqual((greeting['model_calls'], greeting['model']), (0, None))
+        self.assertEqual(self.turn('我要繳水費')['metrics']['model_calls'], 1)
+
+    def test_catalog_modes_are_known_strings(self):
+        self.assertTrue(all(e['mode'] in ('demo', 'local') for e in Registry().entries))
 
 
 if __name__ == '__main__':

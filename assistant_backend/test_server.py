@@ -6,7 +6,7 @@ import urllib.request
 from http.server import ThreadingHTTPServer
 from unittest.mock import patch
 
-from server import Assistant, AssistantError, Catalog, make_handler, retrieve, tools_for, validate_call
+from server import Assistant, AssistantError, Catalog, make_handler, proposal_schema, retrieve, tools_for, validate_call
 
 BOOKS = [
     {"id": "lib-book-3", "book_name": "底層邏輯 : 看清這個世界的底牌", "author": "劉潤著", "isbn": "9786263350717"},
@@ -102,6 +102,15 @@ class RetrievalTests(unittest.TestCase):
                      response("open_library_book", {"book_id": "lib-book-3", "url": "https://evil.test"})):
             with self.assertRaises(AssistantError):
                 validate_call(call["message"]["tool_calls"][0], tools)
+
+    def test_proposal_schema_binds_arguments_to_each_tool(self):
+        tools = tools_for(retrieve("我要借底層邏輯", BOOKS))
+        branches = proposal_schema(tools)["anyOf"]
+        self.assertEqual(len(branches), len(tools))
+        for branch, item in zip(branches, tools):
+            self.assertEqual(branch["properties"]["name"]["enum"], [item["function"]["name"]])
+            self.assertIs(branch["properties"]["arguments"], item["function"]["parameters"])
+            self.assertFalse(branch["additionalProperties"])
 
     def test_changed_catalog_fails_closed(self):
         with patch("server.fetch_json", return_value={"data": BOOKS}):

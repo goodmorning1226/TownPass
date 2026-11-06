@@ -205,7 +205,7 @@ Android Studio 選 `lib/main.dart` 的 Flutter Run configuration、裝置選正�
 - Python 修改需停止該後端再重啟；改目錄資源需同步重啟後端與 App。Ollama 不需每次重下模型。
 - 每批先測規則／widget，再做 wire／模型測試，最後給使用者人工操作表。不要把遠端 mock 當正式交易。
 - 指令：`fvm flutter analyze`、`fvm flutter test`、`python -m unittest discover -s assistant_backend -p 'test*.py'`、`fvm flutter build apk --debug`、`git diff --check`。
-- 本輪基線 Python 36、Flutter 17 通過；analyze 有 7 warning／16 info（零 error），不得刪測試或全域放寬 lint 換成假綠燈。
+- 本輪基線 Python 40、Flutter 17 通過；analyze 有 7 warning／16 info（零 error），不得刪測試或全域放寬 lint 換成假綠燈。
 - 後端與 Ollama 啟動後可跑 `python assistant_backend/evaluate.py` 做 contract 2 模型回歸；它是開發集，通過率不能當成模型的通用準確率。
 - 原開發機使用的 Gradle mirror／emulator workaround 是本機排障，不要自動設定到每個 clone。下載失敗時先保留完整錯誤並定位網路／倉庫問題。
 - 正式 API、缺金鑰地圖、欄位預填、語音仍未完成；開發方向看交接文件，不補假功能來通過展示。

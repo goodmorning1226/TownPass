@@ -52,7 +52,9 @@ Ministral 只做最後的語意工具決策。
 本機測試發現空參數原生 tool call 不穩定，故使用 Ollama **JSON Schema 約束的工具提案**：
 `{name, arguments}` → 白名單與 enum 驗證 → App 再驗證目的地 → 既有 WebView。
 這不是把模型文字當程式執行；不接受任意 URL、JS、未知 ID 或提交工具。
-通常一次推論，輸出格式錯誤最多一次修正；忙碌時拒絕並提示重試，不建立無限 agent loop。
+提案 schema 以 `anyOf` 把每個工具名稱綁定自己的參數；通常一次推論，輸出格式錯誤最多一次修正（圖書與一般服務流程相同）；忙碌時拒絕並提示重試，不建立無限 agent loop。
+模型閒置 30 分鐘後才卸載（約占 3 GB VRAM），可用環境變數 `TOWNPASS_ASSISTANT_KEEP_ALIVE` 改為其他 Ollama 時長，如 `5m`。
+每次回覆都帶 `metrics`（耗時、模型呼叫次數、prompt token）；App 不讀這個欄位。
 地端模型載入可能較慢，App 提供取消；關閉面板／返回後遲到回覆不會跳頁。
 
 API：`GET /health`、`GET /v1/assistant/capabilities`、`POST /v1/assistant/turns`。

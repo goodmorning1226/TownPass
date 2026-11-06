@@ -17,22 +17,23 @@
 9. 正常返回層級：書籍詳情 → 圖書總覽；使用者手動從搜尋進入詳情則保留搜尋歷史。WebView 先載父頁再載目標，不把後端檢索當頁面歷史。
 10. 最新修正：每次**新的助理導航**先清除 `TPRoute.main` 之上的舊頁，再建新服務正常父頁。案件進度 → 助理開圖書 → 按叉叉／圖書首頁按返回，回 App 主畫面，不回舊案件頁。一般回覆、候選確認、取消、無效目標不清頁。
 11. 單一精確命中且停用的功能（如「幫我掛號」）由程式直接回目錄內的未串接原因，不呼叫模型；多候選仍走確認。
-12. Debug 開放助理、release 預設關閉；debug cleartext 僅限 localhost／127.0.0.1／10.0.2.2。USB／模擬器用 adb reverse，不必開放區網端口。
+12. 2026-11-06 後端小修（V0）：提案 schema 依工具綁參數、一般服務決策也有一次修正、所有回覆帶 metrics、`police.online` 標回示範、模型保留 30 分鐘。
+13. Debug 開放助理、release 預設關閉；debug cleartext 僅限 localhost／127.0.0.1／10.0.2.2。USB／模擬器用 adb reverse，不必開放區網端口。
 
 ## 尚未完成與下一步
 
 - 所有表單的欄位 schema、型別／enum 選項抽取、模糊欄位確認與受控預填 adapter；目前主要是導頁與圖書檢索。
 - 語音輸入／Whisper、朗讀、正式城市通會員與服務 API、實際借閱／預約／付款／送件、動作結果稽核。
 - 缺 API、金鑰、空回呼、依賴前頁 store 的功能仍停用。不能靠新增關鍵字就改為已啟用。
-- `assets/assistant/capabilities.json` 的 `police.online` 之 `mode` 是陣列而非 `demo` 字串，導覽回覆因此少了示範資料提示，待核對。
 - 「新導航清舊頁」已由使用者於 2026-11-05 實機驗收（叉叉／Android 返回），回報沒有問題。
+- 2026-11-06 確認：全螢幕「助理」介面、按住說話的地端語音（Breeze-ASR-25／Whisper）、頁面狀態，見 [介面與語音規劃](AI_VOICE_UI_PLAN.md)。
 - 後續依 [全功能分步計畫](AI_ALL_FEATURES_ROLLOUT_PLAN.md) 推進；新 agent 先讀 [交接文件](AI_AGENT_HANDOFF.md)。
 
 ## 實際執行的驗證
 
 | 檢查 | 最近結果與限制 |
 | --- | --- |
-| Python unittest | 36 個通過；fake model 驗證流程、候選隔離與規則，不當作模型準確率 |
+| Python unittest | 40 個通過；fake model 驗證流程、候選隔離與規則，不當作模型準確率 |
 | contract 2 live-model 回歸 | `evaluate.py` 88 個案例／109 輪全數通過，非預期導航 0、錯誤目的地 0。開發集，不是 held-out 準確率 |
 | Flutter tests | 17 個通過；包含案件 → 圖書關閉／系統返回、Web → 原生父頁與取消遲到回覆 |
 | 實際 Ministral 開發案例 | 第一批 6 個一般／候選／排行案例符合預期；不是 held-out 準確率 |
@@ -84,6 +85,7 @@ TownPass/
    ├─ TEAM_LOCAL_SETUP.md                       # clone 後新機建置、模型、模擬器與開發
    ├─ AI_EXPANSION_IMPLEMENTATION.md            # 第一批擴充與人工驗收清單
    ├─ AI_ALL_FEATURES_ROLLOUT_PLAN.md            # 全功能分期主計畫
+   ├─ AI_VOICE_UI_PLAN.md                       # 全螢幕介面、語音與頁面狀態規劃
    ├─ AI_TOOL_CALLING_PLAN.md                   # 原始提案／決策背景
    ├─ AI_PHASE1_IMPLEMENTATION.md              # 第一階段歷史紀錄
    ├─ AI_LIBRARY_IMPLEMENTATION_STEPS.md        # 圖書階段工作清單
