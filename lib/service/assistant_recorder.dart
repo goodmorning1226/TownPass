@@ -4,12 +4,19 @@ import 'dart:typed_data';
 
 import 'package:record/record.dart';
 
-/// Hold-to-talk capture for the assistant: 16 kHz mono PCM16 kept in memory
-/// and wrapped as WAV. Audio is never written to a file.
+/// Hold-to-talk capture for the assistant: mono PCM16 kept in memory and
+/// wrapped as a 16 kHz WAV. Audio is never written to a file.
+///
+/// Capture runs at 48 kHz, the native rate of Android audio hardware, and is
+/// downsampled here. Asking the platform for 16 kHz directly produced audio
+/// stretched about three times on the Android emulator (48 kHz data labelled
+/// 16 kHz), which made speech unrecognisable.
 class AssistantRecorder {
   static const sampleRate = 16000;
+  static const captureRate = 48000;
+  static const _factor = captureRate ~/ sampleRate;
   static const maxDuration = Duration(seconds: 30);
-  static const _maxBytes = sampleRate * 2 * 30;
+  static const _maxBytes = captureRate * 2 * 30;
 
   /// Called with each chunk's loudness (RMS, 0-1) while recording.
   void Function(double level)? onLevel;
@@ -31,7 +38,7 @@ class AssistantRecorder {
     final stream = await recorder.startStream(
       const RecordConfig(
         encoder: AudioEncoder.pcm16bits,
-        sampleRate: sampleRate,
+        sampleRate: captureRate,
         numChannels: 1,
       ),
     );
@@ -58,7 +65,7 @@ class AssistantRecorder {
     await done?.future.timeout(const Duration(seconds: 1), onTimeout: () {});
     await _subscription?.cancel();
     _subscription = null;
-    return pcm.isEmpty ? null : wav(pcm.takeBytes());
+    return pcm.isEmpty ? null : wav(downsample(pcm.takeBytes()));
   }
 
   /// Discards the current recording.
@@ -96,6 +103,22 @@ class AssistantRecorder {
           ..add(header.buffer.asUint8List())
           ..add(pcm))
         .takeBytes();
+  }
+
+  /// 48 kHz -> 16 kHz PCM16: averages each group of three samples, a simple
+  /// low-pass that is adequate for speech recognition.
+  static Uint8List downsample(Uint8List pcm) {
+    final input = ByteData.sublistView(pcm);
+    final frames = pcm.length ~/ (2 * _factor);
+    final output = ByteData(frames * 2);
+    for (var i = 0; i < frames; i++) {
+      var sum = 0;
+      for (var j = 0; j < _factor; j++) {
+        sum += input.getInt16((i * _factor + j) * 2, Endian.little);
+      }
+      output.setInt16(i * 2, sum ~/ _factor, Endian.little);
+    }
+    return output.buffer.asUint8List();
   }
 
   /// Root-mean-square loudness of little-endian PCM16 samples, 0-1.

@@ -80,6 +80,14 @@ def add_cuda_dll_paths():
                 os.environ["PATH"] = str(path) + os.pathsep + os.environ.get("PATH", "")
 
 
+def rms_of(frames):
+    """Loudness of PCM16 frames, 0-1 (standard library only)."""
+    import array
+    import math
+    samples = array.array("h", frames)
+    return math.sqrt(sum(v * v for v in samples) / max(1, len(samples))) / 32768
+
+
 def read_wav(data):
     """Return float32-ready PCM16 samples from a 16 kHz mono WAV, or raise ValueError."""
     with wave.open(io.BytesIO(data), "rb") as audio:
@@ -179,8 +187,13 @@ def make_handler(recognizer, model_name):
                 decoded = recognizer.transcribe(frames)
             except Exception:
                 return self.reply(500, {"error": "語音辨識失敗。"})
-            self.reply(200, {**decoded, "audio_seconds": round(seconds, 2),
-                             "elapsed_ms": round((time.monotonic() - started) * 1000)})
+            elapsed = round((time.monotonic() - started) * 1000)
+            if os.environ.get("TOWNPASS_ASR_DIAGNOSTICS") == "1":
+                # Numbers only, opt-in: never audio or transcript text.
+                print(f"diag audio={seconds:.2f}s rms={rms_of(frames):.4f} status={decoded['status']} "
+                      f"logprob={decoded.get('avg_logprob')} no_speech={decoded.get('no_speech_prob')} "
+                      f"chars={len(decoded['text'])} {elapsed}ms", flush=True)
+            self.reply(200, {**decoded, "audio_seconds": round(seconds, 2), "elapsed_ms": elapsed})
     return Handler
 
 

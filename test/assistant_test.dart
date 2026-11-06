@@ -829,6 +829,24 @@ void main() {
     expect(controller.level.value, 0);
   });
 
+  test('48 kHz capture is averaged down to 16 kHz', () {
+    final input = ByteData(12);
+    for (final (i, v) in [30, 60, 90, -30, -60, -90].indexed) {
+      input.setInt16(i * 2, v, Endian.little);
+    }
+    final out = ByteData.sublistView(
+      AssistantRecorder.downsample(input.buffer.asUint8List()),
+    );
+    expect(out.lengthInBytes, 4);
+    expect(out.getInt16(0, Endian.little), 60);
+    expect(out.getInt16(2, Endian.little), -60);
+    // One second captured at 48 kHz becomes one second of 16 kHz WAV.
+    final second = AssistantRecorder.wav(
+      AssistantRecorder.downsample(Uint8List(96000)),
+    );
+    expect(AssistantRecorder.seconds(second), 1.0);
+  });
+
   test('RMS of PCM16 audio', () {
     final loud = ByteData(4)
       ..setInt16(0, 16384, Endian.little)

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:town_pass/bean/assistant_result.dart';
@@ -268,8 +269,18 @@ class AssistantViewController extends GetxController {
       await recorder.cancel();
       return;
     }
+    final heldFor = _listenStarted == null
+        ? null
+        : clock().difference(_listenStarted!);
     final audio = await recorder.stop();
     if (isClosed) return;
+    if (kDebugMode && audio != null && heldFor != null) {
+      // Numbers only: a mismatch means the device's sample rate is wrong.
+      debugPrint(
+        'assistant voice: held ${heldFor.inMilliseconds} ms, '
+        'audio ${(AssistantRecorder.seconds(audio) * 1000).round()} ms',
+      );
+    }
     if (audio == null || AssistantRecorder.seconds(audio) < minimumSpeech) {
       _add('沒有錄到聲音，請按住麥克風再說話，說完放開。');
       return;
