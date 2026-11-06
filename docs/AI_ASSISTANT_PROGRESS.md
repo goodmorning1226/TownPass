@@ -6,7 +6,7 @@
 
 ## 已完成
 
-1. 右下角助理泡泡：輸入、取消、關閉、候選按鈕、載入指引與過期回覆防護；支援大字體和鍵盤捲動。
+1. 「助理」介面（2026-11-06 V2）：右下角「助理」按鈕開啟全螢幕微透明對話；首次顯示「你可以說…」範例，對話以泡泡呈現並保留到 App 被關閉（不送模型）；操作時收起並在右下角顯示 8 秒提示，點提示回到該則訊息。目前只有鍵盤輸入，語音為 V3。
 2. Python 標準函式庫後端 + Ollama `ministral-3:3b`。Ministral 為 Mistral AI 模型；依使用者要求，不改用中國開發模型，也不失敗轉雲端。
 3. 共用能力目錄 70 項，涵蓋 21 個城市服務、App 原生功能與服務內操作；41 項允許頁面導覽，29 項停用並附原因。數字代表目錄設定，並非 41 項正式 API 或交易能力。
 4. 一般問候、未理解、功能列表分頁、圖書操作說明：使用目錄與模板，不呼叫模型、不自動跳頁。
@@ -35,8 +35,8 @@
 | 檢查 | 最近結果與限制 |
 | --- | --- |
 | Python unittest | 47 個通過；fake model 驗證流程、候選隔離與規則，不當作模型準確率 |
-| contract 3 live-model 回歸 | `evaluate.py` 98 個案例／119 輪全數通過，非預期導航 0、錯誤目的地 0。開發集，不是 held-out 準確率 |
-| Flutter tests | 17 個通過；包含案件 → 圖書關閉／系統返回、Web → 原生父頁與取消遲到回覆 |
+| contract 3 live-model 回歸 | `evaluate.py` 99 個案例／120 輪全數通過，非預期導航 0、錯誤目的地 0。開發集，不是 held-out 準確率 |
+| Flutter tests | 25 個通過；包含案件 → 圖書關閉／系統返回、Web → 原生父頁與取消遲到回覆 |
 | 實際 Ministral 開發案例 | 第一批 6 個一般／候選／排行案例符合預期；不是 held-out 準確率 |
 | App Dart client → HTTP → 模型 | 中文 UTF-8 bytes/contentLength 傳輸與圖書導覽通過 |
 | contract 2 HTTP | 功能列表 + session/resolution 綁定選擇通過；health 顯示 41 個允許能力 |
@@ -67,8 +67,8 @@ TownPass/
 │  ├─ main.dart                                # 助理開關、GetX 初始化、overlay 與路由 observer
 │  ├─ bean/assistant_result.dart                # 回覆／候選 DTO、contract 與目錄版本檢查
 │  ├─ page/assistant/
-│  │  ├─ assistant_view_controller.dart         # 對話、選擇、取消、遲到回覆與面板生命週期
-│  │  └─ widget/assistant_host.dart             # 全域泡泡、對話面板、候選與指引 UI
+│  │  ├─ assistant_view_controller.dart         # 對話紀錄、範例、右下提示、選擇、取消、遲到回覆與面板生命週期
+│  │  └─ widget/assistant_host.dart             # 右下「助理」按鈕／提示、全螢幕對話、範例、候選與輸入列
 │  ├─ service/
 │  │  ├─ assistant_service.dart                # HTTP、UTF-8、取消、timeout 與開發 token
 │  │  ├─ assistant_page_tracker.dart           # 目前路由／WebView 服務路徑／頁籤（只送安全欄位）

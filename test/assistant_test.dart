@@ -488,7 +488,7 @@ void main() {
   });
 
   testWidgets(
-    'Bubble retains the route child, opens and cancels a pending request',
+    'Full-screen sheet keeps the page, shows bubbles and cancels a request',
     (tester) async {
       final service = PendingService();
       final controller = AssistantViewController(
@@ -503,44 +503,205 @@ void main() {
         ),
       );
       expect(find.text('Original page'), findsOneWidget);
+      expect(find.text('助理'), findsOneWidget);
       await tester.tap(find.byType(FloatingActionButton));
       await tester.pump();
+      expect(find.text('你可以說…'), findsOneWidget);
       await tester.enterText(find.byKey(const Key('assistant-input')), '我要借書');
-      await tester.tap(find.text('幫我找'));
+      await tester.tap(find.byTooltip('送出'));
       await tester.pump();
-      expect(find.text('取消'), findsOneWidget);
+      expect(find.text('我要借書'), findsOneWidget);
+      expect(find.text('你可以說…'), findsNothing);
       await tester.tap(find.text('取消'));
       await tester.pump();
       expect(controller.busy.value, isFalse);
+      expect(find.text('已取消，未開啟新的頁面。'), findsOneWidget);
       await tester.tap(find.byTooltip('關閉助理'));
       await tester.pump();
       expect(find.text('Original page'), findsOneWidget);
       expect(find.byType(FloatingActionButton), findsOneWidget);
+      // History survives closing and reopening while the App process lives.
+      await tester.tap(find.byType(FloatingActionButton));
+      await tester.pump();
+      expect(find.text('我要借書'), findsOneWidget);
       expect(tester.takeException(), isNull);
     },
   );
 
-  testWidgets('Large text and keyboard leave panel scrollable', (tester) async {
-    await tester.binding.setSurfaceSize(const Size(360, 640));
-    addTearDown(() => tester.binding.setSurfaceSize(null));
-    final controller = AssistantViewController()..expanded.value = true;
+  testWidgets('Suggestions submit their example text', (tester) async {
+    final service = PendingService();
+    final controller = AssistantViewController(
+      service: service,
+      executor: RecordingExecutor(),
+    )..expanded.value = true;
     await tester.pumpWidget(
       MaterialApp(
-        builder: (context, child) => MediaQuery(
-          data: const MediaQueryData(
-            size: Size(360, 640),
-            textScaler: TextScaler.linear(2),
-            viewInsets: EdgeInsets.only(bottom: 250),
-          ),
-          child: AssistantHost(controller: controller, child: child!),
-        ),
+        builder: (context, child) =>
+            AssistantHost(controller: controller, child: child!),
         home: const Scaffold(),
       ),
     );
+    await tester.tap(find.text('「我要繳水費」'));
     await tester.pump();
-    expect(find.byType(SingleChildScrollView), findsWidgets);
-    expect(tester.takeException(), isNull);
+    expect(controller.messages.single.text, '我要繳水費');
+    expect(controller.messages.single.fromUser, isTrue);
+    controller.cancel();
   });
+
+  test('Suggestions lead only to enabled catalog capabilities', () {
+    final catalog = jsonDecode(
+      File('assets/assistant/capabilities.json').readAsStringSync(),
+    ) as Map<String, dynamic>;
+    final enabled = {
+      for (final entry in catalog['capabilities'] as List)
+        if (entry['enabled'] == true) entry['id'],
+    };
+    for (final suggestion in AssistantViewController.suggestions) {
+      if (suggestion.capability != null) {
+        expect(
+          enabled,
+          contains(suggestion.capability),
+          reason: suggestion.text,
+        );
+      }
+    }
+  });
+
+  testWidgets(
+    'Only the latest reply offers its candidates; unavailable ones are inert',
+    (tester) async {
+      const choices = [
+        AssistantBookChoice('1', '申辦案件進度'),
+        AssistantBookChoice('2', '陳情案件進度', subtitle: '尚未串接', enabled: false),
+      ];
+      final service = QueueService([
+        const AssistantResult(
+          sessionId: 's',
+          message: '你想使用哪個功能？',
+          kind: 'confirm_candidates',
+          resolutionId: 'r1',
+          choices: choices,
+        ),
+        const AssistantResult(sessionId: 's', message: '嗨，我是助理。'),
+      ]);
+      final controller = AssistantViewController(
+        service: service,
+        executor: RecordingExecutor(),
+      )..expanded.value = true;
+      await tester.pumpWidget(
+        MaterialApp(
+          builder: (context, child) =>
+              AssistantHost(controller: controller, child: child!),
+          home: const Scaffold(),
+        ),
+      );
+      await controller.submit('案件進度');
+      await tester.pump();
+      expect(find.text('申辦案件進度'), findsOneWidget);
+      await tester.tap(find.text('陳情案件進度'));
+      await tester.pump();
+      expect(service.results, hasLength(1)); // disabled option sent nothing
+      await controller.submit('你好');
+      await tester.pump();
+      expect(find.text('申辦案件進度'), findsNothing);
+      expect(find.text('嗨，我是助理。'), findsOneWidget);
+    },
+  );
+
+  testWidgets(
+    'Navigation closes the sheet; the corner hint reopens at that message',
+    (tester) async {
+      final service = QueueService([
+        const AssistantResult(
+          sessionId: 's',
+          message: '請在原本的「水費」頁面繼續操作。',
+          destination: {'kind': 'capability', 'id': 'fees.water'},
+        ),
+      ]);
+      final executor = RecordingExecutor();
+      final controller = AssistantViewController(
+        service: service,
+        executor: executor,
+      )..expanded.value = true;
+      await tester.pumpWidget(
+        MaterialApp(
+          builder: (context, child) =>
+              AssistantHost(controller: controller, child: child!),
+          home: const Scaffold(),
+        ),
+      );
+      await controller.submit('我要繳水費');
+      await tester.pump();
+      expect(executor.opened.single['id'], 'fees.water');
+      expect(controller.expanded.value, isFalse);
+      final hint = find.byKey(const Key('assistant-corner-hint'));
+      expect(hint, findsOneWidget);
+      expect(find.text('請在原本的「水費」頁面繼續操作。'), findsOneWidget);
+      await tester.tap(hint);
+      await tester.pump();
+      await tester.pump();
+      expect(controller.expanded.value, isTrue);
+      expect(find.text('我要繳水費'), findsOneWidget);
+      await tester.tap(find.byTooltip('關閉助理'));
+      await tester.pump();
+      expect(hint, findsNothing); // opening the panel consumed the hint
+      controller.hideCorner();
+    },
+  );
+
+  testWidgets('Corner hint hides itself after a few seconds', (tester) async {
+    {
+      final controller = AssistantViewController(
+        service: QueueService([
+          const AssistantResult(
+            sessionId: 's',
+            message: 'done',
+            destination: {'kind': 'home'},
+          ),
+        ]),
+        executor: RecordingExecutor(),
+      );
+      await controller.submit('我要借書');
+      expect(controller.cornerMessageId.value, isNotNull);
+      await tester.pump(AssistantViewController.cornerDuration);
+      expect(controller.cornerMessageId.value, isNull);
+    }
+  });
+
+  for (final keyboard in [true, false]) {
+    testWidgets(
+      'Large text leaves the sheet usable (${keyboard ? 'keyboard open' : 'voice layout'})',
+      (tester) async {
+        await tester.binding.setSurfaceSize(const Size(360, 640));
+        addTearDown(() => tester.binding.setSurfaceSize(null));
+        final controller = AssistantViewController()..expanded.value = true;
+        await tester.pumpWidget(
+          MaterialApp(
+            builder: (context, child) => MediaQuery(
+              data: MediaQueryData(
+                size: const Size(360, 640),
+                textScaler: const TextScaler.linear(2),
+                viewInsets: EdgeInsets.only(bottom: keyboard ? 250 : 0),
+              ),
+              child: AssistantHost(controller: controller, child: child!),
+            ),
+            home: const Scaffold(),
+          ),
+        );
+        await tester.pump();
+        if (!keyboard) {
+          await tester.tap(find.byTooltip('改用語音'));
+          await tester.pump();
+          expect(find.byTooltip('改用鍵盤'), findsOneWidget);
+          await tester.tap(find.byIcon(Icons.mic));
+          await tester.pump();
+          expect(find.textContaining('下一階段開放'), findsOneWidget);
+        }
+        expect(find.byType(Scrollable), findsWidgets);
+        expect(tester.takeException(), isNull);
+      },
+    );
+  }
 
   testWidgets('Android back closes the panel and invalidates a late decision', (
     tester,

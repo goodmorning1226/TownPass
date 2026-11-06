@@ -137,7 +137,8 @@ CASES = [
     one("capability", "我要看圖書借閱排行", cap("library.ranking")),
     one("capability", "打開設定", cap("settings")), one("capability", "我要改基本資料", cap("profile")),
     one("capability", "回首頁", cap("app.home")), one("capability", "我的票夾", cap("wallet")),
-    one("capability", "現在幾號", cap("reservation")), one("capability", "線上報案", cap("police.online")),
+    one("capability", "現在幾號", cap("reservation")), one("capability", "臨櫃叫號", cap("reservation")),
+    one("capability", "線上報案", cap("police.online")),
     one("capability", "我要報案", cap("police")),
     # Catalogued but not connected: an honest explanation, no page.
     one("unavailable", "幫我掛號", UNSUPPORTED), one("unavailable", "疫苗預約", UNSUPPORTED),
