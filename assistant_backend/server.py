@@ -21,7 +21,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 MODEL = "ministral-3:3b"
 CATALOG_URL = "https://taipei-pass-service.vercel.app/mock/library/library_book_list.json"
 CATALOG_VERSION = "570531a9244c3dba1e1f09907468ca55875ccc4b1af6fe1e5115cfdb2252f4ac"
-CONTRACT = 2
+CONTRACT = 3  # 3: optional request "context" (page/last action hint)
 # Avoid a multi-second model reload after a short idle period during a demo.
 # The model keeps ~3 GB of VRAM while loaded; override with an Ollama duration.
 KEEP_ALIVE = os.environ.get("TOWNPASS_ASSISTANT_KEEP_ALIVE", "30m")
@@ -280,7 +280,9 @@ class Assistant:
                 raise AssistantError("工作階段格式不正確。")
             if not isinstance(text, str) or len(text) > 500:
                 raise AssistantError("請輸入最多 500 字的需求。")
-            payload = {**payload, "session_id": session, "text": text}
+            from page_context import parse
+            context = parse(payload.get("context"), self.workflow.registry)
+            payload = {**payload, "session_id": session, "text": text, "page_context": context}
             started = time.monotonic()
             self.usage.calls = []
             result = self.workflow.handle(payload)
@@ -288,9 +290,11 @@ class Assistant:
                 tokens = [count for count in self.usage.calls if count is not None]
                 result["metrics"] = {"elapsed_ms": round((time.monotonic() - started) * 1000),
                     "model_calls": len(self.usage.calls), "prompt_tokens": sum(tokens) if tokens else None,
-                    "model": MODEL if self.usage.calls else None}
+                    "model": MODEL if self.usage.calls else None, "page_capability": self._page_id(context)}
                 return result
         result = self._library_turn(payload)
+        if self.workflow:
+            result["metrics"]["page_capability"] = self._page_id(payload.get("page_context"))
         result["kind"] = "navigate" if result["destination"] else "reply"
         if self.workflow and result.get("choices"):
             offer = self.workflow._offer(payload, [
@@ -302,6 +306,11 @@ class Assistant:
         if self.workflow and result["action"] == "unsupported":
             result["message"] = "目前沒有支援這項操作，可以輸入「有哪些功能」查看可用服務。"
         return result
+
+    @staticmethod
+    def _page_id(context):
+        page = (context or {}).get("page")
+        return page["capability"]["id"] if page and page["capability"] else None
 
     def _library_turn(self, payload):
         text = payload.get("text")
@@ -432,7 +441,7 @@ def make_handler(assistant, token=""):
                 if not 0 < length <= 8192:
                     return self.reply(413, {"error": "請求內容過長或空白。"})
                 payload = json.loads(self.rfile.read(length))
-                if not isinstance(payload, dict) or set(payload) - {"text", "session_id", "request_id", "resolution_id", "choice_id"}:
+                if not isinstance(payload, dict) or set(payload) - {"text", "session_id", "request_id", "resolution_id", "choice_id", "context"}:
                     raise AssistantError("請求欄位不正確。")
                 response = assistant.turn(payload)
                 self.reply(200, response)

@@ -20,7 +20,7 @@ class AssistantResult {
   });
 
   factory AssistantResult.fromJson(Map<String, dynamic> json) {
-    if (!const {1, 2}.contains(json['contract_version']) ||
+    if (!const {1, 2, 3}.contains(json['contract_version']) ||
         json['catalog_version'] != catalogVersion ||
         json['data_mode'] != 'demo' ||
         json['session_id'] is! String ||

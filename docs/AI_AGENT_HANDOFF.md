@@ -36,9 +36,12 @@ Vue 網頁不在此 repo；需要受控表單 adapter 時需另外處理 TownPas
 
 ## 契約與容易踩的坑
 
-- HTTP contract **2**，目錄版本 **1**；App 也容許舊 contract 1 回覆，這不表示舊後端支援全功能。
+- HTTP contract **3**，目錄版本 **1**；App 也容許 contract 1／2 回覆，這不表示舊後端支援全功能。
+  contract 3 新增選填請求欄位 `context`（頁面與上次動作），規格見 `assistant_backend/README.md`。
 - 後端 `GET /health`、`GET /v1/assistant/capabilities`、`POST /v1/assistant/turns`。
-  POST：`text`、`request_id`、選填 `session_id`、`resolution_id`、`choice_id`；不接受任意額外欄位。
+  POST：`text`、`request_id`、選填 `session_id`、`resolution_id`、`choice_id`、`context`；不接受任意額外欄位。
+- 頁面狀態只當提示：後端由路徑自行對應能力（App 不送能力 ID），不得據此導航、略過確認或擴權。
+  `TPWebView` 透過 `AssistantPageTracker` 回報目前服務路徑；搜尋關鍵字、頁面內容與對話不送出。
 - 回覆 kind：`reply`、`navigate`、`capability_list`、`confirm_candidates`、`unsupported`。
   只有 navigate 附目的地；目的地為 reviewed capability ID 或圖書 home/search/detail，App 再解析固定路由。
 - 41 enabled／29 disabled 的來源是同一份 `assets/assistant/capabilities.json`。變更需同時更新 App 資源、後端及版本契約，不可以只在 server 硬加 URL。
@@ -54,14 +57,14 @@ Vue 網頁不在此 repo；需要受控表單 adapter 時需另外處理 TownPas
 - `AssistantActionExecutor` 先驗目標，確認有效後才 `Get.until(TPRoute.main)`，再開新服務。不要改回直接連續 push。原生子頁要驗整條父頁鏈。
 - GetX + asset 的 widget tests：capability 開啟涉及 rootBundle，使用 `tester.runAsync` 包含開啟動作，避免快取 Future 留在不同 fake-async zone；測試間 reset GetX。
 - `/health` 不會測模型或所有遠端頁；不可以拿 health 200 當作完整串線成功。
-- `evaluate.py` 已是 contract 2 的 live-model 回歸集（需先啟動後端與 Ollama）；輸出 evaluation.json 已忽略。
-  目前 88 個案例全數通過；之後出現失敗先查後端行為，不要為了全綠把預期或 validator 放寬。
+- `evaluate.py` 已是 contract 3 的 live-model 回歸集（需先啟動後端與 Ollama）；輸出 evaluation.json 已忽略。
+  目前 98 個案例全數通過；之後出現失敗先查後端行為，不要為了全綠把預期或 validator 放寬。
 - 單一精確命中的停用能力由 `Workflow.handle` 直接回原因、不呼叫模型（3b 模型遇到不可用候選傾向回補問）。
 
 ## 建議接續順序
 
 1. 查看 Git 狀態、目前版本，回報理解的進度與本次要處理的範圍；不要自行重做已完成的泡泡或改框架。
-2. 最新導航修正已由使用者實機驗收，live-model 評估集已更新為 contract 2 且全數通過。
+2. 最新導航修正已由使用者實機驗收，live-model 評估集已更新且全數通過；V0、V1 已完成，下一步依介面與語音規劃做 V2。
 3. 依計畫補 service/provider 與內部 operation schema；優先選可在原頁確認、具備資料來源的唯讀操作。
 4. 再做欄位抽取／模糊 enum 確認及受控預填。先明確欄位名稱、型別、合法值、來源與寫入邊界，再實作，不用任意 JS 尋找／點擊欄位。
 5. 各批提供單元／widget／wire 測試及人工測試表，更新最新進度。外部 API／認證沒到，留停用原因，不造完成狀態。
@@ -78,7 +81,7 @@ fvm flutter build apk --debug
 git diff --check
 ```
 
-目前基線：Python 40／Flutter 17 通過；analyze 零 error、7 warning、16 info，皆在既有非助理檔案。
+目前基線：Python 47／Flutter 19 通過；analyze 零 error、7 warning、16 info，皆在既有非助理檔案。
 變更 asset／模型／pubspec 時執行 `fvm dart run build_runner build`，不手改或提交被忽略產生碼。
 串線可先啟後端，再 `fvm dart run tool/smoke_assistant.dart`；實際 UI 由使用者測。
 Hot reload 不會更新 Python 程式；有新 asset／dart-define 時 Stop 再 Run。

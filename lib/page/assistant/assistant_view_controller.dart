@@ -1,18 +1,26 @@
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:town_pass/bean/assistant_result.dart';
+import 'package:town_pass/page/main/main_view_controller.dart';
 import 'package:town_pass/service/assistant_action_executor.dart';
+import 'package:town_pass/service/assistant_page_tracker.dart';
 import 'package:town_pass/service/assistant_service.dart';
 
 class AssistantViewController extends GetxController {
   final AssistantService service;
   final AssistantActionExecutor executor;
+  final AssistantPageTracker pageTracker;
+  final DateTime Function() clock;
 
   AssistantViewController({
     AssistantService? service,
     AssistantActionExecutor? executor,
+    AssistantPageTracker? pageTracker,
+    DateTime Function()? clock,
   }) : service = service ?? AssistantService(),
-       executor = executor ?? AssistantActionExecutor();
+       executor = executor ?? AssistantActionExecutor(),
+       pageTracker = pageTracker ?? AssistantPageTracker.instance,
+       clock = clock ?? DateTime.now;
 
   final expanded = false.obs;
   final busy = false.obs;
@@ -24,6 +32,31 @@ class AssistantViewController extends GetxController {
   int _generation = 0;
   ModalRoute<dynamic>? activeRoute;
   LocalHistoryEntry? _panelHistory;
+  _AssistantAction? _lastAction;
+
+  /// Page and last-action hint for the backend (contract 3). It never carries
+  /// the conversation, search text or page content.
+  Map<String, dynamic>? requestContext() {
+    final page = pageTracker.page(
+      route: activeRoute?.settings.name,
+      tabIndex: Get.isRegistered<MainViewController>()
+          ? Get.find<MainViewController>().currentIndex.value
+          : null,
+    );
+    Map<String, dynamic>? last;
+    if (_lastAction case final action?) {
+      final age = clock().difference(action.at).inSeconds;
+      if (age >= 0 && age <= 86400) {
+        last = {
+          'destination': action.destination,
+          'result': action.result,
+          'age_seconds': age,
+        };
+      }
+    }
+    if (page == null && last == null) return null;
+    return {'page': ?page, 'last_action': ?last};
+  }
 
   void openPanel() {
     expanded.value = true;
@@ -82,6 +115,7 @@ class AssistantViewController extends GetxController {
         sessionId: _session,
         resolutionId: _resolutionId,
         choiceId: choiceId,
+        context: requestContext(),
       );
       if (generation != _generation || isClosed) return;
       _session = result.sessionId;
@@ -93,10 +127,14 @@ class AssistantViewController extends GetxController {
         _panelHistory?.remove();
         expanded.value = false;
         message.value = '正在開啟服務頁面…';
+        // Stays "cancelled" unless this navigation reports back while current.
+        final action = _AssistantAction(destination, clock());
+        _lastAction = action;
         executor.open(
           destination,
           (error) {
             if (generation != _generation || isClosed) return;
+            action.result = error == null ? 'opened' : 'failed';
             message.value = error == null
                 ? result.message
                 : '服務頁面載入失敗，請檢查網路或重新開啟。';
@@ -123,6 +161,18 @@ class AssistantViewController extends GetxController {
     cancel();
     super.onClose();
   }
+}
+
+class _AssistantAction {
+  final Map<String, dynamic> destination;
+  final DateTime at;
+  String result = 'cancelled';
+
+  /// A search query is user text, so only its kind is reported back.
+  _AssistantAction(Map<String, dynamic> destination, this.at)
+    : destination = destination['kind'] == 'search'
+          ? const {'kind': 'search'}
+          : Map.unmodifiable(destination);
 }
 
 class AssistantNavigationObserver extends NavigatorObserver {

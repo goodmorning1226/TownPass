@@ -58,7 +58,12 @@ Ministral 只做最後的語意工具決策。
 地端模型載入可能較慢，App 提供取消；關閉面板／返回後遲到回覆不會跳頁。
 
 API：`GET /health`、`GET /v1/assistant/capabilities`、`POST /v1/assistant/turns`。
-POST 接受 `text`、`request_id`、選填 `session_id`、`resolution_id`、`choice_id`，回 contract 2、示範標記、回覆類型、目的地、指引及選項。
+POST 接受 `text`、`request_id`、選填 `session_id`、`resolution_id`、`choice_id`、`context`，回 contract 3、示範標記、回覆類型、目的地、指引及選項。
+`context`（contract 3 新增）是 App 回報的頁面與上一次助理導航結果：`page` 為 `{type: tab, index}`、`{type: native, route}` 或 `{type: web, path}`（只含 TownPass 服務路徑，不含網域與 query），
+`last_action` 為 `{destination, result: opened|failed|cancelled, age_seconds}`，搜尋只回報類型不含關鍵字。
+後端自行把頁面對應到目錄能力（[page_context.py](page_context.py)），App 不能指定能力 ID；格式不符的部分直接丟棄，不影響該次請求。
+狀態只當提示：模型看到目前服務名稱與上次動作，歧義候選把目前服務排前面，但不會因此導航或略過確認。
+舊 App 不送 `context` 仍可使用；新 App 對舊（contract 2）後端會被拒收，兩端需一起更新。
 一般問候與功能列表無須模型；操作意圖先檢索共用功能目錄，再讓模型在候選內決策。
 候選選擇須同時攜帶該輪 session／resolution；`choice_id` 是本輪選項號碼，不是任意功能或書籍 ID。
 App 與後端需一起更新；舊的仍執行中之 Python 服務須重新啟動。
@@ -81,11 +86,11 @@ fvm flutter analyze
 fvm flutter build apk --debug
 ```
 
-`evaluate.py` 是 contract 2 的 live-model 回歸集：後端啟動後執行 `python assistant_backend/evaluate.py`。
+`evaluate.py` 是 contract 3 的 live-model 回歸集：後端啟動後執行 `python assistant_backend/evaluate.py`。
 它透過 HTTP 呼叫本機 Ministral，檢查回覆 kind、目的地與候選生命週期（選擇、取消、換題、跨 session 與重播），
 輸出被 Git 忽略的 `evaluation.json`；不經過 App，不導航、不預約。
 `--list` 只列案例，`--only <category>` 只跑指定類別；全部通過退出碼 0，有失敗為 1，後端或目錄不符為 2。
-2026-11-05 實測 88 個案例全數通過，沒有非預期導航。原先 10 個失敗是「目錄內未串接的功能」（如掛號）
+2026-11-06 實測 98 個案例（含 10 個頁面狀態案例）全數通過，沒有非預期導航。原先 10 個失敗是「目錄內未串接的功能」（如掛號）
 被模型回成補問；已改為單一精確命中且停用時，程式直接回目錄內的原因、不呼叫模型。預期沒有放寬。
 語料是開發回歸集，包含省略「書」的未知對象、非書籍借用與歧義案例，
 會用於修正檢索與提示，不能冒充獨立保留集正確率。`test_evaluate.py` 只離線檢查案例集與判定邏輯。

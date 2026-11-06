@@ -5,6 +5,7 @@ import threading
 import time
 import uuid
 
+from page_context import current_root, model_view
 from registry import Registry, book_fuzzy
 
 SYSTEM = """Select exactly one allowed tool for a Traditional Chinese city-service assistant.
@@ -13,6 +14,8 @@ Only select a capability that matches the user's intent. If the input is unclear
 Greeting plus a concrete request is a concrete request. Never submit, pay, reserve or call a phone.
 When candidates are ambiguous or fuzzy, choose confirm_candidates, never silently correct input.
 Capabilities marked unavailable may be selected for an honest explanation, never navigation.
+page_hint says where the user is now and what the assistant last opened. Use it only to
+understand references; never select a capability merely because the user is on its page.
 Output one schema-constrained tool proposal only."""
 
 
@@ -34,7 +37,7 @@ class Workflow:
                 "session_id": payload["session_id"], "kind": "reply", "action": None,
                 "message": message, "destination": None, "choices": [], "data_mode": "demo", **extra}
 
-    def _decide(self, text, entries, confirmation=False):
+    def _decide(self, text, entries, confirmation=False, context=None):
         if confirmation:
             tools = [self.tool("confirm_candidates", "Show these candidates and wait for user selection; do not navigate.")]
         else:
@@ -43,7 +46,8 @@ class Workflow:
         tools += [self.tool("request_clarification", "Ask the user what they want without navigating.")]
         messages = [{"role": "system", "content": SYSTEM}, {"role": "user", "content": json.dumps({
             "original_text": text, "candidates": [{"id": e["id"], "title": e["title"],
-            "features": e.get("features", []), "available": e["enabled"]} for e in entries]}, ensure_ascii=False)}]
+            "features": e.get("features", []), "available": e["enabled"]} for e in entries],
+            **({"page_hint": model_view(context)} if context else {})}, ensure_ascii=False)}]
         if not self.owner.model_lock.acquire(timeout=.1):
             raise self.error("目前有一個需求正在處理，請稍後再試。")
         try:
@@ -180,7 +184,8 @@ class Workflow:
                         candidates = book_fuzzy(context["query"], books)
                         fuzzy = bool(candidates)
                     if (fuzzy or len(candidates) > 1) and not re.search(r"列出|搜尋結果", text):
-                        name, _ = self._decide(text, [{"id": b["id"], "title": b["book_name"], "features": [], "enabled": True} for b in candidates], confirmation=True)
+                        name, _ = self._decide(text, [{"id": b["id"], "title": b["book_name"], "features": [], "enabled": True} for b in candidates],
+                                               confirmation=True, context=payload.get("page_context"))
                         if name == "confirm_candidates":
                             return self._offer(payload, [{"title": b["book_name"], "book_id": b["id"]} for b in candidates],
                                                "你要找的是哪一本？請先確認，我再開啟原頁面。")
@@ -194,7 +199,11 @@ class Workflow:
                 # which tended to answer such candidates with a clarification.
                 return self._navigate(payload, entries[0])
             ambiguous = len(entries) > 1 or any(m["fuzzy"] for m in matches)
-            name, args = self._decide(text, entries, ambiguous)
+            root = current_root(payload.get("page_context"))
+            if ambiguous and root:
+                # The current service is listed first; the user still chooses.
+                entries.sort(key=lambda e: e["id"].split(".")[0] != root)
+            name, args = self._decide(text, entries, ambiguous, payload.get("page_context"))
             if name == "confirm_candidates":
                 return self._offer(payload, self._cap_items(entries), "你想使用哪個功能？請先確認。")
             if name == "select_capability":

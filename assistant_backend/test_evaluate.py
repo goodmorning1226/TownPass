@@ -14,7 +14,7 @@ class EvaluationSetTests(unittest.TestCase):
 
     def judge(self, expect, data, status=200):
         payload = {"request_id": "r", "session_id": "s"}
-        body = {"contract_version": 2, "request_id": "r", "session_id": "s", "action": None,
+        body = {"contract_version": 3, "request_id": "r", "session_id": "s", "action": None,
                 "destination": None, "choices": [], **data}
         return evaluate.judge(expect, status, body, payload, {"fees.water"})
 

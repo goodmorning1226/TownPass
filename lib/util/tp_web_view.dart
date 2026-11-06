@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:get/get.dart';
 import 'package:town_pass/gen/assets.gen.dart';
+import 'package:town_pass/service/assistant_page_tracker.dart';
 import 'package:town_pass/util/tp_app_bar.dart';
 import 'package:town_pass/util/tp_colors.dart';
 import 'package:town_pass/util/web_message_handler/tp_web_message_listener.dart';
@@ -66,6 +67,19 @@ class _TPWebViewState extends State<TPWebView> {
 
   final RxBool canGoBack = RxBool(false);
 
+  /// Reports this WebView's current service path to the assistant.
+  final AssistantWebPage trackedPage = AssistantPageTracker.instance
+      .attachWebView();
+
+  void _track(WebUri? url) =>
+      trackedPage.url = url == null ? null : Uri.tryParse(url.toString());
+
+  @override
+  void dispose() {
+    trackedPage.detach();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     Future<void> handleBack() async {
@@ -113,6 +127,7 @@ class _TPWebViewState extends State<TPWebView> {
         body: TPInAppWebView(
           onLoadStop: (controller, loadedUrl) async {
             if (!mounted) return;
+            _track(loadedUrl);
             if (navigationCompleted) return;
             if (pageArgument?.isAssistantActionCurrent?.call() == false) return;
             if (loadedUrl.toString() != navigation[navigationIndex]) return;
@@ -156,7 +171,8 @@ class _TPWebViewState extends State<TPWebView> {
               controller.loadData(data: _failedToLoadUrlData(url: url));
             }
           },
-          onUpdateVisitedHistory: (_, _, _) async {
+          onUpdateVisitedHistory: (_, visitedUrl, _) async {
+            _track(visitedUrl);
             canGoBack.value =
                 await webViewController.value?.canGoBack() ?? false;
           },

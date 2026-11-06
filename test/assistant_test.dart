@@ -11,6 +11,7 @@ import 'package:town_pass/bean/assistant_result.dart';
 import 'package:town_pass/page/assistant/assistant_view_controller.dart';
 import 'package:town_pass/page/assistant/widget/assistant_host.dart';
 import 'package:town_pass/service/assistant_action_executor.dart';
+import 'package:town_pass/service/assistant_page_tracker.dart';
 import 'package:town_pass/service/assistant_service.dart';
 
 class PendingService extends AssistantService {
@@ -22,7 +23,13 @@ class PendingService extends AssistantService {
     String? sessionId,
     String? resolutionId,
     String? choiceId,
-  }) => response.future;
+    Map<String, dynamic>? context,
+  }) {
+    contexts.add(context);
+    return response.future;
+  }
+
+  final contexts = <Map<String, dynamic>?>[];
   @override
   void cancel() {}
 }
@@ -39,6 +46,48 @@ class RecordingExecutor extends AssistantActionExecutor {
     opened.add(destination);
     onLoaded(null);
   }
+}
+
+class FailingExecutor extends AssistantActionExecutor {
+  @override
+  void open(
+    Map<String, dynamic> destination,
+    void Function(String? error) onLoaded, {
+    bool Function()? beforeBack,
+    bool Function()? isCurrent,
+  }) => onLoaded('HTTP 500');
+}
+
+/// Never reports back, as when the user moves on before the page loads.
+class SilentExecutor extends AssistantActionExecutor {
+  @override
+  void open(
+    Map<String, dynamic> destination,
+    void Function(String? error) onLoaded, {
+    bool Function()? beforeBack,
+    bool Function()? isCurrent,
+  }) {}
+}
+
+class QueueService extends AssistantService {
+  final List<AssistantResult> results;
+  final contexts = <Map<String, dynamic>?>[];
+  QueueService(this.results);
+  @override
+  Future<AssistantResult> decide({
+    required String text,
+    required String requestId,
+    String? sessionId,
+    String? resolutionId,
+    String? choiceId,
+    Map<String, dynamic>? context,
+  }) async {
+    contexts.add(context);
+    return results.removeAt(0);
+  }
+
+  @override
+  void cancel() {}
 }
 
 class RealHttpOverrides extends HttpOverrides {}
@@ -269,6 +318,7 @@ void main() {
         expect(length, bytes!.length);
         expect(length, greaterThan(jsonEncode(payload).length));
         expect(transferEncoding, isNull);
+        expect(payload!.containsKey('context'), isFalse);
         expect(result.destination!['kind'], 'home');
       } finally {
         await server.close(force: true);
@@ -302,6 +352,77 @@ void main() {
       }
     },
   );
+
+  test('Page tracker reports only safe route, service path or tab', () {
+    final tracker = AssistantPageTracker();
+    expect(tracker.page(route: TPRoute.main, tabIndex: 3), {
+      'type': 'tab',
+      'index': 3,
+    });
+    expect(tracker.page(route: TPRoute.main), isNull);
+    expect(tracker.page(route: '/setting'), {
+      'type': 'native',
+      'route': '/setting',
+    });
+    expect(tracker.page(route: 'evil route'), isNull);
+    expect(tracker.page(route: TPRoute.webView), {'type': 'web', 'path': null});
+    final outer = tracker.attachWebView()
+      ..url = Uri.parse(
+        'https://taipei-pass-service.vercel.app/library-service/?type=1',
+      );
+    final inner = tracker.attachWebView()
+      ..url = Uri.parse('https://evil.test/library-service/');
+    expect(tracker.page(route: TPRoute.webView), {'type': 'web', 'path': null});
+    inner.detach();
+    expect(tracker.page(route: TPRoute.webView), {
+      'type': 'web',
+      'path': '/library-service/',
+    });
+    outer.detach();
+    expect(
+      AssistantPageTracker.servicePath(
+        Uri.parse('http://taipei-pass-service.vercel.app/library-service/'),
+      ),
+      isNull,
+    );
+  });
+
+  test('Requests carry the last action result without search text', () async {
+    var now = DateTime(2026, 11, 6, 12);
+    Future<void> run(
+      AssistantActionExecutor executor,
+      Map<String, dynamic> destination,
+      String expected,
+    ) async {
+      final service = QueueService([
+        AssistantResult(sessionId: 's', message: 'm', destination: destination),
+        const AssistantResult(sessionId: 's', message: 'm'),
+      ]);
+      final controller = AssistantViewController(
+        service: service,
+        executor: executor,
+        pageTracker: AssistantPageTracker(),
+        clock: () => now,
+      );
+      await controller.submit('第一句');
+      expect(service.contexts.single, isNull);
+      now = now.add(const Duration(seconds: 7));
+      await controller.submit('第二句');
+      final last = service.contexts.last!['last_action'] as Map;
+      expect(last['result'], expected);
+      expect(last['age_seconds'], 7);
+      expect(jsonEncode(last), isNot(contains('個資書名')));
+    }
+
+    await run(RecordingExecutor(), {'kind': 'home'}, 'opened');
+    await run(RecordingExecutor(), {
+      'kind': 'search',
+      'query': '個資書名',
+      'search_type': 'book_name',
+    }, 'opened');
+    await run(FailingExecutor(), {'kind': 'home'}, 'failed');
+    await run(SilentExecutor(), {'kind': 'home'}, 'cancelled');
+  });
 
   test('A stale model reply cannot navigate after cancellation', () async {
     final service = PendingService();

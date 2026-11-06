@@ -42,13 +42,13 @@ App 每次送出時附上固定欄位的狀態；第一版頁面只取路由與 
 | --- | --- |
 | `page.type` | `native`／`web`／`tab` |
 | `page.route` 或 `page.path` | 原生 GetX 路由（如 `/setting`），或 WebView 服務路徑（如 `/library-service/book-detail/lib-book-3`）；不含 query 中的個資 |
-| `page.capability_id` | App 依目錄反查到的能力 ID，查不到為 null |
-| `last_action` | 上一次助理導航的能力 ID、結果（`opened`／`failed`／`cancelled`）與時間 |
-| `pending` | 是否有待確認候選（後端本來就有，App 只回報面板狀態） |
+| `last_action` | 上一次助理導航的目的地（搜尋只送類型）、結果（`opened`／`failed`／`cancelled`）與經過秒數 |
 
 - 後端只把狀態當檢索線索（例如在圖書頁說「排行榜」優先圖書），不能據此拼網址、擴大權限或略過候選確認。
 - 不傳頁面文字、表單內容、帳號資料或 token。路徑與欄位先過白名單格式檢查，未知值丟棄。
-- 需要 contract 升級（新增選填欄位，舊後端拒收未知欄位，需同時更新兩端）；同時補上計畫中的「動作結果回報」。
+- 已實作為 contract 3：新增選填欄位，舊後端拒收未知欄位，需同時更新兩端。
+- 實作調整：能力 ID 由後端依路徑自行對應（App 不送 `capability_id`，避免用戶端自稱位於某頁取得提示）；
+  「動作結果回報」併入下一輪請求的 `last_action`，未另開端點；待確認候選後端本來就知道，App 不重複回報。
 - 表單填到哪等更細的網頁狀態，需 TownPass-Services 配合，不在第一版。
 
 ## 4. 語音辨識
@@ -73,7 +73,7 @@ RTX 4060 8 GB 的 VRAM、延遲與中文正確率；不足時評估量化或讓�
 | 階段 | 內容 | 驗收 |
 | --- | --- | --- |
 | V0 | 後端小修（schema、重試、metrics、目錄修正、keep_alive）— 2026-11-06 完成 | 單元 40 個、live 回歸 88/88 |
-| V1 | 頁面／動作狀態與結果回報（contract 升級） | wire、單元測試；狀態不擴權 |
+| V1 | 頁面／動作狀態與結果回報（contract 3）— 2026-11-06 完成 | Python 47、Flutter 19、live 回歸 98/98 |
 | V2 | 全螢幕介面（先只用鍵盤）：首次提示、對話泡泡、候選、收起後右下提示、點提示回到訊息、紀錄保存 | widget 測試＋使用者模擬器驗收 |
 | V3 | 一般中文語音：錄音權限、按住說話、上傳、Breeze-ASR-25／Whisper | 辨識 wire 測試、延遲與 VRAM 量測＋使用者實機驗收 |
 | V4 | 其他語言與台語 | 另行選型與驗收 |

@@ -148,7 +148,7 @@ Invoke-RestMethod http://127.0.0.1:8765/health
 fvm dart run tool/smoke_assistant.dart
 ```
 
-health 應含 contract_version 2、registry_version 1 與模型名稱；只能確認設定，smoke 才會實際經 Dart client 呼叫模型。
+health 應含 contract_version 3、registry_version 1 與模型名稱；只能確認設定，smoke 才會實際經 Dart client 呼叫模型。
 首次推論可能要等模型載入。錯誤時分別確認 Ollama :11434、Python :8765 與遠端示範書目網路，避免誤改成 timeout 無上限。
 目前圖書與其他 WebView 仍需要網際網路取得示範資料／頁面；「地端模型」不等於整個 App 可離線。
 
@@ -205,8 +205,8 @@ Android Studio 選 `lib/main.dart` 的 Flutter Run configuration、裝置選正�
 - Python 修改需停止該後端再重啟；改目錄資源需同步重啟後端與 App。Ollama 不需每次重下模型。
 - 每批先測規則／widget，再做 wire／模型測試，最後給使用者人工操作表。不要把遠端 mock 當正式交易。
 - 指令：`fvm flutter analyze`、`fvm flutter test`、`python -m unittest discover -s assistant_backend -p 'test*.py'`、`fvm flutter build apk --debug`、`git diff --check`。
-- 本輪基線 Python 40、Flutter 17 通過；analyze 有 7 warning／16 info（零 error），不得刪測試或全域放寬 lint 換成假綠燈。
-- 後端與 Ollama 啟動後可跑 `python assistant_backend/evaluate.py` 做 contract 2 模型回歸；它是開發集，通過率不能當成模型的通用準確率。
+- 本輪基線 Python 47、Flutter 19 通過；analyze 有 7 warning／16 info（零 error），不得刪測試或全域放寬 lint 換成假綠燈。
+- 後端與 Ollama 啟動後可跑 `python assistant_backend/evaluate.py` 做 contract 3 模型回歸；它是開發集，通過率不能當成模型的通用準確率。
 - 原開發機使用的 Gradle mirror／emulator workaround 是本機排障，不要自動設定到每個 clone。下載失敗時先保留完整錯誤並定位網路／倉庫問題。
 - 正式 API、缺金鑰地圖、欄位預填、語音仍未完成；開發方向看交接文件，不補假功能來通過展示。
 
@@ -219,7 +219,7 @@ Android Studio 選 `lib/main.dart` 的 Flutter Run configuration、裝置選正�
 ```text
 請協助我建置並理解剛 clone 的 TownPass fork。先找 repo 根目錄，讀 AGENTS.md、docs/TEAM_LOCAL_SETUP.md、docs/AI_ASSISTANT_PROGRESS.md 和 docs/AI_AGENT_HANDOFF.md，確認分支與最新 commit；若缺功能分支或文件先說明，不自行重做。
 先 inventory 我電腦的 Git、FVM/Flutter、JDK、Android SDK/Studio、Python、Ollama，缺少的才依官方來源協助安裝，使用 .fvmrc/lockfile 的版本，不整包升級，不照抄別人電腦的絕對路徑、Gradle mirror 或 DLL workaround。
-請告訴我這些文件、Flutter 功能、後端、能力目錄和測試檔在本機的完整路徑。說明要下載 Mistral AI 的 ministral-3:3b，給我 ollama pull/run 指令並驗證 Ollama；再啟 Python 後端、檢查 contract 2 health 與 Dart wire smoke。不能換成中國開發模型。
+請告訴我這些文件、Flutter 功能、後端、能力目錄和測試檔在本機的完整路徑。說明要下載 Mistral AI 的 ministral-3:3b，給我 ollama pull/run 指令並驗證 Ollama；再啟 Python 後端、檢查 contract 3 health 與 Dart wire smoke。不能換成中國開發模型。
 接著協助建立/開啟 Android AVD、選正確裝置、做 adb reverse，從 lib/main.dart Run App，解釋後端/模型/模擬器分別在哪裡執行、日後怎麼重新啟動和開發。安裝或系統設定遇到需要我操作的步驟時，講清楚原因和操作；實際 UI 驗收給我測試清單。
 最後回報安裝版本與路徑、實際通過檢查、待處理問題、常用啟動指令。不要把 mock 當正式服務，不擅自 push 或改專案架構。
 ```

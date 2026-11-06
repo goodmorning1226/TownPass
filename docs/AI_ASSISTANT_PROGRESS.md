@@ -18,7 +18,8 @@
 10. 最新修正：每次**新的助理導航**先清除 `TPRoute.main` 之上的舊頁，再建新服務正常父頁。案件進度 → 助理開圖書 → 按叉叉／圖書首頁按返回，回 App 主畫面，不回舊案件頁。一般回覆、候選確認、取消、無效目標不清頁。
 11. 單一精確命中且停用的功能（如「幫我掛號」）由程式直接回目錄內的未串接原因，不呼叫模型；多候選仍走確認。
 12. 2026-11-06 後端小修（V0）：提案 schema 依工具綁參數、一般服務決策也有一次修正、所有回覆帶 metrics、`police.online` 標回示範、模型保留 30 分鐘。
-13. Debug 開放助理、release 預設關閉；debug cleartext 僅限 localhost／127.0.0.1／10.0.2.2。USB／模擬器用 adb reverse，不必開放區網端口。
+13. 2026-11-06 頁面狀態（V1，contract 3）：App 每輪附上目前頁面與上次助理導航結果（opened／failed／cancelled），後端自行對應能力；只當提示，歧義候選把目前服務排前面，不因此導航。
+14. Debug 開放助理、release 預設關閉；debug cleartext 僅限 localhost／127.0.0.1／10.0.2.2。USB／模擬器用 adb reverse，不必開放區網端口。
 
 ## 尚未完成與下一步
 
@@ -33,8 +34,8 @@
 
 | 檢查 | 最近結果與限制 |
 | --- | --- |
-| Python unittest | 40 個通過；fake model 驗證流程、候選隔離與規則，不當作模型準確率 |
-| contract 2 live-model 回歸 | `evaluate.py` 88 個案例／109 輪全數通過，非預期導航 0、錯誤目的地 0。開發集，不是 held-out 準確率 |
+| Python unittest | 47 個通過；fake model 驗證流程、候選隔離與規則，不當作模型準確率 |
+| contract 3 live-model 回歸 | `evaluate.py` 98 個案例／119 輪全數通過，非預期導航 0、錯誤目的地 0。開發集，不是 held-out 準確率 |
 | Flutter tests | 17 個通過；包含案件 → 圖書關閉／系統返回、Web → 原生父頁與取消遲到回覆 |
 | 實際 Ministral 開發案例 | 第一批 6 個一般／候選／排行案例符合預期；不是 held-out 準確率 |
 | App Dart client → HTTP → 模型 | 中文 UTF-8 bytes/contentLength 傳輸與圖書導覽通過 |
@@ -57,7 +58,9 @@ TownPass/
 │  ├─ workflow.py                              # 一般回覆、分頁、候選確認與 session 狀態
 │  ├─ test_server.py                           # 圖書與 HTTP／工具白名單回歸
 │  ├─ test_workflow.py                         # 全功能目錄、歧義、候選生命週期回歸
-│  ├─ evaluate.py                              # contract 2 live-model 回歸集（HTTP、多輪候選情境）
+│  ├─ page_context.py                          # App 頁面／上次動作狀態驗證與能力對應（contract 3）
+│  ├─ test_page_context.py                     # 頁面狀態解析、排序與 HTTP 回歸
+│  ├─ evaluate.py                              # contract 3 live-model 回歸集（HTTP、多輪候選、頁面狀態）
 │  ├─ test_evaluate.py                         # 回歸集本身的離線檢查，不呼叫模型
 │  └─ README.md                                # 後端啟動與契約說明
 ├─ lib/
@@ -68,6 +71,7 @@ TownPass/
 │  │  └─ widget/assistant_host.dart             # 全域泡泡、對話面板、候選與指引 UI
 │  ├─ service/
 │  │  ├─ assistant_service.dart                # HTTP、UTF-8、取消、timeout 與開發 token
+│  │  ├─ assistant_page_tracker.dart           # 目前路由／WebView 服務路徑／頁籤（只送安全欄位）
 │  │  └─ assistant_action_executor.dart        # 固定目的地、舊頁清除、正常父頁與導航
 │  └─ util/tp_web_view.dart                    # 向後相容的助理參數、父頁載入、返回處理
 ├─ android/app/src/debug/

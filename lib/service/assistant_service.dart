@@ -20,6 +20,7 @@ class AssistantService {
     String? sessionId,
     String? resolutionId,
     String? choiceId,
+    Map<String, dynamic>? context,
   }) async {
     cancel();
     final client = HttpClient()..connectionTimeout = const Duration(seconds: 8);
@@ -32,6 +33,7 @@ class AssistantService {
         sessionId,
         resolutionId,
         choiceId,
+        context,
       ).timeout(const Duration(seconds: 85));
     } on TimeoutException {
       throw const FormatException('處理時間較長，請重試或從原圖書頁面搜尋。');
@@ -52,6 +54,7 @@ class AssistantService {
     String? sessionId,
     String? resolutionId,
     String? choiceId,
+    Map<String, dynamic>? context,
   ) async {
     final request = await client.postUrl(
       Uri.parse(endpoint).resolve('/v1/assistant/turns'),
@@ -68,6 +71,7 @@ class AssistantService {
         'session_id': ?sessionId,
         'resolution_id': ?resolutionId,
         'choice_id': ?choiceId,
+        'context': ?context,
       }),
     );
     // Python's local HTTP server requires a known byte length; Dart otherwise
