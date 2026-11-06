@@ -1,6 +1,6 @@
 # 給接續實作 Agent 的交接文件
 
-交接日期：2026-11-05。先閱讀根目錄 [AGENTS.md](../AGENTS.md)，再讀
+交接日期：2026-11-06。先閱讀根目錄 [AGENTS.md](../AGENTS.md)，再讀
 [最新進度與功能檔案架構](AI_ASSISTANT_PROGRESS.md)、[全功能分步計畫](AI_ALL_FEATURES_ROLLOUT_PLAN.md)
 、[本批實作與人工驗收](AI_EXPANSION_IMPLEMENTATION.md)
 及 [介面與語音規劃](AI_VOICE_UI_PLAN.md)。新機先走 [TEAM_LOCAL_SETUP.md](TEAM_LOCAL_SETUP.md)。
@@ -8,7 +8,7 @@
 
 ## 產品目標與不可遺失的要求
 
-幫助數位使用能力較弱者、弱勢族群與年長者，用文字（未來語音）描述需求，導入原 TownPass 服務頁面。
+幫助數位使用能力較弱者、弱勢族群與年長者，用文字或按住說話描述需求，導入原 TownPass 服務頁面。
 沒有指定內部動作就開服務總覽；有明確書籍就定位到原詳情。模型不直接操作 App，不替人預約或付款。
 需要填表時未來只建受控預填，最後原頁面由使用者確認。現階段沒有通用填表能力。
 
@@ -18,12 +18,21 @@
 - 未知書名若確定是借書意圖，導圖書總覽；如果有模糊候選先確認，完全無候選不開空搜尋結果。不能為單一使用者句子加特殊 case。
 - 最新導航要求：新助理導覽取代先前服務歷史；正常父頁仍保留。案件頁 → 圖書，關閉不回案件頁；詳情返回圖書總覽。這個要求取代舊「保留原 App 位置」規劃。
 - 使用者希望自行做實際 UI／模擬器操作驗收。準備好版本、輸入及預期落點後告知；不要代勾為已通過。
+- 介面：右下「助理」→ 全螢幕微透明對話；使用者泡泡靠右、助理靠左；預設語音版面（中下麥克風、右下鍵盤，左下保留給 V4 語言選擇）。
+  對話紀錄只在 App 記憶體、不送模型；操作後收起並在右下顯示 8 秒提示，點提示回到該則訊息。
+- 語音辨識不確定時一律讓使用者選擇（「我聽到「…」，是這句嗎？」），不可把辨識結果靜默改成另一個功能。
+- Commit 與 push 都要使用者當次同意；commit 訊息不加 AI 共同作者（Co-Authored-By）標記。
 
 ## 系統怎麼串
 
 ```text
+語音（選用）：AssistantRecorder（記憶體 PCM16 → WAV）
+  → POST /v1/assistant/transcriptions（:8765 驗證後轉送）
+  → asr_server.py :8770（faster-whisper + Breeze-ASR-25，n-best 與信心）
+  → clear：文字當一般 turn ／ unsure：讓使用者選 ／ unclear：請重說
+
 AssistantHost → AssistantViewController → AssistantService
-  → POST /v1/assistant/turns（電腦 Python :8765）
+  → POST /v1/assistant/turns（電腦 Python :8765，附頁面狀態 context）
   → Workflow／Registry：一般問題模板、關鍵字／書目候選
   → Ollama :11434 /api/chat（Ministral、受 JSON Schema 約束工具提案）
   → validate_call／候選確認／固定 ID
@@ -67,9 +76,11 @@ Vue 網頁不在此 repo；需要受控表單 adapter 時需另外處理 TownPas
 
 1. 查看 Git 狀態、目前版本，回報理解的進度與本次要處理的範圍；不要自行重做已完成的泡泡或改框架。
 2. 最新導航修正已由使用者實機驗收，live-model 評估集已更新且全數通過；V0–V3（頁面狀態、全螢幕介面、按住說話）已完成；V4 其他語言／台語尚未開始。
-3. 依計畫補 service/provider 與內部 operation schema；優先選可在原頁確認、具備資料來源的唯讀操作。
-4. 再做欄位抽取／模糊 enum 確認及受控預填。先明確欄位名稱、型別、合法值、來源與寫入邊界，再實作，不用任意 JS 尋找／點擊欄位。
-5. 各批提供單元／widget／wire 測試及人工測試表，更新最新進度。外部 API／認證沒到，留停用原因，不造完成狀態。
+3. 語音保留待辦（使用者要求先記錄、未同意前不做）：辨識提示加入目錄關鍵字、USB 實機重測、經同意的除錯錄音。
+   細節與實測見 [介面與語音規劃](AI_VOICE_UI_PLAN.md) V3 節。V4（其他語言、台語、左下語言選擇）尚未開始。
+4. 依計畫補 service/provider 與內部 operation schema；優先選可在原頁確認、具備資料來源的唯讀操作。
+5. 再做欄位抽取／模糊 enum 確認及受控預填。先明確欄位名稱、型別、合法值、來源與寫入邊界，再實作，不用任意 JS 尋找／點擊欄位。
+6. 各批提供單元／widget／wire 測試及人工測試表，更新最新進度。外部 API／認證沒到，留停用原因，不造完成狀態。
 
 ## 驗證與交付標準
 
@@ -86,6 +97,8 @@ git diff --check
 目前基線：Python 55／Flutter 35 通過；analyze 零 error、7 warning、16 info，皆在既有非助理檔案。
 變更 asset／模型／pubspec 時執行 `fvm dart run build_runner build`，不手改或提交被忽略產生碼。
 串線可先啟後端，再 `fvm dart run tool/smoke_assistant.dart`；實際 UI 由使用者測。
+語音串線需另啟 `scripts/start_asr.ps1`；Python 單元測試用假的辨識服務，不需模型。測試用的暫時後端請用其他端口（如 8766／8771），
+不要停掉使用者自己開著的 8765／8770 視窗。
 Hot reload 不會更新 Python 程式；有新 asset／dart-define 時 Stop 再 Run。
 依賴不升級；不要將目前電腦的 `D:\Android`、Gradle mirror、emulator DLL workaround 當別人必備配置。
 修改完回報具體結果、未驗證項目與手動測試步驟；commit／push 依當次使用者授權，不推測已有永久授權。
@@ -93,7 +106,11 @@ Hot reload 不會更新 Python 程式；有新 asset／dart-define 時 Stop 再 
 ## 可直接貼給下一個 Agent 的 Prompt
 
 ```text
-請接續此 TownPass fork 的地端服務助理開發。先讀 AGENTS.md、docs/AI_ASSISTANT_PROGRESS.md、docs/AI_AGENT_HANDOFF.md、docs/AI_ALL_FEATURES_ROLLOUT_PLAN.md，再檢查 Git 分支、status 與目前程式，不覆蓋未提交工作。
-目前使用 ministral-3:3b、Python stdlib 後端、Flutter/GetX 與原 WebView；有 70 項目錄、41 項允許導頁，表單預填與正式交易未完成。保留候選確認、防遲到回覆、UTF-8 HTTP 及新助理跳轉清除舊服務歷史的行為。
-先簡短回報目前完成／待辦與功能相關檔案位置，再依我接下來指定的任務分步實作。若未指定，先依計畫提出下一批範圍。實際 UI 操作由我做，請給輸入、預期落點及返回結果；不要把未測項目當通過。不要自行升級架構、改用中國開發模型或 push。
+請接續此 TownPass fork 的地端服務助理開發。先讀 AGENTS.md、docs/AI_ASSISTANT_PROGRESS.md、docs/AI_AGENT_HANDOFF.md、docs/AI_VOICE_UI_PLAN.md、docs/AI_ALL_FEATURES_ROLLOUT_PLAN.md，再檢查 Git 分支、status 與目前程式，不覆蓋未提交工作。
+
+現況：決策模型 ministral-3:3b（Ollama）、Python 標準函式庫主後端（contract 3，含頁面狀態 context）、Flutter/GetX 與原 WebView；70 項目錄、41 項允許導頁。全螢幕「助理」介面與按住說話已完成，語音用地端 Breeze-ASR-25（faster-whisper 獨立服務 :8770，權重在 repo 外）。表單預填、正式交易、其他語言與台語尚未完成；語音在吵雜環境的辨識率有保留待辦。
+
+必須保留：候選確認與語音「是這句嗎？」確認（不可靜默替換）、取消與防遲到回覆、UTF-8 byte contentLength、新助理導航清除舊服務歷史、錄音不存檔、使用者泡泡靠右／助理靠左。
+
+先簡短回報目前完成／待辦與功能相關檔案位置，再依我指定的任務分步實作；若未指定，先依計畫提出下一批範圍。實際 UI 與語音操作由我做，請給輸入、預期畫面與返回結果，不要把未測項目當通過。測試用的暫時服務請開在其他端口，不要停掉我開著的 8765／8770。不要自行更換架構、改用中國開發的模型（決策或語音）、commit 或 push；commit 要等我同意，訊息不加 AI 共同作者。
 ```
