@@ -27,9 +27,13 @@ class AssistantRecorder {
   Completer<void>? _done;
 
   /// Starts capturing; false when the microphone permission is not granted.
+  ///
+  /// Each recording uses a fresh platform recorder: reusing one across
+  /// sessions risked the next session delivering silence.
   Future<bool> start() async {
     await cancel();
-    final recorder = _recorder ??= AudioRecorder();
+    await _recorder?.dispose();
+    final recorder = _recorder = AudioRecorder();
     if (!await recorder.hasPermission()) return false;
     final pcm = BytesBuilder(copy: false);
     final done = Completer<void>();
@@ -65,6 +69,8 @@ class AssistantRecorder {
     await done?.future.timeout(const Duration(seconds: 1), onTimeout: () {});
     await _subscription?.cancel();
     _subscription = null;
+    await _recorder?.dispose();
+    _recorder = null;
     return pcm.isEmpty ? null : wav(downsample(pcm.takeBytes()));
   }
 

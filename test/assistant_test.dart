@@ -111,15 +111,27 @@ class QueueService extends AssistantService {
 class FakeRecorder extends AssistantRecorder {
   final bool permitted;
   final double seconds;
+
+  /// Sample amplitude of the fake recording; 0 simulates a dead microphone.
+  final int amplitude;
   bool cancelled = false;
-  FakeRecorder({this.permitted = true, this.seconds = 1});
+  FakeRecorder({
+    this.permitted = true,
+    this.seconds = 1,
+    this.amplitude = 3000,
+  });
 
   @override
   Future<bool> start() async => permitted;
 
   @override
-  Future<Uint8List?> stop() async =>
-      AssistantRecorder.wav(Uint8List((seconds * 32000).round()));
+  Future<Uint8List?> stop() async {
+    final samples = ByteData((seconds * 32000).round() & ~1);
+    for (var i = 0; i < samples.lengthInBytes ~/ 2; i++) {
+      samples.setInt16(i * 2, i.isEven ? amplitude : -amplitude, Endian.little);
+    }
+    return AssistantRecorder.wav(samples.buffer.asUint8List());
+  }
 
   @override
   Future<void> cancel() async => cancelled = true;
@@ -877,6 +889,24 @@ void main() {
     );
     expect(AssistantRecorder.rms(Uint8List(0)), 0);
   });
+
+  test(
+    'Digital silence is reported as a microphone problem, not sent',
+    () async {
+      final service = QueueService(
+        [],
+        transcripts: [AssistantTranscript('不該送出')],
+      );
+      final controller = AssistantViewController(
+        service: service,
+        recorder: FakeRecorder(amplitude: 0),
+      );
+      await controller.startListening();
+      await controller.stopListening();
+      expect(service.audio, isEmpty);
+      expect(controller.messages.single.text, contains('麥克風沒有收到任何聲音'));
+    },
+  );
 
   test('Refused permission, short press and discard send nothing', () async {
     final service = QueueService(

@@ -49,6 +49,10 @@ class AssistantViewController extends GetxController {
   /// Loudness (RMS) below which, after [quietAfter], the user is told to
   /// speak up. Speech close to a phone microphone is typically well above it.
   static const quietLevel = 0.03;
+
+  /// Below this the device delivered digital silence (microphone not reaching
+  /// the App, e.g. an emulator whose host microphone dropped), not a quiet voice.
+  static const silentLevel = 0.002;
   static const quietAfter = Duration(milliseconds: 1200);
   static const cornerDuration = Duration(seconds: 8);
   static const historyLimit = 200;
@@ -274,15 +278,22 @@ class AssistantViewController extends GetxController {
         : clock().difference(_listenStarted!);
     final audio = await recorder.stop();
     if (isClosed) return;
-    if (kDebugMode && audio != null && heldFor != null) {
-      // Numbers only: a mismatch means the device's sample rate is wrong.
+    if (kDebugMode && heldFor != null) {
+      // Numbers only: a length mismatch means the sample rate is wrong; a
+      // loudest level of 0 means the device delivered silence.
       debugPrint(
         'assistant voice: held ${heldFor.inMilliseconds} ms, '
-        'audio ${(AssistantRecorder.seconds(audio) * 1000).round()} ms',
+        'audio ${audio == null ? 0 : (AssistantRecorder.seconds(audio) * 1000).round()} ms, '
+        'loudest ${_loudest.toStringAsFixed(4)}',
       );
     }
     if (audio == null || AssistantRecorder.seconds(audio) < minimumSpeech) {
       _add('沒有錄到聲音，請按住麥克風再說話，說完放開。');
+      return;
+    }
+    if (AssistantRecorder.rms(Uint8List.sublistView(audio, 44)) < silentLevel) {
+      // Nothing worth sending: the microphone itself delivered silence.
+      _add('麥克風沒有收到任何聲音。請確認麥克風沒被其他程式占用；用模擬器時請重新開啟它的麥克風設定，或改用鍵盤。');
       return;
     }
     final generation = ++_generation;
