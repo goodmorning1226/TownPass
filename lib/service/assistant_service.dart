@@ -1,8 +1,22 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:town_pass/bean/assistant_result.dart';
+
+/// Recognised speech. When [confirm] is true the user must pick one of
+/// [options] (the heard text first) before anything is sent.
+class AssistantTranscript {
+  final String text;
+  final bool confirm;
+  final List<String> options;
+  const AssistantTranscript(
+    this.text, {
+    this.confirm = false,
+    this.options = const [],
+  });
+}
 
 class AssistantService {
   static const baseUrl = String.fromEnvironment(
@@ -94,6 +108,69 @@ class AssistantService {
       throw const FormatException('助理回覆與本次需求不一致，未執行操作。');
     }
     return AssistantResult.fromJson(json);
+  }
+
+  /// Sends in-memory WAV audio to the backend's local speech recognition and
+  /// returns the recognised text. Nothing is stored on the device or server.
+  Future<AssistantTranscript> transcribe(
+    Uint8List wav, {
+    required String requestId,
+  }) async {
+    cancel();
+    final client = HttpClient()..connectionTimeout = const Duration(seconds: 8);
+    _active = client;
+    try {
+      final request = await client.postUrl(
+        Uri.parse(endpoint).resolve('/v1/assistant/transcriptions'),
+      );
+      request.headers.contentType = ContentType('audio', 'wav');
+      request.headers.set('X-Request-Id', requestId);
+      const token = String.fromEnvironment('ASSISTANT_TOKEN');
+      if (token.isNotEmpty) {
+        request.headers.set(HttpHeaders.authorizationHeader, 'Bearer $token');
+      }
+      request.contentLength = wav.length;
+      request.add(wav);
+      final response = await request.close().timeout(
+        const Duration(seconds: 45),
+      );
+      final body = await response
+          .transform(utf8.decoder)
+          .join()
+          .timeout(const Duration(seconds: 10));
+      final json = jsonDecode(body) as Map<String, dynamic>;
+      if (response.statusCode != HttpStatus.ok) {
+        throw FormatException(json['error'] as String? ?? '語音辨識沒有成功。');
+      }
+      final text = json['text'];
+      final options = json['options'] ?? const [];
+      if (json['request_id'] != requestId ||
+          text is! String ||
+          text.trim().isEmpty ||
+          text.length > 500 ||
+          options is! List ||
+          options.length > 3 ||
+          options.any(
+            (o) => o is! String || o.trim().isEmpty || o.length > 500,
+          )) {
+        throw const FormatException('語音辨識回覆不正確，請再說一次或改用鍵盤。');
+      }
+      final confirm = json['confirm'] == true && options.isNotEmpty;
+      return AssistantTranscript(
+        text.trim(),
+        confirm: confirm,
+        options: confirm ? options.cast<String>() : const [],
+      );
+    } on TimeoutException {
+      throw const FormatException('語音辨識時間較長，請再說一次或改用鍵盤。');
+    } on SocketException {
+      throw const FormatException('連不到電腦上的助理，請確認後端與裝置連線。');
+    } on HttpException {
+      throw const FormatException('助理連線中斷，請再說一次或改用鍵盤。');
+    } finally {
+      client.close(force: true);
+      if (identical(_active, client)) _active = null;
+    }
   }
 
   void cancel() {

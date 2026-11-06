@@ -59,12 +59,14 @@ Vue 網頁不在此 repo；需要受控表單 adapter 時需另外處理 TownPas
 - `/health` 不會測模型或所有遠端頁；不可以拿 health 200 當作完整串線成功。
 - `evaluate.py` 已是 contract 3 的 live-model 回歸集（需先啟動後端與 Ollama）；輸出 evaluation.json 已忽略。
   目前 99 個案例全數通過；之後出現失敗先查後端行為，不要為了全綠把預期或 validator 放寬。
+- 語音：`asr_server.py` 是獨立程序（需 faster-whisper），主後端只做 WAV 驗證與轉送；權重與轉換檔在 repo 外，不提交。
+  App 新增 `record` 套件，錄音只在記憶體。模型限制同樣適用：不得換成中國開發的辨識模型。
 - 單一精確命中的停用能力由 `Workflow.handle` 直接回原因、不呼叫模型（3b 模型遇到不可用候選傾向回補問）。
 
 ## 建議接續順序
 
 1. 查看 Git 狀態、目前版本，回報理解的進度與本次要處理的範圍；不要自行重做已完成的泡泡或改框架。
-2. 最新導航修正已由使用者實機驗收，live-model 評估集已更新且全數通過；V0、V1、V2（鍵盤版全螢幕介面）已完成，下一步依介面與語音規劃做 V3 語音。
+2. 最新導航修正已由使用者實機驗收，live-model 評估集已更新且全數通過；V0–V3（頁面狀態、全螢幕介面、按住說話）已完成；V4 其他語言／台語尚未開始。
 3. 依計畫補 service/provider 與內部 operation schema；優先選可在原頁確認、具備資料來源的唯讀操作。
 4. 再做欄位抽取／模糊 enum 確認及受控預填。先明確欄位名稱、型別、合法值、來源與寫入邊界，再實作，不用任意 JS 尋找／點擊欄位。
 5. 各批提供單元／widget／wire 測試及人工測試表，更新最新進度。外部 API／認證沒到，留停用原因，不造完成狀態。
@@ -81,7 +83,7 @@ fvm flutter build apk --debug
 git diff --check
 ```
 
-目前基線：Python 47／Flutter 25 通過；analyze 零 error、7 warning、16 info，皆在既有非助理檔案。
+目前基線：Python 55／Flutter 35 通過；analyze 零 error、7 warning、16 info，皆在既有非助理檔案。
 變更 asset／模型／pubspec 時執行 `fvm dart run build_runner build`，不手改或提交被忽略產生碼。
 串線可先啟後端，再 `fvm dart run tool/smoke_assistant.dart`；實際 UI 由使用者測。
 Hot reload 不會更新 Python 程式；有新 asset／dart-define 時 Stop 再 Run。

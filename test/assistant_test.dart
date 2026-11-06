@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -12,6 +13,7 @@ import 'package:town_pass/page/assistant/assistant_view_controller.dart';
 import 'package:town_pass/page/assistant/widget/assistant_host.dart';
 import 'package:town_pass/service/assistant_action_executor.dart';
 import 'package:town_pass/service/assistant_page_tracker.dart';
+import 'package:town_pass/service/assistant_recorder.dart';
 import 'package:town_pass/service/assistant_service.dart';
 
 class PendingService extends AssistantService {
@@ -71,8 +73,12 @@ class SilentExecutor extends AssistantActionExecutor {
 
 class QueueService extends AssistantService {
   final List<AssistantResult> results;
+  final List<AssistantTranscript> transcripts;
   final contexts = <Map<String, dynamic>?>[];
-  QueueService(this.results);
+  final texts = <String>[];
+  final audio = <Uint8List>[];
+  Completer<void>? transcriptGate;
+  QueueService(this.results, {this.transcripts = const []});
   @override
   Future<AssistantResult> decide({
     required String text,
@@ -83,11 +89,43 @@ class QueueService extends AssistantService {
     Map<String, dynamic>? context,
   }) async {
     contexts.add(context);
+    texts.add(text);
     return results.removeAt(0);
   }
 
   @override
+  Future<AssistantTranscript> transcribe(
+    Uint8List wav, {
+    required String requestId,
+  }) async {
+    audio.add(wav);
+    await transcriptGate?.future;
+    return transcripts.first;
+  }
+
+  @override
   void cancel() {}
+}
+
+/// In-memory stand-in for the microphone plugin.
+class FakeRecorder extends AssistantRecorder {
+  final bool permitted;
+  final double seconds;
+  bool cancelled = false;
+  FakeRecorder({this.permitted = true, this.seconds = 1});
+
+  @override
+  Future<bool> start() async => permitted;
+
+  @override
+  Future<Uint8List?> stop() async =>
+      AssistantRecorder.wav(Uint8List((seconds * 32000).round()));
+
+  @override
+  Future<void> cancel() async => cancelled = true;
+
+  @override
+  Future<void> dispose() async {}
 }
 
 class RealHttpOverrides extends HttpOverrides {}
@@ -507,6 +545,8 @@ void main() {
       await tester.tap(find.byType(FloatingActionButton));
       await tester.pump();
       expect(find.text('你可以說…'), findsOneWidget);
+      await tester.tap(find.byTooltip('改用鍵盤'));
+      await tester.pump();
       await tester.enterText(find.byKey(const Key('assistant-input')), '我要借書');
       await tester.tap(find.byTooltip('送出'));
       await tester.pump();
@@ -674,7 +714,8 @@ void main() {
       (tester) async {
         await tester.binding.setSurfaceSize(const Size(360, 640));
         addTearDown(() => tester.binding.setSurfaceSize(null));
-        final controller = AssistantViewController()..expanded.value = true;
+        final controller = AssistantViewController(recorder: FakeRecorder())
+          ..expanded.value = true;
         await tester.pumpWidget(
           MaterialApp(
             builder: (context, child) => MediaQuery(
@@ -689,19 +730,303 @@ void main() {
           ),
         );
         await tester.pump();
-        if (!keyboard) {
-          await tester.tap(find.byTooltip('改用語音'));
+        if (keyboard) {
+          await tester.tap(find.byTooltip('改用鍵盤'));
           await tester.pump();
-          expect(find.byTooltip('改用鍵盤'), findsOneWidget);
-          await tester.tap(find.byIcon(Icons.mic));
-          await tester.pump();
-          expect(find.textContaining('下一階段開放'), findsOneWidget);
+          expect(find.byTooltip('改用語音'), findsOneWidget);
+        } else {
+          expect(find.text('按住說話'), findsOneWidget);
         }
         expect(find.byType(Scrollable), findsWidgets);
         expect(tester.takeException(), isNull);
       },
     );
   }
+
+  test('Recorder wraps PCM16 mono audio in a valid WAV header', () {
+    final pcm = Uint8List(32000); // one second at 16 kHz
+    final wav = AssistantRecorder.wav(pcm);
+    final header = ByteData.sublistView(wav, 0, 44);
+    expect(String.fromCharCodes(wav.sublist(0, 4)), 'RIFF');
+    expect(String.fromCharCodes(wav.sublist(8, 16)), 'WAVEfmt ');
+    expect(header.getUint16(22, Endian.little), 1);
+    expect(header.getUint32(24, Endian.little), 16000);
+    expect(header.getUint32(40, Endian.little), pcm.length);
+    expect(AssistantRecorder.seconds(wav), 1.0);
+  });
+
+  test('Speech becomes the user bubble and a normal turn', () async {
+    final service = QueueService(
+      [const AssistantResult(sessionId: 's', message: '請在原圖書頁面搜尋。')],
+      transcripts: [AssistantTranscript('我要借書')],
+    );
+    final recorder = FakeRecorder();
+    final controller = AssistantViewController(
+      service: service,
+      executor: RecordingExecutor(),
+      recorder: recorder,
+    );
+    expect(await controller.startListening(), isTrue);
+    expect(controller.listening.value, isTrue);
+    await controller.stopListening();
+    expect(controller.listening.value, isFalse);
+    expect(service.audio.single.length, 44 + 32000);
+    expect(service.texts, ['我要借書']);
+    expect(controller.messages.map((m) => (m.fromUser, m.text)), [
+      (true, '我要借書'),
+      (false, '請在原圖書頁面搜尋。'),
+    ]);
+  });
+
+  test('Unsure speech asks which reading was meant before sending', () async {
+    final service = QueueService(
+      [const AssistantResult(sessionId: 's', message: '請在原圖書頁面搜尋。')],
+      transcripts: [
+        const AssistantTranscript(
+          '我要解釋',
+          confirm: true,
+          options: ['我要解釋', '我要借書'],
+        ),
+      ],
+    );
+    final controller = AssistantViewController(
+      service: service,
+      executor: RecordingExecutor(),
+      recorder: FakeRecorder(),
+    );
+    await controller.startListening();
+    await controller.stopListening();
+    expect(service.texts, isEmpty); // nothing sent yet
+    final ask = controller.messages.single;
+    expect(ask.fromUser, isFalse);
+    expect(ask.text, contains('我聽到「我要解釋」'));
+    expect(ask.suggestions, ['我要解釋', '我要借書']);
+    expect(controller.choicesMessageId.value, ask.id);
+    await controller.chooseSuggestion('我要借書');
+    expect(service.texts, ['我要借書']);
+    expect(controller.messages[1].text, '我要借書');
+    expect(controller.messages[1].fromUser, isTrue);
+    expect(controller.choicesMessageId.value, isNull);
+  });
+
+  test('A recording that stays quiet asks the user to speak up', () async {
+    var now = DateTime(2026, 11, 6, 12);
+    final recorder = FakeRecorder();
+    final controller = AssistantViewController(
+      recorder: recorder,
+      clock: () => now,
+    );
+    await controller.startListening();
+    recorder.onLevel!(0.01);
+    expect(controller.tooQuiet.value, isFalse); // too early to judge
+    now = now.add(AssistantViewController.quietAfter);
+    recorder.onLevel!(0.012);
+    expect(controller.tooQuiet.value, isTrue);
+    expect(controller.level.value, closeTo(0.08, 0.001));
+    recorder.onLevel!(0.12);
+    expect(controller.tooQuiet.value, isFalse);
+    await controller.stopListening(send: false);
+    expect(controller.level.value, 0);
+  });
+
+  test('RMS of PCM16 audio', () {
+    final loud = ByteData(4)
+      ..setInt16(0, 16384, Endian.little)
+      ..setInt16(2, -16384, Endian.little);
+    expect(
+      AssistantRecorder.rms(loud.buffer.asUint8List()),
+      closeTo(0.5, 1e-6),
+    );
+    expect(AssistantRecorder.rms(Uint8List(0)), 0);
+  });
+
+  test('Refused permission, short press and discard send nothing', () async {
+    final service = QueueService(
+      [],
+      transcripts: [AssistantTranscript('不該送出')],
+    );
+    final denied = AssistantViewController(
+      service: service,
+      recorder: FakeRecorder(permitted: false),
+    );
+    expect(await denied.startListening(), isFalse);
+    expect(denied.listening.value, isFalse);
+    expect(denied.messages.single.text, contains('麥克風權限'));
+
+    final short = AssistantViewController(
+      service: service,
+      recorder: FakeRecorder(seconds: 0.2),
+    );
+    await short.startListening();
+    await short.stopListening();
+    expect(short.messages.single.text, contains('沒有錄到聲音'));
+
+    final discarded = AssistantViewController(
+      service: service,
+      recorder: FakeRecorder(),
+    );
+    await discarded.startListening();
+    await discarded.stopListening(send: false);
+    expect(discarded.messages, isEmpty);
+    expect(service.audio, isEmpty);
+  });
+
+  test('Closing during recognition drops the late transcript', () async {
+    final service = QueueService(
+      [],
+      transcripts: [AssistantTranscript('我要繳水費')],
+    );
+    service.transcriptGate = Completer<void>();
+    final controller = AssistantViewController(
+      service: service,
+      executor: RecordingExecutor(),
+      recorder: FakeRecorder(),
+    );
+    await controller.startListening();
+    final pending = controller.stopListening();
+    await Future<void>.delayed(Duration.zero);
+    expect(controller.busy.value, isTrue);
+    controller.closePanel();
+    service.transcriptGate!.complete();
+    await pending;
+    expect(service.texts, isEmpty);
+    expect(controller.messages.where((m) => m.fromUser), isEmpty);
+  });
+
+  testWidgets('User bubbles sit right, replies left; keyboard clears the mic', (
+    tester,
+  ) async {
+    await tester.binding.setSurfaceSize(const Size(400, 800));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    final controller = AssistantViewController(
+      service: QueueService([
+        const AssistantResult(sessionId: 's', message: '嗨，我是助理。'),
+      ]),
+      executor: RecordingExecutor(),
+      recorder: FakeRecorder(),
+    )..expanded.value = true;
+    await tester.pumpWidget(
+      MaterialApp(
+        builder: (context, child) =>
+            AssistantHost(controller: controller, child: child!),
+        home: const Scaffold(),
+      ),
+    );
+    await controller.submit('你好');
+    await tester.pump();
+    final user = tester.getRect(find.text('你好'));
+    final reply = tester.getRect(find.text('嗨，我是助理。'));
+    expect(user.right, greaterThan(360));
+    expect(reply.left, lessThan(40));
+    final mic = tester.getRect(find.byIcon(Icons.mic));
+    final keyboard = tester.getRect(find.byTooltip('改用鍵盤'));
+    expect(keyboard.overlaps(mic), isFalse);
+    expect(keyboard.right, greaterThan(360));
+  });
+
+  testWidgets('Hold to talk, release to send; slide up discards', (
+    tester,
+  ) async {
+    final service = QueueService(
+      [const AssistantResult(sessionId: 's', message: '嗨，我是助理。')],
+      transcripts: [AssistantTranscript('你好')],
+    );
+    final recorder = FakeRecorder();
+    final controller = AssistantViewController(
+      service: service,
+      executor: RecordingExecutor(),
+      recorder: recorder,
+    )..expanded.value = true;
+    await tester.pumpWidget(
+      MaterialApp(
+        builder: (context, child) =>
+            AssistantHost(controller: controller, child: child!),
+        home: const Scaffold(),
+      ),
+    );
+    expect(find.text('按住說話'), findsOneWidget);
+    final mic = tester.getCenter(find.byIcon(Icons.mic));
+
+    var gesture = await tester.startGesture(mic);
+    await tester.pump();
+    expect(controller.listening.value, isTrue);
+    expect(find.text('放開送出，往上滑可取消'), findsOneWidget);
+    await gesture.moveBy(const Offset(0, -120));
+    await tester.pump();
+    expect(find.text('放開取消'), findsOneWidget);
+    await gesture.up();
+    await tester.pump();
+    expect(service.audio, isEmpty);
+    expect(recorder.cancelled, isTrue);
+
+    gesture = await tester.startGesture(mic);
+    await tester.pump();
+    await gesture.up();
+    await tester.pump();
+    await tester.pump();
+    expect(service.texts, ['你好']);
+    expect(find.text('你好'), findsOneWidget);
+    expect(find.text('嗨，我是助理。'), findsOneWidget);
+  });
+
+  test('Transcription posts WAV with request ID and reports errors', () async {
+    final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
+    final seen = <String?>[];
+    var fail = false;
+    server.listen((request) async {
+      seen
+        ..add(request.headers.contentType?.mimeType)
+        ..add(request.headers.value('X-Request-Id'))
+        ..add('${request.contentLength}');
+      await request.drain<void>();
+      request.response.statusCode = fail ? 503 : 200;
+      request.response.headers.contentType = ContentType.json;
+      request.response.write(
+        jsonEncode(
+          fail
+              ? {'error': '電腦上的語音辨識服務未啟動，請改用鍵盤。'}
+              : {
+                  'contract_version': 3,
+                  'request_id': 'voice-1',
+                  'text': ' 我要繳水費 ',
+                  'confirm': true,
+                  'options': ['我要繳水費', '我要繳學費'],
+                },
+        ),
+      );
+      await request.response.close();
+    });
+    try {
+      final service = AssistantService(
+        endpoint: 'http://127.0.0.1:${server.port}',
+      );
+      final wav = AssistantRecorder.wav(Uint8List(32000));
+      final heard = await HttpOverrides.runWithHttpOverrides(
+        () => service.transcribe(wav, requestId: 'voice-1'),
+        RealHttpOverrides(),
+      );
+      expect(heard.text, '我要繳水費');
+      expect(heard.confirm, isTrue);
+      expect(heard.options, ['我要繳水費', '我要繳學費']);
+      expect(seen, ['audio/wav', 'voice-1', '${wav.length}']);
+      fail = true;
+      await expectLater(
+        HttpOverrides.runWithHttpOverrides(
+          () => service.transcribe(wav, requestId: 'voice-1'),
+          RealHttpOverrides(),
+        ),
+        throwsA(
+          isA<FormatException>().having(
+            (e) => e.message,
+            'message',
+            contains('語音辨識服務未啟動'),
+          ),
+        ),
+      );
+    } finally {
+      await server.close(force: true);
+    }
+  });
 
   testWidgets('Android back closes the panel and invalidates a late decision', (
     tester,

@@ -140,7 +140,9 @@ class _AssistantSheetState extends State<AssistantSheet> {
   final _keys = <int, GlobalKey>{};
   late final Worker _onMessages;
   bool _keyboard = !AssistantViewController.voiceInputAvailable;
-  bool _voiceNotice = false;
+  bool _pressed = false;
+  bool _discard = false;
+  Offset? _pressOrigin;
 
   AssistantViewController get controller => widget.controller;
 
@@ -271,13 +273,16 @@ class _AssistantSheetState extends State<AssistantSheet> {
     final selectable = controller.choicesMessageId.value == item.id;
     return Padding(
       key: key,
+      // The user's messages sit on the right, the assistant's on the left.
       padding: EdgeInsets.only(
         bottom: 10,
-        left: item.fromUser ? 0 : 12,
-        right: item.fromUser ? 48 : 24,
+        left: item.fromUser ? 48 : 0,
+        right: item.fromUser ? 0 : 48,
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: item.fromUser
+            ? CrossAxisAlignment.end
+            : CrossAxisAlignment.start,
         children: [
           Semantics(
             label: item.fromUser ? '你說' : '助理回覆',
@@ -309,13 +314,22 @@ class _AssistantSheetState extends State<AssistantSheet> {
                       : null,
                 ),
               ),
+          if (selectable)
+            for (final suggestion in item.suggestions)
+              Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: _OutlinedChoice(
+                  title: '「$suggestion」',
+                  onTap: () => controller.chooseSuggestion(suggestion),
+                ),
+              ),
         ],
       ),
     );
   }
 
   Widget _busyRow() => Padding(
-    padding: const EdgeInsets.only(left: 12),
+    padding: const EdgeInsets.only(right: 48),
     child: Row(
       children: [
         const SizedBox(
@@ -377,68 +391,151 @@ class _AssistantSheetState extends State<AssistantSheet> {
           tooltip: '改用語音',
           iconSize: 28,
           color: TPColors.grayscale700,
-          onPressed: () => setState(() {
-            _keyboard = false;
-            _voiceNotice = false;
-          }),
+          onPressed: () => setState(() => _keyboard = false),
           icon: const Icon(Icons.mic_none),
         ),
       ],
     ),
   );
 
+  /// Hold to record, release to send, slide up to discard. With a screen
+  /// reader a double-tap starts and a second double-tap sends.
   Widget _voiceBar() => Padding(
     padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-    child: Stack(
-      alignment: Alignment.center,
-      children: [
-        Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Semantics(
-              button: true,
-              label: '按住說話',
-              child: GestureDetector(
-                onLongPressStart: (_) => setState(() => _voiceNotice = true),
-                child: Material(
-                  color: TPColors.primary500,
-                  shape: const CircleBorder(),
-                  elevation: 4,
-                  child: InkWell(
-                    customBorder: const CircleBorder(),
-                    onTap: () => setState(() => _voiceNotice = true),
-                    child: const SizedBox(
-                      width: 88,
-                      height: 88,
-                      child: Icon(Icons.mic, color: TPColors.white, size: 40),
+    child: Obx(() {
+      final listening = controller.listening.value;
+      final busy = controller.busy.value;
+      final quiet = controller.tooQuiet.value;
+      final caption = listening
+          ? (_discard
+                ? '放開取消'
+                : quiet
+                ? '聲音有點小，請靠近麥克風說'
+                : '放開送出，往上滑可取消')
+          : busy
+          ? '處理中，可在上方取消'
+          : '按住說話';
+      return Row(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          // Left column reserved (e.g. a future language picker).
+          const Expanded(child: SizedBox.shrink()),
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Semantics(
+                button: true,
+                label: listening ? '正在聽，點兩下送出' : '按住說話',
+                onTap: busy ? null : _toggleListening,
+                excludeSemantics: true,
+                child: Listener(
+                  onPointerDown: busy ? null : _pressStart,
+                  onPointerMove: (event) => _pressMove(event.position),
+                  onPointerUp: (_) => _pressEnd(cancelled: false),
+                  onPointerCancel: (_) => _pressEnd(cancelled: true),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 150),
+                    width: listening ? 104 : 88,
+                    height: listening ? 104 : 88,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: busy
+                          ? TPColors.grayscale300
+                          : listening
+                          ? (_discard ? TPColors.grayscale500 : TPColors.red500)
+                          : TPColors.primary500,
+                      boxShadow: const [
+                        BoxShadow(color: Color(0x33000000), blurRadius: 8),
+                      ],
+                    ),
+                    child: Icon(
+                      listening ? Icons.graphic_eq : Icons.mic,
+                      color: TPColors.white,
+                      size: 40,
                     ),
                   ),
                 ),
               ),
-            ),
-            const SizedBox(height: 8),
-            TPText(
-              _voiceNotice ? '語音輸入下一階段開放，請先點右下鍵盤用打字。' : '按住說話',
-              style: TPTextStyles.bodyRegular,
-              color: TPColors.grayscale700,
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-        Positioned(
-          right: 0,
-          bottom: 0,
-          child: IconButton(
-            tooltip: '改用鍵盤',
-            iconSize: 30,
-            color: TPColors.grayscale700,
-            onPressed: () => setState(() => _keyboard = true),
-            icon: const Icon(Icons.keyboard_alt_outlined),
+              const SizedBox(height: 8),
+              // Live loudness while recording, so a quiet voice is noticed
+              // before the clip is sent.
+              SizedBox(
+                width: 120,
+                height: 6,
+                child: listening
+                    ? ClipRRect(
+                        borderRadius: BorderRadius.circular(3),
+                        child: LinearProgressIndicator(
+                          key: const Key('assistant-level'),
+                          value: controller.level.value,
+                          color: quiet
+                              ? TPColors.secondary500
+                              : TPColors.primary500,
+                          backgroundColor: TPColors.grayscale100,
+                        ),
+                      )
+                    : null,
+              ),
+              const SizedBox(height: 4),
+              TPText(
+                caption,
+                style: TPTextStyles.bodyRegular,
+                color: quiet && listening
+                    ? TPColors.secondary700
+                    : TPColors.grayscale700,
+                textAlign: TextAlign.center,
+              ),
+            ],
           ),
-        ),
-      ],
-    ),
+          Expanded(
+            child: Align(
+              alignment: Alignment.bottomRight,
+              child: IconButton(
+                tooltip: '改用鍵盤',
+                iconSize: 30,
+                color: TPColors.grayscale700,
+                onPressed: listening
+                    ? null
+                    : () => setState(() => _keyboard = true),
+                icon: const Icon(Icons.keyboard_alt_outlined),
+              ),
+            ),
+          ),
+        ],
+      );
+    }),
   );
+
+  Future<void> _pressStart(PointerDownEvent event) async {
+    _pressOrigin = event.position;
+    _pressed = true;
+    setState(() => _discard = false);
+    final started = await controller.startListening();
+    // Released (or interrupted by the permission dialog) before it started.
+    if (started && !_pressed) await controller.stopListening(send: false);
+  }
+
+  void _pressMove(Offset position) {
+    final origin = _pressOrigin;
+    if (origin == null || !controller.listening.value) return;
+    final discard = origin.dy - position.dy > 80;
+    if (discard != _discard) setState(() => _discard = discard);
+  }
+
+  void _pressEnd({required bool cancelled}) {
+    if (!_pressed) return;
+    _pressed = false;
+    _pressOrigin = null;
+    controller.stopListening(send: !cancelled && !_discard);
+  }
+
+  void _toggleListening() {
+    if (controller.listening.value) {
+      controller.stopListening();
+    } else {
+      controller.startListening();
+    }
+  }
 }
 
 /// A full-width bordered option in the TownPass primary colour.

@@ -6,7 +6,7 @@
 
 ## 已完成
 
-1. 「助理」介面（2026-11-06 V2）：右下角「助理」按鈕開啟全螢幕微透明對話；首次顯示「你可以說…」範例，對話以泡泡呈現並保留到 App 被關閉（不送模型）；操作時收起並在右下角顯示 8 秒提示，點提示回到該則訊息。目前只有鍵盤輸入，語音為 V3。
+1. 「助理」介面（2026-11-06 V2）：右下角「助理」按鈕開啟全螢幕微透明對話；首次顯示「你可以說…」範例，對話以泡泡呈現並保留到 App 被關閉（不送模型）；操作時收起並在右下角顯示 8 秒提示，點提示回到該則訊息。2026-11-06 V3 加入按住說話：地端 Breeze-ASR-25 辨識後走原文字流程，鍵盤仍可切換。
 2. Python 標準函式庫後端 + Ollama `ministral-3:3b`。Ministral 為 Mistral AI 模型；依使用者要求，不改用中國開發模型，也不失敗轉雲端。
 3. 共用能力目錄 70 項，涵蓋 21 個城市服務、App 原生功能與服務內操作；41 項允許頁面導覽，29 項停用並附原因。數字代表目錄設定，並非 41 項正式 API 或交易能力。
 4. 一般問候、未理解、功能列表分頁、圖書操作說明：使用目錄與模板，不呼叫模型、不自動跳頁。
@@ -24,7 +24,8 @@
 ## 尚未完成與下一步
 
 - 所有表單的欄位 schema、型別／enum 選項抽取、模糊欄位確認與受控預填 adapter；目前主要是導頁與圖書檢索。
-- 語音輸入／Whisper、朗讀、正式城市通會員與服務 API、實際借閱／預約／付款／送件、動作結果稽核。
+- 語音辨識率：吵雜／模擬器麥克風下「借書」易誤聽，保留待辦見 [介面與語音規劃](AI_VOICE_UI_PLAN.md) V3 節（關鍵字提示、實機重測、經同意的除錯錄音）。
+- 朗讀、其他語言與台語（V4）、真人語音的辨識準確率評估、正式城市通會員與服務 API、實際借閱／預約／付款／送件、動作結果稽核。
 - 缺 API、金鑰、空回呼、依賴前頁 store 的功能仍停用。不能靠新增關鍵字就改為已啟用。
 - 「新導航清舊頁」已由使用者於 2026-11-05 實機驗收（叉叉／Android 返回），回報沒有問題。
 - 2026-11-06 確認：全螢幕「助理」介面、按住說話的地端語音（Breeze-ASR-25／Whisper）、頁面狀態，見 [介面與語音規劃](AI_VOICE_UI_PLAN.md)。
@@ -34,9 +35,9 @@
 
 | 檢查 | 最近結果與限制 |
 | --- | --- |
-| Python unittest | 47 個通過；fake model 驗證流程、候選隔離與規則，不當作模型準確率 |
+| Python unittest | 55 個通過；fake model 驗證流程、候選隔離與規則，不當作模型準確率 |
 | contract 3 live-model 回歸 | `evaluate.py` 99 個案例／120 輪全數通過，非預期導航 0、錯誤目的地 0。開發集，不是 held-out 準確率 |
-| Flutter tests | 25 個通過；包含案件 → 圖書關閉／系統返回、Web → 原生父頁與取消遲到回覆 |
+| Flutter tests | 35 個通過；包含案件 → 圖書關閉／系統返回、Web → 原生父頁與取消遲到回覆 |
 | 實際 Ministral 開發案例 | 第一批 6 個一般／候選／排行案例符合預期；不是 held-out 準確率 |
 | App Dart client → HTTP → 模型 | 中文 UTF-8 bytes/contentLength 傳輸與圖書導覽通過 |
 | contract 2 HTTP | 功能列表 + session/resolution 綁定選擇通過；health 顯示 41 個允許能力 |
@@ -58,6 +59,8 @@ TownPass/
 │  ├─ workflow.py                              # 一般回覆、分頁、候選確認與 session 狀態
 │  ├─ test_server.py                           # 圖書與 HTTP／工具白名單回歸
 │  ├─ test_workflow.py                         # 全功能目錄、歧義、候選生命週期回歸
+│  ├─ asr_server.py                            # 地端語音辨識服務（faster-whisper，獨立程序，:8770）
+│  ├─ test_transcription.py                    # 語音端點驗證、轉送與錯誤回覆
 │  ├─ page_context.py                          # App 頁面／上次動作狀態驗證與能力對應（contract 3）
 │  ├─ test_page_context.py                     # 頁面狀態解析、排序與 HTTP 回歸
 │  ├─ evaluate.py                              # contract 3 live-model 回歸集（HTTP、多輪候選、頁面狀態）
@@ -71,6 +74,7 @@ TownPass/
 │  │  └─ widget/assistant_host.dart             # 右下「助理」按鈕／提示、全螢幕對話、範例、候選與輸入列
 │  ├─ service/
 │  │  ├─ assistant_service.dart                # HTTP、UTF-8、取消、timeout 與開發 token
+│  │  ├─ assistant_recorder.dart               # 按住說話錄音：記憶體 PCM16 → WAV，不存檔
 │  │  ├─ assistant_page_tracker.dart           # 目前路由／WebView 服務路徑／頁籤（只送安全欄位）
 │  │  └─ assistant_action_executor.dart        # 固定目的地、舊頁清除、正常父頁與導航
 │  └─ util/tp_web_view.dart                    # 向後相容的助理參數、父頁載入、返回處理
@@ -80,6 +84,8 @@ TownPass/
 ├─ pubspec.yaml                                # 登錄 assistant asset，沒有新增套件
 ├─ scripts/
 │  ├─ start_assistant.ps1                      # 啟動 Python 後端
+│  ├─ start_asr.ps1                            # 啟動地端語音辨識
+│  ├─ convert_breeze_asr.ps1                   # 一次性下載官方權重並轉 CTranslate2（repo 外）
 │  └─ run_assistant_android.ps1                # 裝置選擇、health、adb reverse、Flutter run
 ├─ test/assistant_test.dart                     # wire／DTO／泡泡／導航回歸
 ├─ tool/smoke_assistant.dart                    # App 同款 Dart client 的非 UI 串線測試

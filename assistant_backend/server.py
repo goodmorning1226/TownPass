@@ -25,6 +25,8 @@ CONTRACT = 3  # 3: optional request "context" (page/last action hint)
 # Avoid a multi-second model reload after a short idle period during a demo.
 # The model keeps ~3 GB of VRAM while loaded; override with an Ollama duration.
 KEEP_ALIVE = os.environ.get("TOWNPASS_ASSISTANT_KEEP_ALIVE", "30m")
+# Local speech recognition service (assistant_backend/asr_server.py), loopback only.
+ASR_URL = os.environ.get("TOWNPASS_ASR_URL", "http://127.0.0.1:8770/v1/transcribe")
 # Keep one module identity when the standalone entry point imports workflow.
 if __name__ == "__main__":
     sys.modules.setdefault("server", sys.modules[__name__])
@@ -392,6 +394,34 @@ class Assistant:
         return response
 
 
+def clean_transcript(text):
+    """Trim whitespace and trailing sentence punctuation from a transcript."""
+    return re.sub(r"[\s。．.！!？?，,]+$", "", text.strip())
+
+
+def speech_options(text, alternatives, status, recognizes, limit=3):
+    """Options to confirm before a transcript is sent, or [] to send it directly.
+
+    A confident transcript the assistant understands is sent as is. Otherwise the
+    user picks: the heard text first, then alternatives from the same beam search
+    that name something the assistant can act on. Nothing is substituted silently.
+    """
+    if status == "clear" and recognizes(text):
+        return []
+    picked = [text]
+    for alternative in alternatives if isinstance(alternatives, list) else []:
+        if not isinstance(alternative, str):
+            continue
+        alternative = clean_transcript(alternative)
+        if alternative and len(alternative) <= 500 and normalize(alternative) not in map(normalize, picked)                 and recognizes(alternative):
+            picked.append(alternative)
+        if len(picked) == limit:
+            break
+    # A confident but unmatched transcript with nothing better: send it and let
+    # the assistant answer ("我還不太確定你的需求…") instead of asking twice.
+    return picked if status != "clear" or len(picked) > 1 else []
+
+
 def make_handler(assistant, token=""):
     class Handler(BaseHTTPRequestHandler):
         def log_message(self, *args):
@@ -427,6 +457,8 @@ def make_handler(assistant, token=""):
         def do_POST(self):
             if not self.authorized():
                 return self.reply(401, {"error": "連線授權失敗。"})
+            if self.path == "/v1/assistant/transcriptions":
+                return self.transcription()
             if self.path != "/v1/assistant/turns":
                 return self.reply(404, {"error": "找不到此功能。"})
             if self.headers.get("Origin"):
@@ -451,6 +483,58 @@ def make_handler(assistant, token=""):
                 self.reply(422, {"error": str(exc)})
             except Exception:
                 self.reply(500, {"error": "助理暫時無法處理，請使用原服務入口。"})
+
+        def transcription(self):
+            """Validate in-memory WAV audio and forward it to the loopback ASR service.
+
+            Audio is never stored or logged. The text goes back to the App, which
+            shows it as the user's message and sends it as a normal turn.
+            """
+            request_id = self.headers.get("X-Request-Id", "")
+            if not re.fullmatch(r"[a-zA-Z0-9-]{1,64}", request_id):
+                return self.reply(422, {"error": "請求識別碼格式不正確。"})
+            if self.headers.get("Origin"):
+                return self.reply(403, {"error": "此測試服務僅接受 App 或本機 API 呼叫。"})
+            if self.headers.get("Content-Type", "").split(";")[0] != "audio/wav":
+                return self.reply(415, {"error": "請使用 audio/wav。"})
+            if self.headers.get("Transfer-Encoding") or self.headers.get("Content-Length") is None:
+                return self.reply(411, {"error": "App 傳送格式不符，請更新 App 後重試。"})
+            from asr_server import MAX_BYTES, read_wav
+            length = int(self.headers.get("Content-Length", "0"))
+            if not 0 < length <= MAX_BYTES:
+                return self.reply(413, {"error": "錄音過長或空白，請說 30 秒以內。"})
+            self.connection.settimeout(15)
+            audio = self.rfile.read(length)
+            try:
+                read_wav(audio)
+            except ValueError as exc:
+                return self.reply(422, {"error": f"{exc}請再說一次，或改用鍵盤。"})
+            except Exception:
+                return self.reply(422, {"error": "錄音格式不正確，請再說一次，或改用鍵盤。"})
+            try:
+                request = urllib.request.Request(ASR_URL, data=audio, headers={"Content-Type": "audio/wav"})
+                with urllib.request.urlopen(request, timeout=40) as response:
+                    result = json.loads(response.read(100_000))
+            except urllib.error.HTTPError as exc:
+                return self.reply(422 if exc.code in (400, 413) else 503,
+                                  {"error": "語音辨識沒有成功，請再說一次，或改用鍵盤。"})
+            except (OSError, ValueError):
+                return self.reply(503, {"error": "電腦上的語音辨識服務未啟動，請改用鍵盤，或啟動語音服務後再試。"})
+            text = result.get("text") if isinstance(result, dict) else None
+            status = result.get("status", "clear") if isinstance(result, dict) else None
+            if not isinstance(text, str) or not text.strip() or status == "unclear":
+                return self.reply(422, {"error": "沒有聽清楚。請靠近麥克風、說大聲一點再試一次，或改用鍵盤。"})
+            if len(text) > 500:
+                return self.reply(422, {"error": "內容過長，請分段說。"})
+            text = clean_transcript(text)
+            options = speech_options(text, result.get("alternatives", []), status,
+                                     assistant.workflow.recognizes if assistant.workflow else (lambda _: True))
+            self.reply(200, {"contract_version": CONTRACT, "request_id": request_id, "text": text,
+                             "confirm": bool(options), "options": options,
+                             "metrics": {"elapsed_ms": result.get("elapsed_ms"),
+                                         "audio_seconds": result.get("audio_seconds"),
+                                         "status": status, "avg_logprob": result.get("avg_logprob"),
+                                         "no_speech_prob": result.get("no_speech_prob")}})
     return Handler
 
 

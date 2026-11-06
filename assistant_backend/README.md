@@ -63,6 +63,11 @@ POST 接受 `text`、`request_id`、選填 `session_id`、`resolution_id`、`cho
 `last_action` 為 `{destination, result: opened|failed|cancelled, age_seconds}`，搜尋只回報類型不含關鍵字。
 後端自行把頁面對應到目錄能力（[page_context.py](page_context.py)），App 不能指定能力 ID；格式不符的部分直接丟棄，不影響該次請求。
 狀態只當提示：模型看到目前服務名稱與上次動作，歧義候選把目前服務排前面，但不會因此導航或略過確認。
+`POST /v1/assistant/transcriptions`（語音）：body 為 16 kHz 單聲道 16-bit WAV（0.3–30 秒），標頭 `Content-Type: audio/wav` 與 `X-Request-Id`。
+後端驗證格式後轉送本機語音服務（[asr_server.py](asr_server.py)，預設 `http://127.0.0.1:8770`，可用 `TOWNPASS_ASR_URL` 改），
+回 `{contract_version, request_id, text}`；App 把文字顯示為使用者訊息，再當成一般 turn 送出。
+語音服務未啟動回 503、沒聽清楚回 422，訊息都提示改用鍵盤。錄音不存檔、不記錄。
+`asr_server.py` 是獨立程序（需 faster-whisper），主後端仍只用標準函式庫；啟動與模型轉換見 [TEAM_LOCAL_SETUP.md](../docs/TEAM_LOCAL_SETUP.md) 5.1。
 舊 App 不送 `context` 仍可使用；新 App 對舊（contract 2）後端會被拒收，兩端需一起更新。
 一般問候與功能列表無須模型；操作意圖先檢索共用功能目錄，再讓模型在候選內決策。
 候選選擇須同時攜帶該輪 session／resolution；`choice_id` 是本輪選項號碼，不是任意功能或書籍 ID。

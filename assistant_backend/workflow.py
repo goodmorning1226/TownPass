@@ -70,6 +70,23 @@ class Workflow:
         finally:
             self.owner.model_lock.release()
 
+    def recognizes(self, text):
+        """Whether a transcript is something the assistant can act on or answer.
+
+        Used only to rank speech alternatives for the user to confirm; it never
+        executes anything by itself.
+        """
+        text = text.strip()
+        if (re.fullmatch(r"(?:請)?(?:取消|返回|算了|不用了|不要了)[。！!]*", text)
+                or re.fullmatch(r"(?:嗨|你好|您好|哈囉|謝謝|感謝)[！!。\s]*", text)):
+            return True
+        if re.search(r"有哪些功能|有什麼功能|功能列表|能做什麼|可以做什麼", text):
+            return True
+        from server import positive_text
+        if self.registry.search(positive_text(text)):
+            return True
+        return bool(re.search(r"借.{0,6}書|找.{0,6}書|ISBN|圖書|館藏", text, re.I))
+
     def _navigate(self, payload, entry):
         if not entry["enabled"]:
             return self.reply(payload, f"{entry['title']}：{entry['reason']}", kind="unsupported")

@@ -152,6 +152,34 @@ health 應含 contract_version 3、registry_version 1 與模型名稱；只能�
 首次推論可能要等模型載入。錯誤時分別確認 Ollama :11434、Python :8765 與遠端示範書目網路，避免誤改成 timeout 無上限。
 目前圖書與其他 WebView 仍需要網際網路取得示範資料／頁面；「地端模型」不等於整個 App 可離線。
 
+### 5.1 語音辨識（選用，按住說話需要）
+
+語音使用 MediaTek Research 的 **Breeze-ASR-25**（Whisper-large-v2 微調，台灣華語與中英混用），
+由官方權重自行轉成 CTranslate2，在電腦地端以 faster-whisper 執行；不使用中國開發模型，也不上傳雲端。
+沒啟動語音服務時，App 會回「語音辨識服務未啟動，請改用鍵盤」，鍵盤輸入不受影響。
+
+1. 需要 `pip install faster-whisper`。NVIDIA GPU 另需 `nvidia-cublas-cu12`、`nvidia-cudnn-cu12`（pip 套件即可，
+   `asr_server.py` 會自動把它們的 DLL 資料夾加入自己的 PATH，不必改系統設定）。沒有 GPU 可用 `-Device cpu -ComputeType int8`，但會較慢。
+2. 一次性轉換（約下載 3.1 GB，另建隔離 venv 安裝 CPU 版 torch／transformers 只用於轉換）：
+
+   ```powershell
+   .\scripts\convert_breeze_asr.ps1            # 預設放在 %LOCALAPPDATA%\TownPassAssistant
+   .\scripts\convert_breeze_asr.ps1 -Root D:\TownPassAssistant   # 也可指定其他磁碟
+   ```
+
+   只下載推論檔案，不下載官方 repo 中的 optimizer 狀態與 pickle 檔。轉換結果與權重都在 repo 外，不要提交。
+3. 終端 C（保持開啟）：
+
+   ```powershell
+   .\scripts\start_asr.ps1 -Model <轉換輸出資料夾>
+   Invoke-RestMethod http://127.0.0.1:8770/health
+   ```
+
+   預設 GPU `int8_float16`；只監聽 127.0.0.1:8770。App 不直接連它，而是經主後端 `/v1/assistant/transcriptions` 轉送，
+   因此 adb reverse 仍只需要 8765。錄音只在記憶體處理，手機與電腦都不存檔、不記錄。
+4. 模擬器預設聽不到電腦麥克風：模擬器側欄 ⋯ → Extended controls → Microphone，
+   開啟「Virtual microphone uses host audio input」（每次重開模擬器可能要再開一次）。第一次按住說話時 App 會要求麥克風權限。
+
 ## 6. 建立並啟動模擬器
 
 1. Android Studio 從根目錄開啟 TownPass，安裝 Flutter 與 Dart plugins。
@@ -205,7 +233,7 @@ Android Studio 選 `lib/main.dart` 的 Flutter Run configuration、裝置選正�
 - Python 修改需停止該後端再重啟；改目錄資源需同步重啟後端與 App。Ollama 不需每次重下模型。
 - 每批先測規則／widget，再做 wire／模型測試，最後給使用者人工操作表。不要把遠端 mock 當正式交易。
 - 指令：`fvm flutter analyze`、`fvm flutter test`、`python -m unittest discover -s assistant_backend -p 'test*.py'`、`fvm flutter build apk --debug`、`git diff --check`。
-- 本輪基線 Python 47、Flutter 25 通過；analyze 有 7 warning／16 info（零 error），不得刪測試或全域放寬 lint 換成假綠燈。
+- 本輪基線 Python 55、Flutter 35 通過；analyze 有 7 warning／16 info（零 error），不得刪測試或全域放寬 lint 換成假綠燈。
 - 後端與 Ollama 啟動後可跑 `python assistant_backend/evaluate.py` 做 contract 3 模型回歸；它是開發集，通過率不能當成模型的通用準確率。
 - 原開發機使用的 Gradle mirror／emulator workaround 是本機排障，不要自動設定到每個 clone。下載失敗時先保留完整錯誤並定位網路／倉庫問題。
 - 正式 API、缺金鑰地圖、欄位預填、語音仍未完成；開發方向看交接文件，不補假功能來通過展示。

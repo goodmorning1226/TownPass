@@ -6,6 +6,7 @@ import 'package:town_pass/bean/assistant_result.dart';
 import 'package:town_pass/page/main/main_view_controller.dart';
 import 'package:town_pass/service/assistant_action_executor.dart';
 import 'package:town_pass/service/assistant_page_tracker.dart';
+import 'package:town_pass/service/assistant_recorder.dart';
 import 'package:town_pass/service/assistant_service.dart';
 
 /// One bubble of the conversation. Kept in memory while the App process
@@ -16,11 +17,15 @@ class AssistantChatMessage {
   final String text;
   final List<AssistantBookChoice> choices;
 
+  /// Speech readings to choose from; tapping one sends it as the user's words.
+  final List<String> suggestions;
+
   const AssistantChatMessage({
     required this.id,
     required this.fromUser,
     required this.text,
     this.choices = const [],
+    this.suggestions = const [],
   });
 }
 
@@ -34,28 +39,52 @@ class AssistantViewController extends GetxController {
     (text: '臨櫃叫號', capability: 'reservation'),
   ];
 
-  /// Voice input arrives with local speech recognition (plan stage V3).
-  static const voiceInputAvailable = false;
+  /// Hold-to-talk is the default input; the keyboard remains available.
+  static const voiceInputAvailable = true;
+
+  /// Shorter presses are treated as accidental and not sent.
+  static const minimumSpeech = 0.5;
+
+  /// Loudness (RMS) below which, after [quietAfter], the user is told to
+  /// speak up. Speech close to a phone microphone is typically well above it.
+  static const quietLevel = 0.03;
+  static const quietAfter = Duration(milliseconds: 1200);
   static const cornerDuration = Duration(seconds: 8);
   static const historyLimit = 200;
 
   final AssistantService service;
   final AssistantActionExecutor executor;
   final AssistantPageTracker pageTracker;
+  final AssistantRecorder recorder;
   final DateTime Function() clock;
 
   AssistantViewController({
     AssistantService? service,
     AssistantActionExecutor? executor,
     AssistantPageTracker? pageTracker,
+    AssistantRecorder? recorder,
     DateTime Function()? clock,
   }) : service = service ?? AssistantService(),
        executor = executor ?? AssistantActionExecutor(),
        pageTracker = pageTracker ?? AssistantPageTracker.instance,
-       clock = clock ?? DateTime.now;
+       recorder = recorder ?? AssistantRecorder(),
+       clock = clock ?? DateTime.now {
+    this.recorder.onLevel = _onLevel;
+  }
 
   final expanded = false.obs;
   final busy = false.obs;
+
+  /// True while the microphone button is held and audio is captured.
+  final listening = false.obs;
+
+  /// Live microphone loudness (0-1) while listening.
+  final level = 0.0.obs;
+
+  /// True when the recording so far has stayed too quiet.
+  final tooQuiet = false.obs;
+  double _loudest = 0;
+  DateTime? _listenStarted;
   final hidden = false.obs;
 
   /// Latest status line, shown in the corner after the panel closes.
@@ -63,7 +92,7 @@ class AssistantViewController extends GetxController {
   final choices = <AssistantBookChoice>[].obs;
   final messages = <AssistantChatMessage>[].obs;
 
-  /// Message whose candidate buttons are still selectable.
+  /// Message whose candidate or speech-option buttons are still selectable.
   final choicesMessageId = RxnInt();
 
   /// Message summarised in the corner hint; null hides the hint.
@@ -77,6 +106,7 @@ class AssistantViewController extends GetxController {
   int _generation = 0;
   int _nextMessageId = 0;
   Timer? _cornerTimer;
+  Timer? _listenLimit;
   ModalRoute<dynamic>? activeRoute;
   LocalHistoryEntry? _panelHistory;
   _AssistantAction? _lastAction;
@@ -109,12 +139,14 @@ class AssistantViewController extends GetxController {
     String text, {
     bool fromUser = false,
     List<AssistantBookChoice> choices = const [],
+    List<String> suggestions = const [],
   }) {
     final item = AssistantChatMessage(
       id: _nextMessageId++,
       fromUser: fromUser,
       text: text,
       choices: List.unmodifiable(choices),
+      suggestions: List.unmodifiable(suggestions),
     );
     messages.add(item);
     if (messages.length > historyLimit) {
@@ -175,6 +207,12 @@ class AssistantViewController extends GetxController {
   void cancel() {
     _generation++;
     service.cancel();
+    if (listening.value) {
+      listening.value = false;
+      tooQuiet.value = false;
+      _listenLimit?.cancel();
+      recorder.cancel();
+    }
     if (busy.value) {
       message.value = '已取消，未開啟新的頁面。';
       _add(message.value);
@@ -184,6 +222,97 @@ class AssistantViewController extends GetxController {
     choices.clear();
     choicesMessageId.value = null;
   }
+
+  /// Starts hold-to-talk capture. Returns false when nothing was started,
+  /// e.g. the microphone permission was refused (a reply explains why).
+  Future<bool> startListening() async {
+    if (busy.value || listening.value) return false;
+    final generation = _generation;
+    final started = await recorder.start();
+    if (generation != _generation || isClosed) {
+      if (started) await recorder.cancel();
+      return false;
+    }
+    if (!started) {
+      _add('需要麥克風權限才能用語音。可以到手機設定開啟，或點右下角鍵盤改用打字。');
+      return false;
+    }
+    listening.value = true;
+    level.value = 0;
+    tooQuiet.value = false;
+    _loudest = 0;
+    _listenStarted = clock();
+    _listenLimit = Timer(AssistantRecorder.maxDuration, stopListening);
+    return true;
+  }
+
+  void _onLevel(double rms) {
+    if (!listening.value) return;
+    level.value = (rms / 0.15).clamp(0.0, 1.0);
+    if (rms > _loudest) _loudest = rms;
+    final started = _listenStarted;
+    tooQuiet.value =
+        started != null &&
+        clock().difference(started) >= quietAfter &&
+        _loudest < quietLevel;
+  }
+
+  /// Releasing the button sends the recording; [send] false discards it.
+  Future<void> stopListening({bool send = true}) async {
+    if (!listening.value) return;
+    listening.value = false;
+    tooQuiet.value = false;
+    level.value = 0;
+    _listenLimit?.cancel();
+    if (!send) {
+      await recorder.cancel();
+      return;
+    }
+    final audio = await recorder.stop();
+    if (isClosed) return;
+    if (audio == null || AssistantRecorder.seconds(audio) < minimumSpeech) {
+      _add('沒有錄到聲音，請按住麥克風再說話，說完放開。');
+      return;
+    }
+    final generation = ++_generation;
+    busy.value = true;
+    message.value = '正在聽你說的話…';
+    AssistantTranscript heard;
+    try {
+      heard = await service.transcribe(
+        audio,
+        requestId: '${DateTime.now().microsecondsSinceEpoch}-$generation',
+      );
+    } on FormatException catch (error) {
+      if (generation == _generation && !isClosed) {
+        busy.value = false;
+        _add(error.message);
+      }
+      return;
+    } catch (_) {
+      if (generation == _generation && !isClosed) {
+        busy.value = false;
+        _add('語音辨識沒有成功，請再說一次，或點右下角鍵盤改用打字。');
+      }
+      return;
+    }
+    if (generation != _generation || isClosed) return;
+    busy.value = false;
+    if (heard.confirm) {
+      // Unsure or unmatched speech: nothing is sent until the user picks.
+      final ask = _add(
+        '我聽到「${heard.text}」，是這句嗎？也可以選下面的說法，或再說一次。',
+        suggestions: heard.options,
+      );
+      choicesMessageId.value = ask.id;
+      return;
+    }
+    // The recognised text becomes the user's bubble and a normal turn.
+    await submit(heard.text);
+  }
+
+  /// A speech reading the user confirmed; sent exactly like typed text.
+  Future<void> chooseSuggestion(String text) => submit(text);
 
   Future<void> choose(AssistantBookChoice choice) async {
     if (!choice.enabled || _resolutionId == null) return;
@@ -263,6 +392,7 @@ class AssistantViewController extends GetxController {
   void onClose() {
     cancel();
     _cornerTimer?.cancel();
+    recorder.dispose();
     super.onClose();
   }
 }
