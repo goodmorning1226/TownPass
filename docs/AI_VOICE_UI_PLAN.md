@@ -78,7 +78,7 @@
   - 讀音資料：Unicode 18.0 Unihan `kMandarin` 的台灣讀音，抽出成 `assistant_backend/data/unihan_mandarin.tsv`（約 216 KB，
     Unicode License v3），可用 `scripts/extract_unihan_readings.py` 重建；未使用中國開發的拼音工具庫。
 - **保留待辦（使用者要求先記錄、暫不實作）**：
-  1. 辨識提示詞加入目錄各服務的關鍵字（借書、繳費、叫號…），不只服務名稱；仍屬目錄詞彙，不針對單句。
+  1. ~~辨識提示詞加入目錄關鍵字~~ 2026-11-07 完成：原提示詞 253 token 已超過 Whisper 上限、開頭被截；改為 200 token 預算內依序放服務名稱、各服務主要同義詞（如借書）、未串接服務與其他關鍵字，App 選單字最後。合成語音 6/6 仍正確。
   2. 以 USB 實體手機重測，區分模擬器麥克風音質與模型本身的問題。
   3. 經使用者同意後，加入預設關閉的除錯開關，暫存錄音於 repo 外（如 `D:\TownPassAssistant\debug-audio`）
      比較 Breeze 與 Whisper-medium、校正門檻，分析後刪除；未同意前維持「錄音不存檔」。

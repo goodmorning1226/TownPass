@@ -42,17 +42,17 @@ def book(book_id, confirm=False):
     return detail(book_id)
 
 
-# 2026-11-06 retrieval change: 19 failing cases that motivated it were moved to the dev
-# set (evaluate.CASES, category "from_holdout") and replaced here by new phrasings
-# written before the first run.
+# 2026-11-06 and 2026-11-07 retrieval changes: failing cases that motivated them were
+# moved to the dev set (evaluate.CASES, category "from_holdout") and replaced here by
+# new phrasings written before the first run (19 and 13 cases).
 HOLDOUT = [
     # General conversation: answer, never navigate.
     one("general", "早安", NONE), one("general", "謝謝你", NONE), one("general", "你是誰", NONE),
     one("general", "嗯嗯", NONE), one("general", "今天會下雨嗎", NONE), one("general", "我好無聊", NONE),
     one("general", "哈哈哈", NONE), one("general", "。。。", NONE),
     # Asking what the assistant can do.
-    one("listing", "你都能幫什麼忙", LISTING), one("listing", "這裡可以辦哪些事", LISTING),
-    one("listing", "請介紹你的功能", LISTING), one("listing", "圖書館有什麼功能", LISTING),
+    one("listing", "你都能幫什麼忙", LISTING), one("listing", "你能做的事情有哪些", LISTING),
+    one("listing", "說明一下這個助理怎麼用", LISTING), one("listing", "圖書館有什麼功能", LISTING),
     # Library overview without a title.
     one("library_home", "我想去圖書館借幾本書", HOME), one("library_home", "幫我打開借書的地方", HOME),
     one("library_home", "圖書館", HOME), one("library_home", "有沒有書可以看", HOME),
@@ -65,15 +65,15 @@ HOLDOUT = [
     one("book_exact", "幫我找說給兒童的臺灣歷史", book("lib-book-2")),
     one("book_exact", "我要借《The winners》", book("lib-book-4")),
     # Series, authors, misspellings: confirm or the right detail page.
-    one("book_confirm", "神奇柑仔店有哪幾本", CONFIRM),
-    one("book_confirm", "林秋滿寫過什麼書", want(("navigate", "confirm_candidates"),
-        [{"kind": "search", "query": "林秋滿", "search_type": "author"}, {"kind": "detail", "book_id": "lib-book-2"}, None],
-        target=("lib-book-2",))),
+    one("book_confirm", "柑仔店那套書", CONFIRM),
+    one("book_confirm", "Fredrik Backman的小說", want(("navigate", "confirm_candidates"),
+        [{"kind": "search", "query": "Fredrik Backman", "search_type": "author"}, {"kind": "detail", "book_id": "lib-book-4"},
+         None], target=("lib-book-4",))),
     # Expectation changed 2026-11-06 by a user POLICY decision (one-character book typos open
     # the only match directly), not to fit results; it previously expected a confirmation.
     one("book_confirm", "借底層羅輯這本書", book("lib-book-3")),
     one("book_confirm", "我要借說給兒童的台灣歷史", book("lib-book-2", confirm=True)),
-    one("book_confirm", "錢天堂", book("lib-book-5", confirm=True)),
+    one("book_confirm", "有沒有歡迎光臨錢天堂", book("lib-book-5", confirm=True)),
     # Books not in the demo catalogue: library overview, never an empty search.
     one("book_absent", "我要借哈利波特", HOME), one("book_absent", "借三國演義", HOME),
     one("book_absent", "ISBN 9789571234567", HOME), one("book_absent", "找《完全沒有這本書》", HOME),
@@ -82,12 +82,12 @@ HOLDOUT = [
     one("weak_object", "借廁所", NONE), one("weak_object", "找我的眼鏡", NONE),
     one("weak_object", "借一本食譜", HOME),
     # Reviewed capabilities in everyday wording.
-    one("capability", "車子停路邊的錢要繳", caps("fees.parking")),
+    one("capability", "停車單要繳費", caps("fees.parking")),
     one("capability", "水費要怎麼繳", caps("fees.water")),
     one("capability", "看一下我的繳費紀錄", caps("fees.history")),
     one("capability", "地方稅繳費", caps("fees.tax")),
     one("capability", "小孩學雜費", caps("fees.tuition")),
-    one("capability", "幫我繳醫院的帳", caps("fees.hospital")),
+    one("capability", "看醫生的費用怎麼繳", caps("fees.hospital")),
     one("capability", "打開帳務", caps("app.bills")),
     one("capability", "有什麼優惠", caps("app.perks", "coupon.list")),
     one("capability", "我的票券", caps("wallet")),
@@ -104,8 +104,8 @@ HOLDOUT = [
     one("capability", "臨櫃要抽號碼", caps("reservation")),
     one("capability", "我要網路報案", caps("police.online")),
     one("capability", "圖書館有沒有新公告", caps("library.notices")),
-    one("capability", "我還沒還的書", caps("library.records")),
-    one("capability", "大家都在借什麼書", caps("library.ranking")),
+    one("capability", "借的書什麼時候要還", caps("library.records")),
+    one("capability", "最受歡迎的書", caps("library.ranking")),
     one("capability", "設定起始頁面", caps("start_page")),
     one("capability", "服務總覽", caps("app.services")),
     one("capability", "查報案進度", caps("police.records", "police.progress", "police", confirm=True)),
@@ -121,11 +121,11 @@ HOLDOUT = [
     one("unavailable", "帶小孩去親子館", unavailable("familyCenter")),
     one("unavailable", "附近的公園綠地", unavailable("greenMap")),
     one("unavailable", "我想帶寵物出去走走", unavailable("petFriendlyMap")),
-    one("unavailable", "我要登出帳號", unavailable("logout")),
+    one("unavailable", "把帳號登出", unavailable("logout")),
     one("unavailable", "介面可以變英文嗎", unavailable("language")),
     # Ambiguous across services: offer candidates.
-    one("service_confirm", "查一下進度", CONFIRM), one("service_confirm", "案子處理到哪裡", CONFIRM),
-    one("service_confirm", "案件查詢", CONFIRM), one("service_confirm", "我申請的東西辦好了沒", want(("confirm_candidates", "navigate"),
+    one("service_confirm", "查一下進度", CONFIRM), one("service_confirm", "我的案子現在怎樣了", CONFIRM),
+    one("service_confirm", "案件查詢", CONFIRM), one("service_confirm", "申請的案件辦到哪", want(("confirm_candidates", "navigate"),
         [{"kind": "capability", "id": "districtOffice.progress"}, None], target=("districtOffice.progress",))),
     # Negation and correction.
     one("negation", "我不要繳水費，我要繳停車費", caps("fees.parking")),
@@ -149,7 +149,7 @@ HOLDOUT = [
     # Page context as a hint only.
     one("context", "排行榜在哪", caps("library.ranking"),
         context=page(type="web", path="/library-service/book-detail/lib-book-3")),
-    one("context", "上次繳了什麼", caps("fees.history"), context=page(type="web", path="/fee-payment/detail/fee-6/")),
+    one("context", "我繳過的帳單", caps("fees.history"), context=page(type="web", path="/fee-payment/detail/fee-6/")),
     one("context", "哈囉哈囉", NONE, context=page(type="native", route="/online_police")),
     # Multi-turn: choose after a confirmation.
     ("multi_turn", [say("我要借神奇柑仔店", CONFIRM), pick("長髮公主", detail("lib-book-6"))]),

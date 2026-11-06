@@ -9,7 +9,8 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from unittest.mock import patch
 
 import server
-from asr_server import STYLE_PROMPT, judge, read_wav, vocabulary_prompt
+from asr_server import PROMPT_TOKENS, STYLE_PROMPT, judge, prompt_words, read_wav, vocabulary_prompt
+from registry import Registry
 from server import Assistant, make_handler, speech_options, speech_resolution
 from test_server import FakeCatalog, response
 
@@ -25,11 +26,21 @@ def wav_bytes(seconds=1.0, rate=16000, channels=1, width=2):
 
 
 class VocabularyPromptTests(unittest.TestCase):
-    def test_prompt_lists_catalog_services_and_ends_with_style(self):
-        prompt = vocabulary_prompt()
-        for title in ("圖書借閱", "臨櫃叫號", "聯醫掛號"):  # enabled and unavailable alike
-            self.assertIn(title, prompt)
+    def test_prompt_fits_the_budget_and_keeps_the_style_sentence_last(self):
+        count = lambda text: int(len(text) * 1.3) + 1  # same estimate as the server default
+        prompt = vocabulary_prompt(count)
+        self.assertLessEqual(count(prompt), PROMPT_TOKENS)
         self.assertTrue(prompt.endswith(STYLE_PROMPT))
+        for word in ("臨櫃叫號", "圖書借閱", "停車費"):  # service names come first
+            self.assertIn(word, prompt)
+
+    def test_service_vocabulary_comes_before_menu_words(self):
+        words = prompt_words(Registry())
+        self.assertLess(words.index("借書"), words.index("首頁"))  # a service's main synonym
+        self.assertLess(words.index("聯醫掛號"), words.index("首頁"))  # unavailable services too
+        self.assertTrue(all(len(w) <= 5 for w in words))
+        self.assertFalse(any("的" in w for w in words))  # everyday phrases are skipped
+        self.assertEqual(len(words), len(set(words)))
 
 
 class SpeechConfidenceTests(unittest.TestCase):

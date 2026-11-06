@@ -14,6 +14,7 @@ import io
 import json
 import os
 import pathlib
+import re
 import threading
 import time
 import wave
@@ -51,20 +52,63 @@ def judge(text, avg_logprob, no_speech_prob):
     return "clear"
 
 
-def vocabulary_prompt():
-    """Decoder prompt with every TownPass service title from the shared catalog.
+# Whisper keeps only the last ~223 prompt tokens; stay safely under it.
+PROMPT_TOKENS = 200
+MAX_WORD = 5
+# Everyday phrases the recogniser already knows; vocabulary helps with domain terms.
+EVERYDAY = re.compile(r"[的了哪我過嗎呢]|什麼")
 
-    Domain vocabulary, not example sentences: it helps the recogniser spell
-    service names such as 臨櫃叫號 or 借閱. Unavailable services are included so
-    such requests are still heard correctly and can be explained. The style
-    sentence stays last because Whisper keeps the end of an over-long prompt.
-    """
+
+# Categories whose vocabulary is hardest for a recogniser come first; the App's
+# own menu words (首頁, 設定, 帳號) are everyday Mandarin and only fill leftover room.
+CATEGORY_ORDER = ("城市服務", "帳務", "圖書子功能", "警政", "案件查詢", "優惠票券", "訂閱", "App", "帳號設定", "待串接")
+MENU_CATEGORIES = ("App", "帳號設定", "待串接")
+
+
+def prompt_words(registry):
+    """Catalogue vocabulary, most useful first (category order CATEGORY_ORDER):
+    service titles, each service's main synonym (借書 for 圖書借閱), unavailable
+    service titles (so such requests are heard and can be explained), other
+    service keywords, then the App's own menu titles, skipping
+    everyday phrases and names longer than MAX_WORD. A word contained in an
+    earlier one is skipped: its characters are already present."""
+    rank = {category: index for index, category in enumerate(CATEGORY_ORDER)}
+    entries = sorted(registry.entries, key=lambda e: rank.get(e.get("category"), len(rank)))
+    services = [e for e in entries if e.get("category") not in MENU_CATEGORIES]
+    menu = [e for e in entries if e.get("category") in MENU_CATEGORIES]
+    def main_synonym(entry):
+        return next((k for k in entry["keywords"] if k not in entry["title"] and not EVERYDAY.search(k)), None)
+    ordered = ([e["title"] for e in services if e["enabled"]]
+               + [w for w in (main_synonym(e) for e in services if e["enabled"]) if w]
+               + [e["title"] for e in services if not e["enabled"]]
+               + [k for e in services if e["enabled"] for k in e["keywords"] if not EVERYDAY.search(k)]
+               + [e["title"] for e in menu if e["enabled"]])
+    # Long names (國／社宅租金維管費) cost many tokens and are rarely said in full.
+    ordered = [w for w in ordered if 2 <= len(w.strip()) <= MAX_WORD]
+    words = []
+    for word in dict.fromkeys(w.strip() for w in ordered if w.strip()):
+        if not any(word in kept for kept in words):
+            words.append(word)
+    return words
+
+
+def vocabulary_prompt(count_tokens=None, budget=PROMPT_TOKENS):
+    """Decoder prompt: catalogue vocabulary within the token budget, then the style
+    sentence last. count_tokens measures with the model's tokenizer; without it
+    a conservative estimate (1.3 tokens per character) is used."""
+    count = count_tokens or (lambda text: int(len(text) * 1.3) + 1)
     try:
         from registry import Registry
-        titles = dict.fromkeys(e["title"] for e in Registry().entries if "." not in e["id"])
+        words = prompt_words(Registry())
     except (OSError, ValueError, KeyError):
         return STYLE_PROMPT
-    return "台北通服務：" + "、".join(titles) + "。" + STYLE_PROMPT
+    chosen = []
+    for word in words:
+        candidate = "台北通服務：" + "、".join([*chosen, word]) + "。" + STYLE_PROMPT
+        if count(candidate) > budget:
+            break
+        chosen.append(word)
+    return "台北通服務：" + "、".join(chosen) + "。" + STYLE_PROMPT
 
 
 def add_cuda_dll_paths():
@@ -116,8 +160,9 @@ class Recognizer:
         self.model = WhisperModel(model_path, device=device, compute_type=compute_type)
         self.tokenizer = Tokenizer(self.model.hf_tokenizer, self.model.model.is_multilingual,
                                    task="transcribe", language="zh")
-        self.prompt = self.model.get_prompt(
-            self.tokenizer, self.tokenizer.encode(" " + vocabulary_prompt()), without_timestamps=True)
+        text = vocabulary_prompt(lambda value: len(self.tokenizer.encode(" " + value)))
+        self.prompt_tokens = len(self.tokenizer.encode(" " + text))
+        self.prompt = self.model.get_prompt(self.tokenizer, self.tokenizer.encode(" " + text), without_timestamps=True)
         self.suppress = get_suppressed_tokens(self.tokenizer, [-1])
         self.lock = threading.Lock()  # one GPU job at a time, like the model lock
         # Warm up GPU kernels so the user's first utterance is not the slow one
@@ -215,7 +260,7 @@ def main():
     server = ThreadingHTTPServer(("127.0.0.1", args.port), make_handler(recognizer, name))
     server.daemon_threads = True
     print(f"TownPass ASR: http://127.0.0.1:{args.port} | model={name} | {args.device}/{args.compute_type} "
-          f"| loaded in {time.monotonic() - started:.1f}s", flush=True)
+          f"| prompt {recognizer.prompt_tokens} tokens | loaded in {time.monotonic() - started:.1f}s", flush=True)
     try:
         server.serve_forever()
     except KeyboardInterrupt:

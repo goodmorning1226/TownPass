@@ -74,10 +74,12 @@ Vue 網頁不在此 repo；需要受控表單 adapter 時需另外處理 TownPas
 - `evaluate.py` 有兩組案例：dev（`evaluate.CASES`，99 個，開發時調過）與 held-out（`eval_holdout.py`，102 個，不得拿來調整）。
   不可為了讓 held-out 通過而改關鍵字或提示；若要依某個 held-out 失敗修正，先把它移到 dev 並補一句新的說法。
   每輪分成 correct／safe_miss／less_specific／wrong_service／unexpected_navigation，並分開報檢索召回與「有召回時的決策正確率」。
-  2026-11-06 檢索改善後：dev 157/157；held-out 88/102，wrong_service 與 unexpected_navigation 皆 0；未更動的 83 句持平 79/83，新寫 19 句通過 9。瓶頸仍是口語說法的檢索，不是模型。
+  2026-11-07 第二輪後：dev 184/184；held-out 95/102，wrong_service 與 unexpected_navigation 皆 0；兩輪新寫句子通過 9/19、7/13。瓶頸仍是口語說法的檢索，不是模型。
 - 多意圖：`Registry.search` 以「不同服務＋不重疊的命中詞」判斷，不靠連接詞；`ancestors()` 由目錄的 id 根、tab_parent、native parents 推出上層頁，上層與其頁面、名稱內含的詞視為同一需求，且優先回較具體的頁。
 - 語音：`asr_server.py` 是獨立程序（需 faster-whisper），主後端只做 WAV 驗證與轉送；權重與轉換檔在 repo 外，不提交。
   App 新增 `record` 套件，錄音只在記憶體。模型限制同樣適用：不得換成中國開發的辨識模型。
+- 付款主體：帳務子項可在 `capabilities.json` 設 `pay_words`；句子有繳／付／交／帳／錢／費之一且出現主體詞才命中，所以「我要喝水」「醫院在哪裡」不會變帳單。書名片段（3 字以上、非數字）只在沒有動詞受詞時使用，避免截斷完整書名。
+- 語音提示詞有 200 token 預算（Whisper 只保留最後約 223 token）：服務名稱→主要同義詞→未串接服務→其他關鍵字→App 選單字，啟動時印出實際 token 數。
 - 單一精確命中的停用能力由 `Workflow.handle` 直接回原因、不呼叫模型（3b 模型遇到不可用候選傾向回補問）。
 
 ## 建議接續順序
@@ -103,7 +105,7 @@ fvm flutter build apk --debug
 git diff --check
 ```
 
-目前基線：Python 71／Flutter 37 通過；analyze 零 error、7 warning、16 info，皆在既有非助理檔案。
+目前基線：Python 74／Flutter 38 通過；analyze 零 error、7 warning、16 info，皆在既有非助理檔案。
 變更 asset／模型／pubspec 時執行 `fvm dart run build_runner build`，不手改或提交被忽略產生碼。
 串線可先啟後端，再 `fvm dart run tool/smoke_assistant.dart`；實際 UI 由使用者測。
 語音串線需另啟 `scripts/start_asr.ps1`；Python 單元測試用假的辨識服務，不需模型。測試用的暫時後端請用其他端口（如 8766／8771），

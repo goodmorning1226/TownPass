@@ -148,6 +148,26 @@ class WorkflowTests(unittest.TestCase):
         for text in ('你會做什麼', '可以幫我什麼', '有哪些服務'):
             self.assertEqual(self.turn(text)['kind'], 'capability_list', text)
 
+    def test_a_bill_named_by_its_subject_needs_a_payment_word(self):
+        registry = Registry()
+        def ids(text):
+            return [m['entry']['id'] for m in registry.search(text)]
+        self.assertEqual(ids('車子停路邊的錢要繳'), ['fees.parking'])
+        self.assertEqual(ids('幫我繳醫院的帳'), ['fees.hospital'])
+        self.assertEqual(ids('國宅的租金要交'), ['fees.housing'])
+        for text in ('我要喝水', '醫院在哪裡', '路邊有車'):  # no payment word: not a bill
+            self.assertEqual(ids(text), [], text)
+
+    def test_a_book_title_without_a_verb_reaches_the_library(self):
+        from server import retrieve
+        from test_server import BOOKS
+        context = retrieve('神奇柑仔店有哪幾本', BOOKS)
+        self.assertEqual((context['query'], context['library'], len(context['books'])), ('神奇柑仔店', True, 2))
+        self.assertEqual(retrieve('錢天堂', BOOKS)['books'][0]['id'], 'lib-book-5')
+        self.assertEqual(retrieve('9786263350', BOOKS)['search_type'], 'isbn')  # digits are not a title fragment
+        self.assertEqual(self.turn('神奇柑仔店有哪幾本')['kind'], 'confirm_candidates')
+        self.assertEqual(retrieve('劉潤寫過的書', BOOKS)[('search_type')], 'author')
+
     def test_one_correction_then_fail_closed(self):
         replies = []
         def model(messages, tools):

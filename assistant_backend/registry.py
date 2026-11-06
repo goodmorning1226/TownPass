@@ -6,6 +6,9 @@ import re
 import unicodedata
 
 
+# A sentence about paying: any of these plus a bill's subject (its pay_words).
+PAY_CUE = re.compile(r"繳|付|交|帳|錢|費")
+
 # Spelling variants that mean the same thing in everyday Traditional Chinese.
 VARIANTS = (("臺", "台"), ("記錄", "紀錄"))
 
@@ -76,6 +79,12 @@ class Registry:
             own = [entry["title"], *entry["keywords"]]
             direct = [term for term in own if normalized(term) and normalized(term) in n]
             score = max((len(normalized(term)) * 3 for term in direct), default=0)
+            if not direct and entry.get("pay_words") and PAY_CUE.search(n):
+                # "車子停路邊的錢要繳", "幫我繳醫院的帳": the bill named by its subject.
+                subject = [word for word in entry["pay_words"] if normalized(word) in n]
+                if subject:
+                    direct = subject
+                    score = max(len(normalized(word)) * 3 for word in subject) + 3
             longest = max(direct, key=lambda term: len(normalized(term)), default=None)
             inner = [term for term in entry["features"] if normalized(term) in n]
             score += max((len(normalized(term)) for term in inner), default=0)

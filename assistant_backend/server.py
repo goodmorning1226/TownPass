@@ -5,6 +5,7 @@ No model-produced URL, script, reservation or write operation is executed.
 from __future__ import annotations
 
 import argparse
+import difflib
 import hashlib
 import json
 import os
@@ -125,7 +126,7 @@ def retrieve(text, books, previous=()):
     if not query:
         # "<author>寫的(書)" names an author without a search verb; checked first so
         # "找廣嶋玲子寫的書" does not capture "廣嶋玲子寫" as the author.
-        author_match = re.search(r"(?:作者(?:是)?|找|搜尋|查|借|看)?([^，。！？\s]{2,24}?)寫的(?:書|作品)?", clean) \
+        author_match = re.search(r"(?:作者(?:是)?|找|搜尋|查|借|看)?([^，。！？\s]{2,24}?)寫(?:的|過)(?:什麼)?(?:書|作品)?", clean) \
             or re.search(r"(?:作者(?:是)?|找|搜尋|查)([^，。！？]{1,24}?)(?:的書|的作品)", clean)
         if author_match:
             query = re.sub(r"^(?:我要|我想|幫我|請|找|看|借)+", "", author_match[1].strip())
@@ -141,6 +142,20 @@ def retrieve(text, books, previous=()):
             if value and value not in ("書", "書籍", "圖書", "閱"):
                 action_object = value
                 query = value
+    if not query:
+        # A known title named without a verb ("錢天堂", "神奇柑仔店有哪幾本"): the
+        # longest stretch (3+ characters, not just digits) shared with a title.
+        # Only after the verb object, so "借<whole title>" keeps the whole title
+        # for the one-character and sound-alike rules.
+        best = ""
+        for book in books:
+            title = normalize(book["book_name"])
+            match = difflib.SequenceMatcher(None, n, title).find_longest_match(0, len(n), 0, len(title))
+            piece = n[match.a:match.a + match.size]
+            if match.size > len(best) and match.size >= 3 and not piece.isdigit():
+                best = piece
+        if best:
+            query, library = best, True
     library_candidate = library or bool(action_object and not other)
     candidates = []
     exact = []

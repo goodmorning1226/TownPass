@@ -217,7 +217,7 @@ class Workflow:
             return self.reply(payload, "請輸入想使用的服務，或問「有哪些功能」。")
         listing = re.search(r"有哪些功能|有什麼功能|功能(?:列表|有哪些)|(?:所有|全部)功能|查看全部功能|"
                             r"(?:能|可以|會)做(?:什麼|哪些)|(?:能|可以|會)幫(?:我)?(?:什麼|哪些)|"
-                            r"有(?:什麼|哪些)服務", text)
+                            r"有(?:什麼|哪些)服務|介紹.{0,4}功能|(?:能|可以)?辦(?:什麼|哪些)事?", text)
         if listing:
             root = "library" if any(word in text for word in ("圖書", "借書")) else None
             self._trace("listing")
@@ -231,7 +231,9 @@ class Workflow:
         matches = self.registry.search(positive_text(text))
         # Book-specific ambiguity is resolved before any navigation.
         if not any(m["entry"]["id"] not in ("library",) for m in matches):
-            books = self.owner.catalog.books() if (matches or LIBRARY_CUE.search(text)) else []
+            # Unmatched requests also consult the (cached) book catalogue, so a
+            # title named without a verb is still recognised.
+            books = self.owner.catalog.books() if (matches or LIBRARY_CUE.search(text) or len(text) >= 3) else []
             if books:
                 context = self.retrieve(text, books)
                 if not context["other"] and context["library_candidate"]:
