@@ -262,7 +262,17 @@ adb -s <實際device_serial> emu avd hostmicon
 
 ## 7. 啟動 App 並接到電腦後端
 
-保持 Ollama、主後端（及選用的語音辨識）與 Android 都在執行。終端 C：
+**一鍵啟動（建議）**：檢查 Ollama 與模型、在各自視窗開主後端與語音辨識（已在跑就沿用）、等到都正常、
+替模擬器開電腦麥克風，最後執行 App。任何一步失敗會直接說原因，不會漏開語音服務：
+
+```powershell
+.\scripts\start_all.ps1 -Model '<轉換結果資料夾>' -DeviceId <實際Android_device_id>
+```
+
+沒給 `-Model`（也沒設 `TOWNPASS_ASR_MODEL` 環境變數）時只能打字，腳本會明確提示；`-NoVoice` 刻意不開語音，
+`-SkipApp` 只啟動並檢查服務。開出來的服務視窗要保持開著，關掉就會停止（例如語音視窗關掉後，App 會回「語音辨識服務未啟動」）。
+
+手動逐步啟動：保持 Ollama、主後端（及選用的語音辨識）與 Android 都在執行。終端 C：
 
 ```powershell
 .\scripts\run_assistant_android.ps1
@@ -326,7 +336,7 @@ Android Studio 選 `lib/main.dart` 的 Flutter Run configuration、裝置選正�
 2. 告訴我文件、Flutter 助理程式、後端、語音服務、能力目錄和測試檔在本機的完整路徑。跑 pub get、build_runner、Flutter 與 Python 測試並回報結果。
 3. 決策模型：下載 Mistral AI 的 ministral-3:3b（ollama pull），驗證 Ollama，啟動主後端（scripts/start_assistant.ps1），檢查 contract 3 health 與 Dart wire smoke。
 4. 語音（選用）：依 TEAM_LOCAL_SETUP 5.1 安裝 faster-whisper（有 NVIDIA GPU 再加 cuBLAS/cuDNN pip 套件），用 scripts/convert_breeze_asr.ps1 由 MediaTek Research 官方權重轉換 Breeze-ASR-25，權重放在 repo 外並核對 SHA-256，再用 scripts/start_asr.ps1 啟動並檢查 :8770 health。不要使用他人上傳的轉換檔，也不要改用任何中國開發的模型（決策或語音皆同）。
-5. 協助建立／開啟 Android AVD、讓模擬器聽得到電腦麥克風（命令列啟動要加 -allow-host-audio，再 adb emu avd hostmicon）、選正確裝置，用 scripts/run_assistant_android.ps1 執行 App。說明主後端、語音服務、Ollama、App 各在哪裡執行，以及日後怎麼重新啟動；模擬器若出現 ERR_NAME_NOT_RESOLVED，依文件用 -dns-server 重開。
+5. 協助建立／開啟 Android AVD、讓模擬器聽得到電腦麥克風（命令列啟動要加 -allow-host-audio；Android Studio 內的模擬器在 Extended controls → Microphone 開啟），用 scripts/start_all.ps1（一次檢查並啟動主後端、語音與 App）執行。說明主後端、語音服務、Ollama、App 各在哪裡執行，以及日後怎麼重新啟動；模擬器若出現 ERR_NAME_NOT_RESOLVED，依文件用 -dns-server 重開。
 6. 遇到需要我操作的安裝、權限或系統設定，講清楚原因和步驟；實際 UI 與語音驗收由我操作，請給我文件中的測試清單，不要聲稱你已實測。
 
 最後回報：安裝的版本與路徑、實際通過的檢查、尚未處理的問題、常用啟動指令。不要把 mock 當正式服務，不擅自 commit、push 或改專案架構；commit 需經我同意，且訊息不加 AI 共同作者。

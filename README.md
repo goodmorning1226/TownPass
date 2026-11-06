@@ -19,26 +19,64 @@ Here are some quick setup guide.
 
 ## Requirement
 
-- [Flutter](https://docs.flutter.dev/get-started/install) or [FVM](https://fvm.app/documentation/getting-started/installation)
-- [XCode](https://developer.apple.com/xcode/) (for iOS)
-- [Android SDK](https://developer.android.com/studio/index.html) (for Android, with or without Android Studio)
+- [FVM](https://fvm.app/documentation/getting-started/installation): this fork pins Flutter **3.47.6** (Dart 3.13.5) in `.fvmrc`; use `fvm flutter` rather than a global Flutter
+- [Android SDK](https://developer.android.com/studio/index.html) (Platform 36, NDK 29.0.13113456) and JDK 17
+- [XCode](https://developer.apple.com/xcode/) (for iOS; not yet verified in this fork)
+- For the local AI assistant: Python 3.11+ and [Ollama](https://ollama.com/) with `ministral-3:3b`; voice input additionally needs `faster-whisper` (see the setup guide)
+
+Full step-by-step setup, including the emulator and voice, is in [docs/TEAM_LOCAL_SETUP.md](docs/TEAM_LOCAL_SETUP.md).
 
 ## Build the Project
 
-1. Get the packages project needed:
+Run from the repository root.
+
+1. Install the pinned Flutter and get the packages exactly as locked:
 
    ``` bash
-   flutter pub get
+   fvm install
+   fvm flutter pub get --enforce-lockfile
    ```
 
-2. Generate additional needed dart code for the project.
+2. Generate additional needed dart code for the project (generated files are not committed, so this is required after every fresh clone):
 
    ``` bash
-   dart run build_runner build
+   fvm dart run build_runner build
    ```
 
-3. You are all set now, Run the project from your IDE or the through the command line:
+3. Check and build:
 
    ``` bash
-   flutter run
+   fvm flutter analyze
+   fvm flutter test
+   python -m unittest discover -s assistant_backend -p 'test*.py'
+   fvm flutter build apk --debug
    ```
+
+4. Run without the assistant from your IDE (select an Android device, not Windows desktop) or the command line:
+
+   ``` bash
+   fvm flutter run -d <device-id>
+   ```
+
+## Run with the Local Assistant (Windows, Android)
+
+One command checks Ollama, starts the backend and speech service in their own windows (reusing any already
+running), waits until each is healthy, enables the emulator microphone and then runs the App:
+
+``` powershell
+ollama pull ministral-3:3b                     # once; Ollama serves on 127.0.0.1:11434
+.\scripts\start_all.ps1 -Model '<converted Breeze-ASR-25 folder>' -DeviceId <device-id>
+```
+
+Without `-Model` (or `TOWNPASS_ASR_MODEL`) it runs text-only and says so; `-SkipApp` only starts and checks the services.
+The service windows it opens must stay open. The same steps by hand, each in its own terminal:
+
+``` powershell
+.\scripts\start_assistant.ps1                                        # assistant backend on 127.0.0.1:8765
+.\scripts\start_asr.ps1 -Model '<converted Breeze-ASR-25 folder>'    # voice (optional) on 127.0.0.1:8770
+.\scripts\run_assistant_android.ps1 -DeviceId <device-id>            # adb reverse 8765, then flutter run
+```
+
+The voice model is converted once with `.\scripts\convert_breeze_asr.ps1` (weights stay outside the repository).
+An emulator started from the command line needs `-allow-host-audio` to hear the PC microphone; see the setup guide.
+Disable the assistant entirely with `--dart-define=ASSISTANT_ENABLED=false`.
