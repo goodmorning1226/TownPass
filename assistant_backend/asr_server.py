@@ -21,7 +21,7 @@ import wave
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 # Prefer Traditional Chinese output from Whisper-family models.
-STYLE_PROMPT = "以下是台灣華語的繁體中文句子。"
+STYLE_PROMPT = "可能會說第一個、第二個、第三個。以下是台灣華語的繁體中文句子。"
 MAX_BYTES = 1_100_000  # 30 s of 16 kHz mono PCM16 plus header
 SAMPLE_RATE = 16000
 # Hold-to-talk bounds the clip, so a VAD pass mostly adds latency (~1 s on CPU).

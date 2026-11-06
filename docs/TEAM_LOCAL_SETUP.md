@@ -64,7 +64,7 @@ Agent 第一次先告訴你這些檔案的**實際完整路徑**：
 | VS Code（選用） | 安裝 Flutter／Dart extensions，可取代 Android Studio 編輯程式；Android SDK 仍需安裝 |
 
 Android 建置檔已固定 AGP 9.1.0／Gradle 9.3.1／Kotlin 2.4.0，由專案下載，無須另外裝全域 Gradle。
-錄音使用 Flutter 套件 `record` 7.1.2，已記在 `pubspec.lock`，`pub get` 會自動取得，不必另裝。
+錄音使用 Flutter 套件 `record` 7.1.2、朗讀使用 `flutter_tts` 4.2.5（手機內建語音引擎），都已記在 `pubspec.lock`，`pub get` 會自動取得，不必另裝。
 不必安裝 Node.js 或啟動 Vue 專案即可使用目前公開示範頁；若將來修改微服務網頁，需另取得 TownPass-Services。
 
 安裝來源：
@@ -305,7 +305,7 @@ Android Studio 選 `lib/main.dart` 的 Flutter Run configuration、裝置選正�
 - Python 修改需停止該後端再重啟；改目錄資源需同步重啟主後端、語音服務（辨識提示詞取自目錄）與 App。Ollama 不需每次重下模型。
 - 每批先測規則／widget，再做 wire／模型測試，最後給使用者人工操作表。不要把遠端 mock 當正式交易。
 - 指令：`fvm flutter analyze`、`fvm flutter test`、`python -m unittest discover -s assistant_backend -p 'test*.py'`、`fvm flutter build apk --debug`、`git diff --check`。
-- 本輪基線 Python 74、Flutter 38 通過；analyze 有 7 warning／16 info（零 error），不得刪測試或全域放寬 lint 換成假綠燈。
+- 本輪基線 Python 74、Flutter 44 通過；analyze 有 7 warning／16 info（零 error），不得刪測試或全域放寬 lint 換成假綠燈。
 - 後端與 Ollama 啟動後可跑 `python assistant_backend/evaluate.py` 做 contract 3 模型評估（dev 184 個＋held-out 102 個）；dev 是調過的開發集，held-out 才是誠實估計，且不得拿來調整。
 - 原開發機使用的 Gradle mirror／emulator workaround 是本機排障，不要自動設定到每個 clone。下載失敗時先保留完整錯誤並定位網路／倉庫問題。
 - 尚未完成：正式 API、缺金鑰地圖、欄位預填、其他語言與台語、語音在吵雜環境的辨識率。開發方向看交接文件，不補假功能來通過展示。

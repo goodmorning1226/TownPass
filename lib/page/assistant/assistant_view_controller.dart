@@ -8,6 +8,7 @@ import 'package:town_pass/page/main/main_view_controller.dart';
 import 'package:town_pass/service/assistant_action_executor.dart';
 import 'package:town_pass/service/assistant_page_tracker.dart';
 import 'package:town_pass/service/assistant_recorder.dart';
+import 'package:town_pass/service/assistant_speaker.dart';
 import 'package:town_pass/service/assistant_service.dart';
 
 /// One bubble of the conversation. Kept in memory while the App process
@@ -61,6 +62,7 @@ class AssistantViewController extends GetxController {
   final AssistantActionExecutor executor;
   final AssistantPageTracker pageTracker;
   final AssistantRecorder recorder;
+  final AssistantSpeaker speaker;
   final DateTime Function() clock;
 
   AssistantViewController({
@@ -68,13 +70,82 @@ class AssistantViewController extends GetxController {
     AssistantActionExecutor? executor,
     AssistantPageTracker? pageTracker,
     AssistantRecorder? recorder,
+    AssistantSpeaker? speaker,
     DateTime Function()? clock,
   }) : service = service ?? AssistantService(),
        executor = executor ?? AssistantActionExecutor(),
        pageTracker = pageTracker ?? AssistantPageTracker.instance,
        recorder = recorder ?? AssistantRecorder(),
+       speaker = speaker ?? AssistantSpeaker(),
        clock = clock ?? DateTime.now {
     this.recorder.onLevel = _onLevel;
+    this.speaker.loadEnabled().then((enabled) {
+      if (!isClosed) readAloud.value = enabled;
+    });
+  }
+
+  /// Read replies aloud (phone text-to-speech). Off by default; remembered.
+  final readAloud = false.obs;
+
+  void setReadAloud(bool enabled) {
+    readAloud.value = enabled;
+    speaker.saveEnabled(enabled);
+    if (!enabled) speaker.stop();
+  }
+
+  /// "1", "二", "第二個", "選第 2 個" -> 2; anything else -> null.
+  static int? choiceNumber(String text) {
+    final compact = text.replaceAll(RegExp(r'[\s，。！？!?,.、]'), '');
+    final match = RegExp(
+      r'^(?:我要|我選|選擇?|就|要)?第?([1-9]|[一二兩三四五六七八九])'
+      r'(?:個|項|本|筆|號|種|位)?(?:吧|了|就好|好了)?$',
+    ).firstMatch(compact);
+    if (match == null) return null;
+    final digit = match[1]!;
+    if (digit == '兩') return 2;
+    final index = '一二三四五六七八九'.indexOf(digit);
+    return index >= 0 ? index + 1 : int.parse(digit);
+  }
+
+  /// The message whose numbered options can still be chosen, if any.
+  AssistantChatMessage? get _selectable {
+    final id = choicesMessageId.value;
+    if (id == null) return null;
+    for (final item in messages.reversed) {
+      if (item.id == id) {
+        return item.choices.isNotEmpty || item.suggestions.isNotEmpty
+            ? item
+            : null;
+      }
+    }
+    return null;
+  }
+
+  /// Picks an option by its number, said or typed. True when [text] was a
+  /// number for the open option list (even if it could not be used).
+  Future<bool> _chooseByNumber(String text) async {
+    final item = _selectable;
+    final number = choiceNumber(text);
+    if (item == null || number == null) return false;
+    final count = item.choices.isNotEmpty
+        ? item.choices.length
+        : item.suggestions.length;
+    if (number > count) {
+      _add('目前只有 $count 個選項，請說 1 到 $count，或直接點選。');
+      return true;
+    }
+    if (item.choices.isNotEmpty) {
+      final choice = item.choices[number - 1];
+      if (!choice.enabled) {
+        _add('第 $number 項「${choice.title}」目前無法使用，請選其他項目。');
+        return true;
+      }
+      await choose(choice, number: number);
+    } else {
+      final suggestion = item.suggestions[number - 1];
+      await submit(suggestion, shownAs: '第 $number 項：$suggestion');
+    }
+    return true;
   }
 
   final expanded = false.obs;
@@ -154,6 +225,7 @@ class AssistantViewController extends GetxController {
       suggestions: List.unmodifiable(suggestions),
     );
     messages.add(item);
+    if (!fromUser && readAloud.value) speaker.speak(text);
     if (messages.length > historyLimit) {
       messages.removeRange(0, messages.length - historyLimit);
     }
@@ -204,6 +276,7 @@ class AssistantViewController extends GetxController {
   }
 
   void closePanel() {
+    speaker.stop();
     cancel();
     _panelHistory?.remove();
     expanded.value = false;
@@ -232,6 +305,7 @@ class AssistantViewController extends GetxController {
   /// e.g. the microphone permission was refused (a reply explains why).
   Future<bool> startListening() async {
     if (busy.value || listening.value) return false;
+    speaker.stop(); // never record the assistant's own voice
     final generation = _generation;
     final started = await recorder.start();
     if (generation != _generation || isClosed) {
@@ -320,6 +394,14 @@ class AssistantViewController extends GetxController {
     }
     if (generation != _generation || isClosed) return;
     busy.value = false;
+    // "第二個" while numbered options are open selects that option, even when
+    // the recogniser was unsure about such a short word.
+    for (final spoken in [heard.text, ...heard.options]) {
+      if (_selectable != null && choiceNumber(spoken) != null) {
+        await submit(spoken);
+        return;
+      }
+    }
     if (heard.confirm) {
       // Unsure or unmatched speech: nothing is sent until the user picks.
       final ask = _add(
@@ -342,9 +424,14 @@ class AssistantViewController extends GetxController {
   /// A speech reading the user confirmed; sent exactly like typed text.
   Future<void> chooseSuggestion(String text) => submit(text);
 
-  Future<void> choose(AssistantBookChoice choice) async {
+  /// [number] is set when the option was chosen by saying or typing it.
+  Future<void> choose(AssistantBookChoice choice, {int? number}) async {
     if (!choice.enabled || _resolutionId == null) return;
-    await submit('', choiceId: choice.id, shownAs: choice.title);
+    await submit(
+      '',
+      choiceId: choice.id,
+      shownAs: number == null ? choice.title : '第 $number 項：${choice.title}',
+    );
   }
 
   /// [shownAs] is the user's bubble text when a candidate button was tapped.
@@ -356,6 +443,16 @@ class AssistantViewController extends GetxController {
     String? note,
   }) async {
     if (busy.value || (text.trim().isEmpty && choiceId == null)) return;
+    speaker.stop();
+    // Checked synchronously so a normal request still marks itself busy at
+    // once (a second tap meanwhile is ignored).
+    if (choiceId == null &&
+        shownAs == null &&
+        _selectable != null &&
+        choiceNumber(text) != null) {
+      await _chooseByNumber(text);
+      return;
+    }
     final generation = ++_generation;
     final requestId = '${DateTime.now().microsecondsSinceEpoch}-$generation';
     _add(shownAs ?? text.trim(), fromUser: true);
@@ -425,6 +522,7 @@ class AssistantViewController extends GetxController {
 
   @override
   void onClose() {
+    speaker.stop();
     cancel();
     _cornerTimer?.cancel();
     recorder.dispose();

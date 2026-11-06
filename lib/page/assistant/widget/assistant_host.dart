@@ -223,6 +223,22 @@ class _AssistantSheetState extends State<AssistantSheet> {
             color: TPColors.primary700,
           ),
         ),
+        Obx(
+          () => IconButton(
+            tooltip: controller.readAloud.value
+                ? '朗讀回覆：開（點一下關閉）'
+                : '朗讀回覆：關（點一下開啟）',
+            iconSize: 28,
+            onPressed: () =>
+                controller.setReadAloud(!controller.readAloud.value),
+            icon: Icon(
+              controller.readAloud.value ? Icons.volume_up : Icons.volume_off,
+              color: controller.readAloud.value
+                  ? TPColors.primary500
+                  : TPColors.grayscale500,
+            ),
+          ),
+        ),
         IconButton(
           tooltip: '關閉助理',
           iconSize: 28,
@@ -303,10 +319,11 @@ class _AssistantSheetState extends State<AssistantSheet> {
             ),
           ),
           if (selectable)
-            for (final choice in item.choices)
+            for (final (index, choice) in item.choices.indexed)
               Padding(
                 padding: const EdgeInsets.only(top: 8),
                 child: _OutlinedChoice(
+                  number: index + 1,
                   title: choice.title,
                   subtitle: choice.subtitle,
                   onTap: choice.enabled
@@ -315,14 +332,25 @@ class _AssistantSheetState extends State<AssistantSheet> {
                 ),
               ),
           if (selectable)
-            for (final suggestion in item.suggestions)
+            for (final (index, suggestion) in item.suggestions.indexed)
               Padding(
                 padding: const EdgeInsets.only(top: 8),
                 child: _OutlinedChoice(
+                  number: index + 1,
                   title: '「$suggestion」',
                   onTap: () => controller.chooseSuggestion(suggestion),
                 ),
               ),
+          if (selectable &&
+              (item.choices.isNotEmpty || item.suggestions.isNotEmpty))
+            const Padding(
+              padding: EdgeInsets.only(top: 6, left: 4),
+              child: TPText(
+                '可以點選，或說出／打出編號，例如「第 1 個」。',
+                style: TPTextStyles.bodyRegular,
+                color: TPColors.grayscale600,
+              ),
+            ),
         ],
       ),
     );
@@ -543,7 +571,15 @@ class _OutlinedChoice extends StatelessWidget {
   final String title;
   final String subtitle;
   final VoidCallback? onTap;
-  const _OutlinedChoice({required this.title, this.subtitle = '', this.onTap});
+
+  /// Shown as a badge so the option can also be chosen by saying its number.
+  final int? number;
+  const _OutlinedChoice({
+    required this.title,
+    this.subtitle = '',
+    this.onTap,
+    this.number,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -564,20 +600,50 @@ class _OutlinedChoice extends StatelessWidget {
               color: enabled ? TPColors.primary500 : TPColors.grayscale200,
             ),
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          child: Row(
             children: [
-              TPText(
-                title,
-                style: TPTextStyles.h3SemiBold,
-                color: enabled ? TPColors.primary700 : TPColors.grayscale500,
-              ),
-              if (subtitle.isNotEmpty)
-                TPText(
-                  subtitle,
-                  style: TPTextStyles.bodyRegular,
-                  color: TPColors.grayscale600,
+              if (number != null) ...[
+                Semantics(
+                  label: '第 $number 項',
+                  child: Container(
+                    width: 32,
+                    height: 32,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: enabled
+                          ? TPColors.primary500
+                          : TPColors.grayscale200,
+                    ),
+                    child: TPText(
+                      '$number',
+                      style: TPTextStyles.h3SemiBold,
+                      color: TPColors.white,
+                    ),
+                  ),
                 ),
+                const SizedBox(width: 12),
+              ],
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    TPText(
+                      title,
+                      style: TPTextStyles.h3SemiBold,
+                      color: enabled
+                          ? TPColors.primary700
+                          : TPColors.grayscale500,
+                    ),
+                    if (subtitle.isNotEmpty)
+                      TPText(
+                        subtitle,
+                        style: TPTextStyles.bodyRegular,
+                        color: TPColors.grayscale600,
+                      ),
+                  ],
+                ),
+              ),
             ],
           ),
         ),

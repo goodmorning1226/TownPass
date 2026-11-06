@@ -14,6 +14,7 @@ import 'package:town_pass/page/assistant/widget/assistant_host.dart';
 import 'package:town_pass/service/assistant_action_executor.dart';
 import 'package:town_pass/service/assistant_page_tracker.dart';
 import 'package:town_pass/service/assistant_recorder.dart';
+import 'package:town_pass/service/assistant_speaker.dart';
 import 'package:town_pass/service/assistant_service.dart';
 
 class PendingService extends AssistantService {
@@ -76,6 +77,7 @@ class QueueService extends AssistantService {
   final List<AssistantTranscript> transcripts;
   final contexts = <Map<String, dynamic>?>[];
   final texts = <String>[];
+  final choiceIds = <String?>[];
   final audio = <Uint8List>[];
   Completer<void>? transcriptGate;
   QueueService(this.results, {this.transcripts = const []});
@@ -90,6 +92,7 @@ class QueueService extends AssistantService {
   }) async {
     contexts.add(context);
     texts.add(text);
+    choiceIds.add(choiceId);
     return results.removeAt(0);
   }
 
@@ -105,6 +108,27 @@ class QueueService extends AssistantService {
 
   @override
   void cancel() {}
+}
+
+/// Records what would be spoken instead of using the phone's TTS engine.
+class FakeSpeaker extends AssistantSpeaker {
+  final bool stored;
+  final spoken = <String>[];
+  final saved = <bool>[];
+  int stops = 0;
+  FakeSpeaker({this.stored = false});
+
+  @override
+  Future<bool> loadEnabled() async => stored;
+
+  @override
+  Future<void> saveEnabled(bool enabled) async => saved.add(enabled);
+
+  @override
+  Future<void> speak(String text) async => spoken.add(text);
+
+  @override
+  Future<void> stop() async => stops++;
 }
 
 /// In-memory stand-in for the microphone plugin.
@@ -1100,6 +1124,182 @@ void main() {
       await server.close(force: true);
     }
   });
+
+  test('Spoken or typed option numbers are understood', () {
+    for (final (text, expected) in [
+      ('1', 1),
+      ('二', 2),
+      ('兩', 2),
+      ('第二個', 2),
+      ('第 3 項', 3),
+      ('選第2個', 3 - 1),
+      ('我選三', 3),
+      ('第一個吧', 1),
+      ('二。', 2),
+      ('我要借書', null),
+      ('第十個', null),
+      ('二十', null),
+      ('', null),
+    ]) {
+      expect(
+        AssistantViewController.choiceNumber(text),
+        expected,
+        reason: text,
+      );
+    }
+  });
+
+  test('Saying or typing a number chooses that candidate', () async {
+    const confirm = AssistantResult(
+      sessionId: 's',
+      message: '你想使用哪個功能？請先確認。',
+      kind: 'confirm_candidates',
+      resolutionId: 'r1',
+      choices: [
+        AssistantBookChoice('1', '申辦案件進度'),
+        AssistantBookChoice('2', '陳情案件進度', enabled: false),
+        AssistantBookChoice('3', '警政案件進度'),
+      ],
+    );
+    final service = QueueService([
+      confirm,
+      const AssistantResult(sessionId: 's', message: '請在原本的頁面繼續。'),
+    ]);
+    final controller = AssistantViewController(
+      service: service,
+      executor: RecordingExecutor(),
+      speaker: FakeSpeaker(),
+    );
+    await controller.submit('案件進度');
+    await controller.submit('5'); // out of range: explained, nothing sent
+    expect(controller.messages.last.text, contains('目前只有 3 個選項'));
+    await controller.submit('第二個'); // unavailable: explained, nothing sent
+    expect(controller.messages.last.text, contains('第 2 項「陳情案件進度」目前無法使用'));
+    expect(service.choiceIds, [null]);
+    await controller.submit('第三個');
+    expect(service.choiceIds, [null, '3']);
+    expect(
+      controller.messages.where((m) => m.fromUser).last.text,
+      '第 3 項：警政案件進度',
+    );
+  });
+
+  test(
+    'A short spoken number picks from "is this what you said?" options',
+    () async {
+      final service = QueueService(
+        [const AssistantResult(sessionId: 's', message: '請在原圖書頁面搜尋。')],
+        transcripts: [
+          const AssistantTranscript(
+            '我要結束',
+            confirm: true,
+            options: ['我要結束', '我要借書'],
+          ),
+          const AssistantTranscript('二', confirm: true, options: ['二']),
+        ],
+      );
+      final controller = AssistantViewController(
+        service: service,
+        executor: RecordingExecutor(),
+        recorder: FakeRecorder(),
+        speaker: FakeSpeaker(),
+      );
+      await controller.startListening();
+      await controller.stopListening();
+      expect(service.texts, isEmpty);
+      service.transcripts.removeAt(0);
+      await controller.startListening();
+      await controller
+          .stopListening(); // heard "二", unsure: still selects option 2
+      expect(service.texts, ['我要借書']);
+      expect(
+        controller.messages.where((m) => m.fromUser).last.text,
+        '第 2 項：我要借書',
+      );
+    },
+  );
+
+  test(
+    'Replies are read aloud only when switched on, and stop for the mic',
+    () async {
+      final speaker = FakeSpeaker();
+      final controller = AssistantViewController(
+        service: QueueService([
+          const AssistantResult(sessionId: 's', message: '第一則回覆'),
+          const AssistantResult(sessionId: 's', message: '第二則回覆'),
+        ]),
+        executor: RecordingExecutor(),
+        recorder: FakeRecorder(),
+        speaker: speaker,
+      );
+      await Future<void>.delayed(Duration.zero); // stored preference: off
+      expect(controller.readAloud.value, isFalse);
+      await controller.submit('你好');
+      expect(speaker.spoken, isEmpty);
+      controller.setReadAloud(true);
+      expect(speaker.saved, [true]);
+      await controller.submit('謝謝');
+      expect(speaker.spoken, ['第二則回覆']); // only the assistant's words
+      final stopsBefore = speaker.stops;
+      await controller.startListening();
+      expect(speaker.stops, greaterThan(stopsBefore));
+      await controller.stopListening(send: false);
+      controller.setReadAloud(false);
+      expect(speaker.saved, [true, false]);
+    },
+  );
+
+  test('Spoken text pauses after each line and list item', () {
+    expect(
+      AssistantSpeaker.speakable(
+        '目前助理可以開啟的功能：\n• 首頁\n• 網路投票【未串接】\n• App 起始頁面\n可輸入「下一頁」繼續查看。',
+      ),
+      '目前助理可以開啟的功能： 首頁。 網路投票。 App 起始頁面。 可輸入「下一頁」繼續查看。',
+    );
+    // A single sentence is unchanged apart from closing punctuation.
+    expect(AssistantSpeaker.speakable('請在原本的頁面繼續'), '請在原本的頁面繼續。');
+    expect(AssistantSpeaker.speakable('嗨！'), '嗨！');
+  });
+
+  testWidgets(
+    'Options show numbers and a hint; the header has the read-aloud switch',
+    (tester) async {
+      final controller = AssistantViewController(
+        service: QueueService([
+          const AssistantResult(
+            sessionId: 's',
+            message: '你想使用哪個功能？請先確認。',
+            kind: 'confirm_candidates',
+            resolutionId: 'r1',
+            choices: [
+              AssistantBookChoice('1', '申辦案件進度'),
+              AssistantBookChoice('2', '警政案件進度'),
+            ],
+          ),
+        ]),
+        executor: RecordingExecutor(),
+        recorder: FakeRecorder(),
+        speaker: FakeSpeaker(),
+      )..expanded.value = true;
+      await tester.pumpWidget(
+        MaterialApp(
+          builder: (context, child) =>
+              AssistantHost(controller: controller, child: child!),
+          home: const Scaffold(),
+        ),
+      );
+      await controller.submit('案件進度');
+      await tester.pump();
+      expect(find.text('1'), findsOneWidget);
+      expect(find.text('2'), findsOneWidget);
+      expect(find.textContaining('說出／打出編號'), findsOneWidget);
+      expect(find.byTooltip('朗讀回覆：關（點一下開啟）'), findsOneWidget);
+      await tester.tap(find.byTooltip('朗讀回覆：關（點一下開啟）'));
+      await tester.pump();
+      expect(controller.readAloud.value, isTrue);
+      expect(find.byTooltip('朗讀回覆：開（點一下關閉）'), findsOneWidget);
+    },
+  );
 
   testWidgets('Android back closes the panel and invalidates a late decision', (
     tester,
