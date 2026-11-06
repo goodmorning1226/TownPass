@@ -91,11 +91,13 @@ fvm flutter analyze
 fvm flutter build apk --debug
 ```
 
-`evaluate.py` 是 contract 3 的 live-model 回歸集：後端啟動後執行 `python assistant_backend/evaluate.py`。
+`evaluate.py` 是 contract 3 的 live-model 評估：後端啟動後執行 `python assistant_backend/evaluate.py`（`--set dev|holdout|all`）。
+dev 集（`evaluate.CASES`）開發時調過，held-out 集（[eval_holdout.py](eval_holdout.py)）不得拿來調整，後者才是誠實估計。
+每輪分成 correct、safe_miss（沒開頁）、less_specific（對的服務、較上層的頁）、wrong_service、unexpected_navigation，並由回覆 metrics 的 `route`／`candidates` 分開報檢索召回與決策正確率。退出碼只看 dev 集。
 它透過 HTTP 呼叫本機 Ministral，檢查回覆 kind、目的地與候選生命週期（選擇、取消、換題、跨 session 與重播），
 輸出被 Git 忽略的 `evaluation.json`；不經過 App，不導航、不預約。
 `--list` 只列案例，`--only <category>` 只跑指定類別；全部通過退出碼 0，有失敗為 1，後端或目錄不符為 2。
-2026-11-06 實測 99 個案例（含 10 個頁面狀態案例與介面範例句）全數通過，沒有非預期導航。原先 10 個失敗是「目錄內未串接的功能」（如掛號）
+2026-11-06：dev 99/99；held-out 79/102（召回 57/68、有召回時決策 55/57、開錯服務 0）。原先 10 個失敗是「目錄內未串接的功能」（如掛號）
 被模型回成補問；已改為單一精確命中且停用時，程式直接回目錄內的原因、不呼叫模型。預期沒有放寬。
 語料是開發回歸集，包含省略「書」的未知對象、非書籍借用與歧義案例，
 會用於修正檢索與提示，不能冒充獨立保留集正確率。`test_evaluate.py` 只離線檢查案例集與判定邏輯。

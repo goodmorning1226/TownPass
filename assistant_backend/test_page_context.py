@@ -59,7 +59,7 @@ class TurnTests(unittest.TestCase):
             if first["name"] == "select_capability":
                 return response(first["name"], {"capability_id": first["parameters"]["properties"]["capability_id"]["enum"][0]})
             return response(first["name"])
-        self.app = Assistant(FakeCatalog(), model, expanded=True)
+        self.app = Assistant(FakeCatalog(), model)
 
     def turn(self, text, context):
         return self.app.turn({"text": text, "request_id": "r", "session_id": "s", "context": context})
@@ -91,7 +91,7 @@ class HttpTests(unittest.TestCase):
         import urllib.request
         from http.server import ThreadingHTTPServer
         from server import make_handler
-        app = Assistant(FakeCatalog(), lambda *_: response("request_clarification"), expanded=True)
+        app = Assistant(FakeCatalog(), lambda *_: response("request_clarification"))
         server = ThreadingHTTPServer(("127.0.0.1", 0), make_handler(app))
         thread = threading.Thread(target=server.serve_forever, daemon=True)
         thread.start()

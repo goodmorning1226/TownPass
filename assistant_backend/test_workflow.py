@@ -15,7 +15,7 @@ class WorkflowTests(unittest.TestCase):
             if first['name'] == 'select_capability':
                 return response(first['name'], {'capability_id': first['parameters']['properties']['capability_id']['enum'][0]})
             return response(first['name'])
-        self.app = Assistant(FakeCatalog(), model, expanded=True)
+        self.app = Assistant(FakeCatalog(), model)
 
     def turn(self, text='', session='test', **kwargs):
         return self.app.turn({'text': text, 'request_id': 'test-request', 'session_id': session, **kwargs})
@@ -121,12 +121,12 @@ class WorkflowTests(unittest.TestCase):
             if len(replies) == 1:
                 return {'message': {'content': 'done'}}
             return response('select_capability', {'capability_id': 'fees.water'})
-        result = Assistant(FakeCatalog(), model, expanded=True).turn(
+        result = Assistant(FakeCatalog(), model).turn(
             {'text': '我要繳水費', 'request_id': 'r', 'session_id': 's'})
         self.assertEqual(result['destination'], {'kind': 'capability', 'id': 'fees.water'})
         self.assertIn('Invalid output', replies[1])
         self.assertEqual(result['metrics']['model_calls'], 2)
-        broken = Assistant(FakeCatalog(), lambda *_: {'message': {'content': 'done'}}, expanded=True)
+        broken = Assistant(FakeCatalog(), lambda *_: {'message': {'content': 'done'}})
         with self.assertRaises(AssistantError):
             broken.turn({'text': '我要繳水費', 'request_id': 'r', 'session_id': 's'})
 

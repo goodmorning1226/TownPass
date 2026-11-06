@@ -25,6 +25,7 @@
 
 - 所有表單的欄位 schema、型別／enum 選項抽取、模糊欄位確認與受控預填 adapter；目前主要是導頁與圖書檢索。
 - 語音辨識率：吵雜／模擬器麥克風下「借書」易誤聽，保留待辦見 [介面與語音規劃](AI_VOICE_UI_PLAN.md) V3 節（關鍵字提示、實機重測、經同意的除錯錄音）。
+- 下一步建議（2026-11-06 保留、尚未開始）：改善檢索——口語說法對不到候選（如「付停車的錢」「熱門的書」「你會做哪些事」「查案件」）、「順便／跟」未被當成多個需求而直接開其中一頁。須另寫新的 dev 案例來調整，不可直接用 held-out 句子調。
 - 朗讀、其他語言與台語（V4）、真人語音的辨識準確率評估、正式城市通會員與服務 API、實際借閱／預約／付款／送件、動作結果稽核。
 - 缺 API、金鑰、空回呼、依賴前頁 store 的功能仍停用。不能靠新增關鍵字就改為已啟用。
 - 「新導航清舊頁」已由使用者於 2026-11-05 實機驗收（叉叉／Android 返回），回報沒有問題。
@@ -35,9 +36,9 @@
 
 | 檢查 | 最近結果與限制 |
 | --- | --- |
-| Python unittest | 55 個通過；fake model 驗證流程、候選隔離與規則，不當作模型準確率 |
-| contract 3 live-model 回歸 | `evaluate.py` 99 個案例／120 輪全數通過，非預期導航 0、錯誤目的地 0。開發集，不是 held-out 準確率 |
-| Flutter tests | 35 個通過；包含案件 → 圖書關閉／系統返回、Web → 原生父頁與取消遲到回覆 |
+| Python unittest | 58 個通過；fake model 驗證流程、候選隔離與規則，不當作模型準確率 |
+| contract 3 live-model 評估 | dev 99/99（開發時調過，偏樂觀）；**held-out 79/102**（不調整，誠實估計）：召回 57/68、有召回時決策正確 55/57、開錯服務 0；未通過多為口語說法檢索不到（安全地只回話）。合併決策流程前後 held-out 通過數相同 |
+| Flutter tests | 36 個通過；包含案件 → 圖書關閉／系統返回、Web → 原生父頁與取消遲到回覆 |
 | 實際 Ministral 開發案例 | 第一批 6 個一般／候選／排行案例符合預期；不是 held-out 準確率 |
 | App Dart client → HTTP → 模型 | 中文 UTF-8 bytes/contentLength 傳輸與圖書導覽通過 |
 | contract 2 HTTP | 功能列表 + session/resolution 綁定選擇通過；health 顯示 41 個允許能力 |
@@ -63,8 +64,10 @@ TownPass/
 │  ├─ test_transcription.py                    # 語音端點驗證、轉送與錯誤回覆
 │  ├─ page_context.py                          # App 頁面／上次動作狀態驗證與能力對應（contract 3）
 │  ├─ test_page_context.py                     # 頁面狀態解析、排序與 HTTP 回歸
-│  ├─ evaluate.py                              # contract 3 live-model 回歸集（HTTP、多輪候選、頁面狀態）
-│  ├─ test_evaluate.py                         # 回歸集本身的離線檢查，不呼叫模型
+│  ├─ decision.py                              # 唯一的模型決策路徑：policy、提示、重試、白名單驗證、用量
+│  ├─ evaluate.py                              # live-model 評估：dev 集、結果分類、召回與決策分開統計
+│  ├─ eval_holdout.py                          # held-out 集（102 個，不得用來調整）
+│  ├─ test_evaluate.py                         # 評估集與計分邏輯的離線檢查，不呼叫模型
 │  └─ README.md                                # 後端啟動與契約說明
 ├─ lib/
 │  ├─ main.dart                                # 助理開關、GetX 初始化、overlay 與路由 observer

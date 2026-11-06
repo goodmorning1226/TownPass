@@ -137,16 +137,17 @@ class TurnTests(unittest.TestCase):
         self.assertIn("尚未預約", result["message"])
         self.assertNotIn("url", json.dumps(result))
 
-    def test_multiple_results_can_be_selected_in_same_session(self):
-        def model(messages, tools):
-            context = json.loads(messages[1]["content"])["retrieval"]
-            if context["unique_exact_id"]:
-                return response("open_library_book", {"book_id": context["unique_exact_id"]})
-            return response("locate_library_book", {"query": context["query"], "search_type": context["search_type"]})
-        assistant = Assistant(FakeCatalog(), model)
-        result = assistant.turn({"text": "借神奇柑仔店的書", "request_id": "a"})
-        self.assertEqual(len(result["choices"]), 2)
-        selected = assistant.turn({"text": "第二本", "request_id": "b", "session_id": result["session_id"]})
+    def test_several_books_are_confirmed_before_a_volume_opens(self):
+        # The unified workflow asks which book first; a bare "第二本" without the
+        # confirmation's resolution ID must not pick a volume.
+        assistant = Assistant(FakeCatalog(), lambda messages, tools: response(tools[0]["function"]["name"]))
+        result = assistant.turn({"text": "借神奇柑仔店的書", "request_id": "a", "session_id": "s"})
+        self.assertEqual((result["kind"], len(result["choices"])), ("confirm_candidates", 2))
+        unbound = assistant.turn({"text": "第二本", "request_id": "b", "session_id": "s"})
+        self.assertIsNone(unbound["destination"])
+        result = assistant.turn({"text": "借神奇柑仔店的書", "request_id": "c", "session_id": "s"})
+        selected = assistant.turn({"text": "第二本", "request_id": "d", "session_id": "s",
+                                   "resolution_id": result["resolution_id"]})
         self.assertEqual(selected["destination"]["book_id"], "lib-book-6")
 
     def test_cancel_and_invalid_model_output_never_navigate(self):

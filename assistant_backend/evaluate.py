@@ -1,9 +1,14 @@
-"""Live, local-model regression set for assistant contract 3.
+"""Live, local-model evaluation for assistant contract 3.
 
 Sends turns to the running backend over HTTP and checks the reply kind, the
 destination and the candidate lifecycle. The App is not involved: nothing is
-navigated, reserved or paid. This is a development regression set, not a
-held-out accuracy estimate and not an Android UI test.
+navigated, reserved or paid.
+
+Two case sets: the dev set below (used while developing, so its pass rate is
+optimistic) and the held-out set in eval_holdout.py (never tuned on; see its
+rules). Each turn is classed as correct, safe miss (no navigation) or wrong
+navigation, and retrieval recall (was the right target among the candidates
+the backend considered) is reported apart from the decision itself.
 """
 import argparse
 import datetime
@@ -25,10 +30,29 @@ DESTINATION_KEYS = {"capability": {"kind", "id"}, "home": {"kind"},
                     "search": {"kind", "query", "search_type"}, "detail": {"kind", "book_id"}}
 
 
-def want(kinds, dest=None, choices=0, first=None):
+def want(kinds, dest=None, choices=0, first=None, target=None):
     """dest lists the acceptable destinations; None alone means the turn must not navigate.
-    first: text the first offered choice must contain."""
-    return {"kinds": (kinds,) if isinstance(kinds, str) else kinds, "dest": dest, "choices": choices, "first": first}
+    first: text the first offered choice must contain.
+    target: capability/book IDs that retrieval should surface (inferred from dest if omitted)."""
+    return {"kinds": (kinds,) if isinstance(kinds, str) else kinds, "dest": dest, "choices": choices,
+            "first": first, "target": tuple(target) if target else None}
+
+
+def targets(expect):
+    """IDs whose presence among the backend's candidates counts as a retrieval hit."""
+    if expect.get("target"):
+        return set(expect["target"])
+    found = set()
+    for dest in expect.get("dest") or []:
+        if not dest:
+            continue
+        if dest["kind"] == "capability":
+            found.add(dest["id"])
+        elif dest["kind"] == "detail":
+            found.add(dest["book_id"])
+        else:  # home / search
+            found.add("library")
+    return found
 
 
 REPLY = want("reply")                           # template or clarification
@@ -194,15 +218,80 @@ def label(step):
 
 
 def check_cases(catalog, cases=CASES):
-    """Static check: every expected capability destination is an enabled catalogue entry."""
+    """Static check: expected destinations are enabled entries and targets exist."""
     enabled = {entry["id"] for entry in catalog if entry["enabled"]}
+    known = {entry["id"] for entry in catalog}
     problems = []
     for category, steps in cases:
         for step in steps:
             for dest in step["expect"].get("dest") or []:
                 if dest and dest["kind"] == "capability" and dest["id"] not in enabled:
                     problems.append(f"{category}: {dest['id']} is not an enabled capability")
+            for target in step["expect"].get("target") or ():
+                if target not in known and not target.startswith("lib-book-"):
+                    problems.append(f"{category}: target {target} is not in the catalogue")
     return problems
+
+
+def holdout_cases():
+    from eval_holdout import HOLDOUT  # imported lazily: it imports this module
+    return HOLDOUT
+
+
+_ROOTS = None
+
+
+def service_of(dest_or_id):
+    """Service a destination or target belongs to ('library' for any book page).
+
+    A sub-capability belongs to its parent only when the parent is itself a
+    catalogue entry (library.ranking -> library); otherwise each entry is its
+    own service (fees.water and fees.parking are different bills).
+    """
+    global _ROOTS
+    if _ROOTS is None:
+        from registry import Registry
+        _ROOTS = {e["id"] for e in Registry().entries if "." not in e["id"]}
+    if isinstance(dest_or_id, dict):
+        if dest_or_id.get("kind") != "capability":
+            return "library"
+        dest_or_id = dest_or_id.get("id", "")
+    if dest_or_id.startswith("lib-book-"):
+        return "library"
+    root = dest_or_id.split(".")[0]
+    return root if root in _ROOTS else dest_or_id
+
+
+def outcome(row):
+    """correct / safe_miss / less_specific / wrong_service / unexpected_navigation.
+
+    safe_miss: no page opened (a reply, confirmation or rejected request).
+    less_specific: opened the expected service but a broader page than wanted.
+    wrong_service: opened a page of a service the user did not ask for.
+    unexpected_navigation: opened a page where only a reply or confirmation was expected.
+    """
+    if row["passed"]:
+        return "correct"
+    dest = row.get("destination")
+    if dest is None:
+        return "safe_miss"
+    expected = {service_of(t) for t in targets(row.get("expected") or {})}
+    if not expected:  # only a reply or confirmation was expected
+        return "unexpected_navigation"
+    return "less_specific" if service_of(dest) in expected else "wrong_service"
+
+
+def summarize(results):
+    turns = [row for result in results for row in result["steps"]]
+    counts = {"correct": 0, "safe_miss": 0, "less_specific": 0, "wrong_service": 0, "unexpected_navigation": 0}
+    for row in turns:
+        counts[outcome(row)] += 1
+    eligible = [row for row in turns if row.get("retrieval_hit") is not None]
+    hits = [row for row in eligible if row["retrieval_hit"]]
+    return {"cases": len(results), "cases_passed": sum(r["passed"] for r in results),
+            "turns": len(turns), **counts,
+            "retrieval_recall": f"{len(hits)}/{len(eligible)}",
+            "decision_correct_when_retrieved": f"{sum(r['passed'] for r in hits)}/{len(hits)}"}
 
 
 def call(base, token, payload=None, path="/v1/assistant/turns"):
@@ -291,9 +380,16 @@ def run_case(base, token, enabled, number, steps):
         except (OSError, ValueError) as exc:
             status, data = 0, {"error": str(exc)}
         reasons = judge(step["expect"], status, data, payload, enabled)
+        wanted = targets(step["expect"])
+        metrics = data.get("metrics") or {}
+        seen = set(metrics.get("candidates") or [])
+        dest = data.get("destination") or {}
+        seen |= {dest.get("id"), dest.get("book_id"), "library" if dest.get("kind") in ("home", "search") else None}
+        retrieval_hit = bool(wanted & seen) if wanted and status == 200 and "pick" not in step else None
         if status == 200 and data.get("resolution_id"):
             resolution, choices = data["resolution_id"], data.get("choices") or []
         rows.append({**row, "passed": not reasons, "reasons": reasons, "status": status,
+                     "retrieval_hit": retrieval_hit, "route": metrics.get("route"),
                      "seconds": round(time.monotonic() - started, 3), "kind": data.get("kind"),
                      "action": data.get("action"), "destination": data.get("destination"),
                      "choices": [c.get("title") for c in data.get("choices") or []],
@@ -305,16 +401,20 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--base-url", default="http://127.0.0.1:8765")
     parser.add_argument("--output", default="assistant_backend/evaluation.json")
+    parser.add_argument("--set", choices=("dev", "holdout", "all"), default="all", dest="case_set",
+                        help="dev (tuned on), holdout (never tuned on) or both; default all")
     parser.add_argument("--only", action="append", metavar="CATEGORY", help="run only this category; repeatable")
     parser.add_argument("--list", action="store_true", help="print the cases without calling the backend")
     args = parser.parse_args()
     sys.stdout.reconfigure(errors="backslashreplace")   # redirected Windows consoles may not be UTF-8
-    cases = [case for case in CASES if not args.only or case[0] in args.only]
+    sets = {"dev": CASES, "holdout": holdout_cases()}
+    chosen = [name for name in ("dev", "holdout") if args.case_set in (name, "all")]
+    cases = [(name, case) for name in chosen for case in sets[name] if not args.only or case[0] in args.only]
     if not cases:
-        parser.error("no case matches --only; categories: " + ", ".join(dict.fromkeys(c[0] for c in CASES)))
+        parser.error("no case matches --only")
     if args.list:
-        for number, (category, steps) in enumerate(cases, 1):
-            print(f"{number:3} {category:16} " + " -> ".join(label(step) for step in steps))
+        for number, (name, (category, steps)) in enumerate(cases, 1):
+            print(f"{number:3} {name:8} {category:16} " + " -> ".join(label(step) for step in steps))
         return 0
     base, token = args.base_url.rstrip("/"), os.environ.get("TOWNPASS_ASSISTANT_TOKEN", "")
     try:
@@ -325,17 +425,17 @@ def main():
         print(f"Backend at {base} is not a running contract {CONTRACT} assistant (HTTP {status}). "
               "Start scripts/start_assistant.ps1 and retry.", file=sys.stderr)
         return 2
-    problems = check_cases(health["catalog"], cases)
+    problems = check_cases(health["catalog"], [case for _, case in cases])
     if problems:
         print("The case set no longer matches the capability registry:\n  " + "\n  ".join(problems), file=sys.stderr)
         return 2
     enabled = set(health["capabilities"])
     results = []
-    for number, (category, steps) in enumerate(cases, 1):
+    for number, (name, (category, steps)) in enumerate(cases, 1):
         rows = run_case(base, token, enabled, number, steps)
         passed = all(row["passed"] for row in rows)
-        results.append({"category": category, "passed": passed, "steps": rows})
-        print(f"{number}/{len(cases)} {'PASS' if passed else 'FAIL'} {category} "
+        results.append({"set": name, "category": category, "passed": passed, "steps": rows})
+        print(f"{number}/{len(cases)} {'PASS' if passed else 'FAIL'} {name}/{category} "
               f"{sum(row['seconds'] for row in rows):.1f}s", flush=True)
         for row in rows:
             if not row["passed"]:
@@ -344,9 +444,10 @@ def main():
     times = sorted(row["seconds"] for row in turns)
     by_category = {}
     for result in results:
-        tally = by_category.setdefault(result["category"], {"cases": 0, "passed": 0})
+        tally = by_category.setdefault(f"{result['set']}/{result['category']}", {"cases": 0, "passed": 0})
         tally["cases"] += 1
         tally["passed"] += result["passed"]
+    by_set = {name: summarize([r for r in results if r["set"] == name]) for name in chosen}
     report = {"date": datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=8))).isoformat(),
               "model": health.get("model"), "contract_version": health["contract_version"],
               "registry_version": health.get("registry_version"), "catalog_version": health.get("catalog_version"),
@@ -356,12 +457,17 @@ def main():
               "unexpected_navigations": sum("unexpected navigation" in row["reasons"] for row in turns),
               "wrong_destinations": sum("wrong destination" in row["reasons"] for row in turns),
               "p50_seconds": statistics.median(times), "p95_seconds": times[math.ceil(len(times) * .95) - 1],
-              "by_category": by_category,
-              "scope": "Development regression set over HTTP; not a held-out accuracy estimate or an Android UI test.",
+              "by_set": by_set, "by_category": by_category,
+              "scope": "HTTP evaluation of the assistant decision; dev results are optimistic (tuned on), "
+                       "holdout results are the honest estimate. Not an Android UI test.",
               "results": results}
     pathlib.Path(args.output).write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(json.dumps({k: v for k, v in report.items() if k != "results"}, ensure_ascii=True))
-    return 0 if report["passed"] == report["cases"] else 1
+    for name, summary in by_set.items():
+        print(f"[{name}] {json.dumps(summary, ensure_ascii=False)}")
+    # The exit code gates on the dev set only; held-out misses are measured, not "fixed".
+    dev = by_set.get("dev")
+    return 0 if dev is None or dev["cases_passed"] == dev["cases"] else 1
 
 
 if __name__ == "__main__":

@@ -43,7 +43,7 @@ class SpeechConfidenceTests(unittest.TestCase):
         self.assertEqual(judge("我要借書", -0.07, 0.02), "clear")
 
     def test_options_confirm_instead_of_silently_replacing(self):
-        app = Assistant(FakeCatalog(), lambda *_: response("request_clarification"), expanded=True)
+        app = Assistant(FakeCatalog(), lambda *_: response("request_clarification"))
         recognizes = app.workflow.recognizes
         self.assertEqual(speech_options("我要借書", ["我要借書。"], "clear", recognizes), [])
         self.assertEqual(speech_options("我要解釋", ["我要解釋。", "我要借書", "我要借書!"], "clear", recognizes),
@@ -89,7 +89,7 @@ class TranscriptionTests(unittest.TestCase):
                 self.wfile.write(data)
 
         self.asr, self.asr_thread = serve(FakeAsr)
-        app = Assistant(FakeCatalog(), lambda *_: response("request_clarification"), expanded=True)
+        app = Assistant(FakeCatalog(), lambda *_: response("request_clarification"))
         self.app, self.app_thread = serve(make_handler(app, "test-token"))
         self.url = f"http://127.0.0.1:{self.app.server_port}/v1/assistant/transcriptions"
         self.asr_url = f"http://127.0.0.1:{self.asr.server_port}/v1/transcribe"

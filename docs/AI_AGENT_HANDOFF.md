@@ -55,7 +55,7 @@ Vue 網頁不在此 repo；需要受控表單 adapter 時需另外處理 TownPas
   只有 navigate 附目的地；目的地為 reviewed capability ID 或圖書 home/search/detail，App 再解析固定路由。
 - 41 enabled／29 disabled 的來源是同一份 `assets/assistant/capabilities.json`。變更需同時更新 App 資源、後端及版本契約，不可以只在 server 硬加 URL。
 - 候選 choice ID 是**當輪選項號碼**，不能當永久 capability/book ID。五分鐘 TTL、session、resolution、防重播都要保留。
-- Python `Assistant(expanded=True)` 才使用 Workflow；CLI server 是 true，舊圖書單元測試可故意使用 false。新增整合測試不能只測 legacy mode。
+- 決策只有一條路：`Assistant.turn` 驗證請求後一律交給 `Workflow.handle`；所有模型呼叫都經 `decision.decide`（組提示、一次修正重試、白名單驗證、用量紀錄）。圖書與功能只差在 policy 文字與工具清單，新服務不要另寫一套。
 - 圖書資料取自遠端 mock JSON；固定 SHA-256 為
   `570531a9244c3dba1e1f09907468ca55875ccc4b1af6fe1e5115cfdb2252f4ac`。
   資料改變要人工核對 ID／頁面後更新兩端，不可刪驗證或忽略錯誤。詳情白名單目前 `lib-book-1` 至 `lib-book-6`。
@@ -66,8 +66,10 @@ Vue 網頁不在此 repo；需要受控表單 adapter 時需另外處理 TownPas
 - `AssistantActionExecutor` 先驗目標，確認有效後才 `Get.until(TPRoute.main)`，再開新服務。不要改回直接連續 push。原生子頁要驗整條父頁鏈。
 - GetX + asset 的 widget tests：capability 開啟涉及 rootBundle，使用 `tester.runAsync` 包含開啟動作，避免快取 Future 留在不同 fake-async zone；測試間 reset GetX。
 - `/health` 不會測模型或所有遠端頁；不可以拿 health 200 當作完整串線成功。
-- `evaluate.py` 已是 contract 3 的 live-model 回歸集（需先啟動後端與 Ollama）；輸出 evaluation.json 已忽略。
-  目前 99 個案例全數通過；之後出現失敗先查後端行為，不要為了全綠把預期或 validator 放寬。
+- `evaluate.py` 有兩組案例：dev（`evaluate.CASES`，99 個，開發時調過）與 held-out（`eval_holdout.py`，102 個，不得拿來調整）。
+  不可為了讓 held-out 通過而改關鍵字或提示；若要依某個 held-out 失敗修正，先把它移到 dev 並補一句新的說法。
+  每輪分成 correct／safe_miss／less_specific／wrong_service／unexpected_navigation，並分開報檢索召回與「有召回時的決策正確率」。
+  2026-11-06 合併決策流程後：dev 99/99；held-out 79/102，召回 57/68、有召回時決策 55/57，wrong_service 0。瓶頸是檢索（口語說法、未列出的連接詞），不是模型。
 - 語音：`asr_server.py` 是獨立程序（需 faster-whisper），主後端只做 WAV 驗證與轉送；權重與轉換檔在 repo 外，不提交。
   App 新增 `record` 套件，錄音只在記憶體。模型限制同樣適用：不得換成中國開發的辨識模型。
 - 單一精確命中的停用能力由 `Workflow.handle` 直接回原因、不呼叫模型（3b 模型遇到不可用候選傾向回補問）。
@@ -76,11 +78,12 @@ Vue 網頁不在此 repo；需要受控表單 adapter 時需另外處理 TownPas
 
 1. 查看 Git 狀態、目前版本，回報理解的進度與本次要處理的範圍；不要自行重做已完成的泡泡或改框架。
 2. 最新導航修正已由使用者實機驗收，live-model 評估集已更新且全數通過；V0–V3（頁面狀態、全螢幕介面、按住說話）已完成；V4 其他語言／台語尚未開始。
-3. 語音保留待辦（使用者要求先記錄、未同意前不做）：辨識提示加入目錄關鍵字、USB 實機重測、經同意的除錯錄音。
+3. 下一步建議（使用者保留，尚未開始）：依 held-out 結果改善檢索——口語說法與「順便／跟」多意圖；用新寫的 dev 案例調整並重跑兩組評估比較，不可直接用 held-out 句子調。
+4. 語音保留待辦（使用者要求先記錄、未同意前不做）：辨識提示加入目錄關鍵字、USB 實機重測、經同意的除錯錄音。
    細節與實測見 [介面與語音規劃](AI_VOICE_UI_PLAN.md) V3 節。V4（其他語言、台語、左下語言選擇）尚未開始。
-4. 依計畫補 service/provider 與內部 operation schema；優先選可在原頁確認、具備資料來源的唯讀操作。
-5. 再做欄位抽取／模糊 enum 確認及受控預填。先明確欄位名稱、型別、合法值、來源與寫入邊界，再實作，不用任意 JS 尋找／點擊欄位。
-6. 各批提供單元／widget／wire 測試及人工測試表，更新最新進度。外部 API／認證沒到，留停用原因，不造完成狀態。
+5. 依計畫補 service/provider 與內部 operation schema；優先選可在原頁確認、具備資料來源的唯讀操作。
+6. 再做欄位抽取／模糊 enum 確認及受控預填。先明確欄位名稱、型別、合法值、來源與寫入邊界，再實作，不用任意 JS 尋找／點擊欄位。
+7. 各批提供單元／widget／wire 測試及人工測試表，更新最新進度。外部 API／認證沒到，留停用原因，不造完成狀態。
 
 ## 驗證與交付標準
 
@@ -94,7 +97,7 @@ fvm flutter build apk --debug
 git diff --check
 ```
 
-目前基線：Python 55／Flutter 35 通過；analyze 零 error、7 warning、16 info，皆在既有非助理檔案。
+目前基線：Python 58／Flutter 36 通過；analyze 零 error、7 warning、16 info，皆在既有非助理檔案。
 變更 asset／模型／pubspec 時執行 `fvm dart run build_runner build`，不手改或提交被忽略產生碼。
 串線可先啟後端，再 `fvm dart run tool/smoke_assistant.dart`；實際 UI 由使用者測。
 語音串線需另啟 `scripts/start_asr.ps1`；Python 單元測試用假的辨識服務，不需模型。測試用的暫時後端請用其他端口（如 8766／8771），
