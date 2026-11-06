@@ -64,7 +64,9 @@ HOLDOUT = [
     # Series, authors, misspellings: confirm or the right detail page.
     one("book_confirm", "神奇柑仔店有哪幾本", CONFIRM),
     one("book_confirm", "廣嶋玲子寫的書", CONFIRM),
-    one("book_confirm", "借底層羅輯這本書", CONFIRM_ONE),
+    # Expectation changed 2026-11-06 by a user POLICY decision (one-character book typos open
+    # the only match directly), not to fit results; it previously expected a confirmation.
+    one("book_confirm", "借底層羅輯這本書", book("lib-book-3")),
     one("book_confirm", "我要借說給兒童的台灣歷史", book("lib-book-2", confirm=True)),
     one("book_confirm", "錢天堂", book("lib-book-5", confirm=True)),
     # Books not in the demo catalogue: library overview, never an empty search.

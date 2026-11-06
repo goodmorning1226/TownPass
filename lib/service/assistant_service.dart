@@ -6,15 +6,18 @@ import 'dart:typed_data';
 import 'package:town_pass/bean/assistant_result.dart';
 
 /// Recognised speech. When [confirm] is true the user must pick one of
-/// [options] (the heard text first) before anything is sent.
+/// [options] (the heard text first) before anything is sent. When
+/// [correctedFrom] is set, [text] replaced that closely heard reading.
 class AssistantTranscript {
   final String text;
   final bool confirm;
   final List<String> options;
+  final String? correctedFrom;
   const AssistantTranscript(
     this.text, {
     this.confirm = false,
     this.options = const [],
+    this.correctedFrom,
   });
 }
 
@@ -156,10 +159,18 @@ class AssistantService {
         throw const FormatException('語音辨識回覆不正確，請再說一次或改用鍵盤。');
       }
       final confirm = json['confirm'] == true && options.isNotEmpty;
+      final corrected = json['corrected_from'];
       return AssistantTranscript(
         text.trim(),
         confirm: confirm,
         options: confirm ? options.cast<String>() : const [],
+        correctedFrom:
+            !confirm &&
+                corrected is String &&
+                corrected.trim().isNotEmpty &&
+                corrected.length <= 500
+            ? corrected.trim()
+            : null,
       );
     } on TimeoutException {
       throw const FormatException('語音辨識時間較長，請再說一次或改用鍵盤。');

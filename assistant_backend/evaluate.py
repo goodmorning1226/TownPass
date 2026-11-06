@@ -138,9 +138,19 @@ CASES = [
     ("book_confirm", [say("找《神奇柑仔店》", CONFIRM), pick("大圖鑑", detail("lib-book-5"))]),
     one("book_confirm", "我想看神奇柑仔店的書", CONFIRM),
     one("book_confirm", "幫我搜尋廣嶋玲子的書", CONFIRM),
-    ("book_confirm", [say("借底層羅輯", CONFIRM_ONE), pick("底層邏輯", detail("lib-book-3"))]),
-    ("book_confirm", [say("借底層羅輯", CONFIRM_ONE), say("好", detail("lib-book-3"), bound=True)]),
+    # One character substituted and only one plausible book: opened directly, saying so
+    # (user decision 2026-11-06). Other fuzzy titles still ask first.
+    one("book_confirm", "借底層羅輯", detail("lib-book-3")),
+    ("book_confirm", [say("借底邏輯", CONFIRM_ONE), pick("底層邏輯", detail("lib-book-3"))]),
+    ("book_confirm", [say("借底邏輯", CONFIRM_ONE), say("好", detail("lib-book-3"), bound=True)]),
     one("book_confirm", "我要借的不是底層邏輯，是神奇柑仔店", CONFIRM),
+    # Sound-alike titles (phonetic.py): open the only plausible book, saying so; a series still asks.
+    one("book_sound", "我要借低曾羅積", detail("lib-book-3")),
+    one("book_sound", "找錢天糖這本書", detail("lib-book-5")),
+    one("book_sound", "我要看說給兒童的台灣力史", detail("lib-book-2")),
+    one("book_sound", "借我的第一本滑快書", detail("lib-book-1")),
+    one("book_sound", "我要借神奇甘仔店", CONFIRM),
+    one("book_sound", "借低溫冷凍", want(("reply", "unsupported", "navigate"), HOME["dest"] + [None])),
     # An explicit request for the result list may show the original search page.
     one("book_search", "我要找劉潤的書", search("劉潤", "author")),
     one("book_search", "列出神奇柑仔店的搜尋結果", search("神奇柑仔店")),
@@ -183,7 +193,7 @@ CASES = [
     one("cancel", "取消", REPLY), one("cancel", "算了", REPLY),
     ("cancel", [say("有哪些功能", LISTING), say("取消", REPLY, bound=True), replay()]),
     ("cancel", [say("有哪些功能", LISTING), say("你好", REPLY), replay()]),
-    ("cancel", [say("借底層羅輯", CONFIRM_ONE), say("取消", REPLY, bound=True), replay()]),
+    ("cancel", [say("借底邏輯", CONFIRM_ONE), say("取消", REPLY, bound=True), replay()]),
     ("cancel", [say("案件進度", CONFIRM), replay(session="other"), replay(choice="999"),
                 pick("申辦案件進度", cap("districtOffice.progress")), replay()]),
     # Injected instructions are data: no URL, script or write tool, at most a reviewed page.
@@ -198,7 +208,7 @@ CASES = [
     ("context", [say("我想辦事情", REPLY, context=LIBRARY_DETAIL)]),
     ("context", [say("排行榜", cap("library.ranking"), context=LIBRARY_DETAIL)]),
     ("context", [say("我要繳水費", cap("fees.water"), context=LIBRARY_DETAIL)]),
-    ("context", [say("借底層羅輯", CONFIRM_ONE, context=LIBRARY_DETAIL)]),
+    ("context", [say("借底邏輯", CONFIRM_ONE, context=LIBRARY_DETAIL)]),
     ("context", [say("我要借書", HOME, context={**LIBRARY_DETAIL, "last_action": {
         "destination": {"kind": "detail", "book_id": "lib-book-3"}, "result": "failed", "age_seconds": 20}})]),
     ("context", [say("幫我掛號", UNSUPPORTED, context=page(type="tab", index=1))]),

@@ -10,7 +10,7 @@ from unittest.mock import patch
 
 import server
 from asr_server import STYLE_PROMPT, judge, read_wav, vocabulary_prompt
-from server import Assistant, make_handler, speech_options
+from server import Assistant, make_handler, speech_options, speech_resolution
 from test_server import FakeCatalog, response
 
 
@@ -52,6 +52,32 @@ class SpeechConfidenceTests(unittest.TestCase):
                          ["我要借金", "我要借書"])
         self.assertEqual(speech_options("我要借金", ["我要結晶"], "unsure", recognizes), ["我要借金"])
         self.assertEqual(speech_options("今天天氣很好", ["今天天氣"], "clear", recognizes), [])
+
+
+class SpeechCorrectionTests(unittest.TestCase):
+    def setUp(self):
+        app = Assistant(FakeCatalog(), lambda *_: response("request_clarification"))
+        self.recognizes = app.workflow.recognizes
+
+    def test_single_close_alternative_replaces_unmatched_heard_text(self):
+        decided = speech_resolution("我要結束", ["我要結束。", "我要借書"], "clear", self.recognizes,
+                                    -0.2, [-0.25, -0.5])
+        self.assertEqual(decided, {"text": "我要借書", "confirm": False, "options": [],
+                                   "corrected_from": "我要結束"})
+
+    def test_otherwise_the_user_still_chooses(self):
+        cases = (
+            ("我要結束", ["我要借書"], -0.2, [-0.9]),                       # alternative scored too low
+            ("我要結束", ["我要借書", "我要繳水費"], -0.2, [-0.3, -0.3]),    # two plausible readings
+            ("我要結束", ["我要借書"], -0.2, None),                         # no scores reported
+        )
+        for text, alternatives, top, scores in cases:
+            decided = speech_resolution(text, alternatives, "clear", self.recognizes, top, scores)
+            self.assertTrue(decided["confirm"], (alternatives, scores))
+            self.assertIsNone(decided["corrected_from"])
+        # A transcript the assistant understands is never replaced.
+        decided = speech_resolution("我要繳水費", ["我要借書"], "clear", self.recognizes, -0.1, [-0.1])
+        self.assertEqual((decided["text"], decided["confirm"], decided["corrected_from"]), ("我要繳水費", False, None))
 
 
 class ReadWavTests(unittest.TestCase):
@@ -133,6 +159,13 @@ class TranscriptionTests(unittest.TestCase):
             if expected != 401:
                 self.assertIn("error", reply)
         self.assertEqual(self.asr_bodies, [])
+
+    def test_close_alternative_is_sent_with_the_correction_noted(self):
+        self.asr_reply = (200, {"text": "我要結束", "alternatives": ["我要借書"], "alternative_logprobs": [-0.4],
+                                "avg_logprob": -0.2, "status": "clear"})
+        status, body = self.post(wav_bytes(1.0))
+        self.assertEqual(status, 200)
+        self.assertEqual((body["text"], body["confirm"], body["corrected_from"]), ("我要借書", False, "我要結束"))
 
     def test_unsure_speech_returns_options_and_unclear_is_rejected(self):
         self.asr_reply = (200, {"text": "我要借金", "alternatives": ["我要結晶", "我要借書。"], "status": "unsure"})

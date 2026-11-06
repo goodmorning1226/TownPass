@@ -60,6 +60,19 @@ class Registry:
         return sorted(matches, key=lambda item: -item["score"])[:3]
 
 
+def primary_title(book):
+    return re.split(r"[:：.]", book["book_name"])[0]
+
+
+def single_substitution(query, book):
+    """True when the query is the book's main title with exactly one character
+    replaced (e.g. 底程邏輯 for 底層邏輯). Never for numbers such as an ISBN."""
+    q, t = normalized(query), normalized(primary_title(book))
+    if len(q) < 4 or len(q) != len(t) or sum(c.isdigit() for c in q) > len(q) // 2:
+        return False
+    return sum(a != b for a, b in zip(q, t)) == 1
+
+
 def book_fuzzy(query, books):
     q = normalized(query)
     if len(q) < 3:

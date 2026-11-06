@@ -13,11 +13,18 @@ import uuid
 
 from decision import decide
 from page_context import current_root, model_view
-from registry import Registry, book_fuzzy
+from phonetic import rank_books
+from registry import Registry, book_fuzzy, primary_title, single_substitution
 
 # A cheap superset of the library signals retrieve() looks for; the book
 # catalogue is consulted only when one of these appears.
 LIBRARY_CUE = re.compile(r"借|找|搜尋|看|閱|書|館|ISBN", re.I)
+
+# Sound-alike book titles (phonetic.py). On the demo catalogue real
+# sound-alikes score 1.0 and unrelated phrases at most ~0.6.
+SOUND_AUTO = 0.85     # open directly when also clearly ahead of the next book
+SOUND_MARGIN = 0.2
+SOUND_CONFIRM = 0.7   # otherwise offer as a candidate to confirm
 
 
 class Workflow:
@@ -228,9 +235,34 @@ class Workflow:
                 if not context["other"] and context["library_candidate"]:
                     candidates = context["books"]
                     fuzzy = False
+                    sound = []
                     if not candidates and context["query"]:
                         candidates = book_fuzzy(context["query"], books)
                         fuzzy = bool(candidates)
+                        sound = rank_books(context["query"], books)
+                    corrected = None
+                    # Only when no OTHER book also sounds plausible (e.g. a series).
+                    def only_plausible(book):
+                        return all(score < SOUND_CONFIRM for score, other in sound if other["id"] != book["id"])
+                    if (fuzzy and len(candidates) == 1 and single_substitution(context["query"], candidates[0])
+                            and only_plausible(candidates[0])):
+                        corrected = ("book_autocorrect", candidates[0])
+                    elif sound and sound[0][0] >= SOUND_AUTO and (
+                            len(sound) < 2 or sound[0][0] - sound[1][0] >= SOUND_MARGIN) and only_plausible(sound[0][1]):
+                        corrected = ("book_sound_autocorrect", sound[0][1])
+                    if corrected:
+                        # One plausible book that differs by one character or only in
+                        # characters that sound alike: open it and say what was assumed,
+                        # instead of asking (user decisions 2026-11-06).
+                        route, book = corrected
+                        self._trace(route, ["library", book["id"]])
+                        return self.reply(payload, f"已把「{context['query']}」當作《{primary_title(book).strip()}》開啟；"
+                                          "如果不是這本，請返回再說一次。此為示範，尚未預約。", kind="navigate",
+                                          action="open_library_book", destination={"kind": "detail", "book_id": book["id"]})
+                    for score, book in sound:
+                        if score >= SOUND_CONFIRM and all(book["id"] != b["id"] for b in candidates):
+                            candidates = [*candidates, book][:3]
+                            fuzzy = True
                     if (fuzzy or len(candidates) > 1) and not re.search(r"列出|搜尋結果", text):
                         self._trace("book_confirm", ["library", *(b["id"] for b in candidates)])
                         name, _ = self._decide(text, [{"id": b["id"], "title": b["book_name"], "features": [], "enabled": True} for b in candidates],

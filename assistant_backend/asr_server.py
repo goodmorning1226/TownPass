@@ -141,17 +141,18 @@ class Recognizer:
                 encoded, [self.prompt], beam_size=HYPOTHESES, num_hypotheses=HYPOTHESES,
                 return_scores=True, return_no_speech_prob=True, suppress_blank=True,
                 suppress_tokens=self.suppress, max_length=self.model.max_length, length_penalty=1)[0]
-        texts, best_logprob = [], None
+        texts, logprobs = [], []
         for ids, score in zip(result.sequences_ids, result.scores):
             text = self.tokenizer.decode(ids).strip()
-            if best_logprob is None:  # same average log-prob faster-whisper reports
-                best_logprob = score * len(ids) / (len(ids) + 1)
             if text and text not in texts:
                 texts.append(text)
+                # Same average log-prob faster-whisper reports for a segment.
+                logprobs.append(round(score * len(ids) / (len(ids) + 1), 3))
         top = texts[0] if texts else ""
-        status = judge(top, best_logprob or -9.0, result.no_speech_prob)
-        return {"text": top, "alternatives": texts[1:], "status": status,
-                "avg_logprob": round(best_logprob or -9.0, 3), "no_speech_prob": round(result.no_speech_prob, 3)}
+        best_logprob = logprobs[0] if logprobs else -9.0
+        status = judge(top, best_logprob, result.no_speech_prob)
+        return {"text": top, "alternatives": texts[1:], "alternative_logprobs": logprobs[1:], "status": status,
+                "avg_logprob": best_logprob, "no_speech_prob": round(result.no_speech_prob, 3)}
 
 
 def make_handler(recognizer, model_name):

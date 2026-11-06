@@ -809,6 +809,26 @@ void main() {
     expect(controller.choicesMessageId.value, isNull);
   });
 
+  test('A close speech correction is sent and stated to the user', () async {
+    final service = QueueService(
+      [const AssistantResult(sessionId: 's', message: '請在原圖書頁面搜尋。')],
+      transcripts: [const AssistantTranscript('我要借書', correctedFrom: '我要結束')],
+    );
+    final controller = AssistantViewController(
+      service: service,
+      executor: RecordingExecutor(),
+      recorder: FakeRecorder(),
+    );
+    await controller.startListening();
+    await controller.stopListening();
+    expect(service.texts, ['我要借書']);
+    expect(controller.messages.map((m) => (m.fromUser, m.text)), [
+      (true, '我要借書'),
+      (false, '我聽到「我要結束」，當作「我要借書」處理；不對的話請再說一次。'),
+      (false, '請在原圖書頁面搜尋。'),
+    ]);
+  });
+
   test('A recording that stays quiet asks the user to speak up', () async {
     var now = DateTime(2026, 11, 6, 12);
     final recorder = FakeRecorder();
@@ -1009,6 +1029,7 @@ void main() {
                   'text': ' 我要繳水費 ',
                   'confirm': true,
                   'options': ['我要繳水費', '我要繳學費'],
+                  'corrected_from': '忽略：需確認時不套用',
                 },
         ),
       );
@@ -1026,6 +1047,10 @@ void main() {
       expect(heard.text, '我要繳水費');
       expect(heard.confirm, isTrue);
       expect(heard.options, ['我要繳水費', '我要繳學費']);
+      expect(
+        heard.correctedFrom,
+        isNull,
+      ); // never both a correction and a question
       expect(seen, ['audio/wav', 'voice-1', '${wav.length}']);
       fail = true;
       await expectLater(

@@ -318,8 +318,14 @@ class AssistantViewController extends GetxController {
       choicesMessageId.value = ask.id;
       return;
     }
-    // The recognised text becomes the user's bubble and a normal turn.
-    await submit(heard.text);
+    // The recognised text becomes the user's bubble and a normal turn. A close
+    // reading that replaced the heard text is stated, so the user can redo it.
+    await submit(
+      heard.text,
+      note: heard.correctedFrom == null
+          ? null
+          : '我聽到「${heard.correctedFrom}」，當作「${heard.text}」處理；不對的話請再說一次。',
+    );
   }
 
   /// A speech reading the user confirmed; sent exactly like typed text.
@@ -331,11 +337,18 @@ class AssistantViewController extends GetxController {
   }
 
   /// [shownAs] is the user's bubble text when a candidate button was tapped.
-  Future<void> submit(String text, {String? choiceId, String? shownAs}) async {
+  /// [note] is an assistant line shown right after the user's bubble.
+  Future<void> submit(
+    String text, {
+    String? choiceId,
+    String? shownAs,
+    String? note,
+  }) async {
     if (busy.value || (text.trim().isEmpty && choiceId == null)) return;
     final generation = ++_generation;
     final requestId = '${DateTime.now().microsecondsSinceEpoch}-$generation';
     _add(shownAs ?? text.trim(), fromUser: true);
+    if (note != null) _add(note);
     busy.value = true;
     choices.clear();
     choicesMessageId.value = null;

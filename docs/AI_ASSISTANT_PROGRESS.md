@@ -18,8 +18,9 @@
 10. 最新修正：每次**新的助理導航**先清除 `TPRoute.main` 之上的舊頁，再建新服務正常父頁。案件進度 → 助理開圖書 → 按叉叉／圖書首頁按返回，回 App 主畫面，不回舊案件頁。一般回覆、候選確認、取消、無效目標不清頁。
 11. 單一精確命中且停用的功能（如「幫我掛號」）由程式直接回目錄內的未串接原因，不呼叫模型；多候選仍走確認。
 12. 2026-11-06 後端小修（V0）：提案 schema 依工具綁參數、一般服務決策也有一次修正、所有回覆帶 metrics、`police.online` 標回示範、模型保留 30 分鐘。
-13. 2026-11-06 頁面狀態（V1，contract 3）：App 每輪附上目前頁面與上次助理導航結果（opened／failed／cancelled），後端自行對應能力；只當提示，歧義候選把目前服務排前面，不因此導航。
-14. Debug 開放助理、release 預設關閉；debug cleartext 僅限 localhost／127.0.0.1／10.0.2.2。USB／模擬器用 adb reverse，不必開放區網端口。
+13. 2026-11-06 音近修正：語音只有一個合理的候選句、或書名只錯一字／讀音相近且只有一本可能時，直接開啟並說明修正了什麼；其餘仍先確認。讀音取自 Unicode Unihan（抽出檔放 repo，授權 Unicode License v3）。
+14. 2026-11-06 頁面狀態（V1，contract 3）：App 每輪附上目前頁面與上次助理導航結果（opened／failed／cancelled），後端自行對應能力；只當提示，歧義候選把目前服務排前面，不因此導航。
+15. Debug 開放助理、release 預設關閉；debug cleartext 僅限 localhost／127.0.0.1／10.0.2.2。USB／模擬器用 adb reverse，不必開放區網端口。
 
 ## 尚未完成與下一步
 
@@ -36,9 +37,9 @@
 
 | 檢查 | 最近結果與限制 |
 | --- | --- |
-| Python unittest | 58 個通過；fake model 驗證流程、候選隔離與規則，不當作模型準確率 |
-| contract 3 live-model 評估 | dev 99/99（開發時調過，偏樂觀）；**held-out 79/102**（不調整，誠實估計）：召回 57/68、有召回時決策正確 55/57、開錯服務 0；未通過多為口語說法檢索不到（安全地只回話）。合併決策流程前後 held-out 通過數相同 |
-| Flutter tests | 36 個通過；包含案件 → 圖書關閉／系統返回、Web → 原生父頁與取消遲到回覆 |
+| Python unittest | 69 個通過；fake model 驗證流程、候選隔離與規則，不當作模型準確率 |
+| contract 3 live-model 評估 | dev 106/106（開發時調過，偏樂觀）；**held-out 79/102**（不調整，誠實估計）：召回 57/68、有召回時決策正確 55/57、開錯服務 0；未通過多為口語說法檢索不到（安全地只回話）。合併決策流程前後 held-out 通過數相同 |
+| Flutter tests | 37 個通過；包含案件 → 圖書關閉／系統返回、Web → 原生父頁與取消遲到回覆 |
 | 實際 Ministral 開發案例 | 第一批 6 個一般／候選／排行案例符合預期；不是 held-out 準確率 |
 | App Dart client → HTTP → 模型 | 中文 UTF-8 bytes/contentLength 傳輸與圖書導覽通過 |
 | contract 2 HTTP | 功能列表 + session/resolution 綁定選擇通過；health 顯示 41 個允許能力 |
@@ -64,6 +65,8 @@ TownPass/
 │  ├─ test_transcription.py                    # 語音端點驗證、轉送與錯誤回覆
 │  ├─ page_context.py                          # App 頁面／上次動作狀態驗證與能力對應（contract 3）
 │  ├─ test_page_context.py                     # 頁面狀態解析、排序與 HTTP 回歸
+│  ├─ phonetic.py                              # 書名音近比對（Unihan 讀音、台灣口音混淆）
+│  ├─ data/unihan_mandarin.tsv                 # Unicode 18.0 Unihan 台灣讀音抽出檔（Unicode License v3）
 │  ├─ decision.py                              # 唯一的模型決策路徑：policy、提示、重試、白名單驗證、用量
 │  ├─ evaluate.py                              # live-model 評估：dev 集、結果分類、召回與決策分開統計
 │  ├─ eval_holdout.py                          # held-out 集（102 個，不得用來調整）

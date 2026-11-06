@@ -54,12 +54,21 @@ class WorkflowTests(unittest.TestCase):
         with self.assertRaises(AssistantError):
             self.turn(resolution_id=result['resolution_id'], choice_id='1')
 
-    def test_fuzzy_book_requires_confirmation(self):
-        result = self.turn('借底層羅輯')
+    def test_one_character_book_typo_opens_the_only_match_and_says_so(self):
+        for text in ('借底層羅輯', '我要借底程邏輯'):
+            result = self.turn(text)
+            self.assertEqual(result['destination'], {'kind': 'detail', 'book_id': 'lib-book-3'}, text)
+            self.assertIn('當作《底層邏輯》', result['message'])
+            self.assertIn('尚未預約', result['message'])
+        self.assertEqual(self.calls, [])  # decided by the rule, not the model
+
+    def test_other_fuzzy_books_still_require_confirmation(self):
+        result = self.turn('借底邏輯')  # a character missing, not substituted
         self.assertEqual(result['kind'], 'confirm_candidates')
         self.assertIsNone(result['destination'])
         chosen = self.turn(resolution_id=result['resolution_id'], choice_id='1')
         self.assertEqual(chosen['destination'], {'kind': 'detail', 'book_id': 'lib-book-3'})
+        self.assertNotEqual(self.turn('借底曾羅輯')['metrics']['route'], 'book_autocorrect')  # two characters off
 
     def test_multiple_books_do_not_guess_volume(self):
         result = self.turn('借神奇柑仔店')

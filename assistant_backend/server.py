@@ -301,6 +301,33 @@ def speech_options(text, alternatives, status, recognizes, limit=3):
     return picked if status != "clear" or len(picked) > 1 else []
 
 
+# An alternative may replace the heard text only if the recogniser scored it
+# nearly as high (average log-prob per token) as its own best reading.
+CLOSE_ALTERNATIVE = 0.5
+
+
+def speech_resolution(text, alternatives, status, recognizes, top_logprob=None, alternative_logprobs=None):
+    """Decide how a transcript reaches the user: send, correct, or ask.
+
+    - send: a confident transcript the assistant understands.
+    - correct: the heard text matches nothing, exactly ONE alternative from the
+      same audio does, and the recogniser scored it close to the top reading.
+      It is sent with corrected_from set so the App says what was changed.
+    - ask: anything else that is unsure or unmatched (the user picks).
+    """
+    options = speech_options(text, alternatives, status, recognizes)
+    if len(options) == 2 and not recognizes(text) and top_logprob is not None:
+        alternative = options[1]
+        scores = alternative_logprobs if isinstance(alternative_logprobs, list) else []
+        for raw, score in zip(alternatives if isinstance(alternatives, list) else [], scores):
+            if (isinstance(raw, str) and isinstance(score, (int, float))
+                    and normalize(clean_transcript(raw)) == normalize(alternative)):
+                if score >= top_logprob - CLOSE_ALTERNATIVE:
+                    return {"text": alternative, "confirm": False, "options": [], "corrected_from": text}
+                break
+    return {"text": text, "confirm": bool(options), "options": options, "corrected_from": None}
+
+
 def make_handler(assistant, token=""):
     class Handler(BaseHTTPRequestHandler):
         def log_message(self, *args):
@@ -426,10 +453,10 @@ def make_handler(assistant, token=""):
             if len(text) > 500:
                 return self.reply(422, {"error": "內容過長，請分段說。"})
             text = clean_transcript(text)
-            options = speech_options(text, result.get("alternatives", []), status,
-                                     assistant.workflow.recognizes)
-            self.reply(200, {"contract_version": CONTRACT, "request_id": request_id, "text": text,
-                             "confirm": bool(options), "options": options,
+            decided = speech_resolution(text, result.get("alternatives", []), status,
+                                        assistant.workflow.recognizes, result.get("avg_logprob"),
+                                        result.get("alternative_logprobs"))
+            self.reply(200, {"contract_version": CONTRACT, "request_id": request_id, **decided,
                              "metrics": {"elapsed_ms": result.get("elapsed_ms"),
                                          "audio_seconds": result.get("audio_seconds"),
                                          "status": status, "avg_logprob": result.get("avg_logprob"),
