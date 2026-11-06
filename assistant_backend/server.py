@@ -123,9 +123,13 @@ def retrieve(text, books, previous=()):
                 library = True
                 break
     if not query:
-        author_match = re.search(r"(?:作者(?:是)?|找|搜尋|查)([^，。！？]{1,24}?)(?:的書|的作品)", clean)
+        # "<author>寫的(書)" names an author without a search verb; checked first so
+        # "找廣嶋玲子寫的書" does not capture "廣嶋玲子寫" as the author.
+        author_match = re.search(r"(?:作者(?:是)?|找|搜尋|查|借|看)?([^，。！？\s]{2,24}?)寫的(?:書|作品)?", clean) \
+            or re.search(r"(?:作者(?:是)?|找|搜尋|查)([^，。！？]{1,24}?)(?:的書|的作品)", clean)
         if author_match:
-            query, search_type = author_match[1].strip(), "author"
+            query = re.sub(r"^(?:我要|我想|幫我|請|找|看|借)+", "", author_match[1].strip())
+            search_type = "author"
             library = True
     # Extract an action's object before requiring a service classification.
     # It is only evidence: an unknown object is not automatically a book.

@@ -18,7 +18,7 @@ from registry import Registry, book_fuzzy, primary_title, single_substitution
 
 # A cheap superset of the library signals retrieve() looks for; the book
 # catalogue is consulted only when one of these appears.
-LIBRARY_CUE = re.compile(r"借|找|搜尋|看|閱|書|館|ISBN", re.I)
+LIBRARY_CUE = re.compile(r"借|找|搜尋|看|閱|書|館|寫的|ISBN", re.I)
 
 # Sound-alike book titles (phonetic.py). On the demo catalogue real
 # sound-alikes score 1.0 and unrelated phrases at most ~0.6.
@@ -111,7 +111,7 @@ class Workflow:
         if (re.fullmatch(r"(?:請)?(?:取消|返回|算了|不用了|不要了)[。！!]*", text)
                 or re.fullmatch(r"(?:嗨|你好|您好|哈囉|謝謝|感謝)[！!。\s]*", text)):
             return True
-        if re.search(r"有哪些功能|有什麼功能|功能列表|能做什麼|可以做什麼", text):
+        if re.search(r"有哪些功能|有什麼功能|功能(?:列表|有哪些)|(?:能|可以|會)做(?:什麼|哪些)|有(?:什麼|哪些)服務", text):
             return True
         from server import positive_text
         if self.registry.search(positive_text(text)):
@@ -215,7 +215,9 @@ class Workflow:
         if not re.search(r"[\w\u4e00-\u9fff]", text):
             self._trace("empty")
             return self.reply(payload, "請輸入想使用的服務，或問「有哪些功能」。")
-        listing = re.search(r"有哪些功能|有什麼功能|功能列表|查看全部功能|能做什麼|可以做什麼|能幫什麼", text)
+        listing = re.search(r"有哪些功能|有什麼功能|功能(?:列表|有哪些)|(?:所有|全部)功能|查看全部功能|"
+                            r"(?:能|可以|會)做(?:什麼|哪些)|(?:能|可以|會)幫(?:我)?(?:什麼|哪些)|"
+                            r"有(?:什麼|哪些)服務", text)
         if listing:
             root = "library" if any(word in text for word in ("圖書", "借書")) else None
             self._trace("listing")

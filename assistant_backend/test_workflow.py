@@ -123,6 +123,31 @@ class WorkflowTests(unittest.TestCase):
             self.assertEqual(result['kind'], 'confirm_candidates', text)
             self.assertIsNone(result['destination'])
 
+    def test_several_requests_need_no_connective_but_parents_are_one_request(self):
+        registry = Registry()
+        def ids(text):
+            return sorted(m['entry']['id'] for m in registry.search(text))
+        # Two different services, each named by its own words.
+        self.assertEqual(ids('借書順便繳停車費'), ['fees.parking', 'library'])
+        self.assertEqual(ids('幫我開水費跟地方稅'), ['fees.tax', 'fees.water'])
+        # One request: overlapping words, a parent and its page, a word inside the other's name.
+        for text, expected in (('繳費紀錄', ['fees.history']), ('水費繳費', ['fees.water']),
+                               ('設定起始頁面', ['start_page']), ('圖書館排行榜', ['library.ranking']),
+                               ('我要繳聯醫的醫療費', ['fees.hospital']), ('查報案進度', ['police.progress'])):
+            self.assertEqual(ids(text), expected, text)
+        result = self.turn('借書順便繳停車費')
+        self.assertEqual(result['kind'], 'confirm_candidates')
+        self.assertIsNone(result['destination'])
+
+    def test_everyday_wording_and_spelling_variants_reach_the_feature(self):
+        registry = Registry()
+        for text, capability in (('我想看我的資料', 'profile'), ('我借了哪些書', 'library.records'),
+                                 ('熱門的書有哪些', 'library.ranking'), ('繳費記錄', 'fees.history'),
+                                 ('幫我付看病的錢', 'fees.hospital')):
+            self.assertIn(capability, [m['entry']['id'] for m in registry.search(text)], text)
+        for text in ('你會做什麼', '可以幫我什麼', '有哪些服務'):
+            self.assertEqual(self.turn(text)['kind'], 'capability_list', text)
+
     def test_one_correction_then_fail_closed(self):
         replies = []
         def model(messages, tools):

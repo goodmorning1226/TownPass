@@ -74,7 +74,8 @@ Vue 網頁不在此 repo；需要受控表單 adapter 時需另外處理 TownPas
 - `evaluate.py` 有兩組案例：dev（`evaluate.CASES`，99 個，開發時調過）與 held-out（`eval_holdout.py`，102 個，不得拿來調整）。
   不可為了讓 held-out 通過而改關鍵字或提示；若要依某個 held-out 失敗修正，先把它移到 dev 並補一句新的說法。
   每輪分成 correct／safe_miss／less_specific／wrong_service／unexpected_navigation，並分開報檢索召回與「有召回時的決策正確率」。
-  2026-11-06 合併決策流程後：dev 99/99；held-out 79/102，召回 57/68、有召回時決策 55/57，wrong_service 0。瓶頸是檢索（口語說法、未列出的連接詞），不是模型。
+  2026-11-06 檢索改善後：dev 157/157；held-out 88/102，wrong_service 與 unexpected_navigation 皆 0；未更動的 83 句持平 79/83，新寫 19 句通過 9。瓶頸仍是口語說法的檢索，不是模型。
+- 多意圖：`Registry.search` 以「不同服務＋不重疊的命中詞」判斷，不靠連接詞；`ancestors()` 由目錄的 id 根、tab_parent、native parents 推出上層頁，上層與其頁面、名稱內含的詞視為同一需求，且優先回較具體的頁。
 - 語音：`asr_server.py` 是獨立程序（需 faster-whisper），主後端只做 WAV 驗證與轉送；權重與轉換檔在 repo 外，不提交。
   App 新增 `record` 套件，錄音只在記憶體。模型限制同樣適用：不得換成中國開發的辨識模型。
 - 單一精確命中的停用能力由 `Workflow.handle` 直接回原因、不呼叫模型（3b 模型遇到不可用候選傾向回補問）。
@@ -83,7 +84,7 @@ Vue 網頁不在此 repo；需要受控表單 adapter 時需另外處理 TownPas
 
 1. 查看 Git 狀態、目前版本，回報理解的進度與本次要處理的範圍；不要自行重做已完成的泡泡或改框架。
 2. 最新導航修正已由使用者實機驗收，live-model 評估集已更新且全數通過；V0–V3（頁面狀態、全螢幕介面、按住說話）已完成；V4 其他語言／台語尚未開始。
-3. 下一步建議（使用者保留，尚未開始）：依 held-out 結果改善檢索——口語說法與「順便／跟」多意圖；用新寫的 dev 案例調整並重跑兩組評估比較，不可直接用 held-out 句子調。
+3. 檢索已於 2026-11-06 改善（多意圖不需連接詞、口語別名、拼寫變體）。下一輪若再改，照同樣做法：先寫新的 dev 案例，促成修改的 held-out 失敗移到 dev 並補新說法，再比較「未更動的 held-out」與「新 held-out」。
 4. 語音保留待辦（使用者要求先記錄、未同意前不做）：辨識提示加入目錄關鍵字、USB 實機重測、經同意的除錯錄音。
    細節與實測見 [介面與語音規劃](AI_VOICE_UI_PLAN.md) V3 節。V4（其他語言、台語、左下語言選擇）尚未開始。
 5. 依計畫補 service/provider 與內部 operation schema；優先選可在原頁確認、具備資料來源的唯讀操作。
@@ -102,7 +103,7 @@ fvm flutter build apk --debug
 git diff --check
 ```
 
-目前基線：Python 69／Flutter 37 通過；analyze 零 error、7 warning、16 info，皆在既有非助理檔案。
+目前基線：Python 71／Flutter 37 通過；analyze 零 error、7 warning、16 info，皆在既有非助理檔案。
 變更 asset／模型／pubspec 時執行 `fvm dart run build_runner build`，不手改或提交被忽略產生碼。
 串線可先啟後端，再 `fvm dart run tool/smoke_assistant.dart`；實際 UI 由使用者測。
 語音串線需另啟 `scripts/start_asr.ps1`；Python 單元測試用假的辨識服務，不需模型。測試用的暫時後端請用其他端口（如 8766／8771），

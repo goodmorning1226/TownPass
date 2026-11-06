@@ -6,8 +6,20 @@ import re
 import unicodedata
 
 
+# Spelling variants that mean the same thing in everyday Traditional Chinese.
+VARIANTS = (("臺", "台"), ("記錄", "紀錄"))
+
+
 def normalized(value):
-    return re.sub(r"[\W_]+", "", unicodedata.normalize("NFKC", value)).lower()
+    value = re.sub(r"[\W_]+", "", unicodedata.normalize("NFKC", value)).lower()
+    for variant, canonical in VARIANTS:
+        value = value.replace(variant, canonical)
+    return value
+
+
+def _span(term, text):
+    start = text.find(term)
+    return (start, start + len(term)) if start >= 0 else None
 
 
 class Registry:
@@ -20,6 +32,41 @@ class Registry:
         if len(self.by_id) != len(self.entries):
             raise ValueError("Duplicate capability IDs")
 
+    def ancestors(self, entry):
+        """Entries a user passes through to reach this one, from the catalogue:
+        the id root (library -> library.ranking), the bottom tab a page opens
+        under (帳務 -> 水費) and native parent pages (設定 -> 起始頁面)."""
+        found = set()
+        root = entry["id"].split(".")[0]
+        if root in self.by_id and root != entry["id"]:
+            found.add(root)
+        navigation = entry.get("navigation") or {}
+        for other in self.entries:
+            other_nav = other.get("navigation") or {}
+            if navigation.get("tab_parent") is not None and other_nav.get("type") == "tab" \
+                    and other_nav.get("index") == navigation["tab_parent"]:
+                found.add(other["id"])
+            if other_nav.get("type") == "native" and other_nav.get("route") in navigation.get("parents", []):
+                found.add(other["id"])
+        return found
+
+    def same_request(self, a, b, a_term):
+        """Whether match a (matched by a_term) is part of the request already named by b."""
+        if a["id"] == b["id"] or self.service_key(a) == self.service_key(b):
+            return True
+        if b["id"] in self.ancestors(a) or a["id"] in self.ancestors(b):
+            return True
+        # 聯醫 in 聯醫的醫療費 is part of the fee's own name, not a second request.
+        names = [normalized(term) for term in [b["title"], *b["keywords"]]]
+        return any(a_term and a_term in name for name in names)
+
+    def service_key(self, entry):
+        """A sub-capability belongs to its parent only when the parent is itself an
+        entry (library.ranking -> library); otherwise each entry is its own service
+        (fees.water and fees.parking are different bills)."""
+        root = entry["id"].split(".")[0]
+        return root if root in self.by_id else entry["id"]
+
     def search(self, text):
         n = normalized(text)
         matches = []
@@ -29,25 +76,40 @@ class Registry:
             own = [entry["title"], *entry["keywords"]]
             direct = [term for term in own if normalized(term) and normalized(term) in n]
             score = max((len(normalized(term)) * 3 for term in direct), default=0)
+            longest = max(direct, key=lambda term: len(normalized(term)), default=None)
             inner = [term for term in entry["features"] if normalized(term) in n]
             score += max((len(normalized(term)) for term in inner), default=0)
             if root and root is not entry and direct:
                 score += max((len(normalized(term)) * 3 for term in [root["title"], *root["keywords"]]
                               if normalized(term) in n), default=0)
             if score:
-                matches.append({"entry": entry, "score": score, "fuzzy": False, "evidence": direct + inner})
+                matches.append({"entry": entry, "score": score, "fuzzy": False, "evidence": direct + inner,
+                                "span": _span(normalized(longest), n) if longest else None})
         if matches:
             best = max(item["score"] for item in matches)
-            if re.search(r"又|也要|以及|還要|同時", text):
-                # Preserve distinct explicit intents rather than let the longest
-                # service name silently win a request involving several services.
-                roots = {}
-                for item in sorted(matches, key=lambda item: -item["score"]):
-                    if item["score"] >= 6 and item["evidence"]:
-                        roots.setdefault(item["entry"]["id"].split(".")[0], item)
-                if len(roots) > 1:
-                    return list(roots.values())[:5]
-            return sorted((item for item in matches if item["score"] >= best * .8), key=lambda item: -item["score"])[:5]
+            # Several requests at once ("借書順便繳停車費", "水費跟地方稅"): different
+            # services, each named by its own words that do not overlap the others'.
+            # Overlapping words (繳費紀錄 contains 繳費) and a parent with its child page
+            # count as one request. No connective word is required.
+            distinct = []
+            for item in sorted(matches, key=lambda item: -item["score"]):
+                span = item["span"]
+                if item["score"] < 6 or span is None:
+                    continue
+                term = n[span[0]:span[1]]
+                if any(self.same_request(item["entry"], other["entry"], term)
+                       or (span[0] < other["span"][1] and other["span"][0] < span[1]) for other in distinct):
+                    continue
+                distinct.append(item)
+            if len(distinct) > 1:
+                return distinct[:5]
+            kept = [item for item in matches if item["score"] >= best * .8]
+            # Prefer the specific page over a parent that matched the same request
+            # (水費繳費 -> 水費, not also the 帳務 tab).
+            ids = {item["entry"]["id"] for item in kept}
+            kept = [item for item in kept
+                    if not any(item["entry"]["id"] in self.ancestors(self.by_id[other]) for other in ids)]
+            return sorted(kept, key=lambda item: -item["score"])[:5]
         # A conservative spelling fallback; fuzzy matches always require consent.
         residual = re.sub(r"^(?:請|我想|我要|幫我|開啟|打開|查看|查詢|找|去)+", "", text).strip()
         if len(normalized(residual)) < 3:
