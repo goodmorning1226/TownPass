@@ -25,7 +25,7 @@ import urllib.request
 CONTRACT = 3
 KINDS = {"reply", "navigate", "capability_list", "confirm_candidates", "unsupported"}
 ACTIONS = {None, "open_capability", "open_library", "locate_library_book", "open_library_book",
-           "cancel", "unsupported", "request_clarification", "faq_answer", "no_related"}
+           "cancel", "unsupported", "request_clarification", "faq_answer", "no_related", "translate_for_faq"}
 DESTINATION_KEYS = {"capability": {"kind", "id"}, "home": {"kind"},
                     "search": {"kind", "query", "search_type"}, "detail": {"kind", "book_id"}}
 

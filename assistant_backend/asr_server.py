@@ -299,6 +299,7 @@ class WhisperCppRecognizer:
 
     def _infer(self, url, wav, seconds, language):
         import urllib.request
+        self.passes = getattr(self, "passes", 0) + 1  # decodes for this clip (timing log)
         body, content_type = self.multipart(self._fields(seconds, language), wav)
         request = urllib.request.Request(url + "/inference", data=body, headers={"Content-Type": content_type})
         with urllib.request.urlopen(request, timeout=self.timeout) as response:
@@ -309,6 +310,8 @@ class WhisperCppRecognizer:
         if rms_of(frames) < MIN_RMS:
             return {"text": "", "alternatives": [], "status": "unclear", "reason": "silence"}
         language = language_code(language)
+        self.passes = 0
+        requested = language
         buffer = io.BytesIO()
         with wave.open(buffer, "wb") as audio:
             audio.setnchannels(1), audio.setsampwidth(2), audio.setframerate(SAMPLE_RATE)
@@ -353,7 +356,7 @@ class WhisperCppRecognizer:
             text = traditional(text)  # Whisper small and others often write Simplified
         return {"text": text, "alternatives": [], "alternative_logprobs": [], "language": used,
                 "status": judge(text, logprob, no_speech, used), "avg_logprob": logprob,
-                "no_speech_prob": no_speech}
+                "no_speech_prob": no_speech, "passes": self.passes, "requested_language": requested}
 
 
 def make_handler(recognizer, model_name):

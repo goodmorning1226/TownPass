@@ -52,6 +52,7 @@ class AssistantService {
     String? choiceId,
     Map<String, dynamic>? context,
     String? language,
+    String? faqText,
   }) async {
     cancel();
     final client = HttpClient()..connectionTimeout = const Duration(seconds: 8);
@@ -66,6 +67,7 @@ class AssistantService {
         choiceId,
         context,
         language,
+        faqText,
       ).timeout(const Duration(seconds: 85));
     } on TimeoutException {
       throw _error('turnTimeout', language);
@@ -88,6 +90,7 @@ class AssistantService {
     String? choiceId,
     Map<String, dynamic>? context,
     String? language,
+    String? faqText,
   ) async {
     final request = await client.postUrl(
       Uri.parse(endpoint).resolve('/v1/assistant/turns'),
@@ -107,6 +110,8 @@ class AssistantService {
         'context': ?context,
         // The speech language; typed text is left to the backend to detect.
         'language': ?language,
+        // A Chinese translation of a foreign request, only for the FAQ.
+        'faq_text': ?faqText,
       }),
     );
     // Python's local HTTP server requires a known byte length; Dart otherwise

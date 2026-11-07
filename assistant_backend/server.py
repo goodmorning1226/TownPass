@@ -346,7 +346,13 @@ class Assistant:
         if requested is not None and requested not in (*i18n.LANGUAGES, "auto"):
             raise AssistantError("語言欄位不正確。")
         language = requested if requested in i18n.LANGUAGES else i18n.detect_text_language(text)
-        payload = {**payload, "session_id": session, "text": text, "page_context": context, "language": language}
+        # The App's Chinese translation of a foreign request, for the FAQ layer only
+        # (the FAQ is Chinese; Workflow._foreign_faq asks for it).
+        faq_text = payload.get("faq_text")
+        if not isinstance(faq_text, str) or not faq_text.strip() or len(faq_text) > 500:
+            faq_text = None
+        payload = {**payload, "session_id": session, "text": text, "page_context": context, "language": language,
+                   "faq_text": faq_text}
         started = time.monotonic()
         self.usage.calls, self.usage.timings = [], []
         self.usage.route, self.usage.candidates = None, []
@@ -633,6 +639,8 @@ def make_handler(assistant, token=""):
             status = result.get("status", "clear") if isinstance(result, dict) else None
             if TIMING_LOG:  # numbers only, never the words
                 print(f"timing speech recognizer={result.get('recognizer', 'whisper')} status={status} "
+                      f"ms={result.get('elapsed_ms')} passes={result.get('passes')} "
+                      f"asked={result.get('requested_language')} heard={result.get('language')} "
                       f"chars={len(text) if isinstance(text, str) else None} "
                       f"alternatives={len(result.get('alternatives') or [])} "
                       f"confidence={result.get('confidence')}", flush=True)

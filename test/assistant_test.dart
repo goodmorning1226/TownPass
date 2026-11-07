@@ -34,6 +34,7 @@ class PendingService extends AssistantService {
     String? choiceId,
     Map<String, dynamic>? context,
     String? language,
+    String? faqText,
   }) {
     contexts.add(context);
     return response.future;
@@ -88,6 +89,7 @@ class QueueService extends AssistantService {
   final audio = <Uint8List>[];
   Completer<void>? transcriptGate;
   final turnLanguages = <String?>[];
+  final faqTexts = <String?>[];
   QueueService(this.results, {this.transcripts = const []});
   @override
   Future<AssistantResult> decide({
@@ -98,11 +100,13 @@ class QueueService extends AssistantService {
     String? choiceId,
     Map<String, dynamic>? context,
     String? language,
+    String? faqText,
   }) async {
     contexts.add(context);
     texts.add(text);
     choiceIds.add(choiceId);
     turnLanguages.add(language);
+    faqTexts.add(faqText);
     return results.removeAt(0);
   }
 
@@ -216,6 +220,19 @@ class FakeRecorder extends AssistantRecorder {
 
 class RealHttpOverrides extends HttpOverrides {}
 
+/// The executor loads the catalog asset in real time and each native step
+/// needs frames: wait in short real-time slices and pump between them until
+/// [route] is shown (a single fixed 50 ms wait became flaky as the catalog grew).
+Future<void> waitForRoute(WidgetTester tester, String route) async {
+  for (var i = 0; i < 150 && Get.currentRoute != route; i++) {
+    await tester.runAsync(
+      () => Future<void>.delayed(const Duration(milliseconds: 20)),
+    );
+    await tester.pump();
+  }
+  await tester.pumpAndSettle();
+}
+
 void main() {
   setUp(() => Get.reset());
   testWidgets(
@@ -246,8 +263,8 @@ void main() {
       expect(Get.currentRoute, TPRoute.webView);
       await tester.runAsync(() async {
         executor.open({'kind': 'capability', 'id': 'profile'}, (_) {});
-        await Future<void>.delayed(const Duration(milliseconds: 50));
       });
+      await waitForRoute(tester, TPRoute.basicInfo);
       await tester.pumpAndSettle();
       expect(Get.currentRoute, TPRoute.basicInfo);
       for (final expected in [TPRoute.setting, TPRoute.account, TPRoute.main]) {
@@ -298,9 +315,8 @@ void main() {
             'kind': 'capability',
             'id': 'districtOffice.progress',
           }, (_) {});
-          await Future<void>.delayed(const Duration(milliseconds: 50));
         });
-        await tester.pumpAndSettle();
+        await waitForRoute(tester, TPRoute.webView);
         expect(Get.currentRoute, TPRoute.webView);
         expect(
           find.text('https://taipei-pass-service.vercel.app/?isSearch=1'),
@@ -918,6 +934,42 @@ void main() {
       await short.stopListening();
       expect(short.messages.single.text, contains('沒有錄到聲音'));
     });
+
+    test(
+      'A foreign question reaches the Chinese FAQ and comes back translated',
+      () async {
+        start();
+        PageTranslation.instance.pairTranslator = (text, from, to) async =>
+            '[$from>$to] $text';
+        final service = QueueService([
+          const AssistantResult(
+            sessionId: 's',
+            message: 'Nothing found.',
+            language: 'en',
+            action: 'translate_for_faq',
+          ),
+          const AssistantResult(
+            sessionId: 's',
+            message: '免費。',
+            language: 'en',
+            action: 'faq_answer',
+            contentLanguage: 'zh',
+            resolutionId: 'r',
+            choices: [AssistantBookChoice('1', '學齡前視力檢查')],
+          ),
+        ]);
+        final controller = AssistantViewController(
+          service: service,
+          executor: RecordingExecutor(),
+          recorder: FakeRecorder(),
+        );
+        await controller.submit('is the eye check free');
+        expect(service.faqTexts, [null, '[en>zh] is the eye check free']);
+        expect(controller.messages.last.text, '[zh>en] 免費。');
+        expect(controller.choices.single.title, '[zh>en] 學齡前視力檢查');
+        controller.cancel();
+      },
+    );
 
     test('A navigation sets the page language; options keep theirs', () async {
       start();

@@ -240,6 +240,51 @@ class PageTranslation {
     return _mlKitTranslator!.translateText(text);
   }
 
+  /// Replaces ML Kit in tests for [translateBetween].
+  Future<String> Function(String text, String from, String to)? pairTranslator;
+  final _pairs = <String, OnDeviceTranslator>{};
+
+  /// [text] from one offered language into another on the phone (e.g. a
+  /// foreign question into Chinese for the FAQ, the Chinese answer back).
+  /// Returns null when it cannot be translated.
+  Future<String?> translateBetween(
+    String text, {
+    required String from,
+    required String to,
+  }) async {
+    if (from == to || text.trim().isEmpty) return text;
+    final override = pairTranslator;
+    try {
+      if (override != null) return await override(text, from, to);
+      final source = _mlKit[from], target = _mlKit[to];
+      if (source == null || target == null) return null;
+      final key = '$from>$to';
+      var translator = _pairs[key];
+      if (translator == null) {
+        final models = OnDeviceTranslatorModelManager();
+        for (final code in {source, target}) {
+          if (!await models.isModelDownloaded(code.bcpCode)) {
+            preparing.value = true;
+            try {
+              await models.downloadModel(code.bcpCode, isWifiRequired: false);
+            } finally {
+              preparing.value = false;
+            }
+          }
+        }
+        translator = _pairs[key] = OnDeviceTranslator(
+          sourceLanguage: source,
+          targetLanguage: target,
+        );
+      }
+      final out = await translator.translateText(text);
+      return out.trim().isEmpty ? null : out;
+    } catch (error) {
+      debugPrint('translation $from>$to failed: $error');
+      return null;
+    }
+  }
+
   /// Tests only: forget translations and return to Chinese.
   void reset() {
     _cache.clear();
@@ -252,6 +297,7 @@ class PageTranslation {
     _running = Future.value();
     language.value = original;
     translator = null;
+    pairTranslator = null;
   }
 }
 

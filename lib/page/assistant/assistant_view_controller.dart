@@ -132,6 +132,60 @@ class AssistantViewController extends GetxController {
     Map<String, Object> values = const {},
   ]) => AssistantTexts.text(key, AssistantTexts.resolve(language), values);
 
+  /// The Taipei FAQ is Chinese. For a foreign request the backend asks for a
+  /// Chinese translation (action translate_for_faq); it is made on the phone
+  /// and sent once more. Chinese FAQ content in the reply (content_language
+  /// zh) is translated back into the reply language. When a translation is
+  /// not possible the backend's own "nothing found" reply stays.
+  Future<AssistantResult> _foreignFaq(
+    AssistantResult result,
+    String text,
+    String requestId,
+  ) async {
+    final translation = PageTranslation.instance;
+    if (result.action == 'translate_for_faq' &&
+        result.language != 'zh' &&
+        text.isNotEmpty) {
+      final chinese = await translation.translateBetween(
+        text,
+        from: result.language,
+        to: 'zh',
+      );
+      if (chinese != null && chinese.trim().isNotEmpty) {
+        try {
+          result = await service.decide(
+            text: text,
+            requestId: '$requestId-faq',
+            sessionId: result.sessionId,
+            context: requestContext(),
+            language: result.language,
+            faqText: chinese,
+          );
+        } catch (_) {
+          // Keep the first "nothing found" reply.
+        }
+      }
+    }
+    if (result.contentLanguage == 'zh' && result.language != 'zh') {
+      final message = await translation.translateBetween(
+        result.message,
+        from: 'zh',
+        to: result.language,
+      );
+      final titles = <String>[
+        for (final choice in result.choices)
+          await translation.translateBetween(
+                choice.title,
+                from: 'zh',
+                to: result.language,
+              ) ??
+              choice.title,
+      ];
+      result = result.withTexts(message ?? result.message, titles);
+    }
+    return result;
+  }
+
   static final _hasWords = RegExp(r'[^\d\s\p{P}\p{S}]{2,}', unicode: true);
 
   void _rememberLanguage(String? code) {
@@ -648,7 +702,7 @@ class AssistantViewController extends GetxController {
     choicesMessageId.value = null;
     message.value = _status('searching', language);
     try {
-      final result = await service.decide(
+      var result = await service.decide(
         text: text.trim(),
         requestId: requestId,
         sessionId: _session,
@@ -657,6 +711,8 @@ class AssistantViewController extends GetxController {
         context: requestContext(),
         language: language,
       );
+      if (generation != _generation || isClosed) return;
+      result = await _foreignFaq(result, text.trim(), requestId);
       if (generation != _generation || isClosed) return;
       _session = result.sessionId;
       _resolutionId = result.resolutionId;
