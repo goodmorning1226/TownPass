@@ -38,6 +38,22 @@ EMBED_TIMEOUT = 5
 # the closest questions and answer only after the user picks one; HIGH_CONF
 # answers directly. Specific to multilingual-e5-small and this index (e5
 # scores sit in a narrow, high band); re-tune if either changes.
+# Everyday words -> the wording the FAQ uses, appended before embedding (e5 does
+# not connect "大包垃圾" with "巨大垃圾(大型廢棄物)").
+COLLOQUIAL = (
+    (("大包垃圾", "大型垃圾", "大件垃圾", "舊家具", "舊沙發", "舊床墊", "舊衣櫃", "粗大垃圾"), "巨大垃圾 大型廢棄物 收運"),
+    (("垃圾車", "倒垃圾", "丟垃圾"), "垃圾車 收運時間 清運"),
+    (("資源回收", "回收物"), "資源回收 分類"),
+    (("身分證掉了", "身分證不見", "身份證掉了", "身份證不見"), "身分證 遺失 補發"),
+    (("敬老卡", "老人卡"), "敬老悠遊卡 申請"),
+)
+
+
+def expand(text):
+    extra = [words for keys, words in COLLOQUIAL if any(key in text for key in keys)]
+    return text + (" " + " ".join(extra) if extra else "")
+
+
 HIGH_CONF = 0.915
 MEDIUM_CONF = 0.88
 SCOPE_NOTE = "本服務僅涵蓋臺北市政府 FAQ。"
@@ -125,6 +141,7 @@ class FaqIndex:
         return [math.sumprod(row, vector) for row in self.embeddings]
 
     def search(self, text, k=3):
+        text = expand(text)
         """(confidence, hits) with hits [{score, id, question, answer, department, category}].
 
         Hits are best first and at least MEDIUM_CONF; none-confidence results

@@ -31,6 +31,8 @@ from registry import Registry, book_fuzzy, primary_title, single_substitution
 
 # A cheap superset of the library signals retrieve() looks for; the book
 # catalogue is consulted only when one of these appears.
+# "我要借書", "幫我借書了", "我想找一本書": a borrow request naming no book.
+PLAIN_BORROW = re.compile(r"(?:借|找|搜尋)(?:一下|一本|本)?(?:書|圖書)")
 LIBRARY_CUE = re.compile(r"借|找|搜尋|看|閱|書|館|寫的|ISBN", re.I)
 # Version D (docs/AI_COLLOQUIAL_MATCHING_EXPERIMENT.md; TEAM_TASKS T2 items 2-3),
 # on by default (TOWNPASS_T2_GENERIC=0 restores the old behaviour for a rollback):
@@ -78,7 +80,8 @@ SEMANTIC_MIN_CHARS = 2
 SEMANTIC_NOTE = ("These candidates were found by similar meaning, not by matching words. "
                  "Offer them only if one is what the user asks for; otherwise ask to clarify.")
 # Colloquial version B: semantic candidates whose best lift reaches this are offered
-# without a model call (still a list to confirm; never navigates).
+# without a model call; a single connected one opens directly (_offer_services,
+# owner 2026-11-08), several are a list to confirm.
 # TOWNPASS_SEMANTIC_DIRECT=0 turns it off. On the dev
 # sets (leave-one-out, examples on) non-requests reach at most 0.057 and 67 of
 # 203 right top pages reach 0.08 (1 wrong top page).
@@ -194,6 +197,11 @@ class Workflow:
         # cleaned text when it equals the request, an action object equal to the query,
         # and empty lists. unique_exact_id stays, even when null: dropping it made the
         # model open the library for "借ABC123".
+        if (context["library"] and not context["query"] and not context["books"] and not context["other"]
+                and len(text) <= 14 and PLAIN_BORROW.search(text)):
+            self._trace("library_plain", ["library"])
+            return self.reply(payload, "請在圖書借閱頁搜尋想看的書。這裡使用示範資料。", kind="navigate",
+                              action="open_library", destination={"kind": "home"})
         view = {k: v for k, v in context.items() if k not in ("books", "exact", "library", "library_candidate")}
         if view["text"] == text:
             del view["text"]
@@ -496,6 +504,14 @@ class Workflow:
             return self._offer(payload, self._cap_items([entry], language), text, action="emergency")
         return self.reply(payload, text, action="emergency")
 
+    def _offer_services(self, payload, entries, message, language=None):
+        """Services to confirm; a single connected one opens directly instead
+        (owner, 2026-11-08). Emergencies and books keep their own offers."""
+        if len(entries) == 1 and entries[0]["enabled"]:
+            self._trace("single_candidate", [entries[0]["id"]])
+            return self._navigate(payload, entries[0])
+        return self._offer(payload, self._cap_items(entries, language or payload.get("language", "zh")), message)
+
     def _list_rank(self, entry):
         if entry["id"] in LIST_LAST:
             return 4
@@ -601,7 +617,7 @@ class Workflow:
         self._trace("capability_model", [e["id"] for e in entries])
         name, args = self._decide(text, entries, ambiguous, payload.get("page_context"))
         if name == "confirm_candidates":
-            return self._offer(payload, self._cap_items(entries, language), i18n.t("confirm_capability", language))
+            return self._offer_services(payload, entries, i18n.t("confirm_capability", language), language)
         if name == "select_capability":
             return self._navigate(payload, self.registry.by_id[args["capability_id"]])
         return self.reply(payload, i18n.t("clarify", language))
@@ -769,7 +785,7 @@ class Workflow:
             self._trace("capability_model", [e["id"] for e in entries])
             name, args = self._decide(text, entries, ambiguous, payload.get("page_context"))
             if name == "confirm_candidates":
-                return self._offer(payload, self._cap_items(entries), "你想使用哪個功能？請先確認。")
+                return self._offer_services(payload, entries, "你想使用哪個功能？請先確認。")
             if name == "select_capability":
                 return self._navigate(payload, self.registry.by_id[args["capability_id"]])
             return self._faq(payload, text) or self.reply(payload, "請補充想使用的服務或操作，也可以問「有哪些功能」。")
@@ -824,7 +840,7 @@ class Workflow:
     def _semantic_fallback(self, payload, text, positive):
         """Version C (semantic.py): keyword retrieval found nothing, so services
         whose catalogue texts mean about the same as the request (e5 cosine) go to
-        the model, which may only offer them (never navigate) or ask to clarify;
+        the model, which may only offer them (a list, even when single) or ask to clarify;
         a clarification continues to the intent fallback. Off when the index is
         missing, still building or its embedding server does not answer.
         positive: the request without negated parts ("I don't want books" ->
@@ -851,13 +867,14 @@ class Workflow:
             # (it declined 17 of 18 such dev sentences); still only a list to confirm.
             self._trace("semantic_direct", [e["id"] for e in entries])
             self.owner.usage.semantic["decision"] = "direct"
-            return self._offer(payload, self._cap_items(entries, language), message)
+            return self._offer_services(payload, entries, message, language)
         self._trace("semantic_model", [e["id"] for e in entries])
         name, _ = self._decide(text, entries, confirmation=True, context=payload.get("page_context"),
                                note=SEMANTIC_NOTE)
         self.owner.usage.semantic["decision"] = name
         if name != "confirm_candidates":
             return None
+        # Weak evidence the model only agreed to offer: kept as a choice even when single.
         return self._offer(payload, self._cap_items(entries, language), message)
 
     def _sound_candidates(self, text):

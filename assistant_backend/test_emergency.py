@@ -84,5 +84,28 @@ class ListingTests(unittest.TestCase):
             self.app.turn({"text": "", "request_id": "r1", "page_step": 2})
 
 
+class OwnerRulesTests(unittest.TestCase):
+    """2026-11-08: a plain borrow request opens the library; FAQ everyday words."""
+
+    def test_plain_borrow_opens_the_library_without_the_model(self):
+        calls = []
+        app = Assistant(FakeCatalog(), lambda m, t: calls.append(t) or response("request_clarification"))
+        for text in ("幫我借書了", "我要借書", "我想找一本書"):
+            result = app.turn({"text": text, "request_id": "r"})
+            self.assertEqual((result["kind"], result["destination"]), ("navigate", {"kind": "home"}), text)
+        self.assertEqual(calls, [])
+
+    def test_sentence_final_particles_are_not_a_title(self):
+        from server import retrieve
+        from test_server import BOOKS
+        self.assertEqual(retrieve("幫我借書了", BOOKS)["query"], "")
+        self.assertEqual(retrieve("我要借神奇柑仔店啦", BOOKS)["query"], "神奇柑仔店")
+
+    def test_everyday_faq_words_are_expanded(self):
+        import faq
+        self.assertIn("巨大垃圾", faq.expand("大包垃圾要怎麼丟"))
+        self.assertEqual(faq.expand("繳水費"), "繳水費")
+
+
 if __name__ == "__main__":
     unittest.main()

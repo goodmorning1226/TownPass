@@ -221,9 +221,13 @@ class SemanticDirectTests(unittest.TestCase):
                     mock.patch.object(workflow, "INTENT_FALLBACK", False):
                 result = app.turn(payload)
             self.assertEqual(calls, [])
-            self.assertEqual(result["kind"], "confirm_candidates")
-            self.assertIsNone(result["destination"])
-            self.assertEqual(result["metrics"]["route"], "semantic_direct")
+            if result["metrics"]["route"] == "single_candidate":
+                # A single clear match opens directly (owner, 2026-11-08).
+                self.assertEqual(result["kind"], "navigate")
+            else:
+                self.assertEqual(result["metrics"]["route"], "semantic_direct")
+                self.assertEqual(result["kind"], "confirm_candidates")
+                self.assertIsNone(result["destination"])
             with mock.patch.object(workflow, "SEMANTIC_DIRECT", 0.99), \
                     mock.patch.object(workflow, "INTENT_FALLBACK", False):
                 again = app.turn({**payload, "session_id": "t"})

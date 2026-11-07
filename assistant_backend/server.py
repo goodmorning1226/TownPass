@@ -202,7 +202,9 @@ def retrieve(text, books, previous=()):
         # The object ends at the clause: "借原親子館，你能幫我借到嗎" -> "原親子館".
         title_match = re.search(r"(?:借|找|搜尋|看)(?:一下|一本|一部|這本)?\s*([^，,。！？!?；;]+)", clean)
         if title_match:
-            value = re.sub(r"(?:這本書|的書|這本|好嗎|謝謝|就好)[。！？!？?]*$", "", title_match[1]).strip()
+            value = re.sub(r"(?:這本書|的書|這本|好嗎|謝謝|就好)?[了吧啦喔哦呢嗎耶]*[。！？!？?]*$", "",
+                           title_match[1]).strip()
+            value = re.sub(r"(?:這本書|的書|這本|好嗎|謝謝|就好)$", "", value).strip()
             if value and value not in ("書", "書籍", "圖書", "閱"):
                 action_object = value
                 query = value

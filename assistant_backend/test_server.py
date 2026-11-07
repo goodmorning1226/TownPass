@@ -173,14 +173,14 @@ class TurnTests(unittest.TestCase):
         result = Assistant(FakeCatalog(), lambda *_: response("cancel")).turn({"text": "取消", "request_id": "a"})
         self.assertIsNone(result["destination"])
         with self.assertRaises(AssistantError):
-            Assistant(FakeCatalog(), lambda *_: {"message": {"content": "done"}}).turn({"text": "借書", "request_id": "a"})
+            Assistant(FakeCatalog(), lambda *_: {"message": {"content": "done"}}).turn({"text": "借ABC123", "request_id": "a"})
 
     def test_busy_and_oversized_request(self):
         assistant = Assistant(FakeCatalog(), lambda *_: response("open_library"))
         assistant.model_lock.acquire()
         try:
             with self.assertRaisesRegex(AssistantError, "正在處理"):
-                assistant.turn({"text": "借書", "request_id": "a"})
+                assistant.turn({"text": "借ABC123", "request_id": "a"})
         finally:
             assistant.model_lock.release()
         with self.assertRaises(AssistantError):
