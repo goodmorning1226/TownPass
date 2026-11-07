@@ -4,6 +4,7 @@ import 'dart:ui' show ImageFilter;
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:town_pass/page/assistant/assistant_view_controller.dart';
+import 'package:town_pass/service/assistant_speech_language.dart';
 import 'package:town_pass/util/tp_colors.dart';
 import 'package:town_pass/util/tp_text.dart';
 
@@ -448,8 +449,16 @@ class _AssistantSheetState extends State<AssistantSheet> {
       final bar = Row(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          // Left column reserved (e.g. a future language picker).
-          const Expanded(child: SizedBox.shrink()),
+          // Speech language (Whisper builds; the phone's own recogniser is
+          // Chinese only for now).
+          Expanded(
+            child: Align(
+              alignment: Alignment.bottomLeft,
+              child: controller.systemSpeech == null
+                  ? _languageButton(listening || busy)
+                  : const SizedBox.shrink(),
+            ),
+          ),
           Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -560,6 +569,45 @@ class _AssistantSheetState extends State<AssistantSheet> {
       );
     }),
   );
+
+  /// Speech language menu: "自動偵測" or one language, each in its own script.
+  /// With auto, the language last detected is shown after it.
+  Widget _languageButton(bool locked) {
+    final chosen = AssistantSpeechLanguage.of(controller.speechLanguage.value);
+    final heard = controller.heardLanguage.value;
+    final label = chosen.code == 'auto' && heard != null
+        ? '${chosen.short}·${AssistantSpeechLanguage.of(heard).short}'
+        : chosen.short;
+    return PopupMenuButton<String>(
+      key: const Key('assistant-speech-language'),
+      enabled: !locked,
+      tooltip: '說話的語言：${chosen.label}',
+      initialValue: chosen.code,
+      onSelected: controller.setSpeechLanguage,
+      itemBuilder: (_) => [
+        for (final language in AssistantSpeechLanguage.all)
+          PopupMenuItem(
+            value: language.code,
+            child: TPText(language.label, style: TPTextStyles.bodyRegular),
+          ),
+      ],
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.translate, size: 22, color: TPColors.grayscale700),
+            const SizedBox(width: 4),
+            TPText(
+              label,
+              style: TPTextStyles.bodyRegular,
+              color: TPColors.grayscale700,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   Future<void> _pressStart(PointerDownEvent event) async {
     _pressOrigin = event.position;

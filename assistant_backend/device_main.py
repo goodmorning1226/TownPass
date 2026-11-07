@@ -83,13 +83,16 @@ def _serve(server):
     return thread
 
 
-def start(model_port=8771, whisper_port=8772, assistant_port=8765, asr_port=8770, whisper=True):
+def start(model_port=8771, whisper_port=8772, assistant_port=8765, asr_port=8770, whisper=True,
+          multi_port=None):
     """Start both HTTP servers once; returns immediately after they listen.
 
     The native model servers may still be loading: until they answer, requests
     get the usual "model not ready" / "speech service unavailable" replies.
     whisper=False: the App uses the phone's own speech recogniser and sends
     text, so Whisper is neither started nor warmed up.
+    multi_port: a second whisper-server with a multilingual model (other
+    languages and "auto" detection); None when that model is not on the phone.
     """
     with _lock:
         if _started.is_set():
@@ -98,7 +101,9 @@ def start(model_port=8771, whisper_port=8772, assistant_port=8765, asr_port=8770
         from http.server import ThreadingHTTPServer
         import asr_server
         import server
-        recognizer = asr_server.WhisperCppRecognizer(os.environ["TOWNPASS_WHISPER_URL"])
+        recognizer = asr_server.WhisperCppRecognizer(
+            os.environ["TOWNPASS_WHISPER_URL"],
+            multi_url=f"http://127.0.0.1:{multi_port}" if whisper and multi_port else None)
         asr = ThreadingHTTPServer(("127.0.0.1", asr_port), asr_server.make_handler(recognizer, "whisper.cpp"))
         asr.daemon_threads = True
         assistant = ThreadingHTTPServer(("127.0.0.1", assistant_port), server.make_handler(server.Assistant()))
@@ -110,4 +115,6 @@ def start(model_port=8771, whisper_port=8772, assistant_port=8765, asr_port=8770
                          name="assistant-warm-up", daemon=True).start()
         _started.set()
         speech = f"whisper :{whisper_port}" if whisper else "speech: phone recogniser"
+        if whisper and multi_port:
+            speech += f", multilingual whisper :{multi_port}"
         return f"assistant :{assistant_port}, asr :{asr_port}, model :{model_port}, {speech}"

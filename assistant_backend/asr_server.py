@@ -37,15 +37,33 @@ UNSURE_LOGPROB = -0.45
 HYPOTHESES = 5
 
 
+# Speech languages (docs/AI_MULTILINGUAL_PLAN.md): code -> whisper.cpp's full name.
+LANGUAGES = {"zh": "chinese", "en": "english", "ja": "japanese", "vi": "vietnamese",
+             "id": "indonesian", "th": "thai"}
+SPEECH_LANGUAGES = ("auto", *LANGUAGES)
+
+
+def language_code(value, default="zh"):
+    """A requested language ("auto", "zh", "en-US", "english"...) as one of SPEECH_LANGUAGES."""
+    value = str(value or "").strip().lower()
+    if value in ("auto", ""):
+        return "auto" if value else default
+    value = value.split("-")[0].split("_")[0]
+    if value in LANGUAGES:
+        return value
+    return next((code for code, name in LANGUAGES.items() if name == value), default)
+
+
 def cjk_ratio(text):
     letters = [c for c in text if c.isalnum()]
     return sum("\u4e00" <= c <= "\u9fff" for c in letters) / max(1, len(letters))
 
 
-def judge(text, avg_logprob, no_speech_prob):
-    """clear / unsure / unclear for a Chinese-language transcript."""
+def judge(text, avg_logprob, no_speech_prob, language="zh"):
+    """clear / unsure / unclear for a transcript. The Chinese-script check (noise
+    heard as "Thanks you.") only applies to Chinese."""
     if (not text or no_speech_prob > UNCLEAR_NO_SPEECH or avg_logprob < UNCLEAR_LOGPROB
-            or cjk_ratio(text) < 0.5):  # e.g. "Thanks you." from background noise
+            or (language == "zh" and cjk_ratio(text) < 0.5)):
         return "unclear"
     if no_speech_prob > UNSURE_NO_SPEECH or avg_logprob < UNSURE_LOGPROB:
         return "unsure"
@@ -170,8 +188,10 @@ class Recognizer:
         warm = (self.numpy.sin(self.numpy.arange(SAMPLE_RATE) * 0.05) * 3000).astype(self.numpy.int16)
         self.transcribe(warm.tobytes())
 
-    def transcribe(self, frames):
+    def transcribe(self, frames, language="zh"):
         """Decode one hold-to-talk clip (<= 30 s, a single Whisper window).
+        The computer recogniser is Chinese only (Breeze); language is accepted
+        for the shared interface and the result is always Chinese.
 
         Returns the best transcript, distinct alternatives from the same beam
         search, the confidence signals and a clear/unsure/unclear status.
@@ -197,6 +217,7 @@ class Recognizer:
         best_logprob = logprobs[0] if logprobs else -9.0
         status = judge(top, best_logprob, result.no_speech_prob)
         return {"text": top, "alternatives": texts[1:], "alternative_logprobs": logprobs[1:], "status": status,
+                "language": "zh",
                 "avg_logprob": best_logprob, "no_speech_prob": round(result.no_speech_prob, 3)}
 
 
@@ -207,10 +228,15 @@ class WhisperCppRecognizer:
     whisper.cpp returns one decode, so there are no n-best alternatives; the
     confidence signals and the clear/unsure/unclear gates are the same.
     Standard library only.
+
+    Languages: url serves Chinese (Breeze-ASR-25); multi_url, when given, serves a
+    multilingual Whisper for en/ja/vi/id/th and detects the language for "auto"
+    (a clip detected as Chinese is then transcribed by the Chinese model).
     """
 
-    def __init__(self, url, timeout=60):
+    def __init__(self, url, timeout=60, multi_url=None):
         self.url = url.rstrip("/")
+        self.multi_url = multi_url.rstrip("/") if multi_url else None
         self.timeout = timeout
         self.prompt = vocabulary_prompt()  # conservative estimate: no tokenizer here
         self.prompt_tokens = None
@@ -223,8 +249,10 @@ class WhisperCppRecognizer:
         times faster on a phone CPU for short hold-to-talk requests."""
         return min(1500, max(256, int((seconds + 2) * 50)))
 
-    def _fields(self, seconds=30):
-        return {"response_format": "verbose_json", "language": "zh", "prompt": self.prompt,
+    def _fields(self, seconds=30, language="zh"):
+        # The catalogue vocabulary prompt is Chinese: only for Chinese decoding.
+        return {"response_format": "verbose_json", "language": language,
+                "prompt": self.prompt if language == "zh" else "",
                 # temperature_inc > 0 keeps whisper.cpp's fallback: a decode stuck in a
                 # repetition loop (high entropy / low log-prob) is retried warmer.
                 "temperature": "0", "temperature_inc": "0.2", "no_timestamps": "true",
@@ -253,22 +281,38 @@ class WhisperCppRecognizer:
         no_speech = max((s.get("no_speech_prob", 0.0) for s in segments), default=1.0)
         return text, round(logprob, 3), round(no_speech, 3)
 
-    def transcribe(self, frames):
+    def _infer(self, url, wav, seconds, language):
+        import urllib.request
+        body, content_type = self.multipart(self._fields(seconds, language), wav)
+        request = urllib.request.Request(url + "/inference", data=body, headers={"Content-Type": content_type})
+        with urllib.request.urlopen(request, timeout=self.timeout) as response:
+            return json.loads(response.read(2_000_000))
+
+    def transcribe(self, frames, language="zh"):
+        """language: one of SPEECH_LANGUAGES; the result names the language used."""
         if rms_of(frames) < MIN_RMS:
             return {"text": "", "alternatives": [], "status": "unclear", "reason": "silence"}
-        import urllib.request
+        language = language_code(language)
         buffer = io.BytesIO()
         with wave.open(buffer, "wb") as audio:
             audio.setnchannels(1), audio.setsampwidth(2), audio.setframerate(SAMPLE_RATE)
             audio.writeframes(frames)
-        body, content_type = self.multipart(self._fields(len(frames) / 2 / SAMPLE_RATE), buffer.getvalue())
-        request = urllib.request.Request(self.url + "/inference", data=body,
-                                         headers={"Content-Type": content_type})
-        with self.lock, urllib.request.urlopen(request, timeout=self.timeout) as response:
-            reply = json.loads(response.read(2_000_000))
+        wav, seconds = buffer.getvalue(), len(frames) / 2 / SAMPLE_RATE
+        with self.lock:
+            if language == "zh" or not self.multi_url:
+                # Without a multilingual model the Chinese model does everything.
+                used = "zh" if language == "auto" else language
+                reply = self._infer(self.url, wav, seconds, used)
+            else:
+                reply = self._infer(self.multi_url, wav, seconds, language)
+                detected = language_code(reply.get("language"), default=None) if language == "auto" else language
+                used = detected or "zh"
+                if used == "zh":  # Chinese is transcribed by the Chinese model
+                    reply = self._infer(self.url, wav, seconds, "zh")
         text, logprob, no_speech = self.summarize(reply)
-        return {"text": text, "alternatives": [], "alternative_logprobs": [],
-                "status": judge(text, logprob, no_speech), "avg_logprob": logprob, "no_speech_prob": no_speech}
+        return {"text": text, "alternatives": [], "alternative_logprobs": [], "language": used,
+                "status": judge(text, logprob, no_speech, used), "avg_logprob": logprob,
+                "no_speech_prob": no_speech}
 
 
 def make_handler(recognizer, model_name):
@@ -300,14 +344,16 @@ def make_handler(recognizer, model_name):
             except (ValueError, wave.Error, EOFError) as exc:
                 return self.reply(400, {"error": str(exc) if isinstance(exc, ValueError) else "錄音格式不正確。"})
             started = time.monotonic()
+            language = language_code(self.headers.get("X-Language"))
             try:
-                decoded = recognizer.transcribe(frames)
+                decoded = recognizer.transcribe(frames, language)
             except Exception:
                 return self.reply(500, {"error": "語音辨識失敗。"})
             elapsed = round((time.monotonic() - started) * 1000)
             if os.environ.get("TOWNPASS_ASR_DIAGNOSTICS") == "1":
                 # Numbers only, opt-in: never audio or transcript text.
                 print(f"diag audio={seconds:.2f}s rms={rms_of(frames):.4f} status={decoded['status']} "
+                      f"language={language}->{decoded.get('language')} "
                       f"logprob={decoded.get('avg_logprob')} no_speech={decoded.get('no_speech_prob')} "
                       f"chars={len(decoded['text'])} {elapsed}ms", flush=True)
             self.reply(200, {**decoded, "audio_seconds": round(seconds, 2), "elapsed_ms": elapsed})

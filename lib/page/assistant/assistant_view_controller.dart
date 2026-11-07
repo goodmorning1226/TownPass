@@ -10,6 +10,7 @@ import 'package:town_pass/service/assistant_page_tracker.dart';
 import 'package:town_pass/service/assistant_recorder.dart';
 import 'package:town_pass/service/assistant_speaker.dart';
 import 'package:town_pass/service/assistant_service.dart';
+import 'package:town_pass/service/assistant_speech_language.dart';
 import 'package:town_pass/service/assistant_system_speech.dart';
 
 /// One bubble of the conversation. Kept in memory while the App process
@@ -93,10 +94,25 @@ class AssistantViewController extends GetxController {
     this.speaker.loadEnabled().then((enabled) {
       if (!isClosed) readAloud.value = enabled;
     });
+    AssistantSpeechLanguage.load().then((code) {
+      if (!isClosed) speechLanguage.value = code;
+    });
   }
 
   /// Read replies aloud (phone text-to-speech). Off by default; remembered.
   final readAloud = false.obs;
+
+  /// Speech input language for Whisper ('auto', 'zh', 'en', ...); remembered.
+  final speechLanguage = AssistantSpeechLanguage.fallback.obs;
+
+  /// The language the last utterance was recognised in (shown with 'auto').
+  final heardLanguage = RxnString();
+
+  void setSpeechLanguage(String code) {
+    speechLanguage.value = AssistantSpeechLanguage.of(code).code;
+    heardLanguage.value = null;
+    AssistantSpeechLanguage.save(speechLanguage.value);
+  }
 
   void setReadAloud(bool enabled) {
     readAloud.value = enabled;
@@ -432,6 +448,7 @@ class AssistantViewController extends GetxController {
       heard = await service.transcribe(
         audio,
         requestId: '${DateTime.now().microsecondsSinceEpoch}-$generation',
+        language: speechLanguage.value,
       );
     } on FormatException catch (error) {
       if (generation == _generation && !isClosed) {
@@ -489,6 +506,7 @@ class AssistantViewController extends GetxController {
 
   Future<void> _useTranscript(AssistantTranscript heard) async {
     busy.value = false;
+    heardLanguage.value = heard.language;
     // "第二個" while numbered options are open selects that option, even when
     // the recogniser was unsure about such a short word.
     for (final spoken in [heard.text, ...heard.options]) {

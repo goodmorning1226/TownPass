@@ -253,13 +253,20 @@ class SystemSpeech(private val context: Context, messenger: BinaryMessenger) :
     }
 
     override fun onResults(results: Bundle?) {
-        val texts = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION).orEmpty()
-        val confidences = results?.getFloatArray(SpeechRecognizer.CONFIDENCE_SCORES)
-        if (texts.isEmpty()) {
+        val raw = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION).orEmpty()
+        val scores = results?.getFloatArray(SpeechRecognizer.CONFIDENCE_SCORES)
+        // Numbers only (never the words): how many readings, their lengths, confidences.
+        Log.i(TAG, "speech results n=${raw.size} lengths=${raw.map { it.trim().length }} " +
+            "confidences=${scores?.joinToString(prefix = "[", postfix = "]") ?: "none"}")
+        // Blank readings are dropped (with their confidences).
+        val kept = raw.indices.filter { raw[it].isNotBlank() }.take(5)
+        if (kept.isEmpty()) {
             finish(mapOf("error" to "no_match"))
         } else {
-            finish(mapOf("texts" to texts.take(5),
-                "confidences" to (confidences?.take(5)?.map { it.toDouble() } ?: emptyList())))
+            finish(mapOf("texts" to kept.map { raw[it].trim() },
+                "confidences" to if (scores != null && scores.size == raw.size) {
+                    kept.map { scores[it].toDouble() }
+                } else emptyList()))
         }
     }
 

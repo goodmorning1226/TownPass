@@ -101,6 +101,8 @@ class DeviceTranscriptTests(unittest.TestCase):
         self.assertEqual(low["status"], "unsure")
         unknown = device_transcript(json.dumps({"texts": ["我要借書"], "confidences": [0.0]}).encode())
         self.assertEqual((unknown["status"], unknown["confidence"]), ("clear", None))
+        blank_first = device_transcript(json.dumps({"texts": [" ", "我要借書"], "confidences": [0.0, 0.9]}).encode())
+        self.assertEqual((blank_first["text"], blank_first["confidence"]), ("我要借書", 0.9))
 
     def test_malformed_device_results_are_rejected(self):
         from server import device_transcript

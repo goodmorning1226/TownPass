@@ -201,3 +201,74 @@ class PromptLayoutTests(unittest.TestCase):
             self.assertNotIn(", ", message["content"])
         self.assertEqual(json.loads(evidence["content"])["original_text"], "我要繳水費")
         self.assertEqual(list(json.loads(tools["content"])), ["allowed_tools"])
+
+
+CRLF = bytes([13, 10])
+
+
+def field(name, value):
+    """A multipart form field as whisper-server receives it."""
+    return f'name="{name}"'.encode() + CRLF + CRLF + value.encode()
+
+
+class MultilingualSpeechTests(unittest.TestCase):
+    """Chinese goes to the Chinese model (Breeze); other languages and "auto"
+    detection to the multilingual model (docs/AI_MULTILINGUAL_PLAN.md)."""
+
+    def setUp(self):
+        self.calls = []
+        self.heard = {"zh": "chinese", "multi": "english"}  # what each fake model reports
+        test = self
+
+        def fake(name):
+            class Handler(BaseHTTPRequestHandler):
+                def log_message(self, *args):
+                    pass
+
+                def do_POST(self):
+                    test.calls.append((name, self.rfile.read(int(self.headers["Content-Length"]))))
+                    data = json.dumps({"language": test.heard[name], "segments": [
+                        {"text": f"{name}-text", "tokens": [1, 2], "avg_logprob": -0.1, "no_speech_prob": 0.0}]}).encode()
+                    self.send_response(200)
+                    self.send_header("Content-Length", str(len(data)))
+                    self.end_headers()
+                    self.wfile.write(data)
+            return Handler
+        zh, zh_url = serve(fake("zh"))
+        multi, multi_url = serve(fake("multi"))
+        for httpd in (zh, multi):
+            self.addCleanup(httpd.server_close)
+            self.addCleanup(httpd.shutdown)
+        self.recognizer = WhisperCppRecognizer(zh_url, multi_url=multi_url)
+
+    def models(self):
+        return [name for name, _ in self.calls]
+
+    def test_each_language_goes_to_its_model(self):
+        result = self.recognizer.transcribe(loud_frames(), "zh")
+        self.assertEqual((self.models(), result["language"]), (["zh"], "zh"))
+        self.assertIn(field("prompt", self.recognizer.prompt), self.calls[-1][1])
+        result = self.recognizer.transcribe(loud_frames(), "en")
+        self.assertEqual((self.models(), result["language"], result["text"]), (["zh", "multi"], "en", "multi-text"))
+        self.assertIn(field("language", "en"), self.calls[-1][1])
+        self.assertIn(field("prompt", "") + CRLF, self.calls[-1][1])  # no Chinese vocabulary prompt
+        self.assertEqual(result["status"], "clear")  # no Chinese-script check for English
+
+    def test_auto_detects_and_chinese_is_redone_by_the_chinese_model(self):
+        result = self.recognizer.transcribe(loud_frames(), "auto")
+        self.assertEqual((self.models(), result["language"]), (["multi"], "en"))
+        self.assertIn(field("language", "auto"), self.calls[0][1])
+        self.calls.clear()
+        self.heard["multi"] = "chinese"
+        result = self.recognizer.transcribe(loud_frames(), "auto")
+        self.assertEqual((self.models(), result["language"], result["text"]), (["multi", "zh"], "zh", "zh-text"))
+
+    def test_without_a_multilingual_model_chinese_does_everything(self):
+        self.recognizer.multi_url = None
+        result = self.recognizer.transcribe(loud_frames(), "auto")
+        self.assertEqual((self.models(), result["language"]), (["zh"], "zh"))
+
+    def test_language_codes(self):
+        from asr_server import language_code
+        self.assertEqual([language_code(v) for v in ("en-US", "ja", "english", "", None, "xx", "AUTO", "th-TH")],
+                         ["en", "ja", "en", "zh", "zh", "zh", "auto", "th"])

@@ -150,33 +150,60 @@ class Workflow:
                 for name in (primary_title(book), re.sub(r"著$", "", book.get("author") or "")))):
             return None, []
         from server import positive_text
-        services = {}  # service id -> (score, corrected sentence)
+        # service id -> best score and every stretch of the sentence one of its words matches
+        services = {}
         for score, start, end, term in term_matches(text, self.registry.sound_terms()):
             if score < SERVICE_SOUND_CONFIRM:
                 break
             if len(term) == 2 and score < SERVICE_SOUND_AUTO and not REQUEST_ONLY.fullmatch(
                     text[:start] + "□" + text[end:]):
                 continue
-            fixed = text[:start] + term + text[end:]
-            found = self.registry.search(positive_text(fixed))
+            found = self.registry.search(positive_text(text[:start] + term + text[end:]))
             if not found or found[0].get("fuzzy"):
                 continue
-            service = found[0]["entry"]["id"]
-            if service not in services:
-                services[service] = (score, fixed, exact_homophone(text[start:end], term))
-        ranked = sorted(services.values(), key=lambda item: -item[0])
-        if not ranked:
+            item = services.setdefault(found[0]["entry"]["id"], {"score": score, "spans": []})
+            item["spans"].append((start, end, term, score, exact_homophone(text[start:end], term)))
+        if not services:
             return None, []
-        top, best, exact = ranked[0]
-        # A parent and its page (圖書借閱 / 圖書館地圖) are one request, not rivals.
-        lead = self.registry.by_id[next(s for s, item in services.items() if item[1] == best)]
-        rivals = [item[0] for service, item in services.items() if item[1] != best
-                  and not self.registry.same_request(self.registry.by_id[service], lead, None)]
-        clear = all(score <= top - SOUND_MARGIN + 1e-9 for score in rivals)
+
+        def coverage(item):
+            """Characters of the sentence this service's homophone-level words account for:
+            缴水费 is 繳水 + 水費 (3) for the water bill but only 繳稅 (2) for tax."""
+            return len({i for start, end, _, score, _ in item["spans"] if score >= SERVICE_SOUND_AUTO
+                        for i in range(start, end)})
+
+        def corrected(service, item):
+            """The sentence with this service's words written in: every homophone-level
+            stretch that does not overlap a longer one, or else the single best match."""
+            strong = [s for s in item["spans"] if s[3] >= SERVICE_SOUND_AUTO] or [max(item["spans"], key=lambda s: s[3])]
+            chosen, used = [], set()
+            for span in sorted(strong, key=lambda s: (-(s[1] - s[0]), -s[3])):
+                if used.isdisjoint(range(span[0], span[1])):
+                    chosen.append(span)
+                    used.update(range(span[0], span[1]))
+            fixed = text
+            for start, end, term, _, _ in sorted(chosen, reverse=True):
+                fixed = fixed[:start] + term + fixed[end:]
+            found = self.registry.search(positive_text(fixed))
+            if not found or found[0]["entry"]["id"] != service:  # several words changed the meaning
+                start, end, term, _, _ = max(item["spans"], key=lambda s: s[3])
+                return text[:start] + term + text[end:], max(item["spans"], key=lambda s: s[3])[4]
+            return fixed, all(span[4] for span in chosen)
+
+        ranked = sorted(services.items(), key=lambda pair: (-coverage(pair[1]), -pair[1]["score"]))
+        lead_id, lead = ranked[0]
+        best, exact = corrected(lead_id, lead)
+        # A parent and its page (圖書借閱 / 圖書館地圖) are one request, not rivals; a rival
+        # matching as much of the sentence about as closely blocks a silent change.
+        rivals = [item for service, item in ranked[1:]
+                  if not self.registry.same_request(self.registry.by_id[service], self.registry.by_id[lead_id], None)
+                  and coverage(item) >= coverage(lead) and item["score"] > lead["score"] - SOUND_MARGIN + 1e-9]
         # Only an exact homophone replaces silently; a match that relies on the
         # accent fold (偷書 ~ 投訴) is offered instead.
-        auto = best if top >= SERVICE_SOUND_AUTO and clear and exact else None
-        return auto, [fixed for score, fixed, _ in ranked[:2] if score >= top - 0.1]
+        auto = best if lead["score"] >= SERVICE_SOUND_AUTO and not rivals and exact else None
+        options = [corrected(service, item)[0] for service, item in ranked[:2]
+                   if item["score"] >= lead["score"] - 0.1]
+        return auto, options
 
     def _navigate(self, payload, entry):
         if not entry["enabled"]:

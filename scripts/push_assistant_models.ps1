@@ -4,7 +4,8 @@
 param(
     [string]$DeviceId,
     [string]$Models = "D:\TownPassAssistant\models\device",
-    [string]$Package = "com.example.townpass"
+    [string]$Package = "com.example.townpass",
+    [string]$Multilingual = "D:\TownPassAssistant\models\asr-ablation\ggml-large-v3-turbo-q5_0.bin"
 )
 # Native tools write progress to stderr; Windows PowerShell 5.1 would treat that as
 # an error when output is redirected, so failures are detected by exit codes instead.
@@ -25,6 +26,17 @@ foreach ($name in @("Ministral-3-3B-Instruct-2512-Q4_K_M.gguf", "ggml-breeze-asr
     if ($remote -eq (Get-Item $file).Length) { Write-Host "$name already on the device"; continue }
     & $adb -s $DeviceId push $file "$target/$name"
     if ($LASTEXITCODE) { throw "adb push $name failed" }
+}
+# Optional multilingual Whisper (en/ja/vi/id/th and language detection); the App
+# uses it only when present. -Multilingual "" skips it.
+if ($Multilingual -and (Test-Path $Multilingual)) {
+    $name = "ggml-large-v3-turbo-q5_0.bin"  # OnDeviceAssistant.MULTI_ASR_FILE
+    $remote = (& $adb -s $DeviceId shell stat -c %s "$target/$name" 2>$null) -as [long]
+    if ($remote -eq (Get-Item $Multilingual).Length) { Write-Host "$name already on the device" }
+    else {
+        & $adb -s $DeviceId push $Multilingual "$target/$name"
+        if ($LASTEXITCODE) { throw "adb push $name failed" }
+    }
 }
 & $adb -s $DeviceId shell ls -l $target
 $mem = & $adb -s $DeviceId shell cat /proc/meminfo | Select-String "MemTotal"

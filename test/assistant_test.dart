@@ -1,4 +1,4 @@
-﻿import 'dart:async';
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
@@ -101,13 +101,16 @@ class QueueService extends AssistantService {
   Future<AssistantTranscript> transcribe(
     Uint8List wav, {
     required String requestId,
+    String language = 'zh',
   }) async {
     audio.add(wav);
+    languages.add(language);
     await transcriptGate?.future;
     return transcripts.first;
   }
 
   final deviceTexts = <List<String>>[];
+  final languages = <String>[];
 
   @override
   Future<AssistantTranscript> transcribeText(
@@ -846,6 +849,32 @@ void main() {
       (false, '請在原圖書頁面搜尋。'),
     ]);
   });
+
+  test(
+    'The chosen speech language is sent and the detected one shown',
+    () async {
+      final service = QueueService(
+        [const AssistantResult(sessionId: 's', message: 'ok')],
+        transcripts: [
+          const AssistantTranscript('I want to borrow a book', language: 'en'),
+        ],
+      );
+      final controller = AssistantViewController(
+        service: service,
+        executor: RecordingExecutor(),
+        recorder: FakeRecorder(),
+      );
+      expect(controller.speechLanguage.value, 'zh'); // Chinese until chosen
+      controller.setSpeechLanguage('auto');
+      expect(await controller.startListening(), isTrue);
+      await controller.stopListening();
+      expect(service.languages, ['auto']);
+      expect(controller.heardLanguage.value, 'en');
+      controller.setSpeechLanguage('xx'); // unknown codes fall back to Chinese
+      expect(controller.speechLanguage.value, 'zh');
+      expect(controller.heardLanguage.value, isNull);
+    },
+  );
 
   test(
     'The phone recogniser sends text, not audio, through the same flow',

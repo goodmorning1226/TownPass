@@ -412,11 +412,17 @@ def device_transcript(body):
             or not isinstance(confidences, list)
             or any(not isinstance(c, (int, float)) or isinstance(c, bool) for c in confidences)):
         raise ValueError("bad device transcript")
-    texts = [t.strip() for t in texts]
+    # The best non-blank reading leads (a recogniser may return a blank first one).
+    order = [i for i, t in enumerate(texts) if t.strip()]
+    texts = [texts[i].strip() for i in order]
+    confidences = [confidences[i] for i in order] if len(confidences) > max(order, default=-1) else []
     top = float(confidences[0]) if confidences else -1.0
     status = "clear" if top <= 0 or top >= DEVICE_CLEAR else "unsure"
-    return {"text": texts[0], "alternatives": [t for t in texts[1:] if t], "status": status,
-            "recognizer": "device", "confidence": round(top, 3) if top > 0 else None}
+    from asr_server import language_code
+    language = language_code(data.get("language"))
+    return {"text": texts[0] if texts else "", "alternatives": texts[1:], "status": status,
+            "recognizer": "device", "confidence": round(top, 3) if top > 0 else None,
+            "language": "zh" if language == "auto" else language}
 
 
 # An alternative may replace the heard text only if the recogniser scored it
@@ -583,8 +589,13 @@ def make_handler(assistant, token=""):
             except Exception:
                 return self.reply(422, {"error": "錄音格式不正確，請再說一次，或改用鍵盤。"})
             try:
-                request = urllib.request.Request(ASR_URL, data=audio, headers={"Content-Type": "audio/wav"})
-                with urllib.request.urlopen(request, timeout=ASR_TIMEOUT) as response:
+                from asr_server import language_code
+                # The App's chosen speech language (docs/AI_MULTILINGUAL_PLAN.md); default Chinese.
+                language = language_code(self.headers.get("X-Language"))
+                request = urllib.request.Request(ASR_URL, data=audio, headers={
+                    "Content-Type": "audio/wav", "X-Language": language})
+                # Detection plus the Chinese model can take two passes (App waits 70 s).
+                with urllib.request.urlopen(request, timeout=ASR_TIMEOUT * (1 if language == "zh" else 1.6)) as response:
                     result = json.loads(response.read(100_000))
             except urllib.error.HTTPError as exc:
                 return self.reply(422 if exc.code in (400, 413) else 503,
@@ -599,16 +610,24 @@ def make_handler(assistant, token=""):
             """Shared by both recognisers: clean-up, confirmation and sound correction."""
             text = result.get("text") if isinstance(result, dict) else None
             status = result.get("status", "clear") if isinstance(result, dict) else None
+            if TIMING_LOG:  # numbers only, never the words
+                print(f"timing speech recognizer={result.get('recognizer', 'whisper')} status={status} "
+                      f"chars={len(text) if isinstance(text, str) else None} "
+                      f"alternatives={len(result.get('alternatives') or [])} "
+                      f"confidence={result.get('confidence')}", flush=True)
             if not isinstance(text, str) or not text.strip() or status == "unclear":
                 return self.reply(422, {"error": "沒有聽清楚。請靠近麥克風、說大聲一點再試一次，或改用鍵盤。"})
             if len(text) > 500:
                 return self.reply(422, {"error": "內容過長，請分段說。"})
             text = clean_transcript(text)
+            language = result.get("language") or "zh"
+            # Sound-alike correction works on Mandarin syllables: Chinese only.
             decided = speech_resolution(text, result.get("alternatives", []), status,
                                         assistant.workflow.recognizes, result.get("avg_logprob"),
                                         result.get("alternative_logprobs"),
-                                        sound=assistant.workflow.sound_corrections)
+                                        sound=assistant.workflow.sound_corrections if language == "zh" else None)
             self.reply(200, {"contract_version": CONTRACT, "request_id": request_id, **decided,
+                             "language": language,
                              "metrics": {"elapsed_ms": result.get("elapsed_ms"),
                                          "audio_seconds": result.get("audio_seconds"),
                                          "status": status, "avg_logprob": result.get("avg_logprob"),

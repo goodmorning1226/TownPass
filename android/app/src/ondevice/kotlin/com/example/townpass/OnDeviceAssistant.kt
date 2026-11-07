@@ -27,8 +27,13 @@ object OnDeviceAssistant {
     private const val TAG = "TownPassAssistant"
     const val MODEL_FILE = "Ministral-3-3B-Instruct-2512-Q4_K_M.gguf"
     const val ASR_FILE = "ggml-breeze-asr-25-q5_0.bin"
+
+    /** Multilingual Whisper for en/ja/vi/id/th and language detection (optional;
+     *  the model choice follows docs/AI_ASR_ABLATION.md). */
+    const val MULTI_ASR_FILE = "ggml-large-v3-turbo-q5_0.bin"
     private const val MODEL_PORT = 8771
     private const val WHISPER_PORT = 8772
+    private const val MULTI_WHISPER_PORT = 8773
     private val processes = mutableListOf<Process>()
 
     @Volatile
@@ -49,11 +54,14 @@ object OnDeviceAssistant {
                 // Builds with the phone's own speech recogniser (TOWNPASS_SPEECH=system)
                 // do not run Whisper at all.
                 val whisper = app.resources.getBoolean(R.bool.assistant_whisper)
-                val info = Python.getInstance().getModule("device_main")
-                    .callAttr("start", MODEL_PORT, WHISPER_PORT, Kwarg("whisper", whisper)).toString()
-                Log.i(TAG, "backend: $info")
                 val models = app.getExternalFilesDir("models") ?: File(app.filesDir, "models")
                 models.mkdirs()
+                // Other speech languages only when the multilingual model was pushed.
+                val multilingual = whisper && File(models, MULTI_ASR_FILE).isFile
+                val info = Python.getInstance().getModule("device_main")
+                    .callAttr("start", MODEL_PORT, WHISPER_PORT, Kwarg("whisper", whisper),
+                        Kwarg("multi_port", if (multilingual) MULTI_WHISPER_PORT else null)).toString()
+                Log.i(TAG, "backend: $info")
                 // Recent 8-core phone SoCs have 6-8 performance cores; leave two for
                 // the UI. Speech and decision run one after the other, never together.
                 val threads = (Runtime.getRuntime().availableProcessors() - 2).coerceIn(2, 6).toString()
@@ -64,6 +72,11 @@ object OnDeviceAssistant {
                 if (whisper) {
                     launch(app, "libwhisper_server.so", File(models, ASR_FILE), WHISPER_PORT,
                         listOf("-t", threads, "-l", "zh"))
+                    if (multilingual) {
+                        // Same binary, second instance: keep the one just started.
+                        launch(app, "libwhisper_server.so", File(models, MULTI_ASR_FILE), MULTI_WHISPER_PORT,
+                            listOf("-t", threads, "-l", "auto"), stopLeftovers = false)
+                    }
                 } else {
                     stopStale("libwhisper_server.so")
                 }
@@ -78,7 +91,8 @@ object OnDeviceAssistant {
         }
     }
 
-    private fun launch(app: Context, binary: String, model: File, port: Int, extra: List<String>) {
+    private fun launch(app: Context, binary: String, model: File, port: Int, extra: List<String>,
+                       stopLeftovers: Boolean = true) {
         if (!model.isFile) {
             Log.w(TAG, "missing model ${model.absolutePath}; run scripts/push_assistant_models.ps1")
             return
@@ -86,7 +100,7 @@ object OnDeviceAssistant {
         val executable = File(app.applicationInfo.nativeLibraryDir, binary)
         // Servers left by an earlier App process (force-stop or reinstall does not
         // always end them) may sit in the wrong CPU group or point at an old APK.
-        stopStale(binary)
+        if (stopLeftovers) stopStale(binary)
         if (listening(port)) {
             Log.w(TAG, "port $port is in use by another process; not starting $binary")
             return
@@ -97,7 +111,7 @@ object OnDeviceAssistant {
         // Debug builds keep the servers' own log (start-up and timings; requests
         // are not logged at the default verbosity) for diagnosing slow phones.
         val debuggable = app.applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE != 0
-        builder.redirectOutput(File(if (debuggable) "${app.cacheDir}/$binary.log" else "/dev/null"))
+        builder.redirectOutput(File(if (debuggable) "${app.cacheDir}/$binary-$port.log" else "/dev/null"))
         synchronized(processes) { processes += builder.start() }
         Log.i(TAG, "started $binary on $port")
     }

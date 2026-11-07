@@ -13,11 +13,16 @@ class AssistantTranscript {
   final bool confirm;
   final List<String> options;
   final String? correctedFrom;
+
+  /// The language the speech was recognised in (e.g. 'zh', 'en'); with
+  /// 'auto' this is the detected one.
+  final String language;
   const AssistantTranscript(
     this.text, {
     this.confirm = false,
     this.options = const [],
     this.correctedFrom,
+    this.language = 'zh',
   });
 }
 
@@ -115,10 +120,20 @@ class AssistantService {
 
   /// Sends in-memory WAV audio to the backend's local speech recognition and
   /// returns the recognised text. Nothing is stored on the device or server.
+  ///
+  /// [language] is 'auto' (detect) or a speech language code ('zh', 'en', 'ja',
+  /// 'vi', 'id', 'th'); the backend falls back to Chinese without a
+  /// multilingual model.
   Future<AssistantTranscript> transcribe(
     Uint8List wav, {
     required String requestId,
-  }) => _transcription(wav, ContentType('audio', 'wav'), requestId);
+    String language = 'zh',
+  }) => _transcription(
+    wav,
+    ContentType('audio', 'wav'),
+    requestId,
+    language: language,
+  );
 
   /// Sends what the phone's own speech recogniser heard (texts best first, with
   /// their 0-1 confidences) for the same clean-up, confirmation and sound-alike
@@ -143,8 +158,9 @@ class AssistantService {
   Future<AssistantTranscript> _transcription(
     Uint8List payload,
     ContentType contentType,
-    String requestId,
-  ) async {
+    String requestId, {
+    String? language,
+  }) async {
     cancel();
     final client = HttpClient()..connectionTimeout = const Duration(seconds: 8);
     _active = client;
@@ -154,14 +170,16 @@ class AssistantService {
       );
       request.headers.contentType = contentType;
       request.headers.set('X-Request-Id', requestId);
+      if (language != null) request.headers.set('X-Language', language);
       const token = String.fromEnvironment('ASSISTANT_TOKEN');
       if (token.isNotEmpty) {
         request.headers.set(HttpHeaders.authorizationHeader, 'Bearer $token');
       }
       request.contentLength = payload.length;
       request.add(payload);
+      // Detection plus the Chinese model for Chinese can take two passes.
       final response = await request.close().timeout(
-        const Duration(seconds: 45),
+        Duration(seconds: language == null || language == 'zh' ? 45 : 70),
       );
       final body = await response
           .transform(utf8.decoder)
@@ -186,8 +204,10 @@ class AssistantService {
       }
       final confirm = json['confirm'] == true && options.isNotEmpty;
       final corrected = json['corrected_from'];
+      final heardIn = json['language'];
       return AssistantTranscript(
         text.trim(),
+        language: heardIn is String && heardIn.length <= 8 ? heardIn : 'zh',
         confirm: confirm,
         options: confirm ? options.cast<String>() : const [],
         correctedFrom:
