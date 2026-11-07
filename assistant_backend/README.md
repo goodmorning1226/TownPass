@@ -3,7 +3,7 @@
 模型固定使用 **Mistral AI `ministral-3:3b`**。不使用 Qwen，也不在失敗時改呼叫其他模型或雲端。
 主後端採 Python 3.11+ 標準函式庫，與 Flutter 分開啟動，無須 pip 安裝套件；
 選用的語音辨識服務（`asr_server.py`）另需 faster-whisper；
-選用的臺北市府 FAQ 檢索（[faq.py](faq.py)）另需 onnxruntime、tokenizers、numpy 與 repo 外的資料檔，見下方「FAQ 檢索」。
+選用的臺北市府 FAQ 檢索（[faq.py](faq.py)）另需 llama.cpp 的 `llama-server`（embedding 模式）與 repo 外的模型及索引檔，見下方「FAQ 檢索」。
 這是本機開發服務，不是正式上線的多使用者 API。
 
 ## 啟動
@@ -107,18 +107,24 @@ App 與後端需一起更新；舊的仍執行中之 Python 服務須重新啟�
 「沒找到服務」指：目錄與書目都沒命中，或模型回 `request_clarification`／`unsupported`。
 已命中且選到功能、候選確認、未串接功能的原因說明、取消，都不會查 FAQ。
 
-- 資料：8,121 筆臺北市府 FAQ，以 BAAI/bge-small-zh-v1.5（ONNX）編碼，餘弦相似度取前 3 筆。
+- 資料：8,121 筆臺北市府 FAQ，以 Microsoft **intfloat/multilingual-e5-small**（MIT，GGUF q8_0）編碼，餘弦相似度取前 3 筆。
+  查詢向量由 llama.cpp `llama-server --embedding --pooling mean` 計算（電腦與手機同一套 llama.cpp）；
+  FAQ 以 `passage: [機關] 問題` 建索引，查詢加 `query: `。
   回答原文照列，不經模型改寫，附「資料來源：機關」與「本服務僅涵蓋臺北市政府 FAQ。」；超過 600 字截斷並提示洽 1999。
 - 信心（2026-11-07 以 363 句標註資料重新校正，見 [AI_FAQ_RAG.md](../docs/AI_FAQ_RAG.md) 第 6 節）：
-  - 最高分 ≥ 0.85：直接回答，其他相近 FAQ 列為「相關問答」選項。
-  - 0.69–0.85：不直接回答，回「你是不是想問以下的問題？」並列出分數 ≥ 0.69 的問題（最多 3 題），使用者選了才顯示答案。
-  - < 0.69：視為沒找到。
+  - 最高分 ≥ 0.915：直接回答，其他相近 FAQ 列為「相關問答」選項。
+  - 0.88–0.915：不直接回答，回「你是不是想問以下的問題？」並列出分數 ≥ 0.88 的問題（最多 3 題），使用者選了才顯示答案。
+  - < 0.88：視為沒找到。
   門檻只適用此模型與索引，換模型或資料需用 `rag_handoff/tuning/sweep.py` 重新校正。少於 4 個字元的輸入不查 FAQ。
 - 選項為 `kind: "reply"`、`action: "faq_answer"`，選擇規則與其他候選相同（session、resolution、5 分鐘、防重播）。
-- 安裝：`pip install onnxruntime tokenizers numpy`（本機驗證 1.31.1／0.22.2／2.3.2），並把 `rag_handoff/assets/` 的檔案複製到
-  `%LOCALAPPDATA%\TownPassAssistant\faq_rag`，或以 `TOWNPASS_FAQ_DIR` 指定資料夾。資料檔約 117 MB，不提交到 Git。
-- 缺套件或資料時，啟動訊息顯示 `faq=off` 及原因，助理照常運作，只是沒有 FAQ 這一層。`/health` 的 `faq_entries` 為載入筆數（0 表示關閉）。
-- 手機端（Chaquopy）尚未提供 onnxruntime／tokenizers，裝置端版本目前沒有 FAQ 層。決策紀錄見 [AI_FAQ_RAG.md](../docs/AI_FAQ_RAG.md)。
+- 安裝：見 [AI_FAQ_RAG.md](../docs/AI_FAQ_RAG.md) 第 3 節。執行時需要：
+  - 索引（`embeddings.bin`、`metadata.json`、`model_info.json`，約 19 MB）放在 `%LOCALAPPDATA%\TownPassAssistant\faq_rag`，或以 `TOWNPASS_FAQ_DIR` 指定；
+  - embedding 伺服器：`llama-server -m multilingual-e5-small-q8_0.gguf --embedding --pooling mean --port 8774`，
+    或以 `TOWNPASS_FAQ_EMBED_URL` 指定位址。有 numpy 時用 numpy 計分，沒有時以純 Python 計分（手機）。
+- 沒有索引時啟動訊息顯示 `faq=off` 及原因；索引在但伺服器沒開時顯示 `faq=8121` 並提示伺服器未就緒，查詢一律視為沒找到。
+  兩種情況助理都照常運作。`/health` 的 `faq_entries` 為載入筆數（0 表示關閉）。
+- 手機端：`OnDeviceAssistant.kt` 在 :8774 另開一個 embedding 模式的 llama-server（2 執行緒），模型與索引由
+  `scripts/push_assistant_models.ps1` 推送；沒推送就沒有 FAQ 層。決策紀錄見 [AI_FAQ_RAG.md](../docs/AI_FAQ_RAG.md)。
 
 完整新增能力、未串接範圍與裝置測試見 [全功能實作紀錄](../docs/AI_EXPANSION_IMPLEMENTATION.md)。
 

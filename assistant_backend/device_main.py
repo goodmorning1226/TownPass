@@ -8,6 +8,7 @@ side, the HTTP contract and the decision path are unchanged:
   127.0.0.1:8765  assistant backend (server.py)
   127.0.0.1:8770  speech recognition (asr_server.py, whisper.cpp engine)
   llama-server / whisper-server on the ports passed in (loopback only)
+  llama-server --embedding on faq_port for the optional FAQ layer (faq.py)
 """
 from __future__ import annotations
 
@@ -18,8 +19,11 @@ _started = threading.Event()
 _lock = threading.Lock()
 
 
-def configure(model_port, whisper_port, model_timeout=70):
+def configure(model_port, whisper_port, model_timeout=70, faq_port=None, faq_dir=None):
     """Point server.py at llama-server before it is imported (its settings are module constants)."""
+    if faq_port and faq_dir:
+        os.environ["TOWNPASS_FAQ_EMBED_URL"] = f"http://127.0.0.1:{faq_port}"
+        os.environ["TOWNPASS_FAQ_DIR"] = faq_dir
     os.environ["TOWNPASS_MODEL_API"] = "openai"
     os.environ["TOWNPASS_MODEL_URL"] = f"http://127.0.0.1:{model_port}"
     os.environ["TOWNPASS_MODEL_TIMEOUT"] = str(model_timeout)
@@ -76,6 +80,16 @@ def warm_up(recognizer, model_url, limit_s=900):
           f"decision={'ok' if decision else 'failed'} {time.monotonic() - started:.1f}s", flush=True)
 
 
+def _load_faq(backend):
+    """Attach the FAQ index once read (~1 s); until then requests run without FAQ."""
+    import time
+    import faq
+    started = time.monotonic()
+    backend.faq = faq.load_default()
+    print(f"timing faq-load entries={backend.faq.count if backend.faq else 0} "
+          f"{time.monotonic() - started:.1f}s", flush=True)
+
+
 def _serve(server):
     thread = threading.Thread(target=server.serve_forever, daemon=True)
     thread.start()
@@ -83,7 +97,7 @@ def _serve(server):
 
 
 def start(model_port=8771, whisper_port=8772, assistant_port=8765, asr_port=8770, whisper=True,
-          multi_port=None, chinese_model=True):
+          multi_port=None, chinese_model=True, faq_port=None, faq_dir=None):
     """Start both HTTP servers once; returns immediately after they listen.
 
     The native model servers may still be loading: until they answer, requests
@@ -94,11 +108,13 @@ def start(model_port=8771, whisper_port=8772, assistant_port=8765, asr_port=8770
     languages and "auto" detection); None when that model is not on the phone.
     chinese_model=False: no separate Chinese model (Breeze) was pushed, so the
     multilingual model (Whisper small) also serves Chinese.
+    faq_port, faq_dir: the e5 embedding server and the FAQ index directory;
+    None (files not pushed) runs without the FAQ layer.
     """
     with _lock:
         if _started.is_set():
             return "already running"
-        configure(model_port, whisper_port)
+        configure(model_port, whisper_port, faq_port=faq_port, faq_dir=faq_dir)
         from http.server import ThreadingHTTPServer
         import asr_server
         import server
@@ -107,11 +123,14 @@ def start(model_port=8771, whisper_port=8772, assistant_port=8765, asr_port=8770
         recognizer = asr_server.WhisperCppRecognizer(chinese_url, multi_url=multi_url)
         asr = ThreadingHTTPServer(("127.0.0.1", asr_port), asr_server.make_handler(recognizer, "whisper.cpp"))
         asr.daemon_threads = True
-        assistant = ThreadingHTTPServer(("127.0.0.1", assistant_port), server.make_handler(server.Assistant()))
+        backend = server.Assistant()
+        assistant = ThreadingHTTPServer(("127.0.0.1", assistant_port), server.make_handler(backend))
         assistant.daemon_threads = True
         assistant.timeout = 150
         _serve(asr)
         _serve(assistant)
+        if faq_port and faq_dir:
+            threading.Thread(target=_load_faq, args=(backend,), name="assistant-faq", daemon=True).start()
         threading.Thread(target=warm_up, args=(recognizer if whisper else None, os.environ["TOWNPASS_MODEL_URL"]),
                          name="assistant-warm-up", daemon=True).start()
         _started.set()
@@ -119,4 +138,5 @@ def start(model_port=8771, whisper_port=8772, assistant_port=8765, asr_port=8770
         if whisper:
             speech = (f"chinese whisper :{whisper_port}" if chinese_url != multi_url else "chinese = multilingual") + (
                 f", multilingual whisper :{multi_port}" if multi_url else "")
-        return f"assistant :{assistant_port}, asr :{asr_port}, model :{model_port}, {speech}"
+        faq_state = f", faq embed :{faq_port}" if faq_port and faq_dir else ", faq off"
+        return f"assistant :{assistant_port}, asr :{asr_port}, model :{model_port}, {speech}{faq_state}"

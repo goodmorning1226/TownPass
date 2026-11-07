@@ -4,6 +4,9 @@
 #  2. Breeze-ASR-25 for whisper.cpp: converted from the official MediaTek Research
 #     weights already used for the computer setup, then quantised to q8_0 (whisper.cpp has
 #     ARM i8mm kernels for q8_0/q5_k/q4_k but not q5_0: 5.4 s vs 13.4 s a clip on the phone).
+#  3. FAQ embedding model: Microsoft intfloat/multilingual-e5-small (MIT) converted to
+#     GGUF q8_0 for llama-server --embedding (docs/AI_FAQ_RAG.md). The FAQ index itself
+#     is built on the computer with scripts/build_faq_index.py.
 # Output: <Root>\models\device\  (outside the repository). Push with push_assistant_models.ps1.
 param(
     [string]$Root = "D:\TownPassAssistant",
@@ -58,6 +61,19 @@ if (-not (Test-Path $asr)) {
     & $quantize $f16 $asr $AsrQuant
     if ($LASTEXITCODE) { throw "quantize failed" }
     Remove-Item $f16  # 3 GB intermediate
+}
+
+# 3. FAQ embedding model: HF safetensors -> GGUF q8_0 (llama.cpp's converter, see convert_e5_gguf.py)
+$e5 = Join-Path $out "multilingual-e5-small-q8_0.gguf"
+if (-not (Test-Path $e5)) {
+    $e5Source = Join-Path $Root "source\multilingual-e5-small"
+    if (-not (Test-Path (Join-Path $e5Source "model.safetensors"))) {
+        & $py -I -c "from huggingface_hub import snapshot_download; snapshot_download('intfloat/multilingual-e5-small', local_dir=r'$e5Source', allow_patterns=['config.json','model.safetensors','tokenizer.json','tokenizer_config.json','special_tokens_map.json','sentencepiece.bpe.model','modules.json','1_Pooling/*','sentence_bert_config.json'])"
+        if ($LASTEXITCODE) { throw "download multilingual-e5-small failed" }
+    }
+    & $py -m pip install -q sentencepiece protobuf
+    & $py -s -E (Join-Path $PSScriptRoot "convert_e5_gguf.py") (Join-Path $Source "llama.cpp") $e5Source $e5 q8_0
+    if ($LASTEXITCODE) { throw "convert multilingual-e5-small failed" }
 }
 
 Get-ChildItem $out -File | ForEach-Object {

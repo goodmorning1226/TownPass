@@ -100,5 +100,5 @@ app.*.map.json
 # On-device assistant native build output (scripts/build_assistant_native.ps1)
 **/android/app/assistant-native/
 
-# FAQ RAG model and index (~117 MB); installed outside the repo, see assistant_backend/README.md
+# Former FAQ RAG assets (bge ONNX, ~117 MB). The e5 GGUF and index live outside the repo, see docs/AI_FAQ_RAG.md
 /rag_handoff/assets/

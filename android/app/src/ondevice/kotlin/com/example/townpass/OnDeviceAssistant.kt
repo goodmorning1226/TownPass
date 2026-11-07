@@ -17,6 +17,7 @@ import kotlin.concurrent.thread
  *
  *  - llama.cpp llama-server (ministral-3:3b GGUF)   127.0.0.1:8771
  *  - whisper.cpp whisper-server (Breeze-ASR-25)     127.0.0.1:8772
+ *  - llama-server --embedding (multilingual-e5-small) 127.0.0.1:8774, optional FAQ layer
  *  - Python backend via Chaquopy (device_main.py)   127.0.0.1:8765 and :8770
  *
  * so the Flutter side and the HTTP contract do not change. Model files are not
@@ -33,6 +34,12 @@ object OnDeviceAssistant {
     /** Multilingual Whisper (default Whisper small q8_0: 1.4 s a clip) for Chinese
      *  when no separate model is pushed, en/ja/vi/id/th and language detection. */
     const val MULTI_ASR_FILE = "ggml-whisper-multilingual.bin"  // push_assistant_models.ps1 -Multilingual
+    /** Optional FAQ layer (docs/AI_FAQ_RAG.md): Microsoft multilingual-e5-small GGUF and
+     *  the pre-built index directory, both pushed by push_assistant_models.ps1 (-FaqModel, -FaqIndex).
+     *  Without them the assistant runs without FAQ. */
+    const val FAQ_MODEL_FILE = "multilingual-e5-small-q8_0.gguf"
+    const val FAQ_INDEX_DIR = "faq_rag"
+    private const val FAQ_EMBED_PORT = 8774
     private const val MODEL_PORT = 8771
     private const val WHISPER_PORT = 8772
     private const val MULTI_WHISPER_PORT = 8773
@@ -62,10 +69,14 @@ object OnDeviceAssistant {
                 // multilingual one, or both.
                 val chinese = whisper && File(models, ASR_FILE).isFile
                 val multilingual = whisper && File(models, MULTI_ASR_FILE).isFile
+                val faqIndex = File(models, FAQ_INDEX_DIR)
+                val faq = File(models, FAQ_MODEL_FILE).isFile && File(faqIndex, "embeddings.bin").isFile
                 val info = Python.getInstance().getModule("device_main")
                     .callAttr("start", MODEL_PORT, WHISPER_PORT, Kwarg("whisper", whisper),
                         Kwarg("multi_port", if (multilingual) MULTI_WHISPER_PORT else null),
-                        Kwarg("chinese_model", chinese || !multilingual)).toString()
+                        Kwarg("chinese_model", chinese || !multilingual),
+                        Kwarg("faq_port", if (faq) FAQ_EMBED_PORT else null),
+                        Kwarg("faq_dir", if (faq) faqIndex.absolutePath else null)).toString()
                 Log.i(TAG, "backend: $info")
                 // Recent 8-core phone SoCs have 6-8 performance cores; leave two for
                 // the UI. Speech and decision run one after the other, never together.
@@ -92,6 +103,14 @@ object OnDeviceAssistant {
                     // library policy in the prompt cache (requests are <= ~1000 tokens;
                     // the backend still sends one request at a time).
                     llamaCpuArgs() + listOf("-c", "4096", "-np", "2", "--no-webui"))
+                if (faq) {
+                    // Same binary, started after the decision model (whose launch stops
+                    // leftover copies). Queried only after a decision has finished, one
+                    // short query at a time: two threads, one 512-token slot (~130 MB).
+                    launch(app, "libllama_server.so", File(models, FAQ_MODEL_FILE), FAQ_EMBED_PORT,
+                        listOf("--embedding", "--pooling", "mean", "-c", "512", "-b", "512", "-ub", "512",
+                            "-np", "1", "-t", "2", "--no-webui"), stopLeftovers = false)
+                }
             } catch (error: Throwable) {
                 Log.e(TAG, "on-device assistant failed to start", error)
             }
