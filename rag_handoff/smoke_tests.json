@@ -1,0 +1,296 @@
+[
+  {
+    "category": "high_conf",
+    "query": "學齡前視力檢查要錢嗎",
+    "expected_confidence": "high",
+    "expected_top_score": 0.7856,
+    "expected_top_id": "9142457",
+    "expected_top_question": "學齡前兒童護眼方案(視力免費複檢)需要費用嗎?",
+    "top3_ids": [
+      "9142457",
+      "9142448",
+      "9142458"
+    ],
+    "top3_scores": [
+      0.7856,
+      0.7765,
+      0.7743
+    ]
+  },
+  {
+    "category": "high_conf",
+    "query": "房屋拆掉了還要繳稅嗎",
+    "expected_confidence": "high",
+    "expected_top_score": 0.8072,
+    "expected_top_id": "9266496",
+    "expected_top_question": "年度中房屋拆除,是否還要繳納房屋稅?",
+    "top3_ids": [
+      "9266496",
+      "9248420",
+      "9248418"
+    ],
+    "top3_scores": [
+      0.8072,
+      0.7703,
+      0.7653
+    ]
+  },
+  {
+    "category": "high_conf",
+    "query": "水費逾期未繳怎麼辦",
+    "expected_confidence": "high",
+    "expected_top_score": 0.8398,
+    "expected_top_id": "4903605",
+    "expected_top_question": "水費逾期未繳,違約金如何計算?多久會被停水?",
+    "top3_ids": [
+      "4903605",
+      "8948118",
+      "4903569"
+    ],
+    "top3_scores": [
+      0.8398,
+      0.7871,
+      0.7736
+    ]
+  },
+  {
+    "category": "high_conf",
+    "query": "新冠疫苗跟流感疫苗可以一起打嗎",
+    "expected_confidence": "high",
+    "expected_top_score": 0.7743,
+    "expected_top_id": "9285552",
+    "expected_top_question": "新冠疫苗與其他疫苗(如流感疫苗、肺炎鏈球菌疫苗、幼兒常規疫苗等)可以同時接種嗎?",
+    "top3_ids": [
+      "9285552",
+      "9499189",
+      "9051657"
+    ],
+    "top3_scores": [
+      0.7743,
+      0.7614,
+      0.7341
+    ]
+  },
+  {
+    "category": "high_conf",
+    "query": "低收入戶補助怎麼申請",
+    "expected_confidence": "high",
+    "expected_top_score": 0.8108,
+    "expected_top_id": "7652908",
+    "expected_top_question": "目前失業的話就可以申請低收入戶嗎?如果可以要怎樣申請?",
+    "top3_ids": [
+      "7652908",
+      "7652906",
+      "7652904"
+    ],
+    "top3_scores": [
+      0.8108,
+      0.792,
+      0.7903
+    ]
+  },
+  {
+    "category": "high_conf",
+    "query": "離婚登記要帶什麼",
+    "expected_confidence": "high",
+    "expected_top_score": 0.747,
+    "expected_top_id": "4899244",
+    "expected_top_question": "我與先生(太太)感情不好,已經到了水火不容地步,我不想跟他再有瓜葛,該如何辦理離婚?",
+    "top3_ids": [
+      "4899244",
+      "4904519",
+      "4899251"
+    ],
+    "top3_scores": [
+      0.747,
+      0.7384,
+      0.7358
+    ]
+  },
+  {
+    "category": "high_conf",
+    "query": "實價登錄是什麼",
+    "expected_confidence": "high",
+    "expected_top_score": 0.7519,
+    "expected_top_id": "4906196",
+    "expected_top_question": "如果發現實價登錄價格有疑問應如何反映?",
+    "top3_ids": [
+      "4906196",
+      "4906378",
+      "8210469"
+    ],
+    "top3_scores": [
+      0.7519,
+      0.7349,
+      0.7112
+    ]
+  },
+  {
+    "category": "high_conf",
+    "query": "捷運遺失物",
+    "expected_confidence": "high",
+    "expected_top_score": 0.7532,
+    "expected_top_id": "4897787",
+    "expected_top_question": "於捷運系統內遺失及找尋遺失物之相關處理方式?",
+    "top3_ids": [
+      "4897787",
+      "7149824",
+      "8900943"
+    ],
+    "top3_scores": [
+      0.7532,
+      0.6525,
+      0.6435
+    ]
+  },
+  {
+    "category": "high_conf",
+    "query": "白石湖怎麼去",
+    "expected_confidence": "high",
+    "expected_top_score": 0.7328,
+    "expected_top_id": "4908272",
+    "expected_top_question": "請問內湖白石湖要如何前往?",
+    "top3_ids": [
+      "4908272",
+      "4908274",
+      "4908273"
+    ],
+    "top3_scores": [
+      0.7328,
+      0.658,
+      0.6576
+    ]
+  },
+  {
+    "category": "low_conf",
+    "query": "考績乙等要怎麼申訴",
+    "expected_confidence": "high",
+    "expected_top_score": 0.7313,
+    "expected_top_id": "4897595",
+    "expected_top_question": "不服服務機關將其年終考績考列乙等,應如何提起救濟?",
+    "top3_ids": [
+      "4897595",
+      "8061378",
+      "4897594"
+    ],
+    "top3_scores": [
+      0.7313,
+      0.7302,
+      0.7285
+    ]
+  },
+  {
+    "category": "low_conf",
+    "query": "台北市長是誰",
+    "expected_confidence": "low",
+    "expected_top_score": 0.7114,
+    "expected_top_id": "4898776",
+    "expected_top_question": "請問本市○○區○○里里長姓名?電話?",
+    "top3_ids": [
+      "4898776",
+      "4898872",
+      "4906194"
+    ],
+    "top3_scores": [
+      0.7114,
+      0.7042,
+      0.6907
+    ]
+  },
+  {
+    "category": "no_match",
+    "query": "今天天氣怎麼樣",
+    "expected_confidence": "none",
+    "expected_top_score": 0.0,
+    "expected_top_id": null,
+    "expected_top_question": null,
+    "top3_ids": [],
+    "top3_scores": []
+  },
+  {
+    "category": "no_match",
+    "query": "幫我寫一首情詩",
+    "expected_confidence": "none",
+    "expected_top_score": 0.0,
+    "expected_top_id": null,
+    "expected_top_question": null,
+    "top3_ids": [],
+    "top3_scores": []
+  },
+  {
+    "category": "no_match",
+    "query": "我想訂機票去東京",
+    "expected_confidence": "none",
+    "expected_top_score": 0.0,
+    "expected_top_id": null,
+    "expected_top_question": null,
+    "top3_ids": [],
+    "top3_scores": []
+  },
+  {
+    "category": "no_match",
+    "query": "鳳梨披薩好吃嗎",
+    "expected_confidence": "none",
+    "expected_top_score": 0.0,
+    "expected_top_id": null,
+    "expected_top_question": null,
+    "top3_ids": [],
+    "top3_scores": []
+  },
+  {
+    "category": "no_match",
+    "query": "台北有什麼好吃的",
+    "expected_confidence": "none",
+    "expected_top_score": 0.0,
+    "expected_top_id": null,
+    "expected_top_question": null,
+    "top3_ids": [],
+    "top3_scores": []
+  },
+  {
+    "category": "no_match",
+    "query": "基隆港的歷史",
+    "expected_confidence": "none",
+    "expected_top_score": 0.0,
+    "expected_top_id": null,
+    "expected_top_question": null,
+    "top3_ids": [],
+    "top3_scores": []
+  },
+  {
+    "category": "known_fp",
+    "query": "外國人可以免費看動物園嗎",
+    "expected_confidence": "high",
+    "expected_top_score": 0.735,
+    "expected_top_id": "4905502",
+    "expected_top_question": "動物園參觀門票有含保險費嗎?",
+    "top3_ids": [
+      "4905502",
+      "4900832",
+      "8131907"
+    ],
+    "top3_scores": [
+      0.735,
+      0.6979,
+      0.6961
+    ]
+  },
+  {
+    "category": "known_fp",
+    "query": "新北市戶籍遷入",
+    "expected_confidence": "high",
+    "expected_top_score": 0.7523,
+    "expected_top_id": "4910032",
+    "expected_top_question": "若要更換已過期的印鑑證明,但戶籍已不在原申請的戶籍地,應至新戶籍或原戶籍地辦理?",
+    "top3_ids": [
+      "4910032",
+      "4903323",
+      "4903320"
+    ],
+    "top3_scores": [
+      0.7523,
+      0.7489,
+      0.7418
+    ]
+  }
+]

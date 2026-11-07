@@ -169,6 +169,17 @@ health 應含 contract_version 3、registry_version 1 與模型名稱；只能�
 首次推論可能要等模型載入。錯誤時分別確認 Ollama :11434、Python :8765 與遠端示範書目網路，避免誤改成 timeout 無上限。
 目前圖書與其他 WebView 仍需要網際網路取得示範資料／頁面；「地端模型」不等於整個 App 可離線。
 
+FAQ 檢索（選用，工具呼叫找不到服務時回答臺北市府常見問答）：
+
+```powershell
+pip install onnxruntime tokenizers numpy
+New-Item -ItemType Directory -Force "$env:LOCALAPPDATA\TownPassAssistant\faq_rag"
+Copy-Item .\rag_handoff\assets\* "$env:LOCALAPPDATA\TownPassAssistant\faq_rag\"
+```
+
+資料檔約 117 MB，由 FAQ 資料製作者另外提供，不在 Git 中。重新啟動主後端後，啟動訊息應顯示 `faq=8121`；
+顯示 `faq=off` 時，下一行會說明缺少的套件或檔案。細節見 [assistant_backend/README.md](../assistant_backend/README.md) 的「FAQ 檢索」。
+
 ### 5.1 語音辨識（選用，按住說話需要）
 
 語音使用 MediaTek Research 的 **Breeze-ASR-25**（Whisper-large-v2 微調，台灣華語與中英混用），
