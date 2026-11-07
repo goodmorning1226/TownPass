@@ -19,6 +19,7 @@ import 'package:town_pass/service/assistant_recorder.dart';
 import 'package:town_pass/service/assistant_service.dart';
 import 'package:town_pass/service/assistant_speaker.dart';
 import 'package:town_pass/service/assistant_speech_language.dart';
+import 'package:town_pass/service/page_translation.dart';
 
 /// One chat bubble.
 class ChatMessage {
@@ -179,6 +180,16 @@ class GuidedAssistantController extends GetxController {
     speechLanguage.value = AssistantSpeechLanguage.of(code).code;
     heardLanguage.value = null;
     AssistantSpeechLanguage.save(speechLanguage.value);
+  }
+
+  /// A clearly recognised language switches the pages for this launch (the
+  /// next launch starts in the phone's language, see PageTranslation.load).
+  void _followSpokenLanguage(AssistantTranscript heard) {
+    final sure = heard.languageConfidence;
+    if (sure != null && sure < 0.8) return;
+    if (PageTranslation.languages.containsKey(heard.language)) {
+      PageTranslation.instance.setLanguage(heard.language);
+    }
   }
 
   void _onLevel(double rms) {
@@ -1196,6 +1207,7 @@ class GuidedAssistantController extends GetxController {
     // guards navigation. The turn is answered in the language heard.
     final reading = _bestReading(heard);
     _turnLanguage = heard.language;
+    _followSpokenLanguage(heard);
     submit(
       reading.text,
       voice: true,
@@ -1307,6 +1319,7 @@ class GuidedAssistantController extends GetxController {
     homeAsk.value = HomeAsk.asked;
     heardLanguage.value = heard.language;
     _turnLanguage = heard.language;
+    _followSpokenLanguage(heard);
     submit(
       reading.text,
       voice: true,

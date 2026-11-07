@@ -875,9 +875,10 @@ void main() {
       expect(find.text('[en] 首頁'), findsOneWidget);
       expect(find.text('我要借書'), findsOneWidget); // assistant text untouched
       expect(find.text('ISBN 123'), findsOneWidget); // nothing to translate
+      // Not kept: the next launch starts in the phone's language again.
       expect(
         (await SharedPreferences.getInstance()).getString('page_language'),
-        'en',
+        isNull,
       );
       await tester.runAsync(() => PageTranslation.instance.setLanguage('zh'));
       await tester.pump();
@@ -1034,6 +1035,44 @@ void main() {
         controller.cancel();
       },
     );
+
+    test('Each launch starts in the phone language', () {
+      expect(PageTranslation.systemLanguage('vi'), 'vi');
+      expect(PageTranslation.systemLanguage('zh'), 'zh');
+      expect(
+        PageTranslation.systemLanguage('fr'),
+        'zh',
+      ); // not offered: Chinese
+    });
+
+    test('A clearly spoken language switches the pages at once', () async {
+      start();
+      final service = QueueService(
+        [
+          const AssistantResult(
+            sessionId: 's',
+            message: 'Hello',
+            language: 'vi',
+          ),
+        ],
+        transcripts: [
+          const AssistantTranscript(
+            'Tôi muốn mượn sách',
+            language: 'vi',
+            languageConfidence: 0.98,
+          ),
+        ],
+      );
+      final controller = AssistantViewController(
+        service: service,
+        executor: RecordingExecutor(),
+        recorder: FakeRecorder(),
+      );
+      expect(await controller.startListening(), isTrue);
+      await controller.stopListening();
+      expect(PageTranslation.instance.language.value, 'vi');
+      controller.cancel();
+    });
 
     test('A navigation sets the page language; options keep theirs', () async {
       start();

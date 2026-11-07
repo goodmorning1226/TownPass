@@ -73,18 +73,28 @@ class PageTranslation {
 
   bool get active => language.value != original;
 
-  /// The saved page language, if any (else the pages stay in Chinese), the
-  /// App's own strings translated in advance (assets/i18n/app_strings.json,
-  /// shown at once) and what ML Kit translated earlier on this phone.
+  /// Every launch starts in the phone's own language (owner, 2026-11-08:
+  /// e.g. a migrant caregiver using a grandparent's Chinese phone switches it
+  /// by speaking, and the next launch is the phone's language again). A
+  /// language we do not offer leaves the pages in Chinese. Also loads the
+  /// App's strings translated in advance (assets/i18n/app_strings.json) and
+  /// what ML Kit translated earlier on this phone.
   Future<void> load() async {
     await _loadBundled();
-    try {
-      final saved = (await SharedPreferences.getInstance()).getString(_key);
-      if (saved != null && languages.containsKey(saved)) {
-        language.value = saved;
-        await _loadLearned(saved);
-      }
-    } catch (_) {}
+    final system = systemLanguage();
+    if (system != original) {
+      language.value = system;
+      await _loadLearned(system);
+    }
+  }
+
+  /// The phone's language when it is one of [languages], else Chinese.
+  static String systemLanguage([String? languageCode]) {
+    final code =
+        (languageCode ??
+                WidgetsBinding.instance.platformDispatcher.locale.languageCode)
+            .toLowerCase();
+    return languages.containsKey(code) ? code : original;
   }
 
   Future<void> _loadBundled() async {
@@ -136,16 +146,14 @@ class PageTranslation {
     });
   }
 
-  /// Switches every page to [code] and keeps it for the next launch.
+  /// Switches every page to [code] for this launch only (the next launch
+  /// starts in the phone's language again, see [load]).
   Future<void> setLanguage(String code) async {
     if (!languages.containsKey(code) || code == language.value) return;
     language.value = code;
     revision.value++;
     await _loadLearned(code);
     revision.value++; // texts learned earlier on this phone
-    try {
-      await (await SharedPreferences.getInstance()).setString(_key, code);
-    } catch (_) {}
   }
 
   /// [text] in the page language when its translation is ready; otherwise

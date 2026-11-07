@@ -202,6 +202,11 @@ class AssistantViewController extends GetxController {
 
   void _rememberLanguage(String? code) {
     _followInPanel(code);
+    // The pages follow the language actually spoken or typed (clearly
+    // recognised), not only the next navigation.
+    if (code != null && PageTranslation.languages.containsKey(code)) {
+      PageTranslation.instance.setLanguage(code);
+    }
     if (code == null || speechLanguage.value == 'auto') return;
     final known = AssistantSpeechLanguage.all.any((l) => l.code == code);
     if (!known || code == speechLanguage.value) return;
