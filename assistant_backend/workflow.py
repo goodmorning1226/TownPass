@@ -19,6 +19,7 @@ import uuid
 import i18n
 from decision import decide
 from faq import SCOPE_NOTE
+from guide import GuidePlanner
 from page_context import current_root, model_view
 from phonetic import exact_homophone, rank_books, term_matches
 from registry import Registry, book_fuzzy, primary_title, single_substitution
@@ -117,6 +118,7 @@ class Workflow:
         self.validate = validate
         self.error = error
         self.registry = Registry()
+        self.guides = GuidePlanner()
         self.pending = {}
         self.lock = threading.RLock()
 
@@ -481,6 +483,28 @@ class Workflow:
         return self.reply(payload, i18n.t("clarify", language))
 
     def handle(self, payload):
+        """One reply. Which page opens is decided by the page stage below
+        (unchanged). When that page has teaching components, the guide stage
+        (guide.py) adds which ones to teach, as reply["guide"]. Every path
+        that navigates passes here, the other languages included."""
+        reply = self._handle(payload)
+        page = self.guides.page_for(reply.get("destination")) if reply.get("kind") == "navigate" else None
+        if page:
+            if reply.get("language", "zh") != "zh":
+                # The guide stage's keywords and question rules are Chinese: the
+                # (sub-)page's whole task, without a model call.
+                plan, route = self.guides.default_plan(page, reply.get("destination")), "guide_default_language"
+            else:
+                text = payload.get("text", "").strip()
+                from server import positive_text
+                plan, route = self.guides.plan(self.owner, page, positive_text(text) or text, self.tool,
+                                               self.validate, self.error, decide,
+                                               destination=reply.get("destination"))
+            self.owner.usage.guide_route = route
+            reply["guide"] = plan
+        return reply
+
+    def _handle(self, payload):
         text = payload.get("text", "").strip()
         session = payload["session_id"]
         with self.lock:

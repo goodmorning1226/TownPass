@@ -1,0 +1,202 @@
+{
+  "version": 1,
+  "_comment": "Teaching components of one service page. Shared by the App (guides/<page>_guide.dart holds the pre-written step texts) and the backend (guide.py picks a set). The model may only choose ids listed here; prerequisites are added and ordered by the validator, never by the model. capabilities: capability ids (or roots like 'fees') whose pages this guide runs on. capability_goals: the only goals that fit that sub-page, first = its default. entry_goals: components always added for that capability.",
+  "page": "library",
+  "capability": "library",
+  "capabilities": [
+    "library"
+  ],
+  "title": "圖書借閱",
+  "default_goal": "reserve",
+  "capability_goals": {
+    "library.ranking": [
+      "open_ranking"
+    ],
+    "library.notices": [
+      "open_notices"
+    ],
+    "library.records": [
+      "open_records",
+      "check_pickup"
+    ]
+  },
+  "entry_goals": {},
+  "components": [
+    {
+      "id": "open_search",
+      "title": "打開關鍵字搜尋",
+      "description": "在館藏查詢點「關鍵字搜尋」",
+      "keywords": [
+        "搜尋",
+        "查書",
+        "找書"
+      ],
+      "requires": []
+    },
+    {
+      "id": "search_keyword",
+      "title": "輸入書名搜尋",
+      "description": "在搜尋框打書名或作者，再按放大鏡",
+      "keywords": [
+        "書名",
+        "作者",
+        "打字",
+        "輸入"
+      ],
+      "requires": [
+        "open_search"
+      ]
+    },
+    {
+      "id": "hot_keyword",
+      "title": "點熱門關鍵字",
+      "description": "不知道要找什麼時，點一個熱門關鍵字",
+      "keywords": [
+        "熱門",
+        "推薦",
+        "不知道",
+        "隨便",
+        "有什麼書",
+        "好看"
+      ],
+      "requires": [
+        "open_search"
+      ]
+    },
+    {
+      "id": "pick_book",
+      "title": "選一本想借的書",
+      "description": "在搜尋結果點書名，看這本書的詳細內容",
+      "keywords": [
+        "詳細",
+        "介紹",
+        "館藏",
+        "這本書"
+      ],
+      "requires": [
+        "search_keyword|hot_keyword|open_ranking"
+      ]
+    },
+    {
+      "id": "choose_branch",
+      "title": "選擇取書館",
+      "description": "選要去哪一間圖書館拿書",
+      "keywords": [
+        "取書館",
+        "哪一間",
+        "哪間",
+        "分館拿",
+        "選取書館"
+      ],
+      "requires": [
+        "pick_book"
+      ]
+    },
+    {
+      "id": "reserve",
+      "title": "確認後按「預約」",
+      "description": "看清楚書名和取書館，再自己按「預約」",
+      "keywords": [
+        "借",
+        "預約"
+      ],
+      "requires": [
+        "choose_branch"
+      ]
+    },
+    {
+      "id": "open_ranking",
+      "title": "看點閱排行",
+      "description": "打開點閱排行的「更多」，看大家最常看的書",
+      "keywords": [
+        "排行",
+        "排名",
+        "最多人",
+        "最熱門",
+        "大家都看"
+      ],
+      "requires": []
+    },
+    {
+      "id": "open_notices",
+      "title": "看圖書館公告",
+      "description": "打開重要訊息的「更多」，看圖書館的公告",
+      "keywords": [
+        "公告",
+        "訊息",
+        "消息",
+        "休館",
+        "開館",
+        "暫停服務"
+      ],
+      "requires": []
+    },
+    {
+      "id": "open_records",
+      "title": "打開我的紀錄",
+      "description": "點上面的「我的紀錄」，看預約和借閱",
+      "keywords": [
+        "紀錄",
+        "記錄",
+        "借了",
+        "借閱中",
+        "還書",
+        "到期"
+      ],
+      "requires": []
+    },
+    {
+      "id": "check_pickup",
+      "title": "看可以取的書",
+      "description": "在我的紀錄點「可取書」，看哪本書可以去拿",
+      "keywords": [
+        "取書",
+        "可取",
+        "到了沒",
+        "到了嗎",
+        "可以拿",
+        "領書",
+        "預約的書",
+        "可以去拿",
+        "訂的書",
+        "預約好的書",
+        "書好了沒"
+      ],
+      "requires": [
+        "open_records"
+      ]
+    },
+    {
+      "id": "open_map",
+      "title": "看分館地圖",
+      "description": "點上面的「分館地圖」，找附近的圖書館",
+      "keywords": [
+        "分館",
+        "地圖",
+        "在哪",
+        "附近",
+        "最近",
+        "地址"
+      ],
+      "requires": []
+    }
+  ],
+  "follow_ups": {
+    "open_search": "search_keyword",
+    "search_keyword": "pick_book",
+    "hot_keyword": "pick_book"
+  },
+  "no_extend_from": [
+    "open_ranking",
+    "open_notices",
+    "open_records",
+    "check_pickup",
+    "open_map"
+  ],
+  "generic_keywords": [
+    "借",
+    "預約",
+    "書",
+    "圖書館"
+  ]
+}

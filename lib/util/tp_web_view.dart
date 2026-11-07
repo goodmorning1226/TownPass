@@ -231,6 +231,7 @@ class _TPWebViewState extends State<TPWebView> {
           controller: appBarController,
         ),
         body: TPInAppWebView(
+          key: trackedPage.viewKey,
           onLoadStop: (controller, loadedUrl) async {
             if (!mounted) return;
             _track(loadedUrl);
@@ -282,6 +283,7 @@ class _TPWebViewState extends State<TPWebView> {
           onWebViewCreated: (controller) {
             webViewController.value = controller;
             _addTranslationHandler(controller);
+            trackedPage.controller = controller;
             try {
               controller.loadUrl(
                 urlRequest: URLRequest(url: WebUri(navigation.first)),

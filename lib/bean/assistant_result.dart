@@ -13,6 +13,11 @@ class AssistantResult {
   /// The language of [message] ('zh', 'en', ...), for reading it aloud.
   final String language;
 
+  /// Teaching components the backend chose for the opened page, e.g.
+  /// `{page: library, components: [open_records, check_pickup]}`. Only a
+  /// hint: the App drops unknown ids and adds prerequisites itself.
+  final Map<String, dynamic>? guide;
+
   const AssistantResult({
     required this.sessionId,
     required this.message,
@@ -21,6 +26,7 @@ class AssistantResult {
     this.kind = 'reply',
     this.resolutionId,
     this.language = 'zh',
+    this.guide,
   });
 
   factory AssistantResult.fromJson(Map<String, dynamic> json) {
@@ -58,6 +64,9 @@ class AssistantResult {
           json['language'] is String && (json['language'] as String).length <= 8
           ? json['language']
           : 'zh',
+      guide: json['guide'] is Map<String, dynamic>
+          ? json['guide'] as Map<String, dynamic>
+          : null,
       choices: (json['choices'] as List? ?? [])
           .map((value) => AssistantBookChoice.fromJson(value))
           .toList(),

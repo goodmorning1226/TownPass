@@ -106,7 +106,7 @@ if (assistantOnDevice) {
             main {
                 srcDir "../../assistant_backend"
                 srcDir "../../assets/assistant"
-                exclude "test_*.py", "evaluate.py", "eval_holdout.py", "eval_sound.py", "evaluation.json", "README.md"
+                exclude "test_*.py", "evaluate.py", "eval_holdout.py", "eval_sound.py", "eval_guides.py", "evaluation.json", "data/guide_eval*.json", "README.md"
             }
         }
     }
