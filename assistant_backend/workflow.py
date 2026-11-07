@@ -5,7 +5,9 @@ shared capability catalogue and the book catalogue, then one model decision
 (decision.decide) among the retrieved candidates, then session-bound
 candidate confirmation. When that tool-calling layer finds no service (no
 retrieval match, or the model asks for clarification / rejects the request),
-the Taipei FAQ index (faq.py) is the second layer; when it has no confident
+the Taipei FAQ index (faq.py) is the second layer (before it, version C's
+semantic catalogue retrieval, semantic.py, may offer services worded
+differently, and version B's intent fallback); when it has no confident
 answer either, the turn says that nothing related was found. Every turn
 returns exactly one reply.
 """
@@ -56,6 +58,10 @@ OPENING_SOUND_CONFIRM = 0.5
 # Version B: ask the model what kind of message an unmatched request is
 # (docs/AI_SERVICE_COVERAGE_PLAN.md; A/B evaluated with eval_colloquial.json).
 INTENT_FALLBACK = os.environ.get("TOWNPASS_INTENT_FALLBACK", "1") == "1"
+# Version C: semantic retrieval over the catalogue (semantic.py) before the intent fallback.
+SEMANTIC_MIN_CHARS = 2
+SEMANTIC_NOTE = ("These candidates were found by similar meaning, not by matching words. "
+                 "Offer them only if one is what the user asks for; otherwise ask to clarify.")
 FALLBACK_SOUND = 0.8  # misheard words ~1.0 after folding; chance matches <= 0.74
 FALLBACK_LIMIT = 3
 COMMAND_SOUND = 0.8  # "下一個" is 0.78 and stays unmatched
@@ -128,7 +134,7 @@ class Workflow:
                 "message": message, "destination": None, "choices": [], "data_mode": "demo",
                 "language": payload.get("language", "zh"), **extra}
 
-    def _decide(self, text, entries, confirmation=False, context=None, sound=None):
+    def _decide(self, text, entries, confirmation=False, context=None, sound=None, note=None):
         """Capability (or candidate-confirmation) decision among retrieved entries."""
         if confirmation:
             tools = [self.tool("confirm_candidates", "Show these candidates and wait for user selection; do not navigate.")]
@@ -140,6 +146,7 @@ class Workflow:
                     "features": e.get("features", []), "available": e["enabled"],
                     **({"heard_as": sound[e["id"]]} if sound and e["id"] in sound else {})} for e in entries],
                     **({"note": "The text may be misheard speech; heard_as pairs sound alike."} if sound else {}),
+                    **({"note": note} if note else {}),
                     **({"page_hint": model_view(context)} if context else {})}
         return decide(self.owner, "capability", evidence, tools, self.validate, self.error)
 
@@ -481,7 +488,8 @@ class Workflow:
             return self._list(payload)
         matches = self.registry.search_language(i18n.positive_text(text, language), language)
         if not matches:
-            decided = self._intent_fallback(payload, text)
+            decided = (self._semantic_fallback(payload, text, i18n.positive_text(text, language))
+                       or self._intent_fallback(payload, text))
             if decided:
                 return decided
             faq = self._foreign_faq(payload)
@@ -640,7 +648,9 @@ class Workflow:
         if listing_by_sound(text):
             self._trace("listing_sound")
             return self._list(payload)
-        decided = self._intent_fallback(payload, text)
+        # After listing_by_sound: a "what can you do" question worded differently
+        # must show the list (no model call), not services that happen to be close.
+        decided = self._semantic_fallback(payload, text, positive_text(text)) or self._intent_fallback(payload, text)
         if decided:
             return decided
         self._trace("no_match")
@@ -677,6 +687,37 @@ class Workflow:
         if name == "city_question":
             return self._faq(payload, text) if language == "zh" else self._foreign_faq(payload)
         return None
+
+    def _semantic_fallback(self, payload, text, positive):
+        """Version C (semantic.py): keyword retrieval found nothing, so services
+        whose catalogue texts mean about the same as the request (e5 cosine) go to
+        the model, which may only offer them (never navigate) or ask to clarify;
+        a clarification continues to the intent fallback. Off when the index is
+        missing, still building or its embedding server does not answer.
+        positive: the request without negated parts ("I don't want books" ->
+        ""), which is what is embedded; e5 does not understand negation, so a
+        refusal must not bring back the service it refuses."""
+        index = getattr(self.owner, "semantic", None)
+        if index is None or not index.ready or len(re.findall(r"\w", positive)) < SEMANTIC_MIN_CHARS:
+            return None
+        started = time.monotonic()
+        found = index.search(positive)
+        # For metrics: embedding + scoring time and what was found, even when a
+        # later layer decides the turn.
+        self.owner.usage.semantic = {"ms": round((time.monotonic() - started) * 1000),
+                                     "candidates": [[entry["id"], score] for score, entry in found]}
+        if not found:
+            return None
+        entries = [entry for _, entry in found]
+        self._trace("semantic_model", [e["id"] for e in entries])
+        name, _ = self._decide(text, entries, confirmation=True, context=payload.get("page_context"),
+                               note=SEMANTIC_NOTE)
+        self.owner.usage.semantic["decision"] = name
+        if name != "confirm_candidates":
+            return None
+        language = payload.get("language", "zh")
+        message = i18n.t("confirm_capability", language) if language != "zh" else "你是不是要用以下服務？請先確認。"
+        return self._offer(payload, self._cap_items(entries, language), message)
 
     def _sound_candidates(self, text):
         """Services one of whose words sounds like a stretch of text the catalogue did

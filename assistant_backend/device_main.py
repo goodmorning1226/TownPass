@@ -9,6 +9,7 @@ side, the HTTP contract and the decision path are unchanged:
   127.0.0.1:8770  speech recognition (asr_server.py, whisper.cpp engine)
   llama-server / whisper-server on the ports passed in (loopback only)
   llama-server --embedding on faq_port for the optional FAQ layer (faq.py)
+    and the catalogue's semantic retrieval (semantic.py)
 """
 from __future__ import annotations
 
@@ -131,6 +132,10 @@ def start(model_port=8771, whisper_port=8772, assistant_port=8765, asr_port=8770
         _serve(assistant)
         if faq_port and faq_dir:
             threading.Thread(target=_load_faq, args=(backend,), name="assistant-faq", daemon=True).start()
+            # Version C uses the same e5 server; its catalogue vectors are built (or read
+            # from models/semantic_cache) in the background once the server answers.
+            import semantic
+            backend.semantic = semantic.load_default(backend.workflow.registry)
         threading.Thread(target=warm_up, args=(recognizer if whisper else None, os.environ["TOWNPASS_MODEL_URL"]),
                          name="assistant-warm-up", daemon=True).start()
         _started.set()

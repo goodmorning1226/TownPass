@@ -284,12 +284,14 @@ def validate_call(call, tools):
 class Assistant:
     """Validates the request and hands it to the single Workflow orchestrator."""
 
-    def __init__(self, catalog=None, model_call=None, faq=None):
+    def __init__(self, catalog=None, model_call=None, faq=None, semantic=None):
         from workflow import Workflow
         self.catalog = catalog or Catalog()
         self.model_call = model_call or self._model_call
         # Second layer after tool calling (faq.FaqIndex); None runs without FAQ.
         self.faq = faq
+        # Version C: semantic retrieval over the catalogue (semantic.CatalogIndex); None runs without it.
+        self.semantic = semantic
         self.model_lock = threading.Lock()
         self.usage = threading.local()  # per-request model call log for metrics
         self.workflow = Workflow(self, retrieve, tool, validate_call, AssistantError)
@@ -355,13 +357,13 @@ class Assistant:
                    "faq_text": faq_text}
         started = time.monotonic()
         self.usage.calls, self.usage.timings = [], []
-        self.usage.route, self.usage.candidates = None, []
+        self.usage.route, self.usage.candidates, self.usage.semantic = None, [], None
         result = self.workflow.handle(payload)
         tokens = [count for count in self.usage.calls if count is not None]
         result["metrics"] = {"elapsed_ms": round((time.monotonic() - started) * 1000),
             "model_calls": len(self.usage.calls), "prompt_tokens": sum(tokens) if tokens else None,
             "model": MODEL if self.usage.calls else None, "page_capability": self._page_id(context),
-            "route": self.usage.route, "candidates": self.usage.candidates,
+            "route": self.usage.route, "candidates": self.usage.candidates, "semantic": self.usage.semantic,
             "model_timings": [timing for timing in self.usage.timings if timing]}
         if TIMING_LOG:
             # Numbers only (never the request text), for measuring a phone's speed.
@@ -527,6 +529,7 @@ def make_handler(assistant, token=""):
                     "registry_version": registry.version,
                     "catalog": [{k: v for k, v in e.items() if k != "navigation"} for e in registry.entries],
                     "faq_entries": assistant.faq.count if assistant.faq else 0,
+                    "semantic_ready": bool(assistant.semantic and assistant.semantic.ready),
                     "data_mode": "demo"})
             self.reply(404, {"error": "找不到此功能。"})
 
@@ -565,7 +568,8 @@ def make_handler(assistant, token=""):
                     return self.reply(413, {"error": "請求內容過長或空白。"})
                 payload = json.loads(self.rfile.read(length))
                 if not isinstance(payload, dict) or set(payload) - {"text", "session_id", "request_id", "resolution_id",
-                                                                    "choice_id", "context", "language"}:
+                                                                    "choice_id", "context", "language",
+                                                                    "faq_text"}:
                     raise AssistantError("請求欄位不正確。")
                 response = assistant.turn(payload)
                 self.reply(200, response)
@@ -657,6 +661,10 @@ def make_handler(assistant, token=""):
                                         sound=assistant.workflow.sound_corrections if language == "zh" else None)
             self.reply(200, {"contract_version": CONTRACT, "request_id": request_id, **decided,
                              "language": language,
+                             # How sure the language detection was (None: the chosen
+                             # language was used); the App only follows a new
+                             # language for the next turns when this is clear.
+                             "language_confidence": result.get("language_confidence"),
                              "metrics": {"elapsed_ms": result.get("elapsed_ms"),
                                          "audio_seconds": result.get("audio_seconds"),
                                          "status": status, "avg_logprob": result.get("avg_logprob"),
@@ -676,11 +684,15 @@ def main():
         parser.error("LAN binding requires TOWNPASS_ASSISTANT_TOKEN with at least 24 characters.")
     from faq import load_default
     faq = load_default()
-    server = ThreadingHTTPServer((args.host, args.port), make_handler(Assistant(faq=faq), token))
+    assistant = Assistant(faq=faq)
+    import semantic
+    assistant.semantic = semantic.load_default(assistant.workflow.registry)
+    server = ThreadingHTTPServer((args.host, args.port), make_handler(assistant, token))
     server.daemon_threads = True
     server.timeout = 80
     print(f"TownPass assistant: http://{args.host}:{args.port} | model={MODEL} | "
-          f"faq={faq.count if faq else 'off'} | demo only", flush=True)
+          f"faq={faq.count if faq else 'off'} | semantic={'on' if assistant.semantic else 'off'} | demo only",
+          flush=True)
     try:
         server.serve_forever()
     except KeyboardInterrupt:
