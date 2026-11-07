@@ -6,10 +6,10 @@
  "capability": "fees.course",
  "goals": [],
  "expect": {
-  "done": false
+  "done": true
  },
- "recordedAt": "2026-11-07T18:29:52.678Z",
- "durationMs": 4709,
+ "recordedAt": "2026-11-07T18:55:30.860Z",
+ "durationMs": 4847,
  "viewport": {
   "width": 390,
   "height": 844,
@@ -35,6 +35,12 @@
      "fieldName": "繳費編號",
      "fieldHint": "逾繳費期限，不提供查詢繳費功能",
      "fieldChoices": "",
+     "calendar": false,
+     "calTitle": "",
+     "calNav": false,
+     "searchTyped": false,
+     "searchResults": 0,
+     "noBill": false,
      "alert": false,
      "alertText": "",
      "groupOpen": false,
@@ -168,6 +174,12 @@
      "fieldName": "繳費編號",
      "fieldHint": "逾繳費期限，不提供查詢繳費功能",
      "fieldChoices": "",
+     "calendar": false,
+     "calTitle": "",
+     "calNav": false,
+     "searchTyped": false,
+     "searchResults": 0,
+     "noBill": false,
      "alert": false,
      "alertText": "",
      "groupOpen": false,
@@ -224,6 +236,12 @@
      "fieldName": "",
      "fieldHint": "",
      "fieldChoices": "",
+     "calendar": false,
+     "calTitle": "",
+     "calNav": false,
+     "searchTyped": false,
+     "searchResults": 0,
+     "noBill": false,
      "alert": false,
      "alertText": "",
      "groupOpen": false,
@@ -350,6 +368,12 @@
      "fieldName": "",
      "fieldHint": "",
      "fieldChoices": "",
+     "calendar": false,
+     "calTitle": "",
+     "calNav": false,
+     "searchTyped": false,
+     "searchResults": 0,
+     "noBill": false,
      "alert": false,
      "alertText": "",
      "groupOpen": false,
@@ -399,6 +423,12 @@
      "fieldName": "",
      "fieldHint": "",
      "fieldChoices": "",
+     "calendar": false,
+     "calTitle": "",
+     "calNav": false,
+     "searchTyped": false,
+     "searchResults": 0,
+     "noBill": true,
      "alert": false,
      "alertText": "",
      "groupOpen": false,
@@ -416,8 +446,17 @@
      "__bottomBar": 0,
      "__dialog": false
     },
-    "visible": [],
-    "rects": {}
+    "visible": [
+     "fees.no_bill"
+    ],
+    "rects": {
+     "fees.no_bill": [
+      32,
+      220,
+      326,
+      72
+     ]
+    }
    },
    "facts": {
     "url": "/fee-payment/result/fee-11",

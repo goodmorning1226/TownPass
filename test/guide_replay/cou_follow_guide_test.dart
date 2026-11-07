@@ -25,7 +25,7 @@ void main() {
     });
   }
 
-  group('COU-1: pick_coupon always says 「下面還有」', () {
+  group('COU-1: pick_coupon says 「下面還有」 only when cardsBelow', () {
     test('page facts: all coupon cards are on screen', () {
       final fx = loadFixture('cou_list_default');
       final s = (fx['steps'] as List)[2] as Map<String, dynamic>;
@@ -34,16 +34,10 @@ void main() {
       expect(flags['cardsBelow'], isFalse);
     });
 
-    test(
-      'the card only mentions more coupons below when there are some',
-      () {
-        final r = replayFixture('cou_list_default');
-        printOnFailure(r.report);
-        expect(r.trace[2], isNot(contains('下面還有')));
-      },
-      skip:
-          'COU-1: pick_coupon card text ignores the cardsBelow flag and always '
-          'says 「下面還有，可以往下滑看看」.',
-    );
+    test('the card only mentions more coupons below when there are some', () {
+      final r = replayFixture('cou_list_default');
+      printOnFailure(r.report);
+      expect(r.trace[2], isNot(contains('下面還有')));
+    });
   });
 }

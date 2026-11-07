@@ -1,6 +1,6 @@
 {
   "name": "cit_report_disagree",
-  "description": "Known bug: default plan; the 送出 card says 「想改可以點另一個」 for 個人資料. The user picks 不同意: the page greys out 送出 (disabled, no message). The card then says 「往上看看有沒有紅字」 though there is none, and the report can never be sent.",
+  "description": "Default plan; the user picks 不同意 for 個人資料: the page greys out 送出 (disabled, no message). The card says 不同意 can't be sent and points at the 個人資料 choice; the user switches to 同意, presses 送出, then 確認 (CIT-1 fix).",
   "page": "citizen_report",
   "capability": "reportIssue",
   "goals": [],
@@ -33,8 +33,18 @@
     },
     {
       "step": "submit_report",
+      "do": "check",
+      "text": "同意"
+    },
+    {
+      "step": "submit_report",
       "do": "click",
       "text": "送出"
+    },
+    {
+      "step": "done",
+      "do": "click",
+      "text": "確認"
     }
   ]
 }

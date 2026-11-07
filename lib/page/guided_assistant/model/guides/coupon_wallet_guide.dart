@@ -287,7 +287,9 @@ final List<GuideComponent> couponWalletComponents = [
           if (_onHome(s) && s.now.number('cards') == 0) {
             return '這裡目前沒有優惠券。可以晚一點再來看看。';
           }
-          return '想看哪一張優惠？點一下那張優惠券。下面還有，可以往下滑看看。';
+          return s.now.flag('cardsBelow')
+              ? '想看哪一張優惠？點一下那張優惠券。下面還有，可以往下滑看看。'
+              : '想看哪一張優惠？點一下那張優惠券。';
         },
         detail: (_) => '在「優惠券」清單點一張，就能看優惠內容和截止日期。',
         isDone: (s) => _detailReady(s) || _added(s) || _used(s),

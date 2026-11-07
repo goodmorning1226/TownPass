@@ -24,13 +24,6 @@
    "id": "{note}Sudah dicentang! Sekarang “{page:送出}” bisa ditekan.",
    "th": "{note}ติ๊กแล้ว! ตอนนี้กด “{page:送出}” ได้แล้ว"
   },
-  "{scroll}在「災情描述」勾你看到的狀況，至少勾一個，例如「道路」表示影響到馬路。有人受傷、受困，請直接打 119。": {
-   "en": "{scroll}Under “{page:災情描述}”, tick what you see, at least one. For example, “{page:道路}” means the road is affected. If someone is hurt or trapped, call 119 right away.",
-   "ja": "{scroll}「{page:災情描述}」で、見た状況にチェックしてください。少なくとも一つです。例えば「{page:道路}」は道路に影響があるという意味です。けが人や閉じ込められた人がいるときは、すぐ 119 に電話してください。",
-   "vi": "{scroll}Ở “{page:災情描述}”, đánh dấu tình trạng bạn thấy, ít nhất một ô, ví dụ “{page:道路}” nghĩa là ảnh hưởng đến đường. Có người bị thương hoặc mắc kẹt, hãy gọi ngay 119.",
-   "id": "{scroll}Di “{page:災情描述}”, centang keadaan yang Anda lihat, minimal satu. Misalnya “{page:道路}” berarti jalan terdampak. Kalau ada yang terluka atau terjebak, langsung telepon 119.",
-   "th": "{scroll}ที่ “{page:災情描述}” ติ๊กสิ่งที่คุณเห็น อย่างน้อยหนึ่งข้อ เช่น “{page:道路}” หมายถึงกระทบถนน ถ้ามีคนบาดเจ็บหรือติดอยู่ ให้โทร 119 ทันที"
-  },
   "「人員傷亡」和「影響交通」下面的小方框，點一下就是勾選。下面還可以寫「補充描述」或附照片。": {
    "en": "Tap the small boxes under “{page:人員傷亡}” and “{page:影響交通}” to tick them. Below that you can also write “{page:補充描述}” or add photos.",
    "ja": "「{page:人員傷亡}」と「{page:影響交通}」の下の小さな四角をタップするとチェックできます。その下で「{page:補充描述}」を書いたり、写真を付けたりもできます。",
@@ -366,6 +359,69 @@
    "vi": "Chạm vào mục phù hợp nhất, ví dụ “{page:路燈故障}” hoặc “{page:電力停電}”. Không có mục giống hệt thì chọn mục gần nhất.",
    "id": "Ketuk item yang paling cocok, misalnya “{page:路燈故障}” atau “{page:電力停電}”. Kalau tidak ada yang sama persis, pilih yang paling mirip.",
    "th": "แตะรายการที่ตรงที่สุด เช่น “{page:路燈故障}” หรือ “{page:電力停電}” ถ้าไม่มีที่ตรงเป๊ะ ให้เลือกอันที่ใกล้เคียงที่สุด"
+  },
+  "{failed}{scroll}在「災情描述」勾你看到的狀況，至少勾一個，例如「道路」表示影響到馬路。有人受傷、受困，請直接打 119。": {
+   "en": "{failed}{scroll}Under “{page:災情描述}”, tick what you see, at least one. For example, “{page:道路}” means the road is affected. If someone is hurt or trapped, call 119 right away.",
+   "ja": "{failed}{scroll}「{page:災情描述}」で、見た状況にチェックしてください。少なくとも一つです。例えば「{page:道路}」は道路に影響があるという意味です。けが人や閉じ込められた人がいるときは、すぐ 119 に電話してください。",
+   "vi": "{failed}{scroll}Ở “{page:災情描述}”, đánh dấu tình trạng bạn thấy, ít nhất một ô, ví dụ “{page:道路}” nghĩa là ảnh hưởng đến đường. Có người bị thương hoặc mắc kẹt, hãy gọi ngay 119.",
+   "id": "{failed}{scroll}Di “{page:災情描述}”, centang keadaan yang Anda lihat, minimal satu. Misalnya “{page:道路}” berarti jalan terdampak. Kalau ada yang terluka atau terjebak, langsung telepon 119.",
+   "th": "{failed}{scroll}ที่ “{page:災情描述}” ติ๊กสิ่งที่คุณเห็น อย่างน้อยหนึ่งข้อ เช่น “{page:道路}” หมายถึงกระทบถนน ถ้ามีคนบาดเจ็บหรือติดอยู่ ให้โทร 119 ทันที"
+  },
+  "災情狀況填好了！": {
+   "en": "The situation is filled in!",
+   "ja": "災害の状況を入力できました！",
+   "vi": "Đã điền xong tình trạng thiên tai!",
+   "id": "Keadaan bencana sudah diisi!",
+   "th": "กรอกสภาพภัยพิบัติเรียบร้อยแล้ว!"
+  },
+  "「送出」沒有成功，因為還沒填「災情描述」。": {
+   "en": "“{page:送出}” didn’t go through because “{page:災情描述}” is still empty. ",
+   "ja": "「{page:災情描述}」がまだ空なので、「{page:送出}」できませんでした。",
+   "vi": "Chưa gửi được vì “{page:災情描述}” còn trống. ",
+   "id": "“{page:送出}” belum berhasil karena “{page:災情描述}” belum diisi. ",
+   "th": "“{page:送出}” ไม่สำเร็จ เพราะยังไม่ได้กรอก “{page:災情描述}” "
+  },
+  "{failed}{scroll}在「災情描述」勾看到的狀況，或填下面的數字（例如沖刷幾根），至少填一項。有人受傷、受困，請直接打 119。": {
+   "en": "{failed}{scroll}Under “{page:災情描述}”, tick what you see or fill in a number below (e.g. how many are scoured), at least one. If someone is hurt or trapped, call 119 right away.",
+   "ja": "{failed}{scroll}「{page:災情描述}」で見た状況にチェックするか、下の数字（例：洗掘された本数）を入力してください。少なくとも一つです。けが人や閉じ込められた人がいるときは、すぐ 119 に電話してください。",
+   "vi": "{failed}{scroll}Ở “{page:災情描述}”, đánh dấu tình trạng bạn thấy hoặc điền số bên dưới (ví dụ số trụ bị xói), ít nhất một mục. Có người bị thương hoặc mắc kẹt, hãy gọi ngay 119.",
+   "id": "{failed}{scroll}Di “{page:災情描述}”, centang keadaan yang Anda lihat atau isi angka di bawah (misalnya berapa yang tergerus), minimal satu. Kalau ada yang terluka atau terjebak, langsung telepon 119.",
+   "th": "{failed}{scroll}ที่ “{page:災情描述}” ติ๊กสิ่งที่เห็น หรือกรอกตัวเลขด้านล่าง (เช่น ถูกกัดเซาะกี่ต้น) อย่างน้อยหนึ่งข้อ ถ้ามีคนบาดเจ็บหรือติดอยู่ ให้โทร 119 ทันที"
+  },
+  "{failed}{scroll}在「災情描述」勾你看到的狀況，至少勾一個。有人受傷、受困，請直接打 119。": {
+   "en": "{failed}{scroll}Under “{page:災情描述}”, tick what you see, at least one. If someone is hurt or trapped, call 119 right away.",
+   "ja": "{failed}{scroll}「{page:災情描述}」で、見た状況にチェックしてください。少なくとも一つです。けが人や閉じ込められた人がいるときは、すぐ 119 に電話してください。",
+   "vi": "{failed}{scroll}Ở “{page:災情描述}”, đánh dấu tình trạng bạn thấy, ít nhất một ô. Có người bị thương hoặc mắc kẹt, hãy gọi ngay 119.",
+   "id": "{failed}{scroll}Di “{page:災情描述}”, centang keadaan yang Anda lihat, minimal satu. Kalau ada yang terluka atau terjebak, langsung telepon 119.",
+   "th": "{failed}{scroll}ที่ “{page:災情描述}” ติ๊กสิ่งที่คุณเห็น อย่างน้อยหนึ่งข้อ ถ้ามีคนบาดเจ็บหรือติดอยู่ ให้โทร 119 ทันที"
+  },
+  "點一下「補充描述」的框框，寫你看到的狀況，寫完按鍵盤上的「完成」收起鍵盤。": {
+   "en": "Tap the “{page:補充描述}” box and write what you see. When done, tap “Done” on the keyboard to put it away.",
+   "ja": "「{page:補充描述}」の枠をタップして、見た状況を書いてください。書き終えたらキーボードの「完了」を押して閉じてください。",
+   "vi": "Chạm vào ô “{page:補充描述}”, viết tình trạng bạn thấy, viết xong bấm “Xong” trên bàn phím để ẩn bàn phím.",
+   "id": "Ketuk kotak “{page:補充描述}” dan tulis keadaan yang Anda lihat. Setelah selesai, tekan “Selesai” di keyboard untuk menutupnya.",
+   "th": "แตะช่อง “{page:補充描述}” เขียนสิ่งที่เห็น เขียนเสร็จแล้วกด “เสร็จ” บนแป้นพิมพ์เพื่อเก็บแป้นพิมพ์"
+  },
+  "「人員傷亡」下面的小方框，點一下就是勾選；也可以在下面的格子填數字，或寫「補充描述」。": {
+   "en": "Tap a small box under “{page:人員傷亡}” to tick it. You can also fill in a number in the boxes below, or write in “{page:補充描述}”.",
+   "ja": "「{page:人員傷亡}」の下の小さな四角をタップするとチェックできます。下の欄に数字を入れたり、「{page:補充描述}」に書いたりしてもかまいません。",
+   "vi": "Chạm vào ô nhỏ dưới “{page:人員傷亡}” là đánh dấu; cũng có thể điền số vào các ô bên dưới, hoặc viết “{page:補充描述}”.",
+   "id": "Ketuk kotak kecil di bawah “{page:人員傷亡}” untuk mencentang. Anda juga bisa mengisi angka di kolom bawah, atau menulis di “{page:補充描述}”.",
+   "th": "แตะช่องเล็กใต้ “{page:人員傷亡}” เพื่อติ๊ก หรือกรอกตัวเลขในช่องด้านล่าง หรือเขียนใน “{page:補充描述}” ก็ได้"
+  },
+  "還沒填災情描述，請往上滑，勾一個狀況或寫補充描述。": {
+   "en": "“{page:災情描述}” isn’t filled in yet. Scroll up and tick one item or write in “{page:補充描述}”.",
+   "ja": "「{page:災情描述}」がまだです。上にスクロールして、状況を一つチェックするか「{page:補充描述}」を書いてください。",
+   "vi": "Chưa điền “{page:災情描述}”. Hãy cuộn lên, đánh dấu một tình trạng hoặc viết “{page:補充描述}”.",
+   "id": "“{page:災情描述}” belum diisi. Gulir ke atas lalu centang satu keadaan atau tulis “{page:補充描述}”.",
+   "th": "ยังไม่ได้กรอก “{page:災情描述}” เลื่อนขึ้นไป ติ๊กหนึ่งข้อหรือเขียน “{page:補充描述}”"
+  },
+  "{failed}{scroll}這一頁的「災情描述」沒有可以勾的選項，請在「補充描述」寫看到的狀況，例如「路燈不亮」或「道路被土石擋住」。": {
+   "en": "{failed}{scroll}“{page:災情描述}” on this page has no boxes to tick. Write what you see in “{page:補充描述}”, e.g. “the street light is out” or “the road is blocked by mud and rocks”.",
+   "ja": "{failed}{scroll}このページの「{page:災情描述}」にはチェックする項目がありません。「{page:補充描述}」に見た状況を書いてください。例：「街灯がつかない」「道路が土砂でふさがれている」。",
+   "vi": "{failed}{scroll}“{page:災情描述}” ở trang này không có ô để đánh dấu. Hãy viết tình trạng bạn thấy vào “{page:補充描述}”, ví dụ “đèn đường không sáng” hoặc “đường bị đất đá chặn”.",
+   "id": "{failed}{scroll}“{page:災情描述}” di halaman ini tidak punya kotak untuk dicentang. Tulis keadaan yang Anda lihat di “{page:補充描述}”, misalnya “lampu jalan mati” atau “jalan tertutup tanah dan batu”.",
+   "th": "{failed}{scroll}“{page:災情描述}” ในหน้านี้ไม่มีช่องให้ติ๊ก ให้เขียนสิ่งที่เห็นใน “{page:補充描述}” เช่น “ไฟถนนไม่ติด” หรือ “ถนนถูกดินหินขวางอยู่”"
   }
  }
 }

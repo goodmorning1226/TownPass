@@ -8,8 +8,8 @@
  "expect": {
   "done": true
  },
- "recordedAt": "2026-11-07T18:24:03.440Z",
- "durationMs": 4103,
+ "recordedAt": "2026-11-07T19:01:03.758Z",
+ "durationMs": 4080,
  "viewport": {
   "width": 390,
   "height": 844,
@@ -39,6 +39,10 @@
      "notReservable": false,
      "dialogOpen": false,
      "bookTitle": "",
+     "seriesCount": 0,
+     "seriesTicked": 0,
+     "seriesLimit": false,
+     "noBranch": false,
      "pickupOpen": false,
      "__bottomBar": 0,
      "__dialog": false

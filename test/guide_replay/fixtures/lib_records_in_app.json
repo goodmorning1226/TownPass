@@ -8,8 +8,8 @@
  "expect": {
   "done": true
  },
- "recordedAt": "2026-11-07T18:27:31.718Z",
- "durationMs": 3989,
+ "recordedAt": "2026-11-07T19:01:32.088Z",
+ "durationMs": 3974,
  "viewport": {
   "width": 390,
   "height": 844,
@@ -39,6 +39,10 @@
      "notReservable": false,
      "dialogOpen": false,
      "bookTitle": "",
+     "seriesCount": 0,
+     "seriesTicked": 0,
+     "seriesLimit": false,
+     "noBranch": false,
      "pickupOpen": false,
      "__bottomBar": 74,
      "__dialog": false
@@ -226,6 +230,10 @@
      "notReservable": false,
      "dialogOpen": false,
      "bookTitle": "",
+     "seriesCount": 0,
+     "seriesTicked": 0,
+     "seriesLimit": false,
+     "noBranch": false,
      "pickupOpen": false,
      "__bottomBar": 74,
      "__dialog": false
@@ -287,6 +295,10 @@
      "notReservable": false,
      "dialogOpen": false,
      "bookTitle": "",
+     "seriesCount": 0,
+     "seriesTicked": 0,
+     "seriesLimit": false,
+     "noBranch": false,
      "pickupOpen": false,
      "__bottomBar": 74,
      "__dialog": false
@@ -408,6 +420,16 @@
        251,
        326,
        24
+      ]
+     },
+     {
+      "text": "鍵盤快速鍵",
+      "disabled": false,
+      "rect": [
+       573,
+       786,
+       50,
+       14
       ]
      },
      {

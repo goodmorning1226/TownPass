@@ -59,39 +59,39 @@ void main() {
   // CC-1: reservation.c-N-M is opened with full page loads (parents
   // /counter-calling/, then /counter-calling/c-N?subId=…, no in_page), so the
   // 常用地點 added there lives in that document only. Going back to the home
-  // list (as the done card says) shows no 常用地點, yet the done card says
-  // 「最上面亮起來的「常用地點」就是剛加的地點」.
+  // list (as the done card says) may show no 常用地點; the done card must not
+  // then point at a highlighted 常用地點. (The page fix is `"in_page": true`
+  // on the reservation.c-* entries of capabilities.json.)
   group('CC-1 add_favorite on reservation.c-*', () {
-    test('page facts: after 加入常用 and back, the home list has no 常用地點', () {
+    test('page facts: after 加入常用 and back, the home list was reloaded', () {
       final f = _lastFlags('cc_unit_c-2-2_add_favorite_then_home');
-      expect(f['favorites'], 0);
-      final r = replayFixture('cc_unit_c-2-2_add_favorite_then_home');
-      expect(r.trace.last, contains('最上面亮起來的「常用地點」就是剛加的地點'));
+      // 0 while reservation.c-* opens with full loads; 1 with in_page.
+      expect(f['favorites'], anyOf(0, 1));
     });
 
-    test(
-      'after 加入常用 on reservation.c-2-2 the home list shows the place',
-      () {
-        final f = _lastFlags('cc_unit_c-2-2_add_favorite_then_home');
-        expect(f['favorites'], greaterThan(0));
-        final r = replayFixture('cc_unit_c-2-2_add_favorite_then_home');
-        expect(r.problems, isEmpty);
-      },
-      skip:
-          'CC-1: reservation.c-* opens with full loads, so 常用地點 is lost '
-          'on going back, while the done card says it is shown. Re-record '
-          'after the fix (in_page navigation or a done text that checks '
-          'favorites).',
-    );
+    test('after 加入常用 on reservation.c-2-2 and going back, the done card '
+        'matches the home list', () {
+      final f = _lastFlags('cc_unit_c-2-2_add_favorite_then_home');
+      final r = replayFixture('cc_unit_c-2-2_add_favorite_then_home');
+      printOnFailure(r.report);
+      expect(r.problems, isEmpty);
+      expect(r.done, isTrue);
+      if (f['favorites'] == 0) {
+        expect(r.trace.last, isNot(contains('最上面亮起來')));
+        expect(r.trace.last, contains('剛加的常用地點不見了'));
+      } else {
+        expect(r.trace.last, contains('最上面亮起來的「常用地點」就是剛加的地點'));
+      }
+    });
   });
 
-  // CC-2: pick_location is a capability goal of reservation.c-*, but the page
-  // opens with ?subId=, which _located counts as already chosen: the guide is
-  // done before the user picks anything.
+  // CC-2: pick_location is a capability goal of reservation.c-*; the page
+  // opens with ?subId=, which must not count as a place the user picked.
   group('CC-2 pick_location on reservation.c-*', () {
-    test('page facts: the guide is done as soon as the unit page opens', () {
+    test('the guide asks to pick a place before it is done', () {
       final r = replayFixture('cc_unit_c-1-1_pick_location');
-      expect(r.trace.first, contains('DONE'));
+      expect(r.trace.first, isNot(contains('DONE')));
+      expect(r.trace.first, contains('要換一間的話'));
     });
 
     test(
@@ -102,9 +102,19 @@ void main() {
         expect(r.problems, isEmpty);
         expect(r.done, isTrue);
       },
-      skip:
-          'CC-2: ?subId= counts as a picked place, so an explicit '
-          'pick_location goal is done at once. Re-record after the fix.',
     );
+  });
+
+  // remove_favorite: closing 變更 without removing anything is not done.
+  group('remove_favorite via 變更', () {
+    _followsGuide('cc_goal_remove_favorite_edit');
+
+    test('移除地點 with nothing ticked does not finish the guide', () {
+      final r = replayFixture('cc_goal_remove_favorite_edit');
+      final i = r.trace.indexWhere((t) => t.startsWith('[8] after'));
+      expect(i, greaterThanOrEqualTo(0), reason: r.trace.join('\n'));
+      expect(r.trace[i], isNot(contains('DONE')));
+      expect(r.trace.last, contains('DONE'));
+    });
   });
 }

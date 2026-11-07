@@ -17,19 +17,33 @@
    "id": "{again}Ketuk item yang ingin Anda ajukan{example}.",
    "th": "{again}แตะรายการที่ต้องการยื่น{example}"
   },
-  "{note}這是你填的資料，{scroll}從上到下檢查一遍。「個人資料是否提供給承辦員」選不選都可以。沒問題就自己按「送出」喔；要改就按「修改」。這是示範網站，不會真的送出。": {
-   "en": "{note}This is what you filled in. {scroll}Check it once from top to bottom. You can choose or skip “{page:個人資料是否提供給承辦員}”. If all is fine, tap “{page:送出}” yourself; to change something, tap “{page:修改}”. This is a demo site, so nothing is really sent.",
-   "ja": "{note}これはあなたが入力した内容です。{scroll}上から下まで一度確認してください。「{page:個人資料是否提供給承辦員}」は選んでも選ばなくてもかまいません。問題なければ、ご自分で「{page:送出}」を押してください。直すときは「{page:修改}」を押します。これはデモサイトなので、実際には送信されません。",
-   "vi": "{note}Đây là thông tin bạn đã điền. {scroll}Hãy kiểm tra một lượt từ trên xuống dưới. Mục “{page:個人資料是否提供給承辦員}” chọn hay không đều được. Nếu không có vấn đề, bạn tự bấm “{page:送出}” nhé; muốn sửa thì bấm “{page:修改}”. Đây là trang web mẫu, sẽ không gửi thật.",
-   "id": "{note}Ini data yang Anda isi. {scroll}Periksa sekali dari atas ke bawah. “{page:個人資料是否提供給承辦員}” boleh dipilih atau tidak. Jika sudah benar, ketuk sendiri “{page:送出}”; untuk mengubah, ketuk “{page:修改}”. Ini situs demo, jadi tidak benar-benar dikirim.",
-   "th": "{note}นี่คือข้อมูลที่คุณกรอก {scroll}ตรวจดูจากบนลงล่างหนึ่งรอบ ข้อ “{page:個人資料是否提供給承辦員}” จะเลือกหรือไม่เลือกก็ได้ ถ้าไม่มีปัญหา กด “{page:送出}” ด้วยตัวเอง ถ้าจะแก้ กด “{page:修改}” นี่เป็นเว็บไซต์สาธิต จะไม่ส่งจริง"
+  "{note}你改回「同意」了！資料沒問題，就自己按最下面的「送出」。": {
+   "en": "{note}You changed it back to “{page:同意}”! If the information is fine, tap “{page:送出}” at the bottom yourself.",
+   "ja": "{note}「{page:同意}」に戻しました！内容に問題なければ、ご自分で一番下の「{page:送出}」を押してください。",
+   "vi": "{note}Bạn đã chọn lại “{page:同意}”! Nếu thông tin không có vấn đề, hãy tự bấm “{page:送出}” ở dưới cùng.",
+   "id": "{note}Anda mengubahnya kembali ke “{page:同意}”! Jika datanya sudah benar, ketuk sendiri “{page:送出}” paling bawah.",
+   "th": "{note}คุณเปลี่ยนกลับเป็น “{page:同意}” แล้ว! ถ้าข้อมูลไม่มีปัญหา กด “{page:送出}” ด้านล่างสุดด้วยตัวเอง"
   },
-  "{note}選好了！": {
-   "en": "{note}Done, you picked one!",
-   "ja": "{note}選べました！",
-   "vi": "{note}Đã chọn xong!",
-   "id": "{note}Sudah dipilih!",
-   "th": "{note}เลือกแล้ว!"
+  "{note}你選了「不同意」。這樣「送出」會不能按，申請送不出去；要送出，就改點「同意」。": {
+   "en": "{note}You chose “{page:不同意}”. Then “{page:送出}” cannot be tapped and the application cannot be sent; to send it, tap “{page:同意}” instead.",
+   "ja": "{note}「{page:不同意}」を選びました。この場合「{page:送出}」は押せず、申請は送れません。送るときは「{page:同意}」を押してください。",
+   "vi": "{note}Bạn đã chọn “{page:不同意}”. Như vậy sẽ không bấm được “{page:送出}”, đơn không gửi đi được; muốn gửi thì bấm “{page:同意}”.",
+   "id": "{note}Anda memilih “{page:不同意}”. Dengan begitu “{page:送出}” tidak bisa diketuk dan permohonan tidak bisa dikirim; untuk mengirim, ketuk “{page:同意}”.",
+   "th": "{note}คุณเลือก “{page:不同意}” แบบนี้จะกด “{page:送出}” ไม่ได้ และส่งคำขอไม่ได้ ถ้าจะส่ง ให้กด “{page:同意}”"
+  },
+  "{note}這是你填的資料，{scroll}從上到下檢查一遍。「個人資料是否提供給承辦員」已經預先選了「同意」，不想提供就改點「不同意」。沒問題就自己按「送出」喔；要改就按「修改」。這是示範網站，不會真的送出。": {
+   "en": "{note}This is what you filled in. {scroll}Check it once from top to bottom. “{page:個人資料是否提供給承辦員}” is already set to “{page:同意}”; if you do not want to share your data, tap “{page:不同意}” instead. If all is fine, tap “{page:送出}” yourself; to change something, tap “{page:修改}”. This is a demo site, so nothing is really sent.",
+   "ja": "{note}これはあなたが入力した内容です。{scroll}上から下まで一度確認してください。「{page:個人資料是否提供給承辦員}」は最初から「{page:同意}」が選ばれています。提供したくないときは「{page:不同意}」を押してください。問題なければ、ご自分で「{page:送出}」を押してください。直すときは「{page:修改}」を押します。これはデモサイトなので、実際には送信されません。",
+   "vi": "{note}Đây là thông tin bạn đã điền. {scroll}Hãy kiểm tra một lượt từ trên xuống dưới. Mục “{page:個人資料是否提供給承辦員}” đã được chọn sẵn “{page:同意}”; nếu không muốn cung cấp, hãy bấm “{page:不同意}”. Nếu không có vấn đề, bạn tự bấm “{page:送出}” nhé; muốn sửa thì bấm “{page:修改}”. Đây là trang web mẫu, sẽ không gửi thật.",
+   "id": "{note}Ini data yang Anda isi. {scroll}Periksa sekali dari atas ke bawah. “{page:個人資料是否提供給承辦員}” sudah dipilih “{page:同意}”; jika tidak ingin memberikan data, ketuk “{page:不同意}”. Jika sudah benar, ketuk sendiri “{page:送出}”; untuk mengubah, ketuk “{page:修改}”. Ini situs demo, jadi tidak benar-benar dikirim.",
+   "th": "{note}นี่คือข้อมูลที่คุณกรอก {scroll}ตรวจดูจากบนลงล่างหนึ่งรอบ ข้อ “{page:個人資料是否提供給承辦員}” ถูกเลือก “{page:同意}” ไว้แล้ว ถ้าไม่ต้องการให้ข้อมูล ให้กด “{page:不同意}” ถ้าไม่มีปัญหา กด “{page:送出}” ด้วยตัวเอง ถ้าจะแก้ กด “{page:修改}” นี่เป็นเว็บไซต์สาธิต จะไม่ส่งจริง"
+  },
+  "{scroll}「個人資料是否提供給承辦員」選了「不同意」，「送出」就不能按。要送出申請，請改點「同意」。": {
+   "en": "{scroll}“{page:個人資料是否提供給承辦員}” is set to “{page:不同意}”, so “{page:送出}” cannot be tapped. To send the application, tap “{page:同意}” instead.",
+   "ja": "{scroll}「{page:個人資料是否提供給承辦員}」が「{page:不同意}」になっているので、「{page:送出}」は押せません。申請を送るには「{page:同意}」を押してください。",
+   "vi": "{scroll}Mục “{page:個人資料是否提供給承辦員}” đang chọn “{page:不同意}”, nên không bấm được “{page:送出}”. Muốn gửi đơn, hãy bấm “{page:同意}”.",
+   "id": "{scroll}“{page:個人資料是否提供給承辦員}” dipilih “{page:不同意}”, jadi “{page:送出}” tidak bisa diketuk. Untuk mengirim permohonan, ketuk “{page:同意}”.",
+   "th": "{scroll}ข้อ “{page:個人資料是否提供給承辦員}” เลือก “{page:不同意}” อยู่ จึงกด “{page:送出}” ไม่ได้ ถ้าจะส่งคำขอ ให้กด “{page:同意}”"
   },
   "{scroll}按最下面的「上一步」，先回到申辦首頁。": {
    "en": "{scroll}Tap “{page:上一步}” at the very bottom to go back to the Applications home page first.",
@@ -94,12 +108,12 @@
    "id": "Bagian “{section}” sedang tertutup. Ketuk untuk membukanya.",
    "th": "ส่วน “{section}” ถูกพับอยู่ แตะเพื่อเปิด"
   },
-  "「{section}」有「*」的都要填。照亮起來的那一格，一格一格填就好。{red}": {
-   "en": "In “{section}”, every box marked “*” must be filled in. Just follow the highlighted box and fill them in one by one. {red}",
-   "ja": "「{section}」の「*」がついた欄はすべて入力が必要です。光っている欄を、1つずつ入力すれば大丈夫です。{red}",
-   "vi": "Trong “{section}”, các ô có dấu “*” đều phải điền. Cứ theo ô đang sáng, điền từng ô một là được. {red}",
-   "id": "Di “{section}”, semua kolom bertanda “*” wajib diisi. Ikuti kolom yang menyala dan isi satu per satu. {red}",
-   "th": "ใน “{section}” ช่องที่มี “*” ต้องกรอกทั้งหมด กรอกตามช่องที่สว่างทีละช่องก็พอ {red}"
+  "「{section}」有「*」的都要填。照亮起來的那一格，一格一格填就好。還有沒填的，按「下一步」不會動，也不一定有紅字。{red}": {
+   "en": "In “{section}”, every box marked “*” must be filled in. Just follow the highlighted box and fill them in one by one. While a box is still empty, “{page:下一步}” does nothing, and there may be no red message. {red}",
+   "ja": "「{section}」の「*」がついた欄はすべて入力が必要です。光っている欄を、1つずつ入力すれば大丈夫です。まだ空いている欄があると、「{page:下一步}」を押しても進まず、赤い字が出ないこともあります。{red}",
+   "vi": "Trong “{section}”, các ô có dấu “*” đều phải điền. Cứ theo ô đang sáng, điền từng ô một là được. Nếu còn ô chưa điền, bấm “{page:下一步}” sẽ không chuyển trang, và có thể không có chữ đỏ. {red}",
+   "id": "Di “{section}”, semua kolom bertanda “*” wajib diisi. Ikuti kolom yang menyala dan isi satu per satu. Selama masih ada yang kosong, “{page:下一步}” tidak akan berfungsi, dan mungkin tidak ada tulisan merah. {red}",
+   "th": "ใน “{section}” ช่องที่มี “*” ต้องกรอกทั้งหมด กรอกตามช่องที่สว่างทีละช่องก็พอ ถ้ายังมีช่องที่ไม่ได้กรอก กด “{page:下一步}” จะไม่ไปต่อ และอาจไม่มีตัวอักษรสีแดง {red}"
   },
   "「申辦中」是還在辦的，「已結案」是辦完的，點一下就能切換。": {
    "en": "“{page:申辦中}” are still in progress, “{page:已結案}” are finished. Tap to switch.",
@@ -185,13 +199,6 @@
    "id": "Ketuk dulu “{page:修改}” di bawah untuk kembali ke halaman sebelumnya, lalu ketuk “{page:上一步}” paling bawah untuk kembali ke halaman utama permohonan.",
    "th": "กด “{page:修改}” ด้านล่างเพื่อกลับไปหน้าก่อน แล้วกด “{page:上一步}” ด้านล่างสุดเพื่อกลับไปหน้าแรกของบริการยื่นคำร้อง"
   },
-  "共 {n} 件": {
-   "en": " ({n} in total)",
-   "ja": "（全部で {n} 件）",
-   "vi": " (tổng cộng {n} hồ sơ)",
-   "id": " (total {n})",
-   "th": " (ทั้งหมด {n} เรื่อง)"
-  },
   "到「查詢」看案件進度": {
    "en": "Check case progress in “{page:查詢}”",
    "ja": "「{page:查詢}」で案件の進捗を見る",
@@ -234,12 +241,12 @@
    "id": "Kembali ke layar permohonan",
    "th": "กลับไปหน้าจอยื่นคำร้อง"
   },
-  "在「您遇到哪些問題?」的框框打關鍵字，按右邊的放大鏡，下面就會只留下符合的項目。": {
-   "en": "Type a keyword in the “{page:您遇到哪些問題?}” box and tap the magnifier on the right. Only matching items will stay below.",
-   "ja": "「{page:您遇到哪些問題?}」の枠にキーワードを入れて、右の虫めがねを押すと、合う項目だけが下に残ります。",
-   "vi": "Gõ từ khóa vào ô “{page:您遇到哪些問題?}”, bấm kính lúp bên phải, bên dưới sẽ chỉ còn các mục phù hợp.",
-   "id": "Ketik kata kunci di kotak “{page:您遇到哪些問題?}”, lalu ketuk kaca pembesar di kanan. Di bawah hanya tersisa item yang cocok.",
-   "th": "พิมพ์คำค้นในช่อง “{page:您遇到哪些問題?}” แล้วกดแว่นขยายทางขวา ด้านล่างจะเหลือแค่รายการที่ตรงกัน"
+  "在「您遇到哪些問題?」的框框打關鍵字，按右邊的放大鏡，下面就會只留下符合的項目。按了放大鏡還是寫「查無任何申辦相關項目」，就是沒有找到，換個詞再試。": {
+   "en": "Type a keyword in the “{page:您遇到哪些問題?}” box and tap the magnifier on the right. Only matching items will stay below. If it still says “{page:查無任何申辦相關項目}” after you tap the magnifier, nothing was found; try another word.",
+   "ja": "「{page:您遇到哪些問題?}」の枠にキーワードを入れて、右の虫めがねを押すと、合う項目だけが下に残ります。虫めがねを押しても「{page:查無任何申辦相關項目}」のままなら、見つかっていません。別の言葉で試してください。",
+   "vi": "Gõ từ khóa vào ô “{page:您遇到哪些問題?}”, bấm kính lúp bên phải, bên dưới sẽ chỉ còn các mục phù hợp. Bấm kính lúp rồi mà vẫn ghi “{page:查無任何申辦相關項目}” thì là không tìm thấy, hãy thử từ khác.",
+   "id": "Ketik kata kunci di kotak “{page:您遇到哪些問題?}”, lalu ketuk kaca pembesar di kanan. Di bawah hanya tersisa item yang cocok. Jika setelah mengetuk kaca pembesar masih tertulis “{page:查無任何申辦相關項目}”, berarti tidak ditemukan; coba kata lain.",
+   "th": "พิมพ์คำค้นในช่อง “{page:您遇到哪些問題?}” แล้วกดแว่นขยายทางขวา ด้านล่างจะเหลือแค่รายการที่ตรงกัน ถ้ากดแว่นขยายแล้วยังขึ้น “{page:查無任何申辦相關項目}” แปลว่าไม่พบ ลองคำอื่น"
   },
   "在日曆上點一下那一天。要換月份，按{arrows}。": {
    "en": "Tap the day on the calendar. To change the month, tap {arrows}.",
@@ -493,12 +500,12 @@
    "id": "Cek status permohonan",
    "th": "ดูสถานะคำร้อง"
   },
-  "檢查一下資料對不對，沒問題就自己按最下面的「送出」；要改就按「修改」。": {
-   "en": "Check that the information is correct. If all is fine, tap “{page:送出}” at the bottom yourself; to change something, tap “{page:修改}”.",
-   "ja": "内容が正しいか確認してください。問題なければ、ご自分で一番下の「{page:送出}」を押します。直すときは「{page:修改}」を押します。",
-   "vi": "Kiểm tra thông tin có đúng không, nếu ổn thì tự bấm “{page:送出}” ở dưới cùng; muốn sửa thì bấm “{page:修改}”.",
-   "id": "Periksa apakah datanya benar. Jika sudah, ketuk sendiri “{page:送出}” paling bawah; untuk mengubah, ketuk “{page:修改}”.",
-   "th": "ตรวจดูว่าข้อมูลถูกต้องไหม ถ้าไม่มีปัญหา กด “{page:送出}” ด้านล่างสุดด้วยตัวเอง ถ้าจะแก้ กด “{page:修改}”"
+  "檢查一下資料對不對，沒問題就自己按最下面的「送出」；要改就按「修改」。「個人資料是否提供給承辦員」選「不同意」的話，「送出」會不能按，申請就送不出去。": {
+   "en": "Check that the information is correct. If all is fine, tap “{page:送出}” at the bottom yourself; to change something, tap “{page:修改}”. If “{page:個人資料是否提供給承辦員}” is set to “{page:不同意}”, “{page:送出}” cannot be tapped and the application cannot be sent.",
+   "ja": "内容が正しいか確認してください。問題なければ、ご自分で一番下の「{page:送出}」を押します。直すときは「{page:修改}」を押します。「{page:個人資料是否提供給承辦員}」で「{page:不同意}」を選ぶと「{page:送出}」は押せず、申請は送れません。",
+   "vi": "Kiểm tra thông tin có đúng không, nếu ổn thì tự bấm “{page:送出}” ở dưới cùng; muốn sửa thì bấm “{page:修改}”. Nếu mục “{page:個人資料是否提供給承辦員}” chọn “{page:不同意}”, sẽ không bấm được “{page:送出}” và đơn không gửi đi được.",
+   "id": "Periksa apakah datanya benar. Jika sudah, ketuk sendiri “{page:送出}” paling bawah; untuk mengubah, ketuk “{page:修改}”. Jika “{page:個人資料是否提供給承辦員}” dipilih “{page:不同意}”, “{page:送出}” tidak bisa diketuk dan permohonan tidak bisa dikirim.",
+   "th": "ตรวจดูว่าข้อมูลถูกต้องไหม ถ้าไม่มีปัญหา กด “{page:送出}” ด้านล่างสุดด้วยตัวเอง ถ้าจะแก้ กด “{page:修改}” ถ้าข้อ “{page:個人資料是否提供給承辦員}” เลือก “{page:不同意}” จะกด “{page:送出}” ไม่ได้ และส่งคำขอไม่ได้"
   },
   "滑到最下面，按「下一步」。": {
    "en": "Scroll to the very bottom and tap “{page:下一步}”.",
@@ -549,12 +556,12 @@
    "id": "Layar menampilkan “{page:案件已完成申辦}”. Ketuk “{page:確認}” untuk kembali ke halaman utama permohonan, nanti ketuk “{page:查詢}” di atas untuk melihat progres. Ini situs demo, jadi tidak benar-benar dikirim.",
    "th": "หน้าจอขึ้นว่า “{page:案件已完成申辦}” กด “{page:確認}” เพื่อกลับไปหน้าแรกของบริการยื่นคำร้อง ภายหลังแตะ “{page:查詢}” ด้านบนเพื่อดูความคืบหน้า นี่เป็นเว็บไซต์สาธิต ไม่ได้ส่งจริง"
   },
-  "畫面說「查無任何申辦相關項目」，沒有找到。換個簡單一點的詞，例如「補助」，或把框框清空看全部的項目。": {
-   "en": "The screen says “{page:查無任何申辦相關項目}”: nothing was found. Try a simpler word, e.g. “補助” (subsidy), or clear the box to see all items.",
-   "ja": "画面に「{page:查無任何申辦相關項目}」と出ていて、見つかりませんでした。「補助」（補助金）のような簡単な言葉に変えるか、枠を空にしてすべての項目を見てください。",
-   "vi": "Màn hình báo “{page:查無任何申辦相關項目}”, không tìm thấy. Hãy thử từ đơn giản hơn, ví dụ “補助” (trợ cấp), hoặc xóa trống ô để xem tất cả các mục.",
-   "id": "Layar menampilkan “{page:查無任何申辦相關項目}”, tidak ditemukan. Coba kata yang lebih sederhana, misalnya “補助” (subsidi), atau kosongkan kotaknya untuk melihat semua item.",
-   "th": "หน้าจอขึ้นว่า “{page:查無任何申辦相關項目}” ไม่พบรายการ ลองใช้คำที่ง่ายขึ้น เช่น “補助” (เงินอุดหนุน) หรือล้างช่องเพื่อดูทุกรายการ"
+  "畫面說「查無任何申辦相關項目」，沒有找到。換個簡單一點的詞，例如「補助」或「原住民」，或把框框清空看全部的項目。": {
+   "en": "The screen says “{page:查無任何申辦相關項目}”: nothing was found. Try a simpler word, e.g. “補助” (subsidy) or “原住民” (Indigenous), or clear the box to see all items.",
+   "ja": "画面に「{page:查無任何申辦相關項目}」と出ていて、見つかりませんでした。「補助」（補助金）や「原住民」（先住民）のような簡単な言葉に変えるか、枠を空にしてすべての項目を見てください。",
+   "vi": "Màn hình báo “{page:查無任何申辦相關項目}”, không tìm thấy. Hãy thử từ đơn giản hơn, ví dụ “補助” (trợ cấp) hoặc “原住民” (người bản địa), hoặc xóa trống ô để xem tất cả các mục.",
+   "id": "Layar menampilkan “{page:查無任何申辦相關項目}”, tidak ditemukan. Coba kata yang lebih sederhana, misalnya “補助” (subsidi) atau “原住民” (masyarakat adat), atau kosongkan kotaknya untuk melihat semua item.",
+   "th": "หน้าจอขึ้นว่า “{page:查無任何申辦相關項目}” ไม่พบรายการ ลองใช้คำที่ง่ายขึ้น เช่น “補助” (เงินอุดหนุน) หรือ “原住民” (ชนพื้นเมือง) หรือล้างช่องเพื่อดูทุกรายการ"
   },
   "目前沒有已結案的案件。": {
    "en": "There are no finished cases yet.",
@@ -605,12 +612,26 @@
    "id": "Formulir sudah terbuka! Isi satu per satu sesuai layar; semua kolom bertanda “*” wajib diisi.",
    "th": "เปิดแบบฟอร์มแล้ว! กรอกทีละช่องตามหน้าจอ ช่องที่มี “*” ต้องกรอกทั้งหมด"
   },
-  "說明看完了！{scroll}「個人資料是否提供給承辦員」是問：承辦員辦案需要時，可不可以申請看你的資料。選「同意」或「不同意」都可以。": {
-   "en": "You have read it! {scroll}“{page:個人資料是否提供給承辦員}” asks: when the case officer needs it for your case, may they request to see your data? You can choose “{page:同意}” or “{page:不同意}”.",
-   "ja": "説明を読み終わりました！{scroll}「{page:個人資料是否提供給承辦員}」は、担当者が手続きで必要なときに、あなたの資料の閲覧を申請してよいか、という質問です。「{page:同意}」でも「{page:不同意}」でもかまいません。",
-   "vi": "Bạn đã đọc xong! {scroll}“{page:個人資料是否提供給承辦員}” là hỏi: khi cán bộ phụ trách cần để xử lý hồ sơ, họ có được xin xem dữ liệu của bạn không. Chọn “{page:同意}” hay “{page:不同意}” đều được.",
-   "id": "Sudah dibaca! {scroll}“{page:個人資料是否提供給承辦員}” menanyakan: jika petugas memerlukannya untuk menangani kasus, bolehkah mereka meminta untuk melihat data Anda? Boleh pilih “{page:同意}” atau “{page:不同意}”.",
-   "th": "อ่านคำอธิบายจบแล้ว! {scroll}“{page:個人資料是否提供給承辦員}” ถามว่า เมื่อเจ้าหน้าที่ต้องใช้ในการดำเนินเรื่อง จะขอดูข้อมูลของคุณได้ไหม เลือก “{page:同意}” หรือ “{page:不同意}” ก็ได้"
+  "要同意就不用改，檢查好資料直接按「送出」。選「同意」，承辦員依法辦案需要時可以申請取得你的個人資料。注意：選「不同意」的話，「送出」會不能按，這個申請就送不出去。": {
+   "en": "If you agree, leave it as it is, check your data and tap “{page:送出}”. With “{page:同意}”, the case officer may request your personal data when the case needs it under the law. Note: if you choose “{page:不同意}”, “{page:送出}” cannot be tapped and this application cannot be sent.",
+   "ja": "同意するなら変えなくてかまいません。内容を確認して「{page:送出}」を押してください。「{page:同意}」を選ぶと、担当者が法律に基づき手続きで必要なときに、あなたの個人情報の取得を申請できます。注意：「{page:不同意}」を選ぶと「{page:送出}」が押せなくなり、この申請は送れません。",
+   "vi": "Nếu đồng ý thì không cần đổi, kiểm tra xong thông tin rồi bấm “{page:送出}”. Chọn “{page:同意}”, khi cần xử lý hồ sơ theo luật, cán bộ phụ trách có thể xin lấy dữ liệu cá nhân của bạn. Lưu ý: nếu chọn “{page:不同意}”, sẽ không bấm được “{page:送出}” và đơn này không gửi đi được.",
+   "id": "Jika setuju, tidak perlu diubah; periksa datanya lalu ketuk “{page:送出}”. Dengan “{page:同意}”, petugas boleh meminta data pribadi Anda bila diperlukan untuk menangani kasus sesuai hukum. Catatan: jika memilih “{page:不同意}”, “{page:送出}” tidak bisa diketuk dan permohonan ini tidak bisa dikirim.",
+   "th": "ถ้ายินยอมก็ไม่ต้องเปลี่ยน ตรวจข้อมูลแล้วกด “{page:送出}” ได้เลย ถ้าเลือก “{page:同意}” เมื่อเจ้าหน้าที่ต้องใช้ในการดำเนินเรื่องตามกฎหมาย จะขอรับข้อมูลส่วนตัวของคุณได้ หมายเหตุ: ถ้าเลือก “{page:不同意}” จะกด “{page:送出}” ไม่ได้ และส่งคำขอนี้ไม่ได้"
+  },
+  "要送出申請，「個人資料是否提供給承辦員」要選「同意」，再自己按最下面的「送出」。": {
+   "en": "To send the application, “{page:個人資料是否提供給承辦員}” must be “{page:同意}”; then tap “{page:送出}” at the bottom yourself.",
+   "ja": "申請を送るには、「{page:個人資料是否提供給承辦員}」で「{page:同意}」を選び、ご自分で一番下の「{page:送出}」を押してください。",
+   "vi": "Muốn gửi đơn, mục “{page:個人資料是否提供給承辦員}” phải chọn “{page:同意}”, rồi tự bấm “{page:送出}” ở dưới cùng.",
+   "id": "Untuk mengirim permohonan, “{page:個人資料是否提供給承辦員}” harus dipilih “{page:同意}”, lalu ketuk sendiri “{page:送出}” paling bawah.",
+   "th": "ถ้าจะส่งคำขอ ข้อ “{page:個人資料是否提供給承辦員}” ต้องเลือก “{page:同意}” แล้วกด “{page:送出}” ด้านล่างสุดด้วยตัวเอง"
+  },
+  "說明看完了！{scroll}「個人資料是否提供給承辦員」是問：承辦員辦案需要時，可不可以申請看你的資料。畫面已經先幫你選「同意」；如果不想讓承辦員申請看你的資料，請點「不同意」。": {
+   "en": "You have read it! {scroll}“{page:個人資料是否提供給承辦員}” asks: when the case officer needs it for your case, may they request to see your data? The screen has already chosen “{page:同意}” for you; if you do not want the officer to request your data, tap “{page:不同意}”.",
+   "ja": "説明を読み終わりました！{scroll}「{page:個人資料是否提供給承辦員}」は、担当者が手続きで必要なときに、あなたの資料の閲覧を申請してよいか、という質問です。画面では最初から「{page:同意}」が選ばれています。担当者に資料を見られたくないときは「{page:不同意}」を押してください。",
+   "vi": "Bạn đã đọc xong! {scroll}“{page:個人資料是否提供給承辦員}” là hỏi: khi cán bộ phụ trách cần để xử lý hồ sơ, họ có được xin xem dữ liệu của bạn không. Màn hình đã chọn sẵn “{page:同意}” cho bạn; nếu không muốn cán bộ xin xem dữ liệu của bạn, hãy bấm “{page:不同意}”.",
+   "id": "Sudah dibaca! {scroll}“{page:個人資料是否提供給承辦員}” menanyakan: jika petugas memerlukannya untuk menangani kasus, bolehkah mereka meminta untuk melihat data Anda? Layar sudah memilihkan “{page:同意}”; jika Anda tidak ingin petugas meminta data Anda, ketuk “{page:不同意}”.",
+   "th": "อ่านคำอธิบายจบแล้ว! {scroll}“{page:個人資料是否提供給承辦員}” ถามว่า เมื่อเจ้าหน้าที่ต้องใช้ในการดำเนินเรื่อง จะขอดูข้อมูลของคุณได้ไหม หน้าจอเลือก “{page:同意}” ไว้ให้แล้ว ถ้าไม่ต้องการให้เจ้าหน้าที่ขอดูข้อมูลของคุณ ให้กด “{page:不同意}”"
   },
   "資料沒問題，就自己按最下面的「送出」。": {
    "en": "If the information is fine, tap “{page:送出}” at the bottom yourself.",
@@ -626,6 +647,13 @@
    "id": "Jika datanya sudah benar, ketuk sendiri “{page:送出}” paling bawah; untuk mengubah, ketuk “{page:修改}”.",
    "th": "ถ้าข้อมูลไม่มีปัญหา กด “{page:送出}” ด้านล่างสุดด้วยตัวเอง ถ้าจะแก้ กด “{page:修改}”"
   },
+  "送出了！畫面寫「案件已完成申辦」。這是示範網站，沒有真的送出喔。": {
+   "en": "Sent! The screen says “{page:案件已完成申辦}”. This is a demo site, so nothing was really sent.",
+   "ja": "送信しました！画面に「{page:案件已完成申辦}」と出ています。これはデモサイトなので、実際には送信されていません。",
+   "vi": "Đã gửi! Màn hình ghi “{page:案件已完成申辦}”. Đây là trang web mẫu, không gửi thật.",
+   "id": "Terkirim! Layar menampilkan “{page:案件已完成申辦}”. Ini situs demo, jadi tidak benar-benar dikirim.",
+   "th": "ส่งแล้ว! หน้าจอขึ้นว่า “{page:案件已完成申辦}” นี่เป็นเว็บไซต์สาธิต ไม่ได้ส่งจริง"
+  },
   "送出了！畫面寫「案件已完成申辦」，之後可以在「查詢」看辦到哪裡。這是示範網站，沒有真的送出喔。": {
    "en": "Sent! The screen says “{page:案件已完成申辦}”. Later you can see how far it has gone in “{page:查詢}”. This is a demo site, so nothing was really sent.",
    "ja": "送信しました！画面に「{page:案件已完成申辦}」と出ています。後で「{page:查詢}」で進み具合を見られます。これはデモサイトなので、実際には送信されていません。",
@@ -639,13 +667,6 @@
    "vi": "Đã gửi! Đây là trang web mẫu, chưa gửi thật đâu.",
    "id": "Terkirim! Ini situs demo, jadi tidak benar-benar dikirim.",
    "th": "ส่งแล้ว! นี่เป็นเว็บไซต์สาธิต ไม่ได้ส่งจริง"
-  },
-  "這一題不選也可以送出。選「同意」，承辦員依法辦案需要時可以申請取得你的個人資料。": {
-   "en": "You can send the form without answering this. If you choose “{page:同意}”, the case officer may request your personal data when the case needs it under the law.",
-   "ja": "この質問は選ばなくても送信できます。「{page:同意}」を選ぶと、担当者が法律に基づき手続きで必要なときに、あなたの個人情報の取得を申請できます。",
-   "vi": "Câu này không chọn cũng gửi được. Nếu chọn “{page:同意}”, khi cần xử lý hồ sơ theo luật, cán bộ phụ trách có thể xin lấy dữ liệu cá nhân của bạn.",
-   "id": "Pertanyaan ini boleh tidak dijawab dan tetap bisa dikirim. Jika memilih “{page:同意}”, petugas boleh meminta data pribadi Anda bila diperlukan untuk menangani kasus sesuai hukum.",
-   "th": "ข้อนี้ไม่เลือกก็ส่งได้ ถ้าเลือก “{page:同意}” เมื่อเจ้าหน้าที่ต้องใช้ในการดำเนินเรื่องตามกฎหมาย จะขอรับข้อมูลส่วนตัวของคุณได้"
   },
   "這些是已經辦完的案件{n}。{first}": {
    "en": "These are your finished cases{n}. {first}",
@@ -843,12 +864,12 @@
    "id": "Ketuk “{page:查詢}” di atas untuk melihat permohonan Anda.",
    "th": "แตะ “{page:查詢}” ด้านบน จะเห็นคำร้องของคุณ"
   },
-  "點一下上面的框框，打你想辦的事，例如「補助」，再按右邊的放大鏡。": {
-   "en": "Tap the box at the top, type what you want to do, e.g. “補助” (subsidy), then tap the magnifier on the right.",
-   "ja": "上の枠をタップして、したいことを入力してください。例：「補助」（補助金）。それから右の虫めがねを押します。",
-   "vi": "Bấm vào ô phía trên, gõ việc bạn muốn làm, ví dụ “補助” (trợ cấp), rồi bấm kính lúp bên phải.",
-   "id": "Ketuk kotak di atas, ketik yang ingin Anda urus, misalnya “補助” (subsidi), lalu ketuk kaca pembesar di kanan.",
-   "th": "แตะช่องด้านบน พิมพ์เรื่องที่ต้องการทำ เช่น “補助” (เงินอุดหนุน) แล้วกดแว่นขยายทางขวา"
+  "點一下上面的框框，打你想辦的事，例如「補助」或「原住民」，再按右邊的放大鏡。": {
+   "en": "Tap the box at the top, type what you want to do, e.g. “補助” (subsidy) or “原住民” (Indigenous), then tap the magnifier on the right.",
+   "ja": "上の枠をタップして、したいことを入力してください。例：「補助」（補助金）や「原住民」（先住民）。それから右の虫めがねを押します。",
+   "vi": "Bấm vào ô phía trên, gõ việc bạn muốn làm, ví dụ “補助” (trợ cấp) hoặc “原住民” (người bản địa), rồi bấm kính lúp bên phải.",
+   "id": "Ketuk kotak di atas, ketik yang ingin Anda urus, misalnya “補助” (subsidi) atau “原住民” (masyarakat adat), lalu ketuk kaca pembesar di kanan.",
+   "th": "แตะช่องด้านบน พิมพ์เรื่องที่ต้องการทำ เช่น “補助” (เงินอุดหนุน) หรือ “原住民” (ชนพื้นเมือง) แล้วกดแว่นขยายทางขวา"
   },
   "點你要申請的那一項，就會打開申請表單。": {
    "en": "Tap the item you want to apply for, and the application form will open.",
@@ -884,6 +905,13 @@
    "vi": ", ví dụ “{first}”",
    "id": ", misalnya “{first}”",
    "th": " เช่น “{first}”"
+  },
+  "，共 {n} 件": {
+   "en": ", {n} in total",
+   "ja": "、全部で {n} 件",
+   "vi": ", tổng cộng {n} hồ sơ",
+   "id": ", total {n}",
+   "th": " ทั้งหมด {n} เรื่อง"
   },
   "：點「{choices}」": {
    "en": ": tap “{choices}”",

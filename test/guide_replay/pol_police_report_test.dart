@@ -86,27 +86,31 @@ void main() {
   });
 
   // POL-1: a case page loaded directly (reload / deep link) has no data (the
-  // list passes it in memory). caseNo then reads the next label, and the done
-  // card says 「這就是案件 受理時間的詳細內容！」.
+  // list passes it in memory). The guide must notice it (not read the next
+  // label as the case number) and send the user back with ‹.
   group('POL-1 case page without data', () {
+    Map<String, dynamic> emptyPage() {
+      final steps = loadFixture('pol_record_detail_direct')['steps'] as List;
+      return Map<String, dynamic>.from(
+        ((steps[1] as Map)['after'] as Map)['flags'] as Map,
+      );
+    }
+
     test('page facts: the directly loaded case page has no 編號 value', () {
-      final f = _lastFlags('pol_record_detail_direct');
-      expect(f['caseNo'], '受理時間');
+      final f = emptyPage();
+      expect(f['caseNo'], '');
       expect(f['status'], '');
     });
 
-    test(
-      'the done card on a case page without data does not name a label as '
-      'the case number',
-      () {
-        final r = replayFixture('pol_record_detail_direct');
-        printOnFailure(r.report);
-        expect(r.trace.last, isNot(contains('受理時間')));
-      },
-      skip:
-          'POL-1: caseNo regex takes the next label (受理時間) when 編號 is '
-          'empty; the guide does not notice the empty case page. Re-record '
-          'after the fix.',
-    );
+    test('the case page without data sends the user back, then the case '
+        'opened from the list finishes the guide', () {
+      final r = replayFixture('pol_record_detail_direct');
+      printOnFailure(r.report);
+      expect(_problems(r), isEmpty);
+      expect(r.done, isTrue);
+      expect(r.trace.join('\n'), isNot(contains('受理時間')));
+      expect(r.trace[1], contains('資料沒有載入'));
+      expect(r.trace[1], contains('target=police.back'));
+    });
   });
 }

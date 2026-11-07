@@ -12,7 +12,8 @@ import 'package:town_pass/page/guided_assistant/web/web_page_state.dart';
 ///   `/form/ID` step 1: 基本資料 and 申辦服務資料 (collapsible sections,
 ///        the 申訴項目(可多選) dialog, a date calendar), 上一步 / 下一步
 ///   `/form/ID` step 2: read-only summary, 個人資料是否提供給承辦員
-///        同意 / 不同意 (not required), 修改 / 送出 -> 案件已完成申辦 dialog
+///        同意 / 不同意 (同意 pre-selected; 不同意 disables 送出), 修改 / 送出
+///        -> 案件已完成申辦 dialog
 ///
 /// Everything is drawn on top of the page; nothing on the page is changed,
 /// clicked or typed by the assistant. The pages have no fixed bottom bar.
@@ -172,6 +173,9 @@ final districtOfficePageSpec = WebPageSpec(
     'submitted': "!!dialog('案件已完成申辦')",
     // Scrolled to the end of the consent sentence (latched).
     'consentRead': 'readToEnd($_consentText)',
+    // 不同意 was picked (latched): 同意 is pre-selected (input#isAgreeY), so
+    // only a change shows the user's own choice.
+    'consentNo': "(() => { const l = qa('section.px-4.mt-4 > div.flex.flex-wrap.gap-4.mt-2 > label').find((x) => x.querySelector('input:checked')); return !!l && txt(l) === '不同意'; })()",
     'situation': "txt(q('$_situation--active'))",
     'activeCount': r"""(() => { const m = txt(byText('div.p-4 > section.grid.grid-cols-2 > button.situation-button', '申辦中')).match(/\((\d+)\)/); return m ? Number(m[1]) : null; })()""",
     'closedCount': r"""(() => { const m = txt(byText('div.p-4 > section.grid.grid-cols-2 > button.situation-button', '已結案')).match(/\((\d+)\)/); return m ? Number(m[1]) : null; })()""",
@@ -180,7 +184,7 @@ final districtOfficePageSpec = WebPageSpec(
     'firstStatus': '$_caseStatus($_cases[0])',
     for (final e in _targets.entries) 'pos.${e.key}': _posJs(e.value),
   },
-  latchFlags: const {'submitted', 'formSeen', 'consentRead'},
+  latchFlags: const {'submitted', 'formSeen', 'consentRead', 'consentNo'},
 );
 
 bool onDistrictOffice(WebSnapshot s) => s.pathIs('/') || s.pathStarts('/form/');
@@ -193,6 +197,13 @@ bool _submitted(WebPageState s) => s.latched('submitted');
 bool _queryTab(WebPageState s) => _home(s) && s.now.text('tab') == '查詢';
 bool _no(WebPageState s) => false;
 bool _consentRead(WebPageState s) => s.latched('consentRead');
+
+/// 個人資料是否提供給承辦員 opens with 「同意」 already picked, and 「送出」 is
+/// disabled while 「不同意」 is picked.
+bool _consentNo(WebPageState s) => s.now.text('consentChoice') == '不同意';
+
+/// The user changed the pre-selected 「同意」 at least once.
+bool _consentChanged(WebPageState s) => s.latched('consentNo');
 
 /// Said when 同意/不同意 was picked before the sentence was read.
 const _readNote = '建議還是把說明看完喔。';
@@ -354,10 +365,18 @@ String _formLabel(WebPageState s, String sec) {
   return '選一個';
 }
 
+/// The section that owns the popups: the 申訴項目 dialog and the 肇事日期
+/// calendar are both in 申辦服務資料 (基本資料 has no dialog or date field).
+const _popupSection = 'service';
+
+/// An open popup keeps only its own section from being done, so the guide
+/// does not jump back to 基本資料 while the dialog or calendar is open.
 bool _sectionDone(WebPageState s, String sec) =>
     _submitted(s) ||
     _step2(s) ||
-    (_step1(s) && s.now.text('${sec}Kind').isEmpty && _popupTarget(s) == null);
+    (_step1(s) &&
+        s.now.text('${sec}Kind').isEmpty &&
+        (sec != _popupSection || _popupTarget(s) == null));
 
 /// A guide opened straight on a form has no open_service step: on the home
 /// page (the user went back) its first fill step points at the list the way
@@ -373,10 +392,10 @@ GuideStep _fillStep(String sec) => GuideStep(
     final red = warn.isEmpty
         ? ''
         : gt('有紅字「{warn}不能為空」的地方也要補好。', {'warn': pg(warn)});
-    return gt('「{section}」有「*」的都要填。照亮起來的那一格，一格一格填就好。{red}', {
-      'section': pg(_sectionName[sec]!),
-      'red': red,
-    });
+    return gt(
+      '「{section}」有「*」的都要填。照亮起來的那一格，一格一格填就好。還有沒填的，按「下一步」不會動，也不一定有紅字。{red}',
+      {'section': pg(_sectionName[sec]!), 'red': red},
+    );
   },
   isDone: (s) => _sectionDone(s, sec),
   locks: (s) => _home(s) || _lockIfVisible(s, _formTarget(s, sec)),
@@ -396,6 +415,18 @@ String? _listTarget(WebPageState s) {
 String? _searchTarget(WebPageState s) {
   if (!_home(s)) return null;
   return _queryTab(s) ? 'district.tab_apply' : 'district.search';
+}
+
+/// The word that was in the search box when 「查無任何申辦相關項目」 appeared
+/// (null while the message is not shown). The page keeps the message until
+/// the magnifier is pressed again and shows nothing of the word it searched,
+/// so the guide remembers it. Limit: a second word that also finds nothing
+/// cannot be told from a word not searched yet.
+String? _noResultQuery;
+
+String? _noResultWord(WebPageState s) {
+  if (!_home(s) || !s.now.flag('noResult')) return _noResultQuery = null;
+  return _noResultQuery ??= s.now.text('query');
 }
 
 const _applyTabCard = '這裡是「查詢」。先點上面的「申辦」，回到申請項目。';
@@ -454,12 +485,18 @@ String _progressText(WebPageState s) {
 
 String _closedText(WebPageState s) {
   final n = _hasCount(s, 'closedCount')
-      ? gt('共 {n} 件', {'n': s.now.number('closedCount')})
+      ? gt('，共 {n} 件', {'n': s.now.number('closedCount')})
       : '';
   if (_hasCount(s, 'closedCount') && s.now.number('closedCount') == 0) {
     return '目前沒有已結案的案件。';
   }
   return gt('這些是已經辦完的案件{n}。{first}', {'n': n, 'first': _firstCase(s)});
+}
+
+/// 送出, or 同意 / 不同意 while 不同意 keeps 送出 disabled.
+String? _submitTarget(WebPageState s) {
+  if (!_step2(s)) return null;
+  return _consentNo(s) ? 'district.consent' : 'district.submit';
 }
 
 String? _backHomeTarget(WebPageState s) {
@@ -504,15 +541,22 @@ final List<GuideComponent> districtOfficeComponents = [
         label: (s) => _queryTab(s) ? '點一下' : '打字',
         card: (s) {
           if (_queryTab(s)) return _applyTabCard;
-          if (s.now.text('query').isEmpty) {
-            return '點一下上面的框框，打你想辦的事，例如「補助」，再按右邊的放大鏡。';
+          final query = s.now.text('query');
+          final searched = _noResultWord(s);
+          if (query.isEmpty) {
+            return '點一下上面的框框，打你想辦的事，例如「補助」或「原住民」，再按右邊的放大鏡。';
           }
-          if (s.now.flag('noResult') || s.now.number('groupCount') == 0) {
-            return '畫面說「查無任何申辦相關項目」，沒有找到。換個簡單一點的詞，例如「補助」，或把框框清空看全部的項目。';
+          // 查無… stays until the magnifier is pressed again: a new word in
+          // the box has not been searched yet.
+          if (searched != null && searched != query) {
+            return '打好了嗎？按右邊的放大鏡找找看。';
+          }
+          if (searched != null || s.now.number('groupCount') == 0) {
+            return '畫面說「查無任何申辦相關項目」，沒有找到。換個簡單一點的詞，例如「補助」或「原住民」，或把框框清空看全部的項目。';
           }
           return '打好了嗎？按右邊的放大鏡找找看。';
         },
-        detail: (_) => '在「您遇到哪些問題?」的框框打關鍵字，按右邊的放大鏡，下面就會只留下符合的項目。',
+        detail: (_) => '在「您遇到哪些問題?」的框框打關鍵字，按右邊的放大鏡，下面就會只留下符合的項目。按了放大鏡還是寫「查無任何申辦相關項目」，就是沒有找到，換個詞再試。',
         isDone: (s) =>
             _onForm(s) ||
             _submitted(s) ||
@@ -712,10 +756,22 @@ final List<GuideComponent> districtOfficeComponents = [
     requires: const ['next_step'],
     taskTitle: '選同意或不同意',
     doneText: '選好了！',
-    doneTextOf: (s) =>
-        gt('{note}選好了！', {'note': _consentRead(s) ? '' : gt(_readNote)}),
-    doneDetail: '資料沒問題，就自己按最下面的「送出」。',
-    doneTarget: (s) => _step2(s) ? 'district.submit' : null,
+    doneTextOf: (s) {
+      if (_submitted(s)) return '送出了！畫面寫「案件已完成申辦」。這是示範網站，沒有真的送出喔。';
+      final note = _consentRead(s) ? '' : gt(_readNote);
+      if (_consentNo(s)) {
+        return gt('{note}你選了「不同意」。這樣「送出」會不能按，申請送不出去；要送出，就改點「同意」。', {
+          'note': note,
+        });
+      }
+      return gt('{note}你改回「同意」了！資料沒問題，就自己按最下面的「送出」。', {'note': note});
+    },
+    doneDetail: '要送出申請，「個人資料是否提供給承辦員」要選「同意」，再自己按最下面的「送出」。',
+    doneTarget: (s) {
+      if (_submitted(s)) return 'district.ok';
+      if (!_step2(s)) return null;
+      return _consentNo(s) ? 'district.consent' : 'district.submit';
+    },
     steps: [
       // Read first: outline only, so the page can be scrolled.
       GuideStep(
@@ -727,10 +783,11 @@ final List<GuideComponent> districtOfficeComponents = [
         label: (_) => '往下滑',
         card: (_) => '先往下滑，把「個人資料是否提供給承辦員」這段說明看完喔。看到了，我再告訴你要按哪裡。',
         detail: (_) => '這段是說：承辦員依法辦案需要時，可以透過申請程序取得你的個人資料。',
+        // 同意 is pre-selected, so a choice alone does not mean the user saw
+        // the question: only reading it or changing the answer does.
         isDone: (s) =>
             _submitted(s) ||
-            (_step2(s) &&
-                (_consentRead(s) || s.now.text('consentChoice').isNotEmpty)),
+            (_step2(s) && (_consentRead(s) || _consentChanged(s))),
         cardTop: (s) => _cardNear(s, 'district.consent_text'),
       ),
       GuideStep(
@@ -739,13 +796,13 @@ final List<GuideComponent> districtOfficeComponents = [
         arrow: _no,
         label: (_) => '選一個',
         card: (s) => gt(
-          '說明看完了！{scroll}「個人資料是否提供給承辦員」是問：承辦員辦案需要時，可不可以申請看你的資料。選「同意」或「不同意」都可以。',
+          '說明看完了！{scroll}「個人資料是否提供給承辦員」是問：承辦員辦案需要時，可不可以申請看你的資料。畫面已經先幫你選「同意」；如果不想讓承辦員申請看你的資料，請點「不同意」。',
           {'scroll': _scrollWord(s, 'district.consent')},
         ),
-        detail: (_) => '這一題不選也可以送出。選「同意」，承辦員依法辦案需要時可以申請取得你的個人資料。',
-        isDone: (s) =>
-            _submitted(s) ||
-            (_step2(s) && s.now.text('consentChoice').isNotEmpty),
+        detail: (_) => '要同意就不用改，檢查好資料直接按「送出」。選「同意」，承辦員依法辦案需要時可以申請取得你的個人資料。注意：選「不同意」的話，「送出」會不能按，這個申請就送不出去。',
+        // The pre-selected 同意 is not the user's choice: done once they
+        // change it (or send the form with 同意).
+        isDone: (s) => _submitted(s) || (_step2(s) && _consentChanged(s)),
         locks: (s) => _lockIfVisible(s, 'district.consent'),
         scrollHint: (s) => _offScreen(s, 'district.consent'),
         cardTop: (s) => _cardNear(s, 'district.consent'),
@@ -768,26 +825,34 @@ final List<GuideComponent> districtOfficeComponents = [
     after: const TodoItem('之後到「查詢」看進度', self: '之後你自己看'),
     steps: [
       GuideStep(
-        target: (s) => _step2(s) ? 'district.submit' : null,
-        alsoUsable: const ['district.edit', 'district.consent'],
+        target: _submitTarget,
+        alsoUsable: const [
+          'district.edit',
+          'district.consent',
+          'district.submit',
+        ],
         // The user reads the summary first: the screen stays free.
         locks: _no,
         label: (_) => '確認',
         card: (s) {
+          if (_consentNo(s)) {
+            return gt('{scroll}「個人資料是否提供給承辦員」選了「不同意」，「送出」就不能按。要送出申請，請改點「同意」。', {
+              'scroll': _scrollWord(s, 'district.consent'),
+            });
+          }
           final scroll = _offScreen(s, 'district.submit') ? gt('往下滑，') : '';
-          final note =
-              s.now.text('consentChoice').isNotEmpty && !_consentRead(s)
+          final note = _consentChanged(s) && !_consentRead(s)
               ? gt(_readNote)
               : '';
           return gt(
-            '{note}這是你填的資料，{scroll}從上到下檢查一遍。「個人資料是否提供給承辦員」選不選都可以。沒問題就自己按「送出」喔；要改就按「修改」。這是示範網站，不會真的送出。',
+            '{note}這是你填的資料，{scroll}從上到下檢查一遍。「個人資料是否提供給承辦員」已經預先選了「同意」，不想提供就改點「不同意」。沒問題就自己按「送出」喔；要改就按「修改」。這是示範網站，不會真的送出。',
             {'note': note, 'scroll': scroll},
           );
         },
-        detail: (_) => '檢查一下資料對不對，沒問題就自己按最下面的「送出」；要改就按「修改」。',
+        detail: (_) => '檢查一下資料對不對，沒問題就自己按最下面的「送出」；要改就按「修改」。「個人資料是否提供給承辦員」選「不同意」的話，「送出」會不能按，申請就送不出去。',
         isDone: _submitted,
-        scrollHint: (s) => _offScreen(s, 'district.submit'),
-        cardTop: (s) => _cardNear(s, 'district.submit', otherwise: 60),
+        scrollHint: (s) => _offScreen(s, _submitTarget(s)),
+        cardTop: (s) => _cardNear(s, _submitTarget(s), otherwise: 60),
       ),
     ],
   ),

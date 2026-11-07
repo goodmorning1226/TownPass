@@ -8,8 +8,8 @@
  "expect": {
   "done": true
  },
- "recordedAt": "2026-11-07T18:22:39.089Z",
- "durationMs": 10711,
+ "recordedAt": "2026-11-07T18:59:42.641Z",
+ "durationMs": 10444,
  "viewport": {
   "width": 390,
   "height": 844,
@@ -35,6 +35,13 @@
      "hasChecks": false,
      "checked": 0,
      "checksOff": "",
+     "hasRoad": false,
+     "hasNumbers": false,
+     "numbers": 0,
+     "extraText": false,
+     "extraFocus": false,
+     "extraOff": "",
+     "needDescribe": false,
      "consentOff": "",
      "noteRead": false,
      "sendOff": "",
@@ -161,6 +168,13 @@
      "hasChecks": false,
      "checked": 0,
      "checksOff": "",
+     "hasRoad": false,
+     "hasNumbers": false,
+     "numbers": 0,
+     "extraText": false,
+     "extraFocus": false,
+     "extraOff": "",
+     "needDescribe": false,
      "consentOff": "",
      "noteRead": false,
      "sendOff": "",
@@ -201,6 +215,13 @@
      "hasChecks": false,
      "checked": 0,
      "checksOff": "",
+     "hasRoad": false,
+     "hasNumbers": false,
+     "numbers": 0,
+     "extraText": false,
+     "extraFocus": false,
+     "extraOff": "",
+     "needDescribe": false,
      "consentOff": "",
      "noteRead": false,
      "sendOff": "",
@@ -334,6 +355,13 @@
      "hasChecks": false,
      "checked": 0,
      "checksOff": "",
+     "hasRoad": false,
+     "hasNumbers": false,
+     "numbers": 0,
+     "extraText": false,
+     "extraFocus": false,
+     "extraOff": "",
+     "needDescribe": false,
      "consentOff": "",
      "noteRead": false,
      "sendOff": "",
@@ -381,6 +409,13 @@
      "hasChecks": true,
      "checked": 0,
      "checksOff": "",
+     "hasRoad": true,
+     "hasNumbers": true,
+     "numbers": 0,
+     "extraText": false,
+     "extraFocus": false,
+     "extraOff": "",
+     "needDescribe": false,
      "consentOff": "below",
      "noteRead": false,
      "sendOff": "below",
@@ -393,7 +428,8 @@
      "disaster.checks",
      "disaster.extra",
      "disaster.locate",
-     "disaster.location"
+     "disaster.location",
+     "disaster.numbers"
     ],
     "rects": {
      "disaster.location": [
@@ -413,6 +449,12 @@
       567,
       196,
       100
+     ],
+     "disaster.numbers": [
+      29,
+      719,
+      332,
+      44
      ],
      "disaster.extra": [
       29,
@@ -677,6 +719,13 @@
      "hasChecks": true,
      "checked": 0,
      "checksOff": "",
+     "hasRoad": true,
+     "hasNumbers": true,
+     "numbers": 0,
+     "extraText": false,
+     "extraFocus": false,
+     "extraOff": "",
+     "needDescribe": false,
      "consentOff": "below",
      "noteRead": false,
      "sendOff": "below",
@@ -689,7 +738,8 @@
      "disaster.checks",
      "disaster.extra",
      "disaster.locate",
-     "disaster.location"
+     "disaster.location",
+     "disaster.numbers"
     ],
     "rects": {
      "disaster.location": [
@@ -709,6 +759,12 @@
       567,
       196,
       100
+     ],
+     "disaster.numbers": [
+      29,
+      719,
+      332,
+      44
      ],
      "disaster.extra": [
       29,
@@ -731,6 +787,13 @@
      "hasChecks": true,
      "checked": 0,
      "checksOff": "",
+     "hasRoad": true,
+     "hasNumbers": true,
+     "numbers": 0,
+     "extraText": false,
+     "extraFocus": false,
+     "extraOff": "",
+     "needDescribe": false,
      "consentOff": "below",
      "noteRead": false,
      "sendOff": "below",
@@ -743,7 +806,8 @@
      "disaster.checks",
      "disaster.extra",
      "disaster.locate",
-     "disaster.location"
+     "disaster.location",
+     "disaster.numbers"
     ],
     "rects": {
      "disaster.location": [
@@ -763,6 +827,12 @@
       567,
       196,
       100
+     ],
+     "disaster.numbers": [
+      29,
+      719,
+      332,
+      44
      ],
      "disaster.extra": [
       29,
@@ -1026,6 +1096,13 @@
      "hasChecks": true,
      "checked": 0,
      "checksOff": "",
+     "hasRoad": true,
+     "hasNumbers": true,
+     "numbers": 0,
+     "extraText": false,
+     "extraFocus": false,
+     "extraOff": "",
+     "needDescribe": false,
      "consentOff": "below",
      "noteRead": false,
      "sendOff": "below",
@@ -1038,7 +1115,8 @@
      "disaster.checks",
      "disaster.extra",
      "disaster.locate",
-     "disaster.location"
+     "disaster.location",
+     "disaster.numbers"
     ],
     "rects": {
      "disaster.location": [
@@ -1058,6 +1136,12 @@
       567,
       196,
       100
+     ],
+     "disaster.numbers": [
+      29,
+      719,
+      332,
+      44
      ],
      "disaster.extra": [
       29,
@@ -1080,6 +1164,13 @@
      "hasChecks": true,
      "checked": 1,
      "checksOff": "",
+     "hasRoad": true,
+     "hasNumbers": true,
+     "numbers": 0,
+     "extraText": false,
+     "extraFocus": false,
+     "extraOff": "",
+     "needDescribe": false,
      "consentOff": "below",
      "noteRead": false,
      "sendOff": "below",
@@ -1092,7 +1183,8 @@
      "disaster.checks",
      "disaster.extra",
      "disaster.locate",
-     "disaster.location"
+     "disaster.location",
+     "disaster.numbers"
     ],
     "rects": {
      "disaster.location": [
@@ -1112,6 +1204,12 @@
       567,
       196,
       100
+     ],
+     "disaster.numbers": [
+      29,
+      719,
+      332,
+      44
      ],
      "disaster.extra": [
       29,
@@ -1369,6 +1467,13 @@
      "hasChecks": true,
      "checked": 1,
      "checksOff": "",
+     "hasRoad": true,
+     "hasNumbers": true,
+     "numbers": 0,
+     "extraText": false,
+     "extraFocus": false,
+     "extraOff": "",
+     "needDescribe": false,
      "consentOff": "",
      "noteRead": true,
      "sendOff": "",
@@ -1382,6 +1487,7 @@
      "disaster.consent",
      "disaster.extra",
      "disaster.note",
+     "disaster.numbers",
      "disaster.send"
     ],
     "rects": {
@@ -1390,6 +1496,12 @@
       75,
       196,
       100
+     ],
+     "disaster.numbers": [
+      29,
+      227,
+      332,
+      44
      ],
      "disaster.extra": [
       29,
@@ -1430,6 +1542,13 @@
      "hasChecks": true,
      "checked": 1,
      "checksOff": "",
+     "hasRoad": true,
+     "hasNumbers": true,
+     "numbers": 0,
+     "extraText": false,
+     "extraFocus": false,
+     "extraOff": "",
+     "needDescribe": false,
      "consentOff": "",
      "noteRead": true,
      "sendOff": "",
@@ -1443,6 +1562,7 @@
      "disaster.consent",
      "disaster.extra",
      "disaster.note",
+     "disaster.numbers",
      "disaster.send"
     ],
     "rects": {
@@ -1451,6 +1571,12 @@
       75,
       196,
       100
+     ],
+     "disaster.numbers": [
+      29,
+      227,
+      332,
+      44
      ],
      "disaster.extra": [
       29,
@@ -1733,6 +1859,13 @@
      "hasChecks": true,
      "checked": 1,
      "checksOff": "",
+     "hasRoad": true,
+     "hasNumbers": true,
+     "numbers": 0,
+     "extraText": false,
+     "extraFocus": false,
+     "extraOff": "",
+     "needDescribe": false,
      "consentOff": "",
      "noteRead": true,
      "sendOff": "",
@@ -1746,6 +1879,7 @@
      "disaster.consent",
      "disaster.extra",
      "disaster.note",
+     "disaster.numbers",
      "disaster.send"
     ],
     "rects": {
@@ -1754,6 +1888,12 @@
       75,
       196,
       100
+     ],
+     "disaster.numbers": [
+      29,
+      227,
+      332,
+      44
      ],
      "disaster.extra": [
       29,
@@ -1794,6 +1934,13 @@
      "hasChecks": true,
      "checked": 1,
      "checksOff": "",
+     "hasRoad": true,
+     "hasNumbers": true,
+     "numbers": 0,
+     "extraText": false,
+     "extraFocus": false,
+     "extraOff": "",
+     "needDescribe": false,
      "consentOff": "",
      "noteRead": true,
      "sendOff": "",
@@ -1807,6 +1954,7 @@
      "disaster.consent",
      "disaster.extra",
      "disaster.note",
+     "disaster.numbers",
      "disaster.send"
     ],
     "rects": {
@@ -1815,6 +1963,12 @@
       75,
       196,
       100
+     ],
+     "disaster.numbers": [
+      29,
+      227,
+      332,
+      44
      ],
      "disaster.extra": [
       29,
@@ -2094,6 +2248,13 @@
      "hasChecks": true,
      "checked": 1,
      "checksOff": "",
+     "hasRoad": true,
+     "hasNumbers": true,
+     "numbers": 0,
+     "extraText": false,
+     "extraFocus": false,
+     "extraOff": "",
+     "needDescribe": false,
      "consentOff": "",
      "noteRead": true,
      "sendOff": "",
@@ -2107,6 +2268,7 @@
      "disaster.consent",
      "disaster.extra",
      "disaster.note",
+     "disaster.numbers",
      "disaster.send"
     ],
     "rects": {
@@ -2115,6 +2277,12 @@
       75,
       196,
       100
+     ],
+     "disaster.numbers": [
+      29,
+      227,
+      332,
+      44
      ],
      "disaster.extra": [
       29,
@@ -2155,6 +2323,13 @@
      "hasChecks": true,
      "checked": 1,
      "checksOff": "",
+     "hasRoad": true,
+     "hasNumbers": true,
+     "numbers": 0,
+     "extraText": false,
+     "extraFocus": false,
+     "extraOff": "",
+     "needDescribe": false,
      "consentOff": "",
      "noteRead": true,
      "sendOff": "",
@@ -2168,6 +2343,7 @@
      "disaster.consent",
      "disaster.extra",
      "disaster.note",
+     "disaster.numbers",
      "disaster.ok",
      "disaster.send"
     ],
@@ -2177,6 +2353,12 @@
       75,
       196,
       100
+     ],
+     "disaster.numbers": [
+      29,
+      227,
+      332,
+      44
      ],
      "disaster.extra": [
       29,
@@ -2474,6 +2656,13 @@
      "hasChecks": true,
      "checked": 1,
      "checksOff": "",
+     "hasRoad": true,
+     "hasNumbers": true,
+     "numbers": 0,
+     "extraText": false,
+     "extraFocus": false,
+     "extraOff": "",
+     "needDescribe": false,
      "consentOff": "",
      "noteRead": true,
      "sendOff": "",
@@ -2487,6 +2676,7 @@
      "disaster.consent",
      "disaster.extra",
      "disaster.note",
+     "disaster.numbers",
      "disaster.ok",
      "disaster.send"
     ],
@@ -2496,6 +2686,12 @@
       75,
       196,
       100
+     ],
+     "disaster.numbers": [
+      29,
+      227,
+      332,
+      44
      ],
      "disaster.extra": [
       29,
@@ -2542,6 +2738,13 @@
      "hasChecks": false,
      "checked": 0,
      "checksOff": "",
+     "hasRoad": false,
+     "hasNumbers": false,
+     "numbers": 0,
+     "extraText": false,
+     "extraFocus": false,
+     "extraOff": "",
+     "needDescribe": false,
      "consentOff": "",
      "noteRead": false,
      "sendOff": "",

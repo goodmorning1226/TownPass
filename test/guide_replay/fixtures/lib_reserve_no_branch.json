@@ -8,8 +8,8 @@
  "expect": {
   "done": false
  },
- "recordedAt": "2026-11-07T18:24:56.154Z",
- "durationMs": 9005,
+ "recordedAt": "2026-11-07T19:01:58.848Z",
+ "durationMs": 8227,
  "viewport": {
   "width": 390,
   "height": 844,
@@ -39,6 +39,10 @@
      "notReservable": false,
      "dialogOpen": false,
      "bookTitle": "",
+     "seriesCount": 0,
+     "seriesTicked": 0,
+     "seriesLimit": false,
+     "noBranch": false,
      "pickupOpen": false,
      "__bottomBar": 74,
      "__dialog": false
@@ -226,6 +230,10 @@
      "notReservable": false,
      "dialogOpen": false,
      "bookTitle": "",
+     "seriesCount": 0,
+     "seriesTicked": 0,
+     "seriesLimit": false,
+     "noBranch": false,
      "pickupOpen": false,
      "__bottomBar": 74,
      "__dialog": false
@@ -287,6 +295,10 @@
      "notReservable": false,
      "dialogOpen": false,
      "bookTitle": "",
+     "seriesCount": 0,
+     "seriesTicked": 0,
+     "seriesLimit": false,
+     "noBranch": false,
      "pickupOpen": false,
      "__bottomBar": 0,
      "__dialog": false
@@ -492,6 +504,10 @@
      "notReservable": false,
      "dialogOpen": false,
      "bookTitle": "",
+     "seriesCount": 0,
+     "seriesTicked": 0,
+     "seriesLimit": false,
+     "noBranch": false,
      "pickupOpen": false,
      "__bottomBar": 0,
      "__dialog": false
@@ -532,6 +548,10 @@
      "notReservable": false,
      "dialogOpen": false,
      "bookTitle": "",
+     "seriesCount": 0,
+     "seriesTicked": 0,
+     "seriesLimit": false,
+     "noBranch": false,
      "pickupOpen": false,
      "__bottomBar": 0,
      "__dialog": false
@@ -736,6 +756,10 @@
      "notReservable": false,
      "dialogOpen": false,
      "bookTitle": "",
+     "seriesCount": 0,
+     "seriesTicked": 0,
+     "seriesLimit": false,
+     "noBranch": false,
      "pickupOpen": false,
      "__bottomBar": 0,
      "__dialog": false
@@ -779,6 +803,10 @@
      "notReservable": false,
      "dialogOpen": false,
      "bookTitle": "",
+     "seriesCount": 0,
+     "seriesTicked": 0,
+     "seriesLimit": false,
+     "noBranch": false,
      "pickupOpen": false,
      "__bottomBar": 0,
      "__dialog": false
@@ -885,6 +913,10 @@
      "notReservable": false,
      "dialogOpen": false,
      "bookTitle": "",
+     "seriesCount": 0,
+     "seriesTicked": 0,
+     "seriesLimit": false,
+     "noBranch": false,
      "pickupOpen": false,
      "__bottomBar": 0,
      "__dialog": false
@@ -925,13 +957,18 @@
      "notReservable": false,
      "dialogOpen": false,
      "bookTitle": "The winners : a novel",
+     "seriesCount": 3,
+     "seriesTicked": 0,
+     "seriesLimit": false,
+     "noBranch": true,
      "pickupOpen": false,
      "__bottomBar": 176,
      "__dialog": false
     },
     "visible": [
      "library.branch_field",
-     "library.reserve"
+     "library.reserve",
+     "library.series"
     ],
     "rects": {
      "library.branch_field": [
@@ -945,6 +982,12 @@
       780,
       358,
       48
+     ],
+     "library.series": [
+      346,
+      375,
+      24,
+      108
      ]
     }
    },
@@ -1077,13 +1120,18 @@
      "notReservable": false,
      "dialogOpen": false,
      "bookTitle": "The winners : a novel",
+     "seriesCount": 3,
+     "seriesTicked": 0,
+     "seriesLimit": false,
+     "noBranch": true,
      "pickupOpen": false,
      "__bottomBar": 176,
      "__dialog": false
     },
     "visible": [
      "library.branch_field",
-     "library.reserve"
+     "library.reserve",
+     "library.series"
     ],
     "rects": {
      "library.branch_field": [
@@ -1097,6 +1145,12 @@
       780,
       358,
       48
+     ],
+     "library.series": [
+      346,
+      375,
+      24,
+      108
      ]
     }
    },
@@ -1117,6 +1171,10 @@
      "notReservable": false,
      "dialogOpen": true,
      "bookTitle": "The winners : a novel",
+     "seriesCount": 3,
+     "seriesTicked": 0,
+     "seriesLimit": false,
+     "noBranch": true,
      "pickupOpen": false,
      "__bottomBar": 176,
      "__dialog": true
@@ -1125,7 +1183,8 @@
      "library.branch_close",
      "library.branch_field",
      "library.branch_list",
-     "library.reserve"
+     "library.reserve",
+     "library.series"
     ],
     "rects": {
      "library.branch_field": [
@@ -1151,6 +1210,12 @@
       780,
       358,
       48
+     ],
+     "library.series": [
+      346,
+      375,
+      24,
+      108
      ]
     }
    },

@@ -8,8 +8,8 @@
  "expect": {
   "done": true
  },
- "recordedAt": "2026-11-07T18:23:34.623Z",
- "durationMs": 2291,
+ "recordedAt": "2026-11-07T18:59:47.941Z",
+ "durationMs": 2200,
  "viewport": {
   "width": 390,
   "height": 844,
@@ -64,6 +64,7 @@
      "consentChoice": "",
      "submitted": false,
      "consentRead": false,
+     "consentNo": false,
      "situation": "申辦中(2)",
      "activeCount": 2,
      "closedCount": 1,

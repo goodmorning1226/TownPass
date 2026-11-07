@@ -1,6 +1,6 @@
 {
  "name": "fees_other_search",
- "description": "fees.other: the pick_fee detail says 找不到可以按上面的搜尋框打名稱 and the search box is alsoUsable; the user taps it, types 水費, taps the result. /fee-payment/search is in pathExcludes, so the guide is off its page there (no card).",
+ "description": "fees.other: the pick_fee detail says 找不到可以按上面的搜尋框打名稱; the user taps the search box link, and on /fee-payment/search the card says type the name, tap 放大鏡, tap the result (FEE-3).",
  "page": "fees",
  "start": null,
  "capability": "fees.other",
@@ -10,8 +10,8 @@
  "expect": {
   "done": true
  },
- "recordedAt": "2026-11-07T18:33:13.114Z",
- "durationMs": 6494,
+ "recordedAt": "2026-11-07T18:54:59.225Z",
+ "durationMs": 6559,
  "viewport": {
   "width": 390,
   "height": 844,
@@ -37,6 +37,12 @@
      "fieldName": "",
      "fieldHint": "",
      "fieldChoices": "",
+     "calendar": false,
+     "calTitle": "",
+     "calNav": false,
+     "searchTyped": false,
+     "searchResults": 0,
+     "noBill": false,
      "alert": false,
      "alertText": "",
      "groupOpen": false,
@@ -172,6 +178,12 @@
      "fieldName": "",
      "fieldHint": "",
      "fieldChoices": "",
+     "calendar": false,
+     "calTitle": "",
+     "calNav": false,
+     "searchTyped": false,
+     "searchResults": 0,
+     "noBill": false,
      "alert": false,
      "alertText": "",
      "groupOpen": false,
@@ -221,6 +233,12 @@
      "fieldName": "",
      "fieldHint": "",
      "fieldChoices": "",
+     "calendar": false,
+     "calTitle": "",
+     "calNav": false,
+     "searchTyped": false,
+     "searchResults": 0,
+     "noBill": false,
      "alert": false,
      "alertText": "",
      "groupOpen": false,
@@ -238,8 +256,24 @@
      "__bottomBar": 0,
      "__dialog": false
     },
-    "visible": [],
-    "rects": {}
+    "visible": [
+     "fees.search_box",
+     "fees.search_button"
+    ],
+    "rects": {
+     "fees.search_box": [
+      16,
+      16,
+      314,
+      44
+     ],
+     "fees.search_button": [
+      326,
+      16,
+      44,
+      44
+     ]
+    }
    },
    "facts": {
     "url": "/fee-payment/search",
@@ -282,7 +316,9 @@
     "hit": {
      "x": 173,
      "y": 38,
-     "targets": []
+     "targets": [
+      "fees.search_box"
+     ]
     }
    },
    "before": {
@@ -298,6 +334,12 @@
      "fieldName": "",
      "fieldHint": "",
      "fieldChoices": "",
+     "calendar": false,
+     "calTitle": "",
+     "calNav": false,
+     "searchTyped": false,
+     "searchResults": 0,
+     "noBill": false,
      "alert": false,
      "alertText": "",
      "groupOpen": false,
@@ -315,8 +357,24 @@
      "__bottomBar": 0,
      "__dialog": false
     },
-    "visible": [],
-    "rects": {}
+    "visible": [
+     "fees.search_box",
+     "fees.search_button"
+    ],
+    "rects": {
+     "fees.search_box": [
+      16,
+      16,
+      314,
+      44
+     ],
+     "fees.search_button": [
+      326,
+      16,
+      44,
+      44
+     ]
+    }
    },
    "after": {
     "path": "/fee-payment/search",
@@ -331,6 +389,12 @@
      "fieldName": "",
      "fieldHint": "",
      "fieldChoices": "",
+     "calendar": false,
+     "calTitle": "",
+     "calNav": false,
+     "searchTyped": true,
+     "searchResults": 0,
+     "noBill": false,
      "alert": false,
      "alertText": "",
      "groupOpen": false,
@@ -348,8 +412,24 @@
      "__bottomBar": 0,
      "__dialog": false
     },
-    "visible": [],
-    "rects": {}
+    "visible": [
+     "fees.search_box",
+     "fees.search_button"
+    ],
+    "rects": {
+     "fees.search_box": [
+      16,
+      16,
+      314,
+      44
+     ],
+     "fees.search_button": [
+      326,
+      16,
+      44,
+      44
+     ]
+    }
    },
    "facts": {
     "url": "/fee-payment/search",
@@ -391,7 +471,9 @@
     "hit": {
      "x": 348,
      "y": 38,
-     "targets": []
+     "targets": [
+      "fees.search_button"
+     ]
     }
    },
    "before": {
@@ -407,6 +489,12 @@
      "fieldName": "",
      "fieldHint": "",
      "fieldChoices": "",
+     "calendar": false,
+     "calTitle": "",
+     "calNav": false,
+     "searchTyped": true,
+     "searchResults": 0,
+     "noBill": false,
      "alert": false,
      "alertText": "",
      "groupOpen": false,
@@ -424,8 +512,24 @@
      "__bottomBar": 0,
      "__dialog": false
     },
-    "visible": [],
-    "rects": {}
+    "visible": [
+     "fees.search_box",
+     "fees.search_button"
+    ],
+    "rects": {
+     "fees.search_box": [
+      16,
+      16,
+      314,
+      44
+     ],
+     "fees.search_button": [
+      326,
+      16,
+      44,
+      44
+     ]
+    }
    },
    "after": {
     "path": "/fee-payment/search",
@@ -440,6 +544,12 @@
      "fieldName": "",
      "fieldHint": "",
      "fieldChoices": "",
+     "calendar": false,
+     "calTitle": "",
+     "calNav": false,
+     "searchTyped": true,
+     "searchResults": 2,
+     "noBill": false,
      "alert": false,
      "alertText": "",
      "groupOpen": false,
@@ -457,8 +567,31 @@
      "__bottomBar": 0,
      "__dialog": false
     },
-    "visible": [],
-    "rects": {}
+    "visible": [
+     "fees.search_box",
+     "fees.search_button",
+     "fees.search_results"
+    ],
+    "rects": {
+     "fees.search_box": [
+      16,
+      16,
+      314,
+      44
+     ],
+     "fees.search_button": [
+      326,
+      16,
+      44,
+      44
+     ],
+     "fees.search_results": [
+      16,
+      116,
+      358,
+      56
+     ]
+    }
    },
    "facts": {
     "url": "/fee-payment/search",
@@ -500,7 +633,9 @@
     "hit": {
      "x": 195,
      "y": 128,
-     "targets": []
+     "targets": [
+      "fees.search_results"
+     ]
     }
    },
    "before": {
@@ -516,6 +651,12 @@
      "fieldName": "",
      "fieldHint": "",
      "fieldChoices": "",
+     "calendar": false,
+     "calTitle": "",
+     "calNav": false,
+     "searchTyped": true,
+     "searchResults": 2,
+     "noBill": false,
      "alert": false,
      "alertText": "",
      "groupOpen": false,
@@ -533,8 +674,31 @@
      "__bottomBar": 0,
      "__dialog": false
     },
-    "visible": [],
-    "rects": {}
+    "visible": [
+     "fees.search_box",
+     "fees.search_button",
+     "fees.search_results"
+    ],
+    "rects": {
+     "fees.search_box": [
+      16,
+      16,
+      314,
+      44
+     ],
+     "fees.search_button": [
+      326,
+      16,
+      44,
+      44
+     ],
+     "fees.search_results": [
+      16,
+      116,
+      358,
+      56
+     ]
+    }
    },
    "after": {
     "path": "/fee-payment/detail/fee-6",
@@ -549,6 +713,12 @@
      "fieldName": "水號",
      "fieldHint": "大區為1碼，中區為2碼，戶號為6碼，檢核號為1碼",
      "fieldChoices": "",
+     "calendar": false,
+     "calTitle": "",
+     "calNav": false,
+     "searchTyped": false,
+     "searchResults": 0,
+     "noBill": false,
      "alert": false,
      "alertText": "",
      "groupOpen": false,

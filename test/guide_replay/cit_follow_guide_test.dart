@@ -31,54 +31,40 @@ void main() {
   }
 
   group('CIT-1: 不同意 greys out 送出', () {
-    test('the recording shows 送出 disabled after 不同意, with no message', () {
+    test('page facts: 送出 is disabled after 不同意, with no message', () {
       final fx = loadFixture('cit_report_disagree');
       final steps = (fx['steps'] as List).cast<Map<String, dynamic>>();
       final afterTick = steps[4]['after'] as Map<String, dynamic>;
       final flags = afterTick['flags'] as Map<String, dynamic>;
       expect(flags['consent'], '不同意');
       expect(flags['sendEnabled'], isFalse);
-      final last = steps.last['facts'] as Map<String, dynamic>;
-      expect(last['errors'], isEmpty, reason: 'no red text to point at');
-      expect(last['dialogs'], isEmpty, reason: 'no 案件已完成受理');
-      final r = replayFixture('cit_report_disagree');
-      expect(r.trace.last, contains('往上看看有沒有紅字'));
+      final facts = steps[4]['facts'] as Map<String, dynamic>;
+      expect(facts['errors'], isEmpty, reason: 'no red text to point at');
     });
 
-    test(
-      'following the 送出 card (choose the other 個人資料 option) still sends',
-      () {
-        final r = replayFixture('cit_report_disagree');
-        printOnFailure(r.report);
-        expect(r.problems, isEmpty);
-        expect(r.done, isTrue);
-      },
-      skip:
-          'CIT-1: the 送出 card invites switching 個人資料 to 不同意, but the '
-          'page then disables 送出 without a message; the card blames missing '
-          'red text instead of saying 「選「同意」才能送出」.',
-    );
+    test('the card says 不同意 cannot be sent; switching to 同意 sends', () {
+      final r = replayFixture('cit_report_disagree');
+      printOnFailure(r.report);
+      expect(r.problems, isEmpty);
+      expect(r.done, isTrue);
+      expect(r.shownTexts.any((t) => t.contains('請改選「同意」')), isTrue);
+      expect(r.trace.any((t) => t.contains('往上看看有沒有紅字')), isFalse);
+    });
   });
 
-  group('CIT-2: fill_location plan ends with 描述 never named', () {
-    test('the form still has the required 案件主旨 / 描述 empty at done', () {
+  group('CIT-2: fill_location plan names 案件主旨 and 描述', () {
+    test('page facts: the required 案件主旨 / 描述 are empty at done', () {
       final r = replayFixture('cit_fill_location');
       expect(r.done, isTrue);
       expect(r.requiredFields, containsAll(['案件主旨', '描述']));
-      expect(r.shownTexts.any((t) => t.contains('描述')), isFalse);
     });
 
-    test(
-      'the goal-only plan names every required field',
-      () {
-        final r = replayFixture('cit_fill_location');
-        printOnFailure(r.report);
-        expect(r.problems, isEmpty);
-      },
-      skip:
-          'CIT-2: fill_location done card only says to write 案件主旨 next; '
-          '描述* (also required) and 送出 are never mentioned.',
-    );
+    test('the goal-only plan names every required field', () {
+      final r = replayFixture('cit_fill_location');
+      printOnFailure(r.report);
+      expect(r.problems, isEmpty);
+      expect(r.shownTexts.any((t) => t.contains('描述')), isTrue);
+    });
   });
 
   test(

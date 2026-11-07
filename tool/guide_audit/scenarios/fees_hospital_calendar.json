@@ -1,11 +1,11 @@
 {
   "name": "fees_hospital_calendar",
-  "description": "fees.hospital control: 證件號碼, tap the 出生日期 box and pick a day in the calendar that opens (the card says type), 院區 as the card says, 查詢: the demo has no 聯醫 bills (目前查無…待繳帳單).",
+  "description": "fees.hospital control: 證件號碼, tap the 出生日期 box and pick a day of the current month in the calendar, 院區 as the card says, 查詢: the demo has no 聯醫 bills (目前查無…待繳帳單), the guide ends on the no-bill done card.",
   "page": "fees",
   "capability": "fees.hospital",
   "goals": [],
   "expect": {
-    "done": false
+    "done": true
   },
   "actions": [
     {

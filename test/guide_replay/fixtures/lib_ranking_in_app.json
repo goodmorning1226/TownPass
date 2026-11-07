@@ -8,8 +8,8 @@
  "expect": {
   "done": true
  },
- "recordedAt": "2026-11-07T18:24:07.958Z",
- "durationMs": 4348,
+ "recordedAt": "2026-11-07T19:01:08.719Z",
+ "durationMs": 3969,
  "viewport": {
   "width": 390,
   "height": 844,
@@ -39,6 +39,10 @@
      "notReservable": false,
      "dialogOpen": false,
      "bookTitle": "",
+     "seriesCount": 0,
+     "seriesTicked": 0,
+     "seriesLimit": false,
+     "noBranch": false,
      "pickupOpen": false,
      "__bottomBar": 74,
      "__dialog": false
@@ -226,6 +230,10 @@
      "notReservable": false,
      "dialogOpen": false,
      "bookTitle": "",
+     "seriesCount": 0,
+     "seriesTicked": 0,
+     "seriesLimit": false,
+     "noBranch": false,
      "pickupOpen": false,
      "__bottomBar": 74,
      "__dialog": false
@@ -287,6 +295,10 @@
      "notReservable": false,
      "dialogOpen": false,
      "bookTitle": "",
+     "seriesCount": 0,
+     "seriesTicked": 0,
+     "seriesLimit": false,
+     "noBranch": false,
      "pickupOpen": false,
      "__bottomBar": 0,
      "__dialog": false

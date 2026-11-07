@@ -10,8 +10,8 @@
  "expect": {
   "done": true
  },
- "recordedAt": "2026-11-07T18:19:19.297Z",
- "durationMs": 14238,
+ "recordedAt": "2026-11-07T19:00:42.882Z",
+ "durationMs": 14000,
  "viewport": {
   "width": 390,
   "height": 844,
@@ -3507,7 +3507,7 @@
      "sendEnabled": false,
      "warn": 0,
      "month": "",
-     "time": "2:19 AM",
+     "time": "3:00 AM",
      "role": "",
      "date": "",
      "reported": false,
@@ -3617,7 +3617,7 @@
       "name": "",
       "label": "",
       "placeholder": "",
-      "value": "2",
+      "value": "3",
       "required": false,
       "invalid": false,
       "disabled": false,
@@ -3635,7 +3635,7 @@
       "name": "",
       "label": ":",
       "placeholder": "",
-      "value": "19",
+      "value": "0",
       "required": false,
       "invalid": false,
       "disabled": false,

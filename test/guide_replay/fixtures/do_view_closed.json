@@ -10,8 +10,8 @@
  "expect": {
   "done": true
  },
- "recordedAt": "2026-11-07T18:23:38.255Z",
- "durationMs": 3450,
+ "recordedAt": "2026-11-07T19:00:07.824Z",
+ "durationMs": 3632,
  "viewport": {
   "width": 390,
   "height": 844,
@@ -66,6 +66,7 @@
      "consentChoice": "",
      "submitted": false,
      "consentRead": false,
+     "consentNo": false,
      "situation": "申辦中(2)",
      "activeCount": 2,
      "closedCount": 1,
@@ -288,6 +289,7 @@
      "consentChoice": "",
      "submitted": false,
      "consentRead": false,
+     "consentNo": false,
      "situation": "申辦中(2)",
      "activeCount": 2,
      "closedCount": 1,
@@ -403,6 +405,7 @@
      "consentChoice": "",
      "submitted": false,
      "consentRead": false,
+     "consentNo": false,
      "situation": "已結案(1)",
      "activeCount": 2,
      "closedCount": 1,

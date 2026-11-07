@@ -12,10 +12,9 @@ import 'replay.dart';
 /// calendar), even the 補助 forms. Every field is required; only the four text
 /// boxes show 「…不能為空」, the others block 下一步 silently.
 ///
-/// Known bug DO-1: while the 申訴項目 dialog or the 肇事日期 calendar (both in
-/// 申辦服務資料) is open, the guide falls back to fill_basic (步驟 1, 填基本資料)
-/// because `_sectionDone('basic')` is false whenever a popup is open. The card
-/// text is right, but the step / task jumps back.
+/// DO-1 (fixed): while the 申訴項目 dialog or the 肇事日期 calendar (both in
+/// 申辦服務資料) is open, the guide stays on fill_details: a popup only keeps
+/// its own section from being done.
 const _forms = [
   'a1',
   'a2',
@@ -78,47 +77,31 @@ final _fixtures = <String, List<String>>{
   'do_edit_c5': ['fill_basic', 'fill_details', 'next_step', 'submit'],
 };
 
-bool _isDo1(String p) =>
-    p.contains('is for "fill_details" but the guide is at "fill_basic"');
-
 void main() {
   for (final e in _fixtures.entries) {
     group(e.key, () {
-      test('the cards carry the user to 案件已完成申辦 (except DO-1)', () {
+      test('following only the cards carries the user to 案件已完成申辦', () {
         final r = replayFixture(e.key);
         printOnFailure(r.report);
         expect(r.guide.components, e.value);
         expect(r.requiredFields, containsAll(_required));
-        expect(r.problems.where((p) => !_isDo1(p)), isEmpty);
+        expect(r.problems, isEmpty);
         expect(r.finalErrors, isEmpty);
         expect(r.done, isTrue);
-        // DO-1 evidence: the dialog / calendar of 申辦服務資料 shows the
-        // fill_basic step.
-        expect(
-          r.trace.where(
-            (l) =>
-                l.contains('[fill_basic]') &&
-                (l.contains('district.item_options') ||
-                    l.contains('district.item_ok') ||
-                    l.contains('district.calendar')),
-          ),
-          hasLength(3),
-        );
       });
 
-      test(
-        'following only the cards stays on fill_details in its popups',
-        () {
-          final r = replayFixture(e.key);
-          printOnFailure(r.report);
-          expect(r.problems, isEmpty);
-          expect(r.done, isTrue);
-        },
-        skip:
-            'DO-1: with the 申訴項目 dialog or the 肇事日期 calendar open, '
-            '_sectionDone(basic) is false, so the guide jumps back to '
-            'fill_basic (步驟 1, 填基本資料). Re-record after the fix.',
-      );
+      test('the dialog / calendar of 申辦服務資料 stays on fill_details', () {
+        final r = replayFixture(e.key);
+        printOnFailure(r.report);
+        final popup = r.trace.where(
+          (l) =>
+              l.contains('district.item_options') ||
+              l.contains('district.item_ok') ||
+              l.contains('district.calendar'),
+        );
+        expect(popup, isNotEmpty);
+        expect(popup.where((l) => l.contains('[fill_basic]')), isEmpty);
+      });
     });
   }
 }

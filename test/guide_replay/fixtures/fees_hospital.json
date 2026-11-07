@@ -1,15 +1,15 @@
 {
  "name": "fees_hospital",
- "description": "fees.hospital (fee-9) default goal, following the cards literally: 證件號碼 (test A123456789), then the card says type 「1912-01-01」 into the 出生日期 box, but it is a readonly date picker (typing does nothing; tapping opens a calendar on the current month).",
+ "description": "fees.hospital (fee-9) default goal, following the cards: 證件號碼 (test A123456789), then 出生日期 (a readonly date picker): tap the box, tap the calendar title (月份 年份), tap the year, go back with the left arrow to 1980-1991, pick 1985, 5月, day 15; 院區; 查詢: no bills in the demo, done card 目前查無待繳帳單.",
  "page": "fees",
  "start": null,
  "capability": "fees.hospital",
  "goals": [],
  "expect": {
-  "done": false
+  "done": true
  },
- "recordedAt": "2026-11-07T18:32:00.385Z",
- "durationMs": 5452,
+ "recordedAt": "2026-11-07T18:54:44.751Z",
+ "durationMs": 14958,
  "viewport": {
   "width": 390,
   "height": 844,
@@ -35,6 +35,12 @@
      "fieldName": "證件號碼",
      "fieldHint": "",
      "fieldChoices": "",
+     "calendar": false,
+     "calTitle": "",
+     "calNav": false,
+     "searchTyped": false,
+     "searchResults": 0,
+     "noBill": false,
      "alert": false,
      "alertText": "",
      "groupOpen": false,
@@ -249,6 +255,12 @@
      "fieldName": "證件號碼",
      "fieldHint": "",
      "fieldChoices": "",
+     "calendar": false,
+     "calTitle": "",
+     "calNav": false,
+     "searchTyped": false,
+     "searchResults": 0,
+     "noBill": false,
      "alert": false,
      "alertText": "",
      "groupOpen": false,
@@ -308,10 +320,16 @@
      "onInputTab": true,
      "hasFields": true,
      "filled": false,
-     "fieldKind": "text",
-     "fieldName": "",
+     "fieldKind": "date",
+     "fieldName": "出生日期",
      "fieldHint": "範例：1912-01-01(含分隔符號)",
      "fieldChoices": "",
+     "calendar": false,
+     "calTitle": "",
+     "calNav": false,
+     "searchTyped": false,
+     "searchResults": 0,
+     "noBill": false,
      "alert": false,
      "alertText": "",
      "groupOpen": false,
@@ -502,9 +520,8 @@
   {
    "action": {
     "step": "enter_number",
-    "do": "type",
+    "do": "click",
     "selector": ".tab-view input[readonly]",
-    "value": "1912-01-01",
     "hit": {
      "x": 195,
      "y": 273,
@@ -522,10 +539,16 @@
      "onInputTab": true,
      "hasFields": true,
      "filled": false,
-     "fieldKind": "text",
-     "fieldName": "",
+     "fieldKind": "date",
+     "fieldName": "出生日期",
      "fieldHint": "範例：1912-01-01(含分隔符號)",
      "fieldChoices": "",
+     "calendar": false,
+     "calTitle": "",
+     "calNav": false,
+     "searchTyped": false,
+     "searchResults": 0,
+     "noBill": false,
      "alert": false,
      "alertText": "",
      "groupOpen": false,
@@ -585,10 +608,16 @@
      "onInputTab": true,
      "hasFields": true,
      "filled": false,
-     "fieldKind": "text",
-     "fieldName": "",
+     "fieldKind": "date",
+     "fieldName": "出生日期",
      "fieldHint": "範例：1912-01-01(含分隔符號)",
      "fieldChoices": "",
+     "calendar": true,
+     "calTitle": "11月 2026",
+     "calNav": false,
+     "searchTyped": false,
+     "searchResults": 0,
+     "noBill": false,
      "alert": false,
      "alertText": "",
      "groupOpen": false,
@@ -607,6 +636,7 @@
      "__dialog": false
     },
     "visible": [
+     "fees.calendar",
      "fees.field",
      "fees.filters",
      "fees.query",
@@ -624,6 +654,12 @@
       251,
       358,
       44
+     ],
+     "fees.calendar": [
+      16,
+      295,
+      252,
+      282
      ],
      "fees.query": [
       16,
@@ -1076,6 +1112,5813 @@
        406,
        772,
        358,
+       48
+      ]
+     }
+    ],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  },
+  {
+   "action": {
+    "step": "enter_number",
+    "do": "click",
+    "selector": "button.vc-title",
+    "hit": {
+     "x": 142,
+     "y": 331,
+     "targets": [
+      "fees.calendar"
+     ]
+    }
+   },
+   "before": {
+    "path": "/fee-payment/detail/fee-9/",
+    "query": {},
+    "flags": {
+     "feeName": "聯合醫院醫療費",
+     "firstTab": "輸入資料",
+     "onInputTab": true,
+     "hasFields": true,
+     "filled": false,
+     "fieldKind": "date",
+     "fieldName": "出生日期",
+     "fieldHint": "範例：1912-01-01(含分隔符號)",
+     "fieldChoices": "",
+     "calendar": true,
+     "calTitle": "11月 2026",
+     "calNav": false,
+     "searchTyped": false,
+     "searchResults": 0,
+     "noBill": false,
+     "alert": false,
+     "alertText": "",
+     "groupOpen": false,
+     "bills": 0,
+     "selected": 0,
+     "total": "",
+     "amount": "",
+     "payEnabled": false,
+     "methodsBelow": false,
+     "payConfirm": false,
+     "paid": false,
+     "paidMethod": "",
+     "noRecords": false,
+     "filtered": false,
+     "__bottomBar": 128,
+     "__dialog": false
+    },
+    "visible": [
+     "fees.calendar",
+     "fees.field",
+     "fees.filters",
+     "fees.query",
+     "fees.tab_input"
+    ],
+    "rects": {
+     "fees.tab_input": [
+      16,
+      48,
+      119.3,
+      24
+     ],
+     "fees.field": [
+      16,
+      251,
+      358,
+      44
+     ],
+     "fees.calendar": [
+      16,
+      295,
+      252,
+      282
+     ],
+     "fees.query": [
+      16,
+      772,
+      358,
+      48
+     ],
+     "fees.filters": [
+      16,
+      343,
+      358,
+      48
+     ]
+    }
+   },
+   "after": {
+    "path": "/fee-payment/detail/fee-9/",
+    "query": {},
+    "flags": {
+     "feeName": "聯合醫院醫療費",
+     "firstTab": "輸入資料",
+     "onInputTab": true,
+     "hasFields": true,
+     "filled": false,
+     "fieldKind": "date",
+     "fieldName": "出生日期",
+     "fieldHint": "範例：1912-01-01(含分隔符號)",
+     "fieldChoices": "",
+     "calendar": true,
+     "calTitle": "11月 2026",
+     "calNav": true,
+     "searchTyped": false,
+     "searchResults": 0,
+     "noBill": false,
+     "alert": false,
+     "alertText": "",
+     "groupOpen": false,
+     "bills": 0,
+     "selected": 0,
+     "total": "",
+     "amount": "",
+     "payEnabled": false,
+     "methodsBelow": false,
+     "payConfirm": false,
+     "paid": false,
+     "paidMethod": "",
+     "noRecords": false,
+     "filtered": false,
+     "__bottomBar": 128,
+     "__dialog": false
+    },
+    "visible": [
+     "fees.calendar",
+     "fees.field",
+     "fees.filters",
+     "fees.query",
+     "fees.tab_input"
+    ],
+    "rects": {
+     "fees.tab_input": [
+      16,
+      48,
+      119.3,
+      24
+     ],
+     "fees.field": [
+      16,
+      251,
+      358,
+      44
+     ],
+     "fees.calendar": [
+      16,
+      295,
+      252,
+      282
+     ],
+     "fees.query": [
+      16,
+      772,
+      358,
+      48
+     ],
+     "fees.filters": [
+      16,
+      343,
+      358,
+      48
+     ]
+    }
+   },
+   "facts": {
+    "url": "/fee-payment/detail/fee-9/",
+    "title": "繳費項目",
+    "fields": [
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "tax_id",
+      "name": "",
+      "label": "證件號碼",
+      "placeholder": "請輸入證件號碼",
+      "value": "A123456789",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       131,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "",
+      "name": "",
+      "label": "範例：1912-01-01(含分隔符號)",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       251,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "office",
+      "name": "",
+      "label": "院區",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       343,
+       358,
+       48
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "payment_number",
+      "name": "",
+      "label": "繳費編號",
+      "placeholder": "請輸入繳費編號",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       406,
+       159,
+       358,
+       44
+      ]
+     }
+    ],
+    "starred": [],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "輸入資料",
+      "disabled": false,
+      "rect": [
+       16,
+       48,
+       119,
+       24
+      ]
+     },
+     {
+      "text": "繳費編號",
+      "disabled": false,
+      "rect": [
+       135,
+       48,
+       119,
+       24
+      ]
+     },
+     {
+      "text": "掃描",
+      "disabled": false,
+      "rect": [
+       255,
+       48,
+       119,
+       24
+      ]
+     },
+     {
+      "text": "11月 2026",
+      "disabled": false,
+      "rect": [
+       92,
+       316,
+       100,
+       30
+      ]
+     },
+     {
+      "text": "1",
+      "disabled": false,
+      "rect": [
+       26,
+       380,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "2",
+      "disabled": false,
+      "rect": [
+       60,
+       380,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "3",
+      "disabled": false,
+      "rect": [
+       94,
+       380,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "4",
+      "disabled": false,
+      "rect": [
+       128,
+       380,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "5",
+      "disabled": false,
+      "rect": [
+       162,
+       380,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "6",
+      "disabled": false,
+      "rect": [
+       196,
+       380,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "7",
+      "disabled": false,
+      "rect": [
+       230,
+       380,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "8",
+      "disabled": false,
+      "rect": [
+       26,
+       412,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "9",
+      "disabled": false,
+      "rect": [
+       60,
+       412,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "10",
+      "disabled": false,
+      "rect": [
+       94,
+       412,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "11",
+      "disabled": false,
+      "rect": [
+       128,
+       412,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "12",
+      "disabled": false,
+      "rect": [
+       162,
+       412,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "13",
+      "disabled": false,
+      "rect": [
+       196,
+       412,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "14",
+      "disabled": false,
+      "rect": [
+       230,
+       412,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "15",
+      "disabled": false,
+      "rect": [
+       26,
+       444,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "16",
+      "disabled": false,
+      "rect": [
+       60,
+       444,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "17",
+      "disabled": false,
+      "rect": [
+       94,
+       444,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "18",
+      "disabled": false,
+      "rect": [
+       128,
+       444,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "19",
+      "disabled": false,
+      "rect": [
+       162,
+       444,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "20",
+      "disabled": false,
+      "rect": [
+       196,
+       444,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "21",
+      "disabled": false,
+      "rect": [
+       230,
+       444,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "22",
+      "disabled": false,
+      "rect": [
+       26,
+       476,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "23",
+      "disabled": false,
+      "rect": [
+       60,
+       476,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "24",
+      "disabled": false,
+      "rect": [
+       94,
+       476,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "25",
+      "disabled": false,
+      "rect": [
+       128,
+       476,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "26",
+      "disabled": false,
+      "rect": [
+       162,
+       476,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "27",
+      "disabled": false,
+      "rect": [
+       196,
+       476,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "28",
+      "disabled": false,
+      "rect": [
+       230,
+       476,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "29",
+      "disabled": false,
+      "rect": [
+       26,
+       508,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "30",
+      "disabled": false,
+      "rect": [
+       60,
+       508,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "2026",
+      "disabled": false,
+      "rect": [
+       119,
+       361,
+       46,
+       30
+      ]
+     },
+     {
+      "text": "1月",
+      "disabled": false,
+      "rect": [
+       65,
+       393,
+       48,
+       31
+      ]
+     },
+     {
+      "text": "2月",
+      "disabled": false,
+      "rect": [
+       118,
+       393,
+       48,
+       31
+      ]
+     },
+     {
+      "text": "3月",
+      "disabled": false,
+      "rect": [
+       171,
+       393,
+       48,
+       31
+      ]
+     },
+     {
+      "text": "4月",
+      "disabled": false,
+      "rect": [
+       65,
+       426,
+       48,
+       31
+      ]
+     },
+     {
+      "text": "5月",
+      "disabled": false,
+      "rect": [
+       118,
+       426,
+       48,
+       31
+      ]
+     },
+     {
+      "text": "6月",
+      "disabled": false,
+      "rect": [
+       171,
+       426,
+       48,
+       31
+      ]
+     },
+     {
+      "text": "7月",
+      "disabled": false,
+      "rect": [
+       65,
+       460,
+       48,
+       31
+      ]
+     },
+     {
+      "text": "8月",
+      "disabled": false,
+      "rect": [
+       118,
+       460,
+       48,
+       31
+      ]
+     },
+     {
+      "text": "9月",
+      "disabled": false,
+      "rect": [
+       171,
+       460,
+       48,
+       31
+      ]
+     },
+     {
+      "text": "10月",
+      "disabled": false,
+      "rect": [
+       65,
+       493,
+       48,
+       31
+      ]
+     },
+     {
+      "text": "11月",
+      "disabled": false,
+      "rect": [
+       118,
+       493,
+       48,
+       31
+      ]
+     },
+     {
+      "text": "12月",
+      "disabled": false,
+      "rect": [
+       171,
+       493,
+       48,
+       31
+      ]
+     },
+     {
+      "text": "查詢",
+      "disabled": false,
+      "rect": [
+       16,
+       772,
+       358,
+       48
+      ]
+     },
+     {
+      "text": "查詢",
+      "disabled": false,
+      "rect": [
+       406,
+       772,
+       358,
+       48
+      ]
+     }
+    ],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  },
+  {
+   "action": {
+    "step": "enter_number",
+    "do": "click",
+    "selector": "button.vc-nav-title",
+    "hit": {
+     "x": 142,
+     "y": 376,
+     "targets": [
+      "fees.calendar",
+      "fees.filters"
+     ]
+    }
+   },
+   "before": {
+    "path": "/fee-payment/detail/fee-9/",
+    "query": {},
+    "flags": {
+     "feeName": "聯合醫院醫療費",
+     "firstTab": "輸入資料",
+     "onInputTab": true,
+     "hasFields": true,
+     "filled": false,
+     "fieldKind": "date",
+     "fieldName": "出生日期",
+     "fieldHint": "範例：1912-01-01(含分隔符號)",
+     "fieldChoices": "",
+     "calendar": true,
+     "calTitle": "11月 2026",
+     "calNav": true,
+     "searchTyped": false,
+     "searchResults": 0,
+     "noBill": false,
+     "alert": false,
+     "alertText": "",
+     "groupOpen": false,
+     "bills": 0,
+     "selected": 0,
+     "total": "",
+     "amount": "",
+     "payEnabled": false,
+     "methodsBelow": false,
+     "payConfirm": false,
+     "paid": false,
+     "paidMethod": "",
+     "noRecords": false,
+     "filtered": false,
+     "__bottomBar": 128,
+     "__dialog": false
+    },
+    "visible": [
+     "fees.calendar",
+     "fees.field",
+     "fees.filters",
+     "fees.query",
+     "fees.tab_input"
+    ],
+    "rects": {
+     "fees.tab_input": [
+      16,
+      48,
+      119.3,
+      24
+     ],
+     "fees.field": [
+      16,
+      251,
+      358,
+      44
+     ],
+     "fees.calendar": [
+      16,
+      295,
+      252,
+      282
+     ],
+     "fees.query": [
+      16,
+      772,
+      358,
+      48
+     ],
+     "fees.filters": [
+      16,
+      343,
+      358,
+      48
+     ]
+    }
+   },
+   "after": {
+    "path": "/fee-payment/detail/fee-9/",
+    "query": {},
+    "flags": {
+     "feeName": "聯合醫院醫療費",
+     "firstTab": "輸入資料",
+     "onInputTab": true,
+     "hasFields": true,
+     "filled": false,
+     "fieldKind": "date",
+     "fieldName": "出生日期",
+     "fieldHint": "範例：1912-01-01(含分隔符號)",
+     "fieldChoices": "",
+     "calendar": true,
+     "calTitle": "11月 2026",
+     "calNav": true,
+     "searchTyped": false,
+     "searchResults": 0,
+     "noBill": false,
+     "alert": false,
+     "alertText": "",
+     "groupOpen": false,
+     "bills": 0,
+     "selected": 0,
+     "total": "",
+     "amount": "",
+     "payEnabled": false,
+     "methodsBelow": false,
+     "payConfirm": false,
+     "paid": false,
+     "paidMethod": "",
+     "noRecords": false,
+     "filtered": false,
+     "__bottomBar": 128,
+     "__dialog": false
+    },
+    "visible": [
+     "fees.calendar",
+     "fees.field",
+     "fees.filters",
+     "fees.query",
+     "fees.tab_input"
+    ],
+    "rects": {
+     "fees.tab_input": [
+      16,
+      48,
+      119.3,
+      24
+     ],
+     "fees.field": [
+      16,
+      251,
+      358,
+      44
+     ],
+     "fees.calendar": [
+      16,
+      295,
+      252,
+      282
+     ],
+     "fees.query": [
+      16,
+      772,
+      358,
+      48
+     ],
+     "fees.filters": [
+      16,
+      343,
+      358,
+      48
+     ]
+    }
+   },
+   "facts": {
+    "url": "/fee-payment/detail/fee-9/",
+    "title": "繳費項目",
+    "fields": [
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "tax_id",
+      "name": "",
+      "label": "證件號碼",
+      "placeholder": "請輸入證件號碼",
+      "value": "A123456789",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       131,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "",
+      "name": "",
+      "label": "範例：1912-01-01(含分隔符號)",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       251,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "office",
+      "name": "",
+      "label": "院區",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       343,
+       358,
+       48
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "payment_number",
+      "name": "",
+      "label": "繳費編號",
+      "placeholder": "請輸入繳費編號",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       406,
+       159,
+       358,
+       44
+      ]
+     }
+    ],
+    "starred": [],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "輸入資料",
+      "disabled": false,
+      "rect": [
+       16,
+       48,
+       119,
+       24
+      ]
+     },
+     {
+      "text": "繳費編號",
+      "disabled": false,
+      "rect": [
+       135,
+       48,
+       119,
+       24
+      ]
+     },
+     {
+      "text": "掃描",
+      "disabled": false,
+      "rect": [
+       255,
+       48,
+       119,
+       24
+      ]
+     },
+     {
+      "text": "11月 2026",
+      "disabled": false,
+      "rect": [
+       92,
+       316,
+       100,
+       30
+      ]
+     },
+     {
+      "text": "1",
+      "disabled": false,
+      "rect": [
+       26,
+       380,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "2",
+      "disabled": false,
+      "rect": [
+       60,
+       380,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "3",
+      "disabled": false,
+      "rect": [
+       94,
+       380,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "4",
+      "disabled": false,
+      "rect": [
+       128,
+       380,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "5",
+      "disabled": false,
+      "rect": [
+       162,
+       380,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "6",
+      "disabled": false,
+      "rect": [
+       196,
+       380,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "7",
+      "disabled": false,
+      "rect": [
+       230,
+       380,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "8",
+      "disabled": false,
+      "rect": [
+       26,
+       412,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "9",
+      "disabled": false,
+      "rect": [
+       60,
+       412,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "10",
+      "disabled": false,
+      "rect": [
+       94,
+       412,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "11",
+      "disabled": false,
+      "rect": [
+       128,
+       412,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "12",
+      "disabled": false,
+      "rect": [
+       162,
+       412,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "13",
+      "disabled": false,
+      "rect": [
+       196,
+       412,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "14",
+      "disabled": false,
+      "rect": [
+       230,
+       412,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "15",
+      "disabled": false,
+      "rect": [
+       26,
+       444,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "16",
+      "disabled": false,
+      "rect": [
+       60,
+       444,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "17",
+      "disabled": false,
+      "rect": [
+       94,
+       444,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "18",
+      "disabled": false,
+      "rect": [
+       128,
+       444,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "19",
+      "disabled": false,
+      "rect": [
+       162,
+       444,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "20",
+      "disabled": false,
+      "rect": [
+       196,
+       444,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "21",
+      "disabled": false,
+      "rect": [
+       230,
+       444,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "22",
+      "disabled": false,
+      "rect": [
+       26,
+       476,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "23",
+      "disabled": false,
+      "rect": [
+       60,
+       476,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "24",
+      "disabled": false,
+      "rect": [
+       94,
+       476,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "25",
+      "disabled": false,
+      "rect": [
+       128,
+       476,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "26",
+      "disabled": false,
+      "rect": [
+       162,
+       476,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "27",
+      "disabled": false,
+      "rect": [
+       196,
+       476,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "28",
+      "disabled": false,
+      "rect": [
+       230,
+       476,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "29",
+      "disabled": false,
+      "rect": [
+       26,
+       508,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "30",
+      "disabled": false,
+      "rect": [
+       60,
+       508,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "2016 - 2027",
+      "disabled": false,
+      "rect": [
+       95,
+       361,
+       94,
+       30
+      ]
+     },
+     {
+      "text": "2016",
+      "disabled": false,
+      "rect": [
+       65,
+       393,
+       48,
+       31
+      ]
+     },
+     {
+      "text": "2017",
+      "disabled": false,
+      "rect": [
+       118,
+       393,
+       48,
+       31
+      ]
+     },
+     {
+      "text": "2018",
+      "disabled": false,
+      "rect": [
+       171,
+       393,
+       48,
+       31
+      ]
+     },
+     {
+      "text": "2019",
+      "disabled": false,
+      "rect": [
+       65,
+       426,
+       48,
+       31
+      ]
+     },
+     {
+      "text": "2020",
+      "disabled": false,
+      "rect": [
+       118,
+       426,
+       48,
+       31
+      ]
+     },
+     {
+      "text": "2021",
+      "disabled": false,
+      "rect": [
+       171,
+       426,
+       48,
+       31
+      ]
+     },
+     {
+      "text": "2022",
+      "disabled": false,
+      "rect": [
+       65,
+       460,
+       48,
+       31
+      ]
+     },
+     {
+      "text": "2023",
+      "disabled": false,
+      "rect": [
+       118,
+       460,
+       48,
+       31
+      ]
+     },
+     {
+      "text": "2024",
+      "disabled": false,
+      "rect": [
+       171,
+       460,
+       48,
+       31
+      ]
+     },
+     {
+      "text": "2025",
+      "disabled": false,
+      "rect": [
+       65,
+       493,
+       48,
+       31
+      ]
+     },
+     {
+      "text": "2026",
+      "disabled": false,
+      "rect": [
+       118,
+       493,
+       48,
+       31
+      ]
+     },
+     {
+      "text": "2027",
+      "disabled": false,
+      "rect": [
+       171,
+       493,
+       48,
+       31
+      ]
+     },
+     {
+      "text": "查詢",
+      "disabled": false,
+      "rect": [
+       16,
+       772,
+       358,
+       48
+      ]
+     },
+     {
+      "text": "查詢",
+      "disabled": false,
+      "rect": [
+       406,
+       772,
+       358,
+       48
+      ]
+     }
+    ],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  },
+  {
+   "action": {
+    "step": "enter_number",
+    "do": "click",
+    "selector": "button.vc-nav-arrow.is-left",
+    "hit": {
+     "x": 78,
+     "y": 376,
+     "targets": [
+      "fees.calendar",
+      "fees.filters"
+     ]
+    }
+   },
+   "before": {
+    "path": "/fee-payment/detail/fee-9/",
+    "query": {},
+    "flags": {
+     "feeName": "聯合醫院醫療費",
+     "firstTab": "輸入資料",
+     "onInputTab": true,
+     "hasFields": true,
+     "filled": false,
+     "fieldKind": "date",
+     "fieldName": "出生日期",
+     "fieldHint": "範例：1912-01-01(含分隔符號)",
+     "fieldChoices": "",
+     "calendar": true,
+     "calTitle": "11月 2026",
+     "calNav": true,
+     "searchTyped": false,
+     "searchResults": 0,
+     "noBill": false,
+     "alert": false,
+     "alertText": "",
+     "groupOpen": false,
+     "bills": 0,
+     "selected": 0,
+     "total": "",
+     "amount": "",
+     "payEnabled": false,
+     "methodsBelow": false,
+     "payConfirm": false,
+     "paid": false,
+     "paidMethod": "",
+     "noRecords": false,
+     "filtered": false,
+     "__bottomBar": 128,
+     "__dialog": false
+    },
+    "visible": [
+     "fees.calendar",
+     "fees.field",
+     "fees.filters",
+     "fees.query",
+     "fees.tab_input"
+    ],
+    "rects": {
+     "fees.tab_input": [
+      16,
+      48,
+      119.3,
+      24
+     ],
+     "fees.field": [
+      16,
+      251,
+      358,
+      44
+     ],
+     "fees.calendar": [
+      16,
+      295,
+      252,
+      282
+     ],
+     "fees.query": [
+      16,
+      772,
+      358,
+      48
+     ],
+     "fees.filters": [
+      16,
+      343,
+      358,
+      48
+     ]
+    }
+   },
+   "after": {
+    "path": "/fee-payment/detail/fee-9/",
+    "query": {},
+    "flags": {
+     "feeName": "聯合醫院醫療費",
+     "firstTab": "輸入資料",
+     "onInputTab": true,
+     "hasFields": true,
+     "filled": false,
+     "fieldKind": "date",
+     "fieldName": "出生日期",
+     "fieldHint": "範例：1912-01-01(含分隔符號)",
+     "fieldChoices": "",
+     "calendar": true,
+     "calTitle": "11月 2026",
+     "calNav": true,
+     "searchTyped": false,
+     "searchResults": 0,
+     "noBill": false,
+     "alert": false,
+     "alertText": "",
+     "groupOpen": false,
+     "bills": 0,
+     "selected": 0,
+     "total": "",
+     "amount": "",
+     "payEnabled": false,
+     "methodsBelow": false,
+     "payConfirm": false,
+     "paid": false,
+     "paidMethod": "",
+     "noRecords": false,
+     "filtered": false,
+     "__bottomBar": 128,
+     "__dialog": false
+    },
+    "visible": [
+     "fees.calendar",
+     "fees.field",
+     "fees.filters",
+     "fees.query",
+     "fees.tab_input"
+    ],
+    "rects": {
+     "fees.tab_input": [
+      16,
+      48,
+      119.3,
+      24
+     ],
+     "fees.field": [
+      16,
+      251,
+      358,
+      44
+     ],
+     "fees.calendar": [
+      16,
+      295,
+      252,
+      282
+     ],
+     "fees.query": [
+      16,
+      772,
+      358,
+      48
+     ],
+     "fees.filters": [
+      16,
+      343,
+      358,
+      48
+     ]
+    }
+   },
+   "facts": {
+    "url": "/fee-payment/detail/fee-9/",
+    "title": "繳費項目",
+    "fields": [
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "tax_id",
+      "name": "",
+      "label": "證件號碼",
+      "placeholder": "請輸入證件號碼",
+      "value": "A123456789",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       131,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "",
+      "name": "",
+      "label": "範例：1912-01-01(含分隔符號)",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       251,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "office",
+      "name": "",
+      "label": "院區",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       343,
+       358,
+       48
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "payment_number",
+      "name": "",
+      "label": "繳費編號",
+      "placeholder": "請輸入繳費編號",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       406,
+       159,
+       358,
+       44
+      ]
+     }
+    ],
+    "starred": [],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "輸入資料",
+      "disabled": false,
+      "rect": [
+       16,
+       48,
+       119,
+       24
+      ]
+     },
+     {
+      "text": "繳費編號",
+      "disabled": false,
+      "rect": [
+       135,
+       48,
+       119,
+       24
+      ]
+     },
+     {
+      "text": "掃描",
+      "disabled": false,
+      "rect": [
+       255,
+       48,
+       119,
+       24
+      ]
+     },
+     {
+      "text": "11月 2026",
+      "disabled": false,
+      "rect": [
+       92,
+       316,
+       100,
+       30
+      ]
+     },
+     {
+      "text": "1",
+      "disabled": false,
+      "rect": [
+       26,
+       380,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "2",
+      "disabled": false,
+      "rect": [
+       60,
+       380,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "3",
+      "disabled": false,
+      "rect": [
+       94,
+       380,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "4",
+      "disabled": false,
+      "rect": [
+       128,
+       380,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "5",
+      "disabled": false,
+      "rect": [
+       162,
+       380,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "6",
+      "disabled": false,
+      "rect": [
+       196,
+       380,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "7",
+      "disabled": false,
+      "rect": [
+       230,
+       380,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "8",
+      "disabled": false,
+      "rect": [
+       26,
+       412,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "9",
+      "disabled": false,
+      "rect": [
+       60,
+       412,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "10",
+      "disabled": false,
+      "rect": [
+       94,
+       412,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "11",
+      "disabled": false,
+      "rect": [
+       128,
+       412,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "12",
+      "disabled": false,
+      "rect": [
+       162,
+       412,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "13",
+      "disabled": false,
+      "rect": [
+       196,
+       412,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "14",
+      "disabled": false,
+      "rect": [
+       230,
+       412,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "15",
+      "disabled": false,
+      "rect": [
+       26,
+       444,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "16",
+      "disabled": false,
+      "rect": [
+       60,
+       444,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "17",
+      "disabled": false,
+      "rect": [
+       94,
+       444,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "18",
+      "disabled": false,
+      "rect": [
+       128,
+       444,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "19",
+      "disabled": false,
+      "rect": [
+       162,
+       444,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "20",
+      "disabled": false,
+      "rect": [
+       196,
+       444,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "21",
+      "disabled": false,
+      "rect": [
+       230,
+       444,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "22",
+      "disabled": false,
+      "rect": [
+       26,
+       476,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "23",
+      "disabled": false,
+      "rect": [
+       60,
+       476,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "24",
+      "disabled": false,
+      "rect": [
+       94,
+       476,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "25",
+      "disabled": false,
+      "rect": [
+       128,
+       476,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "26",
+      "disabled": false,
+      "rect": [
+       162,
+       476,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "27",
+      "disabled": false,
+      "rect": [
+       196,
+       476,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "28",
+      "disabled": false,
+      "rect": [
+       230,
+       476,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "29",
+      "disabled": false,
+      "rect": [
+       26,
+       508,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "30",
+      "disabled": false,
+      "rect": [
+       60,
+       508,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "2004 - 2015",
+      "disabled": false,
+      "rect": [
+       95,
+       361,
+       94,
+       30
+      ]
+     },
+     {
+      "text": "2004",
+      "disabled": false,
+      "rect": [
+       65,
+       393,
+       48,
+       31
+      ]
+     },
+     {
+      "text": "2005",
+      "disabled": false,
+      "rect": [
+       118,
+       393,
+       48,
+       31
+      ]
+     },
+     {
+      "text": "2006",
+      "disabled": false,
+      "rect": [
+       171,
+       393,
+       48,
+       31
+      ]
+     },
+     {
+      "text": "2007",
+      "disabled": false,
+      "rect": [
+       65,
+       426,
+       48,
+       31
+      ]
+     },
+     {
+      "text": "2008",
+      "disabled": false,
+      "rect": [
+       118,
+       426,
+       48,
+       31
+      ]
+     },
+     {
+      "text": "2009",
+      "disabled": false,
+      "rect": [
+       171,
+       426,
+       48,
+       31
+      ]
+     },
+     {
+      "text": "2010",
+      "disabled": false,
+      "rect": [
+       65,
+       460,
+       48,
+       31
+      ]
+     },
+     {
+      "text": "2011",
+      "disabled": false,
+      "rect": [
+       118,
+       460,
+       48,
+       31
+      ]
+     },
+     {
+      "text": "2012",
+      "disabled": false,
+      "rect": [
+       171,
+       460,
+       48,
+       31
+      ]
+     },
+     {
+      "text": "2013",
+      "disabled": false,
+      "rect": [
+       65,
+       493,
+       48,
+       31
+      ]
+     },
+     {
+      "text": "2014",
+      "disabled": false,
+      "rect": [
+       118,
+       493,
+       48,
+       31
+      ]
+     },
+     {
+      "text": "2015",
+      "disabled": false,
+      "rect": [
+       171,
+       493,
+       48,
+       31
+      ]
+     },
+     {
+      "text": "查詢",
+      "disabled": false,
+      "rect": [
+       16,
+       772,
+       358,
+       48
+      ]
+     },
+     {
+      "text": "查詢",
+      "disabled": false,
+      "rect": [
+       406,
+       772,
+       358,
+       48
+      ]
+     }
+    ],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  },
+  {
+   "action": {
+    "step": "enter_number",
+    "do": "click",
+    "selector": "button.vc-nav-arrow.is-left",
+    "hit": {
+     "x": 78,
+     "y": 376,
+     "targets": [
+      "fees.calendar",
+      "fees.filters"
+     ]
+    }
+   },
+   "before": {
+    "path": "/fee-payment/detail/fee-9/",
+    "query": {},
+    "flags": {
+     "feeName": "聯合醫院醫療費",
+     "firstTab": "輸入資料",
+     "onInputTab": true,
+     "hasFields": true,
+     "filled": false,
+     "fieldKind": "date",
+     "fieldName": "出生日期",
+     "fieldHint": "範例：1912-01-01(含分隔符號)",
+     "fieldChoices": "",
+     "calendar": true,
+     "calTitle": "11月 2026",
+     "calNav": true,
+     "searchTyped": false,
+     "searchResults": 0,
+     "noBill": false,
+     "alert": false,
+     "alertText": "",
+     "groupOpen": false,
+     "bills": 0,
+     "selected": 0,
+     "total": "",
+     "amount": "",
+     "payEnabled": false,
+     "methodsBelow": false,
+     "payConfirm": false,
+     "paid": false,
+     "paidMethod": "",
+     "noRecords": false,
+     "filtered": false,
+     "__bottomBar": 128,
+     "__dialog": false
+    },
+    "visible": [
+     "fees.calendar",
+     "fees.field",
+     "fees.filters",
+     "fees.query",
+     "fees.tab_input"
+    ],
+    "rects": {
+     "fees.tab_input": [
+      16,
+      48,
+      119.3,
+      24
+     ],
+     "fees.field": [
+      16,
+      251,
+      358,
+      44
+     ],
+     "fees.calendar": [
+      16,
+      295,
+      252,
+      282
+     ],
+     "fees.query": [
+      16,
+      772,
+      358,
+      48
+     ],
+     "fees.filters": [
+      16,
+      343,
+      358,
+      48
+     ]
+    }
+   },
+   "after": {
+    "path": "/fee-payment/detail/fee-9/",
+    "query": {},
+    "flags": {
+     "feeName": "聯合醫院醫療費",
+     "firstTab": "輸入資料",
+     "onInputTab": true,
+     "hasFields": true,
+     "filled": false,
+     "fieldKind": "date",
+     "fieldName": "出生日期",
+     "fieldHint": "範例：1912-01-01(含分隔符號)",
+     "fieldChoices": "",
+     "calendar": true,
+     "calTitle": "11月 2026",
+     "calNav": true,
+     "searchTyped": false,
+     "searchResults": 0,
+     "noBill": false,
+     "alert": false,
+     "alertText": "",
+     "groupOpen": false,
+     "bills": 0,
+     "selected": 0,
+     "total": "",
+     "amount": "",
+     "payEnabled": false,
+     "methodsBelow": false,
+     "payConfirm": false,
+     "paid": false,
+     "paidMethod": "",
+     "noRecords": false,
+     "filtered": false,
+     "__bottomBar": 128,
+     "__dialog": false
+    },
+    "visible": [
+     "fees.calendar",
+     "fees.field",
+     "fees.filters",
+     "fees.query",
+     "fees.tab_input"
+    ],
+    "rects": {
+     "fees.tab_input": [
+      16,
+      48,
+      119.3,
+      24
+     ],
+     "fees.field": [
+      16,
+      251,
+      358,
+      44
+     ],
+     "fees.calendar": [
+      16,
+      295,
+      252,
+      282
+     ],
+     "fees.query": [
+      16,
+      772,
+      358,
+      48
+     ],
+     "fees.filters": [
+      16,
+      343,
+      358,
+      48
+     ]
+    }
+   },
+   "facts": {
+    "url": "/fee-payment/detail/fee-9/",
+    "title": "繳費項目",
+    "fields": [
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "tax_id",
+      "name": "",
+      "label": "證件號碼",
+      "placeholder": "請輸入證件號碼",
+      "value": "A123456789",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       131,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "",
+      "name": "",
+      "label": "範例：1912-01-01(含分隔符號)",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       251,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "office",
+      "name": "",
+      "label": "院區",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       343,
+       358,
+       48
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "payment_number",
+      "name": "",
+      "label": "繳費編號",
+      "placeholder": "請輸入繳費編號",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       406,
+       159,
+       358,
+       44
+      ]
+     }
+    ],
+    "starred": [],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "輸入資料",
+      "disabled": false,
+      "rect": [
+       16,
+       48,
+       119,
+       24
+      ]
+     },
+     {
+      "text": "繳費編號",
+      "disabled": false,
+      "rect": [
+       135,
+       48,
+       119,
+       24
+      ]
+     },
+     {
+      "text": "掃描",
+      "disabled": false,
+      "rect": [
+       255,
+       48,
+       119,
+       24
+      ]
+     },
+     {
+      "text": "11月 2026",
+      "disabled": false,
+      "rect": [
+       92,
+       316,
+       100,
+       30
+      ]
+     },
+     {
+      "text": "1",
+      "disabled": false,
+      "rect": [
+       26,
+       380,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "2",
+      "disabled": false,
+      "rect": [
+       60,
+       380,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "3",
+      "disabled": false,
+      "rect": [
+       94,
+       380,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "4",
+      "disabled": false,
+      "rect": [
+       128,
+       380,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "5",
+      "disabled": false,
+      "rect": [
+       162,
+       380,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "6",
+      "disabled": false,
+      "rect": [
+       196,
+       380,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "7",
+      "disabled": false,
+      "rect": [
+       230,
+       380,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "8",
+      "disabled": false,
+      "rect": [
+       26,
+       412,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "9",
+      "disabled": false,
+      "rect": [
+       60,
+       412,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "10",
+      "disabled": false,
+      "rect": [
+       94,
+       412,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "11",
+      "disabled": false,
+      "rect": [
+       128,
+       412,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "12",
+      "disabled": false,
+      "rect": [
+       162,
+       412,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "13",
+      "disabled": false,
+      "rect": [
+       196,
+       412,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "14",
+      "disabled": false,
+      "rect": [
+       230,
+       412,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "15",
+      "disabled": false,
+      "rect": [
+       26,
+       444,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "16",
+      "disabled": false,
+      "rect": [
+       60,
+       444,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "17",
+      "disabled": false,
+      "rect": [
+       94,
+       444,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "18",
+      "disabled": false,
+      "rect": [
+       128,
+       444,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "19",
+      "disabled": false,
+      "rect": [
+       162,
+       444,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "20",
+      "disabled": false,
+      "rect": [
+       196,
+       444,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "21",
+      "disabled": false,
+      "rect": [
+       230,
+       444,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "22",
+      "disabled": false,
+      "rect": [
+       26,
+       476,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "23",
+      "disabled": false,
+      "rect": [
+       60,
+       476,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "24",
+      "disabled": false,
+      "rect": [
+       94,
+       476,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "25",
+      "disabled": false,
+      "rect": [
+       128,
+       476,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "26",
+      "disabled": false,
+      "rect": [
+       162,
+       476,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "27",
+      "disabled": false,
+      "rect": [
+       196,
+       476,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "28",
+      "disabled": false,
+      "rect": [
+       230,
+       476,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "29",
+      "disabled": false,
+      "rect": [
+       26,
+       508,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "30",
+      "disabled": false,
+      "rect": [
+       60,
+       508,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "1992 - 2003",
+      "disabled": false,
+      "rect": [
+       95,
+       361,
+       94,
+       30
+      ]
+     },
+     {
+      "text": "1992",
+      "disabled": false,
+      "rect": [
+       65,
+       393,
+       48,
+       31
+      ]
+     },
+     {
+      "text": "1993",
+      "disabled": false,
+      "rect": [
+       118,
+       393,
+       48,
+       31
+      ]
+     },
+     {
+      "text": "1994",
+      "disabled": false,
+      "rect": [
+       171,
+       393,
+       48,
+       31
+      ]
+     },
+     {
+      "text": "1995",
+      "disabled": false,
+      "rect": [
+       65,
+       426,
+       48,
+       31
+      ]
+     },
+     {
+      "text": "1996",
+      "disabled": false,
+      "rect": [
+       118,
+       426,
+       48,
+       31
+      ]
+     },
+     {
+      "text": "1997",
+      "disabled": false,
+      "rect": [
+       171,
+       426,
+       48,
+       31
+      ]
+     },
+     {
+      "text": "1998",
+      "disabled": false,
+      "rect": [
+       65,
+       460,
+       48,
+       31
+      ]
+     },
+     {
+      "text": "1999",
+      "disabled": false,
+      "rect": [
+       118,
+       460,
+       48,
+       31
+      ]
+     },
+     {
+      "text": "2000",
+      "disabled": false,
+      "rect": [
+       171,
+       460,
+       48,
+       31
+      ]
+     },
+     {
+      "text": "2001",
+      "disabled": false,
+      "rect": [
+       65,
+       493,
+       48,
+       31
+      ]
+     },
+     {
+      "text": "2002",
+      "disabled": false,
+      "rect": [
+       118,
+       493,
+       48,
+       31
+      ]
+     },
+     {
+      "text": "2003",
+      "disabled": false,
+      "rect": [
+       171,
+       493,
+       48,
+       31
+      ]
+     },
+     {
+      "text": "查詢",
+      "disabled": false,
+      "rect": [
+       16,
+       772,
+       358,
+       48
+      ]
+     },
+     {
+      "text": "查詢",
+      "disabled": false,
+      "rect": [
+       406,
+       772,
+       358,
+       48
+      ]
+     }
+    ],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  },
+  {
+   "action": {
+    "step": "enter_number",
+    "do": "click",
+    "selector": "button.vc-nav-arrow.is-left",
+    "hit": {
+     "x": 78,
+     "y": 376,
+     "targets": [
+      "fees.calendar",
+      "fees.filters"
+     ]
+    }
+   },
+   "before": {
+    "path": "/fee-payment/detail/fee-9/",
+    "query": {},
+    "flags": {
+     "feeName": "聯合醫院醫療費",
+     "firstTab": "輸入資料",
+     "onInputTab": true,
+     "hasFields": true,
+     "filled": false,
+     "fieldKind": "date",
+     "fieldName": "出生日期",
+     "fieldHint": "範例：1912-01-01(含分隔符號)",
+     "fieldChoices": "",
+     "calendar": true,
+     "calTitle": "11月 2026",
+     "calNav": true,
+     "searchTyped": false,
+     "searchResults": 0,
+     "noBill": false,
+     "alert": false,
+     "alertText": "",
+     "groupOpen": false,
+     "bills": 0,
+     "selected": 0,
+     "total": "",
+     "amount": "",
+     "payEnabled": false,
+     "methodsBelow": false,
+     "payConfirm": false,
+     "paid": false,
+     "paidMethod": "",
+     "noRecords": false,
+     "filtered": false,
+     "__bottomBar": 128,
+     "__dialog": false
+    },
+    "visible": [
+     "fees.calendar",
+     "fees.field",
+     "fees.filters",
+     "fees.query",
+     "fees.tab_input"
+    ],
+    "rects": {
+     "fees.tab_input": [
+      16,
+      48,
+      119.3,
+      24
+     ],
+     "fees.field": [
+      16,
+      251,
+      358,
+      44
+     ],
+     "fees.calendar": [
+      16,
+      295,
+      252,
+      282
+     ],
+     "fees.query": [
+      16,
+      772,
+      358,
+      48
+     ],
+     "fees.filters": [
+      16,
+      343,
+      358,
+      48
+     ]
+    }
+   },
+   "after": {
+    "path": "/fee-payment/detail/fee-9/",
+    "query": {},
+    "flags": {
+     "feeName": "聯合醫院醫療費",
+     "firstTab": "輸入資料",
+     "onInputTab": true,
+     "hasFields": true,
+     "filled": false,
+     "fieldKind": "date",
+     "fieldName": "出生日期",
+     "fieldHint": "範例：1912-01-01(含分隔符號)",
+     "fieldChoices": "",
+     "calendar": true,
+     "calTitle": "11月 2026",
+     "calNav": true,
+     "searchTyped": false,
+     "searchResults": 0,
+     "noBill": false,
+     "alert": false,
+     "alertText": "",
+     "groupOpen": false,
+     "bills": 0,
+     "selected": 0,
+     "total": "",
+     "amount": "",
+     "payEnabled": false,
+     "methodsBelow": false,
+     "payConfirm": false,
+     "paid": false,
+     "paidMethod": "",
+     "noRecords": false,
+     "filtered": false,
+     "__bottomBar": 128,
+     "__dialog": false
+    },
+    "visible": [
+     "fees.calendar",
+     "fees.field",
+     "fees.filters",
+     "fees.query",
+     "fees.tab_input"
+    ],
+    "rects": {
+     "fees.tab_input": [
+      16,
+      48,
+      119.3,
+      24
+     ],
+     "fees.field": [
+      16,
+      251,
+      358,
+      44
+     ],
+     "fees.calendar": [
+      16,
+      295,
+      252,
+      282
+     ],
+     "fees.query": [
+      16,
+      772,
+      358,
+      48
+     ],
+     "fees.filters": [
+      16,
+      343,
+      358,
+      48
+     ]
+    }
+   },
+   "facts": {
+    "url": "/fee-payment/detail/fee-9/",
+    "title": "繳費項目",
+    "fields": [
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "tax_id",
+      "name": "",
+      "label": "證件號碼",
+      "placeholder": "請輸入證件號碼",
+      "value": "A123456789",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       131,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "",
+      "name": "",
+      "label": "範例：1912-01-01(含分隔符號)",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       251,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "office",
+      "name": "",
+      "label": "院區",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       343,
+       358,
+       48
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "payment_number",
+      "name": "",
+      "label": "繳費編號",
+      "placeholder": "請輸入繳費編號",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       406,
+       159,
+       358,
+       44
+      ]
+     }
+    ],
+    "starred": [],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "輸入資料",
+      "disabled": false,
+      "rect": [
+       16,
+       48,
+       119,
+       24
+      ]
+     },
+     {
+      "text": "繳費編號",
+      "disabled": false,
+      "rect": [
+       135,
+       48,
+       119,
+       24
+      ]
+     },
+     {
+      "text": "掃描",
+      "disabled": false,
+      "rect": [
+       255,
+       48,
+       119,
+       24
+      ]
+     },
+     {
+      "text": "11月 2026",
+      "disabled": false,
+      "rect": [
+       92,
+       316,
+       100,
+       30
+      ]
+     },
+     {
+      "text": "1",
+      "disabled": false,
+      "rect": [
+       26,
+       380,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "2",
+      "disabled": false,
+      "rect": [
+       60,
+       380,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "3",
+      "disabled": false,
+      "rect": [
+       94,
+       380,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "4",
+      "disabled": false,
+      "rect": [
+       128,
+       380,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "5",
+      "disabled": false,
+      "rect": [
+       162,
+       380,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "6",
+      "disabled": false,
+      "rect": [
+       196,
+       380,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "7",
+      "disabled": false,
+      "rect": [
+       230,
+       380,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "8",
+      "disabled": false,
+      "rect": [
+       26,
+       412,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "9",
+      "disabled": false,
+      "rect": [
+       60,
+       412,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "10",
+      "disabled": false,
+      "rect": [
+       94,
+       412,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "11",
+      "disabled": false,
+      "rect": [
+       128,
+       412,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "12",
+      "disabled": false,
+      "rect": [
+       162,
+       412,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "13",
+      "disabled": false,
+      "rect": [
+       196,
+       412,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "14",
+      "disabled": false,
+      "rect": [
+       230,
+       412,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "15",
+      "disabled": false,
+      "rect": [
+       26,
+       444,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "16",
+      "disabled": false,
+      "rect": [
+       60,
+       444,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "17",
+      "disabled": false,
+      "rect": [
+       94,
+       444,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "18",
+      "disabled": false,
+      "rect": [
+       128,
+       444,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "19",
+      "disabled": false,
+      "rect": [
+       162,
+       444,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "20",
+      "disabled": false,
+      "rect": [
+       196,
+       444,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "21",
+      "disabled": false,
+      "rect": [
+       230,
+       444,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "22",
+      "disabled": false,
+      "rect": [
+       26,
+       476,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "23",
+      "disabled": false,
+      "rect": [
+       60,
+       476,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "24",
+      "disabled": false,
+      "rect": [
+       94,
+       476,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "25",
+      "disabled": false,
+      "rect": [
+       128,
+       476,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "26",
+      "disabled": false,
+      "rect": [
+       162,
+       476,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "27",
+      "disabled": false,
+      "rect": [
+       196,
+       476,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "28",
+      "disabled": false,
+      "rect": [
+       230,
+       476,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "29",
+      "disabled": false,
+      "rect": [
+       26,
+       508,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "30",
+      "disabled": false,
+      "rect": [
+       60,
+       508,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "1980 - 1991",
+      "disabled": false,
+      "rect": [
+       98,
+       361,
+       89,
+       30
+      ]
+     },
+     {
+      "text": "1980",
+      "disabled": false,
+      "rect": [
+       65,
+       393,
+       48,
+       31
+      ]
+     },
+     {
+      "text": "1981",
+      "disabled": false,
+      "rect": [
+       118,
+       393,
+       48,
+       31
+      ]
+     },
+     {
+      "text": "1982",
+      "disabled": false,
+      "rect": [
+       171,
+       393,
+       48,
+       31
+      ]
+     },
+     {
+      "text": "1983",
+      "disabled": false,
+      "rect": [
+       65,
+       426,
+       48,
+       31
+      ]
+     },
+     {
+      "text": "1984",
+      "disabled": false,
+      "rect": [
+       118,
+       426,
+       48,
+       31
+      ]
+     },
+     {
+      "text": "1985",
+      "disabled": false,
+      "rect": [
+       171,
+       426,
+       48,
+       31
+      ]
+     },
+     {
+      "text": "1986",
+      "disabled": false,
+      "rect": [
+       65,
+       460,
+       48,
+       31
+      ]
+     },
+     {
+      "text": "1987",
+      "disabled": false,
+      "rect": [
+       118,
+       460,
+       48,
+       31
+      ]
+     },
+     {
+      "text": "1988",
+      "disabled": false,
+      "rect": [
+       171,
+       460,
+       48,
+       31
+      ]
+     },
+     {
+      "text": "1989",
+      "disabled": false,
+      "rect": [
+       65,
+       493,
+       48,
+       31
+      ]
+     },
+     {
+      "text": "1990",
+      "disabled": false,
+      "rect": [
+       118,
+       493,
+       48,
+       31
+      ]
+     },
+     {
+      "text": "1991",
+      "disabled": false,
+      "rect": [
+       171,
+       493,
+       48,
+       31
+      ]
+     },
+     {
+      "text": "查詢",
+      "disabled": false,
+      "rect": [
+       16,
+       772,
+       358,
+       48
+      ]
+     },
+     {
+      "text": "查詢",
+      "disabled": false,
+      "rect": [
+       406,
+       772,
+       358,
+       48
+      ]
+     }
+    ],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  },
+  {
+   "action": {
+    "step": "enter_number",
+    "do": "click",
+    "text": "1985",
+    "within": ".vc-nav-container",
+    "hit": {
+     "x": 195,
+     "y": 442,
+     "targets": [
+      "fees.calendar"
+     ]
+    }
+   },
+   "before": {
+    "path": "/fee-payment/detail/fee-9/",
+    "query": {},
+    "flags": {
+     "feeName": "聯合醫院醫療費",
+     "firstTab": "輸入資料",
+     "onInputTab": true,
+     "hasFields": true,
+     "filled": false,
+     "fieldKind": "date",
+     "fieldName": "出生日期",
+     "fieldHint": "範例：1912-01-01(含分隔符號)",
+     "fieldChoices": "",
+     "calendar": true,
+     "calTitle": "11月 2026",
+     "calNav": true,
+     "searchTyped": false,
+     "searchResults": 0,
+     "noBill": false,
+     "alert": false,
+     "alertText": "",
+     "groupOpen": false,
+     "bills": 0,
+     "selected": 0,
+     "total": "",
+     "amount": "",
+     "payEnabled": false,
+     "methodsBelow": false,
+     "payConfirm": false,
+     "paid": false,
+     "paidMethod": "",
+     "noRecords": false,
+     "filtered": false,
+     "__bottomBar": 128,
+     "__dialog": false
+    },
+    "visible": [
+     "fees.calendar",
+     "fees.field",
+     "fees.filters",
+     "fees.query",
+     "fees.tab_input"
+    ],
+    "rects": {
+     "fees.tab_input": [
+      16,
+      48,
+      119.3,
+      24
+     ],
+     "fees.field": [
+      16,
+      251,
+      358,
+      44
+     ],
+     "fees.calendar": [
+      16,
+      295,
+      252,
+      282
+     ],
+     "fees.query": [
+      16,
+      772,
+      358,
+      48
+     ],
+     "fees.filters": [
+      16,
+      343,
+      358,
+      48
+     ]
+    }
+   },
+   "after": {
+    "path": "/fee-payment/detail/fee-9/",
+    "query": {},
+    "flags": {
+     "feeName": "聯合醫院醫療費",
+     "firstTab": "輸入資料",
+     "onInputTab": true,
+     "hasFields": true,
+     "filled": false,
+     "fieldKind": "date",
+     "fieldName": "出生日期",
+     "fieldHint": "範例：1912-01-01(含分隔符號)",
+     "fieldChoices": "",
+     "calendar": true,
+     "calTitle": "11月 2026",
+     "calNav": true,
+     "searchTyped": false,
+     "searchResults": 0,
+     "noBill": false,
+     "alert": false,
+     "alertText": "",
+     "groupOpen": false,
+     "bills": 0,
+     "selected": 0,
+     "total": "",
+     "amount": "",
+     "payEnabled": false,
+     "methodsBelow": false,
+     "payConfirm": false,
+     "paid": false,
+     "paidMethod": "",
+     "noRecords": false,
+     "filtered": false,
+     "__bottomBar": 128,
+     "__dialog": false
+    },
+    "visible": [
+     "fees.calendar",
+     "fees.field",
+     "fees.filters",
+     "fees.query",
+     "fees.tab_input"
+    ],
+    "rects": {
+     "fees.tab_input": [
+      16,
+      48,
+      119.3,
+      24
+     ],
+     "fees.field": [
+      16,
+      251,
+      358,
+      44
+     ],
+     "fees.calendar": [
+      16,
+      295,
+      252,
+      282
+     ],
+     "fees.query": [
+      16,
+      772,
+      358,
+      48
+     ],
+     "fees.filters": [
+      16,
+      343,
+      358,
+      48
+     ]
+    }
+   },
+   "facts": {
+    "url": "/fee-payment/detail/fee-9/",
+    "title": "繳費項目",
+    "fields": [
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "tax_id",
+      "name": "",
+      "label": "證件號碼",
+      "placeholder": "請輸入證件號碼",
+      "value": "A123456789",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       131,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "",
+      "name": "",
+      "label": "範例：1912-01-01(含分隔符號)",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       251,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "office",
+      "name": "",
+      "label": "院區",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       343,
+       358,
+       48
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "payment_number",
+      "name": "",
+      "label": "繳費編號",
+      "placeholder": "請輸入繳費編號",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       406,
+       159,
+       358,
+       44
+      ]
+     }
+    ],
+    "starred": [],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "輸入資料",
+      "disabled": false,
+      "rect": [
+       16,
+       48,
+       119,
+       24
+      ]
+     },
+     {
+      "text": "繳費編號",
+      "disabled": false,
+      "rect": [
+       135,
+       48,
+       119,
+       24
+      ]
+     },
+     {
+      "text": "掃描",
+      "disabled": false,
+      "rect": [
+       255,
+       48,
+       119,
+       24
+      ]
+     },
+     {
+      "text": "11月 2026",
+      "disabled": false,
+      "rect": [
+       92,
+       316,
+       100,
+       30
+      ]
+     },
+     {
+      "text": "1",
+      "disabled": false,
+      "rect": [
+       26,
+       380,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "2",
+      "disabled": false,
+      "rect": [
+       60,
+       380,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "3",
+      "disabled": false,
+      "rect": [
+       94,
+       380,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "4",
+      "disabled": false,
+      "rect": [
+       128,
+       380,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "5",
+      "disabled": false,
+      "rect": [
+       162,
+       380,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "6",
+      "disabled": false,
+      "rect": [
+       196,
+       380,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "7",
+      "disabled": false,
+      "rect": [
+       230,
+       380,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "8",
+      "disabled": false,
+      "rect": [
+       26,
+       412,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "9",
+      "disabled": false,
+      "rect": [
+       60,
+       412,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "10",
+      "disabled": false,
+      "rect": [
+       94,
+       412,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "11",
+      "disabled": false,
+      "rect": [
+       128,
+       412,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "12",
+      "disabled": false,
+      "rect": [
+       162,
+       412,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "13",
+      "disabled": false,
+      "rect": [
+       196,
+       412,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "14",
+      "disabled": false,
+      "rect": [
+       230,
+       412,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "15",
+      "disabled": false,
+      "rect": [
+       26,
+       444,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "16",
+      "disabled": false,
+      "rect": [
+       60,
+       444,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "17",
+      "disabled": false,
+      "rect": [
+       94,
+       444,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "18",
+      "disabled": false,
+      "rect": [
+       128,
+       444,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "19",
+      "disabled": false,
+      "rect": [
+       162,
+       444,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "20",
+      "disabled": false,
+      "rect": [
+       196,
+       444,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "21",
+      "disabled": false,
+      "rect": [
+       230,
+       444,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "22",
+      "disabled": false,
+      "rect": [
+       26,
+       476,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "23",
+      "disabled": false,
+      "rect": [
+       60,
+       476,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "24",
+      "disabled": false,
+      "rect": [
+       94,
+       476,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "25",
+      "disabled": false,
+      "rect": [
+       128,
+       476,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "26",
+      "disabled": false,
+      "rect": [
+       162,
+       476,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "27",
+      "disabled": false,
+      "rect": [
+       196,
+       476,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "28",
+      "disabled": false,
+      "rect": [
+       230,
+       476,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "29",
+      "disabled": false,
+      "rect": [
+       26,
+       508,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "30",
+      "disabled": false,
+      "rect": [
+       60,
+       508,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "1985",
+      "disabled": false,
+      "rect": [
+       121,
+       361,
+       43,
+       30
+      ]
+     },
+     {
+      "text": "1月",
+      "disabled": false,
+      "rect": [
+       65,
+       393,
+       48,
+       31
+      ]
+     },
+     {
+      "text": "2月",
+      "disabled": false,
+      "rect": [
+       118,
+       393,
+       48,
+       31
+      ]
+     },
+     {
+      "text": "3月",
+      "disabled": false,
+      "rect": [
+       171,
+       393,
+       48,
+       31
+      ]
+     },
+     {
+      "text": "4月",
+      "disabled": false,
+      "rect": [
+       65,
+       426,
+       48,
+       31
+      ]
+     },
+     {
+      "text": "5月",
+      "disabled": false,
+      "rect": [
+       118,
+       426,
+       48,
+       31
+      ]
+     },
+     {
+      "text": "6月",
+      "disabled": false,
+      "rect": [
+       171,
+       426,
+       48,
+       31
+      ]
+     },
+     {
+      "text": "7月",
+      "disabled": false,
+      "rect": [
+       65,
+       460,
+       48,
+       31
+      ]
+     },
+     {
+      "text": "8月",
+      "disabled": false,
+      "rect": [
+       118,
+       460,
+       48,
+       31
+      ]
+     },
+     {
+      "text": "9月",
+      "disabled": false,
+      "rect": [
+       171,
+       460,
+       48,
+       31
+      ]
+     },
+     {
+      "text": "10月",
+      "disabled": false,
+      "rect": [
+       65,
+       493,
+       48,
+       31
+      ]
+     },
+     {
+      "text": "11月",
+      "disabled": false,
+      "rect": [
+       118,
+       493,
+       48,
+       31
+      ]
+     },
+     {
+      "text": "12月",
+      "disabled": false,
+      "rect": [
+       171,
+       493,
+       48,
+       31
+      ]
+     },
+     {
+      "text": "查詢",
+      "disabled": false,
+      "rect": [
+       16,
+       772,
+       358,
+       48
+      ]
+     },
+     {
+      "text": "查詢",
+      "disabled": false,
+      "rect": [
+       406,
+       772,
+       358,
+       48
+      ]
+     }
+    ],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  },
+  {
+   "action": {
+    "step": "enter_number",
+    "do": "click",
+    "text": "5月",
+    "within": ".vc-nav-container",
+    "hit": {
+     "x": 142,
+     "y": 442,
+     "targets": [
+      "fees.calendar"
+     ]
+    }
+   },
+   "before": {
+    "path": "/fee-payment/detail/fee-9/",
+    "query": {},
+    "flags": {
+     "feeName": "聯合醫院醫療費",
+     "firstTab": "輸入資料",
+     "onInputTab": true,
+     "hasFields": true,
+     "filled": false,
+     "fieldKind": "date",
+     "fieldName": "出生日期",
+     "fieldHint": "範例：1912-01-01(含分隔符號)",
+     "fieldChoices": "",
+     "calendar": true,
+     "calTitle": "11月 2026",
+     "calNav": true,
+     "searchTyped": false,
+     "searchResults": 0,
+     "noBill": false,
+     "alert": false,
+     "alertText": "",
+     "groupOpen": false,
+     "bills": 0,
+     "selected": 0,
+     "total": "",
+     "amount": "",
+     "payEnabled": false,
+     "methodsBelow": false,
+     "payConfirm": false,
+     "paid": false,
+     "paidMethod": "",
+     "noRecords": false,
+     "filtered": false,
+     "__bottomBar": 128,
+     "__dialog": false
+    },
+    "visible": [
+     "fees.calendar",
+     "fees.field",
+     "fees.filters",
+     "fees.query",
+     "fees.tab_input"
+    ],
+    "rects": {
+     "fees.tab_input": [
+      16,
+      48,
+      119.3,
+      24
+     ],
+     "fees.field": [
+      16,
+      251,
+      358,
+      44
+     ],
+     "fees.calendar": [
+      16,
+      295,
+      252,
+      282
+     ],
+     "fees.query": [
+      16,
+      772,
+      358,
+      48
+     ],
+     "fees.filters": [
+      16,
+      343,
+      358,
+      48
+     ]
+    }
+   },
+   "after": {
+    "path": "/fee-payment/detail/fee-9/",
+    "query": {},
+    "flags": {
+     "feeName": "聯合醫院醫療費",
+     "firstTab": "輸入資料",
+     "onInputTab": true,
+     "hasFields": true,
+     "filled": false,
+     "fieldKind": "date",
+     "fieldName": "出生日期",
+     "fieldHint": "範例：1912-01-01(含分隔符號)",
+     "fieldChoices": "",
+     "calendar": true,
+     "calTitle": "5月 1985",
+     "calNav": false,
+     "searchTyped": false,
+     "searchResults": 0,
+     "noBill": false,
+     "alert": false,
+     "alertText": "",
+     "groupOpen": false,
+     "bills": 0,
+     "selected": 0,
+     "total": "",
+     "amount": "",
+     "payEnabled": false,
+     "methodsBelow": false,
+     "payConfirm": false,
+     "paid": false,
+     "paidMethod": "",
+     "noRecords": false,
+     "filtered": false,
+     "__bottomBar": 128,
+     "__dialog": false
+    },
+    "visible": [
+     "fees.calendar",
+     "fees.field",
+     "fees.filters",
+     "fees.query",
+     "fees.tab_input"
+    ],
+    "rects": {
+     "fees.tab_input": [
+      16,
+      48,
+      119.3,
+      24
+     ],
+     "fees.field": [
+      16,
+      251,
+      358,
+      44
+     ],
+     "fees.calendar": [
+      16,
+      295,
+      252,
+      282
+     ],
+     "fees.query": [
+      16,
+      772,
+      358,
+      48
+     ],
+     "fees.filters": [
+      16,
+      343,
+      358,
+      48
+     ]
+    }
+   },
+   "facts": {
+    "url": "/fee-payment/detail/fee-9/",
+    "title": "繳費項目",
+    "fields": [
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "tax_id",
+      "name": "",
+      "label": "證件號碼",
+      "placeholder": "請輸入證件號碼",
+      "value": "A123456789",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       131,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "",
+      "name": "",
+      "label": "範例：1912-01-01(含分隔符號)",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       251,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "office",
+      "name": "",
+      "label": "院區",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       343,
+       358,
+       48
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "payment_number",
+      "name": "",
+      "label": "繳費編號",
+      "placeholder": "請輸入繳費編號",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       406,
+       159,
+       358,
+       44
+      ]
+     }
+    ],
+    "starred": [],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "輸入資料",
+      "disabled": false,
+      "rect": [
+       16,
+       48,
+       119,
+       24
+      ]
+     },
+     {
+      "text": "繳費編號",
+      "disabled": false,
+      "rect": [
+       135,
+       48,
+       119,
+       24
+      ]
+     },
+     {
+      "text": "掃描",
+      "disabled": false,
+      "rect": [
+       255,
+       48,
+       119,
+       24
+      ]
+     },
+     {
+      "text": "5月 1985",
+      "disabled": false,
+      "rect": [
+       96,
+       316,
+       92,
+       30
+      ]
+     },
+     {
+      "text": "1",
+      "disabled": false,
+      "rect": [
+       128,
+       380,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "2",
+      "disabled": false,
+      "rect": [
+       162,
+       380,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "3",
+      "disabled": false,
+      "rect": [
+       196,
+       380,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "4",
+      "disabled": false,
+      "rect": [
+       230,
+       380,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "5",
+      "disabled": false,
+      "rect": [
+       26,
+       412,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "6",
+      "disabled": false,
+      "rect": [
+       60,
+       412,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "7",
+      "disabled": false,
+      "rect": [
+       94,
+       412,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "8",
+      "disabled": false,
+      "rect": [
+       128,
+       412,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "9",
+      "disabled": false,
+      "rect": [
+       162,
+       412,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "10",
+      "disabled": false,
+      "rect": [
+       196,
+       412,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "11",
+      "disabled": false,
+      "rect": [
+       230,
+       412,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "12",
+      "disabled": false,
+      "rect": [
+       26,
+       444,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "13",
+      "disabled": false,
+      "rect": [
+       60,
+       444,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "14",
+      "disabled": false,
+      "rect": [
+       94,
+       444,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "15",
+      "disabled": false,
+      "rect": [
+       128,
+       444,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "16",
+      "disabled": false,
+      "rect": [
+       162,
+       444,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "17",
+      "disabled": false,
+      "rect": [
+       196,
+       444,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "18",
+      "disabled": false,
+      "rect": [
+       230,
+       444,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "19",
+      "disabled": false,
+      "rect": [
+       26,
+       476,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "20",
+      "disabled": false,
+      "rect": [
+       60,
+       476,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "21",
+      "disabled": false,
+      "rect": [
+       94,
+       476,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "22",
+      "disabled": false,
+      "rect": [
+       128,
+       476,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "23",
+      "disabled": false,
+      "rect": [
+       162,
+       476,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "24",
+      "disabled": false,
+      "rect": [
+       196,
+       476,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "25",
+      "disabled": false,
+      "rect": [
+       230,
+       476,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "26",
+      "disabled": false,
+      "rect": [
+       26,
+       508,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "27",
+      "disabled": false,
+      "rect": [
+       60,
+       508,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "28",
+      "disabled": false,
+      "rect": [
+       94,
+       508,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "29",
+      "disabled": false,
+      "rect": [
+       128,
+       508,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "30",
+      "disabled": false,
+      "rect": [
+       162,
+       508,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "31",
+      "disabled": false,
+      "rect": [
+       196,
+       508,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "查詢",
+      "disabled": false,
+      "rect": [
+       16,
+       772,
+       358,
+       48
+      ]
+     },
+     {
+      "text": "查詢",
+      "disabled": false,
+      "rect": [
+       406,
+       772,
+       358,
+       48
+      ]
+     }
+    ],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  },
+  {
+   "action": {
+    "step": "enter_number",
+    "do": "click",
+    "text": "15",
+    "within": ".vc-popover-content-wrapper",
+    "hit": {
+     "x": 142,
+     "y": 458,
+     "targets": [
+      "fees.calendar"
+     ]
+    }
+   },
+   "before": {
+    "path": "/fee-payment/detail/fee-9/",
+    "query": {},
+    "flags": {
+     "feeName": "聯合醫院醫療費",
+     "firstTab": "輸入資料",
+     "onInputTab": true,
+     "hasFields": true,
+     "filled": false,
+     "fieldKind": "date",
+     "fieldName": "出生日期",
+     "fieldHint": "範例：1912-01-01(含分隔符號)",
+     "fieldChoices": "",
+     "calendar": true,
+     "calTitle": "5月 1985",
+     "calNav": false,
+     "searchTyped": false,
+     "searchResults": 0,
+     "noBill": false,
+     "alert": false,
+     "alertText": "",
+     "groupOpen": false,
+     "bills": 0,
+     "selected": 0,
+     "total": "",
+     "amount": "",
+     "payEnabled": false,
+     "methodsBelow": false,
+     "payConfirm": false,
+     "paid": false,
+     "paidMethod": "",
+     "noRecords": false,
+     "filtered": false,
+     "__bottomBar": 128,
+     "__dialog": false
+    },
+    "visible": [
+     "fees.calendar",
+     "fees.field",
+     "fees.filters",
+     "fees.query",
+     "fees.tab_input"
+    ],
+    "rects": {
+     "fees.tab_input": [
+      16,
+      48,
+      119.3,
+      24
+     ],
+     "fees.field": [
+      16,
+      251,
+      358,
+      44
+     ],
+     "fees.calendar": [
+      16,
+      295,
+      252,
+      282
+     ],
+     "fees.query": [
+      16,
+      772,
+      358,
+      48
+     ],
+     "fees.filters": [
+      16,
+      343,
+      358,
+      48
+     ]
+    }
+   },
+   "after": {
+    "path": "/fee-payment/detail/fee-9/",
+    "query": {},
+    "flags": {
+     "feeName": "聯合醫院醫療費",
+     "firstTab": "輸入資料",
+     "onInputTab": true,
+     "hasFields": true,
+     "filled": false,
+     "fieldKind": "select",
+     "fieldName": "院區",
+     "fieldHint": "",
+     "fieldChoices": "",
+     "calendar": false,
+     "calTitle": "",
+     "calNav": false,
+     "searchTyped": false,
+     "searchResults": 0,
+     "noBill": false,
+     "alert": false,
+     "alertText": "",
+     "groupOpen": false,
+     "bills": 0,
+     "selected": 0,
+     "total": "",
+     "amount": "",
+     "payEnabled": false,
+     "methodsBelow": false,
+     "payConfirm": false,
+     "paid": false,
+     "paidMethod": "",
+     "noRecords": false,
+     "filtered": false,
+     "__bottomBar": 128,
+     "__dialog": false
+    },
+    "visible": [
+     "fees.field",
+     "fees.filters",
+     "fees.query",
+     "fees.tab_input"
+    ],
+    "rects": {
+     "fees.tab_input": [
+      16,
+      48,
+      119.3,
+      24
+     ],
+     "fees.field": [
+      16,
+      343,
+      358,
+      48
+     ],
+     "fees.query": [
+      16,
+      772,
+      358,
+      48
+     ],
+     "fees.filters": [
+      16,
+      343,
+      358,
+      48
+     ]
+    }
+   },
+   "facts": {
+    "url": "/fee-payment/detail/fee-9/",
+    "title": "繳費項目",
+    "fields": [
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "tax_id",
+      "name": "",
+      "label": "證件號碼",
+      "placeholder": "請輸入證件號碼",
+      "value": "A123456789",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       131,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "",
+      "name": "",
+      "label": "範例：1912-01-01(含分隔符號)",
+      "placeholder": "",
+      "value": "1985-05-15",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       251,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "office",
+      "name": "",
+      "label": "院區",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       343,
+       358,
+       48
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "payment_number",
+      "name": "",
+      "label": "繳費編號",
+      "placeholder": "請輸入繳費編號",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       406,
+       159,
+       358,
+       44
+      ]
+     }
+    ],
+    "starred": [],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "輸入資料",
+      "disabled": false,
+      "rect": [
+       16,
+       48,
+       119,
+       24
+      ]
+     },
+     {
+      "text": "繳費編號",
+      "disabled": false,
+      "rect": [
+       135,
+       48,
+       119,
+       24
+      ]
+     },
+     {
+      "text": "掃描",
+      "disabled": false,
+      "rect": [
+       255,
+       48,
+       119,
+       24
+      ]
+     },
+     {
+      "text": "查詢",
+      "disabled": false,
+      "rect": [
+       16,
+       772,
+       358,
+       48
+      ]
+     },
+     {
+      "text": "查詢",
+      "disabled": false,
+      "rect": [
+       406,
+       772,
+       358,
+       48
+      ]
+     }
+    ],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  },
+  {
+   "action": {
+    "step": "enter_number",
+    "do": "select",
+    "selector": "#office",
+    "value": "中興",
+    "hit": {
+     "x": 195,
+     "y": 367,
+     "targets": [
+      "fees.field",
+      "fees.filters"
+     ]
+    }
+   },
+   "before": {
+    "path": "/fee-payment/detail/fee-9/",
+    "query": {},
+    "flags": {
+     "feeName": "聯合醫院醫療費",
+     "firstTab": "輸入資料",
+     "onInputTab": true,
+     "hasFields": true,
+     "filled": false,
+     "fieldKind": "select",
+     "fieldName": "院區",
+     "fieldHint": "",
+     "fieldChoices": "",
+     "calendar": false,
+     "calTitle": "",
+     "calNav": false,
+     "searchTyped": false,
+     "searchResults": 0,
+     "noBill": false,
+     "alert": false,
+     "alertText": "",
+     "groupOpen": false,
+     "bills": 0,
+     "selected": 0,
+     "total": "",
+     "amount": "",
+     "payEnabled": false,
+     "methodsBelow": false,
+     "payConfirm": false,
+     "paid": false,
+     "paidMethod": "",
+     "noRecords": false,
+     "filtered": false,
+     "__bottomBar": 128,
+     "__dialog": false
+    },
+    "visible": [
+     "fees.field",
+     "fees.filters",
+     "fees.query",
+     "fees.tab_input"
+    ],
+    "rects": {
+     "fees.tab_input": [
+      16,
+      48,
+      119.3,
+      24
+     ],
+     "fees.field": [
+      16,
+      343,
+      358,
+      48
+     ],
+     "fees.query": [
+      16,
+      772,
+      358,
+      48
+     ],
+     "fees.filters": [
+      16,
+      343,
+      358,
+      48
+     ]
+    }
+   },
+   "after": {
+    "path": "/fee-payment/detail/fee-9/",
+    "query": {},
+    "flags": {
+     "feeName": "聯合醫院醫療費",
+     "firstTab": "輸入資料",
+     "onInputTab": true,
+     "hasFields": true,
+     "filled": true,
+     "fieldKind": "",
+     "fieldName": "",
+     "fieldHint": "",
+     "fieldChoices": "",
+     "calendar": false,
+     "calTitle": "",
+     "calNav": false,
+     "searchTyped": false,
+     "searchResults": 0,
+     "noBill": false,
+     "alert": false,
+     "alertText": "",
+     "groupOpen": false,
+     "bills": 0,
+     "selected": 0,
+     "total": "",
+     "amount": "",
+     "payEnabled": false,
+     "methodsBelow": false,
+     "payConfirm": false,
+     "paid": false,
+     "paidMethod": "",
+     "noRecords": false,
+     "filtered": false,
+     "__bottomBar": 128,
+     "__dialog": false
+    },
+    "visible": [
+     "fees.filters",
+     "fees.query",
+     "fees.tab_input"
+    ],
+    "rects": {
+     "fees.tab_input": [
+      16,
+      48,
+      119.3,
+      24
+     ],
+     "fees.query": [
+      16,
+      772,
+      358,
+      48
+     ],
+     "fees.filters": [
+      16,
+      343,
+      358,
+      48
+     ]
+    }
+   },
+   "facts": {
+    "url": "/fee-payment/detail/fee-9/",
+    "title": "繳費項目",
+    "fields": [
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "tax_id",
+      "name": "",
+      "label": "證件號碼",
+      "placeholder": "請輸入證件號碼",
+      "value": "A123456789",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       131,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "",
+      "name": "",
+      "label": "範例：1912-01-01(含分隔符號)",
+      "placeholder": "",
+      "value": "1985-05-15",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       251,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "office",
+      "name": "",
+      "label": "院區",
+      "placeholder": "",
+      "value": "中興",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       343,
+       358,
+       48
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "payment_number",
+      "name": "",
+      "label": "繳費編號",
+      "placeholder": "請輸入繳費編號",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       406,
+       159,
+       358,
+       44
+      ]
+     }
+    ],
+    "starred": [],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "輸入資料",
+      "disabled": false,
+      "rect": [
+       16,
+       48,
+       119,
+       24
+      ]
+     },
+     {
+      "text": "繳費編號",
+      "disabled": false,
+      "rect": [
+       135,
+       48,
+       119,
+       24
+      ]
+     },
+     {
+      "text": "掃描",
+      "disabled": false,
+      "rect": [
+       255,
+       48,
+       119,
+       24
+      ]
+     },
+     {
+      "text": "查詢",
+      "disabled": false,
+      "rect": [
+       16,
+       772,
+       358,
+       48
+      ]
+     },
+     {
+      "text": "查詢",
+      "disabled": false,
+      "rect": [
+       406,
+       772,
+       358,
+       48
+      ]
+     }
+    ],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  },
+  {
+   "action": {
+    "step": "query_bill",
+    "do": "click",
+    "text": "查詢",
+    "within": ".tab-view",
+    "hit": {
+     "x": 195,
+     "y": 796,
+     "targets": [
+      "fees.query"
+     ]
+    }
+   },
+   "before": {
+    "path": "/fee-payment/detail/fee-9/",
+    "query": {},
+    "flags": {
+     "feeName": "聯合醫院醫療費",
+     "firstTab": "輸入資料",
+     "onInputTab": true,
+     "hasFields": true,
+     "filled": true,
+     "fieldKind": "",
+     "fieldName": "",
+     "fieldHint": "",
+     "fieldChoices": "",
+     "calendar": false,
+     "calTitle": "",
+     "calNav": false,
+     "searchTyped": false,
+     "searchResults": 0,
+     "noBill": false,
+     "alert": false,
+     "alertText": "",
+     "groupOpen": false,
+     "bills": 0,
+     "selected": 0,
+     "total": "",
+     "amount": "",
+     "payEnabled": false,
+     "methodsBelow": false,
+     "payConfirm": false,
+     "paid": false,
+     "paidMethod": "",
+     "noRecords": false,
+     "filtered": false,
+     "__bottomBar": 128,
+     "__dialog": false
+    },
+    "visible": [
+     "fees.filters",
+     "fees.query",
+     "fees.tab_input"
+    ],
+    "rects": {
+     "fees.tab_input": [
+      16,
+      48,
+      119.3,
+      24
+     ],
+     "fees.query": [
+      16,
+      772,
+      358,
+      48
+     ],
+     "fees.filters": [
+      16,
+      343,
+      358,
+      48
+     ]
+    }
+   },
+   "after": {
+    "path": "/fee-payment/result/fee-9",
+    "query": {},
+    "flags": {
+     "feeName": "",
+     "firstTab": "",
+     "onInputTab": false,
+     "hasFields": false,
+     "filled": false,
+     "fieldKind": "",
+     "fieldName": "",
+     "fieldHint": "",
+     "fieldChoices": "",
+     "calendar": false,
+     "calTitle": "",
+     "calNav": false,
+     "searchTyped": false,
+     "searchResults": 0,
+     "noBill": true,
+     "alert": false,
+     "alertText": "",
+     "groupOpen": false,
+     "bills": 0,
+     "selected": 0,
+     "total": "",
+     "amount": "",
+     "payEnabled": false,
+     "methodsBelow": false,
+     "payConfirm": false,
+     "paid": false,
+     "paidMethod": "",
+     "noRecords": false,
+     "filtered": false,
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "fees.no_bill"
+    ],
+    "rects": {
+     "fees.no_bill": [
+      32,
+      220,
+      326,
+      72
+     ]
+    }
+   },
+   "facts": {
+    "url": "/fee-payment/result/fee-9",
+    "title": "繳費項目",
+    "fields": [],
+    "starred": [],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "回到城市通",
+      "disabled": false,
+      "rect": [
+       114,
+       332,
+       163,
        48
       ]
      }

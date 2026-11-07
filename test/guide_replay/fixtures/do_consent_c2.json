@@ -1,6 +1,6 @@
 {
  "name": "do_consent_c2",
- "description": "臺北市性侵害被害人補助 (districtOffice.form.c-2, opened like the app), goal consent: the user fills the form as the cards say, presses 下一步, scrolls through 個人資料是否提供給承辦員, picks 不同意.",
+ "description": "臺北市性侵害被害人補助 (districtOffice.form.c-2, opened like the app), goal consent: the user fills the form as the cards say, presses 下一步 (同意 is pre-selected), scrolls through 個人資料是否提供給承辦員, picks 不同意 (送出 turns disabled; the done card says so), picks 同意 again, presses 送出 and 確認.",
  "page": "district_office",
  "start": null,
  "capability": "districtOffice.form.c-2",
@@ -10,8 +10,8 @@
  "expect": {
   "done": true
  },
- "recordedAt": "2026-11-07T18:26:34.115Z",
- "durationMs": 21191,
+ "recordedAt": "2026-11-07T18:59:05.987Z",
+ "durationMs": 24493,
  "viewport": {
   "width": 390,
   "height": 844,
@@ -64,6 +64,7 @@
      "consentChoice": "",
      "submitted": false,
      "consentRead": false,
+     "consentNo": false,
      "situation": "",
      "activeCount": null,
      "closedCount": null,
@@ -485,6 +486,7 @@
      "consentChoice": "",
      "submitted": false,
      "consentRead": false,
+     "consentNo": false,
      "situation": "",
      "activeCount": null,
      "closedCount": null,
@@ -591,6 +593,7 @@
      "consentChoice": "",
      "submitted": false,
      "consentRead": false,
+     "consentNo": false,
      "situation": "",
      "activeCount": null,
      "closedCount": null,
@@ -1012,6 +1015,7 @@
      "consentChoice": "",
      "submitted": false,
      "consentRead": false,
+     "consentNo": false,
      "situation": "",
      "activeCount": null,
      "closedCount": null,
@@ -1118,6 +1122,7 @@
      "consentChoice": "",
      "submitted": false,
      "consentRead": false,
+     "consentNo": false,
      "situation": "",
      "activeCount": null,
      "closedCount": null,
@@ -1539,6 +1544,7 @@
      "consentChoice": "",
      "submitted": false,
      "consentRead": false,
+     "consentNo": false,
      "situation": "",
      "activeCount": null,
      "closedCount": null,
@@ -1645,6 +1651,7 @@
      "consentChoice": "",
      "submitted": false,
      "consentRead": false,
+     "consentNo": false,
      "situation": "",
      "activeCount": null,
      "closedCount": null,
@@ -2066,6 +2073,7 @@
      "consentChoice": "",
      "submitted": false,
      "consentRead": false,
+     "consentNo": false,
      "situation": "",
      "activeCount": null,
      "closedCount": null,
@@ -2172,6 +2180,7 @@
      "consentChoice": "",
      "submitted": false,
      "consentRead": false,
+     "consentNo": false,
      "situation": "",
      "activeCount": null,
      "closedCount": null,
@@ -2586,6 +2595,7 @@
      "consentChoice": "",
      "submitted": false,
      "consentRead": false,
+     "consentNo": false,
      "situation": "",
      "activeCount": null,
      "closedCount": null,
@@ -2685,6 +2695,7 @@
      "consentChoice": "",
      "submitted": false,
      "consentRead": false,
+     "consentNo": false,
      "situation": "",
      "activeCount": null,
      "closedCount": null,
@@ -3099,6 +3110,7 @@
      "consentChoice": "",
      "submitted": false,
      "consentRead": false,
+     "consentNo": false,
      "situation": "",
      "activeCount": null,
      "closedCount": null,
@@ -3198,6 +3210,7 @@
      "consentChoice": "",
      "submitted": false,
      "consentRead": false,
+     "consentNo": false,
      "situation": "",
      "activeCount": null,
      "closedCount": null,
@@ -3612,6 +3625,7 @@
      "consentChoice": "",
      "submitted": false,
      "consentRead": false,
+     "consentNo": false,
      "situation": "",
      "activeCount": null,
      "closedCount": null,
@@ -3711,6 +3725,7 @@
      "consentChoice": "",
      "submitted": false,
      "consentRead": false,
+     "consentNo": false,
      "situation": "",
      "activeCount": null,
      "closedCount": null,
@@ -4186,6 +4201,7 @@
      "consentChoice": "",
      "submitted": false,
      "consentRead": false,
+     "consentNo": false,
      "situation": "",
      "activeCount": null,
      "closedCount": null,
@@ -4299,6 +4315,7 @@
      "consentChoice": "",
      "submitted": false,
      "consentRead": false,
+     "consentNo": false,
      "situation": "",
      "activeCount": null,
      "closedCount": null,
@@ -4743,6 +4760,7 @@
      "consentChoice": "",
      "submitted": false,
      "consentRead": false,
+     "consentNo": false,
      "situation": "",
      "activeCount": null,
      "closedCount": null,
@@ -4842,6 +4860,7 @@
      "consentChoice": "",
      "submitted": false,
      "consentRead": false,
+     "consentNo": false,
      "situation": "",
      "activeCount": null,
      "closedCount": null,
@@ -5240,6 +5259,7 @@
      "consentChoice": "",
      "submitted": false,
      "consentRead": false,
+     "consentNo": false,
      "situation": "",
      "activeCount": null,
      "closedCount": null,
@@ -5332,6 +5352,7 @@
      "consentChoice": "",
      "submitted": false,
      "consentRead": false,
+     "consentNo": false,
      "situation": "",
      "activeCount": null,
      "closedCount": null,
@@ -5731,6 +5752,7 @@
      "consentChoice": "",
      "submitted": false,
      "consentRead": false,
+     "consentNo": false,
      "situation": "",
      "activeCount": null,
      "closedCount": null,
@@ -5844,6 +5866,7 @@
      "consentChoice": "",
      "submitted": false,
      "consentRead": false,
+     "consentNo": false,
      "situation": "",
      "activeCount": null,
      "closedCount": null,
@@ -6263,6 +6286,7 @@
      "consentChoice": "",
      "submitted": false,
      "consentRead": false,
+     "consentNo": false,
      "situation": "",
      "activeCount": null,
      "closedCount": null,
@@ -6376,6 +6400,7 @@
      "consentChoice": "",
      "submitted": false,
      "consentRead": false,
+     "consentNo": false,
      "situation": "",
      "activeCount": null,
      "closedCount": null,
@@ -6796,6 +6821,7 @@
      "consentChoice": "",
      "submitted": false,
      "consentRead": false,
+     "consentNo": false,
      "situation": "",
      "activeCount": null,
      "closedCount": null,
@@ -6909,6 +6935,7 @@
      "consentChoice": "",
      "submitted": false,
      "consentRead": false,
+     "consentNo": false,
      "situation": "",
      "activeCount": null,
      "closedCount": null,
@@ -7646,6 +7673,7 @@
      "consentChoice": "",
      "submitted": false,
      "consentRead": false,
+     "consentNo": false,
      "situation": "",
      "activeCount": null,
      "closedCount": null,
@@ -7766,6 +7794,7 @@
      "consentChoice": "",
      "submitted": false,
      "consentRead": false,
+     "consentNo": false,
      "situation": "",
      "activeCount": null,
      "closedCount": null,
@@ -8171,6 +8200,7 @@
      "consentChoice": "",
      "submitted": false,
      "consentRead": false,
+     "consentNo": false,
      "situation": "",
      "activeCount": null,
      "closedCount": null,
@@ -8270,6 +8300,7 @@
      "consentChoice": "同意",
      "submitted": false,
      "consentRead": true,
+     "consentNo": false,
      "situation": "",
      "activeCount": null,
      "closedCount": null,
@@ -8454,6 +8485,7 @@
      "consentChoice": "同意",
      "submitted": false,
      "consentRead": true,
+     "consentNo": false,
      "situation": "",
      "activeCount": null,
      "closedCount": null,
@@ -8560,6 +8592,7 @@
      "consentChoice": "同意",
      "submitted": false,
      "consentRead": true,
+     "consentNo": false,
      "situation": "",
      "activeCount": null,
      "closedCount": null,
@@ -8750,6 +8783,7 @@
      "consentChoice": "同意",
      "submitted": false,
      "consentRead": true,
+     "consentNo": false,
      "situation": "",
      "activeCount": null,
      "closedCount": null,
@@ -8856,6 +8890,7 @@
      "consentChoice": "不同意",
      "submitted": false,
      "consentRead": true,
+     "consentNo": true,
      "situation": "",
      "activeCount": null,
      "closedCount": null,
@@ -8990,6 +9025,958 @@
     "disabledButtons": [
      "送出"
     ],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  },
+  {
+   "action": {
+    "step": "done",
+    "do": "click",
+    "text": "同意",
+    "hit": {
+     "x": 46,
+     "y": 728,
+     "targets": [
+      "district.consent"
+     ]
+    }
+   },
+   "before": {
+    "path": "/form/c-2",
+    "query": {},
+    "flags": {
+     "tab": "",
+     "query": "",
+     "groupCount": 0,
+     "itemCount": 0,
+     "firstItem": "",
+     "noResult": false,
+     "step1": false,
+     "step2": true,
+     "formSeen": true,
+     "basicKind": "",
+     "basicName": "",
+     "basicHint": "",
+     "basicChoices": "",
+     "basicOpts": 0,
+     "basicOpen": true,
+     "basicTyping": false,
+     "serviceKind": "",
+     "serviceName": "",
+     "serviceHint": "",
+     "serviceChoices": "",
+     "serviceOpts": 0,
+     "serviceOpen": true,
+     "serviceTyping": false,
+     "multiEmpty": false,
+     "multiName": "",
+     "dateEmpty": false,
+     "dateName": "",
+     "itemsDialog": false,
+     "itemsTicked": 0,
+     "itemsChoices": "",
+     "calendar": false,
+     "calTitle": "",
+     "warn": "",
+     "consentChoice": "不同意",
+     "submitted": false,
+     "consentRead": true,
+     "consentNo": true,
+     "situation": "",
+     "activeCount": null,
+     "closedCount": null,
+     "caseCount": 0,
+     "firstCase": "",
+     "firstStatus": "",
+     "pos.district.tab_apply": "",
+     "pos.district.tab_query": "",
+     "pos.district.search": "",
+     "pos.district.groups": "",
+     "pos.district.items": "",
+     "pos.district.basic_head": "",
+     "pos.district.service_head": "",
+     "pos.district.basic_field": "",
+     "pos.district.service_field": "",
+     "pos.district.multi_field": "",
+     "pos.district.date_field": "",
+     "pos.district.item_options": "",
+     "pos.district.item_ok": "",
+     "pos.district.calendar": "",
+     "pos.district.next": "",
+     "pos.district.prev": "",
+     "pos.district.consent_text": "644,708,in",
+     "pos.district.consent": "716,740,in",
+     "pos.district.edit": "756,806,in",
+     "pos.district.submit": "756,806,in",
+     "pos.district.ok": "",
+     "pos.district.situation": "",
+     "pos.district.cases": "",
+     "pos.district.closed_tab": "",
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "district.consent",
+     "district.consent_text",
+     "district.edit",
+     "district.submit"
+    ],
+    "rects": {
+     "district.consent_text": [
+      16,
+      644,
+      358,
+      64
+     ],
+     "district.consent": [
+      16,
+      716,
+      152,
+      24
+     ],
+     "district.edit": [
+      16,
+      756,
+      175,
+      50
+     ],
+     "district.submit": [
+      199,
+      756,
+      175,
+      50
+     ]
+    }
+   },
+   "after": {
+    "path": "/form/c-2",
+    "query": {},
+    "flags": {
+     "tab": "",
+     "query": "",
+     "groupCount": 0,
+     "itemCount": 0,
+     "firstItem": "",
+     "noResult": false,
+     "step1": false,
+     "step2": true,
+     "formSeen": true,
+     "basicKind": "",
+     "basicName": "",
+     "basicHint": "",
+     "basicChoices": "",
+     "basicOpts": 0,
+     "basicOpen": true,
+     "basicTyping": false,
+     "serviceKind": "",
+     "serviceName": "",
+     "serviceHint": "",
+     "serviceChoices": "",
+     "serviceOpts": 0,
+     "serviceOpen": true,
+     "serviceTyping": false,
+     "multiEmpty": false,
+     "multiName": "",
+     "dateEmpty": false,
+     "dateName": "",
+     "itemsDialog": false,
+     "itemsTicked": 0,
+     "itemsChoices": "",
+     "calendar": false,
+     "calTitle": "",
+     "warn": "",
+     "consentChoice": "同意",
+     "submitted": false,
+     "consentRead": true,
+     "consentNo": false,
+     "situation": "",
+     "activeCount": null,
+     "closedCount": null,
+     "caseCount": 0,
+     "firstCase": "",
+     "firstStatus": "",
+     "pos.district.tab_apply": "",
+     "pos.district.tab_query": "",
+     "pos.district.search": "",
+     "pos.district.groups": "",
+     "pos.district.items": "",
+     "pos.district.basic_head": "",
+     "pos.district.service_head": "",
+     "pos.district.basic_field": "",
+     "pos.district.service_field": "",
+     "pos.district.multi_field": "",
+     "pos.district.date_field": "",
+     "pos.district.item_options": "",
+     "pos.district.item_ok": "",
+     "pos.district.calendar": "",
+     "pos.district.next": "",
+     "pos.district.prev": "",
+     "pos.district.consent_text": "644,708,in",
+     "pos.district.consent": "716,740,in",
+     "pos.district.edit": "756,806,in",
+     "pos.district.submit": "756,806,in",
+     "pos.district.ok": "",
+     "pos.district.situation": "",
+     "pos.district.cases": "",
+     "pos.district.closed_tab": "",
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "district.consent",
+     "district.consent_text",
+     "district.edit",
+     "district.submit"
+    ],
+    "rects": {
+     "district.consent_text": [
+      16,
+      644,
+      358,
+      64
+     ],
+     "district.consent": [
+      16,
+      716,
+      152,
+      24
+     ],
+     "district.edit": [
+      16,
+      756,
+      175,
+      50
+     ],
+     "district.submit": [
+      199,
+      756,
+      175,
+      50
+     ]
+    }
+   },
+   "facts": {
+    "url": "/form/c-2",
+    "title": "申辦服務",
+    "fields": [
+     {
+      "tag": "input",
+      "type": "radio",
+      "id": "isAgreeY",
+      "name": "isAgree",
+      "label": "同意",
+      "placeholder": "",
+      "value": "checked",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       716,
+       0,
+       0
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "radio",
+      "id": "isAgreeN",
+      "name": "isAgree",
+      "label": "不同意",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       92,
+       716,
+       0,
+       0
+      ]
+     }
+    ],
+    "starred": [],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "修改",
+      "disabled": false,
+      "rect": [
+       16,
+       756,
+       175,
+       50
+      ]
+     },
+     {
+      "text": "送出",
+      "disabled": false,
+      "rect": [
+       199,
+       756,
+       175,
+       50
+      ]
+     }
+    ],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  },
+  {
+   "action": {
+    "step": "done",
+    "do": "click",
+    "text": "送出",
+    "hit": {
+     "x": 287,
+     "y": 781,
+     "targets": [
+      "district.submit"
+     ]
+    }
+   },
+   "before": {
+    "path": "/form/c-2",
+    "query": {},
+    "flags": {
+     "tab": "",
+     "query": "",
+     "groupCount": 0,
+     "itemCount": 0,
+     "firstItem": "",
+     "noResult": false,
+     "step1": false,
+     "step2": true,
+     "formSeen": true,
+     "basicKind": "",
+     "basicName": "",
+     "basicHint": "",
+     "basicChoices": "",
+     "basicOpts": 0,
+     "basicOpen": true,
+     "basicTyping": false,
+     "serviceKind": "",
+     "serviceName": "",
+     "serviceHint": "",
+     "serviceChoices": "",
+     "serviceOpts": 0,
+     "serviceOpen": true,
+     "serviceTyping": false,
+     "multiEmpty": false,
+     "multiName": "",
+     "dateEmpty": false,
+     "dateName": "",
+     "itemsDialog": false,
+     "itemsTicked": 0,
+     "itemsChoices": "",
+     "calendar": false,
+     "calTitle": "",
+     "warn": "",
+     "consentChoice": "同意",
+     "submitted": false,
+     "consentRead": true,
+     "consentNo": false,
+     "situation": "",
+     "activeCount": null,
+     "closedCount": null,
+     "caseCount": 0,
+     "firstCase": "",
+     "firstStatus": "",
+     "pos.district.tab_apply": "",
+     "pos.district.tab_query": "",
+     "pos.district.search": "",
+     "pos.district.groups": "",
+     "pos.district.items": "",
+     "pos.district.basic_head": "",
+     "pos.district.service_head": "",
+     "pos.district.basic_field": "",
+     "pos.district.service_field": "",
+     "pos.district.multi_field": "",
+     "pos.district.date_field": "",
+     "pos.district.item_options": "",
+     "pos.district.item_ok": "",
+     "pos.district.calendar": "",
+     "pos.district.next": "",
+     "pos.district.prev": "",
+     "pos.district.consent_text": "644,708,in",
+     "pos.district.consent": "716,740,in",
+     "pos.district.edit": "756,806,in",
+     "pos.district.submit": "756,806,in",
+     "pos.district.ok": "",
+     "pos.district.situation": "",
+     "pos.district.cases": "",
+     "pos.district.closed_tab": "",
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "district.consent",
+     "district.consent_text",
+     "district.edit",
+     "district.submit"
+    ],
+    "rects": {
+     "district.consent_text": [
+      16,
+      644,
+      358,
+      64
+     ],
+     "district.consent": [
+      16,
+      716,
+      152,
+      24
+     ],
+     "district.edit": [
+      16,
+      756,
+      175,
+      50
+     ],
+     "district.submit": [
+      199,
+      756,
+      175,
+      50
+     ]
+    }
+   },
+   "after": {
+    "path": "/form/c-2",
+    "query": {},
+    "flags": {
+     "tab": "",
+     "query": "",
+     "groupCount": 0,
+     "itemCount": 0,
+     "firstItem": "",
+     "noResult": false,
+     "step1": false,
+     "step2": true,
+     "formSeen": true,
+     "basicKind": "",
+     "basicName": "",
+     "basicHint": "",
+     "basicChoices": "",
+     "basicOpts": 0,
+     "basicOpen": true,
+     "basicTyping": false,
+     "serviceKind": "",
+     "serviceName": "",
+     "serviceHint": "",
+     "serviceChoices": "",
+     "serviceOpts": 0,
+     "serviceOpen": true,
+     "serviceTyping": false,
+     "multiEmpty": false,
+     "multiName": "",
+     "dateEmpty": false,
+     "dateName": "",
+     "itemsDialog": false,
+     "itemsTicked": 0,
+     "itemsChoices": "",
+     "calendar": false,
+     "calTitle": "",
+     "warn": "",
+     "consentChoice": "同意",
+     "submitted": true,
+     "consentRead": true,
+     "consentNo": false,
+     "situation": "",
+     "activeCount": null,
+     "closedCount": null,
+     "caseCount": 0,
+     "firstCase": "",
+     "firstStatus": "",
+     "pos.district.tab_apply": "",
+     "pos.district.tab_query": "",
+     "pos.district.search": "",
+     "pos.district.groups": "",
+     "pos.district.items": "",
+     "pos.district.basic_head": "",
+     "pos.district.service_head": "",
+     "pos.district.basic_field": "",
+     "pos.district.service_field": "",
+     "pos.district.multi_field": "",
+     "pos.district.date_field": "",
+     "pos.district.item_options": "",
+     "pos.district.item_ok": "",
+     "pos.district.calendar": "",
+     "pos.district.next": "",
+     "pos.district.prev": "",
+     "pos.district.consent_text": "644,708,in",
+     "pos.district.consent": "716,740,in",
+     "pos.district.edit": "756,806,in",
+     "pos.district.submit": "756,806,in",
+     "pos.district.ok": "461,493,in",
+     "pos.district.situation": "",
+     "pos.district.cases": "",
+     "pos.district.closed_tab": "",
+     "__bottomBar": 0,
+     "__dialog": true
+    },
+    "visible": [
+     "district.consent",
+     "district.consent_text",
+     "district.edit",
+     "district.ok",
+     "district.submit"
+    ],
+    "rects": {
+     "district.consent_text": [
+      16,
+      644,
+      358,
+      64
+     ],
+     "district.consent": [
+      16,
+      716,
+      152,
+      24
+     ],
+     "district.edit": [
+      16,
+      756,
+      175,
+      50
+     ],
+     "district.submit": [
+      199,
+      756,
+      175,
+      50
+     ],
+     "district.ok": [
+      39,
+      460.5,
+      156,
+      32
+     ]
+    }
+   },
+   "facts": {
+    "url": "/form/c-2",
+    "title": "申辦服務",
+    "fields": [
+     {
+      "tag": "input",
+      "type": "radio",
+      "id": "isAgreeY",
+      "name": "isAgree",
+      "label": "同意",
+      "placeholder": "",
+      "value": "checked",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       716,
+       0,
+       0
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "radio",
+      "id": "isAgreeN",
+      "name": "isAgree",
+      "label": "不同意",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       92,
+       716,
+       0,
+       0
+      ]
+     }
+    ],
+    "starred": [],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "修改",
+      "disabled": false,
+      "rect": [
+       16,
+       756,
+       175,
+       50
+      ]
+     },
+     {
+      "text": "送出",
+      "disabled": false,
+      "rect": [
+       199,
+       756,
+       175,
+       50
+      ]
+     },
+     {
+      "text": "確認",
+      "disabled": false,
+      "rect": [
+       39,
+       461,
+       156,
+       32
+      ]
+     },
+     {
+      "text": "前往查看",
+      "disabled": false,
+      "rect": [
+       195,
+       461,
+       156,
+       32
+      ]
+     }
+    ],
+    "disabledButtons": [],
+    "dialogs": [
+     "案件已完成申辦 後續處理相關訊息可至案件查詢 確認 前往查看"
+    ],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  },
+  {
+   "action": {
+    "step": "done",
+    "do": "click",
+    "text": "確認",
+    "hit": {
+     "x": 117,
+     "y": 477,
+     "targets": [
+      "district.ok"
+     ]
+    }
+   },
+   "before": {
+    "path": "/form/c-2",
+    "query": {},
+    "flags": {
+     "tab": "",
+     "query": "",
+     "groupCount": 0,
+     "itemCount": 0,
+     "firstItem": "",
+     "noResult": false,
+     "step1": false,
+     "step2": true,
+     "formSeen": true,
+     "basicKind": "",
+     "basicName": "",
+     "basicHint": "",
+     "basicChoices": "",
+     "basicOpts": 0,
+     "basicOpen": true,
+     "basicTyping": false,
+     "serviceKind": "",
+     "serviceName": "",
+     "serviceHint": "",
+     "serviceChoices": "",
+     "serviceOpts": 0,
+     "serviceOpen": true,
+     "serviceTyping": false,
+     "multiEmpty": false,
+     "multiName": "",
+     "dateEmpty": false,
+     "dateName": "",
+     "itemsDialog": false,
+     "itemsTicked": 0,
+     "itemsChoices": "",
+     "calendar": false,
+     "calTitle": "",
+     "warn": "",
+     "consentChoice": "同意",
+     "submitted": true,
+     "consentRead": true,
+     "consentNo": false,
+     "situation": "",
+     "activeCount": null,
+     "closedCount": null,
+     "caseCount": 0,
+     "firstCase": "",
+     "firstStatus": "",
+     "pos.district.tab_apply": "",
+     "pos.district.tab_query": "",
+     "pos.district.search": "",
+     "pos.district.groups": "",
+     "pos.district.items": "",
+     "pos.district.basic_head": "",
+     "pos.district.service_head": "",
+     "pos.district.basic_field": "",
+     "pos.district.service_field": "",
+     "pos.district.multi_field": "",
+     "pos.district.date_field": "",
+     "pos.district.item_options": "",
+     "pos.district.item_ok": "",
+     "pos.district.calendar": "",
+     "pos.district.next": "",
+     "pos.district.prev": "",
+     "pos.district.consent_text": "644,708,in",
+     "pos.district.consent": "716,740,in",
+     "pos.district.edit": "756,806,in",
+     "pos.district.submit": "756,806,in",
+     "pos.district.ok": "461,493,in",
+     "pos.district.situation": "",
+     "pos.district.cases": "",
+     "pos.district.closed_tab": "",
+     "__bottomBar": 0,
+     "__dialog": true
+    },
+    "visible": [
+     "district.consent",
+     "district.consent_text",
+     "district.edit",
+     "district.ok",
+     "district.submit"
+    ],
+    "rects": {
+     "district.consent_text": [
+      16,
+      644,
+      358,
+      64
+     ],
+     "district.consent": [
+      16,
+      716,
+      152,
+      24
+     ],
+     "district.edit": [
+      16,
+      756,
+      175,
+      50
+     ],
+     "district.submit": [
+      199,
+      756,
+      175,
+      50
+     ],
+     "district.ok": [
+      39,
+      460.5,
+      156,
+      32
+     ]
+    }
+   },
+   "after": {
+    "path": "/",
+    "query": {},
+    "flags": {
+     "tab": "申辦",
+     "query": "",
+     "groupCount": 2,
+     "itemCount": 0,
+     "firstItem": "",
+     "noResult": false,
+     "step1": false,
+     "step2": false,
+     "formSeen": false,
+     "basicKind": "",
+     "basicName": "",
+     "basicHint": "",
+     "basicChoices": "",
+     "basicOpts": 0,
+     "basicOpen": true,
+     "basicTyping": false,
+     "serviceKind": "",
+     "serviceName": "",
+     "serviceHint": "",
+     "serviceChoices": "",
+     "serviceOpts": 0,
+     "serviceOpen": true,
+     "serviceTyping": false,
+     "multiEmpty": false,
+     "multiName": "",
+     "dateEmpty": false,
+     "dateName": "",
+     "itemsDialog": false,
+     "itemsTicked": 0,
+     "itemsChoices": "",
+     "calendar": false,
+     "calTitle": "",
+     "warn": "",
+     "consentChoice": "",
+     "submitted": false,
+     "consentRead": false,
+     "consentNo": false,
+     "situation": "申辦中(2)",
+     "activeCount": 2,
+     "closedCount": 1,
+     "caseCount": 0,
+     "firstCase": "",
+     "firstStatus": "",
+     "pos.district.tab_apply": "8,32,in",
+     "pos.district.tab_query": "8,32,in",
+     "pos.district.search": "59,103,in",
+     "pos.district.groups": "159,243,in",
+     "pos.district.items": "",
+     "pos.district.basic_head": "",
+     "pos.district.service_head": "",
+     "pos.district.basic_field": "",
+     "pos.district.service_field": "",
+     "pos.district.multi_field": "",
+     "pos.district.date_field": "",
+     "pos.district.item_options": "",
+     "pos.district.item_ok": "",
+     "pos.district.calendar": "",
+     "pos.district.next": "",
+     "pos.district.prev": "",
+     "pos.district.consent_text": "",
+     "pos.district.consent": "",
+     "pos.district.edit": "",
+     "pos.district.submit": "",
+     "pos.district.ok": "",
+     "pos.district.situation": "",
+     "pos.district.cases": "",
+     "pos.district.closed_tab": "",
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "district.groups",
+     "district.search",
+     "district.tab_apply",
+     "district.tab_query"
+    ],
+    "rects": {
+     "district.tab_apply": [
+      16,
+      8,
+      179,
+      24
+     ],
+     "district.tab_query": [
+      195,
+      8,
+      179,
+      24
+     ],
+     "district.search": [
+      0,
+      59,
+      390,
+      44
+     ],
+     "district.groups": [
+      16,
+      159,
+      358,
+      84
+     ]
+    }
+   },
+   "facts": {
+    "url": "/",
+    "title": "申辦服務",
+    "fields": [
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "",
+      "name": "",
+      "label": "",
+      "placeholder": "您遇到哪些問題?",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       59,
+       314,
+       44
+      ]
+     }
+    ],
+    "starred": [],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "申辦",
+      "disabled": false,
+      "rect": [
+       16,
+       8,
+       179,
+       24
+      ]
+     },
+     {
+      "text": "查詢",
+      "disabled": false,
+      "rect": [
+       195,
+       8,
+       179,
+       24
+      ]
+     },
+     {
+      "text": "申訴類",
+      "disabled": false,
+      "rect": [
+       16,
+       159,
+       358,
+       24
+      ]
+     },
+     {
+      "text": "補助類",
+      "disabled": false,
+      "rect": [
+       16,
+       219,
+       358,
+       24
+      ]
+     },
+     {
+      "text": "申辦中(2)",
+      "disabled": false,
+      "rect": [
+       406,
+       59,
+       179,
+       30
+      ]
+     },
+     {
+      "text": "已結案(1)",
+      "disabled": false,
+      "rect": [
+       585,
+       59,
+       179,
+       30
+      ]
+     }
+    ],
+    "disabledButtons": [],
     "dialogs": [],
     "scrollY": 0,
     "scrollHeight": 844

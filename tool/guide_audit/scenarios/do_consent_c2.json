@@ -1,6 +1,6 @@
 {
   "name": "do_consent_c2",
-  "description": "臺北市性侵害被害人補助 (districtOffice.form.c-2, opened like the app), goal consent: the user fills the form as the cards say, presses 下一步, scrolls through 個人資料是否提供給承辦員, picks 不同意.",
+  "description": "臺北市性侵害被害人補助 (districtOffice.form.c-2, opened like the app), goal consent: the user fills the form as the cards say, presses 下一步 (同意 is pre-selected), scrolls through 個人資料是否提供給承辦員, picks 不同意 (送出 turns disabled; the done card says so), picks 同意 again, presses 送出 and 確認.",
   "page": "district_office",
   "capability": "districtOffice.form.c-2",
   "goals": [
@@ -103,6 +103,21 @@
       "step": "consent",
       "do": "click",
       "text": "不同意"
+    },
+    {
+      "step": "done",
+      "do": "click",
+      "text": "同意"
+    },
+    {
+      "step": "done",
+      "do": "click",
+      "text": "送出"
+    },
+    {
+      "step": "done",
+      "do": "click",
+      "text": "確認"
     }
   ]
 }

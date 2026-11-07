@@ -8,8 +8,8 @@
  "expect": {
   "done": true
  },
- "recordedAt": "2026-11-07T18:23:12.425Z",
- "durationMs": 3075,
+ "recordedAt": "2026-11-07T18:56:22.316Z",
+ "durationMs": 3456,
  "viewport": {
   "width": 390,
   "height": 844,
@@ -31,6 +31,16 @@
      "unitCount": 0,
      "unitsBelow": false,
      "favorites": 0,
+     "favAtLeast1": false,
+     "favAtLeast2": false,
+     "favAtLeast3": false,
+     "favAtLeast4": false,
+     "favAtLeast5": false,
+     "favAtLeast6": false,
+     "favAtLeast7": false,
+     "favAtLeast8": false,
+     "favAtLeast9": false,
+     "favAtLeast10": false,
      "favNames": "",
      "unitName": "區公所",
      "location": "c-3-2",

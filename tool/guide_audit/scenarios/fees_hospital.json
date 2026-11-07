@@ -1,11 +1,11 @@
 {
   "name": "fees_hospital",
-  "description": "fees.hospital (fee-9) default goal, following the cards literally: 證件號碼 (test A123456789), then the card says type 「1912-01-01」 into the 出生日期 box, but it is a readonly date picker (typing does nothing; tapping opens a calendar on the current month).",
+  "description": "fees.hospital (fee-9) default goal, following the cards: 證件號碼 (test A123456789), then 出生日期 (a readonly date picker): tap the box, tap the calendar title (月份 年份), tap the year, go back with the left arrow to 1980-1991, pick 1985, 5月, day 15; 院區; 查詢: no bills in the demo, done card 目前查無待繳帳單.",
   "page": "fees",
   "capability": "fees.hospital",
   "goals": [],
   "expect": {
-    "done": false
+    "done": true
   },
   "actions": [
     {
@@ -16,9 +16,63 @@
     },
     {
       "step": "enter_number",
-      "do": "type",
-      "selector": ".tab-view input[readonly]",
-      "value": "1912-01-01"
+      "do": "click",
+      "selector": ".tab-view input[readonly]"
+    },
+    {
+      "step": "enter_number",
+      "do": "click",
+      "selector": "button.vc-title"
+    },
+    {
+      "step": "enter_number",
+      "do": "click",
+      "selector": "button.vc-nav-title"
+    },
+    {
+      "step": "enter_number",
+      "do": "click",
+      "selector": "button.vc-nav-arrow.is-left"
+    },
+    {
+      "step": "enter_number",
+      "do": "click",
+      "selector": "button.vc-nav-arrow.is-left"
+    },
+    {
+      "step": "enter_number",
+      "do": "click",
+      "selector": "button.vc-nav-arrow.is-left"
+    },
+    {
+      "step": "enter_number",
+      "do": "click",
+      "text": "1985",
+      "within": ".vc-nav-container"
+    },
+    {
+      "step": "enter_number",
+      "do": "click",
+      "text": "5月",
+      "within": ".vc-nav-container"
+    },
+    {
+      "step": "enter_number",
+      "do": "click",
+      "text": "15",
+      "within": ".vc-popover-content-wrapper"
+    },
+    {
+      "step": "enter_number",
+      "do": "select",
+      "selector": "#office",
+      "value": "中興"
+    },
+    {
+      "step": "query_bill",
+      "do": "click",
+      "text": "查詢",
+      "within": ".tab-view"
     }
   ]
 }

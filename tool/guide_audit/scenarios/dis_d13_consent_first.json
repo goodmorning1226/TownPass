@@ -1,6 +1,6 @@
 {
   "name": "dis_d13_consent_first",
-  "description": "DIS-4: on the describe_disaster card the user taps the consent box (an alsoUsable target of that step) instead of a 災情描述 box; the step finishes, nothing is ticked, 送出 answers 至少勾選一項.",
+  "description": "DIS-4: on the describe_disaster card the user ticks the consent box first; the step stays (nothing described yet), the user then ticks 道路 and sends.",
   "page": "disaster_report",
   "capability": "disasterReport.form.D-1-3",
   "goals": [],
@@ -20,9 +20,19 @@
       "text": "提供個人資料給承辦人員"
     },
     {
+      "step": "describe_disaster",
+      "do": "check",
+      "text": "道路"
+    },
+    {
       "step": "send_report",
       "do": "click",
       "text": "送出"
+    },
+    {
+      "step": "done",
+      "do": "click",
+      "text": "確認"
     }
   ]
 }

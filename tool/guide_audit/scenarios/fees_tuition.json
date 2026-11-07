@@ -1,11 +1,11 @@
 {
   "name": "fees_tuition",
-  "description": "fees.tuition default goal: fill the form as the cards say, 查詢. The demo has no bills for fee-7 (目前查無…待繳帳單).",
+  "description": "fees.tuition default goal: fill the form as the cards say, 查詢. The demo has no bills for fee-7 (目前查無…待繳帳單). The guide ends on a non-success done card (目前查無待繳帳單) ringing the message.",
   "page": "fees",
   "capability": "fees.tuition",
   "goals": [],
   "expect": {
-    "done": false
+    "done": true
   },
   "actions": [
     {

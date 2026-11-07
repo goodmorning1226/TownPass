@@ -1,0 +1,69 @@
+{
+  "name": "cc_goal_remove_favorite_edit",
+  "description": "reservation, goals add_favorite + remove_favorite: add on the unit page, go back to the home list, open 變更 and press 移除地點 with nothing ticked (nothing removed: not done), then 變更 → tick → 移除地點.",
+  "page": "counter_calling",
+  "capability": "reservation",
+  "goals": [
+    "add_favorite",
+    "remove_favorite"
+  ],
+  "expect": {
+    "done": true
+  },
+  "actions": [
+    {
+      "step": "pick_unit",
+      "do": "click",
+      "text": "區公所"
+    },
+    {
+      "step": "pick_location",
+      "do": "click",
+      "selector": "select.base-select"
+    },
+    {
+      "step": "pick_location",
+      "do": "select",
+      "selector": "select.base-select",
+      "value": "c-3-2"
+    },
+    {
+      "step": "pick_location",
+      "do": "blur"
+    },
+    {
+      "step": "add_favorite",
+      "do": "click",
+      "text": "加入常用"
+    },
+    {
+      "step": "remove_favorite",
+      "do": "back"
+    },
+    {
+      "step": "remove_favorite",
+      "do": "click",
+      "text": "變更"
+    },
+    {
+      "step": "remove_favorite",
+      "do": "click",
+      "text": "移除地點"
+    },
+    {
+      "step": "remove_favorite",
+      "do": "click",
+      "text": "變更"
+    },
+    {
+      "step": "remove_favorite",
+      "do": "click",
+      "selector": "label.edit-regularly-used-wrapper"
+    },
+    {
+      "step": "remove_favorite",
+      "do": "click",
+      "text": "移除地點"
+    }
+  ]
+}

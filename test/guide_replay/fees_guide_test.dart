@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:town_pass/page/guided_assistant/web/web_page_state.dart';
 
 import 'replay.dart';
 
@@ -12,6 +13,12 @@ Map<String, dynamic> _step(String name, int i) {
 
 Map<String, dynamic> _flags(String name, int i) =>
     (_step(name, i)['after'] as Map)['flags'] as Map<String, dynamic>;
+
+/// The page state right after step [i] of fixture [name].
+WebPageState stateAt(String name, int i) => WebPageState()
+  ..snapshot.value = snapshotOf(
+    _step(name, i)['after'] as Map<String, dynamic>,
+  );
 
 void main() {
   // Flows the guide carries to its done card (regression tests).
@@ -47,89 +54,67 @@ void main() {
     },
   );
 
-  // FEE-1: 聯醫 出生日期 is a readonly date picker; the card says type it.
+  // FEE-1: 聯醫 出生日期 is a readonly date picker (a calendar opens).
   group('FEE-1 出生日期 date picker', () {
-    test('page facts: typing does nothing, only the calendar fills it', () {
-      expect(
-        _flags('fees_hospital', -1)['fieldHint'],
-        startsWith('範例：1912-01-01'),
-      );
-      final fields =
-          (_step('fees_hospital', -1)['facts'] as Map)['fields'] as List;
-      final date = fields.cast<Map>().firstWhere(
-        (f) => '${f['label']}'.startsWith('範例'),
-      );
-      expect(date['value'], isEmpty);
-      final r = replayFixture('fees_hospital');
-      expect(r.trace.last, contains('照這個樣子打：「1912-01-01」'));
+    test('page facts: 出生日期 is filled only from the calendar', () {
+      final f = _flags('fees_hospital', 1);
+      expect(f['fieldKind'], 'date');
+      expect(f['fieldName'], '出生日期');
+      expect(f['fieldHint'], startsWith('範例：1912-01-01'));
     });
-    test('control: picking a day in the calendar goes on to 院區 and 查詢', () {
+    test('following only the cards fills 出生日期 and reaches the result', () {
+      final r = replayFixture('fees_hospital');
+      printOnFailure(r.report);
+      expect(r.problems, isEmpty);
+      expect(r.trace[1], contains('點一下「出生日期」的框框，會跳出月曆'));
+      expect(r.trace[1], contains('選擇'));
+      expect(r.trace.every((l) => !l.contains('照這個樣子打')), isTrue);
+      expect(r.trace.any((l) => l.contains('按左右的箭頭換年份')), isTrue);
+      expect(r.trace.any((l) => l.contains('點一下「院區」')), isTrue);
+      expect(r.done, isTrue);
+    });
+    test('control: picking a day of this month also works', () {
       final r = replayFixture('fees_hospital_calendar');
       printOnFailure(r.report);
+      expect(r.problems, isEmpty);
       expect(r.trace.any((l) => l.contains('點一下「院區」')), isTrue);
-      expect(r.trace.last, contains('這次沒有查到要繳的帳單'));
     });
-    test(
-      'following only the cards fills 出生日期',
-      () {
-        final r = replayFixture('fees_hospital');
-        printOnFailure(r.report);
-        expect(r.trace.last, isNot(contains('照這個樣子打')));
-        expect(r.trace.last, contains('月曆'));
-      },
-      skip:
-          'FEE-1: enter_number treats the readonly date picker as a text box '
-          'and never names 出生日期.',
-    );
   });
 
-  // FEE-2: 「範例：0910999999，不含分隔符號」 becomes 「中間的符號也要打」.
+  // FEE-2: 「範例：0910999999，不含分隔符號」.
   group('FEE-2 不含分隔符號 hint', () {
-    test('page facts: the card contradicts the hint', () {
-      final r = replayFixture('fees_other_company');
+    test('page facts: the hint forbids separators', () {
       expect(_flags('fees_other_company', 2)['fieldHint'], contains('不含分隔符號'));
-      expect(r.trace[2], contains('中間的符號也要打'));
     });
     test('the card does not ask for separators the page forbids', () {
       final r = replayFixture('fees_other_company');
+      printOnFailure(r.report);
+      expect(r.trace[2], contains('照這個樣子打：「0910999999」'));
+      expect(r.trace[2], contains('不要打 - 或空白'));
       expect(r.trace[2], isNot(contains('中間的符號也要打')));
-      expect(r.trace[2], isNot(contains('，不含分隔符號」')));
-    }, skip: 'FEE-2: _fieldCard checks hint.contains(分隔符號), not 不含.');
+    });
   });
 
   // FEE-3 / FEE-4: pick_fee on /fee-payment/search and /fee-payment/scan.
   group('FEE-3/4 pick_fee off the list', () {
-    test(
-      'page facts: search and scan pages leave pick_fee dimmed with no target',
-      () {
-        final s = replayFixture('fees_other_search');
-        expect(
-          s.problems.where((p) => p.contains('not on screen')),
-          isNotEmpty,
-        );
-        expect(s.done, isTrue, reason: 'the search result still reaches 水費');
-        final t = replayFixture('fees_other_tax');
-        expect(
-          _step('fees_other_tax', -1)['after']['path'],
-          '/fee-payment/scan',
-        );
-        expect(t.problems.single, contains('fees.fee_groups is not on screen'));
-      },
-    );
     test('fees.other via the search box (the detail text suggests it)', () {
       final r = replayFixture('fees_other_search');
       printOnFailure(r.report);
+      // 超商 etc. are the 水費 page's own red notes (harness false positive).
       expect(r.problems.where((p) => !p.contains('超商')), isEmpty);
-    }, skip: 'FEE-3: pick_fee has no state for /fee-payment/search.');
-    test(
-      'fees.other: 地方稅 (scan only) gets a card that fits the scan page',
-      () {
-        final r = replayFixture('fees_other_tax');
-        printOnFailure(r.report);
-        expect(r.problems, isEmpty);
-      },
-      skip: 'FEE-4: on /fee-payment/scan pick_fee points at the missing list.',
-    );
+      expect(r.trace[1], contains('打費用名稱'));
+      expect(r.trace[1], contains('fees.search_box'));
+      expect(r.done, isTrue);
+    });
+    test('fees.other: 地方稅 (scan only) gets a card that fits the scan page', () {
+      final r = replayFixture('fees_other_tax');
+      printOnFailure(r.report);
+      expect(_step('fees_other_tax', -1)['after']['path'], '/fee-payment/scan');
+      expect(r.problems, isEmpty);
+      expect(r.trace.last, contains('地方稅要用相機掃描帳單'));
+      expect(r.trace.last, isNot(contains('(locked)')));
+      expect(r.done, isFalse);
+    });
   });
 
   // FEE-5: the demo has no bills for these fees (目前查無…待繳帳單).
@@ -141,13 +126,23 @@ void main() {
       'fees_course',
       'fees_other_company',
       'fees_hospital_calendar',
+      'fees_hospital',
     ]) {
-      test('page facts: $name finds no bill; card says go back', () {
+      test('$name: no bill ends the guide without a payment', () {
         final r = replayFixture(name);
         printOnFailure(r.report);
-        expect(_flags(name, -1)['bills'], 0);
-        expect(r.trace.last, contains('這次沒有查到要繳的帳單'));
-        expect(r.done, isFalse);
+        final f = _flags(name, -1);
+        expect(f['bills'], 0);
+        expect(f['noBill'], isTrue);
+        expect(f['paid'], isFalse);
+        expect(r.problems, isEmpty);
+        expect(r.done, isTrue);
+        expect(r.trace.last, contains('DONE — 畫面寫「目前查無待繳帳單」'));
+        final g = guideFor(loadFixture(name));
+        final s = stateAt(name, -1);
+        expect(g.doneLabelOf!(s), '沒有待繳帳單');
+        expect(g.doneTargetOf!(s), 'fees.no_bill');
+        expect(s.now.shows('fees.no_bill'), isTrue);
       });
     }
   });

@@ -11,8 +11,8 @@
  "expect": {
   "done": true
  },
- "recordedAt": "2026-11-07T18:24:18.105Z",
- "durationMs": 9966,
+ "recordedAt": "2026-11-07T19:01:21.147Z",
+ "durationMs": 9311,
  "viewport": {
   "width": 390,
   "height": 844,
@@ -42,6 +42,10 @@
      "notReservable": false,
      "dialogOpen": false,
      "bookTitle": "",
+     "seriesCount": 0,
+     "seriesTicked": 0,
+     "seriesLimit": false,
+     "noBranch": false,
      "pickupOpen": false,
      "__bottomBar": 74,
      "__dialog": false
@@ -229,6 +233,10 @@
      "notReservable": false,
      "dialogOpen": false,
      "bookTitle": "",
+     "seriesCount": 0,
+     "seriesTicked": 0,
+     "seriesLimit": false,
+     "noBranch": false,
      "pickupOpen": false,
      "__bottomBar": 74,
      "__dialog": false
@@ -290,6 +298,10 @@
      "notReservable": false,
      "dialogOpen": false,
      "bookTitle": "",
+     "seriesCount": 0,
+     "seriesTicked": 0,
+     "seriesLimit": false,
+     "noBranch": false,
      "pickupOpen": false,
      "__bottomBar": 0,
      "__dialog": false
@@ -349,6 +361,10 @@
      "notReservable": false,
      "dialogOpen": false,
      "bookTitle": "",
+     "seriesCount": 0,
+     "seriesTicked": 0,
+     "seriesLimit": false,
+     "noBranch": false,
      "pickupOpen": false,
      "__bottomBar": 0,
      "__dialog": false
@@ -382,6 +398,10 @@
      "notReservable": false,
      "dialogOpen": false,
      "bookTitle": "歡迎光臨錢天堂 : 神奇柑仔店大圖鑑",
+     "seriesCount": 0,
+     "seriesTicked": 0,
+     "seriesLimit": false,
+     "noBranch": false,
      "pickupOpen": false,
      "__bottomBar": 176,
      "__dialog": false
@@ -480,6 +500,10 @@
      "notReservable": false,
      "dialogOpen": false,
      "bookTitle": "歡迎光臨錢天堂 : 神奇柑仔店大圖鑑",
+     "seriesCount": 0,
+     "seriesTicked": 0,
+     "seriesLimit": false,
+     "noBranch": false,
      "pickupOpen": false,
      "__bottomBar": 176,
      "__dialog": false
@@ -520,6 +544,10 @@
      "notReservable": false,
      "dialogOpen": true,
      "bookTitle": "歡迎光臨錢天堂 : 神奇柑仔店大圖鑑",
+     "seriesCount": 0,
+     "seriesTicked": 0,
+     "seriesLimit": false,
+     "noBranch": false,
      "pickupOpen": false,
      "__bottomBar": 176,
      "__dialog": true
@@ -907,6 +935,10 @@
      "notReservable": false,
      "dialogOpen": true,
      "bookTitle": "歡迎光臨錢天堂 : 神奇柑仔店大圖鑑",
+     "seriesCount": 0,
+     "seriesTicked": 0,
+     "seriesLimit": false,
+     "noBranch": false,
      "pickupOpen": false,
      "__bottomBar": 176,
      "__dialog": true
@@ -961,6 +993,10 @@
      "notReservable": false,
      "dialogOpen": true,
      "bookTitle": "歡迎光臨錢天堂 : 神奇柑仔店大圖鑑",
+     "seriesCount": 0,
+     "seriesTicked": 0,
+     "seriesLimit": false,
+     "noBranch": false,
      "pickupOpen": false,
      "__bottomBar": 176,
      "__dialog": true
@@ -1346,6 +1382,10 @@
      "notReservable": false,
      "dialogOpen": true,
      "bookTitle": "歡迎光臨錢天堂 : 神奇柑仔店大圖鑑",
+     "seriesCount": 0,
+     "seriesTicked": 0,
+     "seriesLimit": false,
+     "noBranch": false,
      "pickupOpen": false,
      "__bottomBar": 176,
      "__dialog": true
@@ -1400,6 +1440,10 @@
      "notReservable": false,
      "dialogOpen": false,
      "bookTitle": "歡迎光臨錢天堂 : 神奇柑仔店大圖鑑",
+     "seriesCount": 0,
+     "seriesTicked": 0,
+     "seriesLimit": false,
+     "noBranch": false,
      "pickupOpen": false,
      "__bottomBar": 176,
      "__dialog": false
@@ -1496,6 +1540,10 @@
      "notReservable": false,
      "dialogOpen": false,
      "bookTitle": "歡迎光臨錢天堂 : 神奇柑仔店大圖鑑",
+     "seriesCount": 0,
+     "seriesTicked": 0,
+     "seriesLimit": false,
+     "noBranch": false,
      "pickupOpen": false,
      "__bottomBar": 176,
      "__dialog": false
@@ -1536,6 +1584,10 @@
      "notReservable": false,
      "dialogOpen": true,
      "bookTitle": "歡迎光臨錢天堂 : 神奇柑仔店大圖鑑",
+     "seriesCount": 0,
+     "seriesTicked": 0,
+     "seriesLimit": false,
+     "noBranch": false,
      "pickupOpen": false,
      "__bottomBar": 176,
      "__dialog": true

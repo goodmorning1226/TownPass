@@ -8,8 +8,8 @@
  "expect": {
   "done": true
  },
- "recordedAt": "2026-11-07T18:22:55.898Z",
- "durationMs": 7524,
+ "recordedAt": "2026-11-07T18:56:06.402Z",
+ "durationMs": 3469,
  "viewport": {
   "width": 390,
   "height": 844,
@@ -31,6 +31,16 @@
      "unitCount": 0,
      "unitsBelow": false,
      "favorites": 0,
+     "favAtLeast1": false,
+     "favAtLeast2": false,
+     "favAtLeast3": false,
+     "favAtLeast4": false,
+     "favAtLeast5": false,
+     "favAtLeast6": false,
+     "favAtLeast7": false,
+     "favAtLeast8": false,
+     "favAtLeast9": false,
+     "favAtLeast10": false,
      "favNames": "",
      "unitName": "戶政事務所",
      "location": "c-2-1",

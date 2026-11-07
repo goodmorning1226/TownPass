@@ -1,11 +1,11 @@
 {
   "name": "fees_other_company",
-  "description": "fees.other: 規費 -> 公司登記費 (fee-1). Its 手機號碼 hint is 「範例：0910999999，不含分隔符號」; the card turns it into 照這個樣子打：「0910999999，不含分隔符號」，中間的符號也要打 (says the opposite). The user types a test number and queries; no bills in the demo.",
+  "description": "fees.other: 規費 -> 公司登記費 (fee-1). Its 手機號碼 hint is 「範例：0910999999，不含分隔符號」; the card must say type 「0910999999」 without - or spaces (FEE-2). The user types a test number and queries; no bills in the demo, so the guide ends on the 目前查無待繳帳單 done card (FEE-5).",
   "page": "fees",
   "capability": "fees.other",
   "goals": [],
   "expect": {
-    "done": false
+    "done": true
   },
   "actions": [
     {

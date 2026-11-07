@@ -1,15 +1,15 @@
 {
  "name": "fees_tuition",
- "description": "fees.tuition default goal: fill the form as the cards say, 查詢. The demo has no bills for fee-7 (目前查無…待繳帳單).",
+ "description": "fees.tuition default goal: fill the form as the cards say, 查詢. The demo has no bills for fee-7 (目前查無…待繳帳單). The guide ends on a non-success done card (目前查無待繳帳單) ringing the message.",
  "page": "fees",
  "start": null,
  "capability": "fees.tuition",
  "goals": [],
  "expect": {
-  "done": false
+  "done": true
  },
- "recordedAt": "2026-11-07T18:29:57.328Z",
- "durationMs": 4482,
+ "recordedAt": "2026-11-07T18:55:15.831Z",
+ "durationMs": 4811,
  "viewport": {
   "width": 390,
   "height": 844,
@@ -35,6 +35,12 @@
      "fieldName": "繳費編號",
      "fieldHint": "逾繳費期限，不提供查詢繳費功能",
      "fieldChoices": "",
+     "calendar": false,
+     "calTitle": "",
+     "calNav": false,
+     "searchTyped": false,
+     "searchResults": 0,
+     "noBill": false,
      "alert": false,
      "alertText": "",
      "groupOpen": false,
@@ -168,6 +174,12 @@
      "fieldName": "繳費編號",
      "fieldHint": "逾繳費期限，不提供查詢繳費功能",
      "fieldChoices": "",
+     "calendar": false,
+     "calTitle": "",
+     "calNav": false,
+     "searchTyped": false,
+     "searchResults": 0,
+     "noBill": false,
      "alert": false,
      "alertText": "",
      "groupOpen": false,
@@ -224,6 +236,12 @@
      "fieldName": "",
      "fieldHint": "",
      "fieldChoices": "",
+     "calendar": false,
+     "calTitle": "",
+     "calNav": false,
+     "searchTyped": false,
+     "searchResults": 0,
+     "noBill": false,
      "alert": false,
      "alertText": "",
      "groupOpen": false,
@@ -350,6 +368,12 @@
      "fieldName": "",
      "fieldHint": "",
      "fieldChoices": "",
+     "calendar": false,
+     "calTitle": "",
+     "calNav": false,
+     "searchTyped": false,
+     "searchResults": 0,
+     "noBill": false,
      "alert": false,
      "alertText": "",
      "groupOpen": false,
@@ -399,6 +423,12 @@
      "fieldName": "",
      "fieldHint": "",
      "fieldChoices": "",
+     "calendar": false,
+     "calTitle": "",
+     "calNav": false,
+     "searchTyped": false,
+     "searchResults": 0,
+     "noBill": true,
      "alert": false,
      "alertText": "",
      "groupOpen": false,
@@ -416,8 +446,17 @@
      "__bottomBar": 0,
      "__dialog": false
     },
-    "visible": [],
-    "rects": {}
+    "visible": [
+     "fees.no_bill"
+    ],
+    "rects": {
+     "fees.no_bill": [
+      32,
+      220,
+      326,
+      72
+     ]
+    }
    },
    "facts": {
     "url": "/fee-payment/result/fee-7",

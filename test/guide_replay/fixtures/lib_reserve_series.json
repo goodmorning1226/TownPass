@@ -1,6 +1,6 @@
 {
  "name": "lib_reserve_series",
- "description": "Default goal (reserve), app way. The user searches 滑塊書 (a book with several 冊次, lib-book-1), follows the cards: 取書館, ✕, then 預約. The page keeps 預約 disabled until a 冊次 checkbox is ticked; no card mentions 冊次.",
+ "description": "Default goal (reserve), app way. The user searches 滑塊書 (a book with several 冊次, lib-book-1) and follows the cards: tick a 冊次 (V. 1), 取書館, ✕, then 預約 (預約成功).",
  "page": "library",
  "start": null,
  "capability": "library",
@@ -8,8 +8,8 @@
  "expect": {
   "done": true
  },
- "recordedAt": "2026-11-07T18:25:08.206Z",
- "durationMs": 11879,
+ "recordedAt": "2026-11-07T19:02:12.147Z",
+ "durationMs": 12361,
  "viewport": {
   "width": 390,
   "height": 844,
@@ -39,6 +39,10 @@
      "notReservable": false,
      "dialogOpen": false,
      "bookTitle": "",
+     "seriesCount": 0,
+     "seriesTicked": 0,
+     "seriesLimit": false,
+     "noBranch": false,
      "pickupOpen": false,
      "__bottomBar": 74,
      "__dialog": false
@@ -226,6 +230,10 @@
      "notReservable": false,
      "dialogOpen": false,
      "bookTitle": "",
+     "seriesCount": 0,
+     "seriesTicked": 0,
+     "seriesLimit": false,
+     "noBranch": false,
      "pickupOpen": false,
      "__bottomBar": 74,
      "__dialog": false
@@ -287,6 +295,10 @@
      "notReservable": false,
      "dialogOpen": false,
      "bookTitle": "",
+     "seriesCount": 0,
+     "seriesTicked": 0,
+     "seriesLimit": false,
+     "noBranch": false,
      "pickupOpen": false,
      "__bottomBar": 0,
      "__dialog": false
@@ -492,6 +504,10 @@
      "notReservable": false,
      "dialogOpen": false,
      "bookTitle": "",
+     "seriesCount": 0,
+     "seriesTicked": 0,
+     "seriesLimit": false,
+     "noBranch": false,
      "pickupOpen": false,
      "__bottomBar": 0,
      "__dialog": false
@@ -532,6 +548,10 @@
      "notReservable": false,
      "dialogOpen": false,
      "bookTitle": "",
+     "seriesCount": 0,
+     "seriesTicked": 0,
+     "seriesLimit": false,
+     "noBranch": false,
      "pickupOpen": false,
      "__bottomBar": 0,
      "__dialog": false
@@ -736,6 +756,10 @@
      "notReservable": false,
      "dialogOpen": false,
      "bookTitle": "",
+     "seriesCount": 0,
+     "seriesTicked": 0,
+     "seriesLimit": false,
+     "noBranch": false,
      "pickupOpen": false,
      "__bottomBar": 0,
      "__dialog": false
@@ -779,6 +803,10 @@
      "notReservable": false,
      "dialogOpen": false,
      "bookTitle": "",
+     "seriesCount": 0,
+     "seriesTicked": 0,
+     "seriesLimit": false,
+     "noBranch": false,
      "pickupOpen": false,
      "__bottomBar": 0,
      "__dialog": false
@@ -885,6 +913,10 @@
      "notReservable": false,
      "dialogOpen": false,
      "bookTitle": "",
+     "seriesCount": 0,
+     "seriesTicked": 0,
+     "seriesLimit": false,
+     "noBranch": false,
      "pickupOpen": false,
      "__bottomBar": 0,
      "__dialog": false
@@ -925,13 +957,18 @@
      "notReservable": false,
      "dialogOpen": false,
      "bookTitle": "我的第一本滑塊書 : 顏色配對",
+     "seriesCount": 5,
+     "seriesTicked": 0,
+     "seriesLimit": false,
+     "noBranch": false,
      "pickupOpen": false,
      "__bottomBar": 176,
      "__dialog": false
     },
     "visible": [
      "library.branch_field",
-     "library.reserve"
+     "library.reserve",
+     "library.series"
     ],
     "rects": {
      "library.branch_field": [
@@ -945,6 +982,12 @@
       780,
       358,
       48
+     ],
+     "library.series": [
+      346,
+      303,
+      24,
+      182
      ]
     }
    },
@@ -1086,13 +1129,13 @@
   {
    "action": {
     "step": "choose_branch",
-    "do": "click",
-    "selector": "div.fixed.bottom-0 .base-select-wrapper",
+    "do": "check",
+    "selector": "label.items-center[for=lib-series-1]",
     "hit": {
-     "x": 195,
-     "y": 744,
+     "x": 358,
+     "y": 475,
      "targets": [
-      "library.branch_field"
+      "library.series"
      ]
     }
    },
@@ -1113,13 +1156,18 @@
      "notReservable": false,
      "dialogOpen": false,
      "bookTitle": "我的第一本滑塊書 : 顏色配對",
+     "seriesCount": 5,
+     "seriesTicked": 0,
+     "seriesLimit": false,
+     "noBranch": false,
      "pickupOpen": false,
      "__bottomBar": 176,
      "__dialog": false
     },
     "visible": [
      "library.branch_field",
-     "library.reserve"
+     "library.reserve",
+     "library.series"
     ],
     "rects": {
      "library.branch_field": [
@@ -1133,6 +1181,12 @@
       780,
       358,
       48
+     ],
+     "library.series": [
+      346,
+      303,
+      24,
+      182
      ]
     }
    },
@@ -1140,28 +1194,31 @@
     "path": "/library-service/book-detail/lib-book-1",
     "query": {},
     "flags": {
-     "tab": "離我最近",
+     "tab": "",
      "input": "",
      "results": 0,
      "branch": "",
      "branchName": "",
-     "branchList": true,
+     "branchList": false,
      "reserveEnabled": false,
      "reserved": false,
      "reserveFailed": false,
      "failReason": "",
      "notReservable": false,
-     "dialogOpen": true,
+     "dialogOpen": false,
      "bookTitle": "我的第一本滑塊書 : 顏色配對",
+     "seriesCount": 5,
+     "seriesTicked": 1,
+     "seriesLimit": false,
+     "noBranch": false,
      "pickupOpen": false,
      "__bottomBar": 176,
-     "__dialog": true
+     "__dialog": false
     },
     "visible": [
-     "library.branch_close",
      "library.branch_field",
-     "library.branch_list",
-     "library.reserve"
+     "library.reserve",
+     "library.series"
     ],
     "rects": {
      "library.branch_field": [
@@ -1170,23 +1227,17 @@
       358,
       56
      ],
-     "library.branch_list": [
-      39,
-      193,
-      312,
-      458
-     ],
-     "library.branch_close": [
-      315,
-      209,
-      24,
-      24
-     ],
      "library.reserve": [
       16,
       780,
       358,
       48
+     ],
+     "library.series": [
+      346,
+      303,
+      24,
+      182
      ]
     }
    },
@@ -1273,7 +1324,271 @@
       "name": "",
       "label": "V. 1 ; 預約等待人數：38",
       "placeholder": "",
+      "value": "checked",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       346,
+       475,
+       0,
+       0
+      ]
+     },
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "lib-book-1",
+      "name": "",
+      "label": "取書館",
+      "placeholder": "",
       "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       716,
+       358,
+       48
+      ]
+     }
+    ],
+    "starred": [],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "預約",
+      "disabled": true,
+      "rect": [
+       16,
+       780,
+       358,
+       48
+      ]
+     }
+    ],
+    "disabledButtons": [
+     "預約"
+    ],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  },
+  {
+   "action": {
+    "step": "choose_branch",
+    "do": "click",
+    "selector": "div.fixed.bottom-0 .base-select-wrapper",
+    "hit": {
+     "x": 195,
+     "y": 744,
+     "targets": [
+      "library.branch_field"
+     ]
+    }
+   },
+   "before": {
+    "path": "/library-service/book-detail/lib-book-1",
+    "query": {},
+    "flags": {
+     "tab": "",
+     "input": "",
+     "results": 0,
+     "branch": "",
+     "branchName": "",
+     "branchList": false,
+     "reserveEnabled": false,
+     "reserved": false,
+     "reserveFailed": false,
+     "failReason": "",
+     "notReservable": false,
+     "dialogOpen": false,
+     "bookTitle": "我的第一本滑塊書 : 顏色配對",
+     "seriesCount": 5,
+     "seriesTicked": 1,
+     "seriesLimit": false,
+     "noBranch": false,
+     "pickupOpen": false,
+     "__bottomBar": 176,
+     "__dialog": false
+    },
+    "visible": [
+     "library.branch_field",
+     "library.reserve",
+     "library.series"
+    ],
+    "rects": {
+     "library.branch_field": [
+      16,
+      716,
+      358,
+      56
+     ],
+     "library.reserve": [
+      16,
+      780,
+      358,
+      48
+     ],
+     "library.series": [
+      346,
+      303,
+      24,
+      182
+     ]
+    }
+   },
+   "after": {
+    "path": "/library-service/book-detail/lib-book-1",
+    "query": {},
+    "flags": {
+     "tab": "離我最近",
+     "input": "",
+     "results": 0,
+     "branch": "",
+     "branchName": "",
+     "branchList": true,
+     "reserveEnabled": false,
+     "reserved": false,
+     "reserveFailed": false,
+     "failReason": "",
+     "notReservable": false,
+     "dialogOpen": true,
+     "bookTitle": "我的第一本滑塊書 : 顏色配對",
+     "seriesCount": 5,
+     "seriesTicked": 1,
+     "seriesLimit": false,
+     "noBranch": false,
+     "pickupOpen": false,
+     "__bottomBar": 176,
+     "__dialog": true
+    },
+    "visible": [
+     "library.branch_close",
+     "library.branch_field",
+     "library.branch_list",
+     "library.reserve",
+     "library.series"
+    ],
+    "rects": {
+     "library.branch_field": [
+      16,
+      716,
+      358,
+      56
+     ],
+     "library.branch_list": [
+      39,
+      193,
+      312,
+      458
+     ],
+     "library.branch_close": [
+      315,
+      209,
+      24,
+      24
+     ],
+     "library.reserve": [
+      16,
+      780,
+      358,
+      48
+     ],
+     "library.series": [
+      346,
+      303,
+      24,
+      182
+     ]
+    }
+   },
+   "facts": {
+    "url": "/library-service/book-detail/lib-book-1",
+    "title": "詳細內容",
+    "fields": [
+     {
+      "tag": "input",
+      "type": "checkbox",
+      "id": "lib-series-5",
+      "name": "",
+      "label": "V. 5 ; 預約等待人數：0",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       346,
+       313,
+       0,
+       0
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "checkbox",
+      "id": "lib-series-4",
+      "name": "",
+      "label": "V. 4 ; 預約等待人數：0",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       346,
+       355,
+       0,
+       0
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "checkbox",
+      "id": "lib-series-3",
+      "name": "",
+      "label": "V. 3 ; 預約等待人數：0",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       346,
+       395,
+       0,
+       0
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "checkbox",
+      "id": "lib-series-2",
+      "name": "",
+      "label": "V. 2 ; 預約等待人數：0",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       346,
+       435,
+       0,
+       0
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "checkbox",
+      "id": "lib-series-1",
+      "name": "",
+      "label": "V. 1 ; 預約等待人數：38",
+      "placeholder": "",
+      "value": "checked",
       "required": false,
       "invalid": false,
       "disabled": false,
@@ -1630,6 +1945,10 @@
      "notReservable": false,
      "dialogOpen": true,
      "bookTitle": "我的第一本滑塊書 : 顏色配對",
+     "seriesCount": 5,
+     "seriesTicked": 1,
+     "seriesLimit": false,
+     "noBranch": false,
      "pickupOpen": false,
      "__bottomBar": 176,
      "__dialog": true
@@ -1638,7 +1957,8 @@
      "library.branch_close",
      "library.branch_field",
      "library.branch_list",
-     "library.reserve"
+     "library.reserve",
+     "library.series"
     ],
     "rects": {
      "library.branch_field": [
@@ -1664,6 +1984,12 @@
       780,
       358,
       48
+     ],
+     "library.series": [
+      346,
+      303,
+      24,
+      182
      ]
     }
    },
@@ -1677,13 +2003,17 @@
      "branch": "lib-3",
      "branchName": "B12三興",
      "branchList": true,
-     "reserveEnabled": false,
+     "reserveEnabled": true,
      "reserved": false,
      "reserveFailed": false,
      "failReason": "",
      "notReservable": false,
      "dialogOpen": true,
      "bookTitle": "我的第一本滑塊書 : 顏色配對",
+     "seriesCount": 5,
+     "seriesTicked": 1,
+     "seriesLimit": false,
+     "noBranch": false,
      "pickupOpen": false,
      "__bottomBar": 176,
      "__dialog": true
@@ -1692,7 +2022,8 @@
      "library.branch_close",
      "library.branch_field",
      "library.branch_list",
-     "library.reserve"
+     "library.reserve",
+     "library.series"
     ],
     "rects": {
      "library.branch_field": [
@@ -1718,6 +2049,12 @@
       780,
       358,
       48
+     ],
+     "library.series": [
+      346,
+      303,
+      24,
+      182
      ]
     }
    },
@@ -1804,7 +2141,7 @@
       "name": "",
       "label": "V. 1 ; 預約等待人數：38",
       "placeholder": "",
-      "value": "",
+      "value": "checked",
       "required": false,
       "invalid": false,
       "disabled": false,
@@ -2091,7 +2428,7 @@
     "buttons": [
      {
       "text": "預約",
-      "disabled": true,
+      "disabled": false,
       "rect": [
        16,
        780,
@@ -2120,9 +2457,7 @@
       ]
      }
     ],
-    "disabledButtons": [
-     "預約"
-    ],
+    "disabledButtons": [],
     "dialogs": [
      "請選擇取書館 離我最近 依行政區選擇 B12三興 BFB臺北市政府借書站(取書期限3日，無法申請請預約延長2日) 0.6 公里 C21延吉 0.7 公里 CFB 信義安和借書站 1 公里 B13六合 1.2 公里 B11永春 2.1 公里 信義區 大安區 台北市 共 6 個取書館與站點 BFB臺北市政府借書站(取書期限3日，無法申請請預約延長2日) C21延吉 B12三興 B11永春 CFB 信義…"
     ],
@@ -2154,13 +2489,17 @@
      "branch": "lib-3",
      "branchName": "B12三興",
      "branchList": true,
-     "reserveEnabled": false,
+     "reserveEnabled": true,
      "reserved": false,
      "reserveFailed": false,
      "failReason": "",
      "notReservable": false,
      "dialogOpen": true,
      "bookTitle": "我的第一本滑塊書 : 顏色配對",
+     "seriesCount": 5,
+     "seriesTicked": 1,
+     "seriesLimit": false,
+     "noBranch": false,
      "pickupOpen": false,
      "__bottomBar": 176,
      "__dialog": true
@@ -2169,7 +2508,8 @@
      "library.branch_close",
      "library.branch_field",
      "library.branch_list",
-     "library.reserve"
+     "library.reserve",
+     "library.series"
     ],
     "rects": {
      "library.branch_field": [
@@ -2195,6 +2535,12 @@
       780,
       358,
       48
+     ],
+     "library.series": [
+      346,
+      303,
+      24,
+      182
      ]
     }
    },
@@ -2208,20 +2554,25 @@
      "branch": "lib-3",
      "branchName": "B12三興",
      "branchList": false,
-     "reserveEnabled": false,
+     "reserveEnabled": true,
      "reserved": false,
      "reserveFailed": false,
      "failReason": "",
      "notReservable": false,
      "dialogOpen": false,
      "bookTitle": "我的第一本滑塊書 : 顏色配對",
+     "seriesCount": 5,
+     "seriesTicked": 1,
+     "seriesLimit": false,
+     "noBranch": false,
      "pickupOpen": false,
      "__bottomBar": 176,
      "__dialog": false
     },
     "visible": [
      "library.branch_field",
-     "library.reserve"
+     "library.reserve",
+     "library.series"
     ],
     "rects": {
      "library.branch_field": [
@@ -2235,6 +2586,12 @@
       780,
       358,
       48
+     ],
+     "library.series": [
+      346,
+      303,
+      24,
+      182
      ]
     }
    },
@@ -2321,7 +2678,7 @@
       "name": "",
       "label": "V. 1 ; 預約等待人數：38",
       "placeholder": "",
-      "value": "",
+      "value": "checked",
       "required": false,
       "invalid": false,
       "disabled": false,
@@ -2356,7 +2713,7 @@
     "buttons": [
      {
       "text": "預約",
-      "disabled": true,
+      "disabled": false,
       "rect": [
        16,
        780,
@@ -2365,9 +2722,7 @@
       ]
      }
     ],
-    "disabledButtons": [
-     "預約"
-    ],
+    "disabledButtons": [],
     "dialogs": [],
     "scrollY": 0,
     "scrollHeight": 844
@@ -2396,20 +2751,25 @@
      "branch": "lib-3",
      "branchName": "B12三興",
      "branchList": false,
-     "reserveEnabled": false,
+     "reserveEnabled": true,
      "reserved": false,
      "reserveFailed": false,
      "failReason": "",
      "notReservable": false,
      "dialogOpen": false,
      "bookTitle": "我的第一本滑塊書 : 顏色配對",
+     "seriesCount": 5,
+     "seriesTicked": 1,
+     "seriesLimit": false,
+     "noBranch": false,
      "pickupOpen": false,
      "__bottomBar": 176,
      "__dialog": false
     },
     "visible": [
      "library.branch_field",
-     "library.reserve"
+     "library.reserve",
+     "library.series"
     ],
     "rects": {
      "library.branch_field": [
@@ -2423,6 +2783,12 @@
       780,
       358,
       48
+     ],
+     "library.series": [
+      346,
+      303,
+      24,
+      182
      ]
     }
    },
@@ -2436,20 +2802,26 @@
      "branch": "lib-3",
      "branchName": "B12三興",
      "branchList": false,
-     "reserveEnabled": false,
-     "reserved": false,
+     "reserveEnabled": true,
+     "reserved": true,
      "reserveFailed": false,
      "failReason": "",
      "notReservable": false,
-     "dialogOpen": false,
+     "dialogOpen": true,
      "bookTitle": "我的第一本滑塊書 : 顏色配對",
+     "seriesCount": 5,
+     "seriesTicked": 1,
+     "seriesLimit": false,
+     "noBranch": false,
      "pickupOpen": false,
      "__bottomBar": 176,
-     "__dialog": false
+     "__dialog": true
     },
     "visible": [
      "library.branch_field",
-     "library.reserve"
+     "library.reserve",
+     "library.reserve_result",
+     "library.series"
     ],
     "rects": {
      "library.branch_field": [
@@ -2463,6 +2835,18 @@
       780,
       358,
       48
+     ],
+     "library.reserve_result": [
+      39,
+      263.5,
+      312,
+      317
+     ],
+     "library.series": [
+      346,
+      303,
+      24,
+      182
      ]
     }
    },
@@ -2549,7 +2933,7 @@
       "name": "",
       "label": "V. 1 ; 預約等待人數：38",
       "placeholder": "",
-      "value": "",
+      "value": "checked",
       "required": false,
       "invalid": false,
       "disabled": false,
@@ -2584,19 +2968,39 @@
     "buttons": [
      {
       "text": "預約",
-      "disabled": true,
+      "disabled": false,
       "rect": [
        16,
        780,
        358,
        48
       ]
+     },
+     {
+      "text": "返回首頁",
+      "disabled": false,
+      "rect": [
+       39,
+       545,
+       156,
+       32
+      ]
+     },
+     {
+      "text": "查看預約清單",
+      "disabled": false,
+      "rect": [
+       195,
+       545,
+       156,
+       32
+      ]
      }
     ],
-    "disabledButtons": [
-     "預約"
+    "disabledButtons": [],
+    "dialogs": [
+     "預約成功 本次預約成功 1 筆 取書館：B12三興 到館通知：目前無通知。可前往圖書館 登入個人書房，設定通知方式。 返回首頁 查看預約清單"
     ],
-    "dialogs": [],
     "scrollY": 0,
     "scrollHeight": 844
    }

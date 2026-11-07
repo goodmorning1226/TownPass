@@ -5,7 +5,7 @@
   "capability": "fees.housing",
   "goals": [],
   "expect": {
-    "done": false
+    "done": true
   },
   "actions": [
     {

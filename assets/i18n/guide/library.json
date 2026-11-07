@@ -24,6 +24,27 @@
    "id": "“{page:熱門關鍵字}” adalah kata yang sering dicari orang. Ketuk salah satu, nanti langsung dicarikan.",
    "th": "“{page:熱門關鍵字}” คือคำที่คนค้นหาบ่อย แตะคำใดคำหนึ่งแล้วจะค้นหาให้"
   },
+  "「預約」還不能按，因為還沒勾要借哪一冊。先在那一冊右邊的小方框打勾。": {
+   "en": "“{page:預約}” can’t be tapped yet because no volume is ticked. First tick the small box to the right of the volume you want.",
+   "ja": "まだ借りる巻にチェックがないので、「{page:預約}」は押せません。まず、その巻の右にある小さな四角にチェックを入れてください。",
+   "vi": "Chưa chạm được “{page:預約}” vì chưa đánh dấu tập muốn mượn. Trước tiên, đánh dấu vào ô nhỏ bên phải tập đó.",
+   "id": "“{page:預約}” belum bisa diketuk karena belum ada jilid yang dicentang. Centang dulu kotak kecil di kanan jilid itu.",
+   "th": "ยังกด “{page:預約}” ไม่ได้ เพราะยังไม่ได้ติ๊กเล่มที่อยากยืม ติ๊กช่องเล็กๆ ทางขวาของเล่มนั้นก่อน"
+  },
+  "「預約」還不能按，因為還沒選取書館。點「請選擇取書館」選一間。": {
+   "en": "“{page:預約}” can’t be tapped yet because no pickup library is chosen. Tap “{page:請選擇取書館}” and choose one.",
+   "ja": "まだ受取館を選んでいないので、「{page:預約}」は押せません。「{page:請選擇取書館}」を押して1つ選んでください。",
+   "vi": "Chưa chạm được “{page:預約}” vì chưa chọn thư viện nhận sách. Chạm “{page:請選擇取書館}” và chọn một nơi.",
+   "id": "“{page:預約}” belum bisa diketuk karena perpustakaan pengambilan belum dipilih. Ketuk “{page:請選擇取書館}” lalu pilih satu.",
+   "th": "ยังกด “{page:預約}” ไม่ได้ เพราะยังไม่ได้เลือกห้องสมุดที่จะรับหนังสือ กด “{page:請選擇取書館}” แล้วเลือกหนึ่งแห่ง"
+  },
+  "一本書最多只能勾 7 冊，已經勾滿了。按「關閉」就好，不用再勾。": {
+   "en": "You can tick at most 7 volumes of one book, and you have reached that. Just tap “{page:關閉}”; no need to tick more.",
+   "ja": "1冊の本につき最大7冊までしかチェックできず、もう上限です。「{page:關閉}」を押すだけで大丈夫です。これ以上チェックしなくていいです。",
+   "vi": "Mỗi cuốn sách chỉ đánh dấu được tối đa 7 tập, bạn đã đủ rồi. Chỉ cần chạm “{page:關閉}”, không cần đánh dấu thêm.",
+   "id": "Satu buku paling banyak 7 jilid yang bisa dicentang, dan sudah penuh. Cukup ketuk “{page:關閉}”, tidak perlu mencentang lagi.",
+   "th": "หนังสือหนึ่งเล่มติ๊กได้สูงสุด 7 เล่มย่อย ตอนนี้ครบแล้ว กด “{page:關閉}” ได้เลย ไม่ต้องติ๊กเพิ่ม"
+  },
   "不知道要找什麼嗎？點一個下面的「熱門關鍵字」看看。": {
    "en": "Not sure what to look for? Tap one of the “{page:熱門關鍵字}” below.",
    "ja": "何を探すか迷っていますか？下の「{page:熱門關鍵字}」を1つタップしてみましょう。",
@@ -199,6 +220,13 @@
    "id": "Baik! Layanan perpustakaan sudah saya bukakan. Saya akan memandu langkah demi langkah di layar.",
    "th": "ได้เลย! เปิดบริการห้องสมุดให้แล้ว จะพาทำทีละขั้นบนหน้าจอ"
   },
+  "如果畫面寫「請啟用定位服務」，要先允許「城市通」使用你的位置，才會列出附近的分館。": {
+   "en": "If the page says “{page:請啟用定位服務}”, first allow “{page:城市通}” to use your location; then nearby branches will be listed.",
+   "ja": "画面に「{page:請啟用定位服務}」と出たら、まず「{page:城市通}」に位置情報の使用を許可してください。そうすると近くの分館が表示されます。",
+   "vi": "Nếu màn hình ghi “{page:請啟用定位服務}”, hãy cho phép “{page:城市通}” dùng vị trí của bạn trước, khi đó mới hiện các chi nhánh gần đó.",
+   "id": "Kalau layar menulis “{page:請啟用定位服務}”, izinkan dulu “{page:城市通}” memakai lokasi Anda, baru cabang terdekat akan ditampilkan.",
+   "th": "ถ้าหน้าจอเขียนว่า “{page:請啟用定位服務}” ให้อนุญาตให้ “{page:城市通}” ใช้ตำแหน่งของคุณก่อน แล้วจะแสดงสาขาที่อยู่ใกล้"
+  },
   "往下滑一點，找到「點閱排行」。": {
    "en": "Scroll down a little to find “{page:點閱排行}”.",
    "ja": "少し下にスクロールして、「{page:點閱排行}」を探してください。",
@@ -219,6 +247,13 @@
    "vi": "Mình tìm sách trước nhé! Chạm vào “{page:關鍵字搜尋}” ở phía trên.",
    "id": "Kita cari buku dulu! Ketuk “{page:關鍵字搜尋}” di atas.",
    "th": "มาหาหนังสือกันก่อน! แตะ “{page:關鍵字搜尋}” ด้านบน"
+  },
+  "打勾": {
+   "en": "Tick",
+   "ja": "チェック",
+   "vi": "Đánh dấu",
+   "id": "Centang",
+   "th": "ติ๊ก"
   },
   "打好了嗎？按右邊的放大鏡搜尋。": {
    "en": "Done typing? Tap the magnifying glass on the right to search.",
@@ -276,13 +311,6 @@
    "id": "Cari perpustakaan terdekat",
    "th": "หาห้องสมุดใกล้ๆ"
   },
-  "按「展開列表」可以看所有分館和距離。": {
-   "en": "Tap “{page:展開列表}” to see all branches and how far they are.",
-   "ja": "「{page:展開列表}」を押すと、すべての分館と距離が見られます。",
-   "vi": "Chạm “{page:展開列表}” để xem tất cả chi nhánh và khoảng cách.",
-   "id": "Ketuk “{page:展開列表}” untuk melihat semua cabang dan jaraknya.",
-   "th": "กด “{page:展開列表}” เพื่อดูทุกสาขาและระยะทาง"
-  },
   "接下來，點這裡選要去哪間圖書館拿書。": {
    "en": "Next, tap here to choose which library you’ll pick the book up at.",
    "ja": "次に、ここをタップして、本を受け取る図書館を選んでください。",
@@ -310,6 +338,13 @@
    "vi": "Kiểm tra lần cuối: đặt trước {what}, nhận sách tại {where}. Nếu đúng, bạn tự chạm “{page:預約}” nhé.",
    "id": "Cek terakhir: memesan {what}, ambil bukunya di {where}. Kalau sudah benar, ketuk sendiri “{page:預約}”.",
    "th": "ตรวจสอบครั้งสุดท้าย: จอง{what} รับหนังสือที่{where} ถ้าถูกต้องแล้ว กด “{page:預約}” เองได้เลย"
+  },
+  "沒有找到書": {
+   "en": "No books found",
+   "ja": "本が見つかりません",
+   "vi": "Không tìm thấy sách",
+   "id": "Buku tidak ditemukan",
+   "th": "ไม่พบหนังสือ"
   },
   "沒有預約成功": {
    "en": "Not reserved",
@@ -451,6 +486,41 @@
    "id": "Buku ini tidak bisa dipesan. Halaman menulis “{page:本館藏不提供預約}”. Ketuk “‹” di kiri atas untuk kembali, lalu coba buku lain.",
    "th": "หนังสือเล่มนี้จองไม่ได้ หน้าเว็บเขียนว่า “{page:本館藏不提供預約}” กด “‹” มุมซ้ายบนเพื่อย้อนกลับ แล้วลองเล่มอื่น"
   },
+  "這本書分成好幾冊。在想借的那一冊右邊的小方框打勾，可以勾不只一冊，最多 7 冊。": {
+   "en": "This book comes in several volumes. Tick the small box to the right of each volume you want. You can tick more than one, up to 7.",
+   "ja": "この本は何冊かに分かれています。借りたい巻の右にある小さな四角にチェックを入れます。複数選べます（最大7冊）。",
+   "vi": "Cuốn sách này chia thành nhiều tập. Đánh dấu vào ô nhỏ bên phải tập bạn muốn mượn. Có thể chọn nhiều tập, tối đa 7 tập.",
+   "id": "Buku ini terbagi beberapa jilid. Centang kotak kecil di kanan jilid yang ingin dipinjam. Boleh lebih dari satu, paling banyak 7.",
+   "th": "หนังสือเล่มนี้แบ่งเป็นหลายเล่มย่อย ติ๊กช่องเล็กๆ ทางขวาของเล่มที่อยากยืม เลือกได้มากกว่าหนึ่ง สูงสุด 7 เล่ม"
+  },
+  "這本書有好幾冊。先在想借的那一冊右邊的小方框打勾（例如 V. 1）。": {
+   "en": "This book has several volumes. First tick the small box to the right of the volume you want (for example V. 1).",
+   "ja": "この本は何冊かに分かれています。まず、借りたい巻の右にある小さな四角にチェックを入れてください（例：V. 1）。",
+   "vi": "Cuốn sách này có nhiều tập. Trước tiên, đánh dấu vào ô nhỏ bên phải tập bạn muốn mượn (ví dụ V. 1).",
+   "id": "Buku ini punya beberapa jilid. Centang dulu kotak kecil di kanan jilid yang ingin dipinjam (misalnya V. 1).",
+   "th": "หนังสือเล่มนี้มีหลายเล่มย่อย ก่อนอื่นให้ติ๊กช่องเล็กๆ ทางขวาของเล่มที่อยากยืม (เช่น V. 1)"
+  },
+  "這本書現在沒有可以取書的圖書館。按右上角「✕」關掉，再按左上角「‹」換一本書。": {
+   "en": "There is no library where you can pick up this book right now. Tap “✕” at the top right to close this, then tap “‹” at the top left to choose another book.",
+   "ja": "この本は今、受け取れる図書館がありません。右上の「✕」で閉じてから、左上の「‹」を押して別の本を選びましょう。",
+   "vi": "Hiện không có thư viện nào để nhận cuốn sách này. Chạm “✕” ở góc trên bên phải để đóng, rồi chạm “‹” ở góc trên bên trái để chọn cuốn khác.",
+   "id": "Saat ini tidak ada perpustakaan untuk mengambil buku ini. Ketuk “✕” di kanan atas untuk menutup, lalu ketuk “‹” di kiri atas untuk memilih buku lain.",
+   "th": "ตอนนี้ไม่มีห้องสมุดที่รับหนังสือเล่มนี้ได้ กด “✕” มุมขวาบนเพื่อปิด แล้วกด “‹” มุมซ้ายบนเพื่อเลือกเล่มอื่น"
+  },
+  "這本書現在沒有可以取書的圖書館。按左上角「‹」回上一頁，換一本書。": {
+   "en": "There is no library where you can pick up this book right now. Tap “‹” at the top left to go back and choose another book.",
+   "ja": "この本は今、受け取れる図書館がありません。左上の「‹」を押して前のページに戻り、別の本を選びましょう。",
+   "vi": "Hiện không có thư viện nào để nhận cuốn sách này. Chạm “‹” ở góc trên bên trái để quay lại và chọn cuốn khác.",
+   "id": "Saat ini tidak ada perpustakaan untuk mengambil buku ini. Ketuk “‹” di kiri atas untuk kembali dan memilih buku lain.",
+   "th": "ตอนนี้ไม่มีห้องสมุดที่รับหนังสือเล่มนี้ได้ กด “‹” มุมซ้ายบนเพื่อย้อนกลับ แล้วเลือกเล่มอื่น"
+  },
+  "這本書現在沒有可以取書的圖書館，不能預約。回上一頁換一本書。": {
+   "en": "There is no library where you can pick up this book right now, so it can’t be reserved. Go back and choose another book.",
+   "ja": "この本は今、受け取れる図書館がないので予約できません。前のページに戻って別の本を選びましょう。",
+   "vi": "Hiện không có thư viện nào để nhận cuốn sách này nên không đặt trước được. Hãy quay lại và chọn cuốn khác.",
+   "id": "Saat ini tidak ada perpustakaan untuk mengambil buku ini, jadi tidak bisa dipesan. Kembali dan pilih buku lain.",
+   "th": "ตอนนี้ไม่มีห้องสมุดที่รับหนังสือเล่มนี้ได้ จึงจองไม่ได้ ย้อนกลับแล้วเลือกเล่มอื่น"
+  },
   "這本書的館藏不提供預約。按左上角的「‹」回到搜尋結果，選另一本書。": {
    "en": "This book’s copies can’t be reserved. Tap “‹” at the top left to go back to the search results, and pick another book.",
    "ja": "この本の所蔵は予約できません。左上の「‹」を押して検索結果に戻り、別の本を選んでください。",
@@ -458,12 +528,26 @@
    "id": "Koleksi buku ini tidak bisa dipesan. Ketuk “‹” di kiri atas untuk kembali ke hasil pencarian, lalu pilih buku lain.",
    "th": "หนังสือเล่มนี้ไม่เปิดให้จอง กด “‹” มุมซ้ายบนเพื่อกลับไปที่ผลการค้นหา แล้วเลือกเล่มอื่น"
   },
-  "這次沒有找到書。換個書名，在上面的框重新打字搜尋。": {
-   "en": "No books were found this time. Try another title: type it again in the box at the top.",
-   "ja": "今回は本が見つかりませんでした。別の書名で、上の欄にもう一度入力して検索してください。",
-   "vi": "Lần này không tìm thấy sách. Hãy đổi tên sách khác và gõ lại vào ô phía trên để tìm.",
-   "id": "Kali ini buku tidak ditemukan. Coba judul lain, ketik ulang di kotak atas.",
-   "th": "ครั้งนี้ไม่พบหนังสือ ลองเปลี่ยนชื่อหนังสือ แล้วพิมพ์ค้นหาใหม่ในช่องด้านบน"
+  "這次沒有找到書。在上面的框打別的書名，例如「神奇柑仔店」，再按放大鏡。想看「熱門關鍵字」，就把框裡的字刪掉再按放大鏡。": {
+   "en": "No books were found this time. Type another title in the box at the top, for example “{page:神奇柑仔店}”, and tap the magnifying glass. To see the “{page:熱門關鍵字}” again, delete the words in the box and tap the magnifying glass.",
+   "ja": "今回は本が見つかりませんでした。上の欄に別の書名（例：「{page:神奇柑仔店}」）を入力して、虫めがねを押してください。「{page:熱門關鍵字}」を見たいときは、欄の文字を消して虫めがねを押します。",
+   "vi": "Lần này không tìm thấy sách. Gõ tên sách khác vào ô phía trên, ví dụ “{page:神奇柑仔店}”, rồi chạm kính lúp. Muốn xem “{page:熱門關鍵字}”, hãy xóa chữ trong ô rồi chạm kính lúp.",
+   "id": "Kali ini buku tidak ditemukan. Ketik judul lain di kotak atas, misalnya “{page:神奇柑仔店}”, lalu ketuk kaca pembesar. Untuk melihat “{page:熱門關鍵字}”, hapus tulisan di kotak lalu ketuk kaca pembesar.",
+   "th": "ครั้งนี้ไม่พบหนังสือ พิมพ์ชื่อหนังสืออื่นในช่องด้านบน เช่น “{page:神奇柑仔店}” แล้วกดแว่นขยาย ถ้าอยากเห็น “{page:熱門關鍵字}” ให้ลบคำในช่องแล้วกดแว่นขยาย"
+  },
+  "這次沒有找到書（畫面寫「查無資料」）。把框裡的字刪掉，再按右邊的放大鏡，「熱門關鍵字」就會再出現，可以換一個點，例如「神奇柑仔店」。": {
+   "en": "No books were found this time (the page says “{page:查無資料}”). Delete the words in the box and tap the magnifying glass on the right; the “{page:熱門關鍵字}” will show again, and you can tap another one, for example “{page:神奇柑仔店}”.",
+   "ja": "今回は本が見つかりませんでした（画面に「{page:查無資料}」と出ています）。欄の文字を消して右の虫めがねを押すと、「{page:熱門關鍵字}」がまた出ます。別のものを押してみましょう。例：「{page:神奇柑仔店}」。",
+   "vi": "Lần này không tìm thấy sách (màn hình ghi “{page:查無資料}”). Xóa chữ trong ô rồi chạm kính lúp bên phải, “{page:熱門關鍵字}” sẽ hiện lại, bạn có thể chọn từ khác, ví dụ “{page:神奇柑仔店}”.",
+   "id": "Kali ini buku tidak ditemukan (layar menulis “{page:查無資料}”). Hapus tulisan di kotak lalu ketuk kaca pembesar di kanan, “{page:熱門關鍵字}” akan muncul lagi, dan Anda bisa ketuk yang lain, misalnya “{page:神奇柑仔店}”.",
+   "th": "ครั้งนี้ไม่พบหนังสือ (หน้าจอเขียนว่า “{page:查無資料}”) ลบคำในช่อง แล้วกดแว่นขยายทางขวา “{page:熱門關鍵字}” จะกลับมา แล้วลองแตะคำอื่น เช่น “{page:神奇柑仔店}”"
+  },
+  "這次沒有找到書（畫面寫「查無資料」）。換個書名再搜尋一次，例如「神奇柑仔店」。": {
+   "en": "No books were found this time (the page says “{page:查無資料}”). Search again with another title, for example “{page:神奇柑仔店}”.",
+   "ja": "今回は本が見つかりませんでした（画面に「{page:查無資料}」と出ています）。別の書名でもう一度検索しましょう。例：「{page:神奇柑仔店}」。",
+   "vi": "Lần này không tìm thấy sách (màn hình ghi “{page:查無資料}”). Hãy tìm lại với tên sách khác, ví dụ “{page:神奇柑仔店}”.",
+   "id": "Kali ini buku tidak ditemukan (layar menulis “{page:查無資料}”). Cari lagi dengan judul lain, misalnya “{page:神奇柑仔店}”.",
+   "th": "ครั้งนี้ไม่พบหนังสือ (หน้าจอเขียนว่า “{page:查無資料}”) ลองค้นหาใหม่ด้วยชื่ออื่น เช่น “{page:神奇柑仔店}”"
   },
   "這次沒有預約成功，原因是「{reason}」。可以按「查看預約清單」看看，或換一本書。": {
    "en": "The reservation didn’t go through. The reason: “{reason}”. You can tap “{page:查看預約清單}” to check, or try another book.",
