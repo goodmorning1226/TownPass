@@ -65,6 +65,26 @@ CANCEL_WORDS = ("取消", "返回", "算了", "不用了", "不要了")
 _ORDINAL_SYLLABLES = {"yi": 1, "er": 2, "san": 3, "si": 4, "wu": 5, "liu": 6, "qi": 7, "ba": 8}
 
 
+# "What can you do" questions worded differently ("你有甚麼樣子的功能" 0.76,
+# "你都會些什麼" 0.74), compared by Mandarin syllables with a few standard
+# phrasings; small talk and other requests score at most ~0.55 ("有什麼好吃的"
+# 0.70). Only for text no service matched; a false hit only shows the list.
+LISTING_PHRASES_ZH = ("你有什麼功能", "你會做什麼", "你可以做什麼", "有哪些功能", "你能幫我做什麼", "有什麼服務")
+LISTING_SOUND = 0.72
+
+
+def listing_by_sound(text):
+    from phonetic import similarity, syllables
+    heard = syllables(text)
+    for phrase in LISTING_PHRASES_ZH:
+        wanted = syllables(phrase)
+        for size in range(max(1, len(wanted) - 1), len(wanted) + 3):
+            for start in range(max(1, len(heard) - size + 1)):
+                if similarity(heard[start:start + size], wanted) >= LISTING_SOUND:
+                    return True
+    return False
+
+
 def sounds_like(text, phrases, threshold):
     from phonetic import similarity, syllables
     heard = syllables(text)
@@ -595,6 +615,9 @@ class Workflow:
         sounded = self._sound_fallback(payload, text)
         if sounded:
             return sounded
+        if listing_by_sound(text):
+            self._trace("listing_sound")
+            return self._list(payload)
         decided = self._intent_fallback(payload, text)
         if decided:
             return decided

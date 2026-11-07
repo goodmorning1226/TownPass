@@ -10,7 +10,10 @@ Scoring per item:
 - service: correct when it navigates to (or reports unavailable for) an expected
   id; "confirmed" when it offers candidates that include one (the user picks);
   wrong_navigation when it opens anything else (must stay 0).
-- greeting / chitchat / out_of_scope: correct when nothing is opened.
+- greeting / chitchat / out_of_scope, and negation without expected ids
+  ("I don't want X"): correct when nothing is opened; "not X but Y" is scored
+  like a service request for Y.
+Also scores eval_foreign_holdout.json (--cases).
 The set is never used to tune rules; it is the honest estimate.
 """
 import argparse
@@ -36,6 +39,8 @@ def score(item, reply, registry_titles):
     intent, expected = item["intent"], set(item.get("expected_ids") or [])
     if intent == "listing":
         return "correct" if kind == "capability_list" else "wrong_navigation" if opened else "missed"
+    if intent == "negation":  # "not X but Y" expects Y; a bare refusal must open nothing
+        intent = "service" if expected else "none"
     if intent == "service":
         if opened:
             return "correct" if opened in expected or any(e.split(".")[0] == opened for e in expected) else \

@@ -1,0 +1,1789 @@
+{
+  "schema_version": 1,
+  "generated": "2026-11-07",
+  "source_repo": "https://github.com/taipei-doit/TownPass-Services",
+  "source_commit": "3274852a94504b4fdaecc82ff3a9fda8342557f6",
+  "deployed_site": "https://taipei-pass-service.vercel.app",
+  "deployed_bundle": "assets/index-DwgpGSZE.js (2026-11-07；mock form.json、disaster_reporting.json、citizen_report.json 與 GitHub 相同)",
+  "note": "這是我們閱讀公開頁面後寫的欄位說明，不含官方程式碼。selector 依 2026-11-07 版本，頁面改版要重新核對。",
+  "policy_values": {
+    "fill": "助理可以寫入頁面（需有使用者原話或頁面選項為依據）",
+    "suggest": "只在「助理幫你填了哪些」面板提示，不寫入頁面",
+    "never": "助理不讀、不填、不提示，由使用者自己處理"
+  },
+  "fill_events": {
+    "input": "設定 value 後 dispatch new Event('input', {bubbles: true})（Vue vModelText 監聽 input）",
+    "change": "select：設定 value 後 dispatch new Event('change', {bubbles: true})；checkbox：設定 checked 後 dispatch change",
+    "click": "HTMLElement.click()，讓頁面自己的 click handler 處理"
+  },
+  "forms": [
+    {
+      "id": "citizen_report",
+      "title": "陳情（有話要說）案件內容",
+      "route": "/citizen-report/form/:id",
+      "route_ids": "citizen_report.json 的 problem_reporting / service_requesting id（R-1、R-5~R-9）與特例 R-99",
+      "source": "src/views/CitizenReportFormView.vue",
+      "cold_link": "R-99 可直接開；其他 id 依賴 citizenReport store（由 /citizen-report/ 首頁載入），需 in_page。",
+      "ready_selector": "textarea#description",
+      "fields": [
+        {
+          "key": "category",
+          "label": "案件分類",
+          "selector": null,
+          "control": "display",
+          "vue_binding": "route.params.id -> reportItemMap (store)",
+          "fill_event": null,
+          "required": true,
+          "policy": "never",
+          "reason": "由網址決定（導航時選定），不是輸入欄位。"
+        },
+        {
+          "key": "location",
+          "label": "發生地點",
+          "selector": "input#location",
+          "control": "text",
+          "vue_binding": "BaseInput: defineModel -> native <input type=text v-model>",
+          "fill_event": "input",
+          "required": false,
+          "policy": "fill",
+          "reason": "使用者說出的地址原文；頁面沒有檢查必填。旁邊的地圖按鈕（LocationModal，Google Maps 無金鑰）不操作。",
+          "placeholder": "請輸入完整地址"
+        },
+        {
+          "key": "title",
+          "label": "案件主旨",
+          "selector": "input#title",
+          "control": "text",
+          "vue_binding": "BaseInput: defineModel -> native <input type=text v-model>",
+          "fill_event": "input",
+          "required": true,
+          "policy": "fill",
+          "reason": "取自使用者原話的一小段（逐字）。注意頁面的 label for 寫成 location，不能用 label 找欄位。",
+          "placeholder": "請輸入主旨"
+        },
+        {
+          "key": "description",
+          "label": "描述",
+          "selector": "textarea#description",
+          "control": "textarea",
+          "vue_binding": "BaseTextarea: defineModel -> native <textarea v-model maxlength=4000>",
+          "fill_event": "input",
+          "required": true,
+          "policy": "fill",
+          "reason": "使用者原話逐字，4000 字以內。",
+          "placeholder": "人、事、時、地、物 4000字以內"
+        },
+        {
+          "key": "attachments",
+          "label": "新增附件",
+          "selector": "input[type=file][id^=upload-file-]",
+          "control": "file",
+          "vue_binding": "UploadSection: <input type=file>, files kept in form store",
+          "fill_event": null,
+          "required": false,
+          "policy": "never",
+          "reason": "上傳檔案（最多 10 個）只能由使用者自己選。"
+        },
+        {
+          "key": "isAgree",
+          "label": "個人資料是否提供給承辦",
+          "selector": "input[type=radio][name=isAgree]",
+          "control": "radio",
+          "vue_binding": "BaseRadio: defineModel -> native <input type=radio v-model>",
+          "fill_event": null,
+          "required": true,
+          "policy": "never",
+          "reason": "個資同意；預設「同意」(Y)，選「不同意」時送出鈕停用。助理不碰。",
+          "options": [
+            "Y",
+            "N"
+          ],
+          "ids": [
+            "isAgreeY",
+            "isAgreeN"
+          ]
+        }
+      ],
+      "submit": {
+        "button_text": "送出",
+        "handler": "onSubmitClick: 只檢查 title、description；開「案件已完成受理」對話框，沒有送出網路請求（示範）。",
+        "disabled_when": "isAgree === 'N'",
+        "assistant_may_click": false
+      }
+    },
+    {
+      "id": "library_reservation",
+      "title": "圖書預約（冊次與取書館）",
+      "route": "/library-service/book-detail/:id",
+      "route_ids": [
+        "lib-book-1",
+        "lib-book-2",
+        "lib-book-3",
+        "lib-book-4",
+        "lib-book-5",
+        "lib-book-6"
+      ],
+      "source": "src/views/LibraryBookDetailView.vue + LibrarySelectDialog.vue + public/mock/library/library_book_list.json",
+      "cold_link": "可以（library store 自己 import 書目）。",
+      "ready_selector": "select#<book id>（有冊次的書）",
+      "fields": [
+        {
+          "key": "series",
+          "label": "冊次",
+          "selector": "input[type=checkbox]#<series id>（只在冊次 > 1 時存在）",
+          "control": "checkbox_group",
+          "vue_binding": "seriesModel；label 與 BaseCheckbox 都是 @click.prevent=checkLimit（上限 7 冊）",
+          "fill_event": "click（走頁面自己的 checkLimit）",
+          "required": true,
+          "policy": "fill",
+          "reason": "只有 1 冊時頁面自動選好；enum 只能是該書的冊次。用 click 而不是改 checked，讓頁面的上限檢查照常運作。"
+        },
+        {
+          "key": "library",
+          "label": "取書館",
+          "selector": "select#<book id>",
+          "control": "select",
+          "vue_binding": "BaseSelect v-model=selectedLibraryId；select 有 pointer-events-none，點擊改開 LibrarySelectDialog（需 Google Maps）",
+          "fill_event": "change",
+          "required": true,
+          "policy": "fill",
+          "reason": "enum 只能是該書的 libraries[].id。"
+        }
+      ],
+      "books": [
+        {
+          "id": "lib-book-1",
+          "name": "我的第一本滑塊書 : 顏色配對",
+          "series": [
+            {
+              "id": "lib-series-1",
+              "name": "V. 1"
+            },
+            {
+              "id": "lib-series-2",
+              "name": "V. 2"
+            },
+            {
+              "id": "lib-series-3",
+              "name": "V. 3"
+            },
+            {
+              "id": "lib-series-4",
+              "name": "V. 4"
+            },
+            {
+              "id": "lib-series-5",
+              "name": "V. 5"
+            }
+          ],
+          "libraries": [
+            {
+              "id": "lib-1",
+              "name": "BFB臺北市政府借書站(取書期限3日，無法申請請預約延長2日)",
+              "area": "信義區"
+            },
+            {
+              "id": "lib-2",
+              "name": "C21延吉",
+              "area": "大安區"
+            },
+            {
+              "id": "lib-3",
+              "name": "B12三興",
+              "area": "信義區"
+            },
+            {
+              "id": "lib-4",
+              "name": "B11永春",
+              "area": "信義區"
+            },
+            {
+              "id": "lib-5",
+              "name": "CFB 信義安和借書站",
+              "area": "大安區"
+            },
+            {
+              "id": "lib-6",
+              "name": "B13六合",
+              "area": "信義區"
+            }
+          ],
+          "note": ""
+        },
+        {
+          "id": "lib-book-2",
+          "name": "說給兒童的臺灣歷史",
+          "series": [
+            {
+              "id": "lib-series-1",
+              "name": "V. 1(無附件可借)"
+            },
+            {
+              "id": "lib-series-2",
+              "name": "V. 1(有附件)"
+            },
+            {
+              "id": "lib-series-3",
+              "name": "V. 2(無附件可借)"
+            },
+            {
+              "id": "lib-series-4",
+              "name": "V. 2(有附件)"
+            },
+            {
+              "id": "lib-series-5",
+              "name": "V. 3(無附件可借)"
+            },
+            {
+              "id": "lib-series-6",
+              "name": "V. 3(有附件)"
+            },
+            {
+              "id": "lib-series-7",
+              "name": "V. 4(無附件可借)"
+            },
+            {
+              "id": "lib-series-8",
+              "name": "V. 4(有附件)"
+            },
+            {
+              "id": "lib-series-9",
+              "name": "V. 5(無附件可借)"
+            },
+            {
+              "id": "lib-series-10",
+              "name": "V. 5(有附件)"
+            }
+          ],
+          "libraries": [
+            {
+              "id": "lib-2",
+              "name": "C21延吉",
+              "area": "大安區"
+            }
+          ],
+          "note": ""
+        },
+        {
+          "id": "lib-book-3",
+          "name": "底層邏輯 : 看清這個世界的底牌 = The underlying logic : how to see the essence of things",
+          "series": [
+            {
+              "id": "lib-series-1",
+              "name": ""
+            }
+          ],
+          "libraries": [
+            {
+              "id": "lib-1",
+              "name": "BFB臺北市政府借書站(取書期限3日，無法申請請預約延長2日)",
+              "area": "信義區"
+            },
+            {
+              "id": "lib-2",
+              "name": "C21延吉",
+              "area": "大安區"
+            },
+            {
+              "id": "lib-3",
+              "name": "B12三興",
+              "area": "信義區"
+            },
+            {
+              "id": "lib-4",
+              "name": "B11永春",
+              "area": "信義區"
+            },
+            {
+              "id": "lib-5",
+              "name": "CFB 信義安和借書站",
+              "area": "大安區"
+            },
+            {
+              "id": "lib-6",
+              "name": "B13六合",
+              "area": "信義區"
+            }
+          ],
+          "note": ""
+        },
+        {
+          "id": "lib-book-4",
+          "name": "The winners : a novel",
+          "series": [
+            {
+              "id": "lib-series-1",
+              "name": "N. 1"
+            },
+            {
+              "id": "lib-series-2",
+              "name": "N. 2"
+            },
+            {
+              "id": "lib-series-3",
+              "name": "N. 3"
+            }
+          ],
+          "libraries": [],
+          "note": "沒有取書館，無法預約"
+        },
+        {
+          "id": "lib-book-5",
+          "name": "歡迎光臨錢天堂 : 神奇柑仔店大圖鑑",
+          "series": [
+            {
+              "id": "lib-series-1",
+              "name": "N. 1"
+            }
+          ],
+          "libraries": [
+            {
+              "id": "lib-1",
+              "name": "BFB臺北市政府借書站(取書期限3日，無法申請請預約延長2日)",
+              "area": "信義區"
+            },
+            {
+              "id": "lib-2",
+              "name": "C21延吉",
+              "area": "大安區"
+            },
+            {
+              "id": "lib-3",
+              "name": "B12三興",
+              "area": "信義區"
+            },
+            {
+              "id": "lib-4",
+              "name": "B11永春",
+              "area": "信義區"
+            },
+            {
+              "id": "lib-5",
+              "name": "CFB 信義安和借書站",
+              "area": "大安區"
+            },
+            {
+              "id": "lib-6",
+              "name": "B13六合",
+              "area": "信義區"
+            }
+          ],
+          "note": ""
+        },
+        {
+          "id": "lib-book-6",
+          "name": "神奇柑仔店. 15, 冒牌的長髮公主餅乾",
+          "series": [],
+          "libraries": [],
+          "note": "本館藏不提供預約"
+        }
+      ],
+      "submit": {
+        "button_text": "預約",
+        "handler": "onSubmitClick: 寫入 libraryRecordsOrdering 與 localStorage，開「預約成功」對話框（示範）。",
+        "disabled_when": "未選取書館 或 未選冊次",
+        "assistant_may_click": false
+      }
+    },
+    {
+      "id": "disaster_report",
+      "title": "災情通報表單",
+      "route": "/disaster-report/form/:id",
+      "route_ids": [
+        "D-1-1",
+        "D-1-2",
+        "D-1-3",
+        "D-1-4",
+        "D-2-1",
+        "D-2-2",
+        "D-2-3",
+        "D-3-1",
+        "D-3-2",
+        "D-3-3",
+        "D-4-1",
+        "D-4-2",
+        "D-4-3",
+        "D-4-4"
+      ],
+      "source": "src/views/DisasterReportFormView.vue + public/mock/disaster_reporting.json",
+      "cold_link": "不行：activeFormItem 來自 disasterReport store（由 /disaster-report 首頁載入）；form_format 在 onMounted 建立，冷開只剩補充描述。需 in_page。",
+      "ready_selector": "textarea#additional_disc",
+      "fields": [
+        {
+          "key": "category",
+          "label": "災情分類",
+          "selector": null,
+          "control": "display",
+          "vue_binding": "route.params.id -> disasterReportMap (store)",
+          "fill_event": null,
+          "required": true,
+          "policy": "never",
+          "reason": "由網址決定。"
+        },
+        {
+          "key": "location",
+          "label": "標注災情發生地點",
+          "selector": "input#location",
+          "control": "text",
+          "vue_binding": "BaseInput: defineModel -> native <input type=text v-model>",
+          "fill_event": "input",
+          "required": true,
+          "policy": "fill",
+          "reason": "地址原文；空白時送出鈕停用。地圖定位按鈕不操作。",
+          "placeholder": "可直接定位或輸入完整地址"
+        },
+        {
+          "key": "location_desc",
+          "label": "地點描述",
+          "selector": "textarea#desc",
+          "control": "textarea",
+          "vue_binding": "BaseTextarea: defineModel -> native <textarea v-model maxlength=4000>",
+          "fill_event": "input",
+          "required": false,
+          "policy": "fill",
+          "reason": "使用者原話中的地點補充（例如「家門口」），逐字。",
+          "placeholder": "地點位置補充說明"
+        },
+        {
+          "key": "custom_fields",
+          "label": "災情描述(至少勾選一項)",
+          "selector": "見 forms[].custom_fields",
+          "control": "mixed",
+          "vue_binding": "disasterCustomForm[item.field]",
+          "fill_event": null,
+          "required": true,
+          "policy": "fill",
+          "reason": "自訂欄位與補充描述至少一項有值才能送出（triggerCustomFormValidate）。"
+        },
+        {
+          "key": "additional_disc",
+          "label": "補充描述",
+          "selector": "textarea#additional_disc",
+          "control": "textarea",
+          "vue_binding": "BaseTextarea: defineModel -> native <textarea v-model maxlength=4000>",
+          "fill_event": "input",
+          "required": false,
+          "policy": "fill",
+          "reason": "使用者原話逐字。",
+          "placeholder": "災情細節說明"
+        },
+        {
+          "key": "attachments",
+          "label": "新增附件",
+          "selector": "input[type=file][id^=upload-file-]",
+          "control": "file",
+          "vue_binding": "UploadSection: <input type=file>, files kept in form store",
+          "fill_event": null,
+          "required": false,
+          "policy": "never",
+          "reason": "上傳檔案（最多 3 個）只能由使用者自己選。"
+        },
+        {
+          "key": "isAgree",
+          "label": "提供個人資料給承辦人員",
+          "selector": "input[type=checkbox]#Y[value=Y]",
+          "control": "checkbox",
+          "vue_binding": "BaseCheckbox: defineModel<string[]> -> native <input type=checkbox v-model> (array)",
+          "fill_event": null,
+          "required": true,
+          "policy": "never",
+          "reason": "個資同意；未勾選時送出鈕停用。助理不勾。注意 id 就是 'Y'（BaseCheckbox 以 option.value 當 id）。"
+        }
+      ],
+      "forms": [
+        {
+          "id": "D-1-1",
+          "name": "電線(桿)或纜線受損",
+          "group": "民生、基礎設施災情",
+          "custom_fields": [
+            {
+              "key": "casualties",
+              "label": "人員傷亡",
+              "selector": "input[type=checkbox][value=\"<option>\"] (在災情描述清單第 1 項內)",
+              "control": "checkbox_group",
+              "vue_binding": "BaseCheckbox: defineModel<string[]> -> native <input type=checkbox v-model> (array)",
+              "fill_event": "change (設 checked 後)",
+              "required": false,
+              "policy": "fill",
+              "reason": "只在使用者明確說到時勾選；沒說不代表沒有，不會勾「否」。人員傷亡要另外提醒撥 119。",
+              "options": [
+                "傷亡",
+                "受困",
+                "失蹤"
+              ],
+              "list_index": 1
+            },
+            {
+              "key": "traffic",
+              "label": "影響交通",
+              "selector": "input[type=checkbox][value=\"<option>\"] (在災情描述清單第 2 項內)",
+              "control": "checkbox_group",
+              "vue_binding": "BaseCheckbox: defineModel<string[]> -> native <input type=checkbox v-model> (array)",
+              "fill_event": "change (設 checked 後)",
+              "required": false,
+              "policy": "fill",
+              "reason": "只在使用者明確說到時勾選；沒說不代表沒有，不會勾「否」。",
+              "options": [
+                "道路",
+                "巷弄",
+                "人行道"
+              ],
+              "list_index": 2
+            },
+            {
+              "key": "cable_wire",
+              "label": "電纜線掉落",
+              "selector": "input[type=checkbox][value=\"<option>\"] (在災情描述清單第 3 項內)",
+              "control": "checkbox_group",
+              "vue_binding": "BaseCheckbox: defineModel<string[]> -> native <input type=checkbox v-model> (array)",
+              "fill_event": "change (設 checked 後)",
+              "required": false,
+              "policy": "fill",
+              "reason": "只在使用者明確說到時勾選；沒說不代表沒有，不會勾「否」。",
+              "options": [
+                "電纜掉落，恐有安全之虞",
+                "電力線掉落，恐有安全之虞",
+                "第四台電纜線掉落，恐有安全之虞",
+                "cctv電纜線掉落，恐有安全之虞",
+                "壓倒民宅"
+              ],
+              "list_index": 3
+            }
+          ]
+        },
+        {
+          "id": "D-1-2",
+          "name": "變電所、電廠受災",
+          "group": "民生、基礎設施災情",
+          "custom_fields": [
+            {
+              "key": "casualties",
+              "label": "人員傷亡",
+              "selector": "input[type=checkbox][value=\"<option>\"] (在災情描述清單第 1 項內)",
+              "control": "checkbox_group",
+              "vue_binding": "BaseCheckbox: defineModel<string[]> -> native <input type=checkbox v-model> (array)",
+              "fill_event": "change (設 checked 後)",
+              "required": false,
+              "policy": "fill",
+              "reason": "只在使用者明確說到時勾選；沒說不代表沒有，不會勾「否」。人員傷亡要另外提醒撥 119。",
+              "options": [
+                "傷亡",
+                "受困",
+                "失蹤"
+              ],
+              "list_index": 1
+            },
+            {
+              "key": "traffic",
+              "label": "影響交通",
+              "selector": "input[type=checkbox][value=\"<option>\"] (在災情描述清單第 2 項內)",
+              "control": "checkbox_group",
+              "vue_binding": "BaseCheckbox: defineModel<string[]> -> native <input type=checkbox v-model> (array)",
+              "fill_event": "change (設 checked 後)",
+              "required": false,
+              "policy": "fill",
+              "reason": "只在使用者明確說到時勾選；沒說不代表沒有，不會勾「否」。",
+              "options": [
+                "道路",
+                "巷弄",
+                "人行道"
+              ],
+              "list_index": 2
+            },
+            {
+              "key": "power_failure",
+              "label": "附近全面停電",
+              "selector": "input[type=checkbox][value=\"<option>\"] (在災情描述清單第 3 項內)",
+              "control": "checkbox_group",
+              "vue_binding": "BaseCheckbox: defineModel<string[]> -> native <input type=checkbox v-model> (array)",
+              "fill_event": "change (設 checked 後)",
+              "required": false,
+              "policy": "fill",
+              "reason": "只在使用者明確說到時勾選；沒說不代表沒有，不會勾「否」。",
+              "options": [
+                "變電箱",
+                "變電所",
+                "電廠受災"
+              ],
+              "list_index": 3
+            }
+          ]
+        },
+        {
+          "id": "D-1-3",
+          "name": "路燈故障",
+          "group": "民生、基礎設施災情",
+          "custom_fields": [
+            {
+              "key": "casualties",
+              "label": "人員傷亡",
+              "selector": "input[type=checkbox][value=\"<option>\"] (在災情描述清單第 1 項內)",
+              "control": "checkbox_group",
+              "vue_binding": "BaseCheckbox: defineModel<string[]> -> native <input type=checkbox v-model> (array)",
+              "fill_event": "change (設 checked 後)",
+              "required": false,
+              "policy": "fill",
+              "reason": "只在使用者明確說到時勾選；沒說不代表沒有，不會勾「否」。人員傷亡要另外提醒撥 119。",
+              "options": [
+                "傷亡",
+                "受困",
+                "失蹤"
+              ],
+              "list_index": 1
+            },
+            {
+              "key": "traffic",
+              "label": "影響交通",
+              "selector": "input[type=checkbox][value=\"<option>\"] (在災情描述清單第 2 項內)",
+              "control": "checkbox_group",
+              "vue_binding": "BaseCheckbox: defineModel<string[]> -> native <input type=checkbox v-model> (array)",
+              "fill_event": "change (設 checked 後)",
+              "required": false,
+              "policy": "fill",
+              "reason": "只在使用者明確說到時勾選；沒說不代表沒有，不會勾「否」。",
+              "options": [
+                "道路",
+                "巷弄",
+                "人行道"
+              ],
+              "list_index": 2
+            },
+            {
+              "key": "street_lamp_fall",
+              "label": "路燈傾倒(傾倒盞)",
+              "selector": "input#street_lamp_fall",
+              "control": "text",
+              "vue_binding": "BaseInput: defineModel -> native <input type=text v-model>",
+              "fill_event": "input",
+              "required": false,
+              "policy": "fill",
+              "reason": "使用者原話；數量只填使用者明說的數字。",
+              "list_index": 3
+            },
+            {
+              "key": "street_lamp_lost",
+              "label": "路燈傾倒(失明盞)",
+              "selector": "input#street_lamp_lost",
+              "control": "text",
+              "vue_binding": "BaseInput: defineModel -> native <input type=text v-model>",
+              "fill_event": "input",
+              "required": false,
+              "policy": "fill",
+              "reason": "使用者原話；數量只填使用者明說的數字。",
+              "list_index": 4
+            }
+          ]
+        },
+        {
+          "id": "D-1-4",
+          "name": "電力停電",
+          "group": "民生、基礎設施災情",
+          "custom_fields": [
+            {
+              "key": "casualties",
+              "label": "人員傷亡",
+              "selector": "input[type=checkbox][value=\"<option>\"] (在災情描述清單第 1 項內)",
+              "control": "checkbox_group",
+              "vue_binding": "BaseCheckbox: defineModel<string[]> -> native <input type=checkbox v-model> (array)",
+              "fill_event": "change (設 checked 後)",
+              "required": false,
+              "policy": "fill",
+              "reason": "只在使用者明確說到時勾選；沒說不代表沒有，不會勾「否」。人員傷亡要另外提醒撥 119。",
+              "options": [
+                "傷亡",
+                "受困",
+                "失蹤"
+              ],
+              "list_index": 1
+            },
+            {
+              "key": "traffic",
+              "label": "影響交通",
+              "selector": "input[type=checkbox][value=\"<option>\"] (在災情描述清單第 2 項內)",
+              "control": "checkbox_group",
+              "vue_binding": "BaseCheckbox: defineModel<string[]> -> native <input type=checkbox v-model> (array)",
+              "fill_event": "change (設 checked 後)",
+              "required": false,
+              "policy": "fill",
+              "reason": "只在使用者明確說到時勾選；沒說不代表沒有，不會勾「否」。",
+              "options": [
+                "道路",
+                "巷弄",
+                "人行道"
+              ],
+              "list_index": 2
+            },
+            {
+              "key": "power_failure_range",
+              "label": "停電範圍",
+              "selector": "input[type=checkbox][value=\"<option>\"] (在災情描述清單第 3 項內)",
+              "control": "checkbox_group",
+              "vue_binding": "BaseCheckbox: defineModel<string[]> -> native <input type=checkbox v-model> (array)",
+              "fill_event": "change (設 checked 後)",
+              "required": false,
+              "policy": "fill",
+              "reason": "只在使用者明確說到時勾選；沒說不代表沒有，不會勾「否」。",
+              "options": [
+                "整棟大樓不亮",
+                "整排巷弄不亮",
+                "整區不亮",
+                "請提供發電機供維生系統運作"
+              ],
+              "list_index": 3
+            }
+          ]
+        },
+        {
+          "id": "D-2-1",
+          "name": "橋樑基礎沖刷",
+          "group": "橋梁災情",
+          "custom_fields": [
+            {
+              "key": "casualties",
+              "label": "人員傷亡",
+              "selector": "input[type=checkbox][value=\"<option>\"] (在災情描述清單第 1 項內)",
+              "control": "checkbox_group",
+              "vue_binding": "BaseCheckbox: defineModel<string[]> -> native <input type=checkbox v-model> (array)",
+              "fill_event": "change (設 checked 後)",
+              "required": false,
+              "policy": "fill",
+              "reason": "只在使用者明確說到時勾選；沒說不代表沒有，不會勾「否」。人員傷亡要另外提醒撥 119。",
+              "options": [
+                "傷亡",
+                "受困",
+                "失蹤"
+              ],
+              "list_index": 1
+            },
+            {
+              "key": "bridge_foundation_scouring",
+              "label": "橋墩基礎沖刷有危險之虞影響通行(根)",
+              "selector": "input#bridge_foundation_scouring",
+              "control": "text",
+              "vue_binding": "BaseInput: defineModel -> native <input type=text v-model>",
+              "fill_event": "input",
+              "required": false,
+              "policy": "fill",
+              "reason": "使用者原話；數量只填使用者明說的數字。",
+              "list_index": 2
+            },
+            {
+              "key": "vehicle_submerged_in_water",
+              "label": "車子落水(輛)",
+              "selector": "input#vehicle_submerged_in_water",
+              "control": "text",
+              "vue_binding": "BaseInput: defineModel -> native <input type=text v-model>",
+              "fill_event": "input",
+              "required": false,
+              "policy": "fill",
+              "reason": "使用者原話；數量只填使用者明說的數字。",
+              "list_index": 3
+            }
+          ]
+        },
+        {
+          "id": "D-2-2",
+          "name": "橋樑斷裂",
+          "group": "橋梁災情",
+          "custom_fields": [
+            {
+              "key": "casualties",
+              "label": "人員傷亡",
+              "selector": "input[type=checkbox][value=\"<option>\"] (在災情描述清單第 1 項內)",
+              "control": "checkbox_group",
+              "vue_binding": "BaseCheckbox: defineModel<string[]> -> native <input type=checkbox v-model> (array)",
+              "fill_event": "change (設 checked 後)",
+              "required": false,
+              "policy": "fill",
+              "reason": "只在使用者明確說到時勾選；沒說不代表沒有，不會勾「否」。人員傷亡要另外提醒撥 119。",
+              "options": [
+                "傷亡",
+                "受困",
+                "失蹤"
+              ],
+              "list_index": 1
+            },
+            {
+              "key": "traffic",
+              "label": "影響交通",
+              "selector": "input[type=checkbox][value=\"<option>\"] (在災情描述清單第 2 項內)",
+              "control": "checkbox_group",
+              "vue_binding": "BaseCheckbox: defineModel<string[]> -> native <input type=checkbox v-model> (array)",
+              "fill_event": "change (設 checked 後)",
+              "required": false,
+              "policy": "fill",
+              "reason": "只在使用者明確說到時勾選；沒說不代表沒有，不會勾「否」。",
+              "options": [
+                "道路",
+                "巷弄",
+                "人行道"
+              ],
+              "list_index": 2
+            },
+            {
+              "key": "vehicle_submerged_in_water",
+              "label": "車子落水(輛)",
+              "selector": "input#vehicle_submerged_in_water",
+              "control": "text",
+              "vue_binding": "BaseInput: defineModel -> native <input type=text v-model>",
+              "fill_event": "input",
+              "required": false,
+              "policy": "fill",
+              "reason": "使用者原話；數量只填使用者明說的數字。",
+              "list_index": 3
+            }
+          ]
+        },
+        {
+          "id": "D-2-3",
+          "name": "前述以外之橋梁災情",
+          "group": "橋梁災情",
+          "custom_fields": [
+            {
+              "key": "casualties",
+              "label": "人員傷亡",
+              "selector": "input[type=checkbox][value=\"<option>\"] (在災情描述清單第 1 項內)",
+              "control": "checkbox_group",
+              "vue_binding": "BaseCheckbox: defineModel<string[]> -> native <input type=checkbox v-model> (array)",
+              "fill_event": "change (設 checked 後)",
+              "required": false,
+              "policy": "fill",
+              "reason": "只在使用者明確說到時勾選；沒說不代表沒有，不會勾「否」。人員傷亡要另外提醒撥 119。",
+              "options": [
+                "傷亡",
+                "受困",
+                "失蹤"
+              ],
+              "list_index": 1
+            },
+            {
+              "key": "traffic",
+              "label": "影響交通",
+              "selector": "input[type=checkbox][value=\"<option>\"] (在災情描述清單第 2 項內)",
+              "control": "checkbox_group",
+              "vue_binding": "BaseCheckbox: defineModel<string[]> -> native <input type=checkbox v-model> (array)",
+              "fill_event": "change (設 checked 後)",
+              "required": false,
+              "policy": "fill",
+              "reason": "只在使用者明確說到時勾選；沒說不代表沒有，不會勾「否」。",
+              "options": [
+                "道路",
+                "巷弄",
+                "人行道"
+              ],
+              "list_index": 2
+            },
+            {
+              "key": "river",
+              "label": "河川水位即淹上橋面，有危險之虞(河川)",
+              "selector": "input#river",
+              "control": "text",
+              "vue_binding": "BaseInput: defineModel -> native <input type=text v-model>",
+              "fill_event": "input",
+              "required": false,
+              "policy": "fill",
+              "reason": "使用者原話；數量只填使用者明說的數字。",
+              "list_index": 3
+            },
+            {
+              "key": "meter",
+              "label": "河川水位即淹上橋面，有危險之虞(約差公尺)",
+              "selector": "input#meter",
+              "control": "text",
+              "vue_binding": "BaseInput: defineModel -> native <input type=text v-model>",
+              "fill_event": "input",
+              "required": false,
+              "policy": "fill",
+              "reason": "使用者原話；數量只填使用者明說的數字。",
+              "list_index": 4
+            }
+          ]
+        },
+        {
+          "id": "D-3-1",
+          "name": "土石流",
+          "group": "土石災情",
+          "custom_fields": [
+            {
+              "key": "casualties",
+              "label": "人員傷亡",
+              "selector": "input[type=checkbox][value=\"<option>\"] (在災情描述清單第 1 項內)",
+              "control": "checkbox_group",
+              "vue_binding": "BaseCheckbox: defineModel<string[]> -> native <input type=checkbox v-model> (array)",
+              "fill_event": "change (設 checked 後)",
+              "required": false,
+              "policy": "fill",
+              "reason": "只在使用者明確說到時勾選；沒說不代表沒有，不會勾「否」。人員傷亡要另外提醒撥 119。",
+              "options": [
+                "傷亡",
+                "受困",
+                "失蹤"
+              ],
+              "list_index": 1
+            },
+            {
+              "key": "traffic",
+              "label": "影響交通",
+              "selector": "input[type=checkbox][value=\"<option>\"] (在災情描述清單第 2 項內)",
+              "control": "checkbox_group",
+              "vue_binding": "BaseCheckbox: defineModel<string[]> -> native <input type=checkbox v-model> (array)",
+              "fill_event": "change (設 checked 後)",
+              "required": false,
+              "policy": "fill",
+              "reason": "只在使用者明確說到時勾選；沒說不代表沒有，不會勾「否」。",
+              "options": [
+                "道路",
+                "巷弄",
+                "人行道"
+              ],
+              "list_index": 2
+            },
+            {
+              "key": "debris_flow_length",
+              "label": "土石流(範圍約多長)",
+              "selector": "input#debris_flow_length",
+              "control": "text",
+              "vue_binding": "BaseInput: defineModel -> native <input type=text v-model>",
+              "fill_event": "input",
+              "required": false,
+              "policy": "fill",
+              "reason": "使用者原話；數量只填使用者明說的數字。",
+              "list_index": 3
+            },
+            {
+              "key": "debris_flow_width",
+              "label": "土石流(範圍約多寬)",
+              "selector": "input#debris_flow_width",
+              "control": "text",
+              "vue_binding": "BaseInput: defineModel -> native <input type=text v-model>",
+              "fill_event": "input",
+              "required": false,
+              "policy": "fill",
+              "reason": "使用者原話；數量只填使用者明說的數字。",
+              "list_index": 4
+            },
+            {
+              "key": "debris_flow_height",
+              "label": "土石流(範圍約多深)",
+              "selector": "input#debris_flow_height",
+              "control": "text",
+              "vue_binding": "BaseInput: defineModel -> native <input type=text v-model>",
+              "fill_event": "input",
+              "required": false,
+              "policy": "fill",
+              "reason": "使用者原話；數量只填使用者明說的數字。",
+              "list_index": 5
+            },
+            {
+              "key": "debris_flow_urgent",
+              "label": "(無標題)",
+              "selector": "input[type=checkbox][value=\"<option>\"] (在災情描述清單第 6 項內)",
+              "control": "checkbox_group",
+              "vue_binding": "BaseCheckbox: defineModel<string[]> -> native <input type=checkbox v-model> (array)",
+              "fill_event": "change (設 checked 後)",
+              "required": false,
+              "policy": "fill",
+              "reason": "只在使用者明確說到時勾選；沒說不代表沒有，不會勾「否」。",
+              "options": [
+                "多處房屋掩埋，情況危急"
+              ],
+              "list_index": 6
+            }
+          ]
+        },
+        {
+          "id": "D-3-2",
+          "name": "土石崩落",
+          "group": "土石災情",
+          "custom_fields": [
+            {
+              "key": "casualties",
+              "label": "人員傷亡",
+              "selector": "input[type=checkbox][value=\"<option>\"] (在災情描述清單第 1 項內)",
+              "control": "checkbox_group",
+              "vue_binding": "BaseCheckbox: defineModel<string[]> -> native <input type=checkbox v-model> (array)",
+              "fill_event": "change (設 checked 後)",
+              "required": false,
+              "policy": "fill",
+              "reason": "只在使用者明確說到時勾選；沒說不代表沒有，不會勾「否」。人員傷亡要另外提醒撥 119。",
+              "options": [
+                "傷亡",
+                "受困",
+                "失蹤"
+              ],
+              "list_index": 1
+            },
+            {
+              "key": "traffic",
+              "label": "影響交通",
+              "selector": "input[type=checkbox][value=\"<option>\"] (在災情描述清單第 2 項內)",
+              "control": "checkbox_group",
+              "vue_binding": "BaseCheckbox: defineModel<string[]> -> native <input type=checkbox v-model> (array)",
+              "fill_event": "change (設 checked 後)",
+              "required": false,
+              "policy": "fill",
+              "reason": "只在使用者明確說到時勾選；沒說不代表沒有，不會勾「否」。",
+              "options": [
+                "道路",
+                "巷弄",
+                "人行道"
+              ],
+              "list_index": 2
+            },
+            {
+              "key": "debris_flow_length",
+              "label": "土石流(範圍約多長)",
+              "selector": "input#debris_flow_length",
+              "control": "text",
+              "vue_binding": "BaseInput: defineModel -> native <input type=text v-model>",
+              "fill_event": "input",
+              "required": false,
+              "policy": "fill",
+              "reason": "使用者原話；數量只填使用者明說的數字。",
+              "list_index": 3
+            },
+            {
+              "key": "debris_flow_width",
+              "label": "土石流(範圍約多寬)",
+              "selector": "input#debris_flow_width",
+              "control": "text",
+              "vue_binding": "BaseInput: defineModel -> native <input type=text v-model>",
+              "fill_event": "input",
+              "required": false,
+              "policy": "fill",
+              "reason": "使用者原話；數量只填使用者明說的數字。",
+              "list_index": 4
+            },
+            {
+              "key": "debris_flow_height",
+              "label": "土石流(範圍約多深)",
+              "selector": "input#debris_flow_height",
+              "control": "text",
+              "vue_binding": "BaseInput: defineModel -> native <input type=text v-model>",
+              "fill_event": "input",
+              "required": false,
+              "policy": "fill",
+              "reason": "使用者原話；數量只填使用者明說的數字。",
+              "list_index": 5
+            },
+            {
+              "key": "debris_flow_urgent",
+              "label": "(無標題)",
+              "selector": "input[type=checkbox][value=\"<option>\"] (在災情描述清單第 6 項內)",
+              "control": "checkbox_group",
+              "vue_binding": "BaseCheckbox: defineModel<string[]> -> native <input type=checkbox v-model> (array)",
+              "fill_event": "change (設 checked 後)",
+              "required": false,
+              "policy": "fill",
+              "reason": "只在使用者明確說到時勾選；沒說不代表沒有，不會勾「否」。",
+              "options": [
+                "多處房屋掩埋，情況危急"
+              ],
+              "list_index": 6
+            }
+          ]
+        },
+        {
+          "id": "D-3-3",
+          "name": "堰塞湖",
+          "group": "土石災情",
+          "custom_fields": [
+            {
+              "key": "casualties",
+              "label": "人員傷亡",
+              "selector": "input[type=checkbox][value=\"<option>\"] (在災情描述清單第 1 項內)",
+              "control": "checkbox_group",
+              "vue_binding": "BaseCheckbox: defineModel<string[]> -> native <input type=checkbox v-model> (array)",
+              "fill_event": "change (設 checked 後)",
+              "required": false,
+              "policy": "fill",
+              "reason": "只在使用者明確說到時勾選；沒說不代表沒有，不會勾「否」。人員傷亡要另外提醒撥 119。",
+              "options": [
+                "傷亡",
+                "受困",
+                "失蹤"
+              ],
+              "list_index": 1
+            },
+            {
+              "key": "traffic",
+              "label": "影響交通",
+              "selector": "input[type=checkbox][value=\"<option>\"] (在災情描述清單第 2 項內)",
+              "control": "checkbox_group",
+              "vue_binding": "BaseCheckbox: defineModel<string[]> -> native <input type=checkbox v-model> (array)",
+              "fill_event": "change (設 checked 後)",
+              "required": false,
+              "policy": "fill",
+              "reason": "只在使用者明確說到時勾選；沒說不代表沒有，不會勾「否」。",
+              "options": [
+                "道路",
+                "巷弄",
+                "人行道"
+              ],
+              "list_index": 2
+            },
+            {
+              "key": "debris_flow_length",
+              "label": "土石流(範圍約多長)",
+              "selector": "input#debris_flow_length",
+              "control": "text",
+              "vue_binding": "BaseInput: defineModel -> native <input type=text v-model>",
+              "fill_event": "input",
+              "required": false,
+              "policy": "fill",
+              "reason": "使用者原話；數量只填使用者明說的數字。",
+              "list_index": 3
+            },
+            {
+              "key": "debris_flow_width",
+              "label": "土石流(範圍約多寬)",
+              "selector": "input#debris_flow_width",
+              "control": "text",
+              "vue_binding": "BaseInput: defineModel -> native <input type=text v-model>",
+              "fill_event": "input",
+              "required": false,
+              "policy": "fill",
+              "reason": "使用者原話；數量只填使用者明說的數字。",
+              "list_index": 4
+            },
+            {
+              "key": "debris_flow_height",
+              "label": "土石流(範圍約多深)",
+              "selector": "input#debris_flow_height",
+              "control": "text",
+              "vue_binding": "BaseInput: defineModel -> native <input type=text v-model>",
+              "fill_event": "input",
+              "required": false,
+              "policy": "fill",
+              "reason": "使用者原話；數量只填使用者明說的數字。",
+              "list_index": 5
+            },
+            {
+              "key": "barrier_lake",
+              "label": "土石流(致使什麼河(溪)形成堰塞湖，情況危急)",
+              "selector": "input#barrier_lake",
+              "control": "text",
+              "vue_binding": "BaseInput: defineModel -> native <input type=text v-model>",
+              "fill_event": "input",
+              "required": false,
+              "policy": "fill",
+              "reason": "使用者原話；數量只填使用者明說的數字。",
+              "list_index": 6
+            }
+          ]
+        },
+        {
+          "id": "D-4-1",
+          "name": "建築物火災",
+          "group": "火災",
+          "custom_fields": [
+            {
+              "key": "casualties",
+              "label": "人員傷亡",
+              "selector": "input[type=checkbox][value=\"<option>\"] (在災情描述清單第 1 項內)",
+              "control": "checkbox_group",
+              "vue_binding": "BaseCheckbox: defineModel<string[]> -> native <input type=checkbox v-model> (array)",
+              "fill_event": "change (設 checked 後)",
+              "required": false,
+              "policy": "fill",
+              "reason": "只在使用者明確說到時勾選；沒說不代表沒有，不會勾「否」。人員傷亡要另外提醒撥 119。",
+              "options": [
+                "傷亡",
+                "受困",
+                "失蹤"
+              ],
+              "list_index": 1
+            },
+            {
+              "key": "traffic",
+              "label": "影響交通",
+              "selector": "input[type=checkbox][value=\"<option>\"] (在災情描述清單第 2 項內)",
+              "control": "checkbox_group",
+              "vue_binding": "BaseCheckbox: defineModel<string[]> -> native <input type=checkbox v-model> (array)",
+              "fill_event": "change (設 checked 後)",
+              "required": false,
+              "policy": "fill",
+              "reason": "只在使用者明確說到時勾選；沒說不代表沒有，不會勾「否」。",
+              "options": [
+                "道路",
+                "巷弄",
+                "人行道"
+              ],
+              "list_index": 2
+            },
+            {
+              "key": "floor",
+              "label": "建築物狀況(建築物幾樓)",
+              "selector": "input#floor",
+              "control": "text",
+              "vue_binding": "BaseInput: defineModel -> native <input type=text v-model>",
+              "fill_event": "input",
+              "required": false,
+              "policy": "fill",
+              "reason": "使用者原話；數量只填使用者明說的數字。",
+              "list_index": 3
+            }
+          ]
+        },
+        {
+          "id": "D-4-2",
+          "name": "危險物品火災",
+          "group": "火災",
+          "custom_fields": [
+            {
+              "key": "casualties",
+              "label": "人員傷亡",
+              "selector": "input[type=checkbox][value=\"<option>\"] (在災情描述清單第 1 項內)",
+              "control": "checkbox_group",
+              "vue_binding": "BaseCheckbox: defineModel<string[]> -> native <input type=checkbox v-model> (array)",
+              "fill_event": "change (設 checked 後)",
+              "required": false,
+              "policy": "fill",
+              "reason": "只在使用者明確說到時勾選；沒說不代表沒有，不會勾「否」。人員傷亡要另外提醒撥 119。",
+              "options": [
+                "傷亡",
+                "受困",
+                "失蹤"
+              ],
+              "list_index": 1
+            },
+            {
+              "key": "traffic",
+              "label": "影響交通",
+              "selector": "input[type=checkbox][value=\"<option>\"] (在災情描述清單第 2 項內)",
+              "control": "checkbox_group",
+              "vue_binding": "BaseCheckbox: defineModel<string[]> -> native <input type=checkbox v-model> (array)",
+              "fill_event": "change (設 checked 後)",
+              "required": false,
+              "policy": "fill",
+              "reason": "只在使用者明確說到時勾選；沒說不代表沒有，不會勾「否」。",
+              "options": [
+                "道路",
+                "巷弄",
+                "人行道"
+              ],
+              "list_index": 2
+            },
+            {
+              "key": "situation",
+              "label": "火災狀況",
+              "selector": "input#situation",
+              "control": "text",
+              "vue_binding": "BaseInput: defineModel -> native <input type=text v-model>",
+              "fill_event": "input",
+              "required": false,
+              "policy": "fill",
+              "reason": "使用者原話；數量只填使用者明說的數字。",
+              "list_index": 3
+            }
+          ]
+        },
+        {
+          "id": "D-4-3",
+          "name": "工廠火災",
+          "group": "火災",
+          "custom_fields": [
+            {
+              "key": "casualties",
+              "label": "人員傷亡",
+              "selector": "input[type=checkbox][value=\"<option>\"] (在災情描述清單第 1 項內)",
+              "control": "checkbox_group",
+              "vue_binding": "BaseCheckbox: defineModel<string[]> -> native <input type=checkbox v-model> (array)",
+              "fill_event": "change (設 checked 後)",
+              "required": false,
+              "policy": "fill",
+              "reason": "只在使用者明確說到時勾選；沒說不代表沒有，不會勾「否」。人員傷亡要另外提醒撥 119。",
+              "options": [
+                "傷亡",
+                "受困",
+                "失蹤"
+              ],
+              "list_index": 1
+            },
+            {
+              "key": "traffic",
+              "label": "影響交通",
+              "selector": "input[type=checkbox][value=\"<option>\"] (在災情描述清單第 2 項內)",
+              "control": "checkbox_group",
+              "vue_binding": "BaseCheckbox: defineModel<string[]> -> native <input type=checkbox v-model> (array)",
+              "fill_event": "change (設 checked 後)",
+              "required": false,
+              "policy": "fill",
+              "reason": "只在使用者明確說到時勾選；沒說不代表沒有，不會勾「否」。",
+              "options": [
+                "道路",
+                "巷弄",
+                "人行道"
+              ],
+              "list_index": 2
+            },
+            {
+              "key": "factory",
+              "label": "火災狀況(工廠)",
+              "selector": "input#factory",
+              "control": "text",
+              "vue_binding": "BaseInput: defineModel -> native <input type=text v-model>",
+              "fill_event": "input",
+              "required": false,
+              "policy": "fill",
+              "reason": "使用者原話；數量只填使用者明說的數字。",
+              "list_index": 3
+            },
+            {
+              "key": "floor",
+              "label": "火災狀況(於幾樓)",
+              "selector": "input#floor",
+              "control": "text",
+              "vue_binding": "BaseInput: defineModel -> native <input type=text v-model>",
+              "fill_event": "input",
+              "required": false,
+              "policy": "fill",
+              "reason": "使用者原話；數量只填使用者明說的數字。",
+              "list_index": 4
+            },
+            {
+              "key": "scale",
+              "label": "(無標題)",
+              "selector": "input[type=checkbox][value=\"<option>\"] (在災情描述清單第 5 項內)",
+              "control": "checkbox_group",
+              "vue_binding": "BaseCheckbox: defineModel<string[]> -> native <input type=checkbox v-model> (array)",
+              "fill_event": "change (設 checked 後)",
+              "required": false,
+              "policy": "fill",
+              "reason": "只在使用者明確說到時勾選；沒說不代表沒有，不會勾「否」。",
+              "options": [
+                "冒出大量濃煙",
+                "火舌竄出",
+                "延燒至鄰棟建物"
+              ],
+              "list_index": 5
+            }
+          ]
+        },
+        {
+          "id": "D-4-4",
+          "name": "其他(前述以外火災)",
+          "group": "火災",
+          "custom_fields": [
+            {
+              "key": "casualties",
+              "label": "人員傷亡",
+              "selector": "input[type=checkbox][value=\"<option>\"] (在災情描述清單第 1 項內)",
+              "control": "checkbox_group",
+              "vue_binding": "BaseCheckbox: defineModel<string[]> -> native <input type=checkbox v-model> (array)",
+              "fill_event": "change (設 checked 後)",
+              "required": false,
+              "policy": "fill",
+              "reason": "只在使用者明確說到時勾選；沒說不代表沒有，不會勾「否」。人員傷亡要另外提醒撥 119。",
+              "options": [
+                "傷亡",
+                "受困",
+                "失蹤"
+              ],
+              "list_index": 1
+            },
+            {
+              "key": "traffic",
+              "label": "影響交通",
+              "selector": "input[type=checkbox][value=\"<option>\"] (在災情描述清單第 2 項內)",
+              "control": "checkbox_group",
+              "vue_binding": "BaseCheckbox: defineModel<string[]> -> native <input type=checkbox v-model> (array)",
+              "fill_event": "change (設 checked 後)",
+              "required": false,
+              "policy": "fill",
+              "reason": "只在使用者明確說到時勾選；沒說不代表沒有，不會勾「否」。",
+              "options": [
+                "道路",
+                "巷弄",
+                "人行道"
+              ],
+              "list_index": 2
+            }
+          ]
+        }
+      ],
+      "submit": {
+        "button_text": "送出",
+        "handler": "onSubmitClick: 檢查自訂欄位至少一項；console.log 後開「通報成功」對話框（示範，沒有網路請求）。",
+        "disabled_when": "未勾個資同意 或 location 空白",
+        "assistant_may_click": false
+      }
+    },
+    {
+      "id": "application_form",
+      "title": "申辦表單（/form/:id）",
+      "route": "/form/:id",
+      "route_ids": "首頁服務清單的 a-1、a-2、a-3、b-1、c-1~c-5、d-1、d-2",
+      "source": "src/views/FormView.vue + GeneralInfoForm.vue + ApplyServiceInfoForm.vue + FormPreview.vue + public/mock/form.json",
+      "cold_link": "可以（自己 import form.json）。注意：route id 沒有被使用，11 個 id 都顯示同一張「交通違規申訴」示範表單。",
+      "ready_selector": "textarea#content",
+      "steps": [
+        "1 填寫（基本資料＋申辦服務資料，按「下一步」）",
+        "2 預覽（個資同意＋送出）",
+        "3 完成"
+      ],
+      "fields": [
+        {
+          "key": "mail",
+          "label": "電子信箱",
+          "selector": "input#mail",
+          "control": "text",
+          "vue_binding": "BaseInput: defineModel -> native <input type=text v-model>",
+          "fill_event": "input",
+          "required": true,
+          "policy": "never",
+          "reason": "聯絡個資，由使用者自己填。"
+        },
+        {
+          "key": "county",
+          "label": "縣市",
+          "selector": "select#county",
+          "control": "select",
+          "vue_binding": "BaseSelect: defineModel -> native <select v-model>",
+          "fill_event": "change",
+          "required": true,
+          "policy": "never",
+          "reason": "聯絡地址的一部分（個資）。選項來自 src/zipcode/county.ts。"
+        },
+        {
+          "key": "city",
+          "label": "鄉鎮(市)區",
+          "selector": "select#city",
+          "control": "select",
+          "vue_binding": "BaseSelect: defineModel -> native <select v-model>",
+          "fill_event": "change",
+          "required": true,
+          "policy": "never",
+          "reason": "聯絡地址；選項依縣市變動，改縣市會清空。"
+        },
+        {
+          "key": "address",
+          "label": "通訊地址",
+          "selector": "input#address",
+          "control": "text",
+          "vue_binding": "BaseInput: defineModel -> native <input type=text v-model>",
+          "fill_event": "input",
+          "required": true,
+          "policy": "never",
+          "reason": "聯絡個資。"
+        },
+        {
+          "key": "name",
+          "label": "違規駕駛人姓名",
+          "selector": "input#name",
+          "control": "text",
+          "vue_binding": "BaseInput: defineModel -> native <input type=text v-model>",
+          "fill_event": "input",
+          "required": true,
+          "policy": "never",
+          "reason": "身分資料（可能是別人的姓名），不由助理填。"
+        },
+        {
+          "key": "agency",
+          "label": "承辦機關",
+          "selector": "select#agency",
+          "control": "select",
+          "vue_binding": "BaseSelect: defineModel -> native <select v-model>",
+          "fill_event": "change",
+          "required": true,
+          "policy": "suggest",
+          "reason": "只有一個選項，由使用者點選即可；助理只在面板提示。",
+          "options": [
+            "交通事件裁決所"
+          ]
+        },
+        {
+          "key": "apply",
+          "label": "申訴項目",
+          "selector": null,
+          "control": "multiple_select",
+          "vue_binding": "BaseMultipleSelect: headlessui Dialog 內的 checkbox，只在對話框打開時存在；@confirm 才寫回 form",
+          "fill_event": null,
+          "required": true,
+          "policy": "suggest",
+          "reason": "DOM 平常不存在，不能可靠填；面板提示建議選項，使用者自己選。",
+          "options": [
+            "車禍案件申訴",
+            "車型車色不符"
+          ]
+        },
+        {
+          "key": "send_by_mail",
+          "label": "以E-MAIL寄發",
+          "selector": "input[type=radio][name=send_by_mail]",
+          "control": "radio_group",
+          "vue_binding": "BaseRadio: defineModel -> native <input type=radio v-model>",
+          "fill_event": "click",
+          "required": true,
+          "policy": "suggest",
+          "reason": "使用者的偏好，助理不替他決定；只在使用者明說時於面板提示。",
+          "options": [
+            "Y",
+            "N"
+          ],
+          "ids": [
+            "send_by_mailY",
+            "send_by_mailN"
+          ]
+        },
+        {
+          "key": "content",
+          "label": "申訴內容",
+          "selector": "textarea#content",
+          "control": "textarea",
+          "vue_binding": "BaseTextarea: defineModel -> native <textarea v-model maxlength=4000>",
+          "fill_event": "input",
+          "required": true,
+          "policy": "fill",
+          "reason": "使用者原話逐字。"
+        },
+        {
+          "key": "apply_form",
+          "label": "申請表單",
+          "selector": "input[type=checkbox]#現場圖 / #現場照片",
+          "control": "checkbox_group",
+          "vue_binding": "BaseCheckbox: defineModel<string[]> -> native <input type=checkbox v-model> (array)",
+          "fill_event": "change",
+          "required": true,
+          "policy": "never",
+          "reason": "跟使用者手上的附件有關，由使用者自己勾。",
+          "options": [
+            "現場圖",
+            "現場照片"
+          ]
+        },
+        {
+          "key": "date",
+          "label": "肇事日期",
+          "selector": null,
+          "control": "date_picker",
+          "vue_binding": "DatePicker: v-calendar DatePicker; BaseInput is readonly and shows inputValue",
+          "fill_event": null,
+          "required": true,
+          "policy": "suggest",
+          "reason": "readonly + v-calendar，改 DOM 不會更新 Date；面板顯示使用者說的日期，請他自己點選。"
+        },
+        {
+          "key": "isAgree",
+          "label": "個人資料是否提供給承辦員（預覽頁）",
+          "selector": "input[type=radio][name=isAgree]",
+          "control": "radio",
+          "vue_binding": "BaseRadio: defineModel -> native <input type=radio v-model>",
+          "fill_event": null,
+          "required": true,
+          "policy": "never",
+          "reason": "個資同意，預設 Y。"
+        }
+      ],
+      "submit": {
+        "button_text": "下一步 → 送出",
+        "handler": "onSubmitClick 檢查必填後到預覽；預覽 onSubmitClick 只開「案件已完成申辦」對話框（fetch 範例被註解）。",
+        "assistant_may_click": false
+      }
+    },
+    {
+      "id": "police_report",
+      "title": "線上報案",
+      "route": "/police-report/form",
+      "source": "src/views/PoliceReportFormView.vue + PoliceReportGeneralForm.vue + PoliceReportDetailForm.vue",
+      "cold_link": "可以（不依賴 store；姓名與身分證字號經 userinfo bridge 取得）。",
+      "steps": [
+        "1 基本資料（全部是個資，按「下一步」）",
+        "2 案件內容（按「送出」）"
+      ],
+      "ready_selector": "textarea#case_summary (只在第 2 步出現)",
+      "fields": [
+        {
+          "key": "realName/idNo",
+          "label": "申請人姓名、身分證字號",
+          "selector": null,
+          "control": "display",
+          "vue_binding": "userinfo bridge -> user store",
+          "fill_event": null,
+          "required": true,
+          "policy": "never",
+          "reason": "唯讀顯示的身分資料。"
+        },
+        {
+          "key": "mobile_number",
+          "label": "手機號碼",
+          "selector": "input#mobile_number",
+          "control": "text",
+          "vue_binding": "BaseInput: defineModel -> native <input type=text v-model>",
+          "fill_event": "input",
+          "required": true,
+          "policy": "never",
+          "reason": "個資。",
+          "step": 1
+        },
+        {
+          "key": "contact_number",
+          "label": "住家電話",
+          "selector": "input#contact_number",
+          "control": "text",
+          "vue_binding": "BaseInput: defineModel -> native <input type=text v-model>",
+          "fill_event": "input",
+          "required": false,
+          "policy": "never",
+          "reason": "個資。",
+          "step": 1
+        },
+        {
+          "key": "mail",
+          "label": "電子信箱",
+          "selector": "input#mail",
+          "control": "text",
+          "vue_binding": "BaseInput: defineModel -> native <input type=text v-model>",
+          "fill_event": "input",
+          "required": true,
+          "policy": "never",
+          "reason": "個資。",
+          "step": 1
+        },
+        {
+          "key": "county/city/detail",
+          "label": "通訊地址",
+          "selector": "select#county、select#city（與戶籍地址重複 id）、詳細地址無 id",
+          "control": "select+text",
+          "vue_binding": "BaseSelect: defineModel -> native <select v-model>",
+          "fill_event": null,
+          "required": true,
+          "policy": "never",
+          "reason": "個資；而且 id 重複，選擇器不可靠。",
+          "step": 1
+        },
+        {
+          "key": "permanent_*",
+          "label": "戶籍地址",
+          "selector": "同上（重複 id）",
+          "control": "select+text",
+          "vue_binding": "BaseSelect: defineModel -> native <select v-model>",
+          "fill_event": null,
+          "required": true,
+          "policy": "never",
+          "reason": "個資。",
+          "step": 1
+        },
+        {
+          "key": "isAddressSame",
+          "label": "同通訊地址",
+          "selector": "input[type=checkbox]#Y",
+          "control": "checkbox",
+          "vue_binding": "BaseCheckbox: defineModel<string[]> -> native <input type=checkbox v-model> (array)",
+          "fill_event": null,
+          "required": false,
+          "policy": "never",
+          "reason": "個資相關。",
+          "step": 1
+        },
+        {
+          "key": "isAgree_1",
+          "label": "本人已詳閱並同意以上內容",
+          "selector": "input[type=checkbox]#agree",
+          "control": "checkbox",
+          "vue_binding": "BaseCheckbox: defineModel<string[]> -> native <input type=checkbox v-model> (array)",
+          "fill_event": null,
+          "required": true,
+          "policy": "never",
+          "reason": "同意條款。",
+          "step": 1
+        },
+        {
+          "key": "your_role",
+          "label": "報案人類別",
+          "selector": "select#your_role",
+          "control": "select",
+          "vue_binding": "BaseSelect: defineModel -> native <select v-model>",
+          "fill_event": "change",
+          "required": true,
+          "policy": "fill",
+          "reason": "只在使用者明說身分（我是被害人…）時才選；不推測。",
+          "step": 2,
+          "options": [
+            "當事人Person involved",
+            "被害人Victim",
+            "檢舉人Informant",
+            "關係人Interested Party"
+          ]
+        },
+        {
+          "key": "location",
+          "label": "標注發生地點",
+          "selector": "input#location",
+          "control": "text",
+          "vue_binding": "BaseInput: defineModel -> native <input type=text v-model>",
+          "fill_event": "input",
+          "required": true,
+          "policy": "fill",
+          "reason": "地址原文。",
+          "step": 2
+        },
+        {
+          "key": "date_of_incident",
+          "label": "發生日期",
+          "selector": null,
+          "control": "date_picker",
+          "vue_binding": "DatePicker: v-calendar DatePicker; BaseInput is readonly and shows inputValue",
+          "fill_event": null,
+          "required": true,
+          "policy": "suggest",
+          "reason": "v-calendar，不能用 DOM 填；面板提示。",
+          "step": 2
+        },
+        {
+          "key": "time",
+          "label": "發生時間",
+          "selector": null,
+          "control": "time_picker",
+          "vue_binding": "v-calendar DatePicker mode=time，預設為現在時間",
+          "fill_event": null,
+          "required": true,
+          "policy": "suggest",
+          "reason": "預設值是開頁時間，使用者要自己改；面板提示。",
+          "step": 2
+        },
+        {
+          "key": "case_summary",
+          "label": "案情摘要",
+          "selector": "textarea#case_summary",
+          "control": "textarea",
+          "vue_binding": "BaseTextarea: defineModel -> native <textarea v-model maxlength=4000>",
+          "fill_event": "input",
+          "required": true,
+          "policy": "fill",
+          "reason": "使用者原話逐字；畫面寫 500 字以內（實際 maxlength 4000），超過 500 字要提醒。",
+          "step": 2
+        },
+        {
+          "key": "attachments",
+          "label": "新增附件",
+          "selector": "input[type=file][id^=upload-file-]",
+          "control": "file",
+          "vue_binding": "UploadSection: <input type=file>, files kept in form store",
+          "fill_event": null,
+          "required": false,
+          "policy": "never",
+          "reason": "上傳檔案（最多 不限 個）只能由使用者自己選。",
+          "step": 2
+        },
+        {
+          "key": "isAgree_2",
+          "label": "本人已詳閱並同意以上內容",
+          "selector": "input[type=checkbox]#agree",
+          "control": "checkbox",
+          "vue_binding": "BaseCheckbox: defineModel<string[]> -> native <input type=checkbox v-model> (array)",
+          "fill_event": null,
+          "required": true,
+          "policy": "never",
+          "reason": "同意條款。",
+          "step": 2
+        }
+      ],
+      "submit": {
+        "button_text": "下一步 / 送出",
+        "handler": "送出後開「通報成功」對話框（示範）。報案涉及法律責任。",
+        "assistant_may_click": false
+      }
+    }
+  ]
+}

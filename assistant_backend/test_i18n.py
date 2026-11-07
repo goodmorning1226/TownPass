@@ -186,3 +186,24 @@ class SoundKeyTests(unittest.TestCase):
         app = Assistant(FakeCatalog(), lambda messages, tools: first(tools))
         result = app.turn({"text": "nani ka dekiru", "request_id": "r", "session_id": "s", "language": "ja"})
         self.assertEqual(result["kind"], "capability_list")
+
+
+class PanelExampleTests(unittest.TestCase):
+    """The assistant panel's example sentences (lib/page/assistant/assistant_texts.dart)."""
+
+    def test_every_language_example_reaches_its_capability(self):
+        from test_server import first
+        app = Assistant(FakeCatalog(), lambda messages, tools: first(tools))
+        examples = {
+            "en": ["What can you do?", "I want to borrow a book", "Pay my water bill", "Counter queue"],
+            "ja": ["どんな機能がありますか", "本を借りたい", "水道料金を払いたい", "窓口の順番待ち"],
+            "vi": ["Bạn có những chức năng gì?", "Tôi muốn mượn sách", "Tôi muốn trả tiền nước", "Lấy số thứ tự tại quầy"],
+            "id": ["Ada fitur apa saja?", "Saya mau pinjam buku", "Bayar tagihan air", "Nomor antrean loket"],
+            "th": ["มีฟังก์ชันอะไรบ้าง", "ฉันอยากยืมหนังสือ", "จ่ายค่าน้ำ", "บัตรคิวที่เคาน์เตอร์"],
+        }
+        for language, (listing, library, water, counter) in examples.items():
+            turn = lambda text: app.turn({"text": text, "request_id": "r", "session_id": "s", "language": language})
+            self.assertEqual(turn(listing)["kind"], "capability_list", listing)
+            self.assertIn((turn(library)["destination"] or {}).get("id"), ("library",), library)
+            self.assertEqual(turn(water)["destination"], {"kind": "capability", "id": "fees.water"}, water)
+            self.assertEqual(turn(counter)["destination"], {"kind": "capability", "id": "reservation"}, counter)

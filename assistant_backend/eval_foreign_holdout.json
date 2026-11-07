@@ -1,0 +1,1209 @@
+[
+ {
+  "id": "f001",
+  "language": "en",
+  "text": "hey so what kind of stuff can this app actually do for me?",
+  "intent": "listing",
+  "expected_ids": [],
+  "note": "casual capability question"
+ },
+ {
+  "id": "f002",
+  "language": "en",
+  "text": "I'm just visiting Taipei for a few days, what can you help me with?",
+  "intent": "listing",
+  "expected_ids": [],
+  "note": "tourist, indirect listing"
+ },
+ {
+  "id": "f003",
+  "language": "en",
+  "text": "could you tell me which services you've got in here",
+  "intent": "listing",
+  "expected_ids": [],
+  "note": "polite listing"
+ },
+ {
+  "id": "f004",
+  "language": "en",
+  "text": "I want to learn a book from the library near my hotel",
+  "intent": "service",
+  "expected_ids": [
+   "library"
+  ],
+  "note": "ASR slip: learn for lend/borrow"
+ },
+ {
+  "id": "f005",
+  "language": "en",
+  "text": "which books is everybody reading right now at the city library?",
+  "intent": "service",
+  "expected_ids": [
+   "library.ranking",
+   "library"
+  ],
+  "note": "popular books paraphrase"
+ },
+ {
+  "id": "f006",
+  "language": "en",
+  "text": "when do I have to bring back the books I took out?",
+  "intent": "service",
+  "expected_ids": [
+   "library.records"
+  ],
+  "note": "due date paraphrase"
+ },
+ {
+  "id": "f007",
+  "language": "en",
+  "text": "I got a parking ticket and I think it's a mistake, how do I contest it",
+  "intent": "service",
+  "expected_ids": [
+   "districtOffice.form.a-3",
+   "districtOffice.form.a-1",
+   "districtOffice"
+  ],
+  "note": "appeal a parking fine; form list is a fair landing"
+ },
+ {
+  "id": "f008",
+  "language": "en",
+  "text": "the street lamp outside my hotel isn't working, it's pitch dark",
+  "intent": "service",
+  "expected_ids": [
+   "disasterReport.form.D-1-3",
+   "disasterReport",
+   "reportIssue"
+  ],
+  "note": "broken street light"
+ },
+ {
+  "id": "f009",
+  "language": "en",
+  "text": "um how do I pay the water bell",
+  "intent": "service",
+  "expected_ids": [
+   "fees.water",
+   "app.bills"
+  ],
+  "note": "ASR slip: bell for bill"
+ },
+ {
+  "id": "f010",
+  "language": "en",
+  "text": "someone nicked my phone on the MRT, I need to file something with the cops",
+  "intent": "service",
+  "expected_ids": [
+   "police.online",
+   "police"
+  ],
+  "note": "theft report, slang"
+ },
+ {
+  "id": "f011",
+  "language": "en",
+  "text": "is there a way to get a queue ticket for the household registration office in Wanhua",
+  "intent": "service",
+  "expected_ids": [
+   "reservation.c-2-1",
+   "reservation"
+  ],
+  "note": "counter number at a named office"
+ },
+ {
+  "id": "f012",
+  "language": "en",
+  "text": "where do I find the tickets I picked up earlier?",
+  "intent": "service",
+  "expected_ids": [
+   "wallet"
+  ],
+  "note": "ticket wallet paraphrase"
+ },
+ {
+  "id": "f013",
+  "language": "en",
+  "text": "any disc counts for tourists around here?",
+  "intent": "service",
+  "expected_ids": [
+   "app.perks",
+   "coupon.list"
+  ],
+  "note": "ASR slip: disc counts for discounts"
+ },
+ {
+  "id": "f014",
+  "language": "en",
+  "text": "can you switch everything to Japanese, my mom wants to use it",
+  "intent": "service",
+  "expected_ids": [
+   "language"
+  ],
+  "note": "change display language"
+ },
+ {
+  "id": "f015",
+  "language": "en",
+  "text": "can I just log in with my fingerprint next time?",
+  "intent": "service",
+  "expected_ids": [
+   "quick_login"
+  ],
+  "note": "disabled: quick login not connected"
+ },
+ {
+  "id": "f016",
+  "language": "en",
+  "text": "put me through to the 1999 hotline please",
+  "intent": "service",
+  "expected_ids": [
+   "1999"
+  ],
+  "note": "disabled: hotline entry blank, no auto dial"
+ },
+ {
+  "id": "f017",
+  "language": "en",
+  "text": "has anyone done anything about the noise complaint I sent?",
+  "intent": "service",
+  "expected_ids": [
+   "reportIssue.progress",
+   "reportIssue"
+  ],
+  "note": "complaint status"
+ },
+ {
+  "id": "f018",
+  "language": "en",
+  "text": "what's happening with the application I sent in last week?",
+  "intent": "service",
+  "expected_ids": [
+   "districtOffice.progress",
+   "districtOffice"
+  ],
+  "note": "application status"
+ },
+ {
+  "id": "f019",
+  "language": "en",
+  "text": "you know what, never mind, I don't wanna pay the parking fee right now",
+  "intent": "negation",
+  "expected_ids": [],
+  "note": "cancel parking payment"
+ },
+ {
+  "id": "f020",
+  "language": "en",
+  "text": "no no, not the library, I meant my pay meant history",
+  "intent": "negation",
+  "expected_ids": [
+   "fees.history"
+  ],
+  "note": "not X but Y; ASR slip pay meant"
+ },
+ {
+  "id": "f021",
+  "language": "en",
+  "text": "stop, cancel that, I didn't ask for anything",
+  "intent": "negation",
+  "expected_ids": [],
+  "note": "cancel, open nothing"
+ },
+ {
+  "id": "f022",
+  "language": "en",
+  "text": "hi there, good morning!",
+  "intent": "greeting",
+  "expected_ids": [],
+  "note": "greeting"
+ },
+ {
+  "id": "f023",
+  "language": "en",
+  "text": "what's the weather gonna be like tomorrow in Taipei?",
+  "intent": "out_of_scope",
+  "expected_ids": [],
+  "note": "weather not offered"
+ },
+ {
+  "id": "f024",
+  "language": "en",
+  "text": "recommend a good beef noodle place near Ximending",
+  "intent": "out_of_scope",
+  "expected_ids": [],
+  "note": "restaurant recommendation"
+ },
+ {
+  "id": "f025",
+  "language": "en",
+  "text": "how do I get to Taipei 101 by MRT from the airport?",
+  "intent": "out_of_scope",
+  "expected_ids": [],
+  "note": "transit directions"
+ },
+ {
+  "id": "f026",
+  "language": "ja",
+  "text": "このアプリって何ができるんですか？",
+  "intent": "listing",
+  "expected_ids": [],
+  "note": "polite listing"
+ },
+ {
+  "id": "f027",
+  "language": "ja",
+  "text": "nani ga dekiru no kana kono apuri",
+  "intent": "listing",
+  "expected_ids": [],
+  "note": "romaji ASR transcript"
+ },
+ {
+  "id": "f028",
+  "language": "ja",
+  "text": "観光客でも使えるサービスって、どんなのがあります？",
+  "intent": "listing",
+  "expected_ids": [],
+  "note": "tourist listing"
+ },
+ {
+  "id": "f029",
+  "language": "ja",
+  "text": "としょかんで ほんを かりたいんですけど",
+  "intent": "service",
+  "expected_ids": [
+   "library"
+  ],
+  "note": "kana instead of kanji"
+ },
+ {
+  "id": "f030",
+  "language": "ja",
+  "text": "いま一番読まれてる本ってどれですか",
+  "intent": "service",
+  "expected_ids": [
+   "library.ranking",
+   "library"
+  ],
+  "note": "popular books paraphrase"
+ },
+ {
+  "id": "f031",
+  "language": "ja",
+  "text": "借りてる本、いつまでに返せばいいか確認したい",
+  "intent": "service",
+  "expected_ids": [
+   "library.records"
+  ],
+  "note": "due date paraphrase"
+ },
+ {
+  "id": "f032",
+  "language": "ja",
+  "text": "ホテルの前の街灯が消えてて真っ暗なんです",
+  "intent": "service",
+  "expected_ids": [
+   "disasterReport.form.D-1-3",
+   "disasterReport",
+   "reportIssue"
+  ],
+  "note": "broken street light"
+ },
+ {
+  "id": "f033",
+  "language": "ja",
+  "text": "財布を盗まれたみたいで、警察に届けを出したいです",
+  "intent": "service",
+  "expected_ids": [
+   "police.online",
+   "police"
+  ],
+  "note": "theft report"
+ },
+ {
+  "id": "f034",
+  "language": "ja",
+  "text": "ちゅうしゃりょうきん を はらいたい",
+  "intent": "service",
+  "expected_ids": [
+   "fees.parking",
+   "app.bills"
+  ],
+  "note": "kana ASR output"
+ },
+ {
+  "id": "f035",
+  "language": "ja",
+  "text": "すいどうだいの しはらい できますか",
+  "intent": "service",
+  "expected_ids": [
+   "fees.water",
+   "app.bills"
+  ],
+  "note": "kana ASR output"
+ },
+ {
+  "id": "f036",
+  "language": "ja",
+  "text": "何かお得になるやつ、ありませんか",
+  "intent": "service",
+  "expected_ids": [
+   "app.perks",
+   "coupon.list"
+  ],
+  "note": "indirect deals request"
+ },
+ {
+  "id": "f037",
+  "language": "ja",
+  "text": "もらったチケットってどこで見られます？",
+  "intent": "service",
+  "expected_ids": [
+   "wallet"
+  ],
+  "note": "ticket wallet paraphrase"
+ },
+ {
+  "id": "f038",
+  "language": "ja",
+  "text": "画面を英語表記に切り替えてもらえますか",
+  "intent": "service",
+  "expected_ids": [
+   "language"
+  ],
+  "note": "change display language"
+ },
+ {
+  "id": "f039",
+  "language": "ja",
+  "text": "中正区の区役所の整理券、ここで取れますか",
+  "intent": "service",
+  "expected_ids": [
+   "reservation.c-3-2",
+   "reservation"
+  ],
+  "note": "queue number at district office"
+ },
+ {
+  "id": "f040",
+  "language": "ja",
+  "text": "みんながよく聞いてる質問がまとまってるページある？",
+  "intent": "service",
+  "expected_ids": [
+   "qna",
+   "qna.categories"
+  ],
+  "note": "FAQ paraphrase"
+ },
+ {
+  "id": "f041",
+  "language": "ja",
+  "text": "動物園の園内マップとか見られますか",
+  "intent": "service",
+  "expected_ids": [
+   "zoo"
+  ],
+  "note": "disabled: zoo entry missing"
+ },
+ {
+  "id": "f042",
+  "language": "ja",
+  "text": "台北のラジオってこのアプリで聴けます？",
+  "intent": "service",
+  "expected_ids": [
+   "cityRadio"
+  ],
+  "note": "disabled: radio not verified"
+ },
+ {
+  "id": "f043",
+  "language": "ja",
+  "text": "dekireba shisei no nyuusu wo yomitai desu",
+  "intent": "service",
+  "expected_ids": [
+   "news"
+  ],
+  "note": "disabled: city news; romaji transcript"
+ },
+ {
+  "id": "f044",
+  "language": "ja",
+  "text": "やっぱり水道代は払わなくていいです",
+  "intent": "negation",
+  "expected_ids": [],
+  "note": "decline water payment"
+ },
+ {
+  "id": "f045",
+  "language": "ja",
+  "text": "図書館じゃなくて、支払いの履歴が見たいんです",
+  "intent": "negation",
+  "expected_ids": [
+   "fees.history"
+  ],
+  "note": "not X but Y"
+ },
+ {
+  "id": "f046",
+  "language": "ja",
+  "text": "あ、今のはキャンセルで。何も開かないでください",
+  "intent": "negation",
+  "expected_ids": [],
+  "note": "cancel, open nothing"
+ },
+ {
+  "id": "f047",
+  "language": "ja",
+  "text": "こんにちは〜",
+  "intent": "greeting",
+  "expected_ids": [],
+  "note": "greeting"
+ },
+ {
+  "id": "f048",
+  "language": "ja",
+  "text": "明日の台北の天気はどうですか",
+  "intent": "out_of_scope",
+  "expected_ids": [],
+  "note": "weather not offered"
+ },
+ {
+  "id": "f049",
+  "language": "ja",
+  "text": "九份へのバスの乗り方を教えて",
+  "intent": "out_of_scope",
+  "expected_ids": [],
+  "note": "transit directions"
+ },
+ {
+  "id": "f050",
+  "language": "ja",
+  "text": "おすすめの小籠包のお店ある？",
+  "intent": "out_of_scope",
+  "expected_ids": [],
+  "note": "restaurant recommendation"
+ },
+ {
+  "id": "f051",
+  "language": "vi",
+  "text": "app này làm được những gì vậy bạn?",
+  "intent": "listing",
+  "expected_ids": [],
+  "note": "casual listing"
+ },
+ {
+  "id": "f052",
+  "language": "vi",
+  "text": "cho em hoi ung dung nay co dich vu gi",
+  "intent": "listing",
+  "expected_ids": [],
+  "note": "missing tone marks"
+ },
+ {
+  "id": "f053",
+  "language": "vi",
+  "text": "mình mới qua Đài Loan làm việc, app này giúp được gì cho mình không",
+  "intent": "listing",
+  "expected_ids": [],
+  "note": "new worker listing"
+ },
+ {
+  "id": "f054",
+  "language": "vi",
+  "text": "tháng nay tiền nươc nhà em chưa trả, trả ở đâu vậy",
+  "intent": "service",
+  "expected_ids": [
+   "fees.water",
+   "app.bills"
+  ],
+  "note": "wrong tone marks; water bill"
+ },
+ {
+  "id": "f055",
+  "language": "vi",
+  "text": "tiền giữ xe máy ngoài lề đường thì trả sao vậy",
+  "intent": "service",
+  "expected_ids": [
+   "fees.parking",
+   "app.bills"
+  ],
+  "note": "street parking fee paraphrase"
+ },
+ {
+  "id": "f056",
+  "language": "vi",
+  "text": "cho em xem mấy khoản em đã trả rồi",
+  "intent": "service",
+  "expected_ids": [
+   "fees.history"
+  ],
+  "note": "payment history paraphrase"
+ },
+ {
+  "id": "f057",
+  "language": "vi",
+  "text": "em muốn bốc số ở trạm dịch vụ việc làm Manh Giáp",
+  "intent": "service",
+  "expected_ids": [
+   "reservation.c-5-1",
+   "reservation"
+  ],
+  "note": "queue number at Monga employment station"
+ },
+ {
+  "id": "f058",
+  "language": "vi",
+  "text": "cả khu nhà trọ em cúp điện rồi",
+  "intent": "service",
+  "expected_ids": [
+   "disasterReport.form.D-1-4",
+   "disasterReport"
+  ],
+  "note": "power outage, southern wording"
+ },
+ {
+  "id": "f059",
+  "language": "vi",
+  "text": "nước dâng lên ngập hết con hẻm trước nhà rồi",
+  "intent": "service",
+  "expected_ids": [
+   "disasterReport"
+  ],
+  "note": "flooding paraphrase"
+ },
+ {
+  "id": "f060",
+  "language": "vi",
+  "text": "em muon khieu nai hang xom on ao qua dem",
+  "intent": "service",
+  "expected_ids": [
+   "reportIssue"
+  ],
+  "note": "missing tone marks; noise complaint"
+ },
+ {
+  "id": "f061",
+  "language": "vi",
+  "text": "em bị móc túi, muốn báo công an",
+  "intent": "service",
+  "expected_ids": [
+   "police.online",
+   "police"
+  ],
+  "note": "theft, công an wording"
+ },
+ {
+  "id": "f062",
+  "language": "vi",
+  "text": "muon muon sach o thu vien thanh pho",
+  "intent": "service",
+  "expected_ids": [
+   "library"
+  ],
+  "note": "missing tone marks; borrow books"
+ },
+ {
+  "id": "f063",
+  "language": "vi",
+  "text": "đổi app sang tiếng Việt giùm em với",
+  "intent": "service",
+  "expected_ids": [
+   "language"
+  ],
+  "note": "change display language"
+ },
+ {
+  "id": "f064",
+  "language": "vi",
+  "text": "có cái phiếu nào được bớt tiền không",
+  "intent": "service",
+  "expected_ids": [
+   "app.perks",
+   "coupon.list"
+  ],
+  "note": "coupon paraphrase"
+ },
+ {
+  "id": "f065",
+  "language": "vi",
+  "text": "hồ sơ em nộp hôm trước giờ xử lý tới đâu rồi",
+  "intent": "service",
+  "expected_ids": [
+   "districtOffice.progress",
+   "districtOffice"
+  ],
+  "note": "application progress"
+ },
+ {
+  "id": "f066",
+  "language": "vi",
+  "text": "em muốn hẹn lịch khám ở bệnh viện thành phố",
+  "intent": "service",
+  "expected_ids": [
+   "medicalAppointment"
+  ],
+  "note": "disabled: no hospital booking"
+ },
+ {
+  "id": "f067",
+  "language": "vi",
+  "text": "chỗ nào tiêm phòng cúm, đặt lịch giùm em",
+  "intent": "service",
+  "expected_ids": [
+   "vaccineAppointment"
+  ],
+  "note": "disabled: no vaccine booking"
+ },
+ {
+  "id": "f068",
+  "language": "vi",
+  "text": "em muốn sửa lại số điện thoại trong thông tin của em",
+  "intent": "service",
+  "expected_ids": [
+   "profile"
+  ],
+  "note": "edit personal details"
+ },
+ {
+  "id": "f069",
+  "language": "vi",
+  "text": "thôi khỏi, em không muốn trả tiền giữ xe nữa",
+  "intent": "negation",
+  "expected_ids": [],
+  "note": "decline parking payment"
+ },
+ {
+  "id": "f070",
+  "language": "vi",
+  "text": "không phải tiền nước, mà là tiền học của con em",
+  "intent": "negation",
+  "expected_ids": [
+   "fees.tuition"
+  ],
+  "note": "not X but Y"
+ },
+ {
+  "id": "f071",
+  "language": "vi",
+  "text": "huy di, dung mo gi het",
+  "intent": "negation",
+  "expected_ids": [],
+  "note": "cancel; missing tone marks"
+ },
+ {
+  "id": "f072",
+  "language": "vi",
+  "text": "xin chào bạn ơi",
+  "intent": "greeting",
+  "expected_ids": [],
+  "note": "greeting"
+ },
+ {
+  "id": "f073",
+  "language": "vi",
+  "text": "tỷ giá đô Đài hôm nay bao nhiêu",
+  "intent": "out_of_scope",
+  "expected_ids": [],
+  "note": "exchange rate"
+ },
+ {
+  "id": "f074",
+  "language": "vi",
+  "text": "gửi tiền về Việt Nam cách nào rẻ nhất",
+  "intent": "out_of_scope",
+  "expected_ids": [],
+  "note": "remittance"
+ },
+ {
+  "id": "f075",
+  "language": "vi",
+  "text": "gia hạn thẻ cư trú ARC ở đâu",
+  "intent": "out_of_scope",
+  "expected_ids": [],
+  "note": "immigration office, not a city service in the app"
+ },
+ {
+  "id": "f076",
+  "language": "id",
+  "text": "aplikasi ini bisa bantu apa aja sih?",
+  "intent": "listing",
+  "expected_ids": [],
+  "note": "casual listing"
+ },
+ {
+  "id": "f077",
+  "language": "id",
+  "text": "kak, fiturnya apa aja ya di sini",
+  "intent": "listing",
+  "expected_ids": [],
+  "note": "casual listing"
+ },
+ {
+  "id": "f078",
+  "language": "id",
+  "text": "saya baru pindah ke Taipei, di app ini ada layanan apa saja?",
+  "intent": "listing",
+  "expected_ids": [],
+  "note": "new resident listing"
+ },
+ {
+  "id": "f079",
+  "language": "id",
+  "text": "saya mau bayar tagian aer bulan ini",
+  "intent": "service",
+  "expected_ids": [
+   "fees.water",
+   "app.bills"
+  ],
+  "note": "ASR slip: tagian aer"
+ },
+ {
+  "id": "f080",
+  "language": "id",
+  "text": "saya mau pinjem buku di perpustaka'an",
+  "intent": "service",
+  "expected_ids": [
+   "library"
+  ],
+  "note": "ASR slip in library"
+ },
+ {
+  "id": "f081",
+  "language": "id",
+  "text": "buku yang paling laris dipinjem orang apa ya",
+  "intent": "service",
+  "expected_ids": [
+   "library.ranking",
+   "library"
+  ],
+  "note": "popular books paraphrase"
+ },
+ {
+  "id": "f082",
+  "language": "id",
+  "text": "kapan buku saya harus dibalikin?",
+  "intent": "service",
+  "expected_ids": [
+   "library.records"
+  ],
+  "note": "due date paraphrase"
+ },
+ {
+  "id": "f083",
+  "language": "id",
+  "text": "mau ambil nomer antrian di kantor layanan kerja Ximen",
+  "intent": "service",
+  "expected_ids": [
+   "reservation.c-5-2",
+   "reservation"
+  ],
+  "note": "queue at Ximen employment station"
+ },
+ {
+  "id": "f084",
+  "language": "id",
+  "text": "lampu jalan depan kos saya mati terus",
+  "intent": "service",
+  "expected_ids": [
+   "disasterReport.form.D-1-3",
+   "disasterReport",
+   "reportIssue"
+  ],
+  "note": "broken street light"
+ },
+ {
+  "id": "f085",
+  "language": "id",
+  "text": "pohonnya roboh nutupin jalan di gang saya",
+  "intent": "service",
+  "expected_ids": [
+   "disasterReport"
+  ],
+  "note": "fallen tree paraphrase"
+ },
+ {
+  "id": "f086",
+  "language": "id",
+  "text": "hp saya dicuri, mau lapor ke polisi lewat hp aja",
+  "intent": "service",
+  "expected_ids": [
+   "police.online",
+   "police"
+  ],
+  "note": "theft report online"
+ },
+ {
+  "id": "f087",
+  "language": "id",
+  "text": "laporan polisi saya yang kemaren udah nyampe mana",
+  "intent": "service",
+  "expected_ids": [
+   "police.progress",
+   "police.records"
+  ],
+  "note": "police case progress"
+ },
+ {
+  "id": "f088",
+  "language": "id",
+  "text": "mau ngadu soal suara bising dari pabrik sebelah tiap malam",
+  "intent": "service",
+  "expected_ids": [
+   "reportIssue"
+  ],
+  "note": "noise complaint"
+ },
+ {
+  "id": "f089",
+  "language": "id",
+  "text": "saya dapat surat pajek dari pemda, bayarnya gimana",
+  "intent": "service",
+  "expected_ids": [
+   "fees.tax",
+   "app.bills"
+  ],
+  "note": "ASR slip pajek; local tax"
+ },
+ {
+  "id": "f090",
+  "language": "id",
+  "text": "tolong tampilannya pakai bahasa Indonesia",
+  "intent": "service",
+  "expected_ids": [
+   "language"
+  ],
+  "note": "change display language"
+ },
+ {
+  "id": "f091",
+  "language": "id",
+  "text": "ada potongan harga gak buat warga baru",
+  "intent": "service",
+  "expected_ids": [
+   "app.perks",
+   "coupon.list"
+  ],
+  "note": "discount paraphrase"
+ },
+ {
+  "id": "f092",
+  "language": "id",
+  "text": "saya mau kasih suara di polling warga kota",
+  "intent": "service",
+  "expected_ids": [
+   "iVoting"
+  ],
+  "note": "disabled: online voting"
+ },
+ {
+  "id": "f093",
+  "language": "id",
+  "text": "mau cari taman ijo yang deket buat jalan-jalan sore",
+  "intent": "service",
+  "expected_ids": [
+   "greenMap",
+   "locationSearch"
+  ],
+  "note": "disabled: green map / place search"
+ },
+ {
+  "id": "f094",
+  "language": "id",
+  "text": "gak jadi deh, saya gak mau bayar pajak sekarang",
+  "intent": "negation",
+  "expected_ids": [],
+  "note": "decline tax payment"
+ },
+ {
+  "id": "f095",
+  "language": "id",
+  "text": "bukan riwayat pinjam buku, tapi riwayat bayar-bayar saya",
+  "intent": "negation",
+  "expected_ids": [
+   "fees.history"
+  ],
+  "note": "not X but Y"
+ },
+ {
+  "id": "f096",
+  "language": "id",
+  "text": "batal, jangan buka apa-apa ya",
+  "intent": "negation",
+  "expected_ids": [],
+  "note": "cancel, open nothing"
+ },
+ {
+  "id": "f097",
+  "language": "id",
+  "text": "halo, selamat pagi",
+  "intent": "greeting",
+  "expected_ids": [],
+  "note": "greeting"
+ },
+ {
+  "id": "f098",
+  "language": "id",
+  "text": "besok di Taipei hujan nggak?",
+  "intent": "out_of_scope",
+  "expected_ids": [],
+  "note": "weather not offered"
+ },
+ {
+  "id": "f099",
+  "language": "id",
+  "text": "di mana beli kartu SIM yang murah",
+  "intent": "out_of_scope",
+  "expected_ids": [],
+  "note": "shopping"
+ },
+ {
+  "id": "f100",
+  "language": "id",
+  "text": "berapa kurs dolar Taiwan ke rupiah hari ini",
+  "intent": "out_of_scope",
+  "expected_ids": [],
+  "note": "exchange rate"
+ },
+ {
+  "id": "f101",
+  "language": "th",
+  "text": "แอปนี้ทำอะไรได้บ้างคะ",
+  "intent": "listing",
+  "expected_ids": [],
+  "note": "polite listing"
+ },
+ {
+  "id": "f102",
+  "language": "th",
+  "text": "มีบริการอะไรให้ใช้บ้างครับ",
+  "intent": "listing",
+  "expected_ids": [],
+  "note": "polite listing"
+ },
+ {
+  "id": "f103",
+  "language": "th",
+  "text": "เพิ่งมาทำงานที่ไทเป แอปนี้ช่วยอะไรผมได้บ้าง",
+  "intent": "listing",
+  "expected_ids": [],
+  "note": "new worker listing"
+ },
+ {
+  "id": "f104",
+  "language": "th",
+  "text": "คาน้ำประปาเดือนนี้ยังไม่ได้จ่ายเลย จ่ายตรงไหน",
+  "intent": "service",
+  "expected_ids": [
+   "fees.water",
+   "app.bills"
+  ],
+  "note": "dropped tone mark on ค่า"
+ },
+ {
+  "id": "f105",
+  "language": "th",
+  "text": "จะจ่ายเงินที่จอดมอเตอร์ไซค์ข้างถนนยังไง",
+  "intent": "service",
+  "expected_ids": [
+   "fees.parking",
+   "app.bills"
+  ],
+  "note": "street parking fee paraphrase"
+ },
+ {
+  "id": "f106",
+  "language": "th",
+  "text": "ไฟดับทั้งซอยเลยครับ",
+  "intent": "service",
+  "expected_ids": [
+   "disasterReport.form.D-1-4",
+   "disasterReport"
+  ],
+  "note": "power outage"
+ },
+ {
+  "id": "f107",
+  "language": "th",
+  "text": "ไฟข้างทางหน้าหอพักไม่ติดมาหลายวันแล้ว",
+  "intent": "service",
+  "expected_ids": [
+   "disasterReport.form.D-1-3",
+   "disasterReport",
+   "reportIssue"
+  ],
+  "note": "broken street light paraphrase"
+ },
+ {
+  "id": "f108",
+  "language": "th",
+  "text": "กระเป๋าตังค์หาย อยากแจ้งตำรวจ",
+  "intent": "service",
+  "expected_ids": [
+   "police.online",
+   "police"
+  ],
+  "note": "lost wallet report"
+ },
+ {
+  "id": "f109",
+  "language": "th",
+  "text": "อยากหาหนังสือภาษาไทยอาน มีที่ให้ยืมไหม",
+  "intent": "service",
+  "expected_ids": [
+   "library"
+  ],
+  "note": "dropped tone mark on อ่าน"
+ },
+ {
+  "id": "f110",
+  "language": "th",
+  "text": "หนังสือที่ยืมไว ต้องเอาไปคืนวันไหน",
+  "intent": "service",
+  "expected_ids": [
+   "library.records"
+  ],
+  "note": "dropped tone mark on ไว้"
+ },
+ {
+  "id": "f111",
+  "language": "th",
+  "text": "อยากกดคิวที่สำนักงานทะเบียนราษฎร์เขตจงเจิ้ง",
+  "intent": "service",
+  "expected_ids": [
+   "reservation.c-2-2",
+   "reservation"
+  ],
+  "note": "queue at Zhongzheng household registration"
+ },
+ {
+  "id": "f112",
+  "language": "th",
+  "text": "อยากแจ้งเรื่องเสียงดังจากไซต์ก่อสร้างตอนกลางคืน",
+  "intent": "service",
+  "expected_ids": [
+   "reportIssue"
+  ],
+  "note": "noise complaint"
+ },
+ {
+  "id": "f113",
+  "language": "th",
+  "text": "เรื่องที่ยื่นไปที่เขตเมื่อวาน ถึงไหนแล้ว",
+  "intent": "service",
+  "expected_ids": [
+   "districtOffice.progress",
+   "districtOffice"
+  ],
+  "note": "application progress"
+ },
+ {
+  "id": "f114",
+  "language": "th",
+  "text": "เปลี่ยนหน้าจอเป็นภาษาไทยได้ไหม",
+  "intent": "service",
+  "expected_ids": [
+   "language"
+  ],
+  "note": "change display language"
+ },
+ {
+  "id": "f115",
+  "language": "th",
+  "text": "มีคูปองสวนลดไหม",
+  "intent": "service",
+  "expected_ids": [
+   "app.perks",
+   "coupon.list"
+  ],
+  "note": "dropped tone mark on ส่วน"
+ },
+ {
+  "id": "f116",
+  "language": "th",
+  "text": "อยากดูคำถามที่คนชอบถามกัน",
+  "intent": "service",
+  "expected_ids": [
+   "qna",
+   "qna.categories"
+  ],
+  "note": "FAQ paraphrase"
+ },
+ {
+  "id": "f117",
+  "language": "th",
+  "text": "อยากพาหมาไปเดินเล่น มีที่ไหนให้พาไปได้บ้าง",
+  "intent": "service",
+  "expected_ids": [
+   "petFriendlyMap"
+  ],
+  "note": "disabled: pet map"
+ },
+ {
+  "id": "f118",
+  "language": "th",
+  "text": "อยากดูแผนที่ในสวนสัตว์ไทเป",
+  "intent": "service",
+  "expected_ids": [
+   "zoo"
+  ],
+  "note": "disabled: zoo entry missing"
+ },
+ {
+  "id": "f119",
+  "language": "th",
+  "text": "ไม่เอาแล้ว ไม่ต้องจ่ายค่าจอดรถ",
+  "intent": "negation",
+  "expected_ids": [],
+  "note": "decline parking payment"
+ },
+ {
+  "id": "f120",
+  "language": "th",
+  "text": "ไม่ใช่ค่าน้ำนะ เป็นค่าเช่าห้องในอาคารที่พักของรัฐ",
+  "intent": "negation",
+  "expected_ids": [
+   "fees.housing"
+  ],
+  "note": "not X but Y"
+ },
+ {
+  "id": "f121",
+  "language": "th",
+  "text": "ยกเลิก ๆ ไม่ต้องเปิดอะไรทั้งนั้น",
+  "intent": "negation",
+  "expected_ids": [],
+  "note": "cancel, open nothing"
+ },
+ {
+  "id": "f122",
+  "language": "th",
+  "text": "สวัสดีค่ะ",
+  "intent": "greeting",
+  "expected_ids": [],
+  "note": "greeting"
+ },
+ {
+  "id": "f123",
+  "language": "th",
+  "text": "พรุ่งนี้ฝนจะตกไหม",
+  "intent": "out_of_scope",
+  "expected_ids": [],
+  "note": "weather not offered"
+ },
+ {
+  "id": "f124",
+  "language": "th",
+  "text": "แลกเงินบาทเป็นเงินไต้หวันที่ไหนเรทดี",
+  "intent": "out_of_scope",
+  "expected_ids": [],
+  "note": "currency exchange"
+ },
+ {
+  "id": "f125",
+  "language": "th",
+  "text": "ตลาดกลางคืนไหนอร่อยสุด",
+  "intent": "out_of_scope",
+  "expected_ids": [],
+  "note": "food recommendation"
+ }
+]

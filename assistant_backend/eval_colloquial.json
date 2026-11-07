@@ -23,7 +23,7 @@
 {"id": "c022", "language": "zh", "text": "上禮拜去和平醫院看診的錢還沒付，可以在這邊付嗎", "intent": "service", "expected_ids": ["fees.hospital", "app.bills"], "note": "Heping is a Taipei City Hospital branch"},
 {"id": "c023", "language": "zh", "text": "我想對一下之前付款的明細，看有沒有重複扣", "intent": "service", "expected_ids": ["fees.history", "app.bills"], "note": "payment history, indirect"},
 {"id": "c024", "language": "zh", "text": "我手上有張紙本的單子，可以用相機拍上面的條碼直接付嗎", "intent": "service", "expected_ids": ["fees.scan", "app.bills"], "note": "scan to pay described"},
-{"id": "c025", "language": "zh", "text": "家門口那盞路燈壞了好幾天都沒人修，要跟誰講", "intent": "service", "expected_ids": ["reportIssue", "reportIssue.prefill"], "note": "street light complaint; prefill entry is disabled, reportIssue is the open destination"},
+{"id": "c025", "language": "zh", "text": "家門口那盞路燈壞了好幾天都沒人修，要跟誰講", "intent": "service", "expected_ids": ["reportIssue", "reportIssue.prefill", "disasterReport.form.D-1-3"], "note": "street light complaint; prefill entry is disabled, reportIssue is the open destination; disaster 路燈故障 form added after the set was written (2026-11-07 batch 2)"},
 {"id": "c026", "language": "zh", "text": "我們巷子的水已經積到膝蓋那麼高了，要趕快通知", "intent": "service", "expected_ids": ["disasterReport"], "note": "flooding without 淹水"},
 {"id": "c027", "language": "zh", "text": "我的機車昨天停在樓下就不見了，好像被人偷走", "intent": "service", "expected_ids": ["police", "police.online"], "note": "theft, never says 報案"},
 {"id": "c028", "language": "zh", "text": "之前在網路上報給警察的那件事，現在處理得怎樣了", "intent": "service", "expected_ids": ["police.progress", "police.records", "police"], "note": "police case status"},

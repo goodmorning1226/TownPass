@@ -4,6 +4,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:town_pass/bean/assistant_result.dart';
+import 'package:town_pass/page/assistant/assistant_texts.dart';
 
 /// Recognised speech. When [confirm] is true the user must pick one of
 /// [options] (the heard text first) before anything is sent. When
@@ -36,6 +37,13 @@ class AssistantService {
 
   AssistantService({this.endpoint = baseUrl});
 
+  /// An App error line in [language] (the turn's language), or in the page
+  /// language when that is not known. Backend `error` texts pass through.
+  static FormatException _error(String key, [String? language]) =>
+      FormatException(
+        AssistantTexts.text(key, AssistantTexts.resolve(language)),
+      );
+
   Future<AssistantResult> decide({
     required String text,
     required String requestId,
@@ -60,11 +68,11 @@ class AssistantService {
         language,
       ).timeout(const Duration(seconds: 85));
     } on TimeoutException {
-      throw const FormatException('處理時間較長，請重試或從原圖書頁面搜尋。');
+      throw _error('turnTimeout', language);
     } on SocketException {
-      throw const FormatException('連不到電腦上的助理，請確認後端與裝置連線。');
+      throw _error('unreachable', language);
     } on HttpException {
-      throw const FormatException('助理連線中斷，請重試或使用原服務入口。');
+      throw _error('turnDisconnected', language);
     } finally {
       client.close(force: true);
       if (identical(_active, client)) _active = null;
@@ -110,15 +118,17 @@ class AssistantService {
     await for (final chunk in response.transform(utf8.decoder)) {
       body.write(chunk);
       if (body.length > 32000) {
-        throw const FormatException('助理回覆過長，未執行操作。');
+        throw _error('replyTooLong', language);
       }
     }
     final json = jsonDecode(body.toString()) as Map<String, dynamic>;
     if (response.statusCode != HttpStatus.ok) {
-      throw FormatException(json['error'] as String? ?? '助理暫時無法處理。');
+      throw json['error'] is String
+          ? FormatException(json['error'] as String)
+          : _error('cannotProcess', language);
     }
     if (json['request_id'] != requestId) {
-      throw const FormatException('助理回覆與本次需求不一致，未執行操作。');
+      throw _error('replyMismatch', language);
     }
     return AssistantResult.fromJson(json);
   }
@@ -192,7 +202,9 @@ class AssistantService {
           .timeout(const Duration(seconds: 10));
       final json = jsonDecode(body) as Map<String, dynamic>;
       if (response.statusCode != HttpStatus.ok) {
-        throw FormatException(json['error'] as String? ?? '語音辨識沒有成功。');
+        throw json['error'] is String
+            ? FormatException(json['error'] as String)
+            : _error('transcriptionFailed');
       }
       final text = json['text'];
       final options = json['options'] ?? const [];
@@ -205,7 +217,7 @@ class AssistantService {
           options.any(
             (o) => o is! String || o.trim().isEmpty || o.length > 500,
           )) {
-        throw const FormatException('語音辨識回覆不正確，請再說一次或改用鍵盤。');
+        throw _error('transcriptionInvalid');
       }
       final confirm = json['confirm'] == true && options.isNotEmpty;
       final corrected = json['corrected_from'];
@@ -224,11 +236,11 @@ class AssistantService {
             : null,
       );
     } on TimeoutException {
-      throw const FormatException('語音辨識時間較長，請再說一次或改用鍵盤。');
+      throw _error('transcriptionTimeout');
     } on SocketException {
-      throw const FormatException('連不到電腦上的助理，請確認後端與裝置連線。');
+      throw _error('unreachable');
     } on HttpException {
-      throw const FormatException('助理連線中斷，請再說一次或改用鍵盤。');
+      throw _error('transcriptionDisconnected');
     } finally {
       client.close(force: true);
       if (identical(_active, client)) _active = null;

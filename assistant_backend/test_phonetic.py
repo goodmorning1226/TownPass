@@ -206,7 +206,7 @@ class IntentFallbackTests(unittest.TestCase):
             return Assistant(FakeCatalog(), model).turn(payload), offered
 
     def test_unmatched_question_about_functions_lists_them(self):
-        result, offered = self.turn("請問你有什麼樣的功能", "list_capabilities")
+        result, offered = self.turn("這個App能拿來幹嘛", "list_capabilities")  # not caught by sound
         self.assertEqual(result["kind"], "capability_list")
         self.assertEqual(offered, [["list_capabilities", "greeting", "city_question", "request_clarification"]])
         result, _ = self.turn("what are you able to do for me", "list_capabilities", language="en")
@@ -219,8 +219,23 @@ class IntentFallbackTests(unittest.TestCase):
         self.assertEqual(result["message"], workflow.NO_RELATED)
 
     def test_off_and_matched_requests_add_no_model_call(self):
-        result, offered = self.turn("請問你有什麼樣的功能", "list_capabilities", enabled=False)
+        result, offered = self.turn("這個App能拿來幹嘛", "list_capabilities", enabled=False)
         self.assertEqual((result["metrics"]["route"], offered), ("no_match", []))
         _, offered = self.turn("我要繳水費", "list_capabilities")
         self.assertEqual(len(offered), 1)
         self.assertNotIn("list_capabilities", offered[0])
+
+
+class ListingBySoundTests(unittest.TestCase):
+    def test_reworded_function_questions_list_without_the_model(self):
+        calls = []
+        app = Assistant(FakeCatalog(), lambda messages, tools: calls.append(tools) or first(tools))
+        for text in ("你有甚麼樣子的功能", "你都會些什麼"):
+            result = app.turn({"text": text, "request_id": "r", "session_id": "s"})
+            self.assertEqual((result["kind"], result["metrics"]["route"]), ("capability_list", "listing_sound"), text)
+        self.assertEqual(calls, [])
+
+    def test_small_talk_and_requests_are_not_lists(self):
+        import workflow
+        for text in ("有什麼好吃的", "今天心情真好", "你會不會唱歌", "我會做蛋糕", "我想辦事情"):
+            self.assertFalse(workflow.listing_by_sound(text), text)

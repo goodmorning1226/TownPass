@@ -110,7 +110,10 @@ HOLDOUT = [
     one("capability", "服務總覽", caps("app.services")),
     one("capability", "查報案進度", caps("police.records", "police.progress", "police", confirm=True)),
     one("capability", "路燈壞了要通報", want(("navigate", "unsupported", "confirm_candidates"),
-                                         [{"kind": "capability", "id": "reportIssue"}, None],
+                                         # 2026-11-07 batch 2: the disaster report's own
+                                         # "路燈故障" form is an equally valid place.
+                                         [{"kind": "capability", "id": "reportIssue"},
+                                          {"kind": "capability", "id": "disasterReport.form.D-1-3"}, None],
                                          target=("reportIssue", "reportIssue.prefill"))),
     # Catalogued but not connected: explain why.
     one("unavailable", "幫我預約打疫苗", unavailable("vaccineAppointment")),

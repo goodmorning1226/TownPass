@@ -42,6 +42,9 @@ migrate_working_dir/
 **/android/local.properties
 **/android/**/GeneratedPluginRegistrant.java
 
+# Gradle build output for the Android project (reports, intermediates)
+**/android/build/
+
 # iOS/XCode related
 **/ios/**/*.mode1v3
 **/ios/**/*.mode2v3

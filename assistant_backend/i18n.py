@@ -74,10 +74,10 @@ GREETING = {
 }
 LISTING = {
     "en": r"what can you do|what (?:services|features)|list (?:of )?(?:services|features)|all (?:services|features)|help me with what",
-    "ja": r"何ができ|どんなサービス|機能一覧|サービス一覧|できること",
-    "vi": r"bạn làm được gì|có những dịch vụ gì|danh sách dịch vụ|có chức năng gì",
+    "ja": r"何ができ|どんなサービス|どんな機能|機能一覧|サービス一覧|できること",
+    "vi": r"bạn làm được gì|có những dịch vụ gì|danh sách dịch vụ|(?:có|những) chức năng gì",
     "id": r"bisa apa saja|layanan apa saja|daftar layanan|fitur apa",
-    "th": r"ทำอะไรได้บ้าง|มีบริการอะไรบ้าง|รายการบริการ",
+    "th": r"ทำอะไรได้บ้าง|มีบริการอะไรบ้าง|มีฟังก์ชันอะไรบ้าง|รายการบริการ",
 }
 YES = {
     "en": r"(?:yes|yeah|ok(?:ay)?|sure|that one|confirm)[.!]*",

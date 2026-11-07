@@ -253,7 +253,7 @@ CASES = [
     one("unavailable", "我要自報水表度數", UNSUPPORTED),
     # Ambiguous or misspelt service: candidates first, the landing page after selection.
     ("service_confirm", [say("案件進度", CONFIRM), pick("申辦案件進度", cap("districtOffice.progress"))]),
-    ("service_confirm", [say("案件進度", CONFIRM), pick("陳情案件進度", UNSUPPORTED)]),
+    ("service_confirm", [say("案件進度", CONFIRM), pick("陳情案件進度", cap("reportIssue.progress"))]),  # connected in batch 2
     ("service_confirm", [say("意見回潰", CONFIRM_ONE), say("好", cap("feedback"), bound=True)]),
     # Negation, correction and several services in one request.
     one("negation", "不要借書，幫我掛號", UNSUPPORTED), one("negation", "不要借書", NONE),

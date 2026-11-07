@@ -13,6 +13,7 @@ import 'package:get/get.dart';
 import 'package:town_pass/util/tp_route.dart';
 import 'package:town_pass/util/tp_web_view.dart';
 import 'package:town_pass/bean/assistant_result.dart';
+import 'package:town_pass/page/assistant/assistant_texts.dart';
 import 'package:town_pass/page/assistant/assistant_view_controller.dart';
 import 'package:town_pass/page/assistant/widget/assistant_host.dart';
 import 'package:town_pass/service/assistant_action_executor.dart';
@@ -804,6 +805,120 @@ void main() {
       await tester.pump(const Duration(seconds: 3)); // the learned-cache save
     });
 
+    testWidgets('The panel’s own texts follow the page language', (
+      tester,
+    ) async {
+      start();
+      final controller = AssistantViewController(
+        service: PendingService(),
+        executor: RecordingExecutor(),
+        recorder: FakeRecorder(),
+      )..expanded.value = true;
+      await tester.pumpWidget(
+        MaterialApp(
+          builder: (context, child) =>
+              AssistantHost(controller: controller, child: child!),
+          home: const Scaffold(),
+        ),
+      );
+      expect(find.text('你可以說…'), findsOneWidget);
+      expect(find.text('「我要借書」'), findsOneWidget);
+      expect(find.text('按住說話'), findsOneWidget);
+      expect(find.byTooltip('關閉助理'), findsOneWidget);
+
+      await tester.runAsync(() => PageTranslation.instance.setLanguage('en'));
+      await tester.pump();
+      expect(find.text('You can say…'), findsOneWidget);
+      expect(find.text('“I want to borrow a book”'), findsOneWidget);
+      expect(find.text('Hold to talk'), findsOneWidget);
+      expect(find.text('Assistant'), findsOneWidget);
+      expect(find.byTooltip('Close the assistant'), findsOneWidget);
+      expect(find.byTooltip('Use keyboard'), findsOneWidget);
+      expect(find.text('你可以說…'), findsNothing);
+      expect(find.text('「我要借書」'), findsNothing);
+      await tester.tap(find.byTooltip('Use keyboard'));
+      await tester.pump();
+      expect(
+        find.text('Type what you want to do, e.g. I want to borrow a book'),
+        findsOneWidget,
+      );
+      expect(find.byTooltip('Send'), findsOneWidget);
+
+      await tester.runAsync(() => PageTranslation.instance.setLanguage('zh'));
+      await tester.pump();
+      expect(find.text('你可以說…'), findsOneWidget);
+      expect(find.text('輸入想做的事，例如：我要借書'), findsOneWidget);
+      expect(find.byTooltip('送出'), findsOneWidget);
+      expect(find.text('You can say…'), findsNothing);
+      await tester.pump(const Duration(seconds: 3)); // the learned-cache save
+    });
+
+    testWidgets('English suggestions submit English text', (tester) async {
+      start();
+      final service = PendingService();
+      final controller = AssistantViewController(
+        service: service,
+        executor: RecordingExecutor(),
+        recorder: FakeRecorder(),
+      )..expanded.value = true;
+      await tester.runAsync(() => PageTranslation.instance.setLanguage('en'));
+      await tester.pumpWidget(
+        MaterialApp(
+          builder: (context, child) =>
+              AssistantHost(controller: controller, child: child!),
+          home: const Scaffold(),
+        ),
+      );
+      await tester.tap(find.text('“Pay my water bill”'));
+      await tester.pump();
+      expect(controller.messages.single.text, 'Pay my water bill');
+      expect(controller.messages.single.fromUser, isTrue);
+      expect(find.text('Working on it…'), findsOneWidget);
+      await tester.tap(find.text('Cancel'));
+      await tester.pump();
+      // Typed text: the status line follows the page language.
+      expect(
+        controller.messages.last.text,
+        'Cancelled. No new page was opened.',
+      );
+      await tester.pump(const Duration(seconds: 3)); // the learned-cache save
+    });
+
+    test('Status lines follow the heard language, else the page', () async {
+      start();
+      final service = QueueService(
+        [const AssistantResult(sessionId: 's', message: 'Library.')],
+        transcripts: [
+          const AssistantTranscript(
+            'I want to borrow a book',
+            correctedFrom: 'I want to borrow a cook',
+            language: 'en',
+          ),
+        ],
+      );
+      final controller = AssistantViewController(
+        service: service,
+        executor: RecordingExecutor(),
+        recorder: FakeRecorder(),
+      );
+      await controller.startListening();
+      await controller.stopListening();
+      expect(
+        controller.messages[1].text,
+        'I heard “I want to borrow a cook” and took it as '
+        '“I want to borrow a book”. If that is wrong, please say it again.',
+      );
+      expect(controller.messages[1].language, 'en');
+      // Nothing heard yet: the page language (Chinese here).
+      final short = AssistantViewController(
+        service: service,
+        recorder: FakeRecorder(seconds: 0.2),
+      );
+      await short.startListening();
+      await short.stopListening();
+      expect(short.messages.single.text, contains('沒有錄到聲音'));
+    });
+
     test('A navigation sets the page language; options keep theirs', () async {
       start();
       final service = QueueService([
@@ -843,16 +958,59 @@ void main() {
       for (final entry in catalog['capabilities'] as List)
         if (entry['enabled'] == true) entry['id'],
     };
-    for (final suggestion in AssistantViewController.suggestions) {
-      if (suggestion.capability != null) {
-        expect(
-          enabled,
-          contains(suggestion.capability),
-          reason: suggestion.text,
-        );
+    final chinese = AssistantViewController.suggestionsFor('zh');
+    expect(AssistantTexts.suggestions.keys, AssistantTexts.languages);
+    for (final language in AssistantTexts.languages) {
+      final list = AssistantViewController.suggestionsFor(language);
+      // Every language offers the same examples, in the same order.
+      expect(
+        list.map((s) => s.capability),
+        chinese.map((s) => s.capability),
+        reason: language,
+      );
+      for (final suggestion in list) {
+        expect(suggestion.text.trim(), isNotEmpty, reason: language);
+        if (suggestion.capability != null) {
+          expect(
+            enabled,
+            contains(suggestion.capability),
+            reason: '$language: ${suggestion.text}',
+          );
+        }
       }
     }
+    expect(AssistantViewController.suggestionsFor('xx'), chinese);
   });
+
+  test(
+    'Every assistant text exists in every language with its placeholders',
+    () {
+      final placeholder = RegExp(r'\{(\w+)\}');
+      Set<String> names(String text) =>
+          placeholder.allMatches(text).map((m) => m[1]!).toSet();
+      for (final key in AssistantTexts.keys) {
+        expect(
+          AssistantTexts.languagesOf(key).toSet(),
+          AssistantTexts.languages.toSet(),
+          reason: key,
+        );
+        final chinese = names(AssistantTexts.text(key, 'zh'));
+        for (final language in AssistantTexts.languages) {
+          expect(
+            names(AssistantTexts.text(key, language)),
+            chinese,
+            reason: '$key/$language',
+          );
+        }
+      }
+      expect(AssistantTexts.text('cancel', 'xx'), '取消'); // unknown: Chinese
+      // Values are inserted once; braces in heard text are left alone.
+      expect(
+        AssistantTexts.text('confirmHeard', 'en', {'text': '{text} 1'}),
+        startsWith('I heard “{text} 1”.'),
+      );
+    },
+  );
 
   testWidgets(
     'Only the latest reply offers its candidates; unavailable ones are inert',

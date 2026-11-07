@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:town_pass/bean/assistant_result.dart';
+import 'package:town_pass/page/assistant/assistant_texts.dart';
 import 'package:town_pass/page/main/main_view_controller.dart';
 import 'package:town_pass/service/assistant_action_executor.dart';
 import 'package:town_pass/service/page_translation.dart';
@@ -40,14 +41,11 @@ class AssistantChatMessage {
 }
 
 class AssistantViewController extends GetxController {
-  /// Examples shown before the first message. Each names the reviewed,
-  /// enabled capability it leads to; a test checks them against the catalog.
-  static const suggestions = [
-    (text: '有哪些功能', capability: null),
-    (text: '我要借書', capability: 'library'),
-    (text: '我要繳水費', capability: 'fees.water'),
-    (text: '臨櫃叫號', capability: 'reservation'),
-  ];
+  /// Examples shown before the first message, in [language]. Each names the
+  /// reviewed, enabled capability it leads to; a test checks every language's
+  /// list against the catalog.
+  static List<AssistantSuggestion> suggestionsFor(String language) =>
+      AssistantTexts.suggestionsFor(language);
 
   /// Hold-to-talk is the default input; the keyboard remains available.
   static const voiceInputAvailable = true;
@@ -126,29 +124,13 @@ class AssistantViewController extends GetxController {
   /// only the user's own choice in the menu is kept for the next launch. The
   /// backend treats the language as a preference, so another one is still
   /// detected.
-  /// The App's own short status lines in the reply language.
-  static String _status(String key, String language) =>
-      (_statusTexts[key]?[language] ?? _statusTexts[key]!['zh'])!;
-
-  static const _statusTexts = {
-    'opening': {
-      'zh': '正在開啟服務頁面…',
-      'en': 'Opening the service page…',
-      'ja': 'サービスページを開いています…',
-      'vi': 'Đang mở trang dịch vụ…',
-      'id': 'Membuka halaman layanan…',
-      'th': 'กำลังเปิดหน้าบริการ…',
-    },
-    'failed': {
-      'zh': '服務頁面載入失敗，請檢查網路或重新開啟。',
-      'en':
-          'The service page did not load. Check the network or open it again.',
-      'ja': 'サービスページを読み込めませんでした。ネットワークを確認するか、もう一度開いてください。',
-      'vi': 'Không tải được trang dịch vụ. Hãy kiểm tra mạng hoặc mở lại.',
-      'id': 'Halaman layanan gagal dimuat. Periksa jaringan atau buka lagi.',
-      'th': 'โหลดหน้าบริการไม่สำเร็จ โปรดตรวจสอบเครือข่ายหรือเปิดใหม่อีกครั้ง',
-    },
-  };
+  /// The App's own status line [key] in [language] (the exchange's language),
+  /// or in the page language when that is not known.
+  static String _status(
+    String key, [
+    String? language,
+    Map<String, Object> values = const {},
+  ]) => AssistantTexts.text(key, AssistantTexts.resolve(language), values);
 
   static final _hasWords = RegExp(r'[^\d\s\p{P}\p{S}]{2,}', unicode: true);
 
@@ -202,20 +184,36 @@ class AssistantViewController extends GetxController {
     final count = item.choices.isNotEmpty
         ? item.choices.length
         : item.suggestions.length;
+    final language = item.language;
     if (number > count) {
-      _add('目前只有 $count 個選項，請說 1 到 $count，或直接點選。');
+      _add(
+        _status('onlyCount', language, {'count': count}),
+        language: language,
+      );
       return true;
     }
     if (item.choices.isNotEmpty) {
       final choice = item.choices[number - 1];
       if (!choice.enabled) {
-        _add('第 $number 項「${choice.title}」目前無法使用，請選其他項目。');
+        _add(
+          _status('optionUnavailable', language, {
+            'n': number,
+            'title': choice.title,
+          }),
+          language: language,
+        );
         return true;
       }
       await choose(choice, number: number);
     } else {
       final suggestion = item.suggestions[number - 1];
-      await submit(suggestion, shownAs: '第 $number 項：$suggestion');
+      await submit(
+        suggestion,
+        shownAs: _status('numbered', language, {
+          'n': number,
+          'text': suggestion,
+        }),
+      );
     }
     return true;
   }
@@ -249,13 +247,13 @@ class AssistantViewController extends GetxController {
       case 'started' || 'scheduled':
         speechDownloading.value = true;
         speechDownloadPercent.value = null;
-        if (state == 'scheduled') _add('離線語音下載已排入系統，可能會等連上 Wi-Fi 才開始。');
+        if (state == 'scheduled') _addStatus('speechScheduled');
       case 'done':
         speechDownloading.value = false;
-        _add('中文（台灣）離線語音已下載完成，可以按住麥克風說話了。');
+        _addStatus('speechReady');
       case 'error':
         speechDownloading.value = false;
-        _add('離線語音下載失敗。請確認網路後再按一次麥克風重試，或先用鍵盤。');
+        _addStatus('speechDownloadFailed');
     }
   }
 
@@ -278,6 +276,10 @@ class AssistantViewController extends GetxController {
   final scrollTarget = RxnInt();
 
   String? _session;
+
+  /// The language of the exchange in progress when known (speech heard in it,
+  /// a tapped option's, or the last reply's); null means the page language.
+  String? _turnLanguage;
   String? _resolutionId;
   int _generation = 0;
   int _nextMessageId = 0;
@@ -309,6 +311,12 @@ class AssistantViewController extends GetxController {
     }
     if (page == null && last == null) return null;
     return {'page': ?page, 'last_action': ?last};
+  }
+
+  /// Adds the status line [key] in [language] (page language when unknown).
+  AssistantChatMessage _addStatus(String key, [String? language]) {
+    final resolved = AssistantTexts.resolve(language);
+    return _add(_status(key, resolved), language: resolved);
   }
 
   AssistantChatMessage _add(
@@ -394,8 +402,7 @@ class AssistantViewController extends GetxController {
       systemSpeech == null ? recorder.cancel() : systemSpeech!.cancel();
     }
     if (busy.value) {
-      message.value = '已取消，未開啟新的頁面。';
-      _add(message.value);
+      message.value = _addStatus('cancelled', _turnLanguage).text;
     }
     busy.value = false;
     _resolutionId = null;
@@ -427,7 +434,7 @@ class AssistantViewController extends GetxController {
         return false;
       }
       if (!started) {
-        _add('需要麥克風權限才能用語音。可以到手機設定開啟，或點右下角鍵盤改用打字。');
+        _addStatus('micPermission');
         return false;
       }
     }
@@ -479,17 +486,18 @@ class AssistantViewController extends GetxController {
       );
     }
     if (audio == null || AssistantRecorder.seconds(audio) < minimumSpeech) {
-      _add('沒有錄到聲音，請按住麥克風再說話，說完放開。');
+      _addStatus('noAudio');
       return;
     }
     if (AssistantRecorder.rms(Uint8List.sublistView(audio, 44)) < silentLevel) {
       // Nothing worth sending: the microphone itself delivered silence.
-      _add('麥克風沒有收到任何聲音。請確認麥克風沒被其他程式占用；用模擬器時請重新開啟它的麥克風設定，或改用鍵盤。');
+      _addStatus('silentMic');
       return;
     }
     final generation = ++_generation;
     busy.value = true;
-    message.value = '正在聽你說的話…';
+    _turnLanguage = null;
+    message.value = _status('listening');
     AssistantTranscript heard;
     try {
       heard = await service.transcribe(
@@ -506,7 +514,7 @@ class AssistantViewController extends GetxController {
     } catch (_) {
       if (generation == _generation && !isClosed) {
         busy.value = false;
-        _add('語音辨識沒有成功，請再說一次，或點右下角鍵盤改用打字。');
+        _addStatus('recognitionFailed');
       }
       return;
     }
@@ -519,7 +527,8 @@ class AssistantViewController extends GetxController {
   Future<void> _finishSystemSpeech(AssistantSystemSpeech system) async {
     final generation = ++_generation;
     busy.value = true;
-    message.value = '正在聽你說的話…';
+    _turnLanguage = null;
+    message.value = _status('listening');
     final result = await system.stop();
     if (generation != _generation || isClosed) return;
     if (result.error != null) {
@@ -543,7 +552,7 @@ class AssistantViewController extends GetxController {
     } catch (_) {
       if (generation == _generation && !isClosed) {
         busy.value = false;
-        _add('語音辨識沒有成功，請再說一次，或點右下角鍵盤改用打字。');
+        _addStatus('recognitionFailed');
       }
       return;
     }
@@ -565,8 +574,9 @@ class AssistantViewController extends GetxController {
     if (heard.confirm) {
       // Unsure or unmatched speech: nothing is sent until the user picks.
       final ask = _add(
-        '我聽到「${heard.text}」，是這句嗎？也可以選下面的說法，或再說一次。',
+        _status('confirmHeard', heard.language, {'text': heard.text}),
         suggestions: heard.options,
+        language: AssistantTexts.resolve(heard.language),
       );
       choicesMessageId.value = ask.id;
       return;
@@ -577,7 +587,10 @@ class AssistantViewController extends GetxController {
       heard.text,
       note: heard.correctedFrom == null
           ? null
-          : '我聽到「${heard.correctedFrom}」，當作「${heard.text}」處理；不對的話請再說一次。',
+          : _status('corrected', heard.language, {
+              'heard': heard.correctedFrom!,
+              'text': heard.text,
+            }),
       // The backend answers in the language the speech was recognised in.
       language: heard.language,
     );
@@ -599,9 +612,7 @@ class AssistantViewController extends GetxController {
       choiceId: choice.id,
       shownAs: number == null
           ? choice.title
-          : (language == 'zh'
-                ? '第 $number 項：${choice.title}'
-                : '$number. ${choice.title}'),
+          : _status('numbered', language, {'n': number, 'text': choice.title}),
       language: language,
     );
   }
@@ -629,11 +640,13 @@ class AssistantViewController extends GetxController {
     final generation = ++_generation;
     final requestId = '${DateTime.now().microsecondsSinceEpoch}-$generation';
     _add(shownAs ?? text.trim(), fromUser: true, language: language ?? 'zh');
-    if (note != null) _add(note);
+    // Known for speech and tapped options; typed text waits for the reply.
+    _turnLanguage = language;
+    if (note != null) _add(note, language: AssistantTexts.resolve(language));
     busy.value = true;
     choices.clear();
     choicesMessageId.value = null;
-    message.value = '正在找合適的頁面，你可以隨時取消。';
+    message.value = _status('searching', language);
     try {
       final result = await service.decide(
         text: text.trim(),
@@ -647,6 +660,7 @@ class AssistantViewController extends GetxController {
       if (generation != _generation || isClosed) return;
       _session = result.sessionId;
       _resolutionId = result.resolutionId;
+      _turnLanguage = result.language;
       // A tapped choice or a bare "2" says nothing about the language.
       if (choiceId == null && _hasWords.hasMatch(text)) {
         _rememberLanguage(result.language);
@@ -679,7 +693,7 @@ class AssistantViewController extends GetxController {
               _showCorner(reply.id, reply.text);
             } else {
               final failed = _add(
-                _status('failed', result.language),
+                _status('pageFailed', result.language),
                 language: result.language,
               );
               _showCorner(failed.id, failed.text);
@@ -696,12 +710,11 @@ class AssistantViewController extends GetxController {
     } on FormatException catch (error) {
       if (generation == _generation) {
         message.value = error.message;
-        _add(error.message);
+        _add(error.message, language: AssistantTexts.resolve(language));
       }
     } catch (_) {
       if (generation == _generation) {
-        message.value = '助理暫時無法處理，請重試或使用原服務入口。';
-        _add(message.value);
+        message.value = _addStatus('unavailable', language).text;
       }
     } finally {
       if (generation == _generation) busy.value = false;

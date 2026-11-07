@@ -3,6 +3,7 @@ import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:town_pass/page/assistant/assistant_texts.dart';
 import 'package:town_pass/page/assistant/assistant_view_controller.dart';
 import 'package:town_pass/service/assistant_speech_language.dart';
 import 'package:town_pass/service/page_translation.dart';
@@ -11,7 +12,8 @@ import 'package:town_pass/util/tp_text.dart';
 
 /// Root overlay: the original Navigator and native WebView remain the page UI.
 /// Collapsed it is a corner "助理" button with a short hint; opened it covers
-/// the screen with a translucent conversation sheet.
+/// the screen with a translucent conversation sheet. Its own texts follow the
+/// page language ([AssistantTexts]); replies arrive already in theirs.
 class AssistantHost extends StatefulWidget {
   final Widget child;
   final AssistantViewController controller;
@@ -75,8 +77,10 @@ class _AssistantHostState extends State<AssistantHost> {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: TPText(
-                  _downloadingTranslation[translation.language.value] ??
-                      _downloadingTranslation['zh']!,
+                  AssistantTexts.text(
+                    'downloadingTranslation',
+                    translation.language.value,
+                  ),
                   style: TPTextStyles.bodyRegular,
                   color: TPColors.white,
                 ),
@@ -88,17 +92,10 @@ class _AssistantHostState extends State<AssistantHost> {
     );
   }
 
-  static const _downloadingTranslation = {
-    'zh': '正在下載頁面翻譯模型（約 30 MB），完成後頁面會自動翻譯…',
-    'en': 'Downloading the page translation model (about 30 MB); pages will be translated when it is ready…',
-    'ja': 'ページ翻訳モデルをダウンロード中（約 30 MB）。完了するとページが翻訳されます…',
-    'vi': 'Đang tải mô hình dịch trang (khoảng 30 MB); trang sẽ được dịch khi tải xong…',
-    'id': 'Mengunduh model terjemahan halaman (sekitar 30 MB); halaman akan diterjemahkan setelah selesai…',
-    'th': 'กำลังดาวน์โหลดโมเดลแปลหน้า (ประมาณ 30 MB) หน้าจะถูกแปลเมื่อเสร็จ…',
-  };
-
   Widget _corner(BuildContext context, AssistantViewController controller) {
     final media = MediaQuery.of(context);
+    // Read inside the host's Obx, so the corner follows the page language.
+    final language = AssistantTexts.pageLanguage;
     final hint = controller.cornerMessageId.value;
     return Positioned(
       left: _left ? 16 : null,
@@ -119,7 +116,7 @@ class _AssistantHostState extends State<AssistantHost> {
               Semantics(
                 liveRegion: true,
                 button: true,
-                hint: '開啟助理對話',
+                hint: AssistantTexts.text('openHint', language),
                 child: Material(
                   color: TPColors.white,
                   elevation: 3,
@@ -152,12 +149,12 @@ class _AssistantHostState extends State<AssistantHost> {
               },
               child: FloatingActionButton.extended(
                 heroTag: 'townpass-assistant',
-                tooltip: '開啟助理，長按可移到另一側',
+                tooltip: AssistantTexts.text('openTooltip', language),
                 backgroundColor: TPColors.primary500,
                 foregroundColor: TPColors.white,
                 onPressed: controller.openPanel,
                 icon: const Icon(Icons.chat_bubble_outline),
-                label: const Text('助理'),
+                label: Text(AssistantTexts.text('title', language)),
               ),
             ),
           ],
@@ -225,8 +222,15 @@ class _AssistantSheetState extends State<AssistantSheet> {
     controller.submit(text);
   }
 
+  /// [key] in the page language. Called while an Obx builds, so the sheet
+  /// rebuilds when the page language changes.
+  String _t(String key, [Map<String, Object> values = const {}]) =>
+      AssistantTexts.page(key, values);
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => Obx(() => _sheet(context));
+
+  Widget _sheet(BuildContext context) {
     final media = MediaQuery.of(context);
     return BackdropFilter(
       filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
@@ -259,18 +263,18 @@ class _AssistantSheetState extends State<AssistantSheet> {
     padding: const EdgeInsets.fromLTRB(20, 8, 8, 0),
     child: Row(
       children: [
-        const Expanded(
+        Expanded(
           child: TPText(
-            '助理',
+            _t('title'),
             style: TPTextStyles.h2SemiBold,
             color: TPColors.primary700,
           ),
         ),
         Obx(
           () => IconButton(
-            tooltip: controller.readAloud.value
-                ? '朗讀回覆：開（點一下關閉）'
-                : '朗讀回覆：關（點一下開啟）',
+            tooltip: _t(
+              controller.readAloud.value ? 'readAloudOn' : 'readAloudOff',
+            ),
             iconSize: 28,
             onPressed: () =>
                 controller.setReadAloud(!controller.readAloud.value),
@@ -283,7 +287,7 @@ class _AssistantSheetState extends State<AssistantSheet> {
           ),
         ),
         IconButton(
-          tooltip: '關閉助理',
+          tooltip: _t('close'),
           iconSize: 28,
           onPressed: controller.closePanel,
           icon: const Icon(Icons.close, color: TPColors.grayscale700),
@@ -295,23 +299,25 @@ class _AssistantSheetState extends State<AssistantSheet> {
   Widget _suggestions() => ListView(
     padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
     children: [
-      const TPText(
-        '你可以說…',
+      TPText(
+        _t('youCanSay'),
         style: TPTextStyles.h3SemiBold,
         color: TPColors.grayscale800,
       ),
       const SizedBox(height: 12),
-      for (final suggestion in AssistantViewController.suggestions)
+      for (final suggestion in AssistantViewController.suggestionsFor(
+        AssistantTexts.pageLanguage,
+      ))
         Padding(
           padding: const EdgeInsets.only(bottom: 10),
           child: _OutlinedChoice(
-            title: '「${suggestion.text}」',
+            title: _t('quoted', {'text': suggestion.text}),
             onTap: () => _send(suggestion.text),
           ),
         ),
       const SizedBox(height: 8),
-      const TPText(
-        '我會帶你到原本的服務頁面。示範與未串接功能會標示，送出與付款由你自己確認。',
+      TPText(
+        _t('intro'),
         style: TPTextStyles.bodyRegular,
         color: TPColors.grayscale600,
       ),
@@ -344,7 +350,7 @@ class _AssistantSheetState extends State<AssistantSheet> {
             : CrossAxisAlignment.start,
         children: [
           Semantics(
-            label: item.fromUser ? '你說' : '助理回覆',
+            label: _t(item.fromUser ? 'youSaid' : 'assistantReply'),
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
               decoration: BoxDecoration(
@@ -367,6 +373,7 @@ class _AssistantSheetState extends State<AssistantSheet> {
                 padding: const EdgeInsets.only(top: 8),
                 child: _OutlinedChoice(
                   number: index + 1,
+                  numberLabel: _t('optionNumber', {'n': index + 1}),
                   title: choice.title,
                   subtitle: choice.subtitle,
                   onTap: choice.enabled
@@ -380,16 +387,17 @@ class _AssistantSheetState extends State<AssistantSheet> {
                 padding: const EdgeInsets.only(top: 8),
                 child: _OutlinedChoice(
                   number: index + 1,
-                  title: '「$suggestion」',
+                  numberLabel: _t('optionNumber', {'n': index + 1}),
+                  title: _t('quoted', {'text': suggestion}),
                   onTap: () => controller.chooseSuggestion(suggestion),
                 ),
               ),
           if (selectable &&
               (item.choices.isNotEmpty || item.suggestions.isNotEmpty))
-            const Padding(
-              padding: EdgeInsets.only(top: 6, left: 4),
+            Padding(
+              padding: const EdgeInsets.only(top: 6, left: 4),
               child: TPText(
-                '可以點選，或說出／打出編號，例如「第 1 個」。',
+                _t('chooseHint'),
                 style: TPTextStyles.bodyRegular,
                 color: TPColors.grayscale600,
               ),
@@ -412,8 +420,8 @@ class _AssistantSheetState extends State<AssistantSheet> {
           ),
         ),
         const SizedBox(width: 12),
-        const Expanded(child: TPText('正在處理…', color: TPColors.grayscale700)),
-        TextButton(onPressed: controller.cancel, child: const Text('取消')),
+        Expanded(child: TPText(_t('processing'), color: TPColors.grayscale700)),
+        TextButton(onPressed: controller.cancel, child: Text(_t('cancel'))),
       ],
     ),
   );
@@ -434,7 +442,7 @@ class _AssistantSheetState extends State<AssistantSheet> {
               maxLines: 3,
               textInputAction: TextInputAction.send,
               decoration: InputDecoration(
-                hintText: '輸入想做的事，例如：我要借書',
+                hintText: _t('inputHint'),
                 counterText: '',
                 filled: true,
                 fillColor: TPColors.white,
@@ -452,14 +460,14 @@ class _AssistantSheetState extends State<AssistantSheet> {
           ),
         ),
         IconButton(
-          tooltip: '送出',
+          tooltip: _t('send'),
           iconSize: 28,
           color: TPColors.primary500,
           onPressed: () => _send(),
           icon: const Icon(Icons.send),
         ),
         IconButton(
-          tooltip: '改用語音',
+          tooltip: _t('useVoice'),
           iconSize: 28,
           color: TPColors.grayscale700,
           onPressed: () => setState(() => _keyboard = false),
@@ -477,15 +485,17 @@ class _AssistantSheetState extends State<AssistantSheet> {
       final listening = controller.listening.value;
       final busy = controller.busy.value;
       final quiet = controller.tooQuiet.value;
-      final caption = listening
-          ? (_discard
-                ? '放開取消'
-                : quiet
-                ? '聲音有點小，請靠近麥克風說'
-                : '放開送出，往上滑可取消')
-          : busy
-          ? '處理中，可在上方取消'
-          : '按住說話';
+      final caption = _t(
+        listening
+            ? (_discard
+                  ? 'releaseToCancel'
+                  : quiet
+                  ? 'tooQuiet'
+                  : 'releaseToSend')
+            : busy
+            ? 'busyCaption'
+            : 'holdToTalk',
+      );
       final downloading = controller.speechDownloading.value;
       final percent = controller.speechDownloadPercent.value;
       final bar = Row(
@@ -506,7 +516,7 @@ class _AssistantSheetState extends State<AssistantSheet> {
             children: [
               Semantics(
                 button: true,
-                label: listening ? '正在聽，點兩下送出' : '按住說話',
+                label: _t(listening ? 'listeningSemantics' : 'holdToTalk'),
                 onTap: busy ? null : _toggleListening,
                 excludeSemantics: true,
                 child: Listener(
@@ -572,7 +582,7 @@ class _AssistantSheetState extends State<AssistantSheet> {
             child: Align(
               alignment: Alignment.bottomRight,
               child: IconButton(
-                tooltip: '改用鍵盤',
+                tooltip: _t('useKeyboard'),
                 iconSize: 30,
                 color: TPColors.grayscale700,
                 onPressed: listening
@@ -590,7 +600,9 @@ class _AssistantSheetState extends State<AssistantSheet> {
         mainAxisSize: MainAxisSize.min,
         children: [
           TPText(
-            percent == null ? '正在下載中文（台灣）離線語音…' : '正在下載中文（台灣）離線語音 $percent%',
+            percent == null
+                ? _t('speechDownloading')
+                : _t('speechDownloadingPercent', {'percent': percent}),
             style: TPTextStyles.bodyRegular,
             color: TPColors.grayscale700,
           ),
@@ -612,14 +624,25 @@ class _AssistantSheetState extends State<AssistantSheet> {
     }),
   );
 
-  /// Speech language menu: "自動偵測" or one language, each in its own script.
-  /// With auto, the language last detected is shown after it.
+  /// Speech language menu: "自動偵測" (in the page language) or one language,
+  /// each in its own script. With auto, the language last detected is shown
+  /// after it. Texts are read here, not in the menu's builders, so the
+  /// enclosing Obx sees them.
   Widget _languageButton(bool locked) {
     final chosen = AssistantSpeechLanguage.of(controller.speechLanguage.value);
     final heard = controller.heardLanguage.value;
+    String short(AssistantSpeechLanguage language) =>
+        language.code == 'auto' ? _t('autoShort') : language.short;
+    String name(AssistantSpeechLanguage language) =>
+        language.code == 'auto' ? _t('autoDetect') : language.label;
     final label = chosen.code == 'auto' && heard != null
-        ? '${chosen.short}·${AssistantSpeechLanguage.of(heard).short}'
-        : chosen.short;
+        ? '${short(chosen)}·${short(AssistantSpeechLanguage.of(heard))}'
+        : short(chosen);
+    final semantics = _t('speechLanguage', {'language': name(chosen)});
+    final names = {
+      for (final language in AssistantSpeechLanguage.all)
+        language.code: name(language),
+    };
     // A MenuAnchor, not a PopupMenuButton: this host sits above the App's
     // Navigator, so a popup route opened underneath the panel and the menu
     // never appeared. MenuAnchor draws in the host's own Overlay.
@@ -634,12 +657,15 @@ class _AssistantSheetState extends State<AssistantSheet> {
               language.code == chosen.code ? Icons.check : null,
               size: 20,
             ),
-            child: TPText(language.label, style: TPTextStyles.bodyRegular),
+            child: TPText(
+              names[language.code]!,
+              style: TPTextStyles.bodyRegular,
+            ),
           ),
       ],
       builder: (context, menu, _) => Semantics(
         button: true,
-        label: '說話的語言：${chosen.label}',
+        label: semantics,
         excludeSemantics: true,
         child: GestureDetector(
           behavior: HitTestBehavior.opaque,
@@ -709,11 +735,15 @@ class _OutlinedChoice extends StatelessWidget {
 
   /// Shown as a badge so the option can also be chosen by saying its number.
   final int? number;
+
+  /// The badge's screen-reader label, e.g. "第 1 項".
+  final String? numberLabel;
   const _OutlinedChoice({
     required this.title,
     this.subtitle = '',
     this.onTap,
     this.number,
+    this.numberLabel,
   });
 
   @override
@@ -739,7 +769,7 @@ class _OutlinedChoice extends StatelessWidget {
             children: [
               if (number != null) ...[
                 Semantics(
-                  label: '第 $number 項',
+                  label: numberLabel ?? '$number',
                   child: Container(
                     width: 32,
                     height: 32,
