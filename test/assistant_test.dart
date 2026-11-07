@@ -18,6 +18,7 @@ import 'package:town_pass/page/assistant/assistant_view_controller.dart';
 import 'package:town_pass/page/assistant/widget/assistant_host.dart';
 import 'package:town_pass/service/assistant_action_executor.dart';
 import 'package:town_pass/service/assistant_page_tracker.dart';
+import 'package:town_pass/service/assistant_recent_inputs.dart';
 import 'package:town_pass/service/assistant_recorder.dart';
 import 'package:town_pass/service/assistant_speaker.dart';
 import 'package:town_pass/service/assistant_service.dart';
@@ -875,9 +876,10 @@ void main() {
       expect(find.text('[en] 首頁'), findsOneWidget);
       expect(find.text('我要借書'), findsOneWidget); // assistant text untouched
       expect(find.text('ISBN 123'), findsOneWidget); // nothing to translate
+      // Not kept: the next launch starts in the phone's language again.
       expect(
         (await SharedPreferences.getInstance()).getString('page_language'),
-        'en',
+        isNull,
       );
       await tester.runAsync(() => PageTranslation.instance.setLanguage('zh'));
       await tester.pump();
@@ -983,12 +985,9 @@ void main() {
       );
       await controller.startListening();
       await controller.stopListening();
-      expect(
-        controller.messages[1].text,
-        'I heard “I want to borrow a cook” and took it as '
-        '“I want to borrow a book”. If that is wrong, please say it again.',
-      );
-      expect(controller.messages[1].language, 'en');
+      // The corrected reading is sent without a note; the reply is English.
+      expect(service.texts, ['I want to borrow a book']);
+      expect(controller.messages[1].text, 'Library.');
       // Nothing heard yet: the page language (Chinese here).
       final short = AssistantViewController(
         service: service,
@@ -1035,6 +1034,44 @@ void main() {
       },
     );
 
+    test('Each launch starts in the phone language', () {
+      expect(PageTranslation.systemLanguage('vi'), 'vi');
+      expect(PageTranslation.systemLanguage('zh'), 'zh');
+      expect(
+        PageTranslation.systemLanguage('fr'),
+        'zh',
+      ); // not offered: Chinese
+    });
+
+    test('A clearly spoken language switches the pages at once', () async {
+      start();
+      final service = QueueService(
+        [
+          const AssistantResult(
+            sessionId: 's',
+            message: 'Hello',
+            language: 'vi',
+          ),
+        ],
+        transcripts: [
+          const AssistantTranscript(
+            'Tôi muốn mượn sách',
+            language: 'vi',
+            languageConfidence: 0.98,
+          ),
+        ],
+      );
+      final controller = AssistantViewController(
+        service: service,
+        executor: RecordingExecutor(),
+        recorder: FakeRecorder(),
+      );
+      expect(await controller.startListening(), isTrue);
+      await controller.stopListening();
+      expect(PageTranslation.instance.language.value, 'vi');
+      controller.cancel();
+    });
+
     test('A navigation sets the page language; options keep theirs', () async {
       start();
       final service = QueueService([
@@ -1064,6 +1101,40 @@ void main() {
       expect(PageTranslation.instance.language.value, 'en');
       controller.cancel();
     });
+  });
+
+  test('Requests that opened a page come first in the suggestions', () async {
+    SharedPreferences.setMockInitialValues({});
+    AssistantRecentInputs.instance.reset();
+    final service = QueueService([
+      const AssistantResult(
+        sessionId: 's',
+        message: '請在原本的「停車費」頁面繼續操作。',
+        destination: {'kind': 'capability', 'id': 'fees.parking'},
+      ),
+      const AssistantResult(sessionId: 's', message: '我還不太確定你的需求。'),
+    ]);
+    final controller = AssistantViewController(
+      service: service,
+      executor: RecordingExecutor(),
+      recorder: FakeRecorder(),
+    );
+    await controller.submit('幫我繳停車費');
+    await controller.submit('今天天氣如何'); // opened nothing: not kept
+    final defaults = ['有哪些功能', '我要借書'];
+    expect(AssistantRecentInputs.instance.merged(defaults), [
+      '幫我繳停車費',
+      '有哪些功能',
+      '我要借書',
+    ]);
+    expect(
+      (await SharedPreferences.getInstance()).getStringList(
+        'assistant_recent_inputs',
+      ),
+      ['幫我繳停車費'],
+    );
+    controller.cancel();
+    AssistantRecentInputs.instance.reset();
   });
 
   test('Suggestions lead only to enabled catalog capabilities', () {
@@ -1426,7 +1497,7 @@ void main() {
       expect(service.texts, ['我要借書']);
       expect(controller.messages.first.fromUser, isTrue);
       expect(controller.messages.first.text, '我要借書');
-      expect(controller.messages[1].text, contains('我聽到「我要解釋」'));
+      expect(controller.messages.any((m) => m.text.contains('我聽到')), isFalse);
       expect(controller.messages.any((m) => m.suggestions.isNotEmpty), isFalse);
       // Only what was heard: it is sent as heard.
       service.transcripts.removeAt(0);
@@ -1436,7 +1507,7 @@ void main() {
     },
   );
 
-  test('A close speech correction is sent and stated to the user', () async {
+  test('A close speech correction is sent as it is, without a note', () async {
     final service = QueueService(
       [const AssistantResult(sessionId: 's', message: '請在原圖書頁面搜尋。')],
       transcripts: [const AssistantTranscript('我要借書', correctedFrom: '我要結束')],
@@ -1451,7 +1522,6 @@ void main() {
     expect(service.texts, ['我要借書']);
     expect(controller.messages.map((m) => (m.fromUser, m.text)), [
       (true, '我要借書'),
-      (false, '我聽到「我要結束」，當作「我要借書」處理；不對的話請再說一次。'),
       (false, '請在原圖書頁面搜尋。'),
     ]);
   });

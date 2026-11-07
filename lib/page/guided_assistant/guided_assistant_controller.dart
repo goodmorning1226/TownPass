@@ -16,10 +16,12 @@ import 'package:town_pass/bean/assistant_result.dart';
 import 'package:town_pass/page/main/main_view_controller.dart';
 import 'package:town_pass/service/assistant_action_executor.dart';
 import 'package:town_pass/service/assistant_page_tracker.dart';
+import 'package:town_pass/service/assistant_recent_inputs.dart';
 import 'package:town_pass/service/assistant_recorder.dart';
 import 'package:town_pass/service/assistant_service.dart';
 import 'package:town_pass/service/assistant_speaker.dart';
 import 'package:town_pass/service/assistant_speech_language.dart';
+import 'package:town_pass/service/page_translation.dart';
 
 /// One chat bubble.
 class ChatMessage {
@@ -177,6 +179,7 @@ class GuidedAssistantController extends GetxController {
        executor = executor ?? AssistantActionExecutor(),
        pageTracker = pageTracker ?? AssistantPageTracker.instance {
     recorder?.onLevel = _onLevel;
+    AssistantRecentInputs.instance.load();
     AssistantSpeechLanguage.load().then((code) {
       if (!isClosed) speechLanguage.value = code;
     });
@@ -195,10 +198,23 @@ class GuidedAssistantController extends GetxController {
   /// The language of the current exchange, sent with typed and spoken turns.
   String? _turnLanguage;
 
+  /// The last typed or spoken request (a tapped option opens a page for it).
+  String? _lastRequest;
+
   void setSpeechLanguage(String code) {
     speechLanguage.value = AssistantSpeechLanguage.of(code).code;
     heardLanguage.value = null;
     AssistantSpeechLanguage.save(speechLanguage.value);
+  }
+
+  /// A clearly recognised language switches the pages for this launch (the
+  /// next launch starts in the phone's language, see PageTranslation.load).
+  void _followSpokenLanguage(AssistantTranscript heard) {
+    final sure = heard.languageConfidence;
+    if (sure != null && sure < 0.8) return;
+    if (PageTranslation.languages.containsKey(heard.language)) {
+      PageTranslation.instance.setLanguage(heard.language);
+    }
   }
 
   void _onLevel(double rms) {
@@ -340,7 +356,8 @@ class GuidedAssistantController extends GetxController {
             t.status == TaskStatus.paused)) {
       return t.guide.helpChips;
     }
-    return starterChips;
+    // The user's own recent requests that worked, then the defaults.
+    return AssistantRecentInputs.instance.merged(starterChips);
   }
 
   /// Replies that are always pre-written and answered on the phone; only
@@ -364,6 +381,7 @@ class GuidedAssistantController extends GetxController {
     // Typed text: the backend detects its language; a tapped option keeps
     // the language of the exchange.
     if (!voice && choiceId == null) _turnLanguage = null;
+    if (choiceId == null && raw.trim().isNotEmpty) _lastRequest = raw.trim();
     final text = raw.trim();
     if ((text.isEmpty && choiceId == null) || loading.value) return;
     messages.add(
@@ -437,6 +455,9 @@ class GuidedAssistantController extends GetxController {
     _resolutionId = result.resolutionId;
     final destination = result.destination;
     if (destination != null) {
+      // A request that opened a page becomes a suggestion next time.
+      final asked = choiceId == null ? text : _lastRequest;
+      if (asked != null) AssistantRecentInputs.instance.remember(asked);
       final guide = guideFor(destination, result.guide, text);
       if (guide != null) {
         _guides[guide.id] = guide;
@@ -1240,13 +1261,8 @@ class GuidedAssistantController extends GetxController {
     // guards navigation. The turn is answered in the language heard.
     final reading = _bestReading(heard);
     _turnLanguage = heard.language;
-    submit(
-      reading.text,
-      voice: true,
-      note: reading.correctedFrom == null
-          ? null
-          : Replies.corrected(reading.correctedFrom!, reading.text),
-    );
+    _followSpokenLanguage(heard);
+    submit(reading.text, voice: true);
   }
 
   /// The text to send for [heard]: an unsure transcript uses the backend's
@@ -1351,13 +1367,8 @@ class GuidedAssistantController extends GetxController {
     homeAsk.value = HomeAsk.asked;
     heardLanguage.value = heard.language;
     _turnLanguage = heard.language;
-    submit(
-      reading.text,
-      voice: true,
-      note: reading.correctedFrom == null
-          ? null
-          : Replies.corrected(reading.correctedFrom!, reading.text),
-    );
+    _followSpokenLanguage(heard);
+    submit(reading.text, voice: true);
   }
 
   void _showHomeNotice(String text) {

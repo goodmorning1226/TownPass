@@ -29,6 +29,7 @@ import 'package:town_pass/service/assistant_recorder.dart';
 import 'package:town_pass/service/assistant_service.dart';
 import 'package:town_pass/service/account_service.dart';
 import 'package:town_pass/service/assistant_speaker.dart';
+import 'package:town_pass/service/page_translation.dart';
 import 'package:town_pass/service/device_service.dart';
 import 'package:town_pass/service/shared_preferences_service.dart';
 import 'package:town_pass/service/package_service.dart';
@@ -195,7 +196,12 @@ void main() {
   const engine = MockAssistantEngine();
 
   group('speech language and level', () {
-    tearDown(Get.reset);
+    // A clearly heard language switches the page language (a global): reset
+    // it so later tests see untranslated pages.
+    tearDown(() {
+      PageTranslation.instance.reset();
+      Get.reset();
+    });
 
     test('the chosen language goes with speech and the turn', () async {
       SharedPreferences.setMockInitialValues({
@@ -223,6 +229,7 @@ void main() {
       expect(service.transcribeLanguages, ['en']);
       expect(service.turnLanguages, ['en']);
       expect(c.heardLanguage.value, 'en');
+      expect(PageTranslation.instance.language.value, 'en'); // pages follow
       c.setSpeechLanguage('ja');
       expect(c.speechLanguage.value, 'ja');
     });
