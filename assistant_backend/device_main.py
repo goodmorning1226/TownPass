@@ -82,11 +82,16 @@ def warm_up(recognizer, model_url, limit_s=900):
 
 
 def _load_faq(backend):
-    """Attach the FAQ index once read (~1 s); until then requests run without FAQ."""
+    """Attach the FAQ index once read (~1 s); until then requests run without FAQ.
+
+    The App's own Q&A (qna.py) is then downloaded and embedded in its own
+    background thread; offline it simply stays empty.
+    """
     import time
     import faq
+    import qna
     started = time.monotonic()
-    backend.faq = faq.load_default()
+    backend.faq = qna.with_qna(faq.load_default())
     print(f"timing faq-load entries={backend.faq.count if backend.faq else 0} "
           f"{time.monotonic() - started:.1f}s", flush=True)
 

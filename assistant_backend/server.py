@@ -683,7 +683,8 @@ def main():
     if args.host not in ("127.0.0.1", "localhost") and len(token) < 24:
         parser.error("LAN binding requires TOWNPASS_ASSISTANT_TOKEN with at least 24 characters.")
     from faq import load_default
-    faq = load_default()
+    from qna import with_qna
+    faq = with_qna(load_default())  # App Q&A loads in the background
     assistant = Assistant(faq=faq)
     import semantic
     assistant.semantic = semantic.load_default(assistant.workflow.registry)
