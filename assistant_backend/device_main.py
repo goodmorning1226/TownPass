@@ -124,6 +124,29 @@ def taiwanese_provider(port, starter=None):
     return provide
 
 
+# A FAQ question is known text when its best FAQ score reaches this (faq.MEDIUM_CONF:
+# the band the assistant answers from, after a "did you mean"). One e5 embedding
+# (~0.1 s on the phone), only for transcripts the catalogue rules did not know and
+# only once the FAQ index and its server are up. None: catalogue rules only.
+KNOWN_FAQ_CONFIDENCE = "medium"
+
+
+def known_text(backend):
+    """asr_server's known_text callback: Workflow.known_text, then the FAQ (KNOWN_FAQ_CONFIDENCE)."""
+    def known(text):
+        if backend.workflow.known_text(text):
+            return True
+        index = backend.faq if KNOWN_FAQ_CONFIDENCE else None
+        if index is None or len(text) < 4:  # faq.FAQ_MIN_CHARS: too short for retrieval
+            return False
+        try:
+            confidence, _ = index.search(text, k=1)
+        except Exception:
+            return False
+        return confidence == "high" or (confidence == "medium" and KNOWN_FAQ_CONFIDENCE == "medium")
+    return known
+
+
 def _serve(server):
     thread = threading.Thread(target=server.serve_forever, daemon=True)
     thread.start()
@@ -163,11 +186,13 @@ def start(model_port=8771, whisper_port=8772, assistant_port=8765, asr_port=8770
         chinese_url = os.environ["TOWNPASS_WHISPER_URL"] if chinese_model or not multi_url else multi_url
         taiwanese = taiwanese_provider(taiwanese_port) if whisper and taiwanese_port else None
         gate_url = f"http://127.0.0.1:{gate_port}" if multi_url and gate_port else None
+        backend = server.Assistant()
+        # Same process as the backend: a Chinese transcript the App does not know (no
+        # service, command, book, sound-alike or FAQ question) may be Taiwanese (section 13).
         recognizer = asr_server.WhisperCppRecognizer(chinese_url, multi_url=multi_url, taiwanese=taiwanese,
-                                                     gate_url=gate_url)
+                                                     gate_url=gate_url, known_text=known_text(backend))
         asr = ThreadingHTTPServer(("127.0.0.1", asr_port), asr_server.make_handler(recognizer, "whisper.cpp"))
         asr.daemon_threads = True
-        backend = server.Assistant()
         assistant = ThreadingHTTPServer(("127.0.0.1", assistant_port), server.make_handler(backend))
         assistant.daemon_threads = True
         assistant.timeout = 150
