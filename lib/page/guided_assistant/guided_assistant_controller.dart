@@ -331,6 +331,11 @@ class GuidedAssistantController extends GetxController {
   final nudge = ''.obs;
   final todoOpen = false.obs;
   final currentRoute = '/'.obs;
+
+  /// Tab of the App's first page (MainViewController), once it exists: a
+  /// guide on a tab ([Guide.tab]) shows only while its tab does.
+  final currentTab = RxnInt();
+  Worker? _tabWorker;
   final readAloud = false.obs;
   final speaking = false.obs;
   final typing = false.obs;
@@ -381,8 +386,10 @@ class GuidedAssistantController extends GetxController {
       task,
       sheetOpen,
       currentRoute,
+      currentTab,
       ...web.watched,
     ], (_) => _onProgress());
+    _bindTabs();
     speaker.loadEnabled().then((v) => readAloud.value = v);
     _loadSettings();
     if (runOnboarding) _loadOnboarding();
@@ -400,6 +407,7 @@ class GuidedAssistantController extends GetxController {
       t?.cancel();
     }
     _stepWorker?.dispose();
+    _tabWorker?.dispose();
     probe.stop();
     speaker.stop();
     service?.cancel();
@@ -690,10 +698,9 @@ class GuidedAssistantController extends GetxController {
   }
 
   /// Opens the guide's real service page unless it is already showing.
+  /// A guide on an App tab ([Guide.tab]) only switches to that tab.
   void _openGuidePage(Guide guide, {bool fresh = false}) {
-    if (!fresh &&
-        currentRoute.value == guide.route &&
-        guide.onPage(_pageNow())) {
+    if (!fresh && _onGuideScreen(guide) && guide.onPage(_pageNow())) {
       return;
     }
     _opening = true;
@@ -802,8 +809,12 @@ class GuidedAssistantController extends GetxController {
         final a = reply.answer!;
         _say(_bot(a.summary, answer: a));
       case MockReplyKind.pageHelp:
-        final help = currentRoute.value == TPRoute.webView
-            ? pageHelpForPath(_pageNow().path)
+        // The 優惠 tab shows a service page too (its WebView is tracked).
+        final path = _pageNow().path;
+        final help =
+            currentRoute.value == TPRoute.webView ||
+                (currentRoute.value == TPRoute.main && path != null)
+            ? pageHelpForPath(path)
             : pageHelp[currentRoute.value];
         if (help == null) {
           _say(_bot(Replies.unknownPage));
@@ -892,6 +903,8 @@ class GuidedAssistantController extends GetxController {
 
   /// Starts [guideId], or asks first when another guide is in progress.
   void _requestGuide(String guideId) {
+    final asked = _guide(guideId);
+    if (asked != null) guideId = _onShowingTab(asked).id;
     final active = _activeTask;
     final other = _guide(guideId);
     if (active == null || other == null || active.guide.id == guideId) {
@@ -930,8 +943,10 @@ class GuidedAssistantController extends GetxController {
     bool resuming = false,
     bool? guided,
   }) {
-    final guide = _guide(guideId);
-    if (guide == null) return;
+    final found = _guide(guideId);
+    if (found == null) return;
+    // Resuming keeps the task's own page (and progress).
+    final guide = resuming ? found : _onShowingTab(found);
     // 一般模式: the page opens, the steps do not start (as after 我自己來).
     // [guided] overrides the mode (教我 asks for the steps).
     final alone = !resuming && !(guided ?? mode.value == AssistantMode.teach);
@@ -1037,7 +1052,7 @@ class GuidedAssistantController extends GetxController {
   bool get guideVisible {
     final t = task.value;
     if (t == null || t.left || sheetOpen.value) return false;
-    if (currentRoute.value != t.guide.route) return false;
+    if (!_onGuideScreen(t.guide)) return false;
     if (!t.guide.onPage(web.now)) return false;
     return t.status == TaskStatus.opened || t.status == TaskStatus.on;
   }
@@ -1184,10 +1199,10 @@ class GuidedAssistantController extends GetxController {
     if (t == null || t.left || sheetOpen.value) return false;
     if (t.status != TaskStatus.opened && t.status != TaskStatus.on) {
       return _measureOnly && t.status == TaskStatus.ended
-          ? currentRoute.value == t.guide.route
+          ? _onGuideScreen(t.guide)
           : false;
     }
-    return currentRoute.value == t.guide.route;
+    return _onGuideScreen(t.guide);
   }
 
   /// 一般模式 opened the page without steps: the page is read only until its
@@ -1243,7 +1258,7 @@ class GuidedAssistantController extends GetxController {
         !t.left &&
         !t.stepsDone &&
         (t.status == TaskStatus.opened || t.status == TaskStatus.on) &&
-        currentRoute.value == t.guide.route;
+        _onGuideScreen(t.guide);
   }
 
   /// Whether the WebView's page belongs to [g]; null while nothing is read
@@ -1332,11 +1347,16 @@ class GuidedAssistantController extends GetxController {
     // Looked at again once the 3 s pass: if the page never got back (no
     // page change follows), the bar returns instead of staying away.
     _offScopeTimer = Timer(offScopeDelay, _offScopeSettled);
-    final url = _lastScopeGuide == t.guide.id ? _lastScopeUrl : null;
     final controller = pageTracker.currentWebPage?.controller;
-    if (url != null &&
-        controller != null &&
-        currentRoute.value == t.guide.route) {
+    // On its App tab the guide has no page to open: the tab's WebView goes
+    // back to the guide's last page, else to the tab's own start page.
+    final tab = t.guide.tab;
+    final url =
+        (_lastScopeGuide == t.guide.id ? _lastScopeUrl : null) ??
+        (tab != null && currentRoute.value == TPRoute.main
+            ? Uri.https(AssistantPageTracker.serviceHost, tab.home)
+            : null);
+    if (url != null && controller != null && _onGuideScreen(t.guide)) {
       try {
         await _goBackTo(controller, url);
         return;
@@ -1497,20 +1517,73 @@ class GuidedAssistantController extends GetxController {
 
   void routeChanged(String route) {
     if (route.isEmpty) return;
+    // The tracker first: the reader started by the change below reads it.
+    pageTracker.route = route;
+    _bindTabs();
     currentRoute.value = route;
     if (route != TPRoute.main) dismissHomeAsk();
+    _screenChanged();
+  }
+
+  /// The App's first page switched to tab [index] (MainViewController): for
+  /// a guide on a tab, another tab is leaving it, as another route is.
+  void tabChanged(int index) {
+    currentTab.value = index;
+    _screenChanged();
+  }
+
+  /// Follows MainViewController's tab once that page exists (it is put by
+  /// the main route's binding, after this controller).
+  void _bindTabs() {
+    if (_tabWorker != null || !Get.isRegistered<MainViewController>()) return;
+    final index = Get.find<MainViewController>().currentIndex;
+    currentTab.value = index.value;
+    _tabWorker = ever<int>(index, tabChanged);
+  }
+
+  /// The screen the guide's page shows on: its route, or for a guide on an
+  /// App tab ([Guide.tab]) the first page on that tab, or a WebView opened
+  /// over it (the tab's 票夾 button opens one); its page decides the rest.
+  bool _onGuideScreen(Guide g) {
+    final tab = g.tab;
+    if (tab == null) return currentRoute.value == g.route;
+    return currentRoute.value == TPRoute.webView ||
+        (currentRoute.value == TPRoute.main && currentTab.value == tab.index);
+  }
+
+  /// Route or tab changed: leaving the guide's screen pauses it (the
+  /// 「你離開了…」 card); coming back clears that.
+  void _screenChanged() {
     final t = task.value;
     if (t == null) return;
-    if (route == t.guide.route) _opening = false;
-    if (route != t.guide.route && !_opening) {
+    final here = _onGuideScreen(t.guide);
+    if (here) _opening = false;
+    if (!here && !_opening) {
       if (t.status == TaskStatus.on || t.status == TaskStatus.opened) {
         task.value = t.copyWith(status: TaskStatus.paused, left: true);
       } else if (!t.left && t.status == TaskStatus.paused) {
         task.value = t.copyWith(left: true);
       }
-    } else if (route == t.guide.route && t.left) {
+    } else if (here && t.left) {
       task.value = t.copyWith(left: false);
     }
+  }
+
+  /// [guide] runs on the App tab that already shows its page (優惠: a
+  /// coupon.list guide asked on the 優惠 tab), see [GuidePage.onTabInstead].
+  Guide _onShowingTab(Guide guide) {
+    _bindTabs();
+    final page = guidePageById(guide.id.split(RegExp('[@:]')).first);
+    final tab = page?.tab;
+    if (tab == null ||
+        currentRoute.value != TPRoute.main ||
+        currentTab.value != tab.index) {
+      return guide;
+    }
+    final moved = page!.onTabInstead(guide);
+    if (moved == null) return guide;
+    _guides[moved.id] = moved;
+    return moved;
   }
 
   // ---------------------------------------------------------------- sheet

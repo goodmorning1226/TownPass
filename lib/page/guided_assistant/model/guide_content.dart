@@ -110,8 +110,13 @@ class Guide {
   /// Short name in sentences, e.g. "借書" (暫停借書).
   String get shortName => texts().shortName;
 
-  /// App route the guide runs on (the service WebView).
+  /// App route the guide runs on (the service WebView, or the App's first
+  /// page for a guide on one of its tabs, see [tab]).
   final String route;
+
+  /// The guide runs on this tab of the App's first page (優惠) instead of a
+  /// TPWebView; null for every other guide.
+  final GuideTab? tab;
 
   /// The service page, for the backend executor when the page has to be
   /// opened again (回到借書).
@@ -172,6 +177,7 @@ class Guide {
     required this.title,
     required this.texts,
     required this.route,
+    this.tab,
     required this.destination,
     required this.spec,
     required this.onPage,

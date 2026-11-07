@@ -21,9 +21,11 @@ import 'package:town_pass/page/guided_assistant/web/web_page_state.dart';
 ///                       detail with ?needUse=Y (one 兌換 button)
 ///   /ticket-wallet/exchange/ID   the ticket's QR code
 ///
-/// The native 優惠 tab (PerkView) embeds /coupon/ in a plain TPInAppWebView
-/// that does not register with AssistantPageTracker, so the overlay cannot
-/// read it; these guides only run in the TPWebView route.
+///   `app.perks` is the native 優惠 tab (PerkView), whose WebView shows
+///   /coupon/ and is read like a TPWebView (AssistantPageTracker.attachTab):
+///   the guide runs right on the tab (GuideTab), no TPWebView is opened.
+///   Asked while the tab shows, `coupon.list` runs there too. The tab's 票夾
+///   button opens /ticket-wallet in a TPWebView, where the guide goes on.
 ///
 /// Everything is drawn on top of the page; nothing on the page is changed,
 /// clicked or typed by the assistant. Ids, titles, keywords and
@@ -608,10 +610,11 @@ final couponWalletPage = GuidePage(
   pathPrefixes: const ['/coupon', _wallet],
   components: couponWalletComponents,
   defaultGoal: couponWalletDefaultGoal,
-  // app.perks is the native 優惠 tab: the overlay cannot read it.
-  capabilities: const ['coupon.list', 'wallet'],
+  capabilities: const ['coupon.list', 'wallet', 'app.perks'],
   capabilityGoals: const {
     'coupon.list': ['pick_coupon', 'add_wallet', 'use_coupon'],
+    // The tab shows the coupon home; 票夾 is a native button there.
+    'app.perks': ['pick_coupon', 'add_wallet', 'use_coupon'],
     'wallet': [
       'wallet_coupons',
       'wallet_pick',
@@ -621,14 +624,22 @@ final couponWalletPage = GuidePage(
     ],
   },
   // coupon.list lands on the (empty) 優惠券搜尋 page: go home and pick one.
+  // On the tab: pick one first (use_coupon would else go through 票夾).
   entryGoals: const {
     'coupon.list': ['coupon_home', 'pick_coupon'],
+    'app.perks': ['pick_coupon'],
   },
   defaultDestination: const {'kind': 'capability', 'id': 'coupon.list'},
   texts: _couponTexts,
   offline: _couponOffline,
   // The ticket page has a fixed 立即購票 bar; coupon buttons are in the page.
   bottomBar: (path) => path.startsWith(_ticketDetail) ? 80 : null,
+  tab: const GuideTab(
+    index: 2, // PerkView.tabIndex
+    capability: 'app.perks',
+    home: '/coupon/',
+    replaces: ['coupon.list'],
+  ),
   help: const PageHelp(
     '這是「優惠」和「票夾」',
     '可以看店家的優惠券，喜歡的按「加入票夾」存起來，到店家結帳時再按「立即使用」兌換。票夾裡有你存的優惠券和買好的入場券。',

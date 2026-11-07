@@ -1846,12 +1846,15 @@
   {
    "id": "h-native-perks",
    "text": "打開優惠那一頁",
-   "page": null,
+   "page": "coupon_wallet",
    "capability": "app.perks",
-   "components": [],
-   "note": "原生優惠分頁：開頁沒有引導。",
+   "components": [
+    "coupon_tab",
+    "pick_coupon"
+   ],
+   "note": "原生優惠分頁：切到該分頁，在分頁的 WebView 上引導（app.perks 預設 pick_coupon）。",
    "tags": [
-    "no_guide"
+    "perks"
    ],
    "destination": {
     "kind": "capability",

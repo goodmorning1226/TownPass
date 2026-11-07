@@ -3,7 +3,7 @@
 對象：`feat/guided-assistant-mock` 的引導助理（助理面板 → 後端選頁面與教學元件 → App 在原服務頁上逐步引導）。
 
 - 教學元件現在是每頁一個檔案 `assets/assistant/guide_<page>.json`：library、fees、counter_calling、disaster_report、citizen_report、district_office、police_report、coupon_wallet、subscription。第 2 節（圖書借閱）有逐步的卡片／光圈表；其他頁的步驟表還沒寫（見第 3 節）。
-- 沒有引導的入口（原生 `police` 警政頁、`app.perks` 優惠分頁、`fees.scan`/`fees.tax` QR 相機）只驗證「開頁、沒有光圈與步驟卡」。（`Replies.opensPage`「這個功能還沒有逐步引導，只幫你開頁。」目前在 lib/ 裡沒有被使用。）
+- 沒有引導的入口（原生 `police` 警政頁、`fees.scan`/`fees.tax` QR 相機）只驗證「開頁、沒有光圈與步驟卡」。（`Replies.opensPage`「這個功能還沒有逐步引導，只幫你開頁。」目前在 lib/ 裡沒有被使用。）
 - 後端判斷的正確性由 `assistant_backend/eval_guides.py`（真模型）與 `test_guide_eval.py`（假模型）負責；這份計畫只測 App 上實際看到與能操作的東西。每個項目的輸入句子都在 `assistant_backend/data/guide_eval.json` 有對應案例（括號內是案例 id）。
 
 ## 0. 準備

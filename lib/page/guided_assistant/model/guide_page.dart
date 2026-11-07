@@ -81,6 +81,31 @@ class GuideTexts {
   });
 }
 
+/// A tab of the App's first page that shows a service page itself (the
+/// 優惠 tab's WebView shows /coupon/): a guide opened for [capability] runs
+/// on that tab, and does not open a TPWebView.
+class GuideTab {
+  /// Tab index of TPRoute.main.
+  final int index;
+
+  /// The capability that opens the tab (capabilities.json, type tab).
+  final String capability;
+
+  /// The page the tab's WebView starts on (回到〇〇 when nothing else is known).
+  final String home;
+
+  /// Capabilities of the same page that run on the tab instead when it is
+  /// already showing (their WebView would show the same page again).
+  final List<String> replaces;
+
+  const GuideTab({
+    required this.index,
+    required this.capability,
+    required this.home,
+    this.replaces = const [],
+  });
+}
+
 /// Everything the assistant knows about one service site: how to read it,
 /// its teaching components, and which backend destinations open it.
 ///
@@ -160,6 +185,9 @@ class GuidePage {
   /// e.g. 臨櫃叫號's 常用地點, would be lost).
   final bool reuseOpenPage;
 
+  /// The App tab that shows this page itself; see [GuideTab].
+  final GuideTab? tab;
+
   const GuidePage({
     required this.id,
     required this.pageName,
@@ -181,6 +209,7 @@ class GuidePage {
     this.bottomBar,
     this.offline,
     this.reuseOpenPage = false,
+    this.tab,
   });
 
   GuideComponent? component(String id) {
@@ -353,12 +382,14 @@ class GuidePage {
     }
     if (last.after != null) todos.add(last.after!);
     final makeTexts = texts ?? defaultTexts;
+    final onTab = tab != null && _opensTab(open) ? tab : null;
     return Guide(
       id: guideId(ids, open),
       title: last.taskTitle,
       // Built when read, in the language of that moment.
       texts: () => makeTexts(ids, last),
-      route: TPRoute.webView,
+      route: onTab == null ? TPRoute.webView : TPRoute.main,
+      tab: onTab,
       destination: open,
       spec: spec,
       onPage: onPage,
@@ -376,6 +407,35 @@ class GuidePage {
       doneDetail: last.doneDetail,
       components: ids,
       reuseOpenPage: reuseOpenPage,
+    );
+  }
+
+  bool _opensTab(Map<String, dynamic> destination) =>
+      destination['kind'] == 'capability' &&
+      destination['id'] == tab?.capability;
+
+  /// [guide] (of this page) moved onto [tab] while the tab is showing: the
+  /// same goals, planned for the tab's capability. Null when [guide] does
+  /// not open one of [GuideTab.replaces].
+  Guide? onTabInstead(Guide guide) {
+    final t = tab;
+    final cap = guide.destination['id'];
+    if (t == null ||
+        guide.tab != null ||
+        guide.destination['kind'] != 'capability' ||
+        !t.replaces.contains(cap)) {
+      return null;
+    }
+    // The way into the replaced page (its entry components) is not needed.
+    final entry = forCapability(entryGoals, cap as String) ?? const [];
+    final goals = [
+      for (final id in guide.components)
+        if (!entry.contains(id)) id,
+    ];
+    final destination = {'kind': 'capability', 'id': t.capability};
+    return build(
+      planFor(goals, capability: t.capability),
+      destination: open(destination),
     );
   }
 

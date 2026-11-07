@@ -5,7 +5,8 @@
   "capability": "coupon.list",
   "capabilities": [
     "coupon.list",
-    "wallet"
+    "wallet",
+    "app.perks"
   ],
   "title": "優惠票夾",
   "default_goal": "pick_coupon",
@@ -21,11 +22,19 @@
       "use_coupon",
       "wallet_used",
       "wallet_ticket"
+    ],
+    "app.perks": [
+      "pick_coupon",
+      "add_wallet",
+      "use_coupon"
     ]
   },
   "entry_goals": {
     "coupon.list": [
       "coupon_home",
+      "pick_coupon"
+    ],
+    "app.perks": [
       "pick_coupon"
     ]
   },
