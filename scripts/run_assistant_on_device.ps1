@@ -5,8 +5,11 @@
 # (docs/AI_ASR_ABLATION.md); the Whisper model is then not used.
 # -Chat: the chat-only assistant instead of the guided one (penguin, task card,
 #   highlights), which is the default (ASSISTANT_GUIDED; docs/AI_GUIDED_MERGE_PLAN.md)
+# -DecisionModel gemma: Gemma 4 E2B instead of Ministral 3B as the decision model
+#   (opt-in; push it first with push_assistant_models.ps1 -DecisionModel gemma;
+#   docs/AI_DECISION_MODEL_ABLATION_PLAN.md section 8). Default ministral.
 param([string]$DeviceId, [switch]$Release, [ValidateSet("whisper", "system")][string]$Speech = "whisper",
-      [switch]$Chat)
+      [switch]$Chat, [ValidateSet("ministral", "gemma")][string]$DecisionModel = "ministral")
 # Native tools write progress to stderr; Windows PowerShell 5.1 would treat that as
 # an error when output is redirected, so failures are detected by exit codes instead.
 $ErrorActionPreference = "Continue"
@@ -30,6 +33,7 @@ foreach ($binary in @("libllama_server.so", "libwhisper_server.so")) {
 & $adb -s $DeviceId reverse --remove tcp:8765 2>$null
 $env:TOWNPASS_ON_DEVICE = "1"
 $env:TOWNPASS_SPEECH = $Speech
+$env:TOWNPASS_DECISION_MODEL = $DecisionModel
 Push-Location $root
 try {
     $mode = if ($Release) { "release" } else { "debug" }
@@ -55,4 +59,5 @@ try {
     Pop-Location
     Remove-Item Env:TOWNPASS_ON_DEVICE
     Remove-Item Env:TOWNPASS_SPEECH
+    Remove-Item Env:TOWNPASS_DECISION_MODEL
 }

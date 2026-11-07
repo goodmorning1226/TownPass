@@ -143,6 +143,7 @@ class TranscriptionTests(unittest.TestCase):
     def setUp(self):
         self.asr_reply = (200, {"text": " 我要借書 ", "elapsed_ms": 120, "audio_seconds": 1.0})
         self.asr_bodies = []
+        self.asr_languages = []
         test = self
 
         class FakeAsr(BaseHTTPRequestHandler):
@@ -151,6 +152,7 @@ class TranscriptionTests(unittest.TestCase):
 
             def do_POST(self):
                 test.asr_bodies.append(self.rfile.read(int(self.headers["Content-Length"])))
+                test.asr_languages.append(self.headers.get("X-Language"))
                 status, body = test.asr_reply
                 data = json.dumps(body).encode()
                 self.send_response(status)
@@ -170,8 +172,11 @@ class TranscriptionTests(unittest.TestCase):
             httpd.server_close()
             thread.join()
 
-    def post(self, body, content_type="audio/wav", request_id="voice-1", token="test-token", asr_url=None):
+    def post(self, body, content_type="audio/wav", request_id="voice-1", token="test-token", asr_url=None,
+             language=None):
         headers = {"Content-Type": content_type, "Authorization": f"Bearer {token}"}
+        if language:
+            headers["X-Language"] = language
         if request_id:
             headers["X-Request-Id"] = request_id
         request = urllib.request.Request(self.url, data=body, headers=headers)
@@ -221,6 +226,30 @@ class TranscriptionTests(unittest.TestCase):
         status, body = self.post(wav_bytes(1.0))
         self.assertEqual(status, 422)
         self.assertIn("靠近麥克風", body["error"])
+
+    def test_taiwanese_is_forwarded_and_a_missing_model_is_explained(self):
+        # docs/AI_TAIWANESE_SPEECH_PLAN.md section 10: the reply is Chinese either way.
+        self.asr_reply = (200, {"text": "我要繳水費", "language": "zh", "status": "clear",
+                                "speech_model": "taiwanese"})
+        status, body = self.post(wav_bytes(1.0), language="nan")
+        self.assertEqual((status, body["language"], self.asr_languages), (200, "zh", ["nan"]))
+        self.assertNotIn("speech_notice", body)
+        self.assertEqual(body["metrics"]["speech_model"], "taiwanese")
+        for reason in ("missing", "memory", "failed"):
+            self.asr_reply = (200, {"text": "我要繳水費", "language": "zh", "status": "clear", "notice": reason})
+            status, body = self.post(wav_bytes(1.0), language="nan")
+            self.assertEqual((status, body["language"]), (200, "zh"))
+            self.assertEqual(body["speech_notice"], server.TAIWANESE_NOTICES[reason])
+            self.assertIn("中文", body["speech_notice"])
+        self.asr_reply = (200, {"text": "我要繳水費", "language": "zh", "status": "clear", "notice": "other"})
+        status, body = self.post(wav_bytes(1.0), language="zh")
+        self.assertNotIn("speech_notice", body)  # only known reasons are shown
+
+    def test_taiwanese_from_the_phone_recogniser_is_chinese(self):
+        from server import device_transcript
+        result = device_transcript(json.dumps({"texts": ["我要借書"], "confidences": [0.9],
+                                               "language": "nan"}).encode())
+        self.assertEqual(result["language"], "zh")
 
     def test_recognition_failures_explain_how_to_continue(self):
         for asr_reply, expected in (((200, {"text": "  "}), 422), ((200, {"text": "字" * 501}), 422),

@@ -9,6 +9,7 @@ The model only proposes a tool; validate_call (server.py) checks the name and
 every argument against this turn's enums before anything is executed.
 """
 import json
+import os
 
 # Policy texts are kept verbatim from the earlier separate paths so that a
 # refactor alone does not change what the model sees.
@@ -86,6 +87,18 @@ def with_arguments(call):
 def system_prompt(task):
     """The fixed system message of a task (also sent by the phone's warm-up)."""
     return POLICIES[task] + "\n" + INSTRUCTIONS[task]
+
+
+# Decision model (docs/AI_DECISION_MODEL_ABLATION_PLAN.md section 8): "ministral"
+# (default, Ministral 3B) or "gemma" (Gemma 4 E2B, opt-in on the phone). Both get
+# the same messages and the same {"choice":"X"} grammar: the Gemma-specific
+# variants tried on dev (190) and multilingual dev (46) on 2026-11-08 - a bare
+# letter grammar (2 instead of 6 generated tokens), options as text lines,
+# clarification last, one merged user message, a few-shot example, reworded
+# answer text - were each equal to or worse than this (dev 183-189 vs 189,
+# some with unexpected navigations), so none is used.
+DECISION_MODEL = os.environ.get("TOWNPASS_DECISION_MODEL", "ministral").strip().lower()
+GEMMA = DECISION_MODEL == "gemma"
 
 
 # Output format (2026-11-07, Ollama, dev / held-out): lettered options

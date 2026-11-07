@@ -131,3 +131,98 @@ Ministral Q4_K_S、Q4_0 這次沒有測（手機使用時間已超出預定，�
 - 準確率仍照第 3 節：held-out Gemma 91／102、Ministral 96／102，**掉 5 句，超過「最多掉 3 句」的條件**。
 - 下一步（要擁有者決定）：(a) 保留 Ministral；(b) 先針對 Gemma 調提示／選項格式再評估一次，若 held-out 掉不超過 3 句、開錯頁不增加，就把 Gemma 放進 App 實測；
   (c) 接受掉 5 句換 2.4 秒。
+
+## 8. Gemma 調整與 App 選項（2026-11-08）
+
+分支 `exp/gemma-decision`（從 `feat/asr-ablation` `defa7de` 開出，worktree `D:\github\TownPass-gemma`，未提交）。
+模型：Gemma 4 E2B-it Q4_0（`ggml-org/gemma-4-E2B-it-GGUF`，2.84 GB，`D:\TownPassAssistant\model-study\dl-gemma4-e2b-q4_0\gemma-4-E2B-it-Q4_0.gguf`）；對照 Ministral 3B Q4_K_M（App 現行）。
+
+**怎麼測**（兩個模型同一台電腦、同一套程式）
+- 沿用第 5 節「速度研究」的 `.model-study/run_variant.py` 做法，改成：llama-server b12182（Vulkan 版，`-ngl 99`）用手機的參數 `-c 6144 -np 3 --cache-ram 0 --reasoning off`；
+  另開一個 e5 嵌入伺服器，所以 FAQ 與語意檢索都開著（和推了 FAQ 的手機一樣）；先送三個系統提示暖機（同 `device_main.warm_up`）；每次評估先把後端程式複製一份再跑，評估中改程式不會混進去。
+- 每次決策的 token 數取自後端的 `timing turn` 記錄（`TOWNPASS_TIMING_LOG=1`）。「新讀」是扣掉提示快取後真正要讀的 token。
+- 電腦用 GPU 只是為了跑得快；token 數和手機相同，手機秒數用第 7 節的乾淨實測速度估（Ministral 讀 49.8、生成 5.1 tok/s；Gemma 讀 114.3、生成 7.8 tok/s）。
+- 評估腳本與原始結果：`D:\TownPassAssistant\model-study\gemma-decision-2026-11-08\`（`run_eval.py`、`summarize.py`、`results\`）。
+
+**第 1 步：只用 dev（190）和多語 dev（46）調 Gemma**
+
+Gemma 4 的對話模板有獨立的 system 角色（`<|turn>system`），所以系統提示照原本的位置放即可，不用合併進 user。試過的做法：
+
+| Gemma 的做法 | dev | 多語 dev | dev 開錯頁 | 新讀 token | 生成 token |
+| --- | --- | --- | --- | --- | --- |
+| **原樣**（和 Ministral 相同的提示與 `{"choice":"X"}` 文法） | **189/190** | 45/46 | 0 | 173 | 6 |
+| 只輸出字母的文法（`root ::= "A" \| "B" ...`） | 183 | 46 | 0 | 173 | 2 |
+| 選項改成一行一個（`A) 工具(參數): 說明`） | 186 | 45 | 2 | 147 | 6 |
+| 一行一個＋只輸出字母 | 184 | 45 | 2 | 147 | 2 |
+| 一行一個＋只輸出字母＋系統提示加範例 | 186 | 45 | 2 | 147 | 2 |
+| 一行一個＋只輸出字母＋證據和選項合成一則訊息 | 185 | 45 | 2 | 149 | 2 |
+| 只輸出字母＋系統提示加範例 | 183 | 45 | 0 | 173 | 2 |
+| 「補問」選項排到最後（重新編字母） | 188 | 45 | 1 | 173 | 6 |
+| 「補問」排最後＋只輸出字母 | 186 | 46 | 2 | 173 | 2 |
+| 系統提示加一段範例（會被快取） | 189 | 45 | 0 | 173 | 6.4 |
+| 改寫最後的作答說明 | 189 | 45 | 0 | 201 | 6 |
+
+同一台電腦的 Ministral：dev 188/190、多語 46/46、開錯頁 0。
+
+結論：**沒有一種 Gemma 專用改法比原樣好**。只輸出字母雖然少 4 個生成 token（手機約快 0.5 s），但圖書首頁類的句子會改選「補問」（選項 A）；
+選項改成一行一個、或把「補問」排到最後，會讓「借雨傘」之類的句子開到圖書頁（dev 就出現開錯頁）。溫度維持 0（文法限制下就是取最可能的字母）。
+所以最好的 Gemma 設定就是「原樣」，程式裡不需要 Gemma 專用提示，Ministral 的提示也完全沒動。
+
+**第 2 步：完整評估（held-out、兩份口語集只用來報告，沒拿來調）**
+
+| 集合 | 模型 | 結果 | 開錯頁 | 每次決策：新讀／生成 token | 手機每次決策（估） |
+| --- | --- | --- | --- | --- | --- |
+| dev（190） | Ministral | 188 對；未開頁 2 | 0 | 177.6／6.09 | 4.8 s |
+| | Gemma | 189 對；未開頁 2 | 0 | 173.0／6.00 | 2.3 s |
+| held-out（102） | Ministral | 98 對；未開頁 3、開到同服務較上層 1 | 0 | 183.4／6.09 | 4.9 s |
+| | Gemma | **93 對**；未開頁 8、開到同服務較上層 1 | 0 | 181.2／6.00 | 2.4 s |
+| 多語 dev（46） | Ministral | 46 對 | 0 | 150.9／6.00 | 4.2 s |
+| | Gemma | 45 對（1 句改給候選） | 0 | 149.5／6.00 | 2.1 s |
+| 中文口語集（100） | Ministral | 答對 55、確認 11、沒找到 33 | **1** | 201.6／6.06 | 5.2 s |
+| | Gemma | 答對 59、確認 9、沒找到 30 | **2** | 200.5／6.00 | 2.5 s |
+| 外語 held-out（125） | Ministral | 答對 72、確認 16、沒找到 34 | **3** | 189.6／6.00 | 5.0 s |
+| | Gemma | 答對 79、確認 11、沒找到 29 | **6** | 191.6／6.00 | 2.5 s |
+
+（dev、held-out 的「對」是案例數；「開錯頁」= wrong_service＋unexpected_navigation，口語集是 wrong_navigation。
+提示總長兩者幾乎相同，約 340–475 token，其中約 190–290 token 由快取提供。）
+
+**判斷**
+- held-out 掉 5 句（98 → 93），在擁有者可接受的 5 句以內。
+- **硬性條件不成立**：口語集開錯頁 2 比 1、外語 held-out 6 比 3，都比 Ministral 多（dev、held-out、多語 dev 兩者都是 0）。
+  Gemma 在兩份口語集「答對」較多，但也較常直接開頁，多開錯的是「刪帳號」「借書（越南語，開到排行榜）」「查申辦進度」「抽號碼牌」這類說法。
+- 因此照規則**沒有把 Gemma 放進 App**：worktree 裡的程式與腳本維持原狀，Ministral 仍是唯一的決策模型，現有使用者完全不受影響。
+- 速度優勢仍在：手機每次決策估計約 2.4 s 對 4.9 s。dev 上沒有可以用來修正「多開錯頁」的訊號（Gemma 在 dev 開錯頁本來就是 0），
+  要再改善就需要新的 dev 句子（口語、外語的直接開頁說法），不能拿上面兩份口語集來調。
+
+**如果擁有者決定接受（仍要手機實測）**
+
+App 選項已寫好並驗證過，存成一份 patch，沒有套用在分支上：
+`D:\TownPassAssistant\model-study\gemma-decision-2026-11-08\gemma-app-option.patch`。內容：
+- `run_assistant_on_device.ps1 -DecisionModel gemma`（預設 `ministral`）→ 環境變數 `TOWNPASS_DECISION_MODEL` → Gradle 的 `assistant_decision_model` 資源值。
+- `OnDeviceAssistant.kt`：選 gemma 時載入 `gemma-4-E2B-it-Q4_0.gguf`，llama-server 參數和 Ministral 相同（`-c 6144 -np 3 --cache-ram 0 --reasoning off`；Gemma 4 不需要其他旗標）；
+  手機上沒有 Gemma 檔就記一筆警告、改用 Ministral。
+- `device_main.start(decision_model=...)` 設定 `TOWNPASS_DECISION_MODEL`；後端只改回報的模型名稱（`gemma4:e2b`），提示與 Ministral 相同。
+- `push_assistant_models.ps1 -DecisionModel gemma` 另外推 Gemma 檔（Ministral 照樣留在手機上）；`-RemoveGemma` 刪掉它。
+- 驗證：Python 測試 215 項通過（新增 3 項：預設是 Ministral、Gemma 只換模型名稱、`configure` 設定變數）、`fvm flutter analyze`（23 項 info，和 `feat/asr-ablation` 相同）、
+  `fvm flutter test` 119 項通過、`fvm flutter build apk --debug`（on-device、arm64、`TOWNPASS_DECISION_MODEL=gemma`，參數同 `run_assistant_on_device.ps1`）成功；沒有安裝到手機。
+
+套用並安裝（在 `D:\github\TownPass-gemma`，手機接好且沒有別人在用時）：
+
+```powershell
+git apply D:\TownPassAssistant\model-study\gemma-decision-2026-11-08\gemma-app-option.patch
+fvm dart run build_runner build --delete-conflicting-outputs
+# android\app\assistant-native\jniLibs 要先有 build_assistant_native.ps1 的輸出（此 worktree 已從 TownPass-asr 複製）
+.\scripts\push_assistant_models.ps1 -DecisionModel gemma      # 第一次約 2.84 GB
+.\scripts\run_assistant_on_device.ps1 -DecisionModel gemma
+```
+
+確認：`adb logcat -s TownPassAssistant` 應看到 `model :8771 (gemma4:e2b)`；如果看到 `missing gemma-4-E2B-it-Q4_0.gguf`，表示檔案沒推上去，App 會用 Ministral。
+
+換回 Ministral：
+
+```powershell
+.\scripts\run_assistant_on_device.ps1                         # 預設就是 Ministral
+.\scripts\push_assistant_models.ps1 -RemoveGemma              # 可選：刪掉手機上的 Gemma 檔，省 2.84 GB
+```
+
+不想留這個選項：`git apply -R` 同一份 patch。授權：Gemma 4 的散布條款要在採用前再核對一次（第 2 節）。

@@ -23,6 +23,10 @@ class AssistantTranscript {
   /// was simply used. Only a clear detection switches the session's language.
   final double? languageConfidence;
 
+  /// Why the chosen speech language could not be used (e.g. no Taiwanese
+  /// model on the phone, so the clip was heard as Chinese); shown as is.
+  final String? notice;
+
   const AssistantTranscript(
     this.text, {
     this.confirm = false,
@@ -30,6 +34,7 @@ class AssistantTranscript {
     this.correctedFrom,
     this.language = 'zh',
     this.languageConfidence,
+    this.notice,
   });
 }
 
@@ -240,11 +245,16 @@ class AssistantService {
       final confirm = json['confirm'] == true && options.isNotEmpty;
       final corrected = json['corrected_from'];
       final heardIn = json['language'];
+      final notice = json['speech_notice'];
       return AssistantTranscript(
         text.trim(),
         language: heardIn is String && heardIn.length <= 8 ? heardIn : 'zh',
         languageConfidence: json['language_confidence'] is num
             ? (json['language_confidence'] as num).toDouble()
+            : null,
+        notice:
+            notice is String && notice.trim().isNotEmpty && notice.length <= 200
+            ? notice.trim()
             : null,
         confirm: confirm,
         options: confirm ? options.cast<String>() : const [],

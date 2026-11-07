@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
+import 'package:town_pass/page/assistant/widget/taiwanese_prompt.dart';
 import 'package:town_pass/bean/assistant_result.dart';
 import 'package:town_pass/page/assistant/assistant_texts.dart';
 import 'package:town_pass/page/main/main_view_controller.dart';
@@ -127,7 +128,8 @@ class AssistantViewController extends GetxController {
     speechLanguage.value = AssistantSpeechLanguage.of(code).code;
     heardLanguage.value = null;
     AssistantSpeechLanguage.save(speechLanguage.value);
-    _followInPanel(speechLanguage.value);
+    // 台語 is answered in Chinese: the panel's texts become Chinese.
+    _followInPanel(AssistantSpeechLanguage.textLanguage(speechLanguage.value));
   }
 
   /// The panel's own texts follow the conversation's language at once
@@ -220,7 +222,9 @@ class AssistantViewController extends GetxController {
     final sure = heard.languageConfidence;
     final code = heard.language;
     if (sure == null || sure < _clearDetection) return;
-    if (speechLanguage.value == 'auto' || code == speechLanguage.value) return;
+    if (speechLanguage.value == 'auto') return;
+    // 台語 chosen and heard as Chinese (Breeze writes Mandarin): keep 台語.
+    if (AssistantSpeechLanguage.keeps(speechLanguage.value, code)) return;
     if (!AssistantSpeechLanguage.all.any((l) => l.code == code) ||
         code == AssistantSpeechLanguage.auto.code) {
       return;
@@ -454,6 +458,11 @@ class AssistantViewController extends GetxController {
     hideCorner();
     scrollTarget.value = scrollTo;
     expanded.value = true;
+    // The first time on a Chinese phone: "您是否為台語用戶？" (owner, 2026-11-08).
+    TaiwanesePrompt.maybeAsk(
+      currentLanguage: speechLanguage.value,
+      choose: setSpeechLanguage,
+    );
     if (_panelHistory == null && activeRoute != null) {
       _panelHistory = LocalHistoryEntry(
         onRemove: () {
@@ -657,6 +666,9 @@ class AssistantViewController extends GetxController {
     busy.value = false;
     heardLanguage.value = heard.language;
     _menuFollowsSpeech(heard);
+    // 台語 chosen but its model could not be used: this clip was heard as
+    // Chinese, and the backend says why.
+    if (heard.notice case final notice?) _add(notice, language: 'zh');
     // "第二個" while numbered options are open selects that option, even when
     // the recogniser was unsure about such a short word.
     for (final spoken in [heard.text, ...heard.options]) {

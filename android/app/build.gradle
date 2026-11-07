@@ -83,11 +83,20 @@ if (assistantOnDevice) {
     // (docs/AI_ASR_ABLATION.md); default whisper.
     def assistantWhisper = (project.findProperty("townpass.speech") ?: System.getenv("TOWNPASS_SPEECH") ?: "whisper")
         .toString() != "system"
+    // TOWNPASS_DECISION_MODEL=gemma: Gemma 4 E2B instead of Ministral 3B as the
+    // decision model (opt-in, docs/AI_DECISION_MODEL_ABLATION_PLAN.md section 8);
+    // default ministral.
+    def assistantDecisionModel = (project.findProperty("townpass.decisionModel")
+        ?: System.getenv("TOWNPASS_DECISION_MODEL") ?: "ministral").toString().trim().toLowerCase()
+    if (!["ministral", "gemma"].contains(assistantDecisionModel)) {
+        throw new GradleException("TOWNPASS_DECISION_MODEL must be ministral or gemma, not $assistantDecisionModel")
+    }
     android {
         buildFeatures { resValues = true }  // off by default since AGP 9
         defaultConfig {
             ndk { abiFilters "arm64-v8a", "x86_64" }
             resValue "bool", "assistant_whisper", assistantWhisper.toString()
+            resValue "string", "assistant_decision_model", assistantDecisionModel
         }
         sourceSets.main {
             jniLibs.srcDirs += "assistant-native/jniLibs"

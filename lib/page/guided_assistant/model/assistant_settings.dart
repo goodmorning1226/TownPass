@@ -43,6 +43,7 @@ extension AssistantLanguageChoice on AssistantSpeechLanguage {
     'vi' => '越南文',
     'id' => '印尼文',
     'th' => '泰文',
+    'nan' => '用台語說，助理用中文回答（測試中）',
     _ => '聽你說的話，自動判斷是哪一種語言',
   });
 
