@@ -200,6 +200,75 @@ class Recognizer:
                 "avg_logprob": best_logprob, "no_speech_prob": round(result.no_speech_prob, 3)}
 
 
+class WhisperCppRecognizer:
+    """Same interface as Recognizer, backed by whisper.cpp's whisper-server.
+
+    Used on the phone (device_main.py), where CTranslate2 is not available.
+    whisper.cpp returns one decode, so there are no n-best alternatives; the
+    confidence signals and the clear/unsure/unclear gates are the same.
+    Standard library only.
+    """
+
+    def __init__(self, url, timeout=60):
+        self.url = url.rstrip("/")
+        self.timeout = timeout
+        self.prompt = vocabulary_prompt()  # conservative estimate: no tokenizer here
+        self.prompt_tokens = None
+        self.lock = threading.Lock()
+
+    @staticmethod
+    def audio_context(seconds):
+        """Encoder frames for a clip: Whisper always encodes a 30 s window (1500
+        frames, 50 per second); encoding only the clip plus a 2 s margin is several
+        times faster on a phone CPU for short hold-to-talk requests."""
+        return min(1500, max(256, int((seconds + 2) * 50)))
+
+    def _fields(self, seconds=30):
+        return {"response_format": "verbose_json", "language": "zh", "prompt": self.prompt,
+                "temperature": "0", "temperature_inc": "0", "no_timestamps": "true",
+                "no_language_probabilities": "true", "suppress_nst": "true",
+                "audio_ctx": str(self.audio_context(seconds))}
+
+    @staticmethod
+    def multipart(fields, wav):
+        boundary = "townpass" + os.urandom(12).hex()
+        parts = []
+        for name, value in fields.items():
+            parts.append(f'--{boundary}\r\nContent-Disposition: form-data; name="{name}"\r\n\r\n{value}\r\n'.encode())
+        parts.append(f'--{boundary}\r\nContent-Disposition: form-data; name="file"; filename="clip.wav"\r\n'
+                     "Content-Type: audio/wav\r\n\r\n".encode() + wav + b"\r\n")
+        parts.append(f"--{boundary}--\r\n".encode())
+        return b"".join(parts), f"multipart/form-data; boundary={boundary}"
+
+    @staticmethod
+    def summarize(reply):
+        """Transcript, token-weighted average log-prob and no-speech probability."""
+        segments = reply.get("segments") or []
+        text = "".join(s.get("text", "") for s in segments).strip() or str(reply.get("text", "")).strip()
+        weights = [max(1, len(s.get("tokens") or [])) for s in segments]
+        logprob = (sum(s.get("avg_logprob", -9.0) * w for s, w in zip(segments, weights)) / sum(weights)
+                   if segments else -9.0)
+        no_speech = max((s.get("no_speech_prob", 0.0) for s in segments), default=1.0)
+        return text, round(logprob, 3), round(no_speech, 3)
+
+    def transcribe(self, frames):
+        if rms_of(frames) < MIN_RMS:
+            return {"text": "", "alternatives": [], "status": "unclear", "reason": "silence"}
+        import urllib.request
+        buffer = io.BytesIO()
+        with wave.open(buffer, "wb") as audio:
+            audio.setnchannels(1), audio.setsampwidth(2), audio.setframerate(SAMPLE_RATE)
+            audio.writeframes(frames)
+        body, content_type = self.multipart(self._fields(len(frames) / 2 / SAMPLE_RATE), buffer.getvalue())
+        request = urllib.request.Request(self.url + "/inference", data=body,
+                                         headers={"Content-Type": content_type})
+        with self.lock, urllib.request.urlopen(request, timeout=self.timeout) as response:
+            reply = json.loads(response.read(2_000_000))
+        text, logprob, no_speech = self.summarize(reply)
+        return {"text": text, "alternatives": [], "alternative_logprobs": [],
+                "status": judge(text, logprob, no_speech), "avg_logprob": logprob, "no_speech_prob": no_speech}
+
+
 def make_handler(recognizer, model_name):
     class Handler(BaseHTTPRequestHandler):
         def log_message(self, *args):

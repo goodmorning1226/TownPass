@@ -93,3 +93,6 @@ app.*.map.json
 
 # Generated local assistant evaluation output
 /assistant_backend/evaluation.json
+
+# On-device assistant native build output (scripts/build_assistant_native.ps1)
+**/android/app/assistant-native/

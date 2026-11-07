@@ -1,6 +1,7 @@
 """Shared, reviewed capability data. No model-generated destinations."""
 import difflib
 import json
+import os
 import pathlib
 import re
 import unicodedata
@@ -27,7 +28,10 @@ def _span(term, text):
 
 class Registry:
     def __init__(self, path=None):
-        path = path or pathlib.Path(__file__).resolve().parents[1] / "assets/assistant/capabilities.json"
+        # On the phone the catalogue is packaged with the Python code (device_main.py).
+        default = os.environ.get("TOWNPASS_CAPABILITIES") or (
+            pathlib.Path(__file__).resolve().parents[1] / "assets/assistant/capabilities.json")
+        path = pathlib.Path(path or default)
         data = json.loads(path.read_text(encoding="utf-8"))
         self.version = data["version"]
         self.entries = data["capabilities"]

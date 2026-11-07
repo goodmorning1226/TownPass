@@ -28,6 +28,12 @@ CONTRACT = 3  # 3: optional request "context" (page/last action hint)
 KEEP_ALIVE = os.environ.get("TOWNPASS_ASSISTANT_KEEP_ALIVE", "30m")
 # Local speech recognition service (assistant_backend/asr_server.py), loopback only.
 ASR_URL = os.environ.get("TOWNPASS_ASR_URL", "http://127.0.0.1:8770/v1/transcribe")
+ASR_TIMEOUT = float(os.environ.get("TOWNPASS_ASR_TIMEOUT", "40"))
+# Where the decision model runs: "ollama" (computer) or "openai", the
+# OpenAI-style API of llama.cpp's llama-server (on the phone, device_main.py).
+MODEL_API = os.environ.get("TOWNPASS_MODEL_API", "ollama")
+MODEL_URL = os.environ.get("TOWNPASS_MODEL_URL", "http://127.0.0.1:11434")
+MODEL_TIMEOUT = float(os.environ.get("TOWNPASS_MODEL_TIMEOUT", "70"))
 # Keep one module identity when the standalone entry point imports workflow.
 if __name__ == "__main__":
     sys.modules.setdefault("server", sys.modules[__name__])
@@ -45,6 +51,21 @@ def fetch_json(url, payload=None, timeout=15):
     )
     with urllib.request.urlopen(request, timeout=timeout) as response:
         return json.loads(response.read(2_000_000))
+
+
+def alternating(messages):
+    """Merge consecutive same-role messages (same text, blank line between).
+
+    Ministral's chat template, applied as written by llama.cpp, rejects two
+    user messages in a row; Ollama's template accepts them.
+    """
+    merged = []
+    for message in messages:
+        if merged and merged[-1]["role"] == message["role"]:
+            merged[-1] = {**merged[-1], "content": merged[-1]["content"] + "\n\n" + message["content"]}
+        else:
+            merged.append(dict(message))
+    return merged
 
 
 def normalize(text):
@@ -250,14 +271,26 @@ class Assistant:
         """
         try:
             schema = proposal_schema(tools)
-            result = fetch_json("http://127.0.0.1:11434/api/chat", {
-                "model": MODEL, "stream": False, "messages": messages, "format": schema,
-                "options": {"temperature": 0, "num_ctx": 4096, "num_predict": 180}, "keep_alive": KEEP_ALIVE,
-            }, timeout=70)
-            proposal = json.loads(result.get("message", {}).get("content", ""))
+            if MODEL_API == "openai":
+                # Same messages, schema and limits; the grammar comes from the schema.
+                reply = fetch_json(MODEL_URL + "/v1/chat/completions", {
+                    "model": MODEL, "messages": alternating(messages), "temperature": 0, "max_tokens": 180,
+                    "response_format": {"type": "json_schema", "json_schema": {"name": "proposal", "schema": schema}},
+                }, timeout=MODEL_TIMEOUT)
+                content = reply["choices"][0]["message"]["content"]
+                result = {"prompt_eval_count": (reply.get("usage") or {}).get("prompt_tokens")}
+            else:
+                result = fetch_json(MODEL_URL + "/api/chat", {
+                    "model": MODEL, "stream": False, "messages": messages, "format": schema,
+                    "options": {"temperature": 0, "num_ctx": 4096, "num_predict": 180}, "keep_alive": KEEP_ALIVE,
+                }, timeout=MODEL_TIMEOUT)
+                content = result.get("message", {}).get("content", "")
+            proposal = json.loads(content)
             result["message"] = {"tool_calls": [{"function": proposal}]}
             return result
-        except (OSError, ValueError) as exc:
+        except (OSError, ValueError, KeyError, IndexError, TypeError) as exc:
+            if MODEL_API == "openai":
+                raise AssistantError("手機上的決策模型尚未就緒，請稍候再重試。") from exc
             raise AssistantError("決策模型未回應，請確認電腦上的 Ollama 正在執行，再重試。") from exc
 
     def turn(self, payload):
@@ -458,12 +491,14 @@ def make_handler(assistant, token=""):
                 return self.reply(422, {"error": "錄音格式不正確，請再說一次，或改用鍵盤。"})
             try:
                 request = urllib.request.Request(ASR_URL, data=audio, headers={"Content-Type": "audio/wav"})
-                with urllib.request.urlopen(request, timeout=40) as response:
+                with urllib.request.urlopen(request, timeout=ASR_TIMEOUT) as response:
                     result = json.loads(response.read(100_000))
             except urllib.error.HTTPError as exc:
                 return self.reply(422 if exc.code in (400, 413) else 503,
                                   {"error": "語音辨識沒有成功，請再說一次，或改用鍵盤。"})
             except (OSError, ValueError):
+                if MODEL_API == "openai":  # on the phone: still loading or too slow
+                    return self.reply(503, {"error": "手機上的語音辨識還沒準備好或處理太久，請再說一次，或改用鍵盤。"})
                 return self.reply(503, {"error": "電腦上的語音辨識服務未啟動，請改用鍵盤，或啟動語音服務後再試。"})
             text = result.get("text") if isinstance(result, dict) else None
             status = result.get("status", "clear") if isinstance(result, dict) else None
