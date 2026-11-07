@@ -1026,6 +1026,47 @@ void main() {
       c.task.value = null;
       await tester.pump(const Duration(seconds: 4));
     });
+
+    testWidgets('結束引導 in the panel removes the task card and its to-do', (
+      tester,
+    ) async {
+      final c = makeController();
+      c.startGuide('library');
+      c.beginSteps();
+      c.pause();
+      tester.view.physicalSize = const Size(402, 874);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      await tester.pumpWidget(
+        MaterialApp(
+          home: MediaQuery(
+            data: const MediaQueryData(size: Size(402, 874)),
+            child: GuidedAssistantSheet(controller: c),
+          ),
+        ),
+      );
+      await tester.pump(const Duration(milliseconds: 500));
+      expect(find.text(c.taskTag), findsOneWidget);
+      c.todoOpen.value = true;
+      await tester.pump(const Duration(milliseconds: 500));
+      expect(find.textContaining('這些是我們要一起完成的事'), findsOneWidget);
+      // The button in the task card (chat messages may mention 結束引導 too).
+      final end = find.text('結束引導');
+      expect(end, findsOneWidget);
+      // Pinned under the list: tappable without scrolling the card.
+      expect(tester.getRect(end).bottom, lessThan(874 / 2 + 100));
+      await tester.tap(end);
+      await tester.pump(const Duration(seconds: 1));
+      expect(c.task.value, isNull);
+      expect(c.todoOpen.value, isFalse);
+      // A plain chat again: no task card, to-do list or its buttons.
+      expect(find.textContaining('這些是我們要一起完成的事'), findsNothing);
+      expect(find.textContaining('現在我們要'), findsNothing);
+      expect(find.text('已暫停'), findsNothing);
+      expect(find.text('結束引導'), findsNothing);
+      expect(find.text('繼續引導'), findsNothing);
+      await tester.pump(const Duration(seconds: 4));
+    });
   });
 
   group('host', () {

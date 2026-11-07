@@ -10,8 +10,8 @@
  "expect": {
   "done": true
  },
- "recordedAt": "2026-11-07T18:56:11.757Z",
- "durationMs": 5158,
+ "recordedAt": "2026-11-07T20:30:26.180Z",
+ "durationMs": 5128,
  "viewport": {
   "width": 390,
   "height": 844,
@@ -369,8 +369,8 @@
     "flags": {
      "unitCount": 5,
      "unitsBelow": false,
-     "favorites": 0,
-     "favAtLeast1": false,
+     "favorites": 1,
+     "favAtLeast1": true,
      "favAtLeast2": false,
      "favAtLeast3": false,
      "favAtLeast4": false,
@@ -380,7 +380,7 @@
      "favAtLeast8": false,
      "favAtLeast9": false,
      "favAtLeast10": false,
-     "favNames": "",
+     "favNames": "中正區戶政事務所",
      "unitName": "",
      "location": "",
      "locationName": "",
@@ -400,14 +400,28 @@
      "__dialog": false
     },
     "visible": [
+     "counter.edit",
+     "counter.favorites",
      "counter.units"
     ],
     "rects": {
      "counter.units": [
       20,
-      68,
+      247,
       350,
       448
+     ],
+     "counter.favorites": [
+      20,
+      68,
+      350,
+      65
+     ],
+     "counter.edit": [
+      338,
+      32,
+      32,
+      36
      ]
     }
    },
@@ -421,7 +435,7 @@
     "disabledButtons": [],
     "dialogs": [],
     "scrollY": 0,
-    "scrollHeight": 844
+    "scrollHeight": 1023
    }
   }
  ]
