@@ -3,7 +3,11 @@
 Templates and deterministic shortcuts first, then joint retrieval over the
 shared capability catalogue and the book catalogue, then one model decision
 (decision.decide) among the retrieved candidates, then session-bound
-candidate confirmation. Every turn returns exactly one reply.
+candidate confirmation. When that tool-calling layer finds no service (no
+retrieval match, or the model asks for clarification / rejects the request),
+the Taipei FAQ index (faq.py) is the second layer; when it has no confident
+answer either, the turn says that nothing related was found. Every turn
+returns exactly one reply.
 """
 import json
 import re
@@ -13,6 +17,7 @@ import uuid
 
 import i18n
 from decision import decide
+from faq import SCOPE_NOTE
 from page_context import current_root, model_view
 from phonetic import exact_homophone, rank_books, term_matches
 from registry import Registry, book_fuzzy, primary_title, single_substitution
@@ -40,6 +45,13 @@ REQUEST_ONLY = re.compile(r"(?:請|我|想|要|幫|我們|給|去|打開|開啟|
 # 0.51, "烏鴉借"~"我要借" 0.59; unrelated openings ("早安你", "天氣好") 0.2-0.3.
 REQUEST_OPENINGS = ("我想借", "我要借", "我想找", "我要找")
 OPENING_SOUND_CONFIRM = 0.5
+
+# FAQ layer. Two or three characters carry too little context for semantic
+# retrieval (rag_handoff/HANDOFF.md section 7), so they skip it.
+FAQ_MIN_CHARS = 4
+FAQ_ANSWER_LIMIT = 600
+NO_RELATED = ("抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；"
+              "也可以撥打市民熱線 1999（外縣市 02-27208889）。")
 
 
 class Workflow:
@@ -107,10 +119,45 @@ class Workflow:
         if name == "cancel":
             return self.reply(payload, "已取消，沒有開啟頁面或預約書籍。", action="cancel")
         if name == "unsupported":
-            return self.reply(payload, "目前沒有支援這項操作，可以輸入「有哪些功能」查看可用服務。",
-                              kind="unsupported", action="unsupported")
-        return self.reply(payload, "你想先使用哪個服務？可以描述想做的事，或問「有哪些功能」。",
-                          action="request_clarification")
+            return self._faq(payload, text) or self.reply(
+                payload, "目前沒有支援這項操作，可以輸入「有哪些功能」查看可用服務。",
+                kind="unsupported", action="unsupported")
+        return self._faq(payload, text) or self.reply(
+            payload, "你想先使用哪個服務？可以描述想做的事，或問「有哪些功能」。", action="request_clarification")
+
+    @staticmethod
+    def _faq_text(entry):
+        answer = entry["answer"].strip()
+        if len(answer) > FAQ_ANSWER_LIMIT:
+            answer = answer[:FAQ_ANSWER_LIMIT].rstrip() + "…（內容較長，完整說明請洽 1999 或該機關網站）"
+        return f"【{entry['question'].strip()}】\n{answer}\n資料來源：{entry['department']}。{SCOPE_NOTE}"
+
+    def _faq(self, payload, text):
+        """Second layer: Taipei FAQ when tool calling found no service.
+
+        Returns None when the index is off, the text is too short, or no FAQ is
+        close enough, so the caller keeps its own reply. A near-verbatim match
+        is answered directly; otherwise the closest questions are offered as
+        numbered choices and only the chosen one is answered. Answers are
+        stored text shown verbatim.
+        """
+        index = self.owner.faq
+        if index is None or len(re.findall(r"[\w一-鿿]", text)) < FAQ_MIN_CHARS:
+            return None
+        confidence, hits = index.search(text)
+        if not hits:
+            return None
+        self._trace("faq_" + confidence, [hit["id"] for hit in hits])
+        choices = [{"title": hit["question"].strip(), "subtitle": hit["department"], "faq_id": hit["id"]}
+                   for hit in (hits[1:] if confidence == "high" else hits)]
+        if confidence == "high":
+            message = self._faq_text(hits[0])
+            if not choices:
+                return self.reply(payload, message, action="faq_answer")
+            message += "\n\n也可以查看以下相關問答："
+        else:
+            message = f"你是不是想問以下的問題？請選擇一題，我再顯示答案。{SCOPE_NOTE}"
+        return self._offer(payload, choices, message, kind="reply", action="faq_answer")
 
     def _trace(self, route, candidates=()):
         """Record how a turn was decided, for metrics and evaluation only."""
@@ -244,7 +291,7 @@ class Workflow:
                           + ("目前為示範資料，尚未送出或交易。" if entry["mode"] == "demo" else ""),
                           kind="navigate", action="open_capability", destination={"kind": "capability", "id": entry["id"]})
 
-    def _offer(self, payload, items, message, kind="confirm_candidates", page=None):
+    def _offer(self, payload, items, message, kind="confirm_candidates", page=None, **extra):
         resolution = str(uuid.uuid4())
         public = [{"id": str(index), "title": item["title"],
                    "subtitle": item.get("subtitle", ""), "enabled": item.get("enabled", True)}
@@ -256,7 +303,7 @@ class Workflow:
                 self.pending.pop(next(iter(self.pending)))
             self.pending[payload["session_id"]] = {"id": resolution, "created": now, "items": items,
                 "registry_version": self.registry.version, "page": page}
-        return self.reply(payload, message, kind=kind, resolution_id=resolution, choices=public)
+        return self.reply(payload, message, kind=kind, resolution_id=resolution, choices=public, **extra)
 
     def _cap_items(self, entries, language="zh"):
         if language != "zh":
@@ -303,6 +350,11 @@ class Workflow:
             del self.pending[payload["session_id"]]
         if "entry_id" in item:
             return self._navigate(payload, self.registry.by_id[item["entry_id"]])
+        if "faq_id" in item:
+            entry = self.owner.faq.by_id.get(item["faq_id"]) if self.owner.faq else None
+            if entry is None:
+                raise self.error("FAQ 資料已變更，請重新提問。")
+            return self.reply(payload, self._faq_text(entry), action="faq_answer")
         books = self.owner.catalog.books()
         if not any(b["id"] == item["book_id"] for b in books):
             raise self.error("書目已變更，請重新搜尋。")
@@ -485,8 +537,8 @@ class Workflow:
                 return self._offer(payload, self._cap_items(entries), "你想使用哪個功能？請先確認。")
             if name == "select_capability":
                 return self._navigate(payload, self.registry.by_id[args["capability_id"]])
-            return self.reply(payload, "請補充想使用的服務或操作，也可以問「有哪些功能」。")
+            return self._faq(payload, text) or self.reply(payload, "請補充想使用的服務或操作，也可以問「有哪些功能」。")
         if LIBRARY_CUE.search(text):
             return self._library(payload, text, self.owner.catalog.books())
         self._trace("no_match")
-        return self.reply(payload, "我還不太確定你的需求。我是 TownPass 助手，可以幫你找服務、開啟頁面；你也可以問「有哪些功能」。")
+        return self._faq(payload, text) or self.reply(payload, NO_RELATED, action="no_related")

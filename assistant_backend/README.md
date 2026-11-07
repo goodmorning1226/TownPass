@@ -2,7 +2,8 @@
 
 模型固定使用 **Mistral AI `ministral-3:3b`**。不使用 Qwen，也不在失敗時改呼叫其他模型或雲端。
 主後端採 Python 3.11+ 標準函式庫，與 Flutter 分開啟動，無須 pip 安裝套件；
-選用的語音辨識服務（`asr_server.py`）另需 faster-whisper。
+選用的語音辨識服務（`asr_server.py`）另需 faster-whisper；
+選用的臺北市府 FAQ 檢索（[faq.py](faq.py)）另需 onnxruntime、tokenizers、numpy 與 repo 外的資料檔，見下方「FAQ 檢索」。
 這是本機開發服務，不是正式上線的多使用者 API。
 
 ## 啟動
@@ -98,6 +99,26 @@ App 與後端需一起更新；舊的仍執行中之 Python 服務須重新啟�
 此階段不提供草稿提交、付款、action result 稽核或正式會員登入端點。
 共用候選只存記憶體，5 分鐘過期、最多 128 組；舊圖書上下文保留 15 分鐘；不記錄使用者輸入或憑證。
 `/health` 只表示服務與能力設定存在，不保證模型或網頁當時可用。
+
+### FAQ 檢索（第二層）
+
+每輪的順序：問候／功能列表等模板 → **工具呼叫**（功能目錄與書目檢索後，模型在候選內選工具）→
+工具呼叫沒找到服務時查 **FAQ** → 兩者都沒有就回「沒有找到相關的服務或 FAQ 內容」（`action: "no_related"`）。
+「沒找到服務」指：目錄與書目都沒命中，或模型回 `request_clarification`／`unsupported`。
+已命中且選到功能、候選確認、未串接功能的原因說明、取消，都不會查 FAQ。
+
+- 資料：8,121 筆臺北市府 FAQ，以 BAAI/bge-small-zh-v1.5（ONNX）編碼，餘弦相似度取前 3 筆。
+  回答原文照列，不經模型改寫，附「資料來源：機關」與「本服務僅涵蓋臺北市政府 FAQ。」；超過 600 字截斷並提示洽 1999。
+- 信心（2026-11-07 以 363 句標註資料重新校正，見 [AI_FAQ_RAG.md](../docs/AI_FAQ_RAG.md) 第 6 節）：
+  - 最高分 ≥ 0.85：直接回答，其他相近 FAQ 列為「相關問答」選項。
+  - 0.69–0.85：不直接回答，回「你是不是想問以下的問題？」並列出分數 ≥ 0.69 的問題（最多 3 題），使用者選了才顯示答案。
+  - < 0.69：視為沒找到。
+  門檻只適用此模型與索引，換模型或資料需用 `rag_handoff/tuning/sweep.py` 重新校正。少於 4 個字元的輸入不查 FAQ。
+- 選項為 `kind: "reply"`、`action: "faq_answer"`，選擇規則與其他候選相同（session、resolution、5 分鐘、防重播）。
+- 安裝：`pip install onnxruntime tokenizers numpy`（本機驗證 1.31.1／0.22.2／2.3.2），並把 `rag_handoff/assets/` 的檔案複製到
+  `%LOCALAPPDATA%\TownPassAssistant\faq_rag`，或以 `TOWNPASS_FAQ_DIR` 指定資料夾。資料檔約 117 MB，不提交到 Git。
+- 缺套件或資料時，啟動訊息顯示 `faq=off` 及原因，助理照常運作，只是沒有 FAQ 這一層。`/health` 的 `faq_entries` 為載入筆數（0 表示關閉）。
+- 手機端（Chaquopy）尚未提供 onnxruntime／tokenizers，裝置端版本目前沒有 FAQ 層。決策紀錄見 [AI_FAQ_RAG.md](../docs/AI_FAQ_RAG.md)。
 
 完整新增能力、未串接範圍與裝置測試見 [全功能實作紀錄](../docs/AI_EXPANSION_IMPLEMENTATION.md)。
 
