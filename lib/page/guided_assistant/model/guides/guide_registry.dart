@@ -80,7 +80,7 @@ Guide? guideForDestination(
 
 /// Rebuilds a guide from its id: `page`, `page:a,b` or `page@capability:a,b`.
 Guide? guideFromId(String id) {
-  final m = RegExp(r'^(\w+)(?:@([\w.]+))?(?::(.*))?$').firstMatch(id);
+  final m = RegExp(r'^(\w+)(?:@([\w.\-]+))?(?::(.*))?$').firstMatch(id);
   if (m == null) return null;
   final page = guidePageById(m[1]!);
   if (page == null) return null;
@@ -89,11 +89,9 @@ Guide? guideFromId(String id) {
       ? page.defaultDestination
       : page.open({'kind': 'capability', 'id': cap});
   final listed = m[3];
+  final capGoals = GuidePage.forCapability(page.capabilityGoals, cap);
   final goals = listed == null || listed.isEmpty
-      ? [
-          if (cap != null && page.capabilityGoals[cap] != null)
-            page.capabilityGoals[cap]!.first,
-        ]
+      ? [if (capGoals != null) capGoals.first]
       : listed.split(',');
   final capability =
       cap ??

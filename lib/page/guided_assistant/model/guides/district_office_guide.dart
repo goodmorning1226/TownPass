@@ -49,8 +49,8 @@ const _walk = r'''((sec, kind, any) => {
     if (wrap || change) f = { kind: 'multi', el: (wrap && wrap.querySelector('input')) || wrap || change, empty: !change };
     else if (boxes.length) f = { kind: boxes[0].type === 'radio' ? 'radio' : 'check', el: labels.length ? labels : boxes, empty: !boxes.some((b) => b.checked), choices: labels.map(txt).filter((x) => x).join('|') };
     else if (sel) f = { kind: 'select', el: sel, empty: !sel.value, opts: sel.options.length };
-    else if (area) f = { kind: 'text', el: area, empty: !(area.value || '').trim() || typed(area), typing: typed(area), hint: area.placeholder || '' };
-    else if (inp) f = { kind: inp.readOnly ? 'date' : 'text', el: inp, empty: !(inp.value || '').trim() || (!inp.readOnly && typed(inp)), typing: !inp.readOnly && typed(inp), hint: inp.placeholder || '' };
+    else if (area) f = { kind: 'text', el: area, empty: !(area.value || '').trim() || typed(area), typing: typed(area), hint: phOf(area) };
+    else if (inp) f = { kind: inp.readOnly ? 'date' : 'text', el: inp, empty: !(inp.value || '').trim() || (!inp.readOnly && typed(inp)), typing: !inp.readOnly && typed(inp), hint: phOf(inp) };
     else continue;
     if (kind && f.kind !== kind) continue;
     if (!any && !f.empty) continue;
@@ -72,7 +72,7 @@ const _itemsPanel =
 /// Case cards in the 查詢 tab (the cards are not links and have no class of
 /// their own: each is the largest block holding one 申報日期 line).
 const _cases =
-    r"""(() => { const sb = q('div.p-4 > section.grid.grid-cols-2'); const v = sb && sb.parentElement; if (!v || !inView(sb)) return []; const one = (e) => ((e.innerText || '').match(/申報日期/g) || []).length === 1; const deep = [...v.querySelectorAll('*')].filter((e) => !sb.contains(e) && one(e) && /\d{8,}/.test(e.innerText || '') && shown(e)); const leaf = deep.filter((e) => !deep.some((o) => o !== e && e.contains(o))); const cards = []; for (const d of leaf) { let c = d; while (c.parentElement && c.parentElement !== v && one(c.parentElement)) c = c.parentElement; if (!cards.includes(c)) cards.push(c); } return cards; })()""";
+    r"""(() => { const sb = q('div.p-4 > section.grid.grid-cols-2'); const v = sb && sb.parentElement; if (!v || !inView(sb)) return []; const one = (e) => (orig(e).match(/申報日期/g) || []).length === 1; const deep = [...v.querySelectorAll('*')].filter((e) => !sb.contains(e) && one(e) && /\d{8,}/.test(orig(e)) && shown(e)); const leaf = deep.filter((e) => !deep.some((o) => o !== e && e.contains(o))); const cards = []; for (const d of leaf) { let c = d; while (c.parentElement && c.parentElement !== v && one(c.parentElement)) c = c.parentElement; if (!cards.includes(c)) cards.push(c); } return cards; })()""";
 
 /// First line (the item name) of a case card.
 const _caseTitle =
@@ -166,7 +166,7 @@ final districtOfficePageSpec = WebPageSpec(
         "(() => { const p = $_itemsPanel; return p ? [...p.querySelectorAll('label')].filter(shown).map(txt).filter((x) => x).join('|') : ''; })()",
     'calendar': "qa('.vc-pane-header-wrapper').some(shown)",
     'calTitle': "txt(qa('button.vc-title').find(shown) || null)",
-    'warn': r"""(() => { const m = ((q('#app') || {}).innerText || '').match(/([^\n]+?)不能為空/); return m ? m[1].trim() : ''; })()""",
+    'warn': r"""(() => { const m = pageText('#app').match(/([^\n]+?)不能為空/); return m ? m[1].trim() : ''; })()""",
     'consentChoice': "(() => { const l = qa('section.px-4.mt-4 > div.flex.flex-wrap.gap-4.mt-2 > label').find((x) => x.querySelector('input:checked')); return l ? txt(l) : ''; })()",
     'submitted': "!!dialog('案件已完成申辦')",
     // Scrolled to the end of the consent sentence (latched).
@@ -350,20 +350,25 @@ bool _sectionDone(WebPageState s, String sec) =>
     _step2(s) ||
     (_step1(s) && s.now.text('${sec}Kind').isEmpty && _popupTarget(s) == null);
 
+/// A guide opened straight on a form has no open_service step: on the home
+/// page (the user went back) its first fill step points at the list the way
+/// open_service does.
 GuideStep _fillStep(String sec) => GuideStep(
-  target: (s) => _formTarget(s, sec),
-  label: (s) => _formLabel(s, sec),
-  card: (s) => _formCard(s, sec),
+  target: (s) => _home(s) ? _listTarget(s) : _formTarget(s, sec),
+  alsoUsable: const ['district.groups', 'district.search'],
+  label: (s) => _home(s) ? '點一下' : _formLabel(s, sec),
+  card: (s) => _home(s) ? _listCard(s) : _formCard(s, sec),
   detail: (s) {
+    if (_home(s)) return _listDetail;
     final warn = s.now.text('warn');
     final red = warn.isEmpty ? '' : '有紅字「$warn不能為空」的地方也要補好。';
     return '「${_sectionName[sec]}」有「*」的都要填。照亮起來的那一格，一格一格填就好。$red';
   },
   isDone: (s) => _sectionDone(s, sec),
-  locks: (s) => _lockIfVisible(s, _formTarget(s, sec)),
-  arrow: (s) => _popupTarget(s) == 'district.item_ok',
-  scrollHint: (s) => _offScreen(s, _formTarget(s, sec)),
-  cardTop: (s) => _cardNear(s, _formTarget(s, sec)),
+  locks: (s) => _home(s) || _lockIfVisible(s, _formTarget(s, sec)),
+  arrow: (s) => _home(s) ? _queryTab(s) : _popupTarget(s) == 'district.item_ok',
+  scrollHint: (s) => !_home(s) && _offScreen(s, _formTarget(s, sec)),
+  cardTop: (s) => _cardNear(s, _home(s) ? _listTarget(s) : _formTarget(s, sec)),
 );
 
 // ---- Home ------------------------------------------------------------------
@@ -380,6 +385,20 @@ String? _searchTarget(WebPageState s) {
 }
 
 const _applyTabCard = '這裡是「查詢」。先點上面的「申辦」，回到申請項目。';
+
+/// open_service's card on the 申辦 list.
+String _listCard(WebPageState s) {
+  if (_queryTab(s)) return _applyTabCard;
+  final again = s.latched('formSeen') ? '你回到申辦首頁了。' : '';
+  if (s.now.number('itemCount') > 0) {
+    final first = s.now.text('firstItem');
+    final example = first.isEmpty ? '' : '，例如「$first」';
+    return '$again點你要申請的那一項$example。';
+  }
+  return '$again你想申請什麼？先點一個大類打開來看：「申訴類」或「補助類」。';
+}
+
+const _listDetail = '點「申訴類」或「補助類」打開清單，再點你要申請的項目。也可以在上面的框框打關鍵字找。';
 
 // ---- 查詢 tab ---------------------------------------------------------------
 
@@ -489,17 +508,8 @@ final List<GuideComponent> districtOfficeComponents = [
         alsoUsable: const ['district.groups', 'district.search'],
         arrow: (s) => _queryTab(s),
         label: (_) => '點一下',
-        card: (s) {
-          if (_queryTab(s)) return _applyTabCard;
-          final again = s.latched('formSeen') ? '你回到申辦首頁了。' : '';
-          if (s.now.number('itemCount') > 0) {
-            final first = s.now.text('firstItem');
-            final example = first.isEmpty ? '' : '，例如「$first」';
-            return '$again點你要申請的那一項$example。';
-          }
-          return '$again你想申請什麼？先點一個大類打開來看：「申訴類」或「補助類」。';
-        },
-        detail: (_) => '點「申訴類」或「補助類」打開清單，再點你要申請的項目。也可以在上面的框框打關鍵字找。',
+        card: _listCard,
+        detail: (_) => _listDetail,
         isDone: (s) => _onForm(s) || _submitted(s),
         cardTop: (s) => _cardNear(s, _listTarget(s)),
       ),
@@ -807,6 +817,19 @@ final districtOfficePage = GuidePage(
   capabilities: const ['districtOffice', 'districtOffice.progress'],
   capabilityGoals: const {
     'districtOffice.progress': ['check_progress', 'view_closed'],
+    // districtOffice.form.<id> opens that form: no search / list steps.
+    'districtOffice.form.*': [
+      'submit',
+      'fill_basic',
+      'fill_details',
+      'pick_items',
+      'pick_date',
+      'next_step',
+      'consent',
+    ],
+  },
+  capabilityDone: const {
+    'districtOffice.form.*': ['search_service', 'open_service'],
   },
   defaultDestination: const {'kind': 'capability', 'id': 'districtOffice'},
   texts: _districtTexts,
@@ -819,7 +842,9 @@ final districtOfficePage = GuidePage(
 );
 
 GuideTexts _districtTexts(List<String> plan, GuideComponent last) {
-  if (plan.contains('submit')) {
+  // Opened straight on a form (no open_service): the text below starts with
+  // choosing the item.
+  if (plan.contains('submit') && plan.contains('open_service')) {
     return const GuideTexts(
       shortName: '申辦',
       resumeLabel: '回到申辦服務',

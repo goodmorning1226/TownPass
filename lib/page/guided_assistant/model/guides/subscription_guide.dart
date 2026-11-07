@@ -29,11 +29,11 @@ const _maxCards = 12;
 
 const _wraps = "qa('div.subscription-wrapper')";
 const _isOn =
-    "((w) => { const b = w.querySelector('button.card-button'); return !!b && (b.classList.contains('base-button--outline') || b.textContent.trim() === '取消訂閱'); })";
+    "((w) => { const b = w.querySelector('button.card-button'); return !!b && (b.classList.contains('base-button--outline') || raw(b).trim() === '取消訂閱'); })";
 const _isOpen =
     "((w) => { const b = w.querySelector('button.card-button'); return !!b && opened(b); })";
 const _title =
-    "((w) => ((w.querySelector('.card-header') || {}).textContent || '').trim())";
+    "((w) => raw(w.querySelector('.card-header')).trim())";
 
 /// First open card that is not subscribed / is subscribed.
 const _openOff = "($_wraps.find((w) => $_isOpen(w) && !$_isOn(w)) || null)";
@@ -69,7 +69,7 @@ final subscriptionPageSpec = WebPageSpec(
     'sub.count': r"""(() => { const m = qa('#app p, #app span, #app div, #app h5, #app h6').filter((e) => shown(e) && /^您已訂閱\s*\d+\s*項$/.test(txt(e))); return m[m.length - 1] || null; })()""",
   },
   flags: {
-    'count': r"""(() => { const m = ((q('#app') || {}).innerText || '').match(/您已訂閱\s*(\d+)\s*項/); return m ? Number(m[1]) : 0; })()""",
+    'count': r"""(() => { const m = pageText('#app').match(/您已訂閱\s*(\d+)\s*項/); return m ? Number(m[1]) : 0; })()""",
     'cards': '$_wraps.length',
     'titles': "$_wraps.map($_title).join('|')",
     'onTitles': "$_wraps.filter($_isOn).map($_title).join('、')",

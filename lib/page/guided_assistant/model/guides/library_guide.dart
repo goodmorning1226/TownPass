@@ -42,21 +42,21 @@ const libraryPageSpec = WebPageSpec(
     'library.reserve_list': "dialogButton('預約失敗', '查看預約清單') || dialog('預約失敗')",
   },
   flags: {
-    'tab': "(q('section.tabs > .tab-label--active') || {}).innerText || ''",
+    'tab': "orig(q('section.tabs > .tab-label--active'))",
     'input': "(q('input.base-input') || {}).value || ''",
     'results': "qa('#app a.item').filter(shown).length",
     'branch': "(q('div.fixed.bottom-0 select') || {}).value || ''",
-    'branchName': "(() => { const s = q('div.fixed.bottom-0 select'); return s && s.value && s.selectedIndex >= 0 ? s.options[s.selectedIndex].text : ''; })()",
+    'branchName': "(() => { const s = q('div.fixed.bottom-0 select'); return s && s.value ? optText(s) : ''; })()",
     'branchList': "!!byText('[id^=\"headlessui-dialog-title\"]', '請選擇取書館')",
     'reserveEnabled': "(() => { const b = q('div.fixed.bottom-0 button.base-button'); return !!b && !b.classList.contains('base-button--disabled'); })()",
     'reserved': "!!byText('[id^=\"headlessui-dialog-title\"]', '預約成功')",
     'reserveFailed': "!!byText('[id^=\"headlessui-dialog-title\"]', '預約失敗')",
-    'failReason': "(() => { const t = byText('[id^=\"headlessui-dialog-title\"]', '預約失敗'); const p = t && t.closest('[id^=\"headlessui-dialog-panel\"]'); const l = p && (p.innerText || '').split('\\n').map((x) => x.trim()).find((x) => x.startsWith('原因')); return l ? l.replace(/^原因[:：]\\s*/, '') : ''; })()",
+    'failReason': "(() => { const t = byText('[id^=\"headlessui-dialog-title\"]', '預約失敗'); const p = t && t.closest('[id^=\"headlessui-dialog-panel\"]'); const l = p && orig(p).split('\\n').map((x) => x.trim()).find((x) => x.startsWith('原因')); return l ? l.replace(/^原因[:：]\\s*/, '') : ''; })()",
     // The book page says it cannot be reserved (no 取書館 field).
     'notReservable':
-        "/不提供預約|不可預約|無法預約|不開放預約/.test((q('#app') || {}).innerText || '')",
+        "/不提供預約|不可預約|無法預約|不開放預約/.test(pageText('#app'))",
     'dialogOpen': "qa('[id^=\"headlessui-dialog-panel\"]').some(shown)",
-    'bookTitle': "((q('#app .h-screen') || {}).innerText || '').split('\\n').map((l) => l.trim()).find((l) => l) || ''",
+    'bookTitle': "pageText('#app .h-screen').split('\\n').map((l) => l.trim()).find((l) => l) || ''",
     'pickupOpen': "(() => { const b = byText('li > button', '可取書'); const n = b && b.nextElementSibling; return !!n && n.getBoundingClientRect().height > 4; })()",
   },
   latchFlags: {'reserved', 'reserveFailed'},
@@ -75,6 +75,13 @@ bool _tab(WebPageState s, String name) =>
 bool _no(WebPageState s) => false;
 bool _cannotReserve(WebPageState s) =>
     _onDetail(s) && s.now.flag('notReservable');
+
+/// The page answered the 預約 (預約成功 / 預約失敗 was shown; latched). The
+/// steps before it stay done: the dialog's 返回首頁 / 查看預約清單 go to the
+/// library home, where those steps would otherwise count as not done and
+/// the guide would start again from step 1.
+bool _answered(WebPageState s) =>
+    s.latched('reserved') || s.latched('reserveFailed');
 
 const _cannotReserveCard = '這本書不能預約喔，頁面上寫「本館藏不提供預約」。按左上角的「‹」回上一頁，換一本書看看。';
 
@@ -105,7 +112,7 @@ final List<GuideComponent> libraryComponents = [
             ? '先點一下上面的「館藏查詢」。'
             : '我們先找書！點一下上面的「關鍵字搜尋」。',
         detail: (_) => '先點一下上面的「關鍵字搜尋」。',
-        isDone: (s) => !_onHome(s),
+        isDone: (s) => !_onHome(s) || _answered(s),
         cardTop: (s) => _onHome(s) && s.now.text('tab') != '館藏查詢' ? 90 : 170,
       ),
     ],
@@ -131,7 +138,7 @@ final List<GuideComponent> libraryComponents = [
             ? '點一下框框，打你想找的書名，例如「神奇柑仔店」。'
             : '打好了嗎？按右邊的放大鏡搜尋。',
         detail: (_) => '點一下搜尋框，打書名或作者，打好按右邊的放大鏡。',
-        isDone: (s) => _searched(s) || _onDetail(s),
+        isDone: (s) => _searched(s) || _onDetail(s) || _answered(s),
         cardTop: (_) => 135,
       ),
     ],
@@ -153,7 +160,7 @@ final List<GuideComponent> libraryComponents = [
         label: (_) => _l('點一下'),
         card: (_) => '不知道要找什麼嗎？點一個下面的「熱門關鍵字」看看。',
         detail: (_) => '「熱門關鍵字」是大家常找的字，點一個就會幫你搜尋。',
-        isDone: (s) => _searched(s) || _onDetail(s),
+        isDone: (s) => _searched(s) || _onDetail(s) || _answered(s),
         cardTop: (_) => 135,
       ),
     ],
@@ -182,7 +189,7 @@ final List<GuideComponent> libraryComponents = [
             ? '找到了！上下滑動看看，想借哪一本，點一下書名就好。'
             : '這次沒有找到書。換個書名，在上面的框重新打字搜尋。',
         detail: (_) => '在搜尋結果點你想借的那本書。',
-        isDone: _onDetail,
+        isDone: (s) => _onDetail(s) || _answered(s),
         cardTop: (_) => 470,
       ),
     ],
@@ -224,9 +231,10 @@ final List<GuideComponent> libraryComponents = [
             ? '這本書的館藏不提供預約。按左上角的「‹」回到搜尋結果，選另一本書。'
             : '點「請選擇取書館」，選一個你方便去拿書的圖書館，再按右上角的「✕」。',
         isDone: (s) =>
-            _onDetail(s) &&
-            s.now.text('branch').isNotEmpty &&
-            !s.now.flag('branchList'),
+            _answered(s) ||
+            (_onDetail(s) &&
+                s.now.text('branch').isNotEmpty &&
+                !s.now.flag('branchList')),
         cardTop: (s) => s.now.flag('branchList') ? 20 : 340,
       ),
     ],
@@ -309,7 +317,9 @@ final List<GuideComponent> libraryComponents = [
               : '往下滑一點，找到「點閱排行」。';
         },
         detail: (_) => '在館藏查詢往下滑，點「點閱排行」右邊的「更多」。',
-        isDone: (s) => s.now.pathIs(_ranking),
+        // A book picked from the list (its detail page) is past this step,
+        // else 排行 → 選書 would go back to step 1 on the book's page.
+        isDone: (s) => s.now.pathIs(_ranking) || _onDetail(s) || _answered(s),
         cardTop: (_) => 170,
       ),
     ],

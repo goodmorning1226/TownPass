@@ -113,12 +113,22 @@ class GuidePage {
   final List<String> capabilities;
 
   /// Capability id -> the only goals that make sense there; the first one
-  /// is the default for that capability.
+  /// is the default for that capability. Keys of this, [entryGoals] and
+  /// [capabilityDone] may end in `*` (a prefix); see [forCapability].
   final Map<String, List<String>> capabilityGoals;
 
   /// Capability id -> components always added for it (where the user has
   /// to start on that page, e.g. choosing a fee type from the list).
   final Map<String, List<String>> entryGoals;
+
+  /// Capability id -> components already done when the page opens there
+  /// (e.g. straight on a form, past choosing it): they count as met
+  /// prerequisites and are left out of the plan unless asked for as goals.
+  final Map<String, List<String>> capabilityDone;
+
+  /// Paths under [pathPrefixes] that are not this guide's (page help, FAB
+  /// placement), e.g. a search page with no guide.
+  final List<String> pathExcludes;
 
   /// Destination the guide opens when it starts without one.
   final Map<String, dynamic> defaultDestination;
@@ -163,6 +173,8 @@ class GuidePage {
     required this.help,
     this.capabilityGoals = const {},
     this.entryGoals = const {},
+    this.capabilityDone = const {},
+    this.pathExcludes = const [],
     this.openFor,
     this.texts,
     this.bottomBar,
@@ -181,20 +193,53 @@ class GuidePage {
   bool handlesCapability(String id) =>
       capabilities.contains(id) || capabilities.contains(id.split('.').first);
 
-  bool handlesPath(String path) => pathPrefixes.any(
-    (p) => p == '/'
-        ? path == '/' || path.startsWith('/form/')
-        : path.startsWith(p),
-  );
+  bool handlesPath(String path) =>
+      !pathExcludes.any(path.startsWith) &&
+      pathPrefixes.any(
+        (p) => p == '/'
+            ? path == '/' || path.startsWith('/form/')
+            : path.startsWith(p),
+      );
+
+  /// [table]'s entry for [capability]: an exact key, else the longest key
+  /// ending in `*` that [capability] starts with (`disasterReport.form.*`
+  /// covers every `disasterReport.form.D-x-y`). Same rule as the backend's
+  /// guide.for_capability.
+  static List<String>? forCapability(
+    Map<String, List<String>> table,
+    String? capability,
+  ) {
+    if (capability == null) return null;
+    final exact = table[capability];
+    if (exact != null) return exact;
+    String? best;
+    for (final k in table.keys) {
+      if (k.endsWith('*') &&
+          capability.startsWith(k.substring(0, k.length - 1)) &&
+          (best == null || k.length > best.length)) {
+        best = k;
+      }
+    }
+    return best == null ? null : table[best];
+  }
 
   /// Adds the prerequisites of [goals] before each goal, keeping the goals
   /// in the order given (the user's order). Unknown ids are dropped; an
   /// empty result falls back to the default goal. Same rules as the
   /// backend's GuidePlanner.expand. The model only proposes goals; this
-  /// decides the actual steps.
-  List<String> plan(Iterable<String> goals) {
-    final wanted = goals.toList();
-    final result = <String>[];
+  /// decides the actual steps. [done] components count as met
+  /// prerequisites and are left out unless they are goals (see
+  /// [capabilityDone]).
+  List<String> plan(
+    Iterable<String> goals, {
+    Iterable<String> done = const [],
+  }) {
+    final wanted = goals.where((g) => component(g) != null).toList();
+    final skipped = [
+      for (final d in done)
+        if (component(d) != null && !wanted.contains(d)) d,
+    ];
+    final result = <String>[...skipped];
     void add(String id) {
       final c = component(id);
       if (c == null || result.contains(id)) return;
@@ -212,15 +257,18 @@ class GuidePage {
     for (final g in wanted) {
       add(g);
     }
-    if (result.isEmpty) add(defaultGoal);
-    return result;
+    if (result.length == skipped.length) add(defaultGoal);
+    return [
+      for (final id in result)
+        if (!skipped.contains(id)) id,
+    ];
   }
 
   /// Pre-written keyword choice of goals, used when the model cannot be
   /// reached: the component whose keywords match best. [capability] limits
   /// the choice to that sub-page's goals.
   List<String> goalsFor(String text, {String? capability}) {
-    final allowed = capabilityGoals[capability];
+    final allowed = forCapability(capabilityGoals, capability);
     var best = 0;
     final scores = <String, int>{};
     for (final c in components) {
@@ -239,9 +287,12 @@ class GuidePage {
     ].take(1).toList();
   }
 
-  /// Plan for a capability destination: its entry components plus [goals].
-  List<String> planFor(Iterable<String> goals, {String? capability}) =>
-      plan([...?entryGoals[capability], ...goals]);
+  /// Plan for a capability destination: its entry components plus [goals],
+  /// without the components already done there.
+  List<String> planFor(Iterable<String> goals, {String? capability}) => plan([
+    ...?forCapability(entryGoals, capability),
+    ...goals,
+  ], done: forCapability(capabilityDone, capability) ?? const []);
 
   /// Page to open for [destination].
   Map<String, dynamic> open(Map<String, dynamic> destination) =>

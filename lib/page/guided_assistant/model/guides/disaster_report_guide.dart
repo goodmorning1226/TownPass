@@ -56,12 +56,11 @@ const disasterReportPageSpec = WebPageSpec(
     'disaster.ok': "dialogButton('通報成功', '確認')",
   },
   flags: {
-    'noResults':
-        "((q('#app') || document.body).innerText || '').includes('無搜尋結果')",
+    'noResults': "pageText(q('#app') || document.body).includes('無搜尋結果')",
     'query': "(q('div.flex.mb-2.px-4 > input.base-input') || {}).value || ''",
     'groupOpen':
         "qa('a[href^=\"/disaster-report/form/\"]').filter(shown).some(opened)",
-    'category': r"""(() => { const m = ((q('#app') || document.body).innerText || '').match(/災情分類\s*\n+\s*([^\n]+)/); return m && !m[1].trim().startsWith('*') ? m[1].trim() : ''; })()""",
+    'category': r"""(() => { const m = pageText(q('#app') || document.body).match(/災情分類\s*\n+\s*([^\n]+)/); return m && !m[1].trim().startsWith('*') ? m[1].trim() : ''; })()""",
     'location': "(q('#location') || {}).value || ''",
     // The address box still has the keyboard (the user is typing).
     'locationFocus':
@@ -109,6 +108,26 @@ String _scroll(String off) => switch (off) {
 
 const _demo = '這是示範網站，沒有真的通報喔。';
 
+/// 選災情類別 on the category list. Also the first form step's fallback when
+/// a guide opened straight on a form (no pick_category step) and the list is
+/// showing: briefly before the site switches to the form, or after the user
+/// went back.
+String? _categoryTarget(WebPageState s) {
+  if (!_onHome(s)) return null;
+  if (s.now.flag('noResults')) return 'disaster.search';
+  return s.now.flag('groupOpen') ? 'disaster.items' : 'disaster.groups';
+}
+
+String _categoryCard(WebPageState s) {
+  if (s.now.flag('noResults')) {
+    return '這幾個字沒有找到。把框框裡的字刪掉，再按右邊的放大鏡，清單就會回來，從清單選比較好找。';
+  }
+  if (s.now.flag('groupOpen')) {
+    return '點最符合的那一項，例如「路燈故障」或「電力停電」。沒有一樣的，就選最接近的。';
+  }
+  return '遇到哪一種災情？先點一個大類打開來看，例如「民生、基礎設施災情」。有人受傷或有危險，請先打 119！';
+}
+
 final List<GuideComponent> disasterReportComponents = [
   GuideComponent(
     id: 'pick_category',
@@ -122,23 +141,11 @@ final List<GuideComponent> disasterReportComponents = [
     doneTarget: (s) => _onForm(s) ? 'disaster.location' : null,
     steps: [
       GuideStep(
-        target: (s) {
-          if (!_onHome(s)) return null;
-          if (s.now.flag('noResults')) return 'disaster.search';
-          return s.now.flag('groupOpen') ? 'disaster.items' : 'disaster.groups';
-        },
+        target: _categoryTarget,
         alsoUsable: const ['disaster.groups', 'disaster.search'],
         arrow: (s) => s.now.flag('noResults'),
         label: (_) => '點一下',
-        card: (s) {
-          if (s.now.flag('noResults')) {
-            return '這幾個字沒有找到。把框框裡的字刪掉，再按右邊的放大鏡，清單就會回來，從清單選比較好找。';
-          }
-          if (s.now.flag('groupOpen')) {
-            return '點最符合的那一項，例如「路燈故障」或「電力停電」。沒有一樣的，就選最接近的。';
-          }
-          return '遇到哪一種災情？先點一個大類打開來看，例如「民生、基礎設施災情」。有人受傷或有危險，請先打 119！';
-        },
+        card: _categoryCard,
         detail: (_) => '清單有「民生、基礎設施災情」「橋梁災情」「土石災情」「火災」四大類，點一下就會打開，再點裡面最符合的一項。',
         isDone: (s) => _onForm(s) || _reported(s),
         cardTop: (_) => 450,
@@ -156,11 +163,18 @@ final List<GuideComponent> disasterReportComponents = [
     doneDetail: '下面的「地點描述」可以補充說明，例如「公園門口旁邊」，不寫也可以。',
     steps: [
       GuideStep(
-        target: (s) => _onForm(s) ? 'disaster.location' : null,
-        alsoUsable: const ['disaster.locate'],
-        arrow: _no,
-        label: (_) => '打字',
+        // Opened straight on a form, the category list may show first (see
+        // _categoryTarget).
+        target: (s) => _onForm(s) ? 'disaster.location' : _categoryTarget(s),
+        alsoUsable: const [
+          'disaster.locate',
+          'disaster.groups',
+          'disaster.search',
+        ],
+        arrow: (s) => _onHome(s) && s.now.flag('noResults'),
+        label: (s) => _onHome(s) ? '點一下' : '打字',
         card: (s) {
+          if (_onHome(s)) return _categoryCard(s);
           if (s.now.text('location').isNotEmpty) {
             return '地址打完後，按鍵盤上的「完成」或「✓」收起鍵盤，就到下一步。';
           }
@@ -176,7 +190,7 @@ final List<GuideComponent> disasterReportComponents = [
             (_onForm(s) &&
                 s.now.text('location').isNotEmpty &&
                 !s.now.flag('locationFocus')),
-        cardTop: (_) => 250,
+        cardTop: (s) => _onHome(s) ? 450 : 250,
       ),
     ],
   ),
@@ -308,6 +322,18 @@ final disasterReportPage = GuidePage(
   components: disasterReportComponents,
   defaultGoal: disasterReportDefaultGoal,
   capabilities: const ['disasterReport'],
+  // disasterReport.form.D-x-y opens that form: no category step.
+  capabilityGoals: const {
+    'disasterReport.form.*': [
+      'send_report',
+      'enter_location',
+      'describe_disaster',
+      'give_consent',
+    ],
+  },
+  capabilityDone: const {
+    'disasterReport.form.*': ['pick_category'],
+  },
   defaultDestination: const {'kind': 'capability', 'id': 'disasterReport'},
   texts: _disasterTexts,
   offline: _disasterOffline,
@@ -319,7 +345,8 @@ final disasterReportPage = GuidePage(
 );
 
 GuideTexts _disasterTexts(List<String> plan, GuideComponent last) {
-  if (!plan.contains('send_report')) {
+  // Opened straight on a form: the text below starts with 選災情類別.
+  if (!plan.contains('send_report') || !plan.contains('pick_category')) {
     return GuideTexts(
       shortName: last.taskTitle,
       resumeLabel: '回到災情通報',

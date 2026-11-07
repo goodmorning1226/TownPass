@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:town_pass/page/guided_assistant/model/assistant_settings.dart';
 import 'package:town_pass/page/guided_assistant/model/guide_content.dart';
+import 'package:town_pass/page/guided_assistant/model/guide_i18n.dart';
 import 'package:town_pass/page/guided_assistant/model/mock_assistant_engine.dart';
 import 'package:town_pass/page/guided_assistant/model/guides/guide_registry.dart';
 import 'package:town_pass/page/guided_assistant/web/web_guide_probe.dart';
@@ -73,6 +74,12 @@ class GuideTask {
   /// its progress.
   final bool followUpResumes;
 
+  /// Every step was done once while the guide ran. The task then stays done
+  /// (done card) even when the page moves on, e.g. 預約成功's 返回首頁 goes
+  /// back to the library home, where the first step is no longer met;
+  /// without this the guide would start again from step 1.
+  final bool stepsDone;
+
   const GuideTask(
     this.guide, {
     this.status = TaskStatus.opened,
@@ -80,7 +87,18 @@ class GuideTask {
     this.commitAccepted = false,
     this.followUpGuideId,
     this.followUpResumes = false,
+    this.stepsDone = false,
   });
+
+  /// Index of the current step ([Guide.currentStep]), or past the last one
+  /// once [stepsDone].
+  int currentStep(WebPageState s) =>
+      stepsDone ? guide.steps.length : guide.currentStep(s);
+
+  /// Current task-list line ([Guide.currentTodo]), kept on the done line
+  /// once [stepsDone].
+  int currentTodo(WebPageState s) =>
+      stepsDone ? guide.doneTodo : guide.currentTodo(s);
 
   GuideTask copyWith({
     TaskStatus? status,
@@ -88,12 +106,14 @@ class GuideTask {
     bool? commitAccepted,
     String? followUpGuideId,
     bool clearFollowUp = false,
+    bool? stepsDone,
   }) => GuideTask(
     guide,
     followUpResumes: clearFollowUp ? false : followUpResumes,
     status: status ?? this.status,
     left: left ?? this.left,
     commitAccepted: commitAccepted ?? this.commitAccepted,
+    stepsDone: stepsDone ?? this.stepsDone,
     followUpGuideId: clearFollowUp
         ? null
         : followUpGuideId ?? this.followUpGuideId,
@@ -635,7 +655,7 @@ class GuidedAssistantController extends GetxController {
       return;
     }
     final g = active.guide;
-    final n = g.currentTodo(web).clamp(1, g.stepCount);
+    final n = active.currentTodo(web).clamp(1, g.stepCount);
     final ask = Replies.switchAsk(g.title, n, g.shortName, other.shortName);
     _say(
       _bot(
@@ -696,7 +716,15 @@ class GuidedAssistantController extends GetxController {
     if (alone) _showToast(SettingsTexts.normalToast);
     // The steps start only when the user presses 開始 (or 我自己來 to go
     // alone); nothing moves on by itself.
-    _openGuidePage(guide, fresh: !resuming && !guide.reuseOpenPage);
+    // A sub-page destination (臨櫃叫號 one unit: reservation.c-1-1) must open
+    // that unit even when another page of the service is showing.
+    final subPage =
+        guide.destination['kind'] == 'capability' &&
+        '${guide.destination['id']}'.contains('.');
+    _openGuidePage(
+      guide,
+      fresh: !resuming && (!guide.reuseOpenPage || subPage),
+    );
   }
 
   /// 我自己來 on the opened card: no steps; the task stays so 繼續引導 can
@@ -717,19 +745,19 @@ class GuidedAssistantController extends GetxController {
 
   int get stepIndex {
     final t = task.value;
-    return t == null ? 0 : t.guide.currentStep(web);
+    return t == null ? 0 : t.currentStep(web);
   }
 
   GuideStep? get currentStep {
     final t = task.value;
     if (t == null) return null;
-    final i = t.guide.currentStep(web);
+    final i = t.currentStep(web);
     return i < t.guide.steps.length ? t.guide.steps[i] : null;
   }
 
   bool get allStepsDone {
     final t = task.value;
-    return t != null && t.guide.currentStep(web) >= t.guide.steps.length;
+    return t != null && t.currentStep(web) >= t.guide.steps.length;
   }
 
   /// Answer to "下一步要做什麼？".
@@ -795,7 +823,7 @@ class GuidedAssistantController extends GetxController {
     final t = task.value;
     if (t == null) return const [];
     final g = t.guide;
-    final p = g.currentTodo(web);
+    final p = t.currentTodo(web);
     return [
       for (var i = 0; i < g.todos.length; i++)
         _line(
@@ -824,7 +852,7 @@ class GuidedAssistantController extends GetxController {
   String get currentTodoText {
     final t = task.value;
     if (t == null) return '';
-    final p = t.guide.currentTodo(web);
+    final p = t.currentTodo(web);
     return p < t.guide.todos.length ? t.guide.todos[p].text : '全部完成';
   }
 
@@ -835,7 +863,7 @@ class GuidedAssistantController extends GetxController {
     if (t.status == TaskStatus.opened) {
       return GuideCard(CardVariant.opened, g.openedLabel, g.openedCard);
     }
-    final i = g.currentStep(web);
+    final i = t.currentStep(web);
     if (i >= g.steps.length) {
       final follow = t.followUpGuideId == null
           ? null
@@ -886,6 +914,15 @@ class GuidedAssistantController extends GetxController {
 
   void _onProgress() {
     final t = task.value;
+    // Done once (on the page, steps running) stays done; see
+    // [GuideTask.stepsDone]. Not while the page is unread or elsewhere, where
+    // an empty snapshot could look done.
+    if (t != null &&
+        !t.stepsDone &&
+        _stepRunning &&
+        t.guide.currentStep(web) >= t.guide.steps.length) {
+      task.value = t.copyWith(stepsDone: true);
+    }
     if (_measureOnly &&
         t != null &&
         t.guide.onPage(web.now) &&
@@ -912,7 +949,14 @@ class GuidedAssistantController extends GetxController {
     final key = '${task.value?.guide.id}:${c.variant}:${c.label}:${c.text}';
     if (key == _lastSpokenKey || nudge.value.isNotEmpty) return;
     _lastSpokenKey = key;
-    if (readAloud.value) speaker.speak(c.text);
+    if (readAloud.value) _speakGuide(c.text);
+  }
+
+  /// Reads a card aloud in the language it is shown in (its pre-written
+  /// translation, else the Chinese original).
+  void _speakGuide(String text) {
+    final spoken = GuideI18n.instance.speakable(text);
+    speaker.speak(spoken.text, language: spoken.language);
   }
 
   /// A short reminder on the guide card (e.g. from the keypad's 完成 key).
@@ -939,7 +983,7 @@ class GuidedAssistantController extends GetxController {
     final c = card;
     if (c == null) return;
     speaking.value = true;
-    speaker.speak(c.text);
+    _speakGuide(c.text);
     _speakTimer?.cancel();
     _speakTimer = Timer(
       const Duration(milliseconds: 2400),
@@ -1041,7 +1085,7 @@ class GuidedAssistantController extends GetxController {
       default:
         if (allStepsDone) return '引導完成';
         final n = t.guide.stepCount;
-        return '步驟 ${t.guide.currentTodo(web).clamp(1, n)} / $n';
+        return '步驟 ${t.currentTodo(web).clamp(1, n)} / $n';
     }
   }
 

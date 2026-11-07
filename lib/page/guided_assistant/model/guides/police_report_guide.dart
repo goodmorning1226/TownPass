@@ -36,7 +36,7 @@ const _next = r'''(() => {
     (e.tagName === 'SELECT' || document.activeElement !== e);
   if (q('#mobile_number')) {
     const counties = qa('select#county'), cities = qa('select#city');
-    const addrs = qa('input[placeholder="請輸入詳細地址"]');
+    const addrs = phAll('請輸入詳細地址', 'input');
     const same = byText('label', '同通訊地址');
     const list = [['mobile', q('#mobile_number')], ['mail', q('#mail')],
       ['county', counties[0]], ['city', cities[0]], ['addr', addrs[0]],
@@ -129,16 +129,16 @@ const policeReportPageSpec = WebPageSpec(
     // Red 不能為空 boxes that are still empty (after 下一步 / 送出).
     'warn': "qa('.base-input--warn, .base-select--warn, .base-textarea--warn').filter((e) => shown(e) && !(e.value || '').trim()).length",
     'month': "txt(qa('button.vc-title').find(shown))",
-    'time': "(() => { const s = qa('div.vc-time-select-group select'); if (s.length < 3) return ''; const t = (e) => e.selectedIndex >= 0 ? e.options[e.selectedIndex].text : ''; return t(s[0]) + ':' + t(s[1]) + ' ' + t(s[2]); })()",
-    'role': "(() => { const e = q('#your_role'); return e && e.value && e.selectedIndex >= 0 ? e.options[e.selectedIndex].text.replace(/[A-Za-z ]+\$/, '') : ''; })()",
+    'time': "(() => { const s = qa('div.vc-time-select-group select'); if (s.length < 3) return ''; const t = optText; return t(s[0]) + ':' + t(s[1]) + ' ' + t(s[2]); })()",
+    'role': "(() => { const e = q('#your_role'); return e && e.value ? optText(e).replace(/[A-Za-z ]+\$/, '') : ''; })()",
     'date': "(qa('input.base-input[readonly]').find(shown) || {}).value || ''",
     'reported': "!!dialog('通報成功')",
     // Records.
     'records': "qa('a[href^=\"/police-report/record/\"]').filter(shown).length",
     'open': "qa('a[href^=\"/police-report/record/\"]').filter(shown).filter((a) => txt(a).includes('處理中')).length",
     'tab': "txt(q('section.tabs > .tab-label--active'))",
-    'status': r"""(() => { const m = ((q('#app') || document.body).innerText || '').match(/處理中|已結案|已受理/); return m ? m[0] : ''; })()""",
-    'caseNo': r"""(() => { const m = ((q('#app') || document.body).innerText || '').match(/編號\s*\n+\s*([^\n]+)/); return m ? m[1].trim() : ''; })()""",
+    'status': r"""(() => { const m = pageText(q('#app') || document.body).match(/處理中|已結案|已受理/); return m ? m[0] : ''; })()""",
+    'caseNo': r"""(() => { const m = pageText(q('#app') || document.body).match(/編號\s*\n+\s*([^\n]+)/); return m ? m[1].trim() : ''; })()""",
   },
   latchFlags: {'reported', 'noticeRead', 'statementRead'},
 );

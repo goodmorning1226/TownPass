@@ -221,6 +221,7 @@ void main() {
         };
         expect(goals(page['capability_goals']), app.capabilityGoals);
         expect(goals(page['entry_goals']), app.entryGoals);
+        expect(goals(page['capability_done']), app.capabilityDone);
         // Every id the page names exists.
         final known = {for (final c in app.components) c.id};
         for (final c in app.components) {
@@ -231,6 +232,7 @@ void main() {
         for (final g in [
           ...app.capabilityGoals.values,
           ...app.entryGoals.values,
+          ...app.capabilityDone.values,
         ]) {
           expect(known.containsAll(g), isTrue, reason: app.id);
         }

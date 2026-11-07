@@ -100,7 +100,7 @@ const couponWalletPageSpec = WebPageSpec(
     'period': _periodJs,
     'rule': _ruleJs,
     'desc': _descJs,
-    'remain': r"""(() => { const m = ((q('#app') || {}).innerText || '').match(/剩餘\s*(\d+)\s*份/); return m ? m[1] : ''; })()""",
+    'remain': r"""(() => { const m = pageText('#app').match(/剩餘\s*(\d+)\s*份/); return m ? m[1] : ''; })()""",
     'hasAdd': '!!$_add',
     'addBelow':
         "(() => { const b = $_add; return !!b && b.getBoundingClientRect().bottom > innerHeight; })()",
@@ -122,12 +122,12 @@ const couponWalletPageSpec = WebPageSpec(
 );
 
 const _periodJs =
-    r"""(() => { const m = ((q('#app') || {}).innerText || '').match(/活動日期\s*\n+\s*([^\n]+)/); return m ? m[1].trim() : ''; })()""";
+    r"""(() => { const m = pageText('#app').match(/活動日期\s*\n+\s*([^\n]+)/); return m ? m[1].trim() : ''; })()""";
 const _ruleJs =
-    r"""(() => { const m = ((q('#app') || {}).innerText || '').match(/領取規則\s*\n+\s*([^\n]+)/); return m ? m[1].trim() : ''; })()""";
+    r"""(() => { const m = pageText('#app').match(/領取規則\s*\n+\s*([^\n]+)/); return m ? m[1].trim() : ''; })()""";
 // 優惠說明 is also the first tab label (followed by 店家資訊).
 const _descJs =
-    r"""(() => { const m = ((q('#app') || {}).innerText || '').match(/優惠說明\s*\n+\s*(?!店家資訊)([^\n]+)/); return m ? m[1].trim() : ''; })()""";
+    r"""(() => { const m = pageText('#app').match(/優惠說明\s*\n+\s*(?!店家資訊)([^\n]+)/); return m ? m[1].trim() : ''; })()""";
 
 bool onCouponWallet(WebSnapshot s) =>
     s.pathStarts('/coupon') || s.pathStarts(_wallet);

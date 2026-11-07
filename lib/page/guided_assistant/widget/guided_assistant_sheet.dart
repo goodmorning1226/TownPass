@@ -3,7 +3,9 @@ import 'package:get/get.dart';
 import 'package:town_pass/page/guided_assistant/guided_assistant_controller.dart';
 import 'package:town_pass/page/guided_assistant/model/assistant_settings.dart';
 import 'package:town_pass/page/guided_assistant/model/guide_content.dart';
+import 'package:town_pass/page/guided_assistant/model/guide_i18n.dart';
 import 'package:town_pass/page/guided_assistant/widget/guide_highlight.dart';
+import 'package:town_pass/service/page_translation.dart';
 import 'package:town_pass/util/tp_colors.dart';
 import 'package:town_pass/util/tp_text.dart';
 
@@ -212,25 +214,34 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
                   vertical: 10,
                 ),
                 decoration: whiteBox,
-                child: TPText.rich(
-                  TextSpan(
-                    children: [
-                      const TextSpan(text: '現在我們要：'),
-                      TextSpan(
-                        text: c.currentTodoText,
-                        style: const TextStyle(fontWeight: FontWeight.w600),
-                      ),
-                      TextSpan(
-                        text: ended
-                            ? '。\n你正在自己操作，想要我帶你做，按「繼續引導」。'
-                            : c.allStepsDone
-                            ? '。\n步驟都做好了，有問題隨時問我！'
-                            : '。\n照著畫面上方的提示做就可以，有問題隨時問我！',
-                      ),
-                    ],
-                  ),
-                  style: TPTextStyles.h3Regular.copyWith(height: 24 / 16),
-                ),
+                // Spans are not translated by TPText: the guide line uses
+                // the pre-written translation, the rest the page language.
+                child: Obx(() {
+                  final page = PageTranslation.instance;
+                  page.revision.value;
+                  GuideI18n.instance.revision.value;
+                  return TPText.rich(
+                    TextSpan(
+                      children: [
+                        TextSpan(text: page.display('現在我們要：')),
+                        TextSpan(
+                          text: GuideI18n.instance.show(c.currentTodoText),
+                          style: const TextStyle(fontWeight: FontWeight.w600),
+                        ),
+                        TextSpan(
+                          text: page.display(
+                            ended
+                                ? '。\n你正在自己操作，想要我帶你做，按「繼續引導」。'
+                                : c.allStepsDone
+                                ? '。\n步驟都做好了，有問題隨時問我！'
+                                : '。\n照著畫面上方的提示做就可以，有問題隨時問我！',
+                          ),
+                        ),
+                      ],
+                    ),
+                    style: TPTextStyles.h3Regular.copyWith(height: 24 / 16),
+                  );
+                }),
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(12, 0, 12, 10),
@@ -289,7 +300,7 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
                           ),
                         ),
                         onPressed: c.backToPage,
-                        child: TPText(
+                        child: GuideText(
                           t.guide.backLabel,
                           style: TPTextStyles.h3Regular,
                           color: TPColors.white,
@@ -358,7 +369,7 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
               runSpacing: 2,
               crossAxisAlignment: WrapCrossAlignment.center,
               children: [
-                TPText(
+                GuideText(
                   line.text,
                   style:
                       (line.state == TodoState.current
@@ -471,7 +482,9 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
       );
     }
     final parts = <Widget>[
-      TPText(m.text, style: _botText, color: TPColors.grayscale950),
+      // Guide messages (開頁說明, 這頁在做什麼) use the pre-written
+      // translation; other messages show as before.
+      GuideText(m.text, style: _botText, color: TPColors.grayscale950),
     ];
     if (m.tutorialChoice &&
         c.onboarding.value == OnboardingStage.branch &&
@@ -832,7 +845,7 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
                         padding: const EdgeInsets.symmetric(horizontal: 14),
                       ),
                       onPressed: () => c.submit(chip),
-                      child: TPText(
+                      child: GuideText(
                         chip,
                         style: TPTextStyles.h3Regular,
                         color: TPColors.primary700,
@@ -1034,7 +1047,7 @@ class _Tag extends StatelessWidget {
         color: self ? TPColors.secondary100 : TPColors.primary100,
         borderRadius: BorderRadius.circular(10),
       ),
-      child: TPText(
+      child: GuideText(
         text,
         style: TPTextStyles.bodySemiBold,
         color: self ? TPColors.secondary800 : TPColors.primary700,

@@ -64,7 +64,7 @@ const _fieldInfo = r'''((f) => {
     if (p.tagName === 'P' && !p.classList.contains('field-label')) { hint = txt(p); break; }
     if (p.tagName === 'LABEL' || p.tagName === 'INPUT') break;
   }
-  const name = txt(label) || (f.placeholder || '').replace(/^請(輸入|選擇)/, '') ||
+  const name = txt(label) || phOf(f).replace(/^請(輸入|選擇)/, '') ||
     (hint ? '' : txt(g && g.querySelector('.field-label')));
   return { kind: f.tagName === 'SELECT' ? 'select' : 'text', name, hint, choices: '' };
 })''';
@@ -101,7 +101,7 @@ const feesPageSpec = WebPageSpec(
     'fees.paid_info': "location.pathname.includes('/fee-payment-finished/') ? qa('#app li.flex.justify-between').filter(shown) : null",
   },
   flags: {
-    'feeName': r"""(() => { if (location.pathname.includes('/detail/')) return txt(q('section.fixed.top-0 .font-bold')); const m = ((q('#app') || {}).innerText || '').match(/繳費項目\s*\n+\s*(?!繳費項目)([^\n]+)/); return m ? m[1].trim() : ''; })()""",
+    'feeName': r"""(() => { if (location.pathname.includes('/detail/')) return txt(q('section.fixed.top-0 .font-bold')); const m = pageText('#app').match(/繳費項目\s*\n+\s*(?!繳費項目)([^\n]+)/); return m ? m[1].trim() : ''; })()""",
     'firstTab': "txt(q('section.tabs > button.tab-label'))",
     'onInputTab': "(() => { const t = q('section.tabs > button.tab-label'); return !!t && t.classList.contains('tab-label--active'); })()",
     'hasFields':
@@ -116,15 +116,15 @@ const feesPageSpec = WebPageSpec(
     'alertText': r"""(() => { const p = dialog('提醒'); if (!p) return ''; return txt(p).split('\n').map((x) => x.trim()).filter((x) => x && x !== '提醒' && x !== '確認')[0] || ''; })()""",
     'groupOpen': "qa('ul > li.mb-3 > a').filter(shown).some(opened)",
     'bills': "qa('section.p-4.mt-16 > div.rounded').filter(shown).length",
-    'selected': r"""(() => { const m = ((q('#app') || {}).innerText || '').match(/繳費選擇\((\d+)\/(\d+)\)/); return m ? Number(m[1]) : 0; })()""",
+    'selected': r"""(() => { const m = pageText('#app').match(/繳費選擇\((\d+)\/(\d+)\)/); return m ? Number(m[1]) : 0; })()""",
     'total': r"""(() => { const m = txt(q('div.fixed.bottom-0')).match(/NT\$\s*[\d,]+/); return m ? m[0].replace(/\s+/g, ' ') : ''; })()""",
-    'amount': r"""(() => { const m = ((q('#app') || {}).innerText || '').match(/帳單總金額\s*\n+\s*([^\n]+)/); return m ? m[1].trim() : ''; })()""",
+    'amount': r"""(() => { const m = pageText('#app').match(/帳單總金額\s*\n+\s*([^\n]+)/); return m ? m[1].trim() : ''; })()""",
     'payEnabled': "(() => { const b = q('div.fixed.bottom-0 button.base-button'); return !!b && !b.classList.contains('base-button--disabled'); })()",
     'methodsBelow': "qa('div.grid.grid-cols-2 > button.rounded-md').filter(shown).some((b) => b.getBoundingClientRect().bottom > innerHeight)",
     'payConfirm': "!!dialogButton('提醒', '是')",
     'paid': "location.pathname.includes('/fee-payment-finished/')",
-    'paidMethod': r"""(() => { const m = ((q('#app') || {}).innerText || '').match(/付款方式\s*\n+\s*([^\n]+)/); return m ? m[1].trim() : ''; })()""",
-    'noRecords': "((q('#app') || {}).innerText || '').includes('目前無繳費紀錄')",
+    'paidMethod': r"""(() => { const m = pageText('#app').match(/付款方式\s*\n+\s*([^\n]+)/); return m ? m[1].trim() : ''; })()""",
+    'noRecords': "pageText('#app').includes('目前無繳費紀錄')",
     'filtered': "(() => { const s = qa('select.base-select'); return s.length === 3 && (s[0].value !== '1' || s[1].value !== 'all' || s[2].value !== 'all'); })()",
   },
   latchFlags: {'paid'},
@@ -453,6 +453,8 @@ final feesPage = GuidePage(
   spec: feesPageSpec,
   onPage: onFees,
   pathPrefixes: const ['/fee-payment'],
+  // 繳費查詢 (fees.search) has no guide.
+  pathExcludes: const ['/fee-payment/search'],
   components: feesComponents,
   defaultGoal: feesDefaultGoal,
   // 地方稅 (tax-1) and 掃描繳費 open the camera page and have no guide.

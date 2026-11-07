@@ -7,6 +7,7 @@ import 'package:town_pass/page/guided_assistant/guide_target.dart';
 import 'package:town_pass/page/guided_assistant/guided_assistant_controller.dart';
 import 'package:town_pass/page/guided_assistant/model/assistant_settings.dart';
 import 'package:town_pass/page/guided_assistant/model/guide_content.dart';
+import 'package:town_pass/page/guided_assistant/model/guide_i18n.dart';
 import 'package:town_pass/page/guided_assistant/model/guides/guide_registry.dart';
 import 'package:town_pass/page/guided_assistant/widget/guide_highlight.dart';
 import 'package:town_pass/page/guided_assistant/widget/guided_assistant_sheet.dart';
@@ -643,7 +644,7 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
                     const PenguinAvatar(size: 48),
                     const SizedBox(width: 10),
                     Expanded(
-                      child: TPText(
+                      child: GuideText(
                         card.label,
                         style: TPTextStyles.bodySemiBold,
                         color: commit
@@ -655,7 +656,7 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
                   ],
                 ),
                 const SizedBox(height: 6),
-                TPText(
+                GuideText(
                   card.text,
                   style: TPTextStyles.h3SemiBold.copyWith(
                     fontSize: 17,
@@ -967,7 +968,8 @@ class _PrimaryButton extends StatelessWidget {
           ),
         ),
         onPressed: onTap,
-        child: TPText(
+        // Guide labels such as 回到借書 (others fall back to TPText).
+        child: GuideText(
           label,
           style: TPTextStyles.h3Regular,
           color: TPColors.white,

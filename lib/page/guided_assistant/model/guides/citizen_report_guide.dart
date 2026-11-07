@@ -51,12 +51,12 @@ const _jsConsent =
     "qa('section.px-4 > div.flex.flex-wrap.gap-4.mt-2 > label').filter(shown)";
 const _jsSend =
     "q('div.citizen-report-form > div.px-4.mt-4 > button.base-button')";
-const _jsCaseInput = '''q('input[placeholder="搜尋案號關鍵字"]')''';
+const _jsCaseInput = '''ph('搜尋案號關鍵字', 'input')''';
 const _jsCaseSearch =
     '(inView($_jsCaseInput) ? $_jsCaseInput.closest(\'div.mt-3\') : null)';
 const _jsCases = "qa('ul.mt-10 > li > a[href*=search-detail]').filter(inView)";
 const _jsBack = "q('section.fixed.top-0 button.absolute')";
-const _jsBodyText = "(document.body.innerText || '')";
+const _jsBodyText = "pageText()";
 
 /// Top / bottom (viewport px) of one element or the union of a list;
 /// -9999 when nothing is shown.
