@@ -102,7 +102,8 @@ class ForeignTurnTests(unittest.TestCase):
         listing = self.turn("what can you do")
         self.assertEqual(listing["kind"], "capability_list")
         self.assertTrue(listing["message"].startswith("Services I can open"))
-        self.assertEqual(listing["choices"][0]["title"], "Home")
+        # Microservices first (owner, 2026-11-08); the App's start pages come last.
+        self.assertEqual(listing["choices"][0]["title"], "Applications")
         self.assertEqual(self.turn("cancel")["action"], "cancel")
         nothing = self.turn("tell me a joke")
         self.assertEqual((nothing["kind"], nothing["destination"]), ("reply", None))

@@ -296,9 +296,10 @@ MESSAGES = {
         "id": "Layanan aplikasi (yang belum terhubung ditandai)", "th": "บริการในแอป (รายการที่ยังไม่เชื่อมต่อมีเครื่องหมาย)",
     },
     "list_more": {
-        "en": "Say \"next page\" to see more.", "ja": "「次のページ」で続きを表示します。",
-        "vi": "Nói \"trang tiếp\" để xem thêm.", "id": "Ucapkan \"halaman berikutnya\" untuk melihat lagi.",
-        "th": "พูดว่า \"หน้าถัดไป\" เพื่อดูเพิ่ม",
+        "en": "Say \"next page\" or \"previous page\" to switch.", "ja": "「次のページ」「前のページ」で切り替えます。",
+        "vi": "Nói \"trang tiếp\" hoặc \"trang trước\" để chuyển.",
+        "id": "Ucapkan \"halaman berikutnya\" atau \"halaman sebelumnya\" untuk berpindah.",
+        "th": "พูดว่า \"หน้าถัดไป\" หรือ \"หน้าก่อนหน้า\" เพื่อสลับ",
     },
     "not_connected": {
         "en": "not connected", "ja": "未対応", "vi": "chưa kết nối", "id": "belum terhubung", "th": "ยังไม่เชื่อมต่อ",
@@ -363,6 +364,10 @@ MESSAGES = {
     "opens": {
         "en": "opens", "ja": "開けます", "vi": "mở được", "id": "bisa dibuka", "th": "เปิดได้",
     },
+}
+PREV_PAGE = {
+    "en": r"previous(?: page)?|back a page", "ja": r"前(?:のページ)?",
+    "vi": r"trang trước", "id": r"halaman sebelumnya|sebelumnya", "th": r"หน้าก่อนหน้า|ก่อนหน้า",
 }
 NEXT_PAGE = {
     "en": r"next(?: page)?|more", "ja": r"次(?:のページ)?|もっと", "vi": r"trang (?:tiếp|sau)|thêm",

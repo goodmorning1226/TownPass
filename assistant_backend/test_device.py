@@ -344,6 +344,25 @@ class MultilingualSpeechTests(unittest.TestCase):
         self.assertEqual((calls, result["language"], result["text"], result["status"]),
                          (["zh", "auto"], "en", "I want to lend a book", "clear"))
 
+    def test_unsure_switch_from_chinese_keeps_the_latin_text(self):
+        # "what can you do" with Chinese chosen was detected as Japanese at low
+        # confidence and came back in Japanese (owner, 2026-11-08).
+        self.texts["zh"], self.logprob["zh"] = "what can you do", -0.3
+        self.heard["multi"], self.texts["multi"] = "japanese", "何ができますか"
+        self.probabilities["multi"] = {"ja": 0.41, "en": 0.38, "zh": 0.1}
+        result = self.recognizer.transcribe(loud_frames(), "zh")
+        self.assertEqual((result["language"], result["text"]), ("en", "what can you do"))
+        self.assertIsNone(result["language_confidence"])
+        # Unsure, and the Chinese pass wrote characters: stay Chinese.
+        self.calls.clear()
+        self.texts["zh"], self.logprob["zh"] = "我要借書", -1.5
+        result = self.recognizer.transcribe(loud_frames(), "zh")
+        self.assertEqual(result["language"], "zh")
+        # Sure enough: follow it and report how sure.
+        self.probabilities["multi"] = {"ja": 0.92}
+        result = self.recognizer.transcribe(loud_frames(), "zh")
+        self.assertEqual((result["language"], result["language_confidence"]), ("ja", 0.92))
+
     def test_japanese_in_latin_letters_is_redone_with_a_japanese_prompt(self):
         from asr_server import SCRIPT_PROMPTS
         self.heard["multi"] = "japanese"

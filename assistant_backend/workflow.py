@@ -18,6 +18,7 @@ import threading
 import time
 import uuid
 
+import emergency
 import i18n
 import qna
 from decision import decide
@@ -69,6 +70,12 @@ FALLBACK_LIMIT = 3
 COMMAND_SOUND = 0.8  # "下一個" is 0.78 and stays unmatched
 CANCEL_SOUND = 0.9
 NEXT_PAGE_WORDS = ("下一頁", "更多功能")
+PREV_PAGE_WORDS = ("上一頁", "前一頁")
+LIST_SIZE = 8
+# Listing order (owner, 2026-11-08): microservices first (their sub-pages after the
+# main pages), then the App's own pages, then account and settings, and last the
+# App's start pages, which rarely help: home, all services, start page, pinned.
+LIST_LAST = ("app.home", "app.services", "start_page", "pinned")
 CANCEL_WORDS = ("取消", "返回", "算了", "不用了", "不要了")
 _ORDINAL_SYLLABLES = {"yi": 1, "er": 2, "san": 3, "si": 4, "wu": 5, "liu": 6, "qi": 7, "ba": 8}
 
@@ -439,22 +446,53 @@ class Workflow:
             entries = [e for e in entries if e["id"] == root or e["id"].startswith(root + ".")]
         if not all_entries:
             entries = [e for e in entries if e["enabled"]]
-        page = entries[offset:offset + 8]
+        entries = sorted(entries, key=self._list_rank)
+        page = entries[offset:offset + LIST_SIZE]
         language = payload.get("language", "zh")
         if language != "zh":
             title = i18n.t("list_all" if all_entries else "list_enabled", language)
             mark = f" ({i18n.t('not_connected', language)})"
             message = title + ":\n" + "\n".join(f"• {self.registry.title(e, language)}" + ("" if e["enabled"] else mark)
                                                 for e in page)
-            if offset + 8 < len(entries):
+            if offset + LIST_SIZE < len(entries):
                 message += "\n" + i18n.t("list_more", language)
         else:
             title = "App 功能（未串接項目會標示）" if all_entries else "目前助理可以開啟的功能"
             message = title + "：\n" + "\n".join(f"• {e['title']}" + ("【未串接】" if not e["enabled"] else "") for e in page)
-            if offset + 8 < len(entries):
-                message += "\n可輸入「下一頁」繼續查看。"
+            if offset + LIST_SIZE < len(entries):
+                message += "\n可輸入「下一頁」或「上一頁」切換。"
         return self._offer(payload, self._cap_items(page, language), message, kind="capability_list",
-                           page={"all_entries": all_entries, "root": root, "offset": offset, "total": len(entries)})
+                           page={"all_entries": all_entries, "root": root, "offset": offset, "total": len(entries)},
+                           listing={"offset": offset, "size": LIST_SIZE, "total": len(entries)})
+
+    def _emergency(self, payload, kind):
+        """The emergency number first, before retrieval, FAQ or the model (T1). A
+        related page is only offered; nothing opens by itself."""
+        self._trace("emergency", [kind])
+        language = payload.get("language", "zh")
+        with self.lock:
+            self.pending.pop(payload["session_id"], None)
+        text = emergency.message(kind, language)
+        entry = self.registry.by_id.get(emergency.OFFER.get(kind, ""))
+        if entry and entry["enabled"]:
+            return self._offer(payload, self._cap_items([entry], language), text, action="emergency")
+        return self.reply(payload, text, action="emergency")
+
+    def _list_rank(self, entry):
+        if entry["id"] in LIST_LAST:
+            return 4
+        kind = (entry.get("navigation") or {}).get("type")
+        root = entry["id"].split(".")[0]
+        if kind == "web" or root == "police":
+            return 1 if root != entry["id"] and root in self.registry.by_id else 0
+        return 3 if entry.get("category") == "帳號設定" else 2
+
+    def _turn_page(self, payload, pending, step):
+        """Another page of a listing: step 1 forward, -1 back, wrapping around."""
+        state = pending["page"]
+        pages = max(1, -(-state["total"] // LIST_SIZE))
+        offset = ((state["offset"] // LIST_SIZE + step) % pages) * LIST_SIZE
+        return self._list(payload, state["all_entries"], state["root"], offset)
 
     def _select(self, payload, pending, choice):
         if time.monotonic() - pending["created"] >= 300 or pending["registry_version"] != self.registry.version:
@@ -498,9 +536,10 @@ class Workflow:
             return self.reply(payload, i18n.t("cancelled", language), action="cancel")
         if pending and resolution == pending["id"]:
             self._trace("pending")
+            if i18n.matches(i18n.PREV_PAGE, text, language) and pending.get("page"):
+                return self._turn_page(payload, pending, -1)
             if i18n.matches(i18n.NEXT_PAGE, text, language) and pending.get("page"):
-                state = pending["page"]
-                return self._list(payload, state["all_entries"], state["root"], (state["offset"] + 8) % max(1, state["total"]))
+                return self._turn_page(payload, pending, 1)
             number = i18n.choice_number(text, language)
             if number:
                 return self._select(payload, pending, str(number))
@@ -573,6 +612,13 @@ class Workflow:
         with self.lock:
             pending = self.pending.get(session)
         resolution = payload.get("resolution_id")
+        if payload.get("page_step") in (1, -1):
+            # The listing's arrow buttons: no text, no model.
+            if not pending or pending["id"] != resolution or not pending.get("page"):
+                raise self.error("候選已失效，請重新描述需求。")
+            self._trace("page_step")
+            payload = {**payload, "language": pending.get("language", payload.get("language", "zh"))}
+            return self._turn_page(payload, pending, payload["page_step"])
         if payload.get("choice_id") is not None:
             if not pending or pending["id"] != resolution:
                 raise self.error("候選已失效，請重新描述需求。")
@@ -580,6 +626,9 @@ class Workflow:
             # A tapped option continues in the language the options were offered in.
             payload = {**payload, "language": pending.get("language", payload.get("language", "zh"))}
             return self._select(payload, pending, payload["choice_id"])
+        crisis = emergency.detect(text, payload.get("language", "zh"))
+        if crisis:
+            return self._emergency(payload, crisis)
         if payload.get("language", "zh") != "zh":
             return self._handle_language(payload, text, pending, resolution)
         bare = re.sub(r"^請", "", text)
@@ -591,10 +640,12 @@ class Workflow:
             return self.reply(payload, "已取消，未執行任何操作。")
         if pending and resolution == pending["id"]:
             self._trace("pending")
+            if pending.get("page") and (text in PREV_PAGE_WORDS or (
+                    len(text) <= 4 and sounds_like(text, PREV_PAGE_WORDS, COMMAND_SOUND))):
+                return self._turn_page(payload, pending, -1)
             if pending.get("page") and (text in NEXT_PAGE_WORDS or (
                     len(text) <= 4 and sounds_like(text, NEXT_PAGE_WORDS, COMMAND_SOUND))):
-                state = pending["page"]
-                return self._list(payload, state["all_entries"], state["root"], (state["offset"] + 8) % max(1, state["total"]))
+                return self._turn_page(payload, pending, 1)
             match = re.fullmatch(r"第?([一二三四五六七八1-8])(?:個|本|筆|項)?", text)
             index = (str("一二三四五六七八".find(match[1]) + 1) if not match[1].isdigit() else match[1]) if match else None
             if index is None and len(text) <= 3:

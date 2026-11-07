@@ -135,6 +135,8 @@ OTHER_SERVICES = {
     "report": ("陳情", "報案", "災情", "路燈"),
     "other": ("親子館", "投票", "動物園", "借錢", "借款", "貸款"),
 }
+MONEY_WORDS = ("借錢", "借款", "貸款")
+BOOK_OVER_OTHER = 0.7  # = workflow.SOUND_CONFIRM: a sound-alike book worth offering
 LIBRARY_WORDS = ("借書", "借閱", "圖書", "館藏", "找書", "書名", "作者", "isbn", "的書", "這本書", "library", "搜尋書籍")
 
 
@@ -193,7 +195,8 @@ def retrieve(text, books, previous=()):
     # It is only evidence: an unknown object is not automatically a book.
     action_object = ""
     if not query:
-        title_match = re.search(r"(?:借|找|搜尋|看)(?:一下|一本|一部|這本)?\s*(.+)", clean)
+        # The object ends at the clause: "借原親子館，你能幫我借到嗎" -> "原親子館".
+        title_match = re.search(r"(?:借|找|搜尋|看)(?:一下|一本|一部|這本)?\s*([^，,。！？!?；;]+)", clean)
         if title_match:
             value = re.sub(r"(?:這本書|的書|這本|好嗎|謝謝|就好)[。！？!？?]*$", "", title_match[1]).strip()
             if value and value not in ("書", "書籍", "圖書", "閱"):
@@ -213,6 +216,14 @@ def retrieve(text, books, previous=()):
                 best = piece
         if best:
             query, library = best, True
+    if other and action_object and "借" in clean and not any(w in clean for w in MONEY_WORDS):
+        # A borrowed object that sounds like a catalogue book outweighs a service
+        # word inside it: "借原親子館" was 借原子習慣 misheard (owner, 2026-11-08).
+        # The book is still only offered for confirmation.
+        from phonetic import rank_books
+        ranked = rank_books(action_object, books)
+        if ranked and ranked[0][0] >= BOOK_OVER_OTHER:
+            other = []
     library_candidate = library or bool(action_object and not other)
     candidates = []
     exact = []
@@ -369,6 +380,8 @@ class Assistant:
         faq_text = payload.get("faq_text")
         if not isinstance(faq_text, str) or not faq_text.strip() or len(faq_text) > 500:
             faq_text = None
+        if payload.get("page_step") is not None and payload["page_step"] not in (1, -1):
+            raise AssistantError("換頁欄位不正確。")
         payload = {**payload, "session_id": session, "text": text, "page_context": context, "language": language,
                    "faq_text": faq_text}
         started = time.monotonic()
@@ -585,7 +598,7 @@ def make_handler(assistant, token=""):
                 payload = json.loads(self.rfile.read(length))
                 if not isinstance(payload, dict) or set(payload) - {"text", "session_id", "request_id", "resolution_id",
                                                                     "choice_id", "context", "language",
-                                                                    "faq_text"}:
+                                                                    "faq_text", "page_step"}:
                     raise AssistantError("請求欄位不正確。")
                 response = assistant.turn(payload)
                 self.reply(200, response)
