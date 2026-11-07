@@ -156,6 +156,10 @@ enum HomeAsk { idle, listening, tooShort, working, notice, asked }
 class GuidedAssistantController extends GetxController {
   final MockAssistantEngine engine;
   final Duration thinkDelay;
+
+  /// Shows the first-run hint by itself on the first launches. Off: the
+  /// hint and tutorial are in Chinese only, so the user opens the tutorial
+  /// from 重看新手提示 in the assistant or from the settings instead.
   final bool runOnboarding;
   final AssistantSpeaker speaker;
 
@@ -169,7 +173,7 @@ class GuidedAssistantController extends GetxController {
   GuidedAssistantController({
     this.engine = const MockAssistantEngine(),
     this.thinkDelay = const Duration(milliseconds: 1200),
-    this.runOnboarding = true,
+    this.runOnboarding = false,
     this.service,
     this.recorder,
     AssistantActionExecutor? executor,
@@ -671,9 +675,7 @@ class GuidedAssistantController extends GetxController {
       case MockReplyKind.stepHelp:
         _say(_bot(stepDetail ?? Replies.noTask));
       case MockReplyKind.onboarding:
-        _say(_bot(Replies.onboardingAgain));
-        closeSheet();
-        startOnboarding();
+        startTutorial();
       case MockReplyKind.greet:
         _say(_bot(Replies.hello));
       case MockReplyKind.unknownTerm:
@@ -1605,12 +1607,12 @@ class GuidedAssistantController extends GetxController {
     }
   }
 
-  /// 重看助理新手教學 in the settings: back to the App's first page, then
-  /// the first-run hint and the tutorial again. Settings and chat stay.
+  /// 重看助理新手教學 in the settings: back to the App's first page and the
+  /// tutorial in the assistant. Settings and chat stay.
   void replayTutorial() {
-    closeSheet();
     Get.until((route) => route.isFirst);
-    startOnboarding();
+    openSheet();
+    startTutorial();
   }
 
   // ---------------------------------------------------------------- tutorial
@@ -1776,12 +1778,8 @@ class GuidedAssistantController extends GetxController {
     finishOnboarding();
   }
 
-  /// 重看新手提示 from the assistant.
-  void replayOnboarding() {
-    if (inTutorial) onboarding.value = OnboardingStage.hidden;
-    closeSheet();
-    startOnboarding();
-  }
+  /// 重看新手提示 from the assistant: the tutorial right in the panel.
+  void replayOnboarding() => startTutorial();
 
   void onboardingLater() {
     if (!_hinting) return;

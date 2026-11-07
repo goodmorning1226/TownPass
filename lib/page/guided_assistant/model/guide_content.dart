@@ -381,7 +381,6 @@ abstract class Replies {
   static const goAlone = '好，你可以自己操作。需要我帶你做的時候，點「助理」再按「繼續引導」就可以。';
   static const ended = '好的，引導先結束了，接下來你可以自己操作。想再請我帶你做，跟我說一聲就好。';
   static const commitLater = '好，想預約的時候再叫我。';
-  static const onboardingAgain = '好，我再帶你看一次怎麼用。';
 
   static const offline = '（目前連不到助理的模型，先用示範內容回答。）';
   static const listeningFailed = '語音辨識沒有成功，請再說一次，或按右邊的鍵盤打字。';
