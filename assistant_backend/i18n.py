@@ -262,6 +262,54 @@ def positive_text(text, language):
     return " ".join(kept).strip()
 
 
+# --- Polite and filler wrappers (docs/AI_COLLOQUIAL_MATCHING_EXPERIMENT.md) ---
+# "我想要…一下可以嗎", "could you please…", "…ください": words around a request
+# that carry no service meaning. Used only to measure how much a sentence says
+# besides a common word (workflow._generic_unavailable); matching always sees
+# the whole sentence.
+_FILLER_EDGES = {
+    "zh": (r"^(?:請問一下|請問|請|麻煩(?:你|您)?|拜託|不好意思|欸|嗯|喂|那個|這個|就是|你好|您好|哈囉|"
+           r"我想要|我想|我要|想要|我需要|需要|幫我|幫忙|替我|可以|能不能|能否|可不可以|是不是|我可以|"
+           r"你可以|你能|我們|我)+",
+           r"(?:一下|一點|嗎|呢|啊|阿|啦|喔|哦|耶|吧|呀|囉|好嗎|好不好|可以嗎|可不可以|行嗎|謝謝(?:你|您)?|"
+           r"謝啦|感謝|麻煩了|拜託)+$"),
+    "en": (r"^(?:(?:hi|hello|hey|um+|uh+|excuse me|sorry(?: to bother you)?|please|kindly|"
+           r"(?:can|could|would|will) you(?: please)?|(?:can|could|may) i|i(?:'d| would) like to|"
+           r"i want(?: to)?|i need(?: to)?|i was wondering if(?: you could)?|is it possible to|"
+           r"help me(?: to)?|let me|just|so)\b[\s,]*)+",
+           r"(?:[\s,]*\b(?:please|thanks|thank you|for me|a bit|right now|now|ok|okay)\b)+$"),
+    "ja": (r"^(?:すみません|すいません|あの|あのう|えっと|ちょっと|お忙しいところ恐縮ですが|恐れ入りますが|[、。\s])+",
+           r"(?:ください|下さい|お願いします|お願い|したいです|したいんですが|たいんですが|たいです|"
+           r"ですか|ますか|でしょうか|か|ね|よ|[、。？?！!\s])+$"),
+    "vi": (r"^(?:(?:xin chào|chào bạn|làm ơn|vui lòng|xin|cho tôi|giúp tôi|tôi muốn|tôi cần|mình muốn|"
+           r"bạn ơi|dạ)\b[\s,]*)+",
+           r"(?:[\s,]*\b(?:ạ|nhé|nha|với|giùm|giúp|được không|cảm ơn)\b)+$"),
+    "id": (r"^(?:(?:halo|hai|permisi|maaf|tolong|mohon|saya mau|saya ingin|aku mau|minta|bisa|boleh)\b[\s,]*)+",
+           r"(?:[\s,]*\b(?:ya|dong|deh|sih|nih|terima kasih|makasih)\b)+$"),
+    "th": (r"^(?:ขอโทษ(?:ครับ|ค่ะ|นะคะ)?|รบกวน|ช่วย|อยากจะ|อยาก|ขอ|\s)+",
+           r"(?:ครับ|ค่ะ|คะ|นะ|หน่อย|ด้วย|จ้ะ|จ้า|ได้ไหม|ได้มั้ย|ไหม|มั้ย|\s)+$"),
+}
+_FILLER_INSIDE = {"zh": r"一下|那個|這個"}
+
+
+def strip_fillers(text, language="zh"):
+    """The request without polite or filler wrappers; the original text when
+    fewer than two word characters would be left."""
+    edges = _FILLER_EDGES.get(language)
+    if not edges:
+        return text
+    value = re.sub(r"[。！!？?…~～\s]+$", "", text.strip())
+    previous = None
+    while previous != value:
+        previous = value
+        value = re.sub(edges[0], "", value, flags=re.I).strip(" ,，、")
+        value = re.sub(edges[1], "", value, flags=re.I).strip(" ,，、。？?！!")
+    inside = _FILLER_INSIDE.get(language)
+    if inside:
+        value = re.sub(inside, "", value)
+    return value if len(re.findall(r"\w", value)) >= 2 else text
+
+
 # --- Reply texts (drafts) -------------------------------------------------------
 
 MESSAGES = {

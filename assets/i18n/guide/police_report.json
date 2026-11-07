@@ -612,6 +612,13 @@
    "id": "Status kasus ini sekarang “{status}”. ",
    "th": "คดีนี้ตอนนี้อยู่ในสถานะ “{status}” "
   },
+  "這筆案件的資料沒有載入。按左上角的「‹」回到報案紀錄，再點一次案件。": {
+   "en": "This case's details did not load. Tap “‹” at the top left to go back to your police reports, then tap the case again.",
+   "ja": "この案件のデータが読み込まれていません。左上の「‹」を押して通報記録に戻り、もう一度案件を押してください。",
+   "vi": "Dữ liệu của vụ việc này chưa được tải. Bấm “‹” ở góc trên bên trái để quay lại hồ sơ trình báo, rồi bấm lại vào vụ việc.",
+   "id": "Data kasus ini tidak termuat. Tekan “‹” di kiri atas untuk kembali ke riwayat laporan, lalu tekan kasusnya lagi.",
+   "th": "ข้อมูลของคดีนี้ไม่ได้โหลด กด “‹” ที่มุมซ้ายบนเพื่อกลับไปที่ประวัติการแจ้งความ แล้วกดคดีอีกครั้ง"
+  },
   "這裡目前沒有報案紀錄。": {
    "en": "There are no police reports here yet.",
    "ja": "ここにはまだ通報の記録がありません。",
@@ -695,13 +702,6 @@
    "vi": ": {what}",
    "id": ": {what}",
    "th": ": {what}"
-  },
-  "這筆案件的資料沒有載入。按左上角的「‹」回到報案紀錄，再點一次案件。": {
-   "en": "This case's details did not load. Tap “‹” at the top left to go back to your police reports, then tap the case again.",
-   "ja": "この案件のデータが読み込まれていません。左上の「‹」を押して通報記録に戻り、もう一度案件を押してください。",
-   "vi": "Dữ liệu của vụ việc này chưa được tải. Bấm “‹” ở góc trên bên trái để quay lại hồ sơ trình báo, rồi bấm lại vào vụ việc.",
-   "id": "Data kasus ini tidak termuat. Tekan “‹” di kiri atas untuk kembali ke riwayat laporan, lalu tekan kasusnya lagi.",
-   "th": "ข้อมูลของคดีนี้ไม่ได้โหลด กด “‹” ที่มุมซ้ายบนเพื่อกลับไปที่ประวัติการแจ้งความ แล้วกดคดีอีกครั้ง"
   }
  }
 }

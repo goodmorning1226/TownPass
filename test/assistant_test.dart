@@ -1130,6 +1130,98 @@ void main() {
     AssistantTexts.conversation.value = null;
   });
 
+  test(
+    '台語 is an explicit choice: kept, sent, and answered in Chinese',
+    () async {
+      // docs/AI_TAIWANESE_SPEECH_PLAN.md section 10.
+      expect(AssistantSpeechLanguage.systemDefault('nan'), 'auto');
+      expect(AssistantSpeechLanguage.of('nan').label, '台語（測試）');
+      expect(AssistantSpeechLanguage.textLanguage('nan'), 'zh');
+      expect(AssistantSpeechLanguage.textLanguage('en'), 'en');
+      SharedPreferences.setMockInitialValues({
+        'assistant_speech_language': 'en',
+      });
+      AssistantTexts.conversation.value = 'en';
+      addTearDown(() => AssistantTexts.conversation.value = null);
+      final service = QueueService(
+        [
+          const AssistantResult(sessionId: 's', message: '水費。'),
+          const AssistantResult(sessionId: 's', message: '水費。'),
+        ],
+        transcripts: [const AssistantTranscript('我要繳水費', language: 'zh')],
+      );
+      final controller = AssistantViewController(
+        service: service,
+        executor: RecordingExecutor(),
+        recorder: FakeRecorder(),
+      );
+      await Future<void>.delayed(Duration.zero);
+      controller.setSpeechLanguage('nan');
+      expect(AssistantTexts.conversation.value, 'zh'); // texts stay Chinese
+      expect(await AssistantSpeechLanguage.load(), 'nan'); // saved like others
+      expect(await controller.startListening(), isTrue);
+      await controller.stopListening();
+      expect(service.languages, ['nan']);
+      expect(service.turnLanguages, ['zh']); // the normal Chinese turn
+      // Heard as Chinese, but 台語 stays chosen for the next clip.
+      expect(controller.speechLanguage.value, 'nan');
+      expect(controller.messages.map((m) => m.text), ['我要繳水費', '水費。']);
+      expect(await controller.startListening(), isTrue);
+      await controller.stopListening();
+      expect(service.languages, ['nan', 'nan']);
+    },
+  );
+
+  test('Without the Taiwanese model the reason is shown first', () async {
+    SharedPreferences.setMockInitialValues({
+      'assistant_speech_language': 'nan',
+    });
+    const notice = '還沒有安裝台語語音模型，這次先用中文聽。';
+    final service = QueueService(
+      [const AssistantResult(sessionId: 's', message: '水費。')],
+      transcripts: [
+        const AssistantTranscript('我要繳水費', language: 'zh', notice: notice),
+      ],
+    );
+    final controller = AssistantViewController(
+      service: service,
+      executor: RecordingExecutor(),
+      recorder: FakeRecorder(),
+    );
+    await Future<void>.delayed(Duration.zero);
+    expect(await controller.startListening(), isTrue);
+    await controller.stopListening();
+    expect(controller.messages.map((m) => m.text), [notice, '我要繳水費', '水費。']);
+    expect(controller.speechLanguage.value, 'nan');
+  });
+
+  testWidgets('The speech menu offers 台語 in Chinese', (tester) async {
+    SharedPreferences.setMockInitialValues({'assistant_speech_language': 'zh'});
+    addTearDown(() => AssistantTexts.conversation.value = null);
+    final controller = AssistantViewController(
+      service: PendingService(),
+      executor: RecordingExecutor(),
+      recorder: FakeRecorder(),
+    )..expanded.value = true;
+    await tester.pumpWidget(
+      MaterialApp(
+        builder: (context, child) =>
+            AssistantHost(controller: controller, child: child!),
+        home: const Scaffold(),
+      ),
+    );
+    await tester.pump();
+    await tester.tap(find.byKey(const Key('assistant-speech-language')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('台語（測試）'));
+    await tester.pumpAndSettle();
+    expect(controller.speechLanguage.value, 'nan');
+    expect(find.text('台語'), findsOneWidget);
+    expect(find.text(AssistantTexts.text('holdToTalk', 'zh')), findsOneWidget);
+    expect(tester.takeException(), isNull);
+    controller.cancel();
+  });
+
   testWidgets('The panel follows the conversation language and fits', (
     tester,
   ) async {
@@ -2073,6 +2165,7 @@ void main() {
                   'confirm': true,
                   'options': ['我要繳水費', '我要繳學費'],
                   'corrected_from': '忽略：需確認時不套用',
+                  'speech_notice': '還沒有安裝台語語音模型，這次先用中文聽。',
                 },
         ),
       );
@@ -2090,6 +2183,7 @@ void main() {
       expect(heard.text, '我要繳水費');
       expect(heard.confirm, isTrue);
       expect(heard.options, ['我要繳水費', '我要繳學費']);
+      expect(heard.notice, '還沒有安裝台語語音模型，這次先用中文聽。');
       expect(
         heard.correctedFrom,
         isNull,

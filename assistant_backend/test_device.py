@@ -289,6 +289,7 @@ class MultilingualSpeechTests(unittest.TestCase):
                     self.end_headers()
                     self.wfile.write(data)
             return Handler
+        self.fake = fake
         zh, zh_url = serve(fake("zh"))
         multi, multi_url = serve(fake("multi"))
         for httpd in (zh, multi):
@@ -422,6 +423,21 @@ class MultilingualSpeechTests(unittest.TestCase):
         self.assertEqual(result["language_confidence"], 0.97)
         self.assertIn(field("no_language_probabilities", "false"), self.calls[0][1])
 
+    def test_spoken_language_is_not_translated_into_the_chosen_one(self):
+        # Chinese spoken with English chosen: forcing English made Whisper translate.
+        self.heard["multi"] = "chinese"
+        self.probabilities["multi"] = {"zh": 0.9, "en": 0.06}
+        result = self.recognizer.transcribe(loud_frames(), "en")
+        self.assertEqual((result["language"], result["text"]), ("zh", "我要借書"))
+        self.assertNotIn(field("language", "en"), b"".join(body for _, body in self.calls))
+        # Fairly sure (0.7) is followed too; only a weak or close call keeps English.
+        self.calls.clear()
+        self.probabilities["multi"] = {"zh": 0.7, "en": 0.1}
+        self.assertEqual(self.recognizer.transcribe(loud_frames(), "en")["language"], "zh")
+        self.calls.clear()
+        self.probabilities["multi"] = {"zh": 0.45, "en": 0.2}
+        self.assertEqual(self.recognizer.transcribe(loud_frames(), "en")["language"], "en")
+
     def test_clear_chinese_is_not_run_twice(self):
         self.texts["zh"] = "我要借這個月新到的書"  # longer than the short-text check
         self.recognizer.transcribe(loud_frames(), "zh")
@@ -445,6 +461,90 @@ class MultilingualSpeechTests(unittest.TestCase):
                          ["en", "ja", "en", "zh", "zh", "zh", "auto", "th"])
 
 
+class TaiwaneseSpeechTests(unittest.TestCase):
+    """台語 (docs/AI_TAIWANESE_SPEECH_PLAN.md section 10): an explicit choice, heard by
+    a Taiwanese model started on first use, without the vocabulary prompt; the
+    result is Chinese. Without the model the clip is heard as Chinese, with a notice."""
+
+    def setUp(self):
+        MultilingualSpeechTests.setUp(self)
+        self.heard["nan"], self.texts["nan"], self.logprob["nan"] = "chinese", "我要繳水費", -0.2
+        nan, self.nan_url = serve(self.fake("nan"))
+        self.addCleanup(nan.server_close)
+        self.addCleanup(nan.shutdown)
+        self.starts = []
+        self.state = "ready"
+
+        def starter():
+            self.starts.append(self.state)
+            return self.state
+        from device_main import taiwanese_provider
+        port = int(self.nan_url.rstrip("/").rsplit(":", 1)[1])
+        self.recognizer.taiwanese = taiwanese_provider(port, starter)
+
+    models = MultilingualSpeechTests.models
+
+    def test_taiwanese_uses_its_model_without_a_prompt_and_answers_in_chinese(self):
+        result = self.recognizer.transcribe(loud_frames(), "nan")
+        self.assertEqual((self.models(), result["language"], result["text"]), (["nan"], "zh", "我要繳水費"))
+        body = self.calls[0][1]
+        self.assertIn(field("prompt", "") + CRLF, body)  # no Chinese vocabulary prompt
+        self.assertNotIn(self.recognizer.prompt.encode(), body)
+        self.assertIn(field("language", "zh"), body)
+        self.assertEqual((result["requested_language"], result["speech_model"]), ("nan", "taiwanese"))
+        self.assertNotIn("notice", result)
+        self.assertIsNone(result["language_confidence"])
+
+    def test_missing_model_falls_back_to_chinese_with_a_notice(self):
+        for state in ("missing", "memory", "failed"):
+            self.calls.clear()
+            self.state = state
+            result = self.recognizer.transcribe(loud_frames(), "nan")
+            self.assertEqual((self.models(), result["language"], result["notice"]), (["zh"], "zh", state))
+            self.assertIn(field("prompt", self.recognizer.prompt), self.calls[0][1])  # the normal Chinese request
+            self.assertNotIn("speech_model", result)
+
+    def test_unknown_states_and_errors_are_failures(self):
+        self.state = "weird"
+        self.assertEqual(self.recognizer.transcribe(loud_frames(), "nan")["notice"], "failed")
+
+        def broken():
+            raise RuntimeError("no java")
+        self.recognizer.taiwanese = broken
+        self.assertEqual(self.recognizer.transcribe(loud_frames(), "nan")["notice"], "failed")
+        self.recognizer.taiwanese = None  # e.g. phone recogniser builds: no Taiwanese hook
+        self.assertEqual(self.recognizer.transcribe(loud_frames(), "nan")["notice"], "missing")
+
+    def test_model_is_started_only_for_taiwanese_clips(self):
+        self.texts["zh"] = "我要借這個月新到的書"  # longer than the short-text language check
+        self.recognizer.transcribe(loud_frames(), "zh")
+        self.assertEqual(self.models(), ["zh"])
+        self.assertIn(field("prompt", self.recognizer.prompt), self.calls[0][1])
+        for language in ("en", "auto", "ja"):
+            self.recognizer.transcribe(loud_frames(), language)
+        self.heard["multi"] = "chinese"  # detection never picks Taiwanese
+        result = self.recognizer.transcribe(loud_frames(), "auto")
+        self.assertEqual((result["language"], self.starts), ("zh", []))
+        self.assertNotIn("nan", self.models())
+        self.recognizer.transcribe(loud_frames(), "nan")
+        self.assertEqual(self.starts, ["ready"])
+
+    def test_silence_does_not_load_the_model(self):
+        result = self.recognizer.transcribe(bytes(32000), "nan")
+        self.assertEqual((result["status"], self.starts, self.calls), ("unclear", [], []))
+
+    def test_language_codes(self):
+        from asr_server import SPEECH_LANGUAGES, language_code
+        self.assertEqual([language_code(v) for v in ("nan", "nan-TW", "Taiwanese", "hokkien", "zh-TW")],
+                         ["nan", "nan", "nan", "nan", "zh"])
+        self.assertIn("nan", SPEECH_LANGUAGES)
+
+    def test_provider_reports_the_app_state(self):
+        from device_main import taiwanese_provider
+        self.assertEqual(taiwanese_provider(8776, lambda: "ready")(), ("http://127.0.0.1:8776", None))
+        self.assertEqual(taiwanese_provider(8776, lambda: "missing")(), (None, "missing"))
+
+
 class OutputConstraintTests(unittest.TestCase):
     def test_lettered_choice_gets_an_exact_grammar_other_schemas_keep_response_format(self):
         from server import output_constraint
@@ -453,3 +553,40 @@ class OutputConstraintTests(unittest.TestCase):
         self.assertEqual(grammar, 'root ::= "{\\"choice\\":" ("\\"A\\"" | "\\"B\\"") "}"')
         other = output_constraint({"type": "object", "properties": {"capability_id": {"enum": ["x"]}}})
         self.assertIn("response_format", other)
+
+
+class DecisionModelTests(unittest.TestCase):
+    """TOWNPASS_DECISION_MODEL (docs/AI_DECISION_MODEL_ABLATION_PLAN.md section 8):
+    Ministral stays the default; "gemma" only changes the reported model."""
+
+    @staticmethod
+    def probe(value):
+        import os
+        import subprocess
+        import sys
+        env = {k: v for k, v in os.environ.items() if k != "TOWNPASS_DECISION_MODEL"}
+        if value is not None:
+            env["TOWNPASS_DECISION_MODEL"] = value
+        code = ("import json, decision, server; print(json.dumps([decision.DECISION_MODEL, server.MODEL, "
+                "decision.system_prompt('capability'), decision.system_prompt('library')]))")
+        out = subprocess.run([sys.executable, "-X", "utf8", "-c", code], env=env, capture_output=True, text=True,
+                             encoding="utf-8", cwd=os.path.dirname(os.path.abspath(__file__)), check=True).stdout
+        return json.loads(out)
+
+    def test_default_is_ministral(self):
+        self.assertEqual(self.probe(None)[:2], ["ministral", "ministral-3:3b"])
+        self.assertEqual(self.probe("unknown")[1], "ministral-3:3b")
+
+    def test_gemma_reports_its_model_with_the_same_prompts(self):
+        gemma, ministral = self.probe("gemma"), self.probe(None)
+        self.assertEqual(gemma[:2], ["gemma", "gemma4:e2b"])
+        self.assertEqual(gemma[2:], ministral[2:])
+
+    def test_device_configure_sets_the_decision_model(self):
+        import os
+        import device_main
+        with patch.dict(os.environ, {}, clear=False):
+            device_main.configure(8771, 8772, decision_model="gemma")
+            self.assertEqual(os.environ["TOWNPASS_DECISION_MODEL"], "gemma")
+            device_main.configure(8771, 8772)
+            self.assertEqual(os.environ["TOWNPASS_DECISION_MODEL"], "ministral")

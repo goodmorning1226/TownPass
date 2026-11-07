@@ -1,5 +1,7 @@
 """Version C: semantic retrieval over the catalogue (semantic.py), with a fake
-embedding function instead of the e5 server."""
+embedding function instead of the e5 server. These tests cover the catalogue
+texts and the model-decided layer, so the index is built without the page
+examples and direct listing is off; test_colloquial.py covers both."""
 import json
 import math
 import tempfile
@@ -14,7 +16,7 @@ from test_server import FakeCatalog, first, response
 
 REGISTRY = Registry()
 IDS = [entry["id"] for entry in REGISTRY.entries]
-PASSAGE_OWNER = {text: entry_id for entry_id, text in semantic.passages(REGISTRY)}
+PASSAGE_OWNER = {text: entry_id for entry_id, text in semantic.passages(REGISTRY, False)}
 
 # Requests no keyword, sound or listing rule matches, and the entry each "means".
 MEANING = {"家門口那盞燈晚上都暗暗的": "disasterReport.form.D-1-3",
@@ -52,10 +54,10 @@ class CatalogIndexTests(unittest.TestCase):
         self.addCleanup(self.cache.cleanup)
 
     def index(self, embed=fake_embed):
-        return semantic.CatalogIndex(REGISTRY, embed_many=embed, cache_dir=self.cache.name)
+        return semantic.CatalogIndex(REGISTRY, embed_many=embed, cache_dir=self.cache.name, with_examples=False)
 
     def test_passages_cover_titles_keywords_features_and_translations(self):
-        texts = [text for entry_id, text in semantic.passages(REGISTRY) if entry_id == "fees.water"]
+        texts = [text for entry_id, text in semantic.passages(REGISTRY, False) if entry_id == "fees.water"]
         self.assertTrue(all(text.startswith("passage: ") for text in texts))
         self.assertIn("passage: 水費", texts)
         self.assertTrue(any("水錢" in text for text in texts))
@@ -103,7 +105,8 @@ class SemanticLayerTests(unittest.TestCase):
     def setUp(self):
         self.cache = tempfile.TemporaryDirectory()
         self.addCleanup(self.cache.cleanup)
-        self.index = semantic.CatalogIndex(REGISTRY, embed_many=fake_embed, cache_dir=self.cache.name)
+        self.index = semantic.CatalogIndex(REGISTRY, embed_many=fake_embed, cache_dir=self.cache.name,
+                                           with_examples=False)
         self.index.build()
 
     def turn(self, text, choose, index="built", language=None, intent=True):
@@ -116,7 +119,7 @@ class SemanticLayerTests(unittest.TestCase):
             return response("choose", {"choice": option["choice"]}) if option else first(tools)
         app = Assistant(FakeCatalog(), model, semantic=self.index if index == "built" else index)
         payload = {"text": text, "request_id": "r", "session_id": "s", **({"language": language} if language else {})}
-        with mock.patch.object(workflow, "INTENT_FALLBACK", intent):
+        with mock.patch.object(workflow, "INTENT_FALLBACK", intent), mock.patch.object(workflow, "SEMANTIC_DIRECT", 0):
             return app, app.turn(payload), offered
 
     def test_offers_the_candidates_and_opens_only_after_the_choice(self):

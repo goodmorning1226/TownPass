@@ -42,7 +42,19 @@ HYPOTHESES = 5
 # Speech languages (docs/AI_MULTILINGUAL_PLAN.md): code -> whisper.cpp's full name.
 LANGUAGES = {"zh": "chinese", "en": "english", "ja": "japanese", "vi": "vietnamese",
              "id": "indonesian", "th": "thai"}
-SPEECH_LANGUAGES = ("auto", *LANGUAGES)
+# Taiwanese (Hokkien, docs/AI_TAIWANESE_SPEECH_PLAN.md section 10): only when chosen.
+# Whisper has no Taiwanese tag, so detection never returns it; a Taiwanese model
+# (Breeze-ASR-26) writes Mandarin characters, and the turn then is Chinese.
+TAIWANESE = "nan"
+TAIWANESE_NAMES = ("nan", "taiwanese", "hokkien", "taigi")
+SPEECH_LANGUAGES = ("auto", *LANGUAGES, TAIWANESE)
+# Why Taiwanese was not used (reply field "notice"); the clip was heard as Chinese.
+TAIWANESE_UNAVAILABLE = ("missing", "memory", "failed")
+# Encoder frames at least for the Taiwanese model (10 s). With the usual 256 (5 s)
+# Breeze-ASR-26 repeated short clips ("大西洋 大西洋 大西洋…"), whisper.cpp then
+# retried warmer and wrote noise for up to 2 minutes; 500 stopped it on the same
+# clips (docs/AI_TAIWANESE_SPEECH_PLAN.md section 10).
+TAIWANESE_MIN_AUDIO_CTX = 500
 
 
 # Sentences in each language's own script (see WhisperCppRecognizer._fields).
@@ -52,9 +64,14 @@ SCRIPT_PROMPTS = {"ja": "こんにちは。台北市のサービスについて�
 SCRIPTS = {"ja": re.compile(r"[぀-ヿ一-鿿]"), "th": re.compile(r"[฀-๿]")}
 
 
-# Keep the chosen language unless detection is clearly sure of another one.
-CLEAR_DETECTION = 0.8
-CHOSEN_LANGUAGE_MIN = 0.05
+# Decoding in a language the speaker did not use makes Whisper translate (owner,
+# 2026-11-08: "不要再幫我亂翻成另外的語言"). So the chosen language is forced only
+# when detection is weak (below FOLLOW_DETECTION) or the chosen language is itself
+# a close second (at least CHOSEN_LANGUAGE_MIN). It used to be forced below 0.8 or
+# from 5 %, which turned Chinese spoken with English chosen into English.
+CLEAR_DETECTION = 0.8   # the App moves the speech-language menu from here
+FOLLOW_DETECTION = 0.5
+CHOSEN_LANGUAGE_MIN = 0.3
 # Chinese chosen, another language detected: switch only when detection is at least
 # this sure (or the Chinese pass already wrote Latin letters).
 UNSURE_SWITCH = 0.5
@@ -77,14 +94,14 @@ def detection_confidence(reply, code):
 
 def prefers_chosen(reply, chosen):
     """True when the chosen language should win over the detected one: detection
-    is below CLEAR_DETECTION, or the chosen language still has a real chance."""
+    is below FOLLOW_DETECTION, or the chosen language is a close second."""
     probabilities = reply.get("language_probabilities") if isinstance(reply, dict) else None
     if not isinstance(probabilities, dict) or not probabilities:
         return False  # nothing to judge by: keep the detection (earlier behaviour)
     top = max((float(v) for v in probabilities.values() if isinstance(v, (int, float))), default=0.0)
     chosen_probability = probabilities.get(chosen)
     chosen_probability = float(chosen_probability) if isinstance(chosen_probability, (int, float)) else 0.0
-    return top < CLEAR_DETECTION or chosen_probability >= CHOSEN_LANGUAGE_MIN
+    return top < FOLLOW_DETECTION or chosen_probability >= CHOSEN_LANGUAGE_MIN
 
 
 def language_code(value, default="zh"):
@@ -93,6 +110,8 @@ def language_code(value, default="zh"):
     if value in ("auto", ""):
         return "auto" if value else default
     value = value.split("-")[0].split("_")[0]
+    if value in TAIWANESE_NAMES:
+        return TAIWANESE
     if value in LANGUAGES:
         return value
     return next((code for code, name in LANGUAGES.items() if name == value), default)
@@ -261,7 +280,7 @@ class Recognizer:
         best_logprob = logprobs[0] if logprobs else -9.0
         status = judge(top, best_logprob, result.no_speech_prob)
         return {"text": top, "alternatives": texts[1:], "alternative_logprobs": logprobs[1:], "status": status,
-                "language": "zh",
+                "language": "zh", **({"notice": "missing"} if language == TAIWANESE else {}),
                 "avg_logprob": best_logprob, "no_speech_prob": round(result.no_speech_prob, 3)}
 
 
@@ -278,30 +297,53 @@ class WhisperCppRecognizer:
     detected as Chinese is then transcribed by the Chinese model, unless both
     are the same model, e.g. Whisper small for everything). Chinese results are
     read as Traditional (script.traditional).
+
+    Taiwanese ("nan"): taiwanese, when given, is called on each Taiwanese clip
+    and returns (url, None) for a whisper-server with a Taiwanese model (started
+    on first use by the caller), or (None, reason) with a TAIWANESE_UNAVAILABLE
+    reason. That model is asked for Chinese without the vocabulary prompt (it
+    slowed Breeze-ASR-26 by 1.4-2.5 s a clip and silenced a small Taiwanese
+    model, section 9). Without it the clip is heard as Chinese and the reply
+    carries "notice". Either way the result language is "zh": the turn is Chinese.
     """
 
-    def __init__(self, url, timeout=60, multi_url=None):
+    def __init__(self, url, timeout=60, multi_url=None, taiwanese=None):
         self.url = url.rstrip("/")
         self.multi_url = multi_url.rstrip("/") if multi_url else None
+        self.taiwanese = taiwanese
         self.timeout = timeout
         self.prompt = vocabulary_prompt()  # conservative estimate: no tokenizer here
         self.prompt_tokens = None
         self.lock = threading.Lock()
 
+    def taiwanese_url(self):
+        """(url, None) for the Taiwanese whisper-server, or (None, reason)."""
+        if not callable(self.taiwanese):
+            return None, "missing"
+        try:
+            url, reason = self.taiwanese()
+        except Exception:
+            return None, "failed"
+        if url:
+            return url.rstrip("/"), None
+        return None, reason if reason in TAIWANESE_UNAVAILABLE else "failed"
+
     @staticmethod
-    def audio_context(seconds):
+    def audio_context(seconds, minimum=256):
         """Encoder frames for a clip: Whisper always encodes a 30 s window (1500
         frames, 50 per second); encoding only the clip plus a 2 s margin is several
         times faster on a phone CPU for short hold-to-talk requests."""
-        return min(1500, max(256, int((seconds + 2) * 50)))
+        return min(1500, max(minimum, int((seconds + 2) * 50)))
 
-    def _fields(self, seconds=30, language="zh"):
+    def _fields(self, seconds=30, language="zh", prompt=True, minimum_ctx=256):
         # The catalogue vocabulary prompt is Chinese: only for Chinese decoding.
         # Japanese and Thai get a sentence in their own script, so Whisper writes
         # kana/kanji or Thai instead of romanising ("nani ka dekiru"). "auto"
         # never gets a prompt: it would bias the language detection.
+        # prompt=False: no prompt at all (the Taiwanese model).
+        text = (self.prompt if language == "zh" else SCRIPT_PROMPTS.get(language, "")) if prompt else ""
         return {"response_format": "verbose_json", "language": language,
-                "prompt": self.prompt if language == "zh" else SCRIPT_PROMPTS.get(language, ""),
+                "prompt": text,
                 # temperature_inc > 0 keeps whisper.cpp's fallback: a decode stuck in a
                 # repetition loop (high entropy / low log-prob) is retried warmer.
                 # 0.4 allows two retries (0.4, 0.8); 0.2 allowed five, and an unknown
@@ -311,7 +353,7 @@ class WhisperCppRecognizer:
                 # chosen language when detection is unsure, see transcribe()).
                 "no_language_probabilities": "false" if language == "auto" else "true",
                 "suppress_nst": "true",
-                "audio_ctx": str(self.audio_context(seconds))}
+                "audio_ctx": str(self.audio_context(seconds, minimum_ctx))}
 
     @staticmethod
     def multipart(fields, wav):
@@ -335,10 +377,10 @@ class WhisperCppRecognizer:
         no_speech = max((s.get("no_speech_prob", 0.0) for s in segments), default=1.0)
         return text, round(logprob, 3), round(no_speech, 3)
 
-    def _infer(self, url, wav, seconds, language, detect_only=False):
+    def _infer(self, url, wav, seconds, language, prompt=True, detect_only=False, minimum_ctx=256):
         import urllib.request
         self.passes = getattr(self, "passes", 0) + 1  # decodes for this clip (timing log)
-        fields = self._fields(seconds, language)
+        fields = self._fields(seconds, language, prompt, minimum_ctx)
         if detect_only:
             fields["detect_language"] = "true"  # whisper-server: language only, no text
         body, content_type = self.multipart(fields, wav)
@@ -352,6 +394,7 @@ class WhisperCppRecognizer:
             return {"text": "", "alternatives": [], "status": "unclear", "reason": "silence"}
         language = language_code(language)
         confidence = None
+        notice = None
         self.passes = 0
         requested = language
         buffer = io.BytesIO()
@@ -360,7 +403,16 @@ class WhisperCppRecognizer:
             audio.writeframes(frames)
         wav, seconds = buffer.getvalue(), len(frames) / 2 / SAMPLE_RATE
         with self.lock:
-            if language == "zh" or not self.multi_url:
+            taiwanese = None
+            if language == TAIWANESE:
+                taiwanese, notice = self.taiwanese_url()
+                language = "zh"  # without the Taiwanese model: the Chinese path below
+            if taiwanese:
+                # Chinese characters from Taiwanese speech, no prompt, no language
+                # detection: Taiwanese is an explicit choice, never a detection.
+                reply, used = self._infer(taiwanese, wav, seconds, "zh", prompt=False,
+                                          minimum_ctx=TAIWANESE_MIN_AUDIO_CTX), "zh"
+            elif language == "zh" or not self.multi_url:
                 # Without a multilingual model the Chinese model does everything.
                 used = "zh" if language == "auto" else language
                 reply = self._infer(self.url, wav, seconds, used)
@@ -385,7 +437,9 @@ class WhisperCppRecognizer:
                         import i18n
                         used = i18n.detect_text_language(heard)
                         used = used if used in LANGUAGES else "en"
-                elif used == "zh" and self.multi_url and heard and len(re.sub(r"[\W_]", "", heard)) <= SHORT_TEXT:
+                elif (used == "zh" and self.multi_url and heard and requested != TAIWANESE
+                        and len(re.sub(r"[\W_]", "", heard)) <= SHORT_TEXT):
+                    # Not for 台語 without its model: Taiwanese is never a detection.
                     probe = self._infer(self.multi_url, wav, seconds, "auto", detect_only=True)
                     detected = language_code(probe.get("language"), default=None)
                     sure = detection_confidence(probe, detected)
@@ -421,7 +475,9 @@ class WhisperCppRecognizer:
         return {"text": text, "alternatives": [], "alternative_logprobs": [], "language": used,
                 "status": judge(text, logprob, no_speech, used), "avg_logprob": logprob,
                 "no_speech_prob": no_speech, "passes": self.passes, "requested_language": requested,
-                "language_confidence": confidence}
+                "language_confidence": confidence,
+                **({"speech_model": "taiwanese"} if taiwanese else {}),
+                **({"notice": notice} if notice else {})}
 
 
 def make_handler(recognizer, model_name):

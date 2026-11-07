@@ -18,9 +18,15 @@ class AssistantSpeechLanguage {
   const AssistantSpeechLanguage(this.code, this.label, this.short);
 
   static const auto = AssistantSpeechLanguage('auto', '自動偵測', '自動');
+
+  /// Taiwanese (Hokkien), docs/AI_TAIWANESE_SPEECH_PLAN.md section 10: heard by
+  /// a Taiwanese model that writes Chinese, so the conversation is Chinese.
+  /// Only an explicit choice: detection never picks it.
+  static const taiwanese = AssistantSpeechLanguage('nan', '台語（測試）', '台語');
   static const all = [
     auto,
     AssistantSpeechLanguage('zh', '中文（台灣）', '中文'),
+    taiwanese,
     AssistantSpeechLanguage('en', 'English', 'EN'),
     AssistantSpeechLanguage('ja', '日本語', '日本語'),
     AssistantSpeechLanguage('vi', 'Tiếng Việt', 'VI'),
@@ -41,13 +47,29 @@ class AssistantSpeechLanguage {
   static const _key = 'assistant_speech_language';
 
   /// The phone's own language when it is one we offer ('zh-Hant-TW' -> 'zh',
-  /// 'en-US' -> 'en'); other system languages detect ('auto').
+  /// 'en-US' -> 'en'); other system languages detect ('auto'). Taiwanese is
+  /// never a default, only a choice.
   static String systemDefault([String? languageCode]) {
     final code =
         (languageCode ?? PlatformDispatcher.instance.locale.languageCode)
             .toLowerCase();
-    return all.any((l) => l.code == code && l.code != 'auto') ? code : 'auto';
+    return all.any(
+          (l) => l.code == code && l.code != 'auto' && l.code != taiwanese.code,
+        )
+        ? code
+        : 'auto';
   }
+
+  /// The language the assistant's texts and the pages use for a speech
+  /// choice: Taiwanese is answered in Chinese; others are their own.
+  static String textLanguage(String code) =>
+      code == taiwanese.code ? 'zh' : code;
+
+  /// Whether a turn heard in [heard] keeps the speech choice [chosen]:
+  /// Taiwanese speech comes back as Chinese and must not switch the menu to
+  /// 中文.
+  static bool keeps(String chosen, String heard) =>
+      chosen == heard || (chosen == taiwanese.code && heard == 'zh');
 
   /// The user's own choice, kept across launches; without one, the phone's
   /// language ([systemDefault]).

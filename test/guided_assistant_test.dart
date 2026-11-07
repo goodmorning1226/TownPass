@@ -257,6 +257,52 @@ void main() {
     });
   });
 
+  group('台語 speech', () {
+    tearDown(() {
+      PageTranslation.instance.reset();
+      AssistantTexts.conversation.value = null;
+      Get.reset();
+    });
+
+    test('台語 is sent for listening; the guide stays Chinese', () async {
+      SharedPreferences.setMockInitialValues({
+        'assistant_speech_language': 'nan',
+      });
+      const notice = '還沒有安裝台語語音模型，這次先用中文聽。';
+      final service = SpeechService(
+        heard: const AssistantTranscript(
+          '我要借書',
+          language: 'zh',
+          notice: notice,
+        ),
+      );
+      final web = Get.put<WebPageState>(WebPageState());
+      final c = Get.put(
+        GuidedAssistantController(
+          thinkDelay: Duration.zero,
+          runOnboarding: false,
+          speaker: SilentSpeaker(),
+          service: service,
+          recorder: LoudRecorder(),
+          executor: FakeExecutor(),
+          probeOverride: FakeProbe(web),
+        ),
+      );
+      await Future<void>.delayed(Duration.zero);
+      expect(c.speechLanguage.value, 'nan');
+      c.setSpeechLanguage('en');
+      c.setSpeechLanguage('nan');
+      expect(AssistantTexts.conversation.value, 'zh');
+      await c.micDown();
+      await c.micUp();
+      await Future<void>.delayed(Duration.zero);
+      expect(service.transcribeLanguages, ['nan']);
+      expect(service.turnLanguages, ['zh']);
+      expect(c.speechLanguage.value, 'nan', reason: 'still chosen');
+      expect(c.messages.any((m) => m.text == notice), isTrue);
+    });
+  });
+
   group('teaching components', () {
     test('prerequisites are added in page order', () {
       expect(planLibrary(['reserve']), [
@@ -1156,6 +1202,13 @@ void main() {
       await tester.pump();
       expect(c.speechLanguage.value, 'en');
       expect(AssistantTexts.conversation.value, 'en');
+      await tester.pump(const Duration(seconds: 4));
+      // 台語 (test): listened to in Taiwanese, texts in Chinese.
+      await tester.tap(find.byKey(const Key('assistant-language-nan')));
+      await tester.pump();
+      expect(c.speechLanguage.value, 'nan');
+      expect(AssistantTexts.conversation.value, 'zh');
+      expect(find.text('台語（測試）'), findsWidgets);
       await tester.pump(const Duration(seconds: 4));
     });
 

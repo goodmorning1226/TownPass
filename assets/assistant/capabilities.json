@@ -1425,12 +1425,9 @@
       "mode": "demo",
       "navigation": {
         "type": "web",
-        "path": "/citizen-report/search",
-        "parents": [
-          "/citizen-report/"
-        ],
-        "query": {},
-        "in_page": true
+        "path": "/citizen-report/",
+        "parents": [],
+        "query": {}
       }
     },
     {
@@ -2165,7 +2162,8 @@
         ],
         "query": {
           "subId": "c-1-1"
-        }
+        },
+        "in_page": true
       }
     },
     {
@@ -2192,7 +2190,8 @@
         ],
         "query": {
           "subId": "c-1-2"
-        }
+        },
+        "in_page": true
       }
     },
     {
@@ -2220,7 +2219,8 @@
         ],
         "query": {
           "subId": "c-2-1"
-        }
+        },
+        "in_page": true
       }
     },
     {
@@ -2248,7 +2248,8 @@
         ],
         "query": {
           "subId": "c-2-2"
-        }
+        },
+        "in_page": true
       }
     },
     {
@@ -2275,7 +2276,8 @@
         ],
         "query": {
           "subId": "c-3-1"
-        }
+        },
+        "in_page": true
       }
     },
     {
@@ -2302,7 +2304,8 @@
         ],
         "query": {
           "subId": "c-3-2"
-        }
+        },
+        "in_page": true
       }
     },
     {
@@ -2330,7 +2333,8 @@
         ],
         "query": {
           "subId": "c-4-1"
-        }
+        },
+        "in_page": true
       }
     },
     {
@@ -2358,7 +2362,8 @@
         ],
         "query": {
           "subId": "c-4-2"
-        }
+        },
+        "in_page": true
       }
     },
     {
@@ -2386,7 +2391,8 @@
         ],
         "query": {
           "subId": "c-5-1"
-        }
+        },
+        "in_page": true
       }
     },
     {
@@ -2414,7 +2420,8 @@
         ],
         "query": {
           "subId": "c-5-2"
-        }
+        },
+        "in_page": true
       }
     }
   ]

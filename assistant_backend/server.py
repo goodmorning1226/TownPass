@@ -19,7 +19,11 @@ import uuid
 import sys
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
-MODEL = "ministral-3:3b"
+import decision  # noqa: E402  (TOWNPASS_DECISION_MODEL: Ministral by default, or Gemma)
+
+# Ollama tag and the reported model name; llama-server (the phone) serves the file
+# OnDeviceAssistant.kt loaded for the same TOWNPASS_DECISION_MODEL.
+MODEL = "gemma4:e2b" if decision.GEMMA else "ministral-3:3b"
 CATALOG_URL = "https://taipei-pass-service.vercel.app/mock/library/library_book_list.json"
 CATALOG_VERSION = "570531a9244c3dba1e1f09907468ca55875ccc4b1af6fe1e5115cfdb2252f4ac"
 CONTRACT = 3  # 3: optional request "context" (page/last action hint)
@@ -372,6 +376,8 @@ class Assistant:
         # "auto"/absent to tell it from the typed text; Chinese otherwise.
         import i18n
         requested = payload.get("language")
+        if requested == "nan":
+            requested = "zh"  # Taiwanese speech is transcribed into Chinese (asr_server.TAIWANESE)
         if requested is not None and requested not in (*i18n.LANGUAGES, "auto"):
             raise AssistantError("語言欄位不正確。")
         language = requested if requested in i18n.LANGUAGES else i18n.detect_text_language(text)
@@ -478,7 +484,16 @@ def device_transcript(body):
     language = language_code(data.get("language"))
     return {"text": texts[0] if texts else "", "alternatives": texts[1:], "status": status,
             "recognizer": "device", "confidence": round(top, 3) if top > 0 else None,
-            "language": "zh" if language == "auto" else language}
+            "language": "zh" if language in ("auto", "nan") else language}
+
+
+# Taiwanese was chosen but could not be used (asr_server notice): the clip was
+# heard as Chinese instead, and the App says why (docs/AI_TAIWANESE_SPEECH_PLAN.md section 10).
+TAIWANESE_NOTICES = {
+    "missing": "還沒有安裝台語語音模型，這次先用中文聽。",
+    "memory": "手機記憶體不夠載入台語語音模型，這次先用中文聽。",
+    "failed": "台語語音模型沒有啟動成功，這次先用中文聽。",
+}
 
 
 # An alternative may replace the heard text only if the recogniser scored it
@@ -694,11 +709,14 @@ def make_handler(assistant, token=""):
                              # language was used); the App only follows a new
                              # language for the next turns when this is clear.
                              "language_confidence": result.get("language_confidence"),
+                             **({"speech_notice": TAIWANESE_NOTICES[result["notice"]]}
+                                if result.get("notice") in TAIWANESE_NOTICES else {}),
                              "metrics": {"elapsed_ms": result.get("elapsed_ms"),
                                          "audio_seconds": result.get("audio_seconds"),
                                          "status": status, "avg_logprob": result.get("avg_logprob"),
                                          "no_speech_prob": result.get("no_speech_prob"),
                                          "recognizer": result.get("recognizer", "whisper"),
+                                         "speech_model": result.get("speech_model"),
                                          "confidence": result.get("confidence")}})
     return Handler
 

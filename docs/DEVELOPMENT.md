@@ -156,6 +156,9 @@ Release 預設不啟用，正式 API 尚未串接。
 | --- | --- |
 | 不設 `TOWNPASS_ON_DEVICE`（或 `-Ptownpass.onDevice`） | 一般建置，助理連電腦後端 |
 | `TOWNPASS_INTENT_FALLBACK=0` | 關閉版本 B，找不到就直接回沒找到（版本 A） |
+| `TOWNPASS_SEMANTIC_EXAMPLES=0` | 語意檢索不放每頁例句（[日常說法採用 B](AI_COLLOQUIAL_MATCHING_EXPERIMENT.md) 第 9 節） |
+| `TOWNPASS_SEMANTIC_DIRECT=0` | 語意明確領先時也先問模型，不直接列候選 |
+| `TOWNPASS_T2_GENERIC=0` | 未串接頁只靠常用詞命中時照舊直接回「尚未串接」，圖書入口回到原本的 `LIBRARY_CUE` |
 | `TOWNPASS_FAQ_DIR` 指到不存在的資料夾 | 關閉 FAQ 層（`faq=off`） |
 | `--dart-define=ASSISTANT_ENABLED=false` | App 不顯示助理 |
 | 設定 → 語言 選中文 | 頁面恢復原文，不翻譯 |

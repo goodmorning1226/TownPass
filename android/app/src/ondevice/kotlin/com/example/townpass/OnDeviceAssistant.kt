@@ -1,5 +1,6 @@
 package com.example.townpass
 
+import android.app.ActivityManager
 import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.util.Log
@@ -15,8 +16,10 @@ import kotlin.concurrent.thread
  * Runs the local service assistant on the phone (on-device builds only,
  * docs/AI_ON_DEVICE_PLAN.md). The same loopback endpoints as the computer setup:
  *
- *  - llama.cpp llama-server (ministral-3:3b GGUF)   127.0.0.1:8771
+ *  - llama.cpp llama-server (ministral-3:3b GGUF, or Gemma 4 E2B when built
+ *    with TOWNPASS_DECISION_MODEL=gemma)          127.0.0.1:8771
  *  - whisper.cpp whisper-server (Breeze-ASR-25)     127.0.0.1:8772
+ *  - whisper.cpp whisper-server (Taiwanese, Breeze-ASR-26) 127.0.0.1:8776, started on first use
  *  - llama-server --embedding (multilingual-e5-small) 127.0.0.1:8774, optional FAQ layer
  *  - Python backend via Chaquopy (device_main.py)   127.0.0.1:8765 and :8770
  *
@@ -27,6 +30,10 @@ import kotlin.concurrent.thread
 object OnDeviceAssistant {
     private const val TAG = "TownPassAssistant"
     const val MODEL_FILE = "Ministral-3-3B-Instruct-2512-Q4_K_M.gguf"
+    /** Opt-in decision model (build with TOWNPASS_DECISION_MODEL=gemma; push with
+     *  push_assistant_models.ps1 -DecisionModel gemma). The backend then uses its
+     *  Gemma prompt variant (decision.py); Ministral stays the default. */
+    const val GEMMA_MODEL_FILE = "gemma-4-E2B-it-Q4_0.gguf"
     /** Optional separate Chinese model (e.g. Breeze-ASR-25 q8_0, branch
      *  feat/asr-breeze-q8). Without it the multilingual model serves Chinese too. */
     const val ASR_FILE = "ggml-whisper-chinese.bin"  // push_assistant_models.ps1 -Chinese
@@ -34,6 +41,11 @@ object OnDeviceAssistant {
     /** Multilingual Whisper (default Whisper small q8_0: 1.4 s a clip) for Chinese
      *  when no separate model is pushed, en/ja/vi/id/th and language detection. */
     const val MULTI_ASR_FILE = "ggml-whisper-multilingual.bin"  // push_assistant_models.ps1 -Multilingual
+    /** Optional Taiwanese model (Breeze-ASR-26 q8_0: Taiwanese speech -> Mandarin
+     *  characters, docs/AI_TAIWANESE_SPEECH_PLAN.md section 10). Loaded only when
+     *  台語 is chosen and a clip arrives ([startTaiwanese]); without it Taiwanese
+     *  clips are heard as Chinese and the App says so. */
+    const val TAIWANESE_ASR_FILE = "ggml-whisper-taiwanese.bin"  // push_assistant_models.ps1 -Taiwanese
     /** Optional FAQ layer (docs/AI_FAQ_RAG.md): Microsoft multilingual-e5-small GGUF and
      *  the pre-built index directory, both pushed by push_assistant_models.ps1 (-FaqModel, -FaqIndex).
      *  Without them the assistant runs without FAQ. */
@@ -43,7 +55,16 @@ object OnDeviceAssistant {
     private const val MODEL_PORT = 8771
     private const val WHISPER_PORT = 8772
     private const val MULTI_WHISPER_PORT = 8773
+    private const val TAIWANESE_WHISPER_PORT = 8776
     private val processes = mutableListOf<Process>()
+
+    /** Set by [start]; [startTaiwanese] launches the Taiwanese server with them. */
+    @Volatile
+    private var appContext: Context? = null
+    @Volatile
+    private var whisperThreads = "4"
+    private val taiwaneseLock = Any()
+    private var taiwanese: Process? = null
 
     @Volatile
     private var started = false
@@ -55,6 +76,7 @@ object OnDeviceAssistant {
             started = true
         }
         val app = context.applicationContext
+        appContext = app
         thread(name = "assistant-start", isDaemon = true) {
             try {
                 // The Python servers listen at once; the models load behind them and
@@ -71,16 +93,29 @@ object OnDeviceAssistant {
                 val multilingual = whisper && File(models, MULTI_ASR_FILE).isFile
                 val faqIndex = File(models, FAQ_INDEX_DIR)
                 val faq = File(models, FAQ_MODEL_FILE).isFile && File(faqIndex, "embeddings.bin").isFile
+                // The decision model this build asks for; without its file the default
+                // (Ministral) is used, with the matching prompts.
+                var decisionModel = app.getString(R.string.assistant_decision_model)
+                if (decisionModel == "gemma" && !File(models, GEMMA_MODEL_FILE).isFile) {
+                    Log.w(TAG, "missing $GEMMA_MODEL_FILE; using $MODEL_FILE " +
+                        "(run scripts/push_assistant_models.ps1 -DecisionModel gemma)")
+                    decisionModel = "ministral"
+                }
+                val decisionFile = File(models, if (decisionModel == "gemma") GEMMA_MODEL_FILE else MODEL_FILE)
                 val info = Python.getInstance().getModule("device_main")
                     .callAttr("start", MODEL_PORT, WHISPER_PORT, Kwarg("whisper", whisper),
                         Kwarg("multi_port", if (multilingual) MULTI_WHISPER_PORT else null),
                         Kwarg("chinese_model", chinese || !multilingual),
                         Kwarg("faq_port", if (faq) FAQ_EMBED_PORT else null),
-                        Kwarg("faq_dir", if (faq) faqIndex.absolutePath else null)).toString()
+                        Kwarg("faq_dir", if (faq) faqIndex.absolutePath else null),
+                        // Always offered with Whisper: the file is looked for on first use.
+                        Kwarg("taiwanese_port", if (whisper) TAIWANESE_WHISPER_PORT else null),
+                        Kwarg("decision_model", decisionModel)).toString()
                 Log.i(TAG, "backend: $info")
                 // Recent 8-core phone SoCs have 6-8 performance cores; leave two for
                 // the UI. Speech and decision run one after the other, never together.
                 val threads = (Runtime.getRuntime().availableProcessors() - 2).coerceIn(2, 6).toString()
+                whisperThreads = threads
                 // Child processes keep the CPU group they are forked in, and Android
                 // only re-groups the App's own process later. Forked during start-up
                 // they would stay in "background" (little cores only) for good.
@@ -98,7 +133,10 @@ object OnDeviceAssistant {
                 } else {
                     stopStale("libwhisper_server.so")
                 }
-                launch(app, "libllama_server.so", File(models, MODEL_FILE), MODEL_PORT,
+                // Same arguments for both decision models (Gemma 4 needs no extra flag:
+                // its chat template has a system role, and --reasoning off keeps its
+                // thinking channel closed).
+                launch(app, "libllama_server.so", decisionFile, MODEL_PORT,
                     // Three slots of 2048 tokens: one each keeps the service, library and
                     // guide policy in the prompt cache (requests are <= ~1000 tokens; the
                     // backend sends one request at a time). --cache-ram 0: llama.cpp's
@@ -123,11 +161,53 @@ object OnDeviceAssistant {
         }
     }
 
+    /**
+     * Starts the Taiwanese whisper-server if it is not running yet and waits until
+     * it has loaded (called by asr_server through device_main.taiwanese_provider,
+     * on a backend thread, only for clips spoken with 台語 chosen). Returns
+     * "ready", "missing" (file not pushed), "memory" (not enough free memory;
+     * nothing else is stopped) or "failed". The other speech servers keep running.
+     */
+    @JvmStatic
+    fun startTaiwanese(): String {
+        synchronized(taiwaneseLock) {
+            val app = appContext ?: return "failed"
+            taiwanese?.let { if (it.isAlive && listening(TAIWANESE_WHISPER_PORT)) return "ready" }
+            val models = app.getExternalFilesDir("models") ?: File(app.filesDir, "models")
+            val model = File(models, TAIWANESE_ASR_FILE)
+            if (!model.isFile) return "missing"
+            // Breeze-ASR-26 q8_0 peaked at 1.28x its file size on the phone (2.0 GB for 1.58 GB).
+            val memory = ActivityManager.MemoryInfo()
+            (app.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager).getMemoryInfo(memory)
+            val needed = model.length() * 13 / 10 + 300L * 1024 * 1024
+            if (memory.availMem < needed) {
+                Log.w(TAG, "taiwanese speech: ${memory.availMem shr 20} MB free, needs ${needed shr 20} MB")
+                return "memory"
+            }
+            taiwanese?.destroy()
+            val started = System.currentTimeMillis()
+            val process = launch(app, "libwhisper_server.so", model, TAIWANESE_WHISPER_PORT,
+                listOf("-t", whisperThreads, "-l", "zh"), stopLeftovers = false) ?: return "failed"
+            taiwanese = process
+            // whisper-server listens only after the model has loaded.
+            while (System.currentTimeMillis() - started < 60_000) {
+                if (!process.isAlive) return "failed"
+                if (listening(TAIWANESE_WHISPER_PORT)) {
+                    Log.i(TAG, "taiwanese speech loaded in ${System.currentTimeMillis() - started} ms")
+                    return "ready"
+                }
+                Thread.sleep(200)
+            }
+            process.destroy()
+            return "failed"
+        }
+    }
+
     private fun launch(app: Context, binary: String, model: File, port: Int, extra: List<String>,
-                       stopLeftovers: Boolean = true) {
+                       stopLeftovers: Boolean = true): Process? {
         if (!model.isFile) {
             Log.w(TAG, "missing model ${model.absolutePath}; run scripts/push_assistant_models.ps1")
-            return
+            return null
         }
         val executable = File(app.applicationInfo.nativeLibraryDir, binary)
         // Servers left by an earlier App process (force-stop or reinstall does not
@@ -135,7 +215,7 @@ object OnDeviceAssistant {
         if (stopLeftovers) stopStale(binary)
         if (listening(port)) {
             Log.w(TAG, "port $port is in use by another process; not starting $binary")
-            return
+            return null
         }
         val command = listOf(executable.absolutePath, "-m", model.absolutePath,
             "--host", "127.0.0.1", "--port", port.toString()) + extra
@@ -144,8 +224,10 @@ object OnDeviceAssistant {
         // are not logged at the default verbosity) for diagnosing slow phones.
         val debuggable = app.applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE != 0
         builder.redirectOutput(File(if (debuggable) "${app.cacheDir}/$binary-$port.log" else "/dev/null"))
-        synchronized(processes) { processes += builder.start() }
+        val process = builder.start()
+        synchronized(processes) { processes += process }
         Log.i(TAG, "started $binary on $port")
+        return process
     }
 
     /**

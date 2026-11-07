@@ -5,6 +5,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:town_pass/page/assistant/widget/taiwanese_prompt.dart';
 import 'package:town_pass/page/guided_assistant/model/assistant_settings.dart';
 import 'package:town_pass/page/assistant/assistant_texts.dart';
 import 'package:town_pass/page/guided_assistant/model/guide_content.dart';
@@ -231,8 +232,10 @@ class GuidedAssistantController extends GetxController {
     speechLanguage.value = AssistantSpeechLanguage.of(code).code;
     heardLanguage.value = null;
     AssistantSpeechLanguage.save(speechLanguage.value);
-    if (AssistantTexts.languages.contains(speechLanguage.value)) {
-      AssistantTexts.conversation.value = speechLanguage.value;
+    // 台語 is answered in Chinese: the assistant's texts become Chinese.
+    final texts = AssistantSpeechLanguage.textLanguage(speechLanguage.value);
+    if (AssistantTexts.languages.contains(texts)) {
+      AssistantTexts.conversation.value = texts;
     }
   }
 
@@ -1605,6 +1608,11 @@ class GuidedAssistantController extends GetxController {
     dismissHomeAsk();
     sheetOpen.value = true;
     _addBackEntry(closeSheet);
+    // The first time on a Chinese phone: "您是否為台語用戶？" (owner, 2026-11-08).
+    TaiwanesePrompt.maybeAsk(
+      currentLanguage: speechLanguage.value,
+      choose: setSpeechLanguage,
+    );
   }
 
   void closeSheet() {
@@ -1704,7 +1712,14 @@ class GuidedAssistantController extends GetxController {
     final reading = _bestReading(heard);
     _turnLanguage = heard.language;
     _followSpokenLanguage(heard);
+    _sayNotice(heard);
     submit(reading.text, voice: true);
+  }
+
+  /// 台語 chosen but its model could not be used: this clip was heard as
+  /// Chinese, and the backend's reason is said first.
+  void _sayNotice(AssistantTranscript heard) {
+    if (heard.notice case final notice?) _say(_bot(notice));
   }
 
   /// The text to send for [heard]: an unsure transcript uses the backend's
@@ -1810,6 +1825,7 @@ class GuidedAssistantController extends GetxController {
     heardLanguage.value = heard.language;
     _turnLanguage = heard.language;
     _followSpokenLanguage(heard);
+    _sayNotice(heard);
     submit(reading.text, voice: true);
   }
 

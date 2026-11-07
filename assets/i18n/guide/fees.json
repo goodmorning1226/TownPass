@@ -577,6 +577,13 @@
    "id": "Pilih tagihan",
    "th": "เลือกบิล"
   },
+  "選擇": {
+   "en": "Select",
+   "ja": "選択",
+   "vi": "Chọn",
+   "id": "Pilih",
+   "th": "เลือก"
+  },
   "選繳費項目": {
    "en": "Choose the fee type",
    "ja": "支払う項目を選ぶ",

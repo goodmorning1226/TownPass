@@ -829,6 +829,13 @@
    "id": "Lanjutkan panduan",
    "th": "ทำตามคำแนะนำต่อ"
   },
+  "用台語說，助理用中文回答（測試中）": {
+   "en": "Speak Taiwanese; the assistant answers in Chinese (test)",
+   "ja": "台湾語で話すと、アシスタントは中国語で答えます（テスト中）",
+   "vi": "Nói tiếng Đài Loan, trợ lý trả lời bằng tiếng Trung (thử nghiệm)",
+   "id": "Bicara bahasa Taiwan, asisten menjawab dalam bahasa Mandarin (uji coba)",
+   "th": "พูดภาษาไต้หวัน ผู้ช่วยตอบเป็นภาษาจีน (ทดลอง)"
+  },
   "聽你說的話，自動判斷是哪一種語言": {
    "en": "Listens and works out which language you are speaking",
    "ja": "話した言葉から、どの言語かを自動で判断します",
