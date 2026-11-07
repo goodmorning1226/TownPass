@@ -50,6 +50,7 @@ void main() {
       expect(engine.interpret('下一步要做什麼？').kind, MockReplyKind.stepHelp);
       expect(engine.interpret('教我用').kind, MockReplyKind.onboarding);
       expect(engine.interpret('明天會不會下雨').kind, MockReplyKind.unknown);
+      expect(engine.interpret(onboardingExample).serviceTitle, '停車費');
     });
 
     test('two requests in one sentence ask which comes first', () {

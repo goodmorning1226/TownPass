@@ -75,29 +75,33 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
               );
             }
             final stage = c.onboarding.value;
-            if (!c.sheetOpen.value &&
+            final hinting =
+                !c.sheetOpen.value &&
                 (stage == OnboardingStage.card ||
-                    stage == OnboardingStage.pointer)) {
+                    stage == OnboardingStage.pointer);
+            if (hinting) {
+              // Everything but the assistant button is blocked while the
+              // first-run hint shows.
               layers.add(
-                Positioned.fill(
+                const Positioned.fill(
                   child: GuideHighlight(
-                    key: const ValueKey('onboarding'),
+                    key: ValueKey('onboarding'),
                     targetId: assistantFabTarget,
                     scrimOpacity: 0.6,
                     showArrow: false,
-                    onBlockedTap: stage == OnboardingStage.pointer
-                        ? c.onboardingWrongTap
-                        : null,
+                    ring: HighlightRing.focus,
+                    radius: 24,
                   ),
                 ),
               );
             }
             if (!c.sheetOpen.value) layers.add(_fab(context, c));
-            if (!c.sheetOpen.value && stage == OnboardingStage.card) {
+            if (hinting) layers.add(_onboardingArrow(context, c));
+            if (hinting && stage == OnboardingStage.card) {
               layers.add(_onboardingCard(context, c));
             }
-            if (!c.sheetOpen.value && stage == OnboardingStage.pointer) {
-              layers.add(_onboardingPointer(context, c));
+            if (hinting && stage == OnboardingStage.pointer) {
+              layers.addAll(_onboardingPointer(context, c));
             }
             final card = c.card;
             if (card != null) layers.add(_guideCard(context, c, card));
@@ -183,81 +187,164 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
     );
   }
 
-  Widget _onboardingCard(BuildContext context, GuidedAssistantController c) {
+  /// Tilted yellow arrow just above the assistant button.
+  Widget _onboardingArrow(BuildContext context, GuidedAssistantController c) {
     return Positioned(
-      left: 16,
-      right: 16,
-      bottom: _fabBottom(context, c) + 76,
-      child: _Card(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Row(
-              children: [
-                PenguinAvatar(),
-                SizedBox(width: 10),
-                Expanded(
-                  child: TPText(
-                    '需要幫忙嗎？',
-                    style: TPTextStyles.titleSemiBold,
-                    color: TPColors.grayscale950,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
-            const TPText(
-              '找不到功能、看不懂畫面時，按右下角的「助理」，用說的就可以。',
-              style: TPTextStyles.h3Regular,
-              color: TPColors.grayscale800,
-            ),
-            const SizedBox(height: 14),
-            Row(
-              children: [
-                Expanded(child: _SecondaryButton('稍後再說', c.onboardingLater)),
-                const SizedBox(width: 10),
-                Expanded(child: _PrimaryButton('試試看', c.onboardingTry)),
-              ],
-            ),
-          ],
+      right: 16 + 28,
+      bottom: _fabBottom(context, c) + 56 + 18,
+      child: const IgnorePointer(
+        child: RotationTransition(
+          turns: AlwaysStoppedAnimation(-13 / 360),
+          child: GuideArrow(width: 56, height: 109),
         ),
       ),
     );
   }
 
-  Widget _onboardingPointer(BuildContext context, GuidedAssistantController c) {
-    final text = c.nudge.value.isNotEmpty ? c.nudge.value : '按這裡';
+  Widget _onboardingCard(BuildContext context, GuidedAssistantController c) {
     return Positioned(
+      left: 16,
       right: 16,
-      bottom: _fabBottom(context, c) + 64,
-      child: IgnorePointer(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              decoration: BoxDecoration(
-                color: guideYellow,
-                borderRadius: BorderRadius.circular(12),
+      bottom: _fabBottom(context, c) + 56 + 150,
+      child: Semantics(
+        scopesRoute: true,
+        explicitChildNodes: true,
+        child: _Card(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 44,
+                    height: 44,
+                    decoration: const BoxDecoration(
+                      color: TPColors.primary100,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.sms_outlined,
+                      color: TPColors.primary700,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  const Expanded(
+                    child: TPText(
+                      '第一次使用臺北通嗎？',
+                      style: TPTextStyles.h2SemiBold,
+                      color: TPColors.grayscale950,
+                    ),
+                  ),
+                ],
               ),
-              child: TPText(
-                text,
-                style: TPTextStyles.titleSemiBold,
-                color: TPColors.grayscale950,
+              const SizedBox(height: 16),
+              TPText(
+                '不會用、找不到？\n跟「助理」說，它會帶你一步步做。',
+                style: TPTextStyles.titleSemiBold.copyWith(
+                  fontWeight: FontWeight.w400,
+                  height: 28 / 18,
+                ),
+                color: TPColors.grayscale700,
               ),
-            ),
-            const Padding(
-              padding: EdgeInsets.only(right: 24),
-              child: Icon(
-                Icons.arrow_downward_rounded,
-                color: guideYellow,
-                size: 44,
+              const SizedBox(height: 16),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
+                decoration: BoxDecoration(
+                  color: TPColors.primary50,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Row(
+                  children: [
+                    TPText(
+                      '例如：',
+                      style: TPTextStyles.h3Regular,
+                      color: TPColors.grayscale700,
+                    ),
+                    SizedBox(width: 8),
+                    Flexible(
+                      child: TPText(
+                        '「$onboardingExample」',
+                        style: TPTextStyles.h3SemiBold,
+                        color: TPColors.grayscale950,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(child: _SecondaryButton('稍後再說', c.onboardingLater)),
+                  const SizedBox(width: 16),
+                  Expanded(child: _PrimaryButton('試試看', c.onboardingTry)),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
+  }
+
+  /// After 試試看: an exit pill top right and a caption by the arrow.
+  List<Widget> _onboardingPointer(
+    BuildContext context,
+    GuidedAssistantController c,
+  ) {
+    final media = MediaQuery.of(context);
+    return [
+      Positioned(
+        top: media.padding.top + 4,
+        right: 8,
+        child: Material(
+          color: TPColors.white.withValues(alpha: 0.12),
+          shape: StadiumBorder(
+            side: BorderSide(color: TPColors.white.withValues(alpha: 0.7)),
+          ),
+          child: InkWell(
+            customBorder: const StadiumBorder(),
+            onTap: c.onboardingExit,
+            child: const SizedBox(
+              height: 48,
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(12, 0, 16, 0),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.close_rounded, color: TPColors.white),
+                    SizedBox(width: 6),
+                    TPText(
+                      '退出提示',
+                      style: TPTextStyles.h3Regular,
+                      color: TPColors.white,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+      Positioned(
+        right: 16 + 28 + 56 + 6,
+        bottom: _fabBottom(context, c) + 56 + 44,
+        child: IgnorePointer(
+          child: TPText(
+            '點這裡\n開始問助理',
+            style: TPTextStyles.h2SemiBold.copyWith(
+              fontSize: 20,
+              height: 28 / 20,
+            ),
+            color: TPColors.white,
+            textAlign: TextAlign.right,
+          ),
+        ),
+      ),
+    ];
   }
 
   Widget _guideCard(

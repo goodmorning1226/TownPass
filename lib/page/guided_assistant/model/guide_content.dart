@@ -347,6 +347,9 @@ abstract class Replies {
   static String followUp(String title) => '剛剛你還說要$title，要接著做嗎？';
 }
 
+/// Example sentence on the first-run hint card.
+const onboardingExample = '我想繳停車費';
+
 /// Starter chips in the assistant when there is no task.
 const starterChips = <String>[
   '我要繳水費',

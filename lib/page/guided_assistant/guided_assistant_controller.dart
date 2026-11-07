@@ -85,8 +85,8 @@ class GuideCard {
   const GuideCard(this.variant, this.label, this.text);
 }
 
-/// First-run coach marks: the corner button, then the chips in the sheet.
-enum OnboardingStage { hidden, card, pointer, chips }
+/// First-run hint on the assistant button: the card, then the arrow step.
+enum OnboardingStage { hidden, card, pointer }
 
 class GuidedAssistantController extends GetxController {
   final MockAssistantEngine engine;
@@ -219,7 +219,6 @@ class GuidedAssistantController extends GetxController {
   void submit(String raw) {
     final text = raw.trim();
     if (text.isEmpty || loading.value) return;
-    if (onboarding.value == OnboardingStage.chips) finishOnboarding();
     messages.add(ChatMessage(id: _nextId++, user: true, text: text));
     loading.value = true;
     _think?.cancel();
@@ -248,6 +247,11 @@ class GuidedAssistantController extends GetxController {
     switch (reply.kind) {
       case MockReplyKind.guide:
         startGuide(reply.guideId!);
+      case MockReplyKind.openService:
+        final title = reply.serviceTitle!;
+        _say(_bot(Replies.opensPage(title)));
+        closeSheet();
+        _navigate(MockRoutes.service, arguments: title);
       case MockReplyKind.multi:
         final first = guides[reply.guideId]!;
         final other = guides[reply.otherGuideId]!;
@@ -600,9 +604,10 @@ class GuidedAssistantController extends GetxController {
   void fabPressed() {
     if (onboarding.value == OnboardingStage.card ||
         onboarding.value == OnboardingStage.pointer) {
-      // The coach mark's back entry gives way to the sheet's.
+      // Opening the assistant completes the hint; its back entry gives way
+      // to the sheet's.
       _removeBackEntry();
-      onboarding.value = OnboardingStage.chips;
+      finishOnboarding();
     }
     openSheet();
   }
@@ -618,7 +623,6 @@ class GuidedAssistantController extends GetxController {
     sheetOpen.value = false;
     typing.value = false;
     listening.value = false;
-    if (onboarding.value == OnboardingStage.chips) finishOnboarding();
     _removeBackEntry();
   }
 
@@ -705,13 +709,17 @@ class GuidedAssistantController extends GetxController {
     }
   }
 
-  void onboardingWrongTap() {
-    nudge.value = '按發亮的「助理」就可以了。';
-    _nudgeTimer?.cancel();
-    _nudgeTimer = Timer(
-      const Duration(milliseconds: 2600),
-      () => nudge.value = '',
-    );
+  /// 退出提示: the user does not want the hint; it is not shown again.
+  void onboardingExit() {
+    if (onboarding.value == OnboardingStage.hidden) return;
+    _removeBackEntry();
+    finishOnboarding();
+  }
+
+  /// 重看新手提示 from the assistant.
+  void replayOnboarding() {
+    closeSheet();
+    startOnboarding();
   }
 
   void onboardingLater() {

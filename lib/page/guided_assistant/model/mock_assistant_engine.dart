@@ -3,6 +3,7 @@ import 'package:town_pass/page/guided_assistant/model/guide_content.dart';
 /// What the mock assistant decided to do with one sentence.
 enum MockReplyKind {
   guide,
+  openService,
   candidates,
   multi,
   explain,
@@ -25,6 +26,9 @@ class MockReply {
   final GlossaryEntry? term;
   final AnswerCardContent? answer;
 
+  /// For [MockReplyKind.openService]: page title of a service without a guide.
+  final String? serviceTitle;
+
   const MockReply(
     this.kind, {
     this.guideId,
@@ -32,6 +36,7 @@ class MockReply {
     this.candidates,
     this.term,
     this.answer,
+    this.serviceTitle,
   });
 }
 
@@ -87,6 +92,10 @@ class MockAssistantEngine {
     }
     if (library) {
       return const MockReply(MockReplyKind.guide, guideId: GuideIds.library);
+    }
+
+    if (t.contains('停車')) {
+      return const MockReply(MockReplyKind.openService, serviceTitle: '停車費');
     }
 
     if (t.contains('進度') || t.contains('案件') || t.contains('辦到哪')) {

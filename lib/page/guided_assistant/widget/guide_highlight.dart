@@ -5,8 +5,12 @@ import 'package:town_pass/util/tp_colors.dart';
 
 const guideYellow = Color(0xFFFFD424);
 
-/// Yellow ring and arrow around a [GuideTarget]. When [blocking], the rest of
-/// the screen is dimmed and taps outside the target go to [onBlockedTap]
+/// Yellow ring for guide steps; white ring with a soft glow for the first-run
+/// hint on the assistant button.
+enum HighlightRing { yellow, focus }
+
+/// Ring (and optional arrow) around a [GuideTarget]. When [blocking], the rest
+/// of the screen is dimmed and taps outside the target go to [onBlockedTap]
 /// instead of the page; the target itself stays usable. [topClear] keeps the
 /// page's title bar (close button) usable as well.
 ///
@@ -20,6 +24,8 @@ class GuideHighlight extends StatefulWidget {
   final double topClear;
   final VoidCallback? onBlockedTap;
   final bool showArrow;
+  final HighlightRing ring;
+  final double radius;
 
   const GuideHighlight({
     super.key,
@@ -29,6 +35,8 @@ class GuideHighlight extends StatefulWidget {
     this.topClear = 0,
     this.onBlockedTap,
     this.showArrow = true,
+    this.ring = HighlightRing.yellow,
+    this.radius = 14,
   });
 
   @override
@@ -63,6 +71,19 @@ class _GuideHighlightState extends State<GuideHighlight>
     super.dispose();
   }
 
+  Widget _border(Rect rect, double radius, Color color, double width) =>
+      Positioned.fromRect(
+        rect: rect,
+        child: IgnorePointer(
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(radius),
+              border: Border.all(color: color, width: width),
+            ),
+          ),
+        ),
+      );
+
   @override
   Widget build(BuildContext context) {
     final rect = _rect;
@@ -70,7 +91,9 @@ class _GuideHighlightState extends State<GuideHighlight>
       builder: (context, box) {
         final size = box.biggest;
         if (rect == null) return const SizedBox.expand();
-        final hole = rect.inflate(6);
+        final focus = widget.ring == HighlightRing.focus;
+        final hole = rect.inflate(focus ? 8 : 6);
+        final r = widget.radius;
         final children = <Widget>[];
         if (widget.blocking) {
           children.add(
@@ -79,6 +102,7 @@ class _GuideHighlightState extends State<GuideHighlight>
                 child: CustomPaint(
                   painter: _ScrimPainter(
                     hole,
+                    r,
                     Colors.black.withValues(alpha: widget.scrimOpacity),
                   ),
                 ),
@@ -86,13 +110,13 @@ class _GuideHighlightState extends State<GuideHighlight>
             ),
           );
           final top = widget.topClear;
-          void block(double l, double t, double r, double b) {
-            if (r <= l || b <= t) return;
+          void block(double l, double t, double right, double b) {
+            if (right <= l || b <= t) return;
             children.add(
               Positioned(
                 left: l,
                 top: t,
-                width: r - l,
+                width: right - l,
                 height: b - t,
                 child: Semantics(
                   label: '請先操作亮起來的地方',
@@ -115,30 +139,23 @@ class _GuideHighlightState extends State<GuideHighlight>
           block(0, ht, hole.left.clamp(0, size.width), hb);
           block(hole.right.clamp(0, size.width), ht, size.width, hb);
         }
-        // Yellow ring with a thin white outline; borders only, so the target
-        // stays visible inside.
-        children.add(
-          Positioned.fromRect(
-            rect: hole.inflate(2),
-            child: IgnorePointer(
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: TPColors.white, width: 2),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(2),
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: guideYellow, width: 4),
-                    ),
-                  ),
-                ),
-              ),
+        if (focus) {
+          // White ring with a soft outer glow.
+          children.add(
+            _border(
+              hole.inflate(7),
+              r + 7,
+              TPColors.primary300.withValues(alpha: 0.75),
+              2,
             ),
-          ),
-        );
+          );
+          children.add(_border(hole, r, TPColors.white, 3));
+        } else {
+          // Yellow ring with a thin white outline; borders only, so the
+          // target stays visible inside.
+          children.add(_border(hole.inflate(2), r + 2, TPColors.white, 2));
+          children.add(_border(hole, r, guideYellow, 4));
+        }
         if (widget.showArrow) {
           final below = hole.center.dy < size.height * 0.55;
           final left = (hole.right - 64).clamp(8.0, size.width - 44);
@@ -149,10 +166,7 @@ class _GuideHighlightState extends State<GuideHighlight>
               child: IgnorePointer(
                 child: Transform.rotate(
                   angle: below ? 3.14159 : 0,
-                  child: const CustomPaint(
-                    size: Size(36, 56),
-                    painter: _ArrowPainter(),
-                  ),
+                  child: const GuideArrow(width: 36, height: 56),
                 ),
               ),
             ),
@@ -166,26 +180,36 @@ class _GuideHighlightState extends State<GuideHighlight>
 
 class _ScrimPainter extends CustomPainter {
   final Rect hole;
+  final double radius;
   final Color color;
-  _ScrimPainter(this.hole, this.color);
+  _ScrimPainter(this.hole, this.radius, this.color);
 
   @override
   void paint(Canvas canvas, Size size) {
     final path = Path.combine(
       PathOperation.difference,
       Path()..addRect(Offset.zero & size),
-      Path()
-        ..addRRect(RRect.fromRectAndRadius(hole, const Radius.circular(14))),
+      Path()..addRRect(RRect.fromRectAndRadius(hole, Radius.circular(radius))),
     );
     canvas.drawPath(path, Paint()..color = color);
   }
 
   @override
   bool shouldRepaint(_ScrimPainter old) =>
-      old.hole != hole || old.color != color;
+      old.hole != hole || old.radius != radius || old.color != color;
 }
 
-/// Down-pointing block arrow (rotated for "up").
+/// Yellow down-pointing block arrow (rotate it for other directions).
+class GuideArrow extends StatelessWidget {
+  final double width;
+  final double height;
+  const GuideArrow({super.key, required this.width, required this.height});
+
+  @override
+  Widget build(BuildContext context) =>
+      CustomPaint(size: Size(width, height), painter: const _ArrowPainter());
+}
+
 class _ArrowPainter extends CustomPainter {
   const _ArrowPainter();
 
@@ -202,13 +226,6 @@ class _ArrowPainter extends CustomPainter {
       ..lineTo(13 * sx, 24 * sy)
       ..close();
     canvas.drawPath(path, Paint()..color = guideYellow);
-    canvas.drawPath(
-      path,
-      Paint()
-        ..color = TPColors.white
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 1.5,
-    );
   }
 
   @override

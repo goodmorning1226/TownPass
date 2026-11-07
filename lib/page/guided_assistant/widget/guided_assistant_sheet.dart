@@ -88,6 +88,14 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
             color: TPColors.primary700,
           ),
         ),
+        TextButton(
+          onPressed: c.replayOnboarding,
+          child: const TPText(
+            '重看新手提示',
+            style: TPTextStyles.bodyRegular,
+            color: TPColors.primary700,
+          ),
+        ),
         IconButton(
           tooltip: c.readAloud.value ? '朗讀已開啟' : '朗讀已關閉',
           onPressed: c.toggleReadAloud,
@@ -446,35 +454,6 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          if (c.onboarding.value == OnboardingStage.chips)
-            Container(
-              margin: const EdgeInsets.only(bottom: 10),
-              padding: const EdgeInsets.fromLTRB(12, 8, 4, 8),
-              decoration: BoxDecoration(
-                color: guideYellow.withValues(alpha: 0.25),
-                border: Border.all(color: guideYellow, width: 2),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Row(
-                children: [
-                  const Expanded(
-                    child: TPText(
-                      '不知道要說什麼？按一下下面的例子就可以。',
-                      style: TPTextStyles.h3SemiBold,
-                      color: TPColors.grayscale950,
-                    ),
-                  ),
-                  TextButton(
-                    onPressed: c.finishOnboarding,
-                    child: const TPText(
-                      '知道了',
-                      style: TPTextStyles.h3SemiBold,
-                      color: TPColors.primary700,
-                    ),
-                  ),
-                ],
-              ),
-            ),
           if (chips.isNotEmpty)
             Wrap(
               spacing: 8,
