@@ -73,6 +73,22 @@ def ollama_timing(result):
             "generate_ms": ms(result.get("eval_duration"))}
 
 
+def output_constraint(schema):
+    """llama-server's output constraint for a decision. A lettered choice gets an
+    exact grammar for {"choice":"X"}: under response_format, llama.cpp b12182 let
+    Ministral wrap the answer in a ```json fence (12 generated tokens instead of
+    6, ~1 s on a phone; the fence was stripped, so it was invisible). The exact
+    grammar picked the same option in 351 of 353 replayed decisions with dev,
+    held-out and i18n unchanged (.model-study, 2026-11-08). Any other schema
+    keeps response_format."""
+    properties = schema.get("properties") if isinstance(schema, dict) else None
+    letters = (properties or {}).get("choice", {}).get("enum") if isinstance(properties, dict) else None
+    if isinstance(properties, dict) and list(properties) == ["choice"] and isinstance(letters, list) and letters             and all(isinstance(letter, str) for letter in letters):
+        alternatives = " | ".join(json.dumps(json.dumps(letter)) for letter in letters)
+        return {"grammar": 'root ::= "{\\"choice\\":" (' + alternatives + ') "}"'}
+    return {"response_format": {"type": "json_schema", "json_schema": {"name": "proposal", "schema": schema}}}
+
+
 def alternating(messages):
     """Merge consecutive same-role messages (same text, blank line between).
 
@@ -306,10 +322,10 @@ class Assistant:
         try:
             schema = proposal_schema(tools)
             if MODEL_API == "openai":
-                # Same messages, schema and limits; the grammar comes from the schema.
+                # Same messages and limits; the output constraint comes from the schema.
                 reply = fetch_json(MODEL_URL + "/v1/chat/completions", {
                     "model": MODEL, "messages": alternating(messages), "temperature": 0, "max_tokens": 180,
-                    "response_format": {"type": "json_schema", "json_schema": {"name": "proposal", "schema": schema}},
+                    **output_constraint(schema),
                 }, timeout=MODEL_TIMEOUT)
                 content = reply["choices"][0]["message"]["content"]
                 result = {"prompt_eval_count": (reply.get("usage") or {}).get("prompt_tokens"),

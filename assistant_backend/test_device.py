@@ -82,8 +82,9 @@ class LlamaServerModelTests(unittest.TestCase):
         device_main.warm_up(Recognizer(), server.MODEL_URL, limit_s=5)
         self.assertEqual(heard, [32000])  # one second of 16 kHz PCM16
         from decision import system_prompt
-        systems = [body["messages"][0]["content"] for _, body in FakeLlamaServer.requests[-2:]]
-        self.assertEqual(systems, [system_prompt("library"), system_prompt("capability")])  # both prompt caches
+        from decision import POLICIES
+        systems = [body["messages"][0]["content"] for _, body in FakeLlamaServer.requests[-len(POLICIES):]]
+        self.assertEqual(systems, [system_prompt(task) for task in POLICIES])  # every prompt cache
         self.assertEqual(FakeLlamaServer.requests[-1][1]["max_tokens"], 1)
         heard.clear()
         device_main.warm_up(None, server.MODEL_URL, limit_s=5)  # phone recogniser: no Whisper
@@ -385,3 +386,13 @@ class MultilingualSpeechTests(unittest.TestCase):
         from asr_server import language_code
         self.assertEqual([language_code(v) for v in ("en-US", "ja", "english", "", None, "xx", "AUTO", "th-TH")],
                          ["en", "ja", "en", "zh", "zh", "zh", "auto", "th"])
+
+
+class OutputConstraintTests(unittest.TestCase):
+    def test_lettered_choice_gets_an_exact_grammar_other_schemas_keep_response_format(self):
+        from server import output_constraint
+        grammar = output_constraint({"type": "object", "properties": {"choice": {"type": "string",
+                                     "enum": ["A", "B"]}}, "required": ["choice"]})["grammar"]
+        self.assertEqual(grammar, 'root ::= "{\\"choice\\":" ("\\"A\\"" | "\\"B\\"") "}"')
+        other = output_constraint({"type": "object", "properties": {"capability_id": {"enum": ["x"]}}})
+        self.assertIn("response_format", other)

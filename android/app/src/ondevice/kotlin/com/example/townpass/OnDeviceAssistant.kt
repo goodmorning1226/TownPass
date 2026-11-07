@@ -99,10 +99,16 @@ object OnDeviceAssistant {
                     stopStale("libwhisper_server.so")
                 }
                 launch(app, "libllama_server.so", File(models, MODEL_FILE), MODEL_PORT,
-                    // Two slots of 2048 tokens: one keeps the service policy and one the
-                    // library policy in the prompt cache (requests are <= ~1000 tokens;
-                    // the backend still sends one request at a time).
-                    llamaCpuArgs() + listOf("-c", "4096", "-np", "2", "--no-webui"))
+                    // Three slots of 2048 tokens: one each keeps the service, library and
+                    // guide policy in the prompt cache (requests are <= ~1000 tokens; the
+                    // backend sends one request at a time). --cache-ram 0: llama.cpp's
+                    // host-RAM prompt cache (8 GiB by default) grew the server by 1.8-2.4 GB
+                    // in 40 turns on the PC; with a slot per policy nothing is evicted,
+                    // so it gains nothing (docs/SPEED_CACHE_EXPERIMENT.md, exp/speed-cache).
+                    llamaCpuArgs() + listOf("-c", "6144", "-np", "3", "--cache-ram", "0",
+                        // No thinking block before the answer: with a grammar it could
+                        // run to the 180-token limit (~30 s on a phone) and fail.
+                        "--reasoning", "off", "--no-webui"))
                 if (faq) {
                     // Same binary, started after the decision model (whose launch stops
                     // leftover copies). Queried only after a decision has finished, one
