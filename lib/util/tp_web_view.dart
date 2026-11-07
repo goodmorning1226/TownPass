@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:collection';
+import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
@@ -21,6 +22,11 @@ class WebViewArgument {
   final bool Function()? onAssistantBack;
   final bool Function()? isAssistantActionCurrent;
 
+  /// After the first page of [assistantNavigation], the later ones are opened
+  /// by the service's own router (History API), so data the first page loaded
+  /// stays (a reload would clear it). Same host and reviewed paths only.
+  final bool assistantInPage;
+
   const WebViewArgument({
     this.url,
     this.forceTitle,
@@ -28,6 +34,7 @@ class WebViewArgument {
     this.assistantNavigation,
     this.onAssistantBack,
     this.isAssistantActionCurrent,
+    this.assistantInPage = false,
   });
 }
 
@@ -93,6 +100,53 @@ class _TPWebViewState extends State<TPWebView> {
       }
     },
   );
+
+  /// Opens [targets] one after another with the service's own router: a
+  /// History API entry plus the popstate event Vue Router listens to, shaped
+  /// like the router's own state so its position (and the back button) stay
+  /// right. Returns an error when a page did not arrive.
+  Future<String?> _routeInPage(
+    InAppWebViewController controller,
+    List<String> targets,
+  ) async {
+    final current = Uri.tryParse((await controller.getUrl()).toString());
+    for (final target in targets) {
+      final uri = Uri.tryParse(target);
+      if (uri == null || current == null || uri.host != current.host) {
+        return '無法開啟這個頁面。';
+      }
+      if (pageArgument?.isAssistantActionCurrent?.call() == false) return null;
+      final path = uri.hasQuery ? '${uri.path}?${uri.query}' : uri.path;
+      final arrived = await controller.evaluateJavascript(
+        source: _inPageRoute(path),
+      );
+      // The router renders asynchronously; give it a moment, then check.
+      await Future<void>.delayed(const Duration(milliseconds: 600));
+      final now = Uri.tryParse((await controller.getUrl()).toString());
+      if (arrived != true || now?.path != uri.path) {
+        return '服務頁面沒有切換成功，請在原頁面手動選擇。';
+      }
+      _track(WebUri(target));
+    }
+    canGoBack.value = await controller.canGoBack();
+    return null;
+  }
+
+  static String _inPageRoute(String path) {
+    final quoted = jsonEncode(path);
+    return '''
+(function (path) {
+  var state = history.state || {};
+  var here = location.pathname + location.search + location.hash;
+  var position = typeof state.position === 'number' ? state.position + 1 : 1;
+  history.replaceState(Object.assign({}, state, { forward: path }), '');
+  history.pushState({ back: here, current: path, forward: null, position: position,
+                      replaced: false, scroll: null }, '', path);
+  window.dispatchEvent(new PopStateEvent('popstate', { state: history.state }));
+  return true;
+})($quoted);
+''';
+  }
 
   static bool _translatable(Uri? url) =>
       url != null &&
@@ -184,6 +238,17 @@ class _TPWebViewState extends State<TPWebView> {
             if (navigationCompleted) return;
             if (pageArgument?.isAssistantActionCurrent?.call() == false) return;
             if (loadedUrl.toString() != navigation[navigationIndex]) return;
+            if (!assistantLoadFailed &&
+                navigationIndex + 1 < navigation.length &&
+                pageArgument?.assistantInPage == true) {
+              navigationCompleted = true;
+              final error = await _routeInPage(
+                controller,
+                navigation.sublist(navigationIndex + 1),
+              );
+              pageArgument?.onAssistantPageLoaded?.call(error);
+              return;
+            }
             if (!assistantLoadFailed &&
                 navigationIndex + 1 < navigation.length) {
               navigationIndex++;
@@ -643,11 +708,19 @@ const _translationScript = r'''
   }
   function scan() {
     if (busy) { schedule(); return; }
-    var items = collect();
-    if (!items.length) return;
+    var all = collect();
+    if (!all.length) return;
     busy = true;
+    // Batches of 20, each written as soon as it is translated.
+    var next = function (start) {
+      if (start >= all.length) { busy = false; return; }
+      apply(all.slice(start, start + 20)).finally(function () { next(start + 20); });
+    };
+    next(0);
+  }
+  function apply(items) {
     var texts = items.map(function (item) { return item.text.trim(); });
-    window.flutter_inappwebview.callHandler('townpassTranslate', texts).then(function (out) {
+    return window.flutter_inappwebview.callHandler('townpassTranslate', texts).then(function (out) {
       if (!Array.isArray(out)) return;
       items.forEach(function (item, i) {
         var translated = out[i];
@@ -664,7 +737,7 @@ const _translationScript = r'''
           item.field.setAttribute('placeholder', translated);
         }
       });
-    }).finally(function () { busy = false; });
+    });
   }
   function schedule() { clearTimeout(timer); timer = setTimeout(scan, 300); }
   new MutationObserver(schedule).observe(document.body, {

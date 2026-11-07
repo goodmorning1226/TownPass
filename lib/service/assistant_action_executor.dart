@@ -69,6 +69,9 @@ class AssistantActionExecutor {
       var title = '圖書借閱';
       Uri uri;
       var parents = <String>[];
+      // Pages whose data the parent page loads (navigation.in_page): opened by
+      // the web app's own router after the parent, not reloaded.
+      var inPage = false;
       if (destination['kind'] == 'capability') {
         if (destination.length != 2 || destination['id'] is! String) {
           throw const FormatException('功能目標不正確。');
@@ -138,6 +141,7 @@ class AssistantActionExecutor {
               ).toString(),
             )
             .toList();
+        inPage = navigation['in_page'] == true && parents.isNotEmpty;
       } else {
         uri = destinationUri(destination);
         if (destination['kind'] != 'home') {
@@ -157,6 +161,7 @@ class AssistantActionExecutor {
             forceTitle: title,
             onAssistantPageLoaded: onLoaded,
             assistantNavigation: [...parents, uri.toString()],
+            assistantInPage: inPage,
             onAssistantBack: beforeBack,
             isAssistantActionCurrent: isCurrent,
           ),

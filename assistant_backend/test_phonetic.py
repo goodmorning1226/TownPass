@@ -5,6 +5,23 @@ from server import Assistant
 from test_server import BOOKS, FakeCatalog, first, response
 
 
+# These tests cover the layers before the intent fallback (version B), which
+# is on by default and tested on its own (test_phonetic.IntentFallbackTests).
+_intent_off = None
+
+
+def setUpModule():
+    global _intent_off
+    from unittest.mock import patch
+    import workflow
+    _intent_off = patch.object(workflow, "INTENT_FALLBACK", False)
+    _intent_off.start()
+
+
+def tearDownModule():
+    _intent_off.stop()
+
+
 class PhoneticTests(unittest.TestCase):
     def test_table_is_the_unihan_taiwan_reading_extract(self):
         table = readings()
@@ -168,3 +185,42 @@ class ServiceSoundCorrectionTests(unittest.TestCase):
         self.assertTrue(decided["confirm"])
         self.assertEqual(decided["options"][0], "我要解釋")  # what was heard stays first
         self.assertIn("我要借書", decided["options"])
+
+
+class IntentFallbackTests(unittest.TestCase):
+    """Version B: an unmatched request goes to the model, which has no navigation tool."""
+
+    def turn(self, text, choose, enabled=True, language=None):
+        import json
+        from unittest.mock import patch
+        import workflow
+        offered = []
+
+        def model(messages, tools):
+            options = json.loads(messages[-1]["content"]).get("options", [])
+            offered.append([o["tool"] for o in options])
+            option = next((o for o in options if o["tool"] == choose), None)
+            return response("choose", {"choice": option["choice"]}) if option else first(tools)
+        payload = {"text": text, "request_id": "r", "session_id": "s", **({"language": language} if language else {})}
+        with patch.object(workflow, "INTENT_FALLBACK", enabled):
+            return Assistant(FakeCatalog(), model).turn(payload), offered
+
+    def test_unmatched_question_about_functions_lists_them(self):
+        result, offered = self.turn("請問你有什麼樣的功能", "list_capabilities")
+        self.assertEqual(result["kind"], "capability_list")
+        self.assertEqual(offered, [["list_capabilities", "greeting", "city_question", "request_clarification"]])
+        result, _ = self.turn("what are you able to do for me", "list_capabilities", language="en")
+        self.assertEqual(result["kind"], "capability_list")
+
+    def test_the_model_cannot_navigate_and_clarification_keeps_the_old_reply(self):
+        import workflow
+        result, _ = self.turn("今天心情真好", "request_clarification")
+        self.assertIsNone(result["destination"])
+        self.assertEqual(result["message"], workflow.NO_RELATED)
+
+    def test_off_and_matched_requests_add_no_model_call(self):
+        result, offered = self.turn("請問你有什麼樣的功能", "list_capabilities", enabled=False)
+        self.assertEqual((result["metrics"]["route"], offered), ("no_match", []))
+        _, offered = self.turn("我要繳水費", "list_capabilities")
+        self.assertEqual(len(offered), 1)
+        self.assertNotIn("list_capabilities", offered[0])

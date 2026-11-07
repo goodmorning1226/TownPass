@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "source": "TownPass e4fbd3c / TownPass-Services 3274852a; reviewed 2026-11-05",
+  "source": "TownPass e4fbd3c / TownPass-Services 3274852a; reviewed 2026-11-05; 2026-11-07 batch 1: forms, FAQ, payment search, limited native pages; batch 2: in-page routed pages, counter units",
   "capabilities": [
     {
       "id": "app.home",
@@ -271,33 +271,53 @@
     {
       "id": "language",
       "title": "語言",
-      "category": "待串接",
+      "category": "帳號設定",
       "keywords": [
         "語言",
         "英文介面",
         "英文",
         "換語言",
-        "改語言"
+        "改語言",
+        "頁面語言",
+        "翻譯頁面",
+        "切換語言"
       ],
-      "features": [],
-      "enabled": false,
-      "reason": "原語言切換尚未實作。",
-      "mode": "demo",
-      "navigation": null
+      "features": [
+        "切換頁面語言",
+        "頁面翻譯成英文、日文、越南文、印尼文、泰文"
+      ],
+      "enabled": true,
+      "reason": "",
+      "mode": "local",
+      "navigation": {
+        "type": "native",
+        "route": "/language",
+        "parents": [
+          "/account",
+          "/setting"
+        ]
+      }
     },
     {
       "id": "notification_settings",
       "title": "通知提醒設定",
-      "category": "待串接",
+      "category": "帳號設定",
       "keywords": [
         "通知設定",
         "提醒開關"
       ],
       "features": [],
-      "enabled": false,
-      "reason": "通知偏好儲存尚待串接驗證。",
+      "enabled": true,
+      "reason": "",
       "mode": "demo",
-      "navigation": null
+      "navigation": {
+        "type": "native",
+        "route": "/setting",
+        "parents": [
+          "/account"
+        ]
+      },
+      "limited": "通知開關目前不會儲存，暫時無法變更通知設定。"
     },
     {
       "id": "quick_login",
@@ -316,16 +336,23 @@
     {
       "id": "authorization",
       "title": "歷程與授權管理",
-      "category": "待串接",
+      "category": "帳號設定",
       "keywords": [
         "授權管理",
         "使用歷程"
       ],
       "features": [],
-      "enabled": false,
-      "reason": "目前只有示範標籤，未提供正式紀錄。",
+      "enabled": true,
+      "reason": "",
       "mode": "demo",
-      "navigation": null
+      "navigation": {
+        "type": "native",
+        "route": "/portfolio_and_auth",
+        "parents": [
+          "/account"
+        ]
+      },
+      "limited": "目前只有示範內容，暫時無法查看實際紀錄或管理授權。"
     },
     {
       "id": "logout",
@@ -344,16 +371,24 @@
     {
       "id": "suspend",
       "title": "停用帳號",
-      "category": "待串接",
+      "category": "帳號設定",
       "keywords": [
         "停用帳號",
         "刪除帳號"
       ],
       "features": [],
-      "enabled": false,
-      "reason": "正式停用功能尚未串接。",
+      "enabled": true,
+      "reason": "",
       "mode": "demo",
-      "navigation": null
+      "navigation": {
+        "type": "native",
+        "route": "/suspend_account",
+        "parents": [
+          "/account",
+          "/setting"
+        ]
+      },
+      "limited": "停用帳號的確認按鈕目前尚未串接，暫時無法執行停用。"
     },
     {
       "id": "news",
@@ -908,10 +943,19 @@
         "取書通知"
       ],
       "features": [],
-      "enabled": false,
-      "reason": "可從圖書頁的我的借閱查看；指定預約子標籤尚無受控接口。",
+      "enabled": true,
+      "reason": "",
       "mode": "demo",
-      "navigation": null
+      "navigation": {
+        "type": "web",
+        "path": "/library-service/",
+        "parents": [
+          "/library-service/"
+        ],
+        "query": {
+          "type": "1"
+        }
+      }
     },
     {
       "id": "library.map",
@@ -1376,10 +1420,18 @@
         "辦好了"
       ],
       "features": [],
-      "enabled": false,
-      "reason": "原頁分類與查詢依賴頁面狀態；請由有話要說首頁手動查詢。",
+      "enabled": true,
+      "reason": "",
       "mode": "demo",
-      "navigation": null
+      "navigation": {
+        "type": "web",
+        "path": "/citizen-report/search",
+        "parents": [
+          "/citizen-report/"
+        ],
+        "query": {},
+        "in_page": true
+      }
     },
     {
       "id": "disasterReport.progress",
@@ -1446,6 +1498,924 @@
       "reason": "原表單尚未提供受控預填與回讀 Adapter；可先開有話要說。",
       "mode": "demo",
       "navigation": null
+    },
+    {
+      "id": "qna",
+      "title": "常見問答",
+      "category": "城市服務",
+      "keywords": [
+        "常見問題",
+        "問與答",
+        "問答",
+        "Q&A",
+        "FAQ",
+        "熱門問題"
+      ],
+      "features": [
+        "熱門問題",
+        "問題分類"
+      ],
+      "enabled": true,
+      "reason": "",
+      "mode": "demo",
+      "navigation": {
+        "type": "web",
+        "path": "/qna",
+        "parents": [],
+        "query": {}
+      }
+    },
+    {
+      "id": "qna.categories",
+      "title": "常見問答分類",
+      "category": "城市服務",
+      "keywords": [
+        "問答分類",
+        "問題分類",
+        "全部問題"
+      ],
+      "features": [],
+      "enabled": true,
+      "reason": "",
+      "mode": "demo",
+      "navigation": {
+        "type": "web",
+        "path": "/qna/categories",
+        "parents": [
+          "/qna"
+        ],
+        "query": {}
+      }
+    },
+    {
+      "id": "fees.search",
+      "title": "繳費查詢",
+      "category": "帳務",
+      "keywords": [
+        "繳費查詢",
+        "搜尋繳費",
+        "找繳費項目",
+        "查繳費"
+      ],
+      "features": [],
+      "enabled": true,
+      "reason": "",
+      "mode": "demo",
+      "navigation": {
+        "type": "web",
+        "path": "/fee-payment/search",
+        "parents": [],
+        "query": {},
+        "tab_parent": 3
+      }
+    },
+    {
+      "id": "districtOffice.form.a-1",
+      "title": "裁決所受理之申訴案件(本市)",
+      "category": "申辦表單",
+      "keywords": [
+        "交通罰單申訴",
+        "罰單申訴",
+        "交通違規申訴",
+        "裁決所申訴"
+      ],
+      "features": [],
+      "enabled": true,
+      "reason": "",
+      "mode": "demo",
+      "navigation": {
+        "type": "web",
+        "path": "/form/a-1",
+        "parents": [
+          "/"
+        ],
+        "query": {}
+      }
+    },
+    {
+      "id": "districtOffice.form.a-2",
+      "title": "裁決所受理之申訴案件(外縣市)",
+      "category": "申辦表單",
+      "keywords": [
+        "外縣市罰單申訴",
+        "外縣市交通違規申訴"
+      ],
+      "features": [],
+      "enabled": true,
+      "reason": "",
+      "mode": "demo",
+      "navigation": {
+        "type": "web",
+        "path": "/form/a-2",
+        "parents": [
+          "/"
+        ],
+        "query": {}
+      }
+    },
+    {
+      "id": "districtOffice.form.a-3",
+      "title": "停管處受理之申訴案件",
+      "category": "申辦表單",
+      "keywords": [
+        "停車費申訴",
+        "停車罰單申訴",
+        "違規停車申訴"
+      ],
+      "features": [],
+      "enabled": true,
+      "reason": "",
+      "mode": "demo",
+      "navigation": {
+        "type": "web",
+        "path": "/form/a-3",
+        "parents": [
+          "/"
+        ],
+        "query": {}
+      }
+    },
+    {
+      "id": "districtOffice.form.b-1",
+      "title": "本市警察局受理之違規申訴案件",
+      "category": "申辦表單",
+      "keywords": [
+        "警察局違規申訴",
+        "警察開的罰單申訴",
+        "違規申訴"
+      ],
+      "features": [],
+      "enabled": true,
+      "reason": "",
+      "mode": "demo",
+      "navigation": {
+        "type": "web",
+        "path": "/form/b-1",
+        "parents": [
+          "/"
+        ],
+        "query": {}
+      }
+    },
+    {
+      "id": "districtOffice.form.c-1",
+      "title": "老人全民健康保險保險費自付額補助",
+      "category": "申辦表單",
+      "keywords": [
+        "老人健保補助",
+        "老人健保費補助",
+        "長輩健保補助"
+      ],
+      "features": [],
+      "enabled": true,
+      "reason": "",
+      "mode": "demo",
+      "navigation": {
+        "type": "web",
+        "path": "/form/c-1",
+        "parents": [
+          "/"
+        ],
+        "query": {}
+      }
+    },
+    {
+      "id": "districtOffice.form.c-2",
+      "title": "臺北市性侵害被害人補助",
+      "category": "申辦表單",
+      "keywords": [
+        "性侵害被害人補助",
+        "性侵被害補助"
+      ],
+      "features": [],
+      "enabled": true,
+      "reason": "",
+      "mode": "demo",
+      "navigation": {
+        "type": "web",
+        "path": "/form/c-2",
+        "parents": [
+          "/"
+        ],
+        "query": {}
+      }
+    },
+    {
+      "id": "districtOffice.form.c-3",
+      "title": "臺北市家庭暴力被害人補助",
+      "category": "申辦表單",
+      "keywords": [
+        "家暴被害人補助",
+        "家庭暴力補助",
+        "家暴補助"
+      ],
+      "features": [],
+      "enabled": true,
+      "reason": "",
+      "mode": "demo",
+      "navigation": {
+        "type": "web",
+        "path": "/form/c-3",
+        "parents": [
+          "/"
+        ],
+        "query": {}
+      }
+    },
+    {
+      "id": "districtOffice.form.c-4",
+      "title": "特殊境遇家庭扶助之家庭暴力被害人補助",
+      "category": "申辦表單",
+      "keywords": [
+        "特殊境遇家庭扶助",
+        "特殊境遇家庭補助"
+      ],
+      "features": [],
+      "enabled": true,
+      "reason": "",
+      "mode": "demo",
+      "navigation": {
+        "type": "web",
+        "path": "/form/c-4",
+        "parents": [
+          "/"
+        ],
+        "query": {}
+      }
+    },
+    {
+      "id": "districtOffice.form.c-5",
+      "title": "臺北市身心障礙者參加社會保險保險費補助方式變更",
+      "category": "申辦表單",
+      "keywords": [
+        "身障保險費補助",
+        "身心障礙保險補助變更"
+      ],
+      "features": [],
+      "enabled": true,
+      "reason": "",
+      "mode": "demo",
+      "navigation": {
+        "type": "web",
+        "path": "/form/c-5",
+        "parents": [
+          "/"
+        ],
+        "query": {}
+      }
+    },
+    {
+      "id": "districtOffice.form.d-1",
+      "title": "原住民急難關懷慰問金",
+      "category": "申辦表單",
+      "keywords": [
+        "原住民急難慰問金",
+        "原住民急難救助"
+      ],
+      "features": [],
+      "enabled": true,
+      "reason": "",
+      "mode": "demo",
+      "navigation": {
+        "type": "web",
+        "path": "/form/d-1",
+        "parents": [
+          "/"
+        ],
+        "query": {}
+      }
+    },
+    {
+      "id": "districtOffice.form.d-2",
+      "title": "原住民參加技術士技能檢定獎勵金申請",
+      "category": "申辦表單",
+      "keywords": [
+        "原住民技能檢定獎勵金",
+        "原住民證照獎勵金"
+      ],
+      "features": [],
+      "enabled": true,
+      "reason": "",
+      "mode": "demo",
+      "navigation": {
+        "type": "web",
+        "path": "/form/d-2",
+        "parents": [
+          "/"
+        ],
+        "query": {}
+      }
+    },
+    {
+      "id": "reportIssue.list",
+      "title": "陳情分類",
+      "category": "案件查詢",
+      "keywords": [
+        "陳情分類",
+        "陳情項目",
+        "所有陳情類別",
+        "要陳情什麼"
+      ],
+      "features": [],
+      "enabled": true,
+      "reason": "",
+      "mode": "demo",
+      "navigation": {
+        "type": "web",
+        "path": "/citizen-report/list",
+        "parents": [
+          "/citizen-report/"
+        ],
+        "query": {},
+        "in_page": true
+      }
+    },
+    {
+      "id": "disasterReport.form.D-1-1",
+      "title": "電線(桿)或纜線受損",
+      "category": "災情通報類別",
+      "keywords": [
+        "電線桿倒了",
+        "電線斷了",
+        "纜線掉下來"
+      ],
+      "features": [],
+      "enabled": true,
+      "reason": "",
+      "mode": "demo",
+      "navigation": {
+        "type": "web",
+        "path": "/disaster-report/form/D-1-1",
+        "parents": [
+          "/disaster-report"
+        ],
+        "query": {},
+        "in_page": true
+      }
+    },
+    {
+      "id": "disasterReport.form.D-1-2",
+      "title": "變電所、電廠受災",
+      "category": "災情通報類別",
+      "keywords": [
+        "變電所受災",
+        "電廠受災"
+      ],
+      "features": [],
+      "enabled": true,
+      "reason": "",
+      "mode": "demo",
+      "navigation": {
+        "type": "web",
+        "path": "/disaster-report/form/D-1-2",
+        "parents": [
+          "/disaster-report"
+        ],
+        "query": {},
+        "in_page": true
+      }
+    },
+    {
+      "id": "disasterReport.form.D-1-3",
+      "title": "路燈故障",
+      "category": "災情通報類別",
+      "keywords": [
+        "路燈不亮",
+        "路燈壞了",
+        "路燈故障"
+      ],
+      "features": [],
+      "enabled": true,
+      "reason": "",
+      "mode": "demo",
+      "navigation": {
+        "type": "web",
+        "path": "/disaster-report/form/D-1-3",
+        "parents": [
+          "/disaster-report"
+        ],
+        "query": {},
+        "in_page": true
+      }
+    },
+    {
+      "id": "disasterReport.form.D-1-4",
+      "title": "電力停電",
+      "category": "災情通報類別",
+      "keywords": [
+        "停電",
+        "沒電了",
+        "電力中斷"
+      ],
+      "features": [],
+      "enabled": true,
+      "reason": "",
+      "mode": "demo",
+      "navigation": {
+        "type": "web",
+        "path": "/disaster-report/form/D-1-4",
+        "parents": [
+          "/disaster-report"
+        ],
+        "query": {},
+        "in_page": true
+      }
+    },
+    {
+      "id": "disasterReport.form.D-2-1",
+      "title": "橋樑基礎沖刷",
+      "category": "災情通報類別",
+      "keywords": [
+        "橋墩被沖刷",
+        "橋基沖刷"
+      ],
+      "features": [],
+      "enabled": true,
+      "reason": "",
+      "mode": "demo",
+      "navigation": {
+        "type": "web",
+        "path": "/disaster-report/form/D-2-1",
+        "parents": [
+          "/disaster-report"
+        ],
+        "query": {},
+        "in_page": true
+      }
+    },
+    {
+      "id": "disasterReport.form.D-2-2",
+      "title": "橋樑斷裂",
+      "category": "災情通報類別",
+      "keywords": [
+        "橋斷了",
+        "橋樑斷裂"
+      ],
+      "features": [],
+      "enabled": true,
+      "reason": "",
+      "mode": "demo",
+      "navigation": {
+        "type": "web",
+        "path": "/disaster-report/form/D-2-2",
+        "parents": [
+          "/disaster-report"
+        ],
+        "query": {},
+        "in_page": true
+      }
+    },
+    {
+      "id": "disasterReport.form.D-2-3",
+      "title": "前述以外之橋梁災情",
+      "category": "災情通報類別",
+      "keywords": [
+        "其他橋梁災情",
+        "橋有問題"
+      ],
+      "features": [],
+      "enabled": true,
+      "reason": "",
+      "mode": "demo",
+      "navigation": {
+        "type": "web",
+        "path": "/disaster-report/form/D-2-3",
+        "parents": [
+          "/disaster-report"
+        ],
+        "query": {},
+        "in_page": true
+      }
+    },
+    {
+      "id": "disasterReport.form.D-3-1",
+      "title": "土石流",
+      "category": "災情通報類別",
+      "keywords": [
+        "土石流"
+      ],
+      "features": [],
+      "enabled": true,
+      "reason": "",
+      "mode": "demo",
+      "navigation": {
+        "type": "web",
+        "path": "/disaster-report/form/D-3-1",
+        "parents": [
+          "/disaster-report"
+        ],
+        "query": {},
+        "in_page": true
+      }
+    },
+    {
+      "id": "disasterReport.form.D-3-2",
+      "title": "土石崩落",
+      "category": "災情通報類別",
+      "keywords": [
+        "山崩",
+        "落石",
+        "土石崩落",
+        "坍方"
+      ],
+      "features": [],
+      "enabled": true,
+      "reason": "",
+      "mode": "demo",
+      "navigation": {
+        "type": "web",
+        "path": "/disaster-report/form/D-3-2",
+        "parents": [
+          "/disaster-report"
+        ],
+        "query": {},
+        "in_page": true
+      }
+    },
+    {
+      "id": "disasterReport.form.D-3-3",
+      "title": "堰塞湖",
+      "category": "災情通報類別",
+      "keywords": [
+        "堰塞湖"
+      ],
+      "features": [],
+      "enabled": true,
+      "reason": "",
+      "mode": "demo",
+      "navigation": {
+        "type": "web",
+        "path": "/disaster-report/form/D-3-3",
+        "parents": [
+          "/disaster-report"
+        ],
+        "query": {},
+        "in_page": true
+      }
+    },
+    {
+      "id": "disasterReport.form.D-4-1",
+      "title": "建築物火災",
+      "category": "災情通報類別",
+      "keywords": [
+        "房子失火",
+        "大樓火災",
+        "建築物火災"
+      ],
+      "features": [],
+      "enabled": true,
+      "reason": "",
+      "mode": "demo",
+      "navigation": {
+        "type": "web",
+        "path": "/disaster-report/form/D-4-1",
+        "parents": [
+          "/disaster-report"
+        ],
+        "query": {},
+        "in_page": true
+      }
+    },
+    {
+      "id": "disasterReport.form.D-4-2",
+      "title": "危險物品火災",
+      "category": "災情通報類別",
+      "keywords": [
+        "危險物品火災",
+        "化學品起火"
+      ],
+      "features": [],
+      "enabled": true,
+      "reason": "",
+      "mode": "demo",
+      "navigation": {
+        "type": "web",
+        "path": "/disaster-report/form/D-4-2",
+        "parents": [
+          "/disaster-report"
+        ],
+        "query": {},
+        "in_page": true
+      }
+    },
+    {
+      "id": "disasterReport.form.D-4-3",
+      "title": "工廠火災",
+      "category": "災情通報類別",
+      "keywords": [
+        "工廠失火",
+        "工廠火災"
+      ],
+      "features": [],
+      "enabled": true,
+      "reason": "",
+      "mode": "demo",
+      "navigation": {
+        "type": "web",
+        "path": "/disaster-report/form/D-4-3",
+        "parents": [
+          "/disaster-report"
+        ],
+        "query": {},
+        "in_page": true
+      }
+    },
+    {
+      "id": "disasterReport.form.D-4-4",
+      "title": "其他(前述以外火災)",
+      "category": "災情通報類別",
+      "keywords": [
+        "其他火災"
+      ],
+      "features": [],
+      "enabled": true,
+      "reason": "",
+      "mode": "demo",
+      "navigation": {
+        "type": "web",
+        "path": "/disaster-report/form/D-4-4",
+        "parents": [
+          "/disaster-report"
+        ],
+        "query": {},
+        "in_page": true
+      }
+    },
+    {
+      "id": "reservation.c-1-1",
+      "title": "古亭地政事務所",
+      "category": "臨櫃叫號單位",
+      "keywords": [
+        "古亭地政",
+        "古亭地政事務所叫號",
+        "古亭地政事務所抽號"
+      ],
+      "features": [
+        "目前叫號",
+        "等待人數"
+      ],
+      "enabled": true,
+      "reason": "",
+      "mode": "demo",
+      "navigation": {
+        "type": "web",
+        "path": "/counter-calling/c-1",
+        "parents": [
+          "/counter-calling/"
+        ],
+        "query": {
+          "subId": "c-1-1"
+        }
+      }
+    },
+    {
+      "id": "reservation.c-1-2",
+      "title": "中山地政事務所",
+      "category": "臨櫃叫號單位",
+      "keywords": [
+        "中山地政",
+        "中山地政事務所叫號",
+        "中山地政事務所抽號"
+      ],
+      "features": [
+        "目前叫號",
+        "等待人數"
+      ],
+      "enabled": true,
+      "reason": "",
+      "mode": "demo",
+      "navigation": {
+        "type": "web",
+        "path": "/counter-calling/c-1",
+        "parents": [
+          "/counter-calling/"
+        ],
+        "query": {
+          "subId": "c-1-2"
+        }
+      }
+    },
+    {
+      "id": "reservation.c-2-1",
+      "title": "萬華區戶政事務所",
+      "category": "臨櫃叫號單位",
+      "keywords": [
+        "萬華戶政",
+        "萬華戶政事務所",
+        "萬華區戶政事務所叫號",
+        "萬華區戶政事務所抽號"
+      ],
+      "features": [
+        "目前叫號",
+        "等待人數"
+      ],
+      "enabled": true,
+      "reason": "",
+      "mode": "demo",
+      "navigation": {
+        "type": "web",
+        "path": "/counter-calling/c-2",
+        "parents": [
+          "/counter-calling/"
+        ],
+        "query": {
+          "subId": "c-2-1"
+        }
+      }
+    },
+    {
+      "id": "reservation.c-2-2",
+      "title": "中正區戶政事務所",
+      "category": "臨櫃叫號單位",
+      "keywords": [
+        "中正戶政",
+        "中正戶政事務所",
+        "中正區戶政事務所叫號",
+        "中正區戶政事務所抽號"
+      ],
+      "features": [
+        "目前叫號",
+        "等待人數"
+      ],
+      "enabled": true,
+      "reason": "",
+      "mode": "demo",
+      "navigation": {
+        "type": "web",
+        "path": "/counter-calling/c-2",
+        "parents": [
+          "/counter-calling/"
+        ],
+        "query": {
+          "subId": "c-2-2"
+        }
+      }
+    },
+    {
+      "id": "reservation.c-3-1",
+      "title": "臺北市萬華區公所",
+      "category": "臨櫃叫號單位",
+      "keywords": [
+        "萬華區公所",
+        "臺北市萬華區公所叫號",
+        "臺北市萬華區公所抽號"
+      ],
+      "features": [
+        "目前叫號",
+        "等待人數"
+      ],
+      "enabled": true,
+      "reason": "",
+      "mode": "demo",
+      "navigation": {
+        "type": "web",
+        "path": "/counter-calling/c-3",
+        "parents": [
+          "/counter-calling/"
+        ],
+        "query": {
+          "subId": "c-3-1"
+        }
+      }
+    },
+    {
+      "id": "reservation.c-3-2",
+      "title": "臺北市中正區公所",
+      "category": "臨櫃叫號單位",
+      "keywords": [
+        "中正區公所",
+        "臺北市中正區公所叫號",
+        "臺北市中正區公所抽號"
+      ],
+      "features": [
+        "目前叫號",
+        "等待人數"
+      ],
+      "enabled": true,
+      "reason": "",
+      "mode": "demo",
+      "navigation": {
+        "type": "web",
+        "path": "/counter-calling/c-3",
+        "parents": [
+          "/counter-calling/"
+        ],
+        "query": {
+          "subId": "c-3-2"
+        }
+      }
+    },
+    {
+      "id": "reservation.c-4-1",
+      "title": "稅捐處萬華分處",
+      "category": "臨櫃叫號單位",
+      "keywords": [
+        "萬華稅捐",
+        "萬華分處",
+        "稅捐處萬華分處叫號",
+        "稅捐處萬華分處抽號"
+      ],
+      "features": [
+        "目前叫號",
+        "等待人數"
+      ],
+      "enabled": true,
+      "reason": "",
+      "mode": "demo",
+      "navigation": {
+        "type": "web",
+        "path": "/counter-calling/c-4",
+        "parents": [
+          "/counter-calling/"
+        ],
+        "query": {
+          "subId": "c-4-1"
+        }
+      }
+    },
+    {
+      "id": "reservation.c-4-2",
+      "title": "稅捐處大同分處",
+      "category": "臨櫃叫號單位",
+      "keywords": [
+        "大同稅捐",
+        "大同分處",
+        "稅捐處大同分處叫號",
+        "稅捐處大同分處抽號"
+      ],
+      "features": [
+        "目前叫號",
+        "等待人數"
+      ],
+      "enabled": true,
+      "reason": "",
+      "mode": "demo",
+      "navigation": {
+        "type": "web",
+        "path": "/counter-calling/c-4",
+        "parents": [
+          "/counter-calling/"
+        ],
+        "query": {
+          "subId": "c-4-2"
+        }
+      }
+    },
+    {
+      "id": "reservation.c-5-1",
+      "title": "艋舺就業服務站",
+      "category": "臨櫃叫號單位",
+      "keywords": [
+        "艋舺就業服務站",
+        "艋舺就服站",
+        "艋舺就業服務站叫號",
+        "艋舺就業服務站抽號"
+      ],
+      "features": [
+        "目前叫號",
+        "等待人數"
+      ],
+      "enabled": true,
+      "reason": "",
+      "mode": "demo",
+      "navigation": {
+        "type": "web",
+        "path": "/counter-calling/c-5",
+        "parents": [
+          "/counter-calling/"
+        ],
+        "query": {
+          "subId": "c-5-1"
+        }
+      }
+    },
+    {
+      "id": "reservation.c-5-2",
+      "title": "西門就業服務站",
+      "category": "臨櫃叫號單位",
+      "keywords": [
+        "西門就業服務站",
+        "西門就服站",
+        "西門就業服務站叫號",
+        "西門就業服務站抽號"
+      ],
+      "features": [
+        "目前叫號",
+        "等待人數"
+      ],
+      "enabled": true,
+      "reason": "",
+      "mode": "demo",
+      "navigation": {
+        "type": "web",
+        "path": "/counter-calling/c-5",
+        "parents": [
+          "/counter-calling/"
+        ],
+        "query": {
+          "subId": "c-5-2"
+        }
+      }
     }
   ]
 }

@@ -1,5 +1,8 @@
 import 'dart:async';
 
+import 'dart:convert';
+
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:google_mlkit_translation/google_mlkit_translation.dart';
@@ -53,22 +56,84 @@ class PageTranslation {
   Future<String> Function(String text, String language)? translator;
 
   final _cache = <String, Map<String, String>>{};
+  final _reported = <String>{};
   final _waiting = <String>{};
   Timer? _flush;
   OnDeviceTranslator? _mlKitTranslator;
   String? _mlKitLanguage;
   Future<void> _running = Future.value();
 
+  /// ML Kit results kept on the phone, so a page translated once opens
+  /// translated next time (per language, at most [_learnedLimit] texts).
+  final _learned = <String, Map<String, String>>{};
+  final _learnedLoaded = <String>{};
+  Timer? _save;
+  static const _learnedLimit = 4000;
+  static const _bundle = 'assets/i18n/app_strings.json';
+
   bool get active => language.value != original;
 
-  /// The saved page language, if any (else the pages stay in Chinese).
+  /// The saved page language, if any (else the pages stay in Chinese), the
+  /// App's own strings translated in advance (assets/i18n/app_strings.json,
+  /// shown at once) and what ML Kit translated earlier on this phone.
   Future<void> load() async {
+    await _loadBundled();
     try {
       final saved = (await SharedPreferences.getInstance()).getString(_key);
       if (saved != null && languages.containsKey(saved)) {
         language.value = saved;
+        await _loadLearned(saved);
       }
     } catch (_) {}
+  }
+
+  Future<void> _loadBundled() async {
+    try {
+      final data = jsonDecode(await rootBundle.loadString(_bundle)) as Map;
+      final strings = data['strings'] as Map;
+      strings.forEach((source, translations) {
+        if (source is! String || translations is! Map) return;
+        translations.forEach((code, text) {
+          if (code is String && text is String && text.trim().isNotEmpty) {
+            _cache.putIfAbsent(code, () => {})[source] = text;
+          }
+        });
+      });
+    } catch (error) {
+      debugPrint('page translation: no bundled strings ($error)');
+    }
+  }
+
+  Future<void> _loadLearned(String code) async {
+    if (code == original || !_learnedLoaded.add(code)) return;
+    try {
+      final saved = (await SharedPreferences.getInstance()).getString(
+        '${_key}_cache_$code',
+      );
+      if (saved == null) return;
+      final learned = (jsonDecode(saved) as Map).cast<String, String>();
+      _learned[code] = learned;
+      final cache = _cache.putIfAbsent(code, () => {});
+      learned.forEach((source, text) => cache.putIfAbsent(source, () => text));
+    } catch (_) {}
+  }
+
+  void _remember(String code, String source, String text) {
+    final learned = _learned.putIfAbsent(code, () => {});
+    if (learned.length >= _learnedLimit) learned.remove(learned.keys.first);
+    learned[source] = text;
+    _save?.cancel();
+    _save = Timer(const Duration(seconds: 2), () async {
+      try {
+        final prefs = await SharedPreferences.getInstance();
+        for (final entry in _learned.entries) {
+          await prefs.setString(
+            '${_key}_cache_${entry.key}',
+            jsonEncode(entry.value),
+          );
+        }
+      } catch (_) {}
+    });
   }
 
   /// Switches every page to [code] and keeps it for the next launch.
@@ -76,6 +141,8 @@ class PageTranslation {
     if (!languages.containsKey(code) || code == language.value) return;
     language.value = code;
     revision.value++;
+    await _loadLearned(code);
+    revision.value++; // texts learned earlier on this phone
     try {
       await (await SharedPreferences.getInstance()).setString(_key, code);
     } catch (_) {}
@@ -100,6 +167,13 @@ class PageTranslation {
     return text;
   }
 
+  /// [display] for labels outside TPText (e.g. BottomNavigationBarItem):
+  /// call it inside an Obx so the label rebuilds when a translation arrives.
+  String label(String text) {
+    revision.value;
+    return display(text);
+  }
+
   /// Translations of [texts] in order; a text that cannot be translated is
   /// returned unchanged (also when the language model is unavailable).
   Future<List<String>> translateAll(List<String> texts) {
@@ -118,11 +192,16 @@ class PageTranslation {
         if (translated == null) {
           try {
             translated = await _translate(text, target);
-          } catch (_) {
+          } catch (error) {
             translated = null;
+            // Shown once per language; the page stays in Chinese.
+            if (_reported.add(target)) {
+              debugPrint('page translation to $target failed: $error');
+            }
           }
           if (translated != null && translated.trim().isNotEmpty) {
             cache[text] = translated;
+            _remember(target, text, translated);
           }
         }
         out.add(translated ?? text);
@@ -143,6 +222,7 @@ class PageTranslation {
       final models = OnDeviceTranslatorModelManager();
       for (final code in {TranslateLanguage.chinese, language}) {
         if (!await models.isModelDownloaded(code.bcpCode)) {
+          debugPrint('page translation: downloading ${code.bcpCode} model');
           preparing.value = true;
           try {
             await models.downloadModel(code.bcpCode, isWifiRequired: false);
@@ -166,6 +246,9 @@ class PageTranslation {
     _waiting.clear();
     _flush?.cancel();
     _flush = null;
+    _save?.cancel();
+    _learned.clear();
+    _learnedLoaded.clear();
     _running = Future.value();
     language.value = original;
     translator = null;

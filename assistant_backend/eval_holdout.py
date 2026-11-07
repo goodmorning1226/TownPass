@@ -122,7 +122,7 @@ HOLDOUT = [
     one("unavailable", "附近的公園綠地", unavailable("greenMap")),
     one("unavailable", "我想帶寵物出去走走", unavailable("petFriendlyMap")),
     one("unavailable", "把帳號登出", unavailable("logout")),
-    one("unavailable", "介面可以變英文嗎", unavailable("language")),
+    one("capability", "介面可以變英文嗎", cap("language")),
     # Ambiguous across services: offer candidates.
     one("service_confirm", "查一下進度", CONFIRM), one("service_confirm", "我的案子現在怎樣了", CONFIRM),
     one("service_confirm", "案件查詢", CONFIRM), one("service_confirm", "申請的案件辦到哪", want(("confirm_candidates", "navigate"),

@@ -7,6 +7,23 @@ from server import Assistant, AssistantError
 from test_server import FakeCatalog, first, response
 
 
+# These tests cover the layers before the intent fallback (version B), which
+# is on by default and tested on its own (test_phonetic.IntentFallbackTests).
+_intent_off = None
+
+
+def setUpModule():
+    global _intent_off
+    from unittest.mock import patch
+    import workflow
+    _intent_off = patch.object(workflow, "INTENT_FALLBACK", False)
+    _intent_off.start()
+
+
+def tearDownModule():
+    _intent_off.stop()
+
+
 def hit(id, score, question="問題", answer="答案", department="臺北市政府某局"):
     return {"score": score, "id": id, "question": question, "answer": answer,
             "department": department, "category": "測試"}

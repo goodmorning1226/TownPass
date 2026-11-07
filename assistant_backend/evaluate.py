@@ -161,7 +161,7 @@ CASES = [
     one("colloquial", "有什麼活動", cap("activities")), one("colloquial", "我有新通知嗎", cap("messages")),
     one("colloquial", "載具", cap("invoice")), one("colloquial", "抽號碼牌", cap("reservation")),
     one("colloquial", "淹水要通報", cap("disasterReport")), one("colloquial", "我要檢舉", cap("reportIssue")),
-    one("colloquial", "帶狗可以去哪", UNSUPPORTED), one("colloquial", "換語言", UNSUPPORTED),
+    one("colloquial", "帶狗可以去哪", UNSUPPORTED), one("colloquial", "換語言", cap("language")),
     one("listing", "你會做什麼", LISTING), one("listing", "可以幫我什麼", LISTING), one("listing", "有哪些服務", LISTING),
     one("book_author", "廣嶋玲子寫的", CONFIRM), one("book_author", "劉潤寫的書", search("劉潤", "author")),
     # Moved from the held-out set (unchanged wording and expectation).
@@ -173,7 +173,7 @@ CASES = [
     one("from_holdout", "圖書館的公告", cap("library.notices")), one("from_holdout", "我借了哪些書", cap("library.records")),
     one("from_holdout", "熱門的書有哪些", cap("library.ranking")),
     one("from_holdout", "可以帶狗去哪裡散步", want("unsupported", target=("petFriendlyMap",))),
-    one("from_holdout", "改成英文", want("unsupported", target=("language",))),
+    one("from_holdout", "改成英文", cap("language")),  # language page works since 2026-11-07
     one("from_holdout", "查案件", CONFIRM), one("from_holdout", "我的案件辦到哪了", CONFIRM),
     one("from_holdout", "進度查詢", CONFIRM),
     one("from_holdout", "借書順便繳停車費", CONFIRM), one("from_holdout", "幫我開水費跟地方稅", CONFIRM),
@@ -238,9 +238,17 @@ CASES = [
     one("capability", "線上報案", cap("police.online")),
     one("capability", "我要報案", cap("police")),
     # Catalogued but not connected: an honest explanation, no page.
+    # Batch 1 (2026-11-07): forms, FAQ, payment search, pages whose action is not connected.
+    one("capability", "我想申請老人健保補助", cap("districtOffice.form.c-1")),
+    one("capability", "停車罰單要申訴", want("navigate", [{"kind": "capability", "id": "districtOffice.form.a-3"},
+                                                    {"kind": "capability", "id": "reportIssue"}])),
+    one("capability", "常見問題在哪裡看", cap("qna")),
+    one("capability", "幫我查繳費項目", cap("fees.search")),
+    one("capability", "我的圖書預約清單", cap("library.reservations")),
+    one("capability", "我要停用帳號", cap("suspend")),
     one("unavailable", "幫我掛號", UNSUPPORTED), one("unavailable", "疫苗預約", UNSUPPORTED),
     one("unavailable", "我要聽廣播", UNSUPPORTED), one("unavailable", "動物園", UNSUPPORTED),
-    one("unavailable", "網路投票", UNSUPPORTED), one("unavailable", "切換英文介面", UNSUPPORTED),
+    one("unavailable", "網路投票", UNSUPPORTED), one("capability", "切換英文介面", cap("language")),
     one("unavailable", "我要登出", UNSUPPORTED), one("unavailable", "圖書館地圖", UNSUPPORTED),
     one("unavailable", "我要自報水表度數", UNSUPPORTED),
     # Ambiguous or misspelt service: candidates first, the landing page after selection.

@@ -56,9 +56,46 @@ class _AssistantHostState extends State<AssistantHost> {
             return _corner(context, controller);
           }),
         ),
+        // First use of a page language downloads its translation model.
+        Obx(() {
+          final translation = PageTranslation.instance;
+          if (!translation.preparing.value) return const SizedBox.shrink();
+          return Positioned(
+            left: 16,
+            right: 16,
+            top: MediaQuery.of(context).padding.top + 8,
+            child: IgnorePointer(
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
+                decoration: BoxDecoration(
+                  color: TPColors.grayscale900.withValues(alpha: 0.9),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: TPText(
+                  _downloadingTranslation[translation.language.value] ??
+                      _downloadingTranslation['zh']!,
+                  style: TPTextStyles.bodyRegular,
+                  color: TPColors.white,
+                ),
+              ),
+            ),
+          );
+        }),
       ],
     );
   }
+
+  static const _downloadingTranslation = {
+    'zh': '正在下載頁面翻譯模型（約 30 MB），完成後頁面會自動翻譯…',
+    'en': 'Downloading the page translation model (about 30 MB); pages will be translated when it is ready…',
+    'ja': 'ページ翻訳モデルをダウンロード中（約 30 MB）。完了するとページが翻訳されます…',
+    'vi': 'Đang tải mô hình dịch trang (khoảng 30 MB); trang sẽ được dịch khi tải xong…',
+    'id': 'Mengunduh model terjemahan halaman (sekitar 30 MB); halaman akan diterjemahkan setelah selesai…',
+    'th': 'กำลังดาวน์โหลดโมเดลแปลหน้า (ประมาณ 30 MB) หน้าจะถูกแปลเมื่อเสร็จ…',
+  };
 
   Widget _corner(BuildContext context, AssistantViewController controller) {
     final media = MediaQuery.of(context);

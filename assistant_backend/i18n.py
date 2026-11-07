@@ -125,46 +125,116 @@ def searches(table, text, language):
     return bool(pattern and re.search(pattern, fold(text), re.I))
 
 
-# --- Similar wording (space-separated languages) -------------------------------
-# Speech and non-native speakers change a word or two ("what can I do" for
-# "what can you do", "learn a book" for "lend a book"). Character similarity
-# of the phrase against the sentence's stretches of about the same length:
-# such variants score 0.81-0.88, different requests ("what time is it",
-# "lend a hand" for "lend a book") at most ~0.7.
-SIMILAR_LANGUAGES = ("en", "vi", "id")
+# --- Similar wording and sound (every foreign language) ---------------------
+# Speech and non-native speakers change a sound or a word: "what can I do" for
+# "what can you do", "learn a book" for "lend a book", Whisper writing Japanese
+# as romaji with the wrong voicing ("nani ka dekiru" for なにができる). Texts are
+# first reduced to a sound key per language, then compared by characters
+# against stretches of the sentence of about the same length: such variants
+# score 0.81-0.88 (identical keys 1.0), different requests at most ~0.7.
+SIMILAR_LANGUAGES = ("en", "vi", "id", "ja", "th")
 SIMILAR_PHRASE = 0.8
+_UNSPACED = ("ja", "th")
+# Compared by characters, chance matches score higher ("nanika taberu" 0.83).
+_THRESHOLDS = {"ja": 0.88, "th": 0.88}
+
+_KANA_ROWS = {
+    "": "aiueo", "k": "kakikukeko", "s": "sashisuseso", "t": "tachitsuteto", "n": "naninuneno",
+    "h": "hahifuheho", "m": "mamimumemo", "y": "yayuyo", "r": "rarirurero", "w": "wawo",
+    "g": "gagigugego", "z": "zajizuzezo", "d": "dajizudedo", "b": "babibubebo", "p": "papipupepo",
+}
+_HIRAGANA = ("あいうえお かきくけこ さしすせそ たちつてと なにぬねの はひふへほ まみむめも やゆよ らりるれろ わを "
+             "がぎぐげご ざじずぜぞ だぢづでど ばびぶべぼ ぱぴぷぺぽ").split()
 
 
-def _words(text):
-    return re.findall(r"\w+", fold(text))
+def _syllables(row):
+    """"kakikukeko" -> ka, ki, ku, ke, ko (consonants up to and including a vowel)."""
+    return re.findall(r"[^aiueo]*[aiueo]", row)
 
 
-def similarity(text, phrase):
-    """Best 0-1 similarity of phrase to any stretch of text with one word fewer to one more."""
+_KANA = {}
+for _kana, _row in zip(_HIRAGANA, _KANA_ROWS.values()):
+    for _char, _romaji in zip(_kana, _syllables(_row)):
+        _KANA[_char] = _romaji
+        _KANA[chr(ord(_char) + 0x60)] = _romaji  # katakana
+_KANA.update({"ん": "n", "ン": "n", "ゃ": "ya", "ゅ": "yu", "ょ": "yo", "ャ": "ya", "ュ": "yu", "ョ": "yo",
+              "ぁ": "a", "ぃ": "i", "ぅ": "u", "ぇ": "e", "ぉ": "o", "ァ": "a", "ィ": "i", "ゥ": "u", "ェ": "e",
+              "ォ": "o", "ヴ": "bu"})
+# Voiced and unvoiced consonants are folded together (が/か, だ/た, ば/は/ぱ, ざ/さ).
+_JA_FOLD = (("sh", "s"), ("ch", "t"), ("ts", "t"), ("j", "s"), ("g", "k"), ("z", "s"), ("d", "t"),
+            ("b", "h"), ("p", "h"), ("f", "h"), ("wo", "o"))
+
+
+def _romaji(text):
+    out = []
+    for char in text:
+        if char in "ゃゅょャュョ" and out and out[-1].endswith("i"):
+            out[-1] = out[-1][:-1] + _KANA[char]  # きゃ -> kya
+        elif char in "っッ":
+            out.append("")  # doubled consonant: dropped by the fold
+        elif char == "ー":
+            continue
+        else:
+            out.append(_KANA.get(char, char))
+    return "".join(out)
+
+
+def sound_key(text, language):
+    """A sound-level spelling for comparison: Japanese kana -> folded romaji,
+    Vietnamese without tone marks, Thai without tone marks, Latin lower case."""
+    text = fold(text)
+    if language == "ja":
+        key = re.sub(r"[^\w]", "", _romaji(text))
+        for long, short in _JA_FOLD:
+            key = key.replace(long, short)
+        key = re.sub(r"([a-z])\1+", r"\1", key)  # doubled consonants, long vowels
+        return re.sub(r"ou", "o", key)
+    if language == "vi":
+        stripped = "".join(c for c in unicodedata.normalize("NFD", text.replace("đ", "d"))
+                           if not unicodedata.combining(c))
+        return " ".join(re.findall(r"\w+", stripped))
+    if language == "th":
+        return re.sub(r"[็-๎\s]", "", text)
+    return " ".join(re.findall(r"\w+", text))
+
+
+def similarity(text, phrase, language="en"):
+    """Best 0-1 similarity of phrase's sound key to a stretch of text's key of about
+    the same length (one word fewer to one more; for ja / th, +-25% characters)."""
     import difflib
-    words, wanted = _words(text), _words(phrase)
-    if not words or not wanted:
+    have, want = sound_key(text, language), sound_key(phrase, language)
+    if not have or not want:
         return 0.0
-    target = " ".join(wanted)
+    if language in _UNSPACED:
+        units, wanted, joiner = list(have), list(want), ""
+        spread = max(1, len(wanted) // 4)
+    else:
+        units, wanted, joiner = have.split(), want.split(), " "
+        spread = 1
+    target = joiner.join(wanted)
     best = 0.0
-    for size in range(max(1, len(wanted) - 1), len(wanted) + 2):
-        for start in range(max(1, len(words) - size + 1)):
-            window = " ".join(words[start:start + size])
+    for size in range(max(1, len(wanted) - spread), len(wanted) + spread + 1):
+        for start in range(max(1, len(units) - size + 1)):
+            window = joiner.join(units[start:start + size])
             best = max(best, difflib.SequenceMatcher(None, window, target).ratio())
     return best
 
 
-def similar(phrases, text, language, threshold=SIMILAR_PHRASE):
-    """A phrase of phrases[language] worded like part of text (only SIMILAR_LANGUAGES)."""
+def similar(phrases, text, language, threshold=None):
+    """A phrase of phrases[language] worded or sounding like part of text."""
     if language not in SIMILAR_LANGUAGES:
         return False
-    return any(similarity(text, phrase) >= threshold for phrase in phrases.get(language, ()))
+    threshold = threshold or _THRESHOLDS.get(language, SIMILAR_PHRASE)
+    return any(similarity(text, phrase, language) >= threshold for phrase in phrases.get(language, ()))
 
 
 LISTING_PHRASES = {
     "en": ("what can you do", "what services do you have", "what can you help me with", "show all services"),
     "vi": ("bạn làm được gì", "có những dịch vụ gì"),
     "id": ("bisa apa saja", "layanan apa saja"),
+    # Kana: compared by sound with romaji or kana transcripts.
+    "ja": ("なにができる", "どんなことができる", "どんなサービスがある", "できることをおしえて"),
+    "th": ("ทำอะไรได้บ้าง", "มีบริการอะไรบ้าง"),
 }
 
 
@@ -241,8 +311,18 @@ MESSAGES = {
         "th": "โปรดดำเนินการต่อในหน้า \"{title}\" นี่เป็นเดโม ยังไม่มีการส่งหรือชำระเงิน",
     },
     "page_language": {
-        "en": "(The page itself is in Chinese.)", "ja": "（ページ自体は中国語です。）",
-        "vi": "(Trang này bằng tiếng Trung.)", "id": "(Halaman ini berbahasa Mandarin.)", "th": "(หน้านี้เป็นภาษาจีน)",
+        "en": "(The page is translated on your phone; some names may differ from the Chinese original.)",
+        "ja": "（ページはスマートフォン上で翻訳されます。名称が中国語の原文と異なる場合があります。）",
+        "vi": "(Trang được dịch ngay trên điện thoại; một số tên có thể khác bản gốc tiếng Trung.)",
+        "id": "(Halaman diterjemahkan di ponsel Anda; beberapa nama bisa berbeda dari aslinya dalam bahasa Mandarin.)",
+        "th": "(หน้านี้แปลบนโทรศัพท์ของคุณ ชื่อบางอย่างอาจต่างจากต้นฉบับภาษาจีน)",
+    },
+    "limited": {
+        "en": "This page opens, but its action is not connected yet, so it cannot be done for now.",
+        "ja": "このページは開けますが、操作はまだ接続されていないため、現在は実行できません。",
+        "vi": "Trang này mở được, nhưng thao tác chưa được kết nối nên tạm thời chưa thực hiện được.",
+        "id": "Halaman ini bisa dibuka, tetapi tindakannya belum tersambung, jadi untuk sementara belum bisa dilakukan.",
+        "th": "หน้านี้เปิดได้ แต่การดำเนินการยังไม่ได้เชื่อมต่อ จึงยังทำไม่ได้ในตอนนี้",
     },
     "unsupported": {
         "en": "{title}: this service is not available in the app yet.",

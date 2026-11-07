@@ -1,0 +1,1616 @@
+{
+ "version": 1,
+ "source": "TownPass App strings (lib/, assets/mock_data/); translations reviewed by speakers pending",
+ "strings": {
+  "\n🔹《臺北市物價統計專區》\n": {
+   "en": "\n🔹\"Taipei City Price Statistics\"\n",
+   "ja": "\n🔹『台北市物価統計コーナー』\n",
+   "vi": "\n🔹\"Chuyên mục thống kê giá cả Thành phố Đài Bắc\"\n",
+   "id": "\n🔹\"Pusat Statistik Harga Kota Taipei\"\n",
+   "th": "\n🔹\"ศูนย์สถิติราคาสินค้านครไทเป\"\n"
+  },
+  "113年端午節前台北市節慶商品物價變動": {
+   "en": "Price Changes of Festive Goods in Taipei Before the 113 (2024) Dragon Boat Festival",
+   "ja": "113年（2024年）端午節前の台北市における節句商品の価格変動",
+   "vi": "Biến động giá hàng hóa dịp lễ tại Đài Bắc trước Tết Đoan Ngọ năm 113 (2024)",
+   "id": "Perubahan Harga Barang Musiman di Taipei Menjelang Festival Perahu Naga Tahun 113 (2024)",
+   "th": "การเปลี่ยนแปลงราคาสินค้าเทศกาลในไทเปก่อนเทศกาลเรือมังกร ปี 113 (2024)"
+  },
+  "1999電話": {
+   "en": "1999 Call",
+   "ja": "1999 電話",
+   "vi": "Gọi 1999",
+   "id": "Telepon 1999",
+   "th": "โทร 1999"
+  },
+  "2024士林好神！跟著神農心遶境 6/1盛大登場！ Shilin Spectacular in 2024！Grand Shennong Procession Kicking Off on 6/1！": {
+   "en": "Shilin Spectacular in 2024！Grand Shennong Procession Kicking Off on 6/1！",
+   "ja": "2024 士林すごい神様！神農の心とともに巡行 6/1 盛大に開幕！ Shilin Spectacular in 2024！Grand Shennong Procession Kicking Off on 6/1！",
+   "vi": "Sĩ Lâm 2024 thật tuyệt! Cùng Thần Nông diễu hành bằng cả trái tim, khai mạc hoành tráng ngày 6/1! Shilin Spectacular in 2024！Grand Shennong Procession Kicking Off on 6/1！",
+   "id": "Shilin 2024 luar biasa! Ikuti arak-arakan Shennong sepenuh hati, dimulai meriah 6/1! Shilin Spectacular in 2024！Grand Shennong Procession Kicking Off on 6/1！",
+   "th": "ซื่อหลิน 2024 สุดยอด! ร่วมขบวนแห่เสินหนงด้วยใจ เปิดฉากยิ่งใหญ่ 6/1! Shilin Spectacular in 2024！Grand Shennong Procession Kicking Off on 6/1！"
+  },
+  "APP起始頁面": {
+   "en": "App start page",
+   "ja": "起動ページ",
+   "vi": "Trang khởi động",
+   "id": "Halaman awal aplikasi",
+   "th": "หน้าเริ่มต้นแอป"
+  },
+  "e化繳稅熊讚 Pay Tax By e-Payment with Bravo": {
+   "en": "Pay Tax By e-Payment with Bravo",
+   "ja": "電子納税でらくらく Pay Tax By e-Payment with Bravo",
+   "vi": "Nộp thuế điện tử thật tuyệt Pay Tax By e-Payment with Bravo",
+   "id": "Bayar pajak elektronik, mantap! Pay Tax By e-Payment with Bravo",
+   "th": "ชำระภาษีออนไลน์ สุดยอด Pay Tax By e-Payment with Bravo"
+  },
+  "「1999話務系統」、「臺北市陳情系統」 或「1999派工系統」，": {
+   "en": "the \"1999 Call System\", the \"Taipei City Petition System\" or the \"1999 Dispatch System\",",
+   "ja": "「1999通話システム」、「台北市陳情システム」または「1999派遣システム」に、",
+   "vi": "\"Hệ thống tổng đài 1999\", \"Hệ thống kiến nghị Thành phố Đài Bắc\" hoặc \"Hệ thống điều phối 1999\",",
+   "id": "\"Sistem Panggilan 1999\", \"Sistem Pengaduan Kota Taipei\" atau \"Sistem Penugasan 1999\",",
+   "th": "\"ระบบรับสาย 1999\" \"ระบบร้องเรียนนครไทเป\" หรือ \"ระบบสั่งงาน 1999\","
+  },
+  "【參加「來臺北，找樂點」集點活動 抽iPhone及多項大獎！】Join \"Travel in Taipei\" Stamp Collection Event to Win iPhone and Prizes!": {
+   "en": "Join \"Travel in Taipei\" Stamp Collection Event to Win iPhone and Prizes!",
+   "ja": "【「来台北、找楽点」スタンプラリーに参加して iPhone や豪華賞品を当てよう！】Join \"Travel in Taipei\" Stamp Collection Event to Win iPhone and Prizes!",
+   "vi": "【Tham gia sự kiện tích dấu \"Đến Đài Bắc, tìm niềm vui\" để rút thăm iPhone và nhiều giải thưởng lớn!】Join \"Travel in Taipei\" Stamp Collection Event to Win iPhone and Prizes!",
+   "id": "【Ikuti acara kumpul stempel \"Datang ke Taipei, Cari Keseruan\" dan menangkan iPhone serta hadiah menarik!】Join \"Travel in Taipei\" Stamp Collection Event to Win iPhone and Prizes!",
+   "th": "【ร่วมกิจกรรมสะสมแสตมป์ \"มาไทเป หาจุดสนุก\" ลุ้นรับ iPhone และรางวัลใหญ่อีกมากมาย!】Join \"Travel in Taipei\" Stamp Collection Event to Win iPhone and Prizes!"
+  },
+  "【系統維護完成通知】即日起開放「台北通-健康集點」兌點服務。": {
+   "en": "【System Maintenance Completed】Point redemption for \"TownPass - Health Points\" is open from today.",
+   "ja": "【システムメンテナンス完了のお知らせ】本日より「TownPass - 健康ポイント」のポイント交換サービスを開始します。",
+   "vi": "【Thông báo hoàn tất bảo trì hệ thống】Từ hôm nay, dịch vụ đổi điểm \"TownPass - Tích điểm sức khỏe\" đã mở lại.",
+   "id": "【Pemberitahuan Pemeliharaan Sistem Selesai】Mulai hari ini layanan penukaran poin \"TownPass - Poin Sehat\" dibuka kembali.",
+   "th": "【แจ้งการบำรุงรักษาระบบเสร็จสิ้น】ตั้งแต่วันนี้ เปิดให้บริการแลกคะแนน \"TownPass - สะสมคะแนนสุขภาพ\" แล้ว"
+  },
+  "【系統維護完成通知】即日起開放「台北通-健康集點」兌點服務。[System maintenance has been completed]": {
+   "en": "【System Maintenance Completed】Point redemption for \"TownPass - Health Points\" is open from today.[System maintenance has been completed]",
+   "ja": "【システムメンテナンス完了のお知らせ】本日より「TownPass - 健康ポイント」のポイント交換サービスを開始します。[System maintenance has been completed]",
+   "vi": "【Thông báo hoàn tất bảo trì hệ thống】Từ hôm nay, dịch vụ đổi điểm \"TownPass - Tích điểm sức khỏe\" đã mở lại.[System maintenance has been completed]",
+   "id": "【Pemberitahuan Pemeliharaan Sistem Selesai】Mulai hari ini layanan penukaran poin \"TownPass - Poin Sehat\" dibuka kembali.[System maintenance has been completed]",
+   "th": "【แจ้งการบำรุงรักษาระบบเสร็จสิ้น】ตั้งแต่วันนี้ เปิดให้บริการแลกคะแนน \"TownPass - สะสมคะแนนสุขภาพ\" แล้ว[System maintenance has been completed]"
+  },
+  "並遵守個人資料 保護法相關規定,保障使用者的個資。\n": {
+   "en": "and comply with the Personal Data Protection Act to protect users' personal data.\n",
+   "ja": "個人情報保護法の関連規定を遵守し、利用者の個人情報を保護します。\n",
+   "vi": "và tuân thủ các quy định của Luật Bảo vệ Dữ liệu Cá nhân để bảo vệ dữ liệu cá nhân của người dùng.\n",
+   "id": "dan mematuhi ketentuan Undang-Undang Perlindungan Data Pribadi untuk melindungi data pribadi pengguna.\n",
+   "th": "และปฏิบัติตามกฎหมายคุ้มครองข้อมูลส่วนบุคคล เพื่อคุ้มครองข้อมูลส่วนบุคคลของผู้ใช้\n"
+  },
+  "中山區": {
+   "en": "Zhongshan District",
+   "ja": "中山区",
+   "vi": "Quận Trung Sơn",
+   "id": "Distrik Zhongshan",
+   "th": "เขตจงซาน"
+  },
+  "了解民眾與台北市互動體驗調查": {
+   "en": "Survey on residents' experience with Taipei City",
+   "ja": "市民と台北市の交流体験に関する調査",
+   "vi": "Khảo sát trải nghiệm tương tác của người dân với Thành phố Đài Bắc",
+   "id": "Survei pengalaman interaksi warga dengan Kota Taipei",
+   "th": "แบบสำรวจประสบการณ์การติดต่อของประชาชนกับนครไทเป"
+  },
+  "交通措施": {
+   "en": "Traffic measures",
+   "ja": "交通規制",
+   "vi": "Biện pháp giao thông",
+   "id": "Pengaturan lalu lintas",
+   "th": "มาตรการจราจร"
+  },
+  "使用紀錄": {
+   "en": "Usage history",
+   "ja": "利用履歴",
+   "vi": "Lịch sử sử dụng",
+   "id": "Riwayat penggunaan",
+   "th": "ประวัติการใช้งาน"
+  },
+  "使用者未允許定位權限": {
+   "en": "Location permission not granted",
+   "ja": "位置情報の権限が許可されていません",
+   "vi": "Người dùng chưa cấp quyền vị trí",
+   "id": "Izin lokasi tidak diberikan",
+   "th": "ผู้ใช้ไม่ได้อนุญาตสิทธิ์เข้าถึงตำแหน่ง"
+  },
+  "使用者未允許定位權限（永久），無法取得定位資訊": {
+   "en": "Location permission permanently denied; location information is unavailable",
+   "ja": "位置情報の権限が永久に拒否されているため、位置情報を取得できません",
+   "vi": "Người dùng đã từ chối vĩnh viễn quyền vị trí, không thể lấy thông tin vị trí",
+   "id": "Izin lokasi ditolak secara permanen, informasi lokasi tidak dapat diperoleh",
+   "th": "ผู้ใช้ปฏิเสธสิทธิ์เข้าถึงตำแหน่งถาวร จึงไม่สามารถรับข้อมูลตำแหน่งได้"
+  },
+  "依據個人資料保護法等相關規定,臺北市政府有義務告知以下事項:": {
+   "en": "Under the Personal Data Protection Act and related regulations, Taipei City Government is obliged to inform you of the following:",
+   "ja": "個人情報保護法などの関連規定に基づき、台北市政府は以下の事項をお知らせする義務があります：",
+   "vi": "Theo Luật Bảo vệ Dữ liệu Cá nhân và các quy định liên quan, Chính quyền Thành phố Đài Bắc có nghĩa vụ thông báo những điều sau:",
+   "id": "Berdasarkan Undang-Undang Perlindungan Data Pribadi dan ketentuan terkait, Pemerintah Kota Taipei wajib memberitahukan hal-hal berikut:",
+   "th": "ตามกฎหมายคุ้มครองข้อมูลส่วนบุคคลและระเบียบที่เกี่ยวข้อง รัฐบาลนครไทเปมีหน้าที่แจ้งให้ทราบดังต่อไปนี้:"
+  },
+  "個人資料": {
+   "en": "Personal data",
+   "ja": "個人情報",
+   "vi": "Dữ liệu cá nhân",
+   "id": "Data pribadi",
+   "th": "ข้อมูลส่วนบุคคล"
+  },
+  "個人通知": {
+   "en": "Personal notifications",
+   "ja": "個人のお知らせ",
+   "vi": "Thông báo cá nhân",
+   "id": "Notifikasi pribadi",
+   "th": "การแจ้งเตือนส่วนตัว"
+  },
+  "個資使用聲明": {
+   "en": "Personal data use statement",
+   "ja": "個人情報の利用に関する声明",
+   "vi": "Tuyên bố sử dụng dữ liệu cá nhân",
+   "id": "Pernyataan penggunaan data pribadi",
+   "th": "คำชี้แจงการใช้ข้อมูลส่วนบุคคล"
+  },
+  "個資使用聲明可還地？時離地院。": {
+   "en": "Personal data use statement Lorem ipsum? Dolor sit amet.",
+   "ja": "個人情報の利用に関する声明 Lorem ipsum？Dolor sit amet。",
+   "vi": "Tuyên bố sử dụng dữ liệu cá nhân Lorem ipsum? Dolor sit amet.",
+   "id": "Pernyataan penggunaan data pribadi Lorem ipsum? Dolor sit amet.",
+   "th": "คำชี้แจงการใช้ข้อมูลส่วนบุคคล Lorem ipsum? Dolor sit amet."
+  },
+  "偏好設定": {
+   "en": "Preferences",
+   "ja": "環境設定",
+   "vi": "Tùy chọn",
+   "id": "Preferensi",
+   "th": "ค่ากำหนด"
+  },
+  "停用帳號": {
+   "en": "Deactivate account",
+   "ja": "アカウント停止",
+   "vi": "Ngừng tài khoản",
+   "id": "Nonaktifkan akun",
+   "th": "ปิดใช้งานบัญชี"
+  },
+  "停車費": {
+   "en": "Parking fees",
+   "ja": "駐車料金",
+   "vi": "Phí đỗ xe",
+   "id": "Biaya parkir",
+   "th": "ค่าจอดรถ"
+  },
+  "優惠": {
+   "en": "Deals",
+   "ja": "特典",
+   "vi": "Ưu đãi",
+   "id": "Promo",
+   "th": "สิทธิพิเศษ"
+  },
+  "優惠兌換": {
+   "en": "Redeem deals",
+   "ja": "特典の引き換え",
+   "vi": "Đổi ưu đãi",
+   "id": "Tukar promo",
+   "th": "แลกสิทธิพิเศษ"
+  },
+  "儲存": {
+   "en": "Save",
+   "ja": "保存",
+   "vi": "Lưu",
+   "id": "Simpan",
+   "th": "บันทึก"
+  },
+  "全台唯一結合交通加景點的CityPASS「北北基好玩卡無限暢遊卡」，2024年全新改版！ The only CityPASS in Taiwan that combines transportation with attractions, the \"Taipei FunPass Unlimited,\" has been redesigned for 2024!": {
+   "en": "The only CityPASS in Taiwan that combines transportation with attractions, the \"Taipei FunPass Unlimited,\" has been redesigned for 2024!",
+   "ja": "台湾唯一の交通と観光地を組み合わせた CityPASS「台北ファンパス 無制限乗り放題カード」が2024年に全面リニューアル！ The only CityPASS in Taiwan that combines transportation with attractions, the \"Taipei FunPass Unlimited,\" has been redesigned for 2024!",
+   "vi": "CityPASS duy nhất tại Đài Loan kết hợp giao thông và điểm tham quan, \"Taipei FunPass Unlimited\", đã được làm mới hoàn toàn năm 2024! The only CityPASS in Taiwan that combines transportation with attractions, the \"Taipei FunPass Unlimited,\" has been redesigned for 2024!",
+   "id": "CityPASS satu-satunya di Taiwan yang menggabungkan transportasi dan tempat wisata, \"Taipei FunPass Unlimited\", hadir dengan tampilan baru di 2024! The only CityPASS in Taiwan that combines transportation with attractions, the \"Taipei FunPass Unlimited,\" has been redesigned for 2024!",
+   "th": "CityPASS หนึ่งเดียวในไต้หวันที่รวมการเดินทางและสถานที่ท่องเที่ยว \"Taipei FunPass Unlimited\" โฉมใหม่ปี 2024! The only CityPASS in Taiwan that combines transportation with attractions, the \"Taipei FunPass Unlimited,\" has been redesigned for 2024!"
+  },
+  "公訓處自費課程": {
+   "en": "Civil service training courses",
+   "ja": "公務研修の自費講座",
+   "vi": "Khóa học đào tạo công vụ",
+   "id": "Kursus pelatihan",
+   "th": "หลักสูตรฝึกอบรม"
+  },
+  "其他": {
+   "en": "Other",
+   "ja": "その他",
+   "vi": "Khác",
+   "id": "Lainnya",
+   "th": "อื่น ๆ"
+  },
+  "其他問題": {
+   "en": "Other questions",
+   "ja": "その他の質問",
+   "vi": "Câu hỏi khác",
+   "id": "Pertanyaan lain",
+   "th": "คำถามอื่น ๆ"
+  },
+  "其他服務": {
+   "en": "Other services",
+   "ja": "その他のサービス",
+   "vi": "Dịch vụ khác",
+   "id": "Layanan lain",
+   "th": "บริการอื่น ๆ"
+  },
+  "其個人資料的利用之期間、 對象、地區及方式，": {
+   "en": "the period, recipients, region and manner of use of the personal data,",
+   "ja": "その個人情報の利用期間、対象、地域および方法は、",
+   "vi": "thời gian, đối tượng, khu vực và phương thức sử dụng dữ liệu cá nhân đó,",
+   "id": "jangka waktu, pihak penerima, wilayah, dan cara penggunaan data pribadi tersebut,",
+   "th": "ระยะเวลา ผู้รับ พื้นที่ และวิธีการใช้ข้อมูลส่วนบุคคลดังกล่าว"
+  },
+  "功能教學": {
+   "en": "Tutorial",
+   "ja": "機能ガイド",
+   "vi": "Hướng dẫn tính năng",
+   "id": "Panduan fitur",
+   "th": "คู่มือการใช้งาน"
+  },
+  "助理回覆類型或功能目錄版本不符。": {
+   "en": "The assistant's reply type or capability catalogue version does not match.",
+   "ja": "アシスタントの応答タイプまたは機能カタログのバージョンが一致しません。",
+   "vi": "Loại phản hồi của trợ lý hoặc phiên bản danh mục chức năng không khớp.",
+   "id": "Jenis balasan asisten atau versi katalog fitur tidak cocok.",
+   "th": "ประเภทการตอบกลับของผู้ช่วยหรือเวอร์ชันแคตตาล็อกฟีเจอร์ไม่ตรงกัน"
+  },
+  "助理資料版本不符，請更新後端或使用原服務入口。": {
+   "en": "The assistant data version does not match. Please update the backend or use the original service entry.",
+   "ja": "アシスタントのデータバージョンが一致しません。バックエンドを更新するか、元のサービス入口をご利用ください。",
+   "vi": "Phiên bản dữ liệu của trợ lý không khớp, vui lòng cập nhật backend hoặc dùng lối vào dịch vụ gốc.",
+   "id": "Versi data asisten tidak cocok, perbarui backend atau gunakan pintu masuk layanan asli.",
+   "th": "เวอร์ชันข้อมูลของผู้ช่วยไม่ตรงกัน โปรดอัปเดตแบ็กเอนด์หรือใช้ทางเข้าบริการเดิม"
+  },
+  "動物園區資訊導覽、線上地圖": {
+   "en": "Zoo guide and online map",
+   "ja": "動物園の案内とオンラインマップ",
+   "vi": "Hướng dẫn sở thú, bản đồ trực tuyến",
+   "id": "Panduan kebun binatang, peta online",
+   "th": "ข้อมูลนำชมสวนสัตว์ แผนที่ออนไลน์"
+  },
+  "北市聯合醫院各院區線上掛號": {
+   "en": "Online appointments at all Taipei City Hospital branches",
+   "ja": "台北市立聯合病院各院区のオンライン受診予約",
+   "vi": "Đăng ký khám trực tuyến tại các cơ sở Bệnh viện Thành phố Đài Bắc",
+   "id": "Pendaftaran online di semua cabang Taipei City Hospital",
+   "th": "นัดหมายออนไลน์ทุกสาขาของโรงพยาบาลนครไทเป"
+  },
+  "卡證使用": {
+   "en": "Card use",
+   "ja": "カードの利用",
+   "vi": "Sử dụng thẻ",
+   "id": "Penggunaan kartu",
+   "th": "การใช้บัตร"
+  },
+  "反詐騙專線": {
+   "en": "Anti-fraud hotline",
+   "ja": "詐欺防止ホットライン",
+   "vi": "Đường dây nóng chống lừa đảo",
+   "id": "Hotline antipenipuan",
+   "th": "สายด่วนป้องกันการฉ้อโกง"
+  },
+  "取消": {
+   "en": "Cancel",
+   "ja": "キャンセル",
+   "vi": "Hủy",
+   "id": "Batal",
+   "th": "ยกเลิก"
+  },
+  "台北樂運動": {
+   "en": "Taipei Sports",
+   "ja": "台北スポーツ",
+   "vi": "Thể thao Đài Bắc",
+   "id": "Olahraga Taipei",
+   "th": "ไทเปสปอร์ต"
+  },
+  "台北通祝福您生日快樂": {
+   "en": "TownPass wishes you a happy birthday",
+   "ja": "TownPass よりお誕生日おめでとうございます",
+   "vi": "TownPass chúc bạn sinh nhật vui vẻ",
+   "id": "TownPass mengucapkan selamat ulang tahun",
+   "th": "TownPass ขออวยพรวันเกิดให้คุณ"
+  },
+  "台北電台": {
+   "en": "Taipei radio",
+   "ja": "台北ラジオ",
+   "vi": "Đài phát thanh Đài Bắc",
+   "id": "Radio Taipei",
+   "th": "วิทยุไทเป"
+  },
+  "台灣旅遊必備神卡！全台唯一結合交通加景點的CityPASS「北北基好玩卡無限暢遊卡」，2024年全新改版，景點及文化體驗增加至34項，可暢遊台北101、故宮博物院、野柳地質公園等國際知名景點。本次新增5個以上具有歷史特色、人文藝術、網美熱點及寓教於樂熱門景點與體驗，如滿足聽覺與視覺饗宴的臺北流行音樂中心、網美打卡熱點經國七海文化園區、全台「最古美術館」巫登益美術館等。除此之外，為讓海外旅客享受美食體驗，增加海外旅客來台前十大熱門伴手禮-鳳梨酥免費兌換，再加碼提供限量獨家紀念品「台灣龍虎夜市杯」讓海外旅客深刻感受屬於台灣人的熱情！還有憑卡享四大以上商圈優惠等好康，重點是加量不加價，提供海外旅客最高CP值的旅遊選擇！\n持「無限暢遊卡」可不限次數搭乘臺北捷運、5條台灣好行、臺北市、新北市及基隆市公車，今年更與台鐵合作增加台鐵平溪深澳一日週遊券，讓旅客能輕鬆前往平溪、十分，享受1天不限次數搭乘平溪深澳線，一卡輕鬆暢遊北北基，自由安排彈性又便利的三日行程。\n今年無限暢遊卡增加了許多台灣文化體驗，如九份紅燈籠祈福體驗、曾登上CNN的放天燈體驗、貓空小封茶體驗等，讓海外旅客能夠深度體驗台灣文化，享受動手作帶來的樂趣。\n除此之外，凡購買「北北基好玩卡無限暢遊卡」即可憑卡享「大稻埕 × 永康 × 貓空 × 西門町商圈大禮包」超過80間以上購物優惠，優惠有效期限可至2026年3月31日止，另外也可享「昇恆昌內湖旗艦店」及MITSUI OUTLET PARK 林口、台中港、台南等購物優惠，讓旅客來台暢遊熱門景點同時，也能額外享有台灣特色美食及購物優惠。\n官網購卡即可選擇預約取卡點，桃機一、二航、臺北車站、松山機場及機捷A1旅遊服務中心皆可預約取卡，也在台北捷運詢問處設有現場直接購卡點，即買即用相當方便！更多商品資訊，請至北北基好玩卡無限暢遊卡官方網站查詢。(https://bit.ly/3vCBttB)\n \n\nTaiwan Travel Essential Magic Card! The only CityPASS in Taiwan that combines transportation with attractions, the \"Taipei FunPass Unlimited,\" has been redesigned for 2024, with the number of attractions and cultural experiences increased to 34. You can now explore internationally renowned attractions such as Taipei 101, the National Palace Museum, and Yehliu Geopark. This time, there are over 5 new historical, cultural, artistic, and popular spots added, offering experiences like the auditory and visual feast at Taipei Music Center, the Instagrammable spot Ching-Kuo Chi-Hai Cultural Park, and Wu Dengyi Art Museum, Taiwan's \"Oldest Beautiful Museum.\" Additionally, to enhance the culinary experience for overseas visitors, there's a complimentary exchange for one of the top 10 popular souvenirs for overseas visitors - pineapple cakes. Furthermore, there's an added exclusive limited edition souvenir, the \"Taiwan Dragon and Tiger Night Market Cup,\" allowing overseas visitors to deeply feel the warmth of Taiwanese hospitality! Plus, enjoy discounts at four or more major shopping districts with the card. The highlight is the increase in offerings without increasing the price, providing overseas visitors with the highest CP value for their travel choices!\nWith the \"Taipei FunPass,\" you can ride the Taipei Metro, 5 Taiwan Tourist Shuttle routes, buses in Taipei City, New Taipei City, and Keelung City unlimited times. This year, we've also partnered with Taiwan Railways to add the Pingxi-Shifen One-Day Pass, allowing travelers to easily visit Pingxi and Shifen, enjoying unlimited rides on the Pingxi-Shifen line for a day. With this card, you can easily explore the northern regions of Taipei, New Taipei, and Keelung, allowing for a flexible and convenient three-day itinerary.\nThis year, the Taipei FunPass Unlimited has added numerous Taiwanese cultural experiences, such as the Jiufen Red Lantern Blessing Experience, the Sky Lantern Experience featured on CNN, the Maokong Tea Experience, and more. These offerings allow overseas travelers to deeply immerse themselves in Taiwanese culture and enjoy the fun of hands-on activities.\nIn addition, purchasers of the \"Taipei FunPass Unlimited\" can enjoy the \"Dadaocheng × Yongkang × Maokong × Ximending Shopping District Grand Package,\" which offers discounts at over 80 shopping outlets. The validity of these discounts extends until March 31st, 2026. Additionally, cardholders can also enjoy shopping discounts at Ever Rich Neihu Flagship Store and MITSUI OUTLET PARK in Linkou, Taichung Port, Tainan, and other locations. This allows travelers to not only explore popular attractions in Taiwan but also enjoy additional discounts on Taiwanese cuisine and shopping.\nYou can purchase the card on the official website and choose a designated pick-up location. Pick-up locations include Taoyuan Airport Terminals 1 and 2, Taipei Main Station, Songshan Airport, and the Airport MRT A1 Tourist Service Center. Additionally, there are on-site purchase points at Taipei Metro information counters for immediate use, making it incredibly convenient! For more product information, please visit the official website of the \"Taipei FunPass Unlimited\" at https://bit.ly/3vCBttB.": {
+   "en": "Taiwan Travel Essential Magic Card! The only CityPASS in Taiwan that combines transportation with attractions, the \"Taipei FunPass Unlimited,\" has been redesigned for 2024, with the number of attractions and cultural experiences increased to 34. You can now explore internationally renowned attractions such as Taipei 101, the National Palace Museum, and Yehliu Geopark. This time, there are over 5 new historical, cultural, artistic, and popular spots added, offering experiences like the auditory and visual feast at Taipei Music Center, the Instagrammable spot Ching-Kuo Chi-Hai Cultural Park, and Wu Dengyi Art Museum, Taiwan's \"Oldest Beautiful Museum.\" Additionally, to enhance the culinary experience for overseas visitors, there's a complimentary exchange for one of the top 10 popular souvenirs for overseas visitors - pineapple cakes. Furthermore, there's an added exclusive limited edition souvenir, the \"Taiwan Dragon and Tiger Night Market Cup,\" allowing overseas visitors to deeply feel the warmth of Taiwanese hospitality! Plus, enjoy discounts at four or more major shopping districts with the card. The highlight is the increase in offerings without increasing the price, providing overseas visitors with the highest CP value for their travel choices!\nWith the \"Taipei FunPass,\" you can ride the Taipei Metro, 5 Taiwan Tourist Shuttle routes, buses in Taipei City, New Taipei City, and Keelung City unlimited times. This year, we've also partnered with Taiwan Railways to add the Pingxi-Shifen One-Day Pass, allowing travelers to easily visit Pingxi and Shifen, enjoying unlimited rides on the Pingxi-Shifen line for a day. With this card, you can easily explore the northern regions of Taipei, New Taipei, and Keelung, allowing for a flexible and convenient three-day itinerary.\nThis year, the Taipei FunPass Unlimited has added numerous Taiwanese cultural experiences, such as the Jiufen Red Lantern Blessing Experience, the Sky Lantern Experience featured on CNN, the Maokong Tea Experience, and more. These offerings allow overseas travelers to deeply immerse themselves in Taiwanese culture and enjoy the fun of hands-on activities.\nIn addition, purchasers of the \"Taipei FunPass Unlimited\" can enjoy the \"Dadaocheng × Yongkang × Maokong × Ximending Shopping District Grand Package,\" which offers discounts at over 80 shopping outlets. The validity of these discounts extends until March 31st, 2026. Additionally, cardholders can also enjoy shopping discounts at Ever Rich Neihu Flagship Store and MITSUI OUTLET PARK in Linkou, Taichung Port, Tainan, and other locations. This allows travelers to not only explore popular attractions in Taiwan but also enjoy additional discounts on Taiwanese cuisine and shopping.\nYou can purchase the card on the official website and choose a designated pick-up location. Pick-up locations include Taoyuan Airport Terminals 1 and 2, Taipei Main Station, Songshan Airport, and the Airport MRT A1 Tourist Service Center. Additionally, there are on-site purchase points at Taipei Metro information counters for immediate use, making it incredibly convenient! For more product information, please visit the official website of the \"Taipei FunPass Unlimited\" at https://bit.ly/3vCBttB.",
+   "ja": "台湾旅行の必携カード！台湾唯一の交通と観光地を組み合わせた CityPASS「台北ファンパス 無制限乗り放題カード」が2024年に全面リニューアルし、観光地と文化体験が34項目に増えました。台北101、故宮博物院、野柳地質公園など世界的に有名な観光地を巡れます。今回は歴史、人文芸術、映えスポット、楽しく学べる人気の観光地・体験を5か所以上追加しました。聴覚と視覚の饗宴を楽しめる台北流行音楽センター、映えスポットの経国七海文化園区、台湾「最古の美術館」巫登益美術館などです。さらに、海外旅行者に台湾グルメを楽しんでいただくため、海外旅行者に人気のお土産トップ10であるパイナップルケーキの無料引き換えを追加し、限定の独占記念品「台湾龍虎夜市カップ」もご用意。台湾の人々の温かさを存分に感じられます！4つ以上の商店街での特典などもあり、ポイントは価格据え置きで内容が充実していること。海外旅行者に最もコスパの高い旅の選択肢を提供します！\n「無制限乗り放題カード」があれば、台北MRT、台湾好行5路線、台北市・新北市・基隆市のバスに回数無制限で乗車できます。今年は台湾鉄路と提携し、台鉄平渓深澳線1日周遊券を追加。平渓や十分へ気軽に行け、1日間平渓深澳線に乗り放題です。1枚で台北・新北・基隆を気軽に巡り、自由で柔軟かつ便利な3日間の旅程を組めます。\n今年の無制限乗り放題カードには、九份の赤提灯祈福体験、CNN でも紹介されたランタン上げ体験、猫空のミニお茶詰め体験など、多くの台湾文化体験が加わりました。海外旅行者が台湾文化を深く体験し、手作りの楽しさを味わえます。\nこのほか、「台北ファンパス 無制限乗り放題カード」を購入すると、カード提示で「大稲埕 × 永康 × 猫空 × 西門町 商店街ギフトパック」として80店舗以上のショッピング特典を利用できます。特典の有効期限は2026年3月31日までです。また「昇恆昌（エバーリッチ）内湖旗艦店」や MITSUI OUTLET PARK 林口・台中港・台南などのショッピング特典も利用でき、人気観光地を巡りながら台湾ならではのグルメやショッピング特典も楽しめます。\n公式サイトでカードを購入すると受取場所を予約でき、桃園空港第1・第2ターミナル、台北駅、松山空港、空港MRT A1 旅行サービスセンターで受け取れます。台北MRTの案内所でも直接購入でき、買ってすぐ使えてとても便利です！商品の詳細は「台北ファンパス 無制限乗り放題カード」公式サイトをご覧ください。(https://bit.ly/3vCBttB)\n \n\nTaiwan Travel Essential Magic Card! The only CityPASS in Taiwan that combines transportation with attractions, the \"Taipei FunPass Unlimited,\" has been redesigned for 2024, with the number of attractions and cultural experiences increased to 34. You can now explore internationally renowned attractions such as Taipei 101, the National Palace Museum, and Yehliu Geopark. This time, there are over 5 new historical, cultural, artistic, and popular spots added, offering experiences like the auditory and visual feast at Taipei Music Center, the Instagrammable spot Ching-Kuo Chi-Hai Cultural Park, and Wu Dengyi Art Museum, Taiwan's \"Oldest Beautiful Museum.\" Additionally, to enhance the culinary experience for overseas visitors, there's a complimentary exchange for one of the top 10 popular souvenirs for overseas visitors - pineapple cakes. Furthermore, there's an added exclusive limited edition souvenir, the \"Taiwan Dragon and Tiger Night Market Cup,\" allowing overseas visitors to deeply feel the warmth of Taiwanese hospitality! Plus, enjoy discounts at four or more major shopping districts with the card. The highlight is the increase in offerings without increasing the price, providing overseas visitors with the highest CP value for their travel choices!\nWith the \"Taipei FunPass,\" you can ride the Taipei Metro, 5 Taiwan Tourist Shuttle routes, buses in Taipei City, New Taipei City, and Keelung City unlimited times. This year, we've also partnered with Taiwan Railways to add the Pingxi-Shifen One-Day Pass, allowing travelers to easily visit Pingxi and Shifen, enjoying unlimited rides on the Pingxi-Shifen line for a day. With this card, you can easily explore the northern regions of Taipei, New Taipei, and Keelung, allowing for a flexible and convenient three-day itinerary.\nThis year, the Taipei FunPass Unlimited has added numerous Taiwanese cultural experiences, such as the Jiufen Red Lantern Blessing Experience, the Sky Lantern Experience featured on CNN, the Maokong Tea Experience, and more. These offerings allow overseas travelers to deeply immerse themselves in Taiwanese culture and enjoy the fun of hands-on activities.\nIn addition, purchasers of the \"Taipei FunPass Unlimited\" can enjoy the \"Dadaocheng × Yongkang × Maokong × Ximending Shopping District Grand Package,\" which offers discounts at over 80 shopping outlets. The validity of these discounts extends until March 31st, 2026. Additionally, cardholders can also enjoy shopping discounts at Ever Rich Neihu Flagship Store and MITSUI OUTLET PARK in Linkou, Taichung Port, Tainan, and other locations. This allows travelers to not only explore popular attractions in Taiwan but also enjoy additional discounts on Taiwanese cuisine and shopping.\nYou can purchase the card on the official website and choose a designated pick-up location. Pick-up locations include Taoyuan Airport Terminals 1 and 2, Taipei Main Station, Songshan Airport, and the Airport MRT A1 Tourist Service Center. Additionally, there are on-site purchase points at Taipei Metro information counters for immediate use, making it incredibly convenient! For more product information, please visit the official website of the \"Taipei FunPass Unlimited\" at https://bit.ly/3vCBttB.",
+   "vi": "Thẻ thần kỳ không thể thiếu khi du lịch Đài Loan! CityPASS duy nhất tại Đài Loan kết hợp giao thông và điểm tham quan, \"Taipei FunPass Unlimited\", đã được làm mới hoàn toàn năm 2024, số điểm tham quan và trải nghiệm văn hóa tăng lên 34, cho phép bạn khám phá các điểm nổi tiếng quốc tế như Taipei 101, Bảo tàng Cố cung Quốc gia, Công viên địa chất Dã Liễu. Lần này bổ sung hơn 5 điểm tham quan và trải nghiệm nổi bật mang đặc sắc lịch sử, nhân văn nghệ thuật, check-in sống ảo và vừa học vừa chơi, như Trung tâm Âm nhạc Pop Đài Bắc với bữa tiệc thính giác và thị giác, điểm check-in Công viên văn hóa Kinh Quốc Thất Hải, và Bảo tàng Mỹ thuật Vu Đăng Ích - \"bảo tàng mỹ thuật lâu đời nhất\" Đài Loan. Ngoài ra, để du khách nước ngoài thưởng thức ẩm thực, thẻ bổ sung đổi miễn phí bánh dứa - một trong 10 món quà lưu niệm được du khách nước ngoài yêu thích nhất, kèm quà lưu niệm độc quyền số lượng có hạn \"Cốc chợ đêm Long Hổ Đài Loan\", giúp du khách cảm nhận sâu sắc sự nhiệt tình của người Đài Loan! Còn có ưu đãi tại hơn bốn khu mua sắm lớn khi xuất trình thẻ; đặc biệt là thêm nhiều quyền lợi mà không tăng giá, mang đến lựa chọn du lịch đáng đồng tiền nhất cho du khách nước ngoài!\nVới \"thẻ Unlimited\", bạn có thể đi không giới hạn tàu điện ngầm Đài Bắc, 5 tuyến Taiwan Tourist Shuttle, xe buýt Đài Bắc, Tân Bắc và Cơ Long. Năm nay còn hợp tác với Đường sắt Đài Loan bổ sung vé du lịch một ngày tuyến Bình Khê - Thâm Áo, giúp du khách dễ dàng đến Bình Khê, Thập Phần và đi không giới hạn tuyến Bình Khê - Thâm Áo trong 1 ngày. Một thẻ dạo khắp Đài Bắc, Tân Bắc, Cơ Long, tự do sắp xếp lịch trình ba ngày linh hoạt và tiện lợi.\nNăm nay thẻ Unlimited bổ sung nhiều trải nghiệm văn hóa Đài Loan, như cầu phúc đèn lồng đỏ Cửu Phần, thả đèn trời từng lên CNN, trải nghiệm đóng gói trà Miêu Không..., giúp du khách nước ngoài trải nghiệm sâu văn hóa Đài Loan và tận hưởng niềm vui tự tay làm.\nNgoài ra, khi mua \"Taipei FunPass Unlimited\", bạn được hưởng \"Gói quà khu mua sắm Đại Đạo Trình × Vĩnh Khang × Miêu Không × Tây Môn Đinh\" với ưu đãi mua sắm tại hơn 80 cửa hàng, có hiệu lực đến ngày 31/3/2026. Bạn còn được ưu đãi mua sắm tại \"Cửa hàng chủ lực Ever Rich Nội Hồ\" và MITSUI OUTLET PARK Lâm Khẩu, cảng Đài Trung, Đài Nam..., vừa khám phá các điểm tham quan nổi tiếng vừa tận hưởng thêm ưu đãi ẩm thực và mua sắm đặc sắc Đài Loan.\nMua thẻ trên trang web chính thức và chọn đặt trước điểm nhận thẻ: Nhà ga 1, 2 sân bay Đào Viên, ga Đài Bắc, sân bay Tùng Sơn và Trung tâm dịch vụ du lịch A1 tuyến tàu sân bay. Ngoài ra có thể mua trực tiếp tại quầy thông tin tàu điện ngầm Đài Bắc, mua xong dùng ngay vô cùng tiện lợi! Để biết thêm thông tin sản phẩm, vui lòng truy cập trang web chính thức của Taipei FunPass Unlimited.(https://bit.ly/3vCBttB)\n \n\nTaiwan Travel Essential Magic Card! The only CityPASS in Taiwan that combines transportation with attractions, the \"Taipei FunPass Unlimited,\" has been redesigned for 2024, with the number of attractions and cultural experiences increased to 34. You can now explore internationally renowned attractions such as Taipei 101, the National Palace Museum, and Yehliu Geopark. This time, there are over 5 new historical, cultural, artistic, and popular spots added, offering experiences like the auditory and visual feast at Taipei Music Center, the Instagrammable spot Ching-Kuo Chi-Hai Cultural Park, and Wu Dengyi Art Museum, Taiwan's \"Oldest Beautiful Museum.\" Additionally, to enhance the culinary experience for overseas visitors, there's a complimentary exchange for one of the top 10 popular souvenirs for overseas visitors - pineapple cakes. Furthermore, there's an added exclusive limited edition souvenir, the \"Taiwan Dragon and Tiger Night Market Cup,\" allowing overseas visitors to deeply feel the warmth of Taiwanese hospitality! Plus, enjoy discounts at four or more major shopping districts with the card. The highlight is the increase in offerings without increasing the price, providing overseas visitors with the highest CP value for their travel choices!\nWith the \"Taipei FunPass,\" you can ride the Taipei Metro, 5 Taiwan Tourist Shuttle routes, buses in Taipei City, New Taipei City, and Keelung City unlimited times. This year, we've also partnered with Taiwan Railways to add the Pingxi-Shifen One-Day Pass, allowing travelers to easily visit Pingxi and Shifen, enjoying unlimited rides on the Pingxi-Shifen line for a day. With this card, you can easily explore the northern regions of Taipei, New Taipei, and Keelung, allowing for a flexible and convenient three-day itinerary.\nThis year, the Taipei FunPass Unlimited has added numerous Taiwanese cultural experiences, such as the Jiufen Red Lantern Blessing Experience, the Sky Lantern Experience featured on CNN, the Maokong Tea Experience, and more. These offerings allow overseas travelers to deeply immerse themselves in Taiwanese culture and enjoy the fun of hands-on activities.\nIn addition, purchasers of the \"Taipei FunPass Unlimited\" can enjoy the \"Dadaocheng × Yongkang × Maokong × Ximending Shopping District Grand Package,\" which offers discounts at over 80 shopping outlets. The validity of these discounts extends until March 31st, 2026. Additionally, cardholders can also enjoy shopping discounts at Ever Rich Neihu Flagship Store and MITSUI OUTLET PARK in Linkou, Taichung Port, Tainan, and other locations. This allows travelers to not only explore popular attractions in Taiwan but also enjoy additional discounts on Taiwanese cuisine and shopping.\nYou can purchase the card on the official website and choose a designated pick-up location. Pick-up locations include Taoyuan Airport Terminals 1 and 2, Taipei Main Station, Songshan Airport, and the Airport MRT A1 Tourist Service Center. Additionally, there are on-site purchase points at Taipei Metro information counters for immediate use, making it incredibly convenient! For more product information, please visit the official website of the \"Taipei FunPass Unlimited\" at https://bit.ly/3vCBttB.",
+   "id": "Kartu ajaib wajib untuk wisata Taiwan! CityPASS satu-satunya di Taiwan yang menggabungkan transportasi dan tempat wisata, \"Taipei FunPass Unlimited\", hadir dengan tampilan baru di 2024, dengan jumlah tempat wisata dan pengalaman budaya bertambah menjadi 34. Anda dapat menjelajahi tempat wisata terkenal dunia seperti Taipei 101, Museum Istana Nasional, dan Geopark Yehliu. Kali ini ditambahkan lebih dari 5 tempat wisata dan pengalaman populer bernuansa sejarah, budaya dan seni, spot foto kekinian, serta edukatif, seperti Taipei Music Center yang memanjakan telinga dan mata, spot foto Ching-Kuo Chi-Hai Cultural Park, dan Wu Dengyi Art Museum, \"museum seni tertua\" di Taiwan. Selain itu, agar wisatawan mancanegara dapat menikmati kuliner, ditambahkan penukaran gratis kue nanas, salah satu dari 10 oleh-oleh terpopuler bagi wisatawan mancanegara, plus suvenir eksklusif edisi terbatas \"Cangkir Pasar Malam Naga Harimau Taiwan\" agar wisatawan merasakan kehangatan orang Taiwan! Ada juga promo di lebih dari empat kawasan belanja utama dengan kartu ini. Intinya, isi bertambah tanpa kenaikan harga, memberikan pilihan wisata paling bernilai bagi wisatawan mancanegara!\nDengan \"Kartu Unlimited\", Anda dapat naik Taipei Metro, 5 rute Taiwan Tourist Shuttle, serta bus di Kota Taipei, Kota New Taipei, dan Kota Keelung tanpa batas. Tahun ini juga bekerja sama dengan Taiwan Railway menambahkan Tiket Terusan Satu Hari Pingxi-Shen'ao, sehingga wisatawan dapat dengan mudah mengunjungi Pingxi dan Shifen serta naik jalur Pingxi-Shen'ao tanpa batas selama 1 hari. Satu kartu untuk menjelajahi Taipei, New Taipei, dan Keelung dengan mudah, dengan rencana perjalanan tiga hari yang bebas, fleksibel, dan praktis.\nTahun ini Kartu Unlimited menambahkan banyak pengalaman budaya Taiwan, seperti doa lampion merah di Jiufen, menerbangkan lampion langit yang pernah diliput CNN, mengemas teh di Maokong, dan lainnya, agar wisatawan mancanegara dapat merasakan budaya Taiwan secara mendalam dan menikmati keseruan membuat sendiri.\nSelain itu, setiap pembelian \"Taipei FunPass Unlimited\" mendapatkan \"Paket Hadiah Kawasan Belanja Dadaocheng × Yongkang × Maokong × Ximending\" dengan promo belanja di lebih dari 80 toko, berlaku hingga 31 Maret 2026. Anda juga dapat menikmati promo belanja di \"Ever Rich Neihu Flagship Store\" serta MITSUI OUTLET PARK Linkou, Taichung Port, Tainan, dan lainnya, sehingga wisatawan dapat menjelajahi tempat wisata populer sekaligus menikmati promo kuliner khas dan belanja Taiwan.\nBeli kartu di situs resmi dan pilih lokasi pengambilan: Terminal 1 dan 2 Bandara Taoyuan, Stasiun Utama Taipei, Bandara Songshan, dan Pusat Layanan Wisata A1 Airport MRT. Kartu juga dapat dibeli langsung di loket informasi Taipei Metro dan langsung digunakan, sangat praktis! Untuk informasi produk lebih lanjut, kunjungi situs resmi Taipei FunPass Unlimited.(https://bit.ly/3vCBttB)\n \n\nTaiwan Travel Essential Magic Card! The only CityPASS in Taiwan that combines transportation with attractions, the \"Taipei FunPass Unlimited,\" has been redesigned for 2024, with the number of attractions and cultural experiences increased to 34. You can now explore internationally renowned attractions such as Taipei 101, the National Palace Museum, and Yehliu Geopark. This time, there are over 5 new historical, cultural, artistic, and popular spots added, offering experiences like the auditory and visual feast at Taipei Music Center, the Instagrammable spot Ching-Kuo Chi-Hai Cultural Park, and Wu Dengyi Art Museum, Taiwan's \"Oldest Beautiful Museum.\" Additionally, to enhance the culinary experience for overseas visitors, there's a complimentary exchange for one of the top 10 popular souvenirs for overseas visitors - pineapple cakes. Furthermore, there's an added exclusive limited edition souvenir, the \"Taiwan Dragon and Tiger Night Market Cup,\" allowing overseas visitors to deeply feel the warmth of Taiwanese hospitality! Plus, enjoy discounts at four or more major shopping districts with the card. The highlight is the increase in offerings without increasing the price, providing overseas visitors with the highest CP value for their travel choices!\nWith the \"Taipei FunPass,\" you can ride the Taipei Metro, 5 Taiwan Tourist Shuttle routes, buses in Taipei City, New Taipei City, and Keelung City unlimited times. This year, we've also partnered with Taiwan Railways to add the Pingxi-Shifen One-Day Pass, allowing travelers to easily visit Pingxi and Shifen, enjoying unlimited rides on the Pingxi-Shifen line for a day. With this card, you can easily explore the northern regions of Taipei, New Taipei, and Keelung, allowing for a flexible and convenient three-day itinerary.\nThis year, the Taipei FunPass Unlimited has added numerous Taiwanese cultural experiences, such as the Jiufen Red Lantern Blessing Experience, the Sky Lantern Experience featured on CNN, the Maokong Tea Experience, and more. These offerings allow overseas travelers to deeply immerse themselves in Taiwanese culture and enjoy the fun of hands-on activities.\nIn addition, purchasers of the \"Taipei FunPass Unlimited\" can enjoy the \"Dadaocheng × Yongkang × Maokong × Ximending Shopping District Grand Package,\" which offers discounts at over 80 shopping outlets. The validity of these discounts extends until March 31st, 2026. Additionally, cardholders can also enjoy shopping discounts at Ever Rich Neihu Flagship Store and MITSUI OUTLET PARK in Linkou, Taichung Port, Tainan, and other locations. This allows travelers to not only explore popular attractions in Taiwan but also enjoy additional discounts on Taiwanese cuisine and shopping.\nYou can purchase the card on the official website and choose a designated pick-up location. Pick-up locations include Taoyuan Airport Terminals 1 and 2, Taipei Main Station, Songshan Airport, and the Airport MRT A1 Tourist Service Center. Additionally, there are on-site purchase points at Taipei Metro information counters for immediate use, making it incredibly convenient! For more product information, please visit the official website of the \"Taipei FunPass Unlimited\" at https://bit.ly/3vCBttB.",
+   "th": "บัตรวิเศษที่ต้องมีเมื่อเที่ยวไต้หวัน! CityPASS หนึ่งเดียวในไต้หวันที่รวมการเดินทางและสถานที่ท่องเที่ยว \"Taipei FunPass Unlimited\" โฉมใหม่ปี 2024 เพิ่มสถานที่ท่องเที่ยวและประสบการณ์ทางวัฒนธรรมเป็น 34 รายการ เที่ยวสถานที่ชื่อดังระดับโลกอย่างไทเป 101 พิพิธภัณฑ์พระราชวังแห่งชาติ และอุทยานธรณีเย่หลิ่วได้ ครั้งนี้เพิ่มสถานที่และประสบการณ์ยอดนิยมที่มีเอกลักษณ์ทางประวัติศาสตร์ ศิลปวัฒนธรรม จุดถ่ายรูปยอดฮิต และสนุกพร้อมได้ความรู้อีกกว่า 5 แห่ง เช่น ศูนย์ดนตรีป๊อปไทเปที่เป็นงานเลี้ยงของหูและตา จุดเช็กอินสวนวัฒนธรรมจิงกั๋วชีไห่ และพิพิธภัณฑ์ศิลปะอู๋เติงอี้ \"พิพิธภัณฑ์ศิลปะที่เก่าแก่ที่สุด\" ของไต้หวัน นอกจากนี้ เพื่อให้นักท่องเที่ยวต่างชาติได้เพลิดเพลินกับอาหาร ยังเพิ่มสิทธิ์แลกพายสับปะรดฟรี ซึ่งเป็นหนึ่งในสิบของฝากยอดนิยมของนักท่องเที่ยวต่างชาติ และแถมของที่ระลึกพิเศษจำนวนจำกัด \"แก้วตลาดกลางคืนมังกรเสือไต้หวัน\" ให้นักท่องเที่ยวสัมผัสความอบอุ่นของคนไต้หวัน! ยังมีส่วนลดจากย่านการค้าหลักกว่าสี่แห่งเมื่อแสดงบัตร ที่สำคัญคือเพิ่มสิทธิประโยชน์โดยไม่เพิ่มราคา มอบตัวเลือกการท่องเที่ยวที่คุ้มค่าที่สุดแก่นักท่องเที่ยวต่างชาติ!\nด้วย \"บัตร Unlimited\" สามารถนั่งรถไฟฟ้าไทเป รถ Taiwan Tourist Shuttle 5 สาย และรถโดยสารในไทเป นิวไทเป และจีหลงได้ไม่จำกัดเที่ยว ปีนี้ยังร่วมมือกับการรถไฟไต้หวันเพิ่มบัตรเที่ยววันเดียวสายผิงซี-เซินอ้าว ให้นักท่องเที่ยวไปผิงซีและสือเฟินได้อย่างสะดวก นั่งสายผิงซี-เซินอ้าวได้ไม่จำกัดเที่ยวตลอด 1 วัน บัตรเดียวเที่ยวทั่วไทเป นิวไทเป และจีหลง จัดทริปสามวันได้อย่างอิสระ ยืดหยุ่น และสะดวก\nปีนี้บัตร Unlimited เพิ่มประสบการณ์วัฒนธรรมไต้หวันมากมาย เช่น การขอพรโคมแดงที่จิ่วเฟิ่น การปล่อยโคมลอยที่เคยออก CNN การบรรจุชาที่เหมาคง ฯลฯ ให้นักท่องเที่ยวต่างชาติได้สัมผัสวัฒนธรรมไต้หวันอย่างลึกซึ้งและสนุกกับการลงมือทำเอง\nนอกจากนี้ ผู้ที่ซื้อ \"Taipei FunPass Unlimited\" จะได้รับ \"ชุดของขวัญย่านการค้าต้าเต้าเฉิง × หย่งคัง × เหมาคง × ซีเหมินติง\" พร้อมส่วนลดช้อปปิ้งกว่า 80 ร้าน ใช้ได้ถึงวันที่ 31 มีนาคม 2026 และยังได้รับส่วนลดช้อปปิ้งที่ \"Ever Rich สาขาเรือธงเน่ยหู\" และ MITSUI OUTLET PARK หลินโข่ว ท่าเรือไถจง ไถหนาน ฯลฯ ให้นักท่องเที่ยวได้เที่ยวสถานที่ยอดนิยมพร้อมรับส่วนลดอาหารและช้อปปิ้งสไตล์ไต้หวันเพิ่มเติม\nซื้อบัตรผ่านเว็บไซต์ทางการแล้วเลือกจองจุดรับบัตรได้ ได้แก่ อาคารผู้โดยสาร 1 และ 2 สนามบินเถาหยวน สถานีรถไฟไทเป สนามบินซงซาน และศูนย์บริการนักท่องเที่ยว A1 รถไฟฟ้าสนามบิน นอกจากนี้ยังซื้อได้โดยตรงที่จุดประชาสัมพันธ์รถไฟฟ้าไทเป ซื้อแล้วใช้ได้ทันที สะดวกมาก! ดูข้อมูลสินค้าเพิ่มเติมได้ที่เว็บไซต์ทางการของ Taipei FunPass Unlimited(https://bit.ly/3vCBttB)\n \n\nTaiwan Travel Essential Magic Card! The only CityPASS in Taiwan that combines transportation with attractions, the \"Taipei FunPass Unlimited,\" has been redesigned for 2024, with the number of attractions and cultural experiences increased to 34. You can now explore internationally renowned attractions such as Taipei 101, the National Palace Museum, and Yehliu Geopark. This time, there are over 5 new historical, cultural, artistic, and popular spots added, offering experiences like the auditory and visual feast at Taipei Music Center, the Instagrammable spot Ching-Kuo Chi-Hai Cultural Park, and Wu Dengyi Art Museum, Taiwan's \"Oldest Beautiful Museum.\" Additionally, to enhance the culinary experience for overseas visitors, there's a complimentary exchange for one of the top 10 popular souvenirs for overseas visitors - pineapple cakes. Furthermore, there's an added exclusive limited edition souvenir, the \"Taiwan Dragon and Tiger Night Market Cup,\" allowing overseas visitors to deeply feel the warmth of Taiwanese hospitality! Plus, enjoy discounts at four or more major shopping districts with the card. The highlight is the increase in offerings without increasing the price, providing overseas visitors with the highest CP value for their travel choices!\nWith the \"Taipei FunPass,\" you can ride the Taipei Metro, 5 Taiwan Tourist Shuttle routes, buses in Taipei City, New Taipei City, and Keelung City unlimited times. This year, we've also partnered with Taiwan Railways to add the Pingxi-Shifen One-Day Pass, allowing travelers to easily visit Pingxi and Shifen, enjoying unlimited rides on the Pingxi-Shifen line for a day. With this card, you can easily explore the northern regions of Taipei, New Taipei, and Keelung, allowing for a flexible and convenient three-day itinerary.\nThis year, the Taipei FunPass Unlimited has added numerous Taiwanese cultural experiences, such as the Jiufen Red Lantern Blessing Experience, the Sky Lantern Experience featured on CNN, the Maokong Tea Experience, and more. These offerings allow overseas travelers to deeply immerse themselves in Taiwanese culture and enjoy the fun of hands-on activities.\nIn addition, purchasers of the \"Taipei FunPass Unlimited\" can enjoy the \"Dadaocheng × Yongkang × Maokong × Ximending Shopping District Grand Package,\" which offers discounts at over 80 shopping outlets. The validity of these discounts extends until March 31st, 2026. Additionally, cardholders can also enjoy shopping discounts at Ever Rich Neihu Flagship Store and MITSUI OUTLET PARK in Linkou, Taichung Port, Tainan, and other locations. This allows travelers to not only explore popular attractions in Taiwan but also enjoy additional discounts on Taiwanese cuisine and shopping.\nYou can purchase the card on the official website and choose a designated pick-up location. Pick-up locations include Taoyuan Airport Terminals 1 and 2, Taipei Main Station, Songshan Airport, and the Airport MRT A1 Tourist Service Center. Additionally, there are on-site purchase points at Taipei Metro information counters for immediate use, making it incredibly convenient! For more product information, please visit the official website of the \"Taipei FunPass Unlimited\" at https://bit.ly/3vCBttB."
+  },
+  "吉林路": {
+   "en": "Jilin Rd.",
+   "ja": "吉林路",
+   "vi": "Đường Cát Lâm",
+   "id": "Jalan Jilin",
+   "th": "ถนนจี๋หลิน"
+  },
+  "同意": {
+   "en": "Agree",
+   "ja": "同意する",
+   "vi": "Đồng ý",
+   "id": "Setuju",
+   "th": "ยอมรับ"
+  },
+  "命人資你別然書城很，是公麼級在！有真得劇那舉": {
+   "en": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+   "ja": "Lorem ipsum dolor sit amet、consectetur！",
+   "vi": "Lorem ipsum dolor sit amet, consectetur!",
+   "id": "Lorem ipsum dolor sit amet, consectetur!",
+   "th": "Lorem ipsum dolor sit amet, consectetur!"
+  },
+  "因應113年4月28日2024 NAT GEO RUN 國家地理路跑活動，公車配合改道措施，詳公運處網站。": {
+   "en": "Due to the 2024 NAT GEO RUN on 113/4/28 (April 28, 2024), bus routes will be diverted. See the Public Transportation Office website for details.",
+   "ja": "113年4月28日（2024年4月28日）の 2024 NAT GEO RUN ナショナルジオグラフィック・ランに伴い、バスが迂回運行します。詳しくは公共運輸処のウェブサイトをご覧ください。",
+   "vi": "Do sự kiện chạy bộ 2024 NAT GEO RUN ngày 28/4/113 (28/4/2024), xe buýt sẽ đổi lộ trình, chi tiết xem trang web của Phòng Vận tải Công cộng.",
+   "id": "Sehubungan dengan lomba lari 2024 NAT GEO RUN pada 28/4/113 (28 April 2024), rute bus dialihkan. Lihat situs Kantor Transportasi Umum untuk detailnya.",
+   "th": "เนื่องจากงานวิ่ง 2024 NAT GEO RUN วันที่ 28/4/113 (28 เมษายน 2024) รถโดยสารจะเปลี่ยนเส้นทาง ดูรายละเอียดได้ที่เว็บไซต์สำนักงานขนส่งสาธารณะ"
+  },
+  "因本市113年災害防救演習，113年4月26日8時至18時承平路東西兩側外車道(河美街至福善路)及福真路(承平路至承美路)整段封閉，請改道。": {
+   "en": "Due to the city's 113 (2024) disaster prevention drill, on April 26, 2024 from 8:00 to 18:00 the outer lanes on both sides of Chengping Rd. (Hemei St. to Fushan Rd.) and the whole of Fuzhen Rd. (Chengping Rd. to Chengmei Rd.) will be closed. Please take a detour.",
+   "ja": "本市の113年（2024年）災害防救演習のため、113年4月26日8時から18時まで、承平路東西両側の外側車線（河美街～福善路）および福真路（承平路～承美路）全線を封鎖します。迂回してください。",
+   "vi": "Do diễn tập phòng chống thiên tai năm 113 (2024) của thành phố, từ 8 giờ đến 18 giờ ngày 26/4/113, làn ngoài hai bên đông tây đường Thừa Bình (từ phố Hà Mỹ đến đường Phúc Thiện) và toàn tuyến đường Phúc Chân (từ đường Thừa Bình đến đường Thừa Mỹ) sẽ bị phong tỏa, vui lòng đi đường khác.",
+   "id": "Karena latihan penanggulangan bencana kota tahun 113 (2024), pada 26/4/113 pukul 8.00-18.00 lajur luar di kedua sisi Jalan Chengping (Jalan Hemei sampai Jalan Fushan) dan seluruh Jalan Fuzhen (Jalan Chengping sampai Jalan Chengmei) ditutup. Silakan gunakan jalan lain.",
+   "th": "เนื่องจากการซ้อมป้องกันและบรรเทาภัยพิบัติของเมืองปี 113 (2024) วันที่ 26/4/113 เวลา 8:00-18:00 น. ช่องทางด้านนอกทั้งสองฝั่งของถนนเฉิงผิง (ถนนเหอเหม่ยถึงถนนฝูซ่าน) และถนนฝูเจิน (ถนนเฉิงผิงถึงถนนเฉิงเหม่ย) ตลอดสายจะปิดการจราจร โปรดใช้เส้นทางอื่น"
+  },
+  "國/社宅租金維管費": {
+   "en": "Public housing rent",
+   "ja": "公営住宅の家賃",
+   "vi": "Tiền thuê nhà ở xã hội",
+   "id": "Sewa rumah susun",
+   "th": "ค่าเช่าบ้านพักรัฐ"
+  },
+  "圖書借閱": {
+   "en": "Library",
+   "ja": "図書貸出",
+   "vi": "Mượn sách thư viện",
+   "id": "Peminjaman buku",
+   "th": "ยืมหนังสือห้องสมุด"
+  },
+  "地方稅": {
+   "en": "Local taxes",
+   "ja": "地方税",
+   "vi": "Thuế địa phương",
+   "id": "Pajak daerah",
+   "th": "ภาษีท้องถิ่น"
+  },
+  "城市生活": {
+   "en": "City life",
+   "ja": "都市生活",
+   "vi": "Đời sống đô thị",
+   "id": "Kehidupan kota",
+   "th": "ชีวิตในเมือง"
+  },
+  "城市通相關事宜": {
+   "en": "TownPass matters",
+   "ja": "TownPass に関する事項",
+   "vi": "Các vấn đề liên quan đến TownPass",
+   "id": "Hal terkait TownPass",
+   "th": "เรื่องเกี่ยวกับ TownPass"
+  },
+  "基本資料": {
+   "en": "Personal details",
+   "ja": "基本情報",
+   "vi": "Thông tin cá nhân",
+   "id": "Data pribadi",
+   "th": "ข้อมูลส่วนตัว"
+  },
+  "如有使用問題,請撥打1999市民熱線。": {
+   "en": "If you have any problems using the app, please call the 1999 Citizen Hotline.",
+   "ja": "ご利用に関する問題は、1999市民ホットラインにお電話ください。",
+   "vi": "Nếu gặp vấn đề khi sử dụng, vui lòng gọi đường dây nóng 1999.",
+   "id": "Jika ada masalah penggunaan, silakan hubungi Hotline Warga 1999.",
+   "th": "หากมีปัญหาในการใช้งาน โปรดโทรสายด่วนประชาชน 1999"
+  },
+  "婦幼保護申訴專線": {
+   "en": "Women and children protection hotline",
+   "ja": "女性・児童保護相談ホットライン",
+   "vi": "Đường dây nóng bảo vệ phụ nữ và trẻ em",
+   "id": "Hotline perlindungan perempuan dan anak",
+   "th": "สายด่วนคุ้มครองสตรีและเด็ก"
+  },
+  "學雜費": {
+   "en": "School fees",
+   "ja": "学費",
+   "vi": "Học phí",
+   "id": "Biaya sekolah",
+   "th": "ค่าเล่าเรียน"
+  },
+  "安全性": {
+   "en": "Security",
+   "ja": "セキュリティ",
+   "vi": "Bảo mật",
+   "id": "Keamanan",
+   "th": "ความปลอดภัย"
+  },
+  "客服信箱": {
+   "en": "Customer service email",
+   "ja": "お問い合わせメール",
+   "vi": "Email chăm sóc khách hàng",
+   "id": "Email layanan pelanggan",
+   "th": "อีเมลฝ่ายบริการลูกค้า"
+  },
+  "寵物安心遛": {
+   "en": "Pet-friendly map",
+   "ja": "ペット同伴マップ",
+   "vi": "Bản đồ thân thiện thú cưng",
+   "id": "Peta ramah hewan",
+   "th": "แผนที่สำหรับสัตว์เลี้ยง"
+  },
+  "已取消訂閱(.+)": {
+   "en": "Unsubscribed from (.+)",
+   "ja": "(.+)の購読を解除しました",
+   "vi": "Đã hủy theo dõi (.+)",
+   "id": "Berhenti berlangganan (.+)",
+   "th": "ยกเลิกการสมัครรับ (.+) แล้ว"
+  },
+  "已訂閱(.+)": {
+   "en": "Subscribed to (.+)",
+   "ja": "(.+)を購読しました",
+   "vi": "Đã theo dõi (.+)",
+   "id": "Berlangganan (.+)",
+   "th": "สมัครรับ (.+) แล้ว"
+  },
+  "市府訊息": {
+   "en": "City messages",
+   "ja": "市政府からのお知らせ",
+   "vi": "Thông báo của thành phố",
+   "id": "Pesan pemerintah kota",
+   "th": "ข้อความจากเมือง"
+  },
+  "市政APP": {
+   "en": "City apps",
+   "ja": "市政アプリ",
+   "vi": "Ứng dụng thành phố",
+   "id": "Aplikasi kota",
+   "th": "แอปของเมือง"
+  },
+  "市政新聞": {
+   "en": "City news",
+   "ja": "市政ニュース",
+   "vi": "Tin tức thành phố",
+   "id": "Berita kota",
+   "th": "ข่าวเมือง"
+  },
+  "市政服務": {
+   "en": "City services",
+   "ja": "市政サービス",
+   "vi": "Dịch vụ thành phố",
+   "id": "Layanan kota",
+   "th": "บริการของเมือง"
+  },
+  "市政資訊儀表板": {
+   "en": "City data dashboard",
+   "ja": "市政ダッシュボード",
+   "vi": "Bảng dữ liệu thành phố",
+   "id": "Dasbor data kota",
+   "th": "แดชบอร์ดข้อมูลเมือง"
+  },
+  "市立圖書館借閱服務": {
+   "en": "Taipei Public Library borrowing service",
+   "ja": "市立図書館の貸出サービス",
+   "vi": "Dịch vụ mượn sách Thư viện Thành phố",
+   "id": "Layanan peminjaman Perpustakaan Kota",
+   "th": "บริการยืมหนังสือห้องสมุดเมือง"
+  },
+  "帳務": {
+   "en": "Bills",
+   "ja": "請求",
+   "vi": "Hóa đơn",
+   "id": "Tagihan",
+   "th": "บิล"
+  },
+  "帳戶": {
+   "en": "Account",
+   "ja": "アカウント",
+   "vi": "Tài khoản",
+   "id": "Akun",
+   "th": "บัญชี"
+  },
+  "帳號復用方式": {
+   "en": "How to reactivate your account",
+   "ja": "アカウントの再利用方法",
+   "vi": "Cách khôi phục tài khoản",
+   "id": "Cara mengaktifkan kembali akun",
+   "th": "วิธีใช้งานบัญชีอีกครั้ง"
+  },
+  "平價住宅維護費": {
+   "en": "Low-cost housing maintenance fee",
+   "ja": "低家賃住宅の維持費",
+   "vi": "Phí bảo trì nhà ở giá rẻ",
+   "id": "Biaya pemeliharaan rumah murah",
+   "th": "ค่าบำรุงที่อยู่อาศัยราคาประหยัด"
+  },
+  "年會手這作立死散的。升水育的演無言！於施數、": {
+   "en": "Lorem ipsum dolor sit. Amet consectetur! Adipiscing elit,",
+   "ja": "Lorem ipsum dolor sit。Amet consectetur！Adipiscing elit、",
+   "vi": "Lorem ipsum dolor sit. Amet consectetur! Adipiscing elit,",
+   "id": "Lorem ipsum dolor sit. Amet consectetur! Adipiscing elit,",
+   "th": "Lorem ipsum dolor sit. Amet consectetur! Adipiscing elit,"
+  },
+  "從相片掃描": {
+   "en": "Scan from photo",
+   "ja": "写真からスキャン",
+   "vi": "Quét từ ảnh",
+   "id": "Pindai dari foto",
+   "th": "สแกนจากรูปภาพ"
+  },
+  "快速登入": {
+   "en": "Quick login",
+   "ja": "クイックログイン",
+   "vi": "Đăng nhập nhanh",
+   "id": "Login cepat",
+   "th": "เข้าสู่ระบบด่วน"
+  },
+  "性質如同110，為報案管道之一種，填寫相關資料，進行報案": {
+   "en": "Like 110, this is one of the channels for reporting a crime: fill in the details to file a report",
+   "ja": "110番と同様の通報手段の一つです。必要事項を入力して通報します",
+   "vi": "Tương tự 110, đây là một kênh trình báo: điền thông tin liên quan để trình báo",
+   "id": "Sama seperti 110, ini salah satu saluran pelaporan: isi data terkait untuk membuat laporan",
+   "th": "เช่นเดียวกับ 110 เป็นช่องทางหนึ่งในการแจ้งความ กรอกข้อมูลที่เกี่ยวข้องเพื่อแจ้งความ"
+  },
+  "意見內容": {
+   "en": "Feedback details",
+   "ja": "ご意見の内容",
+   "vi": "Nội dung góp ý",
+   "id": "Isi masukan",
+   "th": "รายละเอียดข้อเสนอแนะ"
+  },
+  "意見回饋": {
+   "en": "Feedback",
+   "ja": "ご意見",
+   "vi": "Góp ý",
+   "id": "Masukan",
+   "th": "ข้อเสนอแนะ"
+  },
+  "意見調查": {
+   "en": "Surveys",
+   "ja": "アンケート",
+   "vi": "Khảo sát",
+   "id": "Survei",
+   "th": "แบบสำรวจ"
+  },
+  "愛遊動物園": {
+   "en": "Zoo",
+   "ja": "動物園",
+   "vi": "Sở thú",
+   "id": "Kebun binatang",
+   "th": "สวนสัตว์"
+  },
+  "我的帳單": {
+   "en": "My bills",
+   "ja": "マイ請求",
+   "vi": "Hóa đơn của tôi",
+   "id": "Tagihan saya",
+   "th": "บิลของฉัน"
+  },
+  "我的服務": {
+   "en": "My services",
+   "ja": "マイサービス",
+   "vi": "Dịch vụ của tôi",
+   "id": "Layanan saya",
+   "th": "บริการของฉัน"
+  },
+  "我的減碳存摺": {
+   "en": "My carbon savings",
+   "ja": "マイ CO2 削減通帳",
+   "vi": "Sổ tiết kiệm carbon của tôi",
+   "id": "Tabungan karbon saya",
+   "th": "สมุดลดคาร์บอนของฉัน"
+  },
+  "或": {
+   "en": "or",
+   "ja": "または",
+   "vi": "hoặc",
+   "id": "atau",
+   "th": "หรือ"
+  },
+  "手機載具": {
+   "en": "Mobile barcode carrier",
+   "ja": "モバイルバーコード",
+   "vi": "Mã vạch hóa đơn điện tử",
+   "id": "Barcode faktur seluler",
+   "th": "บาร์โค้ดใบเสร็จมือถือ"
+  },
+  "手機門號": {
+   "en": "Mobile number",
+   "ja": "携帯電話番号",
+   "vi": "Số điện thoại di động",
+   "id": "Nomor ponsel",
+   "th": "หมายเลขโทรศัพท์มือถือ"
+  },
+  "找地點": {
+   "en": "Find a place",
+   "ja": "場所を探す",
+   "vi": "Tìm địa điểm",
+   "id": "Cari tempat",
+   "th": "ค้นหาสถานที่"
+  },
+  "掃描": {
+   "en": "Scan",
+   "ja": "スキャン",
+   "vi": "Quét",
+   "id": "Pindai",
+   "th": "สแกน"
+  },
+  "掃描說明": {
+   "en": "Scanning instructions",
+   "ja": "スキャンの説明",
+   "vi": "Hướng dẫn quét",
+   "id": "Petunjuk pemindaian",
+   "th": "คำแนะนำการสแกน"
+  },
+  "授權管理": {
+   "en": "Authorisation management",
+   "ja": "権限管理",
+   "vi": "Quản lý ủy quyền",
+   "id": "Kelola otorisasi",
+   "th": "จัดการการอนุญาต"
+  },
+  "探索臺北": {
+   "en": "Explore Taipei",
+   "ja": "台北を探索",
+   "vi": "Khám phá Đài Bắc",
+   "id": "Jelajahi Taipei",
+   "th": "สำรวจไทเป"
+  },
+  "提供北市民生物資交易量與金額": {
+   "en": "Trading volume and value of daily necessities in Taipei",
+   "ja": "台北市の生活物資の取引量と金額を提供",
+   "vi": "Cung cấp khối lượng và giá trị giao dịch hàng thiết yếu tại Đài Bắc",
+   "id": "Menyediakan volume dan nilai transaksi kebutuhan pokok di Taipei",
+   "th": "ข้อมูลปริมาณและมูลค่าการซื้อขายสินค้าจำเป็นในไทเป"
+  },
+  "提供各區日常服務地圖查找": {
+   "en": "Map of everyday services in each district",
+   "ja": "各区の生活サービスを地図で検索",
+   "vi": "Bản đồ tra cứu dịch vụ hằng ngày tại các quận",
+   "id": "Peta layanan sehari-hari di setiap distrik",
+   "th": "แผนที่ค้นหาบริการประจำวันในแต่ละเขต"
+  },
+  "提供寵物友善地圖資訊": {
+   "en": "Pet-friendly map information",
+   "ja": "ペットにやさしい場所の地図情報を提供",
+   "vi": "Cung cấp thông tin bản đồ thân thiện thú cưng",
+   "id": "Menyediakan informasi peta ramah hewan",
+   "th": "ข้อมูลแผนที่ที่เป็นมิตรกับสัตว์เลี้ยง"
+  },
+  "提供居民更即時在地區里服務": {
+   "en": "Timely local neighbourhood services for residents",
+   "ja": "住民により迅速な地域の里サービスを提供",
+   "vi": "Cung cấp dịch vụ phường tại địa phương kịp thời hơn cho cư dân",
+   "id": "Menyediakan layanan lingkungan setempat yang lebih cepat bagi warga",
+   "th": "บริการชุมชนในพื้นที่ที่รวดเร็วยิ่งขึ้นสำหรับผู้อยู่อาศัย"
+  },
+  "提供綠化地圖資訊": {
+   "en": "Green space map information",
+   "ja": "緑地の地図情報を提供",
+   "vi": "Cung cấp thông tin bản đồ mảng xanh",
+   "id": "Menyediakan informasi peta ruang hijau",
+   "th": "ข้อมูลแผนที่พื้นที่สีเขียว"
+  },
+  "提供線上、語音報案": {
+   "en": "Report online or by voice",
+   "ja": "オンライン・音声での通報",
+   "vi": "Trình báo trực tuyến và bằng giọng nói",
+   "id": "Lapor secara online atau dengan suara",
+   "th": "แจ้งความออนไลน์และด้วยเสียง"
+  },
+  "提供臺北市生活的重要數據": {
+   "en": "Key data on life in Taipei",
+   "ja": "台北市の暮らしに関する重要データを提供",
+   "vi": "Cung cấp số liệu quan trọng về cuộc sống tại Đài Bắc",
+   "id": "Menyediakan data penting tentang kehidupan di Taipei",
+   "th": "ข้อมูลสำคัญเกี่ยวกับชีวิตในไทเป"
+  },
+  "提用帳號即無法再登入城市通，並無法再以城市通帳號登入其他系統。相關的資料仍會保存於對應雲端平台。": {
+   "en": "Once your account is deactivated, you can no longer log in to TownPass or use your TownPass account to log in to other systems. Related data will still be kept on the corresponding cloud platforms.",
+   "ja": "アカウントを停止すると TownPass にログインできなくなり、TownPass アカウントで他のシステムにログインすることもできなくなります。関連データは引き続き各クラウドプラットフォームに保存されます。",
+   "vi": "Sau khi ngừng tài khoản, bạn sẽ không thể đăng nhập TownPass và không thể dùng tài khoản TownPass để đăng nhập các hệ thống khác. Dữ liệu liên quan vẫn được lưu trên các nền tảng đám mây tương ứng.",
+   "id": "Setelah akun dinonaktifkan, Anda tidak dapat lagi login ke TownPass atau menggunakan akun TownPass untuk login ke sistem lain. Data terkait tetap disimpan di platform cloud yang bersangkutan.",
+   "th": "เมื่อปิดใช้งานบัญชีแล้ว จะไม่สามารถเข้าสู่ระบบ TownPass และไม่สามารถใช้บัญชี TownPass เข้าสู่ระบบอื่นได้อีก ข้อมูลที่เกี่ยวข้องจะยังคงเก็บไว้ในแพลตฟอร์มคลาวด์ที่เกี่ยวข้อง"
+  },
+  "播打網路語音通話": {
+   "en": "Make an internet voice call",
+   "ja": "インターネット音声通話をかける",
+   "vi": "Gọi thoại qua mạng",
+   "id": "Lakukan panggilan suara internet",
+   "th": "โทรด้วยเสียงผ่านอินเทอร์เน็ต"
+  },
+  "收據": {
+   "en": "Receipts",
+   "ja": "領収書",
+   "vi": "Biên lai",
+   "id": "Kuitansi",
+   "th": "ใบเสร็จ"
+  },
+  "收集民意，促進民眾參與市政服務": {
+   "en": "Gathering public opinion to boost participation in city services",
+   "ja": "民意を集め、市民の市政参加を促進",
+   "vi": "Thu thập ý kiến người dân, thúc đẩy sự tham gia vào dịch vụ thành phố",
+   "id": "Menghimpun pendapat warga untuk mendorong partisipasi dalam layanan kota",
+   "th": "รวบรวมความคิดเห็นเพื่อส่งเสริมการมีส่วนร่วมในบริการของเมือง"
+  },
+  "斯國只": {
+   "en": "Lorem ipsum",
+   "ja": "Lorem ipsum",
+   "vi": "Lorem ipsum",
+   "id": "Lorem ipsum",
+   "th": "Lorem ipsum"
+  },
+  "新增": {
+   "en": "Add",
+   "ja": "追加",
+   "vi": "Thêm",
+   "id": "Tambah",
+   "th": "เพิ่ม"
+  },
+  "新增綁定": {
+   "en": "Add link",
+   "ja": "連携を追加",
+   "vi": "Thêm liên kết",
+   "id": "Tambah tautan",
+   "th": "เพิ่มการเชื่อมโยง"
+  },
+  "施工資訊": {
+   "en": "Construction information",
+   "ja": "工事情報",
+   "vi": "Thông tin thi công",
+   "id": "Informasi konstruksi",
+   "th": "ข้อมูลงานก่อสร้าง"
+  },
+  "更多": {
+   "en": "More",
+   "ja": "もっと見る",
+   "vi": "Thêm",
+   "id": "Lainnya",
+   "th": "เพิ่มเติม"
+  },
+  "書目選項格式不正確。": {
+   "en": "The book option format is invalid.",
+   "ja": "書誌の選択肢の形式が正しくありません。",
+   "vi": "Định dạng tùy chọn sách không hợp lệ.",
+   "id": "Format pilihan buku tidak valid.",
+   "th": "รูปแบบตัวเลือกหนังสือไม่ถูกต้อง"
+  },
+  "最新消息": {
+   "en": "Latest news",
+   "ja": "最新情報",
+   "vi": "Tin mới nhất",
+   "id": "Berita terbaru",
+   "th": "ข่าวล่าสุด"
+  },
+  "有話要說": {
+   "en": "Report an issue",
+   "ja": "ご意見・陳情",
+   "vi": "Phản ánh",
+   "id": "Sampaikan keluhan",
+   "th": "ร้องเรียน"
+  },
+  "服務": {
+   "en": "Services",
+   "ja": "サービス",
+   "vi": "Dịch vụ",
+   "id": "Layanan",
+   "th": "บริการ"
+  },
+  "服務過程將錄音並轉換為文字，以利我們能更快速地登錄及處理您的意見。": {
+   "en": "The call will be recorded and transcribed so that we can log and handle your feedback more quickly.",
+   "ja": "通話は録音され、文字に変換されます。これにより、ご意見をより迅速に登録・処理できます。",
+   "vi": "Cuộc gọi sẽ được ghi âm và chuyển thành văn bản để chúng tôi ghi nhận và xử lý ý kiến của bạn nhanh hơn.",
+   "id": "Panggilan akan direkam dan diubah menjadi teks agar kami dapat mencatat dan menangani masukan Anda lebih cepat.",
+   "th": "การสนทนาจะถูกบันทึกเสียงและแปลงเป็นข้อความ เพื่อให้เราบันทึกและดำเนินการตามความคิดเห็นของคุณได้รวดเร็วขึ้น"
+  },
+  "未設定": {
+   "en": "Not set",
+   "ja": "未設定",
+   "vi": "Chưa thiết lập",
+   "id": "Belum diatur",
+   "th": "ยังไม่ได้ตั้งค่า"
+  },
+  "未開啟定位服務": {
+   "en": "Location services are off",
+   "ja": "位置情報サービスがオフです",
+   "vi": "Chưa bật dịch vụ vị trí",
+   "id": "Layanan lokasi belum aktif",
+   "th": "ยังไม่ได้เปิดบริการตำแหน่ง"
+  },
+  "本人已詳閱並同意以上條款個資使用聲明": {
+   "en": "I have read and agree to the above personal data use statement",
+   "ja": "上記の個人情報の利用に関する声明を読み、同意します",
+   "vi": "Tôi đã đọc kỹ và đồng ý với tuyên bố sử dụng dữ liệu cá nhân ở trên",
+   "id": "Saya telah membaca dan menyetujui pernyataan penggunaan data pribadi di atas",
+   "th": "ข้าพเจ้าได้อ่านและยอมรับคำชี้แจงการใช้ข้อมูลส่วนบุคคลข้างต้นแล้ว"
+  },
+  "本次蒐集之個人資訊，僅限於撥打網路電話轉接至1999市民熱線專人服務時使用，": {
+   "en": "The personal data collected here is used only when an internet call is transferred to a 1999 Citizen Hotline agent,",
+   "ja": "今回収集する個人情報は、インターネット電話を1999市民ホットラインの担当者に転送する場合にのみ使用し、",
+   "vi": "Dữ liệu cá nhân thu thập lần này chỉ được dùng khi cuộc gọi qua mạng được chuyển tới nhân viên đường dây nóng 1999,",
+   "id": "Data pribadi yang dikumpulkan ini hanya digunakan saat panggilan internet dialihkan ke petugas Hotline Warga 1999,",
+   "th": "ข้อมูลส่วนบุคคลที่เก็บรวบรวมครั้งนี้ใช้เฉพาะเมื่อโอนสายโทรศัพท์อินเทอร์เน็ตไปยังเจ้าหน้าที่สายด่วนประชาชน 1999"
+  },
+  "案件查詢": {
+   "en": "Case lookup",
+   "ja": "案件照会",
+   "vi": "Tra cứu hồ sơ",
+   "id": "Cek kasus",
+   "th": "ค้นหาเรื่อง"
+  },
+  "案件進度查詢": {
+   "en": "Case progress",
+   "ja": "案件の進捗照会",
+   "vi": "Tra cứu tiến độ hồ sơ",
+   "id": "Cek status kasus",
+   "th": "ติดตามสถานะเรื่อง"
+  },
+  "條碼示意圖": {
+   "en": "Sample barcode",
+   "ja": "バーコードの例",
+   "vi": "Hình minh họa mã vạch",
+   "id": "Contoh barcode",
+   "th": "ตัวอย่างบาร์โค้ด"
+  },
+  "正得里": {
+   "en": "Zhengde Village",
+   "ja": "正得里",
+   "vi": "Phường Zhengde",
+   "id": "Kelurahan Zhengde",
+   "th": "แขวงเจิ้งเต๋อ"
+  },
+  "歷程與授權管理": {
+   "en": "History and authorisations",
+   "ja": "履歴と権限管理",
+   "vi": "Lịch sử và ủy quyền",
+   "id": "Riwayat dan otorisasi",
+   "th": "ประวัติและการอนุญาต"
+  },
+  "比較臺北市113年端午節連續假期前三天與上年同期節慶商品物價，花生(仁)、栗子、鹹鴨蛋及糯米因部分業者反映進貨成本增加、鹹肉粽及甜粽因人工成本上升、豬肉因飼養成本增加，致價格上漲；至乾香菇、蝦米及粽葉，則因供量充足，致價格下跌。\n\n👉相關訊息：\n為反映113年臺北市端午節前節慶商品物價情況，臺北市政府主計處分別於113年5月9日(假期前三十天)、5月29日(假期前十天)及6月5日(假期前三天)，辦理豬肉、糯米、乾香菇、栗子、鹹鴨蛋、鹹肉粽、甜粽、蝦米、粽葉及花生(仁)等具代表性項目商品之零售價格訪查工作，嗣經統計分析後，於市府主計處網站發布新聞稿，以供各界參考。\n\n👉更多資訊：\n🔹《臺北市節慶物價新聞稿專區》\n": {
+   "en": "Comparing festive goods prices in Taipei three days before the 113 (2024) Dragon Boat Festival long weekend with the same period last year: peanuts (kernels), chestnuts, salted duck eggs and glutinous rice rose as some vendors reported higher purchase costs; savory pork zongzi and sweet zongzi rose due to higher labour costs; and pork rose due to higher farming costs. Dried shiitake mushrooms, dried shrimp and bamboo leaves fell in price thanks to ample supply.\n\n👉Related information:\nTo reflect festive goods prices in Taipei before the 113 (2024) Dragon Boat Festival, the Department of Budget, Accounting and Statistics, Taipei City Government surveyed the retail prices of representative items, including pork, glutinous rice, dried shiitake mushrooms, chestnuts, salted duck eggs, savory pork zongzi, sweet zongzi, dried shrimp, bamboo leaves and peanuts (kernels), on May 9, 113 (30 days before the holiday), May 29 (10 days before) and June 5 (3 days before). After statistical analysis, a press release was published on the department's website for public reference.\n\n👉More information:\n🔹\"Taipei City Festive Prices Press Releases\"\n",
+   "ja": "台北市における113年（2024年）端午節連休の3日前の節句商品価格を前年同期と比較すると、落花生（むき身）、栗、塩漬けアヒルの卵、もち米は一部業者から仕入れコストの増加が報告され、肉ちまき・甘いちまきは人件費の上昇、豚肉は飼育コストの増加により値上がりしました。一方、干し椎茸、干しエビ、ちまきの葉は供給が十分なため値下がりしました。\n\n👉関連情報：\n113年の台北市における端午節前の節句商品価格の状況を反映するため、台北市政府主計処は113年5月9日（連休30日前）、5月29日（連休10日前）、6月5日（連休3日前）に、豚肉、もち米、干し椎茸、栗、塩漬けアヒルの卵、肉ちまき、甘いちまき、干しエビ、ちまきの葉、落花生（むき身）など代表的な品目の小売価格調査を実施し、統計分析の後、市政府主計処のウェブサイトでプレスリリースを公表しました。各方面でご参照ください。\n\n👉詳しい情報：\n🔹『台北市節句物価プレスリリースコーナー』\n",
+   "vi": "So sánh giá hàng hóa dịp lễ tại Đài Bắc ba ngày trước kỳ nghỉ Tết Đoan Ngọ năm 113 (2024) với cùng kỳ năm trước: đậu phộng (nhân), hạt dẻ, trứng vịt muối và gạo nếp tăng giá do một số doanh nghiệp phản ánh chi phí nhập hàng tăng; bánh ú thịt mặn và bánh ú ngọt tăng giá do chi phí nhân công tăng; thịt lợn tăng giá do chi phí chăn nuôi tăng. Riêng nấm hương khô, tôm khô và lá gói bánh ú giảm giá nhờ nguồn cung dồi dào.\n\n👉Thông tin liên quan:\nĐể phản ánh tình hình giá hàng hóa dịp lễ trước Tết Đoan Ngọ năm 113 tại Đài Bắc, Sở Ngân sách, Kế toán và Thống kê Chính quyền Thành phố Đài Bắc đã khảo sát giá bán lẻ các mặt hàng tiêu biểu như thịt lợn, gạo nếp, nấm hương khô, hạt dẻ, trứng vịt muối, bánh ú thịt mặn, bánh ú ngọt, tôm khô, lá gói bánh ú và đậu phộng (nhân) vào các ngày 9/5/113 (30 ngày trước kỳ nghỉ), 29/5 (10 ngày trước kỳ nghỉ) và 5/6 (3 ngày trước kỳ nghỉ). Sau khi phân tích thống kê, thông cáo báo chí đã được đăng trên trang web của Sở để mọi người tham khảo.\n\n👉Thêm thông tin:\n🔹\"Chuyên mục thông cáo báo chí về giá cả dịp lễ của Thành phố Đài Bắc\"\n",
+   "id": "Dibandingkan dengan periode yang sama tahun lalu, harga barang musiman di Taipei tiga hari sebelum libur panjang Festival Perahu Naga tahun 113 (2024): kacang tanah (kupas), kastanye, telur bebek asin, dan beras ketan naik karena sebagian pedagang melaporkan kenaikan biaya pembelian; bakcang daging asin dan bakcang manis naik karena biaya tenaga kerja meningkat; daging babi naik karena biaya pemeliharaan meningkat. Sementara itu, jamur shiitake kering, ebi, dan daun bakcang turun harga karena pasokan melimpah.\n\n👉Informasi terkait:\nUntuk mencerminkan harga barang musiman menjelang Festival Perahu Naga tahun 113 di Taipei, Departemen Anggaran, Akuntansi, dan Statistik Pemerintah Kota Taipei melakukan survei harga eceran untuk barang-barang representatif seperti daging babi, beras ketan, jamur shiitake kering, kastanye, telur bebek asin, bakcang daging asin, bakcang manis, ebi, daun bakcang, dan kacang tanah (kupas) pada 9 Mei 113 (30 hari sebelum libur), 29 Mei (10 hari sebelum libur), dan 5 Juni (3 hari sebelum libur). Setelah analisis statistik, siaran pers diterbitkan di situs web departemen tersebut sebagai referensi publik.\n\n👉Informasi lebih lanjut:\n🔹\"Pusat Siaran Pers Harga Musiman Kota Taipei\"\n",
+   "th": "เมื่อเปรียบเทียบราคาสินค้าเทศกาลในไทเปช่วงสามวันก่อนวันหยุดยาวเทศกาลเรือมังกรปี 113 (2024) กับช่วงเดียวกันของปีก่อน ถั่วลิสง (กะเทาะเปลือก) เกาลัด ไข่เป็ดเค็ม และข้าวเหนียวมีราคาสูงขึ้นเนื่องจากผู้ประกอบการบางรายแจ้งว่าต้นทุนการสั่งซื้อเพิ่มขึ้น บ๊ะจ่างไส้หมูเค็มและบ๊ะจ่างหวานราคาสูงขึ้นเนื่องจากค่าแรงเพิ่มขึ้น ส่วนเนื้อหมูราคาสูงขึ้นเนื่องจากต้นทุนการเลี้ยงเพิ่มขึ้น สำหรับเห็ดหอมแห้ง กุ้งแห้ง และใบไผ่ห่อบ๊ะจ่างมีราคาลดลงเนื่องจากมีปริมาณเพียงพอ\n\n👉ข้อมูลที่เกี่ยวข้อง:\nเพื่อสะท้อนสถานการณ์ราคาสินค้าเทศกาลก่อนเทศกาลเรือมังกรปี 113 ในไทเป สำนักงบประมาณ บัญชี และสถิติ รัฐบาลนครไทเป ได้สำรวจราคาขายปลีกของสินค้าตัวแทน ได้แก่ เนื้อหมู ข้าวเหนียว เห็ดหอมแห้ง เกาลัด ไข่เป็ดเค็ม บ๊ะจ่างไส้หมูเค็ม บ๊ะจ่างหวาน กุ้งแห้ง ใบไผ่ห่อบ๊ะจ่าง และถั่วลิสง (กะเทาะเปลือก) ในวันที่ 9 พฤษภาคม 113 (30 วันก่อนวันหยุด) 29 พฤษภาคม (10 วันก่อนวันหยุด) และ 5 มิถุนายน (3 วันก่อนวันหยุด) หลังจากวิเคราะห์ทางสถิติแล้ว ได้เผยแพร่ข่าวประชาสัมพันธ์บนเว็บไซต์ของสำนักงานเพื่อเป็นข้อมูลอ้างอิง\n\n👉ข้อมูลเพิ่มเติม:\n🔹\"ศูนย์ข่าวประชาสัมพันธ์ราคาสินค้าเทศกาลนครไทเป\"\n"
+  },
+  "民生物資": {
+   "en": "Essential goods",
+   "ja": "生活物資",
+   "vi": "Hàng thiết yếu",
+   "id": "Kebutuhan pokok",
+   "th": "สินค้าจำเป็น"
+  },
+  "水層過院頭大現鄉出石大報量大說，為他然家成長": {
+   "en": "Lorem ipsum dolor sit amet consectetur, adipiscing elit sed do",
+   "ja": "Lorem ipsum dolor sit amet consectetur、adipiscing elit sed do",
+   "vi": "Lorem ipsum dolor sit amet consectetur, adipiscing elit sed do",
+   "id": "Lorem ipsum dolor sit amet consectetur, adipiscing elit sed do",
+   "th": "Lorem ipsum dolor sit amet consectetur, adipiscing elit sed do"
+  },
+  "水費": {
+   "en": "Water bill",
+   "ja": "水道料金",
+   "vi": "Tiền nước",
+   "id": "Tagihan air",
+   "th": "ค่าน้ำ"
+  },
+  "沒她常，讀場史生火分功帶出子資嚴程們是使是隊": {
+   "en": "Lorem ipsum, dolor sit amet consectetur adipiscing elit sed do eiusmod",
+   "ja": "Lorem ipsum、dolor sit amet consectetur adipiscing elit sed do eiusmod",
+   "vi": "Lorem ipsum, dolor sit amet consectetur adipiscing elit sed do eiusmod",
+   "id": "Lorem ipsum, dolor sit amet consectetur adipiscing elit sed do eiusmod",
+   "th": "Lorem ipsum, dolor sit amet consectetur adipiscing elit sed do eiusmod"
+  },
+  "活動、服務、福利 一鍵讓你知": {
+   "en": "Events, services and benefits, all at a tap",
+   "ja": "イベント・サービス・福利をワンタップでお届け",
+   "vi": "Sự kiện, dịch vụ, phúc lợi - chỉ một chạm là biết",
+   "id": "Acara, layanan, dan tunjangan dalam satu sentuhan",
+   "th": "กิจกรรม บริการ สวัสดิการ รู้ได้ในคลิกเดียว"
+  },
+  "活動訊息": {
+   "en": "Events",
+   "ja": "イベント情報",
+   "vi": "Sự kiện",
+   "id": "Acara",
+   "th": "กิจกรรม"
+  },
+  "火災通報": {
+   "en": "Fire report",
+   "ja": "火災通報",
+   "vi": "Báo cháy",
+   "id": "Laporan kebakaran",
+   "th": "แจ้งเหตุไฟไหม้"
+  },
+  "災情通報": {
+   "en": "Disaster report",
+   "ja": "災害通報",
+   "vi": "Báo cáo thiên tai",
+   "id": "Laporan bencana",
+   "th": "แจ้งภัยพิบัติ"
+  },
+  "為提供更快速、便利之服務,利用台北通撥打網路電話，": {
+   "en": "To provide faster and more convenient service, when you make an internet call through TownPass,",
+   "ja": "より迅速で便利なサービスを提供するため、TownPass でインターネット電話をかける際、",
+   "vi": "Để cung cấp dịch vụ nhanh chóng, thuận tiện hơn, khi bạn gọi điện qua mạng bằng TownPass,",
+   "id": "Untuk memberikan layanan yang lebih cepat dan praktis, saat Anda melakukan panggilan internet melalui TownPass,",
+   "th": "เพื่อให้บริการที่รวดเร็วและสะดวกยิ่งขึ้น เมื่อคุณโทรศัพท์ผ่านอินเทอร์เน็ตด้วย TownPass"
+  },
+  "無法辨識 QR Code": {
+   "en": "Unable to recognise the QR Code",
+   "ja": "QR コードを認識できません",
+   "vi": "Không nhận dạng được mã QR",
+   "id": "QR Code tidak dapat dikenali",
+   "th": "ไม่สามารถอ่าน QR Code ได้"
+  },
+  "無法開啟郵件 App": {
+   "en": "Unable to open the mail app",
+   "ja": "メールアプリを開けません",
+   "vi": "Không mở được ứng dụng Mail",
+   "id": "Tidak dapat membuka aplikasi email",
+   "th": "ไม่สามารถเปิดแอปอีเมลได้"
+  },
+  "熱門": {
+   "en": "Popular",
+   "ja": "人気",
+   "vi": "Phổ biến",
+   "id": "Populer",
+   "th": "ยอดนิยม"
+  },
+  "熱門繳費": {
+   "en": "Popular payments",
+   "ja": "人気の支払い",
+   "vi": "Thanh toán phổ biến",
+   "id": "Pembayaran populer",
+   "th": "การชำระเงินยอดนิยม"
+  },
+  "版本": {
+   "en": "Version",
+   "ja": "バージョン",
+   "vi": "Phiên bản",
+   "id": "Versi",
+   "th": "เวอร์ชัน"
+  },
+  "球大看兒……顧果下只常進學影然，演強朋查電利景": {
+   "en": "Lorem ipsum... dolor sit amet consectetur, adipiscing elit sed do eiusmod",
+   "ja": "Lorem ipsum……dolor sit amet consectetur、adipiscing elit sed do eiusmod",
+   "vi": "Lorem ipsum... dolor sit amet consectetur, adipiscing elit sed do eiusmod",
+   "id": "Lorem ipsum... dolor sit amet consectetur, adipiscing elit sed do eiusmod",
+   "th": "Lorem ipsum... dolor sit amet consectetur, adipiscing elit sed do eiusmod"
+  },
+  "生日": {
+   "en": "Birthday",
+   "ja": "誕生日",
+   "vi": "Ngày sinh",
+   "id": "Tanggal lahir",
+   "th": "วันเกิด"
+  },
+  "用水服務": {
+   "en": "Water usage",
+   "ja": "水道使用量",
+   "vi": "Dịch vụ nước",
+   "id": "Pemakaian air",
+   "th": "การใช้น้ำ"
+  },
+  "申辦服務": {
+   "en": "Applications",
+   "ja": "申請サービス",
+   "vi": "Dịch vụ nộp đơn",
+   "id": "Layanan permohonan",
+   "th": "บริการยื่นคำร้อง"
+  },
+  "疫苗預約": {
+   "en": "Vaccine appointment",
+   "ja": "ワクチン予約",
+   "vi": "Đặt lịch tiêm vắc-xin",
+   "id": "Janji vaksin",
+   "th": "จองวัคซีน"
+  },
+  "登入": {
+   "en": "Log in",
+   "ja": "ログイン",
+   "vi": "Đăng nhập",
+   "id": "Masuk",
+   "th": "เข้าสู่ระบบ"
+  },
+  "登入台北通，需重新驗證您的手機或Email資料來復用帳號": {
+   "en": "To log in to TownPass, verify your mobile number or email again to reactivate your account",
+   "ja": "TownPass にログインするには、アカウントを再利用するため携帯電話番号またはメールアドレスを再認証してください",
+   "vi": "Để đăng nhập TownPass, bạn cần xác minh lại số điện thoại hoặc email để khôi phục tài khoản",
+   "id": "Untuk login ke TownPass, verifikasi ulang nomor ponsel atau email Anda untuk mengaktifkan kembali akun",
+   "th": "หากต้องการเข้าสู่ระบบ TownPass ต้องยืนยันหมายเลขโทรศัพท์มือถือหรืออีเมลอีกครั้งเพื่อใช้งานบัญชีอีกครั้ง"
+  },
+  "登出": {
+   "en": "Log out",
+   "ja": "ログアウト",
+   "vi": "Đăng xuất",
+   "id": "Keluar",
+   "th": "ออกจากระบบ"
+  },
+  "發票": {
+   "en": "Invoices",
+   "ja": "統一発票",
+   "vi": "Hóa đơn điện tử",
+   "id": "Faktur",
+   "th": "ใบกำกับภาษี"
+  },
+  "發票收據": {
+   "en": "Invoices and receipts",
+   "ja": "発票・領収書",
+   "vi": "Hóa đơn và biên lai",
+   "id": "Faktur dan kuitansi",
+   "th": "ใบกำกับภาษีและใบเสร็จ"
+  },
+  "發票設定": {
+   "en": "Invoice settings",
+   "ja": "発票の設定",
+   "vi": "Cài đặt hóa đơn",
+   "id": "Pengaturan faktur",
+   "th": "ตั้งค่าใบกำกับภาษี"
+  },
+  "皆以該系統或該單位的「隱私 權公告」為主。\n": {
+   "en": "are governed by the \"privacy notice\" of that system or agency.\n",
+   "ja": "当該システムまたは当該機関の「プライバシー告知」に従います。\n",
+   "vi": "đều tuân theo \"thông báo quyền riêng tư\" của hệ thống hoặc đơn vị đó.\n",
+   "id": "mengikuti \"pemberitahuan privasi\" dari sistem atau instansi tersebut.\n",
+   "th": "เป็นไปตาม \"ประกาศความเป็นส่วนตัว\" ของระบบหรือหน่วยงานนั้น\n"
+  },
+  "目前無訊息": {
+   "en": "No messages",
+   "ja": "メッセージはありません",
+   "vi": "Chưa có tin nhắn",
+   "id": "Belum ada pesan",
+   "th": "ยังไม่มีข้อความ"
+  },
+  "目前登入帳號": {
+   "en": "Currently logged-in account",
+   "ja": "現在ログイン中のアカウント",
+   "vi": "Tài khoản đang đăng nhập",
+   "id": "Akun yang sedang login",
+   "th": "บัญชีที่เข้าสู่ระบบอยู่"
+  },
+  "確認": {
+   "en": "Confirm",
+   "ja": "確認",
+   "vi": "Xác nhận",
+   "id": "Konfirmasi",
+   "th": "ยืนยัน"
+  },
+  "票夾": {
+   "en": "Ticket wallet",
+   "ja": "チケットホルダー",
+   "vi": "Ví vé",
+   "id": "Dompet tiket",
+   "th": "กระเป๋าตั๋ว"
+  },
+  "立即撥號": {
+   "en": "Call now",
+   "ja": "今すぐ発信",
+   "vi": "Gọi ngay",
+   "id": "Telepon sekarang",
+   "th": "โทรเลย"
+  },
+  "立即通報發生災情地點": {
+   "en": "Report the location of a disaster right away",
+   "ja": "災害発生地点をすぐに通報",
+   "vi": "Báo ngay địa điểm xảy ra thiên tai",
+   "id": "Segera laporkan lokasi bencana",
+   "th": "แจ้งสถานที่เกิดภัยพิบัติทันที"
+  },
+  "等道。二一策他一馬才，著好難投集都從；識害興": {
+   "en": "Lorem ipsum. Dolor sit amet consectetur; adipiscing elit sed",
+   "ja": "Lorem ipsum。Dolor sit amet consectetur；adipiscing elit sed",
+   "vi": "Lorem ipsum. Dolor sit amet consectetur; adipiscing elit sed",
+   "id": "Lorem ipsum. Dolor sit amet consectetur; adipiscing elit sed",
+   "th": "Lorem ipsum. Dolor sit amet consectetur; adipiscing elit sed"
+  },
+  "簡單森呼吸": {
+   "en": "Green spaces map",
+   "ja": "緑地マップ",
+   "vi": "Bản đồ mảng xanh",
+   "id": "Peta ruang hijau",
+   "th": "แผนที่พื้นที่สีเขียว"
+  },
+  "系統自動提供您台北通會員的「姓名及手機號碼」等個人資料至": {
+   "en": "the system automatically provides personal data of your TownPass membership, such as your \"name and mobile number\", to",
+   "ja": "システムが TownPass 会員の「氏名および携帯電話番号」などの個人情報を自動的に",
+   "vi": "hệ thống sẽ tự động cung cấp dữ liệu cá nhân của hội viên TownPass như \"họ tên và số điện thoại di động\" cho",
+   "id": "sistem secara otomatis memberikan data pribadi anggota TownPass Anda, seperti \"nama dan nomor ponsel\", kepada",
+   "th": "ระบบจะส่งข้อมูลส่วนบุคคลของสมาชิก TownPass เช่น \"ชื่อและหมายเลขโทรศัพท์มือถือ\" โดยอัตโนมัติไปยัง"
+  },
+  "系統訊息": {
+   "en": "System messages",
+   "ja": "システムメッセージ",
+   "vi": "Thông báo hệ thống",
+   "id": "Pesan sistem",
+   "th": "ข้อความระบบ"
+  },
+  "紀錄": {
+   "en": "History",
+   "ja": "履歴",
+   "vi": "Lịch sử",
+   "id": "Riwayat",
+   "th": "ประวัติ"
+  },
+  "納稅義務人可以透過臺北市稅捐稽徵處網站、台北通、地方稅網路申報作業網站，申請以電子方式傳送臺北市定期開徵之使用牌照稅、房屋稅及地價稅繳款書、轉帳繳納通知及證明，就不用擔心稅單等會漏接或遺失了，還可以e起節能減碳愛地球。\n\nTaxpayers of vehicle license tax, house tax and land value tax can apply for electronic transmitting for tax bills,payment notices and payment certificates of regular levied taxes through the website of Taipei City Revenue Service, TAIPEI PASS,“Local Tax to Declare”homepage.You won’t have to worry about missing or losing tax bills and payment notices.What’s more,it can also save energy and reduce carbon emissions.": {
+   "en": "Taxpayers of vehicle license tax, house tax and land value tax can apply for electronic transmitting for tax bills,payment notices and payment certificates of regular levied taxes through the website of Taipei City Revenue Service, TAIPEI PASS,“Local Tax to Declare”homepage.You won’t have to worry about missing or losing tax bills and payment notices.What’s more,it can also save energy and reduce carbon emissions.",
+   "ja": "納税義務者は、台北市税務局のウェブサイト、TownPass、地方税オンライン申告サイトから、台北市が定期的に課税する使用牌照税（自動車税）、家屋税および地価税の納付書、口座振替通知および納付証明の電子送付を申し込むことができます。税の通知書の受け取り漏れや紛失の心配がなくなり、省エネ・CO2削減で地球にもやさしくなります。\n\nTaxpayers of vehicle license tax, house tax and land value tax can apply for electronic transmitting for tax bills,payment notices and payment certificates of regular levied taxes through the website of Taipei City Revenue Service, TAIPEI PASS,“Local Tax to Declare”homepage.You won’t have to worry about missing or losing tax bills and payment notices.What’s more,it can also save energy and reduce carbon emissions.",
+   "vi": "Người nộp thuế có thể đăng ký nhận bằng phương thức điện tử giấy báo nộp thuế, thông báo chuyển khoản và chứng nhận nộp thuế định kỳ của Đài Bắc đối với thuế giấy phép sử dụng phương tiện, thuế nhà và thuế giá trị đất qua trang web của Sở Thuế Thành phố Đài Bắc, TownPass hoặc trang khai thuế địa phương trực tuyến. Không còn lo bỏ sót hay thất lạc giấy báo thuế, lại còn tiết kiệm năng lượng, giảm phát thải carbon, bảo vệ Trái Đất.\n\nTaxpayers of vehicle license tax, house tax and land value tax can apply for electronic transmitting for tax bills,payment notices and payment certificates of regular levied taxes through the website of Taipei City Revenue Service, TAIPEI PASS,“Local Tax to Declare”homepage.You won’t have to worry about missing or losing tax bills and payment notices.What’s more,it can also save energy and reduce carbon emissions.",
+   "id": "Wajib pajak dapat mengajukan pengiriman elektronik untuk surat tagihan, pemberitahuan pendebetan, dan bukti pembayaran pajak izin kendaraan, pajak bangunan, dan pajak nilai tanah yang dipungut berkala oleh Kota Taipei melalui situs Taipei City Revenue Service, TownPass, atau situs pelaporan pajak daerah online. Tak perlu khawatir tagihan pajak terlewat atau hilang, sekaligus hemat energi dan mengurangi emisi karbon demi bumi.\n\nTaxpayers of vehicle license tax, house tax and land value tax can apply for electronic transmitting for tax bills,payment notices and payment certificates of regular levied taxes through the website of Taipei City Revenue Service, TAIPEI PASS,“Local Tax to Declare”homepage.You won’t have to worry about missing or losing tax bills and payment notices.What’s more,it can also save energy and reduce carbon emissions.",
+   "th": "ผู้เสียภาษีสามารถยื่นขอรับใบแจ้งชำระ หนังสือแจ้งการหักบัญชี และหลักฐานการชำระภาษีป้ายทะเบียนรถ ภาษีโรงเรือน และภาษีมูลค่าที่ดินที่นครไทเปจัดเก็บเป็นประจำทางอิเล็กทรอนิกส์ ผ่านเว็บไซต์สำนักงานภาษีนครไทเป TownPass หรือเว็บไซต์ยื่นภาษีท้องถิ่นออนไลน์ ไม่ต้องกังวลว่าจะพลาดหรือทำใบแจ้งภาษีหาย แถมยังช่วยประหยัดพลังงาน ลดคาร์บอน รักษ์โลก\n\nTaxpayers of vehicle license tax, house tax and land value tax can apply for electronic transmitting for tax bills,payment notices and payment certificates of regular levied taxes through the website of Taipei City Revenue Service, TAIPEI PASS,“Local Tax to Declare”homepage.You won’t have to worry about missing or losing tax bills and payment notices.What’s more,it can also save energy and reduce carbon emissions."
+  },
+  "結合神農宮恭迎天上聖母遶境活動，以「心」遶境為號召，並也達到減碳永續，規劃為期一個月與心互動的系列活動。\n其中包含官方＠LINE尋寶、專屬滿額禮，以及6/1-2兩天的廟前文化市集、文化體驗、商圈優惠護照，邀請民眾體驗傳統文化的同時，用數位方式遊士林，加入士林商圈官方LINE好友即可玩士林文化小遊戲，闖關成功即可獲得商圈電子優惠券，破關完成還可以獲得活動專屬平安符，把祝福帶回家！\n商圈優惠護照領取處：商圈特約店家及神農宮\n\nIn a harmonious blend of tradition and sustainability, the Shennong Temple is proud to present the welcoming procession for Mazu, centered around the theme of a \"heartfelt\" pilgrimage. This event aims to promote carbon reduction and sustainability while engaging the community in a month-long series of interactive activities.\n\nThe festivities will include the official LINE treasure hunt, exclusive gifts for participants, and a vibrant cultural market in front of the temple on 6/1-2. There will be cultural experiences and a discount passport for the shopping district, inviting the public to explore traditional culture through digital means. By joining MRT Shilin Station Nearby Shopping District official LINE account, participants can enjoy a cultural game and earn electronic discount vouchers upon completing challenges. Those who successfully complete the game will also receive a special event-exclusive peace charm to bring blessings home.\n\nDiscount Passport Collection Points：Partner stores in the shopping district and Shennong Temple.": {
+   "en": "In a harmonious blend of tradition and sustainability, the Shennong Temple is proud to present the welcoming procession for Mazu, centered around the theme of a \"heartfelt\" pilgrimage. This event aims to promote carbon reduction and sustainability while engaging the community in a month-long series of interactive activities.\n\nThe festivities will include the official LINE treasure hunt, exclusive gifts for participants, and a vibrant cultural market in front of the temple on 6/1-2. There will be cultural experiences and a discount passport for the shopping district, inviting the public to explore traditional culture through digital means. By joining MRT Shilin Station Nearby Shopping District official LINE account, participants can enjoy a cultural game and earn electronic discount vouchers upon completing challenges. Those who successfully complete the game will also receive a special event-exclusive peace charm to bring blessings home.\n\nDiscount Passport Collection Points：Partner stores in the shopping district and Shennong Temple.",
+   "ja": "神農宮の天上聖母（媽祖）お迎え巡行と連動し、「心」の巡行をテーマに、CO2削減と持続可能性も実現する、1か月にわたる心とふれあうシリーズイベントを企画しました。\nイベントには公式＠LINE宝探し、購入金額特典、6/1-2の2日間にわたる廟前の文化マーケット、文化体験、商店街特典パスポートが含まれます。伝統文化を体験しながらデジタルで士林を巡り、士林商店街の公式LINEを友だち追加すると士林文化ミニゲームで遊べます。ステージをクリアすると商店街の電子クーポンがもらえ、全クリアでイベント限定のお守りももらえます。祝福を持ち帰りましょう！\n商店街特典パスポート受取場所：商店街の提携店舗および神農宮\n\nIn a harmonious blend of tradition and sustainability, the Shennong Temple is proud to present the welcoming procession for Mazu, centered around the theme of a \"heartfelt\" pilgrimage. This event aims to promote carbon reduction and sustainability while engaging the community in a month-long series of interactive activities.\n\nThe festivities will include the official LINE treasure hunt, exclusive gifts for participants, and a vibrant cultural market in front of the temple on 6/1-2. There will be cultural experiences and a discount passport for the shopping district, inviting the public to explore traditional culture through digital means. By joining MRT Shilin Station Nearby Shopping District official LINE account, participants can enjoy a cultural game and earn electronic discount vouchers upon completing challenges. Those who successfully complete the game will also receive a special event-exclusive peace charm to bring blessings home.\n\nDiscount Passport Collection Points：Partner stores in the shopping district and Shennong Temple.",
+   "vi": "Kết hợp với lễ rước Thiên Thượng Thánh Mẫu (Ma Tổ) của miếu Thần Nông, lấy \"trái tim\" làm chủ đề cho cuộc diễu hành, đồng thời hướng tới giảm carbon và phát triển bền vững, chúng tôi tổ chức chuỗi hoạt động tương tác kéo dài một tháng.\nChuỗi hoạt động gồm truy tìm kho báu trên LINE＠ chính thức, quà tặng khi mua đủ hạn mức, cùng chợ văn hóa trước miếu, trải nghiệm văn hóa và hộ chiếu ưu đãi khu mua sắm trong hai ngày 6/1-2. Người dân vừa trải nghiệm văn hóa truyền thống vừa khám phá Sĩ Lâm theo cách số hóa: kết bạn với LINE chính thức của khu mua sắm Sĩ Lâm để chơi trò chơi nhỏ về văn hóa Sĩ Lâm, vượt ải thành công nhận phiếu giảm giá điện tử, hoàn thành toàn bộ còn nhận bùa bình an độc quyền của sự kiện, mang phúc lành về nhà!\nNơi nhận hộ chiếu ưu đãi: các cửa hàng liên kết trong khu mua sắm và miếu Thần Nông\n\nIn a harmonious blend of tradition and sustainability, the Shennong Temple is proud to present the welcoming procession for Mazu, centered around the theme of a \"heartfelt\" pilgrimage. This event aims to promote carbon reduction and sustainability while engaging the community in a month-long series of interactive activities.\n\nThe festivities will include the official LINE treasure hunt, exclusive gifts for participants, and a vibrant cultural market in front of the temple on 6/1-2. There will be cultural experiences and a discount passport for the shopping district, inviting the public to explore traditional culture through digital means. By joining MRT Shilin Station Nearby Shopping District official LINE account, participants can enjoy a cultural game and earn electronic discount vouchers upon completing challenges. Those who successfully complete the game will also receive a special event-exclusive peace charm to bring blessings home.\n\nDiscount Passport Collection Points：Partner stores in the shopping district and Shennong Temple.",
+   "id": "Bersamaan dengan arak-arakan penyambutan Dewi Langit (Mazu) dari Kuil Shennong, dengan tema arak-arakan \"dari hati\" serta mendukung pengurangan karbon dan keberlanjutan, kami menghadirkan rangkaian kegiatan interaktif selama sebulan.\nKegiatan ini mencakup perburuan harta karun di LINE＠ resmi, hadiah khusus belanja minimum, serta pasar budaya di depan kuil, pengalaman budaya, dan paspor promo kawasan belanja pada 6/1-2. Sambil menikmati budaya tradisional, warga dapat menjelajahi Shilin secara digital: tambahkan akun LINE resmi kawasan belanja Shilin untuk bermain gim budaya Shilin, selesaikan tantangan untuk mendapat kupon elektronik, dan tamatkan permainan untuk mendapat jimat keselamatan eksklusif acara. Bawa pulang berkahnya!\nTempat pengambilan paspor promo: toko mitra di kawasan belanja dan Kuil Shennong\n\nIn a harmonious blend of tradition and sustainability, the Shennong Temple is proud to present the welcoming procession for Mazu, centered around the theme of a \"heartfelt\" pilgrimage. This event aims to promote carbon reduction and sustainability while engaging the community in a month-long series of interactive activities.\n\nThe festivities will include the official LINE treasure hunt, exclusive gifts for participants, and a vibrant cultural market in front of the temple on 6/1-2. There will be cultural experiences and a discount passport for the shopping district, inviting the public to explore traditional culture through digital means. By joining MRT Shilin Station Nearby Shopping District official LINE account, participants can enjoy a cultural game and earn electronic discount vouchers upon completing challenges. Those who successfully complete the game will also receive a special event-exclusive peace charm to bring blessings home.\n\nDiscount Passport Collection Points：Partner stores in the shopping district and Shennong Temple.",
+   "th": "ร่วมกับขบวนแห่ต้อนรับเจ้าแม่หม่าจู่ของศาลเจ้าเสินหนง ภายใต้แนวคิดขบวนแห่ \"จากใจ\" พร้อมมุ่งสู่การลดคาร์บอนและความยั่งยืน จึงจัดกิจกรรมต่อเนื่องที่มีปฏิสัมพันธ์ด้วยใจตลอดหนึ่งเดือน\nประกอบด้วยการล่าสมบัติผ่าน LINE＠ อย่างเป็นทางการ ของรางวัลพิเศษเมื่อซื้อครบยอด รวมถึงตลาดวัฒนธรรมหน้าศาลเจ้า กิจกรรมสัมผัสวัฒนธรรม และพาสปอร์ตส่วนลดย่านการค้าในวันที่ 6/1-2 ชวนประชาชนสัมผัสวัฒนธรรมดั้งเดิมพร้อมเที่ยวซื่อหลินแบบดิจิทัล เพิ่มเพื่อน LINE อย่างเป็นทางการของย่านการค้าซื่อหลินเพื่อเล่นเกมวัฒนธรรมซื่อหลิน ผ่านด่านสำเร็จรับคูปองส่วนลดอิเล็กทรอนิกส์ และเมื่อผ่านครบทุกด่านยังได้รับเครื่องรางเฉพาะกิจกรรม นำพรกลับบ้าน!\nจุดรับพาสปอร์ตส่วนลด: ร้านค้าที่ร่วมรายการในย่านการค้าและศาลเจ้าเสินหนง\n\nIn a harmonious blend of tradition and sustainability, the Shennong Temple is proud to present the welcoming procession for Mazu, centered around the theme of a \"heartfelt\" pilgrimage. This event aims to promote carbon reduction and sustainability while engaging the community in a month-long series of interactive activities.\n\nThe festivities will include the official LINE treasure hunt, exclusive gifts for participants, and a vibrant cultural market in front of the temple on 6/1-2. There will be cultural experiences and a discount passport for the shopping district, inviting the public to explore traditional culture through digital means. By joining MRT Shilin Station Nearby Shopping District official LINE account, participants can enjoy a cultural game and earn electronic discount vouchers upon completing challenges. Those who successfully complete the game will also receive a special event-exclusive peace charm to bring blessings home.\n\nDiscount Passport Collection Points：Partner stores in the shopping district and Shennong Temple."
+  },
+  "網址連結": {
+   "en": "URL link",
+   "ja": "URL リンク",
+   "vi": "Liên kết URL",
+   "id": "Tautan URL",
+   "th": "ลิงก์ URL"
+  },
+  "網路報案": {
+   "en": "Online police report",
+   "ja": "オンライン通報",
+   "vi": "Trình báo trực tuyến",
+   "id": "Lapor polisi online",
+   "th": "แจ้งความออนไลน์"
+  },
+  "網路投票": {
+   "en": "Online voting",
+   "ja": "オンライン投票",
+   "vi": "Bỏ phiếu trực tuyến",
+   "id": "Voting online",
+   "th": "โหวตออนไลน์"
+  },
+  "緊急報案": {
+   "en": "Emergency report",
+   "ja": "緊急通報",
+   "vi": "Báo khẩn cấp",
+   "id": "Laporan darurat",
+   "th": "แจ้งเหตุฉุกเฉิน"
+  },
+  "線上即時收聽-臺北廣播電台": {
+   "en": "Listen live online - Taipei Broadcasting Station",
+   "ja": "オンラインでライブ視聴 - 台北放送局",
+   "vi": "Nghe trực tuyến - Đài Phát thanh Đài Bắc",
+   "id": "Dengarkan langsung online - Stasiun Radio Taipei",
+   "th": "ฟังสดออนไลน์ - สถานีวิทยุไทเป"
+  },
+  "線上申辦市政府服務個項目（市民）": {
+   "en": "Apply online for City Government services (residents)",
+   "ja": "市政府の各種サービスをオンライン申請（市民）",
+   "vi": "Nộp đơn trực tuyến các dịch vụ của Chính quyền Thành phố (người dân)",
+   "id": "Ajukan layanan Pemerintah Kota secara online (warga)",
+   "th": "ยื่นคำร้องบริการของรัฐบาลนครไทเปทางออนไลน์ (ประชาชน)"
+  },
+  "線上預約各區親子館活動報名": {
+   "en": "Book activities at parent-child centres in each district online",
+   "ja": "各区の親子館イベントをオンラインで予約・申し込み",
+   "vi": "Đăng ký trực tuyến các hoạt động tại trung tâm cha mẹ và trẻ em ở các quận",
+   "id": "Daftar online kegiatan di pusat orang tua dan anak di setiap distrik",
+   "th": "จองกิจกรรมศูนย์พ่อแม่ลูกในแต่ละเขตทางออนไลน์"
+  },
+  "編輯": {
+   "en": "Edit",
+   "ja": "編集",
+   "vi": "Chỉnh sửa",
+   "id": "Ubah",
+   "th": "แก้ไข"
+  },
+  "繳交水費、查詢或自報用水度數": {
+   "en": "Pay water bills, check or self-report meter readings",
+   "ja": "水道料金の支払い、使用量の照会・自己申告",
+   "vi": "Nộp tiền nước, tra cứu hoặc tự khai báo chỉ số nước",
+   "id": "Bayar tagihan air, cek atau laporkan sendiri angka meter",
+   "th": "ชำระค่าน้ำ ตรวจสอบหรือแจ้งเลขมิเตอร์ด้วยตนเอง"
+  },
+  "繳稅可透過pay.taipei、行動支付工具或電子支付帳戶、paytax、線上查繳稅及電話語音等方式繳納地方稅！\n\nPayments of local taxes can be paid through pay.taipei, mobile payment tools or e-payment account, paytax website, online inquiry tax payment or transfer via telephone payment!": {
+   "en": "Payments of local taxes can be paid through pay.taipei, mobile payment tools or e-payment account, paytax website, online inquiry tax payment or transfer via telephone payment!",
+   "ja": "地方税は pay.taipei、モバイル決済ツールや電子決済口座、paytax、オンライン照会納付、電話音声などの方法で納付できます！\n\nPayments of local taxes can be paid through pay.taipei, mobile payment tools or e-payment account, paytax website, online inquiry tax payment or transfer via telephone payment!",
+   "vi": "Có thể nộp thuế địa phương qua pay.taipei, công cụ thanh toán di động hoặc tài khoản thanh toán điện tử, paytax, tra cứu và nộp thuế trực tuyến, tổng đài thoại và nhiều cách khác!\n\nPayments of local taxes can be paid through pay.taipei, mobile payment tools or e-payment account, paytax website, online inquiry tax payment or transfer via telephone payment!",
+   "id": "Pajak daerah dapat dibayar melalui pay.taipei, alat pembayaran seluler atau akun pembayaran elektronik, paytax, cek dan bayar pajak online, telepon suara, dan cara lainnya!\n\nPayments of local taxes can be paid through pay.taipei, mobile payment tools or e-payment account, paytax website, online inquiry tax payment or transfer via telephone payment!",
+   "th": "ชำระภาษีท้องถิ่นได้ผ่าน pay.taipei เครื่องมือชำระเงินผ่านมือถือหรือบัญชีชำระเงินอิเล็กทรอนิกส์ paytax การตรวจสอบและชำระภาษีออนไลน์ และระบบโทรศัพท์อัตโนมัติ!\n\nPayments of local taxes can be paid through pay.taipei, mobile payment tools or e-payment account, paytax website, online inquiry tax payment or transfer via telephone payment!"
+  },
+  "置頂服務": {
+   "en": "Pinned services",
+   "ja": "ピン留めサービス",
+   "vi": "Dịch vụ đã ghim",
+   "id": "Layanan disematkan",
+   "th": "บริการที่ปักหมุด"
+  },
+  "置頂服務已達上限(12個)": {
+   "en": "Pinned services limit reached (12)",
+   "ja": "ピン留めサービスが上限（12個）に達しました",
+   "vi": "Đã đạt giới hạn dịch vụ ghim (12)",
+   "id": "Batas layanan disematkan tercapai (12)",
+   "th": "ปักหมุดบริการครบจำนวนสูงสุดแล้ว (12 รายการ)"
+  },
+  "聯合醫院醫療費": {
+   "en": "City hospital fees",
+   "ja": "市立病院の医療費",
+   "vi": "Viện phí",
+   "id": "Biaya rumah sakit",
+   "th": "ค่ารักษาพยาบาล"
+  },
+  "聯醫掛號": {
+   "en": "City hospital appointment",
+   "ja": "市立病院の受診予約",
+   "vi": "Đăng ký khám bệnh",
+   "id": "Pendaftaran rumah sakit",
+   "th": "นัดหมายโรงพยาบาล"
+  },
+  "臨櫃叫號": {
+   "en": "Counter queue number",
+   "ja": "窓口の番号札",
+   "vi": "Lấy số thứ tự",
+   "id": "Nomor antrean loket",
+   "th": "บัตรคิวเคาน์เตอร์"
+  },
+  "臨櫃服務查看叫號、預約": {
+   "en": "Check counter queue numbers and make bookings",
+   "ja": "窓口の呼び出し番号確認・予約",
+   "vi": "Xem số thứ tự và đặt lịch tại quầy",
+   "id": "Lihat nomor antrean dan reservasi loket",
+   "th": "ดูคิวและจองคิวที่เคาน์เตอร์"
+  },
+  "臺北市": {
+   "en": "Taipei City",
+   "ja": "台北市",
+   "vi": "Thành phố Đài Bắc",
+   "id": "Kota Taipei",
+   "th": "นครไทเป"
+  },
+  "臺北市中山區吉林路 69 號 4 樓": {
+   "en": "4F, No. 69, Jilin Rd., Zhongshan District, Taipei City",
+   "ja": "台北市中山区吉林路 69 号 4 階",
+   "vi": "Tầng 4, Số 69, Đường Cát Lâm, Quận Trung Sơn, Thành phố Đài Bắc",
+   "id": "Lantai 4, No. 69, Jalan Jilin, Distrik Zhongshan, Kota Taipei",
+   "th": "ชั้น 4 เลขที่ 69 ถนนจี๋หลิน เขตจงซาน นครไทเป"
+  },
+  "臺北市政府觀光傳播局舉辦「來臺北，找樂點」集點抽獎活動，15處蘊藏精彩故事的獨家推薦景點等你來探索！於113年6月3日至7月31日期間，透過臺北市政府LINE@參加活動，提供好禮雙重送。收集1點，即可獲得合作店家優惠，集滿3點，還可獲得1次抽獎機會（每人最多累積5次），抽獎好禮包括iPhone15、空拍機、行李箱、相機等41項，總值超過10萬元，豐富大獎等你來抽！\n\nThe Taipei City Government's Department of Information and Tourism is hosting the  \"Discover Taipei, Find Fun Spots\" stamp collection and lucky draw . This event highlights 15  recommended attractions rich in fascinating stories. From June 3 to July 31, 2024, participate through the Taipei City Government's LINE@ and receive double rewards. Collect one stamp for special offers at partner stores, and accumulate three stamps for one entry to win prizes (up to five entries per person). Prizes include an iPhone 15, drones, suitcases, cameras, and more, totaling 41 items worth over NT$100,000 in total. Fabulous prizes await!": {
+   "en": "The Taipei City Government's Department of Information and Tourism is hosting the  \"Discover Taipei, Find Fun Spots\" stamp collection and lucky draw . This event highlights 15  recommended attractions rich in fascinating stories. From June 3 to July 31, 2024, participate through the Taipei City Government's LINE@ and receive double rewards. Collect one stamp for special offers at partner stores, and accumulate three stamps for one entry to win prizes (up to five entries per person). Prizes include an iPhone 15, drones, suitcases, cameras, and more, totaling 41 items worth over NT$100,000 in total. Fabulous prizes await!",
+   "ja": "台北市政府観光伝播局が「来台北、找楽点」スタンプラリー抽選イベントを開催！素敵な物語が秘められた15か所の厳選スポットがあなたを待っています。113年（2024年）6月3日から7月31日まで、台北市政府の LINE@ からご参加いただくと、うれしい特典がダブルでもらえます。1ポイント集めると提携店舗の特典がもらえ、3ポイント集めると抽選に1回参加できます（1人最大5回まで）。賞品は iPhone15、ドローン、スーツケース、カメラなど41点、総額10万元以上。豪華賞品が当たるチャンスです！\n\nThe Taipei City Government's Department of Information and Tourism is hosting the  \"Discover Taipei, Find Fun Spots\" stamp collection and lucky draw . This event highlights 15  recommended attractions rich in fascinating stories. From June 3 to July 31, 2024, participate through the Taipei City Government's LINE@ and receive double rewards. Collect one stamp for special offers at partner stores, and accumulate three stamps for one entry to win prizes (up to five entries per person). Prizes include an iPhone 15, drones, suitcases, cameras, and more, totaling 41 items worth over NT$100,000 in total. Fabulous prizes await!",
+   "vi": "Sở Thông tin và Du lịch Chính quyền Thành phố Đài Bắc tổ chức sự kiện tích điểm rút thăm \"Đến Đài Bắc, tìm niềm vui\", 15 điểm tham quan đề xuất độc quyền ẩn chứa những câu chuyện thú vị đang chờ bạn khám phá! Từ ngày 3/6 đến 31/7/113 (2024), tham gia qua LINE@ của Chính quyền Thành phố Đài Bắc để nhận quà nhân đôi. Thu thập 1 điểm để nhận ưu đãi từ cửa hàng đối tác, đủ 3 điểm được thêm 1 lượt rút thăm (mỗi người tối đa 5 lượt). Giải thưởng gồm iPhone15, flycam, vali, máy ảnh... tổng cộng 41 phần quà, trị giá hơn 100.000 Đài tệ, nhiều giải lớn đang chờ bạn!\n\nThe Taipei City Government's Department of Information and Tourism is hosting the  \"Discover Taipei, Find Fun Spots\" stamp collection and lucky draw . This event highlights 15  recommended attractions rich in fascinating stories. From June 3 to July 31, 2024, participate through the Taipei City Government's LINE@ and receive double rewards. Collect one stamp for special offers at partner stores, and accumulate three stamps for one entry to win prizes (up to five entries per person). Prizes include an iPhone 15, drones, suitcases, cameras, and more, totaling 41 items worth over NT$100,000 in total. Fabulous prizes await!",
+   "id": "Departemen Informasi dan Pariwisata Pemerintah Kota Taipei mengadakan acara kumpul poin dan undian \"Datang ke Taipei, Cari Keseruan\". 15 tempat wisata rekomendasi eksklusif yang menyimpan kisah menarik menanti untuk Anda jelajahi! Pada 3 Juni hingga 31 Juli 113 (2024), ikuti acara melalui LINE@ Pemerintah Kota Taipei dan dapatkan hadiah ganda. Kumpulkan 1 poin untuk promo dari toko mitra, kumpulkan 3 poin untuk 1 kesempatan undian (maksimal 5 kali per orang). Hadiah undian meliputi iPhone15, drone, koper, kamera, dan lainnya, total 41 hadiah senilai lebih dari NT$100.000. Hadiah menarik menanti Anda!\n\nThe Taipei City Government's Department of Information and Tourism is hosting the  \"Discover Taipei, Find Fun Spots\" stamp collection and lucky draw . This event highlights 15  recommended attractions rich in fascinating stories. From June 3 to July 31, 2024, participate through the Taipei City Government's LINE@ and receive double rewards. Collect one stamp for special offers at partner stores, and accumulate three stamps for one entry to win prizes (up to five entries per person). Prizes include an iPhone 15, drones, suitcases, cameras, and more, totaling 41 items worth over NT$100,000 in total. Fabulous prizes await!",
+   "th": "กรมสารสนเทศและการท่องเที่ยว รัฐบาลนครไทเป จัดกิจกรรมสะสมแต้มลุ้นรางวัล \"มาไทเป หาจุดสนุก\" พร้อมสถานที่ท่องเที่ยวแนะนำพิเศษ 15 แห่งที่ซ่อนเรื่องราวน่าสนใจรอให้คุณไปสำรวจ! ระหว่างวันที่ 3 มิถุนายน ถึง 31 กรกฎาคม 113 (2024) ร่วมกิจกรรมผ่าน LINE@ ของรัฐบาลนครไทเป รับของรางวัลสองต่อ สะสม 1 แต้มรับส่วนลดจากร้านค้าพันธมิตร สะสมครบ 3 แต้มรับสิทธิ์ลุ้นรางวัล 1 ครั้ง (สูงสุด 5 ครั้งต่อคน) ของรางวัลได้แก่ iPhone15 โดรน กระเป๋าเดินทาง กล้อง และอื่น ๆ รวม 41 รายการ มูลค่ารวมกว่า 100,000 ดอลลาร์ไต้หวัน รางวัลใหญ่รอคุณอยู่!\n\nThe Taipei City Government's Department of Information and Tourism is hosting the  \"Discover Taipei, Find Fun Spots\" stamp collection and lucky draw . This event highlights 15  recommended attractions rich in fascinating stories. From June 3 to July 31, 2024, participate through the Taipei City Government's LINE@ and receive double rewards. Collect one stamp for special offers at partner stores, and accumulate three stamps for one entry to win prizes (up to five entries per person). Prizes include an iPhone 15, drones, suitcases, cameras, and more, totaling 41 items worth over NT$100,000 in total. Fabulous prizes await!"
+  },
+  "與我們聯絡": {
+   "en": "Contact us",
+   "ja": "お問い合わせ",
+   "vi": "Liên hệ chúng tôi",
+   "id": "Hubungi kami",
+   "th": "ติดต่อเรา"
+  },
+  "若您使用1999網路電話聯絡我們，為維護雙方權益及提升服務效率，": {
+   "en": "If you contact us via the 1999 internet call, to protect the rights of both parties and improve service efficiency,",
+   "ja": "1999インターネット電話でお問い合わせいただく場合、双方の権益を守りサービス効率を高めるため、",
+   "vi": "Nếu bạn liên hệ chúng tôi qua cuộc gọi mạng 1999, để bảo vệ quyền lợi của hai bên và nâng cao hiệu quả phục vụ,",
+   "id": "Jika Anda menghubungi kami melalui panggilan internet 1999, demi melindungi hak kedua belah pihak dan meningkatkan efisiensi layanan,",
+   "th": "หากคุณติดต่อเราผ่านการโทรอินเทอร์เน็ต 1999 เพื่อคุ้มครองสิทธิของทั้งสองฝ่ายและเพิ่มประสิทธิภาพการให้บริการ"
+  },
+  "若您對市政府有任何建議或問題請至": {
+   "en": "If you have any suggestions or questions for the City Government, please go to",
+   "ja": "市政府へのご提案やご質問は、こちらへ",
+   "vi": "Nếu bạn có góp ý hoặc câu hỏi cho Chính quyền Thành phố, vui lòng truy cập",
+   "id": "Jika Anda memiliki saran atau pertanyaan untuk Pemerintah Kota, silakan kunjungi",
+   "th": "หากคุณมีข้อเสนอแนะหรือคำถามถึงรัฐบาลนครไทเป โปรดไปที่"
+  },
+  "若須轉接至1999市民熱線專人服務時，": {
+   "en": "When a transfer to a 1999 Citizen Hotline agent is needed,",
+   "ja": "1999市民ホットラインの担当者への転送が必要な場合、",
+   "vi": "Khi cần chuyển tới nhân viên đường dây nóng 1999,",
+   "id": "Jika perlu dialihkan ke petugas Hotline Warga 1999,",
+   "th": "เมื่อต้องโอนสายไปยังเจ้าหน้าที่สายด่วนประชาชน 1999"
+  },
+  "親子館": {
+   "en": "Parent-child centre",
+   "ja": "親子館",
+   "vi": "Trung tâm cha mẹ và trẻ em",
+   "id": "Pusat orang tua dan anak",
+   "th": "ศูนย์พ่อแม่ลูก"
+  },
+  "親愛的台北通會員您好\n在這美好又特別的一天，獻上給您的祝福。\n生日快樂🎉祝福您天天都有好的心情～\n台北通與您一同成長，\n未來將有更多多元的市政服務歡迎您一同體驗！\n臺北市政府 敬賀": {
+   "en": "Dear TownPass member,\nOn this wonderful and special day, we send you our best wishes.\nHappy birthday🎉 May every day bring you a good mood~\nTownPass grows together with you,\nand more diverse city services are on the way for you to enjoy!\nWith warm regards, Taipei City Government",
+   "ja": "TownPass 会員の皆さまへ\nこの素晴らしく特別な日に、心よりお祝い申し上げます。\nお誕生日おめでとうございます🎉毎日が素敵な気分でありますように～\nTownPass は皆さまとともに成長し、\nこれからもさらに多彩な市政サービスをご体験いただけます！\n台北市政府より",
+   "vi": "Kính gửi hội viên TownPass,\nTrong ngày tuyệt vời và đặc biệt này, xin gửi đến bạn lời chúc tốt đẹp nhất.\nChúc mừng sinh nhật🎉 Chúc bạn ngày nào cũng vui vẻ～\nTownPass cùng bạn trưởng thành,\nsắp tới sẽ có thêm nhiều dịch vụ thành phố đa dạng chờ bạn trải nghiệm!\nChính quyền Thành phố Đài Bắc kính chúc",
+   "id": "Halo, anggota TownPass yang terhormat,\nDi hari yang indah dan istimewa ini, kami mengirimkan ucapan terbaik untuk Anda.\nSelamat ulang tahun🎉 Semoga hari-hari Anda selalu menyenangkan～\nTownPass tumbuh bersama Anda,\nke depannya akan ada lebih banyak layanan kota yang beragam untuk Anda nikmati!\nSalam hangat, Pemerintah Kota Taipei",
+   "th": "เรียนสมาชิก TownPass\nในวันที่แสนดีและพิเศษนี้ ขอส่งคำอวยพรถึงคุณ\nสุขสันต์วันเกิด🎉 ขอให้คุณมีความสุขทุกวัน～\nTownPass จะเติบโตไปพร้อมกับคุณ\nในอนาคตจะมีบริการของเมืองที่หลากหลายยิ่งขึ้นให้คุณได้สัมผัส!\nด้วยความปรารถนาดีจากรัฐบาลนครไทเป"
+  },
+  "親愛的市民您好！\n點數兌換系統已完成維護，即日起重新開放「台北通-健康集點」兌點服務，點數兌換期限至113年10月31日止，請盡早完成兌換，若有兌點相關問題，請於上班時間撥打02-27208889分機7112洽詢，將由專人協助您。\n👉集點兌換悠遊卡加值金資訊查詢：": {
+   "en": "Dear residents!\nThe points redemption system has completed maintenance, and the \"TownPass - Health Points\" redemption service reopens from today. Points can be redeemed until October 31, 113 (2024), so please redeem them as soon as possible. For questions about redemption, call 02-27208889 ext. 7112 during office hours and a staff member will assist you.\n👉Info on redeeming points for EasyCard top-up credit:",
+   "ja": "市民の皆さま、こんにちは！\nポイント交換システムのメンテナンスが完了し、本日より「TownPass - 健康ポイント」のポイント交換サービスを再開します。ポイント交換の期限は113年（2024年）10月31日までです。お早めに交換してください。ポイント交換に関するご質問は、業務時間内に 02-27208889 内線 7112 までお電話ください。担当者が対応いたします。\n👉ポイントを悠遊カード（EasyCard）のチャージ金に交換する情報はこちら：",
+   "vi": "Kính chào quý thị dân!\nHệ thống đổi điểm đã hoàn tất bảo trì, từ hôm nay dịch vụ đổi điểm \"TownPass - Tích điểm sức khỏe\" mở lại. Hạn đổi điểm đến hết ngày 31/10/113 (2024), vui lòng đổi điểm sớm. Nếu có thắc mắc về đổi điểm, vui lòng gọi 02-27208889 máy lẻ 7112 trong giờ hành chính, nhân viên sẽ hỗ trợ bạn.\n👉Tra cứu thông tin đổi điểm lấy tiền nạp thẻ EasyCard:",
+   "id": "Halo, warga yang terhormat!\nSistem penukaran poin telah selesai dipelihara, dan mulai hari ini layanan penukaran poin \"TownPass - Poin Sehat\" dibuka kembali. Batas waktu penukaran poin hingga 31 Oktober 113 (2024), mohon segera tukarkan poin Anda. Jika ada pertanyaan tentang penukaran poin, hubungi 02-27208889 ext. 7112 pada jam kerja, petugas kami akan membantu Anda.\n👉Informasi penukaran poin menjadi saldo EasyCard:",
+   "th": "เรียนประชาชนทุกท่าน!\nระบบแลกคะแนนได้บำรุงรักษาเสร็จสิ้นแล้ว ตั้งแต่วันนี้เปิดให้บริการแลกคะแนน \"TownPass - สะสมคะแนนสุขภาพ\" อีกครั้ง สามารถแลกคะแนนได้ถึงวันที่ 31 ตุลาคม 113 (2024) โปรดแลกคะแนนโดยเร็ว หากมีคำถามเกี่ยวกับการแลกคะแนน โปรดโทร 02-27208889 ต่อ 7112 ในเวลาทำการ เจ้าหน้าที่จะช่วยเหลือคุณ\n👉ข้อมูลการแลกคะแนนเป็นเงินเติมบัตร EasyCard:"
+  },
+  "親愛的市民您好！\n點數兌換系統已完成維護，即日起重新開放「台北通-健康集點」兌點服務，點數兌換期限至113年10月31日止，請盡早完成兌換，若有兌點相關問題，請於上班時間撥打02-27208889分機7112洽詢，將由專人協助您。\n👉集點兌換悠遊卡加值金資訊查詢：https://reurl.cc/97R6qY\n\n[System maintenance has been completed]": {
+   "en": "Dear residents!\nThe points redemption system has completed maintenance, and the \"TownPass - Health Points\" redemption service reopens from today. Points can be redeemed until October 31, 113 (2024), so please redeem them as soon as possible. For questions about redemption, call 02-27208889 ext. 7112 during office hours and a staff member will assist you.\n👉Info on redeeming points for EasyCard top-up credit:https://reurl.cc/97R6qY\n\n[System maintenance has been completed]",
+   "ja": "市民の皆さま、こんにちは！\nポイント交換システムのメンテナンスが完了し、本日より「TownPass - 健康ポイント」のポイント交換サービスを再開します。ポイント交換の期限は113年（2024年）10月31日までです。お早めに交換してください。ポイント交換に関するご質問は、業務時間内に 02-27208889 内線 7112 までお電話ください。担当者が対応いたします。\n👉ポイントを悠遊カード（EasyCard）のチャージ金に交換する情報はこちら：https://reurl.cc/97R6qY\n\n[System maintenance has been completed]",
+   "vi": "Kính chào quý thị dân!\nHệ thống đổi điểm đã hoàn tất bảo trì, từ hôm nay dịch vụ đổi điểm \"TownPass - Tích điểm sức khỏe\" mở lại. Hạn đổi điểm đến hết ngày 31/10/113 (2024), vui lòng đổi điểm sớm. Nếu có thắc mắc về đổi điểm, vui lòng gọi 02-27208889 máy lẻ 7112 trong giờ hành chính, nhân viên sẽ hỗ trợ bạn.\n👉Tra cứu thông tin đổi điểm lấy tiền nạp thẻ EasyCard:https://reurl.cc/97R6qY\n\n[System maintenance has been completed]",
+   "id": "Halo, warga yang terhormat!\nSistem penukaran poin telah selesai dipelihara, dan mulai hari ini layanan penukaran poin \"TownPass - Poin Sehat\" dibuka kembali. Batas waktu penukaran poin hingga 31 Oktober 113 (2024), mohon segera tukarkan poin Anda. Jika ada pertanyaan tentang penukaran poin, hubungi 02-27208889 ext. 7112 pada jam kerja, petugas kami akan membantu Anda.\n👉Informasi penukaran poin menjadi saldo EasyCard:https://reurl.cc/97R6qY\n\n[System maintenance has been completed]",
+   "th": "เรียนประชาชนทุกท่าน!\nระบบแลกคะแนนได้บำรุงรักษาเสร็จสิ้นแล้ว ตั้งแต่วันนี้เปิดให้บริการแลกคะแนน \"TownPass - สะสมคะแนนสุขภาพ\" อีกครั้ง สามารถแลกคะแนนได้ถึงวันที่ 31 ตุลาคม 113 (2024) โปรดแลกคะแนนโดยเร็ว หากมีคำถามเกี่ยวกับการแลกคะแนน โปรดโทร 02-27208889 ต่อ 7112 ในเวลาทำการ เจ้าหน้าที่จะช่วยเหลือคุณ\n👉ข้อมูลการแลกคะแนนเป็นเงินเติมบัตร EasyCard:https://reurl.cc/97R6qY\n\n[System maintenance has been completed]"
+  },
+  "訂閱": {
+   "en": "Subscribe",
+   "ja": "購読",
+   "vi": "Theo dõi",
+   "id": "Berlangganan",
+   "th": "สมัครรับ"
+  },
+  "訂閱設定": {
+   "en": "Subscription settings",
+   "ja": "購読設定",
+   "vi": "Cài đặt theo dõi",
+   "id": "Pengaturan langganan",
+   "th": "ตั้งค่าการสมัครรับ"
+  },
+  "訊息": {
+   "en": "Messages",
+   "ja": "メッセージ",
+   "vi": "Tin nhắn",
+   "id": "Pesan",
+   "th": "ข้อความ"
+  },
+  "訊息通知提醒": {
+   "en": "Notification reminders",
+   "ja": "通知リマインダー",
+   "vi": "Nhắc nhở thông báo",
+   "id": "Pengingat notifikasi",
+   "th": "การแจ้งเตือน"
+  },
+  "設定": {
+   "en": "Settings",
+   "ja": "設定",
+   "vi": "Cài đặt",
+   "id": "Pengaturan",
+   "th": "การตั้งค่า"
+  },
+  "註冊": {
+   "en": "Sign up",
+   "ja": "新規登録",
+   "vi": "Đăng ký",
+   "id": "Daftar",
+   "th": "ลงทะเบียน"
+  },
+  "語言": {
+   "en": "Language",
+   "ja": "言語",
+   "vi": "Ngôn ngữ",
+   "id": "Bahasa",
+   "th": "ภาษา"
+  },
+  "語音報案": {
+   "en": "Voice police report",
+   "ja": "音声通報",
+   "vi": "Trình báo bằng giọng nói",
+   "id": "Lapor polisi via suara",
+   "th": "แจ้งความด้วยเสียง"
+  },
+  "語音通報": {
+   "en": "Voice report",
+   "ja": "音声通報",
+   "vi": "Báo cáo bằng giọng nói",
+   "id": "Laporan suara",
+   "th": "แจ้งด้วยเสียง"
+  },
+  "請掃描繳費單的 QR Code": {
+   "en": "Please scan the QR Code on the payment slip",
+   "ja": "払込票の QR コードをスキャンしてください",
+   "vi": "Vui lòng quét mã QR trên phiếu thanh toán",
+   "id": "Silakan pindai QR Code pada slip pembayaran",
+   "th": "โปรดสแกน QR Code บนใบแจ้งชำระเงิน"
+  },
+  "請描述建議與問題": {
+   "en": "Please describe your suggestion or problem",
+   "ja": "ご提案や問題の内容を記入してください",
+   "vi": "Vui lòng mô tả góp ý và vấn đề",
+   "id": "Silakan jelaskan saran atau masalah Anda",
+   "th": "โปรดอธิบายข้อเสนอแนะหรือปัญหา"
+  },
+  "請試試其他關鍵字或篩選分類": {
+   "en": "Try other keywords or filter categories",
+   "ja": "他のキーワードやカテゴリで絞り込んでみてください",
+   "vi": "Hãy thử từ khóa hoặc danh mục lọc khác",
+   "id": "Coba kata kunci atau kategori filter lain",
+   "th": "ลองใช้คำค้นหาหรือหมวดหมู่ตัวกรองอื่น"
+  },
+  "請選擇建議類型": {
+   "en": "Please select a suggestion type",
+   "ja": "提案の種類を選択してください",
+   "vi": "Vui lòng chọn loại góp ý",
+   "id": "Silakan pilih jenis saran",
+   "th": "โปรดเลือกประเภทข้อเสนอแนะ"
+  },
+  "警政報案": {
+   "en": "Police report",
+   "ja": "警察への通報",
+   "vi": "Trình báo cảnh sát",
+   "id": "Laporan polisi",
+   "th": "แจ้งความตำรวจ"
+  },
+  "警政報案系統": {
+   "en": "Police reporting system",
+   "ja": "警察通報システム",
+   "vi": "Hệ thống trình báo cảnh sát",
+   "id": "Sistem laporan polisi",
+   "th": "ระบบแจ้งความตำรวจ"
+  },
+  "警政服務": {
+   "en": "Police services",
+   "ja": "警察サービス",
+   "vi": "Dịch vụ cảnh sát",
+   "id": "Layanan polisi",
+   "th": "บริการตำรวจ"
+  },
+  "身分證": {
+   "en": "National ID card",
+   "ja": "身分証",
+   "vi": "Căn cước công dân",
+   "id": "Kartu identitas",
+   "th": "บัตรประชาชน"
+  },
+  "送出": {
+   "en": "Submit",
+   "ja": "送信",
+   "vi": "Gửi",
+   "id": "Kirim",
+   "th": "ส่ง"
+  },
+  "通知": {
+   "en": "Notifications",
+   "ja": "通知",
+   "vi": "Thông báo",
+   "id": "Notifikasi",
+   "th": "การแจ้งเตือน"
+  },
+  "通訊地址": {
+   "en": "Mailing address",
+   "ja": "住所",
+   "vi": "Địa chỉ liên lạc",
+   "id": "Alamat surat",
+   "th": "ที่อยู่สำหรับติดต่อ"
+  },
+  "里辦服務": {
+   "en": "Neighbourhood office",
+   "ja": "里の事務所",
+   "vi": "Văn phòng phường",
+   "id": "Kantor lingkungan",
+   "th": "สำนักงานชุมชน"
+  },
+  "金大森": {
+   "en": "Jin Da-sen",
+   "ja": "金大森",
+   "vi": "Jin Da-sen",
+   "id": "Jin Da-sen",
+   "th": "จิน ต้าเซิน"
+  },
+  "錯誤": {
+   "en": "Error",
+   "ja": "エラー",
+   "vi": "Lỗi",
+   "id": "Kesalahan",
+   "th": "ข้อผิดพลาด"
+  },
+  "開啟APP的起始首頁": {
+   "en": "The page the app opens on",
+   "ja": "アプリ起動時のホームページ",
+   "vi": "Trang chủ khi mở ứng dụng",
+   "id": "Halaman pertama saat aplikasi dibuka",
+   "th": "หน้าแรกเมื่อเปิดแอป"
+  },
+  "開徵稅單不漏接 繳納證明隨身帶 No Worry Missing Tax Bills Out on Payment Period. Carry Tax Payment Certificates at Hand.": {
+   "en": "No Worry Missing Tax Bills Out on Payment Period. Carry Tax Payment Certificates at Hand.",
+   "ja": "納税通知書を見逃さず 納付証明をいつでも手元に No Worry Missing Tax Bills Out on Payment Period. Carry Tax Payment Certificates at Hand.",
+   "vi": "Không bỏ lỡ giấy báo thuế, mang theo chứng nhận nộp thuế bên mình No Worry Missing Tax Bills Out on Payment Period. Carry Tax Payment Certificates at Hand.",
+   "id": "Tak lewatkan tagihan pajak, bukti pembayaran selalu di tangan No Worry Missing Tax Bills Out on Payment Period. Carry Tax Payment Certificates at Hand.",
+   "th": "ไม่พลาดใบแจ้งภาษี พกหลักฐานการชำระติดตัว No Worry Missing Tax Bills Out on Payment Period. Carry Tax Payment Certificates at Hand."
+  },
+  "關閉": {
+   "en": "Close",
+   "ja": "閉じる",
+   "vi": "Đóng",
+   "id": "Tutup",
+   "th": "ปิด"
+  },
+  "防疫醫療": {
+   "en": "Epidemic prevention and healthcare",
+   "ja": "防疫・医療",
+   "vi": "Phòng dịch và y tế",
+   "id": "Pencegahan wabah dan medis",
+   "th": "การป้องกันโรคระบาดและการแพทย์"
+  },
+  "陳情系統": {
+   "en": "Petition system",
+   "ja": "陳情システム",
+   "vi": "Hệ thống kiến nghị",
+   "id": "Sistem pengaduan",
+   "th": "ระบบร้องเรียน"
+  },
+  "隱私權政策": {
+   "en": "Privacy policy",
+   "ja": "プライバシーポリシー",
+   "vi": "Chính sách quyền riêng tư",
+   "id": "Kebijakan privasi",
+   "th": "นโยบายความเป็นส่วนตัว"
+  },
+  "電子信箱": {
+   "en": "Email",
+   "ja": "メールアドレス",
+   "vi": "Email",
+   "id": "Email",
+   "th": "อีเมล"
+  },
+  "電話撥號": {
+   "en": "Phone call",
+   "ja": "電話をかける",
+   "vi": "Gọi điện",
+   "id": "Panggilan telepon",
+   "th": "โทรออก"
+  },
+  "頁面目標格式不正確。": {
+   "en": "The page target format is invalid.",
+   "ja": "ページの遷移先の形式が正しくありません。",
+   "vi": "Định dạng trang đích không hợp lệ.",
+   "id": "Format halaman tujuan tidak valid.",
+   "th": "รูปแบบหน้าปลายทางไม่ถูกต้อง"
+  },
+  "預約Covid-19、流感疫苗施打": {
+   "en": "Book COVID-19 and flu vaccinations",
+   "ja": "新型コロナ・インフルエンザワクチン接種の予約",
+   "vi": "Đặt lịch tiêm vắc-xin Covid-19, cúm",
+   "id": "Reservasi vaksinasi Covid-19 dan flu",
+   "th": "จองฉีดวัคซีนโควิด-19 และไข้หวัดใหญ่"
+  },
+  "首頁": {
+   "en": "Home",
+   "ja": "ホーム",
+   "vi": "Trang chủ",
+   "id": "Beranda",
+   "th": "หน้าแรก"
+  },
+  "首頁>訂閱": {
+   "en": "Home>Subscriptions",
+   "ja": "ホーム>購読",
+   "vi": "Trang chủ>Theo dõi",
+   "id": "Beranda>Langganan",
+   "th": "หน้าแรก>การสมัครรับ"
+  },
+  "首頁偏好設定": {
+   "en": "Home page preferences",
+   "ja": "ホームの表示設定",
+   "vi": "Tùy chọn trang chủ",
+   "id": "Preferensi beranda",
+   "th": "ค่ากำหนดหน้าแรก"
+  },
+  "龍行不國般專新口色。實風選分到英企環行的藥著": {
+   "en": "Lorem ipsum dolor sit amet. Consectetur adipiscing elit sed do eiusmod",
+   "ja": "Lorem ipsum dolor sit amet。Consectetur adipiscing elit sed do eiusmod",
+   "vi": "Lorem ipsum dolor sit amet. Consectetur adipiscing elit sed do eiusmod",
+   "id": "Lorem ipsum dolor sit amet. Consectetur adipiscing elit sed do eiusmod",
+   "th": "Lorem ipsum dolor sit amet. Consectetur adipiscing elit sed do eiusmod"
+  },
+  "，致過吸放情著人趣來受這直可；處教師長。環因": {
+   "en": ", lorem ipsum dolor sit amet; consectetur adipiscing. Elit",
+   "ja": "、lorem ipsum dolor sit amet；consectetur adipiscing。Elit",
+   "vi": ", lorem ipsum dolor sit amet; consectetur adipiscing. Elit",
+   "id": ", lorem ipsum dolor sit amet; consectetur adipiscing. Elit",
+   "th": ", lorem ipsum dolor sit amet; consectetur adipiscing. Elit"
+  },
+  "，若系統操作上有任何問題請": {
+   "en": ", and if you have any problems using the system, please",
+   "ja": "、システム操作に問題がある場合は",
+   "vi": ", nếu gặp bất kỳ vấn đề nào khi thao tác hệ thống, vui lòng",
+   "id": ", jika ada masalah dalam pengoperasian sistem, silakan",
+   "th": " หากมีปัญหาในการใช้งานระบบ โปรด"
+  }
+ }
+}

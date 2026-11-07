@@ -323,6 +323,18 @@ class MultilingualSpeechTests(unittest.TestCase):
         self.assertEqual((calls, result["language"], result["text"], result["status"]),
                          (["zh", "auto"], "en", "I want to lend a book", "clear"))
 
+    def test_japanese_in_latin_letters_is_redone_with_a_japanese_prompt(self):
+        from asr_server import SCRIPT_PROMPTS
+        self.heard["multi"] = "japanese"
+        self.texts["multi"] = "nani ka dekiru"
+        result = self.recognizer.transcribe(loud_frames(), "ja")
+        self.assertEqual((self.models(), result["language"]), (["multi", "multi"], "ja"))
+        self.assertIn(field("prompt", SCRIPT_PROMPTS["ja"]), self.calls[-1][1])
+        self.calls.clear()
+        self.texts["multi"] = "何ができる"  # already in Japanese script: once
+        self.recognizer.transcribe(loud_frames(), "ja")
+        self.assertEqual(self.models(), ["multi"])
+
     def test_chosen_language_is_a_preference_not_a_lock(self):
         self.heard["multi"] = "chinese"  # Chinese spoken while English is remembered
         result = self.recognizer.transcribe(loud_frames(), "en")

@@ -801,6 +801,7 @@ void main() {
       await tester.runAsync(() => PageTranslation.instance.setLanguage('zh'));
       await tester.pump();
       expect(find.text('首頁'), findsOneWidget);
+      await tester.pump(const Duration(seconds: 3)); // the learned-cache save
     });
 
     test('A navigation sets the page language; options keep theirs', () async {

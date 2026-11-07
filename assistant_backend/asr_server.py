@@ -45,6 +45,13 @@ LANGUAGES = {"zh": "chinese", "en": "english", "ja": "japanese", "vi": "vietname
 SPEECH_LANGUAGES = ("auto", *LANGUAGES)
 
 
+# Sentences in each language's own script (see WhisperCppRecognizer._fields).
+SCRIPT_PROMPTS = {"ja": "こんにちは。台北市のサービスについて質問します。",
+                  "th": "สวัสดีครับ ขอสอบถามบริการของเมืองไทเป"}
+# A transcript in the detected language should contain its script.
+SCRIPTS = {"ja": re.compile(r"[぀-ヿ一-鿿]"), "th": re.compile(r"[฀-๿]")}
+
+
 def language_code(value, default="zh"):
     """A requested language ("auto", "zh", "en-US", "english"...) as one of SPEECH_LANGUAGES."""
     value = str(value or "").strip().lower()
@@ -255,8 +262,11 @@ class WhisperCppRecognizer:
 
     def _fields(self, seconds=30, language="zh"):
         # The catalogue vocabulary prompt is Chinese: only for Chinese decoding.
+        # Japanese and Thai get a sentence in their own script, so Whisper writes
+        # kana/kanji or Thai instead of romanising ("nani ka dekiru"). "auto"
+        # never gets a prompt: it would bias the language detection.
         return {"response_format": "verbose_json", "language": language,
-                "prompt": self.prompt if language == "zh" else "",
+                "prompt": self.prompt if language == "zh" else SCRIPT_PROMPTS.get(language, ""),
                 # temperature_inc > 0 keeps whisper.cpp's fallback: a decode stuck in a
                 # repetition loop (high entropy / low log-prob) is retried warmer.
                 # 0.4 allows two retries (0.4, 0.8); 0.2 allowed five, and an unknown
@@ -331,6 +341,10 @@ class WhisperCppRecognizer:
                 detected = language_code(reply.get("language"), default=None)
                 if language != "auto" and detected not in LANGUAGES:
                     reply, detected = self._infer(self.multi_url, wav, seconds, language), language
+                elif detected in SCRIPTS and not SCRIPTS[detected].search(self.summarize(reply)[0] or ""):
+                    # Japanese heard but written in Latin letters: redo with that
+                    # language and a prompt in its own script.
+                    reply = self._infer(self.multi_url, wav, seconds, detected)
                 used = detected or "zh"
                 if used == "zh" and self.url != self.multi_url:  # a separate Chinese model redoes it
                     reply = self._infer(self.url, wav, seconds, "zh")

@@ -10,6 +10,7 @@ answer either, the turn says that nothing related was found. Every turn
 returns exactly one reply.
 """
 import json
+import os
 import re
 import threading
 import time
@@ -52,6 +53,9 @@ OPENING_SOUND_CONFIRM = 0.5
 # (動悟園 -> 動物園, 按鍵進度 -> 案件進度) are shown to the model, which may only
 # offer them or ask for clarification. Chance matches score at most ~0.74
 # (好吃嗎 ~ 抽號碼 0.65, 動電源 ~ 動物園 0.72).
+# Version B: ask the model what kind of message an unmatched request is
+# (docs/AI_SERVICE_COVERAGE_PLAN.md; A/B evaluated with eval_colloquial.json).
+INTENT_FALLBACK = os.environ.get("TOWNPASS_INTENT_FALLBACK", "1") == "1"
 FALLBACK_SOUND = 0.8  # misheard words ~1.0 after folding; chance matches <= 0.74
 FALLBACK_LIMIT = 3
 COMMAND_SOUND = 0.8  # "下一個" is 0.78 and stays unmatched
@@ -316,11 +320,14 @@ class Workflow:
             title = self.registry.title(entry, language)
             if not entry["enabled"]:
                 return self.reply(payload, i18n.t("unsupported", language, title=title), kind="unsupported")
-            return self.reply(payload, i18n.t("navigate", language, title=title) + " " + i18n.t("page_language", language),
+            limited = " " + i18n.t("limited", language) if entry.get("limited") else ""
+            return self.reply(payload, i18n.t("navigate", language, title=title) + limited + " "
+                              + i18n.t("page_language", language),
                               kind="navigate", action="open_capability", destination={"kind": "capability", "id": entry["id"]})
         if not entry["enabled"]:
             return self.reply(payload, f"{entry['title']}：{entry['reason']}", kind="unsupported")
-        return self.reply(payload, f"請在原本的「{entry['title']}」頁面繼續操作。"
+        # A page that opens while its action is not connected says so ("limited").
+        return self.reply(payload, f"請在原本的「{entry['title']}」頁面繼續操作。" + entry.get("limited", "")
                           + ("目前為示範資料，尚未送出或交易。" if entry["mode"] == "demo" else ""),
                           kind="navigate", action="open_capability", destination={"kind": "capability", "id": entry["id"]})
 
@@ -435,6 +442,9 @@ class Workflow:
             return self._list(payload)
         matches = self.registry.search_language(i18n.positive_text(text, language), language)
         if not matches:
+            decided = self._intent_fallback(payload, text)
+            if decided:
+                return decided
             self._trace("no_match")
             return self.reply(payload, i18n.t("no_match", language))
         entries = [m["entry"] for m in matches]
@@ -585,8 +595,43 @@ class Workflow:
         sounded = self._sound_fallback(payload, text)
         if sounded:
             return sounded
+        decided = self._intent_fallback(payload, text)
+        if decided:
+            return decided
         self._trace("no_match")
         return self._faq(payload, text) or self.reply(payload, NO_RELATED, action="no_related")
+
+    def _intent_fallback(self, payload, text):
+        """Version B (INTENT_FALLBACK): nothing in the catalogue matched, so instead
+        of replying "nothing found" straight away the model says what kind of
+        message this is. It has no navigation tool: it can only list the
+        functions, greet, send a city-information question to the FAQ, or ask
+        for clarification (the caller's own reply). Costs one model call, only
+        on misses ("請問你有什麼樣的功能", "你會什麼", "這個App能做什麼")."""
+        if not INTENT_FALLBACK or not re.search(r"\w", text):
+            return None
+        tools = [self.tool("list_capabilities", "The user asks what the assistant or the App can do, "
+                           "or wants to see the available functions or services."),
+                 self.tool("greeting", "Only a greeting, thanks or goodbye, with no request."),
+                 self.tool("city_question", "A question about Taipei city government information, rules or "
+                           "procedures (answered from the official FAQ), not a request to open a service."),
+                 self.tool("request_clarification", "Anything else: small talk, an unclear request, or a "
+                           "service this App does not have.")]
+        evidence = {"original_text": text, "candidates": [],
+                    "note": "No catalogue service matched. Decide what kind of message this is."}
+        self._trace("intent_model")
+        name, _ = decide(self.owner, "capability", evidence, tools, self.validate, self.error)
+        language = payload.get("language", "zh")
+        if name == "list_capabilities":
+            self._trace("intent_listing")
+            return self._list(payload)
+        if name == "greeting":
+            self._trace("intent_greeting")
+            return self.reply(payload, i18n.t("greeting", language) if language != "zh" else
+                              "嗨，我是 TownPass 助手，可以幫你找服務、開啟原頁面。你可以描述想做的事，或問「有哪些功能」。")
+        if name == "city_question" and language == "zh":
+            return self._faq(payload, text)
+        return None
 
     def _sound_candidates(self, text):
         """Services one of whose words sounds like a stretch of text the catalogue did

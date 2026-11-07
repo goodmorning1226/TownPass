@@ -8,6 +8,23 @@ from server import Assistant
 from test_server import FakeCatalog
 
 
+# These tests cover the layers before the intent fallback (version B), which
+# is on by default and tested on its own (test_phonetic.IntentFallbackTests).
+_intent_off = None
+
+
+def setUpModule():
+    global _intent_off
+    from unittest.mock import patch
+    import workflow
+    _intent_off = patch.object(workflow, "INTENT_FALLBACK", False)
+    _intent_off.start()
+
+
+def tearDownModule():
+    _intent_off.stop()
+
+
 def chooser(name="select_capability"):
     """A model that proposes the first allowed tool of the given name (else the first tool)."""
     def model(messages, tools):
@@ -148,3 +165,24 @@ class OfferedLanguageTests(unittest.TestCase):
                            "request_id": "2", "session_id": "s"})
         self.assertEqual((picked["kind"], picked["language"]), ("navigate", "en"))
         self.assertNotRegex(picked["message"], r"[一-鿿]")
+
+
+class SoundKeyTests(unittest.TestCase):
+    """Foreign speech compared by sound (i18n.sound_key)."""
+
+    def test_romaji_and_kana_with_other_voicing_match(self):
+        self.assertEqual(i18n.sound_key("nani ka dekiru", "ja"), i18n.sound_key("なにができる", "ja"))
+        self.assertTrue(i18n.similar(i18n.LISTING_PHRASES, "nani ka dekiru", "ja"))
+        self.assertTrue(i18n.similar(i18n.LISTING_PHRASES, "どんなことができますか", "ja"))
+        self.assertFalse(i18n.similar(i18n.LISTING_PHRASES, "nanika taberu", "ja"))
+        self.assertFalse(i18n.similar(i18n.LISTING_PHRASES, "kyou wa ii tenki", "ja"))
+
+    def test_vietnamese_without_tones_and_thai_tone_slips(self):
+        self.assertTrue(i18n.similar(i18n.LISTING_PHRASES, "ban lam duoc gi", "vi"))
+        self.assertTrue(i18n.similar(i18n.LISTING_PHRASES, "ทำอะไรใด้บ้าง", "th"))
+
+    def test_a_romaji_listing_question_lists_the_services(self):
+        from test_server import first
+        app = Assistant(FakeCatalog(), lambda messages, tools: first(tools))
+        result = app.turn({"text": "nani ka dekiru", "request_id": "r", "session_id": "s", "language": "ja"})
+        self.assertEqual(result["kind"], "capability_list")

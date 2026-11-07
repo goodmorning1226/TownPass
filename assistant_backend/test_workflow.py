@@ -6,6 +6,23 @@ from test_server import FakeCatalog, response
 from registry import Registry, book_fuzzy
 
 
+# These tests cover the layers before the intent fallback (version B), which
+# is on by default and tested on its own (test_phonetic.IntentFallbackTests).
+_intent_off = None
+
+
+def setUpModule():
+    global _intent_off
+    from unittest.mock import patch
+    import workflow
+    _intent_off = patch.object(workflow, "INTENT_FALLBACK", False)
+    _intent_off.start()
+
+
+def tearDownModule():
+    _intent_off.stop()
+
+
 class WorkflowTests(unittest.TestCase):
     def setUp(self):
         self.calls = []
@@ -25,8 +42,8 @@ class WorkflowTests(unittest.TestCase):
 
     def test_registry_and_pagination(self):
         registry = Registry()
-        self.assertEqual(len(registry.entries), 70)
-        self.assertEqual(sum(e['enabled'] for e in registry.entries), 41)
+        self.assertEqual(len(registry.entries), 109)
+        self.assertEqual(sum(e['enabled'] for e in registry.entries), 86)
         first = self.turn('有哪些功能')
         second = self.turn('下一頁', resolution_id=first['resolution_id'])
         self.assertEqual(first['kind'], 'capability_list')
