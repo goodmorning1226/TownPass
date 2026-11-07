@@ -678,13 +678,18 @@ String _failedToLoadUrlData({String? url}) {
 /// Injected into a service page (see _TPWebViewState._translatePage). Runs
 /// once per document; later calls rescan. Each Chinese text node (and input
 /// placeholder) is replaced by its translation, remembering what was written
-/// so Vue re-rendering the Chinese text gets translated again.
+/// so Vue re-rendering the Chinese text gets translated again. The original
+/// Chinese stays queryable for the guided assistant's probes:
+/// `window.__townpassOriginal(el)`, `window.__townpassOriginalPlaceholder(el)`
+/// and the `data-tp-placeholder` attribute. What the user sees is unchanged.
 const _translationScript = r'''
 (function () {
   if (window.__townpassTranslate) { window.__townpassTranslate.scan(); return; }
   var chinese = /[㐀-鿿]/;
   var skip = { SCRIPT: 1, STYLE: 1, NOSCRIPT: 1, TEXTAREA: 1, CODE: 1 };
   var written = new WeakMap();
+  // Text node -> the Chinese it held before we wrote the translation.
+  var original = new WeakMap();
   var timer = null;
   var busy = false;
   function wanted(value, target) {
@@ -730,15 +735,45 @@ const _translationScript = r'''
           var lead = item.text.match(/^\s*/)[0];
           var tail = item.text.match(/\s*$/)[0];
           var value = lead + translated + tail;
+          original.set(item.node, item.text);
           written.set(item.node, value);
           item.node.nodeValue = value;
         } else {
+          if (item.field.getAttribute('placeholder') !== item.text) return;
+          item.field.setAttribute('data-tp-placeholder', item.text);
           written.set(item.field, translated);
           item.field.setAttribute('placeholder', translated);
         }
       });
     });
   }
+  // Read-only lookups. A value the page changed after we wrote it (e.g. Vue
+  // re-rendered new Chinese) is its own original, so stale entries are ignored.
+  function originalOf(node) {
+    var value = node.nodeValue;
+    return written.get(node) === value && original.has(node) ? original.get(node) : value;
+  }
+  window.__townpassOriginal = function (el) {
+    if (!el) return '';
+    if (el.nodeType === 3) return originalOf(el);
+    var out = '';
+    var walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null);
+    var node;
+    while ((node = walker.nextNode())) {
+      var parent = node.parentElement;
+      if (parent && (parent.tagName === 'SCRIPT' || parent.tagName === 'STYLE')) continue;
+      out += originalOf(node);
+    }
+    return out;
+  };
+  window.__townpassOriginalPlaceholder = function (el) {
+    if (!el || !el.getAttribute) return null;
+    var value = el.getAttribute('placeholder');
+    if (value !== null && written.get(el) === value && el.hasAttribute('data-tp-placeholder')) {
+      return el.getAttribute('data-tp-placeholder');
+    }
+    return value;
+  };
   function schedule() { clearTimeout(timer); timer = setTimeout(scan, 300); }
   new MutationObserver(schedule).observe(document.body, {
     childList: true, subtree: true, characterData: true,
@@ -748,3 +783,7 @@ const _translationScript = r'''
   scan();
 })();
 ''';
+
+/// The injected page script, exposed only so tests can check its contract.
+@visibleForTesting
+String get translationScriptForTest => _translationScript;
