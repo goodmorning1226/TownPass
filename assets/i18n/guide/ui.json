@@ -129,6 +129,20 @@
    "id": "Mode biasa",
    "th": "โหมดปกติ"
   },
+  "上一頁": {
+   "en": "Previous page",
+   "ja": "前のページ",
+   "vi": "Trang trước",
+   "id": "Halaman sebelumnya",
+   "th": "หน้าก่อนหน้า"
+  },
+  "下一頁": {
+   "en": "Next page",
+   "ja": "次のページ",
+   "vi": "Trang sau",
+   "id": "Halaman berikutnya",
+   "th": "หน้าถัดไป"
+  },
   "不會改變設定，也不會清除對話。": {
    "en": "Your settings stay the same, and the conversation is not cleared.",
    "ja": "設定は変わらず、会話も消えません。",
@@ -528,12 +542,19 @@
    "id": "Pakai keyboard",
    "th": "ใช้แป้นพิมพ์"
   },
-  "放開送出": {
-   "en": "Release to send",
-   "ja": "離すと送信",
-   "vi": "Thả ra để gửi",
-   "id": "Lepaskan untuk kirim",
-   "th": "ปล่อยเพื่อส่ง"
+  "放開取消": {
+   "en": "Release to cancel",
+   "ja": "離すとキャンセル",
+   "vi": "Thả ra để hủy",
+   "id": "Lepaskan untuk membatalkan",
+   "th": "ปล่อยเพื่อยกเลิก"
+  },
+  "放開送出，往上滑可取消": {
+   "en": "Release to send, slide up to cancel",
+   "ja": "離すと送信、上にスライドでキャンセル",
+   "vi": "Thả ra để gửi, vuốt lên để hủy",
+   "id": "Lepaskan untuk kirim, geser ke atas untuk batal",
+   "th": "ปล่อยเพื่อส่ง ปัดขึ้นเพื่อยกเลิก"
   },
   "教學完成！有問題隨時點右下角找我。": {
    "en": "Tutorial done! If you have a question, tap the bottom right to find me anytime.",
@@ -758,6 +779,13 @@
    "vi": "Để sau",
    "id": "Nanti saja",
    "th": "ไว้ทีหลัง"
+  },
+  "第 {current}／{count} 頁": {
+   "en": "Page {current} of {count}",
+   "ja": "{current}／{count} ページ",
+   "vi": "Trang {current}/{count}",
+   "id": "Halaman {current} dari {count}",
+   "th": "หน้า {current}/{count}"
   },
   "第一次使用臺北通嗎？": {
    "en": "First time using Taipei Pass?",

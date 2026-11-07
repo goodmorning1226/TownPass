@@ -59,7 +59,9 @@ class AssistantService {
     Map<String, dynamic>? context,
     String? language,
     String? faqText,
+    int? pageStep,
   }) async {
+    assert(pageStep == null || pageStep == 1 || pageStep == -1);
     cancel();
     final client = HttpClient()..connectionTimeout = const Duration(seconds: 8);
     _active = client;
@@ -74,6 +76,7 @@ class AssistantService {
         context,
         language,
         faqText,
+        pageStep,
       ).timeout(const Duration(seconds: 85));
     } on TimeoutException {
       throw _error('turnTimeout', language);
@@ -97,6 +100,7 @@ class AssistantService {
     Map<String, dynamic>? context,
     String? language,
     String? faqText,
+    int? pageStep,
   ) async {
     final request = await client.postUrl(
       Uri.parse(endpoint).resolve('/v1/assistant/turns'),
@@ -118,6 +122,9 @@ class AssistantService {
         'language': ?language,
         // A Chinese translation of a foreign request, only for the FAQ.
         'faq_text': ?faqText,
+        // A capability list's previous (-1) or next (1) page button, with the
+        // list's resolution id and no text.
+        'page_step': ?pageStep,
       }),
     );
     // Python's local HTTP server requires a known byte length; Dart otherwise

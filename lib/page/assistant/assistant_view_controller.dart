@@ -31,6 +31,10 @@ class AssistantChatMessage {
   /// continues in it, and so do the page and the assistant after navigating.
   final String language;
 
+  /// The page of a capability list [choices] belong to; with more than one
+  /// page the latest list shows previous/next page buttons.
+  final AssistantListing? listing;
+
   const AssistantChatMessage({
     required this.id,
     required this.fromUser,
@@ -38,6 +42,7 @@ class AssistantChatMessage {
     this.choices = const [],
     this.suggestions = const [],
     this.language = 'zh',
+    this.listing,
   });
 }
 
@@ -133,11 +138,6 @@ class AssistantViewController extends GetxController {
     }
   }
 
-  /// The language a turn was actually spoken or typed in is used for the next
-  /// one in this session, for every language ("auto" stays auto). Not saved:
-  /// only the user's own choice in the menu is kept for the next launch. The
-  /// backend treats the language as a preference, so another one is still
-  /// detected.
   /// The App's own status line [key] in [language] (the exchange's language),
   /// or in the page language when that is not known.
   static String _status(
@@ -202,17 +202,31 @@ class AssistantViewController extends GetxController {
 
   static final _hasWords = RegExp(r'[^\d\s\p{P}\p{S}]{2,}', unicode: true);
 
+  /// The panel and the pages follow the language actually spoken or typed
+  /// (clearly recognised) for this launch. The speech-language menu does not:
+  /// only a clear spoken detection moves it ([_menuFollowsSpeech]).
   void _rememberLanguage(String? code) {
     _followInPanel(code);
-    // The pages follow the language actually spoken or typed (clearly
-    // recognised), not only the next navigation.
     if (code != null && PageTranslation.languages.containsKey(code)) {
       PageTranslation.instance.setLanguage(code);
     }
-    if (code == null || speechLanguage.value == 'auto') return;
-    final known = AssistantSpeechLanguage.all.any((l) => l.code == code);
-    if (!known || code == speechLanguage.value) return;
+  }
+
+  /// A clearly detected spoken language (confidence >= [_clearDetection])
+  /// becomes the menu's choice and is saved like a manual pick, so the next
+  /// launch listens in it (owner: "last time English, next time English").
+  /// 自動偵測 stays 自動偵測; typed text never moves the menu.
+  void _menuFollowsSpeech(AssistantTranscript heard) {
+    final sure = heard.languageConfidence;
+    final code = heard.language;
+    if (sure == null || sure < _clearDetection) return;
+    if (speechLanguage.value == 'auto' || code == speechLanguage.value) return;
+    if (!AssistantSpeechLanguage.all.any((l) => l.code == code) ||
+        code == AssistantSpeechLanguage.auto.code) {
+      return;
+    }
     speechLanguage.value = code;
+    AssistantSpeechLanguage.save(code);
   }
 
   void setReadAloud(bool enabled) {
@@ -402,6 +416,7 @@ class AssistantViewController extends GetxController {
     List<AssistantBookChoice> choices = const [],
     List<String> suggestions = const [],
     String language = 'zh',
+    AssistantListing? listing,
   }) {
     final item = AssistantChatMessage(
       id: _nextMessageId++,
@@ -410,6 +425,7 @@ class AssistantViewController extends GetxController {
       choices: List.unmodifiable(choices),
       suggestions: List.unmodifiable(suggestions),
       language: language,
+      listing: listing,
     );
     messages.add(item);
     if (!fromUser && readAloud.value) speaker.speak(text, language: language);
@@ -640,6 +656,7 @@ class AssistantViewController extends GetxController {
   Future<void> _useTranscript(AssistantTranscript heard) async {
     busy.value = false;
     heardLanguage.value = heard.language;
+    _menuFollowsSpeech(heard);
     // "第二個" while numbered options are open selects that option, even when
     // the recogniser was unsure about such a short word.
     for (final spoken in [heard.text, ...heard.options]) {
@@ -696,6 +713,27 @@ class AssistantViewController extends GetxController {
     );
   }
 
+  /// The latest capability list's previous (-1) or next (1) page button. The
+  /// backend turns the page without the model (wrapping around); the new page
+  /// is a new reply like a typed 下一頁. Not a request of the user's: it is
+  /// not remembered as a recent input and does not change the language.
+  Future<void> turnPage(int step) async {
+    final item = _selectable;
+    if (busy.value ||
+        _resolutionId == null ||
+        item == null ||
+        item.listing?.hasPages != true ||
+        (step != 1 && step != -1)) {
+      return;
+    }
+    await submit(
+      '',
+      pageStep: step,
+      shownAs: _status(step > 0 ? 'nextPage' : 'previousPage', item.language),
+      language: item.language,
+    );
+  }
+
   /// [shownAs] is the user's bubble text when a candidate button was tapped.
   /// [note] is an assistant line shown right after the user's bubble.
   Future<void> submit(
@@ -705,8 +743,12 @@ class AssistantViewController extends GetxController {
     String? note,
     String? language,
     bool rememberLanguage = true,
+    int? pageStep,
   }) async {
-    if (busy.value || (text.trim().isEmpty && choiceId == null)) return;
+    if (busy.value ||
+        (text.trim().isEmpty && choiceId == null && pageStep == null)) {
+      return;
+    }
     speaker.stop();
     // Checked synchronously so a normal request still marks itself busy at
     // once (a second tap meanwhile is ignored).
@@ -728,7 +770,7 @@ class AssistantViewController extends GetxController {
     choicesMessageId.value = null;
     message.value = _status('searching', language);
     try {
-      if (choiceId == null && text.trim().isNotEmpty) {
+      if (choiceId == null && pageStep == null && text.trim().isNotEmpty) {
         _lastRequest = text.trim();
       }
       var result = await service.decide(
@@ -739,6 +781,7 @@ class AssistantViewController extends GetxController {
         choiceId: choiceId,
         context: requestContext(),
         language: language,
+        pageStep: pageStep,
       );
       if (generation != _generation || isClosed) return;
       result = await _foreignFaq(result, text.trim(), requestId);
@@ -747,20 +790,26 @@ class AssistantViewController extends GetxController {
       _resolutionId = result.resolutionId;
       _turnLanguage = result.language;
       // A tapped choice or a bare "2" says nothing about the language.
-      if (rememberLanguage && choiceId == null && _hasWords.hasMatch(text)) {
+      if (rememberLanguage &&
+          choiceId == null &&
+          pageStep == null &&
+          _hasWords.hasMatch(text)) {
         _rememberLanguage(result.language);
       }
       final reply = _add(
         result.message,
         choices: result.choices,
         language: result.language,
+        listing: result.listing,
       );
       choices.assignAll(result.choices);
       if (result.choices.isNotEmpty) choicesMessageId.value = reply.id;
       message.value = result.message;
       if (result.destination case final destination?) {
         // A request that opened a page becomes a suggestion next time.
-        final asked = choiceId == null ? text.trim() : _lastRequest;
+        final asked = choiceId == null && pageStep == null
+            ? text.trim()
+            : _lastRequest;
         if (asked != null) AssistantRecentInputs.instance.remember(asked);
         busy.value = false;
         _panelHistory?.remove();

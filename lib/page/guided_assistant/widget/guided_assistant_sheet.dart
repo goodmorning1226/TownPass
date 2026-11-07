@@ -30,6 +30,33 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
   /// Messages already on screen: only ones added later slide in.
   final _seen = <int>{};
 
+  /// Where the finger went down on the microphone, and whether it has slid
+  /// up far enough that releasing cancels (as in the chat panel).
+  Offset? _micOrigin;
+  bool _micDiscard = false;
+
+  void _micPressStart(PointerDownEvent event) {
+    _micOrigin = event.position;
+    if (_micDiscard) setState(() => _micDiscard = false);
+    GuideMotion.tap();
+    c.micDown();
+  }
+
+  void _micPressMove(PointerMoveEvent event) {
+    final origin = _micOrigin;
+    if (origin == null || !c.listening.value) return;
+    final discard = origin.dy - event.position.dy > 80;
+    if (discard != _micDiscard) setState(() => _micDiscard = discard);
+  }
+
+  void _micPressEnd({required bool cancelled}) {
+    final send = !cancelled && !_micDiscard;
+    _micOrigin = null;
+    if (_micDiscard) setState(() => _micDiscard = false);
+    if (send && c.listening.value) GuideMotion.confirm();
+    c.micUp(send: send);
+  }
+
   GuidedAssistantController get c => widget.controller;
 
   @override
@@ -625,6 +652,16 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
           ),
         );
       }
+      final listing = m.listing;
+      if (listing != null && listing.hasPages) {
+        parts.add(
+          _PageRow(
+            current: listing.page,
+            count: listing.pageCount,
+            onStep: live && !c.loading.value ? (s) => c.turnPage(m, s) : null,
+          ),
+        );
+      }
     }
     final answer = m.answer;
     if (answer != null) parts.add(_AnswerCard(answer));
@@ -1077,15 +1114,11 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
               button: true,
               label: gt('按住說話（示範）'),
               child: Listener(
-                onPointerDown: (_) {
-                  GuideMotion.tap();
-                  c.micDown();
-                },
-                onPointerUp: (_) {
-                  if (c.listening.value) GuideMotion.confirm();
-                  c.micUp();
-                },
-                onPointerCancel: (_) => c.micUp(),
+                key: const Key('guided-mic'),
+                onPointerDown: _micPressStart,
+                onPointerMove: _micPressMove,
+                onPointerUp: (_) => _micPressEnd(cancelled: false),
+                onPointerCancel: (_) => _micPressEnd(cancelled: true),
                 child: AnimatedContainer(
                   duration: GuideMotion.of(context, GuideMotion.quick),
                   curve: GuideMotion.enter,
@@ -1093,7 +1126,7 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
                   height: c.listening.value ? 80 : 72,
                   decoration: BoxDecoration(
                     color: c.listening.value
-                        ? TPColors.primary700
+                        ? (_micDiscard ? TPColors.red500 : TPColors.primary700)
                         : TPColors.primary500,
                     shape: BoxShape.circle,
                     boxShadow: _hello && !c.listening.value
@@ -1106,8 +1139,10 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
                             ),
                           ],
                   ),
-                  child: const Icon(
-                    Icons.mic_none_rounded,
+                  child: Icon(
+                    c.listening.value && _micDiscard
+                        ? Icons.close_rounded
+                        : Icons.mic_none_rounded,
                     color: TPColors.white,
                     size: 30,
                   ),
@@ -1174,9 +1209,17 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
       ),
       const SizedBox(height: 4),
       TPText(
-        gt(c.listening.value ? '放開送出' : '按住說話，或點上面的選項'),
+        gt(
+          !c.listening.value
+              ? '按住說話，或點上面的選項'
+              : _micDiscard
+              ? '放開取消'
+              : '放開送出，往上滑可取消',
+        ),
         style: TPTextStyles.bodyRegular,
-        color: TPColors.grayscale700,
+        color: c.listening.value && _micDiscard
+            ? TPColors.red500
+            : TPColors.grayscale700,
       ),
     ],
   );
@@ -1261,6 +1304,64 @@ class _Tag extends StatelessWidget {
       ),
     );
   }
+}
+
+/// ◀ 第 2／11 頁 ▶ under a capability list with more than one page. [onStep]
+/// gets -1 or 1; null disables the arrows (an older list, or loading).
+class _PageRow extends StatelessWidget {
+  final int current;
+  final int count;
+  final void Function(int step)? onStep;
+  const _PageRow({required this.current, required this.count, this.onStep});
+
+  Widget _arrow(IconData icon, String tooltip, int step, Key key) {
+    final enabled = onStep != null;
+    return IconButton(
+      key: key,
+      tooltip: tooltip,
+      constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
+      style: IconButton.styleFrom(
+        backgroundColor: TPColors.white,
+        disabledBackgroundColor: TPColors.white,
+        side: BorderSide(
+          color: enabled ? TPColors.primary500 : TPColors.grayscale200,
+        ),
+      ),
+      icon: Icon(
+        icon,
+        color: enabled ? TPColors.primary500 : TPColors.grayscale300,
+      ),
+      onPressed: enabled
+          ? () {
+              GuideMotion.tap();
+              onStep!(step);
+            }
+          : null,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) => Row(
+    children: [
+      _arrow(
+        Icons.chevron_left,
+        gt('上一頁'),
+        -1,
+        const Key('guided-page-previous'),
+      ),
+      const SizedBox(width: 8),
+      Expanded(
+        child: TPText(
+          gt('第 {current}／{count} 頁', {'current': current, 'count': count}),
+          textAlign: TextAlign.center,
+          style: TPTextStyles.h3SemiBold,
+          color: TPColors.grayscale700,
+        ),
+      ),
+      const SizedBox(width: 8),
+      _arrow(Icons.chevron_right, gt('下一頁'), 1, const Key('guided-page-next')),
+    ],
+  );
 }
 
 class _OptionButton extends StatefulWidget {

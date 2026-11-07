@@ -27,6 +27,7 @@ import 'package:town_pass/page/guided_assistant/web/web_page_state.dart';
 import 'package:town_pass/page/guided_assistant/widget/guided_assistant_host.dart';
 import 'package:town_pass/page/guided_assistant/widget/guided_assistant_sheet.dart';
 import 'package:town_pass/service/assistant_action_executor.dart';
+import 'package:town_pass/service/assistant_recent_inputs.dart';
 import 'package:town_pass/service/assistant_recorder.dart';
 import 'package:town_pass/service/assistant_service.dart';
 import 'package:town_pass/service/account_service.dart';
@@ -64,6 +65,8 @@ class FakeProbe extends WebGuideProbe {
 class FakeService extends AssistantService {
   final List<AssistantResult Function(String text, String? choiceId)> replies;
   final calls = <(String, String?)>[];
+  final pageSteps = <int?>[];
+  final resolutionIds = <String?>[];
   bool fail;
   FakeService(this.replies, {this.fail = false});
 
@@ -77,8 +80,11 @@ class FakeService extends AssistantService {
     Map<String, dynamic>? context,
     String? language,
     String? faqText,
+    int? pageStep,
   }) async {
     calls.add((text, choiceId));
+    pageSteps.add(pageStep);
+    resolutionIds.add(resolutionId);
     if (fail) throw const FormatException('連不到電腦上的助理。');
     return replies.removeAt(0)(text, choiceId);
   }
@@ -136,6 +142,14 @@ const detail = '/library-service/book-detail/lib-book-5';
 class SpeechService extends AssistantService {
   final transcribeLanguages = <String>[];
   final turnLanguages = <String?>[];
+  final AssistantTranscript heard;
+  SpeechService({
+    this.heard = const AssistantTranscript(
+      'I want to borrow a book',
+      language: 'en',
+      languageConfidence: 0.99,
+    ),
+  });
   @override
   Future<AssistantTranscript> transcribe(
     Uint8List wav, {
@@ -143,11 +157,7 @@ class SpeechService extends AssistantService {
     String language = 'zh',
   }) async {
     transcribeLanguages.add(language);
-    return const AssistantTranscript(
-      'I want to borrow a book',
-      language: 'en',
-      languageConfidence: 0.99,
-    );
+    return heard;
   }
 
   @override
@@ -160,6 +170,7 @@ class SpeechService extends AssistantService {
     Map<String, dynamic>? context,
     String? language,
     String? faqText,
+    int? pageStep,
   }) async {
     turnLanguages.add(language);
     return const AssistantResult(sessionId: 's', message: 'Which one?');
@@ -1350,6 +1361,347 @@ void main() {
       c.routeChanged(TPRoute.webView);
       await tester.pump();
       expect(find.text(HomeAskTexts.label), findsNothing);
+    });
+  });
+  group('capability list pages', () {
+    setUp(() {
+      SharedPreferences.setMockInitialValues({});
+      Get.testMode = true;
+      AssistantRecentInputs.instance.reset();
+    });
+    tearDown(() {
+      AssistantTexts.conversation.value = null;
+      Get.reset();
+    });
+
+    AssistantResult listPage(int offset, {int total = 85, String id = 'r1'}) =>
+        AssistantResult(
+          sessionId: 's',
+          message: '目前助理可以開啟的功能：',
+          kind: 'capability_list',
+          resolutionId: id,
+          choices: [
+            for (var i = 0; i < 3; i++)
+              AssistantBookChoice('${i + 1}', '功能 ${offset + i + 1}'),
+          ],
+          listing: AssistantListing(offset: offset, size: 8, total: total),
+        );
+
+    Future<GuidedAssistantController> pumpSheet(
+      WidgetTester tester,
+      FakeService service, {
+      double width = 402,
+      double textScale = 1,
+    }) async {
+      tester.view.physicalSize = Size(width, 1400);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      final c = makeController(service: service);
+      await tester.pumpWidget(
+        MaterialApp(
+          home: MediaQuery(
+            data: MediaQueryData(
+              size: Size(width, 1400),
+              textScaler: TextScaler.linear(textScale),
+            ),
+            child: GuidedAssistantSheet(controller: c),
+          ),
+        ),
+      );
+      c.submit('列出功能清單');
+      await tester.pump();
+      await tester.pump();
+      return c;
+    }
+
+    testWidgets('the arrows turn the page with page_step', (tester) async {
+      final service = FakeService([
+        (_, _) => listPage(8),
+        (_, _) => listPage(16, id: 'r2'),
+      ]);
+      final c = await pumpSheet(tester, service);
+      expect(service.calls.length, 1);
+      expect(find.text('第 2／11 頁'), findsOneWidget);
+      expect(find.byTooltip('上一頁'), findsOneWidget);
+      expect(find.byTooltip('下一頁'), findsOneWidget);
+      final talking = AssistantTexts.conversation.value;
+      final first = c.messages.last;
+      expect(
+        tester.getSize(find.byKey(const Key('guided-page-next'))).height,
+        greaterThanOrEqualTo(48),
+      );
+      await tester.tap(find.byKey(const Key('guided-page-next')));
+      await tester.pump();
+      await tester.pump();
+      expect(service.calls.last, ('', null));
+      expect(service.pageSteps.last, 1);
+      expect(service.resolutionIds.last, 'r1');
+      expect(c.messages.any((m) => m.user && m.text == '下一頁'), isTrue);
+      expect(c.messages.last.listing?.page, 3);
+      expect(find.text('第 3／11 頁'), findsOneWidget);
+      // The older list stays but its arrows are off; only the newest works.
+      expect(c.optionsLive(first), isFalse);
+      final arrows = tester.widgetList<IconButton>(
+        find.byKey(const Key('guided-page-previous')),
+      );
+      expect(arrows.map((b) => b.onPressed != null), [false, true]);
+      // A page turn is no request of the user's.
+      expect(AssistantRecentInputs.instance.items, isEmpty);
+      expect(AssistantTexts.conversation.value, talking);
+      await tester.pump(const Duration(seconds: 4));
+    });
+
+    testWidgets('previous sends -1 and the arrows are off while loading', (
+      tester,
+    ) async {
+      final service = FakeService([
+        (_, _) => listPage(0),
+        (_, _) => listPage(80),
+      ]);
+      final c = await pumpSheet(tester, service);
+      c.loading.value = true;
+      await tester.pump();
+      expect(
+        tester
+            .widget<IconButton>(find.byKey(const Key('guided-page-previous')))
+            .onPressed,
+        isNull,
+      );
+      c.turnPage(c.messages.last, -1);
+      expect(service.calls.length, 1, reason: 'nothing sent while loading');
+      c.loading.value = false;
+      await tester.pump();
+      await tester.tap(find.byKey(const Key('guided-page-previous')));
+      await tester.pump();
+      await tester.pump();
+      expect(service.pageSteps.last, -1);
+      expect(find.text('第 11／11 頁'), findsOneWidget);
+      await tester.pump(const Duration(seconds: 4));
+    });
+
+    testWidgets('a single page has no arrows', (tester) async {
+      final service = FakeService([(_, _) => listPage(0, total: 5)]);
+      await pumpSheet(tester, service);
+      expect(find.textContaining('功能 1'), findsOneWidget);
+      expect(find.byKey(const Key('guided-page-next')), findsNothing);
+      expect(find.textContaining('頁'), findsNothing);
+      await tester.pump(const Duration(seconds: 4));
+    });
+
+    testWidgets('the row fits 360 px with large text', (tester) async {
+      final service = FakeService([(_, _) => listPage(8)]);
+      await pumpSheet(tester, service, width: 360, textScale: 2);
+      expect(find.byKey(const Key('guided-page-next')), findsOneWidget);
+      expect(tester.takeException(), isNull);
+      await tester.pump(const Duration(seconds: 4));
+    });
+  });
+
+  group('speech language menu follows clear speech', () {
+    tearDown(() {
+      PageTranslation.instance.reset();
+      AssistantTexts.conversation.value = null;
+      Get.reset();
+    });
+
+    Future<GuidedAssistantController> speak(
+      String chosen,
+      AssistantTranscript heard,
+    ) async {
+      SharedPreferences.setMockInitialValues({
+        'assistant_speech_language': chosen,
+      });
+      final web = Get.put<WebPageState>(WebPageState());
+      final c = Get.put(
+        GuidedAssistantController(
+          thinkDelay: Duration.zero,
+          runOnboarding: false,
+          speaker: SilentSpeaker(),
+          service: SpeechService(heard: heard),
+          recorder: LoudRecorder(),
+          executor: FakeExecutor(),
+          probeOverride: FakeProbe(web),
+        ),
+      );
+      await Future<void>.delayed(Duration.zero);
+      expect(c.speechLanguage.value, chosen);
+      await c.micDown();
+      await c.micUp();
+      await Future<void>.delayed(Duration.zero);
+      return c;
+    }
+
+    Future<String?> saved() async => (await SharedPreferences.getInstance())
+        .getString('assistant_speech_language');
+
+    test('a clear detection moves and saves the menu', () async {
+      final c = await speak(
+        'zh',
+        const AssistantTranscript(
+          '本を借りたい',
+          language: 'ja',
+          languageConfidence: 0.92,
+        ),
+      );
+      expect(c.speechLanguage.value, 'ja');
+      expect(await saved(), 'ja');
+      expect(AssistantTexts.conversation.value, 'ja');
+    });
+
+    test('an unsure detection does not move the menu', () async {
+      final c = await speak(
+        'zh',
+        const AssistantTranscript(
+          '本を借りたい',
+          language: 'ja',
+          languageConfidence: 0.6,
+        ),
+      );
+      expect(c.speechLanguage.value, 'zh');
+      expect(await saved(), 'zh');
+    });
+
+    test('自動偵測 stays 自動偵測', () async {
+      final c = await speak(
+        'auto',
+        const AssistantTranscript(
+          'Saya mau pinjam buku',
+          language: 'id',
+          languageConfidence: 0.95,
+        ),
+      );
+      expect(c.speechLanguage.value, 'auto');
+      expect(await saved(), 'auto');
+      expect(AssistantTexts.conversation.value, 'id'); // texts still follow
+    });
+
+    test('typed text does not move the menu', () async {
+      SharedPreferences.setMockInitialValues({
+        'assistant_speech_language': 'zh',
+      });
+      Get.testMode = true;
+      final service = FakeService([
+        (_, _) => const AssistantResult(
+          sessionId: 's',
+          message: 'Which one?',
+          language: 'en',
+        ),
+      ]);
+      final c = makeController(service: service);
+      await Future<void>.delayed(Duration.zero);
+      c.submit('I would like to borrow a book please');
+      await settle();
+      await settle();
+      expect(service.calls, isNotEmpty);
+      expect(AssistantTexts.conversation.value, 'en');
+      expect(c.speechLanguage.value, 'zh');
+      expect(await saved(), 'zh');
+    });
+  });
+
+  group('microphone slide up to cancel', () {
+    setUp(() {
+      SharedPreferences.setMockInitialValues({
+        'assistant_speech_language': 'zh',
+      });
+      Get.testMode = true;
+    });
+    tearDown(() {
+      PageTranslation.instance.reset();
+      AssistantTexts.conversation.value = null;
+      Get.reset();
+    });
+
+    Future<(GuidedAssistantController, SpeechService)> pumpMic(
+      WidgetTester tester,
+    ) async {
+      tester.view.physicalSize = const Size(402, 874);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      final service = SpeechService(
+        heard: const AssistantTranscript('我要借書', language: 'zh'),
+      );
+      final web = Get.put<WebPageState>(WebPageState());
+      final c = Get.put(
+        GuidedAssistantController(
+          thinkDelay: Duration.zero,
+          runOnboarding: false,
+          speaker: SilentSpeaker(),
+          service: service,
+          recorder: LoudRecorder(),
+          executor: FakeExecutor(),
+          probeOverride: FakeProbe(web),
+        ),
+      );
+      await tester.pumpWidget(
+        MaterialApp(home: GuidedAssistantSheet(controller: c)),
+      );
+      await tester.pump();
+      return (c, service);
+    }
+
+    Future<TestGesture> press(WidgetTester tester) async {
+      final gesture = await tester.startGesture(
+        tester.getCenter(find.byKey(const Key('guided-mic'))),
+      );
+      await tester.pump();
+      await tester.pump();
+      return gesture;
+    }
+
+    Future<void> finish(WidgetTester tester) async {
+      for (var i = 0; i < 5; i++) {
+        await tester.pump();
+      }
+      await tester.pump(const Duration(seconds: 4));
+    }
+
+    testWidgets('release sends', (tester) async {
+      final (c, service) = await pumpMic(tester);
+      final gesture = await press(tester);
+      expect(c.listening.value, isTrue);
+      expect(find.text('放開送出，往上滑可取消'), findsOneWidget);
+      await gesture.up();
+      await finish(tester);
+      expect(service.transcribeLanguages, ['zh']);
+      expect(service.turnLanguages, isNotEmpty);
+    });
+
+    testWidgets('slide up, then release cancels', (tester) async {
+      final (c, service) = await pumpMic(tester);
+      final gesture = await press(tester);
+      await gesture.moveBy(const Offset(0, -100));
+      await tester.pump();
+      expect(find.text('放開取消'), findsOneWidget);
+      await gesture.up();
+      await finish(tester);
+      expect(c.listening.value, isFalse);
+      expect(service.transcribeLanguages, isEmpty);
+      expect(service.turnLanguages, isEmpty);
+      expect(find.text('按住說話，或點上面的選項'), findsOneWidget);
+    });
+
+    testWidgets('slide up and back down sends', (tester) async {
+      final (_, service) = await pumpMic(tester);
+      final gesture = await press(tester);
+      await gesture.moveBy(const Offset(0, -100));
+      await tester.pump();
+      await gesture.moveBy(const Offset(0, 60));
+      await tester.pump();
+      expect(find.text('放開送出，往上滑可取消'), findsOneWidget);
+      await gesture.up();
+      await finish(tester);
+      expect(service.transcribeLanguages, ['zh']);
+    });
+
+    testWidgets('a cancelled pointer does not send', (tester) async {
+      final (c, service) = await pumpMic(tester);
+      final gesture = await press(tester);
+      await gesture.cancel();
+      await finish(tester);
+      expect(c.listening.value, isFalse);
+      expect(service.transcribeLanguages, isEmpty);
+      expect(service.turnLanguages, isEmpty);
     });
   });
 }
