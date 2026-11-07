@@ -153,8 +153,22 @@ class Workflow:
         tools = tools_for(context)
         # Do not expose a keyword miss as `library=false`: the model must decide
         # intent, not mistake a lexical retrieval flag for semantic ground truth.
-        view = {k: v for k, v in context.items() if k not in ("books", "exact", "library")}
-        view["book_candidates"] = [{k: b[k] for k in ("id", "book_name", "author")} for b in context["books"]]
+        # Fields that repeat other evidence are left out (docs/SPEED_LIBRARY_EXPERIMENT.md,
+        # ~30 fewer prompt tokens): library_candidate (service_evidence says it), the
+        # cleaned text when it equals the request, an action object equal to the query,
+        # and empty lists. unique_exact_id stays, even when null: dropping it made the
+        # model open the library for "借ABC123".
+        view = {k: v for k, v in context.items() if k not in ("books", "exact", "library", "library_candidate")}
+        if view["text"] == text:
+            del view["text"]
+        if not view["action_object"] or view["action_object"] == view["query"]:
+            del view["action_object"]
+        if not view["other"]:
+            del view["other"]
+        if context["books"]:
+            # Main title and first author only; the option arguments carry the book ID.
+            view["book_candidates"] = [{"title": primary_title(b).strip(), "author": b["author"].split(";")[0].strip()}
+                                       for b in context["books"]]
         view["unique_exact_id"] = context["exact"][0]["id"] if context["exact"] else None
         self._trace("library_model", (["library"] if context["library_candidate"] else [])
                     + [b["id"] for b in context["books"]])

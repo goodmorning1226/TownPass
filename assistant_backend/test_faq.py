@@ -64,6 +64,9 @@ class FaqLayerTests(unittest.TestCase):
         def model(messages, tools):
             # Lettered choices: the offered tools are the options in the last message.
             options = json.loads(messages[-1]["content"]).get("options", [])
+            if isinstance(options, dict):  # library: {"A": "tool(args): description"}
+                options = [{"choice": letter, "tool": line.split(":")[0].split("(")[0]}
+                           for letter, line in options.items()]
             self.calls.append([option["tool"] for option in options])
             chosen = next((o for o in options if o["tool"] == decision), None)
             if chosen:

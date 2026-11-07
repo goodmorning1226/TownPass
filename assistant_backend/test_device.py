@@ -205,6 +205,23 @@ class PromptLayoutTests(unittest.TestCase):
         self.assertEqual([(o["choice"], o["tool"], o["arguments"]) for o in offered["options"]],
                          [("A", "select_capability", {"capability_id": "fees.water"}), ("B", "request_clarification", {})])
 
+    def test_library_prompt_leaves_out_repeated_evidence_and_keeps_descriptions(self):
+        seen = []
+
+        def model(messages, tools):
+            seen.append(messages)
+            return {"message": {"tool_calls": [{"function": {"choice": "C"}}]}}
+        result = Assistant(catalog=FakeCatalog(), model_call=model).turn({"request_id": "layout-2", "text": "我想看底層邏輯"})
+        self.assertEqual(result["destination"], {"kind": "detail", "book_id": "lib-book-3"})
+        evidence = json.loads(seen[0][1]["content"])["retrieval"]
+        self.assertEqual(evidence, {"service_evidence": "domain_or_catalog", "query": "底層邏輯", "search_type": "book_name",
+                                    "book_candidates": [{"title": "底層邏輯", "author": "劉潤著"}],
+                                    "unique_exact_id": "lib-book-3"})
+        options = json.loads(seen[0][2]["content"])["options"]
+        self.assertEqual(list(options), ["A", "B", "C"])
+        self.assertTrue(options["B"].startswith("locate_library_book(query=底層邏輯, search_type=book_name): Search "))
+        self.assertTrue(options["C"].startswith("open_library_book(book_id=lib-book-3): Open the verified"))
+
     def test_lettered_choice_maps_back_and_validation_is_unchanged(self):
         from decision import choice_options, choice_tool, from_choice, with_arguments
         tools = [server.tool("select_capability", "x", {"capability_id": {"type": "string",
