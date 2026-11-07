@@ -16,7 +16,7 @@ import time
 import uuid
 
 from decision import decide
-from faq import LOW_CONF, LOW_CONF_CAVEAT, SCOPE_NOTE
+from faq import SCOPE_NOTE
 from page_context import current_root, model_view
 from phonetic import rank_books
 from registry import Registry, book_fuzzy, primary_title, single_substitution
@@ -117,11 +117,13 @@ class Workflow:
         return f"【{entry['question'].strip()}】\n{answer}\n資料來源：{entry['department']}。{SCOPE_NOTE}"
 
     def _faq(self, payload, text):
-        """Second layer: a stored FAQ answer when tool calling found no service.
+        """Second layer: Taipei FAQ when tool calling found no service.
 
         Returns None when the index is off, the text is too short, or no FAQ is
-        close enough, so the caller keeps its own reply. Answers are shown
-        verbatim; other close FAQs are offered as numbered choices.
+        close enough, so the caller keeps its own reply. A near-verbatim match
+        is answered directly; otherwise the closest questions are offered as
+        numbered choices and only the chosen one is answered. Answers are
+        stored text shown verbatim.
         """
         index = self.owner.faq
         if index is None or len(re.findall(r"[\w一-鿿]", text)) < FAQ_MIN_CHARS:
@@ -130,13 +132,16 @@ class Workflow:
         if not hits:
             return None
         self._trace("faq_" + confidence, [hit["id"] for hit in hits])
-        message = (LOW_CONF_CAVEAT + "\n" if confidence == "low" else "") + self._faq_text(hits[0])
-        related = [hit for hit in hits[1:] if hit["score"] >= LOW_CONF]
-        if not related:
-            return self.reply(payload, message, action="faq_answer")
-        return self._offer(payload, [{"title": hit["question"].strip(), "subtitle": hit["department"],
-                                      "faq_id": hit["id"]} for hit in related],
-                           message + "\n\n也可以查看以下相關問答：", kind="reply", action="faq_answer")
+        choices = [{"title": hit["question"].strip(), "subtitle": hit["department"], "faq_id": hit["id"]}
+                   for hit in (hits[1:] if confidence == "high" else hits)]
+        if confidence == "high":
+            message = self._faq_text(hits[0])
+            if not choices:
+                return self.reply(payload, message, action="faq_answer")
+            message += "\n\n也可以查看以下相關問答："
+        else:
+            message = f"你是不是想問以下的問題？請選擇一題，我再顯示答案。{SCOPE_NOTE}"
+        return self._offer(payload, choices, message, kind="reply", action="faq_answer")
 
     def _trace(self, route, candidates=()):
         """Record how a turn was decided, for metrics and evaluation only."""

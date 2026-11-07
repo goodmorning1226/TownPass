@@ -15,11 +15,15 @@ import json
 import os
 import pathlib
 
-# Tuned for bge-small-zh-v1.5 on this corpus (rag_handoff/HANDOFF.md section 4);
-# keep them unless the index is rebuilt with another model.
-HIGH_CONF = 0.73
-LOW_CONF = 0.65
-LOW_CONF_CAVEAT = "以下是最接近的參考答案，但信心較低，建議撥打 1999 再次確認。"
+# Re-tuned for the assistant on 2026-11-07 (docs/AI_FAQ_RAG.md section 6): on
+# colloquial questions the top-1 FAQ is right only ~55-80% of the time at any
+# score, while the top 3 hold an answer ~83% of the time. So scores from
+# MEDIUM_CONF ask "did you mean" with the closest questions and answer only
+# after the user picks one; HIGH_CONF (near-verbatim questions) answers
+# directly. The handoff's 0.73 / 0.65 bands answered wrongly far more often.
+# Specific to bge-small-zh-v1.5 and this index; re-tune if either changes.
+HIGH_CONF = 0.85
+MEDIUM_CONF = 0.69
 SCOPE_NOTE = "本服務僅涵蓋臺北市政府 FAQ。"
 # The encoder accepts at most 512 positions; assistant requests are <= 500 chars.
 MAX_TOKENS = 512
@@ -33,8 +37,8 @@ def default_dir():
 
 
 def band(score):
-    """Confidence band of the best score: high, low or none."""
-    return "high" if score >= HIGH_CONF else "low" if score >= LOW_CONF else "none"
+    """Confidence band of the best score: high, medium or none."""
+    return "high" if score >= HIGH_CONF else "medium" if score >= MEDIUM_CONF else "none"
 
 
 class FaqIndex:
@@ -69,7 +73,7 @@ class FaqIndex:
     def search(self, text, k=3):
         """(confidence, hits) with hits [{score, id, question, answer, department, category}].
 
-        Hits are best first; none-confidence results carry no hits.
+        Hits are best first and at least MEDIUM_CONF; none-confidence results carry no hits.
         """
         np = self.np
         scores = self.embeddings @ self.embed(text)
@@ -77,8 +81,7 @@ class FaqIndex:
         top = np.argpartition(-scores, k - 1)[:k]
         top = top[np.argsort(-scores[top])]
         hits = [{"score": round(float(scores[i]), 4), **self.metadata[int(i)]} for i in top]
-        confidence = band(hits[0]["score"])
-        return confidence, (hits if confidence != "none" else [])
+        return band(hits[0]["score"]), [hit for hit in hits if hit["score"] >= MEDIUM_CONF]
 
 
 def load_default():
