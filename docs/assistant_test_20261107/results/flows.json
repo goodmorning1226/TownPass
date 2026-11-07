@@ -1,0 +1,2258 @@
+[
+ {
+  "id": "flows-01",
+  "category": "books",
+  "language": "zh",
+  "input": "我想借底層邏輯",
+  "session": "flows-b01",
+  "context": null,
+  "expected": "detail lib-book-3",
+  "observed": {
+   "status": 200,
+   "kind": "navigate",
+   "action": "open_library_book",
+   "destination": {
+    "kind": "detail",
+    "book_id": "lib-book-3"
+   },
+   "route": "library_model",
+   "language": "zh",
+   "elapsed_ms": 21740,
+   "choices": [],
+   "message": "請查看《底層邏輯 : 看清這個世界的底牌 = The underlying logic : how to see the essence of things》的館藏與冊次；如可預約，選取書館後再按頁面按鈕。此為示範，尚未預約。"
+  },
+  "verdict": "PASS",
+  "note": "exact title -> detail"
+ },
+ {
+  "id": "flows-02",
+  "category": "books",
+  "language": "zh",
+  "input": "我要借說給兒童的臺灣",
+  "session": "flows-b02",
+  "context": null,
+  "expected": "detail lib-book-2 (partial title)",
+  "observed": {
+   "status": 200,
+   "kind": "navigate",
+   "action": "locate_library_book",
+   "destination": {
+    "kind": "search",
+    "query": "說給兒童的臺灣",
+    "search_type": "book_name"
+   },
+   "route": "library_model",
+   "language": "zh",
+   "elapsed_ms": 24422,
+   "choices": [],
+   "message": "請在原搜尋結果選擇書籍，再確認冊次與取書館。此為示範，尚未預約。"
+  },
+  "verdict": "PASS",
+  "note": "partial title -> search with one hit; detail would be nicer but acceptable"
+ },
+ {
+  "id": "flows-03",
+  "category": "books",
+  "language": "zh",
+  "input": "劉潤的書",
+  "session": "flows-b03",
+  "context": null,
+  "expected": "detail lib-book-3 (author of 底層邏輯) or search",
+  "observed": {
+   "status": 200,
+   "kind": "navigate",
+   "action": "open_library",
+   "destination": {
+    "kind": "home"
+   },
+   "route": "library_model",
+   "language": "zh",
+   "elapsed_ms": 27891,
+   "choices": [],
+   "message": "請在圖書借閱頁搜尋想看的書。這裡使用示範資料。"
+  },
+  "verdict": "FAIL",
+  "note": "author 劉潤 is in the catalogue (lib-book-3) but no author query is extracted: server.py:170-171 author regexes need 寫 or a verb prefix (作者/找/搜尋/查); '劉潤的書' matches neither, so the generic library home opens"
+ },
+ {
+  "id": "flows-04",
+  "category": "books",
+  "language": "zh",
+  "input": "我想借Fredrik Backman的書",
+  "session": "flows-b04",
+  "context": null,
+  "expected": "detail lib-book-4",
+  "observed": {
+   "status": 200,
+   "kind": "navigate",
+   "action": "open_library",
+   "destination": {
+    "kind": "home"
+   },
+   "route": "library_model",
+   "language": "zh",
+   "elapsed_ms": 22981,
+   "choices": [],
+   "message": "請在圖書借閱頁搜尋想看的書。這裡使用示範資料。"
+  },
+  "verdict": "FAIL",
+  "note": "'借Fredrik Backman的書': second author regex (server.py:171) lacks 借; action_object path (server.py:181) uses 'Fredrik Backman' as a book_name query -> no hit -> library home instead of lib-book-4"
+ },
+ {
+  "id": "flows-05",
+  "category": "books",
+  "language": "zh",
+  "input": "廣嶋玲子的書有哪些",
+  "session": "flows-b05",
+  "context": null,
+  "expected": "candidates lib-book-5/6 or search",
+  "observed": {
+   "status": 200,
+   "kind": "navigate",
+   "action": "open_library",
+   "destination": {
+    "kind": "home"
+   },
+   "route": "library_model",
+   "language": "zh",
+   "elapsed_ms": 41531,
+   "choices": [],
+   "message": "請在圖書借閱頁搜尋想看的書。這裡使用示範資料。"
+  },
+  "verdict": "FAIL",
+  "note": "'廣嶋玲子的書有哪些' has no verb -> author not extracted (server.py:170-171) -> library home; should offer lib-book-5/6"
+ },
+ {
+  "id": "flows-06",
+  "category": "books",
+  "language": "zh",
+  "input": "我要借底程邏輯",
+  "session": "flows-b06",
+  "context": null,
+  "expected": "detail lib-book-3 (typo)",
+  "observed": {
+   "status": 200,
+   "kind": "navigate",
+   "action": "open_library_book",
+   "destination": {
+    "kind": "detail",
+    "book_id": "lib-book-3"
+   },
+   "route": "book_autocorrect",
+   "language": "zh",
+   "elapsed_ms": 442,
+   "choices": [],
+   "message": "已把「底程邏輯」當作《底層邏輯》開啟；如果不是這本，請返回再說一次。此為示範，尚未預約。"
+  },
+  "verdict": "PASS",
+  "note": "one-char typo autocorrected and says what it assumed, 0.4 s"
+ },
+ {
+  "id": "flows-07",
+  "category": "books",
+  "language": "zh",
+  "input": "幫我找底層羅輯這本書",
+  "session": "flows-b07",
+  "context": null,
+  "expected": "detail lib-book-3 (sound-alike)",
+  "observed": {
+   "status": 200,
+   "kind": "navigate",
+   "action": "open_library_book",
+   "destination": {
+    "kind": "detail",
+    "book_id": "lib-book-3"
+   },
+   "route": "book_autocorrect",
+   "language": "zh",
+   "elapsed_ms": 65,
+   "choices": [],
+   "message": "已把「底層羅輯」當作《底層邏輯》開啟；如果不是這本，請返回再說一次。此為示範，尚未預約。"
+  },
+  "verdict": "PASS",
+  "note": "sound-alike autocorrect"
+ },
+ {
+  "id": "flows-08",
+  "category": "books",
+  "language": "zh",
+  "input": "我想借神奇甘仔店",
+  "session": "flows-b08",
+  "context": null,
+  "expected": "candidates 5/6",
+  "observed": {
+   "status": 200,
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "book_confirm",
+   "language": "zh",
+   "elapsed_ms": 35683,
+   "choices": [
+    "神奇柑仔店. 15, 冒牌的長髮公主餅乾",
+    "歡迎光臨錢天堂 : 神奇柑仔店大圖鑑"
+   ],
+   "message": "你要找的是哪一本？請先確認，我再開啟原頁面。"
+  },
+  "verdict": "PASS",
+  "note": "sound-alike series -> 2 candidates"
+ },
+ {
+  "id": "flows-09",
+  "category": "books",
+  "language": "zh",
+  "input": "我想借神奇柑仔店",
+  "session": "flows-b09",
+  "context": null,
+  "expected": "candidates 5/6",
+  "observed": {
+   "status": 200,
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "book_confirm",
+   "language": "zh",
+   "elapsed_ms": 41333,
+   "choices": [
+    "歡迎光臨錢天堂 : 神奇柑仔店大圖鑑",
+    "神奇柑仔店. 15, 冒牌的長髮公主餅乾"
+   ],
+   "message": "你要找的是哪一本？請先確認，我再開啟原頁面。"
+  },
+  "verdict": "PASS",
+  "note": "series -> candidates"
+ },
+ {
+  "id": "flows-10",
+  "category": "books",
+  "language": "zh",
+  "input": "我想借哈利波特",
+  "session": "flows-b10",
+  "context": null,
+  "expected": "library home with honest note, not empty search",
+  "observed": {
+   "status": 200,
+   "kind": "navigate",
+   "action": "open_library",
+   "destination": {
+    "kind": "home"
+   },
+   "route": "library_model",
+   "language": "zh",
+   "elapsed_ms": 38408,
+   "choices": [],
+   "message": "請在圖書借閱頁搜尋想看的書。這裡使用示範資料。"
+  },
+  "verdict": "CONCERN",
+  "note": "library home (not empty search) is right, but the fixed message (workflow.py:164) does not say the title is not in the demo catalogue"
+ },
+ {
+  "id": "flows-11",
+  "category": "books",
+  "language": "zh",
+  "input": "幫我查ISBN 9789571234567",
+  "session": "flows-b11",
+  "context": null,
+  "expected": "library search/home, honest",
+  "observed": {
+   "status": 200,
+   "kind": "navigate",
+   "action": "open_library",
+   "destination": {
+    "kind": "home"
+   },
+   "route": "library_model",
+   "language": "zh",
+   "elapsed_ms": 39279,
+   "choices": [],
+   "message": "請在圖書借閱頁搜尋想看的書。這裡使用示範資料。"
+  },
+  "verdict": "PASS",
+  "note": "unknown ISBN -> library home"
+ },
+ {
+  "id": "flows-12",
+  "category": "books",
+  "language": "zh",
+  "input": "我要借The winners",
+  "session": "flows-b12",
+  "context": null,
+  "expected": "detail lib-book-4",
+  "observed": {
+   "status": 200,
+   "kind": "navigate",
+   "action": "open_library_book",
+   "destination": {
+    "kind": "detail",
+    "book_id": "lib-book-4"
+   },
+   "route": "library_model",
+   "language": "zh",
+   "elapsed_ms": 35383,
+   "choices": [],
+   "message": "請查看《The winners : a novel》的館藏與冊次；如可預約，選取書館後再按頁面按鈕。此為示範，尚未預約。"
+  },
+  "verdict": "PASS",
+  "note": "English title -> detail lib-book-4"
+ },
+ {
+  "id": "flows-13",
+  "category": "books",
+  "language": "zh",
+  "input": "幫我列出神奇柑仔店的搜尋結果",
+  "session": "flows-b13",
+  "context": null,
+  "expected": "search query 神奇柑仔店",
+  "observed": {
+   "status": 200,
+   "kind": "navigate",
+   "action": "locate_library_book",
+   "destination": {
+    "kind": "search",
+    "query": "神奇柑仔店",
+    "search_type": "book_name"
+   },
+   "route": "library_model",
+   "language": "zh",
+   "elapsed_ms": 43577,
+   "choices": [],
+   "message": "請在原搜尋結果選擇書籍，再確認冊次與取書館。此為示範，尚未預約。"
+  },
+  "verdict": "PASS",
+  "note": "'列出...搜尋結果' -> search page instead of confirm (workflow.py:584)"
+ },
+ {
+  "id": "flows-22",
+  "category": "selection",
+  "language": "zh",
+  "input": "我想借神奇柑仔店",
+  "session": "flows-c3",
+  "context": null,
+  "expected": "candidates",
+  "observed": {
+   "status": 200,
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "book_confirm",
+   "language": "zh",
+   "elapsed_ms": 37789,
+   "choices": [
+    "歡迎光臨錢天堂 : 神奇柑仔店大圖鑑",
+    "神奇柑仔店. 15, 冒牌的長髮公主餅乾"
+   ],
+   "message": "你要找的是哪一本？請先確認，我再開啟原頁面。"
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "flows-23",
+  "category": "selection",
+  "language": "zh",
+  "input": "2",
+  "session": "flows-c3",
+  "context": null,
+  "expected": "detail of choice 2",
+  "observed": {
+   "status": 200,
+   "kind": "navigate",
+   "action": "open_library_book",
+   "destination": {
+    "kind": "detail",
+    "book_id": "lib-book-6"
+   },
+   "route": "pending",
+   "language": "zh",
+   "elapsed_ms": 1,
+   "choices": [],
+   "message": "請在《神奇柑仔店. 15, 冒牌的長髮公主餅乾》原頁面確認館藏、冊次與取書館；尚未預約。"
+  },
+  "verdict": "PASS",
+  "note": "text '2' selects"
+ },
+ {
+  "id": "flows-24",
+  "category": "selection",
+  "language": "zh",
+  "input": "我想借神奇柑仔店",
+  "session": "flows-c4",
+  "context": null,
+  "expected": "candidates",
+  "observed": {
+   "status": 200,
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "book_confirm",
+   "language": "zh",
+   "elapsed_ms": 27137,
+   "choices": [
+    "歡迎光臨錢天堂 : 神奇柑仔店大圖鑑",
+    "神奇柑仔店. 15, 冒牌的長髮公主餅乾"
+   ],
+   "message": "你要找的是哪一本？請先確認，我再開啟原頁面。"
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "flows-25",
+  "category": "selection",
+  "language": "zh",
+  "input": "二",
+  "session": "flows-c4",
+  "context": null,
+  "expected": "detail of choice 2",
+  "observed": {
+   "status": 200,
+   "kind": "navigate",
+   "action": "open_library_book",
+   "destination": {
+    "kind": "detail",
+    "book_id": "lib-book-6"
+   },
+   "route": "pending",
+   "language": "zh",
+   "elapsed_ms": 259,
+   "choices": [],
+   "message": "請在《神奇柑仔店. 15, 冒牌的長髮公主餅乾》原頁面確認館藏、冊次與取書館；尚未預約。"
+  },
+  "verdict": "PASS",
+  "note": "text '二' selects"
+ },
+ {
+  "id": "flows-26",
+  "category": "selection",
+  "language": "zh",
+  "input": "我想借神奇柑仔店",
+  "session": "flows-c5",
+  "context": null,
+  "expected": "candidates",
+  "observed": {
+   "status": 200,
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "book_confirm",
+   "language": "zh",
+   "elapsed_ms": 33781,
+   "choices": [
+    "歡迎光臨錢天堂 : 神奇柑仔店大圖鑑",
+    "神奇柑仔店. 15, 冒牌的長髮公主餅乾"
+   ],
+   "message": "你要找的是哪一本？請先確認，我再開啟原頁面。"
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "flows-27",
+  "category": "selection",
+  "language": "zh",
+  "input": "好",
+  "session": "flows-c5",
+  "context": null,
+  "expected": "asks to choose specific (2 candidates)",
+  "observed": {
+   "status": 200,
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "pending",
+   "language": "zh",
+   "elapsed_ms": 0,
+   "choices": [
+    "歡迎光臨錢天堂 : 神奇柑仔店大圖鑑",
+    "神奇柑仔店. 15, 冒牌的長髮公主餅乾"
+   ],
+   "message": "請選擇一個具體選項，或說第幾個。"
+  },
+  "verdict": "PASS",
+  "note": "'好' with 2 candidates -> asks to pick, same resolution kept"
+ },
+ {
+  "id": "flows-28",
+  "category": "selection",
+  "language": "zh",
+  "input": "第二個",
+  "session": "flows-c5",
+  "context": null,
+  "expected": "detail of choice 2",
+  "observed": {
+   "status": 200,
+   "kind": "navigate",
+   "action": "open_library_book",
+   "destination": {
+    "kind": "detail",
+    "book_id": "lib-book-6"
+   },
+   "route": "pending",
+   "language": "zh",
+   "elapsed_ms": 0,
+   "choices": [],
+   "message": "請在《神奇柑仔店. 15, 冒牌的長髮公主餅乾》原頁面確認館藏、冊次與取書館；尚未預約。"
+  },
+  "verdict": "PASS",
+  "note": "text 第二個 selects"
+ },
+ {
+  "id": "flows-29",
+  "category": "selection",
+  "language": "zh",
+  "input": "怎麼借書",
+  "session": "flows-c6",
+  "context": null,
+  "expected": "howto with single library choice",
+  "observed": {
+   "status": 200,
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "howto",
+   "language": "zh",
+   "elapsed_ms": 0,
+   "choices": [
+    "圖書借閱"
+   ],
+   "message": "先在圖書借閱搜尋書籍，再查看館藏、冊次與取書館；預約由你在原頁面確認。這裡使用示範資料。"
+  },
+  "verdict": "PASS",
+  "note": "how-to reply offering a single library choice"
+ },
+ {
+  "id": "flows-30",
+  "category": "selection",
+  "language": "zh",
+  "input": "好",
+  "session": "flows-c6",
+  "context": null,
+  "expected": "open library (single candidate)",
+  "observed": {
+   "status": 200,
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "library"
+   },
+   "route": "pending",
+   "language": "zh",
+   "elapsed_ms": 1,
+   "choices": [],
+   "message": "請在原本的「圖書借閱」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "'好' with a single candidate opens library"
+ },
+ {
+  "id": "flows-31",
+  "category": "selection",
+  "language": "zh",
+  "input": "我想借神奇柑仔店",
+  "session": "flows-c7",
+  "context": null,
+  "expected": "candidates",
+  "observed": {
+   "status": 200,
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "book_confirm",
+   "language": "zh",
+   "elapsed_ms": 34184,
+   "choices": [
+    "歡迎光臨錢天堂 : 神奇柑仔店大圖鑑",
+    "神奇柑仔店. 15, 冒牌的長髮公主餅乾"
+   ],
+   "message": "你要找的是哪一本？請先確認，我再開啟原頁面。"
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "flows-32",
+  "category": "selection",
+  "language": "zh",
+  "input": "<choice 5>",
+  "session": "flows-c7",
+  "context": null,
+  "expected": "error: out of range",
+  "observed": {
+   "status": 422,
+   "kind": null,
+   "action": null,
+   "destination": null,
+   "route": null,
+   "language": null,
+   "elapsed_ms": null,
+   "choices": [],
+   "message": "選項不在本輪候選中，請重新選擇。"
+  },
+  "verdict": "PASS",
+  "note": "choice 5 -> 422 選項不在本輪候選中; pending kept"
+ },
+ {
+  "id": "flows-33",
+  "category": "selection",
+  "language": "zh",
+  "input": "第五本",
+  "session": "flows-c7",
+  "context": null,
+  "expected": "error/out of range, no navigation",
+  "observed": {
+   "status": 422,
+   "kind": null,
+   "action": null,
+   "destination": null,
+   "route": null,
+   "language": null,
+   "elapsed_ms": null,
+   "choices": [],
+   "message": "選項不在本輪候選中，請重新選擇。"
+  },
+  "verdict": "CONCERN",
+  "note": "typed 第五本 returns HTTP 422 instead of a normal reply re-showing the 2 choices; depends on how the App renders 422"
+ },
+ {
+  "id": "flows-34",
+  "category": "selection",
+  "language": "zh",
+  "input": "<choice 1>",
+  "session": "flows-c7",
+  "context": null,
+  "expected": "after out-of-range, valid choice still works",
+  "observed": {
+   "status": 200,
+   "kind": "navigate",
+   "action": "open_library_book",
+   "destination": {
+    "kind": "detail",
+    "book_id": "lib-book-5"
+   },
+   "route": "selection",
+   "language": "zh",
+   "elapsed_ms": 279,
+   "choices": [],
+   "message": "請在《歡迎光臨錢天堂 : 神奇柑仔店大圖鑑》原頁面確認館藏、冊次與取書館；尚未預約。"
+  },
+  "verdict": "PASS",
+  "note": "after out-of-range, a valid choice still works"
+ },
+ {
+  "id": "flows-35",
+  "category": "selection",
+  "language": "zh",
+  "input": "我想借神奇柑仔店",
+  "session": "flows-c8a",
+  "context": null,
+  "expected": "candidates",
+  "observed": {
+   "status": 200,
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "book_confirm",
+   "language": "zh",
+   "elapsed_ms": 50374,
+   "choices": [
+    "歡迎光臨錢天堂 : 神奇柑仔店大圖鑑",
+    "神奇柑仔店. 15, 冒牌的長髮公主餅乾"
+   ],
+   "message": "你要找的是哪一本？請先確認，我再開啟原頁面。"
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "flows-36",
+  "category": "selection",
+  "language": "zh",
+  "input": "<choice 1>",
+  "session": "flows-c8b",
+  "context": null,
+  "expected": "must fail (other session)",
+  "observed": {
+   "status": 422,
+   "kind": null,
+   "action": null,
+   "destination": null,
+   "route": null,
+   "language": null,
+   "elapsed_ms": null,
+   "choices": [],
+   "message": "候選已失效，請重新描述需求。"
+  },
+  "verdict": "PASS",
+  "note": "resolution from another session rejected"
+ },
+ {
+  "id": "flows-37",
+  "category": "selection",
+  "language": "zh",
+  "input": "第一本",
+  "session": "flows-c8b",
+  "context": null,
+  "expected": "must not select (other session)",
+  "observed": {
+   "status": 200,
+   "kind": "navigate",
+   "action": "locate_library_book",
+   "destination": {
+    "kind": "search",
+    "query": "第一本",
+    "search_type": "book_name"
+   },
+   "route": "library_model",
+   "language": "zh",
+   "elapsed_ms": 30711,
+   "choices": [],
+   "message": "請在原搜尋結果選擇書籍，再確認冊次與取書館。此為示範，尚未預約。"
+  },
+  "verdict": "CONCERN",
+  "note": "'第一本' in a session without a pending list becomes a title fragment: server.py:186-198 longest-common-substring takes '第一本' from 我的第一本滑塊書 -> search page '第一本'. No cross-session leak, but an ordinal is turned into a book search"
+ },
+ {
+  "id": "flows-38",
+  "category": "selection",
+  "language": "zh",
+  "input": "我想借神奇柑仔店",
+  "session": "flows-c9",
+  "context": null,
+  "expected": "candidates",
+  "observed": {
+   "status": 200,
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "book_confirm",
+   "language": "zh",
+   "elapsed_ms": 34914,
+   "choices": [
+    "歡迎光臨錢天堂 : 神奇柑仔店大圖鑑",
+    "神奇柑仔店. 15, 冒牌的長髮公主餅乾"
+   ],
+   "message": "你要找的是哪一本？請先確認，我再開啟原頁面。"
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "flows-39",
+  "category": "selection",
+  "language": "zh",
+  "input": "我想繳水費",
+  "session": "flows-c9",
+  "context": null,
+  "expected": "fees.water; old choices dropped",
+  "observed": {
+   "status": 200,
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "fees.water"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 20542,
+   "choices": [],
+   "message": "請在原本的「水費」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "new request while choices pending -> water fee page"
+ },
+ {
+  "id": "flows-40",
+  "category": "selection",
+  "language": "zh",
+  "input": "<choice 1>",
+  "session": "flows-c9",
+  "context": null,
+  "expected": "old choice must fail",
+  "observed": {
+   "status": 422,
+   "kind": null,
+   "action": null,
+   "destination": null,
+   "route": null,
+   "language": null,
+   "elapsed_ms": null,
+   "choices": [],
+   "message": "候選已失效，請重新描述需求。"
+  },
+  "verdict": "PASS",
+  "note": "old choices dropped (422)"
+ },
+ {
+  "id": "flows-17r",
+  "category": "selection",
+  "language": "zh",
+  "input": "我想借神奇柑仔店",
+  "session": "flows-c1r",
+  "context": null,
+  "expected": "candidates",
+  "observed": {
+   "status": 200,
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "book_confirm",
+   "language": "zh",
+   "elapsed_ms": 21235,
+   "choices": [
+    "歡迎光臨錢天堂 : 神奇柑仔店大圖鑑",
+    "神奇柑仔店. 15, 冒牌的長髮公主餅乾"
+   ],
+   "message": "你要找的是哪一本？請先確認，我再開啟原頁面。"
+  },
+  "verdict": "PASS",
+  "note": "candidates (re-run; first attempt hit the busy artefact)"
+ },
+ {
+  "id": "flows-18r",
+  "category": "selection",
+  "language": "zh",
+  "input": "<choice 2>",
+  "session": "flows-c1r",
+  "context": null,
+  "expected": "detail of choice 2",
+  "observed": {
+   "status": 200,
+   "kind": "navigate",
+   "action": "open_library_book",
+   "destination": {
+    "kind": "detail",
+    "book_id": "lib-book-6"
+   },
+   "route": "selection",
+   "language": "zh",
+   "elapsed_ms": 0,
+   "choices": [],
+   "message": "請在《神奇柑仔店. 15, 冒牌的長髮公主餅乾》原頁面確認館藏、冊次與取書館；尚未預約。"
+  },
+  "verdict": "PASS",
+  "note": "--choice 2 -> lib-book-6"
+ },
+ {
+  "id": "flows-19r",
+  "category": "selection",
+  "language": "zh",
+  "input": "<choice 2>",
+  "session": "flows-c1r",
+  "context": null,
+  "expected": "replay must fail",
+  "observed": {
+   "status": 422,
+   "kind": null,
+   "action": null,
+   "destination": null,
+   "route": null,
+   "language": null,
+   "elapsed_ms": null,
+   "choices": [],
+   "message": "候選已失效，請重新描述需求。"
+  },
+  "verdict": "PASS",
+  "note": "replay rejected (422 候選已失效)"
+ },
+ {
+  "id": "flows-20r",
+  "category": "selection",
+  "language": "zh",
+  "input": "神奇柑仔店有哪幾本",
+  "session": "flows-c2r",
+  "context": null,
+  "expected": "candidates",
+  "observed": {
+   "status": 200,
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "book_confirm",
+   "language": "zh",
+   "elapsed_ms": 26319,
+   "choices": [
+    "歡迎光臨錢天堂 : 神奇柑仔店大圖鑑",
+    "神奇柑仔店. 15, 冒牌的長髮公主餅乾"
+   ],
+   "message": "你要找的是哪一本？請先確認，我再開啟原頁面。"
+  },
+  "verdict": "PASS",
+  "note": "'有哪幾本' -> candidates"
+ },
+ {
+  "id": "flows-21r",
+  "category": "selection",
+  "language": "zh",
+  "input": "第二本",
+  "session": "flows-c2r",
+  "context": null,
+  "expected": "detail of choice 2",
+  "observed": {
+   "status": 200,
+   "kind": "navigate",
+   "action": "open_library_book",
+   "destination": {
+    "kind": "detail",
+    "book_id": "lib-book-6"
+   },
+   "route": "pending",
+   "language": "zh",
+   "elapsed_ms": 2,
+   "choices": [],
+   "message": "請在《神奇柑仔店. 15, 冒牌的長髮公主餅乾》原頁面確認館藏、冊次與取書館；尚未預約。"
+  },
+  "verdict": "PASS",
+  "note": "text 第二本 selects choice 2"
+ },
+ {
+  "id": "flows-41",
+  "category": "paging",
+  "language": "zh",
+  "input": "有哪些功能",
+  "session": "flows-p1",
+  "context": null,
+  "expected": "capability_list page 1 (8 items) + 下一頁 hint",
+  "observed": {
+   "status": 200,
+   "kind": "capability_list",
+   "action": null,
+   "destination": null,
+   "route": "listing",
+   "language": "zh",
+   "elapsed_ms": 1,
+   "choices": [
+    "首頁",
+    "服務總覽",
+    "優惠",
+    "帳務",
+    "帳號",
+    "設定",
+    "基本資料",
+    "App 起始頁面"
+   ],
+   "message": "目前助理可以開啟的功能：\n• 首頁\n• 服務總覽\n• 優惠\n• 帳務\n• 帳號\n• 設定\n• 基本資料\n• App 起始頁面\n可輸入「下一頁」繼續查看。"
+  },
+  "verdict": "PASS",
+  "note": "page 1 of 86 enabled features"
+ },
+ {
+  "id": "flows-42",
+  "category": "paging",
+  "language": "zh",
+  "input": "下一頁",
+  "session": "flows-p1",
+  "context": null,
+  "expected": "next page",
+  "observed": {
+   "status": 200,
+   "kind": "capability_list",
+   "action": null,
+   "destination": null,
+   "route": "pending",
+   "language": "zh",
+   "elapsed_ms": 1,
+   "choices": [
+    "我的服務與置頂",
+    "訊息",
+    "活動資訊",
+    "手機載具",
+    "意見回饋",
+    "語言",
+    "通知提醒設定",
+    "歷程與授權管理"
+   ],
+   "message": "目前助理可以開啟的功能：\n• 我的服務與置頂\n• 訊息\n• 活動資訊\n• 手機載具\n• 意見回饋\n• 語言\n• 通知提醒設定\n• 歷程與授權管理\n可輸入「下一頁」繼續查看。"
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "flows-43",
+  "category": "paging",
+  "language": "zh",
+  "input": "下一頁",
+  "session": "flows-p1",
+  "context": null,
+  "expected": "next page",
+  "observed": {
+   "status": 200,
+   "kind": "capability_list",
+   "action": null,
+   "destination": null,
+   "route": "pending",
+   "language": "zh",
+   "elapsed_ms": 2,
+   "choices": [
+    "停用帳號",
+    "申辦服務",
+    "有話要說",
+    "臨櫃叫號",
+    "警政服務",
+    "災情通報",
+    "圖書借閱",
+    "圖書點閱排行榜"
+   ],
+   "message": "目前助理可以開啟的功能：\n• 停用帳號\n• 申辦服務\n• 有話要說\n• 臨櫃叫號\n• 警政服務\n• 災情通報\n• 圖書借閱\n• 圖書點閱排行榜\n可輸入「下一頁」繼續查看。"
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "flows-44",
+  "category": "paging",
+  "language": "zh",
+  "input": "下一頁",
+  "session": "flows-p1",
+  "context": null,
+  "expected": "next page",
+  "observed": {
+   "status": 200,
+   "kind": "capability_list",
+   "action": null,
+   "destination": null,
+   "route": "pending",
+   "language": "zh",
+   "elapsed_ms": 1,
+   "choices": [
+    "圖書公告",
+    "我的借閱紀錄",
+    "圖書預約清單",
+    "優惠列表",
+    "票夾",
+    "訂閱總覽",
+    "訂閱項目",
+    "帳務紀錄"
+   ],
+   "message": "目前助理可以開啟的功能：\n• 圖書公告\n• 我的借閱紀錄\n• 圖書預約清單\n• 優惠列表\n• 票夾\n• 訂閱總覽\n• 訂閱項目\n• 帳務紀錄\n可輸入「下一頁」繼續查看。"
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "flows-45",
+  "category": "paging",
+  "language": "zh",
+  "input": "下一頁",
+  "session": "flows-p1",
+  "context": null,
+  "expected": "next page",
+  "observed": {
+   "status": 200,
+   "kind": "capability_list",
+   "action": null,
+   "destination": null,
+   "route": "pending",
+   "language": "zh",
+   "elapsed_ms": 1,
+   "choices": [
+    "掃描繳費",
+    "停車費",
+    "水費",
+    "地方稅",
+    "學雜費",
+    "國／社宅租金維管費",
+    "聯醫醫療費",
+    "平價住宅維護費"
+   ],
+   "message": "目前助理可以開啟的功能：\n• 掃描繳費\n• 停車費\n• 水費\n• 地方稅\n• 學雜費\n• 國／社宅租金維管費\n• 聯醫醫療費\n• 平價住宅維護費\n可輸入「下一頁」繼續查看。"
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "flows-46",
+  "category": "paging",
+  "language": "zh",
+  "input": "下一頁",
+  "session": "flows-p1",
+  "context": null,
+  "expected": "next page",
+  "observed": {
+   "status": 200,
+   "kind": "capability_list",
+   "action": null,
+   "destination": null,
+   "route": "pending",
+   "language": "zh",
+   "elapsed_ms": 1,
+   "choices": [
+    "公訓處自費課程",
+    "其他繳費",
+    "線上報案",
+    "報案紀錄",
+    "申辦案件進度",
+    "陳情案件進度",
+    "警政案件進度",
+    "常見問答"
+   ],
+   "message": "目前助理可以開啟的功能：\n• 公訓處自費課程\n• 其他繳費\n• 線上報案\n• 報案紀錄\n• 申辦案件進度\n• 陳情案件進度\n• 警政案件進度\n• 常見問答\n可輸入「下一頁」繼續查看。"
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "flows-47",
+  "category": "paging",
+  "language": "zh",
+  "input": "下一頁",
+  "session": "flows-p1",
+  "context": null,
+  "expected": "next page",
+  "observed": {
+   "status": 200,
+   "kind": "capability_list",
+   "action": null,
+   "destination": null,
+   "route": "pending",
+   "language": "zh",
+   "elapsed_ms": 1,
+   "choices": [
+    "常見問答分類",
+    "繳費查詢",
+    "裁決所受理之申訴案件(本市)",
+    "裁決所受理之申訴案件(外縣市)",
+    "停管處受理之申訴案件",
+    "本市警察局受理之違規申訴案件",
+    "老人全民健康保險保險費自付額補助",
+    "臺北市性侵害被害人補助"
+   ],
+   "message": "目前助理可以開啟的功能：\n• 常見問答分類\n• 繳費查詢\n• 裁決所受理之申訴案件(本市)\n• 裁決所受理之申訴案件(外縣市)\n• 停管處受理之申訴案件\n• 本市警察局受理之違規申訴案件\n• 老人全民健康保險保險費自付額補助\n• 臺北市性侵害被害人補助\n可輸入「下一頁」繼續查看。"
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "flows-48",
+  "category": "paging",
+  "language": "zh",
+  "input": "下一頁",
+  "session": "flows-p1",
+  "context": null,
+  "expected": "next page",
+  "observed": {
+   "status": 200,
+   "kind": "capability_list",
+   "action": null,
+   "destination": null,
+   "route": "pending",
+   "language": "zh",
+   "elapsed_ms": 1,
+   "choices": [
+    "臺北市家庭暴力被害人補助",
+    "特殊境遇家庭扶助之家庭暴力被害人補助",
+    "臺北市身心障礙者參加社會保險保險費補助方式變更",
+    "原住民急難關懷慰問金",
+    "原住民參加技術士技能檢定獎勵金申請",
+    "陳情分類",
+    "電線(桿)或纜線受損",
+    "變電所、電廠受災"
+   ],
+   "message": "目前助理可以開啟的功能：\n• 臺北市家庭暴力被害人補助\n• 特殊境遇家庭扶助之家庭暴力被害人補助\n• 臺北市身心障礙者參加社會保險保險費補助方式變更\n• 原住民急難關懷慰問金\n• 原住民參加技術士技能檢定獎勵金申請\n• 陳情分類\n• 電線(桿)或纜線受損\n• 變電所、電廠受災\n可輸入「下一頁」繼續查看。"
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "flows-49",
+  "category": "paging",
+  "language": "zh",
+  "input": "下一頁",
+  "session": "flows-p1",
+  "context": null,
+  "expected": "next page",
+  "observed": {
+   "status": 200,
+   "kind": "capability_list",
+   "action": null,
+   "destination": null,
+   "route": "pending",
+   "language": "zh",
+   "elapsed_ms": 1,
+   "choices": [
+    "路燈故障",
+    "電力停電",
+    "橋樑基礎沖刷",
+    "橋樑斷裂",
+    "前述以外之橋梁災情",
+    "土石流",
+    "土石崩落",
+    "堰塞湖"
+   ],
+   "message": "目前助理可以開啟的功能：\n• 路燈故障\n• 電力停電\n• 橋樑基礎沖刷\n• 橋樑斷裂\n• 前述以外之橋梁災情\n• 土石流\n• 土石崩落\n• 堰塞湖\n可輸入「下一頁」繼續查看。"
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "flows-50",
+  "category": "paging",
+  "language": "zh",
+  "input": "下一頁",
+  "session": "flows-p1",
+  "context": null,
+  "expected": "next page",
+  "observed": {
+   "status": 200,
+   "kind": "capability_list",
+   "action": null,
+   "destination": null,
+   "route": "pending",
+   "language": "zh",
+   "elapsed_ms": 1,
+   "choices": [
+    "建築物火災",
+    "危險物品火災",
+    "工廠火災",
+    "其他(前述以外火災)",
+    "古亭地政事務所",
+    "中山地政事務所",
+    "萬華區戶政事務所",
+    "中正區戶政事務所"
+   ],
+   "message": "目前助理可以開啟的功能：\n• 建築物火災\n• 危險物品火災\n• 工廠火災\n• 其他(前述以外火災)\n• 古亭地政事務所\n• 中山地政事務所\n• 萬華區戶政事務所\n• 中正區戶政事務所\n可輸入「下一頁」繼續查看。"
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "flows-51",
+  "category": "paging",
+  "language": "zh",
+  "input": "下一頁",
+  "session": "flows-p1",
+  "context": null,
+  "expected": "next page",
+  "observed": {
+   "status": 200,
+   "kind": "capability_list",
+   "action": null,
+   "destination": null,
+   "route": "pending",
+   "language": "zh",
+   "elapsed_ms": 6,
+   "choices": [
+    "臺北市萬華區公所",
+    "臺北市中正區公所",
+    "稅捐處萬華分處",
+    "稅捐處大同分處",
+    "艋舺就業服務站",
+    "西門就業服務站"
+   ],
+   "message": "目前助理可以開啟的功能：\n• 臺北市萬華區公所\n• 臺北市中正區公所\n• 稅捐處萬華分處\n• 稅捐處大同分處\n• 艋舺就業服務站\n• 西門就業服務站"
+  },
+  "verdict": "CONCERN",
+  "note": "last page (6 items) has no end-of-list / start-over hint"
+ },
+ {
+  "id": "flows-52",
+  "category": "paging",
+  "language": "zh",
+  "input": "下一頁",
+  "session": "flows-p1",
+  "context": null,
+  "expected": "wrap to first page (offset 0)",
+  "observed": {
+   "status": 200,
+   "kind": "capability_list",
+   "action": null,
+   "destination": null,
+   "route": "pending",
+   "language": "zh",
+   "elapsed_ms": 1,
+   "choices": [
+    "優惠",
+    "帳務",
+    "帳號",
+    "設定",
+    "基本資料",
+    "App 起始頁面",
+    "我的服務與置頂",
+    "訊息"
+   ],
+   "message": "目前助理可以開啟的功能：\n• 優惠\n• 帳務\n• 帳號\n• 設定\n• 基本資料\n• App 起始頁面\n• 我的服務與置頂\n• 訊息\n可輸入「下一頁」繼續查看。"
+  },
+  "verdict": "FAIL",
+  "note": "wrap-around restarts at offset 2 (優惠), skipping 首頁 and 服務總覽: workflow.py:510 (and :442) compute (offset+8) % total = 88 % 86 = 2 instead of resetting to 0"
+ },
+ {
+  "id": "flows-53",
+  "category": "paging",
+  "language": "zh",
+  "input": "圖書有哪些功能",
+  "session": "flows-p2",
+  "context": null,
+  "expected": "library sub-features incl. off ones marked",
+  "observed": {
+   "status": 200,
+   "kind": "capability_list",
+   "action": null,
+   "destination": null,
+   "route": "listing",
+   "language": "zh",
+   "elapsed_ms": 0,
+   "choices": [
+    "圖書借閱",
+    "圖書點閱排行榜",
+    "圖書公告",
+    "我的借閱紀錄",
+    "圖書預約清單",
+    "圖書館地圖",
+    "冊次與取書館選擇"
+   ],
+   "message": "App 功能（未串接項目會標示）：\n• 圖書借閱\n• 圖書點閱排行榜\n• 圖書公告\n• 我的借閱紀錄\n• 圖書預約清單\n• 圖書館地圖【未串接】\n• 冊次與取書館選擇【未串接】"
+  },
+  "verdict": "PASS",
+  "note": "library list incl. 2 【未串接】 items"
+ },
+ {
+  "id": "flows-54",
+  "category": "paging",
+  "language": "zh",
+  "input": "下一頁",
+  "session": "flows-p2",
+  "context": null,
+  "expected": "single page: stays/wraps to same list",
+  "observed": {
+   "status": 200,
+   "kind": "capability_list",
+   "action": null,
+   "destination": null,
+   "route": "pending",
+   "language": "zh",
+   "elapsed_ms": 49,
+   "choices": [
+    "圖書點閱排行榜",
+    "圖書公告",
+    "我的借閱紀錄",
+    "圖書預約清單",
+    "圖書館地圖",
+    "冊次與取書館選擇"
+   ],
+   "message": "App 功能（未串接項目會標示）：\n• 圖書點閱排行榜\n• 圖書公告\n• 我的借閱紀錄\n• 圖書預約清單\n• 圖書館地圖【未串接】\n• 冊次與取書館選擇【未串接】"
+  },
+  "verdict": "FAIL",
+  "note": "single-page list: 下一頁 -> offset (0+8)%7 = 1, dropping 圖書借閱 (same modulo bug, workflow.py:510)"
+ },
+ {
+  "id": "flows-55",
+  "category": "cancel",
+  "language": "zh",
+  "input": "我想借神奇柑仔店",
+  "session": "flows-n1",
+  "context": null,
+  "expected": "candidates",
+  "observed": {
+   "status": 200,
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "book_confirm",
+   "language": "zh",
+   "elapsed_ms": 28619,
+   "choices": [
+    "歡迎光臨錢天堂 : 神奇柑仔店大圖鑑",
+    "神奇柑仔店. 15, 冒牌的長髮公主餅乾"
+   ],
+   "message": "你要找的是哪一本？請先確認，我再開啟原頁面。"
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "flows-56",
+  "category": "cancel",
+  "language": "zh",
+  "input": "算了",
+  "session": "flows-n1",
+  "context": null,
+  "expected": "cancel, no navigation",
+  "observed": {
+   "status": 200,
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "cancel",
+   "language": "zh",
+   "elapsed_ms": 0,
+   "choices": [],
+   "message": "已取消，未執行任何操作。"
+  },
+  "verdict": "PASS",
+  "note": "算了 cancels"
+ },
+ {
+  "id": "flows-57",
+  "category": "cancel",
+  "language": "zh",
+  "input": "<choice 1>",
+  "session": "flows-n1",
+  "context": null,
+  "expected": "cancelled choices must fail",
+  "observed": {
+   "status": 422,
+   "kind": null,
+   "action": null,
+   "destination": null,
+   "route": null,
+   "language": null,
+   "elapsed_ms": null,
+   "choices": [],
+   "message": "候選已失效，請重新描述需求。"
+  },
+  "verdict": "PASS",
+  "note": "cancelled choices rejected"
+ },
+ {
+  "id": "flows-58",
+  "category": "correction",
+  "language": "zh",
+  "input": "不是底層邏輯，是神奇柑仔店",
+  "session": "flows-n2",
+  "context": null,
+  "expected": "神奇柑仔店 candidates, not 底層邏輯",
+  "observed": {
+   "status": 200,
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "book_confirm",
+   "language": "zh",
+   "elapsed_ms": 34920,
+   "choices": [
+    "歡迎光臨錢天堂 : 神奇柑仔店大圖鑑",
+    "神奇柑仔店. 15, 冒牌的長髮公主餅乾"
+   ],
+   "message": "你要找的是哪一本？請先確認，我再開啟原頁面。"
+  },
+  "verdict": "PASS",
+  "note": "correction keeps 神奇柑仔店 (positive_text)"
+ },
+ {
+  "id": "flows-59",
+  "category": "correction",
+  "language": "zh",
+  "input": "不要借書，幫我繳水費",
+  "session": "flows-n3",
+  "context": null,
+  "expected": "fees.water",
+  "observed": {
+   "status": 200,
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "fees.water"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 35222,
+   "choices": [],
+   "message": "請在原本的「水費」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "negated library + water fee -> water page"
+ },
+ {
+  "id": "flows-60",
+  "category": "negation",
+  "language": "zh",
+  "input": "我不要繳水費",
+  "session": "flows-n4",
+  "context": null,
+  "expected": "no navigation",
+  "observed": {
+   "status": 200,
+   "kind": "reply",
+   "action": "faq_answer",
+   "destination": null,
+   "route": "faq_medium",
+   "language": "zh",
+   "elapsed_ms": 37917,
+   "choices": [
+    "沒用水要不要繳交水源保育與回饋費?"
+   ],
+   "message": "你是不是想問以下的問題？請選擇一題，我再顯示答案。本服務僅涵蓋臺北市政府 FAQ。"
+  },
+  "verdict": "CONCERN",
+  "note": "negation without replacement: no navigation (good) but shows an irrelevant FAQ 'did you mean' about 水源保育與回饋費; the FAQ layer searches the original negated text (workflow.py:625 _faq(payload, text) gets the unfiltered text)"
+ },
+ {
+  "id": "flows-61",
+  "category": "cancel",
+  "language": "zh",
+  "input": "算了，我要繳水費",
+  "session": "flows-n5",
+  "context": null,
+  "expected": "fees.water (cancel + new request)",
+  "observed": {
+   "status": 200,
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "fees.water"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 36459,
+   "choices": [],
+   "message": "請在原本的「水費」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "'算了，我要繳水費' -> water page"
+ },
+ {
+  "id": "flows-62",
+  "category": "context",
+  "language": "zh",
+  "input": "這是什麼",
+  "session": "flows-x1",
+  "context": {
+   "page": {
+    "type": "web",
+    "path": "/fee-payment/detail/fee-6/"
+   }
+  },
+  "expected": "explain/clarify, no navigation",
+  "observed": {
+   "status": 200,
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "elapsed_ms": 37317,
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。"
+  },
+  "verdict": "CONCERN",
+  "note": "on water-fee page '這是什麼' -> no navigation (good) but 'nothing related found'; page context is only a model hint and nothing explains the current page"
+ },
+ {
+  "id": "flows-63",
+  "category": "context",
+  "language": "zh",
+  "input": "我要繳費",
+  "session": "flows-x2",
+  "context": {
+   "page": {
+    "type": "web",
+    "path": "/fee-payment/detail/fee-6/"
+   }
+  },
+  "expected": "no auto-pay; water fee first among candidates or app.bills",
+  "observed": {
+   "status": 200,
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "app.bills"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 32678,
+   "choices": [],
+   "message": "請在原本的「帳務」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "CONCERN",
+  "note": "on water-fee page '我要繳費' opens 帳務 (app.bills) directly; no pay claim. Current service not preferred because only app.bills matched 繳費 (ordering applies only when ambiguous, workflow.py:603-606)"
+ },
+ {
+  "id": "flows-64",
+  "category": "context",
+  "language": "zh",
+  "input": "我要查紀錄",
+  "session": "flows-x3",
+  "context": {
+   "page": {
+    "type": "web",
+    "path": "/library-service/"
+   }
+  },
+  "expected": "candidates with library.records first",
+  "observed": {
+   "status": 200,
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "elapsed_ms": 42841,
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。"
+  },
+  "verdict": "FAIL",
+  "note": "on library page '我要查紀錄' -> no_related; 我的借閱紀錄/帳務紀錄/報案紀錄 exist but bare 紀錄 is no keyword and the page context does not feed retrieval"
+ },
+ {
+  "id": "flows-65",
+  "category": "context",
+  "language": "zh",
+  "input": "我要查紀錄",
+  "session": "flows-x4",
+  "context": {
+   "page": {
+    "type": "web",
+    "path": "/fee-payment/detail/fee-6/"
+   }
+  },
+  "expected": "candidates with fees.history first",
+  "observed": {
+   "status": 200,
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "elapsed_ms": 33720,
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。"
+  },
+  "verdict": "FAIL",
+  "note": "same on water page; 帳務紀錄 expected to be offered"
+ },
+ {
+  "id": "flows-66",
+  "category": "context",
+  "language": "zh",
+  "input": "這頁怎麼用",
+  "session": "flows-x5",
+  "context": {
+   "page": {
+    "type": "web",
+    "path": "/library-service/"
+   }
+  },
+  "expected": "no navigation",
+  "observed": {
+   "status": 200,
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "elapsed_ms": 40206,
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。"
+  },
+  "verdict": "CONCERN",
+  "note": "'這頁怎麼用' on library page -> no_related; no navigation (good) but unhelpful"
+ },
+ {
+  "id": "flows-67",
+  "category": "context",
+  "language": "zh",
+  "input": "這是什麼",
+  "session": "flows-x6",
+  "context": {
+   "page": {
+    "type": "tab",
+    "index": 3
+   }
+  },
+  "expected": "no navigation",
+  "observed": {
+   "status": 200,
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "elapsed_ms": 47067,
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。"
+  },
+  "verdict": "CONCERN",
+  "note": "tab context + '這是什麼' -> no_related; no navigation"
+ },
+ {
+  "id": "flows-68",
+  "category": "context",
+  "language": "zh",
+  "input": "我想借底層邏輯",
+  "session": "flows-x7",
+  "context": {
+   "page": {
+    "type": "native",
+    "route": "/x",
+    "extra": 1
+   }
+  },
+  "expected": "malformed context dropped; detail lib-book-3",
+  "observed": {
+   "status": 200,
+   "kind": "navigate",
+   "action": "open_library_book",
+   "destination": {
+    "kind": "detail",
+    "book_id": "lib-book-3"
+   },
+   "route": "library_model",
+   "language": "zh",
+   "elapsed_ms": 42079,
+   "choices": [],
+   "message": "請查看《底層邏輯 : 看清這個世界的底牌 = The underlying logic : how to see the essence of things》的館藏與冊次；如可預約，選取書館後再按頁面按鈕。此為示範，尚未預約。"
+  },
+  "verdict": "PASS",
+  "note": "malformed context silently dropped; detail opened"
+ },
+ {
+  "id": "flows-69",
+  "category": "context",
+  "language": "zh",
+  "input": "幫我繳",
+  "session": "flows-x8",
+  "context": {
+   "page": {
+    "type": "web",
+    "path": "/fee-payment/detail/fee-6/"
+   }
+  },
+  "expected": "no claim of paying; no navigation or water page",
+  "observed": {
+   "status": 200,
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "elapsed_ms": 40476,
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。"
+  },
+  "verdict": "PASS",
+  "note": "'幫我繳' on water page: no navigation and no pay claim; could have offered 水費 from context (minor)"
+ },
+ {
+  "id": "flows-70",
+  "category": "context",
+  "language": "zh",
+  "input": "我想借神奇柑仔店",
+  "session": "flows-x9",
+  "context": {
+   "page": {
+    "type": "web",
+    "path": "/library-service/"
+   }
+  },
+  "expected": "candidates (context does not skip confirm)",
+  "observed": {
+   "status": 200,
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "book_confirm",
+   "language": "zh",
+   "elapsed_ms": 45042,
+   "choices": [
+    "歡迎光臨錢天堂 : 神奇柑仔店大圖鑑",
+    "神奇柑仔店. 15, 冒牌的長髮公主餅乾"
+   ],
+   "message": "你要找的是哪一本？請先確認，我再開啟原頁面。"
+  },
+  "verdict": "PASS",
+  "note": "library page context does not skip confirmation"
+ },
+ {
+  "id": "flows-71",
+  "category": "faq",
+  "language": "zh",
+  "input": "狗走失了要去哪裡找",
+  "session": "flows-f1",
+  "context": null,
+  "expected": "FAQ choices",
+  "observed": {
+   "status": 200,
+   "kind": "unsupported",
+   "action": null,
+   "destination": null,
+   "route": "unavailable_direct",
+   "language": "zh",
+   "elapsed_ms": 4,
+   "choices": [],
+   "message": "寵物安心遛：原服務未提供入口。"
+  },
+  "verdict": "CONCERN",
+  "note": "lost dog -> unsupported '寵物安心遛：原服務未提供入口' (keyword hit on a disconnected pet service) instead of FAQ about lost pets; cryptic reason"
+ },
+ {
+  "id": "flows-72",
+  "category": "faq",
+  "language": "zh",
+  "input": "<choice 1>",
+  "session": "flows-f1",
+  "context": null,
+  "expected": "FAQ answer",
+  "observed": {
+   "status": 422,
+   "kind": null,
+   "action": null,
+   "destination": null,
+   "route": null,
+   "language": null,
+   "elapsed_ms": null,
+   "choices": [],
+   "message": "候選已失效，請重新描述需求。"
+  },
+  "verdict": "PASS",
+  "note": "n/a: no FAQ choices were offered in flows-71, choice correctly rejected"
+ },
+ {
+  "id": "flows-73",
+  "category": "faq",
+  "language": "zh",
+  "input": "<choice 1>",
+  "session": "flows-f1",
+  "context": null,
+  "expected": "replay fails",
+  "observed": {
+   "status": 422,
+   "kind": null,
+   "action": null,
+   "destination": null,
+   "route": null,
+   "language": null,
+   "elapsed_ms": null,
+   "choices": [],
+   "message": "候選已失效，請重新描述需求。"
+  },
+  "verdict": "PASS",
+  "note": "n/a: replay rejected"
+ },
+ {
+  "id": "flows-74",
+  "category": "faq",
+  "language": "zh",
+  "input": "大型垃圾要怎麼丟",
+  "session": "flows-f2",
+  "context": null,
+  "expected": "FAQ answer/choices",
+  "observed": {
+   "status": 200,
+   "kind": "reply",
+   "action": "faq_answer",
+   "destination": null,
+   "route": "faq_medium",
+   "language": "zh",
+   "elapsed_ms": 31819,
+   "choices": [
+    "家戶巨大垃圾(大型廢棄物)如何收運?",
+    "商家或機關、學校、部隊及法人等產生之巨大垃圾如何收運?"
+   ],
+   "message": "你是不是想問以下的問題？請選擇一題，我再顯示答案。本服務僅涵蓋臺北市政府 FAQ。"
+  },
+  "verdict": "PASS",
+  "note": "FAQ did-you-mean with 2 relevant choices"
+ },
+ {
+  "id": "flows-75",
+  "category": "faq",
+  "language": "zh",
+  "input": "第二個",
+  "session": "flows-f2",
+  "context": null,
+  "expected": "FAQ answer for choice 2",
+  "observed": {
+   "status": 200,
+   "kind": "reply",
+   "action": "faq_answer",
+   "destination": null,
+   "route": "pending",
+   "language": "zh",
+   "elapsed_ms": 20,
+   "choices": [],
+   "message": "【商家或機關、學校、部隊及法人等產生之巨大垃圾如何收運?】\n依環保局清運家戶巨大垃圾執行要點規定,住家兼營商(事)業行為者與機構、學校、部隊及法人等均不屬環保局服務範圍,其如有巨大垃圾排出,應由其所有人委託合格之代清除處理機構清運,可洽廢棄物處理公會詢問代清除處理機構業者相關訊息,電話為2828-5177。\n資料來源：臺北市政府環境保護局環境清潔管理科。本服務僅涵蓋臺北市政府 FAQ。"
+  },
+  "verdict": "PASS",
+  "note": "text 第二個 picks FAQ 2 and shows the answer"
+ },
+ {
+  "id": "flows-76",
+  "category": "faq",
+  "language": "zh",
+  "input": "老人搭公車有優惠嗎",
+  "session": "flows-f3",
+  "context": null,
+  "expected": "FAQ answer/choices",
+  "observed": {
+   "status": 200,
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "app.perks"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 34190,
+   "choices": [],
+   "message": "請在原本的「優惠」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "FAIL",
+  "note": "'老人搭公車有優惠嗎' opens 優惠 (coupon page app.perks) on keyword 優惠; should answer from FAQ (敬老卡) or say it is not an app service"
+ },
+ {
+  "id": "flows-14r",
+  "category": "books",
+  "language": "zh",
+  "input": "我想借錢",
+  "session": "flows-b14r",
+  "context": null,
+  "expected": "no library; FAQ/no_related",
+  "observed": {
+   "status": 200,
+   "kind": "reply",
+   "action": "request_clarification",
+   "destination": null,
+   "route": "library_model",
+   "language": "zh",
+   "elapsed_ms": 40375,
+   "choices": [],
+   "message": "你想先使用哪個服務？可以描述想做的事，或問「有哪些功能」。"
+  },
+  "verdict": "PASS",
+  "note": "借錢 not routed to library (OTHER_SERVICES); generic clarification. Re-run after the FAQ outage (same result as before)"
+ },
+ {
+  "id": "flows-15r",
+  "category": "books",
+  "language": "zh",
+  "input": "哪裡可以借雨傘",
+  "session": "flows-b15r",
+  "context": null,
+  "expected": "no library",
+  "observed": {
+   "status": 200,
+   "kind": "unsupported",
+   "action": "unsupported",
+   "destination": null,
+   "route": "library_model",
+   "language": "zh",
+   "elapsed_ms": 38348,
+   "choices": [],
+   "message": "目前沒有支援這項操作，可以輸入「有哪些功能」查看可用服務。"
+  },
+  "verdict": "PASS",
+  "note": "umbrella -> unsupported, no library. Re-run after the FAQ outage"
+ },
+ {
+  "id": "flows-16r",
+  "category": "books",
+  "language": "zh",
+  "input": "我要借行動電源",
+  "session": "flows-b16r",
+  "context": null,
+  "expected": "no library",
+  "observed": {
+   "status": 200,
+   "kind": "reply",
+   "action": "request_clarification",
+   "destination": null,
+   "route": "library_model",
+   "language": "zh",
+   "elapsed_ms": 34291,
+   "choices": [],
+   "message": "你想先使用哪個服務？可以描述想做的事，或問「有哪些功能」。"
+  },
+  "verdict": "PASS",
+  "note": "power bank -> clarification, no library. Re-run after the FAQ outage"
+ },
+ {
+  "id": "flows-77",
+  "category": "context",
+  "language": "zh",
+  "input": "我的案件進度",
+  "session": "flows-y1",
+  "context": null,
+  "expected": "candidates of 3 progress services (baseline order)",
+  "observed": {
+   "status": 200,
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 29477,
+   "choices": [
+    "申辦案件進度",
+    "陳情案件進度",
+    "災情案件進度",
+    "警政案件進度"
+   ],
+   "message": "你想使用哪個功能？請先確認。"
+  },
+  "verdict": "PASS",
+  "note": "4 progress candidates (baseline order)"
+ },
+ {
+  "id": "flows-78",
+  "category": "context",
+  "language": "zh",
+  "input": "我的案件進度",
+  "session": "flows-y2",
+  "context": {
+   "page": {
+    "type": "native",
+    "route": "/online_police"
+   }
+  },
+  "expected": "candidates with police.progress first",
+  "observed": {
+   "status": 200,
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 37159,
+   "choices": [
+    "警政案件進度",
+    "申辦案件進度",
+    "陳情案件進度",
+    "災情案件進度"
+   ],
+   "message": "你想使用哪個功能？請先確認。"
+  },
+  "verdict": "PASS",
+  "note": "on police page police.progress listed first"
+ },
+ {
+  "id": "flows-79",
+  "category": "context",
+  "language": "zh",
+  "input": "1",
+  "session": "flows-y2",
+  "context": {
+   "page": {
+    "type": "native",
+    "route": "/online_police"
+   }
+  },
+  "expected": "open first (police.progress)",
+  "observed": {
+   "status": 200,
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "police.progress"
+   },
+   "route": "pending",
+   "language": "zh",
+   "elapsed_ms": 0,
+   "choices": [],
+   "message": "請在原本的「警政案件進度」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "'1' opens police.progress"
+ },
+ {
+  "id": "flows-80",
+  "category": "faq",
+  "language": "zh",
+  "input": "垃圾車晚上幾點會來",
+  "session": "flows-f4",
+  "context": null,
+  "expected": "FAQ choices or answer",
+  "observed": {
+   "status": 200,
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "elapsed_ms": 30709,
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。"
+  },
+  "verdict": "CONCERN",
+  "note": "'垃圾車晚上幾點會來' -> no_related although the FAQ has garbage collection entries (flows-83)"
+ },
+ {
+  "id": "flows-80a",
+  "category": "faq",
+  "language": "zh",
+  "input": "<choice 1>",
+  "session": "flows-f4",
+  "context": null,
+  "expected": "FAQ answer 1",
+  "observed": {
+   "status": 422,
+   "kind": null,
+   "action": null,
+   "destination": null,
+   "route": null,
+   "language": null,
+   "elapsed_ms": null,
+   "choices": [],
+   "message": "候選已失效，請重新描述需求。"
+  },
+  "verdict": "PASS",
+  "note": "n/a: no choices were offered (no_related), choice rejected"
+ },
+ {
+  "id": "flows-80b",
+  "category": "faq",
+  "language": "zh",
+  "input": "<choice 1>",
+  "session": "flows-f4",
+  "context": null,
+  "expected": "replay fails",
+  "observed": {
+   "status": 422,
+   "kind": null,
+   "action": null,
+   "destination": null,
+   "route": null,
+   "language": null,
+   "elapsed_ms": null,
+   "choices": [],
+   "message": "候選已失效，請重新描述需求。"
+  },
+  "verdict": "PASS",
+  "note": "n/a: replay rejected"
+ },
+ {
+  "id": "flows-81",
+  "category": "faq",
+  "language": "zh",
+  "input": "我家附近的路樹倒了要怎麼處理",
+  "session": "flows-f5",
+  "context": null,
+  "expected": "FAQ choices or service offer",
+  "observed": {
+   "status": 200,
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "disasterReport"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 28430,
+   "choices": [],
+   "message": "請在原本的「災情通報」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "CONCERN",
+  "note": "fallen roadside tree -> disaster report page directly; plausible, but no FAQ/1999 alternative"
+ },
+ {
+  "id": "flows-82",
+  "category": "faq",
+  "language": "zh",
+  "input": "申請育兒津貼需要什麼資格",
+  "session": "flows-f6",
+  "context": null,
+  "expected": "FAQ choices",
+  "observed": {
+   "status": 200,
+   "kind": "reply",
+   "action": "faq_answer",
+   "destination": null,
+   "route": "faq_high",
+   "language": "zh",
+   "elapsed_ms": 29019,
+   "choices": [
+    "育兒津貼在什麼情形下,父母可以由其中一方提出申請呢?需要檢附什麼文件?",
+    "我有申請育兒津貼,如果我的戶籍有異動,要如何申報?會影響我的補助資格嗎?"
+   ],
+   "message": "【如果我的先生已經在台北市設籍滿1年,而我本人沒有滿1年,明年初小孩才出生,那我必需等我和小孩都設籍滿1年才可以申請育兒津貼嗎?】\n育兒津貼為配合行政院擴大實施育兒津貼之意旨,發放中央育兒津貼。\n\n0至2歲:申領「衛生福利部育有未滿2歲兒童育兒津貼」(當月29日撥款)。\n\n2歲以上:申領「教育部2歲以上未滿5歲幼兒育兒津貼」(次月20日撥款)。\n\n上述中央育兒津貼無設籍須滿1年之限制。\n\n凡為我國"
+  },
+  "verdict": "CONCERN",
+  "note": "faq_high direct answer, but the top FAQ is a narrow case (先生設籍滿1年...) for a general eligibility question"
+ },
+ {
+  "id": "flows-82a",
+  "category": "faq",
+  "language": "zh",
+  "input": "1",
+  "session": "flows-f6",
+  "context": null,
+  "expected": "FAQ answer 1 via text",
+  "observed": {
+   "status": 200,
+   "kind": "reply",
+   "action": "faq_answer",
+   "destination": null,
+   "route": "pending",
+   "language": "zh",
+   "elapsed_ms": 0,
+   "choices": [],
+   "message": "【育兒津貼在什麼情形下,父母可以由其中一方提出申請呢?需要檢附什麼文件?】\n(一)有下列情形之一者,可以由父或母一方舉證後提出申請:\n\n1、父或母一方失蹤,經向警察機關報案協尋未獲,達六個月以上。\n\n2、父或母一方受一年以上徒刑或拘束人身自由保安處分之宣告,且在執行中。\n\n3、父母離婚對兒童權利義務之行使或負擔未為協議或法院尚未酌定。\n\n4、非婚生子女與父或母一方同住。\n\n5、有家庭暴力或其他變故"
+  },
+  "verdict": "PASS",
+  "note": "text '1' picks FAQ choice"
+ },
+ {
+  "id": "flows-82b",
+  "category": "faq",
+  "language": "zh",
+  "input": "1",
+  "session": "flows-f6",
+  "context": null,
+  "expected": "replay via text must not re-answer",
+  "observed": {
+   "status": 200,
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "elapsed_ms": 34920,
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。"
+  },
+  "verdict": "PASS",
+  "note": "text replay does not re-answer (no pending -> no_related)"
+ },
+ {
+  "id": "flows-75b",
+  "category": "faq",
+  "language": "zh",
+  "input": "<choice 1>",
+  "session": "flows-f2",
+  "context": null,
+  "expected": "FAQ resolution already used via text -> replay fails",
+  "observed": {
+   "status": 422,
+   "kind": null,
+   "action": null,
+   "destination": null,
+   "route": null,
+   "language": null,
+   "elapsed_ms": null,
+   "choices": [],
+   "message": "候選已失效，請重新描述需求。"
+  },
+  "verdict": "PASS",
+  "note": "FAQ resolution replay (--choice after text pick) rejected"
+ },
+ {
+  "id": "flows-83",
+  "category": "faq",
+  "language": "zh",
+  "input": "垃圾車的收運時間",
+  "session": "flows-f7",
+  "context": null,
+  "expected": "FAQ",
+  "observed": {
+   "status": 200,
+   "kind": "reply",
+   "action": "faq_answer",
+   "destination": null,
+   "route": "faq_medium",
+   "language": "zh",
+   "elapsed_ms": 27516,
+   "choices": [
+    "市民如於週三、日垃圾停收日或平日來不及等候環保局垃圾車攜出垃圾及回收(廚餘)物,有無其他排出管道可以利用?"
+   ],
+   "message": "你是不是想問以下的問題？請選擇一題，我再顯示答案。本服務僅涵蓋臺北市政府 FAQ。"
+  },
+  "verdict": "CONCERN",
+  "note": "'垃圾車的收運時間' -> one tangential did-you-mean choice about 停收日 alternatives"
+ }
+]

@@ -1,0 +1,450 @@
+[
+ {
+  "id": "frontend-01",
+  "category": "navigation+hint",
+  "language": "zh",
+  "input": "我要借書",
+  "session": "ui-A",
+  "steps": "Home → tap 助理 → 改用鍵盤 → type → IME send; after navigation tap corner hint",
+  "expected": "panel closes, library page opens, 8 s hint, tap hint reopens panel at the message",
+  "observed": {
+   "kind": "navigate",
+   "landing": "圖書借閱 (library home, WebView renders books)",
+   "message": "請在圖書借閱頁搜尋想看的書。這裡使用示範資料。",
+   "elapsed_s": "43-54 (UI 正在處理… with 取消 shown meanwhile)",
+   "hint": "corner card above 助理 FAB, tapping it reopened panel scrolled to the reply"
+  },
+  "verdict": "PASS",
+  "note": "Works end to end. Hint shows '正在開啟服務頁面…' first then the reply. 8 s is short given the 40-50 s wait (user may look away); my first two attempts (3.5 s dump latency) missed it and the tap fell through onto the page (opened a book detail) — a slow user tapping where the hint just vanished hits the page underneath. Shots fe-01-*.png"
+ },
+ {
+  "id": "frontend-02",
+  "category": "navigation",
+  "language": "zh",
+  "input": "我要繳水費",
+  "session": "ui-A",
+  "steps": "from library page, panel → type → send",
+  "expected": "water-fee page renders",
+  "observed": {
+   "kind": "navigate",
+   "landing": "水費 page (WebView: 水號 input, 注意事項, 查詢 button)",
+   "message": "請在原本的「水費」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_s": 43
+  },
+  "verdict": "PASS",
+  "note": "Page renders fully. Minor: double title bar (native 水費 + web 〈 水費) with two back affordances (web '<' and native X); demo shows '逾繳費期限，不提供查詢繳費功能'. Shot fe-02-water.png"
+ },
+ {
+  "id": "frontend-03",
+  "category": "book candidates",
+  "language": "zh",
+  "input": "我要借神奇柑仔店 → tap choice 2",
+  "session": "ui-A",
+  "steps": "type → 2 numbered choices → tap 2",
+  "expected": "choices for the two 柑仔店 books, tapping opens book detail",
+  "observed": {
+   "kind": "confirm_candidates → navigate detail",
+   "choices": [
+    "歡迎光臨錢天堂 : 神奇柑仔店大圖鑑",
+    "神奇柑仔店. 15, 冒牌的長髮公主餅乾"
+   ],
+   "message": "你要找的是哪一本？請先確認，我再開啟原頁面。 / after tap: 請在《神奇柑仔店. 15, 冒牌的長髮公主餅乾》原頁面確認館藏、冊次與取書館；尚未預約。",
+   "landing": "圖書借閱 詳細內容 of book 15 (本館藏不提供預約)",
+   "elapsed_s": "34 + 5"
+  },
+  "verdict": "PASS",
+  "note": "Choice tap is fast (5 s, no model). Library home flashes briefly before the detail loads. Shots fe-03-*.png"
+ },
+ {
+  "id": "frontend-04",
+  "category": "history/back",
+  "language": "zh",
+  "input": "(back key after 借書 then 繳水費 via assistant)",
+  "session": "ui-A",
+  "steps": "library (assistant) → water fee (assistant) → system back; earlier: library→book detail→back→back",
+  "expected": "back leaves the service, does not return to the older assistant-opened service",
+  "observed": {
+   "landing_after_back_from_water": "帳務 tab (bills home), not library",
+   "library_detail_back": "detail → library list → home → app exits",
+   "panel_history": "reopening the panel shows the full previous conversation"
+  },
+  "verdict": "PASS",
+  "note": "Second navigation replaced the first service's history (back from water goes to its own parent 帳務 tab, not the library). Conversation persisted across navigations. Panel always reopens in voice mode, even after the user typed (minor). Shot fe-08-back-from-water.png"
+ },
+ {
+  "id": "frontend-05",
+  "category": "FAQ high band",
+  "language": "zh",
+  "input": "學齡前視力檢查要錢嗎 → tap related #2",
+  "session": "ui-A",
+  "steps": "type → answer bubble + 2 related FAQ choices → tap 2",
+  "expected": "direct answer with source line; related answer readable",
+  "observed": {
+   "kind": "reply (faq answer + related choices)",
+   "message": "【學齡前兒童護眼方案(視力免費複檢)需要費用嗎?】檢查費用由臺北市政府衛生局補助(含掛號費)每人一年一次新臺幣480元,家長無須付費… 資料來源：臺北市政府衛生局健康管理科。本服務僅涵蓋臺北市政府 FAQ。",
+   "choices": [
+    "兒童於醫療院所進行學齡前兒童護眼方案…是否須再付費掛號看診?",
+    "臺北市學童免費視力檢查需要費用嗎?"
+   ],
+   "elapsed_s": "24 + 9 for the tapped choice"
+  },
+  "verdict": "PASS",
+  "note": "Long answer wraps cleanly in the bubble, source line present, panel scrolls. The two FAQ entries state different subsidy amounts (480 vs 400 元) — source data, both say parents pay nothing. Translucent panel lets the page underneath (book detail text) show between bubbles. Shots fe-05-faq*.png"
+ },
+ {
+  "id": "frontend-06",
+  "category": "FAQ vs off feature",
+  "language": "zh",
+  "input": "家裡的狗要去哪裡打狂犬病疫苗",
+  "session": "ui-A",
+  "steps": "type → send",
+  "expected": "FAQ answer or did-you-mean about pet rabies vaccination (animal protection office)",
+  "observed": {
+   "kind": "unsupported",
+   "message": "疫苗預約：尚無實際服務入口或預約 API。",
+   "elapsed_s": 5.5
+  },
+  "verdict": "FAIL",
+  "note": "Keyword '疫苗' hits the off catalogue item vaccineAppointment (assets/assistant/capabilities.json:640-655, keywords 疫苗/接種) and the turn ends there; the FAQ (which covers pet rabies shots) is never consulted. The user sees the raw developer 'reason' string including the word 'API' — meaningless to a resident. Shot fe-06-faq-mid.png"
+ },
+ {
+  "id": "frontend-07",
+  "category": "feature list",
+  "language": "zh",
+  "input": "有哪些功能 → 下一頁 → tap 意見回饋",
+  "session": "ui-A",
+  "steps": "type → list of 8 → type 下一頁 → 8 more → tap #5",
+  "expected": "useful list with choices, paging, tapping opens page",
+  "observed": {
+   "kind": "capability_list",
+   "page1": [
+    "首頁",
+    "服務總覽",
+    "優惠",
+    "帳務",
+    "帳號",
+    "設定",
+    "基本資料",
+    "App 起始頁面"
+   ],
+   "page2": [
+    "我的服務與置頂",
+    "訊息",
+    "活動資訊",
+    "手機載具",
+    "意見回饋",
+    "語言",
+    "通知提醒設定",
+    "歷程與授權管理"
+   ],
+   "tap": "意見回饋 page opened in 4.7 s with hint"
+  },
+  "verdict": "CONCERN",
+  "note": "Mechanically fine (instant, choices tap-able, navigation works), but the first two pages are App chrome (home tab, settings, start page…) — the services a resident would want (借書, 繳水費, 臨櫃叫號) are not in the first 16 items. Each item is shown twice (bullet list in the bubble AND as numbered buttons), doubling scroll length. 下一頁 must be typed/spoken; there is no button for it. Shots fe-07-*.png"
+ },
+ {
+  "id": "frontend-08",
+  "category": "off feature",
+  "language": "zh",
+  "input": "我要掛號",
+  "session": "ui-A",
+  "steps": "type → send",
+  "expected": "honest explanation, no navigation, ideally point to an alternative",
+  "observed": {
+   "kind": "unsupported",
+   "message": "聯醫掛號：尚無正式掛號入口與 API。",
+   "elapsed_s": 4.8,
+   "navigation": "none"
+  },
+  "verdict": "CONCERN",
+  "note": "Correctly does not navigate, but the explanation is the developer note from capabilities.json ('API'), gives no alternative (e.g. 聯醫 website / phone). Same mechanism as frontend-06. Shot fe-09-offfeature_hint.png"
+ },
+ {
+  "id": "frontend-09",
+  "category": "nonsense",
+  "language": "zh",
+  "input": "鳳梨披薩好吃嗎",
+  "session": "ui-A",
+  "steps": "type → send",
+  "expected": "nothing-related message",
+  "observed": {
+   "kind": "reply/no_related",
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。",
+   "elapsed_s": 31.5
+  },
+  "verdict": "PASS",
+  "note": "Clear and helpful. Shot fe-10-nonsense.png"
+ },
+ {
+  "id": "frontend-10",
+  "category": "multilingual",
+  "language": "en",
+  "input": "I want to pay my water bill",
+  "session": "ui-A",
+  "steps": "panel → type → send; wait 60 s on landing page",
+  "expected": "English reply, water page opens, page usable for an English reader",
+  "observed": {
+   "kind": "navigate",
+   "landing": "Water bill page",
+   "message": "Please continue on the \"Water bill\" page. It is a demo; nothing is submitted or paid. (The page is translated on your phone; some names may differ from the Chinese original.)",
+   "elapsed_s": 38,
+   "ui": "Whole App chrome switched to English (FAB 'Assistant', panel labels). Banner 'Downloading the page translation model (about 30 MB)…' for ~40 s, page stays Chinese meanwhile.",
+   "translated_page": "'1碼'→'1 yard', '超商'→'Superfocker', '即日起'→'Nowhere', '行動支付'→'Action payment', '檢核號'→'detection number'"
+  },
+  "verdict": "CONCERN",
+  "note": "Assistant part correct (reply language, navigation, disclaimer). But what an English-speaking resident actually reads is ML Kit on-device MT of the page, which is badly wrong on the key instructions ('The zone is 1 yard… the account number is 6 yards') and produces 'Superfocker'. The download banner text renders with Flutter's yellow double-underline debug style (TPText without a Material ancestor, lib/page/assistant/widget/assistant_host.dart:61-89) and sits over the page header/close button. Shots fe-11-en-*.png"
+ },
+ {
+  "id": "frontend-11",
+  "category": "multilingual",
+  "language": "ja",
+  "input": "図書館で本を借りたいです",
+  "session": "ui-A",
+  "steps": "type → send",
+  "expected": "Japanese reply, library opens",
+  "observed": {
+   "kind": "navigate",
+   "landing": "図書貸出 (library home)",
+   "message": "「図書貸出」のページで続けてください。デモのため、送信や支払いは行われません。（ページはスマートフォン上で翻訳されます…）",
+   "elapsed_s": 34,
+   "ui": "FAB 'アシスタント' wider; hint truncated with … at 4 lines; another 30 MB model download banner, page still untranslated after 60 s"
+  },
+  "verdict": "PASS",
+  "note": "Assistant behaviour right. UI notes: corner hint cut at 4 lines (maxLines:4) so the disclaimer is truncated; the download banner stayed >60 s. Shots fe-12-ja*.png"
+ },
+ {
+  "id": "frontend-12",
+  "category": "multilingual",
+  "language": "vi",
+  "input": "Tôi muốn trả tiền nước",
+  "session": "ui-A",
+  "steps": "type → send",
+  "expected": "Vietnamese reply, water page",
+  "observed": {
+   "kind": "navigate",
+   "landing": "Tiền nước (water fee)",
+   "message": "Vui lòng tiếp tục trên trang \"Tiền nước\". Đây là bản demo, chưa gửi hay thanh toán gì. (Trang được dịch ngay trên điện thoại; …)",
+   "elapsed_s": 32
+  },
+  "verdict": "PASS",
+  "note": "Diacritics render fine, no clipping. Yet another 30 MB download banner (one per language). Shot fe-13-vi.png"
+ },
+ {
+  "id": "frontend-13",
+  "category": "multilingual",
+  "language": "id",
+  "input": "Saya mau pinjam buku di perpustakaan",
+  "session": "ui-A",
+  "steps": "type → send",
+  "expected": "Indonesian reply, library page opens",
+  "observed": {
+   "kind": "reply (clarify)",
+   "message": "Layanan atau keperluan apa yang Anda maksud? Anda juga bisa tanya \"bisa apa saja\".",
+   "elapsed_s": 35,
+   "navigation": "none",
+   "ui": "panel chrome still Vietnamese (Gửi / Bạn nói / Trợ lý trả lời) while the reply is Indonesian"
+  },
+  "verdict": "FAIL",
+  "note": "Clear 'borrow a book at the library' intent not resolved. capabilities_i18n.json:283 does have Indonesian keywords (perpustakaan, pinjam buku), and eval_i18n.py:33 expects 'Saya mau pinjam buku' → library home; adding 'di perpustakaan' also hits library.notices/map/pickup ('pengumuman perpustakaan', 'peta perpustakaan', 'pilih perpustakaan…', lines 311-339), so (guess) several library candidates tie and the model asks to clarify instead of opening the library home. UI chrome language only follows the last *navigation*, so the panel stayed Vietnamese (Gửi / Bạn nói) while the reply is Indonesian. Shot fe-14-id-panel.png"
+ },
+ {
+  "id": "frontend-14",
+  "category": "multilingual",
+  "language": "fil",
+  "input": "Gusto kong magbayad ng bill sa tubig",
+  "session": "ui-A",
+  "steps": "type → send",
+  "expected": "water page opens; reply in Filipino or (acceptable) English",
+  "observed": {
+   "kind": "reply (clarify)",
+   "message": "I'm not sure what you need yet. I can find services and open their pages; you can also ask \"what can you do\".",
+   "navigation": "none"
+  },
+  "verdict": "FAIL",
+  "note": "Filipino is not among the catalogue languages (capabilities_i18n.json languages = en, ja, vi, id, th), so 'tubig/magbayad' match nothing; reply falls back to English (acceptable) but nothing opens even though 'bill' is English. Chrome stays Vietnamese → three languages on one screen. Shot fe-15-fil.png"
+ },
+ {
+  "id": "frontend-15",
+  "category": "multilingual",
+  "language": "th",
+  "input": "ฉันอยากจ่ายค่าน้ำประปา",
+  "session": "ui-A",
+  "steps": "type → send; reopen panel",
+  "expected": "Thai reply, water page",
+  "observed": {
+   "kind": "navigate",
+   "landing": "ค่าน้ำ (water fee)",
+   "message": "โปรดดำเนินการต่อในหน้า \"ค่าน้ำ\" นี่เป็นเดโม ยังไม่มีการส่งหรือชำระเงิน (หน้านี้แปลบนโทรศัพท์ของคุณ …)",
+   "elapsed_s": 37
+  },
+  "verdict": "PASS",
+  "note": "Thai script renders without clipping. Download banner overlaps the *panel* header too, hiding the assistant's close (X) and read-aloud buttons while the 30 MB model downloads (banner is IgnorePointer so the hidden X still works if you know where it is). Shot fe-16-th-panel.png"
+ },
+ {
+  "id": "frontend-16",
+  "category": "multilingual",
+  "language": "nan (Taiwanese Hanji)",
+  "input": "我欲去圖書館借冊",
+  "session": "ui-A",
+  "steps": "type → send",
+  "expected": "zh reply, library page",
+  "observed": {
+   "kind": "navigate",
+   "landing": "圖書借閱",
+   "message": "請在圖書借閱頁搜尋想看的書。這裡使用示範資料。",
+   "elapsed_s": 29,
+   "ui": "banner '正在下載頁面翻譯模型（約 30 MB），完成後頁面會自動翻譯…' shown on the Chinese page"
+  },
+  "verdict": "CONCERN",
+  "note": "Assistant correct. But the Thai model download still running is now announced in Chinese as if the Chinese page will be translated: lib/service/page_translation.dart:226-231 keeps `preparing` true for the old download while the banner text follows the new language (assistant_host.dart:62-85). Shot fe-17-nan-landing.png"
+ },
+ {
+  "id": "frontend-17",
+  "category": "speech language menu",
+  "language": "-",
+  "input": "(tap 說話的語言 button bottom-left)",
+  "session": "ui-A",
+  "steps": "panel (voice mode) → tap language button → back",
+  "expected": "sensible list, closes cleanly",
+  "observed": {
+   "menu": [
+    "自動偵測",
+    "中文（台灣）",
+    "English",
+    "日本語",
+    "Tiếng Việt",
+    "Bahasa Indonesia",
+    "ไทย"
+   ],
+   "initial_label": "EN / 'Speech language: English' on first open although the App UI was Chinese; switched to 中文（台灣） after the first Chinese turn",
+   "back_key": "one Back closed the menu AND the whole panel"
+  },
+  "verdict": "CONCERN",
+  "note": "List is sensible, each language in its own script. No Taiwanese/Hakka or Filipino entry (expected for ASR). Speech language initially defaulted to English on a Chinese-UI app (probably follows the emulator locale until the user speaks; an elderly zh user's first voice attempt would be recognised as English). Back dismissing both menu and panel is unexpected. Shots fe-00-panel-open.png, fe-18-speech-lang.png"
+ },
+ {
+  "id": "frontend-18",
+  "category": "cancel",
+  "language": "zh",
+  "input": "我要繳水費 → 取消 at ~20 s",
+  "session": "ui-A",
+  "steps": "send → 正在處理… row with 取消 → tap 取消 → wait 100 s",
+  "expected": "request cancelled, no late navigation",
+  "observed": {
+   "processing_ui": "spinner + 正在處理… + 取消 text button above the input",
+   "after_cancel": "bubble 已取消，未開啟新的頁面。",
+   "after_100s": "still on the library page, panel open, no navigation"
+  },
+  "verdict": "PASS",
+  "note": "Cancel honoured; late reply discarded (generation check in assistant_view_controller.dart:660). Shots fe-19-cancel-*.png"
+ },
+ {
+  "id": "frontend-19",
+  "category": "rotation",
+  "language": "-",
+  "input": "(user_rotation 1 then 0 with panel open, keyboard mode)",
+  "session": "ui-A",
+  "steps": "rotate to landscape, screenshot, rotate back",
+  "expected": "no layout breakage",
+  "observed": {
+   "landscape": "panel re-lays out full width; header ~25% of height, ~550 px left for messages; bubbles stretch to full width; input bar intact",
+   "back_to_portrait": "identical to before, history intact"
+  },
+  "verdict": "PASS",
+  "note": "No breakage or lost state. In landscape the newest message (已取消…) is below the fold; the list is not re-scrolled to the end. Shots fe-20-rotate-*.png"
+ },
+ {
+  "id": "frontend-20",
+  "category": "cancel then retry",
+  "language": "zh",
+  "input": "我要繳水費 → 取消 after ~3 s → immediately 我要借書",
+  "session": "ui-A",
+  "steps": "send, tap 取消, send a new request right away",
+  "expected": "new request is handled (or the UI explains a short wait)",
+  "observed": {
+   "after_cancel": "已取消，未開啟新的頁面。",
+   "retry_reply": "目前有一個需求正在處理，請稍後再試。",
+   "navigation": "none"
+  },
+  "verdict": "CONCERN",
+  "note": "UI cancel only drops the reply client-side; the backend keeps computing the cancelled turn and rejects the user's next request with a vague 'a request is being processed' (the user just cancelled it, so this reads as a bug). The user must guess how long to wait (model turns take 30-50 s here). A retry ~1 min later worked. Shot fe-21-after-cancel-resend*.png"
+ },
+ {
+  "id": "frontend-21",
+  "category": "suggestion chip",
+  "language": "zh",
+  "input": "(tap 「臨櫃叫號」 chip on the empty panel)",
+  "session": "ui-B (after app restart)",
+  "steps": "force-stop + relaunch → 助理 → tap chip",
+  "expected": "queue page opens",
+  "observed": {
+   "kind": "navigate",
+   "landing": "臨櫃叫號 (櫃檯等待人數查詢: 地政/戶政/區公所)",
+   "message": "請在原本的「臨櫃叫號」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_s": 20
+  },
+  "verdict": "PASS",
+  "note": "Chips work. After restart the conversation is gone and the speech language is back to EN (see frontend-17). Shot fe-23-chip-queue.png"
+ },
+ {
+  "id": "frontend-22",
+  "category": "typed choice number",
+  "language": "zh",
+  "input": "我要借神奇柑仔店 → type 「第 1 個」",
+  "session": "ui-B",
+  "steps": "type → 2 choices → type number",
+  "expected": "book 1 detail opens",
+  "observed": {
+   "kind": "navigate detail",
+   "landing": "圖書借閱 詳細內容 《歡迎光臨錢天堂 : 神奇柑仔店大圖鑑》",
+   "elapsed_s": 3.3
+  },
+  "verdict": "PASS",
+  "note": "Typed ordinal resolves instantly. Shot fe-24-typed-number*.png"
+ },
+ {
+  "id": "frontend-23",
+  "category": "history/back",
+  "language": "zh",
+  "input": "(back ×2 after 臨櫃叫號 → book detail via assistant)",
+  "session": "ui-B",
+  "steps": "assistant opens 臨櫃叫號, then book detail; press back twice",
+  "expected": "new navigation replaces older service history",
+  "observed": {
+   "back1": "library home",
+   "back2": "App 首頁 (not 臨櫃叫號)"
+  },
+  "verdict": "PASS",
+  "note": "Consistent with docs: the earlier assistant-opened service is dropped from history."
+ },
+ {
+  "id": "frontend-24",
+  "category": "corner hint timing",
+  "language": "zh",
+  "input": "我要借書 (tap where the hint was, ~8-10 s after the reply)",
+  "session": "ui-A",
+  "steps": "after navigation wait until the hint has just disappeared and tap its spot",
+  "expected": "nothing harmful / hint stays long enough",
+  "observed": {
+   "result": "hint already gone; tap landed on the library ranking list and opened the book 《底層邏輯》 detail page"
+  },
+  "verdict": "CONCERN",
+  "note": "The 8 s hint (assistant_view_controller _showCorner) vanishes while a slow reader is reaching for it, and the tap falls through to whatever is underneath — here it silently opened an unrelated book. Hint also first shows '正在開啟服務頁面…' and only then the reply, eating into the 8 s. Consider a longer timeout or keeping it until the user interacts."
+ },
+ {
+  "id": "frontend-25",
+  "category": "panel readability",
+  "language": "-",
+  "input": "(observed across all panel screenshots)",
+  "session": "ui-A",
+  "steps": "-",
+  "expected": "chat readable over any page",
+  "observed": {
+   "panel": "translucent white over the current page; page text (book titles, ISBN digits, red water-fee notice) visible between bubbles and choice cards",
+   "reopen": "opening via the 助理 FAB does not scroll to the newest message (fe-11-en-panel, fe-16-th-panel: newest turn below the fold); the hint tap does scroll to it",
+   "a11y": "native page buttons announce English 'Back'/'Close' while the UI is Chinese"
+  },
+  "verdict": "CONCERN",
+  "note": "Bubbles themselves are opaque so text is readable, but the gaps show page content, which is distracting for elderly users; after reopening via the FAB the user may think the new answer is missing. Shots fe-05-faq.png, fe-07-features.png, fe-11-en-panel.png, fe-19-cancel-before.png"
+ }
+]

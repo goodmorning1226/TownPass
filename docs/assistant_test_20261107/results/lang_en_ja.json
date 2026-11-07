@@ -1,0 +1,1008 @@
+[
+ {
+  "id": "lang_en_ja-en-01",
+  "category": "I01-greeting",
+  "language": "en",
+  "input": "Hi there!",
+  "session": "s-en-01",
+  "expected": "greeting template in English",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "intent_greeting",
+   "language": "en",
+   "elapsed_ms": 23983,
+   "choices": [],
+   "message": "Hi, I'm the TownPass assistant. I can find a service and open its page for you. Tell me what you need, or ask \"what can you do\"."
+  },
+  "verdict": "PASS",
+  "note": "English greeting; 'Hi there!' missed the GREETING fullmatch regex so it cost a model call via intent_fallback (24 s) instead of the instant template."
+ },
+ {
+  "id": "lang_en_ja-en-02",
+  "category": "I02-capabilities",
+  "language": "en",
+  "input": "What can you help me with?",
+  "session": "s-en-02",
+  "expected": "capability list in English",
+  "observed": {
+   "kind": "capability_list",
+   "action": null,
+   "destination": null,
+   "route": "listing",
+   "language": "en",
+   "elapsed_ms": 1,
+   "choices": [
+    "Home",
+    "All services",
+    "Deals",
+    "Bills",
+    "Account",
+    "Settings",
+    "Personal details",
+    "App start page"
+   ],
+   "message": "Services I can open:\n• Home\n• All services\n• Deals\n• Bills\n• Account\n• Settings\n• Personal details\n• App start page\nSay \"next page\" to see more."
+  },
+  "verdict": "CONCERN",
+  "note": "English list, but the first page is generic app pages (Home, All services, Deals, Bills, Account, Settings...) rather than the city services a newcomer wants (fees, library, police)."
+ },
+ {
+  "id": "lang_en_ja-en-03",
+  "category": "I03-borrow-book",
+  "language": "en",
+  "input": "I'd like to borrow a book from the library",
+  "session": "s-en-03",
+  "expected": "navigate library home",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "library"
+   },
+   "route": "capability_model",
+   "language": "en",
+   "elapsed_ms": 24654,
+   "choices": [],
+   "message": "Please continue on the \"Library\" page. It is a demo; nothing is submitted or paid. (The page is translated on your phone; some names may differ from the Chinese original.)"
+  },
+  "verdict": "PASS",
+  "note": "Library capability page (equivalent of library home)."
+ },
+ {
+  "id": "lang_en_ja-en-04",
+  "category": "I04-borrow-title",
+  "language": "en",
+  "input": "Can I borrow The Underlying Logic?",
+  "session": "s-en-04r",
+  "expected": "detail lib-book-3",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "no_match",
+   "language": "en",
+   "elapsed_ms": 40869,
+   "choices": [],
+   "message": "I'm not sure what you need yet. I can find services and open their pages; you can also ask \"what can you do\"."
+  },
+  "verdict": "FAIL",
+  "note": "Re-run after the 22:01 FAQ fix, same result. 'borrow The Underlying Logic' matched no keyword ('borrow a book'/'borrow books' need those exact words) -> no_match; and the non-zh path never opens book detail at all (workflow.py:425-430 'book titles are Chinese, so a library request opens the library itself'), so lib-book-3 is unreachable in English."
+ },
+ {
+  "id": "lang_en_ja-en-05",
+  "category": "I04-borrow-title",
+  "language": "en",
+  "input": "I want to borrow The Winners by Fredrik Backman",
+  "session": "s-en-05r",
+  "expected": "detail lib-book-4",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "no_match",
+   "language": "en",
+   "elapsed_ms": 37863,
+   "choices": [],
+   "message": "I'm not sure what you need yet. I can find services and open their pages; you can also ask \"what can you do\"."
+  },
+  "verdict": "FAIL",
+  "note": "Re-run after 22:01, same. Even the English-titled demo book (lib-book-4 The Winners) -> no_match. Non-zh path has no book retrieval (_handle_language only calls registry.search_language)."
+ },
+ {
+  "id": "lang_en_ja-en-06",
+  "category": "I05-records",
+  "language": "en",
+  "input": "When do I have to return my library books?",
+  "session": "s-en-06",
+  "expected": "library.records",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "en",
+   "elapsed_ms": 40257,
+   "choices": [],
+   "message": "Which service or task do you mean? You can also ask \"what can you do\"."
+  },
+  "verdict": "FAIL",
+  "note": "'return my library books' -> clarify. Keywords are 'return date'/'due date'/'books i borrowed'; text matches only library-level words, model asked to clarify instead of library.records."
+ },
+ {
+  "id": "lang_en_ja-en-07",
+  "category": "I06-water",
+  "language": "en",
+  "input": "How do I pay my 水費?",
+  "session": "s-en-07",
+  "expected": "fees.water",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "fees.water"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 35107,
+   "choices": [],
+   "message": "請在原本的「水費」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "FAIL",
+  "note": "Right page (fees.water) but reply in CHINESE, language=zh: detect_text_language checks Han characters before Latin (i18n.py:28-34), so any English sentence with one Chinese service name is treated as Chinese. App sends no language for typed text (lib/service/assistant_service.dart:108). Verified (en-24): same text with language=en gives English."
+ },
+ {
+  "id": "lang_en_ja-en-08",
+  "category": "I07-parking",
+  "language": "en",
+  "input": "I got a parking ticket on my scooter, where can I pay it?",
+  "session": "s-en-08r",
+  "expected": "fees.parking",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "no_match",
+   "language": "en",
+   "elapsed_ms": 41756,
+   "choices": [],
+   "message": "I'm not sure what you need yet. I can find services and open their pages; you can also ask \"what can you do\"."
+  },
+  "verdict": "FAIL",
+  "note": "Re-run after 22:01, same. 'parking ticket ... pay it' -> no_match: en keywords are only 'parking fee(s)', 'pay for parking', 'street parking'; no 'parking ticket' or bare 'parking'."
+ },
+ {
+  "id": "lang_en_ja-en-09",
+  "category": "I08-police",
+  "language": "en",
+  "input": "Someone stole my bike, I want to report it to the police online",
+  "session": "s-en-09",
+  "expected": "police.online",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "police"
+   },
+   "route": "capability_model",
+   "language": "en",
+   "elapsed_ms": 36105,
+   "choices": [],
+   "message": "Please continue on the \"Police services\" page. It is a demo; nothing is submitted or paid. (The page is translated on your phone; some names may differ from the Chinese original.)"
+  },
+  "verdict": "PASS",
+  "note": "police (parent) opened; acceptable per brief, though police.online would be better ('report it to the police online' does not contain 'report online' contiguously)."
+ },
+ {
+  "id": "lang_en_ja-en-10",
+  "category": "I09-queue",
+  "language": "en",
+  "input": "I need to take a number for the 戶政事務所 counter",
+  "session": "s-en-10",
+  "expected": "reservation (ideally c-2-x)",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "book_confirm",
+   "language": "zh",
+   "elapsed_ms": 37009,
+   "choices": [],
+   "message": "請再描述想找的書，或查看圖書總覽。"
+  },
+  "verdict": "FAIL",
+  "note": "Mixed '戶政事務所' -> language zh -> Chinese path -> book_confirm route with Chinese reply '請再描述想找的書' (library book clarification). Wrong language and wrong domain; reservation expected. Cause: Han-first language detection; then the Chinese retrieval apparently treats the English words as a book query (guess)."
+ },
+ {
+  "id": "lang_en_ja-en-11",
+  "category": "I10-disaster",
+  "language": "en",
+  "input": "There's a broken street light outside my apartment",
+  "session": "s-en-11",
+  "expected": "disasterReport.form.D-1-3",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "disasterReport.form.D-1-3"
+   },
+   "route": "capability_model",
+   "language": "en",
+   "elapsed_ms": 42125,
+   "choices": [],
+   "message": "Please continue on the \"Broken street light\" page. It is a demo; nothing is submitted or paid. (The page is translated on your phone; some names may differ from the Chinese original.)"
+  },
+  "verdict": "PASS",
+  "note": "disasterReport.form.D-1-3 Broken street light, English."
+ },
+ {
+  "id": "lang_en_ja-en-12",
+  "category": "I10-disaster",
+  "language": "en",
+  "input": "A tree fell down and is blocking the road after the typhoon",
+  "session": "s-en-12r",
+  "expected": "disasterReport",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "no_match",
+   "language": "en",
+   "elapsed_ms": 37137,
+   "choices": [],
+   "message": "I'm not sure what you need yet. I can find services and open their pages; you can also ask \"what can you do\"."
+  },
+  "verdict": "FAIL",
+  "note": "Re-run after 22:01, same. 'A tree fell down' -> no_match; only keyword is 'fallen tree'."
+ },
+ {
+  "id": "lang_en_ja-en-13",
+  "category": "I11-faq-lowincome",
+  "language": "en",
+  "input": "How do I apply for low-income household status in Taipei?",
+  "session": "s-en-13",
+  "expected": "FAQ answer/choices about 低收入戶 application",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "en",
+   "elapsed_ms": 47069,
+   "choices": [],
+   "message": "Which service or task do you mean? You can also ask \"what can you do\"."
+  },
+  "verdict": "FAIL",
+  "note": "Low-income FAQ in English -> clarify. FAQ layer is never consulted for non-zh: workflow.py:655 `if name == 'city_question' and language == 'zh'`; _handle_language ends in clarify/no_match without _faq. (Ran after 22:01, so not the embedding outage.)"
+ },
+ {
+  "id": "lang_en_ja-en-14",
+  "category": "I12-faq-vision",
+  "language": "en",
+  "input": "Is the vision check for preschool kids free?",
+  "session": "s-en-14",
+  "expected": "FAQ about 學齡前兒童視力篩檢 free",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "no_match",
+   "language": "en",
+   "elapsed_ms": 49039,
+   "choices": [],
+   "message": "I'm not sure what you need yet. I can find services and open their pages; you can also ask \"what can you do\"."
+  },
+  "verdict": "FAIL",
+  "note": "Vision-check FAQ -> generic no_match (same zh-only FAQ gate). No hint that FAQ content exists in Chinese."
+ },
+ {
+  "id": "lang_en_ja-en-15",
+  "category": "I13-unsupported",
+  "language": "en",
+  "input": "Can you book me an appointment at the city hospital?",
+  "session": "s-en-15",
+  "expected": "unsupported medicalAppointment explanation, no navigation",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "no_match",
+   "language": "en",
+   "elapsed_ms": 41151,
+   "choices": [],
+   "message": "I'm not sure what you need yet. I can find services and open their pages; you can also ask \"what can you do\"."
+  },
+  "verdict": "FAIL",
+  "note": "'book me an appointment at the city hospital' -> no_match, not the honest 'not connected' explanation. en keywords 'doctor appointment', 'hospital registration', 'see a doctor' do not match."
+ },
+ {
+  "id": "lang_en_ja-en-16",
+  "category": "I14-out-of-scope",
+  "language": "en",
+  "input": "What's the weather like in Taipei today?",
+  "session": "s-en-16",
+  "expected": "no_related, no navigation",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "no_match",
+   "language": "en",
+   "elapsed_ms": 49122,
+   "choices": [],
+   "message": "I'm not sure what you need yet. I can find services and open their pages; you can also ask \"what can you do\"."
+  },
+  "verdict": "PASS",
+  "note": "Weather: no navigation, generic not-sure reply in English (action null rather than no_related; acceptable)."
+ },
+ {
+  "id": "lang_en_ja-en-17",
+  "category": "I14-out-of-scope",
+  "language": "en",
+  "input": "Give me a recipe for beef noodle soup",
+  "session": "s-en-17",
+  "expected": "no_related",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "no_match",
+   "language": "en",
+   "elapsed_ms": 37398,
+   "choices": [],
+   "message": "I'm not sure what you need yet. I can find services and open their pages; you can also ask \"what can you do\"."
+  },
+  "verdict": "PASS",
+  "note": "Recipe: nothing related, English."
+ },
+ {
+  "id": "lang_en_ja-en-18",
+  "category": "I15-cancel",
+  "language": "en",
+  "input": "Never mind, forget it",
+  "session": "s-en-18",
+  "expected": "cancelled, no navigation",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "no_match",
+   "language": "en",
+   "elapsed_ms": 30555,
+   "choices": [],
+   "message": "I'm not sure what you need yet. I can find services and open their pages; you can also ask \"what can you do\"."
+  },
+  "verdict": "FAIL",
+  "note": "'Never mind, forget it' -> no_match instead of cancel. CANCEL is a fullmatch regex (i18n.py:62, matches() at :118) allowing a single phrase; two phrases with a comma fail. No navigation, but user hears 'I'm not sure what you need'."
+ },
+ {
+  "id": "lang_en_ja-en-19",
+  "category": "X-short",
+  "language": "en",
+  "input": "water bill",
+  "session": "s-en-19",
+  "expected": "fees.water",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "fees.water"
+   },
+   "route": "capability_model",
+   "language": "en",
+   "elapsed_ms": 32452,
+   "choices": [],
+   "message": "Please continue on the \"Water bill\" page. It is a demo; nothing is submitted or paid. (The page is translated on your phone; some names may differ from the Chinese original.)"
+  },
+  "verdict": "PASS",
+  "note": "'water bill' -> fees.water, English."
+ },
+ {
+  "id": "lang_en_ja-en-20",
+  "category": "X-typo",
+  "language": "en",
+  "input": "how to pay parkng fee",
+  "session": "s-en-20",
+  "expected": "fees.parking",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "fees.parking"
+   },
+   "route": "capability_model",
+   "language": "en",
+   "elapsed_ms": 30274,
+   "choices": [],
+   "message": "Please continue on the \"Parking fees\" page. It is a demo; nothing is submitted or paid. (The page is translated on your phone; some names may differ from the Chinese original.)"
+  },
+  "verdict": "PASS",
+  "note": "Typo 'parkng fee' -> fees.parking (similar-wording match)."
+ },
+ {
+  "id": "lang_en_ja-en-21",
+  "category": "X-polite",
+  "language": "en",
+  "input": "Hello, sorry to bother you, I'm new to Taipei and I was wondering if you could possibly tell me where I might be able to check which library books I've borrowed?",
+  "session": "s-en-21",
+  "expected": "library.records",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "library"
+   },
+   "route": "capability_model",
+   "language": "en",
+   "elapsed_ms": 25923,
+   "choices": [],
+   "message": "Please continue on the \"Library\" page. It is a demo; nothing is submitted or paid. (The page is translated on your phone; some names may differ from the Chinese original.)"
+  },
+  "verdict": "FAIL",
+  "note": "Polite long request for 'which library books I've borrowed' -> library home, not library.records (keyword 'books i borrowed' vs \"books I've borrowed\")."
+ },
+ {
+  "id": "lang_en_ja-en-22",
+  "category": "X-typo",
+  "language": "en",
+  "input": "repot a crime",
+  "session": "s-en-22",
+  "expected": "police.online",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "no_match",
+   "language": "en",
+   "elapsed_ms": 52818,
+   "choices": [],
+   "message": "I'm not sure what you need yet. I can find services and open their pages; you can also ask \"what can you do\"."
+  },
+  "verdict": "FAIL",
+  "note": "Typo 'repot a crime' -> no_match; 'crime' is not an English keyword anywhere."
+ },
+ {
+  "id": "lang_en_ja-ja-01",
+  "category": "I01-greeting",
+  "language": "ja",
+  "input": "こんにちは",
+  "session": "s-ja-01",
+  "expected": "greeting in Japanese",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "greeting",
+   "language": "ja",
+   "elapsed_ms": 2,
+   "choices": [],
+   "message": "こんにちは、TownPass アシスタントです。サービスを探してページを開くことができます。やりたいことを話すか、「何ができる？」と聞いてください。"
+  },
+  "verdict": "PASS",
+  "note": "Japanese greeting template."
+ },
+ {
+  "id": "lang_en_ja-ja-02",
+  "category": "I02-capabilities",
+  "language": "ja",
+  "input": "何ができますか？",
+  "session": "s-ja-02",
+  "expected": "capability list in Japanese",
+  "observed": {
+   "kind": "capability_list",
+   "action": null,
+   "destination": null,
+   "route": "listing",
+   "language": "ja",
+   "elapsed_ms": 1,
+   "choices": [
+    "ホーム",
+    "サービス一覧",
+    "特典",
+    "請求",
+    "アカウント",
+    "設定",
+    "基本情報",
+    "起動ページ"
+   ],
+   "message": "アシスタントが開けるサービス:\n• ホーム\n• サービス一覧\n• 特典\n• 請求\n• アカウント\n• 設定\n• 基本情報\n• 起動ページ\n「次のページ」で続きを表示します。"
+  },
+  "verdict": "CONCERN",
+  "note": "Japanese list; same generic first page as en-02."
+ },
+ {
+  "id": "lang_en_ja-ja-03",
+  "category": "I03-borrow-book",
+  "language": "ja",
+  "input": "図書館で本を借りたいです",
+  "session": "s-ja-03",
+  "expected": "library home",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "library"
+   },
+   "route": "capability_model",
+   "language": "ja",
+   "elapsed_ms": 17703,
+   "choices": [],
+   "message": "「図書貸出」のページで続けてください。デモのため、送信や支払いは行われません。 （ページはスマートフォン上で翻訳されます。名称が中国語の原文と異なる場合があります。）"
+  },
+  "verdict": "PASS",
+  "note": "Library page, Japanese."
+ },
+ {
+  "id": "lang_en_ja-ja-04",
+  "category": "I04-borrow-title",
+  "language": "ja",
+  "input": "「底層邏輯」を借りたいんですが",
+  "session": "s-ja-04",
+  "expected": "detail lib-book-3",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "ja",
+   "elapsed_ms": 25923,
+   "choices": [],
+   "message": "どのサービスや手続きですか？「何ができる？」と聞くこともできます。"
+  },
+  "verdict": "FAIL",
+  "note": "「底層邏輯」を借りたい -> clarify in Japanese; the non-zh path cannot open book detail even with the exact Chinese title (workflow.py:425-430)."
+ },
+ {
+  "id": "lang_en_ja-ja-05",
+  "category": "I05-records",
+  "language": "ja",
+  "input": "借りている本の返却期限を確認したい",
+  "session": "s-ja-05",
+  "expected": "library.records",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "library"
+   },
+   "route": "capability_model",
+   "language": "ja",
+   "elapsed_ms": 32781,
+   "choices": [],
+   "message": "「図書貸出」のページで続けてください。デモのため、送信や支払いは行われません。 （ページはスマートフォン上で翻訳されます。名称が中国語の原文と異なる場合があります。）"
+  },
+  "verdict": "FAIL",
+  "note": "返却期限 -> library home, not library.records (ja keywords only 貸出履歴/借りた本/返却日)."
+ },
+ {
+  "id": "lang_en_ja-ja-06",
+  "category": "I06-water",
+  "language": "ja",
+  "input": "水道代はどうやって払えばいいですか",
+  "session": "s-ja-06",
+  "expected": "fees.water",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "fees.water"
+   },
+   "route": "capability_model",
+   "language": "ja",
+   "elapsed_ms": 33903,
+   "choices": [],
+   "message": "「水道料金」のページで続けてください。デモのため、送信や支払いは行われません。 （ページはスマートフォン上で翻訳されます。名称が中国語の原文と異なる場合があります。）"
+  },
+  "verdict": "PASS",
+  "note": "fees.water, Japanese."
+ },
+ {
+  "id": "lang_en_ja-ja-07",
+  "category": "I07-parking",
+  "language": "ja",
+  "input": "駐車料金を払いたい",
+  "session": "s-ja-07",
+  "expected": "fees.parking",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "fees.parking"
+   },
+   "route": "capability_model",
+   "language": "ja",
+   "elapsed_ms": 33850,
+   "choices": [],
+   "message": "「駐車料金」のページで続けてください。デモのため、送信や支払いは行われません。 （ページはスマートフォン上で翻訳されます。名称が中国語の原文と異なる場合があります。）"
+  },
+  "verdict": "PASS",
+  "note": "fees.parking, Japanese."
+ },
+ {
+  "id": "lang_en_ja-ja-08",
+  "category": "I08-police",
+  "language": "ja",
+  "input": "財布を盗まれたので、ネットで警察に届けを出したいです",
+  "session": "s-ja-08",
+  "expected": "police.online",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "police"
+   },
+   "route": "capability_model",
+   "language": "ja",
+   "elapsed_ms": 37553,
+   "choices": [],
+   "message": "「警察サービス」のページで続けてください。デモのため、送信や支払いは行われません。 （ページはスマートフォン上で翻訳されます。名称が中国語の原文と異なる場合があります。）"
+  },
+  "verdict": "PASS",
+  "note": "police (parent) opened; acceptable. police.online ja keyword is 'ネットで被害届'; text said 'ネットで警察に届け'."
+ },
+ {
+  "id": "lang_en_ja-ja-09",
+  "category": "I09-queue",
+  "language": "ja",
+  "input": "区役所の窓口の整理券を取りたい",
+  "session": "s-ja-09",
+  "expected": "reservation (ideally c-3-x)",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "reservation"
+   },
+   "route": "capability_model",
+   "language": "ja",
+   "elapsed_ms": 27822,
+   "choices": [],
+   "message": "「窓口の番号札」のページで続けてください。デモのため、送信や支払いは行われません。 （ページはスマートフォン上で翻訳されます。名称が中国語の原文と異なる場合があります。）"
+  },
+  "verdict": "PASS",
+  "note": "reservation, Japanese."
+ },
+ {
+  "id": "lang_en_ja-ja-10",
+  "category": "I10-disaster",
+  "language": "ja",
+  "input": "家の前の街灯が壊れています",
+  "session": "s-ja-10",
+  "expected": "disasterReport.form.D-1-3",
+  "observed": {
+   "kind": "unsupported",
+   "action": null,
+   "destination": null,
+   "route": "unavailable_direct",
+   "language": "ja",
+   "elapsed_ms": 71,
+   "choices": [],
+   "message": "陳情フォームの事前入力：このサービスはまだアプリで利用できません。"
+  },
+  "verdict": "FAIL",
+  "note": "家の前の街灯が壊れています -> UNSUPPORTED '陳情フォームの事前入力' (reportIssue.prefill, off). The ja keyword '街灯' belongs to reportIssue.prefill; D-1-3's ja keyword is only '街灯の故障'. A single off match short-circuits to unsupported with no model call (workflow.py:471-473 unavailable_direct). User is told it is unavailable although the street-light form exists."
+ },
+ {
+  "id": "lang_en_ja-ja-11",
+  "category": "I11-faq-lowincome",
+  "language": "ja",
+  "input": "台北市で低所得世帯の申請はどうすればいいですか",
+  "session": "s-ja-11",
+  "expected": "FAQ 低收入戶",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "ja",
+   "elapsed_ms": 39044,
+   "choices": [],
+   "message": "どのサービスや手続きですか？「何ができる？」と聞くこともできます。"
+  },
+  "verdict": "FAIL",
+  "note": "低所得世帯の申請 -> clarify; zh-only FAQ gate (workflow.py:655)."
+ },
+ {
+  "id": "lang_en_ja-ja-12",
+  "category": "I12-faq-vision",
+  "language": "ja",
+  "input": "未就学児の視力検査は無料ですか？",
+  "session": "s-ja-12",
+  "expected": "FAQ vision check",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "no_match",
+   "language": "ja",
+   "elapsed_ms": 36738,
+   "choices": [],
+   "message": "ご用件がまだよくわかりません。サービスを探してページを開けます。「何ができる？」と聞くこともできます。"
+  },
+  "verdict": "FAIL",
+  "note": "未就学児の視力検査 -> no_match; zh-only FAQ gate."
+ },
+ {
+  "id": "lang_en_ja-ja-13",
+  "category": "I13-unsupported",
+  "language": "ja",
+  "input": "聯醫で診察の予約をしたいです",
+  "session": "s-ja-13",
+  "expected": "unsupported explanation",
+  "observed": {
+   "kind": "unsupported",
+   "action": null,
+   "destination": null,
+   "route": "unavailable_direct",
+   "language": "ja",
+   "elapsed_ms": 39,
+   "choices": [],
+   "message": "市立病院の受診予約：このサービスはまだアプリで利用できません。"
+  },
+  "verdict": "PASS",
+  "note": "聯醫で診察の予約 -> honest unsupported in Japanese, no navigation (terse; no alternative suggested)."
+ },
+ {
+  "id": "lang_en_ja-ja-14",
+  "category": "I14-out-of-scope",
+  "language": "ja",
+  "input": "今日の天気は？",
+  "session": "s-ja-14",
+  "expected": "no_related",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "no_match",
+   "language": "ja",
+   "elapsed_ms": 37701,
+   "choices": [],
+   "message": "ご用件がまだよくわかりません。サービスを探してページを開けます。「何ができる？」と聞くこともできます。"
+  },
+  "verdict": "PASS",
+  "note": "Weather: no navigation, Japanese generic reply."
+ },
+ {
+  "id": "lang_en_ja-ja-15",
+  "category": "I15-cancel",
+  "language": "ja",
+  "input": "やっぱりいいです、キャンセルで",
+  "session": "s-ja-15",
+  "expected": "cancelled",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "no_match",
+   "language": "ja",
+   "elapsed_ms": 38400,
+   "choices": [],
+   "message": "ご用件がまだよくわかりません。サービスを探してページを開けます。「何ができる？」と聞くこともできます。"
+  },
+  "verdict": "FAIL",
+  "note": "やっぱりいいです、キャンセルで -> no_match instead of cancel; CANCEL fullmatch requires the bare word (i18n.py:63)."
+ },
+ {
+  "id": "lang_en_ja-ja-16",
+  "category": "X-short",
+  "language": "ja",
+  "input": "水道代",
+  "session": "s-ja-16",
+  "expected": "fees.water",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "elapsed_ms": 35618,
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。"
+  },
+  "verdict": "FAIL",
+  "note": "水道代 (kanji only, itself a ja keyword of fees.water) -> detected zh (no kana, i18n.py:28-34) -> Chinese no_related reply."
+ },
+ {
+  "id": "lang_en_ja-ja-17",
+  "category": "X-polite",
+  "language": "ja",
+  "input": "すみません、お忙しいところ恐縮ですが、台風で倒れた木が道をふさいでいるので、どこに連絡すればよいか教えていただけますでしょうか",
+  "session": "s-ja-17",
+  "expected": "disasterReport",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "no_match",
+   "language": "ja",
+   "elapsed_ms": 38552,
+   "choices": [],
+   "message": "ご用件がまだよくわかりません。サービスを探してページを開けます。「何ができる？」と聞くこともできます。"
+  },
+  "verdict": "FAIL",
+  "note": "Polite: 台風で倒れた木が道をふさいでいる -> no_match; keyword is '倒木' only."
+ },
+ {
+  "id": "lang_en_ja-ja-18",
+  "category": "X-mixed",
+  "language": "ja",
+  "input": "地方税の支払い方法を知りたい",
+  "session": "s-ja-18",
+  "expected": "fees.tax",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "fees.tax"
+   },
+   "route": "capability_model",
+   "language": "ja",
+   "elapsed_ms": 33135,
+   "choices": [],
+   "message": "「地方税」のページで続けてください。デモのため、送信や支払いは行われません。 （ページはスマートフォン上で翻訳されます。名称が中国語の原文と異なる場合があります。）"
+  },
+  "verdict": "PASS",
+  "note": "地方税 -> fees.tax, Japanese."
+ },
+ {
+  "id": "lang_en_ja-ja-19",
+  "category": "X-short",
+  "language": "ja",
+  "input": "図書",
+  "session": "s-ja-19",
+  "expected": "library or clarification",
+  "observed": {
+   "kind": "reply",
+   "action": "request_clarification",
+   "destination": null,
+   "route": "library_model",
+   "language": "zh",
+   "elapsed_ms": 48288,
+   "choices": [],
+   "message": "你想先使用哪個服務？可以描述想做的事，或問「有哪些功能」。"
+  },
+  "verdict": "FAIL",
+  "note": "図書 (kanji only) -> zh -> Chinese clarification '你想先使用哪個服務？'. Wrong language."
+ },
+ {
+  "id": "lang_en_ja-en-23",
+  "category": "X-vague",
+  "language": "en",
+  "input": "I want to pay a bill",
+  "session": "s-en-23",
+  "expected": "bills overview or fee choices",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "app.bills"
+   },
+   "route": "capability_model",
+   "language": "en"
+  },
+  "verdict": "PASS",
+  "note": "Bills overview, English."
+ },
+ {
+  "id": "lang_en_ja-en-24",
+  "category": "I06-water (raw, language=en)",
+  "language": "en",
+  "input": "How do I pay my 水費? [curl with language:en]",
+  "session": "s-en-24",
+  "expected": "fees.water in English",
+  "observed": {
+   "kind": "navigate",
+   "destination": {
+    "kind": "capability",
+    "id": "fees.water"
+   },
+   "language": "en"
+  },
+  "verdict": "PASS",
+  "note": "Control for en-07: with an explicit language the reply is English; the fault is the text detector."
+ },
+ {
+  "id": "lang_en_ja-en-25",
+  "category": "X-ambiguous",
+  "language": "en",
+  "input": "I want to report a problem to the police or the city",
+  "session": "s-en-25",
+  "expected": "confirm between police / reportIssue",
+  "observed": {
+   "kind": "navigate",
+   "destination": {
+    "kind": "capability",
+    "id": "reportIssue"
+   },
+   "route": "capability_model",
+   "language": "en"
+  },
+  "verdict": "CONCERN",
+  "note": "User named two options; model navigated directly to reportIssue instead of offering both."
+ },
+ {
+  "id": "lang_en_ja-ja-20",
+  "category": "X-choice",
+  "language": "ja",
+  "input": "何ができますか？ -> 2番目",
+  "session": "s-ja-20",
+  "expected": "select option 2 (サービス一覧)",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "route": "no_match",
+   "language": "zh",
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。..."
+  },
+  "verdict": "FAIL",
+  "note": "'2番目' has no kana -> detected zh -> Chinese path; pending choice dropped and Chinese no_related reply. A follow-up tap (--choice 3) then got HTTP 422 '候選已失效，請重新描述需求。' in Chinese (workflow.py:491; _select errors :404-421 are Chinese-only)."
+ },
+ {
+  "id": "lang_en_ja-ja-21",
+  "category": "X-choice",
+  "language": "ja",
+  "input": "何ができますか？ -> ２つ目をお願いします",
+  "session": "s-ja-21",
+  "expected": "select option 2",
+  "observed": {
+   "kind": "navigate",
+   "destination": {
+    "kind": "capability",
+    "id": "app.services"
+   },
+   "route": "pending",
+   "language": "ja"
+  },
+  "verdict": "PASS",
+  "note": "Number with kana works."
+ },
+ {
+  "id": "lang_en_ja-en-26",
+  "category": "X-choice-error",
+  "language": "en",
+  "input": "what can you do -> next page -> tap a choice on the old resolution",
+  "session": "s-en-26",
+  "expected": "error in English",
+  "observed": {
+   "status": 422,
+   "message": "候選已失效，請重新描述需求。"
+  },
+  "verdict": "CONCERN",
+  "note": "Stale-choice error is Chinese-only for an English session (App may show its own text; not verified). 'next page' itself worked in English."
+ },
+ {
+  "id": "lang_en_ja-en-27",
+  "category": "X-choice",
+  "language": "en",
+  "input": "what can you do -> number 4",
+  "session": "s-en-27",
+  "expected": "select option 4 (Bills)",
+  "observed": {
+   "kind": "navigate",
+   "destination": {
+    "kind": "capability",
+    "id": "app.bills"
+   },
+   "route": "pending",
+   "language": "en"
+  },
+  "verdict": "PASS",
+  "note": "English number selection works."
+ }
+]

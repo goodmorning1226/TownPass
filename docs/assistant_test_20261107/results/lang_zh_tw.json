@@ -1,0 +1,1236 @@
+[
+ {
+  "id": "lang_zh_tw-01",
+  "category": "I01-greeting",
+  "language": "zh-TW",
+  "input": "你好",
+  "session": "zhtw-s00",
+  "expected": "greeting reply",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "greeting",
+   "language": "zh",
+   "choices": [],
+   "elapsed_ms": 0,
+   "message": "嗨，我是 TownPass 助手，可以幫你找服務、開啟原頁面。你可以描述想做的事，或問「有哪些功能」。"
+  },
+  "verdict": "PASS",
+  "note": "greeting template"
+ },
+ {
+  "id": "lang_zh_tw-02",
+  "category": "I01-greeting",
+  "language": "nan-Han",
+  "input": "你好，食飽未？",
+  "session": "zhtw-s01-rr",
+  "expected": "greeting reply",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "choices": [],
+   "elapsed_ms": 28123,
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。"
+  },
+  "verdict": "CONCERN",
+  "note": "Common Taiwanese/elderly greeting 食飽未 → 'no related service or FAQ'. Greeting rule is a fullmatch on 嗨|你好|您好… (workflow.py:526); the intent-fallback model did not pick 'greeting'. Harmless but confusing. Re-run after 22:01 FAQ fix: same result."
+ },
+ {
+  "id": "lang_zh_tw-03",
+  "category": "I01-greeting",
+  "language": "nan-POJ",
+  "input": "Lí hó, tsia̍h-pá buē?",
+  "session": "zhtw-s02-rr",
+  "expected": "greeting reply",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "no_match",
+   "language": "vi",
+   "choices": [],
+   "elapsed_ms": 27506,
+   "message": "Tôi chưa rõ bạn cần gì. Tôi có thể tìm dịch vụ và mở trang; bạn cũng có thể hỏi \"bạn làm được gì\"."
+  },
+  "verdict": "FAIL",
+  "note": "POJ/Tâi-lô detected as Vietnamese (i18n.py:16 _VI regex matches á/à/ē/ô… tone marks, checked at i18n.py:35 before any Taiwanese handling); Vietnamese 'don't understand' reply, catalogue never consulted with Taiwanese words, no FAQ (workflow.py:655 FAQ only for zh). Re-run after 22:01: same."
+ },
+ {
+  "id": "lang_zh_tw-04",
+  "category": "I02-capabilities",
+  "language": "zh-TW",
+  "input": "你可以幫我做什麼？",
+  "session": "zhtw-s03",
+  "expected": "capability list",
+  "observed": {
+   "kind": "capability_list",
+   "action": null,
+   "destination": null,
+   "route": "listing_sound",
+   "language": "zh",
+   "choices": [
+    "首頁",
+    "服務總覽",
+    "優惠",
+    "帳務",
+    "帳號",
+    "設定",
+    "基本資料",
+    "App 起始頁面"
+   ],
+   "elapsed_ms": 565,
+   "message": "目前助理可以開啟的功能：\n• 首頁\n• 服務總覽\n• 優惠\n• 帳務\n• 帳號\n• 設定\n• 基本資料\n• App 起始頁面\n可輸入「下一頁」繼續查看。"
+  },
+  "verdict": "PASS",
+  "note": "capability list via listing_sound"
+ },
+ {
+  "id": "lang_zh_tw-05",
+  "category": "I02-capabilities",
+  "language": "nan-Han",
+  "input": "你會曉做啥物？",
+  "session": "zhtw-s04-rr",
+  "expected": "capability list",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "choices": [],
+   "elapsed_ms": 26825,
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。"
+  },
+  "verdict": "FAIL",
+  "note": "會曉/啥物 not in listing regex (workflow.py:529-531) and not close enough to LISTING_PHRASES_ZH by Mandarin syllables; intent-fallback model did not choose list_capabilities → 'nothing found'. Re-run after 22:01: same."
+ },
+ {
+  "id": "lang_zh_tw-06",
+  "category": "I02-capabilities",
+  "language": "nan-POJ",
+  "input": "Lí ē-hiáu tsò siánn-mih?",
+  "session": "zhtw-s05-rr",
+  "expected": "capability list",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "no_match",
+   "language": "vi",
+   "choices": [],
+   "elapsed_ms": 33385,
+   "message": "Tôi chưa rõ bạn cần gì. Tôi có thể tìm dịch vụ và mở trang; bạn cũng có thể hỏi \"bạn làm được gì\"."
+  },
+  "verdict": "FAIL",
+  "note": "POJ/Tâi-lô detected as Vietnamese (i18n.py:16 _VI regex matches á/à/ē/ô… tone marks, checked at i18n.py:35 before any Taiwanese handling); Vietnamese 'don't understand' reply, catalogue never consulted with Taiwanese words, no FAQ (workflow.py:655 FAQ only for zh). Re-run after 22:01: same."
+ },
+ {
+  "id": "lang_zh_tw-07",
+  "category": "I03-borrow-book",
+  "language": "zh-TW",
+  "input": "我想借書",
+  "session": "zhtw-s06",
+  "expected": "library home",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_library",
+   "destination": {
+    "kind": "home"
+   },
+   "route": "library_model",
+   "language": "zh",
+   "choices": [],
+   "elapsed_ms": 33410,
+   "message": "請在圖書借閱頁搜尋想看的書。這裡使用示範資料。"
+  },
+  "verdict": "PASS",
+  "note": "library home"
+ },
+ {
+  "id": "lang_zh_tw-08",
+  "category": "I03-borrow-book",
+  "language": "nan-Han",
+  "input": "我欲借冊",
+  "session": "zhtw-s07-rr",
+  "expected": "library home",
+  "observed": {
+   "kind": "reply",
+   "action": "request_clarification",
+   "destination": null,
+   "route": "library_model",
+   "language": "zh",
+   "choices": [],
+   "elapsed_ms": 21093,
+   "message": "你想先使用哪個服務？可以描述想做的事，或問「有哪些功能」。"
+  },
+  "verdict": "FAIL",
+  "note": "Taiwanese 冊 (book) is not in any library vocabulary (LIBRARY_WORDS server.py:122 has 借書/的書/這本書; library keywords 借書/圖書…), so the library model got weak evidence and asked to clarify. Re-run after 22:01: same."
+ },
+ {
+  "id": "lang_zh_tw-09",
+  "category": "I03-borrow-book",
+  "language": "nan-POJ",
+  "input": "Guá beh tsioh tsheh.",
+  "session": "zhtw-s08-rr",
+  "expected": "library home",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "no_match",
+   "language": "vi",
+   "choices": [],
+   "elapsed_ms": 21004,
+   "message": "Tôi chưa rõ bạn cần gì. Tôi có thể tìm dịch vụ và mở trang; bạn cũng có thể hỏi \"bạn làm được gì\"."
+  },
+  "verdict": "FAIL",
+  "note": "POJ/Tâi-lô detected as Vietnamese (i18n.py:16 _VI regex matches á/à/ē/ô… tone marks, checked at i18n.py:35 before any Taiwanese handling); Vietnamese 'don't understand' reply, catalogue never consulted with Taiwanese words, no FAQ (workflow.py:655 FAQ only for zh). Re-run after 22:01: same."
+ },
+ {
+  "id": "lang_zh_tw-10",
+  "category": "I04-borrow-title",
+  "language": "zh-TW",
+  "input": "我要借《底層邏輯》這本書",
+  "session": "zhtw-s09",
+  "expected": "detail lib-book-3",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_library_book",
+   "destination": {
+    "kind": "detail",
+    "book_id": "lib-book-3"
+   },
+   "route": "library_model",
+   "language": "zh",
+   "choices": [],
+   "elapsed_ms": 41348,
+   "message": "請查看《底層邏輯 : 看清這個世界的底牌 = The underlying logic : how to see the essence of things》的館藏與冊次；如可預約，選取書館後再按頁面按鈕。此為示範，尚未預約。"
+  },
+  "verdict": "PASS",
+  "note": "detail lib-book-3"
+ },
+ {
+  "id": "lang_zh_tw-11",
+  "category": "I04-borrow-title",
+  "language": "nan-Han",
+  "input": "我欲借底層邏輯這本冊",
+  "session": "zhtw-s10",
+  "expected": "detail lib-book-3",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_library_book",
+   "destination": {
+    "kind": "detail",
+    "book_id": "lib-book-3"
+   },
+   "route": "library_model",
+   "language": "zh",
+   "choices": [],
+   "elapsed_ms": 48795,
+   "message": "請查看《底層邏輯 : 看清這個世界的底牌 = The underlying logic : how to see the essence of things》的館藏與冊次；如可預約，選取書館後再按頁面按鈕。此為示範，尚未預約。"
+  },
+  "verdict": "PASS",
+  "note": "detail lib-book-3 (title match carried it despite 冊)"
+ },
+ {
+  "id": "lang_zh_tw-12",
+  "category": "I04-borrow-title",
+  "language": "nan-POJ",
+  "input": "Guá beh tsioh 「底層邏輯」 tsit pún tsheh.",
+  "session": "zhtw-s11",
+  "expected": "detail lib-book-3",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_library_book",
+   "destination": {
+    "kind": "detail",
+    "book_id": "lib-book-3"
+   },
+   "route": "library_model",
+   "language": "zh",
+   "choices": [],
+   "elapsed_ms": 47211,
+   "message": "請查看《底層邏輯 : 看清這個世界的底牌 = The underlying logic : how to see the essence of things》的館藏與冊次；如可預約，選取書館後再按頁面按鈕。此為示範，尚未預約。"
+  },
+  "verdict": "PASS",
+  "note": "Mixed POJ + Han title: Han characters make detector return zh, title matched."
+ },
+ {
+  "id": "lang_zh_tw-13",
+  "category": "I05-records",
+  "language": "zh-TW",
+  "input": "我借的書什麼時候要還？",
+  "session": "zhtw-s12",
+  "expected": "library.records",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "library.records"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "elapsed_ms": 46149,
+   "message": "請在原本的「我的借閱紀錄」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "library.records"
+ },
+ {
+  "id": "lang_zh_tw-14",
+  "category": "I05-records",
+  "language": "nan-Han",
+  "input": "我借的冊當時愛還？",
+  "session": "zhtw-s13",
+  "expected": "library.records",
+  "observed": {
+   "kind": "reply",
+   "action": "request_clarification",
+   "destination": null,
+   "route": "library_model",
+   "language": "zh",
+   "choices": [],
+   "elapsed_ms": 49657,
+   "message": "你想先使用哪個服務？可以描述想做的事，或問「有哪些功能」。"
+  },
+  "verdict": "FAIL",
+  "note": "借的冊 / 當時愛還 match none of library.records keywords (借的書, 還書, 還書日期) — pure substring matching (registry.py:151)."
+ },
+ {
+  "id": "lang_zh_tw-15",
+  "category": "I05-records",
+  "language": "nan-POJ",
+  "input": "Guá tsioh ê tsheh tang-sî ài hîng?",
+  "session": "zhtw-s14",
+  "expected": "library.records",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "no_match",
+   "language": "vi",
+   "choices": [],
+   "elapsed_ms": 44875,
+   "message": "Tôi chưa rõ bạn cần gì. Tôi có thể tìm dịch vụ và mở trang; bạn cũng có thể hỏi \"bạn làm được gì\"."
+  },
+  "verdict": "FAIL",
+  "note": "POJ/Tâi-lô detected as Vietnamese (i18n.py:16 _VI regex matches á/à/ē/ô… tone marks, checked at i18n.py:35 before any Taiwanese handling); Vietnamese 'don't understand' reply, catalogue never consulted with Taiwanese words, no FAQ (workflow.py:655 FAQ only for zh)."
+ },
+ {
+  "id": "lang_zh_tw-16",
+  "category": "I06-water-bill",
+  "language": "zh-TW",
+  "input": "我要繳水費",
+  "session": "zhtw-s15",
+  "expected": "fees.water",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "fees.water"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "elapsed_ms": 27007,
+   "message": "請在原本的「水費」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "lang_zh_tw-17",
+  "category": "I06-water-bill",
+  "language": "nan-Han",
+  "input": "阮欲納水費",
+  "session": "zhtw-s16",
+  "expected": "fees.water",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "fees.water"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "elapsed_ms": 34328,
+   "message": "請在原本的「水費」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "納 accepted because 水費 keyword is present"
+ },
+ {
+  "id": "lang_zh_tw-18",
+  "category": "I06-water-bill",
+  "language": "nan-POJ",
+  "input": "Guán beh la̍p tsuí-huì.",
+  "session": "zhtw-s17",
+  "expected": "fees.water",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "no_match",
+   "language": "vi",
+   "choices": [],
+   "elapsed_ms": 34650,
+   "message": "Tôi chưa rõ bạn cần gì. Tôi có thể tìm dịch vụ và mở trang; bạn cũng có thể hỏi \"bạn làm được gì\"."
+  },
+  "verdict": "FAIL",
+  "note": "POJ/Tâi-lô detected as Vietnamese (i18n.py:16 _VI regex matches á/à/ē/ô… tone marks, checked at i18n.py:35 before any Taiwanese handling); Vietnamese 'don't understand' reply, catalogue never consulted with Taiwanese words, no FAQ (workflow.py:655 FAQ only for zh)."
+ },
+ {
+  "id": "lang_zh_tw-19",
+  "category": "I07-parking",
+  "language": "zh-TW",
+  "input": "停車費要怎麼繳？",
+  "session": "zhtw-s18",
+  "expected": "fees.parking",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "fees.parking"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "elapsed_ms": 26167,
+   "message": "請在原本的「停車費」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "lang_zh_tw-20",
+  "category": "I07-parking",
+  "language": "nan-Han",
+  "input": "我欲納停車費",
+  "session": "zhtw-s19",
+  "expected": "fees.parking",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "fees.parking"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "elapsed_ms": 52793,
+   "message": "請在原本的「停車費」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "lang_zh_tw-21",
+  "category": "I07-parking",
+  "language": "nan-POJ",
+  "input": "Guá beh la̍p thîng-tshia-huì.",
+  "session": "zhtw-s20",
+  "expected": "fees.parking",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "no_match",
+   "language": "vi",
+   "choices": [],
+   "elapsed_ms": 36980,
+   "message": "Tôi chưa rõ bạn cần gì. Tôi có thể tìm dịch vụ và mở trang; bạn cũng có thể hỏi \"bạn làm được gì\"."
+  },
+  "verdict": "FAIL",
+  "note": "POJ/Tâi-lô detected as Vietnamese (i18n.py:16 _VI regex matches á/à/ē/ô… tone marks, checked at i18n.py:35 before any Taiwanese handling); Vietnamese 'don't understand' reply, catalogue never consulted with Taiwanese words, no FAQ (workflow.py:655 FAQ only for zh)."
+ },
+ {
+  "id": "lang_zh_tw-22",
+  "category": "I08-police-online",
+  "language": "zh-TW",
+  "input": "我的機車被偷了，想在網路上報案",
+  "session": "zhtw-s21",
+  "expected": "police.online (or police)",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "police"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "elapsed_ms": 33883,
+   "message": "請在原本的「警政服務」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "Opened police (parent) rather than police.online: '網路上報案' does not contain the keyword 網路報案 (extra 上). Accepted per brief."
+ },
+ {
+  "id": "lang_zh_tw-23",
+  "category": "I08-police-online",
+  "language": "nan-Han",
+  "input": "阮的機車予人偷牽去矣，我欲佇網路報案",
+  "session": "zhtw-s22",
+  "expected": "police.online (or police)",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "police.online"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "elapsed_ms": 26925,
+   "message": "請在原本的「線上報案」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "police.online"
+ },
+ {
+  "id": "lang_zh_tw-24",
+  "category": "I08-police-online",
+  "language": "nan-POJ",
+  "input": "Guán ê ki-tshia hōo lâng thau khan--khì ah, guá beh tī bāng-lōo pò-àn.",
+  "session": "zhtw-s23",
+  "expected": "police.online (or police)",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "no_match",
+   "language": "vi",
+   "choices": [],
+   "elapsed_ms": 18631,
+   "message": "Tôi chưa rõ bạn cần gì. Tôi có thể tìm dịch vụ và mở trang; bạn cũng có thể hỏi \"bạn làm được gì\"."
+  },
+  "verdict": "FAIL",
+  "note": "POJ/Tâi-lô detected as Vietnamese (i18n.py:16 _VI regex matches á/à/ē/ô… tone marks, checked at i18n.py:35 before any Taiwanese handling); Vietnamese 'don't understand' reply, catalogue never consulted with Taiwanese words, no FAQ (workflow.py:655 FAQ only for zh)."
+ },
+ {
+  "id": "lang_zh_tw-25",
+  "category": "I09-queue",
+  "language": "zh-TW",
+  "input": "我要抽區公所的號碼牌",
+  "session": "zhtw-s24",
+  "expected": "reservation (or office sub-page)",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "reservation"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "elapsed_ms": 13746,
+   "message": "請在原本的「臨櫃叫號」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "reservation"
+ },
+ {
+  "id": "lang_zh_tw-26",
+  "category": "I09-queue",
+  "language": "nan-Han",
+  "input": "區公所這馬叫到幾號矣？",
+  "session": "zhtw-s25",
+  "expected": "reservation (or office sub-page)",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "choices": [],
+   "elapsed_ms": 28669,
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。"
+  },
+  "verdict": "FAIL",
+  "note": "'叫到幾號' does not contain keyword 叫號/現在幾號, 這馬 (now) unknown, bare 區公所 is only inside '萬華區公所'/'中正區公所' keywords → no match → nothing found. Very natural Taiwanese question."
+ },
+ {
+  "id": "lang_zh_tw-27",
+  "category": "I09-queue",
+  "language": "nan-POJ",
+  "input": "Khu-kong-sóo tsit-má kiò kàu kuí hō--ah?",
+  "session": "zhtw-s26",
+  "expected": "reservation (or office sub-page)",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "no_match",
+   "language": "vi",
+   "choices": [],
+   "elapsed_ms": 27498,
+   "message": "Tôi chưa rõ bạn cần gì. Tôi có thể tìm dịch vụ và mở trang; bạn cũng có thể hỏi \"bạn làm được gì\"."
+  },
+  "verdict": "FAIL",
+  "note": "POJ/Tâi-lô detected as Vietnamese (i18n.py:16 _VI regex matches á/à/ē/ô… tone marks, checked at i18n.py:35 before any Taiwanese handling); Vietnamese 'don't understand' reply, catalogue never consulted with Taiwanese words, no FAQ (workflow.py:655 FAQ only for zh)."
+ },
+ {
+  "id": "lang_zh_tw-28",
+  "category": "I10-disaster",
+  "language": "zh-TW",
+  "input": "我家門口有一棵大樹倒了擋住路",
+  "session": "zhtw-s27",
+  "expected": "disasterReport",
+  "observed": {
+   "kind": "reply",
+   "action": "faq_answer",
+   "destination": null,
+   "route": "faq_medium",
+   "language": "zh",
+   "choices": [
+    "行道樹茂盛,樹枝已影響住家,請派員修剪,以維住家安全。"
+   ],
+   "elapsed_ms": 41011,
+   "message": "你是不是想問以下的問題？請選擇一題，我再顯示答案。本服務僅涵蓋臺北市政府 FAQ。"
+  },
+  "verdict": "FAIL",
+  "note": "'大樹倒了' does not contain keyword 路樹倒 → no service; FAQ middle band offered only '行道樹…請派員修剪' (pruning), not the disaster-report page."
+ },
+ {
+  "id": "lang_zh_tw-29",
+  "category": "I10-disaster",
+  "language": "nan-Han",
+  "input": "阮兜巷仔口的路燈歹去矣，暗時攏袂光",
+  "session": "zhtw-s28",
+  "expected": "disasterReport.form.D-1-3",
+  "observed": {
+   "kind": "unsupported",
+   "action": null,
+   "destination": null,
+   "route": "unavailable_direct",
+   "language": "zh",
+   "choices": [],
+   "elapsed_ms": 31,
+   "message": "陳情表單預填：原表單尚未提供受控預填與回讀 Adapter；可先開有話要說。"
+  },
+  "verdict": "FAIL",
+  "note": "Street light broken → matched only the disabled reportIssue.prefill (keyword 路燈) → unavailable_direct short-circuit (workflow.py:599) with developer jargon '受控預填與回讀 Adapter'. D-1-3 路燈故障 keywords (路燈不亮/路燈壞了/路燈故障) don't match 歹去/袂光. User gets no usable page."
+ },
+ {
+  "id": "lang_zh_tw-30",
+  "category": "I10-disaster",
+  "language": "nan-POJ",
+  "input": "Guán tau hāng-á-kháu ê lōo-ting pháinn--khì ah, àm-sî lóng bē kng.",
+  "session": "zhtw-s29",
+  "expected": "disasterReport.form.D-1-3",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "no_match",
+   "language": "vi",
+   "choices": [],
+   "elapsed_ms": 32921,
+   "message": "Tôi chưa rõ bạn cần gì. Tôi có thể tìm dịch vụ và mở trang; bạn cũng có thể hỏi \"bạn làm được gì\"."
+  },
+  "verdict": "FAIL",
+  "note": "POJ/Tâi-lô detected as Vietnamese (i18n.py:16 _VI regex matches á/à/ē/ô… tone marks, checked at i18n.py:35 before any Taiwanese handling); Vietnamese 'don't understand' reply, catalogue never consulted with Taiwanese words, no FAQ (workflow.py:655 FAQ only for zh)."
+ },
+ {
+  "id": "lang_zh_tw-31",
+  "category": "I11-faq-lowincome",
+  "language": "zh-TW",
+  "input": "台北市低收入戶要怎麼申請？",
+  "session": "zhtw-s30",
+  "expected": "FAQ answer/choices on low-income application",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "districtOffice"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "elapsed_ms": 36603,
+   "message": "請在原本的「申辦服務」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "FAIL",
+  "note": "Keyword 申請 (districtOffice) wins, navigates to 申辦服務 which has no low-income form; FAQ is only tried when no service matches, so the actual FAQ answer is never shown. Misleading."
+ },
+ {
+  "id": "lang_zh_tw-32",
+  "category": "I11-faq-lowincome",
+  "language": "nan-Han",
+  "input": "台北市的低收入戶欲按怎申請？",
+  "session": "zhtw-s31",
+  "expected": "FAQ answer/choices on low-income application",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "districtOffice"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "elapsed_ms": 27312,
+   "message": "請在原本的「申辦服務」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "FAIL",
+  "note": "Same as Mandarin: 申請 → districtOffice, FAQ skipped."
+ },
+ {
+  "id": "lang_zh_tw-33",
+  "category": "I11-faq-lowincome",
+  "language": "nan-POJ",
+  "input": "Tâi-pak-tshī ê kē-siu-ji̍p-hōo beh án-tsuánn sin-tshíng?",
+  "session": "zhtw-s32",
+  "expected": "FAQ answer/choices on low-income application",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "no_match",
+   "language": "vi",
+   "choices": [],
+   "elapsed_ms": 41010,
+   "message": "Tôi chưa rõ bạn cần gì. Tôi có thể tìm dịch vụ và mở trang; bạn cũng có thể hỏi \"bạn làm được gì\"."
+  },
+  "verdict": "FAIL",
+  "note": "POJ/Tâi-lô detected as Vietnamese (i18n.py:16 _VI regex matches á/à/ē/ô… tone marks, checked at i18n.py:35 before any Taiwanese handling); Vietnamese 'don't understand' reply, catalogue never consulted with Taiwanese words, no FAQ (workflow.py:655 FAQ only for zh)."
+ },
+ {
+  "id": "lang_zh_tw-34",
+  "category": "I12-faq-vision",
+  "language": "zh-TW",
+  "input": "學齡前兒童視力檢查要錢嗎？",
+  "session": "zhtw-s33",
+  "expected": "FAQ answer/choices on preschool vision check fee",
+  "observed": {
+   "kind": "reply",
+   "action": "faq_answer",
+   "destination": null,
+   "route": "faq_high",
+   "language": "zh",
+   "choices": [
+    "兒童於醫療院所進行學齡前兒童護眼方案(視力免費複檢)時,若發現有其他異常,是否須再付費掛號看診?",
+    "學齡前兒童護眼方案(視力免費複檢)包括哪些項目?需要花費多久時間?"
+   ],
+   "elapsed_ms": 35936,
+   "message": "【學齡前兒童護眼方案(視力免費複檢)需要費用嗎?】\n檢查費用由臺北市政府衛生局補助(含掛號費)每人一年一次新臺幣480元,家長無須付費,但若檢查結果經醫師判斷需進行後續矯治或另有其他視力問題,請依醫囑另行用健保掛號約診。\n資料來源：臺北市政府衛生局健康管理科。本服務僅涵蓋臺北市政府 FAQ。\n\n也可以查看以下相關問答："
+  },
+  "verdict": "PASS",
+  "note": "FAQ high: free (subsidised 480 NTD), correct answer plus related choices"
+ },
+ {
+  "id": "lang_zh_tw-35",
+  "category": "I12-faq-vision",
+  "language": "nan-Han",
+  "input": "囡仔讀幼稚園進前做目睭檢查愛錢無？",
+  "session": "zhtw-s34",
+  "expected": "FAQ answer/choices on preschool vision check fee",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "choices": [],
+   "elapsed_ms": 37787,
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。"
+  },
+  "verdict": "FAIL",
+  "note": "Taiwanese wording (囡仔/目睭/愛錢無) → FAQ embedding below middle band → nothing found. Mandarin version answered directly. Likely multilingual-e5-small does not map Taiwanese Han vocabulary close to Mandarin FAQ text (guess)."
+ },
+ {
+  "id": "lang_zh_tw-36",
+  "category": "I12-faq-vision",
+  "language": "nan-POJ",
+  "input": "Gín-á ji̍p iù-tī-hn̂g tsìng-tsîng tsò ba̍k-tsiu kiám-tsa ài tsînn bô?",
+  "session": "zhtw-s35",
+  "expected": "FAQ answer/choices on preschool vision check fee",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "no_match",
+   "language": "vi",
+   "choices": [],
+   "elapsed_ms": 31833,
+   "message": "Tôi chưa rõ bạn cần gì. Tôi có thể tìm dịch vụ và mở trang; bạn cũng có thể hỏi \"bạn làm được gì\"."
+  },
+  "verdict": "FAIL",
+  "note": "POJ/Tâi-lô detected as Vietnamese (i18n.py:16 _VI regex matches á/à/ē/ô… tone marks, checked at i18n.py:35 before any Taiwanese handling); Vietnamese 'don't understand' reply, catalogue never consulted with Taiwanese words, no FAQ (workflow.py:655 FAQ only for zh)."
+ },
+ {
+  "id": "lang_zh_tw-37",
+  "category": "I13-unsupported-hospital",
+  "language": "zh-TW",
+  "input": "我要掛聯醫的號",
+  "session": "zhtw-s36",
+  "expected": "unsupported explanation, no navigation",
+  "observed": {
+   "kind": "unsupported",
+   "action": null,
+   "destination": null,
+   "route": "unavailable_direct",
+   "language": "zh",
+   "choices": [],
+   "elapsed_ms": 19,
+   "message": "聯醫掛號：尚無正式掛號入口與 API。"
+  },
+  "verdict": "CONCERN",
+  "note": "Honest unsupported, no navigation; but text '尚無正式掛號入口與 API' uses jargon and gives no alternative (hospital website / phone)."
+ },
+ {
+  "id": "lang_zh_tw-38",
+  "category": "I13-unsupported-hospital",
+  "language": "nan-Han",
+  "input": "我欲掛號看醫生",
+  "session": "zhtw-s37",
+  "expected": "unsupported explanation, no navigation",
+  "observed": {
+   "kind": "unsupported",
+   "action": null,
+   "destination": null,
+   "route": "unavailable_direct",
+   "language": "zh",
+   "choices": [],
+   "elapsed_ms": 47,
+   "message": "聯醫掛號：尚無正式掛號入口與 API。"
+  },
+  "verdict": "CONCERN",
+  "note": "Same as 36: honest but 'API' jargon, no alternative."
+ },
+ {
+  "id": "lang_zh_tw-39",
+  "category": "I13-unsupported-hospital",
+  "language": "nan-POJ",
+  "input": "Guá beh kuà-hō khuànn i-sing.",
+  "session": "zhtw-s38",
+  "expected": "unsupported explanation, no navigation",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "no_match",
+   "language": "vi",
+   "choices": [],
+   "elapsed_ms": 34880,
+   "message": "Tôi chưa rõ bạn cần gì. Tôi có thể tìm dịch vụ và mở trang; bạn cũng có thể hỏi \"bạn làm được gì\"."
+  },
+  "verdict": "FAIL",
+  "note": "POJ/Tâi-lô detected as Vietnamese (i18n.py:16 _VI regex matches á/à/ē/ô… tone marks, checked at i18n.py:35 before any Taiwanese handling); Vietnamese 'don't understand' reply, catalogue never consulted with Taiwanese words, no FAQ (workflow.py:655 FAQ only for zh)."
+ },
+ {
+  "id": "lang_zh_tw-40",
+  "category": "I14-out-of-scope",
+  "language": "zh-TW",
+  "input": "今天天氣怎麼樣？",
+  "session": "zhtw-s39",
+  "expected": "nothing related / out of scope",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "choices": [],
+   "elapsed_ms": 39342,
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。"
+  },
+  "verdict": "PASS",
+  "note": "nothing related + 1999"
+ },
+ {
+  "id": "lang_zh_tw-41",
+  "category": "I14-out-of-scope",
+  "language": "zh-TW",
+  "input": "菜脯蛋要怎麼煎才好吃？",
+  "session": "zhtw-s40",
+  "expected": "nothing related / out of scope",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "choices": [],
+   "elapsed_ms": 40202,
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。"
+  },
+  "verdict": "PASS",
+  "note": "recipe → nothing related"
+ },
+ {
+  "id": "lang_zh_tw-42",
+  "category": "I14-out-of-scope",
+  "language": "nan-Han",
+  "input": "今仔日天氣按怎？會落雨無？",
+  "session": "zhtw-s41",
+  "expected": "nothing related / out of scope",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "choices": [],
+   "elapsed_ms": 47287,
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。"
+  },
+  "verdict": "PASS",
+  "note": "nothing related, Mandarin reply"
+ },
+ {
+  "id": "lang_zh_tw-43",
+  "category": "I14-out-of-scope",
+  "language": "nan-POJ",
+  "input": "Kin-á-ji̍t thinn-khì án-tsuánn? Ē lo̍h-hōo bô?",
+  "session": "zhtw-s42",
+  "expected": "nothing related / out of scope",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "no_match",
+   "language": "vi",
+   "choices": [],
+   "elapsed_ms": 39501,
+   "message": "Tôi chưa rõ bạn cần gì. Tôi có thể tìm dịch vụ và mở trang; bạn cũng có thể hỏi \"bạn làm được gì\"."
+  },
+  "verdict": "FAIL",
+  "note": "POJ/Tâi-lô detected as Vietnamese (i18n.py:16 _VI regex matches á/à/ē/ô… tone marks, checked at i18n.py:35 before any Taiwanese handling); Vietnamese 'don't understand' reply, catalogue never consulted with Taiwanese words, no FAQ (workflow.py:655 FAQ only for zh)."
+ },
+ {
+  "id": "lang_zh_tw-44",
+  "category": "I15-cancel-setup",
+  "language": "zh-TW",
+  "input": "我要繳費",
+  "session": "zhtw-cz",
+  "expected": "setup: clarification or bills",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "app.bills"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "elapsed_ms": 37509,
+   "message": "請在原本的「帳務」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "setup: 我要繳費 went straight to app.bills (no clarification, so nothing pending to cancel)"
+ },
+ {
+  "id": "lang_zh_tw-45",
+  "category": "I15-cancel",
+  "language": "zh-TW",
+  "input": "算了，不用了",
+  "session": "zhtw-cz",
+  "expected": "cancelled, no navigation",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "choices": [],
+   "elapsed_ms": 47752,
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。"
+  },
+  "verdict": "FAIL",
+  "note": "'算了，不用了' not treated as cancel: cancel rule is a fullmatch on a single word (workflow.py:499 `re.fullmatch(r\"(?:取消|返回|算了|不用了|不要了)\", bare)`), and the sound check only applies to ≤3 chars. Fell through to a 47 s model call and 'nothing found'."
+ },
+ {
+  "id": "lang_zh_tw-46",
+  "category": "I15-cancel-setup",
+  "language": "nan-Han",
+  "input": "我欲納錢",
+  "session": "zhtw-cn",
+  "expected": "setup",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "choices": [],
+   "elapsed_ms": 36814,
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。"
+  },
+  "verdict": "FAIL",
+  "note": "setup failed: 納錢 (Taiwanese 'pay') → nothing found; app.bills keywords use 繳費 only."
+ },
+ {
+  "id": "lang_zh_tw-47",
+  "category": "I15-cancel",
+  "language": "nan-Han",
+  "input": "免啦，毋免矣",
+  "session": "zhtw-cn",
+  "expected": "cancelled, no navigation",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "choices": [],
+   "elapsed_ms": 41602,
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。"
+  },
+  "verdict": "FAIL",
+  "note": "Taiwanese cancel 免啦/毋免矣 not recognised (zh CANCEL list has no Taiwanese words) → 'nothing found'."
+ },
+ {
+  "id": "lang_zh_tw-48",
+  "category": "I15-cancel-setup",
+  "language": "nan-POJ",
+  "input": "Guá beh la̍p tsînn.",
+  "session": "zhtw-cp",
+  "expected": "setup",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "no_match",
+   "language": "vi",
+   "choices": [],
+   "elapsed_ms": 37857,
+   "message": "Tôi chưa rõ bạn cần gì. Tôi có thể tìm dịch vụ và mở trang; bạn cũng có thể hỏi \"bạn làm được gì\"."
+  },
+  "verdict": "FAIL",
+  "note": "POJ/Tâi-lô detected as Vietnamese (i18n.py:16 _VI regex matches á/à/ē/ô… tone marks, checked at i18n.py:35 before any Taiwanese handling); Vietnamese 'don't understand' reply, catalogue never consulted with Taiwanese words, no FAQ (workflow.py:655 FAQ only for zh)."
+ },
+ {
+  "id": "lang_zh_tw-49",
+  "category": "I15-cancel",
+  "language": "nan-POJ",
+  "input": "Bián--lah, m̄-bián--ah.",
+  "session": "zhtw-cp",
+  "expected": "cancelled, no navigation",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "no_match",
+   "language": "vi",
+   "choices": [],
+   "elapsed_ms": 34745,
+   "message": "Tôi chưa rõ bạn cần gì. Tôi có thể tìm dịch vụ và mở trang; bạn cũng có thể hỏi \"bạn làm được gì\"."
+  },
+  "verdict": "FAIL",
+  "note": "POJ/Tâi-lô detected as Vietnamese (i18n.py:16 _VI regex matches á/à/ē/ô… tone marks, checked at i18n.py:35 before any Taiwanese handling); Vietnamese 'don't understand' reply, catalogue never consulted with Taiwanese words, no FAQ (workflow.py:655 FAQ only for zh). Cancel not recognised."
+ },
+ {
+  "id": "lang_zh_tw-50",
+  "category": "I03-borrow-book/elderly",
+  "language": "zh-TW",
+  "input": "欸那個…我孫子說這個手機可以借書是不是啊，我不太會用，你幫我看一下借書在哪裡好不好",
+  "session": "zhtw-s49",
+  "expected": "library home",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_library",
+   "destination": {
+    "kind": "home"
+   },
+   "route": "library_model",
+   "language": "zh",
+   "choices": [],
+   "elapsed_ms": 39912,
+   "message": "請在圖書借閱頁搜尋想看的書。這裡使用示範資料。"
+  },
+  "verdict": "PASS",
+  "note": "elderly long-winded, library home"
+ },
+ {
+  "id": "lang_zh_tw-51",
+  "category": "I06-water-bill/elderly",
+  "language": "zh-TW",
+  "input": "喂喂，那個水費單我找不到啦，我要繳那個水費，是要按哪裡啊",
+  "session": "zhtw-s50",
+  "expected": "fees.water",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "fees.water"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "elapsed_ms": 38746,
+   "message": "請在原本的「水費」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "elderly, fees.water"
+ },
+ {
+  "id": "lang_zh_tw-52",
+  "category": "I10-disaster/elderly",
+  "language": "zh-TW",
+  "input": "啊我們家巷子口那個路燈啊，已經壞好幾天了，晚上都黑漆漆的很危險耶，這要跟誰講啊",
+  "session": "zhtw-s51",
+  "expected": "disasterReport.form.D-1-3",
+  "observed": {
+   "kind": "unsupported",
+   "action": null,
+   "destination": null,
+   "route": "unavailable_direct",
+   "language": "zh",
+   "choices": [],
+   "elapsed_ms": 12,
+   "message": "陳情表單預填：原表單尚未提供受控預填與回讀 Adapter；可先開有話要說。"
+  },
+  "verdict": "FAIL",
+  "note": "Elderly Mandarin '路燈啊，已經壞好幾天了' → same as 28: disabled reportIssue.prefill unsupported with 'Adapter' jargon; D-1-3 not reached because '路燈壞了' is not a contiguous substring."
+ },
+ {
+  "id": "lang_zh_tw-53",
+  "category": "I09-queue/elderly",
+  "language": "zh-TW",
+  "input": "我想問一下喔，就是那個，去區公所辦事情都要排很久，那個號碼牌可以用手機先拿嗎",
+  "session": "zhtw-s52",
+  "expected": "reservation",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "reservation"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "elapsed_ms": 28998,
+   "message": "請在原本的「臨櫃叫號」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "elderly, reservation"
+ },
+ {
+  "id": "lang_zh_tw-54",
+  "category": "I07-parking/elderly",
+  "language": "zh-TW",
+  "input": "嗯…我上禮拜在路邊停車，那個停車費好像還沒繳欸，會不會被罰啊，要怎麼繳",
+  "session": "zhtw-s53",
+  "expected": "fees.parking",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "fees.parking"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "elapsed_ms": 31090,
+   "message": "請在原本的「停車費」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "elderly, fees.parking"
+ },
+ {
+  "id": "lang_zh_tw-55",
+  "category": "I15-cancel/probe",
+  "language": "zh-TW",
+  "input": "算了",
+  "session": "zhtw-s54",
+  "expected": "cancelled",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "cancel",
+   "language": "zh",
+   "choices": [],
+   "elapsed_ms": 0,
+   "message": "已取消，未執行任何操作。"
+  },
+  "verdict": "PASS",
+  "note": "bare 算了 cancels instantly"
+ },
+ {
+  "id": "lang_zh_tw-56",
+  "category": "I15-cancel/probe",
+  "language": "zh-TW",
+  "input": "不用了啦",
+  "session": "zhtw-s55",
+  "expected": "cancelled",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "intent_greeting",
+   "language": "zh",
+   "choices": [],
+   "elapsed_ms": 29144,
+   "message": "嗨，我是 TownPass 助手，可以幫你找服務、開啟原頁面。你可以描述想做的事，或問「有哪些功能」。"
+  },
+  "verdict": "CONCERN",
+  "note": "'不用了啦' (with particle) not cancel; intent model classified it as greeting → greeting reply after 29 s. Harmless but wrong."
+ },
+ {
+  "id": "lang_zh_tw-57",
+  "category": "I15-cancel-setup",
+  "language": "zh-TW",
+  "input": "我要查案件進度",
+  "session": "zhtw-cq",
+  "expected": "confirm_candidates (several progress pages)",
+  "observed": {
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [
+    "申辦案件進度",
+    "陳情案件進度",
+    "災情案件進度",
+    "警政案件進度"
+   ],
+   "elapsed_ms": 35644,
+   "message": "你想使用哪個功能？請先確認。"
+  },
+  "verdict": "PASS",
+  "note": "setup: four progress pages offered"
+ },
+ {
+  "id": "lang_zh_tw-58",
+  "category": "I15-cancel",
+  "language": "zh-TW",
+  "input": "算了，不用了",
+  "session": "zhtw-cq",
+  "expected": "cancelled, pending choices dropped, no navigation",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "choices": [],
+   "elapsed_ms": 27114,
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。"
+  },
+  "verdict": "FAIL",
+  "note": "Same as 44: '算了，不用了' after a choice list → 'nothing found' instead of cancel (sent without resolution_id; the rule failed before pending logic anyway)."
+ }
+]

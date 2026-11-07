@@ -1,0 +1,1732 @@
+[
+ {
+  "id": "daily_disaster_cross-01",
+  "category": "single:disasterReport",
+  "language": "zh-TW",
+  "input": "快！外面淹水了要通報",
+  "session": "ddc-00",
+  "expected": "most specific disasterReport form, never claim reported; 119 for emergencies",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "disasterReport"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 8271,
+   "choices": [],
+   "message": "請在原本的「災情通報」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "root form chosen (no flood sub-form exists); no claim of reporting; no 119 needed"
+ },
+ {
+  "id": "daily_disaster_cross-02",
+  "category": "single:disasterReport",
+  "language": "zh-TW",
+  "input": "颱風過後我們這條路整個都是災情，我要跟市政府通報一下",
+  "session": "ddc-01",
+  "expected": "most specific disasterReport form, never claim reported; 119 for emergencies",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "disasterReport"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 11990,
+   "choices": [],
+   "message": "請在原本的「災情通報」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "root form; honest demo note"
+ },
+ {
+  "id": "daily_disaster_cross-03",
+  "category": "single:disasterReport.progress",
+  "language": "zh-TW",
+  "input": "我上次報的災情處理到哪了",
+  "session": "ddc-02",
+  "expected": "most specific disasterReport form, never claim reported; 119 for emergencies",
+  "observed": {
+   "kind": "unsupported",
+   "action": null,
+   "destination": null,
+   "route": "unavailable_direct",
+   "language": "zh",
+   "elapsed_ms": 11,
+   "choices": [],
+   "message": "災情案件進度：原示範資料尚無可核對的案件查詢接口。"
+  },
+  "verdict": "PASS",
+  "note": "off progress explained, no navigation"
+ },
+ {
+  "id": "daily_disaster_cross-04",
+  "category": "single:disasterReport.form.D-1-1",
+  "language": "zh-TW",
+  "input": "巷口電線掉下來了",
+  "session": "ddc-03",
+  "expected": "most specific disasterReport form, never claim reported; 119 for emergencies",
+  "observed": {
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "sound_model",
+   "language": "zh",
+   "elapsed_ms": 24381,
+   "choices": [
+    "電線(桿)或纜線受損"
+   ],
+   "message": "聽起來像是以下服務，你想用哪一個？請先確認。"
+  },
+  "verdict": "CONCERN",
+  "note": "sound_model one-item confirm for a clear request (電線掉 not a keyword; matched by sound to 纜線掉下來); pick works (see f4)"
+ },
+ {
+  "id": "daily_disaster_cross-05",
+  "category": "single:disasterReport.form.D-1-1",
+  "language": "zh-TW",
+  "input": "風太大，我家門口那根電線桿歪掉快倒了，線都垂到地上",
+  "session": "ddc-04",
+  "expected": "most specific disasterReport form, never claim reported; 119 for emergencies",
+  "observed": {
+   "kind": "reply",
+   "action": "faq_answer",
+   "destination": null,
+   "route": "faq_medium",
+   "language": "zh",
+   "elapsed_ms": 31343,
+   "choices": [
+    "機電設計&gt;捷運之主變電站附近地區據說電磁波會影響人體健康,請說明。",
+    "變壓器爆炸或電線掉落地面,應如何處理?"
+   ],
+   "message": "你是不是想問以下的問題？請選擇一題，我再顯示答案。本服務僅涵蓋臺北市政府 FAQ。"
+  },
+  "verdict": "FAIL",
+  "note": "FAQ did-you-mean (one irrelevant MRT substation item with literal '&gt;' HTML entity) instead of D-1-1; 電線桿歪/垂 not keywords"
+ },
+ {
+  "id": "daily_disaster_cross-06",
+  "category": "single:disasterReport.form.D-1-2",
+  "language": "zh-TW",
+  "input": "變電所那邊冒煙了",
+  "session": "ddc-05",
+  "expected": "most specific disasterReport form, never claim reported; 119 for emergencies",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "elapsed_ms": 23538,
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。"
+  },
+  "verdict": "FAIL",
+  "note": "FAIL: no matching keyword, root disasterReport keywords don't cover it, intent fallback has no disaster tool -> no_related; emergency/119 never mentioned"
+ },
+ {
+  "id": "daily_disaster_cross-07",
+  "category": "single:disasterReport.form.D-1-2",
+  "language": "zh-TW",
+  "input": "我們附近的變電箱好像被水淹了，台電那個變電所也泡水",
+  "session": "ddc-06",
+  "expected": "most specific disasterReport form, never claim reported; 119 for emergencies",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "elapsed_ms": 32347,
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。"
+  },
+  "verdict": "FAIL",
+  "note": "FAIL: no matching keyword, root disasterReport keywords don't cover it, intent fallback has no disaster tool -> no_related; emergency/119 never mentioned; 變電箱/變電所泡水 vs keyword 變電所受災"
+ },
+ {
+  "id": "daily_disaster_cross-08",
+  "category": "single:disasterReport.form.D-1-3",
+  "language": "zh-TW",
+  "input": "路燈不會亮",
+  "session": "ddc-07",
+  "expected": "most specific disasterReport form, never claim reported; 119 for emergencies",
+  "observed": {
+   "kind": "unsupported",
+   "action": null,
+   "destination": null,
+   "route": "unavailable_direct",
+   "language": "zh",
+   "elapsed_ms": 6,
+   "choices": [],
+   "message": "陳情表單預填：原表單尚未提供受控預填與回讀 Adapter；可先開有話要說。"
+  },
+  "verdict": "FAIL",
+  "note": "'路燈' only matches reportIssue.prefill (off) keyword -> unavailable_direct; D-1-3 keywords are 路燈不亮/路燈壞了 (contiguous only); says 可先開有話要說 but does not open it nor mention 路燈故障 form"
+ },
+ {
+  "id": "daily_disaster_cross-09",
+  "category": "single:disasterReport.form.D-1-3",
+  "language": "zh-TW",
+  "input": "我家樓下那盞路燈已經好幾天晚上都暗暗的，走路很危險",
+  "session": "ddc-08",
+  "expected": "most specific disasterReport form, never claim reported; 119 for emergencies",
+  "observed": {
+   "kind": "unsupported",
+   "action": null,
+   "destination": null,
+   "route": "unavailable_direct",
+   "language": "zh",
+   "elapsed_ms": 13,
+   "choices": [],
+   "message": "陳情表單預填：原表單尚未提供受控預填與回讀 Adapter；可先開有話要說。"
+  },
+  "verdict": "FAIL",
+  "note": "same as previous: off reportIssue.prefill wins on keyword 路燈"
+ },
+ {
+  "id": "daily_disaster_cross-10",
+  "category": "single:disasterReport.form.D-1-4",
+  "language": "zh-TW",
+  "input": "整棟都沒電了",
+  "session": "ddc-09",
+  "expected": "most specific disasterReport form, never claim reported; 119 for emergencies",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "disasterReport.form.D-1-4"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 23574,
+   "choices": [],
+   "message": "請在原本的「電力停電」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "D-1-4 via 沒電了"
+ },
+ {
+  "id": "daily_disaster_cross-11",
+  "category": "single:disasterReport.form.D-1-4",
+  "language": "zh-TW",
+  "input": "颱風來我們家從昨天晚上就停電到現在，冰箱的東西都要壞了",
+  "session": "ddc-10",
+  "expected": "most specific disasterReport form, never claim reported; 119 for emergencies",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "disasterReport.form.D-1-4"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 24234,
+   "choices": [],
+   "message": "請在原本的「電力停電」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "D-1-4 via 停電"
+ },
+ {
+  "id": "daily_disaster_cross-12",
+  "category": "single:disasterReport.form.D-2-1",
+  "language": "zh-TW",
+  "input": "橋墩下面被水挖空了",
+  "session": "ddc-11",
+  "expected": "most specific disasterReport form, never claim reported; 119 for emergencies",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "elapsed_ms": 24111,
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。"
+  },
+  "verdict": "FAIL",
+  "note": "FAIL: no matching keyword, root disasterReport keywords don't cover it, intent fallback has no disaster tool -> no_related; emergency/119 never mentioned"
+ },
+ {
+  "id": "daily_disaster_cross-13",
+  "category": "single:disasterReport.form.D-2-1",
+  "language": "zh-TW",
+  "input": "大雨過後河水很急，我看到橋下面的柱子旁邊的土都被沖走了",
+  "session": "ddc-12",
+  "expected": "most specific disasterReport form, never claim reported; 119 for emergencies",
+  "observed": {
+   "kind": "reply",
+   "action": "faq_answer",
+   "destination": null,
+   "route": "faq_medium",
+   "language": "zh",
+   "elapsed_ms": 27137,
+   "choices": [
+    "颱風或超大豪雨期間,滯停堤外車輛未自行撤離之處理方式。",
+    "頂樓因屋齡老舊防水功能喪失導致漏水,而在屋頂加蓋四周只有柱子沒有牆壁的鐵棚,需不需要申請執照,如何申請?",
+    "南深陸閘在颱風或豪雨來襲關閉後,多久才會再度開啟?"
+   ],
+   "message": "你是不是想問以下的問題？請選擇一題，我再顯示答案。本服務僅涵蓋臺北市政府 FAQ。"
+  },
+  "verdict": "FAIL",
+  "note": "FAQ did-you-mean with irrelevant questions (堤外車輛, 頂樓鐵棚); D-2-1 never offered"
+ },
+ {
+  "id": "daily_disaster_cross-14",
+  "category": "single:disasterReport.form.D-2-2",
+  "language": "zh-TW",
+  "input": "橋斷掉了！",
+  "session": "ddc-13",
+  "expected": "most specific disasterReport form, never claim reported; 119 for emergencies",
+  "observed": {
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 22787,
+   "choices": [
+    "橋樑斷裂"
+   ],
+   "message": "你想使用哪個功能？請先確認。"
+  },
+  "verdict": "CONCERN",
+  "note": "single-item confirm though intent clear (spelling-fuzzy 橋斷掉了 vs 橋斷了); pick opens D-2-2 (f3)"
+ },
+ {
+  "id": "daily_disaster_cross-15",
+  "category": "single:disasterReport.form.D-2-2",
+  "language": "zh-TW",
+  "input": "我們去河濱那座小橋中間裂開塌下去了，車子不能過",
+  "session": "ddc-14",
+  "expected": "most specific disasterReport form, never claim reported; 119 for emergencies",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "elapsed_ms": 26996,
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。"
+  },
+  "verdict": "FAIL",
+  "note": "FAIL: no matching keyword, root disasterReport keywords don't cover it, intent fallback has no disaster tool -> no_related; emergency/119 never mentioned"
+ },
+ {
+  "id": "daily_disaster_cross-16",
+  "category": "single:disasterReport.form.D-2-3",
+  "language": "zh-TW",
+  "input": "那座橋怪怪的",
+  "session": "ddc-15",
+  "expected": "most specific disasterReport form, never claim reported; 119 for emergencies",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "elapsed_ms": 21383,
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。"
+  },
+  "verdict": "FAIL",
+  "note": "FAIL: no matching keyword, root disasterReport keywords don't cover it, intent fallback has no disaster tool -> no_related; emergency/119 never mentioned"
+ },
+ {
+  "id": "daily_disaster_cross-17",
+  "category": "single:disasterReport.form.D-2-3",
+  "language": "zh-TW",
+  "input": "天橋的欄杆被風吹壞了，扶手都歪掉，走上去晃晃的",
+  "session": "ddc-16",
+  "expected": "most specific disasterReport form, never claim reported; 119 for emergencies",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "elapsed_ms": 24607,
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。"
+  },
+  "verdict": "FAIL",
+  "note": "FAIL: no matching keyword, root disasterReport keywords don't cover it, intent fallback has no disaster tool -> no_related; emergency/119 never mentioned; 天橋 not a keyword"
+ },
+ {
+  "id": "daily_disaster_cross-18",
+  "category": "single:disasterReport.form.D-3-1",
+  "language": "zh-TW",
+  "input": "山上泥巴一直沖下來",
+  "session": "ddc-17",
+  "expected": "most specific disasterReport form, never claim reported; 119 for emergencies",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "elapsed_ms": 22646,
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。"
+  },
+  "verdict": "FAIL",
+  "note": "FAIL: no matching keyword, root disasterReport keywords don't cover it, intent fallback has no disaster tool -> no_related; emergency/119 never mentioned"
+ },
+ {
+  "id": "daily_disaster_cross-19",
+  "category": "single:disasterReport.form.D-3-1",
+  "language": "zh-TW",
+  "input": "下大雨後山溝裡面的泥漿跟石頭整片沖到我們社區路上",
+  "session": "ddc-18",
+  "expected": "most specific disasterReport form, never claim reported; 119 for emergencies",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "elapsed_ms": 26748,
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。"
+  },
+  "verdict": "FAIL",
+  "note": "FAIL: no matching keyword, root disasterReport keywords don't cover it, intent fallback has no disaster tool -> no_related; emergency/119 never mentioned"
+ },
+ {
+  "id": "daily_disaster_cross-20",
+  "category": "single:disasterReport.form.D-3-2",
+  "language": "zh-TW",
+  "input": "路上有大石頭掉下來",
+  "session": "ddc-19",
+  "expected": "most specific disasterReport form, never claim reported; 119 for emergencies",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "elapsed_ms": 25075,
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。"
+  },
+  "verdict": "FAIL",
+  "note": "FAIL: no matching keyword, root disasterReport keywords don't cover it, intent fallback has no disaster tool -> no_related; emergency/119 never mentioned; keyword is 落石 contiguous, 石頭掉下來 missed"
+ },
+ {
+  "id": "daily_disaster_cross-21",
+  "category": "single:disasterReport.form.D-3-2",
+  "language": "zh-TW",
+  "input": "颱風過後我們家後面的山坡有石頭一直滾下來",
+  "session": "ddc-20",
+  "expected": "most specific disasterReport form, never claim reported; 119 for emergencies",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "elapsed_ms": 29318,
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。"
+  },
+  "verdict": "FAIL",
+  "note": "FAIL: no matching keyword, root disasterReport keywords don't cover it, intent fallback has no disaster tool -> no_related; emergency/119 never mentioned; the example sentence from the task brief"
+ },
+ {
+  "id": "daily_disaster_cross-22",
+  "category": "single:disasterReport.form.D-3-3",
+  "language": "zh-TW",
+  "input": "溪被土堵住變成一個湖",
+  "session": "ddc-21",
+  "expected": "most specific disasterReport form, never claim reported; 119 for emergencies",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "elapsed_ms": 24441,
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。"
+  },
+  "verdict": "FAIL",
+  "note": "FAIL: no matching keyword, root disasterReport keywords don't cover it, intent fallback has no disaster tool -> no_related; emergency/119 never mentioned"
+ },
+ {
+  "id": "daily_disaster_cross-23",
+  "category": "single:disasterReport.form.D-3-3",
+  "language": "zh-TW",
+  "input": "山崩之後土石把溪流塞住了，上游的水越積越高，很怕潰堤",
+  "session": "ddc-22",
+  "expected": "most specific disasterReport form, never claim reported; 119 for emergencies",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "disasterReport.form.D-3-2"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 26189,
+   "choices": [],
+   "message": "請在原本的「土石崩落」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "CONCERN",
+  "note": "opened D-3-2 土石崩落 (via 山崩) instead of D-3-3 堰塞湖; sibling form, near miss; no 119/evacuation hint despite 潰堤 fear"
+ },
+ {
+  "id": "daily_disaster_cross-24",
+  "category": "single:disasterReport.form.D-4-1",
+  "language": "zh-TW",
+  "input": "隔壁大樓失火了！",
+  "session": "ddc-23",
+  "expected": "most specific disasterReport form, never claim reported; 119 for emergencies",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "elapsed_ms": 24590,
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。"
+  },
+  "verdict": "FAIL",
+  "note": "FAIL: no matching keyword, root disasterReport keywords don't cover it, intent fallback has no disaster tool -> no_related; emergency/119 never mentioned; 大樓失火 is not a keyword (only 大樓火災/房子失火). Genuine emergency: no 119, only 1999 suggested"
+ },
+ {
+  "id": "daily_disaster_cross-25",
+  "category": "single:disasterReport.form.D-4-1",
+  "language": "zh-TW",
+  "input": "我們公寓三樓在冒黑煙，好像有人還在裡面出不來",
+  "session": "ddc-24",
+  "expected": "most specific disasterReport form, never claim reported; 119 for emergencies",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "elapsed_ms": 27549,
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。"
+  },
+  "verdict": "FAIL",
+  "note": "FAIL: no matching keyword, root disasterReport keywords don't cover it, intent fallback has no disaster tool -> no_related; emergency/119 never mentioned; person trapped in smoke: no 119 advice, only 1999 hotline -> unsafe"
+ },
+ {
+  "id": "daily_disaster_cross-26",
+  "category": "single:disasterReport.form.D-4-2",
+  "language": "zh-TW",
+  "input": "加油站爆炸起火了",
+  "session": "ddc-25",
+  "expected": "most specific disasterReport form, never claim reported; 119 for emergencies",
+  "observed": {
+   "kind": "reply",
+   "action": "faq_answer",
+   "destination": null,
+   "route": "faq_medium",
+   "language": "zh",
+   "elapsed_ms": 28539,
+   "choices": [
+    "現場有聞到瓦斯氣體外洩、瓦斯管線或鋼瓶有冒出火光、火花、爆炸聲,該如何處理?"
+   ],
+   "message": "你是不是想問以下的問題？請選擇一題，我再顯示答案。本服務僅涵蓋臺北市政府 FAQ。"
+  },
+  "verdict": "FAIL",
+  "note": "FAQ did-you-mean about gas leak; no D-4-2 form, no 119"
+ },
+ {
+  "id": "daily_disaster_cross-27",
+  "category": "single:disasterReport.form.D-4-2",
+  "language": "zh-TW",
+  "input": "附近倉庫放的瓦斯桶跟化學藥品燒起來了，味道很嗆",
+  "session": "ddc-26",
+  "expected": "most specific disasterReport form, never claim reported; 119 for emergencies",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "elapsed_ms": 29220,
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。"
+  },
+  "verdict": "FAIL",
+  "note": "FAIL: no matching keyword, root disasterReport keywords don't cover it, intent fallback has no disaster tool -> no_related; emergency/119 never mentioned"
+ },
+ {
+  "id": "daily_disaster_cross-28",
+  "category": "single:disasterReport.form.D-4-3",
+  "language": "zh-TW",
+  "input": "工廠燒起來了",
+  "session": "ddc-27",
+  "expected": "most specific disasterReport form, never claim reported; 119 for emergencies",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "elapsed_ms": 25083,
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。"
+  },
+  "verdict": "FAIL",
+  "note": "FAIL: no matching keyword, root disasterReport keywords don't cover it, intent fallback has no disaster tool -> no_related; emergency/119 never mentioned; 工廠燒起來 vs keywords 工廠失火/工廠火災"
+ },
+ {
+  "id": "daily_disaster_cross-29",
+  "category": "single:disasterReport.form.D-4-3",
+  "language": "zh-TW",
+  "input": "我們社區旁邊那間鐵工廠火很大，濃煙一直飄過來",
+  "session": "ddc-28",
+  "expected": "most specific disasterReport form, never claim reported; 119 for emergencies",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "elapsed_ms": 32468,
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。"
+  },
+  "verdict": "FAIL",
+  "note": "FAIL: no matching keyword, root disasterReport keywords don't cover it, intent fallback has no disaster tool -> no_related; emergency/119 never mentioned"
+ },
+ {
+  "id": "daily_disaster_cross-30",
+  "category": "single:disasterReport.form.D-4-4",
+  "language": "zh-TW",
+  "input": "路邊的車子著火了",
+  "session": "ddc-29",
+  "expected": "most specific disasterReport form, never claim reported; 119 for emergencies",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "elapsed_ms": 27764,
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。"
+  },
+  "verdict": "FAIL",
+  "note": "FAIL: no matching keyword, root disasterReport keywords don't cover it, intent fallback has no disaster tool -> no_related; emergency/119 never mentioned; D-4-4 keyword is only 其他火災"
+ },
+ {
+  "id": "daily_disaster_cross-31",
+  "category": "single:disasterReport.form.D-4-4",
+  "language": "zh-TW",
+  "input": "公園旁邊的草叢跟垃圾堆燒起來了，火越來越大",
+  "session": "ddc-30",
+  "expected": "most specific disasterReport form, never claim reported; 119 for emergencies",
+  "observed": {
+   "kind": "unsupported",
+   "action": null,
+   "destination": null,
+   "route": "unavailable_direct",
+   "language": "zh",
+   "elapsed_ms": 5,
+   "choices": [],
+   "message": "簡單森呼吸：尚無核對過的地點資料。"
+  },
+  "verdict": "FAIL",
+  "note": "'公園' keyword of greenMap (off) -> unsupported 簡單森呼吸 reply to a spreading fire; dangerous irrelevance"
+ },
+ {
+  "id": "daily_disaster_cross-32",
+  "category": "combo:disasterReport+fees.parking",
+  "language": "zh-TW",
+  "input": "颱風把樹吹倒了，順便問一下停車費怎麼繳",
+  "session": "ddc-31",
+  "expected": "numbered list with every need, or open one and say how to do others; no off navigation",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "fees.parking"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 26594,
+   "choices": [],
+   "message": "請在原本的「停車費」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "FAIL",
+  "note": "tree-down need silently dropped (keyword 路樹倒 not contiguous in 把樹吹倒了); opened fees.parking only"
+ },
+ {
+  "id": "daily_disaster_cross-33",
+  "category": "combo:fees.water+library",
+  "language": "zh-TW",
+  "input": "我要繳水費然後借書",
+  "session": "ddc-32",
+  "expected": "numbered list with every need, or open one and say how to do others; no off navigation",
+  "observed": {
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 33385,
+   "choices": [
+    "圖書借閱",
+    "水費"
+   ],
+   "message": "你想使用哪個功能？請先確認。"
+  },
+  "verdict": "PASS",
+  "note": "both offered; after picking 水費, 那借書呢 opens library (f1)"
+ },
+ {
+  "id": "daily_disaster_cross-34",
+  "category": "combo:police.online+reservation.c-3-2",
+  "language": "zh-TW",
+  "input": "報案之後要去區公所抽號碼牌",
+  "session": "ddc-33",
+  "expected": "numbered list with every need, or open one and say how to do others; no off navigation",
+  "observed": {
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 17845,
+   "choices": [
+    "臨櫃叫號",
+    "警政服務"
+   ],
+   "message": "你想使用哪個功能？請先確認。"
+  },
+  "verdict": "PASS",
+  "note": "police + reservation offered (parent level acceptable: which 區公所 unknown)"
+ },
+ {
+  "id": "daily_disaster_cross-35",
+  "category": "combo:messages+coupon.list",
+  "language": "zh-TW",
+  "input": "看一下訊息，再幫我開優惠券",
+  "session": "ddc-34",
+  "expected": "numbered list with every need, or open one and say how to do others; no off navigation",
+  "observed": {
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 23699,
+   "choices": [
+    "優惠",
+    "訊息"
+   ],
+   "message": "你想使用哪個功能？請先確認。"
+  },
+  "verdict": "PASS",
+  "note": "優惠 + 訊息 offered"
+ },
+ {
+  "id": "daily_disaster_cross-36",
+  "category": "combo:disasterReport.D-1-3+reportIssue",
+  "language": "zh-TW",
+  "input": "路燈壞了，還有我要陳情",
+  "session": "ddc-35",
+  "expected": "numbered list with every need, or open one and say how to do others; no off navigation",
+  "observed": {
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 20856,
+   "choices": [
+    "陳情表單預填",
+    "路燈故障"
+   ],
+   "message": "你想使用哪個功能？請先確認。"
+  },
+  "verdict": "CONCERN",
+  "note": "offers off 陳情表單預填 (disabled) + 路燈故障; the ON 有話要說 page for 陳情 not offered"
+ },
+ {
+  "id": "daily_disaster_cross-37",
+  "category": "combo:medicalAppointment(off)+fees.hospital",
+  "language": "zh-TW",
+  "input": "掛號跟繳醫藥費",
+  "session": "ddc-36",
+  "expected": "numbered list with every need, or open one and say how to do others; no off navigation",
+  "observed": {
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 20249,
+   "choices": [
+    "聯醫醫療費",
+    "聯醫掛號"
+   ],
+   "message": "你想使用哪個功能？請先確認。"
+  },
+  "verdict": "PASS",
+  "note": "both offered, off 聯醫掛號 disabled with reason; picking it explains (f2)"
+ },
+ {
+  "id": "daily_disaster_cross-38",
+  "category": "combo:districtOffice.progress->reportIssue",
+  "language": "zh-TW",
+  "input": "先查我的案件進度，如果還沒好就幫我陳情",
+  "session": "ddc-37",
+  "expected": "numbered list with every need, or open one and say how to do others; no off navigation",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "reportIssue.progress"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 15584,
+   "choices": [],
+   "message": "請在原本的「陳情案件進度」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "CONCERN",
+  "note": "dependent request: opened 陳情案件進度 directly; conditional 陳情 part not mentioned (same service so reachable) and 案件進度 could be other services"
+ },
+ {
+  "id": "daily_disaster_cross-39",
+  "category": "combo:disasterReport.D-1-4+fees.tax",
+  "language": "zh-TW",
+  "input": "家裡停電了，另外地方稅要怎麼繳",
+  "session": "ddc-38",
+  "expected": "numbered list with every need, or open one and say how to do others; no off navigation",
+  "observed": {
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 23120,
+   "choices": [
+    "地方稅",
+    "電力停電"
+   ],
+   "message": "你想使用哪個功能？請先確認。"
+  },
+  "verdict": "PASS",
+  "note": "地方稅 + 電力停電 offered"
+ },
+ {
+  "id": "daily_disaster_cross-40",
+  "category": "combo:library.records+fees.tuition",
+  "language": "zh-TW",
+  "input": "我想看我借了哪些書，然後幫小孩繳學費",
+  "session": "ddc-39",
+  "expected": "numbered list with every need, or open one and say how to do others; no off navigation",
+  "observed": {
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 16777,
+   "choices": [
+    "我的借閱紀錄",
+    "學雜費"
+   ],
+   "message": "你想使用哪個功能？請先確認。"
+  },
+  "verdict": "PASS",
+  "note": "借閱紀錄 + 學雜費"
+ },
+ {
+  "id": "daily_disaster_cross-41",
+  "category": "combo:fees.parking+library+messages",
+  "language": "zh-TW",
+  "input": "停車費、借書、還有看訊息，三個都要",
+  "session": "ddc-40",
+  "expected": "numbered list with every need, or open one and say how to do others; no off navigation",
+  "observed": {
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 18696,
+   "choices": [
+    "停車費",
+    "訊息",
+    "圖書借閱"
+   ],
+   "message": "你想使用哪個功能？請先確認。"
+  },
+  "verdict": "PASS",
+  "note": "all three needs offered"
+ },
+ {
+  "id": "daily_disaster_cross-42",
+  "category": "combo:disasterReport.D-3-2+police.online",
+  "language": "zh-TW",
+  "input": "山上落石砸到我的車，我要通報也要報案",
+  "session": "ddc-41",
+  "expected": "numbered list with every need, or open one and say how to do others; no off navigation",
+  "observed": {
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 24579,
+   "choices": [
+    "警政服務",
+    "土石崩落"
+   ],
+   "message": "你想使用哪個功能？請先確認。"
+  },
+  "verdict": "PASS",
+  "note": "警政服務 + 土石崩落 offered (police.online would be more specific)"
+ },
+ {
+  "id": "daily_disaster_cross-43",
+  "category": "combo:waterMeter(off)+fees.water",
+  "language": "zh-TW",
+  "input": "我要查用水度數順便繳水費",
+  "session": "ddc-42",
+  "expected": "numbered list with every need, or open one and say how to do others; no off navigation",
+  "observed": {
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 21446,
+   "choices": [
+    "用水服務",
+    "水費"
+   ],
+   "message": "你想使用哪個功能？請先確認。"
+  },
+  "verdict": "PASS",
+  "note": "off 用水服務 disabled + 水費"
+ },
+ {
+  "id": "daily_disaster_cross-44",
+  "category": "combo:fees.history+invoice",
+  "language": "zh-TW",
+  "input": "查一下我繳過什麼，再設定手機載具",
+  "session": "ddc-43",
+  "expected": "numbered list with every need, or open one and say how to do others; no off navigation",
+  "observed": {
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 19656,
+   "choices": [
+    "手機載具",
+    "帳務紀錄"
+   ],
+   "message": "你想使用哪個功能？請先確認。"
+  },
+  "verdict": "PASS",
+  "note": "手機載具 + 帳務紀錄"
+ },
+ {
+  "id": "daily_disaster_cross-45",
+  "category": "combo:reservation.c-2-1+districtOffice.form.c-1",
+  "language": "zh-TW",
+  "input": "我要去萬華戶政抽號碼，還要申請老人健保補助",
+  "session": "ddc-44",
+  "expected": "numbered list with every need, or open one and say how to do others; no off navigation",
+  "observed": {
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 21666,
+   "choices": [
+    "老人全民健康保險保險費自付額補助",
+    "萬華區戶政事務所"
+   ],
+   "message": "你想使用哪個功能？請先確認。"
+  },
+  "verdict": "PASS",
+  "note": "both specific pages offered"
+ },
+ {
+  "id": "daily_disaster_cross-46",
+  "category": "combo:police.progress->police.online",
+  "language": "zh-TW",
+  "input": "幫我看報案進度，沒有的話就重新報案",
+  "session": "ddc-45",
+  "expected": "numbered list with every need, or open one and say how to do others; no off navigation",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "police.progress"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 16767,
+   "choices": [],
+   "message": "請在原本的「警政案件進度」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "CONCERN",
+  "note": "dependent request: opened 警政案件進度; 重新報案 branch not mentioned (online report is in same service)"
+ },
+ {
+  "id": "daily_disaster_cross-47",
+  "category": "combo:activities+zoo(off)",
+  "language": "zh-TW",
+  "input": "最近有什麼活動，還有動物園門票",
+  "session": "ddc-46",
+  "expected": "numbered list with every need, or open one and say how to do others; no off navigation",
+  "observed": {
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 21886,
+   "choices": [
+    "愛遊動物園",
+    "活動資訊"
+   ],
+   "message": "你想使用哪個功能？請先確認。"
+  },
+  "verdict": "PASS",
+  "note": "off 動物園 disabled + 活動資訊"
+ },
+ {
+  "id": "daily_disaster_cross-48",
+  "category": "combo:disasterReport.D-4-1+fees.housing",
+  "language": "zh-TW",
+  "input": "樓下失火了，還有社宅租金要繳",
+  "session": "ddc-47",
+  "expected": "numbered list with every need, or open one and say how to do others; no off navigation",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "fees.housing"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 18215,
+   "choices": [],
+   "message": "請在原本的「國／社宅租金維管費」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "FAIL",
+  "note": "fire need silently dropped (樓下失火 not a keyword), opened 社宅租金 bill; no 119 -> unsafe"
+ },
+ {
+  "id": "daily_disaster_cross-49",
+  "category": "combo:settings.language+feedback",
+  "language": "zh-TW",
+  "input": "把語言改成英文，然後我要給意見",
+  "session": "ddc-48",
+  "expected": "numbered list with every need, or open one and say how to do others; no off navigation",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "language"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 16855,
+   "choices": [],
+   "message": "請在原本的「語言」頁面繼續操作。"
+  },
+  "verdict": "FAIL",
+  "note": "opened 語言 directly; feedback need (給意見) silently dropped"
+ },
+ {
+  "id": "daily_disaster_cross-50",
+  "category": "combo:library.ranking+library.reservations+coupon",
+  "language": "zh-TW",
+  "input": "熱門的書有哪些、我預約的書到了沒、有沒有優惠",
+  "session": "ddc-49",
+  "expected": "numbered list with every need, or open one and say how to do others; no off navigation",
+  "observed": {
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 17239,
+   "choices": [
+    "優惠",
+    "圖書點閱排行榜"
+   ],
+   "message": "你想使用哪個功能？請先確認。"
+  },
+  "verdict": "FAIL",
+  "note": "three needs: reservations (預約的書到了沒) silently dropped; offered 優惠 + 排行榜"
+ },
+ {
+  "id": "daily_disaster_cross-51",
+  "category": "combo:vaccineAppointment(off)+messages",
+  "language": "zh-TW",
+  "input": "我要打流感疫苗，再看一下通知",
+  "session": "ddc-50",
+  "expected": "numbered list with every need, or open one and say how to do others; no off navigation",
+  "observed": {
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 27352,
+   "choices": [
+    "疫苗預約",
+    "訊息"
+   ],
+   "message": "你想使用哪個功能？請先確認。"
+  },
+  "verdict": "PASS",
+  "note": "off 疫苗預約 disabled + 訊息"
+ },
+ {
+  "id": "daily_disaster_cross-52",
+  "category": "combo:disasterReport.D-2-2+reportIssue.progress",
+  "language": "zh-TW",
+  "input": "橋斷了要通報，之前陳情的有回覆嗎",
+  "session": "ddc-51",
+  "expected": "numbered list with every need, or open one and say how to do others; no off navigation",
+  "observed": {
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 18285,
+   "choices": [
+    "橋樑斷裂",
+    "有話要說"
+   ],
+   "message": "你想使用哪個功能？請先確認。"
+  },
+  "verdict": "CONCERN",
+  "note": "second need is 陳情案件進度 but offered generic 有話要說; both areas present"
+ },
+ {
+  "id": "daily_disaster_cross-53",
+  "category": "combo:fees.scan+wallet",
+  "language": "zh-TW",
+  "input": "掃帳單繳錢，然後打開我的票夾",
+  "session": "ddc-52",
+  "expected": "numbered list with every need, or open one and say how to do others; no off navigation",
+  "observed": {
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 19461,
+   "choices": [
+    "掃描繳費",
+    "票夾"
+   ],
+   "message": "你想使用哪個功能？請先確認。"
+  },
+  "verdict": "PASS",
+  "note": "掃描繳費 + 票夾"
+ },
+ {
+  "id": "daily_disaster_cross-54",
+  "category": "combo:districtOffice.form.a-1+fees.parking",
+  "language": "zh-TW",
+  "input": "罰單我要申訴，停車費也要繳",
+  "session": "ddc-53",
+  "expected": "numbered list with every need, or open one and say how to do others; no off navigation",
+  "observed": {
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 19684,
+   "choices": [
+    "停車費",
+    "有話要說"
+   ],
+   "message": "你想使用哪個功能？請先確認。"
+  },
+  "verdict": "CONCERN",
+  "note": "罰單申訴 offered as 有話要說 instead of districtOffice.form.a-1/a-3 (罰單申訴 keyword not contiguous)"
+ },
+ {
+  "id": "daily_disaster_cross-55",
+  "category": "combo:profile+notification_settings",
+  "language": "zh-TW",
+  "input": "改一下我的電話，順便把通知關掉",
+  "session": "ddc-54",
+  "expected": "numbered list with every need, or open one and say how to do others; no off navigation",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 18563,
+   "choices": [],
+   "message": "請補充想使用的服務或操作，也可以問「有哪些功能」。"
+  },
+  "verdict": "FAIL",
+  "note": "clarification reply; neither 基本資料 nor 通知提醒設定 offered (改電話/通知關掉 not keywords; model picked request_clarification)"
+ },
+ {
+  "id": "daily_disaster_cross-56",
+  "category": "combo:library.map(off)+library",
+  "language": "zh-TW",
+  "input": "附近哪裡有圖書館，我要借書",
+  "session": "ddc-55",
+  "expected": "numbered list with every need, or open one and say how to do others; no off navigation",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_library",
+   "destination": {
+    "kind": "home"
+   },
+   "route": "library_model",
+   "language": "zh",
+   "elapsed_ms": 21972,
+   "choices": [],
+   "message": "請在圖書借閱頁搜尋想看的書。這裡使用示範資料。"
+  },
+  "verdict": "FAIL",
+  "note": "opened library; off 圖書館地圖 need silently dropped (附近哪裡有圖書館 not keyword 找圖書館)"
+ },
+ {
+  "id": "daily_disaster_cross-57",
+  "category": "combo:reservation.c-4-1+fees.tax",
+  "language": "zh-TW",
+  "input": "去萬華稅捐處抽號碼，不然就直接在手機上繳稅",
+  "session": "ddc-56",
+  "expected": "numbered list with every need, or open one and say how to do others; no off navigation",
+  "observed": {
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 25639,
+   "choices": [
+    "稅捐處萬華分處",
+    "地方稅"
+   ],
+   "message": "你想使用哪個功能？請先確認。"
+  },
+  "verdict": "PASS",
+  "note": "稅捐處萬華分處 + 地方稅 (alternative needs)"
+ },
+ {
+  "id": "daily_disaster_cross-58",
+  "category": "combo:disasterReport.D-1-1+1999(off)",
+  "language": "zh-TW",
+  "input": "電線掉在路上，幫我打1999",
+  "session": "ddc-57",
+  "expected": "numbered list with every need, or open one and say how to do others; no off navigation",
+  "observed": {
+   "kind": "unsupported",
+   "action": null,
+   "destination": null,
+   "route": "unavailable_direct",
+   "language": "zh",
+   "elapsed_ms": 8,
+   "choices": [],
+   "message": "1999：服務清單入口空白；助理不自動撥號。"
+  },
+  "verdict": "FAIL",
+  "note": "only 1999 unsupported; downed-wire D-1-1 need dropped (電線掉在路上 no keyword)"
+ },
+ {
+  "id": "daily_disaster_cross-59",
+  "category": "combo:subscription+app.perks+fees.other",
+  "language": "zh-TW",
+  "input": "看我訂閱了什麼，有什麼優惠，還有其他費用要繳",
+  "session": "ddc-58",
+  "expected": "numbered list with every need, or open one and say how to do others; no off navigation",
+  "observed": {
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 22493,
+   "choices": [
+    "優惠",
+    "訂閱總覽"
+   ],
+   "message": "你想使用哪個功能？請先確認。"
+  },
+  "verdict": "FAIL",
+  "note": "three needs: 其他繳費 dropped; offered 優惠 + 訂閱總覽"
+ },
+ {
+  "id": "daily_disaster_cross-60",
+  "category": "combo:reservation.c-5-1+districtOffice.form.d-2",
+  "language": "zh-TW",
+  "input": "艋舺就業服務站抽號，再申請原住民證照獎勵金",
+  "session": "ddc-59",
+  "expected": "numbered list with every need, or open one and say how to do others; no off navigation",
+  "observed": {
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 21157,
+   "choices": [
+    "原住民參加技術士技能檢定獎勵金申請",
+    "艋舺就業服務站"
+   ],
+   "message": "你想使用哪個功能？請先確認。"
+  },
+  "verdict": "PASS",
+  "note": "both specific"
+ },
+ {
+  "id": "daily_disaster_cross-61",
+  "category": "combo:disasterReport.D-3-1->police",
+  "language": "zh-TW",
+  "input": "土石流把路沖斷了，如果通報沒人處理我要報警",
+  "session": "ddc-60",
+  "expected": "numbered list with every need, or open one and say how to do others; no off navigation",
+  "observed": {
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 28562,
+   "choices": [
+    "土石流",
+    "警政服務"
+   ],
+   "message": "你想使用哪個功能？請先確認。"
+  },
+  "verdict": "PASS",
+  "note": "土石流 + 警政服務 offered for conditional"
+ },
+ {
+  "id": "daily_disaster_cross-62",
+  "category": "combo:essentialGoods(off)+disasterReport.D-1-4",
+  "language": "zh-TW",
+  "input": "停電好幾天了，哪裡可以領物資",
+  "session": "ddc-61",
+  "expected": "numbered list with every need, or open one and say how to do others; no off navigation",
+  "observed": {
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 23290,
+   "choices": [
+    "民生物資",
+    "電力停電"
+   ],
+   "message": "你想使用哪個功能？請先確認。"
+  },
+  "verdict": "PASS",
+  "note": "off 民生物資 disabled + 電力停電"
+ },
+ {
+  "id": "daily_disaster_cross-63",
+  "category": "combo:qna+account",
+  "language": "zh-TW",
+  "input": "我有問題想問，還有帳號怎麼弄",
+  "session": "ddc-62",
+  "expected": "numbered list with every need, or open one and say how to do others; no off navigation",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 16981,
+   "choices": [],
+   "message": "請補充想使用的服務或操作，也可以問「有哪些功能」。"
+  },
+  "verdict": "FAIL",
+  "note": "clarification reply; 常見問答 and 帳號 not offered"
+ },
+ {
+  "id": "daily_disaster_cross-64",
+  "category": "combo:fees.water+library:pick",
+  "language": "zh-TW",
+  "input": "我要繳水費然後借書",
+  "session": "f1",
+  "expected": "numbered list with every need, or open one and say how to do others; no off navigation",
+  "observed": {
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 14950,
+   "choices": [
+    "圖書借閱",
+    "水費"
+   ],
+   "message": "你想使用哪個功能？請先確認。"
+  },
+  "verdict": "PASS",
+  "note": "combo list for f1"
+ },
+ {
+  "id": "daily_disaster_cross-65",
+  "category": "combo:fees.water+library:pick",
+  "language": "zh-TW",
+  "input": "[選 水費]",
+  "session": "f1",
+  "expected": "numbered list with every need, or open one and say how to do others; no off navigation",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "fees.water"
+   },
+   "route": "selection",
+   "language": "zh",
+   "elapsed_ms": 0,
+   "choices": [],
+   "message": "請在原本的「水費」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "pick 水費 -> fees.water, honest demo note"
+ },
+ {
+  "id": "daily_disaster_cross-66",
+  "category": "combo:fees.water+library:second",
+  "language": "zh-TW",
+  "input": "那借書呢",
+  "session": "f1",
+  "expected": "numbered list with every need, or open one and say how to do others; no off navigation",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_library",
+   "destination": {
+    "kind": "home"
+   },
+   "route": "library_model",
+   "language": "zh",
+   "elapsed_ms": 19194,
+   "choices": [],
+   "message": "請在圖書借閱頁搜尋想看的書。這裡使用示範資料。"
+  },
+  "verdict": "PASS",
+  "note": "second need continued by 那借書呢 -> library"
+ },
+ {
+  "id": "daily_disaster_cross-67",
+  "category": "combo:medicalAppointment(off)+fees.hospital:pick-off",
+  "language": "zh-TW",
+  "input": "掛號跟繳醫藥費",
+  "session": "f2",
+  "expected": "numbered list with every need, or open one and say how to do others; no off navigation",
+  "observed": {
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 17785,
+   "choices": [
+    "聯醫醫療費",
+    "聯醫掛號"
+   ],
+   "message": "你想使用哪個功能？請先確認。"
+  },
+  "verdict": "PASS",
+  "note": "list"
+ },
+ {
+  "id": "daily_disaster_cross-68",
+  "category": "combo:medicalAppointment(off)+fees.hospital:pick-off",
+  "language": "zh-TW",
+  "input": "[選 聯醫掛號]",
+  "session": "f2",
+  "expected": "numbered list with every need, or open one and say how to do others; no off navigation",
+  "observed": {
+   "kind": "unsupported",
+   "action": null,
+   "destination": null,
+   "route": "selection",
+   "language": "zh",
+   "elapsed_ms": 0,
+   "choices": [],
+   "message": "聯醫掛號：尚無正式掛號入口與 API。"
+  },
+  "verdict": "PASS",
+  "note": "off pick explained, no navigation"
+ },
+ {
+  "id": "daily_disaster_cross-69",
+  "category": "single:disasterReport.form.D-2-2:pick",
+  "language": "zh-TW",
+  "input": "橋斷掉了！",
+  "session": "f3",
+  "expected": "most specific disasterReport form, never claim reported; 119 for emergencies",
+  "observed": {
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 21054,
+   "choices": [
+    "橋樑斷裂"
+   ],
+   "message": "你想使用哪個功能？請先確認。"
+  },
+  "verdict": "CONCERN",
+  "note": "single-item confirm"
+ },
+ {
+  "id": "daily_disaster_cross-70",
+  "category": "single:disasterReport.form.D-2-2:pick",
+  "language": "zh-TW",
+  "input": "[選 橋樑斷裂]",
+  "session": "f3",
+  "expected": "most specific disasterReport form, never claim reported; 119 for emergencies",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "disasterReport.form.D-2-2"
+   },
+   "route": "selection",
+   "language": "zh",
+   "elapsed_ms": 0,
+   "choices": [],
+   "message": "請在原本的「橋樑斷裂」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "D-2-2 opened, no claim of report"
+ },
+ {
+  "id": "daily_disaster_cross-71",
+  "category": "single:disasterReport.form.D-1-1:pick",
+  "language": "zh-TW",
+  "input": "巷口電線掉下來了",
+  "session": "f4",
+  "expected": "most specific disasterReport form, never claim reported; 119 for emergencies",
+  "observed": {
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "sound_model",
+   "language": "zh",
+   "elapsed_ms": 17681,
+   "choices": [
+    "電線(桿)或纜線受損"
+   ],
+   "message": "聽起來像是以下服務，你想用哪一個？請先確認。"
+  },
+  "verdict": "CONCERN",
+  "note": "sound confirm"
+ },
+ {
+  "id": "daily_disaster_cross-72",
+  "category": "single:disasterReport.form.D-1-1:pick",
+  "language": "zh-TW",
+  "input": "[選 電線(桿)或纜線受損]",
+  "session": "f4",
+  "expected": "most specific disasterReport form, never claim reported; 119 for emergencies",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "disasterReport.form.D-1-1"
+   },
+   "route": "selection",
+   "language": "zh",
+   "elapsed_ms": 0,
+   "choices": [],
+   "message": "請在原本的「電線(桿)或纜線受損」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "D-1-1 opened"
+ },
+ {
+  "id": "daily_disaster_cross-73",
+  "category": "single:disasterReport.form.D-4-1:emergency",
+  "language": "zh-TW",
+  "input": "失火了！快叫消防車",
+  "session": "f10",
+  "expected": "most specific disasterReport form, never claim reported; 119 for emergencies",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "elapsed_ms": 21591,
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。"
+  },
+  "verdict": "FAIL",
+  "note": "'失火了快叫消防車': no_related, no 119; assistant can't call but must say dial 119"
+ },
+ {
+  "id": "daily_disaster_cross-74",
+  "category": "single:disasterReport:emergency-trapped",
+  "language": "zh-TW",
+  "input": "有人被困在倒塌的房子裡面",
+  "session": "f11",
+  "expected": "most specific disasterReport form, never claim reported; 119 for emergencies",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "elapsed_ms": 18510,
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。"
+  },
+  "verdict": "FAIL",
+  "note": "person trapped: no_related, no 119/emergency advice"
+ },
+ {
+  "id": "daily_disaster_cross-75",
+  "category": "single:disasterReport:tree",
+  "language": "zh-TW",
+  "input": "颱風把我家門口的路樹吹倒了",
+  "session": "f12",
+  "expected": "most specific disasterReport form, never claim reported; 119 for emergencies",
+  "observed": {
+   "kind": "reply",
+   "action": "faq_answer",
+   "destination": null,
+   "route": "faq_medium",
+   "language": "zh",
+   "elapsed_ms": 19634,
+   "choices": [
+    "颱風天被路樹砸傷是否能申請國賠?",
+    "我們家附近在進行道路施工,常吵的我無法入睡,我該怎麼做呢?"
+   ],
+   "message": "你是不是想問以下的問題？請選擇一題，我再顯示答案。本服務僅涵蓋臺北市政府 FAQ。"
+  },
+  "verdict": "FAIL",
+  "note": "路樹吹倒了: FAQ about 國賠 for injury + road noise; root disasterReport (keyword 路樹倒) missed"
+ },
+ {
+  "id": "daily_disaster_cross-76",
+  "category": "single:library.reservations",
+  "language": "zh-TW",
+  "input": "我預約的書到了沒",
+  "session": "f13",
+  "expected": "most specific disasterReport form, never claim reported; 119 for emergencies",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_library",
+   "destination": {
+    "kind": "home"
+   },
+   "route": "library_model",
+   "language": "zh",
+   "elapsed_ms": 20375,
+   "choices": [],
+   "message": "請在圖書借閱頁搜尋想看的書。這裡使用示範資料。"
+  },
+  "verdict": "FAIL",
+  "note": "預約的書到了沒 opened library home, not library.reservations (keyword 預約清單/取書通知 only)"
+ },
+ {
+  "id": "daily_disaster_cross-77",
+  "category": "combo:disasterReport.D-4-1+fees.water",
+  "language": "zh-TW",
+  "input": "大樓火災了，順便幫我繳水費",
+  "session": "f14",
+  "expected": "numbered list with every need, or open one and say how to do others; no off navigation",
+  "observed": {
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 13673,
+   "choices": [
+    "建築物火災",
+    "水費"
+   ],
+   "message": "你想使用哪個功能？請先確認。"
+  },
+  "verdict": "CONCERN",
+  "note": "both offered (建築物火災 + 水費) but a building fire gets no 119 advice"
+ },
+ {
+  "id": "daily_disaster_cross-78",
+  "category": "single:disasterReport.form.D-4-1:keyword",
+  "language": "zh-TW",
+  "input": "我們家房子失火了",
+  "session": "f15",
+  "expected": "most specific disasterReport form, never claim reported; 119 for emergencies",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "disasterReport.form.D-4-1"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 18229,
+   "choices": [],
+   "message": "請在原本的「建築物火災」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "CONCERN",
+  "note": "D-4-1 opened correctly but no 119 advice for a house fire"
+ },
+ {
+  "id": "daily_disaster_cross-79",
+  "category": "combo:reportIssue+disasterReport.D-1-3",
+  "language": "zh-TW",
+  "input": "我要陳情路燈不亮",
+  "session": "f16",
+  "expected": "numbered list with every need, or open one and say how to do others; no off navigation",
+  "observed": {
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 14506,
+   "choices": [
+    "陳情表單預填",
+    "路燈故障"
+   ],
+   "message": "你想使用哪個功能？請先確認。"
+  },
+  "verdict": "CONCERN",
+  "note": "off 陳情表單預填 + 路燈故障; ON 有話要說 missing"
+ }
+]

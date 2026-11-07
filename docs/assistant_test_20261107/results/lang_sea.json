@@ -1,0 +1,1497 @@
+[
+ {
+  "id": "lang_sea-01",
+  "category": "I01-greeting",
+  "language": "vi",
+  "input": "Xin chào",
+  "session": "langsea-00",
+  "expected": "greeting in user's language",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "greeting",
+   "language": "vi",
+   "choices": [],
+   "message": "Xin chào, tôi là trợ lý TownPass. Tôi có thể tìm dịch vụ và mở trang giúp bạn. Hãy nói điều bạn cần, hoặc hỏi \"bạn làm được gì\".",
+   "elapsed_ms": 1
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "lang_sea-02",
+  "category": "I01-greeting",
+  "language": "id",
+  "input": "Halo, selamat pagi",
+  "session": "langsea-01",
+  "expected": "greeting in user's language",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "intent_greeting",
+   "language": "id",
+   "choices": [],
+   "message": "Halo, saya asisten TownPass. Saya bisa mencarikan layanan dan membuka halamannya. Sampaikan kebutuhan Anda, atau tanya \"bisa apa saja\".",
+   "elapsed_ms": 27828
+  },
+  "verdict": "PASS",
+  "note": "Template missed 'Halo, selamat pagi' (two greetings in a row), fell back to intent model: 28 s for a greeting"
+ },
+ {
+  "id": "lang_sea-03",
+  "category": "I01-greeting",
+  "language": "tl",
+  "input": "Magandang umaga po",
+  "session": "langsea-02",
+  "expected": "greeting in user's language",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "intent_greeting",
+   "language": "en",
+   "choices": [],
+   "message": "Hi, I'm the TownPass assistant. I can find a service and open its page for you. Tell me what you need, or ask \"what can you do\".",
+   "elapsed_ms": 34445
+  },
+  "verdict": "CONCERN",
+  "note": "Correct greeting but in English; Tagalog is not a supported language (i18n.LANGUAGES has no 'tl', i18n.py:13); detected as en and no Tagalog keywords exist in capabilities_i18n.json (rerun after 22:01: same)"
+ },
+ {
+  "id": "lang_sea-04",
+  "category": "I01-greeting",
+  "language": "th",
+  "input": "สวัสดีค่ะ",
+  "session": "langsea-03",
+  "expected": "greeting in user's language",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "greeting",
+   "language": "th",
+   "choices": [],
+   "message": "สวัสดีครับ ผมคือผู้ช่วย TownPass ช่วยหาบริการและเปิดหน้าให้ได้ บอกสิ่งที่ต้องการ หรือถามว่า \"ทำอะไรได้บ้าง\"",
+   "elapsed_ms": 50
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "lang_sea-05",
+  "category": "I02-capabilities",
+  "language": "vi",
+  "input": "Bạn có thể giúp tôi làm gì?",
+  "session": "langsea-04",
+  "expected": "capability list in user's language",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "intent_greeting",
+   "language": "vi",
+   "choices": [],
+   "message": "Xin chào, tôi là trợ lý TownPass. Tôi có thể tìm dịch vụ và mở trang giúp bạn. Hãy nói điều bạn cần, hoặc hỏi \"bạn làm được gì\".",
+   "elapsed_ms": 33039
+  },
+  "verdict": "CONCERN",
+  "note": "'Bạn có thể giúp tôi làm gì?' not in LISTING (only 'bạn làm được gì', i18n.py:78); intent model called it a greeting, so no feature list (rerun after 22:01: same)"
+ },
+ {
+  "id": "lang_sea-06",
+  "category": "I02-capabilities",
+  "language": "id",
+  "input": "Kamu bisa bantu apa saja?",
+  "session": "langsea-05",
+  "expected": "capability list in user's language",
+  "observed": {
+   "kind": "capability_list",
+   "action": null,
+   "destination": null,
+   "route": "listing",
+   "language": "id",
+   "choices": [
+    "Beranda",
+    "Semua layanan",
+    "Promo",
+    "Tagihan",
+    "Akun",
+    "Pengaturan",
+    "Data pribadi",
+    "Halaman awal aplikasi"
+   ],
+   "message": "Layanan yang bisa saya buka:\n• Beranda\n• Semua layanan\n• Promo\n• Tagihan\n• Akun\n• Pengaturan\n• Data pribadi\n• Halaman awal aplikasi\nUcapkan \"halaman berikutnya\" untuk melihat lagi.",
+   "elapsed_ms": 2
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "lang_sea-07",
+  "category": "I02-capabilities",
+  "language": "tl",
+  "input": "Ano po ang kaya mong gawin?",
+  "session": "langsea-06",
+  "expected": "capability list in user's language",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "no_match",
+   "language": "en",
+   "choices": [],
+   "message": "I'm not sure what you need yet. I can find services and open their pages; you can also ask \"what can you do\".",
+   "elapsed_ms": 33737
+  },
+  "verdict": "FAIL",
+  "note": "Tagalog is not a supported language (i18n.LANGUAGES has no 'tl', i18n.py:13); detected as en and no Tagalog keywords exist in capabilities_i18n.json (rerun after 22:01: same)"
+ },
+ {
+  "id": "lang_sea-08",
+  "category": "I02-capabilities",
+  "language": "th",
+  "input": "คุณช่วยอะไรได้บ้างคะ",
+  "session": "langsea-07",
+  "expected": "capability list in user's language",
+  "observed": {
+   "kind": "capability_list",
+   "action": null,
+   "destination": null,
+   "route": "listing",
+   "language": "th",
+   "choices": [
+    "หน้าแรก",
+    "บริการทั้งหมด",
+    "สิทธิพิเศษ",
+    "บิล",
+    "บัญชี",
+    "การตั้งค่า",
+    "ข้อมูลส่วนตัว",
+    "หน้าเริ่มต้นแอป"
+   ],
+   "message": "บริการที่ผู้ช่วยเปิดได้:\n• หน้าแรก\n• บริการทั้งหมด\n• สิทธิพิเศษ\n• บิล\n• บัญชี\n• การตั้งค่า\n• ข้อมูลส่วนตัว\n• หน้าเริ่มต้นแอป\nพูดว่า \"หน้าถัดไป\" เพื่อดูเพิ่ม",
+   "elapsed_ms": 115
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "lang_sea-09",
+  "category": "I03-borrow-book",
+  "language": "vi",
+  "input": "Tôi muốn mượn sách",
+  "session": "langsea-08",
+  "expected": "navigate library home",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "library"
+   },
+   "route": "capability_model",
+   "language": "vi",
+   "choices": [],
+   "message": "Vui lòng tiếp tục trên trang \"Mượn sách thư viện\". Đây là bản demo, chưa gửi hay thanh toán gì. (Trang được dịch ngay trên điện thoại; một số tên có thể khác bản gốc tiếng Trung.)",
+   "elapsed_ms": 30889
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "lang_sea-10",
+  "category": "I03-borrow-book",
+  "language": "id",
+  "input": "Saya mau pinjam buku",
+  "session": "langsea-09",
+  "expected": "navigate library home",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "library"
+   },
+   "route": "capability_model",
+   "language": "id",
+   "choices": [],
+   "message": "Silakan lanjutkan di halaman \"Peminjaman buku\". Ini demo; belum ada yang dikirim atau dibayar. (Halaman diterjemahkan di ponsel Anda; beberapa nama bisa berbeda dari aslinya dalam bahasa Mandarin.)",
+   "elapsed_ms": 36704
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "lang_sea-11",
+  "category": "I03-borrow-book",
+  "language": "tl",
+  "input": "Gusto kong humiram ng libro",
+  "session": "langsea-10",
+  "expected": "navigate library home",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "no_match",
+   "language": "en",
+   "choices": [],
+   "message": "I'm not sure what you need yet. I can find services and open their pages; you can also ask \"what can you do\".",
+   "elapsed_ms": 38575
+  },
+  "verdict": "FAIL",
+  "note": "Tagalog is not a supported language (i18n.LANGUAGES has no 'tl', i18n.py:13); detected as en and no Tagalog keywords exist in capabilities_i18n.json (rerun after 22:01: same)"
+ },
+ {
+  "id": "lang_sea-12",
+  "category": "I03-borrow-book",
+  "language": "th",
+  "input": "อยากยืมหนังสือค่ะ",
+  "session": "langsea-11",
+  "expected": "navigate library home",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "library"
+   },
+   "route": "capability_model",
+   "language": "th",
+   "choices": [],
+   "message": "โปรดดำเนินการต่อในหน้า \"ยืมหนังสือห้องสมุด\" นี่เป็นเดโม ยังไม่มีการส่งหรือชำระเงิน (หน้านี้แปลบนโทรศัพท์ของคุณ ชื่อบางอย่างอาจต่างจากต้นฉบับภาษาจีน)",
+   "elapsed_ms": 39298
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "lang_sea-13",
+  "category": "I04-borrow-title",
+  "language": "vi",
+  "input": "Tôi muốn mượn cuốn 底層邏輯",
+  "session": "langsea-12",
+  "expected": "navigate detail lib-book-3, reply in user's language",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_library_book",
+   "destination": {
+    "kind": "detail",
+    "book_id": "lib-book-3"
+   },
+   "route": "library_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請查看《底層邏輯 : 看清這個世界的底牌 = The underlying logic : how to see the essence of things》的館藏與冊次；如可預約，選取書館後再按頁面按鈕。此為示範，尚未預約。",
+   "elapsed_ms": 47655
+  },
+  "verdict": "FAIL",
+  "note": "Right book, but reply in Chinese: detect_text_language checks CJK before Vietnamese marks (i18n.py:32-35), so a Vietnamese sentence with a Chinese title becomes zh"
+ },
+ {
+  "id": "lang_sea-14",
+  "category": "I04-borrow-title",
+  "language": "id",
+  "input": "Saya mau pinjam buku 底層邏輯",
+  "session": "langsea-13",
+  "expected": "navigate detail lib-book-3, reply in user's language",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_library_book",
+   "destination": {
+    "kind": "detail",
+    "book_id": "lib-book-3"
+   },
+   "route": "library_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請查看《底層邏輯 : 看清這個世界的底牌 = The underlying logic : how to see the essence of things》的館藏與冊次；如可預約，選取書館後再按頁面按鈕。此為示範，尚未預約。",
+   "elapsed_ms": 47083
+  },
+  "verdict": "FAIL",
+  "note": "Right book, reply in Chinese: CJK check precedes the Latin/Indonesian check (i18n.py:32-38)"
+ },
+ {
+  "id": "lang_sea-15",
+  "category": "I04-borrow-title",
+  "language": "tl",
+  "input": "Pwede po bang humiram ng librong 底層邏輯?",
+  "session": "langsea-14",
+  "expected": "navigate detail lib-book-3, reply in user's language",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_library_book",
+   "destination": {
+    "kind": "detail",
+    "book_id": "lib-book-3"
+   },
+   "route": "library_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請查看《底層邏輯 : 看清這個世界的底牌 = The underlying logic : how to see the essence of things》的館藏與冊次；如可預約，選取書館後再按頁面按鈕。此為示範，尚未預約。",
+   "elapsed_ms": 50396
+  },
+  "verdict": "FAIL",
+  "note": "Right book, reply in Chinese (same cause)"
+ },
+ {
+  "id": "lang_sea-16",
+  "category": "I04-borrow-title",
+  "language": "th",
+  "input": "อยากยืมหนังสือ 底層邏輯 ค่ะ",
+  "session": "langsea-15",
+  "expected": "navigate detail lib-book-3, reply in user's language",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "library"
+   },
+   "route": "capability_model",
+   "language": "th",
+   "choices": [],
+   "message": "โปรดดำเนินการต่อในหน้า \"ยืมหนังสือห้องสมุด\" นี่เป็นเดโม ยังไม่มีการส่งหรือชำระเงิน (หน้านี้แปลบนโทรศัพท์ของคุณ ชื่อบางอย่างอาจต่างจากต้นฉบับภาษาจีน)",
+   "elapsed_ms": 36531
+  },
+  "verdict": "FAIL",
+  "note": "Thai is detected before CJK so stays th, but the non-zh path only searches the catalogue and opens library home; book titles are never matched for non-zh (workflow.py:425-430: 'a library request opens the library itself'). Needed lib-book-3 not opened"
+ },
+ {
+  "id": "lang_sea-17",
+  "category": "I05-borrow-records",
+  "language": "vi",
+  "input": "Xem lịch sử mượn sách của tôi",
+  "session": "langsea-16",
+  "expected": "navigate library.records",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "library.records"
+   },
+   "route": "capability_model",
+   "language": "vi",
+   "choices": [],
+   "message": "Vui lòng tiếp tục trên trang \"Lịch sử mượn sách\". Đây là bản demo, chưa gửi hay thanh toán gì. (Trang được dịch ngay trên điện thoại; một số tên có thể khác bản gốc tiếng Trung.)",
+   "elapsed_ms": 49659
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "lang_sea-18",
+  "category": "I05-borrow-records",
+  "language": "id",
+  "input": "Saya mau lihat riwayat peminjaman buku saya",
+  "session": "langsea-17",
+  "expected": "navigate library.records",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "library.records"
+   },
+   "route": "capability_model",
+   "language": "id",
+   "choices": [],
+   "message": "Silakan lanjutkan di halaman \"Riwayat peminjaman\". Ini demo; belum ada yang dikirim atau dibayar. (Halaman diterjemahkan di ponsel Anda; beberapa nama bisa berbeda dari aslinya dalam bahasa Mandarin.)",
+   "elapsed_ms": 36577
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "lang_sea-19",
+  "category": "I05-borrow-records",
+  "language": "tl",
+  "input": "Paano ko makikita ang mga hiniram kong libro?",
+  "session": "langsea-18",
+  "expected": "navigate library.records",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "no_match",
+   "language": "en",
+   "choices": [],
+   "message": "I'm not sure what you need yet. I can find services and open their pages; you can also ask \"what can you do\".",
+   "elapsed_ms": 33862
+  },
+  "verdict": "FAIL",
+  "note": "Tagalog is not a supported language (i18n.LANGUAGES has no 'tl', i18n.py:13); detected as en and no Tagalog keywords exist in capabilities_i18n.json"
+ },
+ {
+  "id": "lang_sea-20",
+  "category": "I05-borrow-records",
+  "language": "th",
+  "input": "ดูประวัติการยืมหนังสือของฉัน",
+  "session": "langsea-19",
+  "expected": "navigate library.records",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "library.records"
+   },
+   "route": "capability_model",
+   "language": "th",
+   "choices": [],
+   "message": "โปรดดำเนินการต่อในหน้า \"ประวัติการยืม\" นี่เป็นเดโม ยังไม่มีการส่งหรือชำระเงิน (หน้านี้แปลบนโทรศัพท์ของคุณ ชื่อบางอย่างอาจต่างจากต้นฉบับภาษาจีน)",
+   "elapsed_ms": 30522
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "lang_sea-21",
+  "category": "I06-water-bill",
+  "language": "vi",
+  "input": "Tôi muốn đóng tiền nước",
+  "session": "langsea-20",
+  "expected": "navigate fees.water",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "fees.water"
+   },
+   "route": "capability_model",
+   "language": "vi",
+   "choices": [],
+   "message": "Vui lòng tiếp tục trên trang \"Tiền nước\". Đây là bản demo, chưa gửi hay thanh toán gì. (Trang được dịch ngay trên điện thoại; một số tên có thể khác bản gốc tiếng Trung.)",
+   "elapsed_ms": 38183
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "lang_sea-22",
+  "category": "I06-water-bill",
+  "language": "id",
+  "input": "Saya mau bayar tagihan air",
+  "session": "langsea-21",
+  "expected": "navigate fees.water",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "fees.water"
+   },
+   "route": "capability_model",
+   "language": "id",
+   "choices": [],
+   "message": "Silakan lanjutkan di halaman \"Tagihan air\". Ini demo; belum ada yang dikirim atau dibayar. (Halaman diterjemahkan di ponsel Anda; beberapa nama bisa berbeda dari aslinya dalam bahasa Mandarin.)",
+   "elapsed_ms": 45274
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "lang_sea-23",
+  "category": "I06-water-bill",
+  "language": "tl",
+  "input": "Magbabayad po ako ng bill sa tubig",
+  "session": "langsea-22",
+  "expected": "navigate fees.water",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "no_match",
+   "language": "en",
+   "choices": [],
+   "message": "I'm not sure what you need yet. I can find services and open their pages; you can also ask \"what can you do\".",
+   "elapsed_ms": 36685
+  },
+  "verdict": "FAIL",
+  "note": "Tagalog is not a supported language (i18n.LANGUAGES has no 'tl', i18n.py:13); detected as en and no Tagalog keywords exist in capabilities_i18n.json"
+ },
+ {
+  "id": "lang_sea-24",
+  "category": "I06-water-bill",
+  "language": "th",
+  "input": "จะจ่ายค่าน้ำประปาค่ะ",
+  "session": "langsea-23",
+  "expected": "navigate fees.water",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "fees.water"
+   },
+   "route": "capability_model",
+   "language": "th",
+   "choices": [],
+   "message": "โปรดดำเนินการต่อในหน้า \"ค่าน้ำ\" นี่เป็นเดโม ยังไม่มีการส่งหรือชำระเงิน (หน้านี้แปลบนโทรศัพท์ของคุณ ชื่อบางอย่างอาจต่างจากต้นฉบับภาษาจีน)",
+   "elapsed_ms": 34555
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "lang_sea-25",
+  "category": "I07-parking-fee",
+  "language": "vi",
+  "input": "Đóng phí gửi xe ở đâu?",
+  "session": "langsea-24",
+  "expected": "navigate fees.parking",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "no_match",
+   "language": "vi",
+   "choices": [],
+   "message": "Tôi chưa rõ bạn cần gì. Tôi có thể tìm dịch vụ và mở trang; bạn cũng có thể hỏi \"bạn làm được gì\".",
+   "elapsed_ms": 30369
+  },
+  "verdict": "FAIL",
+  "note": "'phí gửi xe' (very common wording) missing; fees.parking vi keywords are only 'phí đỗ xe','tiền gửi xe','đóng phí đỗ xe' (capabilities_i18n.json)"
+ },
+ {
+  "id": "lang_sea-26",
+  "category": "I07-parking-fee",
+  "language": "id",
+  "input": "Bayar biaya parkir",
+  "session": "langsea-25",
+  "expected": "navigate fees.parking",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "fees.parking"
+   },
+   "route": "capability_model",
+   "language": "id",
+   "choices": [],
+   "message": "Silakan lanjutkan di halaman \"Biaya parkir\". Ini demo; belum ada yang dikirim atau dibayar. (Halaman diterjemahkan di ponsel Anda; beberapa nama bisa berbeda dari aslinya dalam bahasa Mandarin.)",
+   "elapsed_ms": 15378
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "lang_sea-27",
+  "category": "I07-parking-fee",
+  "language": "tl",
+  "input": "Paano magbayad ng parking fee?",
+  "session": "langsea-26",
+  "expected": "navigate fees.parking",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "fees.parking"
+   },
+   "route": "capability_model",
+   "language": "en",
+   "choices": [],
+   "message": "Please continue on the \"Parking fees\" page. It is a demo; nothing is submitted or paid. (The page is translated on your phone; some names may differ from the Chinese original.)",
+   "elapsed_ms": 14797
+  },
+  "verdict": "CONCERN",
+  "note": "Right page via English keyword 'parking fee', reply in English; Tagalog is not a supported language (i18n.LANGUAGES has no 'tl', i18n.py:13); detected as en and no Tagalog keywords exist in capabilities_i18n.json"
+ },
+ {
+  "id": "lang_sea-28",
+  "category": "I07-parking-fee",
+  "language": "th",
+  "input": "จ่ายค่าที่จอดรถยังไงคะ",
+  "session": "langsea-27",
+  "expected": "navigate fees.parking",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "fees.parking"
+   },
+   "route": "capability_model",
+   "language": "th",
+   "choices": [],
+   "message": "โปรดดำเนินการต่อในหน้า \"ค่าจอดรถ\" นี่เป็นเดโม ยังไม่มีการส่งหรือชำระเงิน (หน้านี้แปลบนโทรศัพท์ของคุณ ชื่อบางอย่างอาจต่างจากต้นฉบับภาษาจีน)",
+   "elapsed_ms": 18656
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "lang_sea-29",
+  "category": "I08-police-report",
+  "language": "vi",
+  "input": "Tôi bị mất trộm, muốn báo công an trực tuyến",
+  "session": "langsea-28",
+  "expected": "navigate police.online (or police)",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "police.online"
+   },
+   "route": "capability_model",
+   "language": "vi",
+   "choices": [],
+   "message": "Vui lòng tiếp tục trên trang \"Trình báo trực tuyến\". Đây là bản demo, chưa gửi hay thanh toán gì. (Trang được dịch ngay trên điện thoại; một số tên có thể khác bản gốc tiếng Trung.)",
+   "elapsed_ms": 26142
+  },
+  "verdict": "PASS",
+  "note": "vi police keywords use 'cảnh sát'/'trình báo'; 'công an' (what most Vietnamese say) is not a keyword, matched here presumably via 'trực tuyến'/fuzzy similarity (guess). See unaccented probe 62 failing"
+ },
+ {
+  "id": "lang_sea-30",
+  "category": "I08-police-report",
+  "language": "id",
+  "input": "Saya mau lapor polisi online, dompet saya dicuri",
+  "session": "langsea-29",
+  "expected": "navigate police.online (or police)",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "police.online"
+   },
+   "route": "capability_model",
+   "language": "id",
+   "choices": [],
+   "message": "Silakan lanjutkan di halaman \"Lapor polisi online\". Ini demo; belum ada yang dikirim atau dibayar. (Halaman diterjemahkan di ponsel Anda; beberapa nama bisa berbeda dari aslinya dalam bahasa Mandarin.",
+   "elapsed_ms": 32753
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "lang_sea-31",
+  "category": "I08-police-report",
+  "language": "tl",
+  "input": "Gusto kong mag-report sa pulis online, nanakawan ako",
+  "session": "langsea-30",
+  "expected": "navigate police.online (or police)",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "no_match",
+   "language": "en",
+   "choices": [],
+   "message": "I'm not sure what you need yet. I can find services and open their pages; you can also ask \"what can you do\".",
+   "elapsed_ms": 35408
+  },
+  "verdict": "FAIL",
+  "note": "Tagalog is not a supported language (i18n.LANGUAGES has no 'tl', i18n.py:13); detected as en and no Tagalog keywords exist in capabilities_i18n.json"
+ },
+ {
+  "id": "lang_sea-32",
+  "category": "I08-police-report",
+  "language": "th",
+  "input": "อยากแจ้งความออนไลน์ค่ะ โดนขโมยของ",
+  "session": "langsea-31",
+  "expected": "navigate police.online (or police)",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "police.online"
+   },
+   "route": "capability_model",
+   "language": "th",
+   "choices": [],
+   "message": "โปรดดำเนินการต่อในหน้า \"แจ้งความออนไลน์\" นี่เป็นเดโม ยังไม่มีการส่งหรือชำระเงิน (หน้านี้แปลบนโทรศัพท์ของคุณ ชื่อบางอย่างอาจต่างจากต้นฉบับภาษาจีน)",
+   "elapsed_ms": 32179
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "lang_sea-33",
+  "category": "I09-queue-number",
+  "language": "vi",
+  "input": "Tôi muốn lấy số thứ tự ở văn phòng hành chính",
+  "session": "langsea-32",
+  "expected": "navigate reservation",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "reservation"
+   },
+   "route": "capability_model",
+   "language": "vi",
+   "choices": [],
+   "message": "Vui lòng tiếp tục trên trang \"Lấy số thứ tự\". Đây là bản demo, chưa gửi hay thanh toán gì. (Trang được dịch ngay trên điện thoại; một số tên có thể khác bản gốc tiếng Trung.)",
+   "elapsed_ms": 37650
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "lang_sea-34",
+  "category": "I09-queue-number",
+  "language": "id",
+  "input": "Saya mau ambil nomor antrian di kantor pemerintah",
+  "session": "langsea-33",
+  "expected": "navigate reservation",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "reservation"
+   },
+   "route": "capability_model",
+   "language": "id",
+   "choices": [],
+   "message": "Silakan lanjutkan di halaman \"Nomor antrean loket\". Ini demo; belum ada yang dikirim atau dibayar. (Halaman diterjemahkan di ponsel Anda; beberapa nama bisa berbeda dari aslinya dalam bahasa Mandarin.",
+   "elapsed_ms": 27366
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "lang_sea-35",
+  "category": "I09-queue-number",
+  "language": "tl",
+  "input": "Paano kumuha ng numero sa pila sa munisipyo?",
+  "session": "langsea-34",
+  "expected": "navigate reservation",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "no_match",
+   "language": "en",
+   "choices": [],
+   "message": "I'm not sure what you need yet. I can find services and open their pages; you can also ask \"what can you do\".",
+   "elapsed_ms": 41495
+  },
+  "verdict": "FAIL",
+  "note": "Tagalog is not a supported language (i18n.LANGUAGES has no 'tl', i18n.py:13); detected as en and no Tagalog keywords exist in capabilities_i18n.json"
+ },
+ {
+  "id": "lang_sea-36",
+  "category": "I09-queue-number",
+  "language": "th",
+  "input": "อยากกดบัตรคิวที่สำนักงานเขตค่ะ",
+  "session": "langsea-35",
+  "expected": "navigate reservation",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "reservation"
+   },
+   "route": "capability_model",
+   "language": "th",
+   "choices": [],
+   "message": "โปรดดำเนินการต่อในหน้า \"บัตรคิวเคาน์เตอร์\" นี่เป็นเดโม ยังไม่มีการส่งหรือชำระเงิน (หน้านี้แปลบนโทรศัพท์ของคุณ ชื่อบางอย่างอาจต่างจากต้นฉบับภาษาจีน)",
+   "elapsed_ms": 35720
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "lang_sea-37",
+  "category": "I10-disaster-report",
+  "language": "vi",
+  "input": "Có cây đổ trên đường, tôi muốn báo cáo",
+  "session": "langsea-36",
+  "expected": "navigate disasterReport or matching form (D-1-3 street light)",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "disasterReport"
+   },
+   "route": "capability_model",
+   "language": "vi",
+   "choices": [],
+   "message": "Vui lòng tiếp tục trên trang \"Báo cáo thiên tai\". Đây là bản demo, chưa gửi hay thanh toán gì. (Trang được dịch ngay trên điện thoại; một số tên có thể khác bản gốc tiếng Trung.)",
+   "elapsed_ms": 38662
+  },
+  "verdict": "PASS",
+  "note": "'cây đổ' -> disasterReport parent"
+ },
+ {
+  "id": "lang_sea-38",
+  "category": "I10-disaster-report",
+  "language": "id",
+  "input": "Lampu jalan di depan rumah rusak, mau lapor",
+  "session": "langsea-37",
+  "expected": "navigate disasterReport or matching form (D-1-3 street light)",
+  "observed": {
+   "kind": "unsupported",
+   "action": null,
+   "destination": null,
+   "route": "unavailable_direct",
+   "language": "id",
+   "choices": [],
+   "message": "Isi otomatis formulir keluhan: layanan ini belum tersedia di aplikasi.",
+   "elapsed_ms": 92
+  },
+  "verdict": "FAIL",
+  "note": "Replied 'Isi otomatis formulir keluhan: layanan ini belum tersedia' (reportIssue.prefill, off). That off entry owns Indonesian keyword 'lampu jalan' (capabilities_i18n.json:493) while D-1-3 needs the contiguous 'lampu jalan rusak' (line 619); single off match -> unavailable_direct (workflow.py:470-472). User is told street-light reporting is unavailable although D-1-3 exists"
+ },
+ {
+  "id": "lang_sea-39",
+  "category": "I10-disaster-report",
+  "language": "tl",
+  "input": "May natumbang puno sa kalsada, saan ako magre-report?",
+  "session": "langsea-38",
+  "expected": "navigate disasterReport or matching form (D-1-3 street light)",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "no_match",
+   "language": "en",
+   "choices": [],
+   "message": "I'm not sure what you need yet. I can find services and open their pages; you can also ask \"what can you do\".",
+   "elapsed_ms": 40326
+  },
+  "verdict": "FAIL",
+  "note": "Tagalog is not a supported language (i18n.LANGUAGES has no 'tl', i18n.py:13); detected as en and no Tagalog keywords exist in capabilities_i18n.json"
+ },
+ {
+  "id": "lang_sea-40",
+  "category": "I10-disaster-report",
+  "language": "th",
+  "input": "ไฟถนนเสียค่ะ จะแจ้งได้ที่ไหน",
+  "session": "langsea-39",
+  "expected": "navigate disasterReport or matching form (D-1-3 street light)",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "th",
+   "choices": [],
+   "message": "หมายถึงบริการหรือเรื่องไหน ถามว่า \"ทำอะไรได้บ้าง\" ก็ได้",
+   "elapsed_ms": 34578
+  },
+  "verdict": "FAIL",
+  "note": "Text contains D-1-3 keyword 'ไฟถนนเสีย' yet the reply is a clarification; reportIssue.prefill (off) also owns 'ไฟถนน' (capabilities_i18n.json:494). Guess: model got candidates and chose request_clarification"
+ },
+ {
+  "id": "lang_sea-41",
+  "category": "I11-faq-low-income",
+  "language": "vi",
+  "input": "Làm sao đăng ký hộ thu nhập thấp ở Đài Bắc?",
+  "session": "langsea-40",
+  "expected": "FAQ answer/choices about low-income household application",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "vi",
+   "choices": [],
+   "message": "Bạn muốn dịch vụ hay thao tác nào? Bạn cũng có thể hỏi \"bạn làm được gì\".",
+   "elapsed_ms": 38166
+  },
+  "verdict": "FAIL",
+  "note": "Non-Chinese path never consults the FAQ: workflow.py:655 routes city_question to _faq only when language=='zh'; non-zh falls through to no_match/clarify (not affected by the 22:01 embedding fault; these ran after 22:01 anyway)"
+ },
+ {
+  "id": "lang_sea-42",
+  "category": "I11-faq-low-income",
+  "language": "id",
+  "input": "Bagaimana cara daftar status rumah tangga berpenghasilan rendah di Taipei?",
+  "session": "langsea-41",
+  "expected": "FAQ answer/choices about low-income household application",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "no_match",
+   "language": "id",
+   "choices": [],
+   "message": "Saya belum paham kebutuhan Anda. Saya bisa mencari layanan dan membuka halamannya; Anda juga bisa tanya \"bisa apa saja\".",
+   "elapsed_ms": 42100
+  },
+  "verdict": "FAIL",
+  "note": "Non-Chinese path never consults the FAQ: workflow.py:655 routes city_question to _faq only when language=='zh'; non-zh falls through to no_match/clarify (not affected by the 22:01 embedding fault; these ran after 22:01 anyway)"
+ },
+ {
+  "id": "lang_sea-43",
+  "category": "I11-faq-low-income",
+  "language": "tl",
+  "input": "Paano mag-apply bilang low-income household sa Taipei?",
+  "session": "langsea-42",
+  "expected": "FAQ answer/choices about low-income household application",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "en",
+   "choices": [],
+   "message": "Which service or task do you mean? You can also ask \"what can you do\".",
+   "elapsed_ms": 46376
+  },
+  "verdict": "FAIL",
+  "note": "Non-Chinese path never consults the FAQ: workflow.py:655 routes city_question to _faq only when language=='zh'; non-zh falls through to no_match/clarify (not affected by the 22:01 embedding fault; these ran after 22:01 anyway); also Tagalog"
+ },
+ {
+  "id": "lang_sea-44",
+  "category": "I11-faq-low-income",
+  "language": "th",
+  "input": "สมัครเป็นครัวเรือนรายได้น้อยในไทเปยังไงคะ",
+  "session": "langsea-43",
+  "expected": "FAQ answer/choices about low-income household application",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "th",
+   "choices": [],
+   "message": "หมายถึงบริการหรือเรื่องไหน ถามว่า \"ทำอะไรได้บ้าง\" ก็ได้",
+   "elapsed_ms": 41195
+  },
+  "verdict": "FAIL",
+  "note": "Non-Chinese path never consults the FAQ: workflow.py:655 routes city_question to _faq only when language=='zh'; non-zh falls through to no_match/clarify (not affected by the 22:01 embedding fault; these ran after 22:01 anyway)"
+ },
+ {
+  "id": "lang_sea-45",
+  "category": "I12-faq-vision-check",
+  "language": "vi",
+  "input": "Kiểm tra thị lực cho trẻ mầm non có miễn phí không?",
+  "session": "langsea-44",
+  "expected": "FAQ answer/choices about free preschool vision check",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "no_match",
+   "language": "vi",
+   "choices": [],
+   "message": "Tôi chưa rõ bạn cần gì. Tôi có thể tìm dịch vụ và mở trang; bạn cũng có thể hỏi \"bạn làm được gì\".",
+   "elapsed_ms": 39056
+  },
+  "verdict": "FAIL",
+  "note": "Non-Chinese path never consults the FAQ: workflow.py:655 routes city_question to _faq only when language=='zh'; non-zh falls through to no_match/clarify (not affected by the 22:01 embedding fault; these ran after 22:01 anyway)"
+ },
+ {
+  "id": "lang_sea-46",
+  "category": "I12-faq-vision-check",
+  "language": "id",
+  "input": "Apakah pemeriksaan mata untuk anak prasekolah gratis?",
+  "session": "langsea-45",
+  "expected": "FAQ answer/choices about free preschool vision check",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "no_match",
+   "language": "id",
+   "choices": [],
+   "message": "Saya belum paham kebutuhan Anda. Saya bisa mencari layanan dan membuka halamannya; Anda juga bisa tanya \"bisa apa saja\".",
+   "elapsed_ms": 35453
+  },
+  "verdict": "FAIL",
+  "note": "Non-Chinese path never consults the FAQ: workflow.py:655 routes city_question to _faq only when language=='zh'; non-zh falls through to no_match/clarify (not affected by the 22:01 embedding fault; these ran after 22:01 anyway)"
+ },
+ {
+  "id": "lang_sea-47",
+  "category": "I12-faq-vision-check",
+  "language": "tl",
+  "input": "Libre po ba ang eye check-up ng batang preschool?",
+  "session": "langsea-46",
+  "expected": "FAQ answer/choices about free preschool vision check",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "no_match",
+   "language": "en",
+   "choices": [],
+   "message": "I'm not sure what you need yet. I can find services and open their pages; you can also ask \"what can you do\".",
+   "elapsed_ms": 37074
+  },
+  "verdict": "FAIL",
+  "note": "Non-Chinese path never consults the FAQ: workflow.py:655 routes city_question to _faq only when language=='zh'; non-zh falls through to no_match/clarify (not affected by the 22:01 embedding fault; these ran after 22:01 anyway); also Tagalog"
+ },
+ {
+  "id": "lang_sea-48",
+  "category": "I12-faq-vision-check",
+  "language": "th",
+  "input": "ตรวจสายตาเด็กอนุบาลฟรีไหมคะ",
+  "session": "langsea-47",
+  "expected": "FAQ answer/choices about free preschool vision check",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "no_match",
+   "language": "th",
+   "choices": [],
+   "message": "ยังไม่แน่ใจว่าต้องการอะไร ผมช่วยหาบริการและเปิดหน้าได้ หรือถามว่า \"ทำอะไรได้บ้าง\"",
+   "elapsed_ms": 40295
+  },
+  "verdict": "FAIL",
+  "note": "Non-Chinese path never consults the FAQ: workflow.py:655 routes city_question to _faq only when language=='zh'; non-zh falls through to no_match/clarify (not affected by the 22:01 embedding fault; these ran after 22:01 anyway)"
+ },
+ {
+  "id": "lang_sea-49",
+  "category": "I13-unsupported-hospital",
+  "language": "vi",
+  "input": "Tôi muốn đặt lịch khám bệnh ở bệnh viện",
+  "session": "langsea-48",
+  "expected": "honest unsupported explanation (medicalAppointment off), no navigation",
+  "observed": {
+   "kind": "unsupported",
+   "action": null,
+   "destination": null,
+   "route": "unavailable_direct",
+   "language": "vi",
+   "choices": [],
+   "message": "Đăng ký khám bệnh: dịch vụ này chưa có trong ứng dụng.",
+   "elapsed_ms": 134
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "lang_sea-50",
+  "category": "I13-unsupported-hospital",
+  "language": "id",
+  "input": "Saya mau daftar berobat di rumah sakit",
+  "session": "langsea-49",
+  "expected": "honest unsupported explanation (medicalAppointment off), no navigation",
+  "observed": {
+   "kind": "unsupported",
+   "action": null,
+   "destination": null,
+   "route": "unavailable_direct",
+   "language": "id",
+   "choices": [],
+   "message": "Pendaftaran rumah sakit: layanan ini belum tersedia di aplikasi.",
+   "elapsed_ms": 93
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "lang_sea-51",
+  "category": "I13-unsupported-hospital",
+  "language": "tl",
+  "input": "Gusto kong magpa-appointment sa ospital",
+  "session": "langsea-50",
+  "expected": "honest unsupported explanation (medicalAppointment off), no navigation",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "no_match",
+   "language": "en",
+   "choices": [],
+   "message": "I'm not sure what you need yet. I can find services and open their pages; you can also ask \"what can you do\".",
+   "elapsed_ms": 36939
+  },
+  "verdict": "FAIL",
+  "note": "No honest 'hospital booking not available' explanation; Tagalog is not a supported language (i18n.LANGUAGES has no 'tl', i18n.py:13); detected as en and no Tagalog keywords exist in capabilities_i18n.json"
+ },
+ {
+  "id": "lang_sea-52",
+  "category": "I13-unsupported-hospital",
+  "language": "th",
+  "input": "อยากจองคิวหาหมอที่โรงพยาบาลค่ะ",
+  "session": "langsea-51",
+  "expected": "honest unsupported explanation (medicalAppointment off), no navigation",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "th",
+   "choices": [],
+   "message": "หมายถึงบริการหรือเรื่องไหน ถามว่า \"ทำอะไรได้บ้าง\" ก็ได้",
+   "elapsed_ms": 38274
+  },
+  "verdict": "FAIL",
+  "note": "Thai medicalAppointment keywords are 'นัดหมอ','ลงทะเบียนโรงพยาบาล','พบแพทย์'; 'จองคิวหาหมอ ... โรงพยาบาล' not covered -> clarification instead of honest unsupported"
+ },
+ {
+  "id": "lang_sea-53",
+  "category": "I14-out-of-scope",
+  "language": "vi",
+  "input": "Hôm nay thời tiết thế nào?",
+  "session": "langsea-52",
+  "expected": "nothing related, no navigation, user's language",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "no_match",
+   "language": "vi",
+   "choices": [],
+   "message": "Tôi chưa rõ bạn cần gì. Tôi có thể tìm dịch vụ và mở trang; bạn cũng có thể hỏi \"bạn làm được gì\".",
+   "elapsed_ms": 39806
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "lang_sea-54",
+  "category": "I14-out-of-scope",
+  "language": "id",
+  "input": "Resep nasi goreng gimana?",
+  "session": "langsea-53",
+  "expected": "nothing related, no navigation, user's language",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "no_match",
+   "language": "en",
+   "choices": [],
+   "message": "I'm not sure what you need yet. I can find services and open their pages; you can also ask \"what can you do\".",
+   "elapsed_ms": 39578
+  },
+  "verdict": "FAIL",
+  "note": "'Resep nasi goreng gimana?' detected as en (no word in _ID_WORDS, i18n.py:17-19) -> English reply"
+ },
+ {
+  "id": "lang_sea-55",
+  "category": "I14-out-of-scope",
+  "language": "tl",
+  "input": "Ano ang panahon ngayon?",
+  "session": "langsea-54",
+  "expected": "nothing related, no navigation, user's language",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "no_match",
+   "language": "en",
+   "choices": [],
+   "message": "I'm not sure what you need yet. I can find services and open their pages; you can also ask \"what can you do\".",
+   "elapsed_ms": 26437
+  },
+  "verdict": "CONCERN",
+  "note": "English reply; Tagalog is not a supported language (i18n.LANGUAGES has no 'tl', i18n.py:13); detected as en and no Tagalog keywords exist in capabilities_i18n.json"
+ },
+ {
+  "id": "lang_sea-56",
+  "category": "I14-out-of-scope",
+  "language": "th",
+  "input": "วันนี้อากาศเป็นยังไงบ้าง",
+  "session": "langsea-55",
+  "expected": "nothing related, no navigation, user's language",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "no_match",
+   "language": "th",
+   "choices": [],
+   "message": "ยังไม่แน่ใจว่าต้องการอะไร ผมช่วยหาบริการและเปิดหน้าได้ หรือถามว่า \"ทำอะไรได้บ้าง\"",
+   "elapsed_ms": 31122
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "lang_sea-57",
+  "category": "I15-cancel",
+  "language": "vi",
+  "input": "Thôi, không cần nữa",
+  "session": "langsea-56",
+  "expected": "cancelled, no navigation",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "no_match",
+   "language": "vi",
+   "choices": [],
+   "message": "Tôi chưa rõ bạn cần gì. Tôi có thể tìm dịch vụ và mở trang; bạn cũng có thể hỏi \"bạn làm được gì\".",
+   "elapsed_ms": 30474
+  },
+  "verdict": "FAIL",
+  "note": "'Thôi, không cần nữa' — i18n.matches uses re.fullmatch (i18n.py:118-120), so cancel phrases with punctuation/extra words miss the CANCEL table (i18n.py:60-66); then a ~30 s intent-model call ends in no_match. action!=cancel (no pending state existed, so no harm)"
+ },
+ {
+  "id": "lang_sea-58",
+  "category": "I15-cancel",
+  "language": "id",
+  "input": "Gak jadi, batal saja",
+  "session": "langsea-57",
+  "expected": "cancelled, no navigation",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "no_match",
+   "language": "id",
+   "choices": [],
+   "message": "Saya belum paham kebutuhan Anda. Saya bisa mencari layanan dan membuka halamannya; Anda juga bisa tanya \"bisa apa saja\".",
+   "elapsed_ms": 29393
+  },
+  "verdict": "FAIL",
+  "note": "'Gak jadi, batal saja' — i18n.matches uses re.fullmatch (i18n.py:118-120), so cancel phrases with punctuation/extra words miss the CANCEL table (i18n.py:60-66); then a ~30 s intent-model call ends in no_match. action!=cancel (no pending state existed, so no harm); also 'gak jadi' not in the pattern (only 'ga jadi'/'tidak jadi')"
+ },
+ {
+  "id": "lang_sea-59",
+  "category": "I15-cancel",
+  "language": "tl",
+  "input": "Wag na lang po",
+  "session": "langsea-58",
+  "expected": "cancelled, no navigation",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "no_match",
+   "language": "en",
+   "choices": [],
+   "message": "I'm not sure what you need yet. I can find services and open their pages; you can also ask \"what can you do\".",
+   "elapsed_ms": 36386
+  },
+  "verdict": "FAIL",
+  "note": "No Tagalog cancel phrase; Tagalog is not a supported language (i18n.LANGUAGES has no 'tl', i18n.py:13); detected as en and no Tagalog keywords exist in capabilities_i18n.json"
+ },
+ {
+  "id": "lang_sea-60",
+  "category": "I15-cancel",
+  "language": "th",
+  "input": "ไม่เป็นไรค่ะ ยกเลิก",
+  "session": "langsea-59",
+  "expected": "cancelled, no navigation",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "no_match",
+   "language": "th",
+   "choices": [],
+   "message": "ยังไม่แน่ใจว่าต้องการอะไร ผมช่วยหาบริการและเปิดหน้าได้ หรือถามว่า \"ทำอะไรได้บ้าง\"",
+   "elapsed_ms": 26010
+  },
+  "verdict": "FAIL",
+  "note": "'ไม่เป็นไรค่ะ ยกเลิก' — i18n.matches uses re.fullmatch (i18n.py:118-120), so cancel phrases with punctuation/extra words miss the CANCEL table (i18n.py:60-66); then a ~30 s intent-model call ends in no_match. action!=cancel (no pending state existed, so no harm)"
+ },
+ {
+  "id": "lang_sea-61",
+  "category": "I06-water-bill",
+  "language": "vi-nodiac",
+  "input": "toi muon dong tien nuoc",
+  "session": "langsea-60",
+  "expected": "navigate fees.water",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "no_match",
+   "language": "id",
+   "choices": [],
+   "message": "Saya belum paham kebutuhan Anda. Saya bisa mencari layanan dan membuka halamannya; Anda juga bisa tanya \"bisa apa saja\".",
+   "elapsed_ms": 29280
+  },
+  "verdict": "FAIL",
+  "note": "Unaccented Vietnamese: _VI regex needs diacritics; 'dong' is in _ID_WORDS (Indonesian particle) so it was classed Indonesian -> Indonesian reply, no match. vi keywords exist only with diacritics"
+ },
+ {
+  "id": "lang_sea-62",
+  "category": "I08-police-report",
+  "language": "vi-nodiac",
+  "input": "bi mat trom muon bao cong an",
+  "session": "langsea-61",
+  "expected": "navigate police.online (or police)",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "no_match",
+   "language": "en",
+   "choices": [],
+   "message": "I'm not sure what you need yet. I can find services and open their pages; you can also ask \"what can you do\".",
+   "elapsed_ms": 27744
+  },
+  "verdict": "FAIL",
+  "note": "Unaccented Vietnamese detected as en; no unaccented keyword or fold of diacritics (fold keeps marks, i18n.py:42-45)"
+ },
+ {
+  "id": "lang_sea-63",
+  "category": "I03-borrow-book",
+  "language": "vi-nodiac",
+  "input": "muon muon sach",
+  "session": "langsea-62",
+  "expected": "navigate library home",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "no_match",
+   "language": "en",
+   "choices": [],
+   "message": "I'm not sure what you need yet. I can find services and open their pages; you can also ask \"what can you do\".",
+   "elapsed_ms": 27298
+  },
+  "verdict": "FAIL",
+  "note": "Unaccented Vietnamese detected as en; no unaccented keywords"
+ },
+ {
+  "id": "lang_sea-64",
+  "category": "I06-water-bill",
+  "language": "th-informal",
+  "input": "จ่ายค่าน้ำงับ",
+  "session": "langsea-63",
+  "expected": "navigate fees.water",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "fees.water"
+   },
+   "route": "capability_model",
+   "language": "th",
+   "choices": [],
+   "message": "โปรดดำเนินการต่อในหน้า \"ค่าน้ำ\" นี่เป็นเดโม ยังไม่มีการส่งหรือชำระเงิน (หน้านี้แปลบนโทรศัพท์ของคุณ ชื่อบางอย่างอาจต่างจากต้นฉบับภาษาจีน)",
+   "elapsed_ms": 30484
+  },
+  "verdict": "PASS",
+  "note": "Thai substring match tolerates particle 'งับ'"
+ },
+ {
+  "id": "lang_sea-65",
+  "category": "I07-parking-fee",
+  "language": "th-informal",
+  "input": "จ่ายค่าจอดรถหน่อยจ้า",
+  "session": "langsea-64",
+  "expected": "navigate fees.parking",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "fees.parking"
+   },
+   "route": "capability_model",
+   "language": "th",
+   "choices": [],
+   "message": "โปรดดำเนินการต่อในหน้า \"ค่าจอดรถ\" นี่เป็นเดโม ยังไม่มีการส่งหรือชำระเงิน (หน้านี้แปลบนโทรศัพท์ของคุณ ชื่อบางอย่างอาจต่างจากต้นฉบับภาษาจีน)",
+   "elapsed_ms": 21675
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "lang_sea-P1",
+  "category": "I15-cancel",
+  "language": "vi",
+  "input": "Thôi",
+  "session": "langsea-pr*",
+  "expected": "cancelled, no navigation",
+  "observed": {
+   "kind": "reply",
+   "action": "cancel",
+   "route": "cancel",
+   "language": "vi",
+   "message": "Đã hủy. Không mở trang nào."
+  },
+  "verdict": "PASS",
+  "note": "Probe: bare cancel word works -> confirms fullmatch is the cause of the I15 failures"
+ },
+ {
+  "id": "lang_sea-P2",
+  "category": "I15-cancel",
+  "language": "id",
+  "input": "batal",
+  "session": "langsea-pr*",
+  "expected": "cancelled, no navigation",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "route": "no_match",
+   "language": "en",
+   "message": "I'm not sure what you need yet..."
+  },
+  "verdict": "FAIL",
+  "note": "Probe: 'batal' alone detected as en (not in _ID_WORDS), so the Indonesian CANCEL table is never consulted"
+ },
+ {
+  "id": "lang_sea-P3",
+  "category": "I15-cancel",
+  "language": "th",
+  "input": "ยกเลิก",
+  "session": "langsea-pr*",
+  "expected": "cancelled, no navigation",
+  "observed": {
+   "kind": "reply",
+   "action": "cancel",
+   "route": "cancel",
+   "language": "th",
+   "message": "ยกเลิกแล้ว ไม่ได้เปิดหน้าใด"
+  },
+  "verdict": "PASS",
+  "note": "Probe"
+ },
+ {
+  "id": "lang_sea-P4",
+  "category": "I02-capabilities",
+  "language": "tl",
+  "input": "Ano po ang kaya mong gawin",
+  "session": "langsea-pr*",
+  "expected": "capability list in user's language",
+  "observed": {
+   "kind": "reply",
+   "route": "no_match",
+   "language": "en"
+  },
+  "verdict": "FAIL",
+  "note": "Probe (without '?'): same as case 07"
+ },
+ {
+  "id": "lang_sea-P5",
+  "category": "I10-disaster-report",
+  "language": "id",
+  "input": "Lampu jalan rusak",
+  "session": "langsea-pr*",
+  "expected": "navigate disasterReport or matching form (D-1-3 street light)",
+  "observed": {
+   "kind": "reply",
+   "route": "no_match",
+   "language": "en",
+   "message": "I'm not sure what you need yet..."
+  },
+  "verdict": "FAIL",
+  "note": "Probe: exact D-1-3 Indonesian keyword, but detected as en (none of the 3 words in _ID_WORDS) so Indonesian keywords are not searched"
+ },
+ {
+  "id": "lang_sea-P6",
+  "category": "I11-faq-low-income",
+  "language": "zh-control",
+  "input": "臺北市低收入戶怎麼申請",
+  "session": "langsea-pr*",
+  "expected": "FAQ answer/choices about low-income household application",
+  "observed": {
+   "kind": "navigate",
+   "destination": {
+    "kind": "capability",
+    "id": "districtOffice"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "message": "請在原本的「申辦服務」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "CONCERN",
+  "note": "Control in Chinese: opened 申辦服務 instead of an FAQ answer (outside this agent's scope; for the zh testers)"
+ }
+]
