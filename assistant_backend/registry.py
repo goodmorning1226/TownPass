@@ -36,6 +36,7 @@ class Registry:
         default = os.environ.get("TOWNPASS_CAPABILITIES") or (
             pathlib.Path(__file__).resolve().parents[1] / "assets/assistant/capabilities.json")
         path = pathlib.Path(path or default)
+        self.path = path  # semantic.examples() reads capability_examples.json next to it
         data = json.loads(path.read_text(encoding="utf-8"))
         self.version = data["version"]
         self.entries = data["capabilities"]
@@ -48,6 +49,11 @@ class Registry:
         unknown = set(self.i18n) - set(self.by_id)
         if unknown:
             raise ValueError(f"capabilities_i18n.json names unknown capabilities: {sorted(unknown)}")
+        # Each page's own words (title, keywords, bill subjects, inner features),
+        # for telling a common word from a page-specific one (workflow._common_word).
+        self.vocabulary = {entry["id"]: [v for v in dict.fromkeys(
+            normalized(term) for term in [entry["title"], *entry["keywords"], *(entry.get("pay_words") or []),
+                                          *entry.get("features", [])]) if v] for entry in self.entries}
 
     def title(self, entry, language="zh"):
         """The entry's name in a language; the Chinese title when there is none."""

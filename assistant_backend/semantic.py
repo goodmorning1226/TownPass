@@ -14,6 +14,10 @@ file keyed by a hash of the passage texts and of the embedding model's output
 for a fixed probe, so a changed catalogue or model rebuilds them. While the
 embedding server is unreachable the index is not ready and search() finds
 nothing: the assistant runs as before. TOWNPASS_SEMANTIC=0 turns the layer off.
+Everyday example requests per page (capability_examples.json,
+docs/AI_COLLOQUIAL_MATCHING_EXPERIMENT.md) are indexed as well; they are part
+of the hashed texts, so editing them rebuilds the cache.
+TOWNPASS_SEMANTIC_EXAMPLES=0 leaves them out (rollback).
 """
 import array
 import hashlib
@@ -47,8 +51,40 @@ RETRY_SECONDS = 10
 BUILD_TIMEOUT = 120  # one batch while building; a phone's 2 threads are slow
 
 
-def passages(registry):
-    """[(entry id, "passage: ..." text)], several per entry, without duplicates."""
+# Colloquial version B (docs/AI_COLLOQUIAL_MATCHING_EXPERIMENT.md), on unless
+# TOWNPASS_SEMANTIC_EXAMPLES=0: everyday example requests per page
+# (assets/assistant/capability_examples.json) are indexed too, and a page's
+# score is its best cosine over its catalogue texts and its examples. Examples
+# are requests, so they are embedded with the query prefix (query-to-query).
+EXAMPLES = os.environ.get("TOWNPASS_SEMANTIC_EXAMPLES", "1") == "1"
+EXAMPLE_PREFIX = faq.QUERY_PREFIX
+# Query-to-query cosines are higher than query-to-catalogue ones, so pages with
+# examples would be offered for almost anything (non-requests with candidates
+# 11 -> 28 of 41 on the dev sets). Example cosines are lowered by this much
+# before a page's best is taken: 0.05 keeps non-requests at 12/41 while the right
+# page is among the candidates for 215/252 dev sentences (183 without examples;
+# leave-one-out, a sentence never sees its own text). Tuned on
+# eval_colloquial_dev.json and semantic_tuning.json only.
+EXAMPLE_OFFSET = float(os.environ.get("TOWNPASS_SEMANTIC_EXAMPLE_OFFSET", "0.05"))
+
+
+def examples(registry):
+    """[(entry id, example text)] from capability_examples.json next to the catalogue."""
+    path = getattr(registry, "path", None)
+    path = path.with_name("capability_examples.json") if path else None
+    if path is None or not path.exists():
+        return []
+    data = json.loads(path.read_text(encoding="utf-8"))["examples"]
+    unknown = set(data) - set(registry.by_id)
+    if unknown:
+        raise ValueError(f"capability_examples.json names unknown capabilities: {sorted(unknown)}")
+    return [(entry_id, text) for entry_id, languages in data.items()
+            for _, texts in sorted(languages.items()) for text in texts]
+
+
+def passages(registry, with_examples=None):
+    """[(entry id, "passage: ..." text)], several per entry, without duplicates;
+    with examples also [(entry id, "query: <example>")]."""
     found = []
     for entry in registry.entries:
         texts = [entry["title"], "，".join([entry["title"], *entry["keywords"]])]
@@ -59,6 +95,8 @@ def passages(registry):
                 texts.append(", ".join([local["title"], *local.get("keywords", [])]))
         for text in dict.fromkeys(texts):
             found.append((entry["id"], faq.PASSAGE_PREFIX + text))
+    if EXAMPLES if with_examples is None else with_examples:
+        found += [(entry_id, EXAMPLE_PREFIX + text) for entry_id, text in dict.fromkeys(examples(registry))]
     return found
 
 
@@ -71,14 +109,14 @@ def default_cache_dir():
 
 
 class CatalogIndex:
-    def __init__(self, registry, url=None, embed_many=None, cache_dir=None):
+    def __init__(self, registry, url=None, embed_many=None, cache_dir=None, with_examples=None):
         """embed_many: list of texts -> list of L2-normalised vectors, for tests;
         default asks the embedding server at url (faq.embed_texts)."""
         self.registry = registry
         self.url = url or faq.default_url()
         self._embed_many = embed_many
         self.cache_dir = pathlib.Path(cache_dir) if cache_dir else default_cache_dir()
-        self.texts = passages(registry)
+        self.texts = passages(registry, with_examples)
         self.rows = None          # one array("f") per passage once built
         self.lock = threading.Lock()
         self.last_attempt = None
@@ -163,8 +201,10 @@ class CatalogIndex:
             return {}
         best = {}
         dot = getattr(math, "sumprod", None) or (lambda a, b: math.fsum(x * y for x, y in zip(a, b)))
-        for (entry_id, _), row in zip(self.texts, self.rows):
+        for (entry_id, passage), row in zip(self.texts, self.rows):
             score = dot(row, vector)
+            if passage.startswith(EXAMPLE_PREFIX):
+                score -= EXAMPLE_OFFSET  # query-to-query cosines run higher (see EXAMPLE_OFFSET)
             if score > best.get(entry_id, -2.0):
                 best[entry_id] = score
         return best

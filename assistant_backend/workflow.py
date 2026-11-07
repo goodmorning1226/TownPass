@@ -21,6 +21,7 @@ import uuid
 import emergency
 import i18n
 import qna
+import registry as matching
 from decision import decide
 from faq import SCOPE_NOTE
 from guide import GuidePlanner
@@ -31,6 +32,17 @@ from registry import Registry, book_fuzzy, primary_title, single_substitution
 # A cheap superset of the library signals retrieve() looks for; the book
 # catalogue is consulted only when one of these appears.
 LIBRARY_CUE = re.compile(r"借|找|搜尋|看|閱|書|館|寫的|ISBN", re.I)
+# Version D (docs/AI_COLLOQUIAL_MATCHING_EXPERIMENT.md; TEAM_TASKS T2 items 2-3),
+# on by default (TOWNPASS_T2_GENERIC=0 restores the old behaviour for a rollback):
+# an unmatched request goes to the library
+# decision only when it names a book or the library (or borrows); "全部的服務給我看"
+# and "大家常問的問題在哪裡看" continue to the fallbacks. A disconnected page found
+# only by a common word (路燈, 公園, 疫苗) does not answer at once when the
+# sentence says more: a connected page that means the same is offered first.
+T2_GENERIC = os.environ.get("TOWNPASS_T2_GENERIC", "1") == "1"
+LIBRARY_NOUN = re.compile(r"借|書|(?<!手)冊|館|閱|寫的|作者|ISBN", re.I)  # 冊: Taiwanese for book; not 手冊
+GENERIC_REST = 3  # characters besides the common word that make the sentence say more
+GENERIC_REST_FOREIGN = 8  # letters, for the other languages
 
 # Sound-alike book titles (phonetic.py). On the demo catalogue real
 # sound-alikes score 1.0 and unrelated phrases at most ~0.6.
@@ -65,6 +77,12 @@ INTENT_FALLBACK = os.environ.get("TOWNPASS_INTENT_FALLBACK", "1") == "1"
 SEMANTIC_MIN_CHARS = 2
 SEMANTIC_NOTE = ("These candidates were found by similar meaning, not by matching words. "
                  "Offer them only if one is what the user asks for; otherwise ask to clarify.")
+# Colloquial version B: semantic candidates whose best lift reaches this are offered
+# without a model call (still a list to confirm; never navigates).
+# TOWNPASS_SEMANTIC_DIRECT=0 turns it off. On the dev
+# sets (leave-one-out, examples on) non-requests reach at most 0.057 and 67 of
+# 203 right top pages reach 0.08 (1 wrong top page).
+SEMANTIC_DIRECT = float(os.environ.get("TOWNPASS_SEMANTIC_DIRECT", "0.08"))
 FALLBACK_SOUND = 0.8  # misheard words ~1.0 after folding; chance matches <= 0.74
 FALLBACK_LIMIT = 3
 COMMAND_SOUND = 0.8  # "下一個" is 0.78 and stays unmatched
@@ -573,6 +591,10 @@ class Workflow:
             return self.reply(payload, i18n.t("no_match", language))
         entries = [m["entry"] for m in matches]
         if len(matches) == 1 and not entries[0]["enabled"]:
+            offered = T2_GENERIC and self._generic_unavailable(payload, text, i18n.positive_text(text, language),
+                                                               matches[0])
+            if offered:
+                return offered
             self._trace("unavailable_direct", [entries[0]["id"]])
             return self._navigate(payload, entries[0])
         ambiguous = len(entries) > 1
@@ -734,6 +756,9 @@ class Workflow:
                 # A single exact match to a disconnected capability has nothing to
                 # decide: state the reviewed reason instead of asking the model,
                 # which tended to answer such candidates with a clarification.
+                offered = T2_GENERIC and self._generic_unavailable(payload, text, positive_text(text), matches[0])
+                if offered:
+                    return offered
                 self._trace("unavailable_direct", [entries[0]["id"]])
                 return self._navigate(payload, entries[0])
             ambiguous = len(entries) > 1 or any(m["fuzzy"] for m in matches)
@@ -748,7 +773,7 @@ class Workflow:
             if name == "select_capability":
                 return self._navigate(payload, self.registry.by_id[args["capability_id"]])
             return self._faq(payload, text) or self.reply(payload, "請補充想使用的服務或操作，也可以問「有哪些功能」。")
-        if LIBRARY_CUE.search(text):
+        if (LIBRARY_NOUN if T2_GENERIC else LIBRARY_CUE).search(text):
             return self._library(payload, text, self.owner.catalog.books())
         sounded = self._sound_fallback(payload, text)
         if sounded:
@@ -806,6 +831,8 @@ class Workflow:
         ""), which is what is embedded; e5 does not understand negation, so a
         refusal must not bring back the service it refuses."""
         index = getattr(self.owner, "semantic", None)
+        # Not stripped of fillers: in the experiment that found no more right
+        # pages and offered 申辦服務 for "我想辦事情" (AI_COLLOQUIAL_MATCHING_EXPERIMENT.md).
         if index is None or not index.ready or len(re.findall(r"\w", positive)) < SEMANTIC_MIN_CHARS:
             return None
         started = time.monotonic()
@@ -817,14 +844,20 @@ class Workflow:
         if not found:
             return None
         entries = [entry for _, entry in found]
+        language = payload.get("language", "zh")
+        message = i18n.t("confirm_capability", language) if language != "zh" else "你是不是要用以下服務？請先確認。"
+        if SEMANTIC_DIRECT and found[0][0] >= SEMANTIC_DIRECT:
+            # Colloquial version B: a clear semantic match is offered without asking the model
+            # (it declined 17 of 18 such dev sentences); still only a list to confirm.
+            self._trace("semantic_direct", [e["id"] for e in entries])
+            self.owner.usage.semantic["decision"] = "direct"
+            return self._offer(payload, self._cap_items(entries, language), message)
         self._trace("semantic_model", [e["id"] for e in entries])
         name, _ = self._decide(text, entries, confirmation=True, context=payload.get("page_context"),
                                note=SEMANTIC_NOTE)
         self.owner.usage.semantic["decision"] = name
         if name != "confirm_candidates":
             return None
-        language = payload.get("language", "zh")
-        message = i18n.t("confirm_capability", language) if language != "zh" else "你是不是要用以下服務？請先確認。"
         return self._offer(payload, self._cap_items(entries, language), message)
 
     def _sound_candidates(self, text):
@@ -858,3 +891,57 @@ class Workflow:
         if name != "confirm_candidates":
             return None
         return self._offer(payload, self._cap_items(entries), "聽起來像是以下服務，你想用哪一個？請先確認。")
+
+    def _common_word(self, entry, terms, language):
+        """Whether a disconnected page was found only by everyday words: two
+        Chinese characters (公園, 疫苗) or one foreign word, or a word a connected
+        page also uses (路燈 in 路燈故障, street light in broken street light)."""
+        def shared(term):
+            n = matching.normalized(term)
+            for other in self.registry.entries:
+                if other["id"] == entry["id"] or not other["enabled"]:
+                    continue
+                local = [value for names in self.registry.i18n.get(other["id"], {}).values() if names
+                         for value in [names.get("title", ""), *names.get("keywords", [])]]
+                if any(n and n in matching.normalized(word) for word in
+                       [*self.registry.vocabulary[other["id"]], *local]):
+                    return True
+            return False
+
+        def short(term):
+            if language == "zh" or re.search(r"[一-鿿]", term):
+                return len(matching.normalized(term)) <= 2
+            if language in ("ja", "th"):
+                return len(matching.normalized(term)) <= 3
+            return len(term.split()) == 1
+        return bool(terms) and all(short(term) or shared(term) for term in terms)
+
+    def _generic_unavailable(self, payload, text, positive, match):
+        """Version D (T2_GENERIC): a single disconnected page matched by a common
+        word while the sentence says more ("公園旁邊的大樹被風吹倒擋住路"): when
+        semantic retrieval ranks a connected page first, the connected pages it
+        found and the disconnected one are offered (model: offer or clarify).
+        None keeps the usual "not connected" answer, also when the disconnected
+        page itself ranks first ("我要預約打流感疫苗")."""
+        language = payload.get("language", "zh")
+        entry, terms = match["entry"], [term for term in match.get("evidence") or [] if term]
+        if not self._common_word(entry, terms, language):
+            return None
+        rest = (len(matching.normalized(i18n.strip_fillers(positive, language)))
+                - max(len(matching.normalized(term)) for term in terms))
+        if rest < (GENERIC_REST if language == "zh" else GENERIC_REST_FOREIGN):
+            return None
+        index = getattr(self.owner, "semantic", None)
+        if index is None or not index.ready:
+            return None
+        found = [e for _, e in index.search(positive)]
+        if not found or found[0]["id"] == entry["id"] or not found[0]["enabled"]:
+            return None
+        entries = [e for e in found if e["enabled"]] + [entry]
+        self._trace("generic_model", [e["id"] for e in entries])
+        name, _ = self._decide(text, entries, confirmation=True, context=payload.get("page_context"),
+                               note=SEMANTIC_NOTE)
+        if name != "confirm_candidates":
+            return None
+        message = i18n.t("confirm_capability", language) if language != "zh" else "你是不是要用以下服務？請先確認。"
+        return self._offer(payload, self._cap_items(entries, language), message)
