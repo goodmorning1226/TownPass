@@ -511,72 +511,81 @@ class _AssistantSheetState extends State<AssistantSheet> {
                   : const SizedBox.shrink(),
             ),
           ),
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Semantics(
-                button: true,
-                label: _t(listening ? 'listeningSemantics' : 'holdToTalk'),
-                onTap: busy ? null : _toggleListening,
-                excludeSemantics: true,
-                child: Listener(
-                  onPointerDown: busy ? null : _pressStart,
-                  onPointerMove: (event) => _pressMove(event.position),
-                  onPointerUp: (_) => _pressEnd(cancelled: false),
-                  onPointerCancel: (_) => _pressEnd(cancelled: true),
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 150),
-                    width: listening ? 104 : 88,
-                    height: listening ? 104 : 88,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: busy
-                          ? TPColors.grayscale300
-                          : listening
-                          ? (_discard ? TPColors.grayscale500 : TPColors.red500)
-                          : TPColors.primary500,
-                      boxShadow: const [
-                        BoxShadow(color: Color(0x33000000), blurRadius: 8),
-                      ],
-                    ),
-                    child: Icon(
-                      listening ? Icons.graphic_eq : Icons.mic,
-                      color: TPColors.white,
-                      size: 40,
+          // Bounded width: a longer caption in another language wraps
+          // instead of overflowing the row.
+          ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 176),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Semantics(
+                  button: true,
+                  label: _t(listening ? 'listeningSemantics' : 'holdToTalk'),
+                  onTap: busy ? null : _toggleListening,
+                  excludeSemantics: true,
+                  child: Listener(
+                    onPointerDown: busy ? null : _pressStart,
+                    onPointerMove: (event) => _pressMove(event.position),
+                    onPointerUp: (_) => _pressEnd(cancelled: false),
+                    onPointerCancel: (_) => _pressEnd(cancelled: true),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 150),
+                      width: listening ? 104 : 88,
+                      height: listening ? 104 : 88,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: busy
+                            ? TPColors.grayscale300
+                            : listening
+                            ? (_discard
+                                  ? TPColors.grayscale500
+                                  : TPColors.red500)
+                            : TPColors.primary500,
+                        boxShadow: const [
+                          BoxShadow(color: Color(0x33000000), blurRadius: 8),
+                        ],
+                      ),
+                      child: Icon(
+                        listening ? Icons.graphic_eq : Icons.mic,
+                        color: TPColors.white,
+                        size: 40,
+                      ),
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 8),
-              // Live loudness while recording, so a quiet voice is noticed
-              // before the clip is sent.
-              SizedBox(
-                width: 120,
-                height: 6,
-                child: listening
-                    ? ClipRRect(
-                        borderRadius: BorderRadius.circular(3),
-                        child: LinearProgressIndicator(
-                          key: const Key('assistant-level'),
-                          value: controller.level.value,
-                          color: quiet
-                              ? TPColors.secondary500
-                              : TPColors.primary500,
-                          backgroundColor: TPColors.grayscale100,
-                        ),
-                      )
-                    : null,
-              ),
-              const SizedBox(height: 4),
-              TPText(
-                caption,
-                style: TPTextStyles.bodyRegular,
-                color: quiet && listening
-                    ? TPColors.secondary700
-                    : TPColors.grayscale700,
-                textAlign: TextAlign.center,
-              ),
-            ],
+                const SizedBox(height: 8),
+                // Live loudness while recording, so a quiet voice is noticed
+                // before the clip is sent.
+                SizedBox(
+                  width: 120,
+                  height: 6,
+                  child: listening
+                      ? ClipRRect(
+                          borderRadius: BorderRadius.circular(3),
+                          child: LinearProgressIndicator(
+                            key: const Key('assistant-level'),
+                            value: controller.level.value,
+                            color: quiet
+                                ? TPColors.secondary500
+                                : TPColors.primary500,
+                            backgroundColor: TPColors.grayscale100,
+                          ),
+                        )
+                      : null,
+                ),
+                const SizedBox(height: 4),
+                TPText(
+                  caption,
+                  style: TPTextStyles.bodyRegular,
+                  color: quiet && listening
+                      ? TPColors.secondary700
+                      : TPColors.grayscale700,
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
           ),
           Expanded(
             child: Align(

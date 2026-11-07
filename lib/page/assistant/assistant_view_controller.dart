@@ -98,6 +98,9 @@ class AssistantViewController extends GetxController {
     this.speaker.loadEnabled().then((enabled) {
       if (!isClosed) readAloud.value = enabled;
     });
+    // A new assistant starts without a conversation language: the panel uses
+    // the page language until the user picks one in the menu or speaks.
+    AssistantTexts.conversation.value = null;
     AssistantSpeechLanguage.load().then((code) {
       if (!isClosed) speechLanguage.value = code;
     });
@@ -117,6 +120,15 @@ class AssistantViewController extends GetxController {
     speechLanguage.value = AssistantSpeechLanguage.of(code).code;
     heardLanguage.value = null;
     AssistantSpeechLanguage.save(speechLanguage.value);
+    _followInPanel(speechLanguage.value);
+  }
+
+  /// The panel's own texts follow the conversation's language at once
+  /// (AssistantTexts.conversation); "auto" keeps the current one.
+  void _followInPanel(String? code) {
+    if (code != null && AssistantTexts.languages.contains(code)) {
+      AssistantTexts.conversation.value = code;
+    }
   }
 
   /// The language a turn was actually spoken or typed in is used for the next
@@ -189,6 +201,7 @@ class AssistantViewController extends GetxController {
   static final _hasWords = RegExp(r'[^\d\s\p{P}\p{S}]{2,}', unicode: true);
 
   void _rememberLanguage(String? code) {
+    _followInPanel(code);
     if (code == null || speechLanguage.value == 'auto') return;
     final known = AssistantSpeechLanguage.all.any((l) => l.code == code);
     if (!known || code == speechLanguage.value) return;
@@ -625,30 +638,43 @@ class AssistantViewController extends GetxController {
         return;
       }
     }
+    var text = heard.text;
+    var correctedFrom = heard.correctedFrom;
     if (heard.confirm) {
-      // Unsure or unmatched speech: nothing is sent until the user picks.
-      final ask = _add(
-        _status('confirmHeard', heard.language, {'text': heard.text}),
-        suggestions: heard.options,
-        language: AssistantTexts.resolve(heard.language),
+      // No "is this what you said?" question any more (owner, 2026-11-07: it
+      // interrupted the flow and usually listed one or two near-identical
+      // readings). The backend's best other reading (a sound-alike that names
+      // a service) is used and stated; otherwise what was heard. The turn's
+      // own candidate confirmation still guards every navigation.
+      final better = heard.options.firstWhereOrNull(
+        (option) => option.trim().isNotEmpty && option != heard.text,
       );
-      choicesMessageId.value = ask.id;
-      return;
+      if (better != null) {
+        correctedFrom = heard.text;
+        text = better;
+      }
     }
     // The recognised text becomes the user's bubble and a normal turn. A close
     // reading that replaced the heard text is stated, so the user can redo it.
     await submit(
-      heard.text,
-      note: heard.correctedFrom == null
+      text,
+      note: correctedFrom == null
           ? null
           : _status('corrected', heard.language, {
-              'heard': heard.correctedFrom!,
-              'text': heard.text,
+              'heard': correctedFrom,
+              'text': text,
             }),
       // The backend answers in the language the speech was recognised in.
       language: heard.language,
+      // An unsure language detection (short clips) answers in that language
+      // but does not switch the following turns to it.
+      rememberLanguage:
+          heard.languageConfidence == null ||
+          heard.languageConfidence! >= _clearDetection,
     );
   }
+
+  static const _clearDetection = 0.8;
 
   /// A speech reading the user confirmed; sent exactly like typed text.
   Future<void> chooseSuggestion(String text) => submit(text);
@@ -679,6 +705,7 @@ class AssistantViewController extends GetxController {
     String? shownAs,
     String? note,
     String? language,
+    bool rememberLanguage = true,
   }) async {
     if (busy.value || (text.trim().isEmpty && choiceId == null)) return;
     speaker.stop();
@@ -718,7 +745,7 @@ class AssistantViewController extends GetxController {
       _resolutionId = result.resolutionId;
       _turnLanguage = result.language;
       // A tapped choice or a bare "2" says nothing about the language.
-      if (choiceId == null && _hasWords.hasMatch(text)) {
+      if (rememberLanguage && choiceId == null && _hasWords.hasMatch(text)) {
         _rememberLanguage(result.language);
       }
       final reply = _add(

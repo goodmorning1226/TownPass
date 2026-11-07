@@ -18,12 +18,18 @@ class AssistantTranscript {
   /// The language the speech was recognised in (e.g. 'zh', 'en'); with
   /// 'auto' this is the detected one.
   final String language;
+
+  /// How sure the language detection was (0-1); null when the chosen language
+  /// was simply used. Only a clear detection switches the session's language.
+  final double? languageConfidence;
+
   const AssistantTranscript(
     this.text, {
     this.confirm = false,
     this.options = const [],
     this.correctedFrom,
     this.language = 'zh',
+    this.languageConfidence,
   });
 }
 
@@ -230,6 +236,9 @@ class AssistantService {
       return AssistantTranscript(
         text.trim(),
         language: heardIn is String && heardIn.length <= 8 ? heardIn : 'zh',
+        languageConfidence: json['language_confidence'] is num
+            ? (json['language_confidence'] as num).toDouble()
+            : null,
         confirm: confirm,
         options: confirm ? options.cast<String>() : const [],
         correctedFrom:

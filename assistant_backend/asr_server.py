@@ -52,6 +52,32 @@ SCRIPT_PROMPTS = {"ja": "こんにちは。台北市のサービスについて�
 SCRIPTS = {"ja": re.compile(r"[぀-ヿ一-鿿]"), "th": re.compile(r"[฀-๿]")}
 
 
+# Keep the chosen language unless detection is clearly sure of another one.
+CLEAR_DETECTION = 0.8
+CHOSEN_LANGUAGE_MIN = 0.05
+
+
+def detection_confidence(reply, code):
+    """Probability Whisper gave the detected language (None when not reported)."""
+    probabilities = reply.get("language_probabilities") if isinstance(reply, dict) else None
+    if not isinstance(probabilities, dict) or not code:
+        return None
+    value = probabilities.get(code)
+    return round(float(value), 3) if isinstance(value, (int, float)) else None
+
+
+def prefers_chosen(reply, chosen):
+    """True when the chosen language should win over the detected one: detection
+    is below CLEAR_DETECTION, or the chosen language still has a real chance."""
+    probabilities = reply.get("language_probabilities") if isinstance(reply, dict) else None
+    if not isinstance(probabilities, dict) or not probabilities:
+        return False  # nothing to judge by: keep the detection (earlier behaviour)
+    top = max((float(v) for v in probabilities.values() if isinstance(v, (int, float))), default=0.0)
+    chosen_probability = probabilities.get(chosen)
+    chosen_probability = float(chosen_probability) if isinstance(chosen_probability, (int, float)) else 0.0
+    return top < CLEAR_DETECTION or chosen_probability >= CHOSEN_LANGUAGE_MIN
+
+
 def language_code(value, default="zh"):
     """A requested language ("auto", "zh", "en-US", "english"...) as one of SPEECH_LANGUAGES."""
     value = str(value or "").strip().lower()
@@ -272,7 +298,10 @@ class WhisperCppRecognizer:
                 # 0.4 allows two retries (0.4, 0.8); 0.2 allowed five, and an unknown
                 # book title then ran past the 40 s limit.
                 "temperature": "0", "temperature_inc": "0.4", "no_timestamps": "true",
-                "no_language_probabilities": "true", "suppress_nst": "true",
+                # Detection reports each language's probability (used to keep the
+                # chosen language when detection is unsure, see transcribe()).
+                "no_language_probabilities": "false" if language == "auto" else "true",
+                "suppress_nst": "true",
                 "audio_ctx": str(self.audio_context(seconds))}
 
     @staticmethod
@@ -310,6 +339,7 @@ class WhisperCppRecognizer:
         if rms_of(frames) < MIN_RMS:
             return {"text": "", "alternatives": [], "status": "unclear", "reason": "silence"}
         language = language_code(language)
+        confidence = None
         self.passes = 0
         requested = language
         buffer = io.BytesIO()
@@ -342,8 +372,15 @@ class WhisperCppRecognizer:
                 # languages (Thai heard as Lao, Indonesian as Malay).
                 reply = self._infer(self.multi_url, wav, seconds, "auto")
                 detected = language_code(reply.get("language"), default=None)
-                if language != "auto" and detected not in LANGUAGES:
+                confidence = detection_confidence(reply, detected)
+                if language != "auto" and (detected not in LANGUAGES or (
+                        detected != language and prefers_chosen(reply, language))):
+                    # Detection outside our languages, or not clearly another
+                    # language: short Japanese is often detected as Chinese, and
+                    # Whisper then writes its meaning in Chinese ("konnichiwa" ->
+                    # 你好). Decode in the language the user chose.
                     reply, detected = self._infer(self.multi_url, wav, seconds, language), language
+                    confidence = None
                 elif detected in SCRIPTS and not SCRIPTS[detected].search(self.summarize(reply)[0] or ""):
                     # Japanese heard but written in Latin letters: redo with that
                     # language and a prompt in its own script.
@@ -356,7 +393,8 @@ class WhisperCppRecognizer:
             text = traditional(text)  # Whisper small and others often write Simplified
         return {"text": text, "alternatives": [], "alternative_logprobs": [], "language": used,
                 "status": judge(text, logprob, no_speech, used), "avg_logprob": logprob,
-                "no_speech_prob": no_speech, "passes": self.passes, "requested_language": requested}
+                "no_speech_prob": no_speech, "passes": self.passes, "requested_language": requested,
+                "language_confidence": confidence if language != "zh" else None}
 
 
 def make_handler(recognizer, model_name):

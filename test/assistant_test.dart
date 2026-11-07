@@ -737,6 +737,31 @@ void main() {
     expect(await AssistantSpeechLanguage.load(), 'ja'); // the user's choice
   });
 
+  test('An unsure language detection does not switch the next turns', () async {
+    SharedPreferences.setMockInitialValues({'assistant_speech_language': 'ja'});
+    final service = QueueService(
+      [const AssistantResult(sessionId: 's', message: '你好', language: 'zh')],
+      transcripts: [
+        const AssistantTranscript(
+          '你好',
+          language: 'zh',
+          languageConfidence: 0.55,
+        ),
+      ],
+    );
+    final controller = AssistantViewController(
+      service: service,
+      executor: RecordingExecutor(),
+      recorder: FakeRecorder(),
+    );
+    await Future<void>.delayed(Duration.zero);
+    expect(controller.speechLanguage.value, 'ja');
+    expect(await controller.startListening(), isTrue);
+    await controller.stopListening();
+    expect(service.turnLanguages, ['zh']); // answered in what was heard
+    expect(controller.speechLanguage.value, 'ja'); // but Japanese stays chosen
+  });
+
   test('The language last spoken or typed is used next, not saved', () async {
     SharedPreferences.setMockInitialValues({'assistant_speech_language': 'zh'});
     final service = QueueService(
@@ -774,6 +799,45 @@ void main() {
     ); // still the user's choice
     controller.setSpeechLanguage('auto');
     expect(controller.speechLanguage.value, 'auto');
+  });
+
+  testWidgets('The panel follows the conversation language and fits', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({});
+    PageTranslation.instance.reset();
+    await tester.runAsync(() => PageTranslation.instance.setLanguage('ja'));
+    tester.view.physicalSize = const Size(720, 1400); // a narrow phone
+    tester.view.devicePixelRatio = 2;
+    addTearDown(tester.view.reset);
+    final controller = AssistantViewController(
+      service: PendingService(),
+      executor: RecordingExecutor(),
+      recorder: FakeRecorder(),
+    )..expanded.value = true;
+    await tester.pumpWidget(
+      MaterialApp(
+        builder: (context, child) =>
+            AssistantHost(controller: controller, child: child!),
+        home: const Scaffold(),
+      ),
+    );
+    await tester.pump();
+    expect(find.text(AssistantTexts.text('holdToTalk', 'ja')), findsOneWidget);
+    // Recording shows the longest caption; nothing may overflow.
+    controller.listening.value = true;
+    await tester.pump();
+    expect(tester.takeException(), isNull);
+    // Choosing Chinese in the menu switches the panel at once, before any
+    // navigation changes the pages.
+    controller.setSpeechLanguage('zh');
+    controller.listening.value = false;
+    await tester.pump();
+    expect(find.text(AssistantTexts.text('holdToTalk', 'zh')), findsOneWidget);
+    expect(PageTranslation.instance.language.value, 'ja');
+    controller.cancel();
+    AssistantTexts.conversation.value = null;
+    PageTranslation.instance.reset();
   });
 
   group('Page language', () {
@@ -1334,36 +1398,43 @@ void main() {
     expect(service.texts, isEmpty);
   });
 
-  test('Unsure speech asks which reading was meant before sending', () async {
-    final service = QueueService(
-      [const AssistantResult(sessionId: 's', message: '請在原圖書頁面搜尋。')],
-      transcripts: [
-        const AssistantTranscript(
-          '我要解釋',
-          confirm: true,
-          options: ['我要解釋', '我要借書'],
-        ),
-      ],
-    );
-    final controller = AssistantViewController(
-      service: service,
-      executor: RecordingExecutor(),
-      recorder: FakeRecorder(),
-    );
-    await controller.startListening();
-    await controller.stopListening();
-    expect(service.texts, isEmpty); // nothing sent yet
-    final ask = controller.messages.single;
-    expect(ask.fromUser, isFalse);
-    expect(ask.text, contains('我聽到「我要解釋」'));
-    expect(ask.suggestions, ['我要解釋', '我要借書']);
-    expect(controller.choicesMessageId.value, ask.id);
-    await controller.chooseSuggestion('我要借書');
-    expect(service.texts, ['我要借書']);
-    expect(controller.messages[1].text, '我要借書');
-    expect(controller.messages[1].fromUser, isTrue);
-    expect(controller.choicesMessageId.value, isNull);
-  });
+  test(
+    'Unsure speech uses the best reading and says so, without asking',
+    () async {
+      final service = QueueService(
+        [
+          const AssistantResult(sessionId: 's', message: '請在原圖書頁面搜尋。'),
+          const AssistantResult(sessionId: 's', message: '好的。'),
+        ],
+        transcripts: [
+          const AssistantTranscript(
+            '我要解釋',
+            confirm: true,
+            options: ['我要解釋', '我要借書'],
+          ),
+          const AssistantTranscript('今天天氣', confirm: true, options: ['今天天氣']),
+        ],
+      );
+      final controller = AssistantViewController(
+        service: service,
+        executor: RecordingExecutor(),
+        recorder: FakeRecorder(),
+      );
+      await controller.startListening();
+      await controller.stopListening();
+      // The sound-alike that names a service is sent at once and stated.
+      expect(service.texts, ['我要借書']);
+      expect(controller.messages.first.fromUser, isTrue);
+      expect(controller.messages.first.text, '我要借書');
+      expect(controller.messages[1].text, contains('我聽到「我要解釋」'));
+      expect(controller.messages.any((m) => m.suggestions.isNotEmpty), isFalse);
+      // Only what was heard: it is sent as heard.
+      service.transcripts.removeAt(0);
+      await controller.startListening();
+      await controller.stopListening();
+      expect(service.texts.last, '今天天氣');
+    },
+  );
 
   test('A close speech correction is sent and stated to the user', () async {
     final service = QueueService(
@@ -1703,41 +1774,6 @@ void main() {
       '第 3 項：警政案件進度',
     );
   });
-
-  test(
-    'A short spoken number picks from "is this what you said?" options',
-    () async {
-      final service = QueueService(
-        [const AssistantResult(sessionId: 's', message: '請在原圖書頁面搜尋。')],
-        transcripts: [
-          const AssistantTranscript(
-            '我要結束',
-            confirm: true,
-            options: ['我要結束', '我要借書'],
-          ),
-          const AssistantTranscript('二', confirm: true, options: ['二']),
-        ],
-      );
-      final controller = AssistantViewController(
-        service: service,
-        executor: RecordingExecutor(),
-        recorder: FakeRecorder(),
-        speaker: FakeSpeaker(),
-      );
-      await controller.startListening();
-      await controller.stopListening();
-      expect(service.texts, isEmpty);
-      service.transcripts.removeAt(0);
-      await controller.startListening();
-      await controller
-          .stopListening(); // heard "二", unsure: still selects option 2
-      expect(service.texts, ['我要借書']);
-      expect(
-        controller.messages.where((m) => m.fromUser).last.text,
-        '第 2 項：我要借書',
-      );
-    },
-  );
 
   test(
     'Replies are read aloud only when switched on, and stop for the mic',

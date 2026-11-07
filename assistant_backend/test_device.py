@@ -252,6 +252,7 @@ class MultilingualSpeechTests(unittest.TestCase):
         self.heard = {"zh": "chinese", "multi": "english"}  # the language each fake model reports
         self.texts = {"zh": "我要借書", "multi": "multi-text"}  # and the text it writes
         self.logprob = {"zh": -0.1, "multi": -0.1}
+        self.probabilities = {}  # language_probabilities each fake model reports
         test = self
 
         def fake(name):
@@ -261,7 +262,9 @@ class MultilingualSpeechTests(unittest.TestCase):
 
                 def do_POST(self):
                     test.calls.append((name, self.rfile.read(int(self.headers["Content-Length"]))))
-                    data = json.dumps({"language": test.heard[name], "segments": [
+                    extra = ({"language_probabilities": test.probabilities[name]}
+                             if name in test.probabilities else {})
+                    data = json.dumps({"language": test.heard[name], **extra, "segments": [
                         {"text": test.texts[name], "tokens": [1, 2], "avg_logprob": test.logprob[name], "no_speech_prob": 0.0}]}).encode()
                     self.send_response(200)
                     self.send_header("Content-Length", str(len(data)))
@@ -344,6 +347,23 @@ class MultilingualSpeechTests(unittest.TestCase):
         result = self.recognizer.transcribe(loud_frames(), "th")
         self.assertEqual((self.models(), result["language"]), (["multi", "multi"], "th"))
         self.assertIn(field("language", "th"), self.calls[-1][1])
+
+    def test_unsure_detection_keeps_the_chosen_language(self):
+        # Short Japanese detected as Chinese (Whisper then writes 你好): Japanese was chosen.
+        self.heard["multi"] = "chinese"
+        self.probabilities["multi"] = {"zh": 0.6, "ja": 0.35}
+        result = self.recognizer.transcribe(loud_frames(), "ja")
+        self.assertEqual((self.models(), result["language"]), (["multi", "multi"], "ja"))
+        self.assertIn(field("language", "ja"), self.calls[-1][1])
+        self.assertIsNone(result["language_confidence"])
+
+    def test_clear_detection_of_another_language_is_followed(self):
+        self.heard["multi"] = "chinese"
+        self.probabilities["multi"] = {"zh": 0.97, "yue": 0.02}
+        result = self.recognizer.transcribe(loud_frames(), "en")
+        self.assertEqual(result["language"], "zh")
+        self.assertEqual(result["language_confidence"], 0.97)
+        self.assertIn(field("no_language_probabilities", "false"), self.calls[0][1])
 
     def test_clear_chinese_is_not_run_twice(self):
         self.recognizer.transcribe(loud_frames(), "zh")
