@@ -49,6 +49,14 @@ class TPWebView extends StatefulWidget {
 
   const TPWebView({super.key, this.titleController});
 
+  /// Whether a service page shown in [shown] must be reloaded to show it in
+  /// [next] (PageTranslation): only a page still in its own Chinese can be
+  /// translated in place. Back to Chinese, or from one translation to
+  /// another (English text has no Chinese left to translate into Japanese),
+  /// the page is loaded again and translated on load.
+  static bool reloadsFor(String shown, String next) =>
+      next != shown && shown != PageTranslation.original;
+
   @override
   State<TPWebView> createState() => _TPWebViewState();
 }
@@ -91,15 +99,28 @@ class _TPWebViewState extends State<TPWebView> {
   late final Worker _languageWorker = ever<String>(
     PageTranslation.instance.language,
     (language) async {
+      final shown = _shownLanguage;
+      _shownLanguage = language;
       final controller = webViewController.value;
       if (controller == null) return;
-      if (language == PageTranslation.original) {
-        await controller.reload(); // back to the page's own Chinese
+      if (TPWebView.reloadsFor(shown, language)) {
+        // Back to the page's own Chinese, or from one translation to
+        // another: the page holds no Chinese left to translate, so it is
+        // loaded again and translated on load (onLoadStop). Other pages
+        // were never translated.
+        if (language != PageTranslation.original) {
+          final current = await controller.getUrl();
+          if (!_translatable(Uri.tryParse(current?.toString() ?? ''))) return;
+        }
+        await controller.reload();
       } else {
         await _translatePage(controller);
       }
     },
   );
+
+  /// The language the page was last shown in.
+  String _shownLanguage = PageTranslation.instance.language.value;
 
   /// Opens [targets] one after another with the service's own router: a
   /// History API entry plus the popstate event Vue Router listens to, shaped

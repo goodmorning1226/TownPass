@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
-import 'package:town_pass/page/assistant/widget/taiwanese_prompt.dart';
 import 'package:town_pass/bean/assistant_result.dart';
 import 'package:town_pass/page/assistant/assistant_texts.dart';
 import 'package:town_pass/page/main/main_view_controller.dart';
@@ -128,16 +127,9 @@ class AssistantViewController extends GetxController {
     speechLanguage.value = AssistantSpeechLanguage.of(code).code;
     heardLanguage.value = null;
     AssistantSpeechLanguage.save(speechLanguage.value);
-    // 台語 is answered in Chinese: the panel's texts become Chinese.
-    _followInPanel(AssistantSpeechLanguage.textLanguage(speechLanguage.value));
-  }
-
-  /// The panel's own texts follow the conversation's language at once
-  /// (AssistantTexts.conversation); "auto" keeps the current one.
-  void _followInPanel(String? code) {
-    if (code != null && AssistantTexts.languages.contains(code)) {
-      AssistantTexts.conversation.value = code;
-    }
+    // The panel, the guided assistant and every page follow at once; 台語 is
+    // answered in Chinese, 自動偵測 keeps the current language.
+    AssistantTexts.follow(speechLanguage.value);
   }
 
   /// The App's own status line [key] in [language] (the exchange's language),
@@ -205,14 +197,9 @@ class AssistantViewController extends GetxController {
   static final _hasWords = RegExp(r'[^\d\s\p{P}\p{S}]{2,}', unicode: true);
 
   /// The panel and the pages follow the language actually spoken or typed
-  /// (clearly recognised) for this launch. The speech-language menu does not:
-  /// only a clear spoken detection moves it ([_menuFollowsSpeech]).
-  void _rememberLanguage(String? code) {
-    _followInPanel(code);
-    if (code != null && PageTranslation.languages.containsKey(code)) {
-      PageTranslation.instance.setLanguage(code);
-    }
-  }
+  /// for this launch ([AssistantTexts.follow]). The speech-language menu does
+  /// not: only a clear spoken detection moves it ([_menuFollowsSpeech]).
+  void _rememberLanguage(String? code) => AssistantTexts.follow(code);
 
   /// A clearly detected spoken language (confidence >= [_clearDetection])
   /// becomes the menu's choice and is saved like a manual pick, so the next
@@ -458,11 +445,6 @@ class AssistantViewController extends GetxController {
     hideCorner();
     scrollTarget.value = scrollTo;
     expanded.value = true;
-    // The first time on a Chinese phone: "您是否為台語用戶？" (owner, 2026-11-08).
-    TaiwanesePrompt.maybeAsk(
-      currentLanguage: speechLanguage.value,
-      choose: setSpeechLanguage,
-    );
     if (_panelHistory == null && activeRoute != null) {
       _panelHistory = LocalHistoryEntry(
         onRemove: () {
@@ -665,6 +647,11 @@ class AssistantViewController extends GetxController {
   Future<void> _useTranscript(AssistantTranscript heard) async {
     busy.value = false;
     heardLanguage.value = heard.language;
+    // The language the speech was decoded in (the backend's language gate,
+    // docs/AI_LANGUAGE_GATE.md) is followed at once, also for a short clip
+    // detected below 0.8 (a short 「你好」 switches back to Chinese); only
+    // the menu needs a clear detection.
+    _rememberLanguage(heard.language);
     _menuFollowsSpeech(heard);
     // 台語 chosen but its model could not be used: this clip was heard as
     // Chinese, and the backend says why.
@@ -694,11 +681,6 @@ class AssistantViewController extends GetxController {
       text,
       // The backend answers in the language the speech was recognised in.
       language: heard.language,
-      // An unsure language detection (short clips) answers in that language
-      // but does not switch the following turns to it.
-      rememberLanguage:
-          heard.languageConfidence == null ||
-          heard.languageConfidence! >= _clearDetection,
     );
   }
 
@@ -754,7 +736,6 @@ class AssistantViewController extends GetxController {
     String? shownAs,
     String? note,
     String? language,
-    bool rememberLanguage = true,
     int? pageStep,
   }) async {
     if (busy.value ||
@@ -802,10 +783,7 @@ class AssistantViewController extends GetxController {
       _resolutionId = result.resolutionId;
       _turnLanguage = result.language;
       // A tapped choice or a bare "2" says nothing about the language.
-      if (rememberLanguage &&
-          choiceId == null &&
-          pageStep == null &&
-          _hasWords.hasMatch(text)) {
+      if (choiceId == null && pageStep == null && _hasWords.hasMatch(text)) {
         _rememberLanguage(result.language);
       }
       final reply = _add(
@@ -828,7 +806,7 @@ class AssistantViewController extends GetxController {
         expanded.value = false;
         // The page and its guidance follow the language of this navigation
         // until another one (or Settings > Language) changes it.
-        PageTranslation.instance.setLanguage(result.language);
+        AssistantTexts.follow(result.language);
         _showCorner(reply.id, _status('opening', result.language));
         // Stays "cancelled" unless this navigation reports back while current.
         final action = _AssistantAction(destination, clock());

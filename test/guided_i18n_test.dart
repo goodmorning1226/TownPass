@@ -323,6 +323,10 @@ void main() {
         c.taskTag,
         startsWith(GuideI18n.tr('步驟 {i} / {n}', {'i': 1, 'n': 5}, 'ja')),
       );
+      // The menu now switches the pages too (owner, 2026-11-08): the card's
+      // quoted page words are translated like the page.
+      expect(PageTranslation.instance.language.value, 'ja');
+      await tester.pump(const Duration(seconds: 3)); // translation batch
     });
   });
 

@@ -1249,13 +1249,13 @@ void main() {
     controller.listening.value = true;
     await tester.pump();
     expect(tester.takeException(), isNull);
-    // Choosing Chinese in the menu switches the panel at once, before any
-    // navigation changes the pages.
+    // Choosing Chinese in the menu switches the panel and the pages at once
+    // (owner, 2026-11-08: every text follows a language change).
     controller.setSpeechLanguage('zh');
     controller.listening.value = false;
     await tester.pump();
     expect(find.text(AssistantTexts.text('holdToTalk', 'zh')), findsOneWidget);
-    expect(PageTranslation.instance.language.value, 'ja');
+    expect(PageTranslation.instance.language.value, 'zh');
     controller.cancel();
     AssistantTexts.conversation.value = null;
     PageTranslation.instance.reset();
@@ -1521,6 +1521,203 @@ void main() {
       expect(PageTranslation.instance.language.value, 'en');
       controller.cancel();
     });
+  });
+
+  group('A conversation language change reaches everything', () {
+    void start([Map<String, Object> saved = const {}]) {
+      SharedPreferences.setMockInitialValues(saved);
+      PageTranslation.instance.reset();
+      AssistantTexts.conversation.value = null;
+      PageTranslation.instance.translator = (text, language) async =>
+          '[$language] $text';
+    }
+
+    tearDown(() {
+      PageTranslation.instance.reset();
+      AssistantTexts.conversation.value = null;
+    });
+
+    AssistantViewController make(QueueService service) =>
+        AssistantViewController(
+          service: service,
+          executor: RecordingExecutor(),
+          recorder: FakeRecorder(),
+        );
+
+    Future<void> speak(AssistantViewController controller) async {
+      expect(await controller.startListening(), isTrue);
+      await controller.stopListening();
+    }
+
+    test('a menu pick switches the texts and the pages', () async {
+      start();
+      final controller = make(QueueService([]));
+      controller.setSpeechLanguage('ja');
+      expect(AssistantTexts.conversation.value, 'ja');
+      expect(AssistantTexts.pageLanguage, 'ja');
+      expect(PageTranslation.instance.language.value, 'ja');
+      // 自動偵測 keeps the current language.
+      controller.setSpeechLanguage('auto');
+      expect(AssistantTexts.conversation.value, 'ja');
+      expect(PageTranslation.instance.language.value, 'ja');
+      // 台語 is answered in Chinese: everything back to Chinese.
+      controller.setSpeechLanguage(AssistantSpeechLanguage.taiwanese.code);
+      expect(AssistantTexts.conversation.value, 'zh');
+      expect(PageTranslation.instance.language.value, 'zh');
+      // Pages are for this launch only; the menu choice is kept.
+      expect(
+        (await SharedPreferences.getInstance()).getString('page_language'),
+        isNull,
+      );
+      expect(
+        await AssistantSpeechLanguage.load(),
+        AssistantSpeechLanguage.taiwanese.code,
+      );
+      controller.cancel();
+    });
+
+    test('a clear spoken language switches texts, pages and menu', () async {
+      start({'assistant_speech_language': 'zh'});
+      final service = QueueService(
+        [
+          const AssistantResult(
+            sessionId: 's',
+            message: 'Which one?',
+            language: 'en',
+          ),
+        ],
+        transcripts: [
+          const AssistantTranscript(
+            'I want to borrow a book',
+            language: 'en',
+            languageConfidence: 0.93,
+          ),
+        ],
+      );
+      final controller = make(service);
+      await Future<void>.delayed(Duration.zero);
+      await speak(controller);
+      expect(AssistantTexts.conversation.value, 'en');
+      expect(PageTranslation.instance.language.value, 'en');
+      expect(controller.speechLanguage.value, 'en');
+      expect(await AssistantSpeechLanguage.load(), 'en');
+      controller.cancel();
+    });
+
+    test('a short unsure 你好 switches back to Chinese, not the menu', () async {
+      start({'assistant_speech_language': 'en'});
+      final service = QueueService(
+        [const AssistantResult(sessionId: 's', message: '你好！', language: 'zh')],
+        transcripts: [
+          const AssistantTranscript(
+            '你好',
+            language: 'zh',
+            languageConfidence: 0.52,
+          ),
+        ],
+      );
+      final controller = make(service);
+      await Future<void>.delayed(Duration.zero);
+      controller.setSpeechLanguage('en');
+      expect(PageTranslation.instance.language.value, 'en');
+      await speak(controller);
+      expect(service.turnLanguages, ['zh']);
+      expect(AssistantTexts.conversation.value, 'zh');
+      expect(PageTranslation.instance.language.value, 'zh'); // restored
+      expect(controller.speechLanguage.value, 'en'); // menu: needs >= 0.8
+      expect(await AssistantSpeechLanguage.load(), 'en');
+      controller.cancel();
+    });
+
+    test(
+      'a typed sentence answered in another language switches them',
+      () async {
+        start({'assistant_speech_language': 'zh'});
+        final service = QueueService([
+          const AssistantResult(
+            sessionId: 's',
+            message: 'Bạn muốn làm gì?',
+            language: 'vi',
+          ),
+          // A bare number says nothing about the language.
+          const AssistantResult(sessionId: 's', message: '好的', language: 'zh'),
+        ]);
+        final controller = make(service);
+        await Future<void>.delayed(Duration.zero);
+        await controller.submit('Tôi muốn mượn sách');
+        expect(AssistantTexts.conversation.value, 'vi');
+        expect(PageTranslation.instance.language.value, 'vi');
+        expect(controller.speechLanguage.value, 'zh'); // typing: not the menu
+        await controller.submit('2');
+        expect(AssistantTexts.conversation.value, 'vi');
+        expect(PageTranslation.instance.language.value, 'vi');
+        controller.cancel();
+      },
+    );
+
+    testWidgets('the panel and the App screen follow at once', (tester) async {
+      start({'assistant_speech_language': 'zh'});
+      final service = QueueService(
+        [const AssistantResult(sessionId: 's', message: '你好！', language: 'zh')],
+        transcripts: [
+          const AssistantTranscript(
+            '你好',
+            language: 'zh',
+            languageConfidence: 0.4,
+          ),
+        ],
+      );
+      final controller = make(service)..expanded.value = true;
+      await tester.pumpWidget(
+        MaterialApp(
+          builder: (context, child) =>
+              AssistantHost(controller: controller, child: child!),
+          home: const Scaffold(body: Center(child: TPText('首頁'))),
+        ),
+      );
+      await tester.pump();
+      expect(
+        find.text(AssistantTexts.text('holdToTalk', 'zh')),
+        findsOneWidget,
+      );
+      controller.setSpeechLanguage('th');
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 60)); // batch timer
+      await tester.pump();
+      expect(
+        find.text(AssistantTexts.text('holdToTalk', 'th')),
+        findsOneWidget,
+      );
+      expect(find.text('[th] 首頁'), findsOneWidget);
+      // From one translation to another.
+      controller.setSpeechLanguage('ja');
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 60));
+      await tester.pump();
+      expect(
+        find.text(AssistantTexts.text('holdToTalk', 'ja')),
+        findsOneWidget,
+      );
+      expect(find.text('[ja] 首頁'), findsOneWidget);
+      // A short Chinese 你好 below 0.8 brings everything back to Chinese.
+      await tester.runAsync(() => speak(controller));
+      await tester.pump();
+      expect(
+        find.text(AssistantTexts.text('holdToTalk', 'zh')),
+        findsOneWidget,
+      );
+      expect(find.text('首頁'), findsOneWidget);
+      expect(controller.speechLanguage.value, 'ja');
+      controller.cancel();
+      await tester.pump(const Duration(seconds: 3)); // learned-text save
+    });
+  });
+
+  test('A service page reloads only when it holds no Chinese to translate', () {
+    expect(TPWebView.reloadsFor('zh', 'en'), isFalse); // translated in place
+    expect(TPWebView.reloadsFor('en', 'zh'), isTrue); // original restored
+    expect(TPWebView.reloadsFor('en', 'ja'), isTrue); // English -> Japanese
+    expect(TPWebView.reloadsFor('ja', 'ja'), isFalse);
   });
 
   test('Requests that opened a page come first in the suggestions', () async {

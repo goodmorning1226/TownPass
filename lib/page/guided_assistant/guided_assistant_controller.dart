@@ -5,7 +5,6 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:town_pass/page/assistant/widget/taiwanese_prompt.dart';
 import 'package:town_pass/page/guided_assistant/model/assistant_settings.dart';
 import 'package:town_pass/page/assistant/assistant_texts.dart';
 import 'package:town_pass/page/guided_assistant/model/guide_content.dart';
@@ -26,7 +25,6 @@ import 'package:town_pass/service/assistant_recorder.dart';
 import 'package:town_pass/service/assistant_service.dart';
 import 'package:town_pass/service/assistant_speaker.dart';
 import 'package:town_pass/service/assistant_speech_language.dart';
-import 'package:town_pass/service/page_translation.dart';
 
 /// One chat bubble.
 class ChatMessage {
@@ -252,11 +250,9 @@ class GuidedAssistantController extends GetxController {
     speechLanguage.value = AssistantSpeechLanguage.of(code).code;
     heardLanguage.value = null;
     AssistantSpeechLanguage.save(speechLanguage.value);
-    // 台語 is answered in Chinese: the assistant's texts become Chinese.
-    final texts = AssistantSpeechLanguage.textLanguage(speechLanguage.value);
-    if (AssistantTexts.languages.contains(texts)) {
-      AssistantTexts.conversation.value = texts;
-    }
+    // The assistant's texts, chips, guide cards and every page follow at
+    // once; 台語 is answered in Chinese, 自動偵測 keeps the current language.
+    AssistantTexts.follow(speechLanguage.value);
   }
 
   /// 助理語言 in AI 助理設定: the same choice as the menu, with a toast.
@@ -266,19 +262,23 @@ class GuidedAssistantController extends GetxController {
     _showToast(SettingsTexts.languageChanged(AssistantSpeechLanguage.of(code)));
   }
 
-  /// A clearly recognised language switches the pages for this launch (the
-  /// next launch starts in the phone's language, see PageTranslation.load).
-  /// A clear detection (confidence >= 0.8) also becomes the speech-language
-  /// menu's choice (助理語言) and is saved like a manual pick, so the next
-  /// launch listens in it; 自動偵測 stays 自動偵測. Typed text never moves it.
+  /// The language the speech was decoded in (the backend's language gate,
+  /// docs/AI_LANGUAGE_GATE.md) switches the texts and the pages at once for
+  /// this launch, also for a short clip detected below 0.8 (a short 「你好」
+  /// switches back to Chinese; the next launch starts in the phone's
+  /// language, see PageTranslation.load). Only a clear detection (confidence
+  /// >= 0.8) also becomes the speech-language menu's choice (助理語言) and is
+  /// saved like a manual pick, so the next launch listens in it; 自動偵測
+  /// stays 自動偵測, and 台語 heard as Chinese stays 台語. Typed text never
+  /// moves the menu.
   void _followSpokenLanguage(AssistantTranscript heard) {
     final sure = heard.languageConfidence;
-    if (sure != null && sure < _clearDetection) return;
     _followLanguage(heard.language);
     final code = heard.language;
     if (sure == null ||
+        sure < _clearDetection ||
         speechLanguage.value == AssistantSpeechLanguage.auto.code ||
-        code == speechLanguage.value ||
+        AssistantSpeechLanguage.keeps(speechLanguage.value, code) ||
         code == AssistantSpeechLanguage.auto.code ||
         !AssistantSpeechLanguage.all.any((l) => l.code == code)) {
       return;
@@ -290,16 +290,8 @@ class GuidedAssistantController extends GetxController {
   static const _clearDetection = 0.8;
 
   /// The assistant's texts and the pages follow [code], the language the
-  /// user clearly spoke or typed (not saved; see PageTranslation.load).
-  void _followLanguage(String? code) {
-    if (code == null) return;
-    if (AssistantTexts.languages.contains(code)) {
-      AssistantTexts.conversation.value = code;
-    }
-    if (PageTranslation.languages.containsKey(code)) {
-      PageTranslation.instance.setLanguage(code);
-    }
-  }
+  /// user spoke or typed ([AssistantTexts.follow]; pages not saved).
+  void _followLanguage(String? code) => AssistantTexts.follow(code);
 
   static final _hasWords = RegExp(r'[^\d\s\p{P}\p{S}]{2,}', unicode: true);
 
@@ -1629,11 +1621,6 @@ class GuidedAssistantController extends GetxController {
     dismissHomeAsk();
     sheetOpen.value = true;
     _addBackEntry(closeSheet);
-    // The first time on a Chinese phone: "您是否為台語用戶？" (owner, 2026-11-08).
-    TaiwanesePrompt.maybeAsk(
-      currentLanguage: speechLanguage.value,
-      choose: setSpeechLanguage,
-    );
   }
 
   void closeSheet() {

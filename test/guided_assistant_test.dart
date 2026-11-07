@@ -38,6 +38,7 @@ import 'package:town_pass/service/device_service.dart';
 import 'package:town_pass/service/shared_preferences_service.dart';
 import 'package:town_pass/service/package_service.dart';
 import 'package:town_pass/util/tp_route.dart';
+import 'package:town_pass/util/tp_text.dart';
 
 class SilentSpeaker extends AssistantSpeaker {
   @override
@@ -1660,6 +1661,8 @@ void main() {
       );
       expect(c.speechLanguage.value, 'zh');
       expect(await saved(), 'zh');
+      // The texts follow the decoded language anyway.
+      expect(AssistantTexts.conversation.value, 'ja');
     });
 
     test('自動偵測 stays 自動偵測', () async {
@@ -1803,6 +1806,207 @@ void main() {
       expect(c.listening.value, isFalse);
       expect(service.transcribeLanguages, isEmpty);
       expect(service.turnLanguages, isEmpty);
+    });
+  });
+  group('a conversation language change reaches everything', () {
+    void start([Map<String, Object> saved = const {}]) {
+      SharedPreferences.setMockInitialValues(saved);
+      Get.testMode = true;
+      PageTranslation.instance.reset();
+      AssistantTexts.conversation.value = null;
+      PageTranslation.instance.translator = (text, language) async =>
+          '[$language] $text';
+    }
+
+    tearDown(() {
+      PageTranslation.instance.reset();
+      AssistantTexts.conversation.value = null;
+      Get.reset();
+    });
+
+    GuidedAssistantController withSpeech(AssistantTranscript heard) {
+      final web = Get.put<WebPageState>(WebPageState());
+      return Get.put(
+        GuidedAssistantController(
+          thinkDelay: Duration.zero,
+          runOnboarding: false,
+          speaker: SilentSpeaker(),
+          service: SpeechService(heard: heard),
+          recorder: LoudRecorder(),
+          executor: FakeExecutor(),
+          probeOverride: FakeProbe(web),
+        ),
+      );
+    }
+
+    Future<void> speak(GuidedAssistantController c) async {
+      await c.micDown();
+      await c.micUp();
+      await Future<void>.delayed(Duration.zero);
+    }
+
+    test('the menu and 助理語言 switch the texts and the pages', () async {
+      start();
+      final c = makeController();
+      c.setSpeechLanguage('vi');
+      expect(AssistantTexts.conversation.value, 'vi');
+      expect(PageTranslation.instance.language.value, 'vi');
+      c.chooseLanguage('en'); // AI 助理設定 → 助理語言
+      expect(GuideI18n.language, 'en');
+      expect(PageTranslation.instance.language.value, 'en');
+      c.setSpeechLanguage('auto'); // 自動偵測 keeps the current language
+      expect(AssistantTexts.conversation.value, 'en');
+      expect(PageTranslation.instance.language.value, 'en');
+      c.setSpeechLanguage(AssistantSpeechLanguage.taiwanese.code);
+      expect(AssistantTexts.conversation.value, 'zh'); // 台語: Chinese texts
+      expect(PageTranslation.instance.language.value, 'zh');
+      await pumpEventQueue();
+    });
+
+    test('a clear spoken language switches texts, pages and menu', () async {
+      start({'assistant_speech_language': 'zh'});
+      final c = withSpeech(
+        const AssistantTranscript(
+          'ฉันอยากยืมหนังสือ',
+          language: 'th',
+          languageConfidence: 0.9,
+        ),
+      );
+      await Future<void>.delayed(Duration.zero);
+      await speak(c);
+      expect(AssistantTexts.conversation.value, 'th');
+      expect(PageTranslation.instance.language.value, 'th');
+      expect(c.speechLanguage.value, 'th');
+    });
+
+    test('a short unsure 你好 switches back to Chinese, not the menu', () async {
+      start({'assistant_speech_language': 'en'});
+      final c = withSpeech(
+        const AssistantTranscript(
+          '你好',
+          language: 'zh',
+          languageConfidence: 0.45,
+        ),
+      );
+      await Future<void>.delayed(Duration.zero);
+      c.setSpeechLanguage('en');
+      expect(PageTranslation.instance.language.value, 'en');
+      await speak(c);
+      expect(AssistantTexts.conversation.value, 'zh');
+      expect(PageTranslation.instance.language.value, 'zh'); // restored
+      expect(c.speechLanguage.value, 'en'); // the menu needs >= 0.8
+      expect(
+        (await SharedPreferences.getInstance()).getString(
+          'assistant_speech_language',
+        ),
+        'en',
+      );
+    });
+
+    test('台語 heard as clear Chinese keeps 台語 in the menu', () async {
+      start({
+        'assistant_speech_language': AssistantSpeechLanguage.taiwanese.code,
+      });
+      final c = withSpeech(
+        const AssistantTranscript(
+          '我欲借冊',
+          language: 'zh',
+          languageConfidence: 0.95,
+        ),
+      );
+      await Future<void>.delayed(Duration.zero);
+      await speak(c);
+      expect(c.speechLanguage.value, AssistantSpeechLanguage.taiwanese.code);
+      expect(AssistantTexts.conversation.value, 'zh');
+    });
+
+    test(
+      'a typed sentence answered in another language switches them',
+      () async {
+        start({'assistant_speech_language': 'zh'});
+        final service = FakeService([
+          (_, _) => const AssistantResult(
+            sessionId: 's',
+            message: 'どれにしますか？',
+            language: 'ja',
+          ),
+        ]);
+        final c = makeController(service: service);
+        await Future<void>.delayed(Duration.zero);
+        c.submit('本を借りたいです');
+        await settle();
+        await settle();
+        expect(AssistantTexts.conversation.value, 'ja');
+        expect(PageTranslation.instance.language.value, 'ja');
+        expect(c.speechLanguage.value, 'zh'); // typing: not the menu
+      },
+    );
+
+    testWidgets('the button, chips, settings and App screen follow at once', (
+      tester,
+    ) async {
+      start({'assistant_speech_language': 'zh'});
+      await tester.runAsync(GuideI18n.load);
+      await SharedPreferencesService().init();
+      Get.put(MainViewController());
+      final c = withSpeech(
+        const AssistantTranscript(
+          '你好',
+          language: 'zh',
+          languageConfidence: 0.3,
+        ),
+      );
+      await tester.pumpWidget(
+        MaterialApp(
+          home: GuidedAssistantHost(
+            controller: c,
+            child: const Scaffold(body: Center(child: TPText('首頁'))),
+          ),
+        ),
+      );
+      await tester.pump();
+      expect(find.text(HomeAskTexts.label), findsOneWidget);
+      Future<void> settleTexts() async {
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 60)); // batch timer
+        await tester.pump();
+      }
+
+      c.setSpeechLanguage('en');
+      await settleTexts();
+      expect(
+        find.text(GuideI18n.tr(HomeAskTexts.label, const {}, 'en')),
+        findsOneWidget,
+      );
+      expect(find.text('[en] 首頁'), findsOneWidget);
+      expect(c.chips, contains(GuideI18n.tr('我要借書', const {}, 'en')));
+      // From one translation to another.
+      c.setSpeechLanguage('ja');
+      await settleTexts();
+      expect(
+        find.text(GuideI18n.tr(HomeAskTexts.label, const {}, 'ja')),
+        findsOneWidget,
+      );
+      expect(find.text('[ja] 首頁'), findsOneWidget);
+      // A short Chinese 你好 below 0.8 brings everything back to Chinese.
+      await tester.runAsync(() => speak(c));
+      await settleTexts();
+      expect(find.text(HomeAskTexts.label), findsOneWidget);
+      expect(find.text('首頁'), findsOneWidget);
+      expect(c.chips, contains('我要借書'));
+      expect(c.speechLanguage.value, 'ja');
+      // The settings page follows too.
+      c.setSpeechLanguage('vi');
+      await tester.pumpWidget(const MaterialApp(home: AssistantSettingsView()));
+      await tester.pump();
+      expect(
+        find.text(GuideI18n.tr(SettingsTexts.title, const {}, 'vi')),
+        findsOneWidget,
+      );
+      c.setSpeechLanguage('zh');
+      await tester.pump();
+      expect(find.text(SettingsTexts.title), findsOneWidget);
+      await tester.pump(const Duration(seconds: 4));
     });
   });
 }

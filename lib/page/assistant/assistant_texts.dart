@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:town_pass/service/assistant_speech_language.dart';
 import 'package:town_pass/service/page_translation.dart';
 
 /// An example shown before the first message and the reviewed, enabled
@@ -12,10 +13,27 @@ abstract final class AssistantTexts {
   /// Languages with a full set of texts; 'zh' is the original and fallback.
   static const languages = ['zh', 'en', 'ja', 'vi', 'id', 'th'];
 
-  /// The language of the current conversation: the menu choice or the last
-  /// clearly recognised language (set by AssistantViewController). The panel
-  /// follows it at once; the pages switch only on the next navigation.
+  /// The language of the current conversation: the menu choice, or the
+  /// language last spoken or typed (set through [follow]).
   static final conversation = RxnString();
+
+  /// The conversation language became [code]: a concrete menu pick (either
+  /// assistant, or AI 助理設定 → 助理語言), speech decoded in it, or a typed
+  /// sentence the backend answered in it. Everything follows at once: both
+  /// assistants' texts, chips and guide cards ([conversation], read by gt())
+  /// and every App screen and service page (PageTranslation, which also
+  /// restores the original Chinese). Pages switch for this launch only; the
+  /// next launch starts in the phone's language. 台語 ('nan') is answered in
+  /// Chinese; 自動偵測 and unknown codes keep the current language.
+  static void follow(String? code) {
+    if (code == null) return;
+    final language = AssistantSpeechLanguage.textLanguage(code);
+    if (!languages.contains(language)) return;
+    conversation.value = language;
+    if (PageTranslation.languages.containsKey(language)) {
+      PageTranslation.instance.setLanguage(language);
+    }
+  }
 
   /// The panel's language: the conversation's, else the page language (last
   /// assistant navigation or Settings > Language). Read inside an Obx so the
