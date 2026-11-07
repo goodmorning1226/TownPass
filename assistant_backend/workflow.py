@@ -13,7 +13,7 @@ import uuid
 
 from decision import decide
 from page_context import current_root, model_view
-from phonetic import rank_books
+from phonetic import exact_homophone, rank_books, term_matches
 from registry import Registry, book_fuzzy, primary_title, single_substitution
 
 # A cheap superset of the library signals retrieve() looks for; the book
@@ -25,6 +25,15 @@ LIBRARY_CUE = re.compile(r"借|找|搜尋|看|閱|書|館|寫的|ISBN", re.I)
 SOUND_AUTO = 0.85     # open directly when also clearly ahead of the next book
 SOUND_MARGIN = 0.2
 SOUND_CONFIRM = 0.7   # otherwise offer as a candidate to confirm
+
+# Sound-alike service words in a transcript (水廢 -> 水費, 解釋 -> 借書). Toneless
+# homophones score 1.0; one changed vowel or consonant about 0.67-0.79;
+# unrelated words about 0.2.
+SERVICE_SOUND_AUTO = 0.85     # replace silently (and say so) only when no other service is close
+SERVICE_SOUND_CONFIRM = 0.65  # otherwise offer the corrected sentence to confirm
+# "<request words>□<request words>": the sentence only asks for the matched word.
+REQUEST_ONLY = re.compile(r"(?:請|我|想|要|幫|我們|給|去|打開|開啟|開|查|看|用|一下|的|吧|啊|喔)+□"
+                          r"(?:吧|啊|喔|一下|服務|頁面)?[。！!？?]*")
 
 
 class Workflow:
@@ -117,6 +126,57 @@ class Workflow:
         if self.registry.search(positive_text(text)):
             return True
         return bool(re.search(r"借.{0,6}書|找.{0,6}書|ISBN|圖書|館藏", text, re.I))
+
+    def sound_corrections(self, text):
+        """Sentences where one catalogue word replaces a sound-alike stretch of a
+        transcript the assistant does not understand.
+
+        Returns (auto, options): auto is the corrected sentence when the best
+        service is a homophone-level match clearly ahead of any other, else None;
+        options are corrected sentences (one per service, best first) to offer.
+        Never rewritten: a transcript that already names something, or one that
+        sounds like a catalogue book (神奇柑仔店 must not become 申請柑仔店).
+        A two-character word only counts by near-sound when the sentence is just
+        a request for it (我要解釋 -> 我要借書, but not 早安 -> 報案).
+        """
+        if self.recognizes(text):
+            return None, []
+        try:
+            books = self.owner.catalog.books()
+        except Exception:
+            books = []
+        if books and (rank_books(text, books)[0][0] >= SOUND_CONFIRM or any(
+                name and name in text for book in books
+                for name in (primary_title(book), re.sub(r"著$", "", book.get("author") or "")))):
+            return None, []
+        from server import positive_text
+        services = {}  # service id -> (score, corrected sentence)
+        for score, start, end, term in term_matches(text, self.registry.sound_terms()):
+            if score < SERVICE_SOUND_CONFIRM:
+                break
+            if len(term) == 2 and score < SERVICE_SOUND_AUTO and not REQUEST_ONLY.fullmatch(
+                    text[:start] + "□" + text[end:]):
+                continue
+            fixed = text[:start] + term + text[end:]
+            found = self.registry.search(positive_text(fixed))
+            if not found or found[0].get("fuzzy"):
+                continue
+            service = found[0]["entry"]["id"]
+            if service not in services:
+                services[service] = (score, fixed, exact_homophone(text[start:end], term))
+        ranked = sorted(services.values(), key=lambda item: -item[0])
+        if not ranked:
+            return None, []
+        top, best, exact = ranked[0]
+        # A parent and its page (圖書借閱 / 圖書館地圖) are one request, not rivals.
+        lead = self.registry.by_id[next(s for s, item in services.items() if item[1] == best)]
+        rivals = [item[0] for service, item in services.items() if item[1] != best
+                  and not self.registry.same_request(self.registry.by_id[service], lead, None)]
+        clear = all(score <= top - SOUND_MARGIN + 1e-9 for score in rivals)
+        # Only an exact homophone replaces silently; a match that relies on the
+        # accent fold (偷書 ~ 投訴) is offered instead.
+        auto = best if top >= SERVICE_SOUND_AUTO and clear and exact else None
+        return auto, [fixed for score, fixed, _ in ranked[:2] if score >= top - 0.1]
 
     def _navigate(self, payload, entry):
         if not entry["enabled"]:

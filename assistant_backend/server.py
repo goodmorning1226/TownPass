@@ -34,6 +34,8 @@ ASR_TIMEOUT = float(os.environ.get("TOWNPASS_ASR_TIMEOUT", "40"))
 MODEL_API = os.environ.get("TOWNPASS_MODEL_API", "ollama")
 MODEL_URL = os.environ.get("TOWNPASS_MODEL_URL", "http://127.0.0.1:11434")
 MODEL_TIMEOUT = float(os.environ.get("TOWNPASS_MODEL_TIMEOUT", "70"))
+# Print per-request timings (numbers only) to stdout; on the phone that is logcat.
+TIMING_LOG = os.environ.get("TOWNPASS_TIMING_LOG") == "1"
 # Keep one module identity when the standalone entry point imports workflow.
 if __name__ == "__main__":
     sys.modules.setdefault("server", sys.modules[__name__])
@@ -51,6 +53,24 @@ def fetch_json(url, payload=None, timeout=15):
     )
     with urllib.request.urlopen(request, timeout=timeout) as response:
         return json.loads(response.read(2_000_000))
+
+
+def llama_timing(timings):
+    """Where one llama-server decision spent its time (numbers only)."""
+    if not isinstance(timings, dict):
+        return None
+    rounded = lambda value: round(value) if isinstance(value, (int, float)) else None
+    return {"prompt_tokens": timings.get("prompt_n"), "cached_tokens": timings.get("cache_n"),
+            "prompt_ms": rounded(timings.get("prompt_ms")), "generated_tokens": timings.get("predicted_n"),
+            "generate_ms": rounded(timings.get("predicted_ms"))}
+
+
+def ollama_timing(result):
+    """The same fields from an Ollama reply (durations are nanoseconds)."""
+    ms = lambda value: round(value / 1e6) if isinstance(value, (int, float)) else None
+    return {"prompt_tokens": result.get("prompt_eval_count"), "cached_tokens": None,
+            "prompt_ms": ms(result.get("prompt_eval_duration")), "generated_tokens": result.get("eval_count"),
+            "generate_ms": ms(result.get("eval_duration"))}
 
 
 def alternating(messages):
@@ -278,13 +298,15 @@ class Assistant:
                     "response_format": {"type": "json_schema", "json_schema": {"name": "proposal", "schema": schema}},
                 }, timeout=MODEL_TIMEOUT)
                 content = reply["choices"][0]["message"]["content"]
-                result = {"prompt_eval_count": (reply.get("usage") or {}).get("prompt_tokens")}
+                result = {"prompt_eval_count": (reply.get("usage") or {}).get("prompt_tokens"),
+                          "timing": llama_timing(reply.get("timings"))}
             else:
                 result = fetch_json(MODEL_URL + "/api/chat", {
                     "model": MODEL, "stream": False, "messages": messages, "format": schema,
                     "options": {"temperature": 0, "num_ctx": 4096, "num_predict": 180}, "keep_alive": KEEP_ALIVE,
                 }, timeout=MODEL_TIMEOUT)
                 content = result.get("message", {}).get("content", "")
+                result["timing"] = ollama_timing(result)
             proposal = json.loads(content)
             result["message"] = {"tool_calls": [{"function": proposal}]}
             return result
@@ -307,14 +329,22 @@ class Assistant:
         context = parse(payload.get("context"), self.workflow.registry)
         payload = {**payload, "session_id": session, "text": text, "page_context": context}
         started = time.monotonic()
-        self.usage.calls = []
+        self.usage.calls, self.usage.timings = [], []
         self.usage.route, self.usage.candidates = None, []
         result = self.workflow.handle(payload)
         tokens = [count for count in self.usage.calls if count is not None]
         result["metrics"] = {"elapsed_ms": round((time.monotonic() - started) * 1000),
             "model_calls": len(self.usage.calls), "prompt_tokens": sum(tokens) if tokens else None,
             "model": MODEL if self.usage.calls else None, "page_capability": self._page_id(context),
-            "route": self.usage.route, "candidates": self.usage.candidates}
+            "route": self.usage.route, "candidates": self.usage.candidates,
+            "model_timings": [timing for timing in self.usage.timings if timing]}
+        if TIMING_LOG:
+            # Numbers only (never the request text), for measuring a phone's speed.
+            calls = " ".join(f"[prompt {t['prompt_tokens']} tok cached {t['cached_tokens']} {t['prompt_ms']} ms"
+                             f" | gen {t['generated_tokens']} tok {t['generate_ms']} ms]"
+                             for t in result["metrics"]["model_timings"])
+            print(f"timing turn total={result['metrics']['elapsed_ms']} ms route={self.usage.route} {calls}",
+                  flush=True)
         return result
 
     @staticmethod
@@ -324,8 +354,17 @@ class Assistant:
 
 
 def clean_transcript(text):
-    """Trim whitespace and trailing sentence punctuation from a transcript."""
-    return re.sub(r"[\s。．.！!？?，,]+$", "", text.strip())
+    """Trim whitespace and trailing sentence punctuation from a transcript, and
+    undo a recogniser repetition loop: a phrase of 2+ characters said once but
+    written back-to-back several times (我想借底層邏輯我想借底層邏輯…) is kept once."""
+    text = re.sub(r"[\s。．.！!？?，,]+$", "", text.strip())
+    text = re.sub(r"(.{2,}?)(?:[\s，,。]*\1)+", r"\1", text)
+    # The loop usually stops mid-phrase: drop a trailing copy of the phrase's start.
+    for cut in range(4, len(text) - 1):
+        head, tail = text[:cut], text[cut:].lstrip(" ，,。")
+        if len(tail) >= 2 and head.startswith(tail):
+            return head.rstrip(" ，,。")
+    return text
 
 
 def speech_options(text, alternatives, status, recognizes, limit=3):
@@ -353,20 +392,66 @@ def speech_options(text, alternatives, status, recognizes, limit=3):
     return picked if status != "clear" or len(picked) > 1 else []
 
 
+# The phone's own recogniser: a top confidence below this asks the user to confirm.
+DEVICE_CLEAR = 0.5
+
+
+def device_transcript(body):
+    """A transcript from the phone's speech recogniser (Android SpeechRecognizer),
+    as the same fields the Whisper service returns.
+
+    body: {"texts": [best, alternative, ...], "confidences": [0-1 per text]}.
+    A confidence of 0 or below means the recogniser did not provide one; the
+    transcript is then judged only by whether the assistant understands it.
+    """
+    data = json.loads(body)
+    texts = data.get("texts") if isinstance(data, dict) else None
+    confidences = data.get("confidences") or [] if isinstance(data, dict) else []
+    if (not isinstance(texts, list) or not 1 <= len(texts) <= 5
+            or any(not isinstance(t, str) or len(t) > 500 for t in texts)
+            or not isinstance(confidences, list)
+            or any(not isinstance(c, (int, float)) or isinstance(c, bool) for c in confidences)):
+        raise ValueError("bad device transcript")
+    texts = [t.strip() for t in texts]
+    top = float(confidences[0]) if confidences else -1.0
+    status = "clear" if top <= 0 or top >= DEVICE_CLEAR else "unsure"
+    return {"text": texts[0], "alternatives": [t for t in texts[1:] if t], "status": status,
+            "recognizer": "device", "confidence": round(top, 3) if top > 0 else None}
+
+
 # An alternative may replace the heard text only if the recogniser scored it
 # nearly as high (average log-prob per token) as its own best reading.
 CLOSE_ALTERNATIVE = 0.5
 
 
-def speech_resolution(text, alternatives, status, recognizes, top_logprob=None, alternative_logprobs=None):
+def speech_resolution(text, alternatives, status, recognizes, top_logprob=None, alternative_logprobs=None,
+                      sound=None):
     """Decide how a transcript reaches the user: send, correct, or ask.
 
     - send: a confident transcript the assistant understands.
     - correct: the heard text matches nothing, exactly ONE alternative from the
       same audio does, and the recogniser scored it close to the top reading.
       It is sent with corrected_from set so the App says what was changed.
-    - ask: anything else that is unsure or unmatched (the user picks).
+    - correct by sound: the heard text matches nothing, no alternative does, and
+      sound(text) (Workflow.sound_corrections) finds one homophone-level service
+      word (水廢 -> 水費). Works with any recogniser, n-best or not.
+    - ask: anything else that is unsure or unmatched (the user picks); sound-alike
+      sentences (解釋 -> 借書) are offered after the recogniser's own alternatives.
     """
+    decided = _alternative_resolution(text, alternatives, status, recognizes, top_logprob, alternative_logprobs)
+    if decided["corrected_from"] or not callable(sound) or recognizes(text):
+        return decided
+    auto, suggested = sound(text)
+    heard = decided["options"] or [text]
+    if auto and len(heard) == 1:
+        return {"text": auto, "confirm": False, "options": [], "corrected_from": text}
+    options = heard + [s for s in suggested if normalize(s) not in map(normalize, heard)]
+    if len(options) > 1:
+        return {"text": text, "confirm": True, "options": options[:3], "corrected_from": None}
+    return decided
+
+
+def _alternative_resolution(text, alternatives, status, recognizes, top_logprob, alternative_logprobs):
     options = speech_options(text, alternatives, status, recognizes)
     if len(options) == 2 and not recognizes(text) and top_logprob is not None:
         alternative = options[1]
@@ -481,7 +566,15 @@ def make_handler(assistant, token=""):
                 return self.reply(422, {"error": "請求識別碼格式不正確。"})
             if self.headers.get("Origin"):
                 return self.reply(403, {"error": "此測試服務僅接受 App 或本機 API 呼叫。"})
-            if self.headers.get("Content-Type", "").split(";")[0] != "audio/wav":
+            kind = self.headers.get("Content-Type", "").split(";")[0]
+            if kind == "application/json":
+                # Recognised on the phone by its own speech recogniser (no audio).
+                try:
+                    result = device_transcript(audio)
+                except (ValueError, UnicodeError):
+                    return self.reply(400, {"error": "語音辨識結果格式不正確，請再說一次，或改用鍵盤。"})
+                return self.resolve_transcript(request_id, result)
+            if kind != "audio/wav":
                 return self.reply(415, {"error": "請使用 audio/wav。"})
             try:
                 read_wav(audio)
@@ -500,6 +593,10 @@ def make_handler(assistant, token=""):
                 if MODEL_API == "openai":  # on the phone: still loading or too slow
                     return self.reply(503, {"error": "手機上的語音辨識還沒準備好或處理太久，請再說一次，或改用鍵盤。"})
                 return self.reply(503, {"error": "電腦上的語音辨識服務未啟動，請改用鍵盤，或啟動語音服務後再試。"})
+            return self.resolve_transcript(request_id, result)
+
+        def resolve_transcript(self, request_id, result):
+            """Shared by both recognisers: clean-up, confirmation and sound correction."""
             text = result.get("text") if isinstance(result, dict) else None
             status = result.get("status", "clear") if isinstance(result, dict) else None
             if not isinstance(text, str) or not text.strip() or status == "unclear":
@@ -509,12 +606,15 @@ def make_handler(assistant, token=""):
             text = clean_transcript(text)
             decided = speech_resolution(text, result.get("alternatives", []), status,
                                         assistant.workflow.recognizes, result.get("avg_logprob"),
-                                        result.get("alternative_logprobs"))
+                                        result.get("alternative_logprobs"),
+                                        sound=assistant.workflow.sound_corrections)
             self.reply(200, {"contract_version": CONTRACT, "request_id": request_id, **decided,
                              "metrics": {"elapsed_ms": result.get("elapsed_ms"),
                                          "audio_seconds": result.get("audio_seconds"),
                                          "status": status, "avg_logprob": result.get("avg_logprob"),
-                                         "no_speech_prob": result.get("no_speech_prob")}})
+                                         "no_speech_prob": result.get("no_speech_prob"),
+                                         "recognizer": result.get("recognizer", "whisper"),
+                                         "confidence": result.get("confidence")}})
     return Handler
 
 

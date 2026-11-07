@@ -225,7 +225,9 @@ class WhisperCppRecognizer:
 
     def _fields(self, seconds=30):
         return {"response_format": "verbose_json", "language": "zh", "prompt": self.prompt,
-                "temperature": "0", "temperature_inc": "0", "no_timestamps": "true",
+                # temperature_inc > 0 keeps whisper.cpp's fallback: a decode stuck in a
+                # repetition loop (high entropy / low log-prob) is retried warmer.
+                "temperature": "0", "temperature_inc": "0.2", "no_timestamps": "true",
                 "no_language_probabilities": "true", "suppress_nst": "true",
                 "audio_ctx": str(self.audio_context(seconds))}
 

@@ -8,8 +8,10 @@ param(
     [string]$Ndk = "",
     [string]$Source = "D:\TownPassAssistant\native-src",
     [string[]]$Abi = @("arm64-v8a", "x86_64"),
-    # Portable baseline for 2019+ phones; dotprod speeds up quantised matmul.
-    [string]$ArmArch = "armv8.2-a+dotprod+fp16"
+    # Target: AI phones from the last two years (Snapdragon 8 Gen 3 / 8 Elite,
+    # Dimensity 9300+, Tensor G4+), all with int8 matrix multiply (i8mm), which
+    # roughly doubles prompt processing. Older phones are not supported.
+    [string]$ArmArch = "armv8.6-a+dotprod+i8mm+fp16"
 )
 # Native tools write progress to stderr; Windows PowerShell 5.1 would treat that as
 # an error when output is redirected, so failures are detected by exit codes instead.
@@ -65,7 +67,10 @@ $strip = Join-Path $strip.FullName "bin\llvm-strip.exe"
 foreach ($abi in $Abi) {
     $out = Join-Path $Root "android\app\assistant-native\jniLibs\$abi"
     New-Item -ItemType Directory -Force $out | Out-Null
-    $server = Build $llama $abi "llama-server" @("-DLLAMA_OPENSSL=OFF", "-DLLAMA_BUILD_TESTS=OFF", "-DLLAMA_CURL=OFF")
+    $llamaFlags = @("-DLLAMA_OPENSSL=OFF", "-DLLAMA_BUILD_TESTS=OFF", "-DLLAMA_CURL=OFF")
+    # Arm KleidiAI micro-kernels (fetched by llama.cpp's CMake from ARM-software/kleidiai).
+    if ($abi -eq "arm64-v8a") { $llamaFlags += "-DGGML_CPU_KLEIDIAI=ON" }
+    $server = Build $llama $abi "llama-server" $llamaFlags
     Copy-Item $server (Join-Path $out "libllama_server.so") -Force
     $asr = Build $whisper $abi "whisper-server" @("-DWHISPER_BUILD_TESTS=OFF", "-DWHISPER_SDL2=OFF")
     Copy-Item $asr (Join-Path $out "libwhisper_server.so") -Force

@@ -3,6 +3,7 @@ package com.example.townpass
 import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.util.Log
+import com.chaquo.python.Kwarg
 import com.chaquo.python.Python
 import com.chaquo.python.android.AndroidPlatform
 import java.io.File
@@ -45,20 +46,32 @@ object OnDeviceAssistant {
                 // The Python servers listen at once; the models load behind them and
                 // requests get "not ready yet" replies until they answer.
                 if (!Python.isStarted()) Python.start(AndroidPlatform(app))
+                // Builds with the phone's own speech recogniser (TOWNPASS_SPEECH=system)
+                // do not run Whisper at all.
+                val whisper = app.resources.getBoolean(R.bool.assistant_whisper)
                 val info = Python.getInstance().getModule("device_main")
-                    .callAttr("start", MODEL_PORT, WHISPER_PORT).toString()
+                    .callAttr("start", MODEL_PORT, WHISPER_PORT, Kwarg("whisper", whisper)).toString()
                 Log.i(TAG, "backend: $info")
                 val models = app.getExternalFilesDir("models") ?: File(app.filesDir, "models")
                 models.mkdirs()
-                val threads = (Runtime.getRuntime().availableProcessors() / 2).coerceIn(2, 4).toString()
+                // Recent 8-core phone SoCs have 6-8 performance cores; leave two for
+                // the UI. Speech and decision run one after the other, never together.
+                val threads = (Runtime.getRuntime().availableProcessors() - 2).coerceIn(2, 6).toString()
                 // Child processes keep the CPU group they are forked in, and Android
                 // only re-groups the App's own process later. Forked during start-up
                 // they would stay in "background" (little cores only) for good.
                 waitForForeground()
-                launch(app, "libwhisper_server.so", File(models, ASR_FILE), WHISPER_PORT,
-                    listOf("-t", threads, "-l", "zh"))
+                if (whisper) {
+                    launch(app, "libwhisper_server.so", File(models, ASR_FILE), WHISPER_PORT,
+                        listOf("-t", threads, "-l", "zh"))
+                } else {
+                    stopStale("libwhisper_server.so")
+                }
                 launch(app, "libllama_server.so", File(models, MODEL_FILE), MODEL_PORT,
-                    listOf("-t", threads, "-c", "4096", "-np", "1", "--no-webui"))
+                    // Two slots of 2048 tokens: one keeps the service policy and one the
+                    // library policy in the prompt cache (requests are <= ~1000 tokens;
+                    // the backend still sends one request at a time).
+                    llamaCpuArgs() + listOf("-c", "4096", "-np", "2", "--no-webui"))
             } catch (error: Throwable) {
                 Log.e(TAG, "on-device assistant failed to start", error)
             }
@@ -70,11 +83,14 @@ object OnDeviceAssistant {
             Log.w(TAG, "missing model ${model.absolutePath}; run scripts/push_assistant_models.ps1")
             return
         }
+        val executable = File(app.applicationInfo.nativeLibraryDir, binary)
+        // Servers left by an earlier App process (force-stop or reinstall does not
+        // always end them) may sit in the wrong CPU group or point at an old APK.
+        stopStale(binary)
         if (listening(port)) {
-            Log.i(TAG, "$binary already listening on $port")
+            Log.w(TAG, "port $port is in use by another process; not starting $binary")
             return
         }
-        val executable = File(app.applicationInfo.nativeLibraryDir, binary)
         val command = listOf(executable.absolutePath, "-m", model.absolutePath,
             "--host", "127.0.0.1", "--port", port.toString()) + extra
         val builder = ProcessBuilder(command).redirectErrorStream(true)
@@ -84,6 +100,57 @@ object OnDeviceAssistant {
         builder.redirectOutput(File(if (debuggable) "${app.cacheDir}/$binary.log" else "/dev/null"))
         synchronized(processes) { processes += builder.start() }
         Log.i(TAG, "started $binary on $port")
+    }
+
+    /**
+     * CPU settings for the decision model, measured on a vivo V2511 (Snapdragon
+     * 7 Gen 4: 3 little + 4 mid + 1 prime core) with llama-bench:
+     * reading the prompt is fastest on all non-little cores (5 threads pinned:
+     * 57 tok/s vs 46 unpinned), generating on 3 of them (5.9 tok/s vs 4.4 with 6:
+     * generation is limited by memory bandwidth, extra threads only contend).
+     * "Little" cores are those with the lowest maximum frequency.
+     */
+    private fun llamaCpuArgs(): List<String> {
+        val count = Runtime.getRuntime().availableProcessors()
+        val maxFreq = (0 until count).map { cpu ->
+            try {
+                File("/sys/devices/system/cpu/cpu$cpu/cpufreq/cpuinfo_max_freq").readText().trim().toLong()
+            } catch (_: Exception) {
+                0L
+            }
+        }
+        val lowest = maxFreq.filter { it > 0 }.minOrNull()
+        val fast = maxFreq.indices.filter { lowest == null || maxFreq[it] > lowest }
+            .ifEmpty { maxFreq.indices.toList() }
+        val batchCores = fast.takeLast(6)
+        // Generation on the fastest cores (highest frequency first).
+        val genCores = fast.sortedByDescending { maxFreq[it] }.take(3)
+        fun mask(cores: List<Int>) = "0x" + cores.fold(0L) { bits, cpu -> bits or (1L shl cpu) }.toString(16)
+        Log.i(TAG, "llama cpu: gen ${genCores.size} threads ${mask(genCores)}, prompt ${batchCores.size} threads ${mask(batchCores)}")
+        return listOf("-t", genCores.size.toString(), "-C", mask(genCores),
+            "-tb", batchCores.size.toString(), "-Cb", mask(batchCores))
+    }
+
+    /** Ends this App's (same user id) leftover copies of [binary] and waits for them to exit. */
+    private fun stopStale(binary: String) {
+        val self = android.os.Process.myPid()
+        val stale = File("/proc").listFiles().orEmpty().mapNotNull { dir ->
+            val pid = dir.name.toIntOrNull() ?: return@mapNotNull null
+            if (pid == self) return@mapNotNull null
+            val command = try {
+                File(dir, "cmdline").readText().substringBefore('\u0000')
+            } catch (_: Exception) {
+                return@mapNotNull null
+            }
+            pid.takeIf { command.endsWith("/$binary") }
+        }
+        if (stale.isEmpty()) return
+        stale.forEach { android.os.Process.killProcess(it) }
+        Log.i(TAG, "stopped leftover $binary: $stale")
+        val deadline = System.currentTimeMillis() + 5_000
+        while (stale.any { File("/proc/$it").exists() } && System.currentTimeMillis() < deadline) {
+            Thread.sleep(100)
+        }
     }
 
     /** Waits (up to 30 s) until this thread is in the foreground CPU group ("top-app"). */

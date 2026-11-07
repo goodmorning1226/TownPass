@@ -1,4 +1,4 @@
-import 'dart:async';
+﻿import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
@@ -16,6 +16,7 @@ import 'package:town_pass/service/assistant_page_tracker.dart';
 import 'package:town_pass/service/assistant_recorder.dart';
 import 'package:town_pass/service/assistant_speaker.dart';
 import 'package:town_pass/service/assistant_service.dart';
+import 'package:town_pass/service/assistant_system_speech.dart';
 
 class PendingService extends AssistantService {
   final response = Completer<AssistantResult>();
@@ -106,8 +107,40 @@ class QueueService extends AssistantService {
     return transcripts.first;
   }
 
+  final deviceTexts = <List<String>>[];
+
+  @override
+  Future<AssistantTranscript> transcribeText(
+    List<String> texts,
+    List<double> confidences, {
+    required String requestId,
+  }) async {
+    deviceTexts.add(texts);
+    return transcripts.first;
+  }
+
   @override
   void cancel() {}
+}
+
+/// Stand-in for the phone's own speech recogniser (method channel).
+class FakeSystemSpeech extends AssistantSystemSpeech {
+  final String? startProblem;
+  final SystemSpeechResult result;
+  int cancels = 0;
+  FakeSystemSpeech({
+    this.startProblem,
+    this.result = const SystemSpeechResult(['我要借書'], [0.9]),
+  });
+
+  @override
+  Future<String?> start() async => startProblem;
+
+  @override
+  Future<SystemSpeechResult> stop() async => result;
+
+  @override
+  Future<void> cancel() async => cancels++;
 }
 
 /// Records what would be spoken instead of using the phone's TTS engine.
@@ -812,6 +845,63 @@ void main() {
       (true, '我要借書'),
       (false, '請在原圖書頁面搜尋。'),
     ]);
+  });
+
+  test(
+    'The phone recogniser sends text, not audio, through the same flow',
+    () async {
+      final service = QueueService(
+        [const AssistantResult(sessionId: 's', message: '請在原圖書頁面搜尋。')],
+        transcripts: [AssistantTranscript('我要借書')],
+      );
+      final controller = AssistantViewController(
+        service: service,
+        executor: RecordingExecutor(),
+        recorder: FakeRecorder(),
+        systemSpeech: FakeSystemSpeech(
+          result: const SystemSpeechResult(['我要借書', '我要解釋'], [0.9, 0.3]),
+        ),
+      );
+      expect(await controller.startListening(), isTrue);
+      await controller.stopListening();
+      expect(service.audio, isEmpty); // no recording for Whisper
+      expect(service.deviceTexts, [
+        ['我要借書', '我要解釋'],
+      ]);
+      expect(service.texts, ['我要借書']);
+      expect(controller.messages.map((m) => (m.fromUser, m.text)), [
+        (true, '我要借書'),
+        (false, '請在原圖書頁面搜尋。'),
+      ]);
+    },
+  );
+
+  test('Phone recogniser problems are explained and nothing is sent', () async {
+    final service = QueueService(
+      const [],
+      transcripts: [AssistantTranscript('不該送出')],
+    );
+    final unavailable = AssistantViewController(
+      service: service,
+      executor: RecordingExecutor(),
+      systemSpeech: FakeSystemSpeech(startProblem: 'on_device_unavailable'),
+    );
+    expect(await unavailable.startListening(), isFalse);
+    expect(unavailable.messages.single.text, contains('Android 13'));
+
+    final noPack = AssistantViewController(
+      service: service,
+      executor: RecordingExecutor(),
+      systemSpeech: FakeSystemSpeech(
+        result: const SystemSpeechResult.failed('language_unavailable'),
+      ),
+    );
+    expect(await noPack.startListening(), isTrue);
+    await noPack.stopListening();
+    expect(noPack.busy.value, isFalse);
+    expect(noPack.messages.single.text, contains('離線語音辨識'));
+    expect(service.deviceTexts, isEmpty);
+    expect(service.texts, isEmpty);
   });
 
   test('Unsure speech asks which reading was meant before sending', () async {

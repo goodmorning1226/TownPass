@@ -10,6 +10,7 @@ import 'package:town_pass/service/assistant_page_tracker.dart';
 import 'package:town_pass/service/assistant_recorder.dart';
 import 'package:town_pass/service/assistant_speaker.dart';
 import 'package:town_pass/service/assistant_service.dart';
+import 'package:town_pass/service/assistant_system_speech.dart';
 
 /// One bubble of the conversation. Kept in memory while the App process
 /// lives; it is display history only and never sent to the model.
@@ -62,6 +63,10 @@ class AssistantViewController extends GetxController {
   final AssistantActionExecutor executor;
   final AssistantPageTracker pageTracker;
   final AssistantRecorder recorder;
+
+  /// The phone's own speech recogniser instead of recording for Whisper; null
+  /// unless the App is built with ASSISTANT_SPEECH=system.
+  final AssistantSystemSpeech? systemSpeech;
   final AssistantSpeaker speaker;
   final DateTime Function() clock;
 
@@ -70,15 +75,21 @@ class AssistantViewController extends GetxController {
     AssistantActionExecutor? executor,
     AssistantPageTracker? pageTracker,
     AssistantRecorder? recorder,
+    AssistantSystemSpeech? systemSpeech,
     AssistantSpeaker? speaker,
     DateTime Function()? clock,
   }) : service = service ?? AssistantService(),
        executor = executor ?? AssistantActionExecutor(),
        pageTracker = pageTracker ?? AssistantPageTracker.instance,
        recorder = recorder ?? AssistantRecorder(),
+       systemSpeech =
+           systemSpeech ??
+           (AssistantSystemSpeech.enabled ? AssistantSystemSpeech() : null),
        speaker = speaker ?? AssistantSpeaker(),
        clock = clock ?? DateTime.now {
     this.recorder.onLevel = _onLevel;
+    this.systemSpeech?.onLevel = _onLevel;
+    this.systemSpeech?.onDownload = _onSpeechDownload;
     this.speaker.loadEnabled().then((enabled) {
       if (!isClosed) readAloud.value = enabled;
     });
@@ -159,6 +170,34 @@ class AssistantViewController extends GetxController {
 
   /// True when the recording so far has stayed too quiet.
   final tooQuiet = false.obs;
+
+  /// Offline speech language pack being downloaded (phone recogniser only):
+  /// true while it downloads; [speechDownloadPercent] is null when the system
+  /// gives no percentage (e.g. waiting for Wi-Fi).
+  final speechDownloading = false.obs;
+  final speechDownloadPercent = RxnInt();
+
+  void _onSpeechDownload(int? percent, String? state) {
+    if (isClosed) return;
+    if (percent != null) {
+      speechDownloading.value = true;
+      speechDownloadPercent.value = percent.clamp(0, 100);
+      return;
+    }
+    switch (state) {
+      case 'started' || 'scheduled':
+        speechDownloading.value = true;
+        speechDownloadPercent.value = null;
+        if (state == 'scheduled') _add('離線語音下載已排入系統，可能會等連上 Wi-Fi 才開始。');
+      case 'done':
+        speechDownloading.value = false;
+        _add('中文（台灣）離線語音已下載完成，可以按住麥克風說話了。');
+      case 'error':
+        speechDownloading.value = false;
+        _add('離線語音下載失敗。請確認網路後再按一次麥克風重試，或先用鍵盤。');
+    }
+  }
+
   double _loudest = 0;
   DateTime? _listenStarted;
   final hidden = false.obs;
@@ -289,7 +328,7 @@ class AssistantViewController extends GetxController {
       listening.value = false;
       tooQuiet.value = false;
       _listenLimit?.cancel();
-      recorder.cancel();
+      systemSpeech == null ? recorder.cancel() : systemSpeech!.cancel();
     }
     if (busy.value) {
       message.value = '已取消，未開啟新的頁面。';
@@ -307,14 +346,27 @@ class AssistantViewController extends GetxController {
     if (busy.value || listening.value) return false;
     speaker.stop(); // never record the assistant's own voice
     final generation = _generation;
-    final started = await recorder.start();
-    if (generation != _generation || isClosed) {
-      if (started) await recorder.cancel();
-      return false;
-    }
-    if (!started) {
-      _add('需要麥克風權限才能用語音。可以到手機設定開啟，或點右下角鍵盤改用打字。');
-      return false;
+    final system = systemSpeech;
+    if (system != null) {
+      final problem = await system.start();
+      if (generation != _generation || isClosed) {
+        if (problem == null) await system.cancel();
+        return false;
+      }
+      if (problem != null) {
+        _add(AssistantSystemSpeech.message(problem));
+        return false;
+      }
+    } else {
+      final started = await recorder.start();
+      if (generation != _generation || isClosed) {
+        if (started) await recorder.cancel();
+        return false;
+      }
+      if (!started) {
+        _add('需要麥克風權限才能用語音。可以到手機設定開啟，或點右下角鍵盤改用打字。');
+        return false;
+      }
     }
     listening.value = true;
     level.value = 0;
@@ -343,10 +395,12 @@ class AssistantViewController extends GetxController {
     tooQuiet.value = false;
     level.value = 0;
     _listenLimit?.cancel();
+    final system = systemSpeech;
     if (!send) {
-      await recorder.cancel();
+      system == null ? await recorder.cancel() : await system.cancel();
       return;
     }
+    if (system != null) return _finishSystemSpeech(system);
     final heldFor = _listenStarted == null
         ? null
         : clock().difference(_listenStarted!);
@@ -393,6 +447,47 @@ class AssistantViewController extends GetxController {
       return;
     }
     if (generation != _generation || isClosed) return;
+    await _useTranscript(heard);
+  }
+
+  /// The phone's recogniser heard the clip: its texts go to the backend for the
+  /// same confirmation and sound-alike correction as Whisper results.
+  Future<void> _finishSystemSpeech(AssistantSystemSpeech system) async {
+    final generation = ++_generation;
+    busy.value = true;
+    message.value = '正在聽你說的話…';
+    final result = await system.stop();
+    if (generation != _generation || isClosed) return;
+    if (result.error != null) {
+      busy.value = false;
+      _add(AssistantSystemSpeech.message(result.error!));
+      return;
+    }
+    AssistantTranscript heard;
+    try {
+      heard = await service.transcribeText(
+        result.texts,
+        result.confidences,
+        requestId: '${DateTime.now().microsecondsSinceEpoch}-$generation',
+      );
+    } on FormatException catch (error) {
+      if (generation == _generation && !isClosed) {
+        busy.value = false;
+        _add(error.message);
+      }
+      return;
+    } catch (_) {
+      if (generation == _generation && !isClosed) {
+        busy.value = false;
+        _add('語音辨識沒有成功，請再說一次，或點右下角鍵盤改用打字。');
+      }
+      return;
+    }
+    if (generation != _generation || isClosed) return;
+    await _useTranscript(heard);
+  }
+
+  Future<void> _useTranscript(AssistantTranscript heard) async {
     busy.value = false;
     // "第二個" while numbered options are open selects that option, even when
     // the recogniser was unsure about such a short word.
@@ -526,6 +621,7 @@ class AssistantViewController extends GetxController {
     cancel();
     _cornerTimer?.cancel();
     recorder.dispose();
+    systemSpeech?.cancel();
     super.onClose();
   }
 }

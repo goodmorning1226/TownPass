@@ -81,6 +81,37 @@ def title_score(query, book):
     return best
 
 
+def term_matches(text, terms):
+    """[(score, start, end, term)] best first: for each catalogue term (Chinese
+    characters only, 2+ syllables), the stretch of text with the same number of
+    consecutive characters that sounds most like it. start/end index text."""
+    table = readings()
+    chars = [(index, fold(table[char])) for index, char in enumerate(text) if char in table]
+    found = []
+    for term in terms:
+        wanted = syllables(term)
+        size = len(wanted)
+        if size < 2 or size != len(term):
+            continue
+        best = None
+        for first in range(len(chars) - size + 1):
+            window = chars[first:first + size]
+            if window[-1][0] - window[0][0] != size - 1:
+                continue  # not consecutive characters
+            score = similarity([syllable for _, syllable in window], wanted)
+            if best is None or score > best[0]:
+                best = (score, window[0][0], window[-1][0] + 1, term)
+        if best:
+            found.append(best)
+    return sorted(found, key=lambda match: -match[0])
+
+
+def exact_homophone(a, b):
+    """Same toneless syllables before the accent fold (交號/叫號, not 偷書/投訴)."""
+    table = readings()
+    return len(a) == len(b) and all(x in table and y in table and table[x] == table[y] for x, y in zip(a, b))
+
+
 def rank_books(query, books):
     """[(score, book)] best first."""
     return sorted(((title_score(query, book), book) for book in books), key=lambda item: -item[0])

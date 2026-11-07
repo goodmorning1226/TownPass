@@ -118,7 +118,33 @@ class AssistantService {
   Future<AssistantTranscript> transcribe(
     Uint8List wav, {
     required String requestId,
-  }) async {
+  }) => _transcription(wav, ContentType('audio', 'wav'), requestId);
+
+  /// Sends what the phone's own speech recogniser heard (texts best first, with
+  /// their 0-1 confidences) for the same clean-up, confirmation and sound-alike
+  /// correction as Whisper results. No audio is sent.
+  Future<AssistantTranscript> transcribeText(
+    List<String> texts,
+    List<double> confidences, {
+    required String requestId,
+  }) => _transcription(
+    Uint8List.fromList(
+      utf8.encode(
+        jsonEncode({
+          'texts': texts.take(5).toList(),
+          'confidences': confidences.take(5).toList(),
+        }),
+      ),
+    ),
+    ContentType.json,
+    requestId,
+  );
+
+  Future<AssistantTranscript> _transcription(
+    Uint8List payload,
+    ContentType contentType,
+    String requestId,
+  ) async {
     cancel();
     final client = HttpClient()..connectionTimeout = const Duration(seconds: 8);
     _active = client;
@@ -126,14 +152,14 @@ class AssistantService {
       final request = await client.postUrl(
         Uri.parse(endpoint).resolve('/v1/assistant/transcriptions'),
       );
-      request.headers.contentType = ContentType('audio', 'wav');
+      request.headers.contentType = contentType;
       request.headers.set('X-Request-Id', requestId);
       const token = String.fromEnvironment('ASSISTANT_TOKEN');
       if (token.isNotEmpty) {
         request.headers.set(HttpHeaders.authorizationHeader, 'Bearer $token');
       }
-      request.contentLength = wav.length;
-      request.add(wav);
+      request.contentLength = payload.length;
+      request.add(payload);
       final response = await request.close().timeout(
         const Duration(seconds: 45),
       );

@@ -63,3 +63,38 @@ class SoundAlikeTurnTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class ServiceSoundCorrectionTests(unittest.TestCase):
+    """Sound-alike service words in recognised speech (Workflow.sound_corrections)."""
+
+    def setUp(self):
+        self.workflow = Assistant(FakeCatalog(), lambda messages, tools: response("cancel")).workflow
+
+    def test_exact_homophone_is_corrected_automatically(self):
+        self.assertEqual(self.workflow.sound_corrections("幫我開停車廢"), ("幫我開停車費", ["幫我開停車費"]))
+        self.assertEqual(self.workflow.sound_corrections("我要街書")[0], "我要借書")
+
+    def test_near_sound_and_accent_matches_are_only_offered(self):
+        auto, options = self.workflow.sound_corrections("我要解釋")
+        self.assertIsNone(auto)
+        self.assertIn("我要借書", options)
+        auto, options = self.workflow.sound_corrections("打開澀定")  # se/she: same only after the fold
+        self.assertIsNone(auto)
+        self.assertEqual(options, ["打開設定"])
+
+    def test_understood_sentences_books_and_chat_are_never_rewritten(self):
+        for text in ("我要繳水廢", "神奇柑仔店", "廣嶋玲子寫的書", "早安", "今天心情真好", "今天會下雨嗎"):
+            self.assertEqual(self.workflow.sound_corrections(text), (None, []), text)
+
+    def test_transcription_uses_the_correction_and_says_so(self):
+        from server import speech_resolution
+        decided = speech_resolution("幫我開停車廢", [], "clear", self.workflow.recognizes,
+                                    sound=self.workflow.sound_corrections)
+        self.assertEqual((decided["text"], decided["corrected_from"], decided["confirm"]),
+                         ("幫我開停車費", "幫我開停車廢", False))
+        decided = speech_resolution("我要解釋", [], "clear", self.workflow.recognizes,
+                                    sound=self.workflow.sound_corrections)
+        self.assertTrue(decided["confirm"])
+        self.assertEqual(decided["options"][0], "我要解釋")  # what was heard stays first
+        self.assertIn("我要借書", decided["options"])

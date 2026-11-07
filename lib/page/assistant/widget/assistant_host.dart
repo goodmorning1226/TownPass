@@ -443,7 +443,9 @@ class _AssistantSheetState extends State<AssistantSheet> {
           : busy
           ? '處理中，可在上方取消'
           : '按住說話';
-      return Row(
+      final downloading = controller.speechDownloading.value;
+      final percent = controller.speechDownloadPercent.value;
+      final bar = Row(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           // Left column reserved (e.g. a future language picker).
@@ -531,6 +533,31 @@ class _AssistantSheetState extends State<AssistantSheet> {
           ),
         ],
       );
+      if (!downloading) return bar;
+      // The phone's offline speech pack is downloading (phone recogniser only).
+      return Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          TPText(
+            percent == null ? '正在下載中文（台灣）離線語音…' : '正在下載中文（台灣）離線語音 $percent%',
+            style: TPTextStyles.bodyRegular,
+            color: TPColors.grayscale700,
+          ),
+          const SizedBox(height: 6),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(3),
+            child: LinearProgressIndicator(
+              key: const Key('assistant-speech-download'),
+              value: percent == null ? null : percent / 100,
+              minHeight: 6,
+              color: TPColors.primary500,
+              backgroundColor: TPColors.grayscale100,
+            ),
+          ),
+          const SizedBox(height: 12),
+          bar,
+        ],
+      );
     }),
   );
 
@@ -539,8 +566,9 @@ class _AssistantSheetState extends State<AssistantSheet> {
     _pressed = true;
     setState(() => _discard = false);
     final started = await controller.startListening();
-    // Released (or interrupted by the permission dialog) before it started.
-    if (started && !_pressed) await controller.stopListening(send: false);
+    // Released before listening had started (e.g. the first language check):
+    // the recording already began, so send it unless the user slid to cancel.
+    if (started && !_pressed) await controller.stopListening(send: !_discard);
   }
 
   void _pressMove(Offset position) {

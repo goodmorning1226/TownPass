@@ -79,9 +79,15 @@ def assistantOnDevice = ["1", "true"].contains(
     (project.findProperty("townpass.onDevice") ?: System.getenv("TOWNPASS_ON_DEVICE") ?: "").toString())
 if (assistantOnDevice) {
     apply plugin: "com.chaquo.python"
+    // TOWNPASS_SPEECH=system: the phone's own speech recogniser, no Whisper
+    // (docs/AI_ASR_ABLATION.md); default whisper.
+    def assistantWhisper = (project.findProperty("townpass.speech") ?: System.getenv("TOWNPASS_SPEECH") ?: "whisper")
+        .toString() != "system"
     android {
+        buildFeatures { resValues = true }  // off by default since AGP 9
         defaultConfig {
             ndk { abiFilters "arm64-v8a", "x86_64" }
+            resValue "bool", "assistant_whisper", assistantWhisper.toString()
         }
         sourceSets.main {
             jniLibs.srcDirs += "assistant-native/jniLibs"
@@ -100,7 +106,7 @@ if (assistantOnDevice) {
             main {
                 srcDir "../../assistant_backend"
                 srcDir "../../assets/assistant"
-                exclude "test_*.py", "evaluate.py", "eval_holdout.py", "evaluation.json", "README.md"
+                exclude "test_*.py", "evaluate.py", "eval_holdout.py", "eval_sound.py", "evaluation.json", "README.md"
             }
         }
     }

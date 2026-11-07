@@ -59,18 +59,30 @@ INSTRUCTIONS = {
 RETRY = "Invalid output. Return exactly ONE tool proposal with the provided schema. No prose or invented values."
 
 
+def compact(value):
+    """JSON without spaces or \\u escapes (fewer tokens, same content)."""
+    return json.dumps(value, ensure_ascii=False, separators=(",", ":"))
+
+
 def decide(owner, task, context, tools, validate, error):
     """Ask the model for one tool proposal and return the validated (name, args).
 
     owner provides model_call, model_lock and the per-request usage log.
     context is the task's JSON evidence (untrusted user text included).
     """
-    from server import proposal_schema
-    messages = [{"role": "system", "content": POLICIES[task]},
-                {"role": "user", "content": json.dumps(context, ensure_ascii=False)},
-                {"role": "user", "content": json.dumps({
-                    "allowed_tools": tools, "output_schema": proposal_schema(tools),
-                    "instruction": INSTRUCTIONS[task]})}]
+    # 2026-11-07 prompt ablation (docs/AI_ASR_ABLATION.md): 30% fewer tokens,
+    # dev 184/184, held-out 94/102 (was 95/102), 0 wrong services.
+    # - Fixed text first (policy + instruction): the model server reuses that
+    #   prefix from its prompt cache, so a request only processes what follows.
+    # - No output_schema in the prompt: the model server already enforces it as
+    #   a grammar (llama.cpp response_format / Ollama format), and the tools
+    #   carry their argument enums.
+    # - Compact JSON, Chinese unescaped.
+    # Evidence and tools stay separate messages: merging them into one JSON
+    # object lost 16 dev cases.
+    messages = [{"role": "system", "content": POLICIES[task] + "\n" + INSTRUCTIONS[task]},
+                {"role": "user", "content": compact(context)},
+                {"role": "user", "content": compact({"allowed_tools": tools})}]
     if not owner.model_lock.acquire(timeout=.1):
         raise error("目前有一個需求正在處理，請稍後再試。")
     try:
@@ -80,6 +92,9 @@ def decide(owner, task, context, tools, validate, error):
             usage = getattr(owner.usage, "calls", None)
             if usage is not None:
                 usage.append(result.get("prompt_eval_count"))
+            timings = getattr(owner.usage, "timings", None)
+            if timings is not None:
+                timings.append(result.get("timing"))
             try:
                 calls = result.get("message", {}).get("tool_calls", [])
                 if len(calls) != 1:

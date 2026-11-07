@@ -74,6 +74,14 @@ class Registry:
         root = entry["id"].split(".")[0]
         return root if root in self.by_id else entry["id"]
 
+    def sound_terms(self):
+        """Service titles, keywords and bill subjects that speech may mishear as sound-alikes:
+        Chinese characters only, 2-6 long (ASCII names such as ISBN are spelled)."""
+        terms = {term for entry in self.entries
+                 for term in [entry["title"], *entry["keywords"], *(entry.get("pay_words") or [])]
+                 if re.fullmatch(r"[一-鿿]{2,6}", term)}
+        return sorted(terms)
+
     def search(self, text):
         n = normalized(text)
         matches = []

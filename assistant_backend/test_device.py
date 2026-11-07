@@ -29,7 +29,9 @@ class FakeLlamaServer(BaseHTTPRequestHandler):
         body = json.loads(self.rfile.read(int(self.headers["Content-Length"])))
         FakeLlamaServer.requests.append((self.path, body))
         data = json.dumps({"choices": [{"message": {"content": FakeLlamaServer.content}}],
-                           "usage": {"prompt_tokens": 321}}).encode()
+                           "usage": {"prompt_tokens": 321},
+                           "timings": {"cache_n": 300, "prompt_n": 21, "prompt_ms": 812.4,
+                                       "predicted_n": 18, "predicted_ms": 1503.6}}).encode()
         self.send_response(200)
         self.send_header("Content-Length", str(len(data)))
         self.end_headers()
@@ -58,6 +60,35 @@ class LlamaServerModelTests(unittest.TestCase):
         self.assertEqual(body["response_format"]["json_schema"]["schema"], server.proposal_schema(tools))
         self.assertEqual(result["message"]["tool_calls"][0]["function"]["name"], "cancel")
         self.assertEqual(result["prompt_eval_count"], 321)  # metrics keep working
+
+    def test_turn_metrics_show_where_the_model_time_went(self):
+        tools = [server.tool("cancel", "取消")]
+        result = self.assistant._model_call([{"role": "user", "content": "x"}], tools)
+        self.assertEqual(result["timing"], {"prompt_tokens": 21, "cached_tokens": 300, "prompt_ms": 812,
+                                            "generated_tokens": 18, "generate_ms": 1504})
+        self.assertEqual(server.ollama_timing({"prompt_eval_count": 5, "prompt_eval_duration": 2_000_000,
+                                               "eval_count": 3, "eval_duration": 1_500_000})["prompt_ms"], 2)
+        self.assertIsNone(server.llama_timing(None))
+
+    def test_warm_up_loads_speech_then_caches_the_decision_policy(self):
+        import device_main
+        from decision import CAPABILITY_POLICY, INSTRUCTIONS
+        heard = []
+
+        class Recognizer:
+            def transcribe(self, frames):
+                heard.append(len(frames))
+                return {"text": ""}
+        device_main.warm_up(Recognizer(), server.MODEL_URL, limit_s=5)
+        self.assertEqual(heard, [32000])  # one second of 16 kHz PCM16
+        from decision import LIBRARY_POLICY
+        systems = [body["messages"][0]["content"] for _, body in FakeLlamaServer.requests[-2:]]
+        self.assertEqual(systems, [LIBRARY_POLICY + chr(10) + INSTRUCTIONS["library"],
+                                   CAPABILITY_POLICY + chr(10) + INSTRUCTIONS["capability"]])  # both prompt caches
+        self.assertEqual(FakeLlamaServer.requests[-1][1]["max_tokens"], 1)
+        heard.clear()
+        device_main.warm_up(None, server.MODEL_URL, limit_s=5)  # phone recogniser: no Whisper
+        self.assertEqual(heard, [])
 
     def test_consecutive_user_messages_are_merged_for_the_chat_template(self):
         messages = [{"role": "system", "content": "policy"}, {"role": "user", "content": "evidence"},
@@ -151,3 +182,22 @@ class WhisperCppRecognizerTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class PromptLayoutTests(unittest.TestCase):
+    def test_fixed_text_first_no_repeated_schema_and_compact_json(self):
+        from decision import CAPABILITY_POLICY, INSTRUCTIONS
+        seen = []
+
+        def model(messages, tools):
+            seen.append(messages)
+            return {"message": {"tool_calls": [{"function": {"name": "request_clarification", "arguments": {}}}]}}
+        Assistant(catalog=FakeCatalog(), model_call=model).turn({"request_id": "layout-1", "text": "我要繳水費"})
+        system, evidence, tools = seen[0]  # evidence and tools stay separate messages
+        self.assertEqual(system["content"], CAPABILITY_POLICY + "\n" + INSTRUCTIONS["capability"])
+        for message in (evidence, tools):
+            self.assertNotIn("output_schema", message["content"])
+            self.assertNotIn(chr(92) + "u", message["content"])  # Chinese is not escaped
+            self.assertNotIn(", ", message["content"])
+        self.assertEqual(json.loads(evidence["content"])["original_text"], "我要繳水費")
+        self.assertEqual(list(json.loads(tools["content"])), ["allowed_tools"])

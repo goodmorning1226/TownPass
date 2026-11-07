@@ -91,6 +91,37 @@ class SpeechCorrectionTests(unittest.TestCase):
         self.assertEqual((decided["text"], decided["confirm"], decided["corrected_from"]), ("我要繳水費", False, None))
 
 
+class DeviceTranscriptTests(unittest.TestCase):
+    def test_phone_recogniser_results_use_the_same_fields(self):
+        from server import device_transcript
+        result = device_transcript(json.dumps({"texts": ["我要借書", "我要解釋"], "confidences": [0.92, 0.4]}).encode())
+        self.assertEqual((result["text"], result["alternatives"], result["status"], result["recognizer"]),
+                         ("我要借書", ["我要解釋"], "clear", "device"))
+        low = device_transcript(json.dumps({"texts": ["我要解釋"], "confidences": [0.3]}).encode())
+        self.assertEqual(low["status"], "unsure")
+        unknown = device_transcript(json.dumps({"texts": ["我要借書"], "confidences": [0.0]}).encode())
+        self.assertEqual((unknown["status"], unknown["confidence"]), ("clear", None))
+
+    def test_malformed_device_results_are_rejected(self):
+        from server import device_transcript
+        for body in ({}, {"texts": []}, {"texts": ["a"] * 6}, {"texts": [3]}, {"texts": ["a"], "confidences": ["x"]}):
+            with self.assertRaises(ValueError):
+                device_transcript(json.dumps(body).encode())
+
+
+class RepetitionLoopTests(unittest.TestCase):
+    def test_a_phrase_written_many_times_is_kept_once(self):
+        from server import clean_transcript
+        self.assertEqual(clean_transcript("我想借底層邏輯" * 6), "我想借底層邏輯")
+        self.assertEqual(clean_transcript("我想借底層邏輯，我想借底層邏輯我想借底層"), "我想借底層邏輯")
+        self.assertEqual(clean_transcript("謝謝你，謝謝"), "謝謝你")
+
+    def test_ordinary_sentences_are_unchanged(self):
+        from server import clean_transcript
+        for text in ("我要借書", "借書順便繳水費", "我想看看書", "哈哈哈", "第二個", "水費跟地方稅", "停車費停車"):
+            self.assertEqual(clean_transcript(text), text)
+
+
 class ReadWavTests(unittest.TestCase):
     def test_accepts_only_short_16k_mono_pcm16(self):
         self.assertAlmostEqual(read_wav(wav_bytes(1.0))[1], 1.0, places=2)
@@ -157,7 +188,8 @@ class TranscriptionTests(unittest.TestCase):
         self.assertEqual(self.asr_bodies, [audio])
 
     def test_invalid_requests_never_reach_recognition(self):
-        cases = ((wav_bytes(1.0), "application/json", "voice-1", "test-token", 415),
+        cases = ((wav_bytes(1.0), "text/plain", "voice-1", "test-token", 415),
+                 (wav_bytes(1.0), "application/json", "voice-1", "test-token", 400),  # not a device transcript
                  (wav_bytes(1.0), "audio/wav", None, "test-token", 422),
                  (wav_bytes(1.0), "audio/wav", "bad id!", "test-token", 422),
                  (wav_bytes(1.0), "audio/wav", "voice-1", "wrong", 401),
