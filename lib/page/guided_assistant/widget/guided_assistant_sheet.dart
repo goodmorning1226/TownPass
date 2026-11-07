@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:town_pass/service/assistant_speech_language.dart';
 import 'package:get/get.dart';
 import 'package:town_pass/page/guided_assistant/guided_assistant_controller.dart';
 import 'package:town_pass/page/guided_assistant/model/assistant_settings.dart';
@@ -876,6 +877,62 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
     );
   }
 
+  /// Speech language menu ("自動偵測" or one language, each in its own
+  /// script). A MenuAnchor draws in this host's own Overlay; a popup route
+  /// would open underneath the assistant layer.
+  Widget _languageButton() {
+    final chosen = AssistantSpeechLanguage.of(c.speechLanguage.value);
+    final heard = c.heardLanguage.value;
+    final label = chosen.code == 'auto' && heard != null
+        ? '${chosen.short}·${AssistantSpeechLanguage.of(heard).short}'
+        : chosen.short;
+    return MenuAnchor(
+      key: const Key('guided-speech-language'),
+      menuChildren: [
+        for (final language in AssistantSpeechLanguage.all)
+          MenuItemButton(
+            key: Key('guided-speech-language-${language.code}'),
+            onPressed: () => c.setSpeechLanguage(language.code),
+            leadingIcon: Icon(
+              language.code == chosen.code ? Icons.check : null,
+              size: 20,
+            ),
+            child: TPText(language.label, style: TPTextStyles.bodyRegular),
+          ),
+      ],
+      builder: (context, menu, _) => Semantics(
+        button: true,
+        label: '說話的語言：${chosen.label}',
+        excludeSemantics: true,
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: c.listening.value || c.loading.value
+              ? null
+              : () => menu.isOpen ? menu.close() : menu.open(),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(
+                  Icons.translate,
+                  size: 22,
+                  color: TPColors.grayscale700,
+                ),
+                const SizedBox(width: 4),
+                TPText(
+                  label,
+                  style: TPTextStyles.bodyRegular,
+                  color: TPColors.grayscale700,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _micRow() => Column(
     mainAxisSize: MainAxisSize.min,
     children: [
@@ -919,6 +976,8 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
                 ),
               ),
             ),
+            // Speech language, the same menu as the chat assistant.
+            Positioned(left: 0, child: _languageButton()),
             Positioned(
               right: 0,
               child: Tooltip(
@@ -956,6 +1015,23 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
           ],
         ),
       ),
+      // Live loudness while recording, so a quiet voice is noticed.
+      SizedBox(
+        width: 120,
+        height: 6,
+        child: c.listening.value
+            ? ClipRRect(
+                borderRadius: BorderRadius.circular(3),
+                child: LinearProgressIndicator(
+                  key: const Key('guided-level'),
+                  value: c.level.value,
+                  color: TPColors.primary500,
+                  backgroundColor: TPColors.grayscale100,
+                ),
+              )
+            : null,
+      ),
+      const SizedBox(height: 4),
       TPText(
         c.listening.value ? '放開送出' : '按住說話，或點上面的選項',
         style: TPTextStyles.bodyRegular,
