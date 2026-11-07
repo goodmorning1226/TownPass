@@ -25,7 +25,8 @@ class GuideStep {
 
   final bool Function(WebPageState s) isDone;
 
-  /// The rest of the screen is dimmed and blocked (when there is a target).
+  /// The rest of the screen is dimmed when there is a target (taps still
+  /// reach the page).
   final bool Function(WebPageState s) locks;
 
   /// A yellow arrow points at the target.
@@ -38,7 +39,7 @@ class GuideStep {
   /// keeps it under the title bar.
   final double? Function(WebPageState s)? cardTop;
 
-  /// Other targets that stay usable while the screen is locked.
+  /// Other targets that stay lit while the screen is dimmed.
   final List<String> alsoUsable;
 
   /// Index of this step's line in [Guide.todos].
@@ -381,8 +382,6 @@ abstract class Replies {
   static const ended = '好的，引導先結束了，接下來你可以自己操作。想再請我帶你做，跟我說一聲就好。';
   static const commitLater = '好，想預約的時候再叫我。';
   static const onboardingAgain = '好，我再帶你看一次怎麼用。';
-  static const wrongTap = '沒關係～我們先點亮起來的地方就好。';
-  static const wrongTapMany = '要按亮起來的地方喔。想先自己操作，可以按「暫停」。';
 
   static const offline = '（目前連不到助理的模型，先用示範內容回答。）';
   static const listeningFailed = '語音辨識沒有成功，請再說一次，或按右邊的鍵盤打字。';

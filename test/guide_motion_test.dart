@@ -225,15 +225,17 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('the scrim nudges; the lit target takes taps', (tester) async {
+    testWidgets('the scrim lets taps through; the lit target takes taps', (
+      tester,
+    ) async {
       final c = await pumpHost(tester);
       await tester.tap(find.text('開始'));
       await frames(tester, const Duration(seconds: 1));
       expect(c.locked, isTrue);
-      await tester.tap(find.byKey(const Key('row')), warnIfMissed: false);
+      await tester.tap(find.byKey(const Key('row')));
       await tester.pump();
-      expect(rowTaps, 0);
-      expect(c.nudge.value, isNotEmpty, reason: 'onBlockedTap');
+      expect(rowTaps, 1, reason: 'the dimmed page still gets taps');
+      expect(c.nudge.value, isEmpty, reason: 'no wrong-tap nudge');
       await tester.tap(find.byKey(const Key('entry')));
       await tester.pump();
       expect(entryTaps, 1);

@@ -53,8 +53,7 @@ const libraryPageSpec = WebPageSpec(
     'reserveFailed': "!!byText('[id^=\"headlessui-dialog-title\"]', '預約失敗')",
     'failReason': "(() => { const t = byText('[id^=\"headlessui-dialog-title\"]', '預約失敗'); const p = t && t.closest('[id^=\"headlessui-dialog-panel\"]'); const l = p && orig(p).split('\\n').map((x) => x.trim()).find((x) => x.startsWith('原因')); return l ? l.replace(/^原因[:：]\\s*/, '') : ''; })()",
     // The book page says it cannot be reserved (no 取書館 field).
-    'notReservable':
-        "/不提供預約|不可預約|無法預約|不開放預約/.test(pageText('#app'))",
+    'notReservable': "/不提供預約|不可預約|無法預約|不開放預約/.test(pageText('#app'))",
     'dialogOpen': "qa('[id^=\"headlessui-dialog-panel\"]').some(shown)",
     'bookTitle': "pageText('#app .h-screen').split('\\n').map((l) => l.trim()).find((l) => l) || ''",
     'pickupOpen': "(() => { const b = byText('li > button', '可取書'); const n = b && b.nextElementSibling; return !!n && n.getBoundingClientRect().height > 4; })()",

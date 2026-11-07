@@ -24,9 +24,14 @@ class _Seen {
 }
 
 /// Ring (and optional arrow) around a [GuideTarget]. When [blocking], the rest
-/// of the screen is dimmed and taps outside the target go to [onBlockedTap]
-/// instead of the page; the target itself stays usable. [topClear] keeps the
-/// page's title bar (close button) usable as well.
+/// of the screen is dimmed.
+///
+/// With [passThrough] (guide steps) the dimming is only a hint: every tap,
+/// long-press, drag and scroll reaches the page underneath as if nothing were
+/// drawn, and [onBlockedTap] is never called. Without it (the first-run hint)
+/// taps outside the target go to [onBlockedTap] instead of the page; the
+/// target itself stays usable, and [topClear] keeps the page's title bar
+/// (close button) usable as well. The ring, halo and arrow never take taps.
 ///
 /// The target is looked up every frame, so the ring follows scrolling, the
 /// keyboard and lists that open inside the target. If the target cannot be
@@ -42,6 +47,9 @@ class GuideHighlight extends StatefulWidget {
   final double scrimOpacity;
   final double topClear;
   final VoidCallback? onBlockedTap;
+
+  /// The dimming never takes pointer events (see the class doc).
+  final bool passThrough;
   final bool showArrow;
   final HighlightRing ring;
 
@@ -56,6 +64,7 @@ class GuideHighlight extends StatefulWidget {
     this.scrimOpacity = 0.25,
     this.topClear = 0,
     this.onBlockedTap,
+    this.passThrough = false,
     this.showArrow = true,
     this.ring = HighlightRing.yellow,
     this.radius = 14,
@@ -279,7 +288,26 @@ class _GuideHighlightState extends State<GuideHighlight>
         ? hole.inflate(_settleInflate * (1 - shown))
         : hole;
     final children = <Widget>[];
-    if (widget.blocking) {
+    if (widget.blocking && widget.passThrough) {
+      // Dims everything but the holes, as a hint only: the page underneath
+      // (the WebView included) gets every touch.
+      children.add(
+        Positioned.fill(
+          child: IgnorePointer(
+            child: CustomPaint(
+              size: Size.infinite,
+              painter: _ScrimPainter(
+                [hole, ..._extra],
+                const [],
+                r,
+                Colors.black.withValues(alpha: widget.scrimOpacity * shown),
+                widget.topClear,
+              ),
+            ),
+          ),
+        ),
+      );
+    } else if (widget.blocking) {
       // One layer dims everything but the holes and takes the taps outside
       // them; inside a hole (and above [topClear]) taps reach the page. While
       // the ring travels, the real target is open to taps too.

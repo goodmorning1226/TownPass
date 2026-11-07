@@ -32,8 +32,7 @@ const _isOn =
     "((w) => { const b = w.querySelector('button.card-button'); return !!b && (b.classList.contains('base-button--outline') || raw(b).trim() === '取消訂閱'); })";
 const _isOpen =
     "((w) => { const b = w.querySelector('button.card-button'); return !!b && opened(b); })";
-const _title =
-    "((w) => raw(w.querySelector('.card-header')).trim())";
+const _title = "((w) => raw(w.querySelector('.card-header')).trim())";
 
 /// First open card that is not subscribed / is subscribed.
 const _openOff = "($_wraps.find((w) => $_isOpen(w) && !$_isOn(w)) || null)";

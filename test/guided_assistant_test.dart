@@ -721,17 +721,6 @@ void main() {
       expect(c.card?.text, contains('已預約相同卷期'));
     });
 
-    test('tapping outside the target nudges, three times mentions pause', () {
-      c.startGuide('library');
-      onPage(home);
-      c.beginSteps();
-      c.wrongTap();
-      expect(c.card?.text, Replies.wrongTap);
-      c.wrongTap();
-      c.wrongTap();
-      expect(c.card?.text, Replies.wrongTapMany);
-    });
-
     test('task list lines', () {
       c.startGuide('library');
       onPage(home);
@@ -977,7 +966,7 @@ void main() {
       Get.reset();
     });
 
-    testWidgets('a web target is lit; taps elsewhere only nudge', (
+    testWidgets('a web target is lit; taps elsewhere still reach the page', (
       tester,
     ) async {
       final c = makeController();
@@ -1022,10 +1011,10 @@ void main() {
       await tester.pump();
       await tester.pump();
       expect(find.text('我們先找書！點一下上面的「關鍵字搜尋」。'), findsOneWidget);
-      await tester.tap(find.text('other'), warnIfMissed: false);
+      await tester.tap(find.text('other'));
       await tester.pump();
-      expect(pageTaps, 0);
-      expect(find.text(Replies.wrongTap), findsOneWidget);
+      expect(pageTaps, 1, reason: 'the dimmed page still gets taps');
+      expect(c.nudge.value, isEmpty);
       await tester.tap(find.byKey(const Key('web-button')));
       await tester.pump();
       expect(targetTaps, 1, reason: 'the lit spot reaches the page');

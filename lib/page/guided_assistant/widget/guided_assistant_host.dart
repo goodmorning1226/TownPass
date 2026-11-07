@@ -59,6 +59,7 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
             // Read the values the guide depends on so Obx rebuilds on them.
             c.task.value;
             c.nudge.value;
+            c.offScope.value;
             c.currentRoute.value;
             c.sheetOpen.value;
             c.homeAsk.value;
@@ -81,9 +82,11 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
                     targetId: target,
                     alsoUsable: c.currentStep?.alsoUsable ?? const [],
                     blocking: c.locked,
+                    // The dimming only hints at the next step; the page
+                    // underneath keeps every tap, scroll and keystroke.
+                    passThrough: true,
                     showArrow: c.showArrow && !typingInPage,
                     topClear: media.padding.top + 56,
-                    onBlockedTap: c.wrongTap,
                   ),
                 ),
               );
@@ -147,6 +150,18 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
                 'paused',
                 paused ? 'paused' : null,
                 paused ? _pausedBar(context, c, t) : null,
+              ),
+            );
+            // The WebView moved to a page outside the guide: a small bar
+            // under the title bar leads back (the big paused card is only
+            // for leaving to another App screen).
+            final away = t != null && c.offScopeVisible;
+            layers.add(
+              _slot(
+                context,
+                'offScope',
+                away ? 'offScope:${t.guide.id}' : null,
+                away ? _offScopeBar(context, c, t) : null,
               ),
             );
             final asking = homeAsk && c.homeAsk.value != HomeAsk.idle;
@@ -845,6 +860,64 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
                         child: _PrimaryButton(
                           t.left ? t.guide.resumeLabel : '繼續',
                           c.resume,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Compact bar while the WebView shows a page outside the guide: one line
+  /// of text and 結束引導 / 回到〇〇, just under the title bar so most of
+  /// the page stays visible (the assistant button sits at the bottom).
+  Widget _offScopeBar(
+    BuildContext context,
+    GuidedAssistantController c,
+    GuideTask t,
+  ) {
+    final text = '你離開了${t.guide.pageName}';
+    return Positioned(
+      left: 12,
+      right: 12,
+      top: MediaQuery.of(context).padding.top + 60,
+      child: Semantics(
+        container: true,
+        label: text,
+        child: Material(
+          type: MaterialType.transparency,
+          child: _Appear(
+            fade: false,
+            child: Container(
+              padding: const EdgeInsets.fromLTRB(12, 8, 12, 10),
+              decoration: _warm,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ExcludeSemantics(
+                    child: TPText(
+                      text,
+                      style: TPTextStyles.h3SemiBold,
+                      color: TPColors.grayscale950,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Expanded(child: _SecondaryButton('結束引導', c.endGuide)),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: _PrimaryButton(
+                          t.guide.resumeLabel,
+                          c.returnToGuide,
                         ),
                       ),
                     ],
