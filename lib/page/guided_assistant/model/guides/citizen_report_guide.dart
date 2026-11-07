@@ -1,4 +1,5 @@
 import 'package:town_pass/page/guided_assistant/model/guide_content.dart';
+import 'package:town_pass/page/guided_assistant/model/guide_i18n.dart';
 import 'package:town_pass/page/guided_assistant/model/guide_page.dart';
 import 'package:town_pass/page/guided_assistant/web/web_guide_probe.dart';
 import 'package:town_pass/page/guided_assistant/web/web_page_state.dart';
@@ -56,7 +57,7 @@ const _jsCaseSearch =
     '(inView($_jsCaseInput) ? $_jsCaseInput.closest(\'div.mt-3\') : null)';
 const _jsCases = "qa('ul.mt-10 > li > a[href*=search-detail]').filter(inView)";
 const _jsBack = "q('section.fixed.top-0 button.absolute')";
-const _jsBodyText = "(document.body.innerText || '')";
+const _jsBodyText = 'orig(document.body)';
 
 /// Top / bottom (viewport px) of one element or the union of a list;
 /// -9999 when nothing is shown.
@@ -237,7 +238,7 @@ String _category(WebPageState s) {
   final c = s.now.text('category').replaceFirst(RegExp(r'[（(].*$'), '').trim();
   // A form opened by a full reload shows the placeholder 案件名稱.....
   if (c.isEmpty || c.startsWith('案件名稱') || c.contains('...')) return '';
-  return '「$c」';
+  return gt('「{c}」', {'c': pg(c)});
 }
 
 /// Where the user is when a home-tab step starts somewhere else.
@@ -251,7 +252,9 @@ String? _homeTarget(WebPageState s, String tab) {
 
 String? _homeCard(WebPageState s, String tab) {
   if (!_onHome(s)) return _backCard;
-  if (s.now.text('topTab') != tab) return '先點一下上面的「$tab」。';
+  if (s.now.text('topTab') != tab) {
+    return gt('先點一下上面的「{tab}」。', {'tab': pg(tab)});
+  }
   return null;
 }
 
@@ -286,10 +289,13 @@ String _pickCard(WebPageState s) {
 String _searchCard(WebPageState s) {
   final word = s.now.text('searchInput');
   final n = s.now.number('searchResults');
-  if (n > 0) return '找到 $n 個類別。點最接近你問題的那一個。';
+  if (n > 0) return gt('找到 {n} 個類別。點最接近你問題的那一個。', {'n': n});
   if (s.now.flag('noResults')) {
-    final what = word.isEmpty ? '' : '「$word」';
-    return '沒有找到$what的類別。換一個簡單的詞再試試，例如「教育」；也可以按左上角的「‹」回去，點「更多項目」慢慢找。';
+    return word.isEmpty
+        ? gt('沒有找到的類別。換一個簡單的詞再試試，例如「教育」；也可以按左上角的「‹」回去，點「更多項目」慢慢找。')
+        : gt('沒有找到「{word}」的類別。換一個簡單的詞再試試，例如「教育」；也可以按左上角的「‹」回去，點「更多項目」慢慢找。', {
+            'word': word,
+          });
   }
   return word.isEmpty
       ? '點一下框框，用簡單的詞打你遇到的問題，例如「教育」，再按右邊的放大鏡。'
@@ -528,18 +534,26 @@ final List<GuideComponent> citizenReportComponents = [
           final title = s.now.text('title');
           final cat = _category(s);
           final what = [
-            if (cat.isNotEmpty) '類別是$cat',
-            if (title.isNotEmpty) '主旨是「$title」',
-          ].join('，');
+            if (cat.isNotEmpty) gt('類別是{cat}', {'cat': cat}),
+            if (title.isNotEmpty) gt('主旨是「{title}」', {'title': title}),
+          ].join(gt('，'));
           final consent = s.now.text('consent');
           final agree = consent.isEmpty
-              ? '「個人資料是否提供給承辦」也選一下。'
-              : '「個人資料是否提供給承辦」現在選「$consent」，想改可以點另一個。';
+              ? gt('「個人資料是否提供給承辦」也選一下。')
+              : gt('「個人資料是否提供給承辦」現在選「{consent}」，想改可以點另一個。', {
+                  'consent': pg(consent),
+                });
           final stale = s.now.flag('titleWarn') || s.now.flag('descWarn')
-              ? '上面的紅字是剛剛的提醒，現在已經寫好了。'
+              ? gt('上面的紅字是剛剛的提醒，現在已經寫好了。')
               : '';
-          final check = what.isEmpty ? '最後確認一下內容。' : '最後確認一下：$what。';
-          return '$stale$check$agree沒問題就自己按「送出」喔。這是示範網站，不會真的送出。';
+          final check = what.isEmpty
+              ? gt('最後確認一下內容。')
+              : gt('最後確認一下：{what}。', {'what': what});
+          return gt('{stale}{check}{agree}沒問題就自己按「送出」喔。這是示範網站，不會真的送出。', {
+            'stale': stale,
+            'check': check,
+            'agree': agree,
+          });
         },
         detail: (_) => '看一下內容對不對，沒問題就自己按「送出」。不想送了，按左上角的「‹」離開就好。',
         isDone: _accepted,
@@ -648,11 +662,14 @@ final List<GuideComponent> citizenReportComponents = [
       if (status == '處理完成') {
         return from.isEmpty
             ? '這件已經「處理完成」了！往下滑可以看回覆內容。'
-            : '這件已經「處理完成」了！「$from」有回覆你，往下滑可以看回覆內容。';
+            : gt('這件已經「處理完成」了！「{from}」有回覆你，往下滑可以看回覆內容。', {'from': pg(from)});
       }
       return expect.isEmpty
-          ? '這件現在是「$status」，還在辦理，請再等等喔。'
-          : '這件現在是「$status」，預計 $expect 完成，請再等等喔。';
+          ? gt('這件現在是「{status}」，還在辦理，請再等等喔。', {'status': pg(status)})
+          : gt('這件現在是「{status}」，預計 {expect} 完成，請再等等喔。', {
+              'status': pg(status),
+              'expect': expect,
+            });
     },
     steps: [
       GuideStep(
@@ -675,11 +692,15 @@ final List<GuideComponent> citizenReportComponents = [
           if (s.now.flag('noCases')) {
             return s.now.text('caseKeyword').isEmpty
                 ? '這裡還沒有案件紀錄（無紀錄）。'
-                : '沒有找到「${s.now.text('caseKeyword')}」的案件。把框框裡的字清掉，再按放大鏡，就能看到全部的案件。';
+                : gt('沒有找到「{keyword}」的案件。把框框裡的字清掉，再按放大鏡，就能看到全部的案件。', {
+                    'keyword': s.now.text('caseKeyword'),
+                  });
           }
           final n = s.now.number('caseCount');
-          final count = n > 0 ? '這裡有 $n 件案件。' : '';
-          return '$count右邊寫著「處理中」或「處理完成」。點你想看的那一件，看處理到哪裡。';
+          final count = n > 0 ? gt('這裡有 {n} 件案件。', {'n': n}) : '';
+          return gt('{count}右邊寫著「處理中」或「處理完成」。點你想看的那一件，看處理到哪裡。', {
+            'count': count,
+          });
         },
         detail: (_) => '點一件案件，就能看處理情形、辦理機關和回覆。',
         isDone: _onDetail,
@@ -701,7 +722,9 @@ final List<GuideComponent> citizenReportComponents = [
       final subject = s.now.text('caseSubject');
       return subject.isEmpty
           ? '這是案件的詳細內容！有案件編號、辦理機關和預計完成的日子。'
-          : '這是「$subject」的詳細內容！有案件編號、辦理機關和預計完成的日子。';
+          : gt('這是「{subject}」的詳細內容！有案件編號、辦理機關和預計完成的日子。', {
+              'subject': pg(subject),
+            });
     },
     steps: [
       GuideStep(
@@ -806,7 +829,7 @@ GuideTexts _citizenReportTexts(List<String> plan, GuideComponent last) {
     resumeLabel: '回到有話要說',
     backLabel: '回到有話要說畫面',
     openedText: '好的！已經幫你打開「有話要說」，我會在畫面上一步一步帶你做。',
-    openedCard: '好的！「有話要說」打開了，我們一起來${last.taskTitle}。',
+    openedCard: gt('好的！「有話要說」打開了，我們一起來{task}。', {'task': gt(last.taskTitle)}),
     helpChips: const ['下一步要做什麼？', '我要陳情'],
   );
 }

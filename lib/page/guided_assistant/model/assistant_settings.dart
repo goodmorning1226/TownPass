@@ -1,12 +1,14 @@
 /// User settings of the guided assistant (AI 助理設定) and the texts of the
-/// in-assistant tutorial (新手教學).
+/// in-assistant tutorial (新手教學). The texts are the Chinese sources; they
+/// are shown through gt() in the conversation language (guide_i18n.dart).
 library;
+
+import 'package:town_pass/page/guided_assistant/model/guide_i18n.dart';
+import 'package:town_pass/service/assistant_speech_language.dart';
 
 /// 教學模式: after finding a feature the assistant guides step by step.
 /// 一般模式: it only opens the page; the user goes on alone.
 enum AssistantMode { teach, normal }
-
-enum AssistantLanguage { zh, en, ja }
 
 extension AssistantModeText on AssistantMode {
   String get title => switch (this) {
@@ -29,24 +31,23 @@ extension AssistantModeText on AssistantMode {
   );
 }
 
-extension AssistantLanguageText on AssistantLanguage {
-  String get title => switch (this) {
-    AssistantLanguage.zh => '繁體中文',
-    AssistantLanguage.en => 'English',
-    AssistantLanguage.ja => '日本語',
-  };
+/// The assistant's language in AI 助理設定 is the speech-language menu's
+/// choice (AssistantSpeechLanguage, the same menu as under the microphone):
+/// one choice for listening, the assistant's texts and the guides.
+extension AssistantLanguageChoice on AssistantSpeechLanguage {
+  /// The language named in the conversation language, e.g. 英文 / English.
+  String get desc => gt(switch (code) {
+    'zh' => '繁體中文',
+    'en' => '英文',
+    'ja' => '日文',
+    'vi' => '越南文',
+    'id' => '印尼文',
+    'th' => '泰文',
+    _ => '聽你說的話，自動判斷是哪一種語言',
+  });
 
-  String get desc => switch (this) {
-    AssistantLanguage.zh => '繁體中文',
-    AssistantLanguage.en => '英文',
-    AssistantLanguage.ja => '日文',
-  };
-
-  bool get isDefault => this == AssistantLanguage.zh;
-
-  /// Only Traditional Chinese is supported for now; the others are shown
-  /// as 準備中.
-  bool get available => this == AssistantLanguage.zh;
+  /// The menu label: the language in its own script; 自動偵測 translated.
+  String get title => code == 'auto' ? gt('自動偵測') : label;
 }
 
 /// Texts of the tutorial inside the assistant (design 「新手教學 1/2、2/2」).
@@ -64,7 +65,8 @@ abstract class TutorialTexts {
   static const tagType = '↓ 在這裡打字';
   static const tagBackVoice = '點這裡切回語音 ↓';
   static const reply = '你好呀！我是臺北通助理。\n有想問的問題，或是想找的功能，都可以直接告訴我。我也可以一步一步帶你操作喔！';
-  static String modeTitle(AssistantMode m) => '現在是「${m.title}」';
+  static String modeTitle(AssistantMode m) =>
+      gt('現在是「{mode}」', {'mode': gt(m.title)});
   static String modeBody(AssistantMode m) => switch (m) {
     AssistantMode.teach => '找到功能後，我會一步步帶你做。\n不需要時，可到「個人設定」改成「一般模式」。',
     AssistantMode.normal => '我幫你找到功能，之後你自己操作。\n想要我帶著做，可到「個人設定」改成「教學模式」。',
@@ -72,7 +74,8 @@ abstract class TutorialTexts {
   static const wherePath = '個人設定 › AI 助理設定';
   static const finish = '完成教學';
   static const seeSettings = '看設定';
-  static String branch(String task) => '我可以幫你「$task」。\n要先做完教學（剩 1 步），還是直接開始？';
+  static String branch(String task) =>
+      gt('我可以幫你「{task}」。\n要先做完教學（剩 1 步），還是直接開始？', {'task': task});
   static const keepTut = '先完成教學';
   static const goNow = '直接開始';
   static const keepTutReply = '好，先做完教學！';
@@ -82,7 +85,8 @@ abstract class TutorialTexts {
   static const endToast = '已結束教學，可到「個人設定」重看。';
 
   static final greeting = RegExp(
-    r'你好|您好|哈囉|嗨|早安|午安|晚安|hello|hi\b|hey',
+    r'你好|您好|哈囉|嗨|早安|午安|晚安|hello|hi\b|hey|こんにちは|おはよう|'
+    r'chào|halo|hai\b|selamat|สวัสดี',
     caseSensitive: false,
   );
   static final taskLike = RegExp(
@@ -107,24 +111,24 @@ abstract class SettingsTexts {
   static const summaryLabel = '目前設定（兩項各自獨立）';
   static const modeHeader = '助理模式';
   static const langHeader = '助理語言';
-  static const langDesc = '選擇助理回答問題和操作提示時使用的語言。';
+  static const langDesc = '選擇助理聽你說話、回答問題和操作提示時使用的語言。和對話畫面麥克風旁的語言選單是同一個設定。';
   static const defaultTag = '預設';
-  static const comingSoon = '準備中';
   static const whatChanges = '會改變什麼？';
   static const change1 = '・助理說的話和操作提示。';
   static const change2 = '・按住說話時，用這個語言聽你說。';
-  static const change3a = '・';
-  static const change3b = '不會';
-  static const change3c = '翻譯服務網頁。App 的語言請到「設定 > 語言」。';
+  static const change3 = '・你用這個語言說話或打字時，服務網頁也會跟著翻譯；下次打開 App 會回到手機的語言。';
   static const replay = '重看助理新手教學';
   static const replayNote = '不會改變設定，也不會清除對話。';
-  static String modeChanged(AssistantMode m) => '已改成「${m.title}」，語言不變';
-  static String langComingSoon(AssistantLanguage l) =>
-      '${l.title} 還在準備中，目前只能用繁體中文。';
+  static String modeChanged(AssistantMode m) =>
+      gt('已改成「{mode}」，語言不變', {'mode': gt(m.title)});
+  static String languageChanged(AssistantSpeechLanguage l) =>
+      gt('已改成「{language}」，模式不變', {'language': l.title});
 
   /// What the assistant says after opening a page in 一般模式.
-  static String normalOpened(String pageName) =>
-      '已經幫你打開「$pageName」。我幫你找到功能，之後你自己操作。\n想要我帶著做，可到「個人設定」改成「教學模式」。';
+  static String normalOpened(String pageName) => gt(
+    '已經幫你打開「{page}」。我幫你找到功能，之後你自己操作。\n想要我帶著做，可到「個人設定」改成「教學模式」。',
+    {'page': gt(pageName)},
+  );
   static const normalToast = '我幫你找到功能，之後你自己操作。';
 }
 

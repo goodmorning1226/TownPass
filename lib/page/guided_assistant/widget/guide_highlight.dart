@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:town_pass/gen/assets.gen.dart';
 import 'package:town_pass/page/guided_assistant/guide_target.dart';
+import 'package:town_pass/page/guided_assistant/model/guide_i18n.dart';
 import 'package:town_pass/util/tp_colors.dart';
 
 const guideYellow = Color(0xFFFFD424);
@@ -128,7 +129,7 @@ class _GuideHighlightState extends State<GuideHighlight>
           children.add(
             Positioned.fill(
               child: Semantics(
-                label: '請先操作亮起來的地方',
+                label: gt('請先操作亮起來的地方'),
                 child: GestureDetector(
                   behavior: HitTestBehavior.deferToChild,
                   onTap: widget.onBlockedTap,

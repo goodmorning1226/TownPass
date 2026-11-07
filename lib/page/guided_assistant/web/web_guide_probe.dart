@@ -16,7 +16,11 @@ class WebPageSpec {
   ///
   /// Every spec also gets `__bottomBar` (height of the page's fixed bottom
   /// bar, for the 助理 button) and `__dialog` (a headlessui dialog is open).
-  /// Helpers usable in expressions: q, qa, shown, byText, txt, inView (in
+  /// Helpers usable in expressions: q, qa, shown, byText, txt, orig (the
+  /// element's innerText in the page's original Chinese, also on a page the
+  /// App translated; use it instead of `.innerText`), origContent (the same
+  /// for `.textContent`), optText (an option's original text, for `.text`),
+  /// ph (an input's original placeholder), inView (in
   /// the viewport horizontally, for tab views), opened (not inside a
   /// collapsed `grid-rows-[0fr]` group), dialog(title),
   /// dialogButton(title, label), textBetween(scope, head, stop) (the shown
@@ -38,12 +42,10 @@ class WebPageSpec {
   });
 
   String get script {
-    final t = targets.entries
-        .map((e) => '${jsonEncode(e.key)}: () => (${e.value})')
-        .join(',\n');
-    final f = flags.entries
-        .map((e) => '${jsonEncode(e.key)}: () => (${e.value})')
-        .join(',\n');
+    String entry(MapEntry<String, String> e) =>
+        '${jsonEncode(e.key)}: () => (${originalPlaceholders(e.value)})';
+    final t = targets.entries.map(entry).join(',\n');
+    final f = flags.entries.map(entry).join(',\n');
     return '''
 (() => {
   const $_helpers
@@ -59,12 +61,52 @@ class WebPageSpec {
 ''';
   }
 
+  static final _placeholder = RegExp(
+    r'''\[placeholder([~|^$*]?=)("[^"]*"|'[^']*')\]''',
+  );
+
+  /// [expression] with each `[placeholder="X"]` selector also matching a
+  /// field whose placeholder the App translated: the original stays in
+  /// `data-tp-placeholder` (tp_web_view.dart), so guides keep using the
+  /// Chinese placeholder. On an untranslated page it matches as before.
+  @visibleForTesting
+  static String originalPlaceholders(String expression) =>
+      expression.replaceAllMapped(
+        _placeholder,
+        (m) =>
+            ':is([data-tp-placeholder${m[1]}${m[2]}],'
+            '[placeholder${m[1]}${m[2]}])',
+      );
+
+  /// The page-reading helpers, for tests.
+  @visibleForTesting
+  static String get helpersForTest => _helpers;
+
   static const _helpers = r'''
     q = (s) => document.querySelector(s),
     qa = (s) => [...document.querySelectorAll(s)],
     shown = (e) => { if (!e) return false; const r = e.getBoundingClientRect(); if (r.width < 1 || r.height < 1) return false; const st = getComputedStyle(e); return st.visibility !== 'hidden' && st.display !== 'none' && st.opacity !== '0'; },
-    byText = (s, text) => qa(s).filter(shown).find((e) => (e.innerText || '').trim().startsWith(text)) || null,
-    txt = (e) => ((e && e.innerText) || '').trim(),
+    orig = (e) => {
+      // The element's innerText with the original (Chinese) words: on a page
+      // the App translated (tp_web_view.dart), each translated text node is
+      // put back, so guides keep matching the Chinese page text.
+      if (!e) return '';
+      let t = e.innerText || '';
+      const o = window.__townpassOriginal;
+      if (typeof o !== 'function' || !t) return t;
+      const w = document.createTreeWalker(e, NodeFilter.SHOW_TEXT, null);
+      let n;
+      while ((n = w.nextNode())) {
+        const v = (n.nodeValue || '').trim(), was = (o(n) || '').trim();
+        if (v && was && v !== was) t = t.split(v).join(was);
+      }
+      return t;
+    },
+    origContent = (e) => !e ? '' : typeof window.__townpassOriginal === 'function' ? window.__townpassOriginal(e) : (e.textContent || ''),
+    optText = (o) => !o ? '' : typeof window.__townpassOriginal === 'function' ? window.__townpassOriginal(o) : (o.text || ''),
+    ph = (e) => !e || !e.getAttribute ? null : typeof window.__townpassOriginalPlaceholder === 'function' ? window.__townpassOriginalPlaceholder(e) : e.getAttribute('placeholder'),
+    byText = (s, text) => qa(s).filter(shown).find((e) => orig(e).trim().startsWith(text)) || null,
+    txt = (e) => orig(e).trim(),
     inView = (e) => { if (!shown(e)) return false; const r = e.getBoundingClientRect(); return r.right > 1 && r.left < innerWidth - 1; },
     opened = (e) => { const g = e && e.closest('[class*="grid-rows-"]'); return !g || g.className.includes('grid-rows-[1fr]'); },
     dialog = (title) => { const t = byText('[id^="headlessui-dialog-title"]', title); return t ? t.closest('[id^="headlessui-dialog-panel"]') : null; },

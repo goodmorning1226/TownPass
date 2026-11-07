@@ -1,0 +1,553 @@
+{
+ "version": 1,
+ "status": "DRAFT translations (machine-assisted, 2026-11-08), pending native-speaker review. Keys are the Chinese source texts in lib/page/guided_assistant/; keep {name} placeholders; {page:X} shows the page's own word X as the page shows it (translated by PageTranslation).",
+ "section": "counter_calling",
+ "strings": {
+  "{place}加進常用地點了！回到臨櫃叫號首頁，最上面就看得到。這是示範網站，頁面重新打開後會不見喔。": {
+   "en": "Added {place} to your saved places! Go back to the Counter queue number home page and you'll see it at the top. This is a demo site, so it will be gone once the page is reopened.",
+   "ja": "{place}をよく使う場所に追加しました！窓口の番号札のホームに戻ると、一番上に表示されます。これはデモサイトなので、ページを開き直すと消えます。",
+   "vi": "Đã thêm {place} vào địa điểm thường dùng! Quay lại trang chủ Lấy số thứ tự, bạn sẽ thấy ở trên cùng. Đây là trang web mẫu, mở lại trang thì sẽ mất nhé.",
+   "id": "Sudah menambahkan {place} ke tempat favorit! Kembali ke beranda Nomor antrean loket, Anda akan melihatnya di paling atas. Ini situs demo, jadi akan hilang setelah halaman dibuka ulang.",
+   "th": "เพิ่ม{place}ในสถานที่ที่ใช้บ่อยแล้ว! กลับไปที่หน้าแรกของบัตรคิวเคาน์เตอร์ จะเห็นอยู่ด้านบนสุด นี่เป็นเว็บไซต์สาธิต เปิดหน้าใหม่แล้วจะหายไป"
+  },
+  "{place}從常用地點移除了！這是示範網站，沒有真的改到你的資料喔。": {
+   "en": "Removed {place} from your saved places! This is a demo site, so your data was not really changed.",
+   "ja": "{place}をよく使う場所から削除しました！これはデモサイトなので、あなたのデータは実際には変わっていません。",
+   "vi": "Đã xóa {place} khỏi địa điểm thường dùng! Đây là trang web mẫu, dữ liệu của bạn không thật sự bị thay đổi đâu.",
+   "id": "Sudah menghapus {place} dari tempat favorit! Ini situs demo, jadi data Anda tidak benar-benar berubah.",
+   "th": "ลบ{place}ออกจากสถานที่ที่ใช้บ่อยแล้ว! นี่เป็นเว็บไซต์สาธิต ข้อมูลของคุณไม่ได้เปลี่ยนจริง"
+  },
+  "{place}是你的常用地點。不要了的話，自己按右邊的「移除常用」。": {
+   "en": "You have {place} in your saved places. If you don't want it anymore, tap “{page:移除常用}” on the right yourself.",
+   "ja": "{place}はよく使う場所に入っています。いらなくなったら、ご自分で右の「{page:移除常用}」を押してください。",
+   "vi": "Bạn đã lưu {place} là địa điểm thường dùng. Nếu không cần nữa, bạn tự bấm “{page:移除常用}” ở bên phải nhé.",
+   "id": "Anda menyimpan {place} sebagai tempat favorit. Kalau sudah tidak perlu, tekan sendiri “{page:移除常用}” di kanan.",
+   "th": "{place}เป็นสถานที่ที่ใช้บ่อยของคุณ ถ้าไม่ต้องการแล้ว กด “{page:移除常用}” ทางขวาด้วยตัวเอง"
+  },
+  "{place}現在：{lines}。": {
+   "en": "Right now at {place}: {lines}.",
+   "ja": "{place}の今の状況：{lines}。",
+   "vi": "Hiện tại ở {place}: {lines}.",
+   "id": "Saat ini di {place}: {lines}.",
+   "th": "ตอนนี้ที่{place}: {lines}"
+  },
+  "{place}現在：{lines}。{busy}號碼牌要到現場抽喔。這是示範資料。": {
+   "en": "Right now at {place}: {lines}. {busy}You need to take a number ticket on site. This is demo data.",
+   "ja": "{place}の今の状況：{lines}。{busy}番号札は現地で取ってください。これはデモデータです。",
+   "vi": "Hiện tại ở {place}: {lines}. {busy}Phiếu số thứ tự phải lấy tại chỗ nhé. Đây là dữ liệu mẫu.",
+   "id": "Saat ini di {place}: {lines}. {busy}Nomor antrean harus diambil di lokasi. Ini data demo.",
+   "th": "ตอนนี้ที่{place}: {lines} {busy}ต้องไปกดบัตรคิวที่สถานที่จริง นี่เป็นข้อมูลสาธิต"
+  },
+  "{unit}打開了！下面就是櫃檯等候狀況。": {
+   "en": "Opened {unit}! Below is the counter waiting status.",
+   "ja": "{unit}を開きました！下が窓口の待ち状況です。",
+   "vi": "Đã mở {unit}! Bên dưới là tình trạng chờ tại quầy.",
+   "id": "Sudah membuka {unit}! Di bawah ini status antrean loket.",
+   "th": "เปิด{unit}แล้ว! ด้านล่างคือสถานะการรอที่เคาน์เตอร์"
+  },
+  "「{name}」": {
+   "en": "“{name}”",
+   "ja": "「{name}」",
+   "vi": "“{name}”",
+   "id": "“{name}”",
+   "th": "“{name}”"
+  },
+  "「{name}」叫到 {number} 號，還有 {waiting} 人在等": {
+   "en": "“{name}” is serving number {number}, with {waiting} people waiting",
+   "ja": "「{name}」は{number}番を呼び出し中、{waiting}人待ち",
+   "vi": "“{name}” đang gọi số {number}, còn {waiting} người chờ",
+   "id": "“{name}” sedang memanggil nomor {number}, {waiting} orang menunggu",
+   "th": "“{name}” เรียกถึงหมายเลข {number} มีคนรออีก {waiting} คน"
+  },
+  "「{name}」等的人最多。": {
+   "en": "“{name}” has the most people waiting. ",
+   "ja": "「{name}」が一番混んでいます。",
+   "vi": "“{name}” có nhiều người chờ nhất. ",
+   "id": "“{name}” paling banyak yang menunggu. ",
+   "th": "“{name}” มีคนรอมากที่สุด "
+  },
+  "「叫到幾號」是現在辦到的號碼，「等候」是還有幾個人在排。號碼牌要到現場抽。": {
+   "en": "The “number called” is the number being served now, and “{page:等候}” is how many people are still in line. You take a number ticket on site.",
+   "ja": "「呼び出し番号」は今対応中の番号、「{page:等候}」はまだ並んでいる人数です。番号札は現地で取ります。",
+   "vi": "“Số đang gọi” là số đang được phục vụ, “{page:等候}” là số người còn đang xếp hàng. Phiếu số thứ tự lấy tại chỗ.",
+   "id": "“Nomor dipanggil” adalah nomor yang sedang dilayani, “{page:等候}” adalah jumlah orang yang masih antre. Nomor antrean diambil di lokasi.",
+   "th": "“หมายเลขที่เรียก” คือหมายเลขที่กำลังให้บริการอยู่ “{page:等候}” คือจำนวนคนที่ยังต่อคิว บัตรคิวต้องไปกดที่สถานที่จริง"
+  },
+  "下面可以看每個櫃檯現在叫到幾號、還有幾個人在等。": {
+   "en": "Below you can see which number each counter is serving now and how many people are waiting.",
+   "ja": "下で、各窓口が今何番を呼んでいるか、何人待っているかが見られます。",
+   "vi": "Bên dưới có thể xem mỗi quầy đang gọi đến số mấy và còn bao nhiêu người chờ.",
+   "id": "Di bawah ini bisa dilihat nomor yang sedang dipanggil di setiap loket dan berapa orang yang menunggu.",
+   "th": "ด้านล่างดูได้ว่าแต่ละเคาน์เตอร์เรียกถึงหมายเลขไหน และมีคนรออีกกี่คน"
+  },
+  "下面的「櫃檯等候狀況」就是這個地點的叫號情形。": {
+   "en": "The “{page:櫃檯等候狀況}” below shows the queue numbers for this place.",
+   "ja": "下の「{page:櫃檯等候狀況}」が、この場所の呼び出し状況です。",
+   "vi": "“{page:櫃檯等候狀況}” bên dưới là tình hình gọi số của địa điểm này.",
+   "id": "“{page:櫃檯等候狀況}” di bawah adalah status panggilan nomor di tempat ini.",
+   "th": "“{page:櫃檯等候狀況}” ด้านล่างคือสถานะการเรียกคิวของสถานที่นี้"
+  },
+  "你有 {n} 個常用地點。點你要去的那一個。": {
+   "en": "You have {n} saved places. Tap the one you want to go to.",
+   "ja": "よく使う場所が{n}件あります。行きたい場所を押してください。",
+   "vi": "Bạn có {n} địa điểm thường dùng. Bấm vào nơi bạn muốn đến.",
+   "id": "Anda punya {n} tempat favorit. Tekan tempat yang ingin Anda tuju.",
+   "th": "คุณมีสถานที่ที่ใช้บ่อย {n} แห่ง กดแห่งที่คุณจะไป"
+  },
+  "你要去哪個單位辦事？點一下，例如「戶政事務所」。": {
+   "en": "Which office do you need to go to? Tap it, for example “{page:戶政事務所}”.",
+   "ja": "どの機関に行きますか？押してください。例：「{page:戶政事務所}」。",
+   "vi": "Bạn cần đến đơn vị nào làm việc? Bấm vào đó, ví dụ “{page:戶政事務所}”.",
+   "id": "Anda mau mengurus ke kantor mana? Tekan salah satu, misalnya “{page:戶政事務所}”.",
+   "th": "คุณจะไปติดต่อหน่วยงานไหน? กดเลือก เช่น “{page:戶政事務所}”"
+  },
+  "你要去哪個單位辦事？點一下，例如「戶政事務所」。下面還有，可以往下滑看看。": {
+   "en": "Which office do you need to go to? Tap it, for example “{page:戶政事務所}”. There are more below, so you can scroll down to look.",
+   "ja": "どの機関に行きますか？押してください。例：「{page:戶政事務所}」。下にもまだあるので、スクロールして見てみてください。",
+   "vi": "Bạn cần đến đơn vị nào làm việc? Bấm vào đó, ví dụ “{page:戶政事務所}”. Bên dưới vẫn còn, có thể kéo xuống xem.",
+   "id": "Anda mau mengurus ke kantor mana? Tekan salah satu, misalnya “{page:戶政事務所}”. Masih ada lagi di bawah, coba gulir ke bawah.",
+   "th": "คุณจะไปติดต่อหน่วยงานไหน? กดเลือก เช่น “{page:戶政事務所}” ด้านล่างยังมีอีก เลื่อนลงดูได้"
+  },
+  "加入常用地點": {
+   "en": "Save a place",
+   "ja": "よく使う場所に追加",
+   "vi": "Thêm địa điểm thường dùng",
+   "id": "Tambah tempat favorit",
+   "th": "เพิ่มสถานที่ที่ใช้บ่อย"
+  },
+  "加好了！回到臨櫃叫號首頁，最上面的「常用地點」就看得到。這是示範網站，頁面重新打開後會不見喔。": {
+   "en": "Added! Go back to the Counter queue number home page and you'll see it under “{page:常用地點}” at the top. This is a demo site, so it will be gone once the page is reopened.",
+   "ja": "追加しました！窓口の番号札のホームに戻ると、一番上の「{page:常用地點}」に表示されます。これはデモサイトなので、ページを開き直すと消えます。",
+   "vi": "Đã thêm! Quay lại trang chủ Lấy số thứ tự, bạn sẽ thấy ở mục “{page:常用地點}” trên cùng. Đây là trang web mẫu, mở lại trang thì sẽ mất nhé.",
+   "id": "Sudah ditambahkan! Kembali ke beranda Nomor antrean loket, Anda akan melihatnya di “{page:常用地點}” paling atas. Ini situs demo, jadi akan hilang setelah halaman dibuka ulang.",
+   "th": "เพิ่มแล้ว! กลับไปที่หน้าแรกของบัตรคิวเคาน์เตอร์ จะเห็นใน “{page:常用地點}” ด้านบนสุด นี่เป็นเว็บไซต์สาธิต เปิดหน้าใหม่แล้วจะหายไป"
+  },
+  "加好了！最上面亮起來的「常用地點」就是剛加的地點，點一下就能直接打開。這是示範網站，頁面重新打開後會不見喔。": {
+   "en": "Added! The highlighted one under “{page:常用地點}” at the top is the place you just added. Tap it to open it directly. This is a demo site, so it will be gone once the page is reopened.",
+   "ja": "追加しました！一番上の光っている「{page:常用地點}」が、今追加した場所です。押すとすぐに開けます。これはデモサイトなので、ページを開き直すと消えます。",
+   "vi": "Đã thêm! Mục “{page:常用地點}” sáng lên ở trên cùng chính là địa điểm vừa thêm, bấm vào là mở ngay. Đây là trang web mẫu, mở lại trang thì sẽ mất nhé.",
+   "id": "Sudah ditambahkan! Yang menyala di “{page:常用地點}” paling atas adalah tempat yang baru ditambahkan. Tekan untuk langsung membukanya. Ini situs demo, jadi akan hilang setelah halaman dibuka ulang.",
+   "th": "เพิ่มแล้ว! รายการที่สว่างขึ้นใน “{page:常用地點}” ด้านบนสุดคือสถานที่ที่เพิ่งเพิ่ม กดเพื่อเปิดได้ทันที นี่เป็นเว็บไซต์สาธิต เปิดหน้าใหม่แล้วจะหายไป"
+  },
+  "勾好了！要移除就自己按「移除地點」喔。": {
+   "en": "Ticked! To remove it, tap “{page:移除地點}” yourself.",
+   "ja": "チェックできました！削除するなら、ご自分で「{page:移除地點}」を押してください。",
+   "vi": "Đã đánh dấu! Muốn xóa thì bạn tự bấm “{page:移除地點}” nhé.",
+   "id": "Sudah dicentang! Kalau mau menghapus, tekan sendiri “{page:移除地點}”.",
+   "th": "ติ๊กแล้ว! ถ้าจะลบ กด “{page:移除地點}” ด้วยตัวเอง"
+  },
+  "勾選": {
+   "en": "Tick",
+   "ja": "チェック",
+   "vi": "Đánh dấu",
+   "id": "Centang",
+   "th": "ติ๊ก"
+  },
+  "可以看區公所、戶政事務所等單位的櫃檯現在叫到幾號、還有幾個人在等。常去的地點可以加入常用，下次從最上面直接打開。": {
+   "en": "See which number the counters at offices such as district offices and household registration offices are serving now, and how many people are waiting. Places you visit often can be saved, so next time you can open them right from the top.",
+   "ja": "区役所や戸政事務所などの窓口が今何番を呼んでいるか、何人待っているかが見られます。よく行く場所はよく使う場所に追加すると、次回は一番上からすぐ開けます。",
+   "vi": "Xem các quầy ở văn phòng quận, văn phòng hộ tịch... đang gọi đến số mấy và còn bao nhiêu người chờ. Nơi hay đến có thể thêm vào địa điểm thường dùng, lần sau mở ngay từ trên cùng.",
+   "id": "Lihat nomor yang sedang dipanggil di loket kantor distrik, kantor catatan sipil, dan lainnya, serta berapa orang yang menunggu. Tempat yang sering dikunjungi bisa disimpan sebagai favorit, lain kali langsung dibuka dari atas.",
+   "th": "ดูว่าเคาน์เตอร์ของสำนักงานเขต สำนักงานทะเบียนราษฎร์ ฯลฯ เรียกถึงหมายเลขไหน และมีคนรออีกกี่คน สถานที่ที่ไปบ่อยเพิ่มเป็นสถานที่ที่ใช้บ่อยได้ ครั้งหน้าเปิดจากด้านบนได้เลย"
+  },
+  "單位選好了！接下來選要去的地點。": {
+   "en": "Office chosen! Next, choose the place you're going to.",
+   "ja": "機関を選びました！次は行く場所を選びます。",
+   "vi": "Đã chọn đơn vị! Tiếp theo, chọn địa điểm bạn sẽ đến.",
+   "id": "Kantor sudah dipilih! Selanjutnya, pilih tempat yang akan dituju.",
+   "th": "เลือกหน่วยงานแล้ว! ต่อไปเลือกสถานที่ที่จะไป"
+  },
+  "回到臨櫃叫號": {
+   "en": "Back to Counter queue number",
+   "ja": "窓口の番号札に戻る",
+   "vi": "Quay lại Lấy số thứ tự",
+   "id": "Kembali ke Nomor antrean loket",
+   "th": "กลับไปที่บัตรคิวเคาน์เตอร์"
+  },
+  "回到首頁，最上面的「常用地點」點一下就能直接打開這個地點。": {
+   "en": "On the home page, tap it under “{page:常用地點}” at the top to open this place directly.",
+   "ja": "ホームに戻って、一番上の「{page:常用地點}」を押すと、この場所をすぐに開けます。",
+   "vi": "Về trang chủ, bấm vào mục “{page:常用地點}” trên cùng là mở ngay địa điểm này.",
+   "id": "Di beranda, tekan di “{page:常用地點}” paling atas untuk langsung membuka tempat ini.",
+   "th": "กลับไปหน้าแรก กดที่ “{page:常用地點}” ด้านบนสุดเพื่อเปิดสถานที่นี้ได้ทันที"
+  },
+  "在「櫃檯等待人數查詢」下面，點你要去的單位。": {
+   "en": "Under “{page:櫃檯等待人數查詢}”, tap the office you're going to.",
+   "ja": "「{page:櫃檯等待人數查詢}」の下で、行く機関を押してください。",
+   "vi": "Bên dưới “{page:櫃檯等待人數查詢}”, bấm vào đơn vị bạn sẽ đến.",
+   "id": "Di bawah “{page:櫃檯等待人數查詢}”, tekan kantor yang akan Anda tuju.",
+   "th": "ใต้ “{page:櫃檯等待人數查詢}” กดหน่วยงานที่จะไป"
+  },
+  "在最上面的「常用地點」點你要去的地點。": {
+   "en": "Under “{page:常用地點}” at the top, tap the place you're going to.",
+   "ja": "一番上の「{page:常用地點}」で、行く場所を押してください。",
+   "vi": "Ở mục “{page:常用地點}” trên cùng, bấm vào nơi bạn sẽ đến.",
+   "id": "Di “{page:常用地點}” paling atas, tekan tempat yang akan Anda tuju.",
+   "th": "ที่ “{page:常用地點}” ด้านบนสุด กดสถานที่ที่จะไป"
+  },
+  "在臨櫃叫號首頁按「常用地點」右邊的「變更」，勾選不要的地點，再按「移除地點」。": {
+   "en": "On the Counter queue number home page, tap “{page:變更}” to the right of “{page:常用地點}”, tick the places you don't want, then tap “{page:移除地點}”.",
+   "ja": "窓口の番号札のホームで「{page:常用地點}」の右の「{page:變更}」を押し、いらない場所にチェックして、「{page:移除地點}」を押してください。",
+   "vi": "Ở trang chủ Lấy số thứ tự, bấm “{page:變更}” bên phải “{page:常用地點}”, đánh dấu những nơi không cần, rồi bấm “{page:移除地點}”.",
+   "id": "Di beranda Nomor antrean loket, tekan “{page:變更}” di sebelah kanan “{page:常用地點}”, centang tempat yang tidak diperlukan, lalu tekan “{page:移除地點}”.",
+   "th": "ที่หน้าแรกของบัตรคิวเคาน์เตอร์ กด “{page:變更}” ทางขวาของ “{page:常用地點}” ติ๊กสถานที่ที่ไม่ต้องการ แล้วกด “{page:移除地點}”"
+  },
+  "在跳出來的清單，點你要去的地點。": {
+   "en": "In the list that pops up, tap the place you're going to.",
+   "ja": "表示された一覧で、行く場所を押してください。",
+   "vi": "Trong danh sách hiện ra, bấm vào nơi bạn sẽ đến.",
+   "id": "Di daftar yang muncul, tekan tempat yang akan Anda tuju.",
+   "th": "ในรายการที่ขึ้นมา กดสถานที่ที่จะไป"
+  },
+  "地點選好了！": {
+   "en": "Place chosen!",
+   "ja": "場所を選びました！",
+   "vi": "Đã chọn địa điểm!",
+   "id": "Tempat sudah dipilih!",
+   "th": "เลือกสถานที่แล้ว!"
+  },
+  "好的！「臨櫃叫號」打開了，我們一起來{task}。": {
+   "en": "OK! “Counter queue number” is open. Let's get started: {task}.",
+   "ja": "はい！「窓口の番号札」を開きました。一緒に始めましょう：{task}。",
+   "vi": "Được rồi! “Lấy số thứ tự” đã mở. Cùng bắt đầu nhé: {task}.",
+   "id": "Baik! “Nomor antrean loket” sudah terbuka. Ayo mulai bersama: {task}.",
+   "th": "ได้เลย! เปิด “บัตรคิวเคาน์เตอร์” แล้ว มาเริ่มกันเลย: {task}"
+  },
+  "好的！「臨櫃叫號」打開了，我們先選要去的單位吧。": {
+   "en": "OK! “Counter queue number” is open. Let's first choose the office you're going to.",
+   "ja": "はい！「窓口の番号札」を開きました。まず行く機関を選びましょう。",
+   "vi": "Được rồi! “Lấy số thứ tự” đã mở. Trước tiên mình chọn đơn vị bạn sẽ đến nhé.",
+   "id": "Baik! “Nomor antrean loket” sudah terbuka. Pertama, pilih kantor yang akan Anda tuju.",
+   "th": "ได้เลย! เปิด “บัตรคิวเคาน์เตอร์” แล้ว มาเลือกหน่วยงานที่จะไปกันก่อน"
+  },
+  "好的！已經幫你打開「臨櫃叫號」。我們先選單位和地點，再看櫃檯叫到幾號。我會在畫面上一步一步帶你做。": {
+   "en": "OK! I've opened “Counter queue number” for you. First we'll choose the office and place, then see which number each counter is serving. I'll guide you step by step on the screen.",
+   "ja": "はい！「窓口の番号札」を開きました。まず機関と場所を選んでから、窓口が何番を呼んでいるかを見ます。画面の上で一つずつご案内します。",
+   "vi": "Được rồi! Mình đã mở “Lấy số thứ tự” cho bạn. Trước tiên chọn đơn vị và địa điểm, rồi xem quầy đang gọi đến số mấy. Mình sẽ hướng dẫn từng bước trên màn hình.",
+   "id": "Baik! Saya sudah membuka “Nomor antrean loket” untuk Anda. Kita pilih kantor dan tempatnya dulu, lalu lihat nomor yang sedang dipanggil di loket. Saya akan memandu langkah demi langkah di layar.",
+   "th": "ได้เลย! เปิด “บัตรคิวเคาน์เตอร์” ให้แล้ว เราจะเลือกหน่วยงานและสถานที่ก่อน แล้วดูว่าเคาน์เตอร์เรียกถึงหมายเลขไหน จะพาทำทีละขั้นตอนบนหน้าจอ"
+  },
+  "好的！已經幫你打開「臨櫃叫號」，我會在畫面上一步一步帶你做。": {
+   "en": "OK! I've opened “Counter queue number” for you. I'll guide you step by step on the screen.",
+   "ja": "はい！「窓口の番号札」を開きました。画面の上で一つずつご案内します。",
+   "vi": "Được rồi! Mình đã mở “Lấy số thứ tự” cho bạn. Mình sẽ hướng dẫn từng bước trên màn hình.",
+   "id": "Baik! Saya sudah membuka “Nomor antrean loket” untuk Anda. Saya akan memandu langkah demi langkah di layar.",
+   "th": "ได้เลย! เปิด “บัตรคิวเคาน์เตอร์” ให้แล้ว จะพาทำทีละขั้นตอนบนหน้าจอ"
+  },
+  "常去{place}嗎？點右邊的「加入常用」，下次從首頁就能直接打開。要不要加，由你自己按喔。": {
+   "en": "Do you often go to {place}? Tap “{page:加入常用}” on the right, and next time you can open it right from the home page. Whether to add it is up to you.",
+   "ja": "{place}によく行きますか？右の「{page:加入常用}」を押すと、次回はホームからすぐ開けます。追加するかどうかは、ご自分で決めて押してください。",
+   "vi": "Bạn hay đến {place} không? Bấm “{page:加入常用}” bên phải, lần sau mở ngay từ trang chủ. Có thêm hay không là do bạn tự bấm nhé.",
+   "id": "Sering ke {place}? Tekan “{page:加入常用}” di kanan, lain kali bisa langsung dibuka dari beranda. Mau ditambahkan atau tidak, Anda sendiri yang menekan.",
+   "th": "ไป{place}บ่อยไหม? กด “{page:加入常用}” ทางขวา ครั้งหน้าเปิดจากหน้าแรกได้เลย จะเพิ่มหรือไม่ กดเองได้เลย"
+  },
+  "常用地點{place}打開了！下面就是它的櫃檯等候狀況。": {
+   "en": "Your saved place {place} is open! Below is its counter waiting status.",
+   "ja": "よく使う場所{place}を開きました！下がその窓口の待ち状況です。",
+   "vi": "Đã mở địa điểm thường dùng {place}! Bên dưới là tình trạng chờ tại quầy ở đó.",
+   "id": "Tempat favorit {place} sudah terbuka! Di bawah ini status antrean loketnya.",
+   "th": "เปิดสถานที่ที่ใช้บ่อย{place}แล้ว! ด้านล่างคือสถานะการรอที่เคาน์เตอร์ของที่นั่น"
+  },
+  "常用地點在臨櫃叫號首頁。按左上角的「‹」回上一頁。": {
+   "en": "Saved places are on the Counter queue number home page. Tap “‹” at the top left to go back.",
+   "ja": "よく使う場所は窓口の番号札のホームにあります。左上の「‹」を押して前のページに戻ってください。",
+   "vi": "Địa điểm thường dùng nằm ở trang chủ Lấy số thứ tự. Bấm “‹” ở góc trên bên trái để quay lại trang trước.",
+   "id": "Tempat favorit ada di beranda Nomor antrean loket. Tekan “‹” di kiri atas untuk kembali.",
+   "th": "สถานที่ที่ใช้บ่อยอยู่ที่หน้าแรกของบัตรคิวเคาน์เตอร์ กด “‹” มุมซ้ายบนเพื่อกลับหน้าก่อน"
+  },
+  "常用地點打開了！這裡就是它的櫃檯等候狀況。": {
+   "en": "Your saved place is open! This is its counter waiting status.",
+   "ja": "よく使う場所を開きました！ここがその窓口の待ち状況です。",
+   "vi": "Đã mở địa điểm thường dùng! Đây là tình trạng chờ tại quầy ở đó.",
+   "id": "Tempat favorit sudah terbuka! Ini status antrean loketnya.",
+   "th": "เปิดสถานที่ที่ใช้บ่อยแล้ว! นี่คือสถานะการรอที่เคาน์เตอร์ของที่นั่น"
+  },
+  "常用地點是你存起來的地點。打開頁面重新進來後會不見，要再加一次。": {
+   "en": "Saved places are places you have stored. They disappear when you reopen the page, so you'd need to add them again.",
+   "ja": "よく使う場所は、あなたが保存した場所です。ページを開き直すと消えるので、もう一度追加する必要があります。",
+   "vi": "Địa điểm thường dùng là những nơi bạn đã lưu. Mở lại trang thì sẽ mất, phải thêm lại lần nữa.",
+   "id": "Tempat favorit adalah tempat yang Anda simpan. Akan hilang kalau halaman dibuka ulang, jadi perlu ditambahkan lagi.",
+   "th": "สถานที่ที่ใช้บ่อยคือสถานที่ที่คุณบันทึกไว้ ถ้าเปิดหน้าใหม่จะหายไป ต้องเพิ่มอีกครั้ง"
+  },
+  "常用地點都清空了。": {
+   "en": "Your saved places are all cleared. ",
+   "ja": "よく使う場所はすべてなくなりました。",
+   "vi": "Đã xóa hết địa điểm thường dùng. ",
+   "id": "Semua tempat favorit sudah kosong. ",
+   "th": "สถานที่ที่ใช้บ่อยว่างหมดแล้ว "
+  },
+  "想再加回來，打開那個地點，按「加入常用」就可以。": {
+   "en": "To add it back, open that place and tap “{page:加入常用}”.",
+   "ja": "また追加したいときは、その場所を開いて「{page:加入常用}」を押せばOKです。",
+   "vi": "Muốn thêm lại, mở địa điểm đó và bấm “{page:加入常用}” là được.",
+   "id": "Untuk menambahkannya lagi, buka tempat itu dan tekan “{page:加入常用}”.",
+   "th": "ถ้าอยากเพิ่มกลับ เปิดสถานที่นั้นแล้วกด “{page:加入常用}” ได้เลย"
+  },
+  "打開常用地點": {
+   "en": "Open a saved place",
+   "ja": "よく使う場所を開く",
+   "vi": "Mở địa điểm thường dùng",
+   "id": "Buka tempat favorit",
+   "th": "เปิดสถานที่ที่ใช้บ่อย"
+  },
+  "按「加入常用」": {
+   "en": "Tap “{page:加入常用}”",
+   "ja": "「{page:加入常用}」を押す",
+   "vi": "Bấm “{page:加入常用}”",
+   "id": "Tekan “{page:加入常用}”",
+   "th": "กด “{page:加入常用}”"
+  },
+  "按「櫃檯等候狀況」上面右邊的「加入常用」。": {
+   "en": "Tap “{page:加入常用}” on the right, above “{page:櫃檯等候狀況}”.",
+   "ja": "「{page:櫃檯等候狀況}」の上、右側の「{page:加入常用}」を押してください。",
+   "vi": "Bấm “{page:加入常用}” ở bên phải, phía trên “{page:櫃檯等候狀況}”.",
+   "id": "Tekan “{page:加入常用}” di kanan, di atas “{page:櫃檯等候狀況}”.",
+   "th": "กด “{page:加入常用}” ทางขวา เหนือ “{page:櫃檯等候狀況}”"
+  },
+  "每一行是一個櫃檯：前面是櫃檯名稱，後面是現在叫到的號碼，「等候」是還有幾個人在排。": {
+   "en": "Each line is one counter: first the counter name, then the number being served now; “{page:等候}” is how many people are still in line.",
+   "ja": "1行が1つの窓口です。前が窓口の名前、後ろが今呼んでいる番号で、「{page:等候}」はまだ並んでいる人数です。",
+   "vi": "Mỗi dòng là một quầy: phía trước là tên quầy, phía sau là số đang gọi, “{page:等候}” là số người còn đang xếp hàng.",
+   "id": "Setiap baris adalah satu loket: di depan nama loket, lalu nomor yang sedang dipanggil; “{page:等候}” adalah jumlah orang yang masih antre.",
+   "th": "แต่ละบรรทัดคือหนึ่งเคาน์เตอร์: ข้างหน้าคือชื่อเคาน์เตอร์ ข้างหลังคือหมายเลขที่เรียกอยู่ “{page:等候}” คือจำนวนคนที่ยังต่อคิว"
+  },
+  "現在看的是「{name}」。點一下框框確認是你要去的地點。": {
+   "en": "You're looking at “{name}”. Tap the box to confirm it's the place you're going to.",
+   "ja": "今見ているのは「{name}」です。枠を押して、行く場所か確認してください。",
+   "vi": "Bạn đang xem “{name}”. Bấm vào ô để xác nhận đó là nơi bạn sẽ đến.",
+   "id": "Yang sedang dilihat: “{name}”. Tekan kotaknya untuk memastikan itu tempat yang akan Anda tuju.",
+   "th": "ตอนนี้กำลังดู “{name}” กดช่องเพื่อยืนยันว่าเป็นสถานที่ที่จะไป"
+  },
+  "現在看的是「{name}」。點一下框框，選你要去的地點（就是這間的話，也點開選一下）。": {
+   "en": "You're looking at “{name}”. Tap the box and choose the place you're going to (if it's this one, still open the box and choose it).",
+   "ja": "今見ているのは「{name}」です。枠を押して、行く場所を選んでください（ここでよければ、開いて選び直してください）。",
+   "vi": "Bạn đang xem “{name}”. Bấm vào ô và chọn nơi bạn sẽ đến (nếu đúng là nơi này, cũng mở ra chọn một lần nhé).",
+   "id": "Yang sedang dilihat: “{name}”. Tekan kotaknya dan pilih tempat yang akan Anda tuju (kalau memang yang ini, tetap buka dan pilih sekali).",
+   "th": "ตอนนี้กำลังดู “{name}” กดช่องแล้วเลือกสถานที่ที่จะไป (ถ้าเป็นที่นี้ ก็เปิดแล้วเลือกอีกครั้ง)"
+  },
+  "現在都不用等。": {
+   "en": "No waiting anywhere right now. ",
+   "ja": "今はどこも待たずに済みます。",
+   "vi": "Hiện tại không phải chờ ở đâu cả. ",
+   "id": "Saat ini tidak perlu menunggu. ",
+   "th": "ตอนนี้ไม่ต้องรอเลย "
+  },
+  "目前沒有常用地點，不用移除喔。": {
+   "en": "You have no saved places, so there's nothing to remove.",
+   "ja": "今はよく使う場所がないので、削除する必要はありません。",
+   "vi": "Hiện chưa có địa điểm thường dùng, không cần xóa đâu.",
+   "id": "Belum ada tempat favorit, jadi tidak perlu dihapus.",
+   "th": "ตอนนี้ไม่มีสถานที่ที่ใช้บ่อย ไม่ต้องลบ"
+  },
+  "目前還沒有常用地點。先點你要去的單位；選好地點後，按「加入常用」就能存起來。": {
+   "en": "You don't have any saved places yet. First tap the office you're going to; after choosing the place, tap “{page:加入常用}” to save it.",
+   "ja": "まだよく使う場所はありません。まず行く機関を押して、場所を選んだら「{page:加入常用}」を押すと保存できます。",
+   "vi": "Bạn chưa có địa điểm thường dùng. Trước tiên bấm vào đơn vị bạn sẽ đến; chọn xong địa điểm, bấm “{page:加入常用}” là lưu lại được.",
+   "id": "Belum ada tempat favorit. Tekan dulu kantor yang akan Anda tuju; setelah memilih tempat, tekan “{page:加入常用}” untuk menyimpannya.",
+   "th": "ยังไม่มีสถานที่ที่ใช้บ่อย กดหน่วยงานที่จะไปก่อน เลือกสถานที่แล้ว กด “{page:加入常用}” เพื่อบันทึก"
+  },
+  "看一看": {
+   "en": "Take a look",
+   "ja": "見てみる",
+   "vi": "Xem thử",
+   "id": "Lihat",
+   "th": "ดู"
+  },
+  "看叫號": {
+   "en": "Check queue numbers",
+   "ja": "呼び出し番号を見る",
+   "vi": "Xem số đang gọi",
+   "id": "Lihat nomor antrean",
+   "th": "ดูหมายเลขคิว"
+  },
+  "看現在叫到幾號": {
+   "en": "See which number is being called",
+   "ja": "今何番まで呼ばれているか見る",
+   "vi": "Xem đang gọi đến số mấy",
+   "id": "Lihat nomor yang sedang dipanggil",
+   "th": "ดูว่าเรียกถึงหมายเลขไหนแล้ว"
+  },
+  "移除好了！{left}這是示範網站，沒有真的改到你的資料喔。": {
+   "en": "Removed! {left}This is a demo site, so your data was not really changed.",
+   "ja": "削除しました！{left}これはデモサイトなので、あなたのデータは実際には変わっていません。",
+   "vi": "Đã xóa! {left}Đây là trang web mẫu, dữ liệu của bạn không thật sự bị thay đổi đâu.",
+   "id": "Sudah dihapus! {left}Ini situs demo, jadi data Anda tidak benar-benar berubah.",
+   "th": "ลบแล้ว! {left}นี่เป็นเว็บไซต์สาธิต ข้อมูลของคุณไม่ได้เปลี่ยนจริง"
+  },
+  "移除好了！這是示範網站，沒有真的改到你的資料喔。": {
+   "en": "Removed! This is a demo site, so your data was not really changed.",
+   "ja": "削除しました！これはデモサイトなので、あなたのデータは実際には変わっていません。",
+   "vi": "Đã xóa! Đây là trang web mẫu, dữ liệu của bạn không thật sự bị thay đổi đâu.",
+   "id": "Sudah dihapus! Ini situs demo, jadi data Anda tidak benar-benar berubah.",
+   "th": "ลบแล้ว! นี่เป็นเว็บไซต์สาธิต ข้อมูลของคุณไม่ได้เปลี่ยนจริง"
+  },
+  "移除常用地點": {
+   "en": "Remove a saved place",
+   "ja": "よく使う場所を削除",
+   "vi": "Xóa địa điểm thường dùng",
+   "id": "Hapus tempat favorit",
+   "th": "ลบสถานที่ที่ใช้บ่อย"
+  },
+  "臨櫃叫號": {
+   "en": "Counter queue number",
+   "ja": "窓口の番号札",
+   "vi": "Lấy số thứ tự",
+   "id": "Nomor antrean loket",
+   "th": "บัตรคิวเคาน์เตอร์"
+  },
+  "號碼牌在哪裡拿？": {
+   "en": "Where do I get a number ticket?",
+   "ja": "番号札はどこで取りますか？",
+   "vi": "Lấy phiếu số thứ tự ở đâu?",
+   "id": "Di mana mengambil nomor antrean?",
+   "th": "รับบัตรคิวได้ที่ไหน?"
+  },
+  "這個單位": {
+   "en": "this office",
+   "ja": "この機関",
+   "vi": "đơn vị này",
+   "id": "kantor ini",
+   "th": "หน่วยงานนี้"
+  },
+  "這就是{place}的櫃檯等候狀況！號碼牌要到現場抽喔。這是示範資料。": {
+   "en": "This is the counter waiting status at {place}! You need to take a number ticket on site. This is demo data.",
+   "ja": "これが{place}の窓口の待ち状況です！番号札は現地で取ってください。これはデモデータです。",
+   "vi": "Đây là tình trạng chờ tại quầy ở {place}! Phiếu số thứ tự phải lấy tại chỗ nhé. Đây là dữ liệu mẫu.",
+   "id": "Ini status antrean loket di {place}! Nomor antrean harus diambil di lokasi. Ini data demo.",
+   "th": "นี่คือสถานะการรอที่เคาน์เตอร์ของ{place}! ต้องไปกดบัตรคิวที่สถานที่จริง นี่เป็นข้อมูลสาธิต"
+  },
+  "這就是櫃檯等候狀況！號碼牌要到現場抽喔。這是示範資料。": {
+   "en": "This is the counter waiting status! You need to take a number ticket on site. This is demo data.",
+   "ja": "これが窓口の待ち状況です！番号札は現地で取ってください。これはデモデータです。",
+   "vi": "Đây là tình trạng chờ tại quầy! Phiếu số thứ tự phải lấy tại chỗ nhé. Đây là dữ liệu mẫu.",
+   "id": "Ini status antrean loket! Nomor antrean harus diambil di lokasi. Ini data demo.",
+   "th": "นี่คือสถานะการรอที่เคาน์เตอร์! ต้องไปกดบัตรคิวที่สถานที่จริง นี่เป็นข้อมูลสาธิต"
+  },
+  "這是{place}的「櫃檯等候狀況」，看每個櫃檯現在叫到幾號、還有幾個人在等。": {
+   "en": "This is the “{page:櫃檯等候狀況}” for {place}. It shows which number each counter is serving and how many people are waiting.",
+   "ja": "これは{place}の「{page:櫃檯等候狀況}」です。各窓口が今何番を呼んでいるか、何人待っているかがわかります。",
+   "vi": "Đây là “{page:櫃檯等候狀況}” của {place}, xem mỗi quầy đang gọi đến số mấy và còn bao nhiêu người chờ.",
+   "id": "Ini “{page:櫃檯等候狀況}” di {place}. Terlihat nomor yang sedang dipanggil di setiap loket dan berapa orang yang menunggu.",
+   "th": "นี่คือ “{page:櫃檯等候狀況}” ของ{place} ดูได้ว่าแต่ละเคาน์เตอร์เรียกถึงหมายเลขไหน และมีคนรออีกกี่คน"
+  },
+  "這是「臨櫃叫號」": {
+   "en": "This is “Counter queue number”",
+   "ja": "これは「窓口の番号札」です",
+   "vi": "Đây là “Lấy số thứ tự”",
+   "id": "Ini “Nomor antrean loket”",
+   "th": "นี่คือ “บัตรคิวเคาน์เตอร์”"
+  },
+  "選一個": {
+   "en": "Pick one",
+   "ja": "1つ選ぶ",
+   "vi": "Chọn một",
+   "id": "Pilih satu",
+   "th": "เลือกหนึ่งอย่าง"
+  },
+  "選單位": {
+   "en": "Choose an office",
+   "ja": "機関を選ぶ",
+   "vi": "Chọn đơn vị",
+   "id": "Pilih kantor",
+   "th": "เลือกหน่วยงาน"
+  },
+  "選地點": {
+   "en": "Choose a place",
+   "ja": "場所を選ぶ",
+   "vi": "Chọn địa điểm",
+   "id": "Pilih tempat",
+   "th": "เลือกสถานที่"
+  },
+  "選好了{place}！下面就是它的櫃檯等候狀況。": {
+   "en": "You chose {place}! Below is its counter waiting status.",
+   "ja": "{place}を選びました！下がその窓口の待ち状況です。",
+   "vi": "Đã chọn {place}! Bên dưới là tình trạng chờ tại quầy ở đó.",
+   "id": "Sudah memilih {place}! Di bawah ini status antrean loketnya.",
+   "th": "เลือก{place}แล้ว! ด้านล่างคือสถานะการรอที่เคาน์เตอร์ของที่นั่น"
+  },
+  "選要去的單位": {
+   "en": "Choose the office to go to",
+   "ja": "行く機関を選ぶ",
+   "vi": "Chọn đơn vị cần đến",
+   "id": "Pilih kantor yang dituju",
+   "th": "เลือกหน่วยงานที่จะไป"
+  },
+  "選要去的地點": {
+   "en": "Choose the place to go to",
+   "ja": "行く場所を選ぶ",
+   "vi": "Chọn địa điểm cần đến",
+   "id": "Pilih tempat yang dituju",
+   "th": "เลือกสถานที่ที่จะไป"
+  },
+  "還有 {n} 個常用地點。": {
+   "en": "You still have {n} saved places. ",
+   "ja": "よく使う場所はあと{n}件あります。",
+   "vi": "Vẫn còn {n} địa điểm thường dùng. ",
+   "id": "Masih ada {n} tempat favorit. ",
+   "th": "ยังมีสถานที่ที่ใช้บ่อยอีก {n} แห่ง "
+  },
+  "開啟臨櫃叫號": {
+   "en": "Open Counter queue number",
+   "ja": "窓口の番号札を開く",
+   "vi": "Mở Lấy số thứ tự",
+   "id": "Buka Nomor antrean loket",
+   "th": "เปิดบัตรคิวเคาน์เตอร์"
+  },
+  "點一下「常用地點」右邊的「變更」。": {
+   "en": "Tap “{page:變更}” to the right of “{page:常用地點}”.",
+   "ja": "「{page:常用地點}」の右の「{page:變更}」を押してください。",
+   "vi": "Bấm “{page:變更}” bên phải “{page:常用地點}”.",
+   "id": "Tekan “{page:變更}” di sebelah kanan “{page:常用地點}”.",
+   "th": "กด “{page:變更}” ทางขวาของ “{page:常用地點}”"
+  },
+  "點一下「選擇地點」的框框，選你要去的那一間。": {
+   "en": "Tap the “{page:選擇地點}” box and choose the one you're going to.",
+   "ja": "「{page:選擇地點}」の枠を押して、行く場所を選んでください。",
+   "vi": "Bấm vào ô “{page:選擇地點}”, chọn nơi bạn sẽ đến.",
+   "id": "Tekan kotak “{page:選擇地點}”, pilih tempat yang akan Anda tuju.",
+   "th": "กดช่อง “{page:選擇地點}” แล้วเลือกแห่งที่จะไป"
+  },
+  "點一下你不要的地點，再按下面的「移除地點」。": {
+   "en": "Tap the place you don't want, then tap “{page:移除地點}” below.",
+   "ja": "いらない場所を押してから、下の「{page:移除地點}」を押してください。",
+   "vi": "Bấm vào nơi bạn không cần, rồi bấm “{page:移除地點}” ở dưới.",
+   "id": "Tekan tempat yang tidak Anda perlukan, lalu tekan “{page:移除地點}” di bawah.",
+   "th": "กดสถานที่ที่ไม่ต้องการ แล้วกด “{page:移除地點}” ด้านล่าง"
+  },
+  "點一下你不要的地點，打勾後再按下面的「移除地點」。": {
+   "en": "Tap the place you don't want to tick it, then tap “{page:移除地點}” below.",
+   "ja": "いらない場所を押してチェックを入れ、下の「{page:移除地點}」を押してください。",
+   "vi": "Bấm vào nơi bạn không cần để đánh dấu, rồi bấm “{page:移除地點}” ở dưới.",
+   "id": "Tekan tempat yang tidak Anda perlukan sampai tercentang, lalu tekan “{page:移除地點}” di bawah.",
+   "th": "กดสถานที่ที่ไม่ต้องการให้ติ๊ก แล้วกด “{page:移除地點}” ด้านล่าง"
+  },
+  "點一下最上面的常用地點「{name}」。": {
+   "en": "Tap your saved place “{name}” at the top.",
+   "ja": "一番上のよく使う場所「{name}」を押してください。",
+   "vi": "Bấm vào địa điểm thường dùng “{name}” ở trên cùng.",
+   "id": "Tekan tempat favorit “{name}” di paling atas.",
+   "th": "กดสถานที่ที่ใช้บ่อย “{name}” ด้านบนสุด"
+  },
+  "點最上面的「選擇地點」框框，例如「{first}」，選你要去的那一間。": {
+   "en": "Tap the “{page:選擇地點}” box at the top, for example “{first}”, and choose the one you're going to.",
+   "ja": "一番上の「{page:選擇地點}」の枠（例：「{first}」）を押して、行く場所を選んでください。",
+   "vi": "Bấm vào ô “{page:選擇地點}” trên cùng, ví dụ “{first}”, chọn nơi bạn sẽ đến.",
+   "id": "Tekan kotak “{page:選擇地點}” paling atas, misalnya “{first}”, lalu pilih tempat yang akan Anda tuju.",
+   "th": "กดช่อง “{page:選擇地點}” ด้านบนสุด เช่น “{first}” แล้วเลือกแห่งที่จะไป"
+  },
+  "點最上面的「選擇地點」框框，選你要去的那一間。": {
+   "en": "Tap the “{page:選擇地點}” box at the top and choose the one you're going to.",
+   "ja": "一番上の「{page:選擇地點}」の枠を押して、行く場所を選んでください。",
+   "vi": "Bấm vào ô “{page:選擇地點}” trên cùng, chọn nơi bạn sẽ đến.",
+   "id": "Tekan kotak “{page:選擇地點}” paling atas, lalu pilih tempat yang akan Anda tuju.",
+   "th": "กดช่อง “{page:選擇地點}” ด้านบนสุด แล้วเลือกแห่งที่จะไป"
+  },
+  "；": {
+   "en": "; ",
+   "ja": "；",
+   "vi": "; ",
+   "id": "; ",
+   "th": "; "
+  }
+ }
+}

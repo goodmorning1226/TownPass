@@ -7,10 +7,12 @@ import 'package:town_pass/page/guided_assistant/guide_target.dart';
 import 'package:town_pass/page/guided_assistant/guided_assistant_controller.dart';
 import 'package:town_pass/page/guided_assistant/model/assistant_settings.dart';
 import 'package:town_pass/page/guided_assistant/model/guide_content.dart';
+import 'package:town_pass/page/guided_assistant/model/guide_i18n.dart';
 import 'package:town_pass/page/guided_assistant/model/guides/guide_registry.dart';
 import 'package:town_pass/page/guided_assistant/widget/guide_highlight.dart';
 import 'package:town_pass/page/guided_assistant/widget/guided_assistant_sheet.dart';
 import 'package:town_pass/page/main/main_view_controller.dart';
+import 'package:town_pass/service/page_translation.dart';
 import 'package:town_pass/util/tp_bottom_navigation_factory.dart';
 import 'package:town_pass/util/tp_colors.dart';
 import 'package:town_pass/util/tp_route.dart';
@@ -20,7 +22,8 @@ const assistantFabTarget = 'assistant.fab';
 
 /// Root overlay of the guided (mock) assistant: corner button, penguin guide
 /// card, highlight and lock on the page, first-run coach mark, and the
-/// full-screen assistant.
+/// full-screen assistant. Its texts are in the conversation language (gt,
+/// guide_i18n.dart), so the overlay is not translated again as page content.
 class GuidedAssistantHost extends StatefulWidget {
   final Widget child;
   final GuidedAssistantController controller;
@@ -53,101 +56,103 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
       children: [
         widget.child,
         Positioned.fill(
-          child: Obx(() {
-            // Read the values the guide depends on so Obx rebuilds on them.
-            c.task.value;
-            c.nudge.value;
-            c.currentRoute.value;
-            c.sheetOpen.value;
-            c.homeAsk.value;
-            for (final v in c.web.watched) {
-              v.value;
-            }
-            final media = MediaQuery.of(context);
-            // Typing in a page field: the 助理 button and the arrow would sit
-            // on the field the user is filling in, so they step aside until
-            // the keyboard closes (the ring and the card stay).
-            final typingInPage =
-                media.viewInsets.bottom > 0 && !c.sheetOpen.value;
-            final layers = <Widget>[];
-            final target = c.highlightTarget;
-            if (target != null) {
-              layers.add(
-                Positioned.fill(
-                  child: GuideHighlight(
-                    key: ValueKey('guide:$target'),
-                    targetId: target,
-                    alsoUsable: c.currentStep?.alsoUsable ?? const [],
-                    blocking: c.locked,
-                    showArrow: c.showArrow && !typingInPage,
-                    topClear: media.padding.top + 56,
-                    onBlockedTap: c.wrongTap,
-                  ),
-                ),
-              );
-            }
-            final stage = c.onboarding.value;
-            final hinting =
-                !c.sheetOpen.value &&
-                (stage == OnboardingStage.card ||
-                    stage == OnboardingStage.pointer);
-            if (hinting) {
-              // Everything but the assistant button is blocked while the
-              // first-run hint shows.
-              layers.add(
-                const Positioned.fill(
-                  child: GuideHighlight(
-                    key: ValueKey('onboarding'),
-                    targetId: assistantFabTarget,
-                    scrimOpacity: 0.6,
-                    showArrow: false,
-                    ring: HighlightRing.focus,
-                    radius: 36,
-                  ),
-                ),
-              );
-            }
-            final homeAsk =
-                !c.sheetOpen.value && !typingInPage && !hinting && _onHome(c);
-            if (homeAsk) layers.add(_homeAskButton(context, c));
-            if (!c.sheetOpen.value && !typingInPage) {
-              layers.add(_fab(context, c));
-            }
-            if (hinting) layers.add(_onboardingArrow(context, c));
-            if (hinting && stage == OnboardingStage.card) {
-              layers.add(_onboardingCard(context, c));
-            }
-            if (hinting && stage == OnboardingStage.pointer) {
-              layers.addAll(_onboardingPointer(context, c));
-            }
-            if (c.scrollHintVisible && !typingInPage) {
-              layers.add(_scrollHint(context));
-            }
-            final card = c.card;
-            if (card != null) layers.add(_guideCard(context, c, card));
-            final t = c.task.value;
-            if (t != null &&
-                t.status == TaskStatus.paused &&
-                !c.sheetOpen.value) {
-              layers.add(_pausedBar(context, c, t));
-            }
-            if (homeAsk && c.homeAsk.value != HomeAsk.idle) {
-              layers.add(_homeAskCard(context, c));
-            }
-            if (c.toast.value.isNotEmpty && !c.sheetOpen.value) {
-              layers.add(_toast(context, c.toast.value));
-            }
-            if (c.sheetOpen.value) {
-              layers.add(
-                Positioned.fill(child: GuidedAssistantSheet(controller: c)),
-              );
-            }
-            return Stack(children: layers);
-          }),
+          child: PageTranslationScope(
+            enabled: false,
+            child: _overlay(context, c),
+          ),
         ),
       ],
     );
   }
+
+  Widget _overlay(BuildContext context, GuidedAssistantController c) => Obx(() {
+    // Read the values the guide depends on so Obx rebuilds on them.
+    // The language too: every text below follows it at once.
+    GuideI18n.language;
+    PageTranslation.instance.revision.value;
+    c.task.value;
+    c.nudge.value;
+    c.currentRoute.value;
+    c.sheetOpen.value;
+    c.homeAsk.value;
+    for (final v in c.web.watched) {
+      v.value;
+    }
+    final media = MediaQuery.of(context);
+    // Typing in a page field: the 助理 button and the arrow would sit
+    // on the field the user is filling in, so they step aside until
+    // the keyboard closes (the ring and the card stay).
+    final typingInPage = media.viewInsets.bottom > 0 && !c.sheetOpen.value;
+    final layers = <Widget>[];
+    final target = c.highlightTarget;
+    if (target != null) {
+      layers.add(
+        Positioned.fill(
+          child: GuideHighlight(
+            key: ValueKey('guide:$target'),
+            targetId: target,
+            alsoUsable: c.currentStep?.alsoUsable ?? const [],
+            blocking: c.locked,
+            showArrow: c.showArrow && !typingInPage,
+            topClear: media.padding.top + 56,
+            onBlockedTap: c.wrongTap,
+          ),
+        ),
+      );
+    }
+    final stage = c.onboarding.value;
+    final hinting =
+        !c.sheetOpen.value &&
+        (stage == OnboardingStage.card || stage == OnboardingStage.pointer);
+    if (hinting) {
+      // Everything but the assistant button is blocked while the
+      // first-run hint shows.
+      layers.add(
+        const Positioned.fill(
+          child: GuideHighlight(
+            key: ValueKey('onboarding'),
+            targetId: assistantFabTarget,
+            scrimOpacity: 0.6,
+            showArrow: false,
+            ring: HighlightRing.focus,
+            radius: 36,
+          ),
+        ),
+      );
+    }
+    final homeAsk =
+        !c.sheetOpen.value && !typingInPage && !hinting && _onHome(c);
+    if (homeAsk) layers.add(_homeAskButton(context, c));
+    if (!c.sheetOpen.value && !typingInPage) {
+      layers.add(_fab(context, c));
+    }
+    if (hinting) layers.add(_onboardingArrow(context, c));
+    if (hinting && stage == OnboardingStage.card) {
+      layers.add(_onboardingCard(context, c));
+    }
+    if (hinting && stage == OnboardingStage.pointer) {
+      layers.addAll(_onboardingPointer(context, c));
+    }
+    if (c.scrollHintVisible && !typingInPage) {
+      layers.add(_scrollHint(context));
+    }
+    final card = c.card;
+    if (card != null) layers.add(_guideCard(context, c, card));
+    final t = c.task.value;
+    if (t != null && t.status == TaskStatus.paused && !c.sheetOpen.value) {
+      layers.add(_pausedBar(context, c, t));
+    }
+    if (homeAsk && c.homeAsk.value != HomeAsk.idle) {
+      layers.add(_homeAskCard(context, c));
+    }
+    if (c.toast.value.isNotEmpty && !c.sheetOpen.value) {
+      layers.add(_toast(context, c.toast.value));
+    }
+    if (c.sheetOpen.value) {
+      layers.add(Positioned.fill(child: GuidedAssistantSheet(controller: c)));
+    }
+    return Stack(children: layers);
+  });
 
   double _fabBottom(BuildContext context, GuidedAssistantController c) {
     final media = MediaQuery.of(context);
@@ -224,7 +229,7 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
                 const SizedBox(width: 10),
                 Expanded(
                   child: TPText(
-                    HomeAskTexts.listening,
+                    gt(HomeAskTexts.listening),
                     style: note,
                     color: TPColors.grayscale800,
                   ),
@@ -240,8 +245,8 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
             padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 4),
             child: TPText(
               state == HomeAsk.tooShort
-                  ? HomeAskTexts.tooShort
-                  : c.homeNotice.value,
+                  ? gt(HomeAskTexts.tooShort)
+                  : gt(c.homeNotice.value),
               style: note,
               color: TPColors.grayscale800,
             ),
@@ -260,7 +265,7 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     TPText(
-                      HomeAskTexts.voiceTag,
+                      gt(HomeAskTexts.voiceTag),
                       style: TPTextStyles.bodyRegular.copyWith(fontSize: 12),
                       color: TPColors.grayscale700,
                     ),
@@ -306,7 +311,7 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
                 const SizedBox(width: 10),
                 Expanded(
                   child: TPText(
-                    HomeAskTexts.thinking,
+                    gt(HomeAskTexts.thinking),
                     style: note,
                     color: TPColors.grayscale800,
                   ),
@@ -328,7 +333,7 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
                 ),
               ),
               child: TPText(
-                replies.map((m) => m.text).join('\n'),
+                replies.map((m) => m.shown).join('\n'),
                 style: note.copyWith(height: 25 / 17),
                 color: TPColors.grayscale950,
               ),
@@ -336,12 +341,12 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
           );
           if (c.homeNeedsAssistant) {
             body.add(
-              _SecondaryButton(HomeAskTexts.openAssistant, c.openFromHome),
+              _SecondaryButton(gt(HomeAskTexts.openAssistant), c.openFromHome),
             );
           }
           body.add(
             TPText(
-              HomeAskTexts.keptInHistory,
+              gt(HomeAskTexts.keptInHistory),
               style: TPTextStyles.bodyRegular.copyWith(fontSize: 13),
               color: TPColors.grayscale700,
             ),
@@ -368,16 +373,16 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
                   children: [
                     const PenguinAvatar(),
                     const SizedBox(width: 10),
-                    const Expanded(
+                    Expanded(
                       child: TPText(
-                        HomeAskTexts.title,
+                        gt(HomeAskTexts.title),
                         style: TPTextStyles.h3SemiBold,
                         color: TPColors.grayscale950,
                       ),
                     ),
                     Semantics(
                       button: true,
-                      label: '關閉',
+                      label: gt('關閉'),
                       child: Material(
                         color: TPColors.white,
                         shape: RoundedRectangleBorder(
@@ -441,9 +446,9 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
                 children: [
                   const PenguinAvatar(size: 48),
                   const SizedBox(width: 12),
-                  const Expanded(
+                  Expanded(
                     child: TPText(
-                      '第一次使用臺北通嗎？',
+                      gt('第一次使用臺北通嗎？'),
                       style: TPTextStyles.h2SemiBold,
                       color: TPColors.grayscale950,
                     ),
@@ -452,7 +457,7 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
               ),
               const SizedBox(height: 16),
               TPText(
-                '不會用、找不到？\n點右下角的企鵝，它會帶你一步步做。',
+                gt('不會用、找不到？\n點右下角的企鵝，它會帶你一步步做。'),
                 style: TPTextStyles.titleSemiBold.copyWith(
                   fontWeight: FontWeight.w400,
                   height: 28 / 18,
@@ -469,17 +474,17 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
                   color: TPColors.primary50,
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: const Row(
+                child: Row(
                   children: [
                     TPText(
-                      '例如：',
+                      gt('例如：'),
                       style: TPTextStyles.h3Regular,
                       color: TPColors.grayscale700,
                     ),
-                    SizedBox(width: 8),
+                    const SizedBox(width: 8),
                     Flexible(
                       child: TPText(
-                        '「$onboardingExample」',
+                        gt('「{example}」', {'example': gt(onboardingExample)}),
                         style: TPTextStyles.h3SemiBold,
                         color: TPColors.grayscale950,
                       ),
@@ -490,9 +495,11 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
               const SizedBox(height: 16),
               Row(
                 children: [
-                  Expanded(child: _SecondaryButton('稍後再說', c.onboardingLater)),
+                  Expanded(
+                    child: _SecondaryButton(gt('稍後再說'), c.onboardingLater),
+                  ),
                   const SizedBox(width: 16),
-                  Expanded(child: _PrimaryButton('試試看', c.onboardingTry)),
+                  Expanded(child: _PrimaryButton(gt('試試看'), c.onboardingTry)),
                 ],
               ),
             ],
@@ -520,17 +527,17 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
           child: InkWell(
             customBorder: const StadiumBorder(),
             onTap: c.onboardingExit,
-            child: const SizedBox(
+            child: SizedBox(
               height: 48,
               child: Padding(
-                padding: EdgeInsets.fromLTRB(12, 0, 16, 0),
+                padding: const EdgeInsets.fromLTRB(12, 0, 16, 0),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.close_rounded, color: TPColors.white),
-                    SizedBox(width: 6),
+                    const Icon(Icons.close_rounded, color: TPColors.white),
+                    const SizedBox(width: 6),
                     TPText(
-                      '退出提示',
+                      gt('退出提示'),
                       style: TPTextStyles.h3Regular,
                       color: TPColors.white,
                     ),
@@ -548,7 +555,7 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
           child: Material(
             type: MaterialType.transparency,
             child: TPText(
-              '點企鵝\n開始問助理',
+              gt('點企鵝\n開始問助理'),
               style: TPTextStyles.h2SemiBold.copyWith(
                 fontSize: 20,
                 height: 28 / 20,
@@ -588,7 +595,7 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
         tools.addAll([
           Semantics(
             button: true,
-            label: '再唸一次',
+            label: gt('再唸一次'),
             child: Material(
               color: c.speaking.value ? TPColors.secondary200 : TPColors.white,
               shape: RoundedRectangleBorder(
@@ -610,12 +617,12 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
             ),
           ),
           const SizedBox(width: 8),
-          _WarmButton('暫停', c.pause),
+          _WarmButton(gt('暫停'), c.pause),
         ]);
       case CardVariant.opened:
         break; // 我自己來 / 開始 under the text
       case CardVariant.done:
-        if (!followUp) tools.add(_SmallButton('知道了', c.ackDone));
+        if (!followUp) tools.add(_SmallButton(gt('知道了'), c.ackDone));
       case CardVariant.commit:
         break;
     }
@@ -625,7 +632,7 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
       top: top,
       child: Semantics(
         liveRegion: true,
-        label: '助理說',
+        label: gt('助理說'),
         child: Material(
           type: MaterialType.transparency,
           child: Container(
@@ -667,9 +674,9 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
                   const SizedBox(height: 10),
                   Row(
                     children: [
-                      Expanded(child: _SecondaryButton('我自己來', c.goAlone)),
+                      Expanded(child: _SecondaryButton(gt('我自己來'), c.goAlone)),
                       const SizedBox(width: 10),
-                      Expanded(child: _PrimaryButton('開始', c.beginSteps)),
+                      Expanded(child: _PrimaryButton(gt('開始'), c.beginSteps)),
                     ],
                   ),
                 ],
@@ -677,11 +684,13 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
                   const SizedBox(height: 10),
                   Row(
                     children: [
-                      Expanded(child: _SecondaryButton('先不要', c.commitLater)),
+                      Expanded(
+                        child: _SecondaryButton(gt('先不要'), c.commitLater),
+                      ),
                       const SizedBox(width: 10),
                       Expanded(
                         child: _PrimaryButton(
-                          '好，我自己按',
+                          gt('好，我自己按'),
                           c.acceptCommit,
                           color: TPColors.orange500,
                         ),
@@ -693,9 +702,11 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
                   const SizedBox(height: 10),
                   Row(
                     children: [
-                      Expanded(child: _SecondaryButton('先不用', c.ackDone)),
+                      Expanded(child: _SecondaryButton(gt('先不用'), c.ackDone)),
                       const SizedBox(width: 10),
-                      Expanded(child: _PrimaryButton('好', c.acceptFollowUp)),
+                      Expanded(
+                        child: _PrimaryButton(gt('好'), c.acceptFollowUp),
+                      ),
                     ],
                   ),
                 ],
@@ -718,7 +729,7 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
       right: 12,
       top: top,
       child: Semantics(
-        label: '引導已暫停',
+        label: gt('引導已暫停'),
         child: Material(
           type: MaterialType.transparency,
           child: Container(
@@ -735,15 +746,17 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const TPText(
-                            '引導已暫停',
+                          TPText(
+                            gt('引導已暫停'),
                             style: TPTextStyles.h3SemiBold,
                             color: TPColors.grayscale950,
                           ),
                           TPText(
                             t.left
-                                ? '你離開了${t.guide.pageName}，回去後可以接著做。'
-                                : '你可以先自己操作，想繼續再按「繼續」。',
+                                ? gt('你離開了{page}，回去後可以接著做。', {
+                                    'page': gt(t.guide.pageName),
+                                  })
+                                : gt('你可以先自己操作，想繼續再按「繼續」。'),
                             style: TPTextStyles.h3Regular.copyWith(
                               fontSize: 15,
                             ),
@@ -757,11 +770,11 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
                 const SizedBox(height: 10),
                 Row(
                   children: [
-                    Expanded(child: _SecondaryButton('結束引導', c.endGuide)),
+                    Expanded(child: _SecondaryButton(gt('結束引導'), c.endGuide)),
                     const SizedBox(width: 10),
                     Expanded(
                       child: _PrimaryButton(
-                        t.left ? t.guide.resumeLabel : '繼續',
+                        gt(t.left ? t.guide.resumeLabel : '繼續'),
                         c.resume,
                       ),
                     ),
@@ -779,8 +792,11 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
   Widget _scrollHint(BuildContext context) => Positioned(
     right: 10,
     top: MediaQuery.of(context).padding.top + 380,
-    child: const IgnorePointer(
-      child: Material(type: MaterialType.transparency, child: _ScrollHint()),
+    child: IgnorePointer(
+      child: Material(
+        type: MaterialType.transparency,
+        child: _ScrollHint(gt('滑動')),
+      ),
     ),
   );
 
@@ -799,7 +815,7 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
               borderRadius: BorderRadius.circular(10),
             ),
             child: TPText(
-              text,
+              gt(text),
               style: TPTextStyles.h3Regular,
               color: TPColors.white,
               textAlign: TextAlign.center,
@@ -1035,7 +1051,8 @@ class _WarmButton extends StatelessWidget {
 }
 
 class _ScrollHint extends StatefulWidget {
-  const _ScrollHint();
+  final String label;
+  const _ScrollHint(this.label);
 
   @override
   State<_ScrollHint> createState() => _ScrollHintState();
@@ -1077,20 +1094,20 @@ class _ScrollHintState extends State<_ScrollHint>
           offset: Offset(0, -6 + 12 * _bob.value),
           child: child,
         ),
-        child: const Column(
+        child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
+            const Icon(
               Icons.keyboard_arrow_up_rounded,
               color: TPColors.primary700,
               size: 28,
             ),
             TPText(
-              '滑動',
+              widget.label,
               style: TPTextStyles.bodySemiBold,
               color: TPColors.primary700,
             ),
-            Icon(
+            const Icon(
               Icons.keyboard_arrow_down_rounded,
               color: TPColors.primary700,
               size: 28,
@@ -1123,7 +1140,7 @@ class _PenguinFabState extends State<_PenguinFab> {
   Widget build(BuildContext context) {
     return Semantics(
       button: true,
-      label: '開啟助理',
+      label: gt('開啟助理'),
       excludeSemantics: true,
       child: Listener(
         onPointerDown: (_) => _press(true),
@@ -1168,7 +1185,7 @@ class _HomeAskButton extends StatelessWidget {
     final fg = listening ? TPColors.white : TPColors.primary700;
     return Semantics(
       button: true,
-      label: HomeAskTexts.aria,
+      label: gt(HomeAskTexts.aria),
       excludeSemantics: true,
       child: Listener(
         onPointerDown: (_) => onDown(),
@@ -1195,7 +1212,9 @@ class _HomeAskButton extends StatelessWidget {
               Icon(Icons.mic_none_rounded, color: fg, size: 22),
               const SizedBox(width: 6),
               TPText(
-                listening ? HomeAskTexts.listeningLabel : HomeAskTexts.label,
+                gt(
+                  listening ? HomeAskTexts.listeningLabel : HomeAskTexts.label,
+                ),
                 style: TPTextStyles.h3SemiBold,
                 color: fg,
               ),

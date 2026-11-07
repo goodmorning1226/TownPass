@@ -7,6 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:town_pass/bean/assistant_result.dart';
+import 'package:town_pass/page/assistant/assistant_texts.dart';
 import 'package:town_pass/page/guided_assistant/guide_target.dart';
 import 'package:town_pass/page/guided_assistant/guided_assistant_controller.dart';
 import 'package:town_pass/page/account/account_view.dart';
@@ -14,6 +15,7 @@ import 'package:town_pass/page/account/account_view_controller.dart';
 import 'package:town_pass/page/guided_assistant/assistant_settings_view.dart';
 import 'package:town_pass/page/guided_assistant/model/assistant_settings.dart';
 import 'package:town_pass/page/guided_assistant/model/guide_content.dart';
+import 'package:town_pass/page/guided_assistant/model/guide_i18n.dart';
 import 'package:town_pass/page/guided_assistant/model/guide_page.dart';
 import 'package:town_pass/page/guided_assistant/model/guides/fees_guide.dart';
 import 'package:town_pass/page/guided_assistant/model/guides/guide_registry.dart';
@@ -29,6 +31,7 @@ import 'package:town_pass/service/assistant_recorder.dart';
 import 'package:town_pass/service/assistant_service.dart';
 import 'package:town_pass/service/account_service.dart';
 import 'package:town_pass/service/assistant_speaker.dart';
+import 'package:town_pass/service/assistant_speech_language.dart';
 import 'package:town_pass/service/page_translation.dart';
 import 'package:town_pass/service/device_service.dart';
 import 'package:town_pass/service/shared_preferences_service.dart';
@@ -200,6 +203,7 @@ void main() {
     // it so later tests see untranslated pages.
     tearDown(() {
       PageTranslation.instance.reset();
+      AssistantTexts.conversation.value = null;
       Get.reset();
     });
 
@@ -230,8 +234,15 @@ void main() {
       expect(service.turnLanguages, ['en']);
       expect(c.heardLanguage.value, 'en');
       expect(PageTranslation.instance.language.value, 'en'); // pages follow
+      // The guided texts follow the language spoken, at once.
+      await GuideI18n.load();
+      expect(AssistantTexts.conversation.value, 'en');
+      expect(c.chips, contains('I want to borrow a book'));
+      expect(c.chips.any((chip) => chip.contains('我要')), isFalse);
       c.setSpeechLanguage('ja');
       expect(c.speechLanguage.value, 'ja');
+      expect(AssistantTexts.conversation.value, 'ja');
+      expect(c.chips, contains(GuideI18n.tr('我要借書', const {}, 'ja')));
     });
   });
 
@@ -1055,11 +1066,13 @@ void main() {
       Get.reset();
       SharedPreferences.setMockInitialValues({
         'guided_assistant_mode': 'normal',
+        'assistant_speech_language': 'zh',
       });
       final again = makeController();
       await pumpEventQueue();
       expect(again.mode.value, AssistantMode.normal);
-      expect(again.settingsSummary, '一般模式・繁體中文');
+      // 助理語言 is the speech-language menu's choice.
+      expect(again.settingsSummary, '一般模式・中文（台灣）');
     });
 
     test('一般模式 opens the page but does not start the steps', () async {
@@ -1092,37 +1105,51 @@ void main() {
       expect(c.task.value?.status, TaskStatus.opened);
     });
 
-    test('only 繁體中文 can be chosen', () async {
-      expect(AssistantLanguage.values.where((l) => l.available), [
-        AssistantLanguage.zh,
-      ]);
-      expect(c.setLanguage(AssistantLanguage.en), isFalse);
-      expect(c.setLanguage(AssistantLanguage.ja), isFalse);
-      expect(c.language.value, AssistantLanguage.zh);
-      expect(c.toast.value, contains('準備中'));
-      expect(c.setLanguage(AssistantLanguage.zh), isTrue);
+    test('助理語言 is the speech-language menu: one choice', () async {
+      await pumpEventQueue();
+      addTearDown(() => AssistantTexts.conversation.value = null);
+      c.chooseLanguage('ja');
+      expect(c.speechLanguage.value, 'ja', reason: 'the menu shows it too');
+      expect(AssistantTexts.conversation.value, 'ja');
+      expect(
+        (await SharedPreferences.getInstance()).getString(
+          'assistant_speech_language',
+        ),
+        'ja',
+        reason: 'kept for listening, like the menu',
+      );
+      c.setSpeechLanguage('zh');
+      expect(AssistantTexts.conversation.value, 'zh');
+      // 自動偵測 keeps the texts' language.
+      c.setSpeechLanguage('auto');
+      expect(AssistantTexts.conversation.value, 'zh');
     });
 
-    testWidgets('the settings page shows the options; others are 準備中', (
+    testWidgets('the settings page offers the speech languages', (
       tester,
     ) async {
-      tester.view.physicalSize = const Size(402, 1400);
+      tester.view.physicalSize = const Size(402, 1800);
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.reset);
+      addTearDown(() => AssistantTexts.conversation.value = null);
+      c.setSpeechLanguage('zh');
       await tester.pumpWidget(const MaterialApp(home: AssistantSettingsView()));
-      expect(find.text('教學模式　＋　繁體中文'), findsOneWidget);
-      expect(find.text('預設'), findsNWidgets(2));
-      expect(find.text('準備中'), findsNWidgets(2));
+      expect(find.text('教學模式　＋　中文（台灣）'), findsOneWidget);
       expect(find.text('會改變什麼？'), findsOneWidget);
       expect(find.text('重看助理新手教學'), findsOneWidget);
+      expect(find.text('準備中'), findsNothing, reason: 'every language works');
+      for (final l in AssistantSpeechLanguage.all) {
+        expect(find.byKey(Key('assistant-language-${l.code}')), findsOneWidget);
+      }
       expect(find.textContaining('原型說明'), findsNothing);
-      await tester.tap(find.text('English'));
-      await tester.pump();
-      expect(c.language.value, AssistantLanguage.zh);
       await tester.tap(find.text('一般模式'));
       await tester.pump();
       expect(c.mode.value, AssistantMode.normal);
-      expect(find.text('一般模式　＋　繁體中文'), findsOneWidget);
+      expect(find.text('一般模式　＋　中文（台灣）'), findsOneWidget);
+      await tester.tap(find.byKey(const Key('assistant-language-en')));
+      await tester.pump();
+      expect(c.speechLanguage.value, 'en');
+      expect(AssistantTexts.conversation.value, 'en');
       await tester.pump(const Duration(seconds: 4));
     });
 
@@ -1137,7 +1164,10 @@ void main() {
       await tester.pumpWidget(const MaterialApp(home: AccountView()));
       expect(find.text('AI 助理設定'), findsOneWidget);
       expect(find.text('新增'), findsOneWidget);
-      expect(find.text('教學模式・繁體中文'), findsOneWidget);
+      final language = AssistantSpeechLanguage.of(
+        AssistantSpeechLanguage.systemDefault(),
+      ).label;
+      expect(find.text('教學模式・$language'), findsOneWidget);
       // Between 訂閱 and 功能教學.
       final y = tester.getCenter(find.text('AI 助理設定')).dy;
       expect(y, greaterThan(tester.getCenter(find.text('訂閱')).dy));

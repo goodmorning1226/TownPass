@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:town_pass/page/guided_assistant/guided_assistant_controller.dart';
 import 'package:town_pass/page/guided_assistant/model/assistant_settings.dart';
 import 'package:town_pass/page/guided_assistant/model/guide_content.dart';
+import 'package:town_pass/page/guided_assistant/model/guide_i18n.dart';
 import 'package:town_pass/page/guided_assistant/widget/guide_highlight.dart';
 import 'package:town_pass/util/tp_colors.dart';
 import 'package:town_pass/util/tp_text.dart';
@@ -85,7 +86,14 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
                 if (!typingOpen &&
                     c.task.value != null &&
                     c.task.value!.status != TaskStatus.finished)
-                  _taskCard(c.task.value!),
+                  // At most about half of the room: a long task list (or a
+                  // longer language) scrolls instead of pushing the chat
+                  // and the microphone off the screen.
+                  Flexible(
+                    child: SingleChildScrollView(
+                      child: _taskCard(c.task.value!),
+                    ),
+                  ),
                 Expanded(child: _chat()),
                 _bottom(context, typingOpen: typingOpen),
               ],
@@ -101,23 +109,30 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
     child: Row(
       children: [
         const SizedBox(width: 20),
-        const Expanded(
-          child: TPText(
-            '助理',
-            style: TPTextStyles.h2SemiBold,
-            color: TPColors.primary700,
-          ),
+        TPText(
+          gt('助理'),
+          style: TPTextStyles.h2SemiBold,
+          color: TPColors.primary700,
         ),
-        TextButton(
-          onPressed: c.replayOnboarding,
-          child: const TPText(
-            '重看新手提示',
-            style: TPTextStyles.bodyRegular,
-            color: TPColors.primary700,
+        const Spacer(),
+        // Longer in other languages: it shrinks to two lines, never pushes
+        // the buttons off the bar.
+        Flexible(
+          flex: 3,
+          child: TextButton(
+            onPressed: c.replayOnboarding,
+            child: TPText(
+              gt('重看新手提示'),
+              style: TPTextStyles.bodyRegular.copyWith(height: 1.2),
+              color: TPColors.primary700,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.end,
+            ),
           ),
         ),
         IconButton(
-          tooltip: c.readAloud.value ? '朗讀已開啟' : '朗讀已關閉',
+          tooltip: gt(c.readAloud.value ? '朗讀已開啟' : '朗讀已關閉'),
           onPressed: c.toggleReadAloud,
           icon: Icon(
             c.readAloud.value
@@ -127,7 +142,7 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
           ),
         ),
         IconButton(
-          tooltip: '關閉助理',
+          tooltip: gt('關閉助理'),
           onPressed: c.closeSheet,
           icon: const Icon(Icons.close_rounded, color: TPColors.grayscale700),
         ),
@@ -176,7 +191,7 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             TPText(
-                              '目前任務：${t.guide.title}',
+                              gt('目前任務：{task}', {'task': gt(t.guide.title)}),
                               style: TPTextStyles.h3SemiBold,
                               color: TPColors.grayscale950,
                             ),
@@ -189,7 +204,7 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
                         ),
                       ),
                       TPText(
-                        open ? '收起' : '看全部',
+                        gt(open ? '收起' : '看全部'),
                         style: TPTextStyles.bodyRegular.copyWith(fontSize: 15),
                         color: TPColors.primary700,
                       ),
@@ -216,17 +231,19 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
                 child: TPText.rich(
                   TextSpan(
                     children: [
-                      const TextSpan(text: '現在我們要：'),
+                      TextSpan(text: gt('現在我們要：')),
                       TextSpan(
                         text: c.currentTodoText,
                         style: const TextStyle(fontWeight: FontWeight.w600),
                       ),
                       TextSpan(
-                        text: ended
-                            ? '。\n你正在自己操作，想要我帶你做，按「繼續引導」。'
-                            : c.allStepsDone
-                            ? '。\n步驟都做好了，有問題隨時問我！'
-                            : '。\n照著畫面上方的提示做就可以，有問題隨時問我！',
+                        text: gt(
+                          ended
+                              ? '。\n你正在自己操作，想要我帶你做，按「繼續引導」。'
+                              : c.allStepsDone
+                              ? '。\n步驟都做好了，有問題隨時問我！'
+                              : '。\n照著畫面上方的提示做就可以，有問題隨時問我！',
+                        ),
                       ),
                     ],
                   ),
@@ -239,7 +256,7 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
                   alignment: Alignment.centerRight,
                   child: ended
                       ? _outline(c.taskSecondaryLabel, c.taskSecondary)
-                      : _outline('結束引導，自己操作', c.endGuide),
+                      : _outline(gt('結束引導，自己操作'), c.endGuide),
                 ),
               ),
             ] else ...[
@@ -250,8 +267,8 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
                   vertical: 8,
                 ),
                 decoration: whiteBox,
-                child: const TPText(
-                  '這些是我們要一起完成的事，打勾的已經做好了：',
+                child: TPText(
+                  gt('這些是我們要一起完成的事，打勾的已經做好了：'),
                   style: TPTextStyles.h3Regular,
                   color: TPColors.grayscale950,
                 ),
@@ -276,7 +293,7 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
                           ),
                         ),
                         const SizedBox(width: 8),
-                        Expanded(child: _outline('結束引導', c.endGuide)),
+                        Expanded(child: _outline(gt('結束引導'), c.endGuide)),
                       ],
                     ),
                     const SizedBox(height: 8),
@@ -291,7 +308,7 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
                         ),
                         onPressed: c.backToPage,
                         child: TPText(
-                          t.guide.backLabel,
+                          gt(t.guide.backLabel),
                           style: TPTextStyles.h3Regular,
                           color: TPColors.white,
                         ),
@@ -405,17 +422,17 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
                   ),
                 ),
                 const SizedBox(width: 10),
-                const Expanded(
+                Expanded(
                   child: TPText(
-                    '正在幫你找…',
+                    gt('正在幫你找…'),
                     style: TPTextStyles.h3Regular,
                     color: TPColors.grayscale800,
                   ),
                 ),
                 TextButton(
                   onPressed: c.cancelLoading,
-                  child: const TPText(
-                    '取消',
+                  child: TPText(
+                    gt('取消'),
                     style: TPTextStyles.h3SemiBold,
                     color: TPColors.primary700,
                   ),
@@ -449,7 +466,7 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
             children: [
               if (m.voice) ...[
                 TPText(
-                  HomeAskTexts.voiceTag,
+                  gt(HomeAskTexts.voiceTag),
                   style: TPTextStyles.bodyRegular.copyWith(fontSize: 12),
                   color: TPColors.grayscale700,
                 ),
@@ -472,19 +489,19 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
       );
     }
     final parts = <Widget>[
-      TPText(m.text, style: _botText, color: TPColors.grayscale950),
+      TPText(m.shown, style: _botText, color: TPColors.grayscale950),
     ];
     if (m.tutorialChoice &&
         c.onboarding.value == OnboardingStage.branch &&
         c.optionsLive(m)) {
-      parts.add(_filled(TutorialTexts.keepTut, c.keepTutorial));
-      parts.add(_outlineWide(TutorialTexts.goNow, c.startTaskNow));
+      parts.add(_filled(gt(TutorialTexts.keepTut), c.keepTutorial));
+      parts.add(_outlineWide(gt(TutorialTexts.goNow), c.startTaskNow));
     }
     final term = m.term;
     if (term != null) {
       parts.add(
         TPText(
-          term.title,
+          gt(term.title),
           style: TPTextStyles.bodySemiBold,
           color: TPColors.primary700,
         ),
@@ -492,7 +509,7 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
       if (term.showsBill) parts.add(const _BillIllustration());
       parts.add(
         TPText(
-          '例如：${term.example}',
+          gt('例如：{example}', {'example': gt(term.example)}),
           style: TPTextStyles.bodyRegular,
           color: TPColors.grayscale700,
         ),
@@ -506,7 +523,9 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
         final number = n++;
         parts.add(
           _OptionButton(
-            label: '$number. ${o.label}${o.enabled ? '' : '（還不能用）'}',
+            label: o.enabled
+                ? '$number. ${gt(o.label)}'
+                : gt('{n}. {label}（還不能用）', {'n': number, 'label': gt(o.label)}),
             enabled: live && o.enabled,
             dimmed: !o.enabled,
             onTap: live ? () => c.choose(m, o) : null,
@@ -516,7 +535,7 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
       if (m.followUpOf == null) {
         parts.add(
           _OptionButton(
-            label: '$n. 都不是，我再說一次',
+            label: gt('{n}. 都不是，我再說一次', {'n': n}),
             enabled: live,
             onTap: live ? () => c.choose(m, null) : null,
           ),
@@ -529,7 +548,7 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
     if (teach != null && c.optionsLive(m)) {
       parts.add(
         _OptionButton(
-          label: '教我',
+          label: gt('教我'),
           enabled: true,
           onTap: () => c.startGuide(teach, guided: true),
         ),
@@ -706,11 +725,11 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
   );
 
   Widget _tutorialHello() => _tutorialCard(
-    step: TutorialTexts.step1,
-    title: TutorialTexts.hello1,
+    step: gt(TutorialTexts.step1),
+    title: gt(TutorialTexts.hello1),
     children: [
       TPText(
-        TutorialTexts.hello2,
+        gt(TutorialTexts.hello2),
         style: _tutorialBody,
         color: TPColors.grayscale800,
       ),
@@ -718,27 +737,27 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
         spacing: 8,
         runSpacing: 8,
         children: [
-          _way(Icons.mic_none_rounded, TutorialTexts.wayVoice),
-          _way(Icons.keyboard_outlined, TutorialTexts.wayType),
+          _way(Icons.mic_none_rounded, gt(TutorialTexts.wayVoice)),
+          _way(Icons.keyboard_outlined, gt(TutorialTexts.wayType)),
         ],
       ),
       Row(
         children: [
           Expanded(
             child: TPText(
-              TutorialTexts.bothBelow,
+              gt(TutorialTexts.bothBelow),
               style: TPTextStyles.bodyRegular,
               color: TPColors.secondary800,
             ),
           ),
-          _link(TutorialTexts.skip, c.skipTutorial),
+          _link(gt(TutorialTexts.skip), c.skipTutorial),
         ],
       ),
     ],
   );
 
   Widget _tutorialMode() => _tutorialCard(
-    step: TutorialTexts.step2,
+    step: gt(TutorialTexts.step2),
     title: TutorialTexts.modeTitle(c.mode.value),
     children: [
       TPText(
@@ -763,7 +782,7 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
             const SizedBox(width: 8),
             Expanded(
               child: TPText(
-                TutorialTexts.wherePath,
+                gt(TutorialTexts.wherePath),
                 style: TPTextStyles.h3Regular.copyWith(fontSize: 15),
                 color: TPColors.grayscale800,
               ),
@@ -771,8 +790,8 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
           ],
         ),
       ),
-      _filled(TutorialTexts.finish, c.finishTutorial, fontSize: 17),
-      _link(TutorialTexts.seeSettings, c.tutorialSettings),
+      _filled(gt(TutorialTexts.finish), c.finishTutorial, fontSize: 17),
+      _link(gt(TutorialTexts.seeSettings), c.tutorialSettings),
     ],
   );
 
@@ -849,8 +868,8 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  _tag(TutorialTexts.tagType),
-                  _tag(TutorialTexts.tagBackVoice),
+                  _tag(gt(TutorialTexts.tagType)),
+                  _tag(gt(TutorialTexts.tagBackVoice)),
                 ],
               ),
             ),
@@ -861,12 +880,12 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
                 children: [
                   Align(
                     alignment: Alignment.topCenter,
-                    child: _tag(TutorialTexts.tagMic),
+                    child: _tag(gt(TutorialTexts.tagMic)),
                   ),
                   Positioned(
                     right: 0,
                     bottom: 4,
-                    child: _tag(TutorialTexts.tagKb),
+                    child: _tag(gt(TutorialTexts.tagKb)),
                   ),
                 ],
               ),
@@ -880,11 +899,15 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
   /// Speech language menu ("自動偵測" or one language, each in its own
   /// script). A MenuAnchor draws in this host's own Overlay; a popup route
   /// would open underneath the assistant layer.
+  /// The menu button's short name; 自動 in the conversation language.
+  String _short(AssistantSpeechLanguage l) =>
+      l.code == 'auto' ? gt('自動') : l.short;
+
   Widget _languageButton() {
     final chosen = AssistantSpeechLanguage.of(c.speechLanguage.value);
     final heard = c.heardLanguage.value;
     final label = chosen.code == 'auto' && heard != null
-        ? '${chosen.short}·${AssistantSpeechLanguage.of(heard).short}'
+        ? '${_short(chosen)}·${_short(AssistantSpeechLanguage.of(heard))}'
         : chosen.short;
     return MenuAnchor(
       key: const Key('guided-speech-language'),
@@ -897,12 +920,12 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
               language.code == chosen.code ? Icons.check : null,
               size: 20,
             ),
-            child: TPText(language.label, style: TPTextStyles.bodyRegular),
+            child: TPText(language.title, style: TPTextStyles.bodyRegular),
           ),
       ],
       builder: (context, menu, _) => Semantics(
         button: true,
-        label: '說話的語言：${chosen.label}',
+        label: gt('說話的語言：{language}', {'language': chosen.title}),
         excludeSemantics: true,
         child: GestureDetector(
           behavior: HitTestBehavior.opaque,
@@ -944,7 +967,7 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
           children: [
             Semantics(
               button: true,
-              label: '按住說話（示範）',
+              label: gt('按住說話（示範）'),
               child: Listener(
                 onPointerDown: (_) => c.micDown(),
                 onPointerUp: (_) => c.micUp(),
@@ -981,7 +1004,7 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
             Positioned(
               right: 0,
               child: Tooltip(
-                message: '改用鍵盤輸入',
+                message: gt('改用鍵盤輸入'),
                 child: Container(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(22),
@@ -1003,7 +1026,7 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
                         size: 22,
                       ),
                       label: TPText(
-                        TutorialTexts.wayType,
+                        gt(TutorialTexts.wayType),
                         style: TPTextStyles.h3SemiBold.copyWith(fontSize: 15),
                         color: TPColors.primary700,
                       ),
@@ -1033,7 +1056,7 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
       ),
       const SizedBox(height: 4),
       TPText(
-        c.listening.value ? '放開送出' : '按住說話，或點上面的選項',
+        gt(c.listening.value ? '放開送出' : '按住說話，或點上面的選項'),
         style: TPTextStyles.bodyRegular,
         color: TPColors.grayscale700,
       ),
@@ -1057,7 +1080,7 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
               color: TPColors.grayscale950,
             ),
             decoration: InputDecoration(
-              hintText: '打字告訴我你想做什麼',
+              hintText: gt('打字告訴我你想做什麼'),
               hintStyle: TPTextStyles.h3Regular.copyWith(
                 color: TPColors.grayscale400,
               ),
@@ -1076,7 +1099,7 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
         ),
       ),
       IconButton(
-        tooltip: '送出',
+        tooltip: gt('送出'),
         onPressed: _send,
         icon: const Icon(Icons.send_rounded, color: TPColors.primary600),
       ),
@@ -1087,7 +1110,7 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
           boxShadow: _hello ? _ring : null,
         ),
         child: IconButton(
-          tooltip: '改用語音',
+          tooltip: gt('改用語音'),
           onPressed: () => c.typing.value = false,
           icon: const Icon(Icons.mic_none_rounded, color: TPColors.primary700),
         ),
@@ -1162,7 +1185,7 @@ class _BillIllustration extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Semantics(
-      label: '水費帳單示意圖，水號印在帳單上方',
+      label: gt('水費帳單示意圖，水號印在帳單上方'),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
@@ -1172,8 +1195,8 @@ class _BillIllustration extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const TPText(
-              '水費帳單（示意）',
+            TPText(
+              gt('水費帳單（示意）'),
               style: TPTextStyles.bodyRegular,
               color: TPColors.grayscale700,
             ),
@@ -1184,10 +1207,10 @@ class _BillIllustration extends StatelessWidget {
                 border: Border.all(color: guideYellow, width: 3),
                 borderRadius: BorderRadius.circular(6),
               ),
-              child: const Row(
+              child: Row(
                 children: [
                   TPText(
-                    '水號',
+                    gt('水號'),
                     style: TPTextStyles.bodySemiBold,
                     color: TPColors.grayscale950,
                   ),
@@ -1245,7 +1268,7 @@ class _AnswerCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           TPText(
-            content.title,
+            gt(content.title),
             style: TPTextStyles.h3SemiBold,
             color: TPColors.grayscale950,
           ),
@@ -1257,17 +1280,20 @@ class _AnswerCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   TPText(
-                    '${p.name}　${p.distance}',
+                    gt('{name}　{distance}', {
+                      'name': gt(p.name),
+                      'distance': gt(p.distance),
+                    }),
                     style: TPTextStyles.h3SemiBold,
                     color: TPColors.grayscale950,
                   ),
                   TPText(
-                    p.address,
+                    gt(p.address),
                     style: TPTextStyles.bodyRegular,
                     color: TPColors.grayscale700,
                   ),
                   TPText(
-                    '電話 ${p.phone}',
+                    gt('電話 {phone}', {'phone': p.phone}),
                     style: TPTextStyles.bodyRegular,
                     color: TPColors.grayscale700,
                   ),
@@ -1275,7 +1301,7 @@ class _AnswerCard extends StatelessWidget {
               ),
             ),
           TPText(
-            content.source,
+            gt(content.source),
             style: TPTextStyles.bodyRegular,
             color: TPColors.secondary800,
           ),

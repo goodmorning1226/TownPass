@@ -2,87 +2,102 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:town_pass/page/guided_assistant/guided_assistant_controller.dart';
 import 'package:town_pass/page/guided_assistant/model/assistant_settings.dart';
+import 'package:town_pass/page/guided_assistant/model/guide_i18n.dart';
 import 'package:town_pass/page/guided_assistant/widget/guide_highlight.dart';
 import 'package:town_pass/util/tp_app_bar.dart';
 import 'package:town_pass/util/tp_colors.dart';
+import 'package:town_pass/service/assistant_speech_language.dart';
+import 'package:town_pass/service/page_translation.dart';
 import 'package:town_pass/util/tp_text.dart';
 
 /// AI 助理設定: assistant mode, assistant language and the tutorial replay.
 /// Each change is saved at once (a toast says what changed).
+///
+/// The language here is the speech-language menu's choice (the menu next to
+/// the microphone): one setting for the language the assistant listens in
+/// and the one its texts and guides use. The page shows its own texts in
+/// that language (gt), so ML Kit page translation is off here.
 class AssistantSettingsView extends StatelessWidget {
   const AssistantSettingsView({super.key});
 
   @override
   Widget build(BuildContext context) {
     final c = Get.find<GuidedAssistantController>();
-    return Scaffold(
-      backgroundColor: TPColors.grayscale50,
-      appBar: const TPAppBar(title: SettingsTexts.title),
-      body: SafeArea(
-        child: Obx(
-          () => ListView(
-            // Room below for the assistant button.
-            padding: const EdgeInsets.only(bottom: 96),
-            children: [
-              _summary(c),
-              _header(SettingsTexts.modeHeader),
-              _group(SettingsTexts.modeHeader, [
-                for (final m in AssistantMode.values)
-                  _OptionRow(
-                    title: m.title,
-                    desc: m.desc,
-                    isDefault: m.isDefault,
-                    checked: c.mode.value == m,
-                    onTap: () => c.setMode(m),
-                  ),
-              ]),
-              _header(SettingsTexts.langHeader, desc: SettingsTexts.langDesc),
-              _group(SettingsTexts.langHeader, [
-                for (final l in AssistantLanguage.values)
-                  _OptionRow(
-                    title: l.title,
-                    desc: l.desc,
-                    isDefault: l.isDefault,
-                    checked: c.language.value == l,
-                    enabled: l.available,
-                    onTap: () => c.setLanguage(l),
-                  ),
-              ]),
-              _whatChanges(),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    SizedBox(
-                      height: 48,
-                      child: OutlinedButton(
-                        style: OutlinedButton.styleFrom(
-                          backgroundColor: TPColors.white,
-                          side: const BorderSide(color: TPColors.primary500),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
+    return PageTranslationScope(
+      enabled: false,
+      child: Obx(
+        () => Scaffold(
+          backgroundColor: TPColors.grayscale50,
+          appBar: TPAppBar(title: gt(SettingsTexts.title)),
+          body: SafeArea(
+            child: ListView(
+              // Room below for the assistant button.
+              padding: const EdgeInsets.only(bottom: 96),
+              children: [
+                _summary(c),
+                _header(gt(SettingsTexts.modeHeader)),
+                _group(gt(SettingsTexts.modeHeader), [
+                  for (final m in AssistantMode.values)
+                    _OptionRow(
+                      title: gt(m.title),
+                      desc: gt(m.desc),
+                      isDefault: m.isDefault,
+                      checked: c.mode.value == m,
+                      onTap: () => c.setMode(m),
+                    ),
+                ]),
+                _header(
+                  gt(SettingsTexts.langHeader),
+                  desc: gt(SettingsTexts.langDesc),
+                ),
+                _group(gt(SettingsTexts.langHeader), [
+                  for (final l in AssistantSpeechLanguage.all)
+                    _OptionRow(
+                      key: Key('assistant-language-${l.code}'),
+                      title: l.title,
+                      desc: l.desc,
+                      isDefault:
+                          l.code == AssistantSpeechLanguage.systemDefault(),
+                      checked: c.speechLanguage.value == l.code,
+                      onTap: () => c.chooseLanguage(l.code),
+                    ),
+                ]),
+                _whatChanges(),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      SizedBox(
+                        height: 48,
+                        child: OutlinedButton(
+                          style: OutlinedButton.styleFrom(
+                            backgroundColor: TPColors.white,
+                            side: const BorderSide(color: TPColors.primary500),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          onPressed: c.replayTutorial,
+                          child: TPText(
+                            gt(SettingsTexts.replay),
+                            style: TPTextStyles.h3Regular,
+                            color: TPColors.primary700,
                           ),
                         ),
-                        onPressed: c.replayTutorial,
-                        child: const TPText(
-                          SettingsTexts.replay,
-                          style: TPTextStyles.h3Regular,
-                          color: TPColors.primary700,
-                        ),
                       ),
-                    ),
-                    const SizedBox(height: 6),
-                    TPText(
-                      SettingsTexts.replayNote,
-                      style: TPTextStyles.bodyRegular.copyWith(fontSize: 13),
-                      color: TPColors.grayscale700,
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
+                      const SizedBox(height: 6),
+                      TPText(
+                        gt(SettingsTexts.replayNote),
+                        style: TPTextStyles.bodyRegular.copyWith(fontSize: 13),
+                        color: TPColors.grayscale700,
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -105,12 +120,16 @@ class AssistantSettingsView extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               TPText(
-                SettingsTexts.summaryLabel,
+                gt(SettingsTexts.summaryLabel),
                 style: TPTextStyles.bodyRegular.copyWith(fontSize: 13),
                 color: TPColors.grayscale700,
               ),
               TPText(
-                '${c.mode.value.title}　＋　${c.language.value.title}',
+                gt('{mode}　＋　{language}', {
+                  'mode': gt(c.mode.value.title),
+                  'language': AssistantSpeechLanguage.of(c.speechLanguage.value)
+                      .title,
+                }),
                 style: TPTextStyles.h3SemiBold,
                 color: TPColors.grayscale950,
               ),
@@ -168,35 +187,27 @@ class AssistantSettingsView extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           TPText(
-            SettingsTexts.whatChanges,
+            gt(SettingsTexts.whatChanges),
             style: TPTextStyles.h3SemiBold.copyWith(fontSize: 15),
             color: TPColors.grayscale950,
           ),
           const SizedBox(height: 6),
           TPText(
-            SettingsTexts.change1,
+            gt(SettingsTexts.change1),
             style: line,
             color: TPColors.grayscale800,
           ),
           const SizedBox(height: 6),
           TPText(
-            SettingsTexts.change2,
+            gt(SettingsTexts.change2),
             style: line,
             color: TPColors.grayscale800,
           ),
           const SizedBox(height: 6),
-          TPText.rich(
-            const TextSpan(
-              children: [
-                TextSpan(text: SettingsTexts.change3a),
-                TextSpan(
-                  text: SettingsTexts.change3b,
-                  style: TextStyle(fontWeight: FontWeight.w600),
-                ),
-                TextSpan(text: SettingsTexts.change3c),
-              ],
-            ),
-            style: line.copyWith(color: TPColors.grayscale800),
+          TPText(
+            gt(SettingsTexts.change3),
+            style: line,
+            color: TPColors.grayscale800,
           ),
         ],
       ),
@@ -209,32 +220,25 @@ class _OptionRow extends StatelessWidget {
   final String desc;
   final bool isDefault;
   final bool checked;
-  final bool enabled;
   final VoidCallback onTap;
 
   const _OptionRow({
+    super.key,
     required this.title,
     required this.desc,
     required this.isDefault,
     required this.checked,
     required this.onTap,
-    this.enabled = true,
   });
 
   @override
   Widget build(BuildContext context) {
-    final titleColor = !enabled
-        ? TPColors.grayscale500
-        : checked
-        ? TPColors.primary500
-        : TPColors.grayscale950;
+    final titleColor = checked ? TPColors.primary500 : TPColors.grayscale950;
     return Semantics(
       inMutuallyExclusiveGroup: true,
       checked: checked,
-      enabled: enabled,
       button: true,
       child: InkWell(
-        // A language that is not ready still answers with a toast.
         onTap: onTap,
         child: Container(
           constraints: const BoxConstraints(minHeight: 72),
@@ -261,28 +265,24 @@ class _OptionRow extends StatelessWidget {
                           color: titleColor,
                         ),
                         if (isDefault)
-                          const SettingsTag(
-                            SettingsTexts.defaultTag,
+                          SettingsTag(
+                            gt(SettingsTexts.defaultTag),
                             background: TPColors.primary50,
                             color: TPColors.primary700,
                           ),
-                        if (!enabled)
-                          const SettingsTag(SettingsTexts.comingSoon),
                       ],
                     ),
                     const SizedBox(height: 1),
                     TPText(
                       desc,
                       style: TPTextStyles.bodyRegular,
-                      color: enabled
-                          ? TPColors.grayscale700
-                          : TPColors.grayscale500,
+                      color: TPColors.grayscale700,
                     ),
                   ],
                 ),
               ),
               const SizedBox(width: 12),
-              _Radio(checked: checked, enabled: enabled),
+              _Radio(checked: checked),
             ],
           ),
         ),
@@ -293,8 +293,7 @@ class _OptionRow extends StatelessWidget {
 
 class _Radio extends StatelessWidget {
   final bool checked;
-  final bool enabled;
-  const _Radio({required this.checked, required this.enabled});
+  const _Radio({required this.checked});
 
   @override
   Widget build(BuildContext context) {
@@ -314,7 +313,6 @@ class _Radio extends StatelessWidget {
       height: 20,
       margin: const EdgeInsets.all(1),
       decoration: BoxDecoration(
-        color: enabled ? null : TPColors.grayscale50,
         shape: BoxShape.circle,
         border: Border.all(color: TPColors.grayscale200, width: 1.6),
       ),
@@ -322,7 +320,7 @@ class _Radio extends StatelessWidget {
   }
 }
 
-/// Small pill tag (預設, 準備中, 新增).
+/// Small pill tag (預設, 新增).
 class SettingsTag extends StatelessWidget {
   final String text;
   final Color background;

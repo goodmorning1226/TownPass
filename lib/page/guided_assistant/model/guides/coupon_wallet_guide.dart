@@ -1,4 +1,5 @@
 import 'package:town_pass/page/guided_assistant/model/guide_content.dart';
+import 'package:town_pass/page/guided_assistant/model/guide_i18n.dart';
 import 'package:town_pass/page/guided_assistant/model/guide_page.dart';
 import 'package:town_pass/page/guided_assistant/web/web_guide_probe.dart';
 import 'package:town_pass/page/guided_assistant/web/web_page_state.dart';
@@ -100,7 +101,7 @@ const couponWalletPageSpec = WebPageSpec(
     'period': _periodJs,
     'rule': _ruleJs,
     'desc': _descJs,
-    'remain': r"""(() => { const m = ((q('#app') || {}).innerText || '').match(/剩餘\s*(\d+)\s*份/); return m ? m[1] : ''; })()""",
+    'remain': r"""(() => { const m = orig(q('#app')).match(/剩餘\s*(\d+)\s*份/); return m ? m[1] : ''; })()""",
     'hasAdd': '!!$_add',
     'addBelow':
         "(() => { const b = $_add; return !!b && b.getBoundingClientRect().bottom > innerHeight; })()",
@@ -122,12 +123,12 @@ const couponWalletPageSpec = WebPageSpec(
 );
 
 const _periodJs =
-    r"""(() => { const m = ((q('#app') || {}).innerText || '').match(/活動日期\s*\n+\s*([^\n]+)/); return m ? m[1].trim() : ''; })()""";
+    r"""(() => { const m = orig(q('#app')).match(/活動日期\s*\n+\s*([^\n]+)/); return m ? m[1].trim() : ''; })()""";
 const _ruleJs =
-    r"""(() => { const m = ((q('#app') || {}).innerText || '').match(/領取規則\s*\n+\s*([^\n]+)/); return m ? m[1].trim() : ''; })()""";
+    r"""(() => { const m = orig(q('#app')).match(/領取規則\s*\n+\s*([^\n]+)/); return m ? m[1].trim() : ''; })()""";
 // 優惠說明 is also the first tab label (followed by 店家資訊).
 const _descJs =
-    r"""(() => { const m = ((q('#app') || {}).innerText || '').match(/優惠說明\s*\n+\s*(?!店家資訊)([^\n]+)/); return m ? m[1].trim() : ''; })()""";
+    r"""(() => { const m = orig(q('#app')).match(/優惠說明\s*\n+\s*(?!店家資訊)([^\n]+)/); return m ? m[1].trim() : ''; })()""";
 
 bool onCouponWallet(WebSnapshot s) =>
     s.pathStarts('/coupon') || s.pathStarts(_wallet);
@@ -160,7 +161,7 @@ String? _walletStep(WebPageState s) {
 
 String _coupon(WebPageState s) {
   final name = s.now.text('name');
-  return name.isEmpty ? '這張優惠券' : '「$name」';
+  return name.isEmpty ? gt('這張優惠券') : gt('「{name}」', {'name': pg(name)});
 }
 
 const _emptyCard = '這頁的資料沒有出來。按左上角的「‹」回上一頁，再點一次那張優惠券就會出現。';
@@ -244,9 +245,17 @@ final List<GuideComponent> couponWalletComponents = [
     doneTextOf: (s) {
       final desc = s.now.text('desc');
       final period = s.now.text('period');
-      if (desc.isEmpty) return '這就是${_coupon(s)}的內容！這是示範資料喔。';
-      final when = period.isEmpty ? '' : '活動日期是 $period。';
-      return '這就是${_coupon(s)}：「$desc」。$when這是示範資料喔。';
+      if (desc.isEmpty) {
+        return gt('這就是{coupon}的內容！這是示範資料喔。', {'coupon': _coupon(s)});
+      }
+      final when = period.isEmpty
+          ? ''
+          : gt('活動日期是 {period}。', {'period': pg(period)});
+      return gt('這就是{coupon}：「{desc}」。{when}這是示範資料喔。', {
+        'coupon': _coupon(s),
+        'desc': pg(desc),
+        'when': when,
+      });
     },
     steps: [
       GuideStep(
@@ -299,8 +308,8 @@ final List<GuideComponent> couponWalletComponents = [
     // The 領取成功 dialog (更多優惠 / 使用優惠) while it is open.
     doneTarget: (s) => s.now.flag('added') ? 'coupon.added_dialog' : null,
     doneTextOf: (s) => !_added(s) && _fromWallet(s)
-        ? '${_coupon(s)}本來就在你的票夾裡了，不用再加。這是示範資料喔。'
-        : '存好了！${_coupon(s)}已經放進票夾。這是示範網站，資料是假的喔。',
+        ? gt('{coupon}本來就在你的票夾裡了，不用再加。這是示範資料喔。', {'coupon': _coupon(s)})
+        : gt('存好了！{coupon}已經放進票夾。這是示範網站，資料是假的喔。', {'coupon': _coupon(s)}),
     steps: [
       GuideStep(
         target: (s) {
@@ -317,12 +326,19 @@ final List<GuideComponent> couponWalletComponents = [
           final problem = _detailProblemCard(s);
           if (problem != null) return problem;
           if (s.now.flag('addAsk')) {
-            return '畫面問「領取本優惠?」。要把${_coupon(s)}存進票夾，就自己按「存入票夾」；不要就按「取消」。';
+            return gt('畫面問「領取本優惠?」。要把{coupon}存進票夾，就自己按「存入票夾」；不要就按「取消」。', {
+              'coupon': _coupon(s),
+            });
           }
           final rule = s.now.text('rule');
-          final ruleText = rule.isEmpty ? '' : '領取規則是「$rule」。';
-          final below = s.now.flag('addBelow') ? '按鈕在最下面，可以往下滑一點。' : '';
-          return '$ruleText想留著之後用，按下面的「加入票夾」。$below';
+          final ruleText = rule.isEmpty
+              ? ''
+              : gt('領取規則是「{rule}」。', {'rule': pg(rule)});
+          final below = s.now.flag('addBelow') ? gt('按鈕在最下面，可以往下滑一點。') : '';
+          return gt('{ruleText}想留著之後用，按下面的「加入票夾」。{below}', {
+            'ruleText': ruleText,
+            'below': below,
+          });
         },
         detail: (_) => '按優惠券下面左邊的「加入票夾」，畫面問你的時候，再按「存入票夾」。',
         isDone: (s) => _added(s) || _used(s) || _fromWallet(s),
@@ -348,7 +364,7 @@ final List<GuideComponent> couponWalletComponents = [
       }
       return n == 0
           ? '你的票夾裡目前沒有還沒用的優惠券。可以到優惠首頁找一張加入票夾。'
-          : '你的票夾裡有 $n 張還沒用的優惠券，下面寫著截止日期。這是示範資料喔。';
+          : gt('你的票夾裡有 {n} 張還沒用的優惠券，下面寫著截止日期。這是示範資料喔。', {'n': n});
     },
     steps: [
       GuideStep(
@@ -381,8 +397,13 @@ final List<GuideComponent> couponWalletComponents = [
       final n = s.now.number('rows');
       if (n == 0) return '目前沒有用過的優惠券。這是示範資料喔。';
       final first = s.now.text('firstItem');
-      final name = first.isEmpty ? '' : '，例如「$first」';
-      return '這裡有 $n 張用過的優惠券$name，下面寫著兌換的時間。這是示範資料喔。';
+      if (first.isEmpty) {
+        return gt('這裡有 {n} 張用過的優惠券，下面寫著兌換的時間。這是示範資料喔。', {'n': n});
+      }
+      return gt('這裡有 {n} 張用過的優惠券，例如「{first}」，下面寫著兌換的時間。這是示範資料喔。', {
+        'n': n,
+        'first': pg(first),
+      });
     },
     steps: [
       GuideStep(
@@ -430,7 +451,7 @@ final List<GuideComponent> couponWalletComponents = [
             case 'wallet.items':
               final first = s.now.text('firstItem');
               return s.now.number('items') == 1 && first.isNotEmpty
-                  ? '這裡有一張「$first」。點一下打開它。'
+                  ? gt('這裡有一張「{first}」。點一下打開它。', {'first': pg(first)})
                   : '點你要用的那張優惠券。';
           }
           return '你的票夾裡目前沒有還沒用的優惠券。可以到優惠首頁找一張加入票夾。';
@@ -460,7 +481,9 @@ final List<GuideComponent> couponWalletComponents = [
     doneDetail: '按「確定」關掉視窗。用過的優惠券會出現在票夾的「已兌換」。',
     // The 優惠已兌換 dialog's 確定 (gone once it is closed).
     doneTarget: (_) => 'coupon.used_ok',
-    doneTextOf: (s) => '兌換好了！畫面寫「優惠已兌換」，${_coupon(s)}算是用掉了。這是示範網站，不是真的優惠券喔。',
+    doneTextOf: (s) => gt('兌換好了！畫面寫「優惠已兌換」，{coupon}算是用掉了。這是示範網站，不是真的優惠券喔。', {
+      'coupon': _coupon(s),
+    }),
     steps: [
       GuideStep(
         target: (s) {
@@ -483,7 +506,10 @@ final List<GuideComponent> couponWalletComponents = [
         card: (s) {
           if (_emptyDetail(s)) return _emptyCard;
           if (s.now.flag('useAsk')) {
-            return '注意！按下「使用」就會馬上兌換，${_coupon(s)}會變成「已使用」，不能再用一次。請在店家結帳、給店員看的時候，再自己按「使用」；還不用就按「取消」。';
+            return gt(
+              '注意！按下「使用」就會馬上兌換，{coupon}會變成「已使用」，不能再用一次。請在店家結帳、給店員看的時候，再自己按「使用」；還不用就按「取消」。',
+              {'coupon': _coupon(s)},
+            );
           }
           if (s.now.flag('added')) {
             return '已經存進票夾了。現在就要用的話，按「使用優惠」，會打開你的票夾。';
@@ -501,8 +527,11 @@ final List<GuideComponent> couponWalletComponents = [
           }
           final label = s.now.text('useLabel');
           final button = label.isEmpty ? '立即使用' : label;
-          final below = s.now.flag('useBelow') ? '按鈕在最下面，可以往下滑一點。' : '';
-          return '到店家要結帳時，按下面的「$button」。按了還會再問你一次。$below';
+          final below = s.now.flag('useBelow') ? gt('按鈕在最下面，可以往下滑一點。') : '';
+          return gt('到店家要結帳時，按下面的「{button}」。按了還會再問你一次。{below}', {
+            'button': pg(button),
+            'below': below,
+          });
         },
         detail: (s) => '按優惠券下面的「立即使用」（從票夾打開的叫「兌換」），畫面問你的時候，確定要用再自己按「使用」。',
         isDone: _used,
@@ -552,7 +581,7 @@ final List<GuideComponent> couponWalletComponents = [
           if (s.now.text('subTab') != '我的訂單') return '點左邊的「我的訂單」，這裡是還能用的票。';
           final n = s.now.number('items');
           if (n == 0) return '你目前沒有可以用的入場券。';
-          return '這裡有 $n 張票，寫著張數和「限當日使用」。要入場時，點那張票打開 QR code。';
+          return gt('這裡有 {n} 張票，寫著張數和「限當日使用」。要入場時，點那張票打開 QR code。', {'n': n});
         },
         detail: (_) => '在票夾的「入場券」→「我的訂單」，點要用的那張票。',
         isDone: _onExchange,
@@ -614,15 +643,21 @@ const _walletParts = {
 
 GuideTexts _couponTexts(List<String> plan, GuideComponent last) {
   final wallet = plan.any(_walletParts.contains);
-  final name = wallet ? '票夾' : '優惠';
+  final use = plan.contains('use_coupon');
+  final task = {'task': gt(last.taskTitle)};
   return GuideTexts(
     shortName: last.taskTitle,
-    resumeLabel: '回到$name',
-    backLabel: '回到$name畫面',
-    openedText: plan.contains('use_coupon')
-        ? '好的！已經幫你打開$name。我們先找到優惠券，最後要兌換時由你自己按「使用」。我會在畫面上一步一步帶你做。'
-        : '好的！已經幫你打開$name，我會在畫面上一步一步帶你做。',
-    openedCard: '好的！$name打開了，我們一起來${last.taskTitle}。',
+    resumeLabel: wallet ? '回到票夾' : '回到優惠',
+    backLabel: wallet ? '回到票夾畫面' : '回到優惠畫面',
+    openedText: switch ((wallet, use)) {
+      (true, true) => '好的！已經幫你打開票夾。我們先找到優惠券，最後要兌換時由你自己按「使用」。我會在畫面上一步一步帶你做。',
+      (false, true) => '好的！已經幫你打開優惠。我們先找到優惠券，最後要兌換時由你自己按「使用」。我會在畫面上一步一步帶你做。',
+      (true, false) => '好的！已經幫你打開票夾，我會在畫面上一步一步帶你做。',
+      (false, false) => '好的！已經幫你打開優惠，我會在畫面上一步一步帶你做。',
+    },
+    openedCard: wallet
+        ? gt('好的！票夾打開了，我們一起來{task}。', task)
+        : gt('好的！優惠打開了，我們一起來{task}。', task),
     helpChips: const ['下一步要做什麼？', '什麼是票夾？'],
   );
 }

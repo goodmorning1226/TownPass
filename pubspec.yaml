@@ -96,6 +96,7 @@ flutter:
   assets:
     - assets/assistant/
     - assets/i18n/
+    - assets/i18n/guide/
     - assets/mock_data/
     - assets/image/
     - assets/svg/

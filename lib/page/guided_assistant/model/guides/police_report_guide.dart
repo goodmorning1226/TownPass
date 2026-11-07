@@ -1,4 +1,5 @@
 import 'package:town_pass/page/guided_assistant/model/guide_content.dart';
+import 'package:town_pass/page/guided_assistant/model/guide_i18n.dart';
 import 'package:town_pass/page/guided_assistant/model/guide_page.dart';
 import 'package:town_pass/page/guided_assistant/web/web_guide_probe.dart';
 import 'package:town_pass/page/guided_assistant/web/web_page_state.dart';
@@ -129,16 +130,16 @@ const policeReportPageSpec = WebPageSpec(
     // Red 不能為空 boxes that are still empty (after 下一步 / 送出).
     'warn': "qa('.base-input--warn, .base-select--warn, .base-textarea--warn').filter((e) => shown(e) && !(e.value || '').trim()).length",
     'month': "txt(qa('button.vc-title').find(shown))",
-    'time': "(() => { const s = qa('div.vc-time-select-group select'); if (s.length < 3) return ''; const t = (e) => e.selectedIndex >= 0 ? e.options[e.selectedIndex].text : ''; return t(s[0]) + ':' + t(s[1]) + ' ' + t(s[2]); })()",
-    'role': "(() => { const e = q('#your_role'); return e && e.value && e.selectedIndex >= 0 ? e.options[e.selectedIndex].text.replace(/[A-Za-z ]+\$/, '') : ''; })()",
+    'time': "(() => { const s = qa('div.vc-time-select-group select'); if (s.length < 3) return ''; const t = (e) => e.selectedIndex >= 0 ? optText(e.options[e.selectedIndex]) : ''; return t(s[0]) + ':' + t(s[1]) + ' ' + t(s[2]); })()",
+    'role': "(() => { const e = q('#your_role'); return e && e.value && e.selectedIndex >= 0 ? optText(e.options[e.selectedIndex]).replace(/[A-Za-z ]+\$/, '') : ''; })()",
     'date': "(qa('input.base-input[readonly]').find(shown) || {}).value || ''",
     'reported': "!!dialog('通報成功')",
     // Records.
     'records': "qa('a[href^=\"/police-report/record/\"]').filter(shown).length",
     'open': "qa('a[href^=\"/police-report/record/\"]').filter(shown).filter((a) => txt(a).includes('處理中')).length",
     'tab': "txt(q('section.tabs > .tab-label--active'))",
-    'status': r"""(() => { const m = ((q('#app') || document.body).innerText || '').match(/處理中|已結案|已受理/); return m ? m[0] : ''; })()""",
-    'caseNo': r"""(() => { const m = ((q('#app') || document.body).innerText || '').match(/編號\s*\n+\s*([^\n]+)/); return m ? m[1].trim() : ''; })()""",
+    'status': r"""(() => { const m = orig(q('#app') || document.body).match(/處理中|已結案|已受理/); return m ? m[0] : ''; })()""",
+    'caseNo': r"""(() => { const m = orig(q('#app') || document.body).match(/編號\s*\n+\s*([^\n]+)/); return m ? m[1].trim() : ''; })()""",
   },
   latchFlags: {'reported', 'noticeRead', 'statementRead'},
 );
@@ -165,17 +166,17 @@ const _readNote = '建議還是把內容看完喔。';
 bool _onScreen(WebPageState s, String flag) => s.now.text(flag).isEmpty;
 
 String _scroll(String off) => switch (off) {
-  'below' => '它在下面，先往下滑。',
-  'above' => '它在上面，先往上滑。',
+  'below' => gt('它在下面，先往下滑。'),
+  'above' => gt('它在上面，先往上滑。'),
   _ => '',
 };
 
 String _warn(WebPageState s) =>
-    s.now.number('warn') > 0 ? '紅字「不能為空」就是還沒填的格子。' : '';
+    s.now.number('warn') > 0 ? gt('紅字「不能為空」就是還沒填的格子。') : '';
 
 String _contactCard(WebPageState s) {
   final scroll = _scroll(s.now.text('fieldOff'));
-  final text = switch (s.now.text('fieldKey')) {
+  final text = gt(switch (s.now.text('fieldKey')) {
     'mobile' => '姓名和身分證字號已經帶好了。點「手機號碼」的框框，打你的手機號碼，例如 0912345678。',
     'mail' => '點「電子信箱」的框框，打你的 E-mail，警察會用它回覆你。',
     'county' => '「通訊地址」先點「請選擇縣市」，選你住的縣市。',
@@ -185,8 +186,8 @@ String _contactCard(WebPageState s) {
     'city2' => '「戶籍地址」再點「請選擇區域」選一個區。',
     'addr2' => '在「戶籍地址」的「請輸入詳細地址」打路名和門牌。',
     _ => '照畫面把聯絡資料填好。',
-  };
-  if (s.now.flag('typing')) return '$text$_typed';
+  });
+  if (s.now.flag('typing')) return '$text${gt(_typed)}';
   return '$scroll${_warn(s)}$text';
 }
 
@@ -196,22 +197,24 @@ const _typed = '打好了就按鍵盤上的「完成」或「✓」。';
 String _caseCard(WebPageState s) {
   final scroll = _scroll(s.now.text('fieldOff'));
   final text = switch (s.now.text('fieldKey')) {
-    'role' => '點「報案人類別」選一個：自己遇到的選「當事人」，東西被偷、被騙選「被害人」，看到別人違法選「檢舉人」。',
-    'location' => '在「標注發生地點」打事情發生的地址，或按框框右邊的定位圖示。',
-    'date' => '點「發生日期」的框框，會跳出月曆。',
+    'role' => gt('點「報案人類別」選一個：自己遇到的選「當事人」，東西被偷、被騙選「被害人」，看到別人違法選「檢舉人」。'),
+    'location' => gt('在「標注發生地點」打事情發生的地址，或按框框右邊的定位圖示。'),
+    'date' => gt('點「發生日期」的框框，會跳出月曆。'),
     'calendar' => () {
       final month = s.now.text('month');
-      final at = month.isEmpty ? '' : '現在是「$month」，';
-      return '在月曆點事情發生的那一天。$at要換月份就按月曆兩邊的箭頭。';
+      final at = month.isEmpty ? '' : gt('現在是「{month}」，', {'month': pg(month)});
+      return gt('在月曆點事情發生的那一天。{at}要換月份就按月曆兩邊的箭頭。', {'at': at});
     }(),
     'summary' => () {
       final time = s.now.text('time');
-      final at = time.isEmpty ? '' : '「發生時間」已經先填「$time」，不對可以點時、分改。';
-      return '$at接著在「案情摘要」寫下發生什麼事：什麼人、什麼事、什麼時候、在哪裡、什麼東西。';
+      final at = time.isEmpty
+          ? ''
+          : gt('「發生時間」已經先填「{time}」，不對可以點時、分改。', {'time': time});
+      return gt('{at}接著在「案情摘要」寫下發生什麼事：什麼人、什麼事、什麼時候、在哪裡、什麼東西。', {'at': at});
     }(),
-    _ => '照畫面把案件資料填好。',
+    _ => gt('照畫面把案件資料填好。'),
   };
-  if (s.now.flag('typing')) return '$text$_typed';
+  if (s.now.flag('typing')) return '$text${gt(_typed)}';
   return '$scroll${_warn(s)}$text';
 }
 
@@ -220,8 +223,6 @@ double _fieldCardTop(WebPageState s) {
   if (s.now.text('fieldKey') == 'calendar') return 60;
   return s.now.number('fieldTop') < 260 ? 380 : 60;
 }
-
-const _demo = '這是示範網站，沒有真的報案喔。';
 
 final List<GuideComponent> policeReportComponents = [
   GuideComponent(
@@ -268,7 +269,9 @@ final List<GuideComponent> policeReportComponents = [
       GuideStep(
         target: (s) => _stage(s) == 1 ? 'police.notice_ok' : null,
         label: (_) => '點一下',
-        card: (s) => '${_noticeRead(s) ? '' : _readNote}勾好了！按下面的「同意」，開始填報案資料。',
+        card: (s) => gt('{note}勾好了！按下面的「同意」，開始填報案資料。', {
+          'note': _noticeRead(s) ? '' : gt(_readNote),
+        }),
         detail: (_) => '按畫面最下面的「同意」。',
         isDone: (s) => _reported(s) || _stage(s) == 2 || _stage(s) == 3,
         cardTop: (_) => 250,
@@ -325,8 +328,9 @@ final List<GuideComponent> policeReportComponents = [
         arrow: (s) => _onScreen(s, 'agreeOff'),
         scrollHint: (s) => !_onScreen(s, 'agreeOff'),
         label: (_) => '勾選',
-        card: (s) =>
-            '${_scroll(s.now.text('agreeOff'))}勾「本人已詳閱並同意以上內容」，下面灰色的「下一步」才會變成可以按。',
+        card: (s) => gt('{scroll}勾「本人已詳閱並同意以上內容」，下面灰色的「下一步」才會變成可以按。', {
+          'scroll': _scroll(s.now.text('agreeOff')),
+        }),
         detail: (_) => '往下滑到最下面，點「本人已詳閱並同意以上內容」前面的小方框。',
         isDone: (s) =>
             _reported(s) ||
@@ -342,7 +346,9 @@ final List<GuideComponent> policeReportComponents = [
         label: (_) => '點一下',
         card: (s) => s.now.number('warn') > 0
             ? '還有格子沒填好，紅字「不能為空」的地方要補上。往上滑看看。'
-            : '${_scroll(s.now.text('nextOff'))}按「下一步」，接著填案件的資料。',
+            : gt('{scroll}按「下一步」，接著填案件的資料。', {
+                'scroll': _scroll(s.now.text('nextOff')),
+              }),
         detail: (_) => '按畫面最下面的「下一步」。',
         isDone: (s) => _reported(s) || _stage(s) == 3,
         cardTop: (_) => 60,
@@ -386,7 +392,9 @@ final List<GuideComponent> policeReportComponents = [
     requires: const ['fill_case'],
     taskTitle: '同意個資聲明',
     doneText: '勾好了！「送出」現在可以按了。',
-    doneTextOf: (s) => '${_statementRead(s) ? '' : _readNote}勾好了！「送出」現在可以按了。',
+    doneTextOf: (s) => gt('{note}勾好了！「送出」現在可以按了。', {
+      'note': _statementRead(s) ? '' : gt(_readNote),
+    }),
     doneDetail: '看一下填的內容對不對，再自己按「送出」。',
     doneTarget: (s) => _stage(s) == 3 ? 'police.send' : null,
     steps: [
@@ -415,8 +423,9 @@ final List<GuideComponent> policeReportComponents = [
         arrow: (s) => _onScreen(s, 'agreeOff'),
         scrollHint: (s) => !_onScreen(s, 'agreeOff'),
         label: (_) => '勾選',
-        card: (s) =>
-            '聲明看完了！${_scroll(s.now.text('agreeOff'))}勾「本人已詳閱並同意以上內容」，灰色的「送出」才會變成可以按。',
+        card: (s) => gt('聲明看完了！{scroll}勾「本人已詳閱並同意以上內容」，灰色的「送出」才會變成可以按。', {
+          'scroll': _scroll(s.now.text('agreeOff')),
+        }),
         detail: (_) => '往下滑到最下面，點「本人已詳閱並同意以上內容」前面的小方框。',
         isDone: (s) =>
             _reported(s) || (_stage(s) == 3 && s.now.flag('sendEnabled')),
@@ -432,10 +441,10 @@ final List<GuideComponent> policeReportComponents = [
     requires: const ['agree_case'],
     self: '你自己確認',
     taskTitle: '網路報案',
-    doneText: '送出了！畫面寫「通報成功」。$_demo真的要報案，請打 110 或到派出所。',
+    doneText: '送出了！畫面寫「通報成功」。這是示範網站，沒有真的報案喔。真的要報案，請打 110 或到派出所。',
     // The 通報成功 dialog's 確認 (gone once it is closed).
     doneTarget: (_) => 'police.ok',
-    doneDetail: '按「確認」會回到須知頁。$_demo真的報案後，像竊盜、詐騙這類案件，警察還會請你到派出所做筆錄。',
+    doneDetail: '按「確認」會回到須知頁。這是示範網站，沒有真的報案喔。真的報案後，像竊盜、詐騙這類案件，警察還會請你到派出所做筆錄。',
     steps: [
       GuideStep(
         target: (s) =>
@@ -454,12 +463,16 @@ final List<GuideComponent> policeReportComponents = [
           final role = s.now.text('role');
           final date = s.now.text('date');
           final what = [
-            if (role.isNotEmpty) '報案人類別「$role」',
-            if (date.isNotEmpty) '發生日期 $date',
-          ].join('、');
-          final check = what.isEmpty ? '' : '：$what';
-          final note = _statementRead(s) ? '' : _readNote;
-          return '$note${_scroll(s.now.text('sendOff'))}最後確認一下$check。沒問題就自己按「送出」喔。這是示範網站，不會真的報案。';
+            if (role.isNotEmpty) gt('報案人類別「{role}」', {'role': pg(role)}),
+            if (date.isNotEmpty) gt('發生日期 {date}', {'date': date}),
+          ].join(gt('、'));
+          final check = what.isEmpty ? '' : gt('：{what}', {'what': what});
+          final note = _statementRead(s) ? '' : gt(_readNote);
+          return gt('{note}{scroll}最後確認一下{check}。沒問題就自己按「送出」喔。這是示範網站，不會真的報案。', {
+            'note': note,
+            'scroll': _scroll(s.now.text('sendOff')),
+            'check': check,
+          });
         },
         detail: (_) => '看一下填的資料對不對，沒問題就自己按最下面的「送出」。不想報了，按左上角的「‹」離開就好。',
         isDone: _reported,
@@ -492,8 +505,13 @@ final List<GuideComponent> policeReportComponents = [
           final n = s.now.number('records');
           if (n == 0) return '這裡目前沒有報案紀錄。';
           final open = s.now.number('open');
-          final doing = open == 0 ? '都已經結案了' : '有 $open 筆還在「處理中」';
-          return '這是你的報案紀錄，共 $n 筆，$doing。點一筆就能看詳細內容。';
+          final doing = open == 0
+              ? gt('都已經結案了')
+              : gt('有 {open} 筆還在「處理中」', {'open': open});
+          return gt('這是你的報案紀錄，共 {n} 筆，{doing}。點一筆就能看詳細內容。', {
+            'n': n,
+            'doing': doing,
+          });
         },
         detail: (_) => '每一筆左邊是報案日期和編號，右邊寫「處理中」或「已結案」。點一筆可以看警察的回覆。',
         isDone: (s) => _stage(s) == 6,
@@ -522,10 +540,14 @@ final List<GuideComponent> policeReportComponents = [
     doneTextOf: (s) {
       final status = s.now.text('status');
       final no = s.now.text('caseNo');
-      final which = no.isEmpty ? '這筆案件' : '案件 $no';
-      if (status.isEmpty) return '這就是$which的詳細內容！';
-      final note = status == '處理中' ? '網路報案大約 5 天內會回覆（假日順延）。' : '';
-      return '這就是$which的詳細內容，現在是「$status」。$note';
+      final which = no.isEmpty ? gt('這筆案件') : gt('案件 {no}', {'no': no});
+      if (status.isEmpty) return gt('這就是{which}的詳細內容！', {'which': which});
+      final note = status == '處理中' ? gt('網路報案大約 5 天內會回覆（假日順延）。') : '';
+      return gt('這就是{which}的詳細內容，現在是「{status}」。{note}', {
+        'which': which,
+        'status': pg(status),
+        'note': note,
+      });
     },
     steps: [
       GuideStep(
@@ -534,8 +556,10 @@ final List<GuideComponent> policeReportComponents = [
         label: (_) => '點一下',
         card: (s) {
           final status = s.now.text('status');
-          final now = status.isEmpty ? '' : '這筆案件現在是「$status」。';
-          return '$now上面「回覆」是警察的回覆。點「詳細內容」，可以看你報案時寫的內容。';
+          final now = status.isEmpty
+              ? ''
+              : gt('這筆案件現在是「{status}」。', {'status': pg(status)});
+          return gt('{now}上面「回覆」是警察的回覆。點「詳細內容」，可以看你報案時寫的內容。', {'now': now});
         },
         detail: (_) => '點畫面上方的「詳細內容」。按左上角的「‹」可以回到紀錄清單。',
         isDone: (s) => _stage(s) == 6 && s.now.text('tab') == '詳細內容',
@@ -591,7 +615,7 @@ GuideTexts _policeTexts(List<String> plan, GuideComponent last) {
       resumeLabel: '回到報案紀錄',
       backLabel: '回到報案紀錄',
       openedText: '好的！已經幫你打開「報案紀錄」，我會帶你看案件的處理情形。',
-      openedCard: '好的！報案紀錄打開了，我們一起來${last.taskTitle}。',
+      openedCard: gt('好的！報案紀錄打開了，我們一起來{task}。', {'task': gt(last.taskTitle)}),
       helpChips: const ['下一步要做什麼？'],
     );
   }
@@ -601,7 +625,7 @@ GuideTexts _policeTexts(List<String> plan, GuideComponent last) {
       resumeLabel: '回到線上報案',
       backLabel: '回到線上報案',
       openedText: '好的！已經幫你打開「線上報案」，我會在畫面上一步一步帶你做。緊急狀況請直接打 110。',
-      openedCard: '好的！線上報案打開了，我們一起來${last.taskTitle}。',
+      openedCard: gt('好的！線上報案打開了，我們一起來{task}。', {'task': gt(last.taskTitle)}),
       helpChips: const ['下一步要做什麼？'],
     );
   }

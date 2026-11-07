@@ -1,0 +1,630 @@
+{
+ "version": 1,
+ "status": "DRAFT translations (machine-assisted, 2026-11-08), pending native-speaker review. Keys are the Chinese source texts in lib/page/guided_assistant/; keep {name} placeholders; {page:X} shows the page's own word X as the page shows it (translated by PageTranslation).",
+ "section": "content",
+ "strings": {
+  "1.2 公里": {
+   "en": "1.2 km",
+   "ja": "1.2 km",
+   "vi": "1.2 km",
+   "id": "1.2 km",
+   "th": "1.2 กม."
+  },
+  "350 公尺": {
+   "en": "350 m",
+   "ja": "350 m",
+   "vi": "350 m",
+   "id": "350 m",
+   "th": "350 ม."
+  },
+  "700 公尺": {
+   "en": "700 m",
+   "ja": "700 m",
+   "vi": "700 m",
+   "id": "700 m",
+   "th": "700 ม."
+  },
+  "「館藏查詢」就是在找圖書館有沒有你要的書。": {
+   "en": "“{page:館藏查詢}” means checking whether the library has the book you want.",
+   "ja": "「{page:館藏查詢}」は、図書館に読みたい本があるかを探すことです。",
+   "vi": "“{page:館藏查詢}” là tìm xem thư viện có cuốn sách bạn cần không.",
+   "id": "“{page:館藏查詢}” artinya mencari apakah perpustakaan punya buku yang Anda mau.",
+   "th": "“{page:館藏查詢}” คือการค้นว่าห้องสมุดมีหนังสือที่คุณต้องการไหม"
+  },
+  "一個黑白方格的圖案，用手機相機對著它，就能打開網頁或付款。": {
+   "en": "A pattern of black and white squares. Point your phone camera at it to open a web page or pay.",
+   "ja": "白黒の四角が並んだ模様です。スマートフォンのカメラを向けると、ウェブページを開いたり支払いをしたりできます。",
+   "vi": "Một hình gồm các ô vuông đen trắng, đưa camera điện thoại vào là mở được trang web hoặc thanh toán.",
+   "id": "Gambar kotak-kotak hitam putih. Arahkan kamera ponsel ke sana untuk membuka halaman web atau membayar.",
+   "th": "ลายสี่เหลี่ยมสีขาวดำ หันกล้องมือถือไปที่มัน ก็เปิดเว็บหรือจ่ายเงินได้"
+  },
+  "上面是常用的服務，下面那一排按鈕可以切換到其他頁面。": {
+   "en": "At the top are the services people use most; the row of buttons at the bottom takes you to other pages.",
+   "ja": "上はよく使うサービスで、下に並んだボタンで別のページに切り替えられます。",
+   "vi": "Phía trên là các dịch vụ thường dùng, hàng nút phía dưới dùng để chuyển sang trang khác.",
+   "id": "Di atas ada layanan yang sering dipakai, deretan tombol di bawah untuk pindah ke halaman lain.",
+   "th": "ด้านบนคือบริการที่ใช้บ่อย แถวปุ่มด้านล่างใช้สลับไปหน้าอื่น"
+  },
+  "下一步要做什麼？": {
+   "en": "What should I do next?",
+   "ja": "次は何をすればいいですか？",
+   "vi": "Bước tiếp theo làm gì?",
+   "id": "Langkah berikutnya apa?",
+   "th": "ขั้นต่อไปต้องทำอะไร"
+  },
+  "什麼是身分驗證": {
+   "en": "What is identity verification?",
+   "ja": "本人確認とは何ですか？",
+   "vi": "Xác minh danh tính là gì?",
+   "id": "Apa itu verifikasi identitas?",
+   "th": "การยืนยันตัวตนคืออะไร"
+  },
+  "你好！想做什麼，直接跟我說就可以。": {
+   "en": "Hi! Just tell me what you want to do.",
+   "ja": "こんにちは！やりたいことを、そのまま話しかけてください。",
+   "vi": "Xin chào! Bạn muốn làm gì cứ nói với mình.",
+   "id": "Halo! Mau melakukan apa, langsung bilang saja.",
+   "th": "สวัสดี! อยากทำอะไร บอกได้เลย"
+  },
+  "你好！想做什麼，直接跟我說，或點下面的選項。": {
+   "en": "Hi! Just tell me what you want to do, or tap an option below.",
+   "ja": "こんにちは！やりたいことをそのまま話しかけるか、下の選択肢をタップしてください。",
+   "vi": "Xin chào! Bạn muốn làm gì cứ nói với mình, hoặc chạm lựa chọn bên dưới.",
+   "id": "Halo! Mau melakukan apa, langsung bilang saja, atau ketuk pilihan di bawah.",
+   "th": "สวัสดี! อยากทำอะไร บอกได้เลย หรือแตะตัวเลือกด้านล่าง"
+  },
+  "你想查哪一種案件的進度？": {
+   "en": "Which kind of case do you want to check on?",
+   "ja": "どの案件の進み具合を調べますか？",
+   "vi": "Bạn muốn xem tiến độ loại hồ sơ nào?",
+   "id": "Status kasus jenis apa yang ingin Anda cek?",
+   "th": "อยากดูความคืบหน้าของเรื่องประเภทไหน"
+  },
+  "你現在正在{title}，做到第 {step} 步。要先暫停{short}，改去{other}嗎？{short}的進度我會幫你留著。": {
+   "en": "You’re in the middle of “{title}”, at step {step}. Pause “{short}” and go to “{other}”? I’ll keep your progress on “{short}”.",
+   "ja": "いまは「{title}」のステップ {step} です。「{short}」を一時停止して「{other}」に移りますか？「{short}」の進み具合は残しておきます。",
+   "vi": "Bạn đang làm “{title}”, tới bước {step}. Tạm dừng “{short}” để chuyển sang “{other}” không? Mình sẽ giữ lại tiến độ của “{short}”.",
+   "id": "Anda sedang mengerjakan “{title}”, di langkah {step}. Jeda “{short}” dan pindah ke “{other}”? Progres “{short}” akan saya simpan.",
+   "th": "ตอนนี้คุณกำลังทำ “{title}” อยู่ที่ขั้นที่ {step} จะหยุด “{short}” ชั่วคราวแล้วไปที่ “{other}” ไหม ความคืบหน้าของ “{short}” จะเก็บไว้ให้"
+  },
+  "你要去哪一間圖書館拿書。書會送到那裡等你。": {
+   "en": "The library where you’ll go to get the book. The book will be sent there to wait for you.",
+   "ja": "本を受け取りに行く図書館のことです。本はそこに届いて、取りに来るのを待っています。",
+   "vi": "Thư viện nơi bạn sẽ đến lấy sách. Sách sẽ được chuyển đến đó chờ bạn.",
+   "id": "Perpustakaan tempat Anda akan mengambil buku. Bukunya akan dikirim ke sana dan menunggu Anda.",
+   "th": "ห้องสมุดที่คุณจะไปรับหนังสือ หนังสือจะส่งไปรอคุณที่นั่น"
+  },
+  "你說了兩件事，要先做哪一個？": {
+   "en": "You mentioned two things. Which one first?",
+   "ja": "2つのことをおっしゃいました。どちらを先にしますか？",
+   "vi": "Bạn nói hai việc, muốn làm việc nào trước?",
+   "id": "Anda menyebut dua hal. Mau yang mana dulu?",
+   "th": "คุณพูดถึงสองเรื่อง จะทำอันไหนก่อน"
+  },
+  "像用鑰匙打開自己家的門。": {
+   "en": "Like using a key to open your own front door.",
+   "ja": "自分の家のドアを鍵で開けるようなものです。",
+   "vi": "Giống như dùng chìa khóa mở cửa nhà mình.",
+   "id": "Seperti memakai kunci untuk membuka pintu rumah sendiri.",
+   "th": "เหมือนใช้กุญแจเปิดประตูบ้านตัวเอง"
+  },
+  "先輸入書名，再按搜尋喔。": {
+   "en": "Type the book title first, then tap search.",
+   "ja": "まず書名を入力してから、検索を押してください。",
+   "vi": "Hãy gõ tên sách trước, rồi chạm tìm kiếm nhé.",
+   "id": "Ketik judul buku dulu, lalu ketuk cari.",
+   "th": "พิมพ์ชื่อหนังสือก่อน แล้วค่อยกดค้นหา"
+  },
+  "先選好取書館，才能按預約喔。": {
+   "en": "Choose a pickup library first, then you can reserve.",
+   "ja": "先に受取館を選ぶと、予約を押せるようになります。",
+   "vi": "Hãy chọn thư viện nhận sách trước thì mới đặt trước được nhé.",
+   "id": "Pilih perpustakaan pengambilan dulu, baru bisa memesan.",
+   "th": "เลือกห้องสมุดรับหนังสือก่อน จึงจะกดจองได้"
+  },
+  "冊次": {
+   "en": "Copy number",
+   "ja": "冊次（何冊目か）",
+   "vi": "Bản số",
+   "id": "Nomor eksemplar",
+   "th": "เล่มที่"
+  },
+  "剛剛你還說要{title}，要接著做嗎？": {
+   "en": "Earlier you also asked for “{title}”. Shall we do that next?",
+   "ja": "さきほど「{title}」もしたいとおっしゃいました。続けてやりますか？",
+   "vi": "Lúc nãy bạn còn nói muốn “{title}”, làm tiếp luôn không?",
+   "id": "Tadi Anda juga bilang mau “{title}”. Lanjut sekarang?",
+   "th": "เมื่อกี้คุณบอกว่าอยาก “{title}” ด้วย จะทำต่อเลยไหม"
+  },
+  "區公所申辦的案件": {
+   "en": "District office applications",
+   "ja": "区役所での申請",
+   "vi": "Hồ sơ nộp ở văn phòng quận",
+   "id": "Permohonan di kantor distrik",
+   "th": "คำร้องที่สำนักงานเขต"
+  },
+  "取書館": {
+   "en": "Pickup library",
+   "ja": "受取館",
+   "vi": "Thư viện nhận sách",
+   "id": "Perpustakaan pengambilan",
+   "th": "ห้องสมุดรับหนังสือ"
+  },
+  "可以換個說法嗎？例如「我要查報案的進度」。": {
+   "en": "Could you say it another way? For example, “I want to check my police report’s progress”.",
+   "ja": "別の言い方で話してもらえますか？たとえば「通報の進み具合を調べたい」。",
+   "vi": "Bạn nói cách khác được không? Ví dụ “Tôi muốn xem tiến độ trình báo”.",
+   "id": "Bisa dikatakan dengan cara lain? Misalnya “Saya mau cek status laporan polisi”.",
+   "th": "ช่วยพูดอีกแบบได้ไหม เช่น “ฉันอยากดูความคืบหน้าการแจ้งความ”"
+  },
+  "同一本書圖書館會買好幾本，「冊次」就是在選其中哪一本。": {
+   "en": "A library often buys several copies of the same book. The “copy number” says which of them you choose.",
+   "ja": "図書館は同じ本を何冊も持っていることがあります。「冊次」は、そのうちのどの1冊かを選ぶものです。",
+   "vi": "Thư viện thường mua nhiều bản của cùng một cuốn sách, “bản số” là để chọn một trong các bản đó.",
+   "id": "Perpustakaan sering membeli beberapa eksemplar buku yang sama. “Nomor eksemplar” untuk memilih salah satunya.",
+   "th": "ห้องสมุดมักซื้อหนังสือเรื่องเดียวกันไว้หลายเล่ม “เล่มที่” คือการเลือกว่าจะเอาเล่มไหน"
+  },
+  "回到{page}": {
+   "en": "Back to {page}",
+   "ja": "「{page}」に戻る",
+   "vi": "Quay lại {page}",
+   "id": "Kembali ke {page}",
+   "th": "กลับไปที่{page}"
+  },
+  "圖書館有什麼公告": {
+   "en": "What notices does the library have?",
+   "ja": "図書館にはどんなお知らせがありますか",
+   "vi": "Thư viện có thông báo gì?",
+   "id": "Ada pengumuman apa di perpustakaan?",
+   "th": "ห้องสมุดมีประกาศอะไรบ้าง"
+  },
+  "報警（警政）的案件": {
+   "en": "Police reports",
+   "ja": "警察への通報",
+   "vi": "Vụ việc trình báo cảnh sát",
+   "id": "Laporan ke polisi",
+   "th": "เรื่องที่แจ้งตำรวจ"
+  },
+  "大安區〇〇街 8 號": {
+   "en": "No. 8, 〇〇 St., Da’an Dist.",
+   "ja": "大安区〇〇街 8 号",
+   "vi": "Số 8, phố 〇〇, quận Đại An",
+   "id": "No. 8, Jl. 〇〇, Distrik Da’an",
+   "th": "เลขที่ 8 ถนน〇〇 เขตต้าอัน"
+  },
+  "大安區〇〇路 101 號": {
+   "en": "No. 101, 〇〇 Rd., Da’an Dist.",
+   "ja": "大安区〇〇路 101 号",
+   "vi": "Số 101, đường 〇〇, quận Đại An",
+   "id": "No. 101, Jl. 〇〇, Distrik Da’an",
+   "th": "เลขที่ 101 ถนน〇〇 เขตต้าอัน"
+  },
+  "大安區〇〇路 12 號": {
+   "en": "No. 12, 〇〇 Rd., Da’an Dist.",
+   "ja": "大安区〇〇路 12 号",
+   "vi": "Số 12, đường 〇〇, quận Đại An",
+   "id": "No. 12, Jl. 〇〇, Distrik Da’an",
+   "th": "เลขที่ 12 ถนน〇〇 เขตต้าอัน"
+  },
+  "好的！「{page}」打開了，我們一起來{task}。": {
+   "en": "OK! “{page}” is open. Let’s do this together: {task}.",
+   "ja": "はい！「{page}」を開きました。一緒に「{task}」をしましょう。",
+   "vi": "Được rồi! “{page}” đã mở. Mình cùng làm nhé: {task}.",
+   "id": "Baik! “{page}” sudah terbuka. Ayo kita lakukan bersama: {task}.",
+   "th": "ได้เลย! เปิด “{page}” แล้ว มาทำด้วยกัน: {task}"
+  },
+  "好的！已經幫你打開「{page}」，我會在畫面上一步一步帶你做。": {
+   "en": "OK! I opened “{page}” for you. I’ll guide you step by step on the screen.",
+   "ja": "はい！「{page}」を開きました。画面で一つずつご案内します。",
+   "vi": "Được rồi! Mình đã mở “{page}” cho bạn. Mình sẽ hướng dẫn từng bước trên màn hình.",
+   "id": "Baik! “{page}” sudah saya bukakan. Saya akan memandu langkah demi langkah di layar.",
+   "th": "ได้เลย! เปิด “{page}” ให้แล้ว จะพาทำทีละขั้นบนหน้าจอ"
+  },
+  "好的，{short}的進度先幫你存起來，之後可以接著做。": {
+   "en": "OK, I’ve saved your progress on “{short}”. You can carry on later.",
+   "ja": "はい、「{short}」の進み具合を保存しました。あとで続きからできます。",
+   "vi": "Được rồi, mình đã lưu tiến độ của “{short}”, sau này có thể làm tiếp.",
+   "id": "Baik, progres “{short}” sudah saya simpan. Nanti bisa dilanjutkan.",
+   "th": "ได้เลย เก็บความคืบหน้าของ “{short}” ไว้ให้แล้ว ทำต่อภายหลังได้"
+  },
+  "好的，已經取消。": {
+   "en": "OK, it’s cancelled.",
+   "ja": "はい、キャンセルしました。",
+   "vi": "Được rồi, đã hủy.",
+   "id": "Baik, sudah dibatalkan.",
+   "th": "ได้เลย ยกเลิกแล้ว"
+  },
+  "好的，引導先結束了，接下來你可以自己操作。想再請我帶你做，跟我說一聲就好。": {
+   "en": "OK, the guide has ended. You can carry on by yourself now. If you want me to guide you again, just tell me.",
+   "ja": "はい、ガイドを終了しました。ここからはご自分で操作できます。また案内してほしいときは、声をかけてください。",
+   "vi": "Được rồi, hướng dẫn đã kết thúc, giờ bạn có thể tự thao tác. Muốn mình hướng dẫn lại thì cứ nói với mình.",
+   "id": "Baik, panduan sudah selesai. Sekarang Anda bisa melakukannya sendiri. Kalau mau saya pandu lagi, bilang saja.",
+   "th": "ได้เลย จบการแนะนำแล้ว ต่อจากนี้คุณทำเองได้ ถ้าอยากให้พาทำอีก บอกได้เลย"
+  },
+  "好，你可以自己操作。需要我帶你做的時候，點「助理」再按「繼續引導」就可以。": {
+   "en": "OK, you can do it yourself. When you want me to guide you, tap “Assistant”, then “Resume guide”.",
+   "ja": "はい、ご自分で操作できます。案内が必要なときは、「アシスタント」をタップして「ガイドを再開」を押してください。",
+   "vi": "Được rồi, bạn có thể tự thao tác. Khi cần mình hướng dẫn, chạm “Trợ lý” rồi chạm “Tiếp tục hướng dẫn” là được.",
+   "id": "Baik, Anda bisa melakukannya sendiri. Kalau perlu saya pandu, ketuk “Asisten” lalu “Lanjutkan panduan”.",
+   "th": "ได้เลย คุณทำเองได้ ถ้าอยากให้พาทำ แตะ “ผู้ช่วย” แล้วกด “ทำตามคำแนะนำต่อ”"
+  },
+  "好，想預約的時候再叫我。": {
+   "en": "OK, call me when you want to reserve.",
+   "ja": "はい、予約したくなったら呼んでください。",
+   "vi": "Được, khi nào muốn đặt trước thì gọi mình nhé.",
+   "id": "Oke, panggil saya kalau mau memesan.",
+   "th": "ได้เลย อยากจองเมื่อไหร่ค่อยเรียก"
+  },
+  "好，我們回去接著{short}。": {
+   "en": "OK, let’s go back to “{short}”.",
+   "ja": "はい、戻って「{short}」の続きをしましょう。",
+   "vi": "Được, mình quay lại làm tiếp “{short}” nhé.",
+   "id": "Oke, kita kembali melanjutkan “{short}”.",
+   "th": "ได้เลย กลับไปทำ “{short}” ต่อกัน"
+  },
+  "好，我們繼續{short}。關掉這個畫面就能接著做。": {
+   "en": "OK, let’s continue with “{short}”. Close this screen to carry on.",
+   "ja": "はい、「{short}」を続けましょう。この画面を閉じると続きができます。",
+   "vi": "Được, mình tiếp tục “{short}” nhé. Đóng màn hình này là làm tiếp được.",
+   "id": "Oke, kita lanjutkan “{short}”. Tutup layar ini untuk melanjutkan.",
+   "th": "ได้เลย ทำ “{short}” ต่อกัน ปิดหน้าจอนี้แล้วทำต่อได้เลย"
+  },
+  "好，我再帶你看一次怎麼用。": {
+   "en": "OK, I’ll show you how to use it once more.",
+   "ja": "はい、もう一度使い方をご案内します。",
+   "vi": "Được, mình sẽ hướng dẫn lại cách dùng một lần nữa.",
+   "id": "Oke, saya tunjukkan sekali lagi cara pakainya.",
+   "th": "ได้เลย จะพาดูวิธีใช้อีกครั้ง"
+  },
+  "完成了": {
+   "en": "Done",
+   "ja": "完了しました",
+   "vi": "Xong rồi",
+   "id": "Selesai",
+   "th": "เสร็จแล้ว"
+  },
+  "已{todo}": {
+   "en": "Done: {todo}",
+   "ja": "完了：{todo}",
+   "vi": "Đã xong: {todo}",
+   "id": "Selesai: {todo}",
+   "th": "เสร็จแล้ว: {todo}"
+  },
+  "已經幫你打開「{title}」。這個功能還沒有逐步引導，只幫你開頁。": {
+   "en": "I opened “{title}” for you. There’s no step-by-step guide for this feature yet, so I only opened the page.",
+   "ja": "「{title}」を開きました。この機能にはまだ手順のご案内がないので、ページを開くだけです。",
+   "vi": "Mình đã mở “{title}” cho bạn. Chức năng này chưa có hướng dẫn từng bước, mình chỉ mở trang giúp bạn.",
+   "id": "“{title}” sudah saya bukakan. Fitur ini belum punya panduan langkah demi langkah, jadi saya hanya membuka halamannya.",
+   "th": "เปิด “{title}” ให้แล้ว ฟังก์ชันนี้ยังไม่มีการแนะนำทีละขั้น จึงเปิดหน้าให้อย่างเดียว"
+  },
+  "帳單上方「水號」後面那一串數字就是。": {
+   "en": "It’s the string of digits after “水號” (water account number) at the top of the bill.",
+   "ja": "請求書の上の方の「水號」（水道番号）の後ろにある数字です。",
+   "vi": "Đó là dãy số sau chữ “水號” (số danh bộ nước) ở phía trên hóa đơn.",
+   "id": "Itu deretan angka setelah tulisan “水號” (nomor pelanggan air) di bagian atas tagihan.",
+   "th": "คือตัวเลขที่อยู่หลังคำว่า “水號” (หมายเลขผู้ใช้น้ำ) ด้านบนของบิล"
+  },
+  "我想繳停車費": {
+   "en": "I want to pay a parking fee",
+   "ja": "駐車料金を払いたい",
+   "vi": "Tôi muốn trả phí đỗ xe",
+   "id": "Saya mau bayar biaya parkir",
+   "th": "ฉันอยากจ่ายค่าจอดรถ"
+  },
+  "我聽到「{from}」，當作「{to}」處理；不對的話請再說一次。": {
+   "en": "I heard “{from}” and took it as “{to}”. If that is wrong, please say it again.",
+   "ja": "「{from}」と聞こえたので「{to}」として処理します。違う場合はもう一度話してください。",
+   "vi": "Tôi nghe được “{from}” và hiểu là “{to}”; nếu sai, hãy nói lại.",
+   "id": "Saya mendengar “{from}” dan menganggapnya “{to}”; jika salah, silakan ucapkan lagi.",
+   "th": "ฉันได้ยินว่า “{from}” และเข้าใจว่า “{to}” ถ้าไม่ถูก โปรดพูดอีกครั้ง"
+  },
+  "我聽到「{text}」，是這句嗎？也可以選下面的說法，或再說一次。": {
+   "en": "I heard “{text}”. Is that right? You can also pick one below, or say it again.",
+   "ja": "「{text}」と聞こえました。合っていますか？下の候補から選ぶか、もう一度話してください。",
+   "vi": "Tôi nghe được “{text}”, đúng không? Bạn cũng có thể chọn bên dưới, hoặc nói lại.",
+   "id": "Saya mendengar “{text}”, benar? Anda juga bisa memilih di bawah, atau ucapkan lagi.",
+   "th": "ฉันได้ยินว่า “{text}” ใช่ไหม เลือกจากด้านล่างหรือพูดอีกครั้งก็ได้"
+  },
+  "我要借書": {
+   "en": "I want to borrow a book",
+   "ja": "本を借りたい",
+   "vi": "Tôi muốn mượn sách",
+   "id": "Saya mau pinjam buku",
+   "th": "ฉันอยากยืมหนังสือ"
+  },
+  "我要繳水費": {
+   "en": "Pay my water bill",
+   "ja": "水道料金を払いたい",
+   "vi": "Tôi muốn trả tiền nước",
+   "id": "Bayar tagihan air",
+   "th": "จ่ายค่าน้ำ"
+  },
+  "我預約的書到了沒": {
+   "en": "Has my reserved book arrived?",
+   "ja": "予約した本は届きましたか",
+   "vi": "Sách tôi đặt trước đã về chưa?",
+   "id": "Apakah buku yang saya pesan sudah datang?",
+   "th": "หนังสือที่ฉันจองมาถึงหรือยัง"
+  },
+  "服務頁面打不開，請檢查網路後再試一次。": {
+   "en": "The service page won’t open. Check your network and try again.",
+   "ja": "サービスページが開けません。ネットワークを確認して、もう一度お試しください。",
+   "vi": "Không mở được trang dịch vụ. Hãy kiểm tra mạng rồi thử lại.",
+   "id": "Halaman layanan tidak bisa dibuka. Periksa jaringan lalu coba lagi.",
+   "th": "เปิดหน้าบริการไม่ได้ โปรดตรวจสอบเครือข่ายแล้วลองอีกครั้ง"
+  },
+  "查自己的繳費紀錄前，要先做這一步。": {
+   "en": "You need to do this before you can see your own payment history.",
+   "ja": "自分の支払い履歴を見る前に、まずこれが必要です。",
+   "vi": "Bạn cần làm bước này trước khi xem lịch sử thanh toán của mình.",
+   "id": "Langkah ini perlu dilakukan sebelum melihat riwayat pembayaran Anda sendiri.",
+   "th": "ต้องทำขั้นตอนนี้ก่อน จึงจะดูประวัติการชำระเงินของตัวเองได้"
+  },
+  "正在打開服務頁面…": {
+   "en": "Opening the service page…",
+   "ja": "サービスページを開いています…",
+   "vi": "Đang mở trang dịch vụ…",
+   "id": "Membuka halaman layanan…",
+   "th": "กำลังเปิดหน้าบริการ…"
+  },
+  "步驟 {i} / {n}・{verb}": {
+   "en": "Step {i} / {n} · {verb}",
+   "ja": "ステップ {i} / {n}・{verb}",
+   "vi": "Bước {i} / {n} · {verb}",
+   "id": "Langkah {i} / {n} · {verb}",
+   "th": "ขั้นตอน {i} / {n} · {verb}"
+  },
+  "水號是用來確認你家用水帳戶的號碼，一共 10 碼，通常印在水費帳單上。": {
+   "en": "The water account number identifies your home’s water account. It has 10 digits and is usually printed on your water bill.",
+   "ja": "水道番号は、ご家庭の水道の契約を確認するための番号です。全部で 10 けたで、ふつうは水道料金の請求書に印刷されています。",
+   "vi": "Số danh bộ nước là số dùng để xác định tài khoản nước của nhà bạn, gồm 10 chữ số, thường in trên hóa đơn tiền nước.",
+   "id": "Nomor pelanggan air adalah nomor untuk mengenali akun air rumah Anda, terdiri dari 10 digit, biasanya tercetak di tagihan air.",
+   "th": "หมายเลขผู้ใช้น้ำคือหมายเลขที่ใช้ระบุบัญชีน้ำประปาของบ้านคุณ มีทั้งหมด 10 หลัก มักพิมพ์อยู่บนบิลค่าน้ำ"
+  },
+  "沒有錄到聲音，請按住麥克風再說話，說完放開。": {
+   "en": "Nothing was recorded. Hold the microphone while you speak, then release it.",
+   "ja": "録音されませんでした。マイクを押したまま話し、話し終えたら離してください。",
+   "vi": "Không ghi được âm thanh. Hãy nhấn giữ micrô khi nói, nói xong thì thả ra.",
+   "id": "Tidak ada suara yang terekam. Tekan tahan mikrofon sambil bicara, lalu lepaskan.",
+   "th": "ไม่ได้บันทึกเสียง โปรดกดไมโครโฟนค้างไว้ขณะพูด แล้วปล่อยเมื่อพูดจบ"
+  },
+  "沒關係～我們先點亮起來的地方就好。": {
+   "en": "That’s OK! Let’s just tap the highlighted spot first.",
+   "ja": "大丈夫です～まずは光っている所をタップしましょう。",
+   "vi": "Không sao đâu~ Mình chạm vào chỗ đang sáng trước là được.",
+   "id": "Tidak apa-apa~ Kita ketuk dulu bagian yang menyala saja.",
+   "th": "ไม่เป็นไร~ แตะตรงที่สว่างอยู่ก่อนก็พอ"
+  },
+  "災情通報的案件": {
+   "en": "Disaster reports",
+   "ja": "災害通報",
+   "vi": "Báo cáo thiên tai",
+   "id": "Laporan bencana",
+   "th": "เรื่องแจ้งภัยพิบัติ"
+  },
+  "現在沒有進行中的任務。想做什麼，直接跟我說就可以。": {
+   "en": "There’s no task in progress right now. Just tell me what you want to do.",
+   "ja": "いま進行中のタスクはありません。やりたいことを、そのまま話しかけてください。",
+   "vi": "Hiện không có việc nào đang làm. Bạn muốn làm gì cứ nói với mình.",
+   "id": "Saat ini tidak ada tugas yang berjalan. Mau melakukan apa, langsung bilang saja.",
+   "th": "ตอนนี้ไม่มีงานที่กำลังทำอยู่ อยากทำอะไร บอกได้เลย"
+  },
+  "用你的帳號進去（登入）": {
+   "en": "Get in with your account (log in)",
+   "ja": "自分のアカウントで入る（ログイン）",
+   "vi": "Vào bằng tài khoản của bạn (đăng nhập)",
+   "id": "Masuk dengan akun Anda (login)",
+   "th": "เข้าด้วยบัญชีของคุณ (เข้าสู่ระบบ)"
+  },
+  "用手機號碼或自然人憑證，讓 App 知道是你本人在用。": {
+   "en": "Use your mobile number or Citizen Digital Certificate so the App knows it’s really you.",
+   "ja": "携帯電話番号または自然人憑証（電子証明書）を使って、ご本人が使っていることをアプリに知らせます。",
+   "vi": "Dùng số điện thoại hoặc chứng thư số công dân để App biết đúng là bạn đang dùng.",
+   "id": "Pakai nomor ponsel atau sertifikat digital warga agar App tahu bahwa ini benar-benar Anda.",
+   "th": "ใช้เบอร์มือถือหรือใบรับรองดิจิทัลประชาชน เพื่อให้แอปรู้ว่าคุณเป็นคนใช้จริง"
+  },
+  "確認是你本人（身分驗證）": {
+   "en": "Confirm it’s you (identity verification)",
+   "ja": "ご本人であることの確認（本人確認）",
+   "vi": "Xác nhận là chính bạn (xác minh danh tính)",
+   "id": "Pastikan ini Anda (verifikasi identitas)",
+   "th": "ยืนยันว่าเป็นคุณ (ยืนยันตัวตน)"
+  },
+  "示範據點 A": {
+   "en": "Demo site A",
+   "ja": "デモ拠点 A",
+   "vi": "Điểm mẫu A",
+   "id": "Lokasi demo A",
+   "th": "จุดสาธิต A"
+  },
+  "示範據點 B": {
+   "en": "Demo site B",
+   "ja": "デモ拠点 B",
+   "vi": "Điểm mẫu B",
+   "id": "Lokasi demo B",
+   "th": "จุดสาธิต B"
+  },
+  "示範據點 C": {
+   "en": "Demo site C",
+   "ja": "デモ拠点 C",
+   "vi": "Điểm mẫu C",
+   "id": "Lokasi demo C",
+   "th": "จุดสาธิต C"
+  },
+  "示範資料，不是真實據點。正式版會使用「臺北市老人共餐單位一覽表」。": {
+   "en": "This is demo data, not real sites. The full version will use the “Taipei City list of senior group meal sites”.",
+   "ja": "デモデータで、実在の拠点ではありません。正式版では「台北市高齢者会食拠点一覧」を使います。",
+   "vi": "Đây là dữ liệu mẫu, không phải địa điểm thật. Bản chính thức sẽ dùng “Danh sách điểm bữa ăn chung cho người cao tuổi của Thành phố Đài Bắc”.",
+   "id": "Ini data demo, bukan lokasi sungguhan. Versi resmi akan memakai “Daftar lokasi makan bersama lansia Kota Taipei”.",
+   "th": "นี่เป็นข้อมูลสาธิต ไม่ใช่จุดจริง เวอร์ชันจริงจะใช้ “รายชื่อจุดบริการอาหารร่วมกันสำหรับผู้สูงอายุของเมืองไทเป”"
+  },
+  "繳費單上常常會印一個。": {
+   "en": "Bills often have one printed on them.",
+   "ja": "請求書によく印刷されています。",
+   "vi": "Hóa đơn thanh toán thường có in một mã như vậy.",
+   "id": "Sering tercetak di tagihan.",
+   "th": "ใบแจ้งชำระเงินมักพิมพ์ไว้หนึ่งอัน"
+  },
+  "老人共餐": {
+   "en": "Senior group meals",
+   "ja": "高齢者の会食",
+   "vi": "Bữa ăn chung cho người cao tuổi",
+   "id": "Makan bersama lansia",
+   "th": "อาหารร่วมกันสำหรับผู้สูงอายุ"
+  },
+  "臺北市有老人共餐據點，可以跟別人一起吃飯、聊天。下面是大安區的例子。": {
+   "en": "Taipei City has senior group meal sites where you can eat and chat with others. Below are examples in Da’an District.",
+   "ja": "台北市には高齢者の会食拠点があり、ほかの人と一緒に食事やおしゃべりができます。下は大安区の例です。",
+   "vi": "Thành phố Đài Bắc có các điểm bữa ăn chung cho người cao tuổi, nơi bạn có thể cùng ăn và trò chuyện với mọi người. Dưới đây là ví dụ ở quận Đại An.",
+   "id": "Kota Taipei punya lokasi makan bersama lansia, tempat Anda bisa makan dan mengobrol dengan orang lain. Di bawah ini contoh di Distrik Da’an.",
+   "th": "เมืองไทเปมีจุดบริการอาหารร่วมกันสำหรับผู้สูงอายุ ไปกินข้าวและพูดคุยกับคนอื่นได้ ด้านล่างเป็นตัวอย่างในเขตต้าอัน"
+  },
+  "要回去接著{short}嗎？": {
+   "en": "Go back to “{short}”?",
+   "ja": "戻って「{short}」の続きをしますか？",
+   "vi": "Quay lại làm tiếp “{short}” không?",
+   "id": "Kembali melanjutkan “{short}”?",
+   "th": "จะกลับไปทำ “{short}” ต่อไหม"
+  },
+  "要按亮起來的地方喔。想先自己操作，可以按「暫停」。": {
+   "en": "Please tap the highlighted spot. If you’d rather do it yourself first, tap “Pause”.",
+   "ja": "光っている所を押してください。先にご自分で操作したいときは「一時停止」を押してください。",
+   "vi": "Hãy chạm vào chỗ đang sáng nhé. Muốn tự thao tác trước thì chạm “Tạm dừng”.",
+   "id": "Ketuk bagian yang menyala, ya. Kalau mau melakukannya sendiri dulu, ketuk “Jeda”.",
+   "th": "ต้องแตะตรงที่สว่างอยู่นะ ถ้าอยากทำเองก่อน กด “หยุดชั่วคราว”"
+  },
+  "語音辨識沒有成功，請再說一次，或按右邊的鍵盤打字。": {
+   "en": "Speech recognition did not work. Please say it again, or tap the keyboard on the right to type.",
+   "ja": "音声を認識できませんでした。もう一度話すか、右のキーボードで入力してください。",
+   "vi": "Nhận dạng giọng nói không thành công. Hãy nói lại, hoặc chạm bàn phím bên phải để gõ.",
+   "id": "Pengenalan suara gagal. Silakan ucapkan lagi, atau ketuk keyboard di sebelah kanan untuk mengetik.",
+   "th": "จดจำเสียงไม่สำเร็จ โปรดพูดอีกครั้ง หรือแตะแป้นพิมพ์ทางขวาเพื่อพิมพ์"
+  },
+  "輸入你的帳號，讓 App 知道是誰在用，才能看到你自己的資料。": {
+   "en": "Enter your account so the App knows who is using it and can show your own information.",
+   "ja": "アカウントを入力すると、アプリが誰が使っているかわかり、ご自分の情報を見られるようになります。",
+   "vi": "Nhập tài khoản của bạn để App biết ai đang dùng, như vậy mới xem được thông tin của chính bạn.",
+   "id": "Masukkan akun Anda agar App tahu siapa yang memakai, sehingga Anda bisa melihat data Anda sendiri.",
+   "th": "ใส่บัญชีของคุณ เพื่อให้แอปรู้ว่าใครใช้อยู่ จึงจะดูข้อมูลของตัวเองได้"
+  },
+  "這個 App 還沒串好這項服務，可以打 1999 問。": {
+   "en": "This App isn’t connected to this service yet. You can call 1999 to ask.",
+   "ja": "このアプリはまだこのサービスにつながっていません。1999 に電話して聞いてください。",
+   "vi": "App này chưa kết nối với dịch vụ này, bạn có thể gọi 1999 để hỏi.",
+   "id": "App ini belum terhubung dengan layanan ini. Anda bisa menelepon 1999 untuk bertanya.",
+   "th": "แอปนี้ยังไม่ได้เชื่อมต่อบริการนี้ โทร 1999 เพื่อสอบถามได้"
+  },
+  "這個我不確定。你可以打 1999 市民熱線問真人。": {
+   "en": "I’m not sure about this. You can call the 1999 citizen hotline to ask a real person.",
+   "ja": "これについてはよくわかりません。1999 市民ホットラインに電話して、担当の人に聞いてください。",
+   "vi": "Việc này mình không chắc. Bạn có thể gọi đường dây nóng 1999 để hỏi người thật.",
+   "id": "Saya kurang yakin soal ini. Anda bisa menelepon layanan warga 1999 untuk bertanya langsung ke petugas.",
+   "th": "เรื่องนี้ไม่แน่ใจ โทรสายด่วนประชาชน 1999 เพื่อถามเจ้าหน้าที่ตัวจริงได้"
+  },
+  "這個詞我還不會解釋。你可以說說看是在哪裡看到的，或打 1999 問真人。": {
+   "en": "I can’t explain this word yet. Tell me where you saw it, or call 1999 to ask a real person.",
+   "ja": "この言葉はまだ説明できません。どこで見たか教えてもらうか、1999 に電話して担当の人に聞いてください。",
+   "vi": "Từ này mình chưa giải thích được. Bạn thử nói xem đã thấy nó ở đâu, hoặc gọi 1999 để hỏi người thật.",
+   "id": "Saya belum bisa menjelaskan kata ini. Coba ceritakan di mana Anda melihatnya, atau telepon 1999 untuk bertanya ke petugas.",
+   "th": "คำนี้ยังอธิบายไม่ได้ ลองบอกว่าเห็นที่ไหน หรือโทร 1999 เพื่อถามเจ้าหน้าที่ตัวจริง"
+  },
+  "這是臺北通的首頁": {
+   "en": "This is the Taipei Pass home page",
+   "ja": "これは台北通のホーム画面です",
+   "vi": "Đây là trang chủ của Taipei Pass",
+   "id": "Ini beranda Taipei Pass",
+   "th": "นี่คือหน้าแรกของ Taipei Pass"
+  },
+  "這頁我還不熟。你想在這裡做什麼呢？": {
+   "en": "I don’t know this page well yet. What would you like to do here?",
+   "ja": "このページはまだよく知りません。ここで何をしたいですか？",
+   "vi": "Trang này mình chưa rành lắm. Bạn muốn làm gì ở đây?",
+   "id": "Saya belum terlalu mengenal halaman ini. Anda ingin melakukan apa di sini?",
+   "th": "หน้านี้ยังไม่ค่อยคุ้น คุณอยากทำอะไรที่นี่"
+  },
+  "選家裡附近的分館最方便。": {
+   "en": "A branch near your home is the easiest.",
+   "ja": "家の近くの分館を選ぶのがいちばん便利です。",
+   "vi": "Chọn chi nhánh gần nhà là tiện nhất.",
+   "id": "Paling mudah pilih cabang yang dekat rumah.",
+   "th": "เลือกสาขาใกล้บ้านสะดวกที่สุด"
+  },
+  "選第 1 冊或第 2 冊都可以，內容一樣。": {
+   "en": "Copy 1 or copy 2 are both fine. They are the same book.",
+   "ja": "1 冊目でも 2 冊目でも大丈夫です。内容は同じです。",
+   "vi": "Chọn bản số 1 hay bản số 2 đều được, nội dung như nhau.",
+   "id": "Pilih eksemplar 1 atau 2 sama saja, isinya sama.",
+   "th": "เลือกเล่มที่ 1 หรือเล่มที่ 2 ก็ได้ เนื้อหาเหมือนกัน"
+  },
+  "附近哪裡有老人共餐": {
+   "en": "Where are senior group meals near me?",
+   "ja": "近くで高齢者の会食はどこにありますか",
+   "vi": "Gần đây có bữa ăn chung cho người cao tuổi ở đâu?",
+   "id": "Di mana ada makan bersama lansia di dekat sini?",
+   "th": "แถวนี้มีอาหารร่วมกันสำหรับผู้สูงอายุที่ไหน"
+  },
+  "陳情的案件": {
+   "en": "Complaints",
+   "ja": "陳情",
+   "vi": "Phản ánh",
+   "id": "Keluhan",
+   "th": "เรื่องร้องเรียน"
+  },
+  "需要麥克風權限才能用語音。可以到手機設定開啟，或按右邊的鍵盤打字。": {
+   "en": "Voice input needs microphone permission. Turn it on in the phone settings, or tap the keyboard on the right to type.",
+   "ja": "音声入力にはマイクの許可が必要です。スマートフォンの設定で許可するか、右のキーボードで入力してください。",
+   "vi": "Cần quyền micrô để dùng giọng nói. Hãy bật trong cài đặt điện thoại, hoặc chạm bàn phím bên phải để gõ.",
+   "id": "Input suara memerlukan izin mikrofon. Aktifkan di pengaturan ponsel, atau ketuk keyboard di sebelah kanan untuk mengetik.",
+   "th": "ต้องอนุญาตไมโครโฟนจึงจะใช้เสียงได้ เปิดได้ในการตั้งค่าโทรศัพท์ หรือแตะแป้นพิมพ์ทางขวาเพื่อพิมพ์"
+  },
+  "預約": {
+   "en": "Reserve",
+   "ja": "予約",
+   "vi": "Đặt trước",
+   "id": "Pesan (reservasi)",
+   "th": "จอง"
+  },
+  "預約不是馬上借到，要等通知再去拿。": {
+   "en": "Reserving doesn’t mean you get the book right away. Wait for the notice, then go and get it.",
+   "ja": "予約してもすぐには借りられません。通知が来てから受け取りに行きます。",
+   "vi": "Đặt trước không phải mượn được ngay, phải chờ thông báo rồi mới đến lấy.",
+   "id": "Memesan tidak berarti langsung dapat bukunya. Tunggu pemberitahuan, baru ambil.",
+   "th": "การจองไม่ได้ยืมได้ทันที ต้องรอแจ้งก่อนแล้วค่อยไปรับ"
+  },
+  "預約是先幫你把書留下來。等圖書館通知書到了，再去你選的取書館，把書借回家。": {
+   "en": "Reserving means the book is held for you first. When the library tells you it has arrived, go to the pickup library you chose and borrow it.",
+   "ja": "予約とは、本を取り置いてもらうことです。図書館から本が届いたと通知が来たら、選んだ受取館に行って本を借ります。",
+   "vi": "Đặt trước là giữ sách lại cho bạn trước. Khi thư viện báo sách đã về, hãy đến thư viện nhận sách bạn đã chọn để mượn về nhà.",
+   "id": "Memesan artinya buku disimpankan untuk Anda dulu. Saat perpustakaan memberi tahu bukunya sudah tiba, datang ke perpustakaan pengambilan yang Anda pilih untuk meminjamnya.",
+   "th": "การจองคือการกันหนังสือไว้ให้คุณก่อน เมื่อห้องสมุดแจ้งว่าหนังสือมาถึงแล้ว ค่อยไปยืมที่ห้องสมุดที่คุณเลือกไว้"
+  },
+  "館藏": {
+   "en": "Library holdings",
+   "ja": "所蔵",
+   "vi": "Sách lưu trữ của thư viện",
+   "id": "Koleksi perpustakaan",
+   "th": "หนังสือในคลังห้องสมุด"
+  },
+  "館藏就是圖書館裡收藏的書。查館藏，就是看看圖書館有沒有這本書。": {
+   "en": "Holdings are the books a library keeps. Checking the holdings means seeing whether the library has the book.",
+   "ja": "所蔵とは、図書館が持っている本のことです。所蔵を調べるとは、図書館にその本があるか見ることです。",
+   "vi": "Sách lưu trữ là sách mà thư viện đang có. Tra sách lưu trữ là xem thư viện có cuốn sách đó không.",
+   "id": "Koleksi adalah buku-buku yang dimiliki perpustakaan. Mencari koleksi artinya melihat apakah perpustakaan punya buku itu.",
+   "th": "หนังสือในคลังคือหนังสือที่ห้องสมุดเก็บไว้ ค้นหนังสือในคลังก็คือดูว่าห้องสมุดมีหนังสือเล่มนี้ไหม"
+  },
+  "（目前連不到助理的模型，先用示範內容回答。）": {
+   "en": "(The Assistant’s model can’t be reached right now, so this answer uses demo content.)",
+   "ja": "（現在アシスタントのモデルに接続できないため、デモの内容でお答えします。）",
+   "vi": "(Hiện không kết nối được với mô hình của trợ lý, tạm trả lời bằng nội dung mẫu.)",
+   "id": "(Model asisten sedang tidak bisa dihubungi, jadi jawaban ini memakai konten demo.)",
+   "th": "(ตอนนี้เชื่อมต่อโมเดลของผู้ช่วยไม่ได้ จึงตอบด้วยเนื้อหาสาธิตไปก่อน)"
+  },
+  "（示範版）語音辨識還沒接上，請點上面的選項，或按右邊的鍵盤打字。": {
+   "en": "(Demo version) Speech recognition isn’t connected yet. Tap an option above, or tap the keyboard on the right to type.",
+   "ja": "（デモ版）音声認識はまだつながっていません。上の選択肢をタップするか、右のキーボードで入力してください。",
+   "vi": "(Bản mẫu) Nhận dạng giọng nói chưa được kết nối, hãy chạm lựa chọn ở trên, hoặc chạm bàn phím bên phải để gõ.",
+   "id": "(Versi demo) Pengenalan suara belum terhubung. Ketuk pilihan di atas, atau ketuk keyboard di sebelah kanan untuk mengetik.",
+   "th": "(เวอร์ชันสาธิต) ยังไม่ได้เชื่อมต่อการจดจำเสียง แตะตัวเลือกด้านบน หรือแตะแป้นพิมพ์ทางขวาเพื่อพิมพ์"
+  }
+ }
+}

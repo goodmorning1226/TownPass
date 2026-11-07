@@ -1,4 +1,5 @@
 import 'package:town_pass/page/guided_assistant/model/guide_content.dart';
+import 'package:town_pass/page/guided_assistant/model/guide_i18n.dart';
 import 'package:town_pass/page/guided_assistant/model/guide_page.dart';
 import 'package:town_pass/page/guided_assistant/web/web_guide_probe.dart';
 import 'package:town_pass/page/guided_assistant/web/web_page_state.dart';
@@ -64,7 +65,7 @@ const _fieldInfo = r'''((f) => {
     if (p.tagName === 'P' && !p.classList.contains('field-label')) { hint = txt(p); break; }
     if (p.tagName === 'LABEL' || p.tagName === 'INPUT') break;
   }
-  const name = txt(label) || (f.placeholder || '').replace(/^請(輸入|選擇)/, '') ||
+  const name = txt(label) || (ph(f) || '').replace(/^請(輸入|選擇)/, '') ||
     (hint ? '' : txt(g && g.querySelector('.field-label')));
   return { kind: f.tagName === 'SELECT' ? 'select' : 'text', name, hint, choices: '' };
 })''';
@@ -101,7 +102,7 @@ const feesPageSpec = WebPageSpec(
     'fees.paid_info': "location.pathname.includes('/fee-payment-finished/') ? qa('#app li.flex.justify-between').filter(shown) : null",
   },
   flags: {
-    'feeName': r"""(() => { if (location.pathname.includes('/detail/')) return txt(q('section.fixed.top-0 .font-bold')); const m = ((q('#app') || {}).innerText || '').match(/繳費項目\s*\n+\s*(?!繳費項目)([^\n]+)/); return m ? m[1].trim() : ''; })()""",
+    'feeName': r"""(() => { if (location.pathname.includes('/detail/')) return txt(q('section.fixed.top-0 .font-bold')); const m = orig(q('#app')).match(/繳費項目\s*\n+\s*(?!繳費項目)([^\n]+)/); return m ? m[1].trim() : ''; })()""",
     'firstTab': "txt(q('section.tabs > button.tab-label'))",
     'onInputTab': "(() => { const t = q('section.tabs > button.tab-label'); return !!t && t.classList.contains('tab-label--active'); })()",
     'hasFields':
@@ -116,15 +117,15 @@ const feesPageSpec = WebPageSpec(
     'alertText': r"""(() => { const p = dialog('提醒'); if (!p) return ''; return txt(p).split('\n').map((x) => x.trim()).filter((x) => x && x !== '提醒' && x !== '確認')[0] || ''; })()""",
     'groupOpen': "qa('ul > li.mb-3 > a').filter(shown).some(opened)",
     'bills': "qa('section.p-4.mt-16 > div.rounded').filter(shown).length",
-    'selected': r"""(() => { const m = ((q('#app') || {}).innerText || '').match(/繳費選擇\((\d+)\/(\d+)\)/); return m ? Number(m[1]) : 0; })()""",
+    'selected': r"""(() => { const m = orig(q('#app')).match(/繳費選擇\((\d+)\/(\d+)\)/); return m ? Number(m[1]) : 0; })()""",
     'total': r"""(() => { const m = txt(q('div.fixed.bottom-0')).match(/NT\$\s*[\d,]+/); return m ? m[0].replace(/\s+/g, ' ') : ''; })()""",
-    'amount': r"""(() => { const m = ((q('#app') || {}).innerText || '').match(/帳單總金額\s*\n+\s*([^\n]+)/); return m ? m[1].trim() : ''; })()""",
+    'amount': r"""(() => { const m = orig(q('#app')).match(/帳單總金額\s*\n+\s*([^\n]+)/); return m ? m[1].trim() : ''; })()""",
     'payEnabled': "(() => { const b = q('div.fixed.bottom-0 button.base-button'); return !!b && !b.classList.contains('base-button--disabled'); })()",
     'methodsBelow': "qa('div.grid.grid-cols-2 > button.rounded-md').filter(shown).some((b) => b.getBoundingClientRect().bottom > innerHeight)",
     'payConfirm': "!!dialogButton('提醒', '是')",
     'paid': "location.pathname.includes('/fee-payment-finished/')",
-    'paidMethod': r"""(() => { const m = ((q('#app') || {}).innerText || '').match(/付款方式\s*\n+\s*([^\n]+)/); return m ? m[1].trim() : ''; })()""",
-    'noRecords': "((q('#app') || {}).innerText || '').includes('目前無繳費紀錄')",
+    'paidMethod': r"""(() => { const m = orig(q('#app')).match(/付款方式\s*\n+\s*([^\n]+)/); return m ? m[1].trim() : ''; })()""",
+    'noRecords': "orig(q('#app')).includes('目前無繳費紀錄')",
     'filtered': "(() => { const s = qa('select.base-select'); return s.length === 3 && (s[0].value !== '1' || s[1].value !== 'all' || s[2].value !== 'all'); })()",
   },
   latchFlags: {'paid'},
@@ -155,17 +156,19 @@ bool _scanTab(WebPageState s) =>
 
 String _fee(WebPageState s) {
   final name = s.now.text('feeName');
-  return name.isEmpty ? '這筆費用' : '「$name」';
+  return name.isEmpty ? gt('這筆費用') : gt('「{name}」', {'name': pg(name)});
 }
 
 String _alertCard(WebPageState s) {
   final text = s.now.text('alertText');
-  final said = text.isEmpty ? '畫面跳出提醒' : '畫面說「$text」';
+  final said = text.isEmpty
+      ? gt('畫面跳出提醒')
+      : gt('畫面說「{text}」', {'text': pg(text)});
   // Still on the typing step: the box was left empty.
   if (!s.now.flag('filled')) {
-    return '$said。號碼還沒打好喔，先按「確認」關掉，再把帳單上的號碼打進框框。';
+    return gt('{said}。號碼還沒打好喔，先按「確認」關掉，再把帳單上的號碼打進框框。', {'said': said});
   }
-  return '$said。先按「確認」關掉，再檢查一下號碼有沒有打錯、有沒有多打空白。';
+  return gt('{said}。先按「確認」關掉，再檢查一下號碼有沒有打錯、有沒有多打空白。', {'said': said});
 }
 
 /// Above the 提醒 dialog (it sits in the middle of the screen).
@@ -177,21 +180,27 @@ String _fieldCard(WebPageState s) {
   switch (s.now.text('fieldKind')) {
     case 'choice':
       final choices = s.now.text('fieldChoices').split('|');
-      return '先選一個：點「${choices.join('」或「')}」。';
+      return gt('先選一個：點「{choices}」。', {
+        'choices': choices.map(pg).join(gt('」或「')),
+      });
     case 'select':
-      return '點一下「$name」，選一個。';
+      return gt('點一下「{name}」，選一個。', {'name': pg(name)});
   }
   if (hint.startsWith('範例')) {
     final sample = hint
         .replaceFirst(RegExp(r'^範例[:：]\s*'), '')
         .replaceAll(RegExp(r'[（(]含分隔符號[)）]'), '');
-    final dash = hint.contains('分隔符號') ? '中間的符號也要打。' : '';
+    final dash = hint.contains('分隔符號') ? gt('中間的符號也要打。') : '';
     return name.isEmpty
-        ? '點一下框框，照這個樣子打：「$sample」，$dash'
-        : '點一下「$name」的框框，照這個樣子打：「$sample」，$dash';
+        ? gt('點一下框框，照這個樣子打：「{sample}」，{dash}', {'sample': sample, 'dash': dash})
+        : gt('點一下「{name}」的框框，照這個樣子打：「{sample}」，{dash}', {
+            'name': pg(name),
+            'sample': sample,
+            'dash': dash,
+          });
   }
   if (name.isEmpty) return '點一下亮起來的框框，照帳單上的號碼打進去。';
-  return '點一下框框，打上帳單上的「$name」。';
+  return gt('點一下框框，打上帳單上的「{name}」。', {'name': pg(name)});
 }
 
 final List<GuideComponent> feesComponents = [
@@ -247,17 +256,24 @@ final List<GuideComponent> feesComponents = [
           if (_alert(s)) return _alertCard(s);
           if (_scanTab(s)) {
             final tab = s.now.text('firstTab');
-            return '這裡是用相機掃描的。點上面的「${tab.isEmpty ? '輸入資料' : tab}」，改用打字的。';
+            return gt('這裡是用相機掃描的。點上面的「{tab}」，改用打字的。', {
+              'tab': pg(tab.isEmpty ? '輸入資料' : tab),
+            });
           }
           return _fieldCard(s);
         },
         detail: (s) {
           final hint = s.now.text('fieldHint');
           final name = s.now.text('fieldName');
-          final where = name.isEmpty ? '號碼' : '「$name」';
+          final where = name.isEmpty
+              ? gt('號碼')
+              : gt('「{name}」', {'name': pg(name)});
           return hint.isEmpty || hint.startsWith('範例')
-              ? '$where印在帳單上。點一下亮起來的框框，照帳單打進去。'
-              : '$where印在帳單上（$hint）。點一下亮起來的框框，照帳單打進去。';
+              ? gt('{where}印在帳單上。點一下亮起來的框框，照帳單打進去。', {'where': where})
+              : gt('{where}印在帳單上（{hint}）。點一下亮起來的框框，照帳單打進去。', {
+                  'where': where,
+                  'hint': pg(hint),
+                });
         },
         isDone: (s) =>
             _stage(s) > 1 || _paid(s) || (_onDetail(s) && s.now.flag('filled')),
@@ -280,8 +296,9 @@ final List<GuideComponent> feesComponents = [
         target: (s) => _alert(s) ? 'fees.alert_ok' : 'fees.query',
         arrow: (s) => !_alert(s),
         label: (_) => '點一下',
-        card: (s) =>
-            _alert(s) ? _alertCard(s) : '打好了！按下面的「查詢」，看看${_fee(s)}要繳多少錢。',
+        card: (s) => _alert(s)
+            ? _alertCard(s)
+            : gt('打好了！按下面的「查詢」，看看{fee}要繳多少錢。', {'fee': _fee(s)}),
         detail: (_) => '按畫面最下面的「查詢」。',
         isDone: (s) => _stage(s) >= 2 || _paid(s),
         cardTop: _alertTop,
@@ -316,7 +333,7 @@ final List<GuideComponent> feesComponents = [
             return '這次沒有查到要繳的帳單。按左上角的「‹」回上一頁，檢查號碼再查一次。';
           }
           if (n == 1) return '查到 1 張帳單！看一下繳費期限和金額，點右邊的小方框打勾。';
-          return '查到 $n 張帳單。上下滑動看看，在要繳的帳單右邊打勾；全部都要繳，可以按「全部繳清」。';
+          return gt('查到 {n} 張帳單。上下滑動看看，在要繳的帳單右邊打勾；全部都要繳，可以按「全部繳清」。', {'n': n});
         },
         detail: (_) => '在帳單右邊的小方框打勾。沒有帳單的話，回上一頁檢查號碼。',
         isDone: (s) =>
@@ -345,7 +362,7 @@ final List<GuideComponent> feesComponents = [
           final total = s.now.text('total');
           return total.isEmpty
               ? '選好了！按下面的「前往繳費」。'
-              : '選好了！總金額是 $total。按下面的「前往繳費」。';
+              : gt('選好了！總金額是 {total}。按下面的「前往繳費」。', {'total': total});
         },
         detail: (_) => '按畫面最下面的「前往繳費」。',
         isDone: (s) => _stage(s) >= 3 || _paid(s),
@@ -395,7 +412,10 @@ final List<GuideComponent> feesComponents = [
       if (method.isEmpty || amount.isEmpty) {
         return '繳好了！畫面寫「繳費完成」。這是示範網站，沒有真的扣款喔。';
       }
-      return '繳好了！用「$method」繳了 $amount。這是示範網站，沒有真的扣款喔。';
+      return gt('繳好了！用「{method}」繳了 {amount}。這是示範網站，沒有真的扣款喔。', {
+        'method': pg(method),
+        'amount': amount,
+      });
     },
     steps: [
       GuideStep(
@@ -406,8 +426,13 @@ final List<GuideComponent> feesComponents = [
         label: (_) => '確認',
         card: (s) {
           final amount = s.now.text('amount');
-          final what = amount.isEmpty ? _fee(s) : '${_fee(s)}，$amount';
-          return '最後確認一下：要繳的是$what。畫面提醒要在 10 分鐘內付完。沒問題就自己按「是」喔。這是示範網站，不會真的扣款。';
+          final what = amount.isEmpty
+              ? _fee(s)
+              : gt('{fee}，{amount}', {'fee': _fee(s), 'amount': amount});
+          return gt(
+            '最後確認一下：要繳的是{what}。畫面提醒要在 10 分鐘內付完。沒問題就自己按「是」喔。這是示範網站，不會真的扣款。',
+            {'what': what},
+          );
         },
         detail: (_) => '看一下費用和金額對不對，沒問題就自己按「是」；不想繳就按「否」。',
         isDone: _paid,
@@ -495,7 +520,7 @@ GuideTexts _feesTexts(List<String> plan, GuideComponent last) {
       resumeLabel: '回到繳費',
       backLabel: '回到繳費畫面',
       openedText: '好的！已經幫你打開繳費頁面，我會在畫面上一步一步帶你做。',
-      openedCard: '好的！繳費頁面打開了，我們一起來${last.taskTitle}。',
+      openedCard: gt('好的！繳費頁面打開了，我們一起來{task}。', {'task': gt(last.taskTitle)}),
       helpChips: const ['下一步要做什麼？', '我要繳水費'],
     );
   }

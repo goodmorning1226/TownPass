@@ -1,4 +1,5 @@
 import 'package:town_pass/page/guided_assistant/model/guide_content.dart';
+import 'package:town_pass/page/guided_assistant/model/guide_i18n.dart';
 import 'package:town_pass/page/guided_assistant/model/guide_page.dart';
 import 'package:town_pass/page/guided_assistant/web/web_guide_probe.dart';
 import 'package:town_pass/page/guided_assistant/web/web_page_state.dart';
@@ -42,21 +43,20 @@ const libraryPageSpec = WebPageSpec(
     'library.reserve_list': "dialogButton('預約失敗', '查看預約清單') || dialog('預約失敗')",
   },
   flags: {
-    'tab': "(q('section.tabs > .tab-label--active') || {}).innerText || ''",
+    'tab': "orig(q('section.tabs > .tab-label--active'))",
     'input': "(q('input.base-input') || {}).value || ''",
     'results': "qa('#app a.item').filter(shown).length",
     'branch': "(q('div.fixed.bottom-0 select') || {}).value || ''",
-    'branchName': "(() => { const s = q('div.fixed.bottom-0 select'); return s && s.value && s.selectedIndex >= 0 ? s.options[s.selectedIndex].text : ''; })()",
+    'branchName': "(() => { const s = q('div.fixed.bottom-0 select'); return s && s.value && s.selectedIndex >= 0 ? optText(s.options[s.selectedIndex]) : ''; })()",
     'branchList': "!!byText('[id^=\"headlessui-dialog-title\"]', '請選擇取書館')",
     'reserveEnabled': "(() => { const b = q('div.fixed.bottom-0 button.base-button'); return !!b && !b.classList.contains('base-button--disabled'); })()",
     'reserved': "!!byText('[id^=\"headlessui-dialog-title\"]', '預約成功')",
     'reserveFailed': "!!byText('[id^=\"headlessui-dialog-title\"]', '預約失敗')",
-    'failReason': "(() => { const t = byText('[id^=\"headlessui-dialog-title\"]', '預約失敗'); const p = t && t.closest('[id^=\"headlessui-dialog-panel\"]'); const l = p && (p.innerText || '').split('\\n').map((x) => x.trim()).find((x) => x.startsWith('原因')); return l ? l.replace(/^原因[:：]\\s*/, '') : ''; })()",
+    'failReason': "(() => { const t = byText('[id^=\"headlessui-dialog-title\"]', '預約失敗'); const p = t && t.closest('[id^=\"headlessui-dialog-panel\"]'); const l = p && orig(p).split('\\n').map((x) => x.trim()).find((x) => x.startsWith('原因')); return l ? l.replace(/^原因[:：]\\s*/, '') : ''; })()",
     // The book page says it cannot be reserved (no 取書館 field).
-    'notReservable':
-        "/不提供預約|不可預約|無法預約|不開放預約/.test((q('#app') || {}).innerText || '')",
+    'notReservable': "/不提供預約|不可預約|無法預約|不開放預約/.test(orig(q('#app')))",
     'dialogOpen': "qa('[id^=\"headlessui-dialog-panel\"]').some(shown)",
-    'bookTitle': "((q('#app .h-screen') || {}).innerText || '').split('\\n').map((l) => l.trim()).find((l) => l) || ''",
+    'bookTitle': "orig(q('#app .h-screen')).split('\\n').map((l) => l.trim()).find((l) => l) || ''",
     'pickupOpen': "(() => { const b = byText('li > button', '可取書'); const n = b && b.nextElementSibling; return !!n && n.getBoundingClientRect().height > 4; })()",
   },
   latchFlags: {'reserved', 'reserveFailed'},
@@ -252,7 +252,9 @@ final List<GuideComponent> libraryComponents = [
       final reason = s.now.text('failReason');
       return reason.isEmpty
           ? '這次沒有預約成功，畫面上有寫原因。可以按「查看預約清單」看看，或換一本書。'
-          : '這次沒有預約成功，原因是「$reason」。可以按「查看預約清單」看看，或換一本書。';
+          : gt('這次沒有預約成功，原因是「{reason}」。可以按「查看預約清單」看看，或換一本書。', {
+              'reason': pg(reason),
+            });
     },
     steps: [
       GuideStep(
@@ -262,9 +264,16 @@ final List<GuideComponent> libraryComponents = [
         card: (s) {
           final book = s.now.text('bookTitle');
           final branch = s.now.text('branchName');
-          final what = book.isEmpty ? '這本書' : '《$book》';
-          final where = branch.isEmpty ? '你選的取書館' : '「$branch」';
-          return '最後確認一下：預約$what，在$where拿書。沒問題就自己按「預約」喔。';
+          final what = book.isEmpty
+              ? gt('這本書')
+              : gt('《{book}》', {'book': pg(book)});
+          final where = branch.isEmpty
+              ? gt('你選的取書館')
+              : gt('「{branch}」', {'branch': pg(branch)});
+          return gt('最後確認一下：預約{what}，在{where}拿書。沒問題就自己按「預約」喔。', {
+            'what': what,
+            'where': where,
+          });
         },
         detail: (_) => '看一下書名和取書館對不對，沒問題就自己按「預約」。',
         isDone: (s) => s.latched('reserved') || s.latched('reserveFailed'),
@@ -473,7 +482,7 @@ GuideTexts _libraryTexts(List<String> plan, GuideComponent last) {
         : '好的！已經幫你打開圖書館服務，我會在畫面上一步一步帶你做。',
     openedCard: reserving
         ? '好的！圖書館服務打開了，我們一起找書吧。'
-        : '好的！圖書館服務打開了，我們一起來${last.taskTitle}。',
+        : gt('好的！圖書館服務打開了，我們一起來{task}。', {'task': gt(last.taskTitle)}),
     helpChips: reserving
         ? const ['什麼是館藏？', '預約和借書一樣嗎？', '下一步要做什麼？']
         : const ['下一步要做什麼？', '我要借書'],
