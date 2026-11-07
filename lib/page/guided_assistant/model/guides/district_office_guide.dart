@@ -359,11 +359,16 @@ bool _sectionDone(WebPageState s, String sec) =>
     _step2(s) ||
     (_step1(s) && s.now.text('${sec}Kind').isEmpty && _popupTarget(s) == null);
 
+/// A guide opened straight on a form has no open_service step: on the home
+/// page (the user went back) its first fill step points at the list the way
+/// open_service does.
 GuideStep _fillStep(String sec) => GuideStep(
-  target: (s) => _formTarget(s, sec),
-  label: (s) => _formLabel(s, sec),
-  card: (s) => _formCard(s, sec),
+  target: (s) => _home(s) ? _listTarget(s) : _formTarget(s, sec),
+  alsoUsable: const ['district.groups', 'district.search'],
+  label: (s) => _home(s) ? '點一下' : _formLabel(s, sec),
+  card: (s) => _home(s) ? _listCard(s) : _formCard(s, sec),
   detail: (s) {
+    if (_home(s)) return _listDetail;
     final warn = s.now.text('warn');
     final red = warn.isEmpty
         ? ''
@@ -374,10 +379,10 @@ GuideStep _fillStep(String sec) => GuideStep(
     });
   },
   isDone: (s) => _sectionDone(s, sec),
-  locks: (s) => _lockIfVisible(s, _formTarget(s, sec)),
-  arrow: (s) => _popupTarget(s) == 'district.item_ok',
-  scrollHint: (s) => _offScreen(s, _formTarget(s, sec)),
-  cardTop: (s) => _cardNear(s, _formTarget(s, sec)),
+  locks: (s) => _home(s) || _lockIfVisible(s, _formTarget(s, sec)),
+  arrow: (s) => _home(s) ? _queryTab(s) : _popupTarget(s) == 'district.item_ok',
+  scrollHint: (s) => !_home(s) && _offScreen(s, _formTarget(s, sec)),
+  cardTop: (s) => _cardNear(s, _home(s) ? _listTarget(s) : _formTarget(s, sec)),
 );
 
 // ---- Home ------------------------------------------------------------------
@@ -394,6 +399,25 @@ String? _searchTarget(WebPageState s) {
 }
 
 const _applyTabCard = '這裡是「查詢」。先點上面的「申辦」，回到申請項目。';
+
+/// open_service's card on the 申辦 list.
+String _listCard(WebPageState s) {
+  if (_queryTab(s)) return _applyTabCard;
+  final again = s.latched('formSeen') ? gt('你回到申辦首頁了。') : '';
+  if (s.now.number('itemCount') > 0) {
+    final first = s.now.text('firstItem');
+    final example = first.isEmpty
+        ? ''
+        : gt('，例如「{first}」', {'first': pg(first)});
+    return gt('{again}點你要申請的那一項{example}。', {
+      'again': again,
+      'example': example,
+    });
+  }
+  return gt('{again}你想申請什麼？先點一個大類打開來看：「申訴類」或「補助類」。', {'again': again});
+}
+
+const _listDetail = '點「申訴類」或「補助類」打開清單，再點你要申請的項目。也可以在上面的框框打關鍵字找。';
 
 // ---- 查詢 tab ---------------------------------------------------------------
 
@@ -516,22 +540,8 @@ final List<GuideComponent> districtOfficeComponents = [
         alsoUsable: const ['district.groups', 'district.search'],
         arrow: (s) => _queryTab(s),
         label: (_) => '點一下',
-        card: (s) {
-          if (_queryTab(s)) return _applyTabCard;
-          final again = s.latched('formSeen') ? gt('你回到申辦首頁了。') : '';
-          if (s.now.number('itemCount') > 0) {
-            final first = s.now.text('firstItem');
-            final example = first.isEmpty
-                ? ''
-                : gt('，例如「{first}」', {'first': pg(first)});
-            return gt('{again}點你要申請的那一項{example}。', {
-              'again': again,
-              'example': example,
-            });
-          }
-          return gt('{again}你想申請什麼？先點一個大類打開來看：「申訴類」或「補助類」。', {'again': again});
-        },
-        detail: (_) => '點「申訴類」或「補助類」打開清單，再點你要申請的項目。也可以在上面的框框打關鍵字找。',
+        card: _listCard,
+        detail: (_) => _listDetail,
         isDone: (s) => _onForm(s) || _submitted(s),
         cardTop: (s) => _cardNear(s, _listTarget(s)),
       ),
@@ -857,6 +867,19 @@ final districtOfficePage = GuidePage(
   capabilities: const ['districtOffice', 'districtOffice.progress'],
   capabilityGoals: const {
     'districtOffice.progress': ['check_progress', 'view_closed'],
+    // districtOffice.form.<id> opens that form: no search / list steps.
+    'districtOffice.form.*': [
+      'submit',
+      'fill_basic',
+      'fill_details',
+      'pick_items',
+      'pick_date',
+      'next_step',
+      'consent',
+    ],
+  },
+  capabilityDone: const {
+    'districtOffice.form.*': ['search_service', 'open_service'],
   },
   defaultDestination: const {'kind': 'capability', 'id': 'districtOffice'},
   texts: _districtTexts,
@@ -869,7 +892,9 @@ final districtOfficePage = GuidePage(
 );
 
 GuideTexts _districtTexts(List<String> plan, GuideComponent last) {
-  if (plan.contains('submit')) {
+  // Opened straight on a form (no open_service): the text below starts with
+  // choosing the item.
+  if (plan.contains('submit') && plan.contains('open_service')) {
     return const GuideTexts(
       shortName: '申辦',
       resumeLabel: '回到申辦服務',

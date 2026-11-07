@@ -55,6 +55,18 @@ PAIR = "+"
 CONTINUE_TO_DEFAULT = {"disaster_report", "fees", "district_office", "citizen_report", "police_report"}
 
 
+def for_capability(mapping, cap):
+    """mapping[cap] for a capability_goals / entry_goals / capability_done
+    table: an exact key, else the longest key ending in "*" that [cap] starts
+    with ("disasterReport.form.*" covers every disasterReport.form.D-x-y)."""
+    if not cap or not mapping:
+        return None
+    if cap in mapping:
+        return mapping[cap]
+    prefixes = [k for k in mapping if k.endswith("*") and cap.startswith(k[:-1])]
+    return mapping[max(prefixes, key=len)] if prefixes else None
+
+
 def guide_text(text):
     """The part of the request that says what to do (the page stage already
     used it to open the page). Speech has no punctuation: spaces end clauses.
@@ -123,13 +135,16 @@ class GuidePlanner:
                 result[c["id"]] = score
         return result
 
-    def expand(self, page, goals):
+    def expand(self, page, goals, done=()):
         """Add prerequisites (`a|b` = either) before each goal, keeping the
-        goals in the user's order; drop unknown ids."""
+        goals in the user's order; drop unknown ids. [done] components are
+        already done where the page opens (capability_done): they count as
+        met prerequisites and are left out, unless asked for as a goal."""
         components = self.pages[page]["components"]
         by_id = {c["id"]: c for c in components}
         goals = [g for g in goals if g in by_id]
-        result = []
+        skipped = [d for d in done if d in by_id and d not in goals]
+        result = list(skipped)
 
         def add(cid):
             if cid not in by_id or cid in result:
@@ -146,9 +161,9 @@ class GuidePlanner:
 
         for g in goals:
             add(g)
-        if not result:
+        if len(result) == len(skipped):
             add(self.pages[page]["default_goal"])
-        return result
+        return [c for c in result if c not in skipped]
 
     def closure(self, page, cid):
         """Every component [cid] may need first (all `a|b` options)."""
@@ -170,21 +185,23 @@ class GuidePlanner:
 
     def plan(self, owner, page, text, tool, validate, error, decide, destination=None):
         """Returns ({"page", "components"}, route) for the reply. A capability
-        [destination] limits the goals to that sub-page's (capability_goals)
-        and adds its entry components (entry_goals)."""
+        [destination] limits the goals to that sub-page's (capability_goals),
+        adds its entry components (entry_goals) and leaves out the steps that
+        lead to that sub-page (capability_done); see for_capability."""
         text = guide_text(text)
         spec = self.pages[page]
         cap = self._capability(destination)
-        allowed = spec.get("capability_goals", {}).get(cap)
+        allowed = for_capability(spec.get("capability_goals"), cap)
         default = allowed[0] if allowed else spec["default_goal"]
-        entry = spec.get("entry_goals", {}).get(cap, [])
+        entry = for_capability(spec.get("entry_goals"), cap) or []
+        done = for_capability(spec.get("capability_done"), cap) or []
         everything = self.scores(page, text)
         question = bool(QUESTION.search(text))
         two_asked = bool(CONJ.search(text))
         two = self._two_goals(page, text, everything)
         if two:
             # Two requests, each named by keywords: both, in the order said.
-            return self._result(page, [*entry, *two]), "guide_two"
+            return self._result(page, [*entry, *two], done), "guide_two"
         sure = self.scores(page, text, allowed, decisive=True)
         ranked = sorted(sure, key=lambda cid: -sure[cid])
         if ranked and not two_asked and (len(ranked) == 1 or sure[ranked[0]] >= 2 * sure[ranked[1]]):
@@ -198,13 +215,13 @@ class GuidePlanner:
             if not later and page in CONTINUE_TO_DEFAULT and not question and not HELP.search(text) and \
                     top in self.closure(page, default):
                 later = [default]
-            return self._result(page, [*entry, top, *later[:1]]), "guide_keyword"
+            return self._result(page, [*entry, top, *later[:1]], done), "guide_keyword"
         generic_only = everything and not self.scores(page, text, decisive=True)
         if not two_asked and (generic_only or (not everything and not question)):
             # The task is named only by generic words (我要借書, 借書要怎麼弄,
             # 停車的錢我要怎麼繳), or nothing more specific is said: its main
             # goal. (Asking the model here made it pick a partial step.)
-            return self._result(page, [*entry, default]), "guide_default"
+            return self._result(page, [*entry, default], done), "guide_default"
         # Weak, generic or no keywords, a question, or two requests: the model
         # chooses among all components of the (sub-)page.
         pool = [c["id"] for c in spec["components"] if allowed is None or c["id"] in allowed]
@@ -229,10 +246,10 @@ class GuidePlanner:
         try:
             name, args = decide(owner, "guide", evidence, tools, validate, error)
         except error:
-            return self._result(page, [*entry, *fallback]), "guide_keyword_fallback"
+            return self._result(page, [*entry, *fallback], done), "guide_keyword_fallback"
         goals = [args["goal"]] if name == "select_goal" else \
             sorted(args["pair"].split(PAIR), key=lambda cid: self.position(page, cid, text))
-        return self._result(page, [*entry, *goals]), "guide_model"
+        return self._result(page, [*entry, *goals], done), "guide_model"
 
     def _two_goals(self, page, text, scores):
         if not CONJ.search(text) or len(scores) < 2:
@@ -245,13 +262,13 @@ class GuidePlanner:
             return sorted([first, other], key=lambda cid: self.position(page, cid, text))
         return None
 
-    def _result(self, page, goals):
-        plan = self.expand(page, goals)
+    def _result(self, page, goals, done=()):
+        plan = self.expand(page, goals, done)
         follow = self.pages[page].get("follow_ups", {})
         # A goal that is only a way in (搜尋, 熱門關鍵字) goes on to its natural
         # next step (選一本書).
         while plan and follow.get(plan[-1]) and follow[plan[-1]] not in plan:
-            plan = self.expand(page, [*plan, follow[plan[-1]]])
+            plan = self.expand(page, [*plan, follow[plan[-1]]], done)
         return {"page": page, "components": plan}
 
     def default_plan(self, page, destination=None):
@@ -259,6 +276,7 @@ class GuidePlanner:
         in another language: the keywords and question rules here are Chinese."""
         spec = self.pages[page]
         cap = self._capability(destination)
-        allowed = spec.get("capability_goals", {}).get(cap)
-        entry = spec.get("entry_goals", {}).get(cap, [])
-        return self._result(page, [*entry, allowed[0] if allowed else spec["default_goal"]])
+        allowed = for_capability(spec.get("capability_goals"), cap)
+        entry = for_capability(spec.get("entry_goals"), cap) or []
+        done = for_capability(spec.get("capability_done"), cap) or []
+        return self._result(page, [*entry, allowed[0] if allowed else spec["default_goal"]], done)

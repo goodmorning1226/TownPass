@@ -164,6 +164,13 @@
    "id": "Halo! Saya Asisten Taipei Pass.\nKalau ada pertanyaan atau fitur yang ingin dicari, langsung saja beri tahu saya. Saya juga bisa memandu Anda langkah demi langkah!",
    "th": "สวัสดี! นี่คือผู้ช่วยของ Taipei Pass\nมีคำถามหรืออยากหาฟังก์ชันไหน บอกได้เลย ช่วยพาทำทีละขั้นก็ได้นะ!"
   },
+  "你離開了{page}": {
+   "en": "You left “{page}”",
+   "ja": "「{page}」から離れました",
+   "vi": "Bạn đã rời “{page}”",
+   "id": "Anda keluar dari “{page}”",
+   "th": "คุณออกจาก “{page}” แล้ว"
+  },
   "你離開了{page}，回去後可以接著做。": {
    "en": "You left “{page}”. Go back to carry on where you stopped.",
    "ja": "「{page}」から離れました。戻れば続きから進められます。",

@@ -321,6 +321,7 @@ void main() {
         };
         expect(goals(page['capability_goals']), app.capabilityGoals);
         expect(goals(page['entry_goals']), app.entryGoals);
+        expect(goals(page['capability_done']), app.capabilityDone);
         // Every id the page names exists.
         final known = {for (final c in app.components) c.id};
         for (final c in app.components) {
@@ -331,6 +332,7 @@ void main() {
         for (final g in [
           ...app.capabilityGoals.values,
           ...app.entryGoals.values,
+          ...app.capabilityDone.values,
         ]) {
           expect(known.containsAll(g), isTrue, reason: app.id);
         }
@@ -730,17 +732,6 @@ void main() {
       expect(c.card?.text, contains('已預約相同卷期'));
     });
 
-    test('tapping outside the target nudges, three times mentions pause', () {
-      c.startGuide('library');
-      onPage(home);
-      c.beginSteps();
-      c.wrongTap();
-      expect(c.card?.text, Replies.wrongTap);
-      c.wrongTap();
-      c.wrongTap();
-      expect(c.card?.text, Replies.wrongTapMany);
-    });
-
     test('task list lines', () {
       c.startGuide('library');
       onPage(home);
@@ -986,7 +977,7 @@ void main() {
       Get.reset();
     });
 
-    testWidgets('a web target is lit; taps elsewhere only nudge', (
+    testWidgets('a web target is lit; taps elsewhere still reach the page', (
       tester,
     ) async {
       final c = makeController();
@@ -1031,10 +1022,10 @@ void main() {
       await tester.pump();
       await tester.pump();
       expect(find.text('我們先找書！點一下上面的「關鍵字搜尋」。'), findsOneWidget);
-      await tester.tap(find.text('other'), warnIfMissed: false);
+      await tester.tap(find.text('other'));
       await tester.pump();
-      expect(pageTaps, 0);
-      expect(find.text(Replies.wrongTap), findsOneWidget);
+      expect(pageTaps, 1, reason: 'the dimmed page still gets taps');
+      expect(c.nudge.value, isEmpty);
       await tester.tap(find.byKey(const Key('web-button')));
       await tester.pump();
       expect(targetTaps, 1, reason: 'the lit spot reaches the page');
@@ -1192,6 +1183,34 @@ void main() {
       c.onboardingTry();
       c.fabPressed();
     }
+
+    test('nothing starts by itself; 重看新手提示 opens the tutorial', () async {
+      // The App's own controller (no runOnboarding argument).
+      Get.reset();
+      Get.put<WebPageState>(WebPageState());
+      final app = Get.put(
+        GuidedAssistantController(
+          thinkDelay: Duration.zero,
+          speaker: SilentSpeaker(),
+          executor: FakeExecutor(),
+        ),
+      );
+      app.routeChanged('/');
+      await Future<void>.delayed(const Duration(milliseconds: 1500));
+      expect(app.onboarding.value, OnboardingStage.hidden);
+      app.openSheet();
+      app.replayOnboarding();
+      expect(app.sheetOpen.value, isTrue);
+      expect(app.onboarding.value, OnboardingStage.hello);
+    });
+
+    test('「教我用」 in the chat starts the tutorial in the panel', () async {
+      c.openSheet();
+      c.submit('教我用');
+      await settle();
+      expect(c.sheetOpen.value, isTrue);
+      expect(c.onboarding.value, OnboardingStage.hello);
+    });
 
     test('only 試試看 then the penguin starts the tutorial', () {
       c.startOnboarding();

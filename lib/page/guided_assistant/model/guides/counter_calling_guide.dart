@@ -144,6 +144,8 @@ String _counterLines(List<_Counter> list) => list
     )
     .join(gt('；'));
 
+const _unitDetail = '在「櫃檯等待人數查詢」下面，點你要去的單位。';
+
 String _readCard(WebPageState s) {
   final list = _counters(s);
   if (list.isEmpty) {
@@ -174,6 +176,18 @@ String _readDone(WebPageState s) {
   });
 }
 
+/// pick_unit on the home list. Also the fallback of the unit-page steps when a
+/// guide opened straight on a unit page (no pick_unit step) is on the home
+/// list (the page was kept as it was, or the user went back).
+String? _unitTarget(WebPageState s) =>
+    _homeReady(s) && !_editOpen(s) ? 'counter.units' : null;
+
+String _unitCard(WebPageState s) => s.now.flag('unitsBelow')
+    ? '你要去哪個單位辦事？點一下，例如「戶政事務所」。下面還有，可以往下滑看看。'
+    : '你要去哪個單位辦事？點一下，例如「戶政事務所」。';
+
+double _unitCardTop(WebPageState s) => _favorites(s) > 0 ? 20 : 580;
+
 /// The counters block, outlined on the done card that reads it.
 String? _countersTarget(WebPageState s) =>
     _onUnit(s) ? 'counter.counters' : null;
@@ -191,16 +205,14 @@ final List<GuideComponent> counterCallingComponents = [
     doneTarget: (s) => _onUnit(s) ? 'counter.location' : null,
     steps: [
       GuideStep(
-        target: (s) => _homeReady(s) && !_editOpen(s) ? 'counter.units' : null,
+        target: _unitTarget,
         arrow: _no,
         scrollHint: (s) => _onHome(s) && s.now.flag('unitsBelow'),
         label: (_) => '點一下',
-        card: (s) => s.now.flag('unitsBelow')
-            ? '你要去哪個單位辦事？點一下，例如「戶政事務所」。下面還有，可以往下滑看看。'
-            : '你要去哪個單位辦事？點一下，例如「戶政事務所」。',
-        detail: (_) => '在「櫃檯等待人數查詢」下面，點你要去的單位。',
+        card: _unitCard,
+        detail: (_) => _unitDetail,
         isDone: _unitDone,
-        cardTop: (s) => _favorites(s) > 0 ? 20 : 580,
+        cardTop: _unitCardTop,
       ),
     ],
   ),
@@ -261,10 +273,12 @@ final List<GuideComponent> counterCallingComponents = [
     doneTextOf: (s) => gt('選好了{place}！下面就是它的櫃檯等候狀況。', {'place': _place(s)}),
     steps: [
       GuideStep(
-        target: (s) => _onUnit(s) ? 'counter.location' : null,
-        arrow: (s) => !s.now.flag('locationFocus'),
-        label: (_) => '選一個',
+        target: (s) => _onUnit(s) ? 'counter.location' : _unitTarget(s),
+        arrow: (s) => _onUnit(s) && !s.now.flag('locationFocus'),
+        scrollHint: (s) => _onHome(s) && s.now.flag('unitsBelow'),
+        label: (s) => _onHome(s) ? '點一下' : '選一個',
         card: (s) {
+          if (_onHome(s)) return _unitCard(s);
           if (s.now.flag('locationFocus')) return '在跳出來的清單，點你要去的地點。';
           final name = s.now.text('locationName');
           final n = s.now.number('locationCount');
@@ -276,6 +290,7 @@ final List<GuideComponent> counterCallingComponents = [
               : gt('現在看的是「{name}」。點一下框框確認是你要去的地點。', {'name': pg(name)});
         },
         detail: (s) {
+          if (_onHome(s)) return _unitDetail;
           final first = s.now.text('firstLocation');
           return first.isEmpty
               ? '點最上面的「選擇地點」框框，選你要去的那一間。'
@@ -283,7 +298,9 @@ final List<GuideComponent> counterCallingComponents = [
         },
         isDone: (s) => _located(s) || s.latched('favOn'),
         // The iOS place menu opens under the select: keep the card below it.
-        cardTop: (s) => s.now.flag('locationFocus')
+        cardTop: (s) => _onHome(s)
+            ? _unitCardTop(s)
+            : s.now.flag('locationFocus')
             ? (240 + 44 * s.now.number('locationCount'))
                   .clamp(240, 560)
                   .toDouble()
@@ -313,16 +330,20 @@ final List<GuideComponent> counterCallingComponents = [
     doneTextOf: _readDone,
     steps: [
       GuideStep(
-        target: (s) => _onUnit(s) ? 'counter.counters' : null,
-        locks: _no,
+        target: (s) => _onUnit(s) ? 'counter.counters' : _unitTarget(s),
+        locks: _onHome,
         arrow: _no,
-        label: (_) => '看一看',
-        card: _readCard,
-        detail: (_) => '每一行是一個櫃檯：前面是櫃檯名稱，後面是現在叫到的號碼，「等候」是還有幾個人在排。',
+        scrollHint: (s) => _onHome(s) && s.now.flag('unitsBelow'),
+        label: (s) => _onHome(s) ? '點一下' : '看一看',
+        card: (s) => _onHome(s) ? _unitCard(s) : _readCard(s),
+        detail: (s) => _onHome(s)
+            ? _unitDetail
+            : '每一行是一個櫃檯：前面是櫃檯名稱，後面是現在叫到的號碼，「等候」是還有幾個人在排。',
         // Nothing to press: the numbers are shown as soon as a place is chosen.
         isDone: (s) => _onUnit(s) && s.now.text('location').isNotEmpty,
-        cardTop: (s) =>
-            (s.now.number('countersBottom') + 70).clamp(190, 600).toDouble(),
+        cardTop: (s) => _onHome(s)
+            ? _unitCardTop(s)
+            : (s.now.number('countersBottom') + 70).clamp(190, 600).toDouble(),
       ),
     ],
   ),
@@ -449,6 +470,14 @@ final counterCallingPage = GuidePage(
   components: counterCallingComponents,
   defaultGoal: counterCallingDefaultGoal,
   capabilities: const ['reservation'],
+  // reservation.c-N-M opens that place's unit page (?subId=): no unit or
+  // place step.
+  capabilityGoals: const {
+    'reservation.c-*': ['read_counters', 'add_favorite', 'pick_location'],
+  },
+  capabilityDone: const {
+    'reservation.c-*': ['pick_unit', 'pick_location'],
+  },
   defaultDestination: const {'kind': 'capability', 'id': 'reservation'},
   texts: _counterTexts,
   offline: _counterOffline,
@@ -462,7 +491,9 @@ final counterCallingPage = GuidePage(
 );
 
 GuideTexts _counterTexts(List<String> plan, GuideComponent last) {
-  if (last.id == 'read_counters') {
+  // Opened straight on a place (no pick_unit): the text below starts with
+  // choosing the unit.
+  if (last.id == 'read_counters' && plan.contains('pick_unit')) {
     return const GuideTexts(
       shortName: '看叫號',
       resumeLabel: '回到臨櫃叫號',
@@ -478,7 +509,9 @@ GuideTexts _counterTexts(List<String> plan, GuideComponent last) {
     backLabel: '回到臨櫃叫號',
     openedText: '好的！已經幫你打開「臨櫃叫號」，我會在畫面上一步一步帶你做。',
     openedCard: gt('好的！「臨櫃叫號」打開了，我們一起來{task}。', {'task': gt(last.taskTitle)}),
-    helpChips: const ['下一步要做什麼？'],
+    helpChips: last.id == 'read_counters'
+        ? const ['下一步要做什麼？', '號碼牌在哪裡拿？']
+        : const ['下一步要做什麼？'],
   );
 }
 

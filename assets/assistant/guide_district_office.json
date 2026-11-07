@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "_comment": "Teaching components of one service page. Shared by the App (guides/<page>_guide.dart holds the pre-written step texts) and the backend (guide.py picks a set). The model may only choose ids listed here; prerequisites are added and ordered by the validator, never by the model. capabilities: capability ids (or roots like 'fees') whose pages this guide runs on. capability_goals: the only goals that fit that sub-page, first = its default. entry_goals: components always added for that capability.",
+  "_comment": "Teaching components of one service page. Shared by the App (guides/<page>_guide.dart holds the pre-written step texts) and the backend (guide.py picks a set). The model may only choose ids listed here; prerequisites are added and ordered by the validator, never by the model. capabilities: capability ids (or roots like 'fees') whose pages this guide runs on. capability_goals: the only goals that fit that sub-page, first = its default. entry_goals: components always added for that capability. capability_done: components already done when the page opens at that capability (it opens past them, e.g. straight on a form): they count as met prerequisites and are left out of the plan unless asked for as a goal. A key of these three tables ending in '*' is a prefix: it covers every capability id starting with the text before the '*' (an exact key wins, then the longest prefix).",
   "page": "district_office",
   "capability": "districtOffice",
   "capabilities": [
@@ -13,9 +13,24 @@
     "districtOffice.progress": [
       "check_progress",
       "view_closed"
+    ],
+    "districtOffice.form.*": [
+      "submit",
+      "fill_basic",
+      "fill_details",
+      "pick_items",
+      "pick_date",
+      "next_step",
+      "consent"
     ]
   },
   "entry_goals": {},
+  "capability_done": {
+    "districtOffice.form.*": [
+      "search_service",
+      "open_service"
+    ]
+  },
   "components": [
     {
       "id": "search_service",

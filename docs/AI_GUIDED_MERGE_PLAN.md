@@ -402,14 +402,16 @@
   `.innerText`／`.textContent`／`placeholder`／`option.text` 的地方都已改掉（有測試擋）。
 - 原生頁面的目標用 widget key（`GuideTarget`），不靠文字，TPText 翻譯不影響。
 
-**後端。** `guide` 欄位是 `{"page", "components"}`（元件 id），與語言無關；外語句子仍用該頁的預設目標（`default_plan`）。這次沒有改後端。
+**後端。** `guide` 欄位是 `{"page", "components"}`（元件 id），與語言無關；外語句子仍用該頁的預設目標（`default_plan`）。多語本身沒有改後端；與隊友 `feat/asr-ablation` 合併後，後端多了子頁起點（`capability_done`、`for_capability`，例如 `reservation.c-*`、`disasterReport.form.*`、`districtOffice.form.*` 直接從表單／單位頁開始）。
 
 **維護。** `python -X utf8 scripts/extract_guide_strings.py` 從程式抽出所有要顯示的中文（排除探測 JS、關鍵字、比對字、
 `description`），更新各 section 檔（保留既有翻譯、新句子留空、刪掉不用的）；`--check` 只報告缺漏與「有 `$` 插值、查不到」的句子。
 改了中文原文 = 新的 key：翻譯會變回中文，直到補上。測試（`test/guided_i18n_test.dart`）檢查每句 6 種語言都有、變數一致、
 `{page:X}` 的 X 在中文裡、每個指南的文字都查得到、各語言在 360×780 畫面不溢出、探測器只讀原文。
 
-**數量**：1,061 句（ui 146、content 89、指南 826），每種外語 1,061 句。
+**數量**：1,059 句（ui 147、content 86、指南 826），每種外語 1,059 句。
+
+**與隊友分支合併（2026-11-08）。** 翻譯機制保留這裡的設計（`gt`、`assets/i18n/guide/`、探測器 `orig` 系列、本檔的抽取腳本）；隊友平行做的 `assets/i18n/guide_texts/`、`GuideText`、`pageText`／`phOf`／`phAll` 已移除，他們新增的子頁步驟與「你離開了〇〇」提示列的文字已併入這裡的表。他們的子頁起點、動態與觸感回饋、變暗區域可操作（不再有點錯提醒，`Replies.wrongTap` 等已刪）、離開頁面提示列、圖書館迴圈修正與新手教學只在要求時開始都保留。
 
 **還要手機確認／母語校對**：
 - 英文（及其他語言）頁面下實際走一次圖書預約、繳費：光圈位置、`{page:}` 的字與畫面一致、企鵝卡（寫死的 `cardTop`）有沒有蓋住目標。

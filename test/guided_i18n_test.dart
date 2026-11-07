@@ -229,7 +229,6 @@ void main() {
         ...starterChips,
         onboardingExample,
         Replies.greet,
-        Replies.wrongTap,
         caseProgress.question,
         for (final o in caseProgress.options) o.label,
         for (final g in glossary) ...[g.title, g.explain, g.example],

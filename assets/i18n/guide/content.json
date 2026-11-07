@@ -269,13 +269,6 @@
    "id": "Oke, kita lanjutkan “{short}”. Tutup layar ini untuk melanjutkan.",
    "th": "ได้เลย ทำ “{short}” ต่อกัน ปิดหน้าจอนี้แล้วทำต่อได้เลย"
   },
-  "好，我再帶你看一次怎麼用。": {
-   "en": "OK, I’ll show you how to use it once more.",
-   "ja": "はい、もう一度使い方をご案内します。",
-   "vi": "Được, mình sẽ hướng dẫn lại cách dùng một lần nữa.",
-   "id": "Oke, saya tunjukkan sekali lagi cara pakainya.",
-   "th": "ได้เลย จะพาดูวิธีใช้อีกครั้ง"
-  },
   "完成了": {
    "en": "Done",
    "ja": "完了しました",
@@ -388,13 +381,6 @@
    "id": "Tidak ada suara yang terekam. Tekan tahan mikrofon sambil bicara, lalu lepaskan.",
    "th": "ไม่ได้บันทึกเสียง โปรดกดไมโครโฟนค้างไว้ขณะพูด แล้วปล่อยเมื่อพูดจบ"
   },
-  "沒關係～我們先點亮起來的地方就好。": {
-   "en": "That’s OK! Let’s just tap the highlighted spot first.",
-   "ja": "大丈夫です～まずは光っている所をタップしましょう。",
-   "vi": "Không sao đâu~ Mình chạm vào chỗ đang sáng trước là được.",
-   "id": "Tidak apa-apa~ Kita ketuk dulu bagian yang menyala saja.",
-   "th": "ไม่เป็นไร~ แตะตรงที่สว่างอยู่ก่อนก็พอ"
-  },
   "災情通報的案件": {
    "en": "Disaster reports",
    "ja": "災害通報",
@@ -485,13 +471,6 @@
    "vi": "Quay lại làm tiếp “{short}” không?",
    "id": "Kembali melanjutkan “{short}”?",
    "th": "จะกลับไปทำ “{short}” ต่อไหม"
-  },
-  "要按亮起來的地方喔。想先自己操作，可以按「暫停」。": {
-   "en": "Please tap the highlighted spot. If you’d rather do it yourself first, tap “Pause”.",
-   "ja": "光っている所を押してください。先にご自分で操作したいときは「一時停止」を押してください。",
-   "vi": "Hãy chạm vào chỗ đang sáng nhé. Muốn tự thao tác trước thì chạm “Tạm dừng”.",
-   "id": "Ketuk bagian yang menyala, ya. Kalau mau melakukannya sendiri dulu, ketuk “Jeda”.",
-   "th": "ต้องแตะตรงที่สว่างอยู่นะ ถ้าอยากทำเองก่อน กด “หยุดชั่วคราว”"
   },
   "語音辨識沒有成功，請再說一次，或按右邊的鍵盤打字。": {
    "en": "Speech recognition did not work. Please say it again, or tap the keyboard on the right to type.",

@@ -478,6 +478,8 @@ final feesPage = GuidePage(
   spec: feesPageSpec,
   onPage: onFees,
   pathPrefixes: const ['/fee-payment'],
+  // 繳費查詢 (fees.search) has no guide.
+  pathExcludes: const ['/fee-payment/search'],
   components: feesComponents,
   defaultGoal: feesDefaultGoal,
   // 地方稅 (tax-1) and 掃描繳費 open the camera page and have no guide.

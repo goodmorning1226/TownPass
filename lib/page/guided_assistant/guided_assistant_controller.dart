@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:flutter/widgets.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:town_pass/page/guided_assistant/model/assistant_settings.dart';
@@ -86,6 +87,12 @@ class GuideTask {
   /// its progress.
   final bool followUpResumes;
 
+  /// Every step was done once while the guide ran. The task then stays done
+  /// (done card) even when the page moves on, e.g. 預約成功's 返回首頁 goes
+  /// back to the library home, where the first step is no longer met;
+  /// without this the guide would start again from step 1.
+  final bool stepsDone;
+
   const GuideTask(
     this.guide, {
     this.status = TaskStatus.opened,
@@ -93,7 +100,18 @@ class GuideTask {
     this.commitAccepted = false,
     this.followUpGuideId,
     this.followUpResumes = false,
+    this.stepsDone = false,
   });
+
+  /// Index of the current step ([Guide.currentStep]), or past the last one
+  /// once [stepsDone].
+  int currentStep(WebPageState s) =>
+      stepsDone ? guide.steps.length : guide.currentStep(s);
+
+  /// Current task-list line ([Guide.currentTodo]), kept on the done line
+  /// once [stepsDone].
+  int currentTodo(WebPageState s) =>
+      stepsDone ? guide.doneTodo : guide.currentTodo(s);
 
   GuideTask copyWith({
     TaskStatus? status,
@@ -101,12 +119,14 @@ class GuideTask {
     bool? commitAccepted,
     String? followUpGuideId,
     bool clearFollowUp = false,
+    bool? stepsDone,
   }) => GuideTask(
     guide,
     followUpResumes: clearFollowUp ? false : followUpResumes,
     status: status ?? this.status,
     left: left ?? this.left,
     commitAccepted: commitAccepted ?? this.commitAccepted,
+    stepsDone: stepsDone ?? this.stepsDone,
     followUpGuideId: clearFollowUp
         ? null
         : followUpGuideId ?? this.followUpGuideId,
@@ -145,6 +165,10 @@ enum HomeAsk { idle, listening, tooShort, working, notice, asked }
 class GuidedAssistantController extends GetxController {
   final MockAssistantEngine engine;
   final Duration thinkDelay;
+
+  /// Shows the first-run hint by itself on the first launches. Off: the
+  /// hint and tutorial are in Chinese only, so the user opens the tutorial
+  /// from 重看新手提示 in the assistant or from the settings instead.
   final bool runOnboarding;
   final AssistantSpeaker speaker;
 
@@ -158,7 +182,7 @@ class GuidedAssistantController extends GetxController {
   GuidedAssistantController({
     this.engine = const MockAssistantEngine(),
     this.thinkDelay = const Duration(milliseconds: 1200),
-    this.runOnboarding = true,
+    this.runOnboarding = false,
     this.service,
     this.recorder,
     AssistantActionExecutor? executor,
@@ -259,6 +283,27 @@ class GuidedAssistantController extends GetxController {
   /// App shell, then the WebView) do not pause it.
   bool _opening = false;
 
+  /// When the controller last asked for a guide page; cleared once the
+  /// executor reports the page (and its in-page routing) loaded.
+  DateTime? _loadingSince;
+
+  /// The WebView shows a page outside the running guide (another service
+  /// page or another site) and has for a while: the small 「你離開了…」 bar.
+  final offScope = false.obs;
+
+  /// How long a page outside the guide must stay before [offScope] shows:
+  /// loads, redirects and the in-page router (~600 ms) pass by unseen.
+  static const offScopeDelay = Duration(milliseconds: 800);
+  Timer? _offScopeTimer;
+
+  /// The last address in the guide's scope (with its query, e.g. the book
+  /// detail page), for 回到〇〇; [_lastScopeGuide] is whose it is.
+  Uri? _lastScopeUrl;
+  String? _lastScopeGuide;
+
+  /// 回到〇〇 was pressed: the bar stays away while the page goes back.
+  DateTime? _returningUntil;
+
   final sheetOpen = false.obs;
   final messages = <ChatMessage>[].obs;
   final loading = false.obs;
@@ -291,7 +336,6 @@ class GuidedAssistantController extends GetxController {
   final focusMessageId = RxnInt();
 
   int _nextId = 1;
-  int _wrongTaps = 0;
   Timer? _think;
   Timer? _nudgeTimer;
   Timer? _speakTimer;
@@ -326,7 +370,13 @@ class GuidedAssistantController extends GetxController {
 
   @override
   void onClose() {
-    for (final t in [_think, _nudgeTimer, _speakTimer, _toastTimer]) {
+    for (final t in [
+      _think,
+      _nudgeTimer,
+      _speakTimer,
+      _toastTimer,
+      _offScopeTimer,
+    ]) {
       t?.cancel();
     }
     _stepWorker?.dispose();
@@ -586,12 +636,14 @@ class GuidedAssistantController extends GetxController {
       return;
     }
     _opening = true;
+    _loadingSince = DateTime.now();
     final generation = _generation;
     executor.open(
       guide.destination,
       (error) {
         if (isClosed) return;
         _opening = false;
+        _loadingSince = null;
         if (error != null && generation == _generation) {
           _say(_bot(Replies.pageFailed));
           _showToast(Replies.pageFailed);
@@ -708,9 +760,7 @@ class GuidedAssistantController extends GetxController {
       case MockReplyKind.stepHelp:
         _say(_bot(stepDetail ?? Replies.noTask));
       case MockReplyKind.onboarding:
-        _say(_bot(Replies.onboardingAgain));
-        closeSheet();
-        startOnboarding();
+        startTutorial();
       case MockReplyKind.greet:
         _say(_bot(Replies.hello));
       case MockReplyKind.unknownTerm:
@@ -788,7 +838,7 @@ class GuidedAssistantController extends GetxController {
       return;
     }
     final g = active.guide;
-    final n = g.currentTodo(web).clamp(1, g.stepCount);
+    final n = active.currentTodo(web).clamp(1, g.stepCount);
     final ask = Replies.switchAsk(g.title, n, g.shortName, other.shortName);
     _say(
       _bot(
@@ -828,7 +878,12 @@ class GuidedAssistantController extends GetxController {
     if (inTutorial) onboarding.value = OnboardingStage.hidden;
     _measureOnly = alone;
     if (!resuming) web.resetLatches();
-    _wrongTaps = 0;
+    if (!resuming) _lastScopeUrl = null;
+    // A bar from the previous task would name this guide's page before it
+    // even opened: start over (it waits [offScopeDelay] again).
+    _offScopeTimer?.cancel();
+    _offScopeTimer = null;
+    offScope.value = false;
     nudge.value = '';
     _lastSpokenKey = null;
     todoOpen.value = false;
@@ -855,7 +910,15 @@ class GuidedAssistantController extends GetxController {
     if (alone) _showToast(SettingsTexts.normalToast);
     // The steps start only when the user presses 開始 (or 我自己來 to go
     // alone); nothing moves on by itself.
-    _openGuidePage(guide, fresh: !resuming && !guide.reuseOpenPage);
+    // A sub-page destination (臨櫃叫號 one unit: reservation.c-1-1) must open
+    // that unit even when another page of the service is showing.
+    final subPage =
+        guide.destination['kind'] == 'capability' &&
+        '${guide.destination['id']}'.contains('.');
+    _openGuidePage(
+      guide,
+      fresh: !resuming && (!guide.reuseOpenPage || subPage),
+    );
   }
 
   /// 我自己來 on the opened card: no steps; the task stays so 繼續引導 can
@@ -876,19 +939,19 @@ class GuidedAssistantController extends GetxController {
 
   int get stepIndex {
     final t = task.value;
-    return t == null ? 0 : t.guide.currentStep(web);
+    return t == null ? 0 : t.currentStep(web);
   }
 
   GuideStep? get currentStep {
     final t = task.value;
     if (t == null) return null;
-    final i = t.guide.currentStep(web);
+    final i = t.currentStep(web);
     return i < t.guide.steps.length ? t.guide.steps[i] : null;
   }
 
   bool get allStepsDone {
     final t = task.value;
-    return t != null && t.guide.currentStep(web) >= t.guide.steps.length;
+    return t != null && t.currentStep(web) >= t.guide.steps.length;
   }
 
   /// Answer to "下一步要做什麼？".
@@ -911,7 +974,7 @@ class GuidedAssistantController extends GetxController {
 
   bool get _stepRunning => guideVisible && task.value!.status == TaskStatus.on;
 
-  /// The rest of the screen is dimmed and blocked.
+  /// The rest of the screen is dimmed (taps still reach the page).
   bool get locked {
     if (!_stepRunning) return false;
     final step = currentStep;
@@ -955,7 +1018,7 @@ class GuidedAssistantController extends GetxController {
     final t = task.value;
     if (t == null) return const [];
     final g = t.guide;
-    final p = g.currentTodo(web);
+    final p = t.currentTodo(web);
     return [
       for (var i = 0; i < g.todos.length; i++)
         _line(
@@ -989,7 +1052,7 @@ class GuidedAssistantController extends GetxController {
   String get currentTodoText {
     final t = task.value;
     if (t == null) return '';
-    final p = t.guide.currentTodo(web);
+    final p = t.currentTodo(web);
     return gt(p < t.guide.todos.length ? t.guide.todos[p].text : '全部完成');
   }
 
@@ -1007,7 +1070,7 @@ class GuidedAssistantController extends GetxController {
     if (t.status == TaskStatus.opened) {
       return GuideCard(CardVariant.opened, g.openedLabel, g.openedCard);
     }
-    final i = g.currentStep(web);
+    final i = t.currentStep(web);
     if (i >= g.steps.length) {
       final follow = t.followUpGuideId == null
           ? null
@@ -1062,7 +1125,17 @@ class GuidedAssistantController extends GetxController {
   bool _measureOnly = false;
 
   void _onProgress() {
+    _checkScope();
     final t = task.value;
+    // Done once (on the page, steps running) stays done; see
+    // [GuideTask.stepsDone]. Not while the page is unread or elsewhere, where
+    // an empty snapshot could look done.
+    if (t != null &&
+        !t.stepsDone &&
+        _stepRunning &&
+        t.guide.currentStep(web) >= t.guide.steps.length) {
+      task.value = t.copyWith(stepsDone: true);
+    }
     if (_measureOnly &&
         t != null &&
         t.guide.onPage(web.now) &&
@@ -1080,7 +1153,6 @@ class GuidedAssistantController extends GetxController {
         '${task.value?.guide.id}:$stepIndex:${currentStep?.card(web)}';
     if (stepKey != _lastStepKey) {
       _lastStepKey = stepKey;
-      _wrongTaps = 0;
       _nudgeTimer?.cancel();
       nudge.value = '';
     }
@@ -1092,19 +1164,146 @@ class GuidedAssistantController extends GetxController {
     _speak(c.text);
   }
 
-  /// A short reminder on the guide card (e.g. from the keypad's 完成 key).
-  void showNudge(String text) {
-    nudge.value = text;
-    _nudgeTimer?.cancel();
-    _nudgeTimer = Timer(
-      const Duration(milliseconds: 2600),
-      () => nudge.value = '',
+  // ------------------------------------------------------- leaving the page
+
+  /// A guide runs on its route: pages the WebView moves to are watched.
+  bool get _watchingScope {
+    final t = task.value;
+    return t != null &&
+        !t.left &&
+        !t.stepsDone &&
+        (t.status == TaskStatus.opened || t.status == TaskStatus.on) &&
+        currentRoute.value == t.guide.route;
+  }
+
+  /// Whether the WebView's page belongs to [g]; null while nothing is read
+  /// or tracked yet. The probe's reading comes first; without one (another
+  /// site, or not read yet) the WebView's own address decides.
+  bool? _inScope(Guide g) {
+    final now = web.now;
+    if (now.path != null) return g.onPage(now);
+    final url = pageTracker.currentWebPage?.url;
+    if (url == null) return null;
+    return g.onPage(WebSnapshot(path: AssistantPageTracker.servicePath(url)));
+  }
+
+  /// The controller is opening a page or going back to one: an address
+  /// outside the guide on the way is not the user leaving.
+  bool get _navigating {
+    final now = DateTime.now();
+    final loading = _loadingSince;
+    if (_opening ||
+        (loading != null &&
+            now.difference(loading) < const Duration(seconds: 10))) {
+      return true;
+    }
+    final back = _returningUntil;
+    return back != null && now.isBefore(back);
+  }
+
+  /// Runs on every page change: back in scope hides the bar at once and
+  /// keeps the address; outside it, the bar waits [offScopeDelay].
+  void _checkScope() {
+    final t = task.value;
+    if (t == null || !_watchingScope) {
+      _offScopeTimer?.cancel();
+      _offScopeTimer = null;
+      if (offScope.value) offScope.value = false;
+      return;
+    }
+    final inScope = _inScope(t.guide);
+    if (inScope == true) {
+      _rememberScopeUrl(t.guide);
+      _returningUntil = null;
+      _offScopeTimer?.cancel();
+      _offScopeTimer = null;
+      if (offScope.value) offScope.value = false;
+      return;
+    }
+    if (inScope == null || offScope.value) return;
+    _offScopeTimer ??= Timer(offScopeDelay, _offScopeSettled);
+  }
+
+  void _offScopeSettled() {
+    _offScopeTimer = null;
+    final t = task.value;
+    if (isClosed || t == null || !_watchingScope) return;
+    if (_inScope(t.guide) != false) return;
+    if (_navigating) {
+      // Still loading: look again later (the bar may not be needed).
+      _offScopeTimer = Timer(offScopeDelay, _offScopeSettled);
+      return;
+    }
+    offScope.value = true;
+  }
+
+  void _rememberScopeUrl(Guide g) {
+    final url = pageTracker.currentWebPage?.url;
+    if (url == null ||
+        !g.onPage(WebSnapshot(path: AssistantPageTracker.servicePath(url)))) {
+      return;
+    }
+    _lastScopeUrl = url;
+    _lastScopeGuide = g.id;
+  }
+
+  /// The small 「你離開了…」 bar shows (not over the assistant panel).
+  bool get offScopeVisible => offScope.value && !sheetOpen.value;
+
+  /// 回到〇〇 on that bar: back to the last page of the guide the user was
+  /// on (through the WebView's history when it is there, so the page keeps
+  /// its state), else the guide's start page. The task keeps its step.
+  Future<void> returnToGuide() async {
+    final t = task.value;
+    if (t == null) return;
+    _offScopeTimer?.cancel();
+    offScope.value = false;
+    _returningUntil = DateTime.now().add(const Duration(seconds: 3));
+    // Looked at again once the 3 s pass: if the page never got back (no
+    // page change follows), the bar returns instead of staying away.
+    _offScopeTimer = Timer(offScopeDelay, _offScopeSettled);
+    final url = _lastScopeGuide == t.guide.id ? _lastScopeUrl : null;
+    final controller = pageTracker.currentWebPage?.controller;
+    if (url != null &&
+        controller != null &&
+        currentRoute.value == t.guide.route) {
+      try {
+        await _goBackTo(controller, url);
+        return;
+      } catch (_) {
+        // The WebView is gone or refused: open the guide's page instead.
+      }
+    }
+    if (isClosed || task.value?.guide.id != t.guide.id) return;
+    _openGuidePage(t.guide, fresh: true);
+  }
+
+  /// Steps back to [url] when it is in the WebView's back list, else loads
+  /// it. The App navigates; the page itself is not changed.
+  static Future<void> _goBackTo(
+    InAppWebViewController controller,
+    Uri url,
+  ) async {
+    final history = await controller.getCopyBackForwardList();
+    final items = history?.list;
+    final current = history?.currentIndex;
+    if (items != null && current != null && current < items.length) {
+      for (var i = current - 1; i >= 0; i--) {
+        final at = Uri.tryParse(items[i].url?.toString() ?? '');
+        if (at == url) {
+          await controller.goBackOrForward(steps: i - current);
+          return;
+        }
+      }
+    }
+    await controller.loadUrl(
+      urlRequest: URLRequest(url: WebUri(url.toString())),
     );
   }
 
-  void wrongTap() {
-    _wrongTaps++;
-    nudge.value = _wrongTaps >= 3 ? Replies.wrongTapMany : Replies.wrongTap;
+  /// A short reminder on the guide card (e.g. from the keypad's 完成 key).
+  void showNudge(String text) {
+    nudge.value = text;
     _nudgeTimer?.cancel();
     _nudgeTimer = Timer(
       const Duration(milliseconds: 2600),
@@ -1219,7 +1418,7 @@ class GuidedAssistantController extends GetxController {
         if (allStepsDone) return gt('引導完成');
         final n = t.guide.stepCount;
         return gt('步驟 {i} / {n}', {
-          'i': t.guide.currentTodo(web).clamp(1, n),
+          'i': t.currentTodo(web).clamp(1, n),
           'n': n,
         });
     }
@@ -1507,12 +1706,12 @@ class GuidedAssistantController extends GetxController {
     }
   }
 
-  /// 重看助理新手教學 in the settings: back to the App's first page, then
-  /// the first-run hint and the tutorial again. Settings and chat stay.
+  /// 重看助理新手教學 in the settings: back to the App's first page and the
+  /// tutorial in the assistant. Settings and chat stay.
   void replayTutorial() {
-    closeSheet();
     Get.until((route) => route.isFirst);
-    startOnboarding();
+    openSheet();
+    startTutorial();
   }
 
   // ---------------------------------------------------------------- tutorial
@@ -1678,12 +1877,8 @@ class GuidedAssistantController extends GetxController {
     finishOnboarding();
   }
 
-  /// 重看新手提示 from the assistant.
-  void replayOnboarding() {
-    if (inTutorial) onboarding.value = OnboardingStage.hidden;
-    closeSheet();
-    startOnboarding();
-  }
+  /// 重看新手提示 from the assistant: the tutorial right in the panel.
+  void replayOnboarding() => startTutorial();
 
   void onboardingLater() {
     if (!_hinting) return;
