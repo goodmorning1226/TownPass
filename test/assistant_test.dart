@@ -5,6 +5,8 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:town_pass/service/assistant_speech_language.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:get/get.dart';
 import 'package:town_pass/util/tp_route.dart';
 import 'package:town_pass/util/tp_web_view.dart';
@@ -669,6 +671,92 @@ void main() {
     controller.cancel();
   });
 
+  testWidgets(
+    'The speech language menu opens above the App and switches language',
+    (tester) async {
+      SharedPreferences.setMockInitialValues({
+        'assistant_speech_language': 'zh',
+      });
+      final controller = AssistantViewController(
+        service: PendingService(),
+        executor: RecordingExecutor(),
+        recorder: FakeRecorder(),
+      )..expanded.value = true;
+      // Like main.dart: the host sits above the Navigator, where a popup route
+      // would open underneath the panel.
+      await tester.pumpWidget(
+        MaterialApp(
+          builder: (context, child) =>
+              AssistantHost(controller: controller, child: child!),
+          home: const Scaffold(),
+        ),
+      );
+      await tester.pump();
+      expect(controller.speechLanguage.value, 'zh');
+      await tester.tap(find.byKey(const Key('assistant-speech-language')));
+      await tester.pumpAndSettle();
+      expect(find.text('English'), findsOneWidget);
+      await tester.tap(find.text('English'));
+      await tester.pumpAndSettle();
+      expect(controller.speechLanguage.value, 'en');
+      expect(find.text('EN'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  test('Without a saved choice the phone language is the default', () async {
+    expect(AssistantSpeechLanguage.systemDefault('zh'), 'zh');
+    expect(AssistantSpeechLanguage.systemDefault('en'), 'en');
+    expect(AssistantSpeechLanguage.systemDefault('th'), 'th');
+    expect(AssistantSpeechLanguage.systemDefault('fr'), 'auto');
+    SharedPreferences.setMockInitialValues({});
+    expect(
+      await AssistantSpeechLanguage.load(),
+      AssistantSpeechLanguage.systemDefault(),
+    );
+    SharedPreferences.setMockInitialValues({'assistant_speech_language': 'ja'});
+    expect(await AssistantSpeechLanguage.load(), 'ja'); // the user's choice
+  });
+
+  test('The language last spoken or typed is used next, not saved', () async {
+    SharedPreferences.setMockInitialValues({'assistant_speech_language': 'zh'});
+    final service = QueueService(
+      [
+        const AssistantResult(
+          sessionId: 's',
+          message: 'Library.',
+          language: 'en',
+        ),
+        // A tapped choice: the reply's default language must not switch back.
+        const AssistantResult(sessionId: 's', message: '好的。'),
+        const AssistantResult(sessionId: 's', message: '水費。'),
+      ],
+      transcripts: [
+        const AssistantTranscript('I want to borrow a book', language: 'en'),
+      ],
+    );
+    final controller = AssistantViewController(
+      service: service,
+      executor: RecordingExecutor(),
+      recorder: FakeRecorder(),
+    );
+    await Future<void>.delayed(Duration.zero);
+    expect(controller.speechLanguage.value, 'zh');
+    expect(await controller.startListening(), isTrue);
+    await controller.stopListening();
+    expect(controller.speechLanguage.value, 'en'); // spoken in English
+    await controller.submit('', choiceId: '1');
+    expect(controller.speechLanguage.value, 'en');
+    await controller.submit('我要繳水費');
+    expect(controller.speechLanguage.value, 'zh'); // typed in Chinese
+    expect(
+      await AssistantSpeechLanguage.load(),
+      'zh',
+    ); // still the user's choice
+    controller.setSpeechLanguage('auto');
+    expect(controller.speechLanguage.value, 'auto');
+  });
+
   test('Suggestions lead only to enabled catalog capabilities', () {
     final catalog = jsonDecode(
       File('assets/assistant/capabilities.json').readAsStringSync(),
@@ -862,6 +950,9 @@ void main() {
   test(
     'The chosen speech language is sent and the detected one shown',
     () async {
+      SharedPreferences.setMockInitialValues({
+        'assistant_speech_language': 'zh',
+      });
       final service = QueueService(
         [
           const AssistantResult(
@@ -883,7 +974,7 @@ void main() {
         speaker: speaker,
       );
       await Future<void>.delayed(Duration.zero);
-      expect(controller.speechLanguage.value, 'zh'); // Chinese until chosen
+      expect(controller.speechLanguage.value, 'zh'); // the saved choice
       controller.setSpeechLanguage('auto');
       expect(await controller.startListening(), isTrue);
       await controller.stopListening();

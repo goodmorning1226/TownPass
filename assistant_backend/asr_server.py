@@ -309,18 +309,28 @@ class WhisperCppRecognizer:
                 # Without a multilingual model the Chinese model does everything.
                 used = "zh" if language == "auto" else language
                 reply = self._infer(self.url, wav, seconds, used)
-                heard = self.summarize(reply)[0]
-                if used == "zh" and self.multi_url and heard and cjk_ratio(heard) < 0.5:
-                    # Chinese chosen but another language spoken ("I want to borrow a
-                    # book" in Chinese mode): let the multilingual model detect it
-                    # instead of rejecting the clip as unclear.
+                heard, heard_logprob, heard_no_speech = self.summarize(reply)
+                # Chinese chosen but another language spoken: in Chinese mode Whisper
+                # writes "I hate you" in Latin letters, but a longer English sentence
+                # ("I want to lend a book") can come out as unsure Chinese
+                # characters. Either way let the multilingual model detect the
+                # language instead of rejecting the clip as unclear.
+                if used == "zh" and self.multi_url and heard and (
+                        cjk_ratio(heard) < 0.5 or judge(heard, heard_logprob, heard_no_speech) != "clear"):
                     other = self._infer(self.multi_url, wav, seconds, "auto")
                     detected = language_code(other.get("language"), default=None)
                     if detected and detected != "zh":
                         reply, used = other, detected
             else:
-                reply = self._infer(self.multi_url, wav, seconds, language)
-                detected = language_code(reply.get("language"), default=None) if language == "auto" else language
+                # A chosen language is a preference, not a lock: the App keeps the
+                # language last used, so the next speaker may use another one (forcing
+                # English on Chinese speech makes Whisper translate it). Detect first;
+                # force the chosen language only when detection lands outside our
+                # languages (Thai heard as Lao, Indonesian as Malay).
+                reply = self._infer(self.multi_url, wav, seconds, "auto")
+                detected = language_code(reply.get("language"), default=None)
+                if language != "auto" and detected not in LANGUAGES:
+                    reply, detected = self._infer(self.multi_url, wav, seconds, language), language
                 used = detected or "zh"
                 if used == "zh" and self.url != self.multi_url:  # a separate Chinese model redoes it
                     reply = self._infer(self.url, wav, seconds, "zh")

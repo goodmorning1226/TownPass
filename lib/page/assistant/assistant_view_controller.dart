@@ -102,8 +102,9 @@ class AssistantViewController extends GetxController {
   /// Read replies aloud (phone text-to-speech). Off by default; remembered.
   final readAloud = false.obs;
 
-  /// Speech input language for Whisper ('auto', 'zh', 'en', ...); remembered.
-  final speechLanguage = AssistantSpeechLanguage.fallback.obs;
+  /// Speech input language for Whisper ('auto', 'zh', 'en', ...): the phone's
+  /// language until the user picks one, which is then kept across launches.
+  final speechLanguage = AssistantSpeechLanguage.systemDefault().obs;
 
   /// The language the last utterance was recognised in (shown with 'auto').
   final heardLanguage = RxnString();
@@ -112,6 +113,20 @@ class AssistantViewController extends GetxController {
     speechLanguage.value = AssistantSpeechLanguage.of(code).code;
     heardLanguage.value = null;
     AssistantSpeechLanguage.save(speechLanguage.value);
+  }
+
+  /// The language a turn was actually spoken or typed in is used for the next
+  /// one in this session, for every language ("auto" stays auto). Not saved:
+  /// only the user's own choice in the menu is kept for the next launch. The
+  /// backend treats the language as a preference, so another one is still
+  /// detected.
+  static final _hasWords = RegExp(r'[^\d\s\p{P}\p{S}]{2,}', unicode: true);
+
+  void _rememberLanguage(String? code) {
+    if (code == null || speechLanguage.value == 'auto') return;
+    final known = AssistantSpeechLanguage.all.any((l) => l.code == code);
+    if (!known || code == speechLanguage.value) return;
+    speechLanguage.value = code;
   }
 
   void setReadAloud(bool enabled) {
@@ -591,6 +606,10 @@ class AssistantViewController extends GetxController {
       if (generation != _generation || isClosed) return;
       _session = result.sessionId;
       _resolutionId = result.resolutionId;
+      // A tapped choice or a bare "2" says nothing about the language.
+      if (choiceId == null && _hasWords.hasMatch(text)) {
+        _rememberLanguage(result.language);
+      }
       final reply = _add(
         result.message,
         choices: result.choices,

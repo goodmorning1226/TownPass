@@ -251,6 +251,7 @@ class MultilingualSpeechTests(unittest.TestCase):
         self.calls = []
         self.heard = {"zh": "chinese", "multi": "english"}  # the language each fake model reports
         self.texts = {"zh": "我要借書", "multi": "multi-text"}  # and the text it writes
+        self.logprob = {"zh": -0.1, "multi": -0.1}
         test = self
 
         def fake(name):
@@ -261,7 +262,7 @@ class MultilingualSpeechTests(unittest.TestCase):
                 def do_POST(self):
                     test.calls.append((name, self.rfile.read(int(self.headers["Content-Length"]))))
                     data = json.dumps({"language": test.heard[name], "segments": [
-                        {"text": test.texts[name], "tokens": [1, 2], "avg_logprob": -0.1, "no_speech_prob": 0.0}]}).encode()
+                        {"text": test.texts[name], "tokens": [1, 2], "avg_logprob": test.logprob[name], "no_speech_prob": 0.0}]}).encode()
                     self.send_response(200)
                     self.send_header("Content-Length", str(len(data)))
                     self.end_headers()
@@ -283,7 +284,7 @@ class MultilingualSpeechTests(unittest.TestCase):
         self.assertIn(field("prompt", self.recognizer.prompt), self.calls[-1][1])
         result = self.recognizer.transcribe(loud_frames(), "en")
         self.assertEqual((self.models(), result["language"], result["text"]), (["zh", "multi"], "en", "multi-text"))
-        self.assertIn(field("language", "en"), self.calls[-1][1])
+        self.assertIn(field("language", "auto"), self.calls[-1][1])  # a preference: detected first
         self.assertIn(field("prompt", "") + CRLF, self.calls[-1][1])  # no Chinese vocabulary prompt
         self.assertEqual(result["status"], "clear")  # no Chinese-script check for English
 
@@ -302,6 +303,39 @@ class MultilingualSpeechTests(unittest.TestCase):
         result = self.recognizer.transcribe(loud_frames(), "zh")
         self.assertEqual((self.models(), result["language"], result["status"]), (["zh", "multi"], "en", "clear"))
         self.assertIn(field("language", "auto"), self.calls[-1][1])
+
+    def test_unsure_chinese_characters_for_english_speech_are_redetected(self):
+        # Whisper small in Chinese mode may write "I want to lend a book" as unsure characters.
+        self.recognizer = WhisperCppRecognizer(self.recognizer.multi_url, multi_url=self.recognizer.multi_url)
+        self.heard["multi"] = "english"
+        self.texts["multi"] = "愛旺特蘭德布克"
+        self.logprob["multi"] = -1.2
+        calls = []
+        original = self.recognizer._infer
+
+        def infer(url, wav, seconds, language):
+            calls.append(language)
+            if language == "auto":
+                self.texts["multi"], self.logprob["multi"] = "I want to lend a book", -0.2
+            return original(url, wav, seconds, language)
+        self.recognizer._infer = infer
+        result = self.recognizer.transcribe(loud_frames(), "zh")
+        self.assertEqual((calls, result["language"], result["text"], result["status"]),
+                         (["zh", "auto"], "en", "I want to lend a book", "clear"))
+
+    def test_chosen_language_is_a_preference_not_a_lock(self):
+        self.heard["multi"] = "chinese"  # Chinese spoken while English is remembered
+        result = self.recognizer.transcribe(loud_frames(), "en")
+        self.assertEqual((self.models(), result["language"], result["text"]), (["multi", "zh"], "zh", "我要借書"))
+        self.calls.clear()
+        self.heard["multi"] = "lao"  # detection outside our languages: the chosen one is forced
+        result = self.recognizer.transcribe(loud_frames(), "th")
+        self.assertEqual((self.models(), result["language"]), (["multi", "multi"], "th"))
+        self.assertIn(field("language", "th"), self.calls[-1][1])
+
+    def test_clear_chinese_is_not_run_twice(self):
+        self.recognizer.transcribe(loud_frames(), "zh")
+        self.assertEqual(self.models(), ["zh"])
 
     def test_one_multilingual_model_for_everything_and_simplified_becomes_traditional(self):
         self.recognizer = WhisperCppRecognizer(self.recognizer.multi_url, multi_url=self.recognizer.multi_url)

@@ -52,7 +52,8 @@ def contains(text, term, language):
         return False
     if language in ("ja", "th"):
         return term in text
-    return re.search(r"(?<!\w)" + re.escape(term) + r"(?!\w)", text) is not None
+    plural = r"(?:e?s)?" if language == "en" else ""  # "water bills" for "water bill"
+    return re.search(r"(?<!\w)" + re.escape(term) + plural + r"(?!\w)", text) is not None
 
 
 # --- Rule tables --------------------------------------------------------------
@@ -122,6 +123,49 @@ def matches(table, text, language):
 def searches(table, text, language):
     pattern = table.get(language)
     return bool(pattern and re.search(pattern, fold(text), re.I))
+
+
+# --- Similar wording (space-separated languages) -------------------------------
+# Speech and non-native speakers change a word or two ("what can I do" for
+# "what can you do", "learn a book" for "lend a book"). Character similarity
+# of the phrase against the sentence's stretches of about the same length:
+# such variants score 0.81-0.88, different requests ("what time is it",
+# "lend a hand" for "lend a book") at most ~0.7.
+SIMILAR_LANGUAGES = ("en", "vi", "id")
+SIMILAR_PHRASE = 0.8
+
+
+def _words(text):
+    return re.findall(r"\w+", fold(text))
+
+
+def similarity(text, phrase):
+    """Best 0-1 similarity of phrase to any stretch of text with one word fewer to one more."""
+    import difflib
+    words, wanted = _words(text), _words(phrase)
+    if not words or not wanted:
+        return 0.0
+    target = " ".join(wanted)
+    best = 0.0
+    for size in range(max(1, len(wanted) - 1), len(wanted) + 2):
+        for start in range(max(1, len(words) - size + 1)):
+            window = " ".join(words[start:start + size])
+            best = max(best, difflib.SequenceMatcher(None, window, target).ratio())
+    return best
+
+
+def similar(phrases, text, language, threshold=SIMILAR_PHRASE):
+    """A phrase of phrases[language] worded like part of text (only SIMILAR_LANGUAGES)."""
+    if language not in SIMILAR_LANGUAGES:
+        return False
+    return any(similarity(text, phrase) >= threshold for phrase in phrases.get(language, ()))
+
+
+LISTING_PHRASES = {
+    "en": ("what can you do", "what services do you have", "what can you help me with", "show all services"),
+    "vi": ("bạn làm được gì", "có những dịch vụ gì"),
+    "id": ("bisa apa saja", "layanan apa saja"),
+}
 
 
 def choice_number(text, language):

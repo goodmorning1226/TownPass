@@ -111,3 +111,29 @@ class ForeignTurnTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class SimilarWordingTests(unittest.TestCase):
+    """Space-separated languages: a word or two changed still matches."""
+
+    def turn(self, text):
+        from test_server import first
+        app = Assistant(FakeCatalog(), lambda messages, tools: first(tools))
+        return app.turn({"text": text, "request_id": "r", "session_id": "s", "language": "en"})
+
+    def test_similar_listing_questions_list_the_services(self):
+        for text in ("what can I do", "What can you help"):
+            self.assertEqual(self.turn(text)["kind"], "capability_list", text)
+        for text in ("what time is it", "what can I eat"):
+            self.assertNotEqual(self.turn(text)["kind"], "capability_list", text)
+
+    def test_plural_and_near_keywords(self):
+        self.assertEqual(self.turn("pay my water bills")["destination"], {"kind": "capability", "id": "fees.water"})
+        self.assertEqual(self.turn("I want to learn a book")["destination"], {"kind": "capability", "id": "library"})
+        self.assertIsNone(self.turn("lend a hand")["destination"])
+
+    def test_near_keyword_is_only_offered(self):
+        registry = Assistant(FakeCatalog(), lambda *_: None).workflow.registry
+        found = registry.search_language("pey water bil", "en")
+        self.assertTrue(found and all(item["fuzzy"] for item in found))
+        self.assertEqual(found[0]["entry"]["id"], "fees.water")

@@ -30,6 +30,10 @@ class PhoneticTests(unittest.TestCase):
         self.assertEqual(title_score("雨傘", BOOKS[0]), 0.0)
 
 
+def titles(result):
+    return [choice["title"] for choice in result.get("choices") or []]
+
+
 class SoundAlikeTurnTests(unittest.TestCase):
     def setUp(self):
         self.calls = []
@@ -55,6 +59,30 @@ class SoundAlikeTurnTests(unittest.TestCase):
         self.assertEqual(len(result["choices"]), 2)
         self.assertIsNone(result["destination"])
 
+    def follow(self, text, previous):
+        return self.app.turn({"text": text, "request_id": "r2", "session_id": "s",
+                              "resolution_id": previous["resolution_id"]})
+
+    def test_misheard_menu_commands_still_work_while_a_list_is_open(self):
+        listing = self.turn("有哪些功能")
+        second = self.follow("下一頁", listing)
+        self.assertNotEqual(titles(second), titles(listing))
+        self.assertEqual(titles(self.follow("下夜", self.turn("有哪些功能"))), titles(second))
+        books = self.turn("我要借神奇甘仔店")
+        self.assertEqual(self.follow("弟二個", books)["destination"],
+                         self.follow("第二個", self.turn("我要借神奇甘仔店"))["destination"])
+
+    def test_other_short_phrases_are_not_taken_as_commands(self):
+        second = titles(self.follow("下一頁", self.turn("有哪些功能")))
+        for text in ("下雨天", "下一個", "打開"):
+            self.assertNotEqual(titles(self.follow(text, self.turn("有哪些功能"))), second, text)
+        result = self.follow("第十個", self.turn("我要借神奇甘仔店"))
+        self.assertNotEqual((result["destination"] or {}).get("kind"), "detail")
+
+    def test_sound_alike_cancel_needs_a_homophone(self):
+        self.assertIn("已取消", self.turn("去笑")["message"])
+        self.assertNotIn("已取消", self.turn("算拉")["message"])
+
     def test_unrelated_phrases_do_not_open_a_book(self):
         for text in ("借低溫冷凍", "借三國演義"):
             result = self.turn(text)
@@ -63,6 +91,42 @@ class SoundAlikeTurnTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class SoundFallbackTests(unittest.TestCase):
+    """Before "nothing found", sound-alike services go to the model (offer or clarify only)."""
+
+    def app(self, choose):
+        self.calls = []
+
+        def model(messages, tools):
+            options = __import__("json").loads(messages[-1]["content"]).get("options", [])
+            self.calls.append(messages)
+            option = next((o for o in options if o["tool"] == choose), None)
+            return response("choose", {"choice": option["choice"]}) if option else first(tools)
+        return Assistant(FakeCatalog(), model)
+
+    def test_misheard_service_is_offered_never_opened(self):
+        result = self.app("confirm_candidates").turn({"text": "我要去動悟園", "request_id": "r", "session_id": "s"})
+        self.assertEqual((result["kind"], result["destination"]), ("confirm_candidates", None))
+        self.assertEqual(result["metrics"]["route"], "sound_model")
+        evidence = self.calls[0][1]["content"]
+        self.assertIn("動悟園", evidence)
+        self.assertIn("heard_as", evidence)
+
+    def test_model_clarification_falls_back_to_nothing_found(self):
+        import workflow
+        result = self.app("request_clarification").turn({"text": "我要去動悟園", "request_id": "r", "session_id": "s"})
+        self.assertEqual(result["message"], workflow.NO_RELATED)
+
+    def test_chance_sound_alikes_and_clear_requests_add_no_model_call(self):
+        for text in ("鳳梨披薩好吃嗎", "早安你好嗎", "學齡前視力檢查要錢嗎"):
+            app = self.app("confirm_candidates")
+            self.assertEqual(app.turn({"text": text, "request_id": "r", "session_id": "s"})["metrics"]["route"], "no_match", text)
+            self.assertEqual(self.calls, [], text)
+        app = self.app("select_capability")
+        app.turn({"text": "我要繳水費", "request_id": "r", "session_id": "s"})
+        self.assertEqual(len(self.calls), 1)
 
 
 class ServiceSoundCorrectionTests(unittest.TestCase):

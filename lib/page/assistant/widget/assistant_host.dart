@@ -578,32 +578,49 @@ class _AssistantSheetState extends State<AssistantSheet> {
     final label = chosen.code == 'auto' && heard != null
         ? '${chosen.short}·${AssistantSpeechLanguage.of(heard).short}'
         : chosen.short;
-    return PopupMenuButton<String>(
+    // A MenuAnchor, not a PopupMenuButton: this host sits above the App's
+    // Navigator, so a popup route opened underneath the panel and the menu
+    // never appeared. MenuAnchor draws in the host's own Overlay.
+    return MenuAnchor(
       key: const Key('assistant-speech-language'),
-      enabled: !locked,
-      tooltip: '說話的語言：${chosen.label}',
-      initialValue: chosen.code,
-      onSelected: controller.setSpeechLanguage,
-      itemBuilder: (_) => [
+      menuChildren: [
         for (final language in AssistantSpeechLanguage.all)
-          PopupMenuItem(
-            value: language.code,
+          MenuItemButton(
+            key: Key('assistant-speech-language-${language.code}'),
+            onPressed: () => controller.setSpeechLanguage(language.code),
+            leadingIcon: Icon(
+              language.code == chosen.code ? Icons.check : null,
+              size: 20,
+            ),
             child: TPText(language.label, style: TPTextStyles.bodyRegular),
           ),
       ],
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 12),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.translate, size: 22, color: TPColors.grayscale700),
-            const SizedBox(width: 4),
-            TPText(
-              label,
-              style: TPTextStyles.bodyRegular,
-              color: TPColors.grayscale700,
+      builder: (context, menu, _) => Semantics(
+        button: true,
+        label: '說話的語言：${chosen.label}',
+        excludeSemantics: true,
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: locked ? null : () => menu.isOpen ? menu.close() : menu.open(),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(
+                  Icons.translate,
+                  size: 22,
+                  color: TPColors.grayscale700,
+                ),
+                const SizedBox(width: 4),
+                TPText(
+                  label,
+                  style: TPTextStyles.bodyRegular,
+                  color: TPColors.grayscale700,
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );

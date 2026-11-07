@@ -1,3 +1,5 @@
+import 'dart:ui' show PlatformDispatcher;
+
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// A speech input language offered in the assistant's language menu
@@ -38,13 +40,24 @@ class AssistantSpeechLanguage {
 
   static const _key = 'assistant_speech_language';
 
+  /// The phone's own language when it is one we offer ('zh-Hant-TW' -> 'zh',
+  /// 'en-US' -> 'en'); other system languages detect ('auto').
+  static String systemDefault([String? languageCode]) {
+    final code =
+        (languageCode ?? PlatformDispatcher.instance.locale.languageCode)
+            .toLowerCase();
+    return all.any((l) => l.code == code && l.code != 'auto') ? code : 'auto';
+  }
+
+  /// The user's own choice, kept across launches; without one, the phone's
+  /// language ([systemDefault]).
   static Future<String> load() async {
+    String? saved;
     try {
-      final saved = (await SharedPreferences.getInstance()).getString(_key);
-      return of(saved).code;
-    } catch (_) {
-      return fallback;
-    }
+      saved = (await SharedPreferences.getInstance()).getString(_key);
+    } catch (_) {}
+    if (saved != null && all.any((l) => l.code == saved)) return saved;
+    return systemDefault();
   }
 
   static Future<void> save(String code) async {

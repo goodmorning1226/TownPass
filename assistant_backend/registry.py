@@ -26,6 +26,10 @@ def _span(term, text):
     return (start, start + len(term)) if start >= 0 else None
 
 
+# Similar multi-word keyword ("learn a book" ~ "lend a book" 0.87; "lend a hand" 0.64).
+SIMILAR_KEYWORD = 0.85
+
+
 class Registry:
     def __init__(self, path=None):
         # On the phone the catalogue is packaged with the Python code (device_main.py).
@@ -66,12 +70,31 @@ class Registry:
                 matches.append({"entry": entry, "score": max(len(term) for term in hits), "fuzzy": False,
                                 "evidence": hits, "span": None})
         if not matches:
+            matches = self._similar_language(text, language)
+        if not matches:
             return []
         best = max(item["score"] for item in matches)
         kept = [item for item in matches if item["score"] >= best * .8]
         ids = {item["entry"]["id"] for item in kept}
         kept = [item for item in kept if not any(item["entry"]["id"] in self.ancestors(self.by_id[other]) for other in ids)]
         return sorted(kept, key=lambda item: -item["score"])[:5]
+
+    def _similar_language(self, text, language):
+        """No exact keyword: multi-word keywords worded almost the same ("learn a book"
+        for "lend a book"), marked fuzzy so the user confirms before anything opens."""
+        from i18n import SIMILAR_LANGUAGES, similarity
+        if language not in SIMILAR_LANGUAGES:
+            return []
+        found = []
+        for entry in self.entries:
+            local = self.i18n.get(entry["id"], {})
+            terms = [term for lang in dict.fromkeys((language, "en"))
+                     for term in (local.get(lang) or {}).get("keywords", []) if len(term.split()) >= 2]
+            scored = [(similarity(text, term), term) for term in terms]
+            score, term = max(scored, default=(0.0, None))
+            if score >= SIMILAR_KEYWORD:
+                found.append({"entry": entry, "score": len(term), "fuzzy": True, "evidence": [term], "span": None})
+        return found
 
     def ancestors(self, entry):
         """Entries a user passes through to reach this one, from the catalogue:

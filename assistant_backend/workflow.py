@@ -45,6 +45,37 @@ REQUEST_ONLY = re.compile(r"(?:請|我|想|要|幫|我們|給|去|打開|開啟|
 # 0.51, "烏鴉借"~"我要借" 0.59; unrelated openings ("早安你", "天氣好") 0.2-0.3.
 REQUEST_OPENINGS = ("我想借", "我要借", "我想找", "我要找")
 OPENING_SOUND_CONFIRM = 0.5
+# Menu commands heard as sound-alikes, lengths may differ ("下夜"/"夏夜" ~ 下一頁 0.8,
+# "弟二個" ~ 第二個 1.0; "下雨天" 0.47, "打開" 0.2). Next page and numbers only while a
+# list is open; cancel (which does nothing) needs a homophone and a short sentence.
+# Before "nothing found": services whose words sound like part of the request
+# (動悟園 -> 動物園, 按鍵進度 -> 案件進度) are shown to the model, which may only
+# offer them or ask for clarification. Chance matches score at most ~0.74
+# (好吃嗎 ~ 抽號碼 0.65, 動電源 ~ 動物園 0.72).
+FALLBACK_SOUND = 0.8  # misheard words ~1.0 after folding; chance matches <= 0.74
+FALLBACK_LIMIT = 3
+COMMAND_SOUND = 0.8  # "下一個" is 0.78 and stays unmatched
+CANCEL_SOUND = 0.9
+NEXT_PAGE_WORDS = ("下一頁", "更多功能")
+CANCEL_WORDS = ("取消", "返回", "算了", "不用了", "不要了")
+_ORDINAL_SYLLABLES = {"yi": 1, "er": 2, "san": 3, "si": 4, "wu": 5, "liu": 6, "qi": 7, "ba": 8}
+
+
+def sounds_like(text, phrases, threshold):
+    from phonetic import similarity, syllables
+    heard = syllables(text)
+    return bool(heard) and any(similarity(heard, syllables(p)) >= threshold for p in phrases)
+
+
+def sound_ordinal(text):
+    """"弟二個" / "地一本" -> 2 / 1 by sound (第 + number + optional 個/本/筆/項)."""
+    from phonetic import readings
+    table = readings()
+    heard = [table.get(c) for c in text]  # unfolded: folding would make 十 (shi) sound like 四 (si)
+    if 2 <= len(heard) <= 3 and heard[0] == "di" and heard[1] in _ORDINAL_SYLLABLES and (
+            len(heard) == 2 or heard[2] in ("ge", "ben", "bi", "xiang")):
+        return _ORDINAL_SYLLABLES[heard[1]]
+    return None
 
 # FAQ layer. Two or three characters carry too little context for semantic
 # retrieval (rag_handoff/HANDOFF.md section 7), so they skip it.
@@ -73,7 +104,7 @@ class Workflow:
                 "message": message, "destination": None, "choices": [], "data_mode": "demo",
                 "language": payload.get("language", "zh"), **extra}
 
-    def _decide(self, text, entries, confirmation=False, context=None):
+    def _decide(self, text, entries, confirmation=False, context=None, sound=None):
         """Capability (or candidate-confirmation) decision among retrieved entries."""
         if confirmation:
             tools = [self.tool("confirm_candidates", "Show these candidates and wait for user selection; do not navigate.")]
@@ -82,7 +113,9 @@ class Workflow:
                               {"capability_id": {"type": "string", "enum": [e["id"] for e in entries]}}, ["capability_id"])]
         tools += [self.tool("request_clarification", "Ask the user what they want without navigating.")]
         evidence = {"original_text": text, "candidates": [{"id": e["id"], "title": e["title"],
-                    "features": e.get("features", []), "available": e["enabled"]} for e in entries],
+                    "features": e.get("features", []), "available": e["enabled"],
+                    **({"heard_as": sound[e["id"]]} if sound and e["id"] in sound else {})} for e in entries],
+                    **({"note": "The text may be misheard speech; heard_as pairs sound alike."} if sound else {}),
                     **({"page_hint": model_view(context)} if context else {})}
         return decide(self.owner, "capability", evidence, tools, self.validate, self.error)
 
@@ -396,7 +429,7 @@ class Workflow:
         if not re.search(r"\w", text):
             self._trace("empty")
             return self.reply(payload, i18n.t("empty", language))
-        if i18n.searches(i18n.LISTING, text, language):
+        if i18n.searches(i18n.LISTING, text, language) or i18n.similar(i18n.LISTING_PHRASES, text, language):
             self._trace("listing")
             return self._list(payload)
         matches = self.registry.search_language(i18n.positive_text(text, language), language)
@@ -429,19 +462,25 @@ class Workflow:
             return self._select(payload, pending, payload["choice_id"])
         if payload.get("language", "zh") != "zh":
             return self._handle_language(payload, text, pending, resolution)
-        if re.fullmatch(r"(?:請)?(?:取消|返回|算了|不用了|不要了)", text):
+        bare = re.sub(r"^請", "", text)
+        if re.fullmatch(r"(?:取消|返回|算了|不用了|不要了)", bare) or (
+                len(bare) <= 3 and sounds_like(bare, CANCEL_WORDS, CANCEL_SOUND)):
             with self.lock:
                 self.pending.pop(session, None)
             self._trace("cancel")
             return self.reply(payload, "已取消，未執行任何操作。")
         if pending and resolution == pending["id"]:
             self._trace("pending")
-            if text in ("下一頁", "更多功能") and pending.get("page"):
+            if pending.get("page") and (text in NEXT_PAGE_WORDS or (
+                    len(text) <= 4 and sounds_like(text, NEXT_PAGE_WORDS, COMMAND_SOUND))):
                 state = pending["page"]
                 return self._list(payload, state["all_entries"], state["root"], (state["offset"] + 8) % max(1, state["total"]))
             match = re.fullmatch(r"第?([一二三四五六七八1-8])(?:個|本|筆|項)?", text)
-            if match:
-                index = str("一二三四五六七八".find(match[1]) + 1) if not match[1].isdigit() else match[1]
+            index = (str("一二三四五六七八".find(match[1]) + 1) if not match[1].isdigit() else match[1]) if match else None
+            if index is None and len(text) <= 3:
+                spoken = sound_ordinal(text)
+                index = str(spoken) if spoken else None
+            if index is not None:
                 return self._select(payload, pending, index)
             if text in ("好", "是", "就是它", "確認"):
                 if len(pending["items"]) == 1:
@@ -540,5 +579,40 @@ class Workflow:
             return self._faq(payload, text) or self.reply(payload, "請補充想使用的服務或操作，也可以問「有哪些功能」。")
         if LIBRARY_CUE.search(text):
             return self._library(payload, text, self.owner.catalog.books())
+        sounded = self._sound_fallback(payload, text)
+        if sounded:
+            return sounded
         self._trace("no_match")
         return self._faq(payload, text) or self.reply(payload, NO_RELATED, action="no_related")
+
+    def _sound_candidates(self, text):
+        """Services one of whose words sounds like a stretch of text the catalogue did
+        not match, best first, with what was heard: [(entry, [{"heard", "sounds_like"}])]."""
+        from server import positive_text
+        found = {}
+        for score, start, end, term in term_matches(text, self.registry.sound_terms()):
+            if score < FALLBACK_SOUND:
+                break
+            if text[start:end] == term or (len(term) == 2 and score < SERVICE_SOUND_AUTO):
+                continue  # heard as written; or two syllables, too easy to match by chance
+            hits = self.registry.search(positive_text(text[:start] + term + text[end:]))
+            if hits and not hits[0].get("fuzzy"):
+                entry = hits[0]["entry"]
+                found.setdefault(entry["id"], (entry, []))[1].append({"heard": text[start:end], "sounds_like": term})
+        # Misheard openings (佛小姐 -> 我想借) are not used here: speech already offers
+        # them, and typed "我想辦事情" must not turn into a library offer.
+        return list(found.values())[:FALLBACK_LIMIT]
+
+    def _sound_fallback(self, payload, text):
+        """Before saying nothing was found: services that only sound like the request
+        go to the model, which may offer them (never navigate) or ask to clarify."""
+        candidates = self._sound_candidates(text)
+        if not candidates:
+            return None
+        entries = [entry for entry, _ in candidates]
+        self._trace("sound_model", [e["id"] for e in entries])
+        name, _ = self._decide(text, entries, confirmation=True, context=payload.get("page_context"),
+                               sound={e["id"]: heard for e, heard in candidates})
+        if name != "confirm_candidates":
+            return None
+        return self._offer(payload, self._cap_items(entries), "聽起來像是以下服務，你想用哪一個？請先確認。")
