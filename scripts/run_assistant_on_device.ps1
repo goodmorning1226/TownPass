@@ -26,10 +26,18 @@ foreach ($binary in @("libllama_server.so", "libwhisper_server.so")) {
 $env:TOWNPASS_ON_DEVICE = "1"
 Push-Location $root
 try {
-    $mode = if ($Release) { "--release" } else { "--debug" }
-    # Python is 64-bit only, so Flutter must not force its default ABI list (with armeabi-v7a).
-    fvm flutter run -d $DeviceId $mode --target-platform $platform --android-project-arg=disable-abi-filtering=true `
+    $mode = if ($Release) { "release" } else { "debug" }
+    # `flutter run` has no --target-platform, so build the APK for this device's ABI,
+    # then install and launch it. Python is 64-bit only, so Flutter must not force
+    # its default ABI list (with armeabi-v7a).
+    fvm flutter build apk "--$mode" --target-platform $platform --android-project-arg=disable-abi-filtering=true `
         --dart-define=ASSISTANT_ENABLED=true --dart-define=ASSISTANT_BASE_URL=http://127.0.0.1:8765
+    if ($LASTEXITCODE) { throw "flutter build apk failed" }
+    & $adb -s $DeviceId install -r (Join-Path $root "build\app\outputs\flutter-apk\app-$mode.apk")
+    if ($LASTEXITCODE) { throw "adb install failed" }
+    & $adb -s $DeviceId shell am force-stop com.example.townpass
+    & $adb -s $DeviceId shell am start -n com.example.townpass/.MainActivity
+    Write-Host "Installed and started. The models take a little while to load; the USB cable can be unplugged."
 } finally {
     Pop-Location
     Remove-Item Env:TOWNPASS_ON_DEVICE

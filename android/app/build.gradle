@@ -90,6 +90,9 @@ if (assistantOnDevice) {
         // The model servers are executables: Android runs them only from the
         // extracted native library directory.
         packaging { jniLibs { useLegacyPackaging = true } }
+        buildTypes {
+            release { proguardFile "src/ondevice/proguard-rules.pro" }
+        }
     }
     chaquopy {
         defaultConfig { version "3.13" }
