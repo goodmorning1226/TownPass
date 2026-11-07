@@ -254,10 +254,12 @@ def validate_call(call, tools):
 class Assistant:
     """Validates the request and hands it to the single Workflow orchestrator."""
 
-    def __init__(self, catalog=None, model_call=None):
+    def __init__(self, catalog=None, model_call=None, faq=None):
         from workflow import Workflow
         self.catalog = catalog or Catalog()
         self.model_call = model_call or self._model_call
+        # Second layer after tool calling (faq.FaqIndex); None runs without FAQ.
+        self.faq = faq
         self.model_lock = threading.Lock()
         self.usage = threading.local()  # per-request model call log for metrics
         self.workflow = Workflow(self, retrieve, tool, validate_call, AssistantError)
@@ -410,6 +412,7 @@ def make_handler(assistant, token=""):
                     "catalog_version": CATALOG_VERSION, "capabilities": [e["id"] for e in registry.entries if e["enabled"]],
                     "registry_version": registry.version,
                     "catalog": [{k: v for k, v in e.items() if k != "navigation"} for e in registry.entries],
+                    "faq_entries": assistant.faq.count if assistant.faq else 0,
                     "data_mode": "demo"})
             self.reply(404, {"error": "找不到此功能。"})
 
@@ -526,10 +529,13 @@ def main():
     token = os.environ.get("TOWNPASS_ASSISTANT_TOKEN", "")
     if args.host not in ("127.0.0.1", "localhost") and len(token) < 24:
         parser.error("LAN binding requires TOWNPASS_ASSISTANT_TOKEN with at least 24 characters.")
-    server = ThreadingHTTPServer((args.host, args.port), make_handler(Assistant(), token))
+    from faq import load_default
+    faq = load_default()
+    server = ThreadingHTTPServer((args.host, args.port), make_handler(Assistant(faq=faq), token))
     server.daemon_threads = True
     server.timeout = 80
-    print(f"TownPass assistant: http://{args.host}:{args.port} | model={MODEL} | demo only", flush=True)
+    print(f"TownPass assistant: http://{args.host}:{args.port} | model={MODEL} | "
+          f"faq={faq.count if faq else 'off'} | demo only", flush=True)
     try:
         server.serve_forever()
     except KeyboardInterrupt:
