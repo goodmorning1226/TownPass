@@ -12,6 +12,7 @@ import time
 import uuid
 
 from decision import decide
+from guide import GuidePlanner
 from page_context import current_root, model_view
 from phonetic import rank_books
 from registry import Registry, book_fuzzy, primary_title, single_substitution
@@ -35,6 +36,7 @@ class Workflow:
         self.validate = validate
         self.error = error
         self.registry = Registry()
+        self.guides = GuidePlanner()
         self.pending = {}
         self.lock = threading.RLock()
 
@@ -177,6 +179,22 @@ class Workflow:
                           kind="navigate", action="open_library_book", destination={"kind": "detail", "book_id": item["book_id"]})
 
     def handle(self, payload):
+        """One reply. Which page opens is decided by the page stage below
+        (unchanged). When that page has teaching components, the guide stage
+        (guide.py) adds which ones to teach, as reply["guide"]."""
+        reply = self._handle(payload)
+        page = self.guides.page_for(reply.get("destination")) if reply.get("kind") == "navigate" else None
+        if page:
+            text = payload.get("text", "").strip()
+            from server import positive_text
+            plan, route = self.guides.plan(self.owner, page, positive_text(text) or text, self.tool,
+                                           self.validate, self.error, decide,
+                                           destination=reply.get("destination"))
+            self.owner.usage.guide_route = route
+            reply["guide"] = plan
+        return reply
+
+    def _handle(self, payload):
         text = payload.get("text", "").strip()
         session = payload["session_id"]
         with self.lock:

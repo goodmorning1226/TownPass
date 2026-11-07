@@ -1,14 +1,16 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
 import 'package:town_pass/page/guided_assistant/guide_target.dart';
 import 'package:town_pass/page/guided_assistant/guided_assistant_controller.dart';
-import 'package:town_pass/page/guided_assistant/mock_pages/mock_library_view.dart';
-import 'package:town_pass/page/guided_assistant/mock_pages/mock_water_fee_view.dart';
-import 'package:town_pass/page/guided_assistant/model/mock_service_state.dart';
 import 'package:town_pass/page/guided_assistant/model/guide_content.dart';
+import 'package:town_pass/page/guided_assistant/model/guides/guide_registry.dart';
 import 'package:town_pass/page/guided_assistant/widget/guide_highlight.dart';
 import 'package:town_pass/page/guided_assistant/widget/guided_assistant_sheet.dart';
 import 'package:town_pass/util/tp_colors.dart';
+import 'package:town_pass/util/tp_route.dart';
 import 'package:town_pass/util/tp_text.dart';
 
 const assistantFabTarget = 'assistant.fab';
@@ -54,7 +56,7 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
             c.nudge.value;
             c.currentRoute.value;
             c.sheetOpen.value;
-            for (final v in c.pages.watched) {
+            for (final v in c.web.watched) {
               v.value;
             }
             final media = MediaQuery.of(context);
@@ -135,22 +137,16 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
     final keyboard = media.viewInsets.bottom;
     final base = keyboard > 0 ? keyboard : media.padding.bottom;
     switch (c.currentRoute.value) {
-      case MockRoutes.waterFee:
-        if (c.pages.waterQueried.value) return base + 24;
-        // Above the in-page keypad while it is open (as in the design).
-        if (c.pages.waterFocused.value) {
-          return media.padding.bottom + waterKeypadHeight + 16;
-        }
-        return base + 150;
-      case MockRoutes.library:
-        if (c.pages.libraryKeyboard.value &&
-            c.pages.libraryPage.value == LibraryPage.search) {
-          return media.padding.bottom + libraryKeyboardHeight + 12;
-        }
-        if (c.pages.libraryPage.value == LibraryPage.detail) {
-          return base + 182;
-        }
-        return base + 150;
+      case TPRoute.webView:
+        // Above the service page's fixed bottom buttons (預約, 查詢, 前往繳費…):
+        // measured by the probe while a guide runs, otherwise the page's
+        // known lift for this path. A dialog covers the bar.
+        final page = c.pageNow;
+        if (page.flag('__dialog') || page.flag('dialogOpen')) return base + 24;
+        final bar = page.number('__bottomBar');
+        final lift = guidePageForPath(page.path)?.bottomBar?.call(page.path!);
+        final known = base + 24 + (lift ?? 0);
+        return bar > 0 ? math.max(known, bar + 12.0) : known;
       case '/':
         return base + 80;
       default:
@@ -159,8 +155,8 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
   }
 
   Widget _fab(BuildContext context, GuidedAssistantController c) {
-    return Positioned(
-      right: 16,
+    return _FabDodge(
+      avoid: c.highlightTarget,
       bottom: _fabBottom(context, c),
       child: GuideTarget(
         id: assistantFabTarget,
@@ -414,7 +410,7 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
           _WarmButton('暫停', c.pause),
         ]);
       case CardVariant.opened:
-        tools.add(_SmallButton('開始', c.beginSteps));
+        break; // 我自己來 / 開始 under the text
       case CardVariant.done:
         if (!followUp) tools.add(_SmallButton('知道了', c.ackDone));
       case CardVariant.commit:
@@ -464,6 +460,16 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
                   ),
                   color: TPColors.grayscale950,
                 ),
+                if (card.variant == CardVariant.opened) ...[
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Expanded(child: _SecondaryButton('我自己來', c.goAlone)),
+                      const SizedBox(width: 10),
+                      Expanded(child: _PrimaryButton('開始', c.beginSteps)),
+                    ],
+                  ),
+                ],
                 if (commit) ...[
                   const SizedBox(height: 10),
                   Row(
@@ -597,6 +603,84 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
       ),
     );
   }
+}
+
+/// The 助理 button at the bottom right, moved to the bottom left while the
+/// ring of the current step is under it (e.g. a checkbox row at the right
+/// edge above the keyboard), so the button never hides what to tap.
+class _FabDodge extends StatefulWidget {
+  final String? avoid;
+  final double bottom;
+  final Widget child;
+  const _FabDodge({
+    required this.avoid,
+    required this.bottom,
+    required this.child,
+  });
+
+  @override
+  State<_FabDodge> createState() => _FabDodgeState();
+}
+
+class _FabDodgeState extends State<_FabDodge>
+    with SingleTickerProviderStateMixin {
+  late final Ticker _ticker;
+  bool _left = false;
+  double? _lift;
+
+  @override
+  void initState() {
+    super.initState();
+    _ticker = createTicker((_) => _check())..start();
+  }
+
+  void _check() {
+    if (!mounted) return;
+    final id = widget.avoid;
+    final target = id == null ? null : GuideTargets.rectOf(id)?.inflate(10);
+    final fab = GuideTargets.rectOf(assistantFabTarget);
+    final screen = MediaQuery.sizeOf(context);
+    var left = false;
+    double? lift;
+    if (target != null && fab != null) {
+      final top = screen.height - widget.bottom - fab.height;
+      final right = Rect.fromLTWH(
+        screen.width - 16 - fab.width,
+        top,
+        fab.width,
+        fab.height,
+      );
+      final leftRect = Rect.fromLTWH(16, top, fab.width, fab.height);
+      if (right.overlaps(target)) {
+        if (!leftRect.overlaps(target)) {
+          left = true;
+        } else if (target.top - fab.height > screen.height * 0.4) {
+          // A full-width row: sit just above it instead.
+          lift = screen.height - target.top;
+        }
+      }
+    }
+    if (left != _left || lift != _lift) {
+      setState(() {
+        _left = left;
+        _lift = lift;
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _ticker.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => Positioned(
+    left: _left ? 16 : null,
+    right: _left ? null : 16,
+    bottom: _lift ?? widget.bottom,
+    child: widget.child,
+  );
 }
 
 class _Card extends StatelessWidget {

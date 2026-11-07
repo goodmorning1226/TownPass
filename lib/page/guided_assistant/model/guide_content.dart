@@ -1,43 +1,44 @@
-import 'package:town_pass/page/guided_assistant/model/mock_service_state.dart';
+import 'package:town_pass/page/guided_assistant/web/web_guide_probe.dart';
+import 'package:town_pass/page/guided_assistant/web/web_page_state.dart';
 
 /// Every sentence the guided assistant shows or reads aloud is written here
-/// in advance. Nothing is generated at run time: the matcher only picks which
-/// entry to show.
+/// (and in the per-page guide files, guides/*_guide.dart) in advance.
+/// Nothing is generated at run time: the model only picks which pre-written
+/// teaching components to show.
 
-bool _always(MockServiceState s) => true;
-bool _never(MockServiceState s) => false;
+bool _always(WebPageState s) => true;
+bool _never(WebPageState s) => false;
 
 class GuideStep {
   /// [GuideTargets] id to highlight now, or null for no ring (e.g. while the
   /// user scrolls a result list).
-  final String? Function(MockServiceState s) target;
+  final String? Function(WebPageState s) target;
 
   /// Label on the penguin card, e.g. "步驟 1 / 4・點一下".
-  final String Function(MockServiceState s) label;
+  final String Function(WebPageState s) label;
 
   /// Text on the penguin card while this is the current step.
-  final String Function(MockServiceState s) card;
+  final String Function(WebPageState s) card;
 
   /// Answer to "下一步要做什麼？" / "我不會".
-  final String Function(MockServiceState s) detail;
+  final String Function(WebPageState s) detail;
 
-  final bool Function(MockServiceState s) isDone;
+  final bool Function(WebPageState s) isDone;
 
   /// The rest of the screen is dimmed and blocked (when there is a target).
-  final bool Function(MockServiceState s) locks;
+  final bool Function(WebPageState s) locks;
 
   /// A yellow arrow points at the target.
-  final bool Function(MockServiceState s) arrow;
+  final bool Function(WebPageState s) arrow;
 
   /// Shows the 「滑動」 hint.
-  final bool Function(MockServiceState s) scrollHint;
+  final bool Function(WebPageState s) scrollHint;
 
   /// Card distance from the top of the page (below the status bar); null
   /// keeps it under the title bar.
-  final double? cardTop;
+  final double? Function(WebPageState s)? cardTop;
 
-  /// Other widgets that stay usable while the screen is locked (the in-page
-  /// keyboards).
+  /// Other targets that stay usable while the screen is locked.
   final List<String> alsoUsable;
 
   /// Index of this step's line in [Guide.todos].
@@ -53,7 +54,7 @@ class GuideStep {
     required this.card,
     required this.detail,
     required this.isDone,
-    required this.todo,
+    this.todo = 0,
     this.locks = _always,
     this.arrow = _always,
     this.scrollHint = _never,
@@ -62,7 +63,24 @@ class GuideStep {
     this.commit = false,
   });
 
-  String? targetFor(MockServiceState s) => target(s);
+  String? targetFor(WebPageState s) => target(s);
+
+  /// Copy with this step's task-list line and label prefix filled in.
+  GuideStep numbered(int todoIndex, String Function(WebPageState s) newLabel) =>
+      GuideStep(
+        target: target,
+        label: newLabel,
+        card: card,
+        detail: detail,
+        isDone: isDone,
+        todo: todoIndex,
+        locks: locks,
+        arrow: arrow,
+        scrollHint: scrollHint,
+        cardTop: cardTop,
+        alsoUsable: alsoUsable,
+        commit: commit,
+      );
 }
 
 /// A line in the task list. [self] marks things the user does alone (shown
@@ -75,6 +93,7 @@ class TodoItem {
 }
 
 class Guide {
+  /// Unique per plan, e.g. "library:open_records,check_pickup".
   final String id;
 
   /// Task name in the assistant, e.g. "預約書籍" (目前任務：…).
@@ -83,16 +102,24 @@ class Guide {
   /// Short name in sentences, e.g. "借書" (暫停借書).
   final String shortName;
 
-  /// Mock page the guide runs on.
+  /// App route the guide runs on (the service WebView).
   final String route;
+
+  /// The service page, for the backend executor when the page has to be
+  /// opened again (回到借書).
+  final Map<String, dynamic> destination;
+
+  /// How to read the page, and whether the visible page is this service.
+  final WebPageSpec spec;
+  final bool Function(WebSnapshot s) onPage;
 
   /// Name of that page, e.g. "圖書借閱" (你離開了…).
   final String pageName;
 
-  /// Button that goes back to the page (回到水費頁 / 回到借書).
+  /// Button that goes back to the page (回到借書).
   final String resumeLabel;
 
-  /// Button in the assistant's task card (回到水費頁 / 回到借書畫面).
+  /// Button in the assistant's task card (回到借書畫面).
   final String backLabel;
 
   /// Chat message when the page opens.
@@ -115,17 +142,31 @@ class Guide {
   final String doneText;
   final String doneDetail;
 
+  /// Done card that depends on the page's answer; null uses the fixed one.
+  final String Function(WebPageState s)? doneLabelOf;
+  final String Function(WebPageState s)? doneTextOf;
+
+  /// Outlined (not blocking) while the done card shows; null draws no ring.
+  final String? Function(WebPageState s)? doneTargetOf;
+  final double? Function(WebPageState s)? doneCardTopOf;
+
   /// Chips in the assistant while this guide is the current task.
   final List<String> helpChips;
 
-  /// Resets the mock page before a fresh run.
-  final void Function(MockServiceState s) reset;
+  /// Teaching components this guide was built from, in order.
+  final List<String> components;
+
+  /// Starting this guide on its page already open does not reload it.
+  final bool reuseOpenPage;
 
   const Guide({
     required this.id,
     required this.title,
     required this.shortName,
     required this.route,
+    required this.destination,
+    required this.spec,
+    required this.onPage,
     required this.pageName,
     required this.resumeLabel,
     required this.backLabel,
@@ -139,12 +180,17 @@ class Guide {
     required this.doneLabel,
     required this.doneText,
     required this.doneDetail,
+    this.doneLabelOf,
+    this.doneTextOf,
+    this.doneTargetOf,
+    this.doneCardTopOf,
     required this.helpChips,
-    required this.reset,
+    required this.components,
+    this.reuseOpenPage = false,
   });
 
   /// Index of the first step not done yet; [steps.length] when all are done.
-  int currentStep(MockServiceState s) {
+  int currentStep(WebPageState s) {
     for (var i = 0; i < steps.length; i++) {
       if (!steps[i].isDone(s)) return i;
     }
@@ -152,183 +198,11 @@ class Guide {
   }
 
   /// Current line of the task list.
-  int currentTodo(MockServiceState s) {
+  int currentTodo(WebPageState s) {
     final i = currentStep(s);
     return i >= steps.length ? doneTodo : steps[i].todo;
   }
 }
-
-abstract class GuideIds {
-  static const water = 'water';
-  static const library = 'library';
-}
-
-abstract class MockRoutes {
-  static const waterFee = '/mock/water_fee';
-  static const library = '/mock/library';
-  static const service = '/mock/service';
-}
-
-const _waterTodos = [
-  TodoItem('開啟水費頁面'),
-  TodoItem('輸入水號（10 碼）'),
-  TodoItem('按「查詢」'),
-  TodoItem('確認帳單金額', self: '你自己確認', selfCurrent: '輪到你確認'),
-  TodoItem('選擇繳費方式並付款', self: '你自己確認', selfCurrent: '輪到你確認'),
-];
-
-const _libraryTodos = [
-  TodoItem('開啟圖書館服務'),
-  TodoItem('搜尋書名'),
-  TodoItem('選一本想借的書'),
-  TodoItem('選擇取書館'),
-  TodoItem('確認後按「預約」', self: '你自己確認'),
-  TodoItem('等通知，到館取書', self: '之後你自己去'),
-];
-
-bool _onDetail(MockServiceState s) => s.libraryPage.value == LibraryPage.detail;
-
-final Map<String, Guide> guides = {
-  GuideIds.water: Guide(
-    id: GuideIds.water,
-    title: '繳水費',
-    shortName: '繳水費',
-    route: MockRoutes.waterFee,
-    pageName: '水費頁',
-    resumeLabel: '回到水費頁',
-    backLabel: '回到水費頁',
-    openedText: '好的！已經幫你打開水費頁面了。接下來我會在畫面上，一步一步帶你做。',
-    openedLabel: '已開啟水費頁面',
-    openedCard: '好的！水費頁面打開了，我們一起來繳吧。',
-    steps: [
-      GuideStep(
-        target: (_) => 'water.field',
-        alsoUsable: const ['water.keypad'],
-        label: (_) => '步驟 1 / 2',
-        card: (s) {
-          if (s.waterDigits.value.length == MockServiceState.waterDigitCount) {
-            return '輸入好了！按一下鍵盤的「完成」。';
-          }
-          if (!s.waterFieldTapped.value && s.waterDigits.value.isEmpty) {
-            return '先點一下亮起來的框，把水號輸進去喔。';
-          }
-          return '水號一共 10 碼，慢慢輸入就好。';
-        },
-        detail: (s) => s.waterFieldTapped.value
-            ? '在框裡輸入帳單上的水號，一共 10 碼。輸入好，按鍵盤的「完成」。'
-            : '先點一下水費頁上「請輸入水號」那個框。',
-        isDone: (s) =>
-            s.waterDigits.value.length == MockServiceState.waterDigitCount &&
-            !s.waterFocused.value,
-        todo: 1,
-      ),
-      GuideStep(
-        target: (_) => 'water.query',
-        label: (_) => '步驟 2 / 2',
-        card: (_) => '很好！最後按一下最下面的「查詢」。',
-        detail: (_) => '按最下面的「查詢」按鈕就可以了。',
-        isDone: (s) => s.waterQueried.value,
-        todo: 2,
-      ),
-    ],
-    todos: _waterTodos,
-    doneTodo: 3,
-    stepCount: 2,
-    doneLabel: '引導完成',
-    doneText: '查到了！金額請你自己看清楚，再決定要不要繳喔。',
-    doneDetail: '帳單出來後，請自己看清楚金額，再決定要不要繳費。付款要由你自己確認，我不會幫你付。',
-    helpChips: const ['水號是什麼？', '下一步要做什麼？'],
-    reset: (s) => s.resetWater(),
-  ),
-  GuideIds.library: Guide(
-    id: GuideIds.library,
-    title: '預約書籍',
-    shortName: '借書',
-    route: MockRoutes.library,
-    pageName: '圖書借閱',
-    resumeLabel: '回到借書',
-    backLabel: '回到借書畫面',
-    openedText: '好的！已經幫你打開圖書館服務。我們先找到書、預約，之後再到圖書館取書。我會在畫面上一步一步帶你做。',
-    openedLabel: '已開啟圖書館服務',
-    openedCard: '好的！圖書館服務打開了，我們一起找書吧。',
-    steps: [
-      GuideStep(
-        target: (_) => 'library.search_entry',
-        label: (_) => '步驟 1 / 4・點一下',
-        card: (_) => '我們先找書！點一下上面的「關鍵字搜尋」。',
-        detail: (_) => '先點一下上面的「關鍵字搜尋」。',
-        isDone: (s) => s.libraryPage.value != LibraryPage.home,
-        cardTop: 230,
-        todo: 1,
-      ),
-      GuideStep(
-        target: (_) => 'library.search_row',
-        alsoUsable: const ['library.keyboard'],
-        arrow: (_) => false,
-        label: (_) => '步驟 1 / 4・打字',
-        card: (s) => s.libraryQuery.value.trim().isEmpty
-            ? '在這裡打想找的書名，例如「小王子」。'
-            : '打好了嗎？按右邊的放大鏡搜尋。',
-        detail: (_) => '在框裡打你想找的書名，例如「小王子」，打好按放大鏡搜尋。',
-        isDone: (s) => _onDetail(s) || s.librarySearched.value,
-        cardTop: 142,
-        todo: 1,
-      ),
-      GuideStep(
-        target: (_) => null,
-        locks: (_) => false,
-        arrow: (_) => false,
-        scrollHint: (_) => true,
-        label: (_) => '步驟 2 / 4・滑動',
-        card: (_) => '找到好多書！上下滑動看看，想借就點書名。',
-        detail: (_) => '在搜尋結果裡上下滑動，看到想借的書，點一下書名。',
-        isDone: (s) => _onDetail(s) || s.libraryScrolled.value,
-        todo: 2,
-      ),
-      GuideStep(
-        target: (_) => null,
-        locks: (_) => false,
-        arrow: (_) => false,
-        label: (_) => '步驟 2 / 4・選一本',
-        card: (_) => '有看到想借的書嗎？點一下書名就好。',
-        detail: (_) => '在搜尋結果裡上下滑動，看到想借的書，點一下書名。',
-        isDone: _onDetail,
-        todo: 2,
-      ),
-      GuideStep(
-        target: (s) => s.libraryBranchList.value
-            ? 'library.branch_list'
-            : 'library.branch_field',
-        locks: (s) => !s.libraryBranchList.value,
-        arrow: (s) => !s.libraryBranchList.value,
-        label: (_) => '步驟 3 / 4・選擇',
-        card: (s) =>
-            s.libraryBranchList.value ? '點一下你方便去拿書的圖書館。' : '接下來，點這裡選要去哪間圖書館拿書。',
-        detail: (_) => '點「請選擇取書館」，選一個你方便去拿書的圖書館。',
-        isDone: (s) => _onDetail(s) && s.libraryBranch.value >= 0,
-        todo: 3,
-      ),
-      GuideStep(
-        target: (_) => 'library.reserve',
-        arrow: (_) => false,
-        label: (_) => '步驟 4 / 4・確認',
-        card: (s) =>
-            '最後確認一下：預約《${s.bookTitle}》，在「${s.branchName}」拿書。沒問題就自己按「預約」喔。',
-        detail: (_) => '看一下書名和取書館對不對，沒問題就自己按「預約」。',
-        isDone: (s) => s.libraryReserved.value,
-        todo: 4,
-      ),
-    ],
-    todos: _libraryTodos,
-    doneTodo: 5,
-    stepCount: 4,
-    doneLabel: '完成了',
-    doneText: '預約的步驟都走完了！這是示範，沒有真的送出喔。',
-    doneDetail: '預約好了。等圖書館通知書到了，再去取書館把書借回家。',
-    helpChips: const ['什麼是館藏？', '預約和借書一樣嗎？', '下一步要做什麼？', '我要繳水費'],
-    reset: (s) => s.resetLibrary(),
-  ),
-};
 
 /// Plain-language explanation of a word, shown as a card in the chat.
 class GlossaryEntry {
@@ -403,9 +277,6 @@ const glossary = <GlossaryEntry>[
 
 class CandidateOption {
   final String label;
-
-  /// Mock page title to open; null when the service is not connected yet.
-  final String? opensTitle;
   final String? guideId;
 
   /// Option id from the assistant backend (this turn's number).
@@ -422,7 +293,6 @@ class CandidateOption {
 
   const CandidateOption(
     this.label, {
-    this.opensTitle,
     this.guideId,
     this.choiceId,
     this.say,
@@ -432,11 +302,7 @@ class CandidateOption {
 
   bool get enabled =>
       available ??
-      (opensTitle != null ||
-          guideId != null ||
-          choiceId != null ||
-          say != null ||
-          action != null);
+      (guideId != null || choiceId != null || say != null || action != null);
 }
 
 class CandidateGroup {
@@ -446,8 +312,8 @@ class CandidateGroup {
 }
 
 const caseProgress = CandidateGroup('你想查哪一種案件的進度？', [
-  CandidateOption('區公所申辦的案件', opensTitle: '申辦案件進度'),
-  CandidateOption('報警（警政）的案件', opensTitle: '警政案件進度'),
+  CandidateOption('區公所申辦的案件'),
+  CandidateOption('報警（警政）的案件'),
   CandidateOption('陳情的案件'),
   CandidateOption('災情通報的案件'),
 ]);
@@ -493,17 +359,9 @@ class PageHelp {
   const PageHelp(this.title, this.summary, {this.guideId});
 }
 
+/// Keyed by App route. Service pages keep theirs in their GuidePage
+/// (guides/*_guide.dart).
 const pageHelp = <String, PageHelp>{
-  MockRoutes.waterFee: PageHelp(
-    '這是「水費」頁',
-    '輸入水號後按「查詢」，就能看到要繳多少水費。',
-    guideId: GuideIds.water,
-  ),
-  MockRoutes.library: PageHelp(
-    '這是「圖書借閱」',
-    '可以搜尋圖書館有哪些書，選好書再預約，之後到圖書館取書。',
-    guideId: GuideIds.library,
-  ),
   '/': PageHelp('這是臺北通的首頁', '上面是常用的服務，下面那一排按鈕可以切換到其他頁面。'),
 };
 
@@ -519,6 +377,7 @@ abstract class Replies {
   static const notConnected = '這個 App 還沒串好這項服務，可以打 1999 問。';
   static const micDemo = '（示範版）語音辨識還沒接上，請點上面的選項，或按右邊的鍵盤打字。';
   static const cancelled = '好的，已經取消。';
+  static const goAlone = '好，你可以自己操作。需要我帶你做的時候，點「助理」再按「繼續引導」就可以。';
   static const ended = '好的，引導先結束了，接下來你可以自己操作。想再請我帶你做，跟我說一聲就好。';
   static const commitLater = '好，想預約的時候再叫我。';
   static const onboardingAgain = '好，我再帶你看一次怎麼用。';
@@ -552,10 +411,10 @@ const onboardingExample = '我想繳停車費';
 
 /// Starter chips in the assistant when there is no task.
 const starterChips = <String>[
-  '我要繳水費',
   '我要借書',
-  '查案件進度',
+  '我預約的書到了沒',
+  '圖書館有什麼公告',
+  '我要繳水費',
   '什麼是身分驗證',
   '附近哪裡有老人共餐',
-  '我要借書，還要繳水費',
 ];

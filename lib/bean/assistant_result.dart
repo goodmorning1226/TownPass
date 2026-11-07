@@ -10,6 +10,11 @@ class AssistantResult {
   final String kind;
   final String? resolutionId;
 
+  /// Teaching components the backend chose for the opened page, e.g.
+  /// `{page: library, components: [open_records, check_pickup]}`. Only a
+  /// hint: the App drops unknown ids and adds prerequisites itself.
+  final Map<String, dynamic>? guide;
+
   const AssistantResult({
     required this.sessionId,
     required this.message,
@@ -17,6 +22,7 @@ class AssistantResult {
     this.choices = const [],
     this.kind = 'reply',
     this.resolutionId,
+    this.guide,
   });
 
   factory AssistantResult.fromJson(Map<String, dynamic> json) {
@@ -50,6 +56,9 @@ class AssistantResult {
       destination: destination,
       kind: kind,
       resolutionId: json['resolution_id'] as String?,
+      guide: json['guide'] is Map<String, dynamic>
+          ? json['guide'] as Map<String, dynamic>
+          : null,
       choices: (json['choices'] as List? ?? [])
           .map((value) => AssistantBookChoice.fromJson(value))
           .toList(),

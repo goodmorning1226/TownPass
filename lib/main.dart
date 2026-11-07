@@ -17,7 +17,7 @@ import 'package:town_pass/page/assistant/widget/assistant_host.dart';
 import 'package:town_pass/page/guided_assistant/guided_assistant_controller.dart';
 import 'package:town_pass/service/assistant_recorder.dart';
 import 'package:town_pass/service/assistant_service.dart';
-import 'package:town_pass/page/guided_assistant/model/mock_service_state.dart';
+import 'package:town_pass/page/guided_assistant/web/web_page_state.dart';
 import 'package:town_pass/page/guided_assistant/widget/guided_assistant_host.dart';
 
 const assistantEnabled = bool.fromEnvironment(
@@ -71,7 +71,7 @@ Future<void> initServices() async {
 
   Get.put<SubscriptionService>(SubscriptionService());
   if (_useMock) {
-    Get.put<MockServiceState>(MockServiceState(), permanent: true);
+    Get.put<WebPageState>(WebPageState(), permanent: true);
     Get.put<GuidedAssistantController>(
       assistantOffline
           ? GuidedAssistantController()

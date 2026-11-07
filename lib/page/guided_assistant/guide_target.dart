@@ -7,8 +7,14 @@ abstract class GuideTargets {
 
   static GlobalKey keyFor(String id) => _keys.putIfAbsent(id, GlobalKey.new);
 
+  /// Rects of elements inside the service WebView, read by WebGuideProbe.
+  static Map<String, Rect> _web = const {};
+
+  static void setWebRects(Map<String, Rect> rects) => _web = rects;
+
   /// Global rect of the target, or null while it is not laid out.
   static Rect? rectOf(String id) {
+    if (_web[id] case final web?) return web;
     final context = _keys[id]?.currentContext;
     final box = context?.findRenderObject();
     if (box is! RenderBox || !box.attached || !box.hasSize) return null;

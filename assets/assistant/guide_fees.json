@@ -1,0 +1,152 @@
+{
+  "version": 1,
+  "_comment": "Teaching components of one service page. Shared by the App (guides/<page>_guide.dart holds the pre-written step texts) and the backend (guide.py picks a set). The model may only choose ids listed here; prerequisites are added and ordered by the validator, never by the model. capabilities: capability ids (or roots like 'fees') whose pages this guide runs on. capability_goals: the only goals that fit that sub-page, first = its default. entry_goals: components always added for that capability.",
+  "page": "fees",
+  "capability": "fees.other",
+  "capabilities": [
+    "fees.parking",
+    "fees.water",
+    "fees.tuition",
+    "fees.housing",
+    "fees.hospital",
+    "fees.maintenance",
+    "fees.course",
+    "fees.other",
+    "fees.history"
+  ],
+  "title": "繳費",
+  "default_goal": "confirm_pay",
+  "capability_goals": {
+    "fees.history": [
+      "filter_history"
+    ]
+  },
+  "entry_goals": {
+    "fees.other": [
+      "pick_fee"
+    ]
+  },
+  "components": [
+    {
+      "id": "pick_fee",
+      "title": "選要繳的費用",
+      "description": "在繳費項目清單點要繳的費用，例如水費",
+      "keywords": [
+        "其他費用",
+        "其他繳費",
+        "別的費用",
+        "繳費項目",
+        "哪一種費用"
+      ],
+      "requires": []
+    },
+    {
+      "id": "enter_number",
+      "title": "輸入帳單號碼",
+      "description": "把帳單上的號碼（例如水號）打進框框",
+      "keywords": [
+        "水號",
+        "繳費編號",
+        "單據號碼",
+        "車號",
+        "帳單號碼",
+        "輸入號碼"
+      ],
+      "requires": []
+    },
+    {
+      "id": "query_bill",
+      "title": "按「查詢」找帳單",
+      "description": "號碼打好後按「查詢」，看要繳的帳單和金額",
+      "keywords": [
+        "查帳單",
+        "查詢",
+        "多少錢",
+        "欠多少",
+        "要繳多少"
+      ],
+      "requires": [
+        "enter_number"
+      ]
+    },
+    {
+      "id": "pick_bill",
+      "title": "勾選要繳的帳單",
+      "description": "在查到的帳單右邊打勾，選要繳哪幾張",
+      "keywords": [
+        "勾選",
+        "哪一張",
+        "全部繳清",
+        "選帳單"
+      ],
+      "requires": [
+        "query_bill"
+      ]
+    },
+    {
+      "id": "to_payment",
+      "title": "按「前往繳費」",
+      "description": "看一下總金額，按「前往繳費」",
+      "keywords": [
+        "前往繳費",
+        "總金額"
+      ],
+      "requires": [
+        "pick_bill"
+      ]
+    },
+    {
+      "id": "choose_method",
+      "title": "選付款方式",
+      "description": "在「請選擇繳費方式」點一個常用的付款方式",
+      "keywords": [
+        "付款方式",
+        "信用卡",
+        "悠遊付",
+        "行動支付",
+        "怎麼付"
+      ],
+      "requires": [
+        "to_payment"
+      ]
+    },
+    {
+      "id": "confirm_pay",
+      "title": "確認後按「是」付款",
+      "description": "看清楚費用和金額，再自己按「是」",
+      "keywords": [
+        "繳費",
+        "繳錢",
+        "付錢",
+        "付款",
+        "繳"
+      ],
+      "requires": [
+        "choose_method"
+      ]
+    },
+    {
+      "id": "filter_history",
+      "title": "篩選繳費紀錄",
+      "description": "在繳費紀錄用上面的選單挑時間、費用或狀態",
+      "keywords": [
+        "繳費紀錄",
+        "繳費記錄",
+        "繳過",
+        "繳了什麼",
+        "紀錄",
+        "記錄"
+      ],
+      "requires": []
+    }
+  ],
+  "follow_ups": {
+    "pick_fee": "confirm_pay"
+  },
+  "generic_keywords": [
+    "繳",
+    "繳費",
+    "帳單",
+    "付"
+  ]
+}

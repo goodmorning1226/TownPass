@@ -1,3 +1,5 @@
+import 'package:flutter/widgets.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:town_pass/util/tp_route.dart';
 
 /// Where the user is, reported to the assistant backend as a hint only
@@ -13,6 +15,10 @@ class AssistantPageTracker {
   static final _path = RegExp(r'^/[A-Za-z0-9/_\-.]{0,200}$');
 
   final _webPages = <AssistantWebPage>[];
+
+  /// The visible WebView, for the guided assistant's overlay (read only).
+  AssistantWebPage? get currentWebPage =>
+      _webPages.isEmpty ? null : _webPages.last;
 
   /// Each open [TPWebView] holds one slot; the newest slot is the visible one.
   AssistantWebPage attachWebView() {
@@ -48,6 +54,13 @@ class AssistantPageTracker {
 class AssistantWebPage {
   final AssistantPageTracker _tracker;
   Uri? url;
+
+  /// Lets the guided assistant read where elements are on the page. The
+  /// overlay only reads; it never changes the page.
+  InAppWebViewController? controller;
+
+  /// Key on the WebView, so the overlay knows where it sits on screen.
+  final viewKey = GlobalKey();
 
   AssistantWebPage._(this._tracker);
 

@@ -6,7 +6,10 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:town_pass/page/guided_assistant/model/guide_content.dart';
 import 'package:town_pass/page/guided_assistant/model/mock_assistant_engine.dart';
-import 'package:town_pass/page/guided_assistant/model/mock_service_state.dart';
+import 'package:town_pass/page/guided_assistant/model/guides/guide_registry.dart';
+import 'package:town_pass/page/guided_assistant/web/web_guide_probe.dart';
+import 'package:town_pass/page/guided_assistant/web/web_page_state.dart';
+import 'package:town_pass/util/tp_route.dart';
 import 'package:town_pass/bean/assistant_result.dart';
 import 'package:town_pass/page/main/main_view_controller.dart';
 import 'package:town_pass/service/assistant_action_executor.dart';
@@ -115,10 +118,8 @@ enum OnboardingStage { hidden, card, pointer }
 class GuidedAssistantController extends GetxController {
   final MockAssistantEngine engine;
   final Duration thinkDelay;
-  final Duration autoStartDelay;
   final bool runOnboarding;
   final AssistantSpeaker speaker;
-  final void Function(String route, {Object? arguments}) _navigate;
 
   /// Backend with the on-device (or desktop) model; null = pre-written
   /// rules only.
@@ -130,25 +131,33 @@ class GuidedAssistantController extends GetxController {
   GuidedAssistantController({
     this.engine = const MockAssistantEngine(),
     this.thinkDelay = const Duration(milliseconds: 1200),
-    this.autoStartDelay = const Duration(seconds: 3),
     this.runOnboarding = true,
     this.service,
     this.recorder,
     AssistantActionExecutor? executor,
     AssistantPageTracker? pageTracker,
     AssistantSpeaker? speaker,
-    void Function(String route, {Object? arguments})? navigate,
+    this.probeOverride,
   }) : speaker = speaker ?? AssistantSpeaker(),
        executor = executor ?? AssistantActionExecutor(),
-       pageTracker = pageTracker ?? AssistantPageTracker.instance,
-       _navigate = navigate ?? _defaultNavigate;
+       pageTracker = pageTracker ?? AssistantPageTracker.instance;
 
-  static void _defaultNavigate(String route, {Object? arguments}) {
-    if (Get.currentRoute == route) return;
-    Get.offNamedUntil(route, (r) => r.isFirst, arguments: arguments);
-  }
+  WebPageState get web => Get.find<WebPageState>();
 
-  MockServiceState get pages => Get.find<MockServiceState>();
+  /// Reads the real service page while a guide runs (never changes it).
+  late final WebGuideProbe probe =
+      probeOverride ?? WebGuideProbe(web, tracker: pageTracker);
+
+  /// Tests replace the page reader.
+  final WebGuideProbe? probeOverride;
+
+  /// Guides built this session, by id (`page:components`, see
+  /// guide_registry.dart).
+  final _guides = <String, Guide>{};
+
+  /// A guide's page is being opened: route changes on the way (back to the
+  /// App shell, then the WebView) do not pause it.
+  bool _opening = false;
 
   final sheetOpen = false.obs;
   final messages = <ChatMessage>[].obs;
@@ -170,7 +179,6 @@ class GuidedAssistantController extends GetxController {
   int _nextId = 1;
   int _wrongTaps = 0;
   Timer? _think;
-  Timer? _autoStart;
   Timer? _nudgeTimer;
   Timer? _speakTimer;
   Timer? _toastTimer;
@@ -191,24 +199,18 @@ class GuidedAssistantController extends GetxController {
   void onInit() {
     super.onInit();
     messages.add(_bot(Replies.greet));
-    final p = pages;
-    _stepWorker = everAll([task, ...p.watched], (_) => _onProgress());
+    _stepWorker = everAll([task, ...web.watched], (_) => _onProgress());
     speaker.loadEnabled().then((v) => readAloud.value = v);
     if (runOnboarding) _loadOnboarding();
   }
 
   @override
   void onClose() {
-    for (final t in [
-      _think,
-      _autoStart,
-      _nudgeTimer,
-      _speakTimer,
-      _toastTimer,
-    ]) {
+    for (final t in [_think, _nudgeTimer, _speakTimer, _toastTimer]) {
       t?.cancel();
     }
     _stepWorker?.dispose();
+    probe.stop();
     speaker.stop();
     service?.cancel();
     recorder?.dispose();
@@ -262,7 +264,6 @@ class GuidedAssistantController extends GetxController {
     MockReplyKind.stepHelp,
     MockReplyKind.onboarding,
     MockReplyKind.greet,
-    MockReplyKind.multi,
   };
 
   void submit(String raw, {String? choiceId, String? shownAs, String? note}) {
@@ -326,9 +327,10 @@ class GuidedAssistantController extends GetxController {
     _resolutionId = result.resolutionId;
     final destination = result.destination;
     if (destination != null) {
-      final guideId = guideFor(destination, local);
-      if (guideId != null) {
-        _requestGuide(guideId);
+      final guide = guideFor(destination, result.guide, text);
+      if (guide != null) {
+        _guides[guide.id] = guide;
+        _requestGuide(guide.id);
       } else {
         _openReal(destination, result.message);
       }
@@ -357,19 +359,74 @@ class GuidedAssistantController extends GetxController {
     _say(_bot(result.message));
   }
 
-  /// A pre-written guide for this backend destination, if there is one.
-  static String? guideFor(Map<String, dynamic> destination, MockReply local) {
-    if (destination['kind'] == 'capability' &&
-        destination['id'] == 'fees.water') {
-      return GuideIds.water;
+  /// The pre-written guide for this backend destination, if there is one.
+  /// [plan] is the backend's choice of teaching components; it is checked
+  /// and completed here again (unknown ids dropped, prerequisites added).
+  static Guide? guideFor(
+    Map<String, dynamic> destination,
+    Map<String, dynamic>? plan,
+    String text,
+  ) {
+    final page = guidePageFor(destination);
+    if (page == null) return null;
+    final goals = plan?['page'] == page.id && plan?['components'] is List
+        ? (plan!['components'] as List).whereType<String>().toList()
+        : null;
+    return guideForDestination(
+      destination,
+      goals,
+      MockAssistantEngine.normalize(text),
+    );
+  }
+
+  Guide? _guide(String id) {
+    final known = _guides[id];
+    if (known != null) return known;
+    final built = guideFromId(id);
+    if (built != null) _guides[built.id] = built;
+    return built;
+  }
+
+  /// Opens the guide's real service page unless it is already showing.
+  void _openGuidePage(Guide guide, {bool fresh = false}) {
+    if (!fresh &&
+        currentRoute.value == guide.route &&
+        guide.onPage(_pageNow())) {
+      return;
     }
-    const libraryKinds = {'home', 'search', 'detail'};
-    if (libraryKinds.contains(destination['kind']) ||
-        (destination['kind'] == 'capability' &&
-            destination['id'] == 'library')) {
-      return GuideIds.library;
-    }
-    return null;
+    _opening = true;
+    final generation = _generation;
+    executor.open(
+      guide.destination,
+      (error) {
+        if (isClosed) return;
+        _opening = false;
+        if (error != null && generation == _generation) {
+          _say(_bot(Replies.pageFailed));
+          _showToast(Replies.pageFailed);
+          final t = task.value;
+          if (t != null && t.guide.id == guide.id) {
+            task.value = t.copyWith(status: TaskStatus.ended);
+          }
+        }
+      },
+      beforeBack: () {
+        if (!sheetOpen.value) return false;
+        closeSheet();
+        return true;
+      },
+      isCurrent: () => !isClosed,
+    );
+  }
+
+  /// The visible service page: from the probe while it runs, otherwise from
+  /// the WebView's own address.
+  WebSnapshot get pageNow => _pageNow();
+
+  WebSnapshot _pageNow() {
+    if (web.now.path != null) return web.now;
+    final url = pageTracker.currentWebPage?.url;
+    return WebSnapshot(path: AssistantPageTracker.servicePath(url));
   }
 
   void _openReal(Map<String, dynamic> destination, String message) {
@@ -430,25 +487,8 @@ class GuidedAssistantController extends GetxController {
   void _handle(MockReply reply) {
     switch (reply.kind) {
       case MockReplyKind.guide:
-        _requestGuide(reply.guideId!);
-      case MockReplyKind.openService:
-        final title = reply.serviceTitle!;
-        _say(_bot(Replies.opensPage(title)));
-        closeSheet();
-        _navigate(MockRoutes.service, arguments: title);
-      case MockReplyKind.multi:
-        final first = guides[reply.guideId]!;
-        final other = guides[reply.otherGuideId]!;
-        _say(
-          _bot(
-            Replies.multi,
-            options: CandidateGroup(Replies.multi, [
-              CandidateOption(first.title, guideId: first.id),
-              CandidateOption(other.title, guideId: other.id),
-            ]),
-            followUpOf: '${first.id}|${other.id}',
-          ),
-        );
+        final guide = _guide(reply.guideId!);
+        if (guide != null) _requestGuide(guide.id);
       case MockReplyKind.candidates:
         _say(_bot(reply.candidates!.question, options: reply.candidates));
       case MockReplyKind.explain:
@@ -458,7 +498,9 @@ class GuidedAssistantController extends GetxController {
         final a = reply.answer!;
         _say(_bot(a.summary, answer: a));
       case MockReplyKind.pageHelp:
-        final help = pageHelp[currentRoute.value];
+        final help = currentRoute.value == TPRoute.webView
+            ? pageHelpForPath(_pageNow().path)
+            : pageHelp[currentRoute.value];
         if (help == null) {
           _say(_bot(Replies.unknownPage));
         } else {
@@ -524,11 +566,7 @@ class GuidedAssistantController extends GetxController {
         followUp = pair.firstWhere((id) => id != option.guideId);
       }
       startGuide(option.guideId!, followUpGuideId: followUp);
-      return;
     }
-    _say(_bot(Replies.opensPage(option.opensTitle!)));
-    closeSheet();
-    _navigate(MockRoutes.service, arguments: option.opensTitle);
   }
 
   // ---------------------------------------------------------------- guide
@@ -536,13 +574,13 @@ class GuidedAssistantController extends GetxController {
   /// Starts [guideId], or asks first when another guide is in progress.
   void _requestGuide(String guideId) {
     final active = _activeTask;
-    final other = guides[guideId];
+    final other = _guide(guideId);
     if (active == null || other == null || active.guide.id == guideId) {
       startGuide(guideId);
       return;
     }
     final g = active.guide;
-    final n = g.currentTodo(pages).clamp(1, g.stepCount);
+    final n = g.currentTodo(web).clamp(1, g.stepCount);
     final ask = Replies.switchAsk(g.title, n, g.shortName, other.shortName);
     _say(
       _bot(
@@ -566,10 +604,9 @@ class GuidedAssistantController extends GetxController {
     bool followUpResumes = false,
     bool resuming = false,
   }) {
-    final guide = guides[guideId];
+    final guide = _guide(guideId);
     if (guide == null) return;
-    _autoStart?.cancel();
-    if (!resuming) guide.reset(pages);
+    if (!resuming) web.resetLatches();
     _wrongTaps = 0;
     nudge.value = '';
     _lastSpokenKey = null;
@@ -582,36 +619,42 @@ class GuidedAssistantController extends GetxController {
     );
     _say(_bot(resuming ? Replies.backTo(guide.shortName) : guide.openedText));
     closeSheet();
-    _navigate(guide.route);
-    currentRoute.value = guide.route;
-    if (resuming) return;
-    _autoStart = Timer(autoStartDelay, () {
-      if (task.value?.status == TaskStatus.opened) beginSteps();
-    });
+    // The steps start only when the user presses 開始 (or 我自己來 to go
+    // alone); nothing moves on by itself.
+    _openGuidePage(guide, fresh: !resuming && !guide.reuseOpenPage);
+  }
+
+  /// 我自己來 on the opened card: no steps; the task stays so 繼續引導 can
+  /// still start them later.
+  void goAlone() {
+    final t = task.value;
+    if (t == null) return;
+    task.value = t.copyWith(status: TaskStatus.ended, left: false);
+    todoOpen.value = false;
+    _say(_bot(Replies.goAlone));
   }
 
   void beginSteps() {
     final t = task.value;
     if (t == null) return;
-    _autoStart?.cancel();
     task.value = t.copyWith(status: TaskStatus.on, left: false);
   }
 
   int get stepIndex {
     final t = task.value;
-    return t == null ? 0 : t.guide.currentStep(pages);
+    return t == null ? 0 : t.guide.currentStep(web);
   }
 
   GuideStep? get currentStep {
     final t = task.value;
     if (t == null) return null;
-    final i = t.guide.currentStep(pages);
+    final i = t.guide.currentStep(web);
     return i < t.guide.steps.length ? t.guide.steps[i] : null;
   }
 
   bool get allStepsDone {
     final t = task.value;
-    return t != null && t.guide.currentStep(pages) >= t.guide.steps.length;
+    return t != null && t.guide.currentStep(web) >= t.guide.steps.length;
   }
 
   /// Answer to "下一步要做什麼？".
@@ -619,7 +662,7 @@ class GuidedAssistantController extends GetxController {
     final t = _activeTask;
     if (t == null) return null;
     if (allStepsDone) return t.guide.doneDetail;
-    return currentStep?.detail(pages);
+    return currentStep?.detail(web);
   }
 
   /// The guide is showing on its page (card, highlight).
@@ -627,6 +670,7 @@ class GuidedAssistantController extends GetxController {
     final t = task.value;
     if (t == null || t.left || sheetOpen.value) return false;
     if (currentRoute.value != t.guide.route) return false;
+    if (!t.guide.onPage(web.now)) return false;
     return t.status == TaskStatus.opened || t.status == TaskStatus.on;
   }
 
@@ -637,7 +681,7 @@ class GuidedAssistantController extends GetxController {
     if (!_stepRunning) return false;
     final step = currentStep;
     if (step == null || step.commit) return false;
-    return step.targetFor(pages) != null && step.locks(pages);
+    return step.targetFor(web) != null && step.locks(web);
   }
 
   /// Ring without blocking: a step that leaves the screen free, or a submit
@@ -645,28 +689,38 @@ class GuidedAssistantController extends GetxController {
   bool get pointingOnly {
     if (!_stepRunning) return false;
     final step = currentStep;
-    if (step == null || step.targetFor(pages) == null) return false;
+    if (step == null || step.targetFor(web) == null) return false;
     if (step.commit) return task.value!.commitAccepted;
-    return !step.locks(pages);
+    return !step.locks(web);
   }
 
   String? get highlightTarget =>
-      (locked || pointingOnly) ? currentStep?.targetFor(pages) : null;
+      (locked || pointingOnly) ? currentStep?.targetFor(web) : doneTarget;
 
-  bool get showArrow => _stepRunning && (currentStep?.arrow(pages) ?? false);
+  /// Ring (nothing blocked) on the result or the button the done card
+  /// talks about.
+  String? get doneTarget => _stepRunning && allStepsDone
+      ? task.value!.guide.doneTargetOf?.call(web)
+      : null;
+
+  bool get showArrow => _stepRunning && (currentStep?.arrow(web) ?? false);
 
   /// Card distance from the top for this step (null: under the title bar).
-  double? get cardTop => _stepRunning ? currentStep?.cardTop : null;
+  double? get cardTop {
+    if (!_stepRunning) return null;
+    if (allStepsDone) return task.value!.guide.doneCardTopOf?.call(web);
+    return currentStep?.cardTop?.call(web);
+  }
 
   bool get scrollHintVisible =>
-      _stepRunning && (currentStep?.scrollHint(pages) ?? false);
+      _stepRunning && (currentStep?.scrollHint(web) ?? false);
 
   /// Lines of the task list in the assistant.
   List<TodoLine> get todoLines {
     final t = task.value;
     if (t == null) return const [];
     final g = t.guide;
-    final p = g.currentTodo(pages);
+    final p = g.currentTodo(web);
     return [
       for (var i = 0; i < g.todos.length; i++)
         _line(
@@ -695,7 +749,7 @@ class GuidedAssistantController extends GetxController {
   String get currentTodoText {
     final t = task.value;
     if (t == null) return '';
-    final p = t.guide.currentTodo(pages);
+    final p = t.guide.currentTodo(web);
     return p < t.guide.todos.length ? t.guide.todos[p].text : '全部完成';
   }
 
@@ -706,37 +760,47 @@ class GuidedAssistantController extends GetxController {
     if (t.status == TaskStatus.opened) {
       return GuideCard(CardVariant.opened, g.openedLabel, g.openedCard);
     }
-    final i = g.currentStep(pages);
+    final i = g.currentStep(web);
     if (i >= g.steps.length) {
       final follow = t.followUpGuideId == null
           ? null
-          : guides[t.followUpGuideId];
+          : _guide(t.followUpGuideId!);
       final offer = follow == null
           ? ''
           : t.followUpResumes
           ? Replies.resumeOffer(follow.shortName)
           : Replies.followUp(follow.title);
-      return GuideCard(CardVariant.done, g.doneLabel, '${g.doneText}$offer');
+      return GuideCard(
+        CardVariant.done,
+        g.doneLabelOf?.call(web) ?? g.doneLabel,
+        '${g.doneTextOf?.call(web) ?? g.doneText}$offer',
+      );
     }
     final step = g.steps[i];
-    final label = step.label(pages);
+    final label = step.label(web);
     if (nudge.value.isNotEmpty) {
       return GuideCard(CardVariant.step, label, nudge.value);
     }
     if (step.commit && !t.commitAccepted) {
-      return GuideCard(CardVariant.commit, label, step.card(pages));
+      return GuideCard(CardVariant.commit, label, step.card(web));
     }
     if (step.commit) {
       return GuideCard(CardVariant.step, label, '請按亮起來的「預約」，按了就會送出。');
     }
-    return GuideCard(CardVariant.step, label, step.card(pages));
+    return GuideCard(CardVariant.step, label, step.card(web));
   }
 
   void _onProgress() {
+    final active = _activeTask;
+    if (active == null) {
+      if (probe.running) probe.stop();
+    } else {
+      probe.start(active.guide.spec);
+    }
     // A new step replaces any "tap the highlighted spot" reminder at once.
     // The step's own text counts too (tapping the field within one step).
     final stepKey =
-        '${task.value?.guide.id}:$stepIndex:${currentStep?.card(pages)}';
+        '${task.value?.guide.id}:$stepIndex:${currentStep?.card(web)}';
     if (stepKey != _lastStepKey) {
       _lastStepKey = stepKey;
       _wrongTaps = 0;
@@ -786,7 +850,6 @@ class GuidedAssistantController extends GetxController {
   void pause() {
     final t = task.value;
     if (t == null) return;
-    _autoStart?.cancel();
     task.value = t.copyWith(status: TaskStatus.paused);
   }
 
@@ -794,20 +857,14 @@ class GuidedAssistantController extends GetxController {
     final t = task.value;
     if (t == null) return;
     closeSheet();
-    if (t.left || currentRoute.value != t.guide.route) {
-      _navigate(t.guide.route);
-      currentRoute.value = t.guide.route;
-    }
+    _openGuidePage(t.guide);
     task.value = t.copyWith(status: TaskStatus.on, left: false);
   }
 
   void endGuide() {
     final t = task.value;
     if (t == null) return;
-    _autoStart?.cancel();
     task.value = t.copyWith(status: TaskStatus.ended, left: false);
-    pages.waterFocused.value = false;
-    pages.libraryKeyboard.value = false;
     todoOpen.value = false;
     _say(_bot(Replies.ended));
   }
@@ -865,9 +922,8 @@ class GuidedAssistantController extends GetxController {
   void backToPage() {
     final t = task.value;
     closeSheet();
-    if (t != null && currentRoute.value != t.guide.route) {
-      _navigate(t.guide.route);
-      currentRoute.value = t.guide.route;
+    if (t != null) {
+      _openGuidePage(t.guide);
       if (t.left) task.value = t.copyWith(left: false);
     }
   }
@@ -885,7 +941,7 @@ class GuidedAssistantController extends GetxController {
       default:
         if (allStepsDone) return '引導完成';
         final n = t.guide.stepCount;
-        return '步驟 ${t.guide.currentTodo(pages).clamp(1, n)} / $n';
+        return '步驟 ${t.guide.currentTodo(web).clamp(1, n)} / $n';
     }
   }
 
@@ -894,14 +950,14 @@ class GuidedAssistantController extends GetxController {
     currentRoute.value = route;
     final t = task.value;
     if (t == null) return;
-    if (route != t.guide.route) {
+    if (route == t.guide.route) _opening = false;
+    if (route != t.guide.route && !_opening) {
       if (t.status == TaskStatus.on || t.status == TaskStatus.opened) {
-        _autoStart?.cancel();
         task.value = t.copyWith(status: TaskStatus.paused, left: true);
       } else if (!t.left && t.status == TaskStatus.paused) {
         task.value = t.copyWith(left: true);
       }
-    } else if (t.left) {
+    } else if (route == t.guide.route && t.left) {
       task.value = t.copyWith(left: false);
     }
   }

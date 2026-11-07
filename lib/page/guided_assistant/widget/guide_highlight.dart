@@ -167,7 +167,10 @@ class _GuideHighlightState extends State<GuideHighlight>
         }
         if (widget.showArrow) {
           final below = hole.center.dy < size.height * 0.55;
-          final left = (hole.right - 64).clamp(8.0, size.width - 44);
+          // Wide targets (full-width buttons) get the arrow in the middle,
+          // clear of the 助理 button and of texts at the right end (totals).
+          final x = hole.width > 200 ? hole.center.dx - 18 : hole.right - 64;
+          final left = x.clamp(8.0, size.width - 44);
           children.add(
             Positioned(
               left: left,

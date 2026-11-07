@@ -1,41 +1,48 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:town_pass/bean/assistant_result.dart';
 import 'package:town_pass/page/guided_assistant/guide_target.dart';
 import 'package:town_pass/page/guided_assistant/guided_assistant_controller.dart';
 import 'package:town_pass/page/guided_assistant/model/guide_content.dart';
+import 'package:town_pass/page/guided_assistant/model/guide_page.dart';
+import 'package:town_pass/page/guided_assistant/model/guides/fees_guide.dart';
+import 'package:town_pass/page/guided_assistant/model/guides/guide_registry.dart';
+import 'package:town_pass/page/guided_assistant/model/guides/library_guide.dart';
 import 'package:town_pass/page/guided_assistant/model/mock_assistant_engine.dart';
-import 'package:town_pass/page/guided_assistant/model/mock_service_state.dart';
+import 'package:town_pass/page/guided_assistant/web/web_guide_probe.dart';
+import 'package:town_pass/page/guided_assistant/web/web_page_state.dart';
 import 'package:town_pass/page/guided_assistant/widget/guided_assistant_host.dart';
-import 'package:town_pass/bean/assistant_result.dart';
 import 'package:town_pass/service/assistant_action_executor.dart';
 import 'package:town_pass/service/assistant_service.dart';
 import 'package:town_pass/service/assistant_speaker.dart';
+import 'package:town_pass/util/tp_route.dart';
 
 class SilentSpeaker extends AssistantSpeaker {
-  final spoken = <String>[];
   @override
   Future<bool> loadEnabled() async => false;
   @override
   Future<void> saveEnabled(bool enabled) async {}
   @override
-  Future<void> speak(String text) async => spoken.add(text);
+  Future<void> speak(String text) async {}
   @override
   Future<void> stop() async {}
 }
 
-GuidedAssistantController makeController(List<String> routes) {
-  Get.put<MockServiceState>(MockServiceState());
-  return Get.put(
-    GuidedAssistantController(
-      thinkDelay: Duration.zero,
-      autoStartDelay: const Duration(seconds: 3),
-      runOnboarding: false,
-      speaker: SilentSpeaker(),
-      navigate: (route, {arguments}) => routes.add(route),
-    ),
-  );
+/// The tests set the page state themselves instead of reading a WebView.
+class FakeProbe extends WebGuideProbe {
+  FakeProbe(super.state);
+  bool started = false;
+  @override
+  bool get running => started;
+  @override
+  void start(WebPageSpec spec) => started = true;
+  @override
+  void stop() => started = false;
 }
 
 class FakeService extends AssistantService {
@@ -54,7 +61,7 @@ class FakeService extends AssistantService {
     Map<String, dynamic>? context,
   }) async {
     calls.add((text, choiceId));
-    if (fail) throw const FormatException('連不到電腦上的助理，請確認後端與裝置連線。');
+    if (fail) throw const FormatException('連不到電腦上的助理。');
     return replies.removeAt(0)(text, choiceId);
   }
 
@@ -76,27 +83,50 @@ class FakeExecutor extends AssistantActionExecutor {
   }
 }
 
-AssistantResult navigateTo(Map<String, dynamic> d) => AssistantResult(
+AssistantResult navigateTo(
+  Map<String, dynamic> d, {
+  Map<String, dynamic>? guide,
+}) => AssistantResult(
   sessionId: 's',
   message: '好的，已經打開。',
   destination: d,
   kind: 'navigate',
+  guide: guide,
 );
 
-GuidedAssistantController makeModelController(
-  List<String> routes,
-  FakeService service,
-  FakeExecutor executor,
-) {
-  Get.put<MockServiceState>(MockServiceState());
+/// Puts the visible library page in a state.
+void show(
+  WebPageState s,
+  String path, {
+  Map<String, String> query = const {},
+  Map<String, Object?> flags = const {},
+  Set<String> visible = const {},
+}) {
+  s.snapshot.value = WebSnapshot(
+    path: path,
+    query: query,
+    flags: {'tab': '館藏查詢', ...flags},
+    visible: visible,
+  );
+}
+
+const home = '/library-service/';
+const search = '/library-service/keyword-search';
+const detail = '/library-service/book-detail/lib-book-5';
+
+GuidedAssistantController makeController({
+  FakeService? service,
+  FakeExecutor? executor,
+}) {
+  final web = Get.put<WebPageState>(WebPageState());
   return Get.put(
     GuidedAssistantController(
       thinkDelay: Duration.zero,
       runOnboarding: false,
       speaker: SilentSpeaker(),
       service: service,
-      executor: executor,
-      navigate: (route, {arguments}) => routes.add(route),
+      executor: executor ?? FakeExecutor(),
+      probeOverride: FakeProbe(web),
     ),
   );
 }
@@ -104,140 +134,493 @@ GuidedAssistantController makeModelController(
 void main() {
   const engine = MockAssistantEngine();
 
-  group('mock engine', () {
+  group('teaching components', () {
+    test('prerequisites are added in page order', () {
+      expect(planLibrary(['reserve']), [
+        'open_search',
+        'search_keyword',
+        'pick_book',
+        'choose_branch',
+        'reserve',
+      ]);
+      expect(planLibrary(['hot_keyword', 'pick_book']), [
+        'open_search',
+        'hot_keyword',
+        'pick_book',
+      ]);
+      expect(planLibrary(['check_pickup']), ['open_records', 'check_pickup']);
+      expect(planLibrary(['unknown']), planLibrary(['reserve']));
+    });
+
+    test('keyword fallback picks the best matching goal', () {
+      expect(libraryGoalsFor('我要借書'), ['reserve']);
+      expect(libraryGoalsFor('我預約的書到了沒'), ['check_pickup']);
+      expect(libraryGoalsFor('圖書館有什麼公告'), ['open_notices']);
+      expect(libraryGoalsFor('最近的分館在哪'), ['open_map']);
+      expect(libraryGoalsFor('有什麼好看的書推薦'), ['hot_keyword']);
+    });
+
+    test('every page file matches its App page', () {
+      final files = Directory('assets/assistant')
+          .listSync()
+          .whereType<File>()
+          .where((f) => RegExp(r'guide_\w+\.json$').hasMatch(f.path))
+          .toList();
+      final ids = <String>{};
+      for (final file in files) {
+        final page =
+            jsonDecode(file.readAsStringSync()) as Map<String, dynamic>;
+        final app = guidePageById(page['page'] as String);
+        expect(app, isNotNull, reason: file.path);
+        ids.add(app!.id);
+        String line(
+          String id,
+          String title,
+          String description,
+          List r,
+          List k,
+        ) => '$id|$title|$description|${r.join(',')}|${k.join(',')}';
+        expect(
+          [
+            for (final c in app.components)
+              line(c.id, c.title, c.description, c.requires, c.keywords),
+          ],
+          [
+            for (final c in page['components'] as List)
+              line(
+                c['id'],
+                c['title'],
+                c['description'],
+                c['requires'],
+                c['keywords'],
+              ),
+          ],
+          reason: app.id,
+        );
+        expect(page['default_goal'], app.defaultGoal, reason: app.id);
+        expect(
+          (page['capabilities'] as List).toSet(),
+          app.capabilities.toSet(),
+          reason: app.id,
+        );
+        Map<String, List<String>> goals(Object? m) => {
+          for (final e in ((m as Map?) ?? {}).entries)
+            e.key as String: (e.value as List).cast<String>(),
+        };
+        expect(goals(page['capability_goals']), app.capabilityGoals);
+        expect(goals(page['entry_goals']), app.entryGoals);
+        // Every id the page names exists.
+        final known = {for (final c in app.components) c.id};
+        for (final c in app.components) {
+          for (final r in c.requires) {
+            expect(known.containsAll(r.split('|')), isTrue, reason: c.id);
+          }
+        }
+        for (final g in [
+          ...app.capabilityGoals.values,
+          ...app.entryGoals.values,
+        ]) {
+          expect(known.containsAll(g), isTrue, reason: app.id);
+        }
+      }
+      expect(ids, {for (final p in guidePages) p.id});
+    });
+
+    test('a guide is numbered by component', () {
+      final g = buildLibraryGuide(planLibrary(['check_pickup']));
+      final s = WebPageState();
+      expect(g.id, 'library:open_records,check_pickup');
+      expect(g.stepCount, 2);
+      expect(g.todos.map((t) => t.text), ['開啟圖書館服務', '打開我的紀錄', '看可以取的書']);
+      show(s, home);
+      expect(g.steps.first.label(s), '步驟 1 / 2・點一下');
+    });
+  });
+
+  group('library guide follows the real page', () {
+    final g = buildLibraryGuide(planLibrary(['reserve']));
+    late WebPageState s;
+    setUp(() => s = WebPageState());
+
+    test('search, pick, branch window, reserve', () {
+      show(s, home);
+      expect(g.currentStep(s), 0);
+      expect(g.steps[0].targetFor(s), 'library.search_entry');
+
+      show(s, search);
+      expect(g.currentStep(s), 1);
+      expect(g.steps[1].targetFor(s), 'library.search_row');
+      expect(g.steps[1].alsoUsable, contains('library.hot_keywords'));
+      expect(g.steps[1].card(s), contains('打你想找的書名'));
+      show(s, search, flags: {'input': '神奇柑仔店'});
+      expect(g.steps[1].card(s), '打好了嗎？按右邊的放大鏡搜尋。');
+
+      show(s, search, query: {'search': '神奇柑仔店'}, flags: {'results': 2});
+      expect(g.currentStep(s), 2);
+      expect(g.steps[2].targetFor(s), 'library.results');
+      expect(g.steps[2].locks(s), isFalse);
+
+      show(s, detail);
+      expect(g.currentStep(s), 3);
+      expect(g.steps[3].targetFor(s), 'library.branch_field');
+      expect(g.steps[3].locks(s), isTrue);
+      show(s, detail, flags: {'branchList': true, 'branch': ''});
+      expect(g.steps[3].targetFor(s), 'library.branch_list');
+      show(s, detail, flags: {'branchList': true, 'branch': 'lib-3'});
+      expect(g.steps[3].targetFor(s), 'library.branch_close');
+      expect(g.steps[3].card(s), contains('關掉這個視窗'));
+
+      show(
+        s,
+        detail,
+        flags: {
+          'branch': 'lib-3',
+          'branchName': 'B12三興',
+          'bookTitle': '歡迎光臨錢天堂',
+        },
+      );
+      expect(g.currentStep(s), 4);
+      expect(g.steps[4].targetFor(s), 'library.reserve');
+      expect(g.steps[4].card(s), contains('《歡迎光臨錢天堂》'));
+      expect(g.steps[4].card(s), contains('「B12三興」'));
+
+      s.latch(['reserved']);
+      expect(g.currentStep(s), g.steps.length);
+      expect(g.doneLabelOf!(s), '完成了');
+    });
+
+    test('no results points back to the search box', () {
+      show(s, search, query: {'search': 'xyz'}, flags: {'results': 0});
+      expect(g.currentStep(s), 2);
+      expect(g.steps[2].targetFor(s), 'library.search_row');
+      expect(g.steps[2].card(s), contains('沒有找到書'));
+    });
+
+    test('a refused reservation ends with the page\'s reason', () {
+      show(s, detail, flags: {'branch': 'lib-3', 'failReason': '已預約相同卷期'});
+      s.latch(['reserveFailed']);
+      expect(g.currentStep(s), g.steps.length);
+      expect(g.doneLabelOf!(s), '沒有預約成功');
+      expect(g.doneTextOf!(s), contains('已預約相同卷期'));
+    });
+
+    test('a book that cannot be reserved sends the user back', () {
+      show(s, detail, flags: {'notReservable': true});
+      expect(g.currentStep(s), 3, reason: 'stays before 預約');
+      expect(g.steps[3].targetFor(s), isNull);
+      expect(g.steps[3].locks(s), isFalse, reason: 'the back button works');
+      expect(g.steps[3].arrow(s), isFalse);
+      expect(g.steps[3].card(s), contains('不能預約'));
+      expect(g.steps[3].detail(s), contains('選另一本書'));
+      show(s, search, query: {'search': '神奇柑仔店'}, flags: {'results': 2});
+      expect(g.currentStep(s), 2, reason: 'back to picking a book');
+    });
+
+    test('a book opened directly skips the search steps', () {
+      show(s, detail);
+      expect(g.currentStep(s), 3);
+    });
+
+    test('ranking below the fold asks to scroll first', () {
+      final r = buildLibraryGuide(planLibrary(['open_ranking']));
+      show(s, home);
+      expect(r.steps.single.targetFor(s), isNull);
+      expect(r.steps.single.scrollHint(s), isTrue);
+      show(s, home, visible: {'library.ranking_more'});
+      expect(r.steps.single.targetFor(s), 'library.ranking_more');
+      show(s, '/library-service/ranking-list');
+      expect(r.currentStep(s), 1);
+    });
+  });
+
+  group('fees guide follows the real page', () {
+    final GuidePage page = feesPage;
+    late WebPageState s;
+    setUp(() => s = WebPageState());
+
+    void at(String path, [Map<String, Object?> flags = const {}]) =>
+        s.snapshot.value = WebSnapshot(path: path, flags: flags);
+
+    test('water: number, 查詢, bill, method, the user presses 是', () {
+      final g = page.build(
+        page.planFor(
+          page.goalsFor('我要繳水費', capability: 'fees.water'),
+          capability: 'fees.water',
+        ),
+        destination: page.open({'kind': 'capability', 'id': 'fees.water'}),
+      );
+      expect(g.id, startsWith('fees@fees.water:enter_number'));
+      expect(g.components.last, 'confirm_pay');
+      const detail = '/fee-payment/detail/fee-6/';
+      at(detail, {
+        'onInputTab': true,
+        'hasFields': true,
+        'fieldKind': 'text',
+        'fieldName': '水號',
+        'feeName': '水費',
+      });
+      expect(g.currentStep(s), 0);
+      expect(g.steps[0].targetFor(s), 'fees.field');
+      expect(g.steps[0].card(s), contains('「水號」'));
+
+      at(detail, {
+        'onInputTab': true,
+        'hasFields': true,
+        'filled': true,
+        'feeName': '水費',
+      });
+      expect(g.currentStep(s), 1);
+      expect(g.steps[1].targetFor(s), 'fees.query');
+      expect(g.steps[1].card(s), contains('「水費」'));
+      at(detail, {
+        'onInputTab': true,
+        'hasFields': true,
+        'filled': true,
+        'alert': true,
+        'alertText': '請確認資料是否含空白或符號',
+      });
+      expect(g.steps[1].targetFor(s), 'fees.alert_ok');
+      expect(g.steps[1].card(s), contains('請確認資料是否含空白或符號'));
+
+      const result = '/fee-payment/result/fee-6';
+      at(result, {'bills': 1, 'selected': 0});
+      expect(g.currentStep(s), 2);
+      expect(g.steps[2].targetFor(s), 'fees.bills');
+      expect(g.steps[2].locks(s), isTrue);
+      at(result, {'bills': 1, 'selected': 1, 'total': 'NT\$ 120'});
+      expect(g.currentStep(s), 3);
+      expect(g.steps[3].card(s), contains('NT\$ 120'));
+
+      const payment = '/fee-payment/payment/fee-6/B999999999';
+      at(payment, {'feeName': '水費', 'amount': '\$120'});
+      expect(g.currentStep(s), 4);
+      expect(g.steps[4].targetFor(s), 'fees.methods');
+      at(payment, {'feeName': '水費', 'amount': '\$120', 'payConfirm': true});
+      expect(g.currentStep(s), 5);
+      expect(g.steps[5].targetFor(s), 'fees.pay_yes');
+      expect(g.steps[5].card(s), contains('自己按「是」'));
+      expect(g.steps[5].card(s), contains('不會真的扣款'));
+      expect(g.todos[6].self, '你自己確認');
+      // 否 closes the dialog: back to choosing a method.
+      at(payment, {'feeName': '水費'});
+      expect(g.currentStep(s), 4);
+
+      s.latch(['paid']);
+      at('/fee-payment/fee-payment-finished/fee-6', {
+        'paidMethod': '悠遊付',
+        'amount': 'NT\$120',
+      });
+      expect(g.currentStep(s), g.steps.length);
+      expect(g.doneTextOf!(s), contains('悠遊付'));
+    });
+
+    test('parking asks for the vehicle type, then the plate format', () {
+      final g = page.build(page.plan(['enter_number']));
+      const detail = '/fee-payment/detail/fee-5/';
+      at(detail, {
+        'onInputTab': true,
+        'hasFields': true,
+        'fieldKind': 'choice',
+        'fieldChoices': '汽車|機車',
+      });
+      expect(g.steps[0].card(s), contains('「汽車」或「機車」'));
+      at(detail, {
+        'onInputTab': true,
+        'hasFields': true,
+        'fieldKind': 'text',
+        'fieldHint': '範例：AAA-8888(含分隔符號)',
+      });
+      expect(g.steps[0].card(s), contains('「AAA-8888」'));
+    });
+
+    test('the 掃描 tab points back to typing', () {
+      final g = page.build(page.plan(['enter_number']));
+      at('/fee-payment/detail/fee-7/', {
+        'onInputTab': false,
+        'hasFields': false,
+        'firstTab': '繳費編號',
+      });
+      expect(g.steps[0].targetFor(s), 'fees.tab_input');
+      expect(g.steps[0].card(s), contains('「繳費編號」'));
+    });
+
+    test('no bills found sends the user back', () {
+      final g = page.build(page.plan(['pick_bill']));
+      at('/fee-payment/result/fee-6', {'bills': 0});
+      expect(g.currentStep(s), 2);
+      expect(g.steps[2].targetFor(s), isNull);
+      expect(g.steps[2].card(s), contains('沒有查到'));
+    });
+
+    test('the fee list comes first only for 其他繳費', () {
+      expect(
+        page.planFor(['confirm_pay'], capability: 'fees.other').first,
+        'pick_fee',
+      );
+      expect(
+        page.planFor(['confirm_pay'], capability: 'fees.water').first,
+        'enter_number',
+      );
+      expect(page.goalsFor('隨便看看', capability: 'fees.history'), [
+        'filter_history',
+      ]);
+      final g = guideFromId('fees');
+      expect(g?.components.first, 'pick_fee');
+      expect(g?.destination, {'kind': 'capability', 'id': 'fees.other'});
+      at('/fee-payment/others/');
+      expect(g!.steps[0].targetFor(s), 'fees.fee_groups');
+      at('/fee-payment/others/', {'groupOpen': true});
+      expect(g.steps[0].targetFor(s), 'fees.fee_items');
+    });
+
+    test('registry maps destinations and paths', () {
+      expect(
+        guidePageFor({'kind': 'capability', 'id': 'fees.water'})?.id,
+        'fees',
+      );
+      expect(guidePageFor({'kind': 'capability', 'id': 'fees.tax'}), isNull);
+      expect(
+        guidePageFor({'kind': 'capability', 'id': 'library.notices'})?.id,
+        'library',
+      );
+      expect(
+        guidePageFor({'kind': 'detail', 'book_id': 'lib-book-5'})?.id,
+        'library',
+      );
+      expect(guidePageForPath('/fee-payment/result/fee-6')?.id, 'fees');
+      expect(guidePageForPath('/library-service/')?.id, 'library');
+      expect(guidePageForPath('/counter-calling/')?.id, 'counter_calling');
+      // A service without teaching components.
+      expect(guidePageForPath('/surrounding-service/'), isNull);
+      final id = guideFromId('fees@fees.water:confirm_pay')!;
+      expect(id.destination, {'kind': 'capability', 'id': 'fees.water'});
+      expect(guideFromId(id.id)?.components, id.components);
+    });
+  });
+
+  group('fallback engine', () {
     test('picks the pre-written entry for each scenario', () {
-      expect(engine.interpret('我要繳水費').guideId, GuideIds.water);
-      expect(engine.interpret('我要借底層邏輯').guideId, GuideIds.library);
+      expect(
+        engine.interpret('我要借書').guideId,
+        'library:open_search,search_keyword,pick_book,choose_branch,reserve',
+      );
+      expect(
+        engine.interpret('我預約的書到了沒').guideId,
+        'library:open_records,check_pickup',
+      );
       expect(engine.interpret('什麼是館藏？').term?.title, '館藏');
       expect(engine.interpret('預約和借書一樣嗎？').term?.title, '預約');
       expect(engine.interpret('查案件進度').kind, MockReplyKind.candidates);
-      expect(engine.interpret('什麼是身分驗證').term?.title, contains('身分驗證'));
-      expect(engine.interpret('水號是什麼？').term?.showsBill, isTrue);
       expect(engine.interpret('附近哪裡有老人共餐').kind, MockReplyKind.answer);
       expect(engine.interpret('這頁在做什麼').kind, MockReplyKind.pageHelp);
       expect(engine.interpret('下一步要做什麼？').kind, MockReplyKind.stepHelp);
       expect(engine.interpret('教我用').kind, MockReplyKind.onboarding);
-      expect(engine.interpret('明天會不會下雨').kind, MockReplyKind.unknown);
-      expect(engine.interpret(onboardingExample).serviceTitle, '停車費');
-    });
-
-    test('two requests in one sentence ask which comes first', () {
-      final reply = engine.interpret('我要借書，還要繳水費');
-      expect(reply.kind, MockReplyKind.multi);
       expect(
-        {reply.guideId, reply.otherGuideId},
-        {GuideIds.library, GuideIds.water},
+        engine.interpret('我要繳水費').guideId,
+        'fees@fees.water:enter_number,query_bill,pick_bill,to_payment,choose_method,confirm_pay',
       );
-    });
-
-    test('asking the meaning of an unknown word does not open a service', () {
+      expect(
+        engine.interpret('我想看繳費紀錄').guideId,
+        'fees@fees.history:filter_history',
+      );
+      expect(engine.interpret('明天會不會下雨').kind, MockReplyKind.unknown);
       expect(engine.interpret('什麼是量子糾纏').kind, MockReplyKind.unknownTerm);
     });
   });
 
-  group('guide steps follow the page state', () {
-    test('water fee: tap and type are one step, then 查詢', () {
-      final s = MockServiceState();
-      final g = guides[GuideIds.water]!;
-      expect(g.steps, hasLength(2));
-      expect(g.currentStep(s), 0);
-      s.waterFieldTapped.value = true;
-      s.waterFocused.value = true;
-      s.waterDigits.value = '1234567890';
-      expect(g.currentStep(s), 0, reason: 'typing until 完成 is pressed');
-      s.waterFocused.value = false;
-      expect(g.currentStep(s), 1);
-      s.waterQueried.value = true;
-      expect(g.currentStep(s), g.steps.length);
-      expect(g.currentTodo(s), g.doneTodo);
-    });
-
-    test('library: search, scroll, pick, branch, reserve', () {
-      final s = MockServiceState();
-      final g = guides[GuideIds.library]!;
-      expect(g.currentStep(s), 0);
-      s.libraryPage.value = LibraryPage.search;
-      expect(g.currentStep(s), 1);
-      s.librarySearched.value = true;
-      expect(g.currentStep(s), 2);
-      expect(g.steps[2].scrollHint(s), isTrue);
-      s.libraryScrolled.value = true;
-      expect(g.currentStep(s), 3);
-      s
-        ..libraryPage.value = LibraryPage.detail
-        ..libraryBook.value = 0;
-      expect(g.currentStep(s), 4);
-      expect(g.currentTodo(s), 3);
-      s.libraryBranch.value = 3;
-      expect(g.currentStep(s), 5);
-      expect(g.steps[5].card(s), contains('《小王子》'));
-      expect(g.steps[5].card(s), contains('CFB 信義安和借書站'));
-      s.libraryReserved.value = true;
-      expect(g.currentStep(s), g.steps.length);
-      expect(g.currentTodo(s), 5);
-    });
-  });
-
   group('controller', () {
-    late List<String> routes;
+    late FakeExecutor executor;
     late GuidedAssistantController c;
 
     setUp(() {
       SharedPreferences.setMockInitialValues({});
       Get.testMode = true;
-      routes = [];
-      c = makeController(routes);
+      executor = FakeExecutor();
+      c = makeController(executor: executor);
     });
-
     tearDown(Get.reset);
 
-    test('a guide request opens the page and starts after the card', () async {
-      {
-        c.openSheet();
-        c.submit('我要繳水費');
-        await settle();
-        expect(routes, [MockRoutes.waterFee]);
-        expect(c.sheetOpen.value, isFalse);
-        expect(c.task.value?.status, TaskStatus.opened);
-        expect(c.card?.variant, CardVariant.opened);
-        expect(c.locked, isFalse);
-        c.beginSteps();
-        expect(c.locked, isTrue);
-        expect(c.highlightTarget, 'water.field');
-        expect(c.card?.label, '步驟 1 / 2');
-        expect(c.card?.text, '先點一下亮起來的框，把水號輸進去喔。');
-      }
+    void onPage(String path, {Map<String, Object?> flags = const {}}) {
+      c.routeChanged(TPRoute.webView);
+      show(c.web, path, flags: flags);
+    }
+
+    test('a guide opens the real page and starts once it shows', () async {
+      c.openSheet();
+      c.submit('我要借書');
+      await settle();
+      expect(executor.opened.single, {'kind': 'home'});
+      expect(c.sheetOpen.value, isFalse);
+      expect(c.task.value?.status, TaskStatus.opened);
+      expect(c.card, isNull, reason: 'page not showing yet');
+      onPage(home);
+      expect(c.card?.variant, CardVariant.opened);
+      c.beginSteps();
+      expect(c.locked, isTrue);
+      expect(c.highlightTarget, 'library.search_entry');
+      expect(c.card?.label, '步驟 1 / 5・點一下');
+      expect(c.probe.running, isTrue);
     });
 
-    test('typing step: the field stays lit and the keypad stays usable', () {
-      c.startGuide(GuideIds.water);
-      c.beginSteps();
-      c.pages
-        ..waterFieldTapped.value = true
-        ..waterFocused.value = true
-        ..waterDigits.value = '12345';
-      expect(c.highlightTarget, 'water.field');
-      expect(c.currentStep?.alsoUsable, ['water.keypad']);
-      expect(c.card?.text, '水號一共 10 碼，慢慢輸入就好。');
-      c.pages.waterDigits.value = '1234567890';
-      expect(c.card?.text, '輸入好了！按一下鍵盤的「完成」。');
-      c.pages.waterFocused.value = false;
-      expect(c.highlightTarget, 'water.query');
+    test('steps wait for 開始; nothing moves on by itself', () async {
+      c.startGuide('library');
+      onPage(home);
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+      expect(c.task.value?.status, TaskStatus.opened);
+      expect(c.card?.variant, CardVariant.opened);
+      expect(c.locked, isFalse);
     });
 
-    test('a nudge from the keypad shows on the card', () {
-      c.startGuide(GuideIds.water);
+    test('我自己來 leaves the page free and can be resumed later', () {
+      c.startGuide('library');
+      onPage(home);
+      c.goAlone();
+      expect(c.card, isNull);
+      expect(c.highlightTarget, isNull);
+      expect(c.messages.last.text, Replies.goAlone);
+      expect(c.taskSecondaryLabel, '繼續引導');
+      c.taskSecondary();
+      expect(c.task.value?.status, TaskStatus.on);
+      expect(c.highlightTarget, 'library.search_entry');
+    });
+
+    test('leaving the page pauses; resuming opens it again', () {
+      c.startGuide('library');
+      onPage(home);
       c.beginSteps();
-      c.pages
-        ..waterFieldTapped.value = true
-        ..waterFocused.value = true
-        ..waterDigits.value = '123';
-      c.showNudge('水號有 10 碼，還差 7 碼喔。');
-      expect(c.card?.text, '水號有 10 碼，還差 7 碼喔。');
+      c.routeChanged('/');
+      expect(c.task.value?.status, TaskStatus.paused);
+      expect(c.task.value?.left, isTrue);
+      expect(c.card, isNull);
+      executor.opened.clear();
+      c.resume();
+      expect(executor.opened.single, {'kind': 'home'});
+      onPage(search);
+      expect(c.task.value?.status, TaskStatus.on);
+      expect(c.highlightTarget, 'library.search_row');
+    });
+
+    test('the branch window is ringed, the result window stays usable', () {
+      c.startGuide('library');
+      onPage(detail);
+      c.beginSteps();
+      expect(c.highlightTarget, 'library.branch_field');
+      expect(c.showArrow, isTrue);
+      show(c.web, detail, flags: {'branchList': true});
+      expect(c.highlightTarget, 'library.branch_list');
+      show(c.web, detail, flags: {'branch': 'lib-3', 'branchName': 'B12三興'});
+      expect(c.highlightTarget, 'library.reserve');
+      expect(c.taskTag, '步驟 5 / 5');
+      c.web.latch(['reserveFailed']);
+      show(c.web, detail, flags: {'branch': 'lib-3', 'failReason': '已預約相同卷期'});
+      expect(c.locked, isFalse);
+      expect(c.card?.variant, CardVariant.done);
+      expect(c.card?.text, contains('已預約相同卷期'));
     });
 
     test('tapping outside the target nudges, three times mentions pause', () {
-      c.startGuide(GuideIds.water);
+      c.startGuide('library');
+      onPage(home);
       c.beginSteps();
       c.wrongTap();
       expect(c.card?.text, Replies.wrongTap);
@@ -246,199 +629,110 @@ void main() {
       expect(c.card?.text, Replies.wrongTapMany);
     });
 
-    test('leaving the page pauses; resuming goes back to it', () {
-      c.startGuide(GuideIds.water);
+    test('task list lines', () {
+      c.startGuide('library');
+      onPage(home);
       c.beginSteps();
-      c.routeChanged('/');
-      expect(c.task.value?.status, TaskStatus.paused);
-      expect(c.task.value?.left, isTrue);
-      expect(c.card, isNull);
-      routes.clear();
-      c.resume();
-      expect(routes, [MockRoutes.waterFee]);
-      expect(c.task.value?.status, TaskStatus.on);
-      expect(c.locked, isTrue);
-    });
-
-    test('library: scrolling is free, the branch window is lit not locked', () {
-      c.startGuide(GuideIds.library);
-      c.beginSteps();
-      expect(c.locked, isTrue);
-      expect(c.highlightTarget, 'library.search_entry');
-      expect(c.cardTop, 230);
-      expect(c.showArrow, isTrue);
-      c.pages.libraryPage.value = LibraryPage.search;
-      expect(c.highlightTarget, 'library.search_row');
-      expect(c.currentStep?.alsoUsable, ['library.keyboard']);
-      expect(c.showArrow, isFalse);
-      c.pages.librarySearched.value = true;
-      expect(c.locked, isFalse);
-      expect(c.highlightTarget, isNull);
-      expect(c.scrollHintVisible, isTrue);
-      expect(c.cardTop, isNull);
-      c.pages
-        ..libraryPage.value = LibraryPage.detail
-        ..libraryBook.value = 0;
-      expect(c.locked, isTrue);
-      expect(c.highlightTarget, 'library.branch_field');
-      c.pages.libraryBranchList.value = true;
-      expect(c.locked, isFalse);
-      expect(c.pointingOnly, isTrue);
-      expect(c.highlightTarget, 'library.branch_list');
-      c.pages
-        ..libraryBranch.value = 2
-        ..libraryBranchList.value = false;
-      expect(c.locked, isTrue);
-      expect(c.highlightTarget, 'library.reserve');
-      expect(c.taskTag, '步驟 4 / 4');
-      c.pages.libraryReserved.value = true;
-      expect(c.card?.variant, CardVariant.done);
-      expect(c.card?.label, '完成了');
-    });
-
-    test('task list lines and the collapsed summary', () {
-      c.startGuide(GuideIds.library);
-      c.beginSteps();
-      expect(c.todoOpen.value, isFalse);
-      expect(c.currentTodoText, '搜尋書名');
+      expect(c.currentTodoText, '打開關鍵字搜尋');
       final lines = c.todoLines;
       expect(lines.first.tag, '完成');
       expect(lines[1].tag, '進行中');
-      expect(lines[4].tag, '你自己確認');
-      expect(lines[5].tag, '之後你自己去');
+      expect(lines[5].tag, '你自己確認');
+      expect(lines[6].tag, '之後你自己去');
     });
 
-    test(
-      'a different task mid-guide asks first and keeps the progress',
-      () async {
-        c.startGuide(GuideIds.library);
-        c.beginSteps();
-        c.pages
-          ..libraryPage.value = LibraryPage.search
-          ..libraryQuery.value = '小王子'
-          ..librarySearched.value = true;
-        c.submit('我要繳水費');
-        await settle();
-        final ask = c.messages.last;
-        expect(ask.text, startsWith('你現在正在預約書籍，做到第 2 步。'));
-        expect(ask.options!.options.map((o) => o.label), [
-          '先繼續借書',
-          '暫停借書，改去繳水費',
-        ]);
-        c.choose(ask, ask.options!.options.last);
-        expect(c.task.value?.guide.id, GuideIds.water);
-        expect(c.task.value?.followUpGuideId, GuideIds.library);
-        c.beginSteps();
-        c.pages
-          ..waterDigits.value = '1234567890'
-          ..waterQueried.value = true;
-        expect(c.card?.text, contains('要回去接著借書嗎？'));
-        c.acceptFollowUp();
-        expect(c.task.value?.guide.id, GuideIds.library);
-        expect(c.task.value?.status, TaskStatus.on);
-        expect(c.pages.libraryQuery.value, '小王子', reason: 'progress kept');
-      },
-    );
-
-    test('ending the guide says so and hides the card', () {
-      c.startGuide(GuideIds.water);
+    test('ending the guide says so, hides the card and stops reading', () {
+      c.startGuide('library');
+      onPage(home);
       c.beginSteps();
-      c.pages.waterFocused.value = true;
       c.endGuide();
       expect(c.card, isNull);
-      expect(c.pages.waterFocused.value, isFalse);
       expect(c.messages.last.text, Replies.ended);
+      expect(c.probe.running, isFalse);
     });
 
-    test('two things: the second is offered when the first is done', () async {
-      {
-        c.submit('我要借書，還要繳水費');
-        await settle();
-        final ask = c.messages.last;
-        expect(ask.options?.options.map((o) => o.guideId), [
-          GuideIds.library,
-          GuideIds.water,
-        ]);
-        c.choose(ask, ask.options!.options.first);
-        expect(c.task.value?.guide.id, GuideIds.library);
-        expect(c.task.value?.followUpGuideId, GuideIds.water);
-        c.beginSteps();
-        c.pages
-          ..libraryPage.value = LibraryPage.detail
-          ..libraryBook.value = 0
-          ..libraryBranch.value = 1
-          ..libraryReserved.value = true;
-        expect(c.card?.text, contains('繳水費'));
-        c.acceptFollowUp();
-        expect(c.task.value?.guide.id, GuideIds.water);
-      }
+    test('step help and page help use the pre-written text', () async {
+      c.startGuide('library');
+      onPage(search);
+      c.beginSteps();
+      c.submit('下一步要做什麼？');
+      await settle();
+      expect(c.messages.last.text, contains('點一下搜尋框'));
+      c.submit('這頁在做什麼');
+      await settle();
+      expect(c.messages.last.text, startsWith('這是「圖書借閱」'));
     });
 
     test('candidates: a service not connected yet does not open', () async {
-      {
-        c.submit('查案件進度');
-        await settle();
-        final ask = c.messages.last;
-        final disabled = ask.options!.options.firstWhere((o) => !o.enabled);
-        c.choose(ask, disabled);
-        expect(routes, isEmpty);
-        expect(c.messages.last.text, contains(Replies.notConnected));
-        final ask2 = c.messages[c.messages.length - 2];
-        expect(
-          c.optionsLive(ask2),
-          isFalse,
-          reason: 'only the newest options are live',
-        );
-      }
-    });
-
-    test('step help answers with the pre-written detail', () async {
-      {
-        c.startGuide(GuideIds.water);
-        c.beginSteps();
-        c.submit('下一步要做什麼？');
-        await settle();
-        expect(
-          c.messages.last.text,
-          guides[GuideIds.water]!.steps.first.detail(c.pages),
-        );
-      }
+      c.submit('查案件進度');
+      await settle();
+      final ask = c.messages.last;
+      c.choose(ask, ask.options!.options.firstWhere((o) => !o.enabled));
+      expect(executor.opened, isEmpty);
+      expect(c.messages.last.text, contains(Replies.notConnected));
     });
   });
 
   group('with the model', () {
-    late List<String> routes;
     late FakeExecutor executor;
 
     setUp(() {
       SharedPreferences.setMockInitialValues({});
       Get.testMode = true;
-      routes = [];
       executor = FakeExecutor();
     });
     tearDown(Get.reset);
 
-    test('water fee from the model starts the pre-written guide', () async {
+    test('the backend\'s components are checked and completed', () async {
       final service = FakeService([
-        (_, _) => navigateTo({'kind': 'capability', 'id': 'fees.water'}),
+        (_, _) => navigateTo(
+          {'kind': 'capability', 'id': 'library'},
+          guide: {
+            'page': 'library',
+            'components': ['check_pickup', 'delete_everything'],
+          },
+        ),
       ]);
-      final c = makeModelController(routes, service, executor);
-      c.submit('幫我付自來水的錢');
+      final c = makeController(service: service, executor: executor);
+      c.submit('我預約的書到了沒');
       await settle();
-      expect(service.calls.single.$1, '幫我付自來水的錢');
-      expect(c.task.value?.guide.id, GuideIds.water);
-      expect(routes, [MockRoutes.waterFee]);
-      expect(executor.opened, isEmpty);
+      expect(c.task.value?.guide.components, ['open_records', 'check_pickup']);
+      expect(executor.opened.single, {'kind': 'home'});
+    });
+
+    test('a library sub-page starts the guide from the library home', () async {
+      final service = FakeService([
+        (_, _) => navigateTo({'kind': 'capability', 'id': 'library.notices'}),
+      ]);
+      final c = makeController(service: service, executor: executor);
+      c.submit('圖書館有什麼公告');
+      await settle();
+      expect(c.task.value?.guide.components, ['open_notices']);
+      expect(executor.opened.single, {'kind': 'home'});
+    });
+
+    test('a book page from the backend opens that page', () async {
+      final service = FakeService([
+        (_, _) => navigateTo({'kind': 'detail', 'book_id': 'lib-book-5'}),
+      ]);
+      final c = makeController(service: service, executor: executor);
+      c.submit('我要借歡迎光臨錢天堂');
+      await settle();
+      expect(executor.opened.single, {
+        'kind': 'detail',
+        'book_id': 'lib-book-5',
+      });
+      expect(c.task.value?.guide.components.last, 'reserve');
     });
 
     test('a service without a guide opens the real page', () async {
       final service = FakeService([
-        (_, _) => navigateTo({'kind': 'capability', 'id': 'fees.parking'}),
+        (_, _) => navigateTo({'kind': 'capability', 'id': 'fees.tax'}),
       ]);
-      final c = makeModelController(routes, service, executor);
-      c.submit(onboardingExample);
+      final c = makeController(service: service, executor: executor);
+      c.submit('我要繳地方稅');
       await settle();
-      expect(executor.opened.single['id'], 'fees.parking');
+      expect(executor.opened.single['id'], 'fees.tax');
       expect(c.task.value, isNull);
     });
 
@@ -457,7 +751,7 @@ void main() {
         (_, choice) =>
             navigateTo({'kind': 'capability', 'id': 'districtOffice.progress'}),
       ]);
-      final c = makeModelController(routes, service, executor);
+      final c = makeController(service: service, executor: executor);
       c.submit('我想知道案子辦到哪');
       await settle();
       final ask = c.messages.last;
@@ -470,7 +764,7 @@ void main() {
 
     test('pre-written replies never call the model', () async {
       final service = FakeService([]);
-      final c = makeModelController(routes, service, executor);
+      final c = makeController(service: service, executor: executor);
       c.submit('什麼是身分驗證');
       await settle();
       expect(service.calls, isEmpty);
@@ -479,11 +773,28 @@ void main() {
 
     test('without a backend it falls back to the pre-written rules', () async {
       final service = FakeService([], fail: true);
-      final c = makeModelController(routes, service, executor);
-      c.submit('我要繳水費');
+      final c = makeController(service: service, executor: executor);
+      c.submit('我要借書');
       await settle();
       expect(c.messages.any((m) => m.text == Replies.offline), isTrue);
-      expect(c.task.value?.guide.id, GuideIds.water);
+      expect(c.task.value?.guide.components.last, 'reserve');
+    });
+
+    test('the result keeps the backend guide plan', () {
+      final r = AssistantResult.fromJson({
+        'contract_version': 3,
+        'catalog_version': AssistantResult.catalogVersion,
+        'data_mode': 'demo',
+        'session_id': 's',
+        'message': 'ok',
+        'kind': 'navigate',
+        'destination': {'kind': 'home'},
+        'guide': {
+          'page': 'library',
+          'components': ['open_map'],
+        },
+      });
+      expect(r.guide?['components'], ['open_map']);
     });
   });
 
@@ -492,14 +803,17 @@ void main() {
       SharedPreferences.setMockInitialValues({});
       Get.testMode = true;
     });
-    tearDown(Get.reset);
+    tearDown(() {
+      GuideTargets.setWebRects(const {});
+      Get.reset();
+    });
 
-    testWidgets('locked step dims the page and taps outside only nudge', (
+    testWidgets('a web target is lit; taps elsewhere only nudge', (
       tester,
     ) async {
-      final routes = <String>[];
-      final c = makeController(routes);
+      final c = makeController();
       var pageTaps = 0;
+      var targetTaps = 0;
       await tester.pumpWidget(
         MaterialApp(
           home: GuidedAssistantHost(
@@ -513,49 +827,43 @@ void main() {
                     child: const Text('other'),
                   ),
                   const SizedBox(height: 40),
-                  const _Target(),
+                  TextButton(
+                    key: const Key('web-button'),
+                    onPressed: () => targetTaps++,
+                    child: const Text('關鍵字搜尋'),
+                  ),
                 ],
               ),
             ),
           ),
         ),
       );
-      c.startGuide(GuideIds.water);
-      c.currentRoute.value = MockRoutes.waterFee;
-      c.beginSteps();
+      // The probe would read this rect from the WebView.
+      GuideTargets.setWebRects({
+        'library.search_entry': tester.getRect(
+          find.byKey(const Key('web-button')),
+        ),
+      });
+      c.startGuide('library');
+      c.routeChanged(TPRoute.webView);
+      show(c.web, home);
+      await tester.pump();
+      expect(find.text('我自己來'), findsOneWidget);
+      await tester.tap(find.text('開始'));
       await tester.pump();
       await tester.pump();
-      expect(find.text('先點一下亮起來的框，把水號輸進去喔。'), findsOneWidget);
+      expect(find.text('我們先找書！點一下上面的「關鍵字搜尋」。'), findsOneWidget);
       await tester.tap(find.text('other'), warnIfMissed: false);
       await tester.pump();
       expect(pageTaps, 0);
       expect(find.text(Replies.wrongTap), findsOneWidget);
-      await tester.tap(find.text('target'));
+      await tester.tap(find.byKey(const Key('web-button')));
       await tester.pump();
-      expect(c.pages.waterFieldTapped.value, isTrue);
-      expect(find.text('水號一共 10 碼，慢慢輸入就好。'), findsOneWidget);
-      c.showNudge('水號有 10 碼，還差 7 碼喔。');
-      await tester.pump();
-      expect(find.text('水號有 10 碼，還差 7 碼喔。'), findsOneWidget);
+      expect(targetTaps, 1, reason: 'the lit spot reaches the page');
       c.task.value = null;
       await tester.pump(const Duration(seconds: 4));
     });
   });
-}
-
-class _Target extends StatelessWidget {
-  const _Target();
-  @override
-  Widget build(BuildContext context) {
-    final s = Get.find<MockServiceState>();
-    return GuideTarget(
-      id: 'water.field',
-      child: TextButton(
-        onPressed: () => s.waterFieldTapped.value = true,
-        child: const Text('target'),
-      ),
-    );
-  }
 }
 
 /// Lets the zero-length "thinking" timer fire.

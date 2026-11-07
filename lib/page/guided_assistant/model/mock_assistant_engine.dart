@@ -1,11 +1,10 @@
 import 'package:town_pass/page/guided_assistant/model/guide_content.dart';
+import 'package:town_pass/page/guided_assistant/model/guides/guide_registry.dart';
 
 /// What the mock assistant decided to do with one sentence.
 enum MockReplyKind {
   guide,
-  openService,
   candidates,
-  multi,
   explain,
   answer,
   pageHelp,
@@ -20,23 +19,16 @@ class MockReply {
   final MockReplyKind kind;
   final String? guideId;
 
-  /// For [MockReplyKind.multi]: the guide to offer after the first one.
-  final String? otherGuideId;
   final CandidateGroup? candidates;
   final GlossaryEntry? term;
   final AnswerCardContent? answer;
 
-  /// For [MockReplyKind.openService]: page title of a service without a guide.
-  final String? serviceTitle;
-
   const MockReply(
     this.kind, {
     this.guideId,
-    this.otherGuideId,
     this.candidates,
     this.term,
     this.answer,
-    this.serviceTitle,
   });
 }
 
@@ -78,24 +70,9 @@ class MockAssistantEngine {
       return const MockReply(MockReplyKind.stepHelp);
     }
 
-    final water = t.contains('水費');
-    final library = t.contains('底層邏輯') || (t.contains('借') && t.contains('書'));
-    if (water && library) {
-      return const MockReply(
-        MockReplyKind.multi,
-        guideId: GuideIds.library,
-        otherGuideId: GuideIds.water,
-      );
-    }
-    if (water) {
-      return const MockReply(MockReplyKind.guide, guideId: GuideIds.water);
-    }
-    if (library) {
-      return const MockReply(MockReplyKind.guide, guideId: GuideIds.library);
-    }
-
-    if (t.contains('停車')) {
-      return const MockReply(MockReplyKind.openService, serviceTitle: '停車費');
+    final guideId = offlineGuideId(t);
+    if (guideId != null) {
+      return MockReply(MockReplyKind.guide, guideId: guideId);
     }
 
     if (t.contains('進度') || t.contains('案件') || t.contains('辦到哪')) {
@@ -116,6 +93,34 @@ class MockAssistantEngine {
 
     return const MockReply(MockReplyKind.unknown);
   }
+
+  /// The guide for a service request the pre-written fallback recognises
+  /// (the model decides when it can be reached). Each page says which
+  /// sentences are about it (GuidePage.offline).
+  static String? offlineGuideId(String t) {
+    for (final page in guidePages) {
+      final cap = page.offline?.call(t);
+      if (cap == null) continue;
+      final destination = cap.isEmpty
+          ? page.defaultDestination
+          : <String, dynamic>{'kind': 'capability', 'id': cap};
+      return guideForDestination(destination, null, t)?.id;
+    }
+    return null;
+  }
+
+  /// Library requests the pre-written fallback recognises.
+  static bool isLibrary(String t) =>
+      t.contains('圖書') ||
+      t.contains('館藏') ||
+      (t.contains('書') &&
+          (t.contains('借') ||
+              t.contains('預約') ||
+              t.contains('找') ||
+              t.contains('排行') ||
+              t.contains('取'))) ||
+      ((t.contains('圖書館') || t.contains('分館')) &&
+          (t.contains('公告') || t.contains('地圖') || t.contains('在哪')));
 
   static GlossaryEntry? findTerm(String normalized) {
     for (final entry in glossary) {

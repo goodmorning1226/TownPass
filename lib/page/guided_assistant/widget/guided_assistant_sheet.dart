@@ -66,8 +66,9 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               _header(),
+              // An ended task (我自己來, 結束引導) keeps its card so 繼續引導
+              // can pick it up again.
               if (c.task.value != null &&
-                  c.task.value!.status != TaskStatus.ended &&
                   c.task.value!.status != TaskStatus.finished)
                 _taskCard(c.task.value!),
               Expanded(child: _chat()),
@@ -122,6 +123,7 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
   /// Current task (design: warm card, collapsed by default).
   Widget _taskCard(GuideTask t) {
     final open = c.todoOpen.value;
+    final ended = t.status == TaskStatus.ended;
     final whiteBox = BoxDecoration(
       color: TPColors.white,
       borderRadius: BorderRadius.circular(12),
@@ -203,7 +205,13 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
                         text: c.currentTodoText,
                         style: const TextStyle(fontWeight: FontWeight.w600),
                       ),
-                      const TextSpan(text: '。\n照著畫面上方的提示做就可以，有問題隨時問我！'),
+                      TextSpan(
+                        text: ended
+                            ? '。\n你正在自己操作，想要我帶你做，按「繼續引導」。'
+                            : c.allStepsDone
+                            ? '。\n步驟都做好了，有問題隨時問我！'
+                            : '。\n照著畫面上方的提示做就可以，有問題隨時問我！',
+                      ),
                     ],
                   ),
                   style: TPTextStyles.h3Regular.copyWith(height: 24 / 16),
@@ -213,7 +221,9 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
                 padding: const EdgeInsets.fromLTRB(12, 0, 12, 10),
                 child: Align(
                   alignment: Alignment.centerRight,
-                  child: _outline('結束引導，自己操作', c.endGuide),
+                  child: ended
+                      ? _outline(c.taskSecondaryLabel, c.taskSecondary)
+                      : _outline('結束引導，自己操作', c.endGuide),
                 ),
               ),
             ] else ...[
