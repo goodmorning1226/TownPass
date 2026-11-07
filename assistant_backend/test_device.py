@@ -300,6 +300,7 @@ class MultilingualSpeechTests(unittest.TestCase):
         return [name for name, _ in self.calls]
 
     def test_each_language_goes_to_its_model(self):
+        self.texts["zh"] = "我要借這個月新到的書"  # longer than the short-text check
         result = self.recognizer.transcribe(loud_frames(), "zh")
         self.assertEqual((self.models(), result["language"]), (["zh"], "zh"))
         self.assertIn(field("prompt", self.recognizer.prompt), self.calls[-1][1])
@@ -363,6 +364,25 @@ class MultilingualSpeechTests(unittest.TestCase):
         result = self.recognizer.transcribe(loud_frames(), "zh")
         self.assertEqual((result["language"], result["language_confidence"]), ("ja", 0.92))
 
+    def test_short_chinese_that_was_another_language_is_redone(self):
+        # "nani ga dekiru" with Chinese chosen came back as the translation 何能做到.
+        self.texts["zh"] = "何能做到"
+        self.heard["multi"], self.texts["multi"] = "japanese", "何ができる"
+        self.probabilities["multi"] = {"ja": 0.86, "zh": 0.1}
+        result = self.recognizer.transcribe(loud_frames(), "zh")
+        self.assertEqual((result["language"], result["text"], result["language_confidence"]), ("ja", "何ができる", 0.86))
+        self.assertIn(field("detect_language", "true"), self.calls[1][1])
+        self.assertEqual(self.models(), ["zh", "multi", "multi"])
+        # Short Chinese that detection is not sure about stays Chinese, and long
+        # clear Chinese is not checked at all.
+        self.calls.clear()
+        self.probabilities["multi"] = {"ja": 0.55, "zh": 0.4}
+        self.assertEqual(self.recognizer.transcribe(loud_frames(), "zh")["text"], "何能做到")
+        self.calls.clear()
+        self.texts["zh"] = "我要繳這個月的水費帳單"
+        self.recognizer.transcribe(loud_frames(), "zh")
+        self.assertEqual(self.models(), ["zh"])
+
     def test_japanese_in_latin_letters_is_redone_with_a_japanese_prompt(self):
         from asr_server import SCRIPT_PROMPTS
         self.heard["multi"] = "japanese"
@@ -403,6 +423,7 @@ class MultilingualSpeechTests(unittest.TestCase):
         self.assertIn(field("no_language_probabilities", "false"), self.calls[0][1])
 
     def test_clear_chinese_is_not_run_twice(self):
+        self.texts["zh"] = "我要借這個月新到的書"  # longer than the short-text check
         self.recognizer.transcribe(loud_frames(), "zh")
         self.assertEqual(self.models(), ["zh"])
 

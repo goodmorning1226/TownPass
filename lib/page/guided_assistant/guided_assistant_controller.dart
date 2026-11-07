@@ -50,6 +50,10 @@ class ChatMessage {
   /// Tutorial question with 先完成教學 / 直接開始.
   final bool tutorialChoice;
 
+  /// The backend capability list's page [options] show; with more than one
+  /// page the newest list offers previous/next page buttons.
+  final AssistantListing? listing;
+
   const ChatMessage({
     required this.id,
     required this.user,
@@ -61,6 +65,7 @@ class ChatMessage {
     this.followUpOf,
     this.voice = false,
     this.tutorialChoice = false,
+    this.listing,
   });
 
   /// The text on screen: the assistant's pre-written Chinese texts follow
@@ -240,11 +245,26 @@ class GuidedAssistantController extends GetxController {
 
   /// A clearly recognised language switches the pages for this launch (the
   /// next launch starts in the phone's language, see PageTranslation.load).
+  /// A clear detection (confidence >= 0.8) also becomes the speech-language
+  /// menu's choice (助理語言) and is saved like a manual pick, so the next
+  /// launch listens in it; 自動偵測 stays 自動偵測. Typed text never moves it.
   void _followSpokenLanguage(AssistantTranscript heard) {
     final sure = heard.languageConfidence;
-    if (sure != null && sure < 0.8) return;
+    if (sure != null && sure < _clearDetection) return;
     _followLanguage(heard.language);
+    final code = heard.language;
+    if (sure == null ||
+        speechLanguage.value == AssistantSpeechLanguage.auto.code ||
+        code == speechLanguage.value ||
+        code == AssistantSpeechLanguage.auto.code ||
+        !AssistantSpeechLanguage.all.any((l) => l.code == code)) {
+      return;
+    }
+    speechLanguage.value = code;
+    AssistantSpeechLanguage.save(code);
   }
+
+  static const _clearDetection = 0.8;
 
   /// The assistant's texts and the pages follow [code], the language the
   /// user clearly spoke or typed (not saved; see PageTranslation.load).
@@ -397,6 +417,7 @@ class GuidedAssistantController extends GetxController {
     String? teachGuideId,
     String? followUpOf,
     bool tutorialChoice = false,
+    AssistantListing? listing,
   }) => ChatMessage(
     id: _nextId++,
     user: false,
@@ -407,6 +428,7 @@ class GuidedAssistantController extends GetxController {
     teachGuideId: teachGuideId,
     followUpOf: followUpOf,
     tutorialChoice: tutorialChoice,
+    listing: listing,
   );
 
   void _say(ChatMessage message) {
@@ -521,6 +543,7 @@ class GuidedAssistantController extends GetxController {
     MockReply local,
     int generation, {
     String? choiceId,
+    int? pageStep,
   }) async {
     AssistantResult result;
     try {
@@ -528,15 +551,18 @@ class GuidedAssistantController extends GetxController {
         text: text,
         requestId: '${DateTime.now().microsecondsSinceEpoch}-$generation',
         sessionId: _session,
-        resolutionId: choiceId == null ? null : _resolutionId,
+        resolutionId: choiceId == null && pageStep == null
+            ? null
+            : _resolutionId,
         choiceId: choiceId,
         context: requestContext(),
         language: _turnLanguage,
+        pageStep: pageStep,
       );
     } catch (error) {
       if (generation != _generation || isClosed) return;
       loading.value = false;
-      if (choiceId != null) {
+      if (choiceId != null || pageStep != null) {
         _say(
           _bot(error is FormatException ? error.message : Replies.pageFailed),
         );
@@ -557,13 +583,16 @@ class GuidedAssistantController extends GetxController {
     _resolutionId = result.resolutionId;
     // Typed words in another language switch the texts and pages, as speech
     // does (a tapped option or a bare number says nothing about it).
-    if (!_voiceTurn && choiceId == null && _hasWords.hasMatch(text)) {
+    if (!_voiceTurn &&
+        choiceId == null &&
+        pageStep == null &&
+        _hasWords.hasMatch(text)) {
       _followLanguage(result.language);
     }
     final destination = result.destination;
     if (destination != null) {
       // A request that opened a page becomes a suggestion next time.
-      final asked = choiceId == null ? text : _lastRequest;
+      final asked = choiceId == null && pageStep == null ? text : _lastRequest;
       if (asked != null) AssistantRecentInputs.instance.remember(asked);
       final guide = guideFor(destination, result.guide, text);
       if (guide != null) {
@@ -593,11 +622,43 @@ class GuidedAssistantController extends GetxController {
                 available: c.enabled,
               ),
           ]),
+          listing: result.listing,
         ),
       );
       return;
     }
     _say(_bot(result.message));
+  }
+
+  /// The newest capability list's previous (-1) or next (1) page button: the
+  /// backend turns the page without the model (wrapping around) and the new
+  /// page arrives as a new list, like a typed 下一頁. Not remembered as a
+  /// recent input and it does not change the conversation language.
+  void turnPage(ChatMessage message, int step) {
+    if (!optionsLive(message) ||
+        loading.value ||
+        service == null ||
+        _resolutionId == null ||
+        message.listing?.hasPages != true ||
+        (step != 1 && step != -1)) {
+      return;
+    }
+    messages.add(
+      ChatMessage(
+        id: _nextId++,
+        user: true,
+        text: step > 0 ? gt('下一頁') : gt('上一頁'),
+      ),
+    );
+    _voiceTurn = false;
+    final generation = ++_generation;
+    loading.value = true;
+    _askModel(
+      '',
+      const MockReply(MockReplyKind.unknown),
+      generation,
+      pageStep: step,
+    );
   }
 
   /// The pre-written guide for this backend destination, if there is one.
@@ -1501,18 +1562,37 @@ class GuidedAssistantController extends GetxController {
     }
     speaker.stop(); // never record the assistant's own voice
     listening.value = true;
+    _micDiscarded = false;
     final started = await rec.start();
+    if (started && _micDiscarded && !listening.value) {
+      // Slid up and released before the microphone had started.
+      await rec.cancel();
+      return;
+    }
     if (!started && !isClosed) {
       listening.value = false;
       _say(_bot(Replies.noMic));
     }
   }
 
-  Future<void> micUp() async {
+  /// The press was discarded (slide up to cancel, or a cancelled pointer)
+  /// while the microphone was still starting.
+  bool _micDiscarded = false;
+
+  /// Releasing the microphone sends the recording; [send] false (slid up to
+  /// cancel, or the pointer was cancelled) discards it: nothing is
+  /// transcribed or sent.
+  Future<void> micUp({bool send = true}) async {
     if (!listening.value) return;
     listening.value = false;
     final rec = recorder;
     final svc = service;
+    if (!send) {
+      _micDiscarded = true;
+      level.value = 0;
+      await rec?.cancel();
+      return;
+    }
     if (rec == null || svc == null) {
       _say(_bot(Replies.micDemo));
       return;

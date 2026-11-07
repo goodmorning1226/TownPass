@@ -386,6 +386,17 @@ class _AssistantSheetState extends State<AssistantSheet> {
                       : null,
                 ),
               ),
+          if (item.listing case final listing?
+              when selectable && listing.hasPages && item.choices.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(top: 8),
+              child: AssistantPageRow(
+                current: listing.page,
+                count: listing.pageCount,
+                label: _t,
+                onStep: controller.busy.value ? null : controller.turnPage,
+              ),
+            ),
           if (selectable)
             for (final (index, suggestion) in item.suggestions.indexed)
               Padding(
@@ -739,6 +750,72 @@ class _AssistantSheetState extends State<AssistantSheet> {
       controller.startListening();
     }
   }
+}
+
+/// ◀ 第 2／11 頁 ▶ under a capability list with more than one page. [onStep]
+/// gets -1 or 1; null disables both buttons (a request is on its way).
+/// [label] gives the panel's texts (previousPage, nextPage, pageOf).
+class AssistantPageRow extends StatelessWidget {
+  final int current;
+  final int count;
+  final String Function(String key, [Map<String, Object> values]) label;
+  final void Function(int step)? onStep;
+  const AssistantPageRow({
+    super.key,
+    required this.current,
+    required this.count,
+    required this.label,
+    this.onStep,
+  });
+
+  Widget _arrow(IconData icon, String tooltip, int step, Key key) {
+    final enabled = onStep != null;
+    return IconButton(
+      key: key,
+      tooltip: tooltip,
+      constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
+      style: IconButton.styleFrom(
+        backgroundColor: TPColors.white,
+        disabledBackgroundColor: TPColors.white,
+        side: BorderSide(
+          color: enabled ? TPColors.primary500 : TPColors.grayscale200,
+        ),
+      ),
+      icon: Icon(
+        icon,
+        color: enabled ? TPColors.primary500 : TPColors.grayscale300,
+      ),
+      onPressed: enabled ? () => onStep!(step) : null,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) => Row(
+    children: [
+      _arrow(
+        Icons.chevron_left,
+        label('previousPage'),
+        -1,
+        const Key('assistant-page-previous'),
+      ),
+      const SizedBox(width: 8),
+      Expanded(
+        child: TPText(
+          label('pageOf', {'current': current, 'count': count}),
+          textAlign: TextAlign.center,
+          style: TPTextStyles.h3SemiBold,
+          color: TPColors.grayscale700,
+        ),
+      ),
+      const SizedBox(width: 8),
+      _arrow(
+        Icons.chevron_right,
+        label('nextPage'),
+        1,
+        const Key('assistant-page-next'),
+      ),
+    ],
+  );
 }
 
 /// A full-width bordered option in the TownPass primary colour.

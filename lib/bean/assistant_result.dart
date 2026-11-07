@@ -26,6 +26,10 @@ class AssistantResult {
   /// hint: the App drops unknown ids and adds prerequisites itself.
   final Map<String, dynamic>? guide;
 
+  /// Where a capability list's [choices] sit in the whole list (its page),
+  /// for the App's previous/next page buttons; null for other replies.
+  final AssistantListing? listing;
+
   const AssistantResult({
     required this.sessionId,
     required this.message,
@@ -37,6 +41,7 @@ class AssistantResult {
     this.action,
     this.contentLanguage,
     this.guide,
+    this.listing,
   });
 
   /// The same reply with [message] and choice titles replaced (translation).
@@ -51,6 +56,7 @@ class AssistantResult {
         action: action,
         contentLanguage: null,
         guide: guide,
+        listing: listing,
         choices: [
           for (var i = 0; i < choices.length; i++)
             AssistantBookChoice(
@@ -102,11 +108,54 @@ class AssistantResult {
       guide: json['guide'] is Map<String, dynamic>
           ? json['guide'] as Map<String, dynamic>
           : null,
+      listing: kind == 'capability_list'
+          ? AssistantListing.tryParse(json['listing'])
+          : null,
       choices: (json['choices'] as List? ?? [])
           .map((value) => AssistantBookChoice.fromJson(value))
           .toList(),
     );
   }
+}
+
+/// One page of a capability listing: [size] entries from [offset] of [total].
+/// The backend turns pages itself (`page_step`, wrapping around); the App only
+/// shows where the user is and offers the arrows.
+class AssistantListing {
+  final int offset;
+  final int size;
+  final int total;
+  const AssistantListing({
+    required this.offset,
+    required this.size,
+    required this.total,
+  });
+
+  /// The `listing` field, or null when it is missing or malformed (the list
+  /// is then shown without page buttons, as before).
+  static AssistantListing? tryParse(Object? json) {
+    if (json is! Map) return null;
+    final offset = json['offset'];
+    final size = json['size'];
+    final total = json['total'];
+    if (offset is! int || size is! int || total is! int) return null;
+    if (offset < 0 ||
+        size <= 0 ||
+        total < 0 ||
+        (total > 0 && offset >= total)) {
+      return null;
+    }
+    return AssistantListing(offset: offset, size: size, total: total);
+  }
+
+  /// 1-based number of this page.
+  int get page => offset ~/ size + 1;
+
+  /// Number of pages (at least 1).
+  int get pageCount => total <= size ? 1 : (total + size - 1) ~/ size;
+
+  /// More than one page: the previous/next buttons are shown.
+  bool get hasPages => pageCount > 1;
 }
 
 class AssistantBookChoice {

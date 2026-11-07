@@ -36,6 +36,7 @@ class PendingService extends AssistantService {
     Map<String, dynamic>? context,
     String? language,
     String? faqText,
+    int? pageStep,
   }) {
     contexts.add(context);
     return response.future;
@@ -91,6 +92,8 @@ class QueueService extends AssistantService {
   Completer<void>? transcriptGate;
   final turnLanguages = <String?>[];
   final faqTexts = <String?>[];
+  final pageSteps = <int?>[];
+  final resolutionIds = <String?>[];
   QueueService(this.results, {this.transcripts = const []});
   @override
   Future<AssistantResult> decide({
@@ -102,12 +105,15 @@ class QueueService extends AssistantService {
     Map<String, dynamic>? context,
     String? language,
     String? faqText,
+    int? pageStep,
   }) async {
     contexts.add(context);
     texts.add(text);
     choiceIds.add(choiceId);
     turnLanguages.add(language);
     faqTexts.add(faqText);
+    pageSteps.add(pageStep);
+    resolutionIds.add(resolutionId);
     return results.removeAt(0);
   }
 
@@ -628,6 +634,284 @@ void main() {
     );
   });
 
+  group('Capability list pages', () {
+    Map<String, dynamic> listJson(
+      Object? listing, {
+      String kind = 'capability_list',
+    }) => {
+      'contract_version': 3,
+      'catalog_version': AssistantResult.catalogVersion,
+      'data_mode': 'demo',
+      'session_id': 's',
+      'message': '目前助理可以開啟的功能：',
+      'kind': kind,
+      'resolution_id': 'r1',
+      'choices': [
+        {'id': '1', 'title': '圖書館'},
+      ],
+      'listing': ?listing,
+    };
+
+    test('listing is parsed, malformed values are ignored', () {
+      final listing = AssistantResult.fromJson(
+        listJson({'offset': 8, 'size': 8, 'total': 85}),
+      ).listing!;
+      expect((listing.offset, listing.size, listing.total), (8, 8, 85));
+      expect(listing.page, 2);
+      expect(listing.pageCount, 11);
+      expect(listing.hasPages, isTrue);
+      final single = AssistantResult.fromJson(
+        listJson({'offset': 0, 'size': 8, 'total': 8}),
+      ).listing!;
+      expect((single.page, single.pageCount, single.hasPages), (1, 1, false));
+      for (final bad in [
+        null,
+        'page 2',
+        {'offset': '8', 'size': 8, 'total': 85},
+        {'offset': 8, 'size': 0, 'total': 85},
+        {'offset': -8, 'size': 8, 'total': 85},
+        {'offset': 88, 'size': 8, 'total': 85},
+        {'size': 8, 'total': 85},
+      ]) {
+        final result = AssistantResult.fromJson(listJson(bad));
+        expect(result.listing, isNull, reason: '$bad');
+        expect(result.choices.single.title, '圖書館'); // the list still shows
+      }
+      // Only a capability list has pages.
+      expect(
+        AssistantResult.fromJson(
+          listJson({
+            'offset': 8,
+            'size': 8,
+            'total': 85,
+          }, kind: 'confirm_candidates'),
+        ).listing,
+        isNull,
+      );
+    });
+
+    test('page_step is sent with the listing\'s resolution id', () async {
+      final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
+      Map<String, dynamic>? payload;
+      server.listen((request) async {
+        payload = jsonDecode(
+          await utf8.decoder.bind(request).join(),
+        ) as Map<String, dynamic>;
+        request.response.headers.contentType = ContentType.json;
+        request.response.write(
+          jsonEncode({
+            ...listJson({'offset': 16, 'size': 8, 'total': 85}),
+            'request_id': payload!['request_id'],
+          }),
+        );
+        await request.response.close();
+      });
+      try {
+        final result = await HttpOverrides.runWithHttpOverrides(
+          () => AssistantService(endpoint: 'http://127.0.0.1:${server.port}')
+              .decide(
+                text: '',
+                requestId: 'page-step',
+                sessionId: 's',
+                resolutionId: 'r1',
+                pageStep: 1,
+              ),
+          RealHttpOverrides(),
+        );
+        expect(payload!['page_step'], 1);
+        expect(payload!['resolution_id'], 'r1');
+        expect(payload!['session_id'], 's');
+        expect(payload!['text'], '');
+        expect(result.listing!.page, 3);
+        // Ordinary turns carry no page_step.
+        await HttpOverrides.runWithHttpOverrides(
+          () =>
+              AssistantService(endpoint: 'http://127.0.0.1:${server.port}')
+                  .decide(text: '有哪些功能', requestId: 'plain'),
+          RealHttpOverrides(),
+        );
+        expect(payload!.containsKey('page_step'), isFalse);
+      } finally {
+        await server.close(force: true);
+      }
+    });
+
+    AssistantResult listPage(int offset, {int total = 85, String id = 'r1'}) =>
+        AssistantResult(
+          sessionId: 's',
+          message: '目前助理可以開啟的功能：',
+          kind: 'capability_list',
+          resolutionId: id,
+          choices: [
+            for (var i = 0; i < 3; i++)
+              AssistantBookChoice('${i + 1}', '功能 ${offset + i + 1}'),
+          ],
+          listing: AssistantListing(offset: offset, size: 8, total: total),
+        );
+
+    Future<AssistantViewController> pumpPanel(
+      WidgetTester tester,
+      QueueService service, {
+      double width = 402,
+      double textScale = 1,
+    }) async {
+      SharedPreferences.setMockInitialValues({
+        'assistant_speech_language': 'zh',
+      });
+      AssistantRecentInputs.instance.reset();
+      tester.view.physicalSize = Size(width, 1400);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      final controller = AssistantViewController(
+        service: service,
+        executor: RecordingExecutor(),
+        recorder: FakeRecorder(),
+      )..expanded.value = true;
+      await tester.pumpWidget(
+        MaterialApp(
+          builder: (context, child) => MediaQuery(
+            data: MediaQuery.of(context)
+                .copyWith(textScaler: TextScaler.linear(textScale)),
+            child: AssistantHost(controller: controller, child: child!),
+          ),
+          home: const Scaffold(),
+        ),
+      );
+      await tester.pump();
+      await controller.submit('有哪些功能');
+      await tester.pump();
+      return controller;
+    }
+
+    testWidgets('the arrows send page_step and the new page follows', (
+      tester,
+    ) async {
+      final service = QueueService([
+        listPage(8),
+        listPage(16, id: 'r2'),
+        listPage(8, id: 'r3'),
+      ]);
+      final controller = await pumpPanel(tester, service);
+      expect(find.text('第 2／11 頁'), findsOneWidget);
+      expect(find.byTooltip('上一頁'), findsOneWidget);
+      expect(find.byTooltip('下一頁'), findsOneWidget);
+      final talking = AssistantTexts.conversation.value;
+      final next = find.byKey(const Key('assistant-page-next'));
+      expect(tester.getSize(next).width, greaterThanOrEqualTo(48));
+      expect(tester.getSize(next).height, greaterThanOrEqualTo(48));
+      await tester.tap(next);
+      await tester.pump();
+      expect(service.pageSteps, [null, 1]);
+      expect(service.resolutionIds.last, 'r1');
+      expect(service.texts.last, '');
+      expect(service.choiceIds.last, isNull);
+      expect(find.text('第 3／11 頁'), findsOneWidget);
+      // Only the newest list is live: one row, the old one is gone.
+      expect(find.byKey(const Key('assistant-page-next')), findsOneWidget);
+      expect(controller.messages.where((m) => m.text == '下一頁'), hasLength(1));
+      await tester.tap(find.byKey(const Key('assistant-page-previous')));
+      await tester.pump();
+      expect(service.pageSteps.last, -1);
+      expect(service.resolutionIds.last, 'r2');
+      expect(find.text('第 2／11 頁'), findsOneWidget);
+      // Not a request: nothing remembered, the language stays.
+      expect(AssistantRecentInputs.instance.items, isEmpty);
+      expect(controller.speechLanguage.value, 'zh');
+      expect(AssistantTexts.conversation.value, talking);
+      AssistantTexts.conversation.value = null;
+      controller.cancel();
+    });
+
+    testWidgets('a single page has no arrows', (tester) async {
+      final service = QueueService([listPage(0, total: 6)]);
+      final controller = await pumpPanel(tester, service);
+      expect(find.text('功能 1'), findsOneWidget);
+      expect(find.byKey(const Key('assistant-page-next')), findsNothing);
+      await controller.turnPage(1);
+      expect(service.pageSteps, [null], reason: 'nothing to turn');
+      controller.cancel();
+    });
+
+    testWidgets('the arrows are off while busy', (tester) async {
+      final service = QueueService([listPage(8), listPage(16)]);
+      final controller = await pumpPanel(tester, service);
+      controller.busy.value = true;
+      await tester.pump();
+      for (final key in ['assistant-page-previous', 'assistant-page-next']) {
+        expect(
+          tester.widget<IconButton>(find.byKey(Key(key))).onPressed,
+          isNull,
+        );
+      }
+      await controller.turnPage(1);
+      expect(service.pageSteps, [null], reason: 'nothing sent while busy');
+      controller.busy.value = false;
+      controller.cancel();
+    });
+
+    testWidgets('the panel with the row fits 360 px with large text', (
+      tester,
+    ) async {
+      final service = QueueService([listPage(8)]);
+      final controller = await pumpPanel(
+        tester,
+        service,
+        width: 360,
+        textScale: 2,
+      );
+      expect(find.text('第 2／11 頁'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+      controller.cancel();
+    });
+
+    testWidgets('the row itself fits a narrow bubble in every language', (
+      tester,
+    ) async {
+      // 360 px minus the panel padding (16 + 16) and the reply's right
+      // margin (48), at twice the text size.
+      for (final language in AssistantTexts.languages) {
+        await tester.pumpWidget(
+          MaterialApp(
+            home: MediaQuery(
+              data: const MediaQueryData(
+                size: Size(360, 800),
+                textScaler: TextScaler.linear(2),
+              ),
+              child: Scaffold(
+                body: Center(
+                  child: SizedBox(
+                    width: 280,
+                    child: AssistantPageRow(
+                      current: 10,
+                      count: 11,
+                      label: (key, [values = const {}]) =>
+                          AssistantTexts.text(key, language, values),
+                      onStep: (_) {},
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+        expect(
+          find.text(
+            AssistantTexts.text('pageOf', language, {
+              'current': 10,
+              'count': 11,
+            }),
+          ),
+          findsOneWidget,
+        );
+        expect(
+          find.byTooltip(AssistantTexts.text('nextPage', language)),
+          findsOneWidget,
+        );
+        expect(tester.takeException(), isNull, reason: language);
+      }
+    });
+  });
+
   testWidgets(
     'Full-screen sheet keeps the page, shows bubbles and cancels a request',
     (tester) async {
@@ -763,21 +1047,72 @@ void main() {
     expect(controller.speechLanguage.value, 'ja'); // but Japanese stays chosen
   });
 
-  test('The language last spoken or typed is used next, not saved', () async {
-    SharedPreferences.setMockInitialValues({'assistant_speech_language': 'zh'});
+  test(
+    'A clear spoken language moves and saves the menu; typing does not',
+    () async {
+      SharedPreferences.setMockInitialValues({
+        'assistant_speech_language': 'zh',
+      });
+      final service = QueueService(
+        [
+          const AssistantResult(
+            sessionId: 's',
+            message: 'Library.',
+            language: 'en',
+          ),
+          // A tapped choice: the reply's default language must not switch back.
+          const AssistantResult(sessionId: 's', message: '好的。'),
+          const AssistantResult(sessionId: 's', message: '水費。'),
+        ],
+        transcripts: [
+          const AssistantTranscript(
+            'I want to borrow a book',
+            language: 'en',
+            languageConfidence: 0.95,
+          ),
+        ],
+      );
+      final controller = AssistantViewController(
+        service: service,
+        executor: RecordingExecutor(),
+        recorder: FakeRecorder(),
+      );
+      await Future<void>.delayed(Duration.zero);
+      expect(controller.speechLanguage.value, 'zh');
+      expect(await controller.startListening(), isTrue);
+      await controller.stopListening();
+      expect(
+        controller.speechLanguage.value,
+        'en',
+      ); // spoken clearly in English
+      expect(AssistantTexts.conversation.value, 'en');
+      // Saved like a manual pick: the next launch listens in English.
+      expect(await AssistantSpeechLanguage.load(), 'en');
+      await controller.submit('', choiceId: '1');
+      expect(controller.speechLanguage.value, 'en');
+      await controller.submit('我要繳水費');
+      // Typed Chinese switches the panel but not the menu.
+      expect(controller.speechLanguage.value, 'en');
+      expect(AssistantTexts.conversation.value, 'zh');
+      expect(await AssistantSpeechLanguage.load(), 'en');
+      controller.setSpeechLanguage('auto');
+      expect(controller.speechLanguage.value, 'auto');
+      AssistantTexts.conversation.value = null;
+    },
+  );
+
+  test('自動偵測 stays chosen when a language is detected clearly', () async {
+    SharedPreferences.setMockInitialValues({
+      'assistant_speech_language': 'auto',
+    });
     final service = QueueService(
-      [
-        const AssistantResult(
-          sessionId: 's',
-          message: 'Library.',
-          language: 'en',
-        ),
-        // A tapped choice: the reply's default language must not switch back.
-        const AssistantResult(sessionId: 's', message: '好的。'),
-        const AssistantResult(sessionId: 's', message: '水費。'),
-      ],
+      [const AssistantResult(sessionId: 's', message: 'はい', language: 'ja')],
       transcripts: [
-        const AssistantTranscript('I want to borrow a book', language: 'en'),
+        const AssistantTranscript(
+          '本を借りたい',
+          language: 'ja',
+          languageConfidence: 0.97,
+        ),
       ],
     );
     final controller = AssistantViewController(
@@ -786,20 +1121,13 @@ void main() {
       recorder: FakeRecorder(),
     );
     await Future<void>.delayed(Duration.zero);
-    expect(controller.speechLanguage.value, 'zh');
+    expect(controller.speechLanguage.value, 'auto');
     expect(await controller.startListening(), isTrue);
     await controller.stopListening();
-    expect(controller.speechLanguage.value, 'en'); // spoken in English
-    await controller.submit('', choiceId: '1');
-    expect(controller.speechLanguage.value, 'en');
-    await controller.submit('我要繳水費');
-    expect(controller.speechLanguage.value, 'zh'); // typed in Chinese
-    expect(
-      await AssistantSpeechLanguage.load(),
-      'zh',
-    ); // still the user's choice
-    controller.setSpeechLanguage('auto');
     expect(controller.speechLanguage.value, 'auto');
+    expect(await AssistantSpeechLanguage.load(), 'auto');
+    expect(AssistantTexts.conversation.value, 'ja'); // the panel follows
+    AssistantTexts.conversation.value = null;
   });
 
   testWidgets('The panel follows the conversation language and fits', (

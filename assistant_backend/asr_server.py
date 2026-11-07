@@ -58,6 +58,12 @@ CHOSEN_LANGUAGE_MIN = 0.05
 # Chinese chosen, another language detected: switch only when detection is at least
 # this sure (or the Chinese pass already wrote Latin letters).
 UNSURE_SWITCH = 0.5
+# Chinese chosen and a short clear Chinese text: Whisper may have translated another
+# language into it ("nani ga dekiru" -> 何能做到, "konnichiwa" -> 你好). A detection-only
+# pass (encoder plus one step) checks the language; another language must be at least
+# this sure, so short Chinese commands are not turned into Japanese.
+SHORT_TEXT = 6
+SHORT_SWITCH = 0.7
 
 
 def detection_confidence(reply, code):
@@ -329,10 +335,13 @@ class WhisperCppRecognizer:
         no_speech = max((s.get("no_speech_prob", 0.0) for s in segments), default=1.0)
         return text, round(logprob, 3), round(no_speech, 3)
 
-    def _infer(self, url, wav, seconds, language):
+    def _infer(self, url, wav, seconds, language, detect_only=False):
         import urllib.request
         self.passes = getattr(self, "passes", 0) + 1  # decodes for this clip (timing log)
-        body, content_type = self.multipart(self._fields(seconds, language), wav)
+        fields = self._fields(seconds, language)
+        if detect_only:
+            fields["detect_language"] = "true"  # whisper-server: language only, no text
+        body, content_type = self.multipart(fields, wav)
         request = urllib.request.Request(url + "/inference", data=body, headers={"Content-Type": content_type})
         with urllib.request.urlopen(request, timeout=self.timeout) as response:
             return json.loads(response.read(2_000_000))
@@ -376,6 +385,12 @@ class WhisperCppRecognizer:
                         import i18n
                         used = i18n.detect_text_language(heard)
                         used = used if used in LANGUAGES else "en"
+                elif used == "zh" and self.multi_url and heard and len(re.sub(r"[\W_]", "", heard)) <= SHORT_TEXT:
+                    probe = self._infer(self.multi_url, wav, seconds, "auto", detect_only=True)
+                    detected = language_code(probe.get("language"), default=None)
+                    sure = detection_confidence(probe, detected)
+                    if detected in LANGUAGES and detected != "zh" and sure is not None and sure >= SHORT_SWITCH:
+                        reply, used, confidence = self._infer(self.multi_url, wav, seconds, detected), detected, sure
             else:
                 # A chosen language is a preference, not a lock: the App keeps the
                 # language last used, so the next speaker may use another one (forcing
