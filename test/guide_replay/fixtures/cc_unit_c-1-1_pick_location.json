@@ -1,0 +1,567 @@
+{
+ "name": "cc_unit_c-1-1_pick_location",
+ "description": "reservation.c-1-1, goal pick_location (換地點): the user wants another place.",
+ "page": "counter_calling",
+ "start": null,
+ "capability": "reservation.c-1-1",
+ "goals": [
+  "pick_location"
+ ],
+ "expect": {
+  "done": true
+ },
+ "recordedAt": "2026-11-07T18:22:41.414Z",
+ "durationMs": 6141,
+ "viewport": {
+  "width": 390,
+  "height": 844,
+  "deviceScaleFactor": 3,
+  "isMobile": true,
+  "hasTouch": true
+ },
+ "failed": null,
+ "steps": [
+  {
+   "action": null,
+   "before": null,
+   "after": {
+    "path": "/counter-calling/c-1",
+    "query": {
+     "subId": "c-1-1"
+    },
+    "flags": {
+     "unitCount": 0,
+     "unitsBelow": false,
+     "favorites": 0,
+     "favNames": "",
+     "unitName": "地政事務所",
+     "location": "c-1-1",
+     "locationName": "古亭地政事務所",
+     "firstLocation": "古亭地政事務所",
+     "locationCount": 2,
+     "locationFocus": false,
+     "locationPicked": false,
+     "favText": "加入常用",
+     "favOn": false,
+     "counters": "謄本櫃檯|0001|0;網路申辦|1001|3;全功能櫃檯|2001|0",
+     "countersBottom": 454,
+     "editOpen": false,
+     "editHasInputs": false,
+     "editTicked": false,
+     "editBottom": 0,
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "counter.counters",
+     "counter.favorite",
+     "counter.location"
+    ],
+    "rects": {
+     "counter.location": [
+      20,
+      68,
+      350,
+      50
+     ],
+     "counter.counters": [
+      20,
+      222,
+      350,
+      232
+     ],
+     "counter.favorite": [
+      282,
+      182,
+      88,
+      24
+     ]
+    }
+   },
+   "facts": {
+    "url": "/counter-calling/c-1?subId=c-1-1",
+    "title": "臨櫃叫號",
+    "fields": [
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "c-1",
+      "name": "",
+      "label": "選擇地點",
+      "placeholder": "",
+      "value": "c-1-1",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       20,
+       68,
+       350,
+       50
+      ]
+     }
+    ],
+    "starred": [],
+    "errors": [],
+    "buttons": [],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  },
+  {
+   "action": {
+    "step": "pick_location",
+    "do": "click",
+    "selector": "select.base-select",
+    "hit": {
+     "x": 195,
+     "y": 93,
+     "targets": [
+      "counter.location"
+     ]
+    }
+   },
+   "before": {
+    "path": "/counter-calling/c-1",
+    "query": {
+     "subId": "c-1-1"
+    },
+    "flags": {
+     "unitCount": 0,
+     "unitsBelow": false,
+     "favorites": 0,
+     "favNames": "",
+     "unitName": "地政事務所",
+     "location": "c-1-1",
+     "locationName": "古亭地政事務所",
+     "firstLocation": "古亭地政事務所",
+     "locationCount": 2,
+     "locationFocus": false,
+     "locationPicked": false,
+     "favText": "加入常用",
+     "favOn": false,
+     "counters": "謄本櫃檯|0001|0;網路申辦|1001|3;全功能櫃檯|2001|0",
+     "countersBottom": 454,
+     "editOpen": false,
+     "editHasInputs": false,
+     "editTicked": false,
+     "editBottom": 0,
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "counter.counters",
+     "counter.favorite",
+     "counter.location"
+    ],
+    "rects": {
+     "counter.location": [
+      20,
+      68,
+      350,
+      50
+     ],
+     "counter.counters": [
+      20,
+      222,
+      350,
+      232
+     ],
+     "counter.favorite": [
+      282,
+      182,
+      88,
+      24
+     ]
+    }
+   },
+   "after": {
+    "path": "/counter-calling/c-1",
+    "query": {
+     "subId": "c-1-1"
+    },
+    "flags": {
+     "unitCount": 0,
+     "unitsBelow": false,
+     "favorites": 0,
+     "favNames": "",
+     "unitName": "地政事務所",
+     "location": "c-1-1",
+     "locationName": "古亭地政事務所",
+     "firstLocation": "古亭地政事務所",
+     "locationCount": 2,
+     "locationFocus": true,
+     "locationPicked": true,
+     "favText": "加入常用",
+     "favOn": false,
+     "counters": "謄本櫃檯|0001|0;網路申辦|1001|3;全功能櫃檯|2001|0",
+     "countersBottom": 454,
+     "editOpen": false,
+     "editHasInputs": false,
+     "editTicked": false,
+     "editBottom": 0,
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "counter.counters",
+     "counter.favorite",
+     "counter.location"
+    ],
+    "rects": {
+     "counter.location": [
+      20,
+      68,
+      350,
+      50
+     ],
+     "counter.counters": [
+      20,
+      222,
+      350,
+      232
+     ],
+     "counter.favorite": [
+      282,
+      182,
+      88,
+      24
+     ]
+    }
+   },
+   "facts": {
+    "url": "/counter-calling/c-1?subId=c-1-1",
+    "title": "臨櫃叫號",
+    "fields": [
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "c-1",
+      "name": "",
+      "label": "選擇地點",
+      "placeholder": "",
+      "value": "c-1-1",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       20,
+       68,
+       350,
+       50
+      ]
+     }
+    ],
+    "starred": [],
+    "errors": [],
+    "buttons": [],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  },
+  {
+   "action": {
+    "step": "pick_location",
+    "do": "select",
+    "selector": "select.base-select",
+    "value": "c-1-2",
+    "hit": {
+     "x": 195,
+     "y": 93,
+     "targets": [
+      "counter.location"
+     ]
+    }
+   },
+   "before": {
+    "path": "/counter-calling/c-1",
+    "query": {
+     "subId": "c-1-1"
+    },
+    "flags": {
+     "unitCount": 0,
+     "unitsBelow": false,
+     "favorites": 0,
+     "favNames": "",
+     "unitName": "地政事務所",
+     "location": "c-1-1",
+     "locationName": "古亭地政事務所",
+     "firstLocation": "古亭地政事務所",
+     "locationCount": 2,
+     "locationFocus": true,
+     "locationPicked": true,
+     "favText": "加入常用",
+     "favOn": false,
+     "counters": "謄本櫃檯|0001|0;網路申辦|1001|3;全功能櫃檯|2001|0",
+     "countersBottom": 454,
+     "editOpen": false,
+     "editHasInputs": false,
+     "editTicked": false,
+     "editBottom": 0,
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "counter.counters",
+     "counter.favorite",
+     "counter.location"
+    ],
+    "rects": {
+     "counter.location": [
+      20,
+      68,
+      350,
+      50
+     ],
+     "counter.counters": [
+      20,
+      222,
+      350,
+      232
+     ],
+     "counter.favorite": [
+      282,
+      182,
+      88,
+      24
+     ]
+    }
+   },
+   "after": {
+    "path": "/counter-calling/c-1",
+    "query": {
+     "subId": "c-1-1"
+    },
+    "flags": {
+     "unitCount": 0,
+     "unitsBelow": false,
+     "favorites": 0,
+     "favNames": "",
+     "unitName": "地政事務所",
+     "location": "c-1-2",
+     "locationName": "中山地政事務所",
+     "firstLocation": "古亭地政事務所",
+     "locationCount": 2,
+     "locationFocus": true,
+     "locationPicked": true,
+     "favText": "加入常用",
+     "favOn": false,
+     "counters": "謄本櫃檯|1093|0;網路申辦|0000|0;全功能櫃檯|4054|0;收件櫃檯|3114|0",
+     "countersBottom": 518,
+     "editOpen": false,
+     "editHasInputs": false,
+     "editTicked": false,
+     "editBottom": 0,
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "counter.counters",
+     "counter.favorite",
+     "counter.location"
+    ],
+    "rects": {
+     "counter.location": [
+      20,
+      68,
+      350,
+      50
+     ],
+     "counter.counters": [
+      20,
+      222,
+      350,
+      296
+     ],
+     "counter.favorite": [
+      282,
+      182,
+      88,
+      24
+     ]
+    }
+   },
+   "facts": {
+    "url": "/counter-calling/c-1?subId=c-1-1",
+    "title": "臨櫃叫號",
+    "fields": [
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "c-1",
+      "name": "",
+      "label": "選擇地點",
+      "placeholder": "",
+      "value": "c-1-2",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       20,
+       68,
+       350,
+       50
+      ]
+     }
+    ],
+    "starred": [],
+    "errors": [],
+    "buttons": [],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  },
+  {
+   "action": {
+    "step": "pick_location",
+    "do": "blur",
+    "hit": null
+   },
+   "before": {
+    "path": "/counter-calling/c-1",
+    "query": {
+     "subId": "c-1-1"
+    },
+    "flags": {
+     "unitCount": 0,
+     "unitsBelow": false,
+     "favorites": 0,
+     "favNames": "",
+     "unitName": "地政事務所",
+     "location": "c-1-2",
+     "locationName": "中山地政事務所",
+     "firstLocation": "古亭地政事務所",
+     "locationCount": 2,
+     "locationFocus": true,
+     "locationPicked": true,
+     "favText": "加入常用",
+     "favOn": false,
+     "counters": "謄本櫃檯|1093|0;網路申辦|0000|0;全功能櫃檯|4054|0;收件櫃檯|3114|0",
+     "countersBottom": 518,
+     "editOpen": false,
+     "editHasInputs": false,
+     "editTicked": false,
+     "editBottom": 0,
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "counter.counters",
+     "counter.favorite",
+     "counter.location"
+    ],
+    "rects": {
+     "counter.location": [
+      20,
+      68,
+      350,
+      50
+     ],
+     "counter.counters": [
+      20,
+      222,
+      350,
+      296
+     ],
+     "counter.favorite": [
+      282,
+      182,
+      88,
+      24
+     ]
+    }
+   },
+   "after": {
+    "path": "/counter-calling/c-1",
+    "query": {
+     "subId": "c-1-1"
+    },
+    "flags": {
+     "unitCount": 0,
+     "unitsBelow": false,
+     "favorites": 0,
+     "favNames": "",
+     "unitName": "地政事務所",
+     "location": "c-1-2",
+     "locationName": "中山地政事務所",
+     "firstLocation": "古亭地政事務所",
+     "locationCount": 2,
+     "locationFocus": false,
+     "locationPicked": true,
+     "favText": "加入常用",
+     "favOn": false,
+     "counters": "謄本櫃檯|1093|0;網路申辦|0000|0;全功能櫃檯|4054|0;收件櫃檯|3114|0",
+     "countersBottom": 518,
+     "editOpen": false,
+     "editHasInputs": false,
+     "editTicked": false,
+     "editBottom": 0,
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "counter.counters",
+     "counter.favorite",
+     "counter.location"
+    ],
+    "rects": {
+     "counter.location": [
+      20,
+      68,
+      350,
+      50
+     ],
+     "counter.counters": [
+      20,
+      222,
+      350,
+      296
+     ],
+     "counter.favorite": [
+      282,
+      182,
+      88,
+      24
+     ]
+    }
+   },
+   "facts": {
+    "url": "/counter-calling/c-1?subId=c-1-1",
+    "title": "臨櫃叫號",
+    "fields": [
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "c-1",
+      "name": "",
+      "label": "選擇地點",
+      "placeholder": "",
+      "value": "c-1-2",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       20,
+       68,
+       350,
+       50
+      ]
+     }
+    ],
+    "starred": [],
+    "errors": [],
+    "buttons": [],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  }
+ ]
+}

@@ -1,0 +1,23 @@
+{
+  "name": "cit_progress_open_case",
+  "description": "reportIssue.progress default (open_case), opened at /citizen-report/ (the guide's openFor). 查詢 -> tap a case.",
+  "page": "citizen_report",
+  "capability": "reportIssue.progress",
+  "start": "/citizen-report/",
+  "goals": [],
+  "expect": {
+    "done": true
+  },
+  "actions": [
+    {
+      "step": "open_cases",
+      "do": "click",
+      "text": "查詢"
+    },
+    {
+      "step": "open_case",
+      "do": "click",
+      "text": "test2"
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "name": "cc_unit_c-5-1_add_favorite",
+  "description": "reservation.c-5-1 (first place of the unit, picked=false), goal add_favorite.",
+  "page": "counter_calling",
+  "capability": "reservation.c-5-1",
+  "goals": [
+    "add_favorite"
+  ],
+  "expect": {
+    "done": true
+  },
+  "actions": [
+    {
+      "step": "add_favorite",
+      "do": "click",
+      "text": "加入常用"
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "name": "cc_goal_add_favorite_then_home",
+  "description": "reservation, goal add_favorite: unit, place, 加入常用, then back to the home list as the done card says.",
+  "page": "counter_calling",
+  "capability": "reservation",
+  "goals": [
+    "add_favorite"
+  ],
+  "expect": {
+    "done": true
+  },
+  "actions": [
+    {
+      "step": "pick_unit",
+      "do": "click",
+      "text": "區公所"
+    },
+    {
+      "step": "pick_location",
+      "do": "click",
+      "selector": "select.base-select"
+    },
+    {
+      "step": "pick_location",
+      "do": "select",
+      "selector": "select.base-select",
+      "value": "c-3-2"
+    },
+    {
+      "step": "pick_location",
+      "do": "blur"
+    },
+    {
+      "step": "add_favorite",
+      "do": "click",
+      "text": "加入常用"
+    },
+    {
+      "step": "done",
+      "do": "back"
+    }
+  ]
+}

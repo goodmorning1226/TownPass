@@ -1,0 +1,13 @@
+{
+  "name": "sub_unsubscribe_none",
+  "description": "goal unsubscribe on a fresh page (您已訂閱 0 項): the card says there is nothing to cancel.",
+  "page": "subscription",
+  "capability": "subscription",
+  "goals": [
+    "unsubscribe"
+  ],
+  "expect": {
+    "done": false
+  },
+  "actions": []
+}

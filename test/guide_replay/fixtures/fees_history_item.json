@@ -1,0 +1,346 @@
+{
+ "name": "fees_history_item",
+ "description": "fees.history: user changes 所有項目 to 停車費 (the card for a non-empty list names 所有項目; here the list is empty so the card says 近1年 -> 近3年; this checks any filter completes the step and the done text for an empty result).",
+ "page": "fees",
+ "start": null,
+ "capability": "fees.history",
+ "goals": [],
+ "expect": {
+  "done": true
+ },
+ "recordedAt": "2026-11-07T18:32:54.358Z",
+ "durationMs": 3500,
+ "viewport": {
+  "width": 390,
+  "height": 844,
+  "deviceScaleFactor": 3,
+  "isMobile": true,
+  "hasTouch": true
+ },
+ "failed": null,
+ "steps": [
+  {
+   "action": null,
+   "before": null,
+   "after": {
+    "path": "/fee-payment/history/",
+    "query": {},
+    "flags": {
+     "feeName": "",
+     "firstTab": "",
+     "onInputTab": false,
+     "hasFields": false,
+     "filled": false,
+     "fieldKind": "",
+     "fieldName": "",
+     "fieldHint": "",
+     "fieldChoices": "",
+     "alert": false,
+     "alertText": "",
+     "groupOpen": false,
+     "bills": 0,
+     "selected": 0,
+     "total": "",
+     "amount": "",
+     "payEnabled": false,
+     "methodsBelow": false,
+     "payConfirm": false,
+     "paid": false,
+     "paidMethod": "",
+     "noRecords": true,
+     "filtered": false,
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "fees.filters",
+     "fees.item_filter",
+     "fees.records"
+    ],
+    "rects": {
+     "fees.filters": [
+      0,
+      56,
+      374,
+      48
+     ],
+     "fees.item_filter": [
+      130,
+      56,
+      114,
+      48
+     ],
+     "fees.records": [
+      0,
+      264,
+      390,
+      216
+     ]
+    }
+   },
+   "facts": {
+    "url": "/fee-payment/history/",
+    "title": "帳務紀錄",
+    "fields": [
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "1",
+      "name": "",
+      "label": "",
+      "placeholder": "",
+      "value": "1",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       0,
+       56,
+       114,
+       48
+      ]
+     },
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "all",
+      "name": "",
+      "label": "近1年 近2年 近3年",
+      "placeholder": "",
+      "value": "all",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       130,
+       56,
+       114,
+       48
+      ]
+     },
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "all",
+      "name": "",
+      "label": "所有項目 停車費 公訓處自費課程",
+      "placeholder": "",
+      "value": "all",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       260,
+       56,
+       114,
+       48
+      ]
+     }
+    ],
+    "starred": [],
+    "errors": [],
+    "buttons": [],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  },
+  {
+   "action": {
+    "step": "filter_history",
+    "do": "select",
+    "selector": "select.base-select",
+    "nth": 1,
+    "value": "fee-5",
+    "hit": {
+     "x": 187,
+     "y": 80,
+     "targets": [
+      "fees.filters",
+      "fees.item_filter"
+     ]
+    }
+   },
+   "before": {
+    "path": "/fee-payment/history/",
+    "query": {},
+    "flags": {
+     "feeName": "",
+     "firstTab": "",
+     "onInputTab": false,
+     "hasFields": false,
+     "filled": false,
+     "fieldKind": "",
+     "fieldName": "",
+     "fieldHint": "",
+     "fieldChoices": "",
+     "alert": false,
+     "alertText": "",
+     "groupOpen": false,
+     "bills": 0,
+     "selected": 0,
+     "total": "",
+     "amount": "",
+     "payEnabled": false,
+     "methodsBelow": false,
+     "payConfirm": false,
+     "paid": false,
+     "paidMethod": "",
+     "noRecords": true,
+     "filtered": false,
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "fees.filters",
+     "fees.item_filter",
+     "fees.records"
+    ],
+    "rects": {
+     "fees.filters": [
+      0,
+      56,
+      374,
+      48
+     ],
+     "fees.item_filter": [
+      130,
+      56,
+      114,
+      48
+     ],
+     "fees.records": [
+      0,
+      264,
+      390,
+      216
+     ]
+    }
+   },
+   "after": {
+    "path": "/fee-payment/history/",
+    "query": {},
+    "flags": {
+     "feeName": "",
+     "firstTab": "",
+     "onInputTab": false,
+     "hasFields": false,
+     "filled": false,
+     "fieldKind": "",
+     "fieldName": "",
+     "fieldHint": "",
+     "fieldChoices": "",
+     "alert": false,
+     "alertText": "",
+     "groupOpen": false,
+     "bills": 0,
+     "selected": 0,
+     "total": "",
+     "amount": "",
+     "payEnabled": false,
+     "methodsBelow": false,
+     "payConfirm": false,
+     "paid": false,
+     "paidMethod": "",
+     "noRecords": true,
+     "filtered": true,
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "fees.filters",
+     "fees.item_filter",
+     "fees.records"
+    ],
+    "rects": {
+     "fees.filters": [
+      0,
+      56,
+      374,
+      48
+     ],
+     "fees.item_filter": [
+      130,
+      56,
+      114,
+      48
+     ],
+     "fees.records": [
+      0,
+      264,
+      390,
+      216
+     ]
+    }
+   },
+   "facts": {
+    "url": "/fee-payment/history/",
+    "title": "帳務紀錄",
+    "fields": [
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "1",
+      "name": "",
+      "label": "",
+      "placeholder": "",
+      "value": "1",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       0,
+       56,
+       114,
+       48
+      ]
+     },
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "all",
+      "name": "",
+      "label": "近1年 近2年 近3年",
+      "placeholder": "",
+      "value": "fee-5",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       130,
+       56,
+       114,
+       48
+      ]
+     },
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "all",
+      "name": "",
+      "label": "所有項目 停車費 公訓處自費課程",
+      "placeholder": "",
+      "value": "all",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       260,
+       56,
+       114,
+       48
+      ]
+     }
+    ],
+    "starred": [],
+    "errors": [],
+    "buttons": [],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  }
+ ]
+}

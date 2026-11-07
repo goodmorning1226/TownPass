@@ -1,0 +1,43 @@
+{
+  "name": "dis_d43_app",
+  "description": "D-4-3 opened like the app (/disaster-report + in-page route); default plan; only the cards are followed (tick 道路).",
+  "page": "disaster_report",
+  "capability": "disasterReport.form.D-4-3",
+  "goals": [],
+  "expect": {
+    "done": true
+  },
+  "actions": [
+    {
+      "step": "enter_location",
+      "do": "type",
+      "selector": "#location",
+      "value": "臺北市信義區市府路1號"
+    },
+    {
+      "step": "describe_disaster",
+      "do": "check",
+      "text": "道路"
+    },
+    {
+      "step": "give_consent",
+      "do": "scroll",
+      "to": "bottom"
+    },
+    {
+      "step": "give_consent",
+      "do": "check",
+      "text": "提供個人資料給承辦人員"
+    },
+    {
+      "step": "send_report",
+      "do": "click",
+      "text": "送出"
+    },
+    {
+      "step": "done",
+      "do": "click",
+      "text": "確認"
+    }
+  ]
+}

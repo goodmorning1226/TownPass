@@ -1,0 +1,41 @@
+{
+  "name": "cou_wallet_use",
+  "description": "wallet goal use_coupon: 優惠券 -> 未兌換 coupon -> 兌換 -> 使用 -> 確定.",
+  "page": "coupon_wallet",
+  "capability": "wallet",
+  "goals": [
+    "use_coupon"
+  ],
+  "expect": {
+    "done": true
+  },
+  "actions": [
+    {
+      "step": "wallet_coupons",
+      "do": "click",
+      "text": "優惠券",
+      "within": "section.tabs:not(.tabs__content-type)"
+    },
+    {
+      "step": "wallet_pick",
+      "do": "click",
+      "selector": "ul.p-4.flex.flex-col.gap-y-3 > li > a",
+      "nth": 1
+    },
+    {
+      "step": "use_coupon",
+      "do": "click",
+      "text": "兌換"
+    },
+    {
+      "step": "use_coupon",
+      "do": "click",
+      "text": "使用"
+    },
+    {
+      "step": "done",
+      "do": "click",
+      "text": "確定"
+    }
+  ]
+}

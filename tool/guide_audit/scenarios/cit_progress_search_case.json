@@ -1,0 +1,31 @@
+{
+  "name": "cit_progress_search_case",
+  "description": "goal search_case: 查詢, type a case number (the card's A10- format), press the magnifier.",
+  "page": "citizen_report",
+  "capability": "reportIssue.progress",
+  "start": "/citizen-report/",
+  "goals": [
+    "search_case"
+  ],
+  "expect": {
+    "done": true
+  },
+  "actions": [
+    {
+      "step": "open_cases",
+      "do": "click",
+      "text": "查詢"
+    },
+    {
+      "step": "search_case",
+      "do": "type",
+      "placeholder": "搜尋案號關鍵字",
+      "value": "A10-1130930-00161"
+    },
+    {
+      "step": "search_case",
+      "do": "click",
+      "selector": "div.mt-3 div.flex-grow > button.search-button"
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "name": "cit_report_default",
+  "description": "有話要說 default plan (submit_report) opened the app's way (/citizen-report/). Follow the cards: pick a category in the grid, write 案件主旨 and 描述, press 送出, then 確認.",
+  "page": "citizen_report",
+  "capability": "reportIssue",
+  "goals": [],
+  "expect": { "done": true },
+  "actions": [
+    { "step": "pick_category", "do": "click", "text": "停車管理及收費問題", "nth": 0 },
+    { "step": "fill_form", "do": "type", "selector": "#title", "value": "測試主旨（示範）" },
+    { "step": "fill_form", "do": "type", "selector": "#description", "value": "測試描述，示範用假資料" },
+    { "step": "submit_report", "do": "click", "text": "送出" },
+    { "step": "done", "do": "click", "text": "確認" }
+  ]
+}

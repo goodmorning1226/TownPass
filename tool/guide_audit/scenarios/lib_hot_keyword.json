@@ -1,0 +1,12 @@
+{
+  "name": "lib_hot_keyword",
+  "description": "Goal hot_keyword only, app way. The card says tap any 熱門關鍵字; the user taps 東野圭吾. The page shows 查無資料 (9 of the 10 hot keywords find nothing) but the done card says 這些是大家常找的書.",
+  "page": "library",
+  "capability": "library",
+  "goals": ["hot_keyword"],
+  "expect": { "done": true },
+  "actions": [
+    { "step": "open_search", "do": "click", "selector": "a.search-bar" },
+    { "step": "hot_keyword", "do": "click", "text": "東野圭吾" }
+  ]
+}

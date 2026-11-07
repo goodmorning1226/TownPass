@@ -112,11 +112,17 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
                 ),
               );
             }
+            // Variant E: the penguin is enlarged (with a glow and a slow
+            // breath) whenever no guide is under way and the first-run hint
+            // is not pointing at it.
+            final enlarged = !c.guiding && !hinting;
             final homeAsk =
                 !c.sheetOpen.value && !typingInPage && !hinting && _onHome(c);
-            if (homeAsk) layers.add(_homeAskButton(context, c));
+            if (homeAsk) {
+              layers.add(_homeAskButton(context, c, enlarged: enlarged));
+            }
             if (!c.sheetOpen.value && !typingInPage) {
-              layers.add(_fab(context, c, attention: hinting));
+              layers.add(_fab(context, c, enlarged: enlarged));
             }
             if (hinting) layers.add(_onboardingArrow(context, c));
             if (hinting && stage == OnboardingStage.card) {
@@ -213,7 +219,7 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
   Widget _fab(
     BuildContext context,
     GuidedAssistantController c, {
-    required bool attention,
+    required bool enlarged,
   }) {
     // The newest assistant reply: a new one while the panel is closed makes
     // the penguin hop once.
@@ -226,7 +232,7 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
         id: assistantFabTarget,
         child: _PenguinFab(
           onTap: c.fabPressed,
-          attention: attention,
+          enlarged: enlarged,
           replyId: last == null || last.user ? null : last.id,
         ),
       ),
@@ -264,11 +270,20 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
         TPBottomNavigationFactory.defaultIndex;
   }
 
-  /// 「按住提問」 left of the penguin on the home tab.
-  Widget _homeAskButton(BuildContext context, GuidedAssistantController c) {
-    return Positioned(
+  /// 「按住提問」 left of the penguin on the home tab: 8px from the button
+  /// (56 + 16 margin + 8 gap), moved left by the enlarged penguin's extra
+  /// width (its breathing does not move it).
+  Widget _homeAskButton(
+    BuildContext context,
+    GuidedAssistantController c, {
+    required bool enlarged,
+  }) {
+    final grow = enlarged ? 56 * (GuideMotion.fabEnlarged - 1) : 0.0;
+    return AnimatedPositioned(
       key: const ValueKey('layer:homeAskButton'),
-      right: 80,
+      duration: GuideMotion.of(context, GuideMotion.fabResize),
+      curve: Curves.ease,
+      right: 80 + grow,
       bottom: _fabBottom(context, c),
       child: Material(
         type: MaterialType.transparency,
@@ -1683,24 +1698,23 @@ class _ScrollHintState extends State<_ScrollHint>
   }
 }
 
-/// Round teal button with the penguin (design Variant D); it shrinks a
-/// little while pressed, breathes gently while it wants attention (the
-/// first-run hint) and hops once when the assistant replies while the
-/// panel is closed. All still when motion is reduced.
+/// Round teal button with the penguin (design Variant D). Outside a guide
+/// it is enlarged ([GuideMotion.fabEnlarged], anchored bottom right) with
+/// a warm glow and breathes slowly (design Variant E); while a guide is
+/// under way or the first-run hint points at it, it is its normal size.
+/// It shrinks a little while pressed and hops once when the assistant
+/// replies while the panel is closed. No breathing, press or hop when
+/// motion is reduced (the enlarged size and glow stay).
 class _PenguinFab extends StatefulWidget {
   final VoidCallback onTap;
 
-  /// The first-run hint points at the button.
-  final bool attention;
+  /// Not guiding: enlarged, glowing and breathing.
+  final bool enlarged;
 
   /// Id of the newest assistant message (null: the last one is the user's).
   final int? replyId;
 
-  const _PenguinFab({
-    required this.onTap,
-    this.attention = false,
-    this.replyId,
-  });
+  const _PenguinFab({required this.onTap, this.enlarged = false, this.replyId});
 
   @override
   State<_PenguinFab> createState() => _PenguinFabState();
@@ -1711,11 +1725,9 @@ class _PenguinFabState extends State<_PenguinFab>
   bool _down = false;
   bool _reduced = false;
 
-  /// One breath in (or out) per [GuideMotion.loop]: slow and calm.
-  late final AnimationController _breath = AnimationController(
-    vsync: this,
-    duration: GuideMotion.loop,
-  );
+  /// One breath in (or out) per half [GuideMotion.fabBreath]; only exists
+  /// while enlarged with motion on.
+  AnimationController? _breath;
   late final AnimationController _hop = AnimationController(
     vsync: this,
     duration: GuideMotion.slow,
@@ -1738,22 +1750,23 @@ class _PenguinFabState extends State<_PenguinFab>
   }
 
   void _syncBreath() {
-    final want = widget.attention && !_reduced;
-    if (want) {
-      if (!_breath.isAnimating) _breath.repeat(reverse: true);
-    } else if (_breath.isAnimating || _breath.value > 0) {
-      if (_reduced) {
-        _breath.stop();
-        _breath.value = 0;
-      } else {
-        _breath.animateTo(0, duration: GuideMotion.quick);
-      }
+    final want = widget.enlarged && !_reduced;
+    if (want && _breath == null) {
+      _breath = AnimationController(
+        vsync: this,
+        duration: GuideMotion.fabBreath ~/ 2,
+      )..repeat(reverse: true);
+    } else if (!want && _breath != null) {
+      _breath!
+        ..stop()
+        ..dispose();
+      _breath = null;
     }
   }
 
   @override
   void dispose() {
-    _breath.dispose();
+    _breath?.dispose();
     _hop.dispose();
     super.dispose();
   }
@@ -1768,6 +1781,9 @@ class _PenguinFabState extends State<_PenguinFab>
   }
 
   Widget _fab() {
+    final scale = widget.enlarged ? GuideMotion.fabEnlarged : 1.0;
+    final resize = GuideMotion.of(context, GuideMotion.fabResize);
+    const curve = Curves.ease;
     return Semantics(
       button: true,
       label: '開啟助理',
@@ -1777,35 +1793,105 @@ class _PenguinFabState extends State<_PenguinFab>
         onPointerUp: (_) => _press(false),
         onPointerCancel: (_) => _press(false),
         child: AnimatedBuilder(
-          animation: Listenable.merge([_breath, _hop]),
-          builder: (context, child) {
-            final b = Curves.easeInOut.transform(_breath.value);
-            final h = math.sin(math.pi * _hop.value);
-            return Transform.translate(
-              offset: Offset(0, -10 * h),
-              child: Transform.scale(scale: 1 + 0.05 * b, child: child),
-            );
-          },
-          child: AnimatedScale(
-            scale: _down && !_reduced ? 0.92 : 1,
-            duration: _pressTime,
-            child: Material(
-              color: TPColors.primary500,
-              elevation: 3,
-              shape: const CircleBorder(),
-              child: InkWell(
-                customBorder: const CircleBorder(),
-                onTap: _tapped(widget.onTap),
-                child: const SizedBox(
-                  width: 56,
-                  height: 56,
-                  child: Center(child: PenguinAvatar(size: 46, borderWidth: 2)),
-                ),
-              ),
+          animation: _hop,
+          builder: (context, child) => Transform.translate(
+            offset: Offset(0, -10 * math.sin(math.pi * _hop.value)),
+            child: child,
+          ),
+          // The laid-out box grows with the scale (up and left, the
+          // Positioned keeps its right and bottom), so the whole enlarged
+          // button takes taps and nothing next to it is overlapped.
+          child: AnimatedContainer(
+            duration: resize,
+            curve: curve,
+            width: 56 * scale,
+            height: 56 * scale,
+            alignment: Alignment.bottomRight,
+            child: AnimatedScale(
+              key: const ValueKey('penguinFab.size'),
+              scale: scale,
+              duration: resize,
+              curve: curve,
+              alignment: Alignment.bottomRight,
+              child: RepaintBoundary(child: _breathing(resize)),
             ),
           ),
         ),
       ),
+    );
+  }
+
+  /// The button with its glow; both breathe while [_breath] runs.
+  Widget _breathing(Duration resize) {
+    final button = AnimatedScale(
+      scale: _down && !_reduced ? 0.92 : 1,
+      duration: _pressTime,
+      child: Material(
+        color: TPColors.primary500,
+        elevation: 3,
+        shape: const CircleBorder(),
+        child: InkWell(
+          customBorder: const CircleBorder(),
+          onTap: _tapped(widget.onTap),
+          child: const SizedBox(
+            width: 56,
+            height: 56,
+            child: Center(child: PenguinAvatar(size: 46, borderWidth: 2)),
+          ),
+        ),
+      ),
+    );
+    Widget frame(double? b, Widget child) {
+      final glow = Positioned.fill(
+        child: IgnorePointer(
+          child: AnimatedOpacity(
+            key: const ValueKey('penguinFab.glow'),
+            opacity: widget.enlarged ? 1 : 0,
+            duration: resize,
+            curve: Curves.ease,
+            child: DecoratedBox(decoration: _glow(b)),
+          ),
+        ),
+      );
+      final stack = Stack(clipBehavior: Clip.none, children: [glow, child]);
+      if (b == null) return stack;
+      return Transform.scale(
+        scale: 1 + (GuideMotion.fabBreathScale - 1) * b,
+        alignment: Alignment.bottomRight,
+        child: stack,
+      );
+    }
+
+    final breath = _breath;
+    if (breath == null) return frame(null, button);
+    return AnimatedBuilder(
+      animation: breath,
+      builder: (context, child) =>
+          frame(Curves.easeInOut.transform(breath.value), child!),
+      child: button,
+    );
+  }
+
+  /// Warm glow around the enlarged button: a tight ring and a soft halo in
+  /// [TPColors.secondary500]. [b] is the breath (0 in … 1 out); null: still.
+  static BoxDecoration _glow(double? b) {
+    double lerp(double still, double lo, double hi) =>
+        b == null ? still : lo + (hi - lo) * b;
+    return BoxDecoration(
+      shape: BoxShape.circle,
+      boxShadow: [
+        BoxShadow(
+          color: TPColors.secondary500.withValues(alpha: 0.38),
+          blurRadius: lerp(22, 16, 28),
+          spreadRadius: 8,
+        ),
+        BoxShadow(
+          color: TPColors.secondary500.withValues(
+            alpha: lerp(0.28, 0.22, 0.34),
+          ),
+          spreadRadius: lerp(5, 4, 7),
+        ),
+      ],
     );
   }
 }

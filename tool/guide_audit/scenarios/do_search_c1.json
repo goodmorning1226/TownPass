@@ -1,0 +1,131 @@
+{
+  "name": "do_search_c1",
+  "description": "Plain 申辦服務 (districtOffice, opened at /), goals search_service + submit: the user searches 補助, presses the magnifier, opens 老人全民健康保險保險費自付額補助 from the results (in-page router) and follows the cards to 案件已完成申辦.",
+  "page": "district_office",
+  "capability": "districtOffice",
+  "goals": [
+    "search_service",
+    "submit"
+  ],
+  "expect": {
+    "done": true
+  },
+  "actions": [
+    {
+      "step": "search_service",
+      "do": "type",
+      "placeholder": "您遇到哪些問題?",
+      "value": "補助"
+    },
+    {
+      "step": "search_service",
+      "do": "click",
+      "selector": "button.search-button"
+    },
+    {
+      "step": "open_service",
+      "do": "click",
+      "text": "老人全民健康保險保險費自付額補助",
+      "exact": false
+    },
+    {
+      "step": "fill_basic",
+      "do": "type",
+      "selector": "#mail",
+      "value": "test@example.com"
+    },
+    {
+      "step": "fill_basic",
+      "do": "select",
+      "selector": "#county",
+      "value": "臺北市"
+    },
+    {
+      "step": "fill_basic",
+      "do": "select",
+      "selector": "#city",
+      "value": "信義區"
+    },
+    {
+      "step": "fill_basic",
+      "do": "type",
+      "selector": "#address",
+      "value": "測試路1號"
+    },
+    {
+      "step": "fill_details",
+      "do": "type",
+      "selector": "#name",
+      "value": "王小明"
+    },
+    {
+      "step": "fill_details",
+      "do": "select",
+      "selector": "#agency",
+      "value": "交通事件裁決所"
+    },
+    {
+      "step": "fill_details",
+      "do": "click",
+      "selector": ".base-multiple-select-wrapper input"
+    },
+    {
+      "step": "fill_details",
+      "do": "check",
+      "text": "車禍案件申訴"
+    },
+    {
+      "step": "fill_details",
+      "do": "click",
+      "text": "確認",
+      "within": "[id^=\"headlessui-dialog-panel\"]"
+    },
+    {
+      "step": "fill_details",
+      "do": "click",
+      "selector": "label[for=\"send_by_mailY\"]"
+    },
+    {
+      "step": "fill_details",
+      "do": "type",
+      "selector": "#content",
+      "value": "測試內容"
+    },
+    {
+      "step": "fill_details",
+      "do": "click",
+      "selector": "label[for=\"現場圖\"]"
+    },
+    {
+      "step": "fill_details",
+      "do": "click",
+      "selector": "input[readonly]"
+    },
+    {
+      "step": "fill_details",
+      "do": "click",
+      "selector": ".vc-day:not(.is-not-in-month) .vc-day-content",
+      "nth": 2
+    },
+    {
+      "step": "next_step",
+      "do": "click",
+      "text": "下一步"
+    },
+    {
+      "step": "submit",
+      "do": "scroll",
+      "to": "bottom"
+    },
+    {
+      "step": "submit",
+      "do": "click",
+      "text": "送出"
+    },
+    {
+      "step": "done",
+      "do": "click",
+      "text": "確認"
+    }
+  ]
+}

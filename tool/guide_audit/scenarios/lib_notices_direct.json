@@ -1,0 +1,6 @@
+{
+  "name": "lib_notices_direct",
+  "description": "library.notices opened via capabilities.json navigation (lands on notice-list): done at once.",
+  "page": "library", "capability": "library.notices", "goals": [], "expect": { "done": true },
+  "actions": []
+}

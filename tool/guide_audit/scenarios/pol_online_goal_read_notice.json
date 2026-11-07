@@ -1,0 +1,29 @@
+{
+  "name": "pol_online_goal_read_notice",
+  "description": "police.online with goal read_notice (question plan), opened the app's way. Follows only the cards until the guide is done.",
+  "page": "police_report",
+  "capability": "police.online",
+  "goals": [
+    "read_notice"
+  ],
+  "expect": {
+    "done": true
+  },
+  "actions": [
+    {
+      "step": "read_notice",
+      "do": "scroll",
+      "to": "bottom"
+    },
+    {
+      "step": "read_notice",
+      "do": "check",
+      "text": "本人已詳閱須知並同意繼續"
+    },
+    {
+      "step": "read_notice",
+      "do": "click",
+      "text": "同意"
+    }
+  ]
+}

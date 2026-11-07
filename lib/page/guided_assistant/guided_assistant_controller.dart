@@ -860,6 +860,15 @@ class GuidedAssistantController extends GetxController {
     return currentStep?.detail(web);
   }
 
+  /// A guide is under way: waiting at its 要不要開始引導 card, running a
+  /// step or paused. Ended, finished or no task: false.
+  bool get guiding {
+    final s = task.value?.status;
+    return s == TaskStatus.opened ||
+        s == TaskStatus.on ||
+        s == TaskStatus.paused;
+  }
+
   /// The guide is showing on its page (card, highlight).
   bool get guideVisible {
     final t = task.value;

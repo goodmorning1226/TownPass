@@ -1,0 +1,24 @@
+{
+  "name": "fees_tuition",
+  "description": "fees.tuition default goal: fill the form as the cards say, 查詢. The demo has no bills for fee-7 (目前查無…待繳帳單).",
+  "page": "fees",
+  "capability": "fees.tuition",
+  "goals": [],
+  "expect": {
+    "done": false
+  },
+  "actions": [
+    {
+      "step": "enter_number",
+      "do": "type",
+      "selector": "#payment_number",
+      "value": "TEST0001"
+    },
+    {
+      "step": "query_bill",
+      "do": "click",
+      "text": "查詢",
+      "within": ".tab-view"
+    }
+  ]
+}

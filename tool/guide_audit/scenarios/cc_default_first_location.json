@@ -1,0 +1,26 @@
+{
+  "name": "cc_default_first_location",
+  "description": "reservation default plan; the user keeps the first place (opens the picker and closes it).",
+  "page": "counter_calling",
+  "capability": "reservation",
+  "goals": [],
+  "expect": {
+    "done": true
+  },
+  "actions": [
+    {
+      "step": "pick_unit",
+      "do": "click",
+      "text": "地政事務所"
+    },
+    {
+      "step": "pick_location",
+      "do": "click",
+      "selector": "select.base-select"
+    },
+    {
+      "step": "pick_location",
+      "do": "blur"
+    }
+  ]
+}

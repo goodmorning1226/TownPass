@@ -1,0 +1,13 @@
+{
+  "name": "cit_call_1999",
+  "description": "goal call_1999 on /citizen-report/ (通報 tab). In the 390x844 harness viewport 撥打1999專線 is already on screen at open, so the card is done at once; nothing is pressed (it would dial).",
+  "page": "citizen_report",
+  "capability": "reportIssue",
+  "goals": [
+    "call_1999"
+  ],
+  "expect": {
+    "done": true
+  },
+  "actions": []
+}

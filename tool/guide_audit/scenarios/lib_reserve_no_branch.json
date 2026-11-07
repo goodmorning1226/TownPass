@@ -1,0 +1,15 @@
+{
+  "name": "lib_reserve_no_branch",
+  "description": "Default goal, app way. Book 'The winners' (lib-book-4) has 冊次 and its 取書館 list says 目前無取書館與站點. The card asks to pick a library that does not exist.",
+  "page": "library",
+  "capability": "library",
+  "goals": [],
+  "expect": { "done": false },
+  "actions": [
+    { "step": "open_search", "do": "click", "selector": "a.search-bar" },
+    { "step": "search_keyword", "do": "type", "selector": "input.base-input", "value": "winners" },
+    { "step": "search_keyword", "do": "click", "selector": "button.search-button" },
+    { "step": "pick_book", "do": "click", "text": "The winners : a novel" },
+    { "step": "choose_branch", "do": "click", "selector": "div.fixed.bottom-0 .base-select-wrapper" }
+  ]
+}

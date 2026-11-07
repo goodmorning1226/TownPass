@@ -1,0 +1,26 @@
+{
+  "name": "fees_water_query",
+  "description": "fees.water, goal query_bill: type, 查詢; done card on the bill list.",
+  "page": "fees",
+  "capability": "fees.water",
+  "goals": [
+    "query_bill"
+  ],
+  "expect": {
+    "done": true
+  },
+  "actions": [
+    {
+      "step": "enter_number",
+      "do": "type",
+      "selector": "#water_number",
+      "value": "1234567890"
+    },
+    {
+      "step": "query_bill",
+      "do": "click",
+      "text": "查詢",
+      "within": ".tab-view"
+    }
+  ]
+}

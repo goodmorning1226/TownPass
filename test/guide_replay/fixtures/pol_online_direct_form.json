@@ -1,0 +1,6324 @@
+{
+ "name": "pol_online_direct_form",
+ "description": "police.online default plan, form loaded directly (reload / deep link): read_notice counts as done.",
+ "page": "police_report",
+ "start": "/police-report/form",
+ "capability": "police.online",
+ "goals": [],
+ "expect": {
+  "done": true
+ },
+ "recordedAt": "2026-11-07T18:23:51.997Z",
+ "durationMs": 21339,
+ "viewport": {
+  "width": 390,
+  "height": 844,
+  "deviceScaleFactor": 3,
+  "isMobile": true,
+  "hasTouch": true
+ },
+ "failed": null,
+ "steps": [
+  {
+   "action": null,
+   "before": null,
+   "after": {
+    "path": "/police-report/form",
+    "query": {},
+    "flags": {
+     "noticeEnabled": false,
+     "noticeRead": false,
+     "statementRead": false,
+     "statementBox": false,
+     "formStep": 1,
+     "fieldKey": "mobile",
+     "typing": false,
+     "fieldTop": 196,
+     "fieldOff": "",
+     "agreeOff": "",
+     "nextOff": "below",
+     "sendOff": "",
+     "nextEnabled": false,
+     "sendEnabled": false,
+     "warn": 0,
+     "month": "",
+     "time": "",
+     "role": "",
+     "date": "",
+     "reported": false,
+     "records": 0,
+     "open": 0,
+     "tab": "",
+     "status": "",
+     "caseNo": "",
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "police.agree",
+     "police.field",
+     "police.same_addr"
+    ],
+    "rects": {
+     "police.field": [
+      16,
+      196,
+      358,
+      44
+     ],
+     "police.same_addr": [
+      16,
+      608,
+      358,
+      24
+     ],
+     "police.agree": [
+      16,
+      768,
+      358,
+      24
+     ]
+    }
+   },
+   "facts": {
+    "url": "/police-report/form",
+    "title": "警政報案",
+    "fields": [
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "mobile_number",
+      "name": "",
+      "label": "手機號碼* Mobile Number",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       196,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "contact_number",
+      "name": "",
+      "label": "住家電話 Contact Number (Home)",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       284,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "mail",
+      "name": "",
+      "label": "電子信箱* E-Mail",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       372,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "county",
+      "name": "",
+      "label": "通訊地址* Current Address",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       460,
+       175,
+       48
+      ]
+     },
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "city",
+      "name": "",
+      "label": "通訊地址* Current Address",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       199,
+       460,
+       175,
+       48
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "",
+      "name": "",
+      "label": "電子信箱* E-Mail",
+      "placeholder": "請輸入詳細地址",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       520,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "checkbox",
+      "id": "Y",
+      "name": "",
+      "label": "同通訊地址",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       620,
+       0,
+       0
+      ]
+     },
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "county",
+      "name": "",
+      "label": "同通訊地址",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       640,
+       175,
+       48
+      ]
+     },
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "city",
+      "name": "",
+      "label": "同通訊地址",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       199,
+       640,
+       175,
+       48
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "",
+      "name": "",
+      "label": "身分證字號 Personal ID",
+      "placeholder": "請輸入詳細地址",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       700,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "checkbox",
+      "id": "agree",
+      "name": "",
+      "label": "本人已詳閱並同意以上內容",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       780,
+       0,
+       0
+      ]
+     }
+    ],
+    "starred": [
+     "手機號碼 Mobile Number",
+     "電子信箱 E-Mail",
+     "通訊地址 Current Address",
+     "戶籍地址 Regisered Permanent Address"
+    ],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "I have read and agree to the D…",
+      "disabled": false,
+      "rect": [
+       16,
+       792,
+       358,
+       72
+      ]
+     },
+     {
+      "text": "下一步",
+      "disabled": true,
+      "rect": [
+       16,
+       888,
+       358,
+       48
+      ]
+     }
+    ],
+    "disabledButtons": [
+     "下一步"
+    ],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 952
+   }
+  },
+  {
+   "action": {
+    "step": "fill_contact",
+    "do": "type",
+    "selector": "#mobile_number",
+    "value": "0912345678",
+    "hit": {
+     "x": 195,
+     "y": 218,
+     "targets": [
+      "police.field"
+     ]
+    }
+   },
+   "before": {
+    "path": "/police-report/form",
+    "query": {},
+    "flags": {
+     "noticeEnabled": false,
+     "noticeRead": false,
+     "statementRead": false,
+     "statementBox": false,
+     "formStep": 1,
+     "fieldKey": "mobile",
+     "typing": false,
+     "fieldTop": 196,
+     "fieldOff": "",
+     "agreeOff": "",
+     "nextOff": "below",
+     "sendOff": "",
+     "nextEnabled": false,
+     "sendEnabled": false,
+     "warn": 0,
+     "month": "",
+     "time": "",
+     "role": "",
+     "date": "",
+     "reported": false,
+     "records": 0,
+     "open": 0,
+     "tab": "",
+     "status": "",
+     "caseNo": "",
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "police.agree",
+     "police.field",
+     "police.same_addr"
+    ],
+    "rects": {
+     "police.field": [
+      16,
+      196,
+      358,
+      44
+     ],
+     "police.same_addr": [
+      16,
+      608,
+      358,
+      24
+     ],
+     "police.agree": [
+      16,
+      768,
+      358,
+      24
+     ]
+    }
+   },
+   "after": {
+    "path": "/police-report/form",
+    "query": {},
+    "flags": {
+     "noticeEnabled": false,
+     "noticeRead": false,
+     "statementRead": false,
+     "statementBox": false,
+     "formStep": 1,
+     "fieldKey": "mail",
+     "typing": false,
+     "fieldTop": 372,
+     "fieldOff": "",
+     "agreeOff": "",
+     "nextOff": "below",
+     "sendOff": "",
+     "nextEnabled": false,
+     "sendEnabled": false,
+     "warn": 0,
+     "month": "",
+     "time": "",
+     "role": "",
+     "date": "",
+     "reported": false,
+     "records": 0,
+     "open": 0,
+     "tab": "",
+     "status": "",
+     "caseNo": "",
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "police.agree",
+     "police.field",
+     "police.same_addr"
+    ],
+    "rects": {
+     "police.field": [
+      16,
+      372,
+      358,
+      44
+     ],
+     "police.same_addr": [
+      16,
+      608,
+      358,
+      24
+     ],
+     "police.agree": [
+      16,
+      768,
+      358,
+      24
+     ]
+    }
+   },
+   "facts": {
+    "url": "/police-report/form",
+    "title": "警政報案",
+    "fields": [
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "mobile_number",
+      "name": "",
+      "label": "手機號碼* Mobile Number",
+      "placeholder": "",
+      "value": "0912345678",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       196,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "contact_number",
+      "name": "",
+      "label": "住家電話 Contact Number (Home)",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       284,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "mail",
+      "name": "",
+      "label": "電子信箱* E-Mail",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       372,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "county",
+      "name": "",
+      "label": "通訊地址* Current Address",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       460,
+       175,
+       48
+      ]
+     },
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "city",
+      "name": "",
+      "label": "通訊地址* Current Address",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       199,
+       460,
+       175,
+       48
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "",
+      "name": "",
+      "label": "電子信箱* E-Mail",
+      "placeholder": "請輸入詳細地址",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       520,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "checkbox",
+      "id": "Y",
+      "name": "",
+      "label": "同通訊地址",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       620,
+       0,
+       0
+      ]
+     },
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "county",
+      "name": "",
+      "label": "同通訊地址",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       640,
+       175,
+       48
+      ]
+     },
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "city",
+      "name": "",
+      "label": "同通訊地址",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       199,
+       640,
+       175,
+       48
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "",
+      "name": "",
+      "label": "身分證字號 Personal ID",
+      "placeholder": "請輸入詳細地址",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       700,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "checkbox",
+      "id": "agree",
+      "name": "",
+      "label": "本人已詳閱並同意以上內容",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       780,
+       0,
+       0
+      ]
+     }
+    ],
+    "starred": [
+     "手機號碼 Mobile Number",
+     "電子信箱 E-Mail",
+     "通訊地址 Current Address",
+     "戶籍地址 Regisered Permanent Address"
+    ],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "I have read and agree to the D…",
+      "disabled": false,
+      "rect": [
+       16,
+       792,
+       358,
+       72
+      ]
+     },
+     {
+      "text": "下一步",
+      "disabled": true,
+      "rect": [
+       16,
+       888,
+       358,
+       48
+      ]
+     }
+    ],
+    "disabledButtons": [
+     "下一步"
+    ],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 952
+   }
+  },
+  {
+   "action": {
+    "step": "fill_contact",
+    "do": "type",
+    "selector": "#mail",
+    "value": "test@example.com",
+    "hit": {
+     "x": 195,
+     "y": 394,
+     "targets": [
+      "police.field"
+     ]
+    }
+   },
+   "before": {
+    "path": "/police-report/form",
+    "query": {},
+    "flags": {
+     "noticeEnabled": false,
+     "noticeRead": false,
+     "statementRead": false,
+     "statementBox": false,
+     "formStep": 1,
+     "fieldKey": "mail",
+     "typing": false,
+     "fieldTop": 372,
+     "fieldOff": "",
+     "agreeOff": "",
+     "nextOff": "below",
+     "sendOff": "",
+     "nextEnabled": false,
+     "sendEnabled": false,
+     "warn": 0,
+     "month": "",
+     "time": "",
+     "role": "",
+     "date": "",
+     "reported": false,
+     "records": 0,
+     "open": 0,
+     "tab": "",
+     "status": "",
+     "caseNo": "",
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "police.agree",
+     "police.field",
+     "police.same_addr"
+    ],
+    "rects": {
+     "police.field": [
+      16,
+      372,
+      358,
+      44
+     ],
+     "police.same_addr": [
+      16,
+      608,
+      358,
+      24
+     ],
+     "police.agree": [
+      16,
+      768,
+      358,
+      24
+     ]
+    }
+   },
+   "after": {
+    "path": "/police-report/form",
+    "query": {},
+    "flags": {
+     "noticeEnabled": false,
+     "noticeRead": false,
+     "statementRead": false,
+     "statementBox": false,
+     "formStep": 1,
+     "fieldKey": "county",
+     "typing": false,
+     "fieldTop": 460,
+     "fieldOff": "",
+     "agreeOff": "",
+     "nextOff": "below",
+     "sendOff": "",
+     "nextEnabled": false,
+     "sendEnabled": false,
+     "warn": 0,
+     "month": "",
+     "time": "",
+     "role": "",
+     "date": "",
+     "reported": false,
+     "records": 0,
+     "open": 0,
+     "tab": "",
+     "status": "",
+     "caseNo": "",
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "police.agree",
+     "police.field",
+     "police.same_addr"
+    ],
+    "rects": {
+     "police.field": [
+      16,
+      460,
+      175,
+      48
+     ],
+     "police.same_addr": [
+      16,
+      608,
+      358,
+      24
+     ],
+     "police.agree": [
+      16,
+      768,
+      358,
+      24
+     ]
+    }
+   },
+   "facts": {
+    "url": "/police-report/form",
+    "title": "警政報案",
+    "fields": [
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "mobile_number",
+      "name": "",
+      "label": "手機號碼* Mobile Number",
+      "placeholder": "",
+      "value": "0912345678",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       196,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "contact_number",
+      "name": "",
+      "label": "住家電話 Contact Number (Home)",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       284,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "mail",
+      "name": "",
+      "label": "電子信箱* E-Mail",
+      "placeholder": "",
+      "value": "test@example.com",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       372,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "county",
+      "name": "",
+      "label": "通訊地址* Current Address",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       460,
+       175,
+       48
+      ]
+     },
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "city",
+      "name": "",
+      "label": "通訊地址* Current Address",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       199,
+       460,
+       175,
+       48
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "",
+      "name": "",
+      "label": "電子信箱* E-Mail",
+      "placeholder": "請輸入詳細地址",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       520,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "checkbox",
+      "id": "Y",
+      "name": "",
+      "label": "同通訊地址",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       620,
+       0,
+       0
+      ]
+     },
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "county",
+      "name": "",
+      "label": "同通訊地址",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       640,
+       175,
+       48
+      ]
+     },
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "city",
+      "name": "",
+      "label": "同通訊地址",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       199,
+       640,
+       175,
+       48
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "",
+      "name": "",
+      "label": "身分證字號 Personal ID",
+      "placeholder": "請輸入詳細地址",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       700,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "checkbox",
+      "id": "agree",
+      "name": "",
+      "label": "本人已詳閱並同意以上內容",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       780,
+       0,
+       0
+      ]
+     }
+    ],
+    "starred": [
+     "手機號碼 Mobile Number",
+     "電子信箱 E-Mail",
+     "通訊地址 Current Address",
+     "戶籍地址 Regisered Permanent Address"
+    ],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "I have read and agree to the D…",
+      "disabled": false,
+      "rect": [
+       16,
+       792,
+       358,
+       72
+      ]
+     },
+     {
+      "text": "下一步",
+      "disabled": true,
+      "rect": [
+       16,
+       888,
+       358,
+       48
+      ]
+     }
+    ],
+    "disabledButtons": [
+     "下一步"
+    ],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 952
+   }
+  },
+  {
+   "action": {
+    "step": "fill_contact",
+    "do": "select",
+    "selector": "select#county",
+    "value": "臺北市",
+    "hit": {
+     "x": 104,
+     "y": 484,
+     "targets": [
+      "police.field"
+     ]
+    }
+   },
+   "before": {
+    "path": "/police-report/form",
+    "query": {},
+    "flags": {
+     "noticeEnabled": false,
+     "noticeRead": false,
+     "statementRead": false,
+     "statementBox": false,
+     "formStep": 1,
+     "fieldKey": "county",
+     "typing": false,
+     "fieldTop": 460,
+     "fieldOff": "",
+     "agreeOff": "",
+     "nextOff": "below",
+     "sendOff": "",
+     "nextEnabled": false,
+     "sendEnabled": false,
+     "warn": 0,
+     "month": "",
+     "time": "",
+     "role": "",
+     "date": "",
+     "reported": false,
+     "records": 0,
+     "open": 0,
+     "tab": "",
+     "status": "",
+     "caseNo": "",
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "police.agree",
+     "police.field",
+     "police.same_addr"
+    ],
+    "rects": {
+     "police.field": [
+      16,
+      460,
+      175,
+      48
+     ],
+     "police.same_addr": [
+      16,
+      608,
+      358,
+      24
+     ],
+     "police.agree": [
+      16,
+      768,
+      358,
+      24
+     ]
+    }
+   },
+   "after": {
+    "path": "/police-report/form",
+    "query": {},
+    "flags": {
+     "noticeEnabled": false,
+     "noticeRead": false,
+     "statementRead": false,
+     "statementBox": false,
+     "formStep": 1,
+     "fieldKey": "city",
+     "typing": false,
+     "fieldTop": 460,
+     "fieldOff": "",
+     "agreeOff": "",
+     "nextOff": "below",
+     "sendOff": "",
+     "nextEnabled": false,
+     "sendEnabled": false,
+     "warn": 0,
+     "month": "",
+     "time": "",
+     "role": "",
+     "date": "",
+     "reported": false,
+     "records": 0,
+     "open": 0,
+     "tab": "",
+     "status": "",
+     "caseNo": "",
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "police.agree",
+     "police.field",
+     "police.same_addr"
+    ],
+    "rects": {
+     "police.field": [
+      199,
+      460,
+      175,
+      48
+     ],
+     "police.same_addr": [
+      16,
+      608,
+      358,
+      24
+     ],
+     "police.agree": [
+      16,
+      768,
+      358,
+      24
+     ]
+    }
+   },
+   "facts": {
+    "url": "/police-report/form",
+    "title": "警政報案",
+    "fields": [
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "mobile_number",
+      "name": "",
+      "label": "手機號碼* Mobile Number",
+      "placeholder": "",
+      "value": "0912345678",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       196,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "contact_number",
+      "name": "",
+      "label": "住家電話 Contact Number (Home)",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       284,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "mail",
+      "name": "",
+      "label": "電子信箱* E-Mail",
+      "placeholder": "",
+      "value": "test@example.com",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       372,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "county",
+      "name": "",
+      "label": "通訊地址* Current Address",
+      "placeholder": "",
+      "value": "臺北市",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       460,
+       175,
+       48
+      ]
+     },
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "city",
+      "name": "",
+      "label": "通訊地址* Current Address",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       199,
+       460,
+       175,
+       48
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "",
+      "name": "",
+      "label": "電子信箱* E-Mail",
+      "placeholder": "請輸入詳細地址",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       520,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "checkbox",
+      "id": "Y",
+      "name": "",
+      "label": "同通訊地址",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       620,
+       0,
+       0
+      ]
+     },
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "county",
+      "name": "",
+      "label": "同通訊地址",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       640,
+       175,
+       48
+      ]
+     },
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "city",
+      "name": "",
+      "label": "同通訊地址",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       199,
+       640,
+       175,
+       48
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "",
+      "name": "",
+      "label": "身分證字號 Personal ID",
+      "placeholder": "請輸入詳細地址",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       700,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "checkbox",
+      "id": "agree",
+      "name": "",
+      "label": "本人已詳閱並同意以上內容",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       780,
+       0,
+       0
+      ]
+     }
+    ],
+    "starred": [
+     "手機號碼 Mobile Number",
+     "電子信箱 E-Mail",
+     "通訊地址 Current Address",
+     "戶籍地址 Regisered Permanent Address"
+    ],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "I have read and agree to the D…",
+      "disabled": false,
+      "rect": [
+       16,
+       792,
+       358,
+       72
+      ]
+     },
+     {
+      "text": "下一步",
+      "disabled": true,
+      "rect": [
+       16,
+       888,
+       358,
+       48
+      ]
+     }
+    ],
+    "disabledButtons": [
+     "下一步"
+    ],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 952
+   }
+  },
+  {
+   "action": {
+    "step": "fill_contact",
+    "do": "select",
+    "selector": "select#city",
+    "value": "信義區",
+    "hit": {
+     "x": 287,
+     "y": 484,
+     "targets": [
+      "police.field"
+     ]
+    }
+   },
+   "before": {
+    "path": "/police-report/form",
+    "query": {},
+    "flags": {
+     "noticeEnabled": false,
+     "noticeRead": false,
+     "statementRead": false,
+     "statementBox": false,
+     "formStep": 1,
+     "fieldKey": "city",
+     "typing": false,
+     "fieldTop": 460,
+     "fieldOff": "",
+     "agreeOff": "",
+     "nextOff": "below",
+     "sendOff": "",
+     "nextEnabled": false,
+     "sendEnabled": false,
+     "warn": 0,
+     "month": "",
+     "time": "",
+     "role": "",
+     "date": "",
+     "reported": false,
+     "records": 0,
+     "open": 0,
+     "tab": "",
+     "status": "",
+     "caseNo": "",
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "police.agree",
+     "police.field",
+     "police.same_addr"
+    ],
+    "rects": {
+     "police.field": [
+      199,
+      460,
+      175,
+      48
+     ],
+     "police.same_addr": [
+      16,
+      608,
+      358,
+      24
+     ],
+     "police.agree": [
+      16,
+      768,
+      358,
+      24
+     ]
+    }
+   },
+   "after": {
+    "path": "/police-report/form",
+    "query": {},
+    "flags": {
+     "noticeEnabled": false,
+     "noticeRead": false,
+     "statementRead": false,
+     "statementBox": false,
+     "formStep": 1,
+     "fieldKey": "addr",
+     "typing": false,
+     "fieldTop": 520,
+     "fieldOff": "",
+     "agreeOff": "",
+     "nextOff": "below",
+     "sendOff": "",
+     "nextEnabled": false,
+     "sendEnabled": false,
+     "warn": 0,
+     "month": "",
+     "time": "",
+     "role": "",
+     "date": "",
+     "reported": false,
+     "records": 0,
+     "open": 0,
+     "tab": "",
+     "status": "",
+     "caseNo": "",
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "police.agree",
+     "police.field",
+     "police.same_addr"
+    ],
+    "rects": {
+     "police.field": [
+      16,
+      520,
+      358,
+      44
+     ],
+     "police.same_addr": [
+      16,
+      608,
+      358,
+      24
+     ],
+     "police.agree": [
+      16,
+      768,
+      358,
+      24
+     ]
+    }
+   },
+   "facts": {
+    "url": "/police-report/form",
+    "title": "警政報案",
+    "fields": [
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "mobile_number",
+      "name": "",
+      "label": "手機號碼* Mobile Number",
+      "placeholder": "",
+      "value": "0912345678",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       196,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "contact_number",
+      "name": "",
+      "label": "住家電話 Contact Number (Home)",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       284,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "mail",
+      "name": "",
+      "label": "電子信箱* E-Mail",
+      "placeholder": "",
+      "value": "test@example.com",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       372,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "county",
+      "name": "",
+      "label": "通訊地址* Current Address",
+      "placeholder": "",
+      "value": "臺北市",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       460,
+       175,
+       48
+      ]
+     },
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "city",
+      "name": "",
+      "label": "通訊地址* Current Address",
+      "placeholder": "",
+      "value": "信義區",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       199,
+       460,
+       175,
+       48
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "",
+      "name": "",
+      "label": "電子信箱* E-Mail",
+      "placeholder": "請輸入詳細地址",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       520,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "checkbox",
+      "id": "Y",
+      "name": "",
+      "label": "同通訊地址",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       620,
+       0,
+       0
+      ]
+     },
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "county",
+      "name": "",
+      "label": "同通訊地址",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       640,
+       175,
+       48
+      ]
+     },
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "city",
+      "name": "",
+      "label": "同通訊地址",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       199,
+       640,
+       175,
+       48
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "",
+      "name": "",
+      "label": "身分證字號 Personal ID",
+      "placeholder": "請輸入詳細地址",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       700,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "checkbox",
+      "id": "agree",
+      "name": "",
+      "label": "本人已詳閱並同意以上內容",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       780,
+       0,
+       0
+      ]
+     }
+    ],
+    "starred": [
+     "手機號碼 Mobile Number",
+     "電子信箱 E-Mail",
+     "通訊地址 Current Address",
+     "戶籍地址 Regisered Permanent Address"
+    ],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "I have read and agree to the D…",
+      "disabled": false,
+      "rect": [
+       16,
+       792,
+       358,
+       72
+      ]
+     },
+     {
+      "text": "下一步",
+      "disabled": true,
+      "rect": [
+       16,
+       888,
+       358,
+       48
+      ]
+     }
+    ],
+    "disabledButtons": [
+     "下一步"
+    ],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 952
+   }
+  },
+  {
+   "action": {
+    "step": "fill_contact",
+    "do": "type",
+    "placeholder": "請輸入詳細地址",
+    "value": "市府路1號",
+    "hit": {
+     "x": 195,
+     "y": 542,
+     "targets": [
+      "police.field"
+     ]
+    }
+   },
+   "before": {
+    "path": "/police-report/form",
+    "query": {},
+    "flags": {
+     "noticeEnabled": false,
+     "noticeRead": false,
+     "statementRead": false,
+     "statementBox": false,
+     "formStep": 1,
+     "fieldKey": "addr",
+     "typing": false,
+     "fieldTop": 520,
+     "fieldOff": "",
+     "agreeOff": "",
+     "nextOff": "below",
+     "sendOff": "",
+     "nextEnabled": false,
+     "sendEnabled": false,
+     "warn": 0,
+     "month": "",
+     "time": "",
+     "role": "",
+     "date": "",
+     "reported": false,
+     "records": 0,
+     "open": 0,
+     "tab": "",
+     "status": "",
+     "caseNo": "",
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "police.agree",
+     "police.field",
+     "police.same_addr"
+    ],
+    "rects": {
+     "police.field": [
+      16,
+      520,
+      358,
+      44
+     ],
+     "police.same_addr": [
+      16,
+      608,
+      358,
+      24
+     ],
+     "police.agree": [
+      16,
+      768,
+      358,
+      24
+     ]
+    }
+   },
+   "after": {
+    "path": "/police-report/form",
+    "query": {},
+    "flags": {
+     "noticeEnabled": false,
+     "noticeRead": false,
+     "statementRead": false,
+     "statementBox": false,
+     "formStep": 1,
+     "fieldKey": "county2",
+     "typing": false,
+     "fieldTop": 608,
+     "fieldOff": "",
+     "agreeOff": "",
+     "nextOff": "below",
+     "sendOff": "",
+     "nextEnabled": false,
+     "sendEnabled": false,
+     "warn": 0,
+     "month": "",
+     "time": "",
+     "role": "",
+     "date": "",
+     "reported": false,
+     "records": 0,
+     "open": 0,
+     "tab": "",
+     "status": "",
+     "caseNo": "",
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "police.agree",
+     "police.field",
+     "police.same_addr"
+    ],
+    "rects": {
+     "police.field": [
+      16,
+      608,
+      358,
+      80
+     ],
+     "police.same_addr": [
+      16,
+      608,
+      358,
+      24
+     ],
+     "police.agree": [
+      16,
+      768,
+      358,
+      24
+     ]
+    }
+   },
+   "facts": {
+    "url": "/police-report/form",
+    "title": "警政報案",
+    "fields": [
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "mobile_number",
+      "name": "",
+      "label": "手機號碼* Mobile Number",
+      "placeholder": "",
+      "value": "0912345678",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       196,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "contact_number",
+      "name": "",
+      "label": "住家電話 Contact Number (Home)",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       284,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "mail",
+      "name": "",
+      "label": "電子信箱* E-Mail",
+      "placeholder": "",
+      "value": "test@example.com",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       372,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "county",
+      "name": "",
+      "label": "通訊地址* Current Address",
+      "placeholder": "",
+      "value": "臺北市",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       460,
+       175,
+       48
+      ]
+     },
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "city",
+      "name": "",
+      "label": "通訊地址* Current Address",
+      "placeholder": "",
+      "value": "信義區",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       199,
+       460,
+       175,
+       48
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "",
+      "name": "",
+      "label": "電子信箱* E-Mail",
+      "placeholder": "請輸入詳細地址",
+      "value": "市府路1號",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       520,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "checkbox",
+      "id": "Y",
+      "name": "",
+      "label": "同通訊地址",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       620,
+       0,
+       0
+      ]
+     },
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "county",
+      "name": "",
+      "label": "同通訊地址",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       640,
+       175,
+       48
+      ]
+     },
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "city",
+      "name": "",
+      "label": "同通訊地址",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       199,
+       640,
+       175,
+       48
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "",
+      "name": "",
+      "label": "身分證字號 Personal ID",
+      "placeholder": "請輸入詳細地址",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       700,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "checkbox",
+      "id": "agree",
+      "name": "",
+      "label": "本人已詳閱並同意以上內容",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       780,
+       0,
+       0
+      ]
+     }
+    ],
+    "starred": [
+     "手機號碼 Mobile Number",
+     "電子信箱 E-Mail",
+     "通訊地址 Current Address",
+     "戶籍地址 Regisered Permanent Address"
+    ],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "I have read and agree to the D…",
+      "disabled": false,
+      "rect": [
+       16,
+       792,
+       358,
+       72
+      ]
+     },
+     {
+      "text": "下一步",
+      "disabled": true,
+      "rect": [
+       16,
+       888,
+       358,
+       48
+      ]
+     }
+    ],
+    "disabledButtons": [
+     "下一步"
+    ],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 952
+   }
+  },
+  {
+   "action": {
+    "step": "fill_contact",
+    "do": "check",
+    "text": "同通訊地址",
+    "hit": {
+     "x": 195,
+     "y": 620,
+     "targets": [
+      "police.field",
+      "police.same_addr"
+     ]
+    }
+   },
+   "before": {
+    "path": "/police-report/form",
+    "query": {},
+    "flags": {
+     "noticeEnabled": false,
+     "noticeRead": false,
+     "statementRead": false,
+     "statementBox": false,
+     "formStep": 1,
+     "fieldKey": "county2",
+     "typing": false,
+     "fieldTop": 608,
+     "fieldOff": "",
+     "agreeOff": "",
+     "nextOff": "below",
+     "sendOff": "",
+     "nextEnabled": false,
+     "sendEnabled": false,
+     "warn": 0,
+     "month": "",
+     "time": "",
+     "role": "",
+     "date": "",
+     "reported": false,
+     "records": 0,
+     "open": 0,
+     "tab": "",
+     "status": "",
+     "caseNo": "",
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "police.agree",
+     "police.field",
+     "police.same_addr"
+    ],
+    "rects": {
+     "police.field": [
+      16,
+      608,
+      358,
+      80
+     ],
+     "police.same_addr": [
+      16,
+      608,
+      358,
+      24
+     ],
+     "police.agree": [
+      16,
+      768,
+      358,
+      24
+     ]
+    }
+   },
+   "after": {
+    "path": "/police-report/form",
+    "query": {},
+    "flags": {
+     "noticeEnabled": false,
+     "noticeRead": false,
+     "statementRead": false,
+     "statementBox": false,
+     "formStep": 1,
+     "fieldKey": "",
+     "typing": false,
+     "fieldTop": 0,
+     "fieldOff": "",
+     "agreeOff": "",
+     "nextOff": "below",
+     "sendOff": "",
+     "nextEnabled": false,
+     "sendEnabled": false,
+     "warn": 0,
+     "month": "",
+     "time": "",
+     "role": "",
+     "date": "",
+     "reported": false,
+     "records": 0,
+     "open": 0,
+     "tab": "",
+     "status": "",
+     "caseNo": "",
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "police.agree",
+     "police.same_addr"
+    ],
+    "rects": {
+     "police.same_addr": [
+      16,
+      608,
+      358,
+      24
+     ],
+     "police.agree": [
+      16,
+      768,
+      358,
+      24
+     ]
+    }
+   },
+   "facts": {
+    "url": "/police-report/form",
+    "title": "警政報案",
+    "fields": [
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "mobile_number",
+      "name": "",
+      "label": "手機號碼* Mobile Number",
+      "placeholder": "",
+      "value": "0912345678",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       196,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "contact_number",
+      "name": "",
+      "label": "住家電話 Contact Number (Home)",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       284,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "mail",
+      "name": "",
+      "label": "電子信箱* E-Mail",
+      "placeholder": "",
+      "value": "test@example.com",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       372,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "county",
+      "name": "",
+      "label": "通訊地址* Current Address",
+      "placeholder": "",
+      "value": "臺北市",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       460,
+       175,
+       48
+      ]
+     },
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "city",
+      "name": "",
+      "label": "通訊地址* Current Address",
+      "placeholder": "",
+      "value": "信義區",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       199,
+       460,
+       175,
+       48
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "",
+      "name": "",
+      "label": "電子信箱* E-Mail",
+      "placeholder": "請輸入詳細地址",
+      "value": "市府路1號",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       520,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "checkbox",
+      "id": "Y",
+      "name": "",
+      "label": "同通訊地址",
+      "placeholder": "",
+      "value": "checked",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       620,
+       0,
+       0
+      ]
+     },
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "county",
+      "name": "",
+      "label": "同通訊地址",
+      "placeholder": "",
+      "value": "臺北市",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       640,
+       175,
+       48
+      ]
+     },
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "city",
+      "name": "",
+      "label": "同通訊地址",
+      "placeholder": "",
+      "value": "信義區",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       199,
+       640,
+       175,
+       48
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "",
+      "name": "",
+      "label": "身分證字號 Personal ID",
+      "placeholder": "請輸入詳細地址",
+      "value": "市府路1號",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       700,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "checkbox",
+      "id": "agree",
+      "name": "",
+      "label": "本人已詳閱並同意以上內容",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       780,
+       0,
+       0
+      ]
+     }
+    ],
+    "starred": [
+     "手機號碼 Mobile Number",
+     "電子信箱 E-Mail",
+     "通訊地址 Current Address",
+     "戶籍地址 Regisered Permanent Address"
+    ],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "I have read and agree to the D…",
+      "disabled": false,
+      "rect": [
+       16,
+       792,
+       358,
+       72
+      ]
+     },
+     {
+      "text": "下一步",
+      "disabled": true,
+      "rect": [
+       16,
+       888,
+       358,
+       48
+      ]
+     }
+    ],
+    "disabledButtons": [
+     "下一步"
+    ],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 952
+   }
+  },
+  {
+   "action": {
+    "step": "next_step",
+    "do": "check",
+    "text": "本人已詳閱並同意以上內容",
+    "hit": {
+     "x": 195,
+     "y": 672,
+     "targets": [
+      "police.agree"
+     ]
+    }
+   },
+   "before": {
+    "path": "/police-report/form",
+    "query": {},
+    "flags": {
+     "noticeEnabled": false,
+     "noticeRead": false,
+     "statementRead": false,
+     "statementBox": false,
+     "formStep": 1,
+     "fieldKey": "",
+     "typing": false,
+     "fieldTop": 0,
+     "fieldOff": "",
+     "agreeOff": "",
+     "nextOff": "",
+     "sendOff": "",
+     "nextEnabled": false,
+     "sendEnabled": false,
+     "warn": 0,
+     "month": "",
+     "time": "",
+     "role": "",
+     "date": "",
+     "reported": false,
+     "records": 0,
+     "open": 0,
+     "tab": "",
+     "status": "",
+     "caseNo": "",
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "police.agree",
+     "police.next",
+     "police.same_addr"
+    ],
+    "rects": {
+     "police.same_addr": [
+      16,
+      500,
+      358,
+      24
+     ],
+     "police.agree": [
+      16,
+      660,
+      358,
+      24
+     ],
+     "police.next": [
+      16,
+      780,
+      358,
+      48
+     ]
+    }
+   },
+   "after": {
+    "path": "/police-report/form",
+    "query": {},
+    "flags": {
+     "noticeEnabled": false,
+     "noticeRead": false,
+     "statementRead": false,
+     "statementBox": false,
+     "formStep": 1,
+     "fieldKey": "",
+     "typing": false,
+     "fieldTop": 0,
+     "fieldOff": "",
+     "agreeOff": "",
+     "nextOff": "",
+     "sendOff": "",
+     "nextEnabled": true,
+     "sendEnabled": false,
+     "warn": 0,
+     "month": "",
+     "time": "",
+     "role": "",
+     "date": "",
+     "reported": false,
+     "records": 0,
+     "open": 0,
+     "tab": "",
+     "status": "",
+     "caseNo": "",
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "police.agree",
+     "police.next",
+     "police.same_addr"
+    ],
+    "rects": {
+     "police.same_addr": [
+      16,
+      500,
+      358,
+      24
+     ],
+     "police.agree": [
+      16,
+      660,
+      358,
+      24
+     ],
+     "police.next": [
+      16,
+      780,
+      358,
+      48
+     ]
+    }
+   },
+   "facts": {
+    "url": "/police-report/form",
+    "title": "警政報案",
+    "fields": [
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "mobile_number",
+      "name": "",
+      "label": "手機號碼* Mobile Number",
+      "placeholder": "",
+      "value": "0912345678",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       88,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "contact_number",
+      "name": "",
+      "label": "住家電話 Contact Number (Home)",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       176,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "mail",
+      "name": "",
+      "label": "電子信箱* E-Mail",
+      "placeholder": "",
+      "value": "test@example.com",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       264,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "county",
+      "name": "",
+      "label": "通訊地址* Current Address",
+      "placeholder": "",
+      "value": "臺北市",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       352,
+       175,
+       48
+      ]
+     },
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "city",
+      "name": "",
+      "label": "通訊地址* Current Address",
+      "placeholder": "",
+      "value": "信義區",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       199,
+       352,
+       175,
+       48
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "",
+      "name": "",
+      "label": "電子信箱* E-Mail",
+      "placeholder": "請輸入詳細地址",
+      "value": "市府路1號",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       412,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "checkbox",
+      "id": "Y",
+      "name": "",
+      "label": "同通訊地址",
+      "placeholder": "",
+      "value": "checked",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       512,
+       0,
+       0
+      ]
+     },
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "county",
+      "name": "",
+      "label": "同通訊地址",
+      "placeholder": "",
+      "value": "臺北市",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       532,
+       175,
+       48
+      ]
+     },
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "city",
+      "name": "",
+      "label": "同通訊地址",
+      "placeholder": "",
+      "value": "信義區",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       199,
+       532,
+       175,
+       48
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "",
+      "name": "",
+      "label": "身分證字號 Personal ID",
+      "placeholder": "請輸入詳細地址",
+      "value": "市府路1號",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       592,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "checkbox",
+      "id": "agree",
+      "name": "",
+      "label": "本人已詳閱並同意以上內容",
+      "placeholder": "",
+      "value": "checked",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       672,
+       0,
+       0
+      ]
+     }
+    ],
+    "starred": [
+     "手機號碼 Mobile Number",
+     "電子信箱 E-Mail",
+     "通訊地址 Current Address",
+     "戶籍地址 Regisered Permanent Address"
+    ],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "I have read and agree to the D…",
+      "disabled": false,
+      "rect": [
+       16,
+       684,
+       358,
+       72
+      ]
+     },
+     {
+      "text": "下一步",
+      "disabled": false,
+      "rect": [
+       16,
+       780,
+       358,
+       48
+      ]
+     }
+    ],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 108,
+    "scrollHeight": 952
+   }
+  },
+  {
+   "action": {
+    "step": "next_step",
+    "do": "click",
+    "text": "下一步",
+    "hit": {
+     "x": 195,
+     "y": 804,
+     "targets": [
+      "police.next"
+     ]
+    }
+   },
+   "before": {
+    "path": "/police-report/form",
+    "query": {},
+    "flags": {
+     "noticeEnabled": false,
+     "noticeRead": false,
+     "statementRead": false,
+     "statementBox": false,
+     "formStep": 1,
+     "fieldKey": "",
+     "typing": false,
+     "fieldTop": 0,
+     "fieldOff": "",
+     "agreeOff": "",
+     "nextOff": "",
+     "sendOff": "",
+     "nextEnabled": true,
+     "sendEnabled": false,
+     "warn": 0,
+     "month": "",
+     "time": "",
+     "role": "",
+     "date": "",
+     "reported": false,
+     "records": 0,
+     "open": 0,
+     "tab": "",
+     "status": "",
+     "caseNo": "",
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "police.agree",
+     "police.next",
+     "police.same_addr"
+    ],
+    "rects": {
+     "police.same_addr": [
+      16,
+      500,
+      358,
+      24
+     ],
+     "police.agree": [
+      16,
+      660,
+      358,
+      24
+     ],
+     "police.next": [
+      16,
+      780,
+      358,
+      48
+     ]
+    }
+   },
+   "after": {
+    "path": "/police-report/form",
+    "query": {},
+    "flags": {
+     "noticeEnabled": false,
+     "noticeRead": false,
+     "statementRead": false,
+     "statementBox": true,
+     "formStep": 2,
+     "fieldKey": "role",
+     "typing": false,
+     "fieldTop": 108,
+     "fieldOff": "",
+     "agreeOff": "below",
+     "nextOff": "",
+     "sendOff": "below",
+     "nextEnabled": false,
+     "sendEnabled": false,
+     "warn": 0,
+     "month": "",
+     "time": "2:23 AM",
+     "role": "",
+     "date": "",
+     "reported": false,
+     "records": 0,
+     "open": 0,
+     "tab": "",
+     "status": "",
+     "caseNo": "",
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "police.field",
+     "police.locate",
+     "police.statement",
+     "police.time"
+    ],
+    "rects": {
+     "police.field": [
+      16,
+      108,
+      358,
+      48
+     ],
+     "police.locate": [
+      346,
+      214,
+      20,
+      20
+     ],
+     "police.statement": [
+      16,
+      790,
+      358,
+      54
+     ],
+     "police.time": [
+      21,
+      387,
+      348,
+      32
+     ]
+    }
+   },
+   "facts": {
+    "url": "/police-report/form",
+    "title": "警政報案",
+    "fields": [
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "your_role",
+      "name": "",
+      "label": "報案人類別* Your Role",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       108,
+       358,
+       48
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "location",
+      "name": "",
+      "label": "標注發生地點* Location",
+      "placeholder": "可直接定位或輸入完整地址",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       202,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "",
+      "name": "",
+      "label": "發生日期* Date of Incident",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       290,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "",
+      "name": "",
+      "label": "",
+      "placeholder": "",
+      "value": "2",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       47,
+       388,
+       26,
+       30
+      ]
+     },
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "",
+      "name": "",
+      "label": ":",
+      "placeholder": "",
+      "value": "23",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       80,
+       388,
+       29,
+       30
+      ]
+     },
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "",
+      "name": "",
+      "label": "",
+      "placeholder": "",
+      "value": "true",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       109,
+       388,
+       33,
+       30
+      ]
+     },
+     {
+      "tag": "textarea",
+      "type": "textarea",
+      "id": "case_summary",
+      "name": "",
+      "label": "案情摘要* Case Summary",
+      "placeholder": "人、事、時、地、物500字以內",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       472,
+       358,
+       128
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "checkbox",
+      "id": "agree",
+      "name": "",
+      "label": "本人已詳閱並同意以上內容",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       1130,
+       0,
+       0
+      ]
+     }
+    ],
+    "starred": [
+     "報案人類別 Your Role",
+     "標注發生地點 Location",
+     "發生日期 Date of Incident",
+     "發生時間 Time of Incident",
+     "案情摘要 Case Summary"
+    ],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "I have read and agree to the D…",
+      "disabled": false,
+      "rect": [
+       16,
+       1142,
+       358,
+       72
+      ]
+     },
+     {
+      "text": "送出",
+      "disabled": true,
+      "rect": [
+       16,
+       1238,
+       358,
+       48
+      ]
+     }
+    ],
+    "disabledButtons": [
+     "送出"
+    ],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 1302
+   }
+  },
+  {
+   "action": {
+    "step": "fill_case",
+    "do": "select",
+    "selector": "#your_role",
+    "value": "當事人",
+    "hit": {
+     "x": 195,
+     "y": 132,
+     "targets": [
+      "police.field"
+     ]
+    }
+   },
+   "before": {
+    "path": "/police-report/form",
+    "query": {},
+    "flags": {
+     "noticeEnabled": false,
+     "noticeRead": false,
+     "statementRead": false,
+     "statementBox": true,
+     "formStep": 2,
+     "fieldKey": "role",
+     "typing": false,
+     "fieldTop": 108,
+     "fieldOff": "",
+     "agreeOff": "below",
+     "nextOff": "",
+     "sendOff": "below",
+     "nextEnabled": false,
+     "sendEnabled": false,
+     "warn": 0,
+     "month": "",
+     "time": "2:23 AM",
+     "role": "",
+     "date": "",
+     "reported": false,
+     "records": 0,
+     "open": 0,
+     "tab": "",
+     "status": "",
+     "caseNo": "",
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "police.field",
+     "police.locate",
+     "police.statement",
+     "police.time"
+    ],
+    "rects": {
+     "police.field": [
+      16,
+      108,
+      358,
+      48
+     ],
+     "police.locate": [
+      346,
+      214,
+      20,
+      20
+     ],
+     "police.statement": [
+      16,
+      790,
+      358,
+      54
+     ],
+     "police.time": [
+      21,
+      387,
+      348,
+      32
+     ]
+    }
+   },
+   "after": {
+    "path": "/police-report/form",
+    "query": {},
+    "flags": {
+     "noticeEnabled": false,
+     "noticeRead": false,
+     "statementRead": false,
+     "statementBox": true,
+     "formStep": 2,
+     "fieldKey": "location",
+     "typing": false,
+     "fieldTop": 202,
+     "fieldOff": "",
+     "agreeOff": "below",
+     "nextOff": "",
+     "sendOff": "below",
+     "nextEnabled": false,
+     "sendEnabled": false,
+     "warn": 0,
+     "month": "",
+     "time": "2:23 AM",
+     "role": "當事人",
+     "date": "",
+     "reported": false,
+     "records": 0,
+     "open": 0,
+     "tab": "",
+     "status": "",
+     "caseNo": "",
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "police.field",
+     "police.locate",
+     "police.statement",
+     "police.time"
+    ],
+    "rects": {
+     "police.field": [
+      16,
+      202,
+      358,
+      44
+     ],
+     "police.locate": [
+      346,
+      214,
+      20,
+      20
+     ],
+     "police.statement": [
+      16,
+      790,
+      358,
+      54
+     ],
+     "police.time": [
+      21,
+      387,
+      348,
+      32
+     ]
+    }
+   },
+   "facts": {
+    "url": "/police-report/form",
+    "title": "警政報案",
+    "fields": [
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "your_role",
+      "name": "",
+      "label": "報案人類別* Your Role",
+      "placeholder": "",
+      "value": "當事人Person involved",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       108,
+       358,
+       48
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "location",
+      "name": "",
+      "label": "標注發生地點* Location",
+      "placeholder": "可直接定位或輸入完整地址",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       202,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "",
+      "name": "",
+      "label": "發生日期* Date of Incident",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       290,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "",
+      "name": "",
+      "label": "",
+      "placeholder": "",
+      "value": "2",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       47,
+       388,
+       26,
+       30
+      ]
+     },
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "",
+      "name": "",
+      "label": ":",
+      "placeholder": "",
+      "value": "23",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       80,
+       388,
+       29,
+       30
+      ]
+     },
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "",
+      "name": "",
+      "label": "",
+      "placeholder": "",
+      "value": "true",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       109,
+       388,
+       33,
+       30
+      ]
+     },
+     {
+      "tag": "textarea",
+      "type": "textarea",
+      "id": "case_summary",
+      "name": "",
+      "label": "案情摘要* Case Summary",
+      "placeholder": "人、事、時、地、物500字以內",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       472,
+       358,
+       128
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "checkbox",
+      "id": "agree",
+      "name": "",
+      "label": "本人已詳閱並同意以上內容",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       1130,
+       0,
+       0
+      ]
+     }
+    ],
+    "starred": [
+     "報案人類別 Your Role",
+     "標注發生地點 Location",
+     "發生日期 Date of Incident",
+     "發生時間 Time of Incident",
+     "案情摘要 Case Summary"
+    ],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "I have read and agree to the D…",
+      "disabled": false,
+      "rect": [
+       16,
+       1142,
+       358,
+       72
+      ]
+     },
+     {
+      "text": "送出",
+      "disabled": true,
+      "rect": [
+       16,
+       1238,
+       358,
+       48
+      ]
+     }
+    ],
+    "disabledButtons": [
+     "送出"
+    ],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 1302
+   }
+  },
+  {
+   "action": {
+    "step": "fill_case",
+    "do": "type",
+    "selector": "#location",
+    "value": "臺北市信義區市府路1號",
+    "hit": {
+     "x": 195,
+     "y": 224,
+     "targets": [
+      "police.field"
+     ]
+    }
+   },
+   "before": {
+    "path": "/police-report/form",
+    "query": {},
+    "flags": {
+     "noticeEnabled": false,
+     "noticeRead": false,
+     "statementRead": false,
+     "statementBox": true,
+     "formStep": 2,
+     "fieldKey": "location",
+     "typing": false,
+     "fieldTop": 202,
+     "fieldOff": "",
+     "agreeOff": "below",
+     "nextOff": "",
+     "sendOff": "below",
+     "nextEnabled": false,
+     "sendEnabled": false,
+     "warn": 0,
+     "month": "",
+     "time": "2:23 AM",
+     "role": "當事人",
+     "date": "",
+     "reported": false,
+     "records": 0,
+     "open": 0,
+     "tab": "",
+     "status": "",
+     "caseNo": "",
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "police.field",
+     "police.locate",
+     "police.statement",
+     "police.time"
+    ],
+    "rects": {
+     "police.field": [
+      16,
+      202,
+      358,
+      44
+     ],
+     "police.locate": [
+      346,
+      214,
+      20,
+      20
+     ],
+     "police.statement": [
+      16,
+      790,
+      358,
+      54
+     ],
+     "police.time": [
+      21,
+      387,
+      348,
+      32
+     ]
+    }
+   },
+   "after": {
+    "path": "/police-report/form",
+    "query": {},
+    "flags": {
+     "noticeEnabled": false,
+     "noticeRead": false,
+     "statementRead": false,
+     "statementBox": true,
+     "formStep": 2,
+     "fieldKey": "date",
+     "typing": false,
+     "fieldTop": 290,
+     "fieldOff": "",
+     "agreeOff": "below",
+     "nextOff": "",
+     "sendOff": "below",
+     "nextEnabled": false,
+     "sendEnabled": false,
+     "warn": 0,
+     "month": "",
+     "time": "2:23 AM",
+     "role": "當事人",
+     "date": "",
+     "reported": false,
+     "records": 0,
+     "open": 0,
+     "tab": "",
+     "status": "",
+     "caseNo": "",
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "police.field",
+     "police.locate",
+     "police.statement",
+     "police.time"
+    ],
+    "rects": {
+     "police.field": [
+      16,
+      290,
+      358,
+      44
+     ],
+     "police.locate": [
+      346,
+      214,
+      20,
+      20
+     ],
+     "police.statement": [
+      16,
+      790,
+      358,
+      54
+     ],
+     "police.time": [
+      21,
+      387,
+      348,
+      32
+     ]
+    }
+   },
+   "facts": {
+    "url": "/police-report/form",
+    "title": "警政報案",
+    "fields": [
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "your_role",
+      "name": "",
+      "label": "報案人類別* Your Role",
+      "placeholder": "",
+      "value": "當事人Person involved",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       108,
+       358,
+       48
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "location",
+      "name": "",
+      "label": "標注發生地點* Location",
+      "placeholder": "可直接定位或輸入完整地址",
+      "value": "臺北市信義區市府路1號",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       202,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "",
+      "name": "",
+      "label": "發生日期* Date of Incident",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       290,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "",
+      "name": "",
+      "label": "",
+      "placeholder": "",
+      "value": "2",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       47,
+       388,
+       26,
+       30
+      ]
+     },
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "",
+      "name": "",
+      "label": ":",
+      "placeholder": "",
+      "value": "23",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       80,
+       388,
+       29,
+       30
+      ]
+     },
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "",
+      "name": "",
+      "label": "",
+      "placeholder": "",
+      "value": "true",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       109,
+       388,
+       33,
+       30
+      ]
+     },
+     {
+      "tag": "textarea",
+      "type": "textarea",
+      "id": "case_summary",
+      "name": "",
+      "label": "案情摘要* Case Summary",
+      "placeholder": "人、事、時、地、物500字以內",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       472,
+       358,
+       128
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "checkbox",
+      "id": "agree",
+      "name": "",
+      "label": "本人已詳閱並同意以上內容",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       1130,
+       0,
+       0
+      ]
+     }
+    ],
+    "starred": [
+     "報案人類別 Your Role",
+     "標注發生地點 Location",
+     "發生日期 Date of Incident",
+     "發生時間 Time of Incident",
+     "案情摘要 Case Summary"
+    ],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "I have read and agree to the D…",
+      "disabled": false,
+      "rect": [
+       16,
+       1142,
+       358,
+       72
+      ]
+     },
+     {
+      "text": "送出",
+      "disabled": true,
+      "rect": [
+       16,
+       1238,
+       358,
+       48
+      ]
+     }
+    ],
+    "disabledButtons": [
+     "送出"
+    ],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 1302
+   }
+  },
+  {
+   "action": {
+    "step": "fill_case",
+    "do": "click",
+    "selector": "input.base-input[readonly]",
+    "hit": {
+     "x": 195,
+     "y": 312,
+     "targets": [
+      "police.field"
+     ]
+    }
+   },
+   "before": {
+    "path": "/police-report/form",
+    "query": {},
+    "flags": {
+     "noticeEnabled": false,
+     "noticeRead": false,
+     "statementRead": false,
+     "statementBox": true,
+     "formStep": 2,
+     "fieldKey": "date",
+     "typing": false,
+     "fieldTop": 290,
+     "fieldOff": "",
+     "agreeOff": "below",
+     "nextOff": "",
+     "sendOff": "below",
+     "nextEnabled": false,
+     "sendEnabled": false,
+     "warn": 0,
+     "month": "",
+     "time": "2:23 AM",
+     "role": "當事人",
+     "date": "",
+     "reported": false,
+     "records": 0,
+     "open": 0,
+     "tab": "",
+     "status": "",
+     "caseNo": "",
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "police.field",
+     "police.locate",
+     "police.statement",
+     "police.time"
+    ],
+    "rects": {
+     "police.field": [
+      16,
+      290,
+      358,
+      44
+     ],
+     "police.locate": [
+      346,
+      214,
+      20,
+      20
+     ],
+     "police.statement": [
+      16,
+      790,
+      358,
+      54
+     ],
+     "police.time": [
+      21,
+      387,
+      348,
+      32
+     ]
+    }
+   },
+   "after": {
+    "path": "/police-report/form",
+    "query": {},
+    "flags": {
+     "noticeEnabled": false,
+     "noticeRead": false,
+     "statementRead": false,
+     "statementBox": true,
+     "formStep": 2,
+     "fieldKey": "calendar",
+     "typing": false,
+     "fieldTop": 344,
+     "fieldOff": "",
+     "agreeOff": "below",
+     "nextOff": "",
+     "sendOff": "below",
+     "nextEnabled": false,
+     "sendEnabled": false,
+     "warn": 0,
+     "month": "11月 2026",
+     "time": "2:23 AM",
+     "role": "當事人",
+     "date": "",
+     "reported": false,
+     "records": 0,
+     "open": 0,
+     "tab": "",
+     "status": "",
+     "caseNo": "",
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "police.field",
+     "police.locate",
+     "police.statement",
+     "police.time"
+    ],
+    "rects": {
+     "police.field": [
+      16,
+      344,
+      252,
+      272
+     ],
+     "police.locate": [
+      346,
+      214,
+      20,
+      20
+     ],
+     "police.statement": [
+      16,
+      790,
+      358,
+      54
+     ],
+     "police.time": [
+      21,
+      387,
+      348,
+      32
+     ]
+    }
+   },
+   "facts": {
+    "url": "/police-report/form",
+    "title": "警政報案",
+    "fields": [
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "your_role",
+      "name": "",
+      "label": "報案人類別* Your Role",
+      "placeholder": "",
+      "value": "當事人Person involved",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       108,
+       358,
+       48
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "location",
+      "name": "",
+      "label": "標注發生地點* Location",
+      "placeholder": "可直接定位或輸入完整地址",
+      "value": "臺北市信義區市府路1號",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       202,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "",
+      "name": "",
+      "label": "發生日期* Date of Incident",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       290,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "",
+      "name": "",
+      "label": "",
+      "placeholder": "",
+      "value": "2",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       47,
+       388,
+       26,
+       30
+      ]
+     },
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "",
+      "name": "",
+      "label": ":",
+      "placeholder": "",
+      "value": "23",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       80,
+       388,
+       29,
+       30
+      ]
+     },
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "",
+      "name": "",
+      "label": "",
+      "placeholder": "",
+      "value": "true",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       109,
+       388,
+       33,
+       30
+      ]
+     },
+     {
+      "tag": "textarea",
+      "type": "textarea",
+      "id": "case_summary",
+      "name": "",
+      "label": "案情摘要* Case Summary",
+      "placeholder": "人、事、時、地、物500字以內",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       472,
+       358,
+       128
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "checkbox",
+      "id": "agree",
+      "name": "",
+      "label": "本人已詳閱並同意以上內容",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       1130,
+       0,
+       0
+      ]
+     }
+    ],
+    "starred": [
+     "報案人類別 Your Role",
+     "標注發生地點 Location",
+     "發生日期 Date of Incident",
+     "發生時間 Time of Incident",
+     "案情摘要 Case Summary"
+    ],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "11月 2026",
+      "disabled": false,
+      "rect": [
+       92,
+       355,
+       100,
+       30
+      ]
+     },
+     {
+      "text": "1",
+      "disabled": false,
+      "rect": [
+       26,
+       419,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "2",
+      "disabled": false,
+      "rect": [
+       60,
+       419,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "3",
+      "disabled": false,
+      "rect": [
+       94,
+       419,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "4",
+      "disabled": false,
+      "rect": [
+       128,
+       419,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "5",
+      "disabled": false,
+      "rect": [
+       162,
+       419,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "6",
+      "disabled": false,
+      "rect": [
+       196,
+       419,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "7",
+      "disabled": false,
+      "rect": [
+       230,
+       419,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "8",
+      "disabled": false,
+      "rect": [
+       26,
+       451,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "9",
+      "disabled": false,
+      "rect": [
+       60,
+       451,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "10",
+      "disabled": false,
+      "rect": [
+       94,
+       451,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "11",
+      "disabled": false,
+      "rect": [
+       128,
+       451,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "12",
+      "disabled": false,
+      "rect": [
+       162,
+       451,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "13",
+      "disabled": false,
+      "rect": [
+       196,
+       451,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "14",
+      "disabled": false,
+      "rect": [
+       230,
+       451,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "15",
+      "disabled": false,
+      "rect": [
+       26,
+       483,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "16",
+      "disabled": false,
+      "rect": [
+       60,
+       483,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "17",
+      "disabled": false,
+      "rect": [
+       94,
+       483,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "18",
+      "disabled": false,
+      "rect": [
+       128,
+       483,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "19",
+      "disabled": false,
+      "rect": [
+       162,
+       483,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "20",
+      "disabled": false,
+      "rect": [
+       196,
+       483,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "21",
+      "disabled": false,
+      "rect": [
+       230,
+       483,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "22",
+      "disabled": false,
+      "rect": [
+       26,
+       515,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "23",
+      "disabled": false,
+      "rect": [
+       60,
+       515,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "24",
+      "disabled": false,
+      "rect": [
+       94,
+       515,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "25",
+      "disabled": false,
+      "rect": [
+       128,
+       515,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "26",
+      "disabled": false,
+      "rect": [
+       162,
+       515,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "27",
+      "disabled": false,
+      "rect": [
+       196,
+       515,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "28",
+      "disabled": false,
+      "rect": [
+       230,
+       515,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "29",
+      "disabled": false,
+      "rect": [
+       26,
+       547,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "30",
+      "disabled": false,
+      "rect": [
+       60,
+       547,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "I have read and agree to the D…",
+      "disabled": false,
+      "rect": [
+       16,
+       1142,
+       358,
+       72
+      ]
+     },
+     {
+      "text": "送出",
+      "disabled": true,
+      "rect": [
+       16,
+       1238,
+       358,
+       48
+      ]
+     }
+    ],
+    "disabledButtons": [
+     "送出"
+    ],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 1302
+   }
+  },
+  {
+   "action": {
+    "step": "fill_case",
+    "do": "click",
+    "selector": ".vc-day:not(.is-not-in-month) .vc-day-content",
+    "nth": 0,
+    "hit": {
+     "x": 40,
+     "y": 433,
+     "targets": [
+      "police.field"
+     ]
+    }
+   },
+   "before": {
+    "path": "/police-report/form",
+    "query": {},
+    "flags": {
+     "noticeEnabled": false,
+     "noticeRead": false,
+     "statementRead": false,
+     "statementBox": true,
+     "formStep": 2,
+     "fieldKey": "calendar",
+     "typing": false,
+     "fieldTop": 344,
+     "fieldOff": "",
+     "agreeOff": "below",
+     "nextOff": "",
+     "sendOff": "below",
+     "nextEnabled": false,
+     "sendEnabled": false,
+     "warn": 0,
+     "month": "11月 2026",
+     "time": "2:23 AM",
+     "role": "當事人",
+     "date": "",
+     "reported": false,
+     "records": 0,
+     "open": 0,
+     "tab": "",
+     "status": "",
+     "caseNo": "",
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "police.field",
+     "police.locate",
+     "police.statement",
+     "police.time"
+    ],
+    "rects": {
+     "police.field": [
+      16,
+      344,
+      252,
+      272
+     ],
+     "police.locate": [
+      346,
+      214,
+      20,
+      20
+     ],
+     "police.statement": [
+      16,
+      790,
+      358,
+      54
+     ],
+     "police.time": [
+      21,
+      387,
+      348,
+      32
+     ]
+    }
+   },
+   "after": {
+    "path": "/police-report/form",
+    "query": {},
+    "flags": {
+     "noticeEnabled": false,
+     "noticeRead": false,
+     "statementRead": false,
+     "statementBox": true,
+     "formStep": 2,
+     "fieldKey": "summary",
+     "typing": false,
+     "fieldTop": 472,
+     "fieldOff": "",
+     "agreeOff": "below",
+     "nextOff": "",
+     "sendOff": "below",
+     "nextEnabled": false,
+     "sendEnabled": false,
+     "warn": 0,
+     "month": "",
+     "time": "2:23 AM",
+     "role": "當事人",
+     "date": "2026-11-01",
+     "reported": false,
+     "records": 0,
+     "open": 0,
+     "tab": "",
+     "status": "",
+     "caseNo": "",
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "police.field",
+     "police.locate",
+     "police.statement",
+     "police.time"
+    ],
+    "rects": {
+     "police.field": [
+      16,
+      472,
+      358,
+      128
+     ],
+     "police.locate": [
+      346,
+      214,
+      20,
+      20
+     ],
+     "police.statement": [
+      16,
+      790,
+      358,
+      54
+     ],
+     "police.time": [
+      21,
+      387,
+      348,
+      32
+     ]
+    }
+   },
+   "facts": {
+    "url": "/police-report/form",
+    "title": "警政報案",
+    "fields": [
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "your_role",
+      "name": "",
+      "label": "報案人類別* Your Role",
+      "placeholder": "",
+      "value": "當事人Person involved",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       108,
+       358,
+       48
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "location",
+      "name": "",
+      "label": "標注發生地點* Location",
+      "placeholder": "可直接定位或輸入完整地址",
+      "value": "臺北市信義區市府路1號",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       202,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "",
+      "name": "",
+      "label": "發生日期* Date of Incident",
+      "placeholder": "",
+      "value": "2026-11-01",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       290,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "",
+      "name": "",
+      "label": "",
+      "placeholder": "",
+      "value": "2",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       47,
+       388,
+       26,
+       30
+      ]
+     },
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "",
+      "name": "",
+      "label": ":",
+      "placeholder": "",
+      "value": "23",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       80,
+       388,
+       29,
+       30
+      ]
+     },
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "",
+      "name": "",
+      "label": "",
+      "placeholder": "",
+      "value": "true",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       109,
+       388,
+       33,
+       30
+      ]
+     },
+     {
+      "tag": "textarea",
+      "type": "textarea",
+      "id": "case_summary",
+      "name": "",
+      "label": "案情摘要* Case Summary",
+      "placeholder": "人、事、時、地、物500字以內",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       472,
+       358,
+       128
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "checkbox",
+      "id": "agree",
+      "name": "",
+      "label": "本人已詳閱並同意以上內容",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       1130,
+       0,
+       0
+      ]
+     }
+    ],
+    "starred": [
+     "報案人類別 Your Role",
+     "標注發生地點 Location",
+     "發生日期 Date of Incident",
+     "發生時間 Time of Incident",
+     "案情摘要 Case Summary"
+    ],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "I have read and agree to the D…",
+      "disabled": false,
+      "rect": [
+       16,
+       1142,
+       358,
+       72
+      ]
+     },
+     {
+      "text": "送出",
+      "disabled": true,
+      "rect": [
+       16,
+       1238,
+       358,
+       48
+      ]
+     }
+    ],
+    "disabledButtons": [
+     "送出"
+    ],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 1302
+   }
+  },
+  {
+   "action": {
+    "step": "fill_case",
+    "do": "type",
+    "selector": "#case_summary",
+    "value": "測試用案情摘要，示範資料。",
+    "hit": {
+     "x": 195,
+     "y": 536,
+     "targets": [
+      "police.field"
+     ]
+    }
+   },
+   "before": {
+    "path": "/police-report/form",
+    "query": {},
+    "flags": {
+     "noticeEnabled": false,
+     "noticeRead": false,
+     "statementRead": false,
+     "statementBox": true,
+     "formStep": 2,
+     "fieldKey": "summary",
+     "typing": false,
+     "fieldTop": 472,
+     "fieldOff": "",
+     "agreeOff": "below",
+     "nextOff": "",
+     "sendOff": "below",
+     "nextEnabled": false,
+     "sendEnabled": false,
+     "warn": 0,
+     "month": "",
+     "time": "2:23 AM",
+     "role": "當事人",
+     "date": "2026-11-01",
+     "reported": false,
+     "records": 0,
+     "open": 0,
+     "tab": "",
+     "status": "",
+     "caseNo": "",
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "police.field",
+     "police.locate",
+     "police.statement",
+     "police.time"
+    ],
+    "rects": {
+     "police.field": [
+      16,
+      472,
+      358,
+      128
+     ],
+     "police.locate": [
+      346,
+      214,
+      20,
+      20
+     ],
+     "police.statement": [
+      16,
+      790,
+      358,
+      54
+     ],
+     "police.time": [
+      21,
+      387,
+      348,
+      32
+     ]
+    }
+   },
+   "after": {
+    "path": "/police-report/form",
+    "query": {},
+    "flags": {
+     "noticeEnabled": false,
+     "noticeRead": false,
+     "statementRead": false,
+     "statementBox": true,
+     "formStep": 2,
+     "fieldKey": "",
+     "typing": false,
+     "fieldTop": 0,
+     "fieldOff": "",
+     "agreeOff": "below",
+     "nextOff": "",
+     "sendOff": "below",
+     "nextEnabled": false,
+     "sendEnabled": false,
+     "warn": 0,
+     "month": "",
+     "time": "2:23 AM",
+     "role": "當事人",
+     "date": "2026-11-01",
+     "reported": false,
+     "records": 0,
+     "open": 0,
+     "tab": "",
+     "status": "",
+     "caseNo": "",
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "police.locate",
+     "police.statement",
+     "police.time"
+    ],
+    "rects": {
+     "police.locate": [
+      346,
+      214,
+      20,
+      20
+     ],
+     "police.statement": [
+      16,
+      790,
+      358,
+      54
+     ],
+     "police.time": [
+      21,
+      387,
+      348,
+      32
+     ]
+    }
+   },
+   "facts": {
+    "url": "/police-report/form",
+    "title": "警政報案",
+    "fields": [
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "your_role",
+      "name": "",
+      "label": "報案人類別* Your Role",
+      "placeholder": "",
+      "value": "當事人Person involved",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       108,
+       358,
+       48
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "location",
+      "name": "",
+      "label": "標注發生地點* Location",
+      "placeholder": "可直接定位或輸入完整地址",
+      "value": "臺北市信義區市府路1號",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       202,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "",
+      "name": "",
+      "label": "發生日期* Date of Incident",
+      "placeholder": "",
+      "value": "2026-11-01",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       290,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "",
+      "name": "",
+      "label": "",
+      "placeholder": "",
+      "value": "2",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       47,
+       388,
+       26,
+       30
+      ]
+     },
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "",
+      "name": "",
+      "label": ":",
+      "placeholder": "",
+      "value": "23",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       80,
+       388,
+       29,
+       30
+      ]
+     },
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "",
+      "name": "",
+      "label": "",
+      "placeholder": "",
+      "value": "true",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       109,
+       388,
+       33,
+       30
+      ]
+     },
+     {
+      "tag": "textarea",
+      "type": "textarea",
+      "id": "case_summary",
+      "name": "",
+      "label": "案情摘要* Case Summary",
+      "placeholder": "人、事、時、地、物500字以內",
+      "value": "測試用案情摘要，示範資料。",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       472,
+       358,
+       128
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "checkbox",
+      "id": "agree",
+      "name": "",
+      "label": "本人已詳閱並同意以上內容",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       1130,
+       0,
+       0
+      ]
+     }
+    ],
+    "starred": [
+     "報案人類別 Your Role",
+     "標注發生地點 Location",
+     "發生日期 Date of Incident",
+     "發生時間 Time of Incident",
+     "案情摘要 Case Summary"
+    ],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "I have read and agree to the D…",
+      "disabled": false,
+      "rect": [
+       16,
+       1142,
+       358,
+       72
+      ]
+     },
+     {
+      "text": "送出",
+      "disabled": true,
+      "rect": [
+       16,
+       1238,
+       358,
+       48
+      ]
+     }
+    ],
+    "disabledButtons": [
+     "送出"
+    ],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 1302
+   }
+  },
+  {
+   "action": {
+    "step": "agree_case",
+    "do": "scroll",
+    "to": "bottom",
+    "hit": null
+   },
+   "before": {
+    "path": "/police-report/form",
+    "query": {},
+    "flags": {
+     "noticeEnabled": false,
+     "noticeRead": false,
+     "statementRead": false,
+     "statementBox": true,
+     "formStep": 2,
+     "fieldKey": "",
+     "typing": false,
+     "fieldTop": 0,
+     "fieldOff": "",
+     "agreeOff": "",
+     "nextOff": "",
+     "sendOff": "",
+     "nextEnabled": false,
+     "sendEnabled": false,
+     "warn": 0,
+     "month": "",
+     "time": "2:23 AM",
+     "role": "當事人",
+     "date": "2026-11-01",
+     "reported": false,
+     "records": 0,
+     "open": 0,
+     "tab": "",
+     "status": "",
+     "caseNo": "",
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "police.agree",
+     "police.send",
+     "police.statement"
+    ],
+    "rects": {
+     "police.agree": [
+      16,
+      660,
+      358,
+      24
+     ],
+     "police.statement": [
+      16,
+      332,
+      358,
+      350
+     ],
+     "police.send": [
+      16,
+      780,
+      358,
+      48
+     ]
+    }
+   },
+   "after": {
+    "path": "/police-report/form",
+    "query": {},
+    "flags": {
+     "noticeEnabled": false,
+     "noticeRead": false,
+     "statementRead": false,
+     "statementBox": true,
+     "formStep": 2,
+     "fieldKey": "",
+     "typing": false,
+     "fieldTop": 0,
+     "fieldOff": "",
+     "agreeOff": "",
+     "nextOff": "",
+     "sendOff": "",
+     "nextEnabled": false,
+     "sendEnabled": false,
+     "warn": 0,
+     "month": "",
+     "time": "2:23 AM",
+     "role": "當事人",
+     "date": "2026-11-01",
+     "reported": false,
+     "records": 0,
+     "open": 0,
+     "tab": "",
+     "status": "",
+     "caseNo": "",
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "police.agree",
+     "police.send",
+     "police.statement"
+    ],
+    "rects": {
+     "police.agree": [
+      16,
+      660,
+      358,
+      24
+     ],
+     "police.statement": [
+      16,
+      332,
+      358,
+      350
+     ],
+     "police.send": [
+      16,
+      780,
+      358,
+      48
+     ]
+    }
+   },
+   "facts": {
+    "url": "/police-report/form",
+    "title": "警政報案",
+    "fields": [
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "your_role",
+      "name": "",
+      "label": "報案人類別* Your Role",
+      "placeholder": "",
+      "value": "當事人Person involved",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       -350,
+       358,
+       48
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "location",
+      "name": "",
+      "label": "標注發生地點* Location",
+      "placeholder": "可直接定位或輸入完整地址",
+      "value": "臺北市信義區市府路1號",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       -256,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "",
+      "name": "",
+      "label": "發生日期* Date of Incident",
+      "placeholder": "",
+      "value": "2026-11-01",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       -168,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "",
+      "name": "",
+      "label": "",
+      "placeholder": "",
+      "value": "2",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       47,
+       -70,
+       26,
+       30
+      ]
+     },
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "",
+      "name": "",
+      "label": ":",
+      "placeholder": "",
+      "value": "23",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       80,
+       -70,
+       29,
+       30
+      ]
+     },
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "",
+      "name": "",
+      "label": "",
+      "placeholder": "",
+      "value": "true",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       109,
+       -70,
+       33,
+       30
+      ]
+     },
+     {
+      "tag": "textarea",
+      "type": "textarea",
+      "id": "case_summary",
+      "name": "",
+      "label": "案情摘要* Case Summary",
+      "placeholder": "人、事、時、地、物500字以內",
+      "value": "測試用案情摘要，示範資料。",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       14,
+       358,
+       128
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "checkbox",
+      "id": "agree",
+      "name": "",
+      "label": "本人已詳閱並同意以上內容",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       672,
+       0,
+       0
+      ]
+     }
+    ],
+    "starred": [
+     "報案人類別 Your Role",
+     "標注發生地點 Location",
+     "發生日期 Date of Incident",
+     "發生時間 Time of Incident",
+     "案情摘要 Case Summary"
+    ],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "I have read and agree to the D…",
+      "disabled": false,
+      "rect": [
+       16,
+       684,
+       358,
+       72
+      ]
+     },
+     {
+      "text": "送出",
+      "disabled": true,
+      "rect": [
+       16,
+       780,
+       358,
+       48
+      ]
+     }
+    ],
+    "disabledButtons": [
+     "送出"
+    ],
+    "dialogs": [],
+    "scrollY": 458,
+    "scrollHeight": 1302
+   }
+  },
+  {
+   "action": {
+    "step": "agree_case",
+    "do": "check",
+    "text": "本人已詳閱並同意以上內容",
+    "hit": {
+     "x": 195,
+     "y": 672,
+     "targets": [
+      "police.agree",
+      "police.statement"
+     ]
+    }
+   },
+   "before": {
+    "path": "/police-report/form",
+    "query": {},
+    "flags": {
+     "noticeEnabled": false,
+     "noticeRead": false,
+     "statementRead": false,
+     "statementBox": true,
+     "formStep": 2,
+     "fieldKey": "",
+     "typing": false,
+     "fieldTop": 0,
+     "fieldOff": "",
+     "agreeOff": "",
+     "nextOff": "",
+     "sendOff": "",
+     "nextEnabled": false,
+     "sendEnabled": false,
+     "warn": 0,
+     "month": "",
+     "time": "2:23 AM",
+     "role": "當事人",
+     "date": "2026-11-01",
+     "reported": false,
+     "records": 0,
+     "open": 0,
+     "tab": "",
+     "status": "",
+     "caseNo": "",
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "police.agree",
+     "police.send",
+     "police.statement"
+    ],
+    "rects": {
+     "police.agree": [
+      16,
+      660,
+      358,
+      24
+     ],
+     "police.statement": [
+      16,
+      332,
+      358,
+      350
+     ],
+     "police.send": [
+      16,
+      780,
+      358,
+      48
+     ]
+    }
+   },
+   "after": {
+    "path": "/police-report/form",
+    "query": {},
+    "flags": {
+     "noticeEnabled": false,
+     "noticeRead": false,
+     "statementRead": false,
+     "statementBox": true,
+     "formStep": 2,
+     "fieldKey": "",
+     "typing": false,
+     "fieldTop": 0,
+     "fieldOff": "",
+     "agreeOff": "",
+     "nextOff": "",
+     "sendOff": "",
+     "nextEnabled": false,
+     "sendEnabled": true,
+     "warn": 0,
+     "month": "",
+     "time": "2:23 AM",
+     "role": "當事人",
+     "date": "2026-11-01",
+     "reported": false,
+     "records": 0,
+     "open": 0,
+     "tab": "",
+     "status": "",
+     "caseNo": "",
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "police.agree",
+     "police.send",
+     "police.statement"
+    ],
+    "rects": {
+     "police.agree": [
+      16,
+      660,
+      358,
+      24
+     ],
+     "police.statement": [
+      16,
+      332,
+      358,
+      350
+     ],
+     "police.send": [
+      16,
+      780,
+      358,
+      48
+     ]
+    }
+   },
+   "facts": {
+    "url": "/police-report/form",
+    "title": "警政報案",
+    "fields": [
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "your_role",
+      "name": "",
+      "label": "報案人類別* Your Role",
+      "placeholder": "",
+      "value": "當事人Person involved",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       -350,
+       358,
+       48
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "location",
+      "name": "",
+      "label": "標注發生地點* Location",
+      "placeholder": "可直接定位或輸入完整地址",
+      "value": "臺北市信義區市府路1號",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       -256,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "",
+      "name": "",
+      "label": "發生日期* Date of Incident",
+      "placeholder": "",
+      "value": "2026-11-01",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       -168,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "",
+      "name": "",
+      "label": "",
+      "placeholder": "",
+      "value": "2",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       47,
+       -70,
+       26,
+       30
+      ]
+     },
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "",
+      "name": "",
+      "label": ":",
+      "placeholder": "",
+      "value": "23",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       80,
+       -70,
+       29,
+       30
+      ]
+     },
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "",
+      "name": "",
+      "label": "",
+      "placeholder": "",
+      "value": "true",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       109,
+       -70,
+       33,
+       30
+      ]
+     },
+     {
+      "tag": "textarea",
+      "type": "textarea",
+      "id": "case_summary",
+      "name": "",
+      "label": "案情摘要* Case Summary",
+      "placeholder": "人、事、時、地、物500字以內",
+      "value": "測試用案情摘要，示範資料。",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       14,
+       358,
+       128
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "checkbox",
+      "id": "agree",
+      "name": "",
+      "label": "本人已詳閱並同意以上內容",
+      "placeholder": "",
+      "value": "checked",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       672,
+       0,
+       0
+      ]
+     }
+    ],
+    "starred": [
+     "報案人類別 Your Role",
+     "標注發生地點 Location",
+     "發生日期 Date of Incident",
+     "發生時間 Time of Incident",
+     "案情摘要 Case Summary"
+    ],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "I have read and agree to the D…",
+      "disabled": false,
+      "rect": [
+       16,
+       684,
+       358,
+       72
+      ]
+     },
+     {
+      "text": "送出",
+      "disabled": false,
+      "rect": [
+       16,
+       780,
+       358,
+       48
+      ]
+     }
+    ],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 458,
+    "scrollHeight": 1302
+   }
+  },
+  {
+   "action": {
+    "step": "submit_report",
+    "do": "click",
+    "text": "送出",
+    "hit": {
+     "x": 195,
+     "y": 804,
+     "targets": [
+      "police.send"
+     ]
+    }
+   },
+   "before": {
+    "path": "/police-report/form",
+    "query": {},
+    "flags": {
+     "noticeEnabled": false,
+     "noticeRead": false,
+     "statementRead": false,
+     "statementBox": true,
+     "formStep": 2,
+     "fieldKey": "",
+     "typing": false,
+     "fieldTop": 0,
+     "fieldOff": "",
+     "agreeOff": "",
+     "nextOff": "",
+     "sendOff": "",
+     "nextEnabled": false,
+     "sendEnabled": true,
+     "warn": 0,
+     "month": "",
+     "time": "2:23 AM",
+     "role": "當事人",
+     "date": "2026-11-01",
+     "reported": false,
+     "records": 0,
+     "open": 0,
+     "tab": "",
+     "status": "",
+     "caseNo": "",
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "police.agree",
+     "police.send",
+     "police.statement"
+    ],
+    "rects": {
+     "police.agree": [
+      16,
+      660,
+      358,
+      24
+     ],
+     "police.statement": [
+      16,
+      332,
+      358,
+      350
+     ],
+     "police.send": [
+      16,
+      780,
+      358,
+      48
+     ]
+    }
+   },
+   "after": {
+    "path": "/police-report/form",
+    "query": {},
+    "flags": {
+     "noticeEnabled": false,
+     "noticeRead": false,
+     "statementRead": false,
+     "statementBox": true,
+     "formStep": 2,
+     "fieldKey": "",
+     "typing": false,
+     "fieldTop": 0,
+     "fieldOff": "",
+     "agreeOff": "",
+     "nextOff": "",
+     "sendOff": "",
+     "nextEnabled": false,
+     "sendEnabled": true,
+     "warn": 0,
+     "month": "",
+     "time": "2:23 AM",
+     "role": "當事人",
+     "date": "2026-11-01",
+     "reported": true,
+     "records": 0,
+     "open": 0,
+     "tab": "",
+     "status": "",
+     "caseNo": "",
+     "__bottomBar": 0,
+     "__dialog": true
+    },
+    "visible": [
+     "police.agree",
+     "police.ok",
+     "police.send",
+     "police.statement"
+    ],
+    "rects": {
+     "police.agree": [
+      16,
+      660,
+      358,
+      24
+     ],
+     "police.statement": [
+      16,
+      332,
+      358,
+      350
+     ],
+     "police.send": [
+      16,
+      780,
+      358,
+      48
+     ],
+     "police.ok": [
+      39,
+      508.5,
+      312,
+      32
+     ]
+    }
+   },
+   "facts": {
+    "url": "/police-report/form",
+    "title": "警政報案",
+    "fields": [
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "your_role",
+      "name": "",
+      "label": "報案人類別* Your Role",
+      "placeholder": "",
+      "value": "當事人Person involved",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       -350,
+       358,
+       48
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "location",
+      "name": "",
+      "label": "標注發生地點* Location",
+      "placeholder": "可直接定位或輸入完整地址",
+      "value": "臺北市信義區市府路1號",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       -256,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "",
+      "name": "",
+      "label": "發生日期* Date of Incident",
+      "placeholder": "",
+      "value": "2026-11-01",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       -168,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "",
+      "name": "",
+      "label": "",
+      "placeholder": "",
+      "value": "2",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       47,
+       -70,
+       26,
+       30
+      ]
+     },
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "",
+      "name": "",
+      "label": ":",
+      "placeholder": "",
+      "value": "23",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       80,
+       -70,
+       29,
+       30
+      ]
+     },
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "",
+      "name": "",
+      "label": "",
+      "placeholder": "",
+      "value": "true",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       109,
+       -70,
+       33,
+       30
+      ]
+     },
+     {
+      "tag": "textarea",
+      "type": "textarea",
+      "id": "case_summary",
+      "name": "",
+      "label": "案情摘要* Case Summary",
+      "placeholder": "人、事、時、地、物500字以內",
+      "value": "測試用案情摘要，示範資料。",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       14,
+       358,
+       128
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "checkbox",
+      "id": "agree",
+      "name": "",
+      "label": "本人已詳閱並同意以上內容",
+      "placeholder": "",
+      "value": "checked",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       672,
+       0,
+       0
+      ]
+     }
+    ],
+    "starred": [
+     "報案人類別 Your Role",
+     "標注發生地點 Location",
+     "發生日期 Date of Incident",
+     "發生時間 Time of Incident",
+     "案情摘要 Case Summary"
+    ],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "I have read and agree to the D…",
+      "disabled": false,
+      "rect": [
+       16,
+       684,
+       358,
+       72
+      ]
+     },
+     {
+      "text": "送出",
+      "disabled": false,
+      "rect": [
+       16,
+       780,
+       358,
+       48
+      ]
+     },
+     {
+      "text": "確認",
+      "disabled": false,
+      "rect": [
+       39,
+       509,
+       312,
+       32
+      ]
+     }
+    ],
+    "disabledButtons": [],
+    "dialogs": [
+     "通報成功 感謝您提供寶貴資訊 確認"
+    ],
+    "scrollY": 458,
+    "scrollHeight": 1302
+   }
+  },
+  {
+   "action": {
+    "step": "done",
+    "do": "click",
+    "text": "確認",
+    "hit": {
+     "x": 195,
+     "y": 525,
+     "targets": [
+      "police.ok",
+      "police.statement"
+     ]
+    }
+   },
+   "before": {
+    "path": "/police-report/form",
+    "query": {},
+    "flags": {
+     "noticeEnabled": false,
+     "noticeRead": false,
+     "statementRead": false,
+     "statementBox": true,
+     "formStep": 2,
+     "fieldKey": "",
+     "typing": false,
+     "fieldTop": 0,
+     "fieldOff": "",
+     "agreeOff": "",
+     "nextOff": "",
+     "sendOff": "",
+     "nextEnabled": false,
+     "sendEnabled": true,
+     "warn": 0,
+     "month": "",
+     "time": "2:23 AM",
+     "role": "當事人",
+     "date": "2026-11-01",
+     "reported": true,
+     "records": 0,
+     "open": 0,
+     "tab": "",
+     "status": "",
+     "caseNo": "",
+     "__bottomBar": 0,
+     "__dialog": true
+    },
+    "visible": [
+     "police.agree",
+     "police.ok",
+     "police.send",
+     "police.statement"
+    ],
+    "rects": {
+     "police.agree": [
+      16,
+      660,
+      358,
+      24
+     ],
+     "police.statement": [
+      16,
+      332,
+      358,
+      350
+     ],
+     "police.send": [
+      16,
+      780,
+      358,
+      48
+     ],
+     "police.ok": [
+      39,
+      508.5,
+      312,
+      32
+     ]
+    }
+   },
+   "after": {
+    "path": "/police-report",
+    "query": {},
+    "flags": {
+     "noticeEnabled": false,
+     "noticeRead": false,
+     "statementRead": false,
+     "statementBox": false,
+     "formStep": 0,
+     "fieldKey": "",
+     "typing": false,
+     "fieldTop": 0,
+     "fieldOff": "",
+     "agreeOff": "",
+     "nextOff": "",
+     "sendOff": "",
+     "nextEnabled": false,
+     "sendEnabled": false,
+     "warn": 0,
+     "month": "",
+     "time": "",
+     "role": "",
+     "date": "",
+     "reported": false,
+     "records": 0,
+     "open": 0,
+     "tab": "",
+     "status": "",
+     "caseNo": "",
+     "__bottomBar": 120,
+     "__dialog": false
+    },
+    "visible": [
+     "police.notice_agree",
+     "police.notice_ok",
+     "police.notice_text"
+    ],
+    "rects": {
+     "police.notice_agree": [
+      16,
+      740,
+      358,
+      24
+     ],
+     "police.notice_ok": [
+      16,
+      780,
+      358,
+      48
+     ],
+     "police.notice_text": [
+      24,
+      24,
+      342,
+      820
+     ]
+    }
+   },
+   "facts": {
+    "url": "/police-report",
+    "title": "警政報案",
+    "fields": [
+     {
+      "tag": "input",
+      "type": "checkbox",
+      "id": "Y",
+      "name": "",
+      "label": "本人已詳閱須知並同意繼續",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       752,
+       0,
+       0
+      ]
+     }
+    ],
+    "starred": [],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "同意",
+      "disabled": true,
+      "rect": [
+       16,
+       780,
+       358,
+       48
+      ]
+     }
+    ],
+    "disabledButtons": [
+     "同意"
+    ],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 4264
+   }
+  }
+ ]
+}

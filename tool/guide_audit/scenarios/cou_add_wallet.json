@@ -1,0 +1,40 @@
+{
+  "name": "cou_add_wallet",
+  "description": "coupon.list goal add_wallet: pick a coupon, 加入票夾, 存入票夾.",
+  "page": "coupon_wallet",
+  "capability": "coupon.list",
+  "goals": [
+    "add_wallet"
+  ],
+  "expect": {
+    "done": true
+  },
+  "actions": [
+    {
+      "do": "click",
+      "selector": "div.py-2.px-4 > div.flex.justify-between > a",
+      "step": "coupon_home"
+    },
+    {
+      "step": "coupon_tab",
+      "do": "click",
+      "text": "優惠券",
+      "within": "section.tabs:not(.tabs__content-type)"
+    },
+    {
+      "step": "pick_coupon",
+      "do": "click",
+      "text": "阿爸手工皂"
+    },
+    {
+      "step": "add_wallet",
+      "do": "click",
+      "text": "加入票夾"
+    },
+    {
+      "step": "add_wallet",
+      "do": "click",
+      "text": "存入票夾"
+    }
+  ]
+}

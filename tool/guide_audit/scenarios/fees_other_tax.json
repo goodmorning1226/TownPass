@@ -1,0 +1,12 @@
+{
+  "name": "fees_other_tax",
+  "description": "fees.other: 稅費 -> 地方稅 (tax-1) redirects to /fee-payment/scan (camera only, no guide for it). The pick_fee step is current again on the scan page: dimmed screen, card asks for a 大類 that is not there.",
+  "page": "fees",
+  "capability": "fees.other",
+  "goals": [],
+  "expect": { "done": false },
+  "actions": [
+    { "step": "pick_fee", "do": "click", "text": "稅費" },
+    { "step": "pick_fee", "do": "click", "text": "地方稅" }
+  ]
+}

@@ -1,0 +1,72 @@
+{
+ "name": "lib_ranking_direct",
+ "description": "library.ranking opened through capabilities.json navigation (parents /library-service/ then /library-service/ranking-list), i.e. already on the list: guide should be done at once.",
+ "page": "library",
+ "start": null,
+ "capability": "library.ranking",
+ "goals": [],
+ "expect": {
+  "done": true
+ },
+ "recordedAt": "2026-11-07T18:24:03.440Z",
+ "durationMs": 4103,
+ "viewport": {
+  "width": 390,
+  "height": 844,
+  "deviceScaleFactor": 3,
+  "isMobile": true,
+  "hasTouch": true
+ },
+ "failed": null,
+ "steps": [
+  {
+   "action": null,
+   "before": null,
+   "after": {
+    "path": "/library-service/ranking-list",
+    "query": {},
+    "flags": {
+     "tab": "",
+     "input": "",
+     "results": 6,
+     "branch": "",
+     "branchName": "",
+     "branchList": false,
+     "reserveEnabled": false,
+     "reserved": false,
+     "reserveFailed": false,
+     "failReason": "",
+     "notReservable": false,
+     "dialogOpen": false,
+     "bookTitle": "",
+     "pickupOpen": false,
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "library.results"
+    ],
+    "rects": {
+     "library.results": [
+      16,
+      16,
+      358,
+      639.6
+     ]
+    }
+   },
+   "facts": {
+    "url": "/library-service/ranking-list",
+    "title": "點閱排行",
+    "fields": [],
+    "starred": [],
+    "errors": [],
+    "buttons": [],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  }
+ ]
+}

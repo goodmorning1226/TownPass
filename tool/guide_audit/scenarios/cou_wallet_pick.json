@@ -1,0 +1,26 @@
+{
+  "name": "cou_wallet_pick",
+  "description": "wallet goal wallet_pick: 優惠券 -> 未兌換 -> tap the coupon.",
+  "page": "coupon_wallet",
+  "capability": "wallet",
+  "goals": [
+    "wallet_pick"
+  ],
+  "expect": {
+    "done": true
+  },
+  "actions": [
+    {
+      "step": "wallet_coupons",
+      "do": "click",
+      "text": "優惠券",
+      "within": "section.tabs:not(.tabs__content-type)"
+    },
+    {
+      "step": "wallet_pick",
+      "do": "click",
+      "selector": "ul.p-4.flex.flex-col.gap-y-3 > li > a",
+      "nth": 1
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "name": "pol_record_detail_direct",
+  "description": "police.progress, detail URL loaded directly (reload): the page shows empty fields.",
+  "page": "police_report",
+  "capability": "police.progress",
+  "start": "/police-report/record/W10-1090102-00225",
+  "goals": [],
+  "expect": {
+    "done": true
+  },
+  "actions": [
+    {
+      "step": "record_detail",
+      "do": "click",
+      "text": "詳細內容"
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "name": "pol_progress_goal_open_record",
+  "description": "police.progress with goal open_record.",
+  "page": "police_report",
+  "capability": "police.progress",
+  "goals": [
+    "open_record"
+  ],
+  "expect": {
+    "done": true
+  },
+  "actions": [
+    {
+      "step": "open_record",
+      "do": "click",
+      "selector": "a[href^=\"/police-report/record/\"]",
+      "nth": 1
+    }
+  ]
+}

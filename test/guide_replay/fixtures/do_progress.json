@@ -1,0 +1,234 @@
+{
+ "name": "do_progress",
+ "description": "districtOffice.progress opened like the app (/?isSearch=1, default goal check_progress): the 查詢 tab is open at once; the guide should be done and describe the 申辦中 cases.",
+ "page": "district_office",
+ "start": null,
+ "capability": "districtOffice.progress",
+ "goals": [],
+ "expect": {
+  "done": true
+ },
+ "recordedAt": "2026-11-07T18:23:34.623Z",
+ "durationMs": 2291,
+ "viewport": {
+  "width": 390,
+  "height": 844,
+  "deviceScaleFactor": 3,
+  "isMobile": true,
+  "hasTouch": true
+ },
+ "failed": null,
+ "steps": [
+  {
+   "action": null,
+   "before": null,
+   "after": {
+    "path": "/",
+    "query": {
+     "isSearch": "1"
+    },
+    "flags": {
+     "tab": "查詢",
+     "query": "",
+     "groupCount": 0,
+     "itemCount": 0,
+     "firstItem": "",
+     "noResult": false,
+     "step1": false,
+     "step2": false,
+     "formSeen": false,
+     "basicKind": "",
+     "basicName": "",
+     "basicHint": "",
+     "basicChoices": "",
+     "basicOpts": 0,
+     "basicOpen": true,
+     "basicTyping": false,
+     "serviceKind": "",
+     "serviceName": "",
+     "serviceHint": "",
+     "serviceChoices": "",
+     "serviceOpts": 0,
+     "serviceOpen": true,
+     "serviceTyping": false,
+     "multiEmpty": false,
+     "multiName": "",
+     "dateEmpty": false,
+     "dateName": "",
+     "itemsDialog": false,
+     "itemsTicked": 0,
+     "itemsChoices": "",
+     "calendar": false,
+     "calTitle": "",
+     "warn": "",
+     "consentChoice": "",
+     "submitted": false,
+     "consentRead": false,
+     "situation": "申辦中(2)",
+     "activeCount": 2,
+     "closedCount": 1,
+     "caseCount": 2,
+     "firstCase": "臺北市路邊停車費重複繳費申請退費",
+     "firstStatus": "待審核",
+     "pos.district.tab_apply": "8,32,in",
+     "pos.district.tab_query": "8,32,in",
+     "pos.district.search": "",
+     "pos.district.groups": "",
+     "pos.district.items": "",
+     "pos.district.basic_head": "",
+     "pos.district.service_head": "",
+     "pos.district.basic_field": "",
+     "pos.district.service_field": "",
+     "pos.district.multi_field": "",
+     "pos.district.date_field": "",
+     "pos.district.item_options": "",
+     "pos.district.item_ok": "",
+     "pos.district.calendar": "",
+     "pos.district.next": "",
+     "pos.district.prev": "",
+     "pos.district.consent_text": "",
+     "pos.district.consent": "",
+     "pos.district.edit": "",
+     "pos.district.submit": "",
+     "pos.district.ok": "",
+     "pos.district.situation": "59,89,in",
+     "pos.district.cases": "105,353,in",
+     "pos.district.closed_tab": "59,89,in",
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "district.cases",
+     "district.closed_tab",
+     "district.situation",
+     "district.tab_apply",
+     "district.tab_query"
+    ],
+    "rects": {
+     "district.tab_apply": [
+      16,
+      8,
+      179,
+      24
+     ],
+     "district.tab_query": [
+      195,
+      8,
+      179,
+      24
+     ],
+     "district.situation": [
+      16,
+      59,
+      358,
+      30
+     ],
+     "district.cases": [
+      16,
+      105,
+      358,
+      248
+     ],
+     "district.closed_tab": [
+      195,
+      59,
+      179,
+      30
+     ]
+    }
+   },
+   "facts": {
+    "url": "/?isSearch=1",
+    "title": "申辦服務",
+    "fields": [
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "",
+      "name": "",
+      "label": "",
+      "placeholder": "您遇到哪些問題?",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       -374,
+       59,
+       314,
+       44
+      ]
+     }
+    ],
+    "starred": [],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "申辦",
+      "disabled": false,
+      "rect": [
+       16,
+       8,
+       179,
+       24
+      ]
+     },
+     {
+      "text": "查詢",
+      "disabled": false,
+      "rect": [
+       195,
+       8,
+       179,
+       24
+      ]
+     },
+     {
+      "text": "申訴類",
+      "disabled": false,
+      "rect": [
+       -374,
+       159,
+       358,
+       24
+      ]
+     },
+     {
+      "text": "補助類",
+      "disabled": false,
+      "rect": [
+       -374,
+       219,
+       358,
+       24
+      ]
+     },
+     {
+      "text": "申辦中(2)",
+      "disabled": false,
+      "rect": [
+       16,
+       59,
+       179,
+       30
+      ]
+     },
+     {
+      "text": "已結案(1)",
+      "disabled": false,
+      "rect": [
+       195,
+       59,
+       179,
+       30
+      ]
+     }
+    ],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  }
+ ]
+}

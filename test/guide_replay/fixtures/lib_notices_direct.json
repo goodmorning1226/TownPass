@@ -1,0 +1,63 @@
+{
+ "name": "lib_notices_direct",
+ "description": "library.notices opened via capabilities.json navigation (lands on notice-list): done at once.",
+ "page": "library",
+ "start": null,
+ "capability": "library.notices",
+ "goals": [],
+ "expect": {
+  "done": true
+ },
+ "recordedAt": "2026-11-07T18:23:41.381Z",
+ "durationMs": 3818,
+ "viewport": {
+  "width": 390,
+  "height": 844,
+  "deviceScaleFactor": 3,
+  "isMobile": true,
+  "hasTouch": true
+ },
+ "failed": null,
+ "steps": [
+  {
+   "action": null,
+   "before": null,
+   "after": {
+    "path": "/library-service/notice-list",
+    "query": {},
+    "flags": {
+     "tab": "",
+     "input": "",
+     "results": 5,
+     "branch": "",
+     "branchName": "",
+     "branchList": false,
+     "reserveEnabled": false,
+     "reserved": false,
+     "reserveFailed": false,
+     "failReason": "",
+     "notReservable": false,
+     "dialogOpen": false,
+     "bookTitle": "",
+     "pickupOpen": false,
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [],
+    "rects": {}
+   },
+   "facts": {
+    "url": "/library-service/notice-list",
+    "title": "重要訊息",
+    "fields": [],
+    "starred": [],
+    "errors": [],
+    "buttons": [],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  }
+ ]
+}

@@ -1,0 +1,8 @@
+{
+  "name": "lib_ranking_in_app",
+  "description": "library.ranking (goal open_ranking). The app opens the library home (openFor -> home); the user scrolls as told and taps 點閱排行 更多.",
+  "page": "library", "capability": "library.ranking", "start": "/library-service/", "goals": [], "expect": { "done": true },
+  "actions": [
+    { "step": "open_ranking", "do": "click", "selector": "a[href$=\"ranking-list\"]" }
+  ]
+}

@@ -1,0 +1,2007 @@
+{
+ "name": "cit_report_disagree",
+ "description": "Known bug: default plan; the 送出 card says 「想改可以點另一個」 for 個人資料. The user picks 不同意: the page greys out 送出 (disabled, no message). The card then says 「往上看看有沒有紅字」 though there is none, and the report can never be sent.",
+ "page": "citizen_report",
+ "start": null,
+ "capability": "reportIssue",
+ "goals": [],
+ "expect": {
+  "done": true
+ },
+ "recordedAt": "2026-11-07T18:32:02.879Z",
+ "durationMs": 8157,
+ "viewport": {
+  "width": 390,
+  "height": 844,
+  "deviceScaleFactor": 3,
+  "isMobile": true,
+  "hasTouch": true
+ },
+ "failed": null,
+ "steps": [
+  {
+   "action": null,
+   "before": null,
+   "after": {
+    "path": "/citizen-report/",
+    "query": {},
+    "flags": {
+     "vh": 844,
+     "topTab": "通報",
+     "subTab": "有話要說",
+     "groupOpen": false,
+     "searchInput": "",
+     "searchResults": 0,
+     "noResults": false,
+     "category": "",
+     "location": "",
+     "title": "",
+     "description": "",
+     "focus": "",
+     "titleWarn": false,
+     "descWarn": false,
+     "photos": 0,
+     "consent": "",
+     "sendEnabled": false,
+     "accepted": false,
+     "caseKeyword": "",
+     "caseCount": 0,
+     "noCases": false,
+     "casesFiltered": false,
+     "detailTab": "",
+     "caseStatus": "",
+     "caseSubject": "",
+     "replyFrom": "",
+     "expectDone": "",
+     "gridTop": 153,
+     "gridBot": 655,
+     "listTop": -9999,
+     "listBot": -9999,
+     "rowTop": -9999,
+     "rowBot": -9999,
+     "resultsTop": -9999,
+     "resultsBot": -9999,
+     "locTop": -9999,
+     "locBot": -9999,
+     "titleTop": -9999,
+     "titleBot": -9999,
+     "descTop": -9999,
+     "descBot": -9999,
+     "photoTop": -9999,
+     "photoBot": -9999,
+     "consentTop": -9999,
+     "consentBot": -9999,
+     "sendTop": -9999,
+     "sendBot": -9999,
+     "callTop": 761,
+     "callBot": 815,
+     "casesTop": -9999,
+     "casesBot": -9999,
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "report.call_1999",
+     "report.categories",
+     "report.more_items",
+     "report.search_entry",
+     "report.tab_query",
+     "report.tab_report"
+    ],
+    "rects": {
+     "report.tab_report": [
+      16,
+      8,
+      179,
+      24
+     ],
+     "report.tab_query": [
+      195,
+      8,
+      179,
+      24
+     ],
+     "report.search_entry": [
+      16,
+      97,
+      358,
+      44
+     ],
+     "report.categories": [
+      16,
+      153,
+      358,
+      502
+     ],
+     "report.more_items": [
+      16,
+      671,
+      358,
+      54
+     ],
+     "report.call_1999": [
+      16,
+      761,
+      358,
+      54
+     ]
+    }
+   },
+   "facts": {
+    "url": "/citizen-report/",
+    "title": "有話要說",
+    "fields": [
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "",
+      "name": "",
+      "label": "選擇要通報項目",
+      "placeholder": "您遇到哪些問題?",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       97,
+       314,
+       44
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "",
+      "name": "",
+      "label": "有話要說 災情通報",
+      "placeholder": "搜尋案號關鍵字",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       406,
+       123,
+       262,
+       44
+      ]
+     }
+    ],
+    "starred": [],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "通報",
+      "disabled": false,
+      "rect": [
+       16,
+       8,
+       179,
+       24
+      ]
+     },
+     {
+      "text": "查詢",
+      "disabled": false,
+      "rect": [
+       195,
+       8,
+       179,
+       24
+      ]
+     },
+     {
+      "text": "撥打1999專線",
+      "disabled": false,
+      "rect": [
+       16,
+       761,
+       358,
+       54
+      ]
+     },
+     {
+      "text": "有話要說",
+      "disabled": false,
+      "rect": [
+       406,
+       67,
+       179,
+       41
+      ]
+     },
+     {
+      "text": "災情通報",
+      "disabled": false,
+      "rect": [
+       585,
+       67,
+       179,
+       41
+      ]
+     }
+    ],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  },
+  {
+   "action": {
+    "step": "pick_category",
+    "do": "click",
+    "text": "公車、計程車、復康巴士問題",
+    "nth": 0,
+    "hit": {
+     "x": 288,
+     "y": 200,
+     "targets": [
+      "report.categories"
+     ]
+    }
+   },
+   "before": {
+    "path": "/citizen-report/",
+    "query": {},
+    "flags": {
+     "vh": 844,
+     "topTab": "通報",
+     "subTab": "有話要說",
+     "groupOpen": false,
+     "searchInput": "",
+     "searchResults": 0,
+     "noResults": false,
+     "category": "",
+     "location": "",
+     "title": "",
+     "description": "",
+     "focus": "",
+     "titleWarn": false,
+     "descWarn": false,
+     "photos": 0,
+     "consent": "",
+     "sendEnabled": false,
+     "accepted": false,
+     "caseKeyword": "",
+     "caseCount": 0,
+     "noCases": false,
+     "casesFiltered": false,
+     "detailTab": "",
+     "caseStatus": "",
+     "caseSubject": "",
+     "replyFrom": "",
+     "expectDone": "",
+     "gridTop": 153,
+     "gridBot": 655,
+     "listTop": -9999,
+     "listBot": -9999,
+     "rowTop": -9999,
+     "rowBot": -9999,
+     "resultsTop": -9999,
+     "resultsBot": -9999,
+     "locTop": -9999,
+     "locBot": -9999,
+     "titleTop": -9999,
+     "titleBot": -9999,
+     "descTop": -9999,
+     "descBot": -9999,
+     "photoTop": -9999,
+     "photoBot": -9999,
+     "consentTop": -9999,
+     "consentBot": -9999,
+     "sendTop": -9999,
+     "sendBot": -9999,
+     "callTop": 761,
+     "callBot": 815,
+     "casesTop": -9999,
+     "casesBot": -9999,
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "report.call_1999",
+     "report.categories",
+     "report.more_items",
+     "report.search_entry",
+     "report.tab_query",
+     "report.tab_report"
+    ],
+    "rects": {
+     "report.tab_report": [
+      16,
+      8,
+      179,
+      24
+     ],
+     "report.tab_query": [
+      195,
+      8,
+      179,
+      24
+     ],
+     "report.search_entry": [
+      16,
+      97,
+      358,
+      44
+     ],
+     "report.categories": [
+      16,
+      153,
+      358,
+      502
+     ],
+     "report.more_items": [
+      16,
+      671,
+      358,
+      54
+     ],
+     "report.call_1999": [
+      16,
+      761,
+      358,
+      54
+     ]
+    }
+   },
+   "after": {
+    "path": "/citizen-report/form/R-2",
+    "query": {},
+    "flags": {
+     "vh": 844,
+     "topTab": "",
+     "subTab": "",
+     "groupOpen": false,
+     "searchInput": "",
+     "searchResults": 0,
+     "noResults": false,
+     "category": "案件名稱.....",
+     "location": "",
+     "title": "",
+     "description": "",
+     "focus": "",
+     "titleWarn": false,
+     "descWarn": false,
+     "photos": 0,
+     "consent": "同意",
+     "sendEnabled": true,
+     "accepted": false,
+     "caseKeyword": "",
+     "caseCount": 0,
+     "noCases": false,
+     "casesFiltered": false,
+     "detailTab": "",
+     "caseStatus": "",
+     "caseSubject": "",
+     "replyFrom": "",
+     "expectDone": "",
+     "gridTop": -9999,
+     "gridBot": -9999,
+     "listTop": -9999,
+     "listBot": -9999,
+     "rowTop": -9999,
+     "rowBot": -9999,
+     "resultsTop": -9999,
+     "resultsBot": -9999,
+     "locTop": 148,
+     "locBot": 192,
+     "titleTop": 232,
+     "titleBot": 276,
+     "descTop": 316,
+     "descBot": 444,
+     "photoTop": 528,
+     "photoBot": 624,
+     "consentTop": 708,
+     "consentBot": 732,
+     "sendTop": 748,
+     "sendBot": 796,
+     "callTop": -9999,
+     "callBot": -9999,
+     "casesTop": -9999,
+     "casesBot": -9999,
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "report.back",
+     "report.consent",
+     "report.description",
+     "report.location",
+     "report.photo",
+     "report.send",
+     "report.title"
+    ],
+    "rects": {
+     "report.location": [
+      16,
+      148,
+      358,
+      44
+     ],
+     "report.title": [
+      16,
+      232,
+      358,
+      44
+     ],
+     "report.description": [
+      16,
+      316,
+      358,
+      128
+     ],
+     "report.photo": [
+      16,
+      528,
+      96,
+      96
+     ],
+     "report.consent": [
+      16,
+      708,
+      152,
+      24
+     ],
+     "report.send": [
+      16,
+      748,
+      358,
+      48
+     ],
+     "report.back": [
+      10,
+      16,
+      24,
+      24
+     ]
+    }
+   },
+   "facts": {
+    "url": "/citizen-report/form/R-2",
+    "title": "有話要說",
+    "fields": [
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "location",
+      "name": "",
+      "label": "發生地點",
+      "placeholder": "請輸入完整地址",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       148,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "title",
+      "name": "",
+      "label": "案件主旨*",
+      "placeholder": "請輸入主旨",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       232,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "textarea",
+      "type": "textarea",
+      "id": "description",
+      "name": "",
+      "label": "描述*",
+      "placeholder": "人、事、時、地、物 4000字以內",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       316,
+       358,
+       128
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "radio",
+      "id": "isAgreeY",
+      "name": "isAgree",
+      "label": "同意",
+      "placeholder": "",
+      "value": "checked",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       708,
+       0,
+       0
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "radio",
+      "id": "isAgreeN",
+      "name": "isAgree",
+      "label": "不同意",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       92,
+       708,
+       0,
+       0
+      ]
+     }
+    ],
+    "starred": [
+     "案件主旨",
+     "描述"
+    ],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "送出",
+      "disabled": false,
+      "rect": [
+       16,
+       748,
+       358,
+       48
+      ]
+     }
+    ],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  },
+  {
+   "action": {
+    "step": "fill_form",
+    "do": "type",
+    "selector": "#title",
+    "value": "測試主旨（示範）",
+    "hit": {
+     "x": 195,
+     "y": 254,
+     "targets": [
+      "report.title"
+     ]
+    }
+   },
+   "before": {
+    "path": "/citizen-report/form/R-2",
+    "query": {},
+    "flags": {
+     "vh": 844,
+     "topTab": "",
+     "subTab": "",
+     "groupOpen": false,
+     "searchInput": "",
+     "searchResults": 0,
+     "noResults": false,
+     "category": "案件名稱.....",
+     "location": "",
+     "title": "",
+     "description": "",
+     "focus": "",
+     "titleWarn": false,
+     "descWarn": false,
+     "photos": 0,
+     "consent": "同意",
+     "sendEnabled": true,
+     "accepted": false,
+     "caseKeyword": "",
+     "caseCount": 0,
+     "noCases": false,
+     "casesFiltered": false,
+     "detailTab": "",
+     "caseStatus": "",
+     "caseSubject": "",
+     "replyFrom": "",
+     "expectDone": "",
+     "gridTop": -9999,
+     "gridBot": -9999,
+     "listTop": -9999,
+     "listBot": -9999,
+     "rowTop": -9999,
+     "rowBot": -9999,
+     "resultsTop": -9999,
+     "resultsBot": -9999,
+     "locTop": 148,
+     "locBot": 192,
+     "titleTop": 232,
+     "titleBot": 276,
+     "descTop": 316,
+     "descBot": 444,
+     "photoTop": 528,
+     "photoBot": 624,
+     "consentTop": 708,
+     "consentBot": 732,
+     "sendTop": 748,
+     "sendBot": 796,
+     "callTop": -9999,
+     "callBot": -9999,
+     "casesTop": -9999,
+     "casesBot": -9999,
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "report.back",
+     "report.consent",
+     "report.description",
+     "report.location",
+     "report.photo",
+     "report.send",
+     "report.title"
+    ],
+    "rects": {
+     "report.location": [
+      16,
+      148,
+      358,
+      44
+     ],
+     "report.title": [
+      16,
+      232,
+      358,
+      44
+     ],
+     "report.description": [
+      16,
+      316,
+      358,
+      128
+     ],
+     "report.photo": [
+      16,
+      528,
+      96,
+      96
+     ],
+     "report.consent": [
+      16,
+      708,
+      152,
+      24
+     ],
+     "report.send": [
+      16,
+      748,
+      358,
+      48
+     ],
+     "report.back": [
+      10,
+      16,
+      24,
+      24
+     ]
+    }
+   },
+   "after": {
+    "path": "/citizen-report/form/R-2",
+    "query": {},
+    "flags": {
+     "vh": 844,
+     "topTab": "",
+     "subTab": "",
+     "groupOpen": false,
+     "searchInput": "",
+     "searchResults": 0,
+     "noResults": false,
+     "category": "案件名稱.....",
+     "location": "",
+     "title": "測試主旨（示範）",
+     "description": "",
+     "focus": "",
+     "titleWarn": false,
+     "descWarn": false,
+     "photos": 0,
+     "consent": "同意",
+     "sendEnabled": true,
+     "accepted": false,
+     "caseKeyword": "",
+     "caseCount": 0,
+     "noCases": false,
+     "casesFiltered": false,
+     "detailTab": "",
+     "caseStatus": "",
+     "caseSubject": "",
+     "replyFrom": "",
+     "expectDone": "",
+     "gridTop": -9999,
+     "gridBot": -9999,
+     "listTop": -9999,
+     "listBot": -9999,
+     "rowTop": -9999,
+     "rowBot": -9999,
+     "resultsTop": -9999,
+     "resultsBot": -9999,
+     "locTop": 148,
+     "locBot": 192,
+     "titleTop": 232,
+     "titleBot": 276,
+     "descTop": 316,
+     "descBot": 444,
+     "photoTop": 528,
+     "photoBot": 624,
+     "consentTop": 708,
+     "consentBot": 732,
+     "sendTop": 748,
+     "sendBot": 796,
+     "callTop": -9999,
+     "callBot": -9999,
+     "casesTop": -9999,
+     "casesBot": -9999,
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "report.back",
+     "report.consent",
+     "report.description",
+     "report.location",
+     "report.photo",
+     "report.send",
+     "report.title"
+    ],
+    "rects": {
+     "report.location": [
+      16,
+      148,
+      358,
+      44
+     ],
+     "report.title": [
+      16,
+      232,
+      358,
+      44
+     ],
+     "report.description": [
+      16,
+      316,
+      358,
+      128
+     ],
+     "report.photo": [
+      16,
+      528,
+      96,
+      96
+     ],
+     "report.consent": [
+      16,
+      708,
+      152,
+      24
+     ],
+     "report.send": [
+      16,
+      748,
+      358,
+      48
+     ],
+     "report.back": [
+      10,
+      16,
+      24,
+      24
+     ]
+    }
+   },
+   "facts": {
+    "url": "/citizen-report/form/R-2",
+    "title": "有話要說",
+    "fields": [
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "location",
+      "name": "",
+      "label": "發生地點",
+      "placeholder": "請輸入完整地址",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       148,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "title",
+      "name": "",
+      "label": "案件主旨*",
+      "placeholder": "請輸入主旨",
+      "value": "測試主旨（示範）",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       232,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "textarea",
+      "type": "textarea",
+      "id": "description",
+      "name": "",
+      "label": "描述*",
+      "placeholder": "人、事、時、地、物 4000字以內",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       316,
+       358,
+       128
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "radio",
+      "id": "isAgreeY",
+      "name": "isAgree",
+      "label": "同意",
+      "placeholder": "",
+      "value": "checked",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       708,
+       0,
+       0
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "radio",
+      "id": "isAgreeN",
+      "name": "isAgree",
+      "label": "不同意",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       92,
+       708,
+       0,
+       0
+      ]
+     }
+    ],
+    "starred": [
+     "案件主旨",
+     "描述"
+    ],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "送出",
+      "disabled": false,
+      "rect": [
+       16,
+       748,
+       358,
+       48
+      ]
+     }
+    ],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  },
+  {
+   "action": {
+    "step": "fill_form",
+    "do": "type",
+    "selector": "#description",
+    "value": "測試描述，示範用假資料",
+    "hit": {
+     "x": 195,
+     "y": 380,
+     "targets": [
+      "report.description"
+     ]
+    }
+   },
+   "before": {
+    "path": "/citizen-report/form/R-2",
+    "query": {},
+    "flags": {
+     "vh": 844,
+     "topTab": "",
+     "subTab": "",
+     "groupOpen": false,
+     "searchInput": "",
+     "searchResults": 0,
+     "noResults": false,
+     "category": "案件名稱.....",
+     "location": "",
+     "title": "測試主旨（示範）",
+     "description": "",
+     "focus": "",
+     "titleWarn": false,
+     "descWarn": false,
+     "photos": 0,
+     "consent": "同意",
+     "sendEnabled": true,
+     "accepted": false,
+     "caseKeyword": "",
+     "caseCount": 0,
+     "noCases": false,
+     "casesFiltered": false,
+     "detailTab": "",
+     "caseStatus": "",
+     "caseSubject": "",
+     "replyFrom": "",
+     "expectDone": "",
+     "gridTop": -9999,
+     "gridBot": -9999,
+     "listTop": -9999,
+     "listBot": -9999,
+     "rowTop": -9999,
+     "rowBot": -9999,
+     "resultsTop": -9999,
+     "resultsBot": -9999,
+     "locTop": 148,
+     "locBot": 192,
+     "titleTop": 232,
+     "titleBot": 276,
+     "descTop": 316,
+     "descBot": 444,
+     "photoTop": 528,
+     "photoBot": 624,
+     "consentTop": 708,
+     "consentBot": 732,
+     "sendTop": 748,
+     "sendBot": 796,
+     "callTop": -9999,
+     "callBot": -9999,
+     "casesTop": -9999,
+     "casesBot": -9999,
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "report.back",
+     "report.consent",
+     "report.description",
+     "report.location",
+     "report.photo",
+     "report.send",
+     "report.title"
+    ],
+    "rects": {
+     "report.location": [
+      16,
+      148,
+      358,
+      44
+     ],
+     "report.title": [
+      16,
+      232,
+      358,
+      44
+     ],
+     "report.description": [
+      16,
+      316,
+      358,
+      128
+     ],
+     "report.photo": [
+      16,
+      528,
+      96,
+      96
+     ],
+     "report.consent": [
+      16,
+      708,
+      152,
+      24
+     ],
+     "report.send": [
+      16,
+      748,
+      358,
+      48
+     ],
+     "report.back": [
+      10,
+      16,
+      24,
+      24
+     ]
+    }
+   },
+   "after": {
+    "path": "/citizen-report/form/R-2",
+    "query": {},
+    "flags": {
+     "vh": 844,
+     "topTab": "",
+     "subTab": "",
+     "groupOpen": false,
+     "searchInput": "",
+     "searchResults": 0,
+     "noResults": false,
+     "category": "案件名稱.....",
+     "location": "",
+     "title": "測試主旨（示範）",
+     "description": "測試描述，示範用假資料",
+     "focus": "",
+     "titleWarn": false,
+     "descWarn": false,
+     "photos": 0,
+     "consent": "同意",
+     "sendEnabled": true,
+     "accepted": false,
+     "caseKeyword": "",
+     "caseCount": 0,
+     "noCases": false,
+     "casesFiltered": false,
+     "detailTab": "",
+     "caseStatus": "",
+     "caseSubject": "",
+     "replyFrom": "",
+     "expectDone": "",
+     "gridTop": -9999,
+     "gridBot": -9999,
+     "listTop": -9999,
+     "listBot": -9999,
+     "rowTop": -9999,
+     "rowBot": -9999,
+     "resultsTop": -9999,
+     "resultsBot": -9999,
+     "locTop": 148,
+     "locBot": 192,
+     "titleTop": 232,
+     "titleBot": 276,
+     "descTop": 316,
+     "descBot": 444,
+     "photoTop": 528,
+     "photoBot": 624,
+     "consentTop": 708,
+     "consentBot": 732,
+     "sendTop": 748,
+     "sendBot": 796,
+     "callTop": -9999,
+     "callBot": -9999,
+     "casesTop": -9999,
+     "casesBot": -9999,
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "report.back",
+     "report.consent",
+     "report.description",
+     "report.location",
+     "report.photo",
+     "report.send",
+     "report.title"
+    ],
+    "rects": {
+     "report.location": [
+      16,
+      148,
+      358,
+      44
+     ],
+     "report.title": [
+      16,
+      232,
+      358,
+      44
+     ],
+     "report.description": [
+      16,
+      316,
+      358,
+      128
+     ],
+     "report.photo": [
+      16,
+      528,
+      96,
+      96
+     ],
+     "report.consent": [
+      16,
+      708,
+      152,
+      24
+     ],
+     "report.send": [
+      16,
+      748,
+      358,
+      48
+     ],
+     "report.back": [
+      10,
+      16,
+      24,
+      24
+     ]
+    }
+   },
+   "facts": {
+    "url": "/citizen-report/form/R-2",
+    "title": "有話要說",
+    "fields": [
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "location",
+      "name": "",
+      "label": "發生地點",
+      "placeholder": "請輸入完整地址",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       148,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "title",
+      "name": "",
+      "label": "案件主旨*",
+      "placeholder": "請輸入主旨",
+      "value": "測試主旨（示範）",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       232,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "textarea",
+      "type": "textarea",
+      "id": "description",
+      "name": "",
+      "label": "描述*",
+      "placeholder": "人、事、時、地、物 4000字以內",
+      "value": "測試描述，示範用假資料",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       316,
+       358,
+       128
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "radio",
+      "id": "isAgreeY",
+      "name": "isAgree",
+      "label": "同意",
+      "placeholder": "",
+      "value": "checked",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       708,
+       0,
+       0
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "radio",
+      "id": "isAgreeN",
+      "name": "isAgree",
+      "label": "不同意",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       92,
+       708,
+       0,
+       0
+      ]
+     }
+    ],
+    "starred": [
+     "案件主旨",
+     "描述"
+    ],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "送出",
+      "disabled": false,
+      "rect": [
+       16,
+       748,
+       358,
+       48
+      ]
+     }
+    ],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  },
+  {
+   "action": {
+    "step": "submit_report",
+    "do": "check",
+    "text": "不同意",
+    "hit": {
+     "x": 130,
+     "y": 720,
+     "targets": [
+      "report.consent"
+     ]
+    }
+   },
+   "before": {
+    "path": "/citizen-report/form/R-2",
+    "query": {},
+    "flags": {
+     "vh": 844,
+     "topTab": "",
+     "subTab": "",
+     "groupOpen": false,
+     "searchInput": "",
+     "searchResults": 0,
+     "noResults": false,
+     "category": "案件名稱.....",
+     "location": "",
+     "title": "測試主旨（示範）",
+     "description": "測試描述，示範用假資料",
+     "focus": "",
+     "titleWarn": false,
+     "descWarn": false,
+     "photos": 0,
+     "consent": "同意",
+     "sendEnabled": true,
+     "accepted": false,
+     "caseKeyword": "",
+     "caseCount": 0,
+     "noCases": false,
+     "casesFiltered": false,
+     "detailTab": "",
+     "caseStatus": "",
+     "caseSubject": "",
+     "replyFrom": "",
+     "expectDone": "",
+     "gridTop": -9999,
+     "gridBot": -9999,
+     "listTop": -9999,
+     "listBot": -9999,
+     "rowTop": -9999,
+     "rowBot": -9999,
+     "resultsTop": -9999,
+     "resultsBot": -9999,
+     "locTop": 148,
+     "locBot": 192,
+     "titleTop": 232,
+     "titleBot": 276,
+     "descTop": 316,
+     "descBot": 444,
+     "photoTop": 528,
+     "photoBot": 624,
+     "consentTop": 708,
+     "consentBot": 732,
+     "sendTop": 748,
+     "sendBot": 796,
+     "callTop": -9999,
+     "callBot": -9999,
+     "casesTop": -9999,
+     "casesBot": -9999,
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "report.back",
+     "report.consent",
+     "report.description",
+     "report.location",
+     "report.photo",
+     "report.send",
+     "report.title"
+    ],
+    "rects": {
+     "report.location": [
+      16,
+      148,
+      358,
+      44
+     ],
+     "report.title": [
+      16,
+      232,
+      358,
+      44
+     ],
+     "report.description": [
+      16,
+      316,
+      358,
+      128
+     ],
+     "report.photo": [
+      16,
+      528,
+      96,
+      96
+     ],
+     "report.consent": [
+      16,
+      708,
+      152,
+      24
+     ],
+     "report.send": [
+      16,
+      748,
+      358,
+      48
+     ],
+     "report.back": [
+      10,
+      16,
+      24,
+      24
+     ]
+    }
+   },
+   "after": {
+    "path": "/citizen-report/form/R-2",
+    "query": {},
+    "flags": {
+     "vh": 844,
+     "topTab": "",
+     "subTab": "",
+     "groupOpen": false,
+     "searchInput": "",
+     "searchResults": 0,
+     "noResults": false,
+     "category": "案件名稱.....",
+     "location": "",
+     "title": "測試主旨（示範）",
+     "description": "測試描述，示範用假資料",
+     "focus": "isAgreeN",
+     "titleWarn": false,
+     "descWarn": false,
+     "photos": 0,
+     "consent": "不同意",
+     "sendEnabled": false,
+     "accepted": false,
+     "caseKeyword": "",
+     "caseCount": 0,
+     "noCases": false,
+     "casesFiltered": false,
+     "detailTab": "",
+     "caseStatus": "",
+     "caseSubject": "",
+     "replyFrom": "",
+     "expectDone": "",
+     "gridTop": -9999,
+     "gridBot": -9999,
+     "listTop": -9999,
+     "listBot": -9999,
+     "rowTop": -9999,
+     "rowBot": -9999,
+     "resultsTop": -9999,
+     "resultsBot": -9999,
+     "locTop": 148,
+     "locBot": 192,
+     "titleTop": 232,
+     "titleBot": 276,
+     "descTop": 316,
+     "descBot": 444,
+     "photoTop": 528,
+     "photoBot": 624,
+     "consentTop": 708,
+     "consentBot": 732,
+     "sendTop": 748,
+     "sendBot": 796,
+     "callTop": -9999,
+     "callBot": -9999,
+     "casesTop": -9999,
+     "casesBot": -9999,
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "report.back",
+     "report.consent",
+     "report.description",
+     "report.location",
+     "report.photo",
+     "report.send",
+     "report.title"
+    ],
+    "rects": {
+     "report.location": [
+      16,
+      148,
+      358,
+      44
+     ],
+     "report.title": [
+      16,
+      232,
+      358,
+      44
+     ],
+     "report.description": [
+      16,
+      316,
+      358,
+      128
+     ],
+     "report.photo": [
+      16,
+      528,
+      96,
+      96
+     ],
+     "report.consent": [
+      16,
+      708,
+      152,
+      24
+     ],
+     "report.send": [
+      16,
+      748,
+      358,
+      48
+     ],
+     "report.back": [
+      10,
+      16,
+      24,
+      24
+     ]
+    }
+   },
+   "facts": {
+    "url": "/citizen-report/form/R-2",
+    "title": "有話要說",
+    "fields": [
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "location",
+      "name": "",
+      "label": "發生地點",
+      "placeholder": "請輸入完整地址",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       148,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "title",
+      "name": "",
+      "label": "案件主旨*",
+      "placeholder": "請輸入主旨",
+      "value": "測試主旨（示範）",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       232,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "textarea",
+      "type": "textarea",
+      "id": "description",
+      "name": "",
+      "label": "描述*",
+      "placeholder": "人、事、時、地、物 4000字以內",
+      "value": "測試描述，示範用假資料",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       316,
+       358,
+       128
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "radio",
+      "id": "isAgreeY",
+      "name": "isAgree",
+      "label": "同意",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       708,
+       0,
+       0
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "radio",
+      "id": "isAgreeN",
+      "name": "isAgree",
+      "label": "不同意",
+      "placeholder": "",
+      "value": "checked",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       92,
+       708,
+       0,
+       0
+      ]
+     }
+    ],
+    "starred": [
+     "案件主旨",
+     "描述"
+    ],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "送出",
+      "disabled": true,
+      "rect": [
+       16,
+       748,
+       358,
+       48
+      ]
+     }
+    ],
+    "disabledButtons": [
+     "送出"
+    ],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  },
+  {
+   "action": {
+    "step": "submit_report",
+    "do": "click",
+    "text": "送出",
+    "hit": {
+     "x": 195,
+     "y": 772,
+     "targets": [
+      "report.send"
+     ]
+    }
+   },
+   "before": {
+    "path": "/citizen-report/form/R-2",
+    "query": {},
+    "flags": {
+     "vh": 844,
+     "topTab": "",
+     "subTab": "",
+     "groupOpen": false,
+     "searchInput": "",
+     "searchResults": 0,
+     "noResults": false,
+     "category": "案件名稱.....",
+     "location": "",
+     "title": "測試主旨（示範）",
+     "description": "測試描述，示範用假資料",
+     "focus": "isAgreeN",
+     "titleWarn": false,
+     "descWarn": false,
+     "photos": 0,
+     "consent": "不同意",
+     "sendEnabled": false,
+     "accepted": false,
+     "caseKeyword": "",
+     "caseCount": 0,
+     "noCases": false,
+     "casesFiltered": false,
+     "detailTab": "",
+     "caseStatus": "",
+     "caseSubject": "",
+     "replyFrom": "",
+     "expectDone": "",
+     "gridTop": -9999,
+     "gridBot": -9999,
+     "listTop": -9999,
+     "listBot": -9999,
+     "rowTop": -9999,
+     "rowBot": -9999,
+     "resultsTop": -9999,
+     "resultsBot": -9999,
+     "locTop": 148,
+     "locBot": 192,
+     "titleTop": 232,
+     "titleBot": 276,
+     "descTop": 316,
+     "descBot": 444,
+     "photoTop": 528,
+     "photoBot": 624,
+     "consentTop": 708,
+     "consentBot": 732,
+     "sendTop": 748,
+     "sendBot": 796,
+     "callTop": -9999,
+     "callBot": -9999,
+     "casesTop": -9999,
+     "casesBot": -9999,
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "report.back",
+     "report.consent",
+     "report.description",
+     "report.location",
+     "report.photo",
+     "report.send",
+     "report.title"
+    ],
+    "rects": {
+     "report.location": [
+      16,
+      148,
+      358,
+      44
+     ],
+     "report.title": [
+      16,
+      232,
+      358,
+      44
+     ],
+     "report.description": [
+      16,
+      316,
+      358,
+      128
+     ],
+     "report.photo": [
+      16,
+      528,
+      96,
+      96
+     ],
+     "report.consent": [
+      16,
+      708,
+      152,
+      24
+     ],
+     "report.send": [
+      16,
+      748,
+      358,
+      48
+     ],
+     "report.back": [
+      10,
+      16,
+      24,
+      24
+     ]
+    }
+   },
+   "after": {
+    "path": "/citizen-report/form/R-2",
+    "query": {},
+    "flags": {
+     "vh": 844,
+     "topTab": "",
+     "subTab": "",
+     "groupOpen": false,
+     "searchInput": "",
+     "searchResults": 0,
+     "noResults": false,
+     "category": "案件名稱.....",
+     "location": "",
+     "title": "測試主旨（示範）",
+     "description": "測試描述，示範用假資料",
+     "focus": "",
+     "titleWarn": false,
+     "descWarn": false,
+     "photos": 0,
+     "consent": "不同意",
+     "sendEnabled": false,
+     "accepted": false,
+     "caseKeyword": "",
+     "caseCount": 0,
+     "noCases": false,
+     "casesFiltered": false,
+     "detailTab": "",
+     "caseStatus": "",
+     "caseSubject": "",
+     "replyFrom": "",
+     "expectDone": "",
+     "gridTop": -9999,
+     "gridBot": -9999,
+     "listTop": -9999,
+     "listBot": -9999,
+     "rowTop": -9999,
+     "rowBot": -9999,
+     "resultsTop": -9999,
+     "resultsBot": -9999,
+     "locTop": 148,
+     "locBot": 192,
+     "titleTop": 232,
+     "titleBot": 276,
+     "descTop": 316,
+     "descBot": 444,
+     "photoTop": 528,
+     "photoBot": 624,
+     "consentTop": 708,
+     "consentBot": 732,
+     "sendTop": 748,
+     "sendBot": 796,
+     "callTop": -9999,
+     "callBot": -9999,
+     "casesTop": -9999,
+     "casesBot": -9999,
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "report.back",
+     "report.consent",
+     "report.description",
+     "report.location",
+     "report.photo",
+     "report.send",
+     "report.title"
+    ],
+    "rects": {
+     "report.location": [
+      16,
+      148,
+      358,
+      44
+     ],
+     "report.title": [
+      16,
+      232,
+      358,
+      44
+     ],
+     "report.description": [
+      16,
+      316,
+      358,
+      128
+     ],
+     "report.photo": [
+      16,
+      528,
+      96,
+      96
+     ],
+     "report.consent": [
+      16,
+      708,
+      152,
+      24
+     ],
+     "report.send": [
+      16,
+      748,
+      358,
+      48
+     ],
+     "report.back": [
+      10,
+      16,
+      24,
+      24
+     ]
+    }
+   },
+   "facts": {
+    "url": "/citizen-report/form/R-2",
+    "title": "有話要說",
+    "fields": [
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "location",
+      "name": "",
+      "label": "發生地點",
+      "placeholder": "請輸入完整地址",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       148,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "title",
+      "name": "",
+      "label": "案件主旨*",
+      "placeholder": "請輸入主旨",
+      "value": "測試主旨（示範）",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       232,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "textarea",
+      "type": "textarea",
+      "id": "description",
+      "name": "",
+      "label": "描述*",
+      "placeholder": "人、事、時、地、物 4000字以內",
+      "value": "測試描述，示範用假資料",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       316,
+       358,
+       128
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "radio",
+      "id": "isAgreeY",
+      "name": "isAgree",
+      "label": "同意",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       708,
+       0,
+       0
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "radio",
+      "id": "isAgreeN",
+      "name": "isAgree",
+      "label": "不同意",
+      "placeholder": "",
+      "value": "checked",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       92,
+       708,
+       0,
+       0
+      ]
+     }
+    ],
+    "starred": [
+     "案件主旨",
+     "描述"
+    ],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "送出",
+      "disabled": true,
+      "rect": [
+       16,
+       748,
+       358,
+       48
+      ]
+     }
+    ],
+    "disabledButtons": [
+     "送出"
+    ],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  }
+ ]
+}

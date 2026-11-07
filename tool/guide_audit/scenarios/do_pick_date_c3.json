@@ -1,0 +1,25 @@
+{
+  "name": "do_pick_date_c3",
+  "description": "Question plan pick_date alone on 臺北市家庭暴力被害人補助 (districtOffice.form.c-3, opened like the app): the user taps the 肇事日期 box and a day in the calendar.",
+  "page": "district_office",
+  "capability": "districtOffice.form.c-3",
+  "goals": [
+    "pick_date"
+  ],
+  "expect": {
+    "done": true
+  },
+  "actions": [
+    {
+      "step": "pick_date",
+      "do": "click",
+      "selector": "input.base-input[readonly]:not(.w-full)"
+    },
+    {
+      "step": "pick_date",
+      "do": "click",
+      "selector": ".vc-day:not(.is-not-in-month) .vc-day-content",
+      "nth": 2
+    }
+  ]
+}

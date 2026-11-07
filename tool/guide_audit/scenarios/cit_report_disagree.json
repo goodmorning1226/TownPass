@@ -1,0 +1,40 @@
+{
+  "name": "cit_report_disagree",
+  "description": "Known bug: default plan; the 送出 card says 「想改可以點另一個」 for 個人資料. The user picks 不同意: the page greys out 送出 (disabled, no message). The card then says 「往上看看有沒有紅字」 though there is none, and the report can never be sent.",
+  "page": "citizen_report",
+  "capability": "reportIssue",
+  "goals": [],
+  "expect": {
+    "done": true
+  },
+  "actions": [
+    {
+      "step": "pick_category",
+      "do": "click",
+      "text": "公車、計程車、復康巴士問題",
+      "nth": 0
+    },
+    {
+      "step": "fill_form",
+      "do": "type",
+      "selector": "#title",
+      "value": "測試主旨（示範）"
+    },
+    {
+      "step": "fill_form",
+      "do": "type",
+      "selector": "#description",
+      "value": "測試描述，示範用假資料"
+    },
+    {
+      "step": "submit_report",
+      "do": "check",
+      "text": "不同意"
+    },
+    {
+      "step": "submit_report",
+      "do": "click",
+      "text": "送出"
+    }
+  ]
+}

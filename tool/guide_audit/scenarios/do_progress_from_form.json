@@ -1,0 +1,23 @@
+{
+  "name": "do_progress_from_form",
+  "description": "check_progress while the user is still on a form (/form/a-1 loaded directly, capability districtOffice.progress): the card sends them back with 上一步, then to 查詢.",
+  "page": "district_office",
+  "capability": "districtOffice.progress",
+  "start": "/form/a-1",
+  "goals": [],
+  "expect": {
+    "done": true
+  },
+  "actions": [
+    {
+      "step": "check_progress",
+      "do": "click",
+      "text": "上一步"
+    },
+    {
+      "step": "check_progress",
+      "do": "click",
+      "text": "查詢"
+    }
+  ]
+}

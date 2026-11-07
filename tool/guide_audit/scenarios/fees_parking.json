@@ -1,0 +1,49 @@
+{
+  "name": "fees_parking",
+  "description": "fees.parking default goal: pick 汽車, type the plate like the 範例 (TST-0001), 查詢, 4 bills: 全部繳清, 前往繳費, 悠遊付, 是.",
+  "page": "fees",
+  "capability": "fees.parking",
+  "goals": [],
+  "expect": {
+    "done": true
+  },
+  "actions": [
+    {
+      "step": "enter_number",
+      "do": "click",
+      "text": "汽車"
+    },
+    {
+      "step": "enter_number",
+      "do": "type",
+      "selector": ".tab-view input[type=text]",
+      "value": "TST-0001"
+    },
+    {
+      "step": "query_bill",
+      "do": "click",
+      "text": "查詢",
+      "within": ".tab-view"
+    },
+    {
+      "step": "pick_bill",
+      "do": "click",
+      "text": "全部繳清"
+    },
+    {
+      "step": "to_payment",
+      "do": "click",
+      "text": "前往繳費"
+    },
+    {
+      "step": "choose_method",
+      "do": "click",
+      "text": "悠遊付"
+    },
+    {
+      "step": "confirm_pay",
+      "do": "click",
+      "text": "是"
+    }
+  ]
+}

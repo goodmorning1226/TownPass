@@ -1,0 +1,18 @@
+{
+  "name": "sub_items_read",
+  "description": "subscription.items default (read_messages): tap the first message.",
+  "page": "subscription",
+  "capability": "subscription.items",
+  "goals": [],
+  "expect": {
+    "done": true
+  },
+  "actions": [
+    {
+      "step": "read_messages",
+      "do": "click",
+      "selector": "#app > a.item",
+      "nth": 0
+    }
+  ]
+}

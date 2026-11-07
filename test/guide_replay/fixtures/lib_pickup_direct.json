@@ -1,0 +1,457 @@
+{
+ "name": "lib_pickup_direct",
+ "description": "library.records with goal check_pickup via capabilities.json navigation (/library-service/?type=1): only 可取書 left.",
+ "page": "library",
+ "start": null,
+ "capability": "library.records",
+ "goals": [
+  "check_pickup"
+ ],
+ "expect": {
+  "done": true
+ },
+ "recordedAt": "2026-11-07T18:27:27.559Z",
+ "durationMs": 4879,
+ "viewport": {
+  "width": 390,
+  "height": 844,
+  "deviceScaleFactor": 3,
+  "isMobile": true,
+  "hasTouch": true
+ },
+ "failed": null,
+ "steps": [
+  {
+   "action": null,
+   "before": null,
+   "after": {
+    "path": "/library-service/",
+    "query": {
+     "type": "1"
+    },
+    "flags": {
+     "tab": "我的紀錄",
+     "input": "",
+     "results": 7,
+     "branch": "",
+     "branchName": "",
+     "branchList": false,
+     "reserveEnabled": false,
+     "reserved": false,
+     "reserveFailed": false,
+     "failReason": "",
+     "notReservable": false,
+     "dialogOpen": false,
+     "bookTitle": "",
+     "pickupOpen": false,
+     "__bottomBar": 74,
+     "__dialog": false
+    },
+    "visible": [
+     "library.pickup",
+     "library.tab_map",
+     "library.tab_records",
+     "library.tab_search"
+    ],
+    "rects": {
+     "library.tab_search": [
+      16,
+      8,
+      119.3,
+      24
+     ],
+     "library.tab_records": [
+      135.3,
+      8,
+      119.3,
+      24
+     ],
+     "library.tab_map": [
+      254.7,
+      8,
+      119.3,
+      24
+     ],
+     "library.pickup": [
+      32,
+      131,
+      326,
+      24
+     ]
+    }
+   },
+   "facts": {
+    "url": "/library-service/?type=1",
+    "title": "圖書借閱",
+    "fields": [
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "reservation-list",
+      "name": "",
+      "label": "",
+      "placeholder": "",
+      "value": "reservation-list",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       59,
+       358,
+       48
+      ]
+     }
+    ],
+    "starred": [],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "館藏查詢",
+      "disabled": false,
+      "rect": [
+       16,
+       8,
+       119,
+       24
+      ]
+     },
+     {
+      "text": "我的紀錄",
+      "disabled": false,
+      "rect": [
+       135,
+       8,
+       119,
+       24
+      ]
+     },
+     {
+      "text": "分館地圖",
+      "disabled": false,
+      "rect": [
+       255,
+       8,
+       119,
+       24
+      ]
+     },
+     {
+      "text": "可取書(1)",
+      "disabled": false,
+      "rect": [
+       32,
+       131,
+       326,
+       24
+      ]
+     },
+     {
+      "text": "處理中(1)",
+      "disabled": false,
+      "rect": [
+       32,
+       191,
+       326,
+       24
+      ]
+     },
+     {
+      "text": "排序中(0)",
+      "disabled": false,
+      "rect": [
+       32,
+       251,
+       326,
+       24
+      ]
+     },
+     {
+      "text": "鍵盤快速鍵",
+      "disabled": false,
+      "rect": [
+       573,
+       785,
+       50,
+       14
+      ]
+     },
+     {
+      "text": "確定",
+      "disabled": false,
+      "rect": [
+       668,
+       132,
+       78,
+       36
+      ]
+     },
+     {
+      "text": "確認",
+      "disabled": false,
+      "rect": [
+       435,
+       492,
+       300,
+       40
+      ]
+     }
+    ],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  },
+  {
+   "action": {
+    "step": "check_pickup",
+    "do": "click",
+    "text": "可取書",
+    "exact": false,
+    "within": "li",
+    "hit": {
+     "x": 195,
+     "y": 143,
+     "targets": [
+      "library.pickup"
+     ]
+    }
+   },
+   "before": {
+    "path": "/library-service/",
+    "query": {
+     "type": "1"
+    },
+    "flags": {
+     "tab": "我的紀錄",
+     "input": "",
+     "results": 7,
+     "branch": "",
+     "branchName": "",
+     "branchList": false,
+     "reserveEnabled": false,
+     "reserved": false,
+     "reserveFailed": false,
+     "failReason": "",
+     "notReservable": false,
+     "dialogOpen": false,
+     "bookTitle": "",
+     "pickupOpen": false,
+     "__bottomBar": 74,
+     "__dialog": false
+    },
+    "visible": [
+     "library.pickup",
+     "library.tab_map",
+     "library.tab_records",
+     "library.tab_search"
+    ],
+    "rects": {
+     "library.tab_search": [
+      16,
+      8,
+      119.3,
+      24
+     ],
+     "library.tab_records": [
+      135.3,
+      8,
+      119.3,
+      24
+     ],
+     "library.tab_map": [
+      254.7,
+      8,
+      119.3,
+      24
+     ],
+     "library.pickup": [
+      32,
+      131,
+      326,
+      24
+     ]
+    }
+   },
+   "after": {
+    "path": "/library-service/",
+    "query": {
+     "type": "1"
+    },
+    "flags": {
+     "tab": "我的紀錄",
+     "input": "",
+     "results": 7,
+     "branch": "",
+     "branchName": "",
+     "branchList": false,
+     "reserveEnabled": false,
+     "reserved": false,
+     "reserveFailed": false,
+     "failReason": "",
+     "notReservable": false,
+     "dialogOpen": false,
+     "bookTitle": "",
+     "pickupOpen": true,
+     "__bottomBar": 74,
+     "__dialog": false
+    },
+    "visible": [
+     "library.pickup",
+     "library.tab_map",
+     "library.tab_records",
+     "library.tab_search"
+    ],
+    "rects": {
+     "library.tab_search": [
+      16,
+      8,
+      119.3,
+      24
+     ],
+     "library.tab_records": [
+      135.3,
+      8,
+      119.3,
+      24
+     ],
+     "library.tab_map": [
+      254.7,
+      8,
+      119.3,
+      24
+     ],
+     "library.pickup": [
+      32,
+      131,
+      326,
+      24
+     ]
+    }
+   },
+   "facts": {
+    "url": "/library-service/?type=1",
+    "title": "圖書借閱",
+    "fields": [
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "reservation-list",
+      "name": "",
+      "label": "",
+      "placeholder": "",
+      "value": "reservation-list",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       59,
+       358,
+       48
+      ]
+     }
+    ],
+    "starred": [],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "館藏查詢",
+      "disabled": false,
+      "rect": [
+       16,
+       8,
+       119,
+       24
+      ]
+     },
+     {
+      "text": "我的紀錄",
+      "disabled": false,
+      "rect": [
+       135,
+       8,
+       119,
+       24
+      ]
+     },
+     {
+      "text": "分館地圖",
+      "disabled": false,
+      "rect": [
+       255,
+       8,
+       119,
+       24
+      ]
+     },
+     {
+      "text": "可取書(1)",
+      "disabled": false,
+      "rect": [
+       32,
+       131,
+       326,
+       24
+      ]
+     },
+     {
+      "text": "處理中(1)",
+      "disabled": false,
+      "rect": [
+       32,
+       347,
+       326,
+       24
+      ]
+     },
+     {
+      "text": "排序中(0)",
+      "disabled": false,
+      "rect": [
+       32,
+       407,
+       326,
+       24
+      ]
+     },
+     {
+      "text": "鍵盤快速鍵",
+      "disabled": false,
+      "rect": [
+       573,
+       785,
+       50,
+       14
+      ]
+     },
+     {
+      "text": "確定",
+      "disabled": false,
+      "rect": [
+       668,
+       132,
+       78,
+       36
+      ]
+     },
+     {
+      "text": "確認",
+      "disabled": false,
+      "rect": [
+       435,
+       492,
+       300,
+       40
+      ]
+     }
+    ],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  }
+ ]
+}

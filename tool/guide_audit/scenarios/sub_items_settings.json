@@ -1,0 +1,19 @@
+{
+  "name": "sub_items_settings",
+  "description": "subscription.items goal open_settings: press 設定.",
+  "page": "subscription",
+  "capability": "subscription.items",
+  "goals": [
+    "open_settings"
+  ],
+  "expect": {
+    "done": true
+  },
+  "actions": [
+    {
+      "step": "open_settings",
+      "do": "click",
+      "text": "設定"
+    }
+  ]
+}

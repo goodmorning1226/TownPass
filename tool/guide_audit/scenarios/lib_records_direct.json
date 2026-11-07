@@ -1,0 +1,11 @@
+{
+  "name": "lib_records_direct",
+  "description": "library.records via capabilities.json navigation (/library-service/?type=1, already on 我的紀錄): done at once (default goal open_records).",
+  "page": "library",
+  "capability": "library.records",
+  "goals": [],
+  "expect": {
+    "done": true
+  },
+  "actions": []
+}

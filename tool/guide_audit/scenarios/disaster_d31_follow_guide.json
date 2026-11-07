@@ -1,0 +1,34 @@
+{
+  "name": "disaster_d31_follow_guide",
+  "description": "Known bug: 土石流 (D-3-1) loaded directly (a reload / deep link of /disaster-report/form/D-3-1). Without the category list's state the form has no 災情描述 checkboxes, only 補充描述, which then is required. The user does only what the cards say: address, scroll the 注意事項, tick the consent, 送出; the page answers 至少勾選一項.",
+  "page": "disaster_report",
+  "start": "/disaster-report/form/D-3-1",
+  "capability": "disasterReport.form.D-3-1",
+  "goals": [],
+  "expect": {
+    "done": true
+  },
+  "actions": [
+    {
+      "step": "enter_location",
+      "do": "type",
+      "selector": "#location",
+      "value": "臺北市信義區市府路1號"
+    },
+    {
+      "step": "give_consent",
+      "do": "scroll",
+      "to": "bottom"
+    },
+    {
+      "step": "give_consent",
+      "do": "check",
+      "text": "提供個人資料給承辦人員"
+    },
+    {
+      "step": "send_report",
+      "do": "click",
+      "text": "送出"
+    }
+  ]
+}

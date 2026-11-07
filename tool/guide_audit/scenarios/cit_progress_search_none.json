@@ -1,0 +1,31 @@
+{
+  "name": "cit_progress_search_none",
+  "description": "goal search_case with a number that does not exist: page shows 共0筆 / 無紀錄.",
+  "page": "citizen_report",
+  "capability": "reportIssue.progress",
+  "start": "/citizen-report/",
+  "goals": [
+    "search_case"
+  ],
+  "expect": {
+    "done": true
+  },
+  "actions": [
+    {
+      "step": "open_cases",
+      "do": "click",
+      "text": "查詢"
+    },
+    {
+      "step": "search_case",
+      "do": "type",
+      "placeholder": "搜尋案號關鍵字",
+      "value": "A10-0000000-99999"
+    },
+    {
+      "step": "search_case",
+      "do": "click",
+      "selector": "div.mt-3 div.flex-grow > button.search-button"
+    }
+  ]
+}

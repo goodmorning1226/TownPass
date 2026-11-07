@@ -1,0 +1,19 @@
+{
+  "name": "sub_pick_topic",
+  "description": "goal pick_topic: open 防汛資訊 (far down the list).",
+  "page": "subscription",
+  "capability": "subscription",
+  "goals": [
+    "pick_topic"
+  ],
+  "expect": {
+    "done": true
+  },
+  "actions": [
+    {
+      "step": "pick_topic",
+      "do": "click",
+      "text": "防汛資訊"
+    }
+  ]
+}

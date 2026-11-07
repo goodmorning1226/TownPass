@@ -1,0 +1,1618 @@
+{
+ "name": "fees_parking",
+ "description": "fees.parking default goal: pick 汽車, type the plate like the 範例 (TST-0001), 查詢, 4 bills: 全部繳清, 前往繳費, 悠遊付, 是.",
+ "page": "fees",
+ "start": null,
+ "capability": "fees.parking",
+ "goals": [],
+ "expect": {
+  "done": true
+ },
+ "recordedAt": "2026-11-07T18:30:58.195Z",
+ "durationMs": 9950,
+ "viewport": {
+  "width": 390,
+  "height": 844,
+  "deviceScaleFactor": 3,
+  "isMobile": true,
+  "hasTouch": true
+ },
+ "failed": null,
+ "steps": [
+  {
+   "action": null,
+   "before": null,
+   "after": {
+    "path": "/fee-payment/detail/fee-5/",
+    "query": {},
+    "flags": {
+     "feeName": "停車費",
+     "firstTab": "輸入資料",
+     "onInputTab": true,
+     "hasFields": true,
+     "filled": false,
+     "fieldKind": "choice",
+     "fieldName": "請選擇車種",
+     "fieldHint": "",
+     "fieldChoices": "汽車|機車",
+     "alert": false,
+     "alertText": "",
+     "groupOpen": false,
+     "bills": 0,
+     "selected": 0,
+     "total": "",
+     "amount": "",
+     "payEnabled": false,
+     "methodsBelow": false,
+     "payConfirm": false,
+     "paid": false,
+     "paidMethod": "",
+     "noRecords": false,
+     "filtered": false,
+     "__bottomBar": 128,
+     "__dialog": false
+    },
+    "visible": [
+     "fees.field",
+     "fees.query",
+     "fees.tab_input"
+    ],
+    "rects": {
+     "fees.tab_input": [
+      16,
+      48,
+      179,
+      24
+     ],
+     "fees.field": [
+      16,
+      131,
+      358,
+      64
+     ],
+     "fees.query": [
+      16,
+      772,
+      358,
+      48
+     ]
+    }
+   },
+   "facts": {
+    "url": "/fee-payment/detail/fee-5/",
+    "title": "繳費項目",
+    "fields": [
+     {
+      "tag": "input",
+      "type": "radio",
+      "id": "vehicle_typecar",
+      "name": "vehicle_type",
+      "label": "汽車",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       131,
+       0,
+       0
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "radio",
+      "id": "vehicle_typemotorcycle",
+      "name": "vehicle_type",
+      "label": "機車",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       171,
+       0,
+       0
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "payment_number",
+      "name": "",
+      "label": "繳費編號",
+      "placeholder": "請輸入繳費編號",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       406,
+       159,
+       358,
+       44
+      ]
+     }
+    ],
+    "starred": [],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "輸入資料",
+      "disabled": false,
+      "rect": [
+       16,
+       48,
+       179,
+       24
+      ]
+     },
+     {
+      "text": "繳費編號",
+      "disabled": false,
+      "rect": [
+       195,
+       48,
+       179,
+       24
+      ]
+     },
+     {
+      "text": "查詢",
+      "disabled": false,
+      "rect": [
+       16,
+       772,
+       358,
+       48
+      ]
+     },
+     {
+      "text": "查詢",
+      "disabled": false,
+      "rect": [
+       406,
+       772,
+       358,
+       48
+      ]
+     }
+    ],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  },
+  {
+   "action": {
+    "step": "enter_number",
+    "do": "click",
+    "text": "汽車",
+    "hit": {
+     "x": 195,
+     "y": 143,
+     "targets": [
+      "fees.field"
+     ]
+    }
+   },
+   "before": {
+    "path": "/fee-payment/detail/fee-5/",
+    "query": {},
+    "flags": {
+     "feeName": "停車費",
+     "firstTab": "輸入資料",
+     "onInputTab": true,
+     "hasFields": true,
+     "filled": false,
+     "fieldKind": "choice",
+     "fieldName": "請選擇車種",
+     "fieldHint": "",
+     "fieldChoices": "汽車|機車",
+     "alert": false,
+     "alertText": "",
+     "groupOpen": false,
+     "bills": 0,
+     "selected": 0,
+     "total": "",
+     "amount": "",
+     "payEnabled": false,
+     "methodsBelow": false,
+     "payConfirm": false,
+     "paid": false,
+     "paidMethod": "",
+     "noRecords": false,
+     "filtered": false,
+     "__bottomBar": 128,
+     "__dialog": false
+    },
+    "visible": [
+     "fees.field",
+     "fees.query",
+     "fees.tab_input"
+    ],
+    "rects": {
+     "fees.tab_input": [
+      16,
+      48,
+      179,
+      24
+     ],
+     "fees.field": [
+      16,
+      131,
+      358,
+      64
+     ],
+     "fees.query": [
+      16,
+      772,
+      358,
+      48
+     ]
+    }
+   },
+   "after": {
+    "path": "/fee-payment/detail/fee-5/",
+    "query": {},
+    "flags": {
+     "feeName": "停車費",
+     "firstTab": "輸入資料",
+     "onInputTab": true,
+     "hasFields": true,
+     "filled": false,
+     "fieldKind": "text",
+     "fieldName": "",
+     "fieldHint": "範例：AAA-8888(含分隔符號)",
+     "fieldChoices": "",
+     "alert": false,
+     "alertText": "",
+     "groupOpen": false,
+     "bills": 0,
+     "selected": 0,
+     "total": "",
+     "amount": "",
+     "payEnabled": false,
+     "methodsBelow": false,
+     "payConfirm": false,
+     "paid": false,
+     "paidMethod": "",
+     "noRecords": false,
+     "filtered": false,
+     "__bottomBar": 128,
+     "__dialog": false
+    },
+    "visible": [
+     "fees.field",
+     "fees.query",
+     "fees.tab_input"
+    ],
+    "rects": {
+     "fees.tab_input": [
+      16,
+      48,
+      179,
+      24
+     ],
+     "fees.field": [
+      16,
+      199,
+      358,
+      44
+     ],
+     "fees.query": [
+      16,
+      772,
+      358,
+      48
+     ]
+    }
+   },
+   "facts": {
+    "url": "/fee-payment/detail/fee-5/",
+    "title": "繳費項目",
+    "fields": [
+     {
+      "tag": "input",
+      "type": "radio",
+      "id": "vehicle_typecar",
+      "name": "vehicle_type",
+      "label": "汽車",
+      "placeholder": "",
+      "value": "checked",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       131,
+       0,
+       0
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "",
+      "name": "",
+      "label": "範例：AAA-8888(含分隔符號)",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       199,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "radio",
+      "id": "vehicle_typemotorcycle",
+      "name": "vehicle_type",
+      "label": "機車",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       259,
+       0,
+       0
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "payment_number",
+      "name": "",
+      "label": "繳費編號",
+      "placeholder": "請輸入繳費編號",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       406,
+       159,
+       358,
+       44
+      ]
+     }
+    ],
+    "starred": [],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "輸入資料",
+      "disabled": false,
+      "rect": [
+       16,
+       48,
+       179,
+       24
+      ]
+     },
+     {
+      "text": "繳費編號",
+      "disabled": false,
+      "rect": [
+       195,
+       48,
+       179,
+       24
+      ]
+     },
+     {
+      "text": "查詢",
+      "disabled": false,
+      "rect": [
+       16,
+       772,
+       358,
+       48
+      ]
+     },
+     {
+      "text": "查詢",
+      "disabled": false,
+      "rect": [
+       406,
+       772,
+       358,
+       48
+      ]
+     }
+    ],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  },
+  {
+   "action": {
+    "step": "enter_number",
+    "do": "type",
+    "selector": ".tab-view input[type=text]",
+    "value": "TST-0001",
+    "hit": {
+     "x": 195,
+     "y": 221,
+     "targets": [
+      "fees.field"
+     ]
+    }
+   },
+   "before": {
+    "path": "/fee-payment/detail/fee-5/",
+    "query": {},
+    "flags": {
+     "feeName": "停車費",
+     "firstTab": "輸入資料",
+     "onInputTab": true,
+     "hasFields": true,
+     "filled": false,
+     "fieldKind": "text",
+     "fieldName": "",
+     "fieldHint": "範例：AAA-8888(含分隔符號)",
+     "fieldChoices": "",
+     "alert": false,
+     "alertText": "",
+     "groupOpen": false,
+     "bills": 0,
+     "selected": 0,
+     "total": "",
+     "amount": "",
+     "payEnabled": false,
+     "methodsBelow": false,
+     "payConfirm": false,
+     "paid": false,
+     "paidMethod": "",
+     "noRecords": false,
+     "filtered": false,
+     "__bottomBar": 128,
+     "__dialog": false
+    },
+    "visible": [
+     "fees.field",
+     "fees.query",
+     "fees.tab_input"
+    ],
+    "rects": {
+     "fees.tab_input": [
+      16,
+      48,
+      179,
+      24
+     ],
+     "fees.field": [
+      16,
+      199,
+      358,
+      44
+     ],
+     "fees.query": [
+      16,
+      772,
+      358,
+      48
+     ]
+    }
+   },
+   "after": {
+    "path": "/fee-payment/detail/fee-5/",
+    "query": {},
+    "flags": {
+     "feeName": "停車費",
+     "firstTab": "輸入資料",
+     "onInputTab": true,
+     "hasFields": true,
+     "filled": true,
+     "fieldKind": "",
+     "fieldName": "",
+     "fieldHint": "",
+     "fieldChoices": "",
+     "alert": false,
+     "alertText": "",
+     "groupOpen": false,
+     "bills": 0,
+     "selected": 0,
+     "total": "",
+     "amount": "",
+     "payEnabled": false,
+     "methodsBelow": false,
+     "payConfirm": false,
+     "paid": false,
+     "paidMethod": "",
+     "noRecords": false,
+     "filtered": false,
+     "__bottomBar": 128,
+     "__dialog": false
+    },
+    "visible": [
+     "fees.query",
+     "fees.tab_input"
+    ],
+    "rects": {
+     "fees.tab_input": [
+      16,
+      48,
+      179,
+      24
+     ],
+     "fees.query": [
+      16,
+      772,
+      358,
+      48
+     ]
+    }
+   },
+   "facts": {
+    "url": "/fee-payment/detail/fee-5/",
+    "title": "繳費項目",
+    "fields": [
+     {
+      "tag": "input",
+      "type": "radio",
+      "id": "vehicle_typecar",
+      "name": "vehicle_type",
+      "label": "汽車",
+      "placeholder": "",
+      "value": "checked",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       131,
+       0,
+       0
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "",
+      "name": "",
+      "label": "範例：AAA-8888(含分隔符號)",
+      "placeholder": "",
+      "value": "TST-0001",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       199,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "radio",
+      "id": "vehicle_typemotorcycle",
+      "name": "vehicle_type",
+      "label": "機車",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       259,
+       0,
+       0
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "payment_number",
+      "name": "",
+      "label": "繳費編號",
+      "placeholder": "請輸入繳費編號",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       406,
+       159,
+       358,
+       44
+      ]
+     }
+    ],
+    "starred": [],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "輸入資料",
+      "disabled": false,
+      "rect": [
+       16,
+       48,
+       179,
+       24
+      ]
+     },
+     {
+      "text": "繳費編號",
+      "disabled": false,
+      "rect": [
+       195,
+       48,
+       179,
+       24
+      ]
+     },
+     {
+      "text": "查詢",
+      "disabled": false,
+      "rect": [
+       16,
+       772,
+       358,
+       48
+      ]
+     },
+     {
+      "text": "查詢",
+      "disabled": false,
+      "rect": [
+       406,
+       772,
+       358,
+       48
+      ]
+     }
+    ],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  },
+  {
+   "action": {
+    "step": "query_bill",
+    "do": "click",
+    "text": "查詢",
+    "within": ".tab-view",
+    "hit": {
+     "x": 195,
+     "y": 796,
+     "targets": [
+      "fees.query"
+     ]
+    }
+   },
+   "before": {
+    "path": "/fee-payment/detail/fee-5/",
+    "query": {},
+    "flags": {
+     "feeName": "停車費",
+     "firstTab": "輸入資料",
+     "onInputTab": true,
+     "hasFields": true,
+     "filled": true,
+     "fieldKind": "",
+     "fieldName": "",
+     "fieldHint": "",
+     "fieldChoices": "",
+     "alert": false,
+     "alertText": "",
+     "groupOpen": false,
+     "bills": 0,
+     "selected": 0,
+     "total": "",
+     "amount": "",
+     "payEnabled": false,
+     "methodsBelow": false,
+     "payConfirm": false,
+     "paid": false,
+     "paidMethod": "",
+     "noRecords": false,
+     "filtered": false,
+     "__bottomBar": 128,
+     "__dialog": false
+    },
+    "visible": [
+     "fees.query",
+     "fees.tab_input"
+    ],
+    "rects": {
+     "fees.tab_input": [
+      16,
+      48,
+      179,
+      24
+     ],
+     "fees.query": [
+      16,
+      772,
+      358,
+      48
+     ]
+    }
+   },
+   "after": {
+    "path": "/fee-payment/result/fee-5",
+    "query": {},
+    "flags": {
+     "feeName": "",
+     "firstTab": "",
+     "onInputTab": false,
+     "hasFields": false,
+     "filled": false,
+     "fieldKind": "",
+     "fieldName": "",
+     "fieldHint": "",
+     "fieldChoices": "",
+     "alert": false,
+     "alertText": "",
+     "groupOpen": false,
+     "bills": 4,
+     "selected": 0,
+     "total": "NT$ 0",
+     "amount": "",
+     "payEnabled": false,
+     "methodsBelow": false,
+     "payConfirm": false,
+     "paid": false,
+     "paidMethod": "",
+     "noRecords": false,
+     "filtered": false,
+     "__bottomBar": 116,
+     "__dialog": false
+    },
+    "visible": [
+     "fees.bills",
+     "fees.pay_all",
+     "fees.to_pay"
+    ],
+    "rects": {
+     "fees.bills": [
+      16,
+      120,
+      358,
+      724
+     ],
+     "fees.pay_all": [
+      310,
+      80,
+      64,
+      24
+     ],
+     "fees.to_pay": [
+      16,
+      780,
+      358,
+      48
+     ]
+    }
+   },
+   "facts": {
+    "url": "/fee-payment/result/fee-5",
+    "title": "繳費項目",
+    "fields": [
+     {
+      "tag": "input",
+      "type": "checkbox",
+      "id": "A1111111111",
+      "name": "",
+      "label": "",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       333,
+       149,
+       0,
+       0
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "checkbox",
+      "id": "A2222222222",
+      "name": "",
+      "label": "",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       333,
+       439,
+       0,
+       0
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "checkbox",
+      "id": "A3333333333",
+      "name": "",
+      "label": "",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       333,
+       729,
+       0,
+       0
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "checkbox",
+      "id": "A44444444444",
+      "name": "",
+      "label": "",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       333,
+       1019,
+       0,
+       0
+      ]
+     }
+    ],
+    "starred": [],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "前往繳費",
+      "disabled": true,
+      "rect": [
+       16,
+       780,
+       358,
+       48
+      ]
+     }
+    ],
+    "disabledButtons": [
+     "前往繳費"
+    ],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 1416
+   }
+  },
+  {
+   "action": {
+    "step": "pick_bill",
+    "do": "click",
+    "text": "全部繳清",
+    "hit": {
+     "x": 342,
+     "y": 92,
+     "targets": [
+      "fees.pay_all"
+     ]
+    }
+   },
+   "before": {
+    "path": "/fee-payment/result/fee-5",
+    "query": {},
+    "flags": {
+     "feeName": "",
+     "firstTab": "",
+     "onInputTab": false,
+     "hasFields": false,
+     "filled": false,
+     "fieldKind": "",
+     "fieldName": "",
+     "fieldHint": "",
+     "fieldChoices": "",
+     "alert": false,
+     "alertText": "",
+     "groupOpen": false,
+     "bills": 4,
+     "selected": 0,
+     "total": "NT$ 0",
+     "amount": "",
+     "payEnabled": false,
+     "methodsBelow": false,
+     "payConfirm": false,
+     "paid": false,
+     "paidMethod": "",
+     "noRecords": false,
+     "filtered": false,
+     "__bottomBar": 116,
+     "__dialog": false
+    },
+    "visible": [
+     "fees.bills",
+     "fees.pay_all",
+     "fees.to_pay"
+    ],
+    "rects": {
+     "fees.bills": [
+      16,
+      120,
+      358,
+      724
+     ],
+     "fees.pay_all": [
+      310,
+      80,
+      64,
+      24
+     ],
+     "fees.to_pay": [
+      16,
+      780,
+      358,
+      48
+     ]
+    }
+   },
+   "after": {
+    "path": "/fee-payment/result/fee-5",
+    "query": {},
+    "flags": {
+     "feeName": "",
+     "firstTab": "",
+     "onInputTab": false,
+     "hasFields": false,
+     "filled": false,
+     "fieldKind": "",
+     "fieldName": "",
+     "fieldHint": "",
+     "fieldChoices": "",
+     "alert": false,
+     "alertText": "",
+     "groupOpen": false,
+     "bills": 4,
+     "selected": 4,
+     "total": "NT$ 510",
+     "amount": "",
+     "payEnabled": true,
+     "methodsBelow": false,
+     "payConfirm": false,
+     "paid": false,
+     "paidMethod": "",
+     "noRecords": false,
+     "filtered": false,
+     "__bottomBar": 116,
+     "__dialog": false
+    },
+    "visible": [
+     "fees.bills",
+     "fees.pay_all",
+     "fees.to_pay"
+    ],
+    "rects": {
+     "fees.bills": [
+      16,
+      120,
+      358,
+      724
+     ],
+     "fees.pay_all": [
+      310,
+      80,
+      64,
+      24
+     ],
+     "fees.to_pay": [
+      16,
+      780,
+      358,
+      48
+     ]
+    }
+   },
+   "facts": {
+    "url": "/fee-payment/result/fee-5",
+    "title": "繳費項目",
+    "fields": [
+     {
+      "tag": "input",
+      "type": "checkbox",
+      "id": "A1111111111",
+      "name": "",
+      "label": "",
+      "placeholder": "",
+      "value": "checked",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       333,
+       149,
+       0,
+       0
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "checkbox",
+      "id": "A2222222222",
+      "name": "",
+      "label": "",
+      "placeholder": "",
+      "value": "checked",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       333,
+       439,
+       0,
+       0
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "checkbox",
+      "id": "A3333333333",
+      "name": "",
+      "label": "",
+      "placeholder": "",
+      "value": "checked",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       333,
+       729,
+       0,
+       0
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "checkbox",
+      "id": "A44444444444",
+      "name": "",
+      "label": "",
+      "placeholder": "",
+      "value": "checked",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       333,
+       1019,
+       0,
+       0
+      ]
+     }
+    ],
+    "starred": [],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "前往繳費",
+      "disabled": false,
+      "rect": [
+       16,
+       780,
+       358,
+       48
+      ]
+     }
+    ],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 1416
+   }
+  },
+  {
+   "action": {
+    "step": "to_payment",
+    "do": "click",
+    "text": "前往繳費",
+    "hit": {
+     "x": 195,
+     "y": 804,
+     "targets": [
+      "fees.bills",
+      "fees.to_pay"
+     ]
+    }
+   },
+   "before": {
+    "path": "/fee-payment/result/fee-5",
+    "query": {},
+    "flags": {
+     "feeName": "",
+     "firstTab": "",
+     "onInputTab": false,
+     "hasFields": false,
+     "filled": false,
+     "fieldKind": "",
+     "fieldName": "",
+     "fieldHint": "",
+     "fieldChoices": "",
+     "alert": false,
+     "alertText": "",
+     "groupOpen": false,
+     "bills": 4,
+     "selected": 4,
+     "total": "NT$ 510",
+     "amount": "",
+     "payEnabled": true,
+     "methodsBelow": false,
+     "payConfirm": false,
+     "paid": false,
+     "paidMethod": "",
+     "noRecords": false,
+     "filtered": false,
+     "__bottomBar": 116,
+     "__dialog": false
+    },
+    "visible": [
+     "fees.bills",
+     "fees.pay_all",
+     "fees.to_pay"
+    ],
+    "rects": {
+     "fees.bills": [
+      16,
+      120,
+      358,
+      724
+     ],
+     "fees.pay_all": [
+      310,
+      80,
+      64,
+      24
+     ],
+     "fees.to_pay": [
+      16,
+      780,
+      358,
+      48
+     ]
+    }
+   },
+   "after": {
+    "path": "/fee-payment/payment/fee-5/A1111111111,A2222222222,A3333333333,A44444444444",
+    "query": {},
+    "flags": {
+     "feeName": "停車費",
+     "firstTab": "",
+     "onInputTab": false,
+     "hasFields": false,
+     "filled": false,
+     "fieldKind": "",
+     "fieldName": "",
+     "fieldHint": "",
+     "fieldChoices": "",
+     "alert": false,
+     "alertText": "",
+     "groupOpen": false,
+     "bills": 0,
+     "selected": 0,
+     "total": "",
+     "amount": "$510",
+     "payEnabled": false,
+     "methodsBelow": false,
+     "payConfirm": false,
+     "paid": false,
+     "paidMethod": "",
+     "noRecords": false,
+     "filtered": false,
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "fees.methods"
+    ],
+    "rects": {
+     "fees.methods": [
+      16,
+      416,
+      358,
+      348
+     ]
+    }
+   },
+   "facts": {
+    "url": "/fee-payment/payment/fee-5/A1111111111,A2222222222,A3333333333,A44444444444",
+    "title": "城市通",
+    "fields": [],
+    "starred": [],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "台北富邦信用卡",
+      "disabled": false,
+      "rect": [
+       16,
+       416,
+       173,
+       96
+      ]
+     },
+     {
+      "text": "悠遊付",
+      "disabled": false,
+      "rect": [
+       16,
+       564,
+       173,
+       96
+      ]
+     },
+     {
+      "text": "台北富邦信用卡",
+      "disabled": false,
+      "rect": [
+       201,
+       564,
+       173,
+       96
+      ]
+     },
+     {
+      "text": "智慧支付平台",
+      "disabled": false,
+      "rect": [
+       16,
+       668,
+       173,
+       96
+      ]
+     }
+    ],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  },
+  {
+   "action": {
+    "step": "choose_method",
+    "do": "click",
+    "text": "悠遊付",
+    "hit": {
+     "x": 103,
+     "y": 612,
+     "targets": [
+      "fees.methods"
+     ]
+    }
+   },
+   "before": {
+    "path": "/fee-payment/payment/fee-5/A1111111111,A2222222222,A3333333333,A44444444444",
+    "query": {},
+    "flags": {
+     "feeName": "停車費",
+     "firstTab": "",
+     "onInputTab": false,
+     "hasFields": false,
+     "filled": false,
+     "fieldKind": "",
+     "fieldName": "",
+     "fieldHint": "",
+     "fieldChoices": "",
+     "alert": false,
+     "alertText": "",
+     "groupOpen": false,
+     "bills": 0,
+     "selected": 0,
+     "total": "",
+     "amount": "$510",
+     "payEnabled": false,
+     "methodsBelow": false,
+     "payConfirm": false,
+     "paid": false,
+     "paidMethod": "",
+     "noRecords": false,
+     "filtered": false,
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "fees.methods"
+    ],
+    "rects": {
+     "fees.methods": [
+      16,
+      416,
+      358,
+      348
+     ]
+    }
+   },
+   "after": {
+    "path": "/fee-payment/payment/fee-5/A1111111111,A2222222222,A3333333333,A44444444444",
+    "query": {},
+    "flags": {
+     "feeName": "停車費",
+     "firstTab": "",
+     "onInputTab": false,
+     "hasFields": false,
+     "filled": false,
+     "fieldKind": "",
+     "fieldName": "",
+     "fieldHint": "",
+     "fieldChoices": "",
+     "alert": false,
+     "alertText": "您即將進入支付業者付款頁面，請務必於 10 分鐘內完成繳費作業。繳費逾時，請重新查詢並繳費！！",
+     "groupOpen": false,
+     "bills": 0,
+     "selected": 0,
+     "total": "",
+     "amount": "$510",
+     "payEnabled": false,
+     "methodsBelow": false,
+     "payConfirm": true,
+     "paid": false,
+     "paidMethod": "",
+     "noRecords": false,
+     "filtered": false,
+     "__bottomBar": 0,
+     "__dialog": true
+    },
+    "visible": [
+     "fees.methods",
+     "fees.pay_no",
+     "fees.pay_yes"
+    ],
+    "rects": {
+     "fees.methods": [
+      16,
+      416,
+      358,
+      348
+     ],
+     "fees.pay_yes": [
+      195,
+      532.5,
+      156,
+      32
+     ],
+     "fees.pay_no": [
+      39,
+      532.5,
+      156,
+      32
+     ]
+    }
+   },
+   "facts": {
+    "url": "/fee-payment/payment/fee-5/A1111111111,A2222222222,A3333333333,A44444444444",
+    "title": "城市通",
+    "fields": [],
+    "starred": [],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "台北富邦信用卡",
+      "disabled": false,
+      "rect": [
+       16,
+       416,
+       173,
+       96
+      ]
+     },
+     {
+      "text": "悠遊付",
+      "disabled": false,
+      "rect": [
+       16,
+       564,
+       173,
+       96
+      ]
+     },
+     {
+      "text": "台北富邦信用卡",
+      "disabled": false,
+      "rect": [
+       201,
+       564,
+       173,
+       96
+      ]
+     },
+     {
+      "text": "智慧支付平台",
+      "disabled": false,
+      "rect": [
+       16,
+       668,
+       173,
+       96
+      ]
+     },
+     {
+      "text": "否",
+      "disabled": false,
+      "rect": [
+       39,
+       533,
+       156,
+       32
+      ]
+     },
+     {
+      "text": "是",
+      "disabled": false,
+      "rect": [
+       195,
+       533,
+       156,
+       32
+      ]
+     }
+    ],
+    "disabledButtons": [],
+    "dialogs": [
+     "提醒 您即將進入支付業者付款頁面，請務必於 10 分鐘內完成繳費作業。繳費逾時，請重新查詢並繳費！！ 否 是"
+    ],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  },
+  {
+   "action": {
+    "step": "confirm_pay",
+    "do": "click",
+    "text": "是",
+    "hit": {
+     "x": 273,
+     "y": 549,
+     "targets": [
+      "fees.methods",
+      "fees.pay_yes"
+     ]
+    }
+   },
+   "before": {
+    "path": "/fee-payment/payment/fee-5/A1111111111,A2222222222,A3333333333,A44444444444",
+    "query": {},
+    "flags": {
+     "feeName": "停車費",
+     "firstTab": "",
+     "onInputTab": false,
+     "hasFields": false,
+     "filled": false,
+     "fieldKind": "",
+     "fieldName": "",
+     "fieldHint": "",
+     "fieldChoices": "",
+     "alert": false,
+     "alertText": "您即將進入支付業者付款頁面，請務必於 10 分鐘內完成繳費作業。繳費逾時，請重新查詢並繳費！！",
+     "groupOpen": false,
+     "bills": 0,
+     "selected": 0,
+     "total": "",
+     "amount": "$510",
+     "payEnabled": false,
+     "methodsBelow": false,
+     "payConfirm": true,
+     "paid": false,
+     "paidMethod": "",
+     "noRecords": false,
+     "filtered": false,
+     "__bottomBar": 0,
+     "__dialog": true
+    },
+    "visible": [
+     "fees.methods",
+     "fees.pay_no",
+     "fees.pay_yes"
+    ],
+    "rects": {
+     "fees.methods": [
+      16,
+      416,
+      358,
+      348
+     ],
+     "fees.pay_yes": [
+      195,
+      532.5,
+      156,
+      32
+     ],
+     "fees.pay_no": [
+      39,
+      532.5,
+      156,
+      32
+     ]
+    }
+   },
+   "after": {
+    "path": "/fee-payment/fee-payment-finished/fee-5",
+    "query": {},
+    "flags": {
+     "feeName": "停車費",
+     "firstTab": "",
+     "onInputTab": false,
+     "hasFields": false,
+     "filled": false,
+     "fieldKind": "",
+     "fieldName": "",
+     "fieldHint": "",
+     "fieldChoices": "",
+     "alert": false,
+     "alertText": "",
+     "groupOpen": false,
+     "bills": 0,
+     "selected": 0,
+     "total": "",
+     "amount": "NT$510",
+     "payEnabled": false,
+     "methodsBelow": false,
+     "payConfirm": false,
+     "paid": true,
+     "paidMethod": "悠遊付",
+     "noRecords": false,
+     "filtered": false,
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "fees.paid_info"
+    ],
+    "rects": {
+     "fees.paid_info": [
+      16,
+      264,
+      358,
+      164
+     ]
+    }
+   },
+   "facts": {
+    "url": "/fee-payment/fee-payment-finished/fee-5",
+    "title": "城市通",
+    "fields": [],
+    "starred": [],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "回到城市通",
+      "disabled": false,
+      "rect": [
+       98,
+       476,
+       195,
+       48
+      ]
+     }
+    ],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  }
+ ]
+}

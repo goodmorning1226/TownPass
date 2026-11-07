@@ -1,0 +1,11 @@
+{
+  "name": "lib_pick_book",
+  "description": "Goal pick_book, app way: search 神奇柑仔店, pick the reservable book; done card on its detail.",
+  "page": "library", "capability": "library", "goals": ["pick_book"], "expect": { "done": true },
+  "actions": [
+    { "step": "open_search", "do": "click", "selector": "a.search-bar" },
+    { "step": "search_keyword", "do": "type", "selector": "input.base-input", "value": "神奇柑仔店" },
+    { "step": "search_keyword", "do": "click", "selector": "button.search-button" },
+    { "step": "pick_book", "do": "click", "text": "歡迎光臨錢天堂 : 神奇柑仔店大圖鑑" }
+  ]
+}

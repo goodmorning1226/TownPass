@@ -1,0 +1,112 @@
+{
+ "name": "cc_unit_c-3-1_read",
+ "description": "reservation.c-3-1 default (read_counters), opened the app's way (/counter-calling/ then /counter-calling/c-3?subId=c-3-1).",
+ "page": "counter_calling",
+ "start": null,
+ "capability": "reservation.c-3-1",
+ "goals": [],
+ "expect": {
+  "done": true
+ },
+ "recordedAt": "2026-11-07T18:23:09.179Z",
+ "durationMs": 3461,
+ "viewport": {
+  "width": 390,
+  "height": 844,
+  "deviceScaleFactor": 3,
+  "isMobile": true,
+  "hasTouch": true
+ },
+ "failed": null,
+ "steps": [
+  {
+   "action": null,
+   "before": null,
+   "after": {
+    "path": "/counter-calling/c-3",
+    "query": {
+     "subId": "c-3-1"
+    },
+    "flags": {
+     "unitCount": 0,
+     "unitsBelow": false,
+     "favorites": 0,
+     "favNames": "",
+     "unitName": "區公所",
+     "location": "c-3-1",
+     "locationName": "臺北市萬華區公所",
+     "firstLocation": "臺北市萬華區公所",
+     "locationCount": 2,
+     "locationFocus": false,
+     "locationPicked": false,
+     "favText": "加入常用",
+     "favOn": false,
+     "counters": "綜合櫃檯|23|0;兵役服務|703|0;博愛櫃檯|903|6",
+     "countersBottom": 454,
+     "editOpen": false,
+     "editHasInputs": false,
+     "editTicked": false,
+     "editBottom": 0,
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "counter.counters",
+     "counter.favorite",
+     "counter.location"
+    ],
+    "rects": {
+     "counter.location": [
+      20,
+      68,
+      350,
+      50
+     ],
+     "counter.counters": [
+      20,
+      222,
+      350,
+      232
+     ],
+     "counter.favorite": [
+      282,
+      182,
+      88,
+      24
+     ]
+    }
+   },
+   "facts": {
+    "url": "/counter-calling/c-3?subId=c-3-1",
+    "title": "臨櫃叫號",
+    "fields": [
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "c-3",
+      "name": "",
+      "label": "選擇地點",
+      "placeholder": "",
+      "value": "c-3-1",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       20,
+       68,
+       350,
+       50
+      ]
+     }
+    ],
+    "starred": [],
+    "errors": [],
+    "buttons": [],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  }
+ ]
+}

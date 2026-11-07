@@ -102,3 +102,6 @@ app.*.map.json
 
 # Former FAQ RAG assets (bge ONNX, ~117 MB). The e5 GGUF and index live outside the repo, see docs/AI_FAQ_RAG.md
 /rag_handoff/assets/
+
+# Guide audit harness (tool/guide_audit, npm install there)
+/tool/guide_audit/node_modules/

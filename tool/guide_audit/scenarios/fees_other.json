@@ -1,0 +1,54 @@
+{
+  "name": "fees_other",
+  "description": "fees.other (entry goal pick_fee + confirm_pay): open 規費, tap 水費, then the water flow.",
+  "page": "fees",
+  "capability": "fees.other",
+  "goals": [],
+  "expect": {
+    "done": true
+  },
+  "actions": [
+    {
+      "step": "pick_fee",
+      "do": "click",
+      "text": "規費"
+    },
+    {
+      "step": "pick_fee",
+      "do": "click",
+      "text": "水費"
+    },
+    {
+      "step": "enter_number",
+      "do": "type",
+      "selector": "#water_number",
+      "value": "1234567890"
+    },
+    {
+      "step": "query_bill",
+      "do": "click",
+      "text": "查詢",
+      "within": ".tab-view"
+    },
+    {
+      "step": "pick_bill",
+      "do": "click",
+      "selector": "label[for=\"B999999999\"]"
+    },
+    {
+      "step": "to_payment",
+      "do": "click",
+      "text": "前往繳費"
+    },
+    {
+      "step": "choose_method",
+      "do": "click",
+      "text": "悠遊付"
+    },
+    {
+      "step": "confirm_pay",
+      "do": "click",
+      "text": "是"
+    }
+  ]
+}

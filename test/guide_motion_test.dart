@@ -221,7 +221,9 @@ void main() {
       await frames(tester, const Duration(milliseconds: 200));
       expect(tickers(tester), 3);
       await endTask(tester, c);
-      expect(tickers(tester), 1, reason: 'card, check, ring all finished');
+      // Card, check and ring all finished; the guide is over, so the
+      // enlarged penguin breathes again (Variant E) next to the dodge.
+      expect(tickers(tester), 2, reason: 'dodge tracker + penguin breath');
       expect(tester.takeException(), isNull);
     });
 

@@ -1,0 +1,24 @@
+{
+  "name": "fees_course",
+  "description": "fees.course (公訓處自費課程, fee-11) default goal: 繳費編號, 查詢, tick, 前往繳費, 智慧支付平台, 是.",
+  "page": "fees",
+  "capability": "fees.course",
+  "goals": [],
+  "expect": {
+    "done": false
+  },
+  "actions": [
+    {
+      "step": "enter_number",
+      "do": "type",
+      "selector": "#payment_number",
+      "value": "TEST0001"
+    },
+    {
+      "step": "query_bill",
+      "do": "click",
+      "text": "查詢",
+      "within": ".tab-view"
+    }
+  ]
+}

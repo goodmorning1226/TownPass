@@ -21,6 +21,18 @@ class GuideMotion {
   /// Repeating hints (breathing ring, bobbing arrow): one full cycle.
   static const Duration loop = Duration(milliseconds: 1400);
 
+  /// The 助理 button growing to (or back from) its enlarged size.
+  static const Duration fabResize = Duration(milliseconds: 250);
+
+  /// The enlarged 助理 button's breathing: one full in-and-out cycle.
+  static const Duration fabBreath = Duration(seconds: 3);
+
+  /// Size of the 助理 button when it is not guiding (56 → ~72px).
+  static const double fabEnlarged = 1.28;
+
+  /// Extra scale at the top of a breath, on top of [fabEnlarged].
+  static const double fabBreathScale = 1.06;
+
   static const Curve enter = Curves.easeOutCubic;
   static const Curve exit = Curves.easeInCubic;
   static const Curve move = Curves.easeInOutCubic;

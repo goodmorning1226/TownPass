@@ -1,0 +1,455 @@
+{
+ "name": "fees_other_tax",
+ "description": "fees.other: 稅費 -> 地方稅 (tax-1) redirects to /fee-payment/scan (camera only, no guide for it). The pick_fee step is current again on the scan page: dimmed screen, card asks for a 大類 that is not there.",
+ "page": "fees",
+ "start": null,
+ "capability": "fees.other",
+ "goals": [],
+ "expect": {
+  "done": false
+ },
+ "recordedAt": "2026-11-07T18:34:11.723Z",
+ "durationMs": 4332,
+ "viewport": {
+  "width": 390,
+  "height": 844,
+  "deviceScaleFactor": 3,
+  "isMobile": true,
+  "hasTouch": true
+ },
+ "failed": null,
+ "steps": [
+  {
+   "action": null,
+   "before": null,
+   "after": {
+    "path": "/fee-payment/others/",
+    "query": {},
+    "flags": {
+     "feeName": "",
+     "firstTab": "",
+     "onInputTab": false,
+     "hasFields": false,
+     "filled": false,
+     "fieldKind": "",
+     "fieldName": "",
+     "fieldHint": "",
+     "fieldChoices": "",
+     "alert": false,
+     "alertText": "",
+     "groupOpen": false,
+     "bills": 0,
+     "selected": 0,
+     "total": "",
+     "amount": "",
+     "payEnabled": false,
+     "methodsBelow": false,
+     "payConfirm": false,
+     "paid": false,
+     "paidMethod": "",
+     "noRecords": false,
+     "filtered": false,
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "fees.fee_groups",
+     "fees.fee_search"
+    ],
+    "rects": {
+     "fees.fee_groups": [
+      16,
+      84,
+      358,
+      204
+     ],
+     "fees.fee_search": [
+      16,
+      16,
+      358,
+      44
+     ]
+    }
+   },
+   "facts": {
+    "url": "/fee-payment/others/",
+    "title": "其他",
+    "fields": [
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "",
+      "name": "",
+      "label": "",
+      "placeholder": "搜尋項目名稱",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       16,
+       314,
+       44
+      ]
+     }
+    ],
+    "starred": [],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "規費",
+      "disabled": false,
+      "rect": [
+       16,
+       84,
+       358,
+       24
+      ]
+     },
+     {
+      "text": "稅費",
+      "disabled": false,
+      "rect": [
+       16,
+       144,
+       358,
+       24
+      ]
+     },
+     {
+      "text": "罰鍰",
+      "disabled": false,
+      "rect": [
+       16,
+       204,
+       358,
+       24
+      ]
+     },
+     {
+      "text": "金門縣政府",
+      "disabled": false,
+      "rect": [
+       16,
+       264,
+       358,
+       24
+      ]
+     }
+    ],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  },
+  {
+   "action": {
+    "step": "pick_fee",
+    "do": "click",
+    "text": "稅費",
+    "hit": {
+     "x": 195,
+     "y": 156,
+     "targets": [
+      "fees.fee_groups"
+     ]
+    }
+   },
+   "before": {
+    "path": "/fee-payment/others/",
+    "query": {},
+    "flags": {
+     "feeName": "",
+     "firstTab": "",
+     "onInputTab": false,
+     "hasFields": false,
+     "filled": false,
+     "fieldKind": "",
+     "fieldName": "",
+     "fieldHint": "",
+     "fieldChoices": "",
+     "alert": false,
+     "alertText": "",
+     "groupOpen": false,
+     "bills": 0,
+     "selected": 0,
+     "total": "",
+     "amount": "",
+     "payEnabled": false,
+     "methodsBelow": false,
+     "payConfirm": false,
+     "paid": false,
+     "paidMethod": "",
+     "noRecords": false,
+     "filtered": false,
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "fees.fee_groups",
+     "fees.fee_search"
+    ],
+    "rects": {
+     "fees.fee_groups": [
+      16,
+      84,
+      358,
+      204
+     ],
+     "fees.fee_search": [
+      16,
+      16,
+      358,
+      44
+     ]
+    }
+   },
+   "after": {
+    "path": "/fee-payment/others/",
+    "query": {},
+    "flags": {
+     "feeName": "",
+     "firstTab": "",
+     "onInputTab": false,
+     "hasFields": false,
+     "filled": false,
+     "fieldKind": "",
+     "fieldName": "",
+     "fieldHint": "",
+     "fieldChoices": "",
+     "alert": false,
+     "alertText": "",
+     "groupOpen": true,
+     "bills": 0,
+     "selected": 0,
+     "total": "",
+     "amount": "",
+     "payEnabled": false,
+     "methodsBelow": false,
+     "payConfirm": false,
+     "paid": false,
+     "paidMethod": "",
+     "noRecords": false,
+     "filtered": false,
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "fees.fee_groups",
+     "fees.fee_items",
+     "fees.fee_search"
+    ],
+    "rects": {
+     "fees.fee_groups": [
+      16,
+      84,
+      358,
+      244
+     ],
+     "fees.fee_items": [
+      19,
+      188,
+      355,
+      24
+     ],
+     "fees.fee_search": [
+      16,
+      16,
+      358,
+      44
+     ]
+    }
+   },
+   "facts": {
+    "url": "/fee-payment/others/",
+    "title": "其他",
+    "fields": [
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "",
+      "name": "",
+      "label": "",
+      "placeholder": "搜尋項目名稱",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       16,
+       314,
+       44
+      ]
+     }
+    ],
+    "starred": [],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "規費",
+      "disabled": false,
+      "rect": [
+       16,
+       84,
+       358,
+       24
+      ]
+     },
+     {
+      "text": "稅費",
+      "disabled": false,
+      "rect": [
+       16,
+       144,
+       358,
+       24
+      ]
+     },
+     {
+      "text": "罰鍰",
+      "disabled": false,
+      "rect": [
+       16,
+       244,
+       358,
+       24
+      ]
+     },
+     {
+      "text": "金門縣政府",
+      "disabled": false,
+      "rect": [
+       16,
+       304,
+       358,
+       24
+      ]
+     }
+    ],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  },
+  {
+   "action": {
+    "step": "pick_fee",
+    "do": "click",
+    "text": "地方稅",
+    "hit": {
+     "x": 197,
+     "y": 200,
+     "targets": [
+      "fees.fee_groups",
+      "fees.fee_items"
+     ]
+    }
+   },
+   "before": {
+    "path": "/fee-payment/others/",
+    "query": {},
+    "flags": {
+     "feeName": "",
+     "firstTab": "",
+     "onInputTab": false,
+     "hasFields": false,
+     "filled": false,
+     "fieldKind": "",
+     "fieldName": "",
+     "fieldHint": "",
+     "fieldChoices": "",
+     "alert": false,
+     "alertText": "",
+     "groupOpen": true,
+     "bills": 0,
+     "selected": 0,
+     "total": "",
+     "amount": "",
+     "payEnabled": false,
+     "methodsBelow": false,
+     "payConfirm": false,
+     "paid": false,
+     "paidMethod": "",
+     "noRecords": false,
+     "filtered": false,
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "fees.fee_groups",
+     "fees.fee_items",
+     "fees.fee_search"
+    ],
+    "rects": {
+     "fees.fee_groups": [
+      16,
+      84,
+      358,
+      244
+     ],
+     "fees.fee_items": [
+      19,
+      188,
+      355,
+      24
+     ],
+     "fees.fee_search": [
+      16,
+      16,
+      358,
+      44
+     ]
+    }
+   },
+   "after": {
+    "path": "/fee-payment/scan",
+    "query": {},
+    "flags": {
+     "feeName": "",
+     "firstTab": "",
+     "onInputTab": false,
+     "hasFields": false,
+     "filled": false,
+     "fieldKind": "",
+     "fieldName": "",
+     "fieldHint": "",
+     "fieldChoices": "",
+     "alert": false,
+     "alertText": "",
+     "groupOpen": false,
+     "bills": 0,
+     "selected": 0,
+     "total": "",
+     "amount": "",
+     "payEnabled": false,
+     "methodsBelow": false,
+     "payConfirm": false,
+     "paid": false,
+     "paidMethod": "",
+     "noRecords": false,
+     "filtered": false,
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [],
+    "rects": {}
+   },
+   "facts": {
+    "url": "/fee-payment/scan",
+    "title": "掃描",
+    "fields": [],
+    "starred": [],
+    "errors": [],
+    "buttons": [],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  }
+ ]
+}

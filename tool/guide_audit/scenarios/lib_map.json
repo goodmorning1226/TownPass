@@ -1,0 +1,6 @@
+{
+  "name": "lib_map",
+  "description": "Goal open_map (capability library), app way: tap 分館地圖.",
+  "page": "library", "capability": "library", "goals": ["open_map"], "expect": { "done": true },
+  "actions": [ { "step": "open_map", "do": "click", "text": "分館地圖" } ]
+}

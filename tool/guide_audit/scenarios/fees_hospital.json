@@ -1,0 +1,24 @@
+{
+  "name": "fees_hospital",
+  "description": "fees.hospital (fee-9) default goal, following the cards literally: 證件號碼 (test A123456789), then the card says type 「1912-01-01」 into the 出生日期 box, but it is a readonly date picker (typing does nothing; tapping opens a calendar on the current month).",
+  "page": "fees",
+  "capability": "fees.hospital",
+  "goals": [],
+  "expect": {
+    "done": false
+  },
+  "actions": [
+    {
+      "step": "enter_number",
+      "do": "type",
+      "selector": "#tax_id",
+      "value": "A123456789"
+    },
+    {
+      "step": "enter_number",
+      "do": "type",
+      "selector": ".tab-view input[readonly]",
+      "value": "1912-01-01"
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "name": "cc_goal_open_favorite_empty",
+  "description": "reservation, goal open_favorite on a fresh page (no 常用地點 yet).",
+  "page": "counter_calling",
+  "capability": "reservation",
+  "goals": [
+    "open_favorite"
+  ],
+  "expect": {
+    "done": true
+  },
+  "actions": [
+    {
+      "step": "open_favorite",
+      "do": "click",
+      "text": "戶政事務所"
+    }
+  ]
+}

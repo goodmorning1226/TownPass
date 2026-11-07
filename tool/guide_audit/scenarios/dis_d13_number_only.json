@@ -1,0 +1,24 @@
+{
+  "name": "dis_d13_number_only",
+  "description": "路燈故障 app-opened: the user fills only 路燈傾倒(失明盞) (accepted by the page as 災情描述); the describe card keeps asking for a tick.",
+  "page": "disaster_report",
+  "capability": "disasterReport.form.D-1-3",
+  "goals": [],
+  "expect": {
+    "done": false
+  },
+  "actions": [
+    {
+      "step": "enter_location",
+      "do": "type",
+      "selector": "#location",
+      "value": "臺北市信義區市府路1號"
+    },
+    {
+      "step": "describe_disaster",
+      "do": "type",
+      "selector": "#street_lamp_lost",
+      "value": "2"
+    }
+  ]
+}

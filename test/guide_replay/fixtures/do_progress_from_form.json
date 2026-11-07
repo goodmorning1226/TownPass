@@ -1,0 +1,1090 @@
+{
+ "name": "do_progress_from_form",
+ "description": "check_progress while the user is still on a form (/form/a-1 loaded directly, capability districtOffice.progress): the card sends them back with 上一步, then to 查詢.",
+ "page": "district_office",
+ "start": "/form/a-1",
+ "capability": "districtOffice.progress",
+ "goals": [],
+ "expect": {
+  "done": true
+ },
+ "recordedAt": "2026-11-07T18:23:42.997Z",
+ "durationMs": 4550,
+ "viewport": {
+  "width": 390,
+  "height": 844,
+  "deviceScaleFactor": 3,
+  "isMobile": true,
+  "hasTouch": true
+ },
+ "failed": null,
+ "steps": [
+  {
+   "action": null,
+   "before": null,
+   "after": {
+    "path": "/form/a-1",
+    "query": {},
+    "flags": {
+     "tab": "",
+     "query": "",
+     "groupCount": 0,
+     "itemCount": 0,
+     "firstItem": "",
+     "noResult": false,
+     "step1": true,
+     "step2": false,
+     "formSeen": true,
+     "basicKind": "text",
+     "basicName": "電子信箱",
+     "basicHint": "請輸入電子信箱",
+     "basicChoices": "",
+     "basicOpts": 0,
+     "basicOpen": true,
+     "basicTyping": false,
+     "serviceKind": "text",
+     "serviceName": "違規駕駛人姓名",
+     "serviceHint": "請輸入違規駕駛人姓名",
+     "serviceChoices": "",
+     "serviceOpts": 0,
+     "serviceOpen": true,
+     "serviceTyping": false,
+     "multiEmpty": true,
+     "multiName": "申訴項目",
+     "dateEmpty": true,
+     "dateName": "肇事日期",
+     "itemsDialog": false,
+     "itemsTicked": 0,
+     "itemsChoices": "",
+     "calendar": false,
+     "calTitle": "",
+     "warn": "",
+     "consentChoice": "",
+     "submitted": false,
+     "consentRead": false,
+     "situation": "",
+     "activeCount": null,
+     "closedCount": null,
+     "caseCount": 0,
+     "firstCase": "",
+     "firstStatus": "",
+     "pos.district.tab_apply": "",
+     "pos.district.tab_query": "",
+     "pos.district.search": "",
+     "pos.district.groups": "",
+     "pos.district.items": "",
+     "pos.district.basic_head": "124,148,in",
+     "pos.district.service_head": "576,600,in",
+     "pos.district.basic_field": "200,244,in",
+     "pos.district.service_field": "652,696,in",
+     "pos.district.multi_field": "840,884,below",
+     "pos.district.date_field": "1252,1296,below",
+     "pos.district.item_options": "",
+     "pos.district.item_ok": "",
+     "pos.district.calendar": "",
+     "pos.district.next": "1316,1366,below",
+     "pos.district.prev": "1316,1366,below",
+     "pos.district.consent_text": "",
+     "pos.district.consent": "",
+     "pos.district.edit": "",
+     "pos.district.submit": "",
+     "pos.district.ok": "",
+     "pos.district.situation": "",
+     "pos.district.cases": "",
+     "pos.district.closed_tab": "",
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "district.basic_field",
+     "district.basic_head",
+     "district.service_field",
+     "district.service_head"
+    ],
+    "rects": {
+     "district.basic_head": [
+      16,
+      124,
+      358,
+      24
+     ],
+     "district.service_head": [
+      16,
+      576,
+      358,
+      24
+     ],
+     "district.basic_field": [
+      16,
+      200,
+      358,
+      44
+     ],
+     "district.service_field": [
+      16,
+      652,
+      358,
+      44
+     ]
+    }
+   },
+   "facts": {
+    "url": "/form/a-1",
+    "title": "申辦服務",
+    "fields": [
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "mail",
+      "name": "",
+      "label": "電子信箱 *",
+      "placeholder": "請輸入電子信箱",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       200,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "county",
+      "name": "",
+      "label": "縣市 *",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       292,
+       358,
+       48
+      ]
+     },
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "city",
+      "name": "",
+      "label": "鄉鎮(市)區 *",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       388,
+       358,
+       48
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "address",
+      "name": "",
+      "label": "通訊地址 *",
+      "placeholder": "請輸入通訊地址",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       484,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "name",
+      "name": "",
+      "label": "違規駕駛人姓名 *",
+      "placeholder": "請輸入違規駕駛人姓名",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       652,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "agency",
+      "name": "",
+      "label": "承辦機關 *",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       744,
+       358,
+       48
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "",
+      "name": "",
+      "label": "申訴項目 *",
+      "placeholder": "",
+      "value": "請選擇申訴項目",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       840,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "radio",
+      "id": "send_by_mailY",
+      "name": "send_by_mail",
+      "label": "是",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       932,
+       0,
+       0
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "radio",
+      "id": "send_by_mailN",
+      "name": "send_by_mail",
+      "label": "否",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       76,
+       932,
+       0,
+       0
+      ]
+     },
+     {
+      "tag": "textarea",
+      "type": "textarea",
+      "id": "content",
+      "name": "",
+      "label": "申訴內容 *",
+      "placeholder": "人、事、時、地、物 4000字以內",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       1004,
+       358,
+       128
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "checkbox",
+      "id": "現場圖",
+      "name": "",
+      "label": "現場圖",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       1192,
+       0,
+       0
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "checkbox",
+      "id": "現場照片",
+      "name": "",
+      "label": "現場照片",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       94,
+       1192,
+       0,
+       0
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "",
+      "name": "",
+      "label": "肇事日期*",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       1252,
+       358,
+       44
+      ]
+     }
+    ],
+    "starred": [
+     "電子信箱",
+     "縣市",
+     "鄉鎮(市)區",
+     "通訊地址",
+     "違規駕駛人姓名",
+     "承辦機關",
+     "申訴項目",
+     "以E-MAIL寄發",
+     "申訴內容",
+     "申請表單",
+     "肇事日期"
+    ],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "基本資料",
+      "disabled": false,
+      "rect": [
+       16,
+       124,
+       358,
+       24
+      ]
+     },
+     {
+      "text": "申辦服務資料",
+      "disabled": false,
+      "rect": [
+       16,
+       576,
+       358,
+       24
+      ]
+     },
+     {
+      "text": "上一步",
+      "disabled": false,
+      "rect": [
+       8,
+       1316,
+       183,
+       50
+      ]
+     },
+     {
+      "text": "下一步",
+      "disabled": false,
+      "rect": [
+       199,
+       1316,
+       183,
+       50
+      ]
+     }
+    ],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 1398
+   }
+  },
+  {
+   "action": {
+    "step": "check_progress",
+    "do": "click",
+    "text": "上一步",
+    "hit": {
+     "x": 100,
+     "y": 787,
+     "targets": [
+      "district.prev"
+     ]
+    }
+   },
+   "before": {
+    "path": "/form/a-1",
+    "query": {},
+    "flags": {
+     "tab": "",
+     "query": "",
+     "groupCount": 0,
+     "itemCount": 0,
+     "firstItem": "",
+     "noResult": false,
+     "step1": true,
+     "step2": false,
+     "formSeen": true,
+     "basicKind": "text",
+     "basicName": "電子信箱",
+     "basicHint": "請輸入電子信箱",
+     "basicChoices": "",
+     "basicOpts": 0,
+     "basicOpen": true,
+     "basicTyping": false,
+     "serviceKind": "text",
+     "serviceName": "違規駕駛人姓名",
+     "serviceHint": "請輸入違規駕駛人姓名",
+     "serviceChoices": "",
+     "serviceOpts": 0,
+     "serviceOpen": true,
+     "serviceTyping": false,
+     "multiEmpty": true,
+     "multiName": "申訴項目",
+     "dateEmpty": true,
+     "dateName": "肇事日期",
+     "itemsDialog": false,
+     "itemsTicked": 0,
+     "itemsChoices": "",
+     "calendar": false,
+     "calTitle": "",
+     "warn": "",
+     "consentChoice": "",
+     "submitted": false,
+     "consentRead": false,
+     "situation": "",
+     "activeCount": null,
+     "closedCount": null,
+     "caseCount": 0,
+     "firstCase": "",
+     "firstStatus": "",
+     "pos.district.tab_apply": "",
+     "pos.district.tab_query": "",
+     "pos.district.search": "",
+     "pos.district.groups": "",
+     "pos.district.items": "",
+     "pos.district.basic_head": "-430,-406,above",
+     "pos.district.service_head": "22,46,in",
+     "pos.district.basic_field": "-354,-310,above",
+     "pos.district.service_field": "98,142,in",
+     "pos.district.multi_field": "286,330,in",
+     "pos.district.date_field": "698,742,in",
+     "pos.district.item_options": "",
+     "pos.district.item_ok": "",
+     "pos.district.calendar": "",
+     "pos.district.next": "762,812,in",
+     "pos.district.prev": "762,812,in",
+     "pos.district.consent_text": "",
+     "pos.district.consent": "",
+     "pos.district.edit": "",
+     "pos.district.submit": "",
+     "pos.district.ok": "",
+     "pos.district.situation": "",
+     "pos.district.cases": "",
+     "pos.district.closed_tab": "",
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "district.date_field",
+     "district.multi_field",
+     "district.next",
+     "district.prev",
+     "district.service_field",
+     "district.service_head"
+    ],
+    "rects": {
+     "district.service_head": [
+      16,
+      22,
+      358,
+      24
+     ],
+     "district.service_field": [
+      16,
+      98,
+      358,
+      44
+     ],
+     "district.multi_field": [
+      16,
+      286,
+      358,
+      44
+     ],
+     "district.date_field": [
+      16,
+      698,
+      358,
+      44
+     ],
+     "district.next": [
+      199,
+      762,
+      183,
+      50
+     ],
+     "district.prev": [
+      8,
+      762,
+      183,
+      50
+     ]
+    }
+   },
+   "after": {
+    "path": "/",
+    "query": {},
+    "flags": {
+     "tab": "申辦",
+     "query": "",
+     "groupCount": 2,
+     "itemCount": 0,
+     "firstItem": "",
+     "noResult": false,
+     "step1": false,
+     "step2": false,
+     "formSeen": false,
+     "basicKind": "",
+     "basicName": "",
+     "basicHint": "",
+     "basicChoices": "",
+     "basicOpts": 0,
+     "basicOpen": true,
+     "basicTyping": false,
+     "serviceKind": "",
+     "serviceName": "",
+     "serviceHint": "",
+     "serviceChoices": "",
+     "serviceOpts": 0,
+     "serviceOpen": true,
+     "serviceTyping": false,
+     "multiEmpty": false,
+     "multiName": "",
+     "dateEmpty": false,
+     "dateName": "",
+     "itemsDialog": false,
+     "itemsTicked": 0,
+     "itemsChoices": "",
+     "calendar": false,
+     "calTitle": "",
+     "warn": "",
+     "consentChoice": "",
+     "submitted": false,
+     "consentRead": false,
+     "situation": "申辦中(2)",
+     "activeCount": 2,
+     "closedCount": 1,
+     "caseCount": 0,
+     "firstCase": "",
+     "firstStatus": "",
+     "pos.district.tab_apply": "8,32,in",
+     "pos.district.tab_query": "8,32,in",
+     "pos.district.search": "59,103,in",
+     "pos.district.groups": "159,243,in",
+     "pos.district.items": "",
+     "pos.district.basic_head": "",
+     "pos.district.service_head": "",
+     "pos.district.basic_field": "",
+     "pos.district.service_field": "",
+     "pos.district.multi_field": "",
+     "pos.district.date_field": "",
+     "pos.district.item_options": "",
+     "pos.district.item_ok": "",
+     "pos.district.calendar": "",
+     "pos.district.next": "",
+     "pos.district.prev": "",
+     "pos.district.consent_text": "",
+     "pos.district.consent": "",
+     "pos.district.edit": "",
+     "pos.district.submit": "",
+     "pos.district.ok": "",
+     "pos.district.situation": "",
+     "pos.district.cases": "",
+     "pos.district.closed_tab": "",
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "district.groups",
+     "district.search",
+     "district.tab_apply",
+     "district.tab_query"
+    ],
+    "rects": {
+     "district.tab_apply": [
+      16,
+      8,
+      179,
+      24
+     ],
+     "district.tab_query": [
+      195,
+      8,
+      179,
+      24
+     ],
+     "district.search": [
+      0,
+      59,
+      390,
+      44
+     ],
+     "district.groups": [
+      16,
+      159,
+      358,
+      84
+     ]
+    }
+   },
+   "facts": {
+    "url": "/",
+    "title": "申辦服務",
+    "fields": [
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "",
+      "name": "",
+      "label": "",
+      "placeholder": "您遇到哪些問題?",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       59,
+       314,
+       44
+      ]
+     }
+    ],
+    "starred": [],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "申辦",
+      "disabled": false,
+      "rect": [
+       16,
+       8,
+       179,
+       24
+      ]
+     },
+     {
+      "text": "查詢",
+      "disabled": false,
+      "rect": [
+       195,
+       8,
+       179,
+       24
+      ]
+     },
+     {
+      "text": "申訴類",
+      "disabled": false,
+      "rect": [
+       16,
+       159,
+       358,
+       24
+      ]
+     },
+     {
+      "text": "補助類",
+      "disabled": false,
+      "rect": [
+       16,
+       219,
+       358,
+       24
+      ]
+     },
+     {
+      "text": "申辦中(2)",
+      "disabled": false,
+      "rect": [
+       406,
+       59,
+       179,
+       30
+      ]
+     },
+     {
+      "text": "已結案(1)",
+      "disabled": false,
+      "rect": [
+       585,
+       59,
+       179,
+       30
+      ]
+     }
+    ],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  },
+  {
+   "action": {
+    "step": "check_progress",
+    "do": "click",
+    "text": "查詢",
+    "hit": {
+     "x": 285,
+     "y": 20,
+     "targets": [
+      "district.tab_query"
+     ]
+    }
+   },
+   "before": {
+    "path": "/",
+    "query": {},
+    "flags": {
+     "tab": "申辦",
+     "query": "",
+     "groupCount": 2,
+     "itemCount": 0,
+     "firstItem": "",
+     "noResult": false,
+     "step1": false,
+     "step2": false,
+     "formSeen": false,
+     "basicKind": "",
+     "basicName": "",
+     "basicHint": "",
+     "basicChoices": "",
+     "basicOpts": 0,
+     "basicOpen": true,
+     "basicTyping": false,
+     "serviceKind": "",
+     "serviceName": "",
+     "serviceHint": "",
+     "serviceChoices": "",
+     "serviceOpts": 0,
+     "serviceOpen": true,
+     "serviceTyping": false,
+     "multiEmpty": false,
+     "multiName": "",
+     "dateEmpty": false,
+     "dateName": "",
+     "itemsDialog": false,
+     "itemsTicked": 0,
+     "itemsChoices": "",
+     "calendar": false,
+     "calTitle": "",
+     "warn": "",
+     "consentChoice": "",
+     "submitted": false,
+     "consentRead": false,
+     "situation": "申辦中(2)",
+     "activeCount": 2,
+     "closedCount": 1,
+     "caseCount": 0,
+     "firstCase": "",
+     "firstStatus": "",
+     "pos.district.tab_apply": "8,32,in",
+     "pos.district.tab_query": "8,32,in",
+     "pos.district.search": "59,103,in",
+     "pos.district.groups": "159,243,in",
+     "pos.district.items": "",
+     "pos.district.basic_head": "",
+     "pos.district.service_head": "",
+     "pos.district.basic_field": "",
+     "pos.district.service_field": "",
+     "pos.district.multi_field": "",
+     "pos.district.date_field": "",
+     "pos.district.item_options": "",
+     "pos.district.item_ok": "",
+     "pos.district.calendar": "",
+     "pos.district.next": "",
+     "pos.district.prev": "",
+     "pos.district.consent_text": "",
+     "pos.district.consent": "",
+     "pos.district.edit": "",
+     "pos.district.submit": "",
+     "pos.district.ok": "",
+     "pos.district.situation": "",
+     "pos.district.cases": "",
+     "pos.district.closed_tab": "",
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "district.groups",
+     "district.search",
+     "district.tab_apply",
+     "district.tab_query"
+    ],
+    "rects": {
+     "district.tab_apply": [
+      16,
+      8,
+      179,
+      24
+     ],
+     "district.tab_query": [
+      195,
+      8,
+      179,
+      24
+     ],
+     "district.search": [
+      0,
+      59,
+      390,
+      44
+     ],
+     "district.groups": [
+      16,
+      159,
+      358,
+      84
+     ]
+    }
+   },
+   "after": {
+    "path": "/",
+    "query": {},
+    "flags": {
+     "tab": "查詢",
+     "query": "",
+     "groupCount": 0,
+     "itemCount": 0,
+     "firstItem": "",
+     "noResult": false,
+     "step1": false,
+     "step2": false,
+     "formSeen": false,
+     "basicKind": "",
+     "basicName": "",
+     "basicHint": "",
+     "basicChoices": "",
+     "basicOpts": 0,
+     "basicOpen": true,
+     "basicTyping": false,
+     "serviceKind": "",
+     "serviceName": "",
+     "serviceHint": "",
+     "serviceChoices": "",
+     "serviceOpts": 0,
+     "serviceOpen": true,
+     "serviceTyping": false,
+     "multiEmpty": false,
+     "multiName": "",
+     "dateEmpty": false,
+     "dateName": "",
+     "itemsDialog": false,
+     "itemsTicked": 0,
+     "itemsChoices": "",
+     "calendar": false,
+     "calTitle": "",
+     "warn": "",
+     "consentChoice": "",
+     "submitted": false,
+     "consentRead": false,
+     "situation": "申辦中(2)",
+     "activeCount": 2,
+     "closedCount": 1,
+     "caseCount": 2,
+     "firstCase": "臺北市路邊停車費重複繳費申請退費",
+     "firstStatus": "待審核",
+     "pos.district.tab_apply": "8,32,in",
+     "pos.district.tab_query": "8,32,in",
+     "pos.district.search": "",
+     "pos.district.groups": "",
+     "pos.district.items": "",
+     "pos.district.basic_head": "",
+     "pos.district.service_head": "",
+     "pos.district.basic_field": "",
+     "pos.district.service_field": "",
+     "pos.district.multi_field": "",
+     "pos.district.date_field": "",
+     "pos.district.item_options": "",
+     "pos.district.item_ok": "",
+     "pos.district.calendar": "",
+     "pos.district.next": "",
+     "pos.district.prev": "",
+     "pos.district.consent_text": "",
+     "pos.district.consent": "",
+     "pos.district.edit": "",
+     "pos.district.submit": "",
+     "pos.district.ok": "",
+     "pos.district.situation": "59,89,in",
+     "pos.district.cases": "105,353,in",
+     "pos.district.closed_tab": "59,89,in",
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "district.cases",
+     "district.closed_tab",
+     "district.situation",
+     "district.tab_apply",
+     "district.tab_query"
+    ],
+    "rects": {
+     "district.tab_apply": [
+      16,
+      8,
+      179,
+      24
+     ],
+     "district.tab_query": [
+      195,
+      8,
+      179,
+      24
+     ],
+     "district.situation": [
+      16,
+      59,
+      358,
+      30
+     ],
+     "district.cases": [
+      16,
+      105,
+      358,
+      248
+     ],
+     "district.closed_tab": [
+      195,
+      59,
+      179,
+      30
+     ]
+    }
+   },
+   "facts": {
+    "url": "/",
+    "title": "申辦服務",
+    "fields": [
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "",
+      "name": "",
+      "label": "",
+      "placeholder": "您遇到哪些問題?",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       -374,
+       59,
+       314,
+       44
+      ]
+     }
+    ],
+    "starred": [],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "申辦",
+      "disabled": false,
+      "rect": [
+       16,
+       8,
+       179,
+       24
+      ]
+     },
+     {
+      "text": "查詢",
+      "disabled": false,
+      "rect": [
+       195,
+       8,
+       179,
+       24
+      ]
+     },
+     {
+      "text": "申訴類",
+      "disabled": false,
+      "rect": [
+       -374,
+       159,
+       358,
+       24
+      ]
+     },
+     {
+      "text": "補助類",
+      "disabled": false,
+      "rect": [
+       -374,
+       219,
+       358,
+       24
+      ]
+     },
+     {
+      "text": "申辦中(2)",
+      "disabled": false,
+      "rect": [
+       16,
+       59,
+       179,
+       30
+      ]
+     },
+     {
+      "text": "已結案(1)",
+      "disabled": false,
+      "rect": [
+       195,
+       59,
+       179,
+       30
+      ]
+     }
+    ],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  }
+ ]
+}

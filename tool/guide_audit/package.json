@@ -1,0 +1,14 @@
+{
+  "name": "townpass-guide-audit",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Records the real TownPass service pages with the guide's own probe script, for Dart replay tests.",
+  "scripts": {
+    "specs": "cd ../.. && fvm flutter test tool/guide_audit/dump_specs_test.dart",
+    "record": "node record.js",
+    "inspect": "node inspect.js"
+  },
+  "dependencies": {
+    "puppeteer-core": "^23.11.1"
+  }
+}

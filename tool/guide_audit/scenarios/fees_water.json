@@ -1,0 +1,44 @@
+{
+  "name": "fees_water",
+  "description": "fees.water default goal (confirm_pay), opened as the app opens it (detail/fee-6 directly; no parents). Type a test 水號, 查詢, tick the bill, 前往繳費, 悠遊付, 是.",
+  "page": "fees",
+  "capability": "fees.water",
+  "goals": [],
+  "expect": {
+    "done": true
+  },
+  "actions": [
+    {
+      "step": "enter_number",
+      "do": "type",
+      "selector": "#water_number",
+      "value": "1234567890"
+    },
+    {
+      "step": "query_bill",
+      "do": "click",
+      "text": "查詢",
+      "within": ".tab-view"
+    },
+    {
+      "step": "pick_bill",
+      "do": "click",
+      "selector": "label[for=\"B999999999\"]"
+    },
+    {
+      "step": "to_payment",
+      "do": "click",
+      "text": "前往繳費"
+    },
+    {
+      "step": "choose_method",
+      "do": "click",
+      "text": "悠遊付"
+    },
+    {
+      "step": "confirm_pay",
+      "do": "click",
+      "text": "是"
+    }
+  ]
+}

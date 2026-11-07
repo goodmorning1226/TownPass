@@ -1,0 +1,9 @@
+{
+  "name": "lib_notices_in_app",
+  "description": "library.notices (goal open_notices), app way (home). Scroll to the bottom as the card says, tap 重要訊息 更多.",
+  "page": "library", "capability": "library.notices", "start": "/library-service/", "goals": [], "expect": { "done": true },
+  "actions": [
+    { "step": "open_notices", "do": "scroll", "to": "bottom" },
+    { "step": "open_notices", "do": "click", "selector": "a[href$=\"notice-list\"]" }
+  ]
+}

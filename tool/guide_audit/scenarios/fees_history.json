@@ -1,0 +1,18 @@
+{
+  "name": "fees_history",
+  "description": "fees.history (filter_history), opened as the app does (history/ directly). The list is empty (近1年; the demo records are from 2024). The card says change 近1年 to 近3年; the user does that.",
+  "page": "fees",
+  "capability": "fees.history",
+  "goals": [],
+  "expect": {
+    "done": true
+  },
+  "actions": [
+    {
+      "step": "filter_history",
+      "do": "select",
+      "selector": "select.base-select",
+      "value": "3"
+    }
+  ]
+}
