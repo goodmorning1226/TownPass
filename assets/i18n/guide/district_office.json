@@ -633,13 +633,6 @@
    "id": "Sudah dibaca! {scroll}“{page:個人資料是否提供給承辦員}” menanyakan: jika petugas memerlukannya untuk menangani kasus, bolehkah mereka meminta untuk melihat data Anda? Layar sudah memilihkan “{page:同意}”; jika Anda tidak ingin petugas meminta data Anda, ketuk “{page:不同意}”.",
    "th": "อ่านคำอธิบายจบแล้ว! {scroll}“{page:個人資料是否提供給承辦員}” ถามว่า เมื่อเจ้าหน้าที่ต้องใช้ในการดำเนินเรื่อง จะขอดูข้อมูลของคุณได้ไหม หน้าจอเลือก “{page:同意}” ไว้ให้แล้ว ถ้าไม่ต้องการให้เจ้าหน้าที่ขอดูข้อมูลของคุณ ให้กด “{page:不同意}”"
   },
-  "資料沒問題，就自己按最下面的「送出」。": {
-   "en": "If the information is fine, tap “{page:送出}” at the bottom yourself.",
-   "ja": "内容に問題なければ、ご自分で一番下の「{page:送出}」を押してください。",
-   "vi": "Nếu thông tin không có vấn đề, hãy tự bấm “{page:送出}” ở dưới cùng.",
-   "id": "Jika datanya sudah benar, ketuk sendiri “{page:送出}” paling bawah.",
-   "th": "ถ้าข้อมูลไม่มีปัญหา กด “{page:送出}” ด้านล่างสุดด้วยตัวเอง"
-  },
   "資料沒問題，就自己按最下面的「送出」；要改就按「修改」。": {
    "en": "If the information is fine, tap “{page:送出}” at the bottom yourself; to change something, tap “{page:修改}”.",
    "ja": "内容に問題なければ、ご自分で一番下の「{page:送出}」を押してください。直すときは「{page:修改}」を押します。",

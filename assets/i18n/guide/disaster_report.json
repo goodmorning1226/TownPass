@@ -3,6 +3,34 @@
  "status": "DRAFT translations (machine-assisted, 2026-11-08), pending native-speaker review. Keys are the Chinese source texts in lib/page/guided_assistant/; keep {name} placeholders; {page:X} shows the page's own word X as the page shows it (translated by PageTranslation).",
  "section": "disaster_report",
  "strings": {
+  "{failed}{scroll}在「災情描述」勾你看到的狀況，至少勾一個。有人受傷、受困，請直接打 119。": {
+   "en": "{failed}{scroll}Under “{page:災情描述}”, tick what you see, at least one. If someone is hurt or trapped, call 119 right away.",
+   "ja": "{failed}{scroll}「{page:災情描述}」で、見た状況にチェックしてください。少なくとも一つです。けが人や閉じ込められた人がいるときは、すぐ 119 に電話してください。",
+   "vi": "{failed}{scroll}Ở “{page:災情描述}”, đánh dấu tình trạng bạn thấy, ít nhất một ô. Có người bị thương hoặc mắc kẹt, hãy gọi ngay 119.",
+   "id": "{failed}{scroll}Di “{page:災情描述}”, centang keadaan yang Anda lihat, minimal satu. Kalau ada yang terluka atau terjebak, langsung telepon 119.",
+   "th": "{failed}{scroll}ที่ “{page:災情描述}” ติ๊กสิ่งที่คุณเห็น อย่างน้อยหนึ่งข้อ ถ้ามีคนบาดเจ็บหรือติดอยู่ ให้โทร 119 ทันที"
+  },
+  "{failed}{scroll}在「災情描述」勾你看到的狀況，至少勾一個，例如「道路」表示影響到馬路。有人受傷、受困，請直接打 119。": {
+   "en": "{failed}{scroll}Under “{page:災情描述}”, tick what you see, at least one. For example, “{page:道路}” means the road is affected. If someone is hurt or trapped, call 119 right away.",
+   "ja": "{failed}{scroll}「{page:災情描述}」で、見た状況にチェックしてください。少なくとも一つです。例えば「{page:道路}」は道路に影響があるという意味です。けが人や閉じ込められた人がいるときは、すぐ 119 に電話してください。",
+   "vi": "{failed}{scroll}Ở “{page:災情描述}”, đánh dấu tình trạng bạn thấy, ít nhất một ô, ví dụ “{page:道路}” nghĩa là ảnh hưởng đến đường. Có người bị thương hoặc mắc kẹt, hãy gọi ngay 119.",
+   "id": "{failed}{scroll}Di “{page:災情描述}”, centang keadaan yang Anda lihat, minimal satu. Misalnya “{page:道路}” berarti jalan terdampak. Kalau ada yang terluka atau terjebak, langsung telepon 119.",
+   "th": "{failed}{scroll}ที่ “{page:災情描述}” ติ๊กสิ่งที่คุณเห็น อย่างน้อยหนึ่งข้อ เช่น “{page:道路}” หมายถึงกระทบถนน ถ้ามีคนบาดเจ็บหรือติดอยู่ ให้โทร 119 ทันที"
+  },
+  "{failed}{scroll}在「災情描述」勾看到的狀況，或填下面的數字（例如沖刷幾根），至少填一項。有人受傷、受困，請直接打 119。": {
+   "en": "{failed}{scroll}Under “{page:災情描述}”, tick what you see or fill in a number below (e.g. how many are scoured), at least one. If someone is hurt or trapped, call 119 right away.",
+   "ja": "{failed}{scroll}「{page:災情描述}」で見た状況にチェックするか、下の数字（例：洗掘された本数）を入力してください。少なくとも一つです。けが人や閉じ込められた人がいるときは、すぐ 119 に電話してください。",
+   "vi": "{failed}{scroll}Ở “{page:災情描述}”, đánh dấu tình trạng bạn thấy hoặc điền số bên dưới (ví dụ số trụ bị xói), ít nhất một mục. Có người bị thương hoặc mắc kẹt, hãy gọi ngay 119.",
+   "id": "{failed}{scroll}Di “{page:災情描述}”, centang keadaan yang Anda lihat atau isi angka di bawah (misalnya berapa yang tergerus), minimal satu. Kalau ada yang terluka atau terjebak, langsung telepon 119.",
+   "th": "{failed}{scroll}ที่ “{page:災情描述}” ติ๊กสิ่งที่เห็น หรือกรอกตัวเลขด้านล่าง (เช่น ถูกกัดเซาะกี่ต้น) อย่างน้อยหนึ่งข้อ ถ้ามีคนบาดเจ็บหรือติดอยู่ ให้โทร 119 ทันที"
+  },
+  "{failed}{scroll}這一頁的「災情描述」沒有可以勾的選項，請在「補充描述」寫看到的狀況，例如「路燈不亮」或「道路被土石擋住」。": {
+   "en": "{failed}{scroll}“{page:災情描述}” on this page has no boxes to tick. Write what you see in “{page:補充描述}”, e.g. “the street light is out” or “the road is blocked by mud and rocks”.",
+   "ja": "{failed}{scroll}このページの「{page:災情描述}」にはチェックする項目がありません。「{page:補充描述}」に見た状況を書いてください。例：「街灯がつかない」「道路が土砂でふさがれている」。",
+   "vi": "{failed}{scroll}“{page:災情描述}” ở trang này không có ô để đánh dấu. Hãy viết tình trạng bạn thấy vào “{page:補充描述}”, ví dụ “đèn đường không sáng” hoặc “đường bị đất đá chặn”.",
+   "id": "{failed}{scroll}“{page:災情描述}” di halaman ini tidak punya kotak untuk dicentang. Tulis keadaan yang Anda lihat di “{page:補充描述}”, misalnya “lampu jalan mati” atau “jalan tertutup tanah dan batu”.",
+   "th": "{failed}{scroll}“{page:災情描述}” ในหน้านี้ไม่มีช่องให้ติ๊ก ให้เขียนสิ่งที่เห็นใน “{page:補充描述}” เช่น “ไฟถนนไม่ติด” หรือ “ถนนถูกดินหินขวางอยู่”"
+  },
   "{fire}{what}點一下框框，打災情發生的地址，例如「臺北市信義區市府路1號」；也可以按框框右邊的定位圖示，直接用你現在的位置。": {
    "en": "{fire}{what}Tap the box and type the address where it happened, e.g. “臺北市信義區市府路1號”. Or tap the location icon on the right of the box to use where you are now.",
    "ja": "{fire}{what}枠をタップして、災害が起きた場所の住所を入力してください。例：「臺北市信義區市府路1號」。枠の右の位置アイコンを押すと、今いる場所をそのまま使えます。",
@@ -24,12 +52,26 @@
    "id": "{note}Sudah dicentang! Sekarang “{page:送出}” bisa ditekan.",
    "th": "{note}ติ๊กแล้ว! ตอนนี้กด “{page:送出}” ได้แล้ว"
   },
+  "「人員傷亡」下面的小方框，點一下就是勾選；也可以在下面的格子填數字，或寫「補充描述」。": {
+   "en": "Tap a small box under “{page:人員傷亡}” to tick it. You can also fill in a number in the boxes below, or write in “{page:補充描述}”.",
+   "ja": "「{page:人員傷亡}」の下の小さな四角をタップするとチェックできます。下の欄に数字を入れたり、「{page:補充描述}」に書いたりしてもかまいません。",
+   "vi": "Chạm vào ô nhỏ dưới “{page:人員傷亡}” là đánh dấu; cũng có thể điền số vào các ô bên dưới, hoặc viết “{page:補充描述}”.",
+   "id": "Ketuk kotak kecil di bawah “{page:人員傷亡}” untuk mencentang. Anda juga bisa mengisi angka di kolom bawah, atau menulis di “{page:補充描述}”.",
+   "th": "แตะช่องเล็กใต้ “{page:人員傷亡}” เพื่อติ๊ก หรือกรอกตัวเลขในช่องด้านล่าง หรือเขียนใน “{page:補充描述}” ก็ได้"
+  },
   "「人員傷亡」和「影響交通」下面的小方框，點一下就是勾選。下面還可以寫「補充描述」或附照片。": {
    "en": "Tap the small boxes under “{page:人員傷亡}” and “{page:影響交通}” to tick them. Below that you can also write “{page:補充描述}” or add photos.",
    "ja": "「{page:人員傷亡}」と「{page:影響交通}」の下の小さな四角をタップするとチェックできます。その下で「{page:補充描述}」を書いたり、写真を付けたりもできます。",
    "vi": "Chạm vào các ô nhỏ dưới “{page:人員傷亡}” và “{page:影響交通}” để đánh dấu. Bên dưới còn có thể viết “{page:補充描述}” hoặc đính kèm ảnh.",
    "id": "Ketuk kotak kecil di bawah “{page:人員傷亡}” dan “{page:影響交通}” untuk mencentang. Di bawahnya Anda juga bisa menulis “{page:補充描述}” atau melampirkan foto.",
    "th": "แตะช่องสี่เหลี่ยมเล็กใต้ “{page:人員傷亡}” และ “{page:影響交通}” เพื่อติ๊ก ด้านล่างยังเขียน “{page:補充描述}” หรือแนบรูปได้"
+  },
+  "「送出」沒有成功，因為還沒填「災情描述」。": {
+   "en": "“{page:送出}” didn’t go through because “{page:災情描述}” is still empty. ",
+   "ja": "「{page:災情描述}」がまだ空なので、「{page:送出}」できませんでした。",
+   "vi": "Chưa gửi được vì “{page:災情描述}” còn trống. ",
+   "id": "“{page:送出}” belum berhasil karena “{page:災情描述}” belum diisi. ",
+   "th": "“{page:送出}” ไม่สำเร็จ เพราะยังไม่ได้กรอก “{page:災情描述}” "
   },
   "「送出」還是灰色的。先勾「提供個人資料給承辦人員」，它才會變成可以按。": {
    "en": "“{page:送出}” is still grey. Tick “{page:提供個人資料給承辦人員}” first, then it can be tapped.",
@@ -59,6 +101,20 @@
    "id": "Anda memilih {cat}. ",
    "th": "คุณเลือก {cat} "
   },
+  "其他(前述以外火災)": {
+   "en": "Other fire",
+   "ja": "その他の火災",
+   "vi": "Đám cháy khác",
+   "id": "Kebakaran lainnya",
+   "th": "ไฟไหม้อื่น ๆ"
+  },
+  "前述以外之橋梁災情": {
+   "en": "Other bridge damage",
+   "ja": "その他の橋の被害",
+   "vi": "Hư hại cầu khác",
+   "id": "Kerusakan jembatan lainnya",
+   "th": "ความเสียหายของสะพานอื่น ๆ"
+  },
   "勾好了！「送出」現在可以按了。": {
    "en": "Ticked! You can tap “{page:送出}” now.",
    "ja": "チェックできました！「{page:送出}」が押せるようになりました。",
@@ -80,6 +136,13 @@
    "id": "Centang keadaan bencana",
    "th": "ติ๊กสภาพภัยพิบัติ"
   },
+  "危險物品火災": {
+   "en": "Hazardous material fire",
+   "ja": "危険物火災",
+   "vi": "Cháy vật liệu nguy hiểm",
+   "id": "Kebakaran bahan berbahaya",
+   "th": "ไฟไหม้วัตถุอันตราย"
+  },
   "同意提供聯絡資料": {
    "en": "Agree to share contact details",
    "ja": "連絡先の提供に同意する",
@@ -100,6 +163,20 @@
    "vi": "Quay lại màn hình Báo cáo thiên tai",
    "id": "Kembali ke layar Laporan bencana",
    "th": "กลับไปที่หน้าจอแจ้งภัยพิบัติ"
+  },
+  "土石崩落": {
+   "en": "Landslide or rockfall",
+   "ja": "土砂崩れ・落石",
+   "vi": "Sạt lở đất đá",
+   "id": "Longsor atau batu jatuh",
+   "th": "ดินถล่มหรือหินร่วง"
+  },
+  "土石流": {
+   "en": "Debris flow",
+   "ja": "土石流",
+   "vi": "Lũ bùn đá",
+   "id": "Aliran debris",
+   "th": "โคลนถล่ม"
   },
   "在「標注災情發生地點」打地址，或按框框右邊的定位圖示。": {
    "en": "Type the address in “{page:標注災情發生地點}”, or tap the location icon on the right of the box.",
@@ -135,6 +212,13 @@
    "vi": "Địa điểm: “{where}”. ",
    "id": "Lokasi: “{where}”. ",
    "th": "สถานที่: “{where}” "
+  },
+  "堰塞湖": {
+   "en": "Landslide dam lake",
+   "ja": "せき止め湖",
+   "vi": "Hồ chắn do sạt lở",
+   "id": "Danau bendungan longsor",
+   "th": "ทะเลสาบจากดินถล่มปิดกั้น"
   },
   "填災情地點": {
    "en": "Fill in the disaster location",
@@ -199,6 +283,20 @@
    "id": "Letaknya di bawah, gulir ke bawah dulu. ",
    "th": "อยู่ด้านล่าง เลื่อนลงก่อน "
   },
+  "工廠火災": {
+   "en": "Factory fire",
+   "ja": "工場火災",
+   "vi": "Cháy nhà máy",
+   "id": "Kebakaran pabrik",
+   "th": "ไฟไหม้โรงงาน"
+  },
+  "建築物火災": {
+   "en": "Building fire",
+   "ja": "建物火災",
+   "vi": "Cháy nhà/công trình",
+   "id": "Kebakaran bangunan",
+   "th": "ไฟไหม้อาคาร"
+  },
   "建議還是把注意事項看完喔。": {
    "en": "It’s still a good idea to read “{page:注意事項}” to the end. ",
    "ja": "「{page:注意事項}」は最後まで読んでおくのがおすすめです。",
@@ -233,6 +331,20 @@
    "vi": "Ở dưới cùng có phần “{page:注意事項}”. Hãy cuộn xuống đọc hết trước nhé. Đọc xong, mình sẽ chỉ bạn bấm vào đâu.",
    "id": "Di paling bawah ada bagian “{page:注意事項}”. Gulir ke bawah dan baca sampai habis dulu. Setelah itu, saya beri tahu bagian yang harus ditekan.",
    "th": "ด้านล่างสุดมีส่วน “{page:注意事項}” เลื่อนลงไปอ่านให้จบก่อน อ่านแล้วจะบอกว่าต้องกดตรงไหน"
+  },
+  "橋樑基礎沖刷": {
+   "en": "Bridge foundation scour",
+   "ja": "橋の基礎の洗掘",
+   "vi": "Xói lở móng cầu",
+   "id": "Gerusan fondasi jembatan",
+   "th": "ฐานสะพานถูกกัดเซาะ"
+  },
+  "橋樑斷裂": {
+   "en": "Broken bridge",
+   "ja": "橋の破断",
+   "vi": "Cầu bị gãy",
+   "id": "Jembatan putus",
+   "th": "สะพานขาด"
   },
   "注意事項是說：承辦人員依法辦案需要時，可以經過申請和主管同意，取得你的個人資料。": {
    "en": "The notes say: when the staff need it to handle the case under the law, they can get your personal data after applying and getting a supervisor’s approval.",
@@ -269,6 +381,13 @@
    "id": "Keadaan bencana sudah dicentang!",
    "th": "ติ๊กสภาพภัยพิบัติเรียบร้อยแล้ว!"
   },
+  "災情狀況填好了！": {
+   "en": "The situation is filled in!",
+   "ja": "災害の状況を入力できました！",
+   "vi": "Đã điền xong tình trạng thiên tai!",
+   "id": "Keadaan bencana sudah diisi!",
+   "th": "กรอกสภาพภัยพิบัติเรียบร้อยแล้ว!"
+  },
   "災情通報": {
    "en": "Disaster report",
    "ja": "災害通報",
@@ -303,6 +422,20 @@
    "vi": "Thấy đèn đường hỏng, mất điện, sự cố cầu hoặc sạt lở đất, bạn có thể báo ở đây: chọn loại thiên tai, điền địa điểm và tình trạng, rồi gửi. Có người bị thương hoặc nguy hiểm ngay lập tức, hãy gọi ngay 119.",
    "id": "Kalau melihat lampu jalan rusak, listrik padam, kerusakan jembatan, atau tanah longsor, Anda bisa melaporkannya di sini: pilih kategori bencana, isi lokasi dan keadaannya, lalu kirim. Kalau ada yang terluka atau ada bahaya langsung, segera telepon 119.",
    "th": "ถ้าเห็นไฟถนนเสีย ไฟดับ สะพานเสียหาย หรือดินถล่ม แจ้งได้ที่นี่ เลือกหมวดหมู่ภัย กรอกสถานที่และสภาพ แล้วส่ง ถ้ามีคนบาดเจ็บหรือมีอันตรายเฉพาะหน้า ให้โทร 119 ทันที"
+  },
+  "變電所、電廠受災": {
+   "en": "Substation or power plant damage",
+   "ja": "変電所・発電所の被害",
+   "vi": "Trạm biến áp hoặc nhà máy điện bị hư hại",
+   "id": "Gardu atau pembangkit listrik rusak",
+   "th": "สถานีไฟฟ้าย่อยหรือโรงไฟฟ้าเสียหาย"
+  },
+  "路燈故障": {
+   "en": "Broken street light",
+   "ja": "街灯の故障",
+   "vi": "Đèn đường bị hỏng",
+   "id": "Lampu jalan rusak",
+   "th": "ไฟถนนเสีย"
   },
   "這幾個字沒有找到。把框框裡的字刪掉，再按右邊的放大鏡，清單就會回來，從清單選比較好找。": {
    "en": "Nothing was found for those words. Delete the words in the box and tap the magnifying glass on the right; the list will come back, and picking from the list is easier.",
@@ -346,6 +479,13 @@
    "id": "Pilih kategori bencana",
    "th": "เลือกหมวดหมู่ภัยพิบัติ"
   },
+  "還沒填災情描述，請往上滑，勾一個狀況或寫補充描述。": {
+   "en": "“{page:災情描述}” isn’t filled in yet. Scroll up and tick one item or write in “{page:補充描述}”.",
+   "ja": "「{page:災情描述}」がまだです。上にスクロールして、状況を一つチェックするか「{page:補充描述}」を書いてください。",
+   "vi": "Chưa điền “{page:災情描述}”. Hãy cuộn lên, đánh dấu một tình trạng hoặc viết “{page:補充描述}”.",
+   "id": "“{page:災情描述}” belum diisi. Gulir ke atas lalu centang satu keadaan atau tulis “{page:補充描述}”.",
+   "th": "ยังไม่ได้กรอก “{page:災情描述}” เลื่อนขึ้นไป ติ๊กหนึ่งข้อหรือเขียน “{page:補充描述}”"
+  },
   "開啟災情通報": {
    "en": "Open Disaster report",
    "ja": "災害通報を開く",
@@ -353,47 +493,19 @@
    "id": "Buka Laporan bencana",
    "th": "เปิดแจ้งภัยพิบัติ"
   },
-  "點最符合的那一項，例如「路燈故障」或「電力停電」。沒有一樣的，就選最接近的。": {
-   "en": "Tap the item that fits best, e.g. “{page:路燈故障}” or “{page:電力停電}”. If none is exactly right, pick the closest.",
-   "ja": "一番合う項目をタップしてください。例：「{page:路燈故障}」や「{page:電力停電}」。同じものがなければ、一番近いものを選んでください。",
-   "vi": "Chạm vào mục phù hợp nhất, ví dụ “{page:路燈故障}” hoặc “{page:電力停電}”. Không có mục giống hệt thì chọn mục gần nhất.",
-   "id": "Ketuk item yang paling cocok, misalnya “{page:路燈故障}” atau “{page:電力停電}”. Kalau tidak ada yang sama persis, pilih yang paling mirip.",
-   "th": "แตะรายการที่ตรงที่สุด เช่น “{page:路燈故障}” หรือ “{page:電力停電}” ถ้าไม่มีที่ตรงเป๊ะ ให้เลือกอันที่ใกล้เคียงที่สุด"
+  "電力停電": {
+   "en": "Power outage",
+   "ja": "停電",
+   "vi": "Mất điện",
+   "id": "Listrik padam",
+   "th": "ไฟฟ้าดับ"
   },
-  "{failed}{scroll}在「災情描述」勾你看到的狀況，至少勾一個，例如「道路」表示影響到馬路。有人受傷、受困，請直接打 119。": {
-   "en": "{failed}{scroll}Under “{page:災情描述}”, tick what you see, at least one. For example, “{page:道路}” means the road is affected. If someone is hurt or trapped, call 119 right away.",
-   "ja": "{failed}{scroll}「{page:災情描述}」で、見た状況にチェックしてください。少なくとも一つです。例えば「{page:道路}」は道路に影響があるという意味です。けが人や閉じ込められた人がいるときは、すぐ 119 に電話してください。",
-   "vi": "{failed}{scroll}Ở “{page:災情描述}”, đánh dấu tình trạng bạn thấy, ít nhất một ô, ví dụ “{page:道路}” nghĩa là ảnh hưởng đến đường. Có người bị thương hoặc mắc kẹt, hãy gọi ngay 119.",
-   "id": "{failed}{scroll}Di “{page:災情描述}”, centang keadaan yang Anda lihat, minimal satu. Misalnya “{page:道路}” berarti jalan terdampak. Kalau ada yang terluka atau terjebak, langsung telepon 119.",
-   "th": "{failed}{scroll}ที่ “{page:災情描述}” ติ๊กสิ่งที่คุณเห็น อย่างน้อยหนึ่งข้อ เช่น “{page:道路}” หมายถึงกระทบถนน ถ้ามีคนบาดเจ็บหรือติดอยู่ ให้โทร 119 ทันที"
-  },
-  "災情狀況填好了！": {
-   "en": "The situation is filled in!",
-   "ja": "災害の状況を入力できました！",
-   "vi": "Đã điền xong tình trạng thiên tai!",
-   "id": "Keadaan bencana sudah diisi!",
-   "th": "กรอกสภาพภัยพิบัติเรียบร้อยแล้ว!"
-  },
-  "「送出」沒有成功，因為還沒填「災情描述」。": {
-   "en": "“{page:送出}” didn’t go through because “{page:災情描述}” is still empty. ",
-   "ja": "「{page:災情描述}」がまだ空なので、「{page:送出}」できませんでした。",
-   "vi": "Chưa gửi được vì “{page:災情描述}” còn trống. ",
-   "id": "“{page:送出}” belum berhasil karena “{page:災情描述}” belum diisi. ",
-   "th": "“{page:送出}” ไม่สำเร็จ เพราะยังไม่ได้กรอก “{page:災情描述}” "
-  },
-  "{failed}{scroll}在「災情描述」勾看到的狀況，或填下面的數字（例如沖刷幾根），至少填一項。有人受傷、受困，請直接打 119。": {
-   "en": "{failed}{scroll}Under “{page:災情描述}”, tick what you see or fill in a number below (e.g. how many are scoured), at least one. If someone is hurt or trapped, call 119 right away.",
-   "ja": "{failed}{scroll}「{page:災情描述}」で見た状況にチェックするか、下の数字（例：洗掘された本数）を入力してください。少なくとも一つです。けが人や閉じ込められた人がいるときは、すぐ 119 に電話してください。",
-   "vi": "{failed}{scroll}Ở “{page:災情描述}”, đánh dấu tình trạng bạn thấy hoặc điền số bên dưới (ví dụ số trụ bị xói), ít nhất một mục. Có người bị thương hoặc mắc kẹt, hãy gọi ngay 119.",
-   "id": "{failed}{scroll}Di “{page:災情描述}”, centang keadaan yang Anda lihat atau isi angka di bawah (misalnya berapa yang tergerus), minimal satu. Kalau ada yang terluka atau terjebak, langsung telepon 119.",
-   "th": "{failed}{scroll}ที่ “{page:災情描述}” ติ๊กสิ่งที่เห็น หรือกรอกตัวเลขด้านล่าง (เช่น ถูกกัดเซาะกี่ต้น) อย่างน้อยหนึ่งข้อ ถ้ามีคนบาดเจ็บหรือติดอยู่ ให้โทร 119 ทันที"
-  },
-  "{failed}{scroll}在「災情描述」勾你看到的狀況，至少勾一個。有人受傷、受困，請直接打 119。": {
-   "en": "{failed}{scroll}Under “{page:災情描述}”, tick what you see, at least one. If someone is hurt or trapped, call 119 right away.",
-   "ja": "{failed}{scroll}「{page:災情描述}」で、見た状況にチェックしてください。少なくとも一つです。けが人や閉じ込められた人がいるときは、すぐ 119 に電話してください。",
-   "vi": "{failed}{scroll}Ở “{page:災情描述}”, đánh dấu tình trạng bạn thấy, ít nhất một ô. Có người bị thương hoặc mắc kẹt, hãy gọi ngay 119.",
-   "id": "{failed}{scroll}Di “{page:災情描述}”, centang keadaan yang Anda lihat, minimal satu. Kalau ada yang terluka atau terjebak, langsung telepon 119.",
-   "th": "{failed}{scroll}ที่ “{page:災情描述}” ติ๊กสิ่งที่คุณเห็น อย่างน้อยหนึ่งข้อ ถ้ามีคนบาดเจ็บหรือติดอยู่ ให้โทร 119 ทันที"
+  "電線(桿)或纜線受損": {
+   "en": "Damaged power line or pole",
+   "ja": "電線・電柱の損傷",
+   "vi": "Dây điện hoặc cột điện hư hỏng",
+   "id": "Kabel atau tiang listrik rusak",
+   "th": "สายไฟหรือเสาไฟเสียหาย"
   },
   "點一下「補充描述」的框框，寫你看到的狀況，寫完按鍵盤上的「完成」收起鍵盤。": {
    "en": "Tap the “{page:補充描述}” box and write what you see. When done, tap “Done” on the keyboard to put it away.",
@@ -402,26 +514,12 @@
    "id": "Ketuk kotak “{page:補充描述}” dan tulis keadaan yang Anda lihat. Setelah selesai, tekan “Selesai” di keyboard untuk menutupnya.",
    "th": "แตะช่อง “{page:補充描述}” เขียนสิ่งที่เห็น เขียนเสร็จแล้วกด “เสร็จ” บนแป้นพิมพ์เพื่อเก็บแป้นพิมพ์"
   },
-  "「人員傷亡」下面的小方框，點一下就是勾選；也可以在下面的格子填數字，或寫「補充描述」。": {
-   "en": "Tap a small box under “{page:人員傷亡}” to tick it. You can also fill in a number in the boxes below, or write in “{page:補充描述}”.",
-   "ja": "「{page:人員傷亡}」の下の小さな四角をタップするとチェックできます。下の欄に数字を入れたり、「{page:補充描述}」に書いたりしてもかまいません。",
-   "vi": "Chạm vào ô nhỏ dưới “{page:人員傷亡}” là đánh dấu; cũng có thể điền số vào các ô bên dưới, hoặc viết “{page:補充描述}”.",
-   "id": "Ketuk kotak kecil di bawah “{page:人員傷亡}” untuk mencentang. Anda juga bisa mengisi angka di kolom bawah, atau menulis di “{page:補充描述}”.",
-   "th": "แตะช่องเล็กใต้ “{page:人員傷亡}” เพื่อติ๊ก หรือกรอกตัวเลขในช่องด้านล่าง หรือเขียนใน “{page:補充描述}” ก็ได้"
-  },
-  "還沒填災情描述，請往上滑，勾一個狀況或寫補充描述。": {
-   "en": "“{page:災情描述}” isn’t filled in yet. Scroll up and tick one item or write in “{page:補充描述}”.",
-   "ja": "「{page:災情描述}」がまだです。上にスクロールして、状況を一つチェックするか「{page:補充描述}」を書いてください。",
-   "vi": "Chưa điền “{page:災情描述}”. Hãy cuộn lên, đánh dấu một tình trạng hoặc viết “{page:補充描述}”.",
-   "id": "“{page:災情描述}” belum diisi. Gulir ke atas lalu centang satu keadaan atau tulis “{page:補充描述}”.",
-   "th": "ยังไม่ได้กรอก “{page:災情描述}” เลื่อนขึ้นไป ติ๊กหนึ่งข้อหรือเขียน “{page:補充描述}”"
-  },
-  "{failed}{scroll}這一頁的「災情描述」沒有可以勾的選項，請在「補充描述」寫看到的狀況，例如「路燈不亮」或「道路被土石擋住」。": {
-   "en": "{failed}{scroll}“{page:災情描述}” on this page has no boxes to tick. Write what you see in “{page:補充描述}”, e.g. “the street light is out” or “the road is blocked by mud and rocks”.",
-   "ja": "{failed}{scroll}このページの「{page:災情描述}」にはチェックする項目がありません。「{page:補充描述}」に見た状況を書いてください。例：「街灯がつかない」「道路が土砂でふさがれている」。",
-   "vi": "{failed}{scroll}“{page:災情描述}” ở trang này không có ô để đánh dấu. Hãy viết tình trạng bạn thấy vào “{page:補充描述}”, ví dụ “đèn đường không sáng” hoặc “đường bị đất đá chặn”.",
-   "id": "{failed}{scroll}“{page:災情描述}” di halaman ini tidak punya kotak untuk dicentang. Tulis keadaan yang Anda lihat di “{page:補充描述}”, misalnya “lampu jalan mati” atau “jalan tertutup tanah dan batu”.",
-   "th": "{failed}{scroll}“{page:災情描述}” ในหน้านี้ไม่มีช่องให้ติ๊ก ให้เขียนสิ่งที่เห็นใน “{page:補充描述}” เช่น “ไฟถนนไม่ติด” หรือ “ถนนถูกดินหินขวางอยู่”"
+  "點最符合的那一項，例如「路燈故障」或「電力停電」。沒有一樣的，就選最接近的。": {
+   "en": "Tap the item that fits best, e.g. “{page:路燈故障}” or “{page:電力停電}”. If none is exactly right, pick the closest.",
+   "ja": "一番合う項目をタップしてください。例：「{page:路燈故障}」や「{page:電力停電}」。同じものがなければ、一番近いものを選んでください。",
+   "vi": "Chạm vào mục phù hợp nhất, ví dụ “{page:路燈故障}” hoặc “{page:電力停電}”. Không có mục giống hệt thì chọn mục gần nhất.",
+   "id": "Ketuk item yang paling cocok, misalnya “{page:路燈故障}” atau “{page:電力停電}”. Kalau tidak ada yang sama persis, pilih yang paling mirip.",
+   "th": "แตะรายการที่ตรงที่สุด เช่น “{page:路燈故障}” หรือ “{page:電力停電}” ถ้าไม่มีที่ตรงเป๊ะ ให้เลือกอันที่ใกล้เคียงที่สุด"
   }
  }
 }

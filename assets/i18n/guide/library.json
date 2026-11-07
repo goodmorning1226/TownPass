@@ -591,13 +591,6 @@
    "id": "Sudah dipilih! Ketuk “✕” di kanan atas untuk menutup jendela ini.",
    "th": "เลือกแล้ว! กด “✕” มุมขวาบนเพื่อปิดหน้าต่างนี้"
   },
-  "選擇": {
-   "en": "Choose",
-   "ja": "選ぶ",
-   "vi": "Chọn",
-   "id": "Pilih",
-   "th": "เลือก"
-  },
   "選擇取書館": {
    "en": "Choose a pickup library",
    "ja": "受取館を選ぶ",

@@ -297,6 +297,13 @@
    "id": "Sudah tersimpan di dompet tiket. Untuk memakainya sekarang, ketuk “{page:使用優惠}”, dompet tiket Anda akan terbuka.",
    "th": "เก็บเข้ากระเป๋าตั๋วแล้ว ถ้าจะใช้ตอนนี้ แตะ “{page:使用優惠}” กระเป๋าตั๋วของคุณจะเปิดขึ้น"
   },
+  "想看哪一張優惠？點一下那張優惠券。": {
+   "en": "Which deal would you like to see? Tap that coupon.",
+   "ja": "どの特典を見たいですか？そのクーポンを押してください。",
+   "vi": "Bạn muốn xem ưu đãi nào? Bấm vào phiếu giảm giá đó.",
+   "id": "Promo mana yang ingin dilihat? Ketuk kupon itu.",
+   "th": "อยากดูสิทธิพิเศษใบไหน แตะที่คูปองใบนั้น"
+  },
   "想看哪一張優惠？點一下那張優惠券。下面還有，可以往下滑看看。": {
    "en": "Which deal would you like to see? Tap that coupon. There are more below; you can scroll down.",
    "ja": "どの特典を見たいですか？そのクーポンを押してください。下にもまだあるので、スクロールして見られます。",
@@ -730,13 +737,6 @@
    "vi": "Bấm “‹” ở góc trên bên trái để quay lại trang chủ ưu đãi.",
    "id": "Ketuk “‹” di kiri atas untuk kembali ke halaman utama promo.",
    "th": "แตะ “‹” มุมบนซ้ายเพื่อกลับไปที่หน้าแรกสิทธิพิเศษ"
-  },
-  "想看哪一張優惠？點一下那張優惠券。": {
-   "en": "Which deal would you like to see? Tap that coupon.",
-   "ja": "どの特典を見たいですか？そのクーポンを押してください。",
-   "vi": "Bạn muốn xem ưu đãi nào? Bấm vào phiếu giảm giá đó.",
-   "id": "Promo mana yang ingin dilihat? Ketuk kupon itu.",
-   "th": "อยากดูสิทธิพิเศษใบไหน แตะที่คูปองใบนั้น"
   }
  }
 }
