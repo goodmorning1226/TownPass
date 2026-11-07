@@ -771,6 +771,10 @@ void main() {
       expect(c.card, isNull);
       expect(c.messages.last.text, Replies.ended);
       expect(c.probe.running, isFalse);
+      // A plain chat again: no task card, 繼續引導 or step chips.
+      expect(c.task.value, isNull);
+      expect(c.taskTag, isEmpty);
+      expect(c.chips, isNot(contains('下一步要做什麼？')));
     });
 
     test('step help and page help use the pre-written text', () async {

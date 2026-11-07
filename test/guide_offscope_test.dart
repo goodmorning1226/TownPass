@@ -253,7 +253,7 @@ void main() {
       await wait(const Duration(seconds: 1));
       expect(c.offScope.value, isTrue);
       c.endGuide();
-      expect(c.task.value?.status, TaskStatus.ended);
+      expect(c.task.value, isNull);
       expect(c.offScope.value, isFalse);
       await wait(const Duration(seconds: 2));
       expect(c.offScope.value, isFalse);
@@ -309,10 +309,10 @@ void main() {
       expect(c.offScope.value, isFalse);
     });
 
-    run('a pending timer is cancelled when the task ends', (wait) async {
+    run('a pending timer is cancelled when the task pauses', (wait) async {
       show(c.web, otherService);
       await wait(const Duration(milliseconds: 400));
-      c.endGuide();
+      c.pause();
       await wait(const Duration(milliseconds: 100));
       // Resumed while still away: a fresh 800 ms, not the old timer's rest.
       c.resume();
@@ -616,7 +616,7 @@ void main() {
       expect(find.text('你離開了$name'), findsOneWidget);
       await tester.tap(find.text('結束引導'));
       await frames(tester, const Duration(seconds: 1));
-      expect(c.task.value?.status, TaskStatus.ended);
+      expect(c.task.value, isNull);
       expect(find.text('你離開了$name'), findsNothing);
       await finish(tester, c);
     });
