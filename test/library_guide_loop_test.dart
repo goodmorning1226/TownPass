@@ -178,6 +178,44 @@ void main() {
       expect(c.currentTodoText, c.task.value!.guide.todos.last.text);
     });
 
+    test('知道了 on the done card clears the task from the chat', () async {
+      c.startGuide('library');
+      c.routeChanged(TPRoute.webView);
+      show(c.web, home);
+      c.beginSteps();
+      reserveFlow(c.web);
+      await settle();
+      expect(c.card?.variant, CardVariant.done);
+      c.ackDone();
+      expect(c.task.value, isNull);
+      expect(c.todoOpen.value, isFalse);
+      expect(c.card, isNull);
+    });
+
+    test('opening the chat after the last step ends the guide', () async {
+      c.startGuide('library');
+      c.routeChanged(TPRoute.webView);
+      show(c.web, home);
+      c.beginSteps();
+      reserveFlow(c.web);
+      await settle();
+      expect(c.card?.variant, CardVariant.done);
+      c.todoOpen.value = true;
+      c.openSheet();
+      expect(c.sheetOpen.value, isTrue);
+      expect(c.task.value, isNull, reason: 'no task card left in the chat');
+      expect(c.todoOpen.value, isFalse);
+    });
+
+    test('opening the chat mid-guide keeps the task', () async {
+      c.startGuide('library');
+      c.routeChanged(TPRoute.webView);
+      show(c.web, home);
+      c.beginSteps();
+      c.openSheet();
+      expect(c.task.value, isNotNull);
+    });
+
     test('a done card stays when the page undoes the last step', () async {
       // 看可以取的書: done while the 可取書 row is open; closing the row or
       // switching tabs afterwards must not bring the steps back.
