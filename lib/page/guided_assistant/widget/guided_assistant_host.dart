@@ -60,6 +60,11 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
               v.value;
             }
             final media = MediaQuery.of(context);
+            // Typing in a page field: the 助理 button and the arrow would sit
+            // on the field the user is filling in, so they step aside until
+            // the keyboard closes (the ring and the card stay).
+            final typingInPage =
+                media.viewInsets.bottom > 0 && !c.sheetOpen.value;
             final layers = <Widget>[];
             final target = c.highlightTarget;
             if (target != null) {
@@ -70,7 +75,7 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
                     targetId: target,
                     alsoUsable: c.currentStep?.alsoUsable ?? const [],
                     blocking: c.locked,
-                    showArrow: c.showArrow,
+                    showArrow: c.showArrow && !typingInPage,
                     topClear: media.padding.top + 56,
                     onBlockedTap: c.wrongTap,
                   ),
@@ -98,7 +103,9 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
                 ),
               );
             }
-            if (!c.sheetOpen.value) layers.add(_fab(context, c));
+            if (!c.sheetOpen.value && !typingInPage) {
+              layers.add(_fab(context, c));
+            }
             if (hinting) layers.add(_onboardingArrow(context, c));
             if (hinting && stage == OnboardingStage.card) {
               layers.add(_onboardingCard(context, c));
@@ -106,7 +113,9 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
             if (hinting && stage == OnboardingStage.pointer) {
               layers.addAll(_onboardingPointer(context, c));
             }
-            if (c.scrollHintVisible) layers.add(_scrollHint(context));
+            if (c.scrollHintVisible && !typingInPage) {
+              layers.add(_scrollHint(context));
+            }
             final card = c.card;
             if (card != null) layers.add(_guideCard(context, c, card));
             final t = c.task.value;
