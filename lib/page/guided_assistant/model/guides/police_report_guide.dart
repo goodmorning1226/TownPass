@@ -139,7 +139,7 @@ const policeReportPageSpec = WebPageSpec(
     'open': "qa('a[href^=\"/police-report/record/\"]').filter(shown).filter((a) => txt(a).includes('處理中')).length",
     'tab': "txt(q('section.tabs > .tab-label--active'))",
     'status': r"""(() => { const m = orig(q('#app') || document.body).match(/處理中|已結案|已受理/); return m ? m[0] : ''; })()""",
-    'caseNo': r"""(() => { const m = orig(q('#app') || document.body).match(/編號\s*\n+\s*([^\n]+)/); return m ? m[1].trim() : ''; })()""",
+    'caseNo': r"""(() => { const m = orig(q('#app') || document.body).match(/編號\s*\n+\s*(W\d[^\n]*)/); return m ? m[1].trim() : ''; })()""",
   },
   latchFlags: {'reported', 'noticeRead', 'statementRead'},
 );
@@ -157,6 +157,15 @@ int _stage(WebPageState s) {
 }
 
 bool _reported(WebPageState s) => s.latched('reported');
+
+/// A case page loaded straight (reload / deep link): the list passes the case
+/// in memory, so the page shows no 編號 and no status.
+bool _caseEmpty(WebPageState s) =>
+    _stage(s) == 6 &&
+    s.now.text('status').isEmpty &&
+    s.now.text('caseNo').isEmpty;
+
+const _caseEmptyCard = '這筆案件的資料沒有載入。按左上角的「‹」回到報案紀錄，再點一次案件。';
 bool _no(WebPageState s) => false;
 bool _noticeRead(WebPageState s) => s.latched('noticeRead');
 bool _statementRead(WebPageState s) => s.latched('statementRead');
@@ -538,6 +547,7 @@ final List<GuideComponent> policeReportComponents = [
     doneText: '這就是你報案寫的內容！',
     doneDetail: '按左上角的「‹」可以回到報案紀錄。網路報案大約 5 天內回覆（假日順延）。',
     doneTextOf: (s) {
+      if (_caseEmpty(s)) return _caseEmptyCard;
       final status = s.now.text('status');
       final no = s.now.text('caseNo');
       final which = no.isEmpty ? gt('這筆案件') : gt('案件 {no}', {'no': no});
@@ -551,18 +561,26 @@ final List<GuideComponent> policeReportComponents = [
     },
     steps: [
       GuideStep(
-        target: (s) => _stage(s) == 6 ? 'police.tab_detail' : null,
-        alsoUsable: const ['police.back'],
+        // Back on the list, open_record (not done any more) takes over.
+        target: (s) => _caseEmpty(s)
+            ? 'police.back'
+            : _stage(s) == 6
+            ? 'police.tab_detail'
+            : null,
+        alsoUsable: const ['police.back', 'police.tab_detail'],
         label: (_) => '點一下',
         card: (s) {
+          if (_caseEmpty(s)) return _caseEmptyCard;
           final status = s.now.text('status');
           final now = status.isEmpty
               ? ''
               : gt('這筆案件現在是「{status}」。', {'status': pg(status)});
           return gt('{now}上面「回覆」是警察的回覆。點「詳細內容」，可以看你報案時寫的內容。', {'now': now});
         },
-        detail: (_) => '點畫面上方的「詳細內容」。按左上角的「‹」可以回到紀錄清單。',
-        isDone: (s) => _stage(s) == 6 && s.now.text('tab') == '詳細內容',
+        detail: (s) =>
+            _caseEmpty(s) ? _caseEmptyCard : '點畫面上方的「詳細內容」。按左上角的「‹」可以回到紀錄清單。',
+        isDone: (s) =>
+            _stage(s) == 6 && !_caseEmpty(s) && s.now.text('tab') == '詳細內容',
         cardTop: (_) => 300,
       ),
     ],

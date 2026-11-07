@@ -1,0 +1,112 @@
+{
+  "name": "do_c5_direct",
+  "description": "臺北市身心障礙者參加社會保險保險費補助方式變更 (/form/c-5) loaded directly (reload / deep link); the user does only what the cards say for the default plan (submit).",
+  "page": "district_office",
+  "capability": "districtOffice.form.c-5",
+  "start": "/form/c-5",
+  "goals": [],
+  "expect": {
+    "done": true
+  },
+  "actions": [
+    {
+      "step": "fill_basic",
+      "do": "type",
+      "selector": "#mail",
+      "value": "test@example.com"
+    },
+    {
+      "step": "fill_basic",
+      "do": "select",
+      "selector": "#county",
+      "value": "臺北市"
+    },
+    {
+      "step": "fill_basic",
+      "do": "select",
+      "selector": "#city",
+      "value": "信義區"
+    },
+    {
+      "step": "fill_basic",
+      "do": "type",
+      "selector": "#address",
+      "value": "測試路1號"
+    },
+    {
+      "step": "fill_details",
+      "do": "type",
+      "selector": "#name",
+      "value": "王小明"
+    },
+    {
+      "step": "fill_details",
+      "do": "select",
+      "selector": "#agency",
+      "value": "交通事件裁決所"
+    },
+    {
+      "step": "fill_details",
+      "do": "click",
+      "selector": ".base-multiple-select-wrapper input"
+    },
+    {
+      "step": "fill_details",
+      "do": "check",
+      "text": "車禍案件申訴"
+    },
+    {
+      "step": "fill_details",
+      "do": "click",
+      "text": "確認",
+      "within": "[id^=\"headlessui-dialog-panel\"]"
+    },
+    {
+      "step": "fill_details",
+      "do": "click",
+      "selector": "label[for=\"send_by_mailY\"]"
+    },
+    {
+      "step": "fill_details",
+      "do": "type",
+      "selector": "#content",
+      "value": "測試內容"
+    },
+    {
+      "step": "fill_details",
+      "do": "click",
+      "selector": "label[for=\"現場圖\"]"
+    },
+    {
+      "step": "fill_details",
+      "do": "click",
+      "selector": "input[readonly]"
+    },
+    {
+      "step": "fill_details",
+      "do": "click",
+      "selector": ".vc-day:not(.is-not-in-month) .vc-day-content",
+      "nth": 2
+    },
+    {
+      "step": "next_step",
+      "do": "click",
+      "text": "下一步"
+    },
+    {
+      "step": "submit",
+      "do": "scroll",
+      "to": "bottom"
+    },
+    {
+      "step": "submit",
+      "do": "click",
+      "text": "送出"
+    },
+    {
+      "step": "done",
+      "do": "click",
+      "text": "確認"
+    }
+  ]
+}

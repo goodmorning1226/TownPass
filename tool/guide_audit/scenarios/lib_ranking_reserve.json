@@ -1,0 +1,13 @@
+{
+  "name": "lib_ranking_reserve",
+  "description": "Goals open_ranking + reserve (capability library): 更多 on 點閱排行, pick the top book from the list, 取書館, ✕, 預約.",
+  "page": "library", "capability": "library", "goals": ["open_ranking", "reserve"], "expect": { "done": true },
+  "actions": [
+    { "step": "open_ranking", "do": "click", "selector": "a[href$=\"ranking-list\"]" },
+    { "step": "pick_book", "do": "click", "text": "歡迎光臨錢天堂 : 神奇柑仔店大圖鑑" },
+    { "step": "choose_branch", "do": "click", "selector": "div.fixed.bottom-0 .base-select-wrapper" },
+    { "step": "choose_branch", "do": "click", "text": "B12三興", "within": "[id^=headlessui-dialog-panel]" },
+    { "step": "choose_branch", "do": "click", "selector": "[id^=headlessui-dialog-title] button" },
+    { "step": "reserve", "do": "click", "selector": "div.fixed.bottom-0 button.base-button" }
+  ]
+}

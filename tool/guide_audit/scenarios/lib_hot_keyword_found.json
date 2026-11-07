@@ -1,0 +1,13 @@
+{
+  "name": "lib_hot_keyword_found",
+  "description": "Goal hot_keyword only, app way; the user taps the one hot keyword that finds books (神奇柑仔店).",
+  "page": "library",
+  "capability": "library",
+  "goals": ["hot_keyword"],
+  "expect": { "done": true },
+  "actions": [
+    { "step": "open_search", "do": "click", "selector": "a.search-bar" },
+    { "step": "hot_keyword", "do": "click", "text": "神奇柑仔店" },
+    { "step": "done", "do": "click", "text": "歡迎光臨錢天堂 : 神奇柑仔店大圖鑑" }
+  ]
+}

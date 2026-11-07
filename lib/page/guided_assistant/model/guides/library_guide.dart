@@ -41,6 +41,11 @@ const libraryPageSpec = WebPageSpec(
     // The 預約成功 / 預約失敗 dialog, and 查看預約清單 in the failure one.
     'library.reserve_result': "dialog('預約成功') || dialog('預約失敗')",
     'library.reserve_list': "dialogButton('預約失敗', '查看預約清單') || dialog('預約失敗')",
+    // The 冊次 tick boxes (the visible box; the input itself is 0x0).
+    'library.series':
+        "qa('input.base-checkbox[id^=\"lib-series\"]').map((i) => i.parentElement)",
+    // 關閉 in the 提醒 dialog 「…已達上限7冊」.
+    'library.limit_close': "dialogButton('提醒', '關閉')",
   },
   flags: {
     'tab': "orig(q('section.tabs > .tab-label--active'))",
@@ -57,6 +62,14 @@ const libraryPageSpec = WebPageSpec(
     'notReservable': "/不提供預約|不可預約|無法預約|不開放預約/.test(orig(q('#app')))",
     'dialogOpen': "qa('[id^=\"headlessui-dialog-panel\"]').some(shown)",
     'bookTitle': "orig(q('#app .h-screen')).split('\\n').map((l) => l.trim()).find((l) => l) || ''",
+    // 冊次 tick boxes on a book with several 冊次 (none for a single one,
+    // which the page picks by itself), and how many are ticked.
+    'seriesCount': "qa('input.base-checkbox[id^=\"lib-series\"]').length",
+    'seriesTicked': "qa('input.base-checkbox[id^=\"lib-series\"]').filter((i) => i.checked).length",
+    // The 提醒 dialog 「您的已預約及預約冊數，已達上限7冊」 (ticking one too many).
+    'seriesLimit': "(() => { const p = dialog('提醒'); return !!p && orig(p).includes('已達上限'); })()",
+    // The 取書館 select has no library (the list says 目前無取書館與站點).
+    'noBranch': "(() => { const s = q('div.fixed.bottom-0 select'); return !!s && ![...s.options].some((o) => o.value); })()",
     'pickupOpen': "(() => { const b = byText('li > button', '可取書'); const n = b && b.nextElementSibling; return !!n && n.getBoundingClientRect().height > 4; })()",
   },
   latchFlags: {'reserved', 'reserveFailed'},
@@ -74,7 +87,21 @@ bool _tab(WebPageState s, String name) =>
     _onHome(s) && s.now.text('tab') == name;
 bool _no(WebPageState s) => false;
 bool _cannotReserve(WebPageState s) =>
-    _onDetail(s) && s.now.flag('notReservable');
+    _onDetail(s) && (s.now.flag('notReservable') || _noBranch(s));
+bool _noBranch(WebPageState s) => _onDetail(s) && s.now.flag('noBranch');
+
+/// A book with several 冊次 and none ticked: 預約 stays disabled.
+bool _needSeries(WebPageState s) =>
+    _onDetail(s) &&
+    s.now.number('seriesCount') > 0 &&
+    s.now.number('seriesTicked') == 0;
+
+/// The 提醒 dialog: one 冊次 too many was ticked.
+bool _seriesLimit(WebPageState s) => _onDetail(s) && s.now.flag('seriesLimit');
+
+/// The search page answered 查無資料.
+bool _noBooks(WebPageState s) =>
+    _searched(s) && s.now.number('results') == 0;
 
 /// The page answered the 預約 (預約成功 / 預約失敗 was shown; latched). The
 /// steps before it stay done: the dialog's 返回首頁 / 查看預約清單 go to the
@@ -84,6 +111,16 @@ bool _answered(WebPageState s) =>
     s.latched('reserved') || s.latched('reserveFailed');
 
 const _cannotReserveCard = '這本書不能預約喔，頁面上寫「本館藏不提供預約」。按左上角的「‹」回上一頁，換一本書看看。';
+
+String _cannotReserveCardOf(WebPageState s) {
+  if (!_noBranch(s)) return _cannotReserveCard;
+  return s.now.flag('branchList')
+      ? '這本書現在沒有可以取書的圖書館。按右上角「✕」關掉，再按左上角「‹」換一本書。'
+      : '這本書現在沒有可以取書的圖書館。按左上角「‹」回上一頁，換一本書。';
+}
+
+const _seriesCard = '這本書有好幾冊。先在想借的那一冊右邊的小方框打勾（例如 V. 1）。';
+const _seriesLimitCard = '一本書最多只能勾 7 冊，已經勾滿了。按「關閉」就好，不用再勾。';
 
 String _l(String verb) => verb; // label text is numbered when composed
 
@@ -127,6 +164,10 @@ final List<GuideComponent> libraryComponents = [
     doneText: '找到書了！點書名就能看詳細內容。',
     doneDetail: '在搜尋結果點書名，可以看這本書的詳細內容。',
     doneTarget: _resultsDone,
+    doneLabelOf: (s) => _noBooks(s) ? '沒有找到書' : '完成了',
+    doneTextOf: (s) => _noBooks(s)
+        ? '這次沒有找到書（畫面寫「查無資料」）。換個書名再搜尋一次，例如「神奇柑仔店」。'
+        : '找到書了！點書名就能看詳細內容。',
     steps: [
       GuideStep(
         target: (_) => 'library.search_row',
@@ -153,6 +194,10 @@ final List<GuideComponent> libraryComponents = [
     doneText: '這些是大家常找的書！點書名就能看詳細內容。',
     doneDetail: '在搜尋結果點書名，可以看這本書的詳細內容。',
     doneTarget: _resultsDone,
+    doneLabelOf: (s) => _noBooks(s) ? '沒有找到書' : '完成了',
+    doneTextOf: (s) => _noBooks(s)
+        ? '這次沒有找到書（畫面寫「查無資料」）。把框裡的字刪掉，再按右邊的放大鏡，「熱門關鍵字」就會再出現，可以換一個點，例如「神奇柑仔店」。'
+        : '這些是大家常找的書！點書名就能看詳細內容。',
     steps: [
       GuideStep(
         target: (_) => 'library.hot_keywords',
@@ -187,7 +232,7 @@ final List<GuideComponent> libraryComponents = [
         label: (_) => _l('選一本'),
         card: (s) => s.now.number('results') > 0
             ? '找到了！上下滑動看看，想借哪一本，點一下書名就好。'
-            : '這次沒有找到書。換個書名，在上面的框重新打字搜尋。',
+            : '這次沒有找到書。在上面的框打別的書名，例如「神奇柑仔店」，再按放大鏡。想看「熱門關鍵字」，就把框裡的字刪掉再按放大鏡。',
         detail: (_) => '在搜尋結果點你想借的那本書。',
         isDone: (s) => _onDetail(s) || _answered(s),
         cardTop: (_) => 470,
@@ -207,35 +252,77 @@ final List<GuideComponent> libraryComponents = [
     steps: [
       GuideStep(
         target: (s) {
-          if (_cannotReserve(s)) return null;
+          if (_cannotReserve(s)) {
+            return _noBranch(s) && s.now.flag('branchList')
+                ? 'library.branch_close'
+                : null;
+          }
+          if (_seriesLimit(s)) return 'library.limit_close';
+          if (!s.now.flag('branchList') && _needSeries(s)) {
+            return 'library.series';
+          }
           if (!s.now.flag('branchList')) return 'library.branch_field';
           return s.now.text('branch').isEmpty
               ? 'library.branch_list'
               : 'library.branch_close';
         },
-        // After picking, a different branch can still be picked.
-        alsoUsable: const ['library.branch_list'],
+        // After picking, a different branch can still be picked; more 冊次
+        // can be ticked, and the 取書館 field stays usable while ticking.
+        alsoUsable: const [
+          'library.branch_list',
+          'library.branch_field',
+          'library.series',
+        ],
         // A book that cannot be reserved leaves the screen free (back button).
-        locks: (s) => !_cannotReserve(s),
-        arrow: (s) =>
-            !_cannotReserve(s) &&
-            (!s.now.flag('branchList') || s.now.text('branch').isNotEmpty),
-        label: (_) => _l('選擇'),
+        locks: (s) =>
+            !_cannotReserve(s) || (_noBranch(s) && s.now.flag('branchList')),
+        arrow: (s) {
+          if (_cannotReserve(s)) {
+            return _noBranch(s) && s.now.flag('branchList');
+          }
+          if (_seriesLimit(s)) return true;
+          if (!s.now.flag('branchList') && _needSeries(s)) return false;
+          return !s.now.flag('branchList') || s.now.text('branch').isNotEmpty;
+        },
+        label: (s) => _l(
+          !_cannotReserve(s) &&
+                  !_seriesLimit(s) &&
+                  !s.now.flag('branchList') &&
+                  _needSeries(s)
+              ? '打勾'
+              : '選擇',
+        ),
         card: (s) {
-          if (_cannotReserve(s)) return _cannotReserveCard;
+          if (_cannotReserve(s)) return _cannotReserveCardOf(s);
+          if (_seriesLimit(s)) return _seriesLimitCard;
+          if (!s.now.flag('branchList') && _needSeries(s)) return _seriesCard;
           if (!s.now.flag('branchList')) return '接下來，點這裡選要去哪間圖書館拿書。';
           if (s.now.text('branch').isEmpty) return '點一下你方便去拿書的圖書館。';
           return '選好了！按右上角的「✕」關掉這個視窗。';
         },
-        detail: (s) => _cannotReserve(s)
-            ? '這本書的館藏不提供預約。按左上角的「‹」回到搜尋結果，選另一本書。'
-            : '點「請選擇取書館」，選一個你方便去拿書的圖書館，再按右上角的「✕」。',
+        detail: (s) {
+          if (_noBranch(s)) {
+            return '這本書現在沒有可以取書的圖書館，不能預約。回上一頁換一本書。';
+          }
+          if (_cannotReserve(s)) {
+            return '這本書的館藏不提供預約。按左上角的「‹」回到搜尋結果，選另一本書。';
+          }
+          if (_needSeries(s) || _seriesLimit(s)) {
+            return '這本書分成好幾冊。在想借的那一冊右邊的小方框打勾，可以勾不只一冊，最多 7 冊。';
+          }
+          return '點「請選擇取書館」，選一個你方便去拿書的圖書館，再按右上角的「✕」。';
+        },
         isDone: (s) =>
             _answered(s) ||
             (_onDetail(s) &&
                 s.now.text('branch').isNotEmpty &&
-                !s.now.flag('branchList')),
-        cardTop: (s) => s.now.flag('branchList') ? 20 : 340,
+                !s.now.flag('branchList') &&
+                !_needSeries(s) &&
+                !_seriesLimit(s)),
+        cardTop: (s) =>
+            s.now.flag('branchList') || _seriesLimit(s) || _needSeries(s)
+                ? 20
+                : 340,
       ),
     ],
   ),
@@ -266,10 +353,28 @@ final List<GuideComponent> libraryComponents = [
     },
     steps: [
       GuideStep(
-        target: (_) => 'library.reserve',
-        arrow: _no,
+        target: (s) {
+          if (_seriesLimit(s)) return 'library.limit_close';
+          if (!s.now.flag('reserveEnabled') && _needSeries(s)) {
+            return 'library.series';
+          }
+          if (!s.now.flag('reserveEnabled') && s.now.text('branch').isEmpty) {
+            return 'library.branch_field';
+          }
+          return 'library.reserve';
+        },
+        arrow: (s) => _seriesLimit(s),
         label: (_) => _l('確認'),
         card: (s) {
+          if (_seriesLimit(s)) return _seriesLimitCard;
+          if (!s.now.flag('reserveEnabled')) {
+            if (_needSeries(s)) {
+              return '「預約」還不能按，因為還沒勾要借哪一冊。先在那一冊右邊的小方框打勾。';
+            }
+            if (s.now.text('branch').isEmpty) {
+              return '「預約」還不能按，因為還沒選取書館。點「請選擇取書館」選一間。';
+            }
+          }
           final book = s.now.text('bookTitle');
           final branch = s.now.text('branchName');
           final what = book.isEmpty
@@ -435,7 +540,7 @@ final List<GuideComponent> libraryComponents = [
     requires: const [],
     taskTitle: '找附近的圖書館',
     doneText: '這是分館地圖！允許使用位置，就能看到離你最近的圖書館。',
-    doneDetail: '按「展開列表」可以看所有分館和距離。',
+    doneDetail: '如果畫面寫「請啟用定位服務」，要先允許「城市通」使用你的位置，才會列出附近的分館。',
     steps: [
       GuideStep(
         target: (_) => 'library.tab_map',
@@ -465,6 +570,8 @@ final libraryPage = GuidePage(
     'library.ranking': ['open_ranking'],
     'library.notices': ['open_notices'],
     'library.records': ['open_records', 'check_pickup'],
+    // 預約清單 / 取書通知 are in 我的紀錄.
+    'library.reservations': ['open_records', 'check_pickup'],
   },
   defaultDestination: const {'kind': 'home'},
   // A library sub-page (排行, 公告, 紀錄) starts from the library home, so the

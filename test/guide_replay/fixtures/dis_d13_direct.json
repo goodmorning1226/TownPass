@@ -1,0 +1,1552 @@
+{
+ "name": "dis_d13_direct",
+ "description": "DIS-1: D-1-3 loaded directly (reload / loadUrl fallback): no 災情描述 checkboxes, 補充描述 then required; only the cards are followed. Fixed: the describe card asks for 補充描述 on a form without boxes.",
+ "page": "disaster_report",
+ "start": "/disaster-report/form/D-1-3",
+ "capability": "disasterReport.form.D-1-3",
+ "goals": [],
+ "expect": {
+  "done": true
+ },
+ "recordedAt": "2026-11-07T18:54:02.416Z",
+ "durationMs": 8714,
+ "viewport": {
+  "width": 390,
+  "height": 844,
+  "deviceScaleFactor": 3,
+  "isMobile": true,
+  "hasTouch": true
+ },
+ "failed": null,
+ "steps": [
+  {
+   "action": null,
+   "before": null,
+   "after": {
+    "path": "/disaster-report/form/D-1-3",
+    "query": {},
+    "flags": {
+     "noResults": false,
+     "query": "",
+     "groupOpen": false,
+     "category": "",
+     "location": "",
+     "locationFocus": false,
+     "hasChecks": false,
+     "checked": 0,
+     "checksOff": "",
+     "hasRoad": false,
+     "hasNumbers": false,
+     "numbers": 0,
+     "extraText": false,
+     "extraFocus": false,
+     "extraOff": "",
+     "needDescribe": false,
+     "consentOff": "below",
+     "noteRead": false,
+     "sendOff": "below",
+     "sendEnabled": false,
+     "reported": false,
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "disaster.extra",
+     "disaster.locate",
+     "disaster.location"
+    ],
+    "rects": {
+     "disaster.location": [
+      16,
+      108,
+      358,
+      44
+     ],
+     "disaster.locate": [
+      346,
+      120,
+      20,
+      20
+     ],
+     "disaster.extra": [
+      29,
+      543,
+      332,
+      128
+     ]
+    }
+   },
+   "facts": {
+    "url": "/disaster-report/form/D-1-3",
+    "title": "災情通報",
+    "fields": [
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "location",
+      "name": "",
+      "label": "* 標注災情發生地點",
+      "placeholder": "可直接定位或輸入完整地址",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       108,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "textarea",
+      "type": "textarea",
+      "id": "desc",
+      "name": "",
+      "label": "地點描述",
+      "placeholder": "地點位置補充說明",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       210,
+       358,
+       224
+      ]
+     },
+     {
+      "tag": "textarea",
+      "type": "textarea",
+      "id": "additional_disc",
+      "name": "",
+      "label": "補充描述：",
+      "placeholder": "災情細節說明",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       29,
+       543,
+       332,
+       128
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "checkbox",
+      "id": "Y",
+      "name": "",
+      "label": "提供個人資料給承辦人員",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       966,
+       0,
+       0
+      ]
+     }
+    ],
+    "starred": [
+     "標注災情發生地點",
+     "災情描述(至少勾選一項)"
+    ],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "送出",
+      "disabled": true,
+      "rect": [
+       16,
+       1000,
+       358,
+       48
+      ]
+     }
+    ],
+    "disabledButtons": [
+     "送出"
+    ],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 1064
+   }
+  },
+  {
+   "action": {
+    "step": "enter_location",
+    "do": "type",
+    "selector": "#location",
+    "value": "臺北市信義區市府路1號",
+    "hit": {
+     "x": 195,
+     "y": 130,
+     "targets": [
+      "disaster.location"
+     ]
+    }
+   },
+   "before": {
+    "path": "/disaster-report/form/D-1-3",
+    "query": {},
+    "flags": {
+     "noResults": false,
+     "query": "",
+     "groupOpen": false,
+     "category": "",
+     "location": "",
+     "locationFocus": false,
+     "hasChecks": false,
+     "checked": 0,
+     "checksOff": "",
+     "hasRoad": false,
+     "hasNumbers": false,
+     "numbers": 0,
+     "extraText": false,
+     "extraFocus": false,
+     "extraOff": "",
+     "needDescribe": false,
+     "consentOff": "below",
+     "noteRead": false,
+     "sendOff": "below",
+     "sendEnabled": false,
+     "reported": false,
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "disaster.extra",
+     "disaster.locate",
+     "disaster.location"
+    ],
+    "rects": {
+     "disaster.location": [
+      16,
+      108,
+      358,
+      44
+     ],
+     "disaster.locate": [
+      346,
+      120,
+      20,
+      20
+     ],
+     "disaster.extra": [
+      29,
+      543,
+      332,
+      128
+     ]
+    }
+   },
+   "after": {
+    "path": "/disaster-report/form/D-1-3",
+    "query": {},
+    "flags": {
+     "noResults": false,
+     "query": "",
+     "groupOpen": false,
+     "category": "",
+     "location": "臺北市信義區市府路1號",
+     "locationFocus": false,
+     "hasChecks": false,
+     "checked": 0,
+     "checksOff": "",
+     "hasRoad": false,
+     "hasNumbers": false,
+     "numbers": 0,
+     "extraText": false,
+     "extraFocus": false,
+     "extraOff": "",
+     "needDescribe": false,
+     "consentOff": "below",
+     "noteRead": false,
+     "sendOff": "below",
+     "sendEnabled": false,
+     "reported": false,
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "disaster.extra",
+     "disaster.locate",
+     "disaster.location"
+    ],
+    "rects": {
+     "disaster.location": [
+      16,
+      108,
+      358,
+      44
+     ],
+     "disaster.locate": [
+      346,
+      120,
+      20,
+      20
+     ],
+     "disaster.extra": [
+      29,
+      543,
+      332,
+      128
+     ]
+    }
+   },
+   "facts": {
+    "url": "/disaster-report/form/D-1-3",
+    "title": "災情通報",
+    "fields": [
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "location",
+      "name": "",
+      "label": "* 標注災情發生地點",
+      "placeholder": "可直接定位或輸入完整地址",
+      "value": "臺北市信義區市府路1號",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       108,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "textarea",
+      "type": "textarea",
+      "id": "desc",
+      "name": "",
+      "label": "地點描述",
+      "placeholder": "地點位置補充說明",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       210,
+       358,
+       224
+      ]
+     },
+     {
+      "tag": "textarea",
+      "type": "textarea",
+      "id": "additional_disc",
+      "name": "",
+      "label": "補充描述：",
+      "placeholder": "災情細節說明",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       29,
+       543,
+       332,
+       128
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "checkbox",
+      "id": "Y",
+      "name": "",
+      "label": "提供個人資料給承辦人員",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       966,
+       0,
+       0
+      ]
+     }
+    ],
+    "starred": [
+     "標注災情發生地點",
+     "災情描述(至少勾選一項)"
+    ],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "送出",
+      "disabled": true,
+      "rect": [
+       16,
+       1000,
+       358,
+       48
+      ]
+     }
+    ],
+    "disabledButtons": [
+     "送出"
+    ],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 1064
+   }
+  },
+  {
+   "action": {
+    "step": "describe_disaster",
+    "do": "type",
+    "selector": "#additional_disc",
+    "value": "道路被土石擋住",
+    "hit": {
+     "x": 195,
+     "y": 607,
+     "targets": [
+      "disaster.extra"
+     ]
+    }
+   },
+   "before": {
+    "path": "/disaster-report/form/D-1-3",
+    "query": {},
+    "flags": {
+     "noResults": false,
+     "query": "",
+     "groupOpen": false,
+     "category": "",
+     "location": "臺北市信義區市府路1號",
+     "locationFocus": false,
+     "hasChecks": false,
+     "checked": 0,
+     "checksOff": "",
+     "hasRoad": false,
+     "hasNumbers": false,
+     "numbers": 0,
+     "extraText": false,
+     "extraFocus": false,
+     "extraOff": "",
+     "needDescribe": false,
+     "consentOff": "below",
+     "noteRead": false,
+     "sendOff": "below",
+     "sendEnabled": false,
+     "reported": false,
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "disaster.extra",
+     "disaster.locate",
+     "disaster.location"
+    ],
+    "rects": {
+     "disaster.location": [
+      16,
+      108,
+      358,
+      44
+     ],
+     "disaster.locate": [
+      346,
+      120,
+      20,
+      20
+     ],
+     "disaster.extra": [
+      29,
+      543,
+      332,
+      128
+     ]
+    }
+   },
+   "after": {
+    "path": "/disaster-report/form/D-1-3",
+    "query": {},
+    "flags": {
+     "noResults": false,
+     "query": "",
+     "groupOpen": false,
+     "category": "",
+     "location": "臺北市信義區市府路1號",
+     "locationFocus": false,
+     "hasChecks": false,
+     "checked": 0,
+     "checksOff": "",
+     "hasRoad": false,
+     "hasNumbers": false,
+     "numbers": 0,
+     "extraText": true,
+     "extraFocus": false,
+     "extraOff": "",
+     "needDescribe": false,
+     "consentOff": "below",
+     "noteRead": false,
+     "sendOff": "below",
+     "sendEnabled": false,
+     "reported": false,
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "disaster.extra",
+     "disaster.locate",
+     "disaster.location"
+    ],
+    "rects": {
+     "disaster.location": [
+      16,
+      108,
+      358,
+      44
+     ],
+     "disaster.locate": [
+      346,
+      120,
+      20,
+      20
+     ],
+     "disaster.extra": [
+      29,
+      543,
+      332,
+      128
+     ]
+    }
+   },
+   "facts": {
+    "url": "/disaster-report/form/D-1-3",
+    "title": "災情通報",
+    "fields": [
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "location",
+      "name": "",
+      "label": "* 標注災情發生地點",
+      "placeholder": "可直接定位或輸入完整地址",
+      "value": "臺北市信義區市府路1號",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       108,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "textarea",
+      "type": "textarea",
+      "id": "desc",
+      "name": "",
+      "label": "地點描述",
+      "placeholder": "地點位置補充說明",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       210,
+       358,
+       224
+      ]
+     },
+     {
+      "tag": "textarea",
+      "type": "textarea",
+      "id": "additional_disc",
+      "name": "",
+      "label": "補充描述：",
+      "placeholder": "災情細節說明",
+      "value": "道路被土石擋住",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       29,
+       543,
+       332,
+       128
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "checkbox",
+      "id": "Y",
+      "name": "",
+      "label": "提供個人資料給承辦人員",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       966,
+       0,
+       0
+      ]
+     }
+    ],
+    "starred": [
+     "標注災情發生地點",
+     "災情描述(至少勾選一項)"
+    ],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "送出",
+      "disabled": true,
+      "rect": [
+       16,
+       1000,
+       358,
+       48
+      ]
+     }
+    ],
+    "disabledButtons": [
+     "送出"
+    ],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 1064
+   }
+  },
+  {
+   "action": {
+    "step": "give_consent",
+    "do": "scroll",
+    "to": "bottom",
+    "hit": null
+   },
+   "before": {
+    "path": "/disaster-report/form/D-1-3",
+    "query": {},
+    "flags": {
+     "noResults": false,
+     "query": "",
+     "groupOpen": false,
+     "category": "",
+     "location": "臺北市信義區市府路1號",
+     "locationFocus": false,
+     "hasChecks": false,
+     "checked": 0,
+     "checksOff": "",
+     "hasRoad": false,
+     "hasNumbers": false,
+     "numbers": 0,
+     "extraText": true,
+     "extraFocus": false,
+     "extraOff": "",
+     "needDescribe": false,
+     "consentOff": "",
+     "noteRead": true,
+     "sendOff": "",
+     "sendEnabled": false,
+     "reported": false,
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "disaster.consent",
+     "disaster.extra",
+     "disaster.note",
+     "disaster.send"
+    ],
+    "rects": {
+     "disaster.extra": [
+      29,
+      323,
+      332,
+      128
+     ],
+     "disaster.note": [
+      16,
+      660,
+      358,
+      96
+     ],
+     "disaster.consent": [
+      16,
+      736,
+      358,
+      20
+     ],
+     "disaster.send": [
+      16,
+      780,
+      358,
+      48
+     ]
+    }
+   },
+   "after": {
+    "path": "/disaster-report/form/D-1-3",
+    "query": {},
+    "flags": {
+     "noResults": false,
+     "query": "",
+     "groupOpen": false,
+     "category": "",
+     "location": "臺北市信義區市府路1號",
+     "locationFocus": false,
+     "hasChecks": false,
+     "checked": 0,
+     "checksOff": "",
+     "hasRoad": false,
+     "hasNumbers": false,
+     "numbers": 0,
+     "extraText": true,
+     "extraFocus": false,
+     "extraOff": "",
+     "needDescribe": false,
+     "consentOff": "",
+     "noteRead": true,
+     "sendOff": "",
+     "sendEnabled": false,
+     "reported": false,
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "disaster.consent",
+     "disaster.extra",
+     "disaster.note",
+     "disaster.send"
+    ],
+    "rects": {
+     "disaster.extra": [
+      29,
+      323,
+      332,
+      128
+     ],
+     "disaster.note": [
+      16,
+      660,
+      358,
+      96
+     ],
+     "disaster.consent": [
+      16,
+      736,
+      358,
+      20
+     ],
+     "disaster.send": [
+      16,
+      780,
+      358,
+      48
+     ]
+    }
+   },
+   "facts": {
+    "url": "/disaster-report/form/D-1-3",
+    "title": "災情通報",
+    "fields": [
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "location",
+      "name": "",
+      "label": "* 標注災情發生地點",
+      "placeholder": "可直接定位或輸入完整地址",
+      "value": "臺北市信義區市府路1號",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       -112,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "textarea",
+      "type": "textarea",
+      "id": "desc",
+      "name": "",
+      "label": "地點描述",
+      "placeholder": "地點位置補充說明",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       -10,
+       358,
+       224
+      ]
+     },
+     {
+      "tag": "textarea",
+      "type": "textarea",
+      "id": "additional_disc",
+      "name": "",
+      "label": "補充描述：",
+      "placeholder": "災情細節說明",
+      "value": "道路被土石擋住",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       29,
+       323,
+       332,
+       128
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "checkbox",
+      "id": "Y",
+      "name": "",
+      "label": "提供個人資料給承辦人員",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       746,
+       0,
+       0
+      ]
+     }
+    ],
+    "starred": [
+     "標注災情發生地點",
+     "災情描述(至少勾選一項)"
+    ],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "送出",
+      "disabled": true,
+      "rect": [
+       16,
+       780,
+       358,
+       48
+      ]
+     }
+    ],
+    "disabledButtons": [
+     "送出"
+    ],
+    "dialogs": [],
+    "scrollY": 220,
+    "scrollHeight": 1064
+   }
+  },
+  {
+   "action": {
+    "step": "give_consent",
+    "do": "check",
+    "text": "提供個人資料給承辦人員",
+    "hit": {
+     "x": 195,
+     "y": 746,
+     "targets": [
+      "disaster.consent",
+      "disaster.note"
+     ]
+    }
+   },
+   "before": {
+    "path": "/disaster-report/form/D-1-3",
+    "query": {},
+    "flags": {
+     "noResults": false,
+     "query": "",
+     "groupOpen": false,
+     "category": "",
+     "location": "臺北市信義區市府路1號",
+     "locationFocus": false,
+     "hasChecks": false,
+     "checked": 0,
+     "checksOff": "",
+     "hasRoad": false,
+     "hasNumbers": false,
+     "numbers": 0,
+     "extraText": true,
+     "extraFocus": false,
+     "extraOff": "",
+     "needDescribe": false,
+     "consentOff": "",
+     "noteRead": true,
+     "sendOff": "",
+     "sendEnabled": false,
+     "reported": false,
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "disaster.consent",
+     "disaster.extra",
+     "disaster.note",
+     "disaster.send"
+    ],
+    "rects": {
+     "disaster.extra": [
+      29,
+      323,
+      332,
+      128
+     ],
+     "disaster.note": [
+      16,
+      660,
+      358,
+      96
+     ],
+     "disaster.consent": [
+      16,
+      736,
+      358,
+      20
+     ],
+     "disaster.send": [
+      16,
+      780,
+      358,
+      48
+     ]
+    }
+   },
+   "after": {
+    "path": "/disaster-report/form/D-1-3",
+    "query": {},
+    "flags": {
+     "noResults": false,
+     "query": "",
+     "groupOpen": false,
+     "category": "",
+     "location": "臺北市信義區市府路1號",
+     "locationFocus": false,
+     "hasChecks": false,
+     "checked": 0,
+     "checksOff": "",
+     "hasRoad": false,
+     "hasNumbers": false,
+     "numbers": 0,
+     "extraText": true,
+     "extraFocus": false,
+     "extraOff": "",
+     "needDescribe": false,
+     "consentOff": "",
+     "noteRead": true,
+     "sendOff": "",
+     "sendEnabled": true,
+     "reported": false,
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "disaster.consent",
+     "disaster.extra",
+     "disaster.note",
+     "disaster.send"
+    ],
+    "rects": {
+     "disaster.extra": [
+      29,
+      323,
+      332,
+      128
+     ],
+     "disaster.note": [
+      16,
+      660,
+      358,
+      96
+     ],
+     "disaster.consent": [
+      16,
+      736,
+      358,
+      20
+     ],
+     "disaster.send": [
+      16,
+      780,
+      358,
+      48
+     ]
+    }
+   },
+   "facts": {
+    "url": "/disaster-report/form/D-1-3",
+    "title": "災情通報",
+    "fields": [
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "location",
+      "name": "",
+      "label": "* 標注災情發生地點",
+      "placeholder": "可直接定位或輸入完整地址",
+      "value": "臺北市信義區市府路1號",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       -112,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "textarea",
+      "type": "textarea",
+      "id": "desc",
+      "name": "",
+      "label": "地點描述",
+      "placeholder": "地點位置補充說明",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       -10,
+       358,
+       224
+      ]
+     },
+     {
+      "tag": "textarea",
+      "type": "textarea",
+      "id": "additional_disc",
+      "name": "",
+      "label": "補充描述：",
+      "placeholder": "災情細節說明",
+      "value": "道路被土石擋住",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       29,
+       323,
+       332,
+       128
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "checkbox",
+      "id": "Y",
+      "name": "",
+      "label": "提供個人資料給承辦人員",
+      "placeholder": "",
+      "value": "checked",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       746,
+       0,
+       0
+      ]
+     }
+    ],
+    "starred": [
+     "標注災情發生地點",
+     "災情描述(至少勾選一項)"
+    ],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "送出",
+      "disabled": false,
+      "rect": [
+       16,
+       780,
+       358,
+       48
+      ]
+     }
+    ],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 220,
+    "scrollHeight": 1064
+   }
+  },
+  {
+   "action": {
+    "step": "send_report",
+    "do": "click",
+    "text": "送出",
+    "hit": {
+     "x": 195,
+     "y": 804,
+     "targets": [
+      "disaster.send"
+     ]
+    }
+   },
+   "before": {
+    "path": "/disaster-report/form/D-1-3",
+    "query": {},
+    "flags": {
+     "noResults": false,
+     "query": "",
+     "groupOpen": false,
+     "category": "",
+     "location": "臺北市信義區市府路1號",
+     "locationFocus": false,
+     "hasChecks": false,
+     "checked": 0,
+     "checksOff": "",
+     "hasRoad": false,
+     "hasNumbers": false,
+     "numbers": 0,
+     "extraText": true,
+     "extraFocus": false,
+     "extraOff": "",
+     "needDescribe": false,
+     "consentOff": "",
+     "noteRead": true,
+     "sendOff": "",
+     "sendEnabled": true,
+     "reported": false,
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "disaster.consent",
+     "disaster.extra",
+     "disaster.note",
+     "disaster.send"
+    ],
+    "rects": {
+     "disaster.extra": [
+      29,
+      323,
+      332,
+      128
+     ],
+     "disaster.note": [
+      16,
+      660,
+      358,
+      96
+     ],
+     "disaster.consent": [
+      16,
+      736,
+      358,
+      20
+     ],
+     "disaster.send": [
+      16,
+      780,
+      358,
+      48
+     ]
+    }
+   },
+   "after": {
+    "path": "/disaster-report/form/D-1-3",
+    "query": {},
+    "flags": {
+     "noResults": false,
+     "query": "",
+     "groupOpen": false,
+     "category": "",
+     "location": "臺北市信義區市府路1號",
+     "locationFocus": false,
+     "hasChecks": false,
+     "checked": 0,
+     "checksOff": "",
+     "hasRoad": false,
+     "hasNumbers": false,
+     "numbers": 0,
+     "extraText": true,
+     "extraFocus": false,
+     "extraOff": "",
+     "needDescribe": false,
+     "consentOff": "",
+     "noteRead": true,
+     "sendOff": "",
+     "sendEnabled": true,
+     "reported": true,
+     "__bottomBar": 0,
+     "__dialog": true
+    },
+    "visible": [
+     "disaster.consent",
+     "disaster.extra",
+     "disaster.note",
+     "disaster.ok",
+     "disaster.send"
+    ],
+    "rects": {
+     "disaster.extra": [
+      29,
+      323,
+      332,
+      128
+     ],
+     "disaster.note": [
+      16,
+      660,
+      358,
+      96
+     ],
+     "disaster.consent": [
+      16,
+      736,
+      358,
+      20
+     ],
+     "disaster.send": [
+      16,
+      780,
+      358,
+      48
+     ],
+     "disaster.ok": [
+      39,
+      508.5,
+      312,
+      32
+     ]
+    }
+   },
+   "facts": {
+    "url": "/disaster-report/form/D-1-3",
+    "title": "災情通報",
+    "fields": [
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "location",
+      "name": "",
+      "label": "* 標注災情發生地點",
+      "placeholder": "可直接定位或輸入完整地址",
+      "value": "臺北市信義區市府路1號",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       -112,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "textarea",
+      "type": "textarea",
+      "id": "desc",
+      "name": "",
+      "label": "地點描述",
+      "placeholder": "地點位置補充說明",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       -10,
+       358,
+       224
+      ]
+     },
+     {
+      "tag": "textarea",
+      "type": "textarea",
+      "id": "additional_disc",
+      "name": "",
+      "label": "補充描述：",
+      "placeholder": "災情細節說明",
+      "value": "道路被土石擋住",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       29,
+       323,
+       332,
+       128
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "checkbox",
+      "id": "Y",
+      "name": "",
+      "label": "提供個人資料給承辦人員",
+      "placeholder": "",
+      "value": "checked",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       746,
+       0,
+       0
+      ]
+     }
+    ],
+    "starred": [
+     "標注災情發生地點",
+     "災情描述(至少勾選一項)"
+    ],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "送出",
+      "disabled": false,
+      "rect": [
+       16,
+       780,
+       358,
+       48
+      ]
+     },
+     {
+      "text": "確認",
+      "disabled": false,
+      "rect": [
+       39,
+       509,
+       312,
+       32
+      ]
+     }
+    ],
+    "disabledButtons": [],
+    "dialogs": [
+     "通報成功 感謝您提供寶貴資訊 確認"
+    ],
+    "scrollY": 220,
+    "scrollHeight": 1064
+   }
+  },
+  {
+   "action": {
+    "step": "done",
+    "do": "click",
+    "text": "確認",
+    "hit": {
+     "x": 195,
+     "y": 525,
+     "targets": [
+      "disaster.ok"
+     ]
+    }
+   },
+   "before": {
+    "path": "/disaster-report/form/D-1-3",
+    "query": {},
+    "flags": {
+     "noResults": false,
+     "query": "",
+     "groupOpen": false,
+     "category": "",
+     "location": "臺北市信義區市府路1號",
+     "locationFocus": false,
+     "hasChecks": false,
+     "checked": 0,
+     "checksOff": "",
+     "hasRoad": false,
+     "hasNumbers": false,
+     "numbers": 0,
+     "extraText": true,
+     "extraFocus": false,
+     "extraOff": "",
+     "needDescribe": false,
+     "consentOff": "",
+     "noteRead": true,
+     "sendOff": "",
+     "sendEnabled": true,
+     "reported": true,
+     "__bottomBar": 0,
+     "__dialog": true
+    },
+    "visible": [
+     "disaster.consent",
+     "disaster.extra",
+     "disaster.note",
+     "disaster.ok",
+     "disaster.send"
+    ],
+    "rects": {
+     "disaster.extra": [
+      29,
+      323,
+      332,
+      128
+     ],
+     "disaster.note": [
+      16,
+      660,
+      358,
+      96
+     ],
+     "disaster.consent": [
+      16,
+      736,
+      358,
+      20
+     ],
+     "disaster.send": [
+      16,
+      780,
+      358,
+      48
+     ],
+     "disaster.ok": [
+      39,
+      508.5,
+      312,
+      32
+     ]
+    }
+   },
+   "after": {
+    "path": "/disaster-report",
+    "query": {},
+    "flags": {
+     "noResults": false,
+     "query": "",
+     "groupOpen": false,
+     "category": "",
+     "location": "",
+     "locationFocus": false,
+     "hasChecks": false,
+     "checked": 0,
+     "checksOff": "",
+     "hasRoad": false,
+     "hasNumbers": false,
+     "numbers": 0,
+     "extraText": false,
+     "extraFocus": false,
+     "extraOff": "",
+     "needDescribe": false,
+     "consentOff": "",
+     "noteRead": false,
+     "sendOff": "",
+     "sendEnabled": false,
+     "reported": false,
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "disaster.groups",
+     "disaster.search"
+    ],
+    "rects": {
+     "disaster.search": [
+      0,
+      12,
+      390,
+      44
+     ],
+     "disaster.groups": [
+      16,
+      76,
+      358,
+      192
+     ]
+    }
+   },
+   "facts": {
+    "url": "/disaster-report",
+    "title": "災情通報",
+    "fields": [
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "",
+      "name": "",
+      "label": "",
+      "placeholder": "您遇到哪些問題?",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       12,
+       314,
+       44
+      ]
+     }
+    ],
+    "starred": [],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "民生、基礎設施災情",
+      "disabled": false,
+      "rect": [
+       16,
+       76,
+       358,
+       24
+      ]
+     },
+     {
+      "text": "橋梁災情",
+      "disabled": false,
+      "rect": [
+       16,
+       132,
+       358,
+       24
+      ]
+     },
+     {
+      "text": "土石災情",
+      "disabled": false,
+      "rect": [
+       16,
+       188,
+       358,
+       24
+      ]
+     },
+     {
+      "text": "火災",
+      "disabled": false,
+      "rect": [
+       16,
+       244,
+       358,
+       24
+      ]
+     }
+    ],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  }
+ ]
+}

@@ -1,0 +1,54 @@
+{
+  "name": "fees_water_no_then_yes",
+  "description": "fees.water default goal: at the 提醒 the user first taps 否 (alsoUsable), picks the method again, then 是.",
+  "page": "fees",
+  "capability": "fees.water",
+  "goals": [],
+  "expect": {
+    "done": true
+  },
+  "actions": [
+    {
+      "step": "enter_number",
+      "do": "type",
+      "selector": "#water_number",
+      "value": "1234567890"
+    },
+    {
+      "step": "query_bill",
+      "do": "click",
+      "text": "查詢",
+      "within": ".tab-view"
+    },
+    {
+      "step": "pick_bill",
+      "do": "click",
+      "selector": "label[for=\"B999999999\"]"
+    },
+    {
+      "step": "to_payment",
+      "do": "click",
+      "text": "前往繳費"
+    },
+    {
+      "step": "choose_method",
+      "do": "click",
+      "text": "智慧支付平台"
+    },
+    {
+      "step": "confirm_pay",
+      "do": "click",
+      "text": "否"
+    },
+    {
+      "step": "choose_method",
+      "do": "click",
+      "text": "智慧支付平台"
+    },
+    {
+      "step": "confirm_pay",
+      "do": "click",
+      "text": "是"
+    }
+  ]
+}

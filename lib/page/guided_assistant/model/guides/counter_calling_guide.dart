@@ -29,6 +29,9 @@ const _header = "q('div.mb-8 > div.flex.justify-between.mb-4')";
 const _edit =
     "(qa('[id^=\"headlessui-dialog-panel\"]').filter(shown).find((p) => txt(p).includes('請選擇要移除的地點')) || null)";
 
+/// favAtLeast1 … favAtLeast10 (see the spec's flags).
+const _maxFav = 10;
+
 const _select = "q('div.base-select-wrapper > select.base-select')";
 
 const counterCallingPageSpec = WebPageSpec(
@@ -54,6 +57,18 @@ const counterCallingPageSpec = WebPageSpec(
     'unitCount': "qa('div.h-screen > div.w-full.flex.flex-col > a.link-wrapper').filter(shown).length",
     'unitsBelow': "qa('div.h-screen > div.w-full.flex.flex-col > a.link-wrapper').filter(shown).some((a) => a.getBoundingClientRect().bottom > innerHeight)",
     'favorites': "qa('a.regularly-used-wrapper').filter(shown).length",
+    // Latched: the most 常用地點 cards seen on the home list in this guide run,
+    // so remove_favorite can tell that one really went away.
+    'favAtLeast1': "qa('a.regularly-used-wrapper').filter(shown).length >= 1",
+    'favAtLeast2': "qa('a.regularly-used-wrapper').filter(shown).length >= 2",
+    'favAtLeast3': "qa('a.regularly-used-wrapper').filter(shown).length >= 3",
+    'favAtLeast4': "qa('a.regularly-used-wrapper').filter(shown).length >= 4",
+    'favAtLeast5': "qa('a.regularly-used-wrapper').filter(shown).length >= 5",
+    'favAtLeast6': "qa('a.regularly-used-wrapper').filter(shown).length >= 6",
+    'favAtLeast7': "qa('a.regularly-used-wrapper').filter(shown).length >= 7",
+    'favAtLeast8': "qa('a.regularly-used-wrapper').filter(shown).length >= 8",
+    'favAtLeast9': "qa('a.regularly-used-wrapper').filter(shown).length >= 9",
+    'favAtLeast10': "qa('a.regularly-used-wrapper').filter(shown).length >= 10",
     'favNames': "qa('a.regularly-used-wrapper').filter(shown).map((a) => txt(a).split('\\n')[0].trim()).filter((x) => x).join('|')",
     'unitName':
         "txt(q('div.mb-8 > div.flex.justify-between.mb-4 > h5.font-bold'))",
@@ -84,7 +99,22 @@ const counterCallingPageSpec = WebPageSpec(
     'editBottom':
         "(() => { const p = $_edit; const b = p && [...p.querySelectorAll('button')].find((x) => txt(x) === '移除地點'); return b ? Math.round(b.getBoundingClientRect().bottom) : 0; })()",
   },
-  latchFlags: {'locationPicked', 'favOn', 'editOpen'},
+  latchFlags: {
+    'locationPicked',
+    'locationFocus',
+    'favOn',
+    'editOpen',
+    'favAtLeast1',
+    'favAtLeast2',
+    'favAtLeast3',
+    'favAtLeast4',
+    'favAtLeast5',
+    'favAtLeast6',
+    'favAtLeast7',
+    'favAtLeast8',
+    'favAtLeast9',
+    'favAtLeast10',
+  },
 );
 
 bool onCounterCalling(WebSnapshot s) => s.pathStarts('/counter-calling');
@@ -102,12 +132,26 @@ int _favorites(WebPageState s) => s.now.number('favorites');
 /// the home page afterwards does not undo the earlier steps).
 bool _unitDone(WebPageState s) => _onUnit(s) || s.latched('favOn');
 
-/// A place is chosen on the unit page.
+/// A place is chosen on the unit page. A page opened on a place (?subId=,
+/// from reservation.c-N-M or a 常用地點 card) already shows one: there the
+/// user must open the picker (pick_location was asked for, so they want to
+/// change it); the place shown is never counted as picked by itself.
 bool _located(WebPageState s) =>
     _onUnit(s) &&
     s.now.text('location').isNotEmpty &&
-    (s.latched('locationPicked') || s.now.query['subId'] != null) &&
+    (s.now.query['subId'] != null
+        ? s.latched('locationFocus')
+        : s.latched('locationPicked')) &&
     !s.now.flag('locationFocus');
+
+/// The home list shows fewer 常用地點 than were seen earlier in this run.
+bool _favDropped(WebPageState s) {
+  final n = _favorites(s);
+  for (var k = n + 1; k <= _maxFav; k++) {
+    if (s.latched('favAtLeast\$k')) return true;
+  }
+  return false;
+}
 
 String _unit(WebPageState s) {
   final name = s.now.text('unitName');
@@ -283,6 +327,11 @@ final List<GuideComponent> counterCallingComponents = [
           final name = s.now.text('locationName');
           final n = s.now.number('locationCount');
           if (name.isEmpty) return '點一下「選擇地點」的框框，選你要去的那一間。';
+          if (s.now.query['subId'] != null) {
+            return gt('現在看的是「{name}」。要換一間的話，點一下「選擇地點」的框框，選你要去的地點。', {
+              'name': pg(name),
+            });
+          }
           return n > 1
               ? gt('現在看的是「{name}」。點一下框框，選你要去的地點（就是這間的話，也點開選一下）。', {
                   'name': pg(name),
@@ -361,7 +410,10 @@ final List<GuideComponent> counterCallingComponents = [
         _homeReady(s) && _favorites(s) > 0 ? 'counter.favorites' : null,
     doneCardTop: (s) => _homeReady(s) ? 300 : null,
     doneTextOf: (s) => _onHome(s)
-        ? '加好了！最上面亮起來的「常用地點」就是剛加的地點，點一下就能直接打開。這是示範網站，頁面重新打開後會不見喔。'
+        ? _favorites(s) > 0
+              ? '加好了！最上面亮起來的「常用地點」就是剛加的地點，點一下就能直接打開。這是示範網站，頁面重新打開後會不見喔。'
+              // The home list was loaded again: 常用 kept in page memory is gone.
+              : '這個頁面是重新打開的，剛加的常用地點不見了。點你要去的單位，再按一次「加入常用」。'
         : gt('{place}加進常用地點了！回到臨櫃叫號首頁，最上面就看得到。這是示範網站，頁面重新打開後會不見喔。', {
             'place': _place(s),
           }),
@@ -441,7 +493,11 @@ final List<GuideComponent> counterCallingComponents = [
         detail: (_) => '在臨櫃叫號首頁按「常用地點」右邊的「變更」，勾選不要的地點，再按「移除地點」。',
         isDone: (s) =>
             (_homeReady(s) && _favorites(s) == 0 && !_editOpen(s)) ||
-            (s.latched('editOpen') && _onHome(s) && !_editOpen(s)) ||
+            // Only when a place really went away (not 變更 closed as it was).
+            (s.latched('editOpen') &&
+                _homeReady(s) &&
+                !_editOpen(s) &&
+                _favDropped(s)) ||
             (s.latched('favOn') &&
                 _onUnit(s) &&
                 s.now.text('favText') == '加入常用'),

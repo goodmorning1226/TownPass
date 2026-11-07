@@ -1,0 +1,64 @@
+{
+  "name": "pol_online_goal_fill_contact",
+  "description": "police.online with goal fill_contact (question plan), opened the app's way. Follows only the cards until the guide is done.",
+  "page": "police_report",
+  "capability": "police.online",
+  "goals": [
+    "fill_contact"
+  ],
+  "expect": {
+    "done": true
+  },
+  "actions": [
+    {
+      "step": "read_notice",
+      "do": "scroll",
+      "to": "bottom"
+    },
+    {
+      "step": "read_notice",
+      "do": "check",
+      "text": "本人已詳閱須知並同意繼續"
+    },
+    {
+      "step": "read_notice",
+      "do": "click",
+      "text": "同意"
+    },
+    {
+      "step": "fill_contact",
+      "do": "type",
+      "selector": "#mobile_number",
+      "value": "0912345678"
+    },
+    {
+      "step": "fill_contact",
+      "do": "type",
+      "selector": "#mail",
+      "value": "test@example.com"
+    },
+    {
+      "step": "fill_contact",
+      "do": "select",
+      "selector": "select#county",
+      "value": "臺北市"
+    },
+    {
+      "step": "fill_contact",
+      "do": "select",
+      "selector": "select#city",
+      "value": "信義區"
+    },
+    {
+      "step": "fill_contact",
+      "do": "type",
+      "placeholder": "請輸入詳細地址",
+      "value": "市府路1號"
+    },
+    {
+      "step": "fill_contact",
+      "do": "check",
+      "text": "同通訊地址"
+    }
+  ]
+}

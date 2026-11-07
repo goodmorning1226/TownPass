@@ -1,0 +1,74 @@
+{
+  "name": "dis_home_search_none",
+  "description": "Plain disasterReport: the user searches 路燈 with the magnifier; the demo site answers 無搜尋結果 (it does so for every word, even 路燈故障); the card says clear it and press the magnifier; then pick 土石災情 -> 土石流 and follow the cards to 通報成功.",
+  "page": "disaster_report",
+  "capability": "disasterReport",
+  "goals": [],
+  "expect": {
+    "done": true
+  },
+  "actions": [
+    {
+      "step": "pick_category",
+      "do": "type",
+      "selector": "div.flex.mb-2.px-4 > input.base-input",
+      "value": "路燈"
+    },
+    {
+      "step": "pick_category",
+      "do": "click",
+      "selector": "div.flex.mb-2.px-4 button.search-button"
+    },
+    {
+      "step": "pick_category",
+      "do": "clear",
+      "selector": "div.flex.mb-2.px-4 > input.base-input"
+    },
+    {
+      "step": "pick_category",
+      "do": "click",
+      "selector": "div.flex.mb-2.px-4 button.search-button"
+    },
+    {
+      "step": "pick_category",
+      "do": "click",
+      "text": "土石災情"
+    },
+    {
+      "step": "pick_category",
+      "do": "click",
+      "text": "土石流"
+    },
+    {
+      "step": "enter_location",
+      "do": "type",
+      "selector": "#location",
+      "value": "臺北市信義區市府路1號"
+    },
+    {
+      "step": "describe_disaster",
+      "do": "check",
+      "text": "道路"
+    },
+    {
+      "step": "give_consent",
+      "do": "scroll",
+      "to": "bottom"
+    },
+    {
+      "step": "give_consent",
+      "do": "check",
+      "text": "提供個人資料給承辦人員"
+    },
+    {
+      "step": "send_report",
+      "do": "click",
+      "text": "送出"
+    },
+    {
+      "step": "done",
+      "do": "click",
+      "text": "確認"
+    }
+  ]
+}

@@ -548,6 +548,20 @@
    "vi": "; ",
    "id": "; ",
    "th": "; "
+  },
+  "這個頁面是重新打開的，剛加的常用地點不見了。點你要去的單位，再按一次「加入常用」。": {
+   "en": "This page was opened again, so the place you just saved is gone. Tap the office you are going to, then tap “{page:加入常用}” once more.",
+   "ja": "このページは開き直されたため、今追加したよく使う場所は消えました。行く窓口を押して、もう一度「{page:加入常用}」を押してください。",
+   "vi": "Trang này đã được mở lại nên địa điểm vừa thêm đã mất. Bấm vào cơ quan bạn sẽ đến, rồi bấm “{page:加入常用}” thêm một lần nữa.",
+   "id": "Halaman ini dibuka ulang, jadi tempat yang baru ditambahkan hilang. Tekan kantor yang akan Anda tuju, lalu tekan “{page:加入常用}” sekali lagi.",
+   "th": "หน้านี้ถูกเปิดใหม่ สถานที่ที่เพิ่งเพิ่มจึงหายไป กดหน่วยงานที่จะไป แล้วกด “{page:加入常用}” อีกครั้ง"
+  },
+  "現在看的是「{name}」。要換一間的話，點一下「選擇地點」的框框，選你要去的地點。": {
+   "en": "You're looking at “{name}”. To change it, tap the “{page:選擇地點}” box and choose the place you're going to.",
+   "ja": "今見ているのは「{name}」です。変えるときは「{page:選擇地點}」の枠を押して、行く場所を選んでください。",
+   "vi": "Bạn đang xem “{name}”. Muốn đổi nơi khác, bấm vào ô “{page:選擇地點}” rồi chọn nơi bạn sẽ đến.",
+   "id": "Yang sedang dilihat: “{name}”. Untuk menggantinya, tekan kotak “{page:選擇地點}” lalu pilih tempat yang akan Anda tuju.",
+   "th": "ตอนนี้กำลังดู “{name}” ถ้าจะเปลี่ยน กดช่อง “{page:選擇地點}” แล้วเลือกสถานที่ที่จะไป"
   }
  }
 }

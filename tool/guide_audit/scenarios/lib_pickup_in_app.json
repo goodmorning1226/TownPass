@@ -1,0 +1,27 @@
+{
+  "name": "lib_pickup_in_app",
+  "description": "library.records with goal check_pickup (second capability goal), app way (home): 我的紀錄, then 可取書.",
+  "page": "library",
+  "capability": "library.records",
+  "start": "/library-service/",
+  "goals": [
+    "check_pickup"
+  ],
+  "expect": {
+    "done": true
+  },
+  "actions": [
+    {
+      "step": "open_records",
+      "do": "click",
+      "text": "我的紀錄"
+    },
+    {
+      "step": "check_pickup",
+      "do": "click",
+      "text": "可取書",
+      "exact": false,
+      "within": "li"
+    }
+  ]
+}

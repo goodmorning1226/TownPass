@@ -1,0 +1,17 @@
+{
+  "name": "cit_report_via_list",
+  "description": "有話要說 default plan; the user takes the card's 「更多項目」 hint, opens the group the card names, picks 自動選擇案件類別's item, writes 主旨/描述, 送出, 確認.",
+  "page": "citizen_report",
+  "capability": "reportIssue",
+  "goals": [],
+  "expect": { "done": true },
+  "actions": [
+    { "step": "pick_category", "do": "click", "text": "更多項目" },
+    { "step": "pick_category", "do": "click", "text": "垃圾、噪音、汙染及資源回收" },
+    { "step": "pick_category", "do": "click", "text": "汙染舉發" },
+    { "step": "fill_form", "do": "type", "selector": "#title", "value": "測試主旨（示範）" },
+    { "step": "fill_form", "do": "type", "selector": "#description", "value": "測試描述，示範用假資料" },
+    { "step": "submit_report", "do": "click", "text": "送出" },
+    { "step": "done", "do": "click", "text": "確認" }
+  ]
+}

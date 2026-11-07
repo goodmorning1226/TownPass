@@ -1,0 +1,45 @@
+{
+  "name": "cc_goal_add_remove_favorite",
+  "description": "reservation, goals add_favorite + remove_favorite: add on the unit page, then follow the remove card.",
+  "page": "counter_calling",
+  "capability": "reservation",
+  "goals": [
+    "add_favorite",
+    "remove_favorite"
+  ],
+  "expect": {
+    "done": true
+  },
+  "actions": [
+    {
+      "step": "pick_unit",
+      "do": "click",
+      "text": "稅捐處"
+    },
+    {
+      "step": "pick_location",
+      "do": "click",
+      "selector": "select.base-select"
+    },
+    {
+      "step": "pick_location",
+      "do": "select",
+      "selector": "select.base-select",
+      "value": "c-4-2"
+    },
+    {
+      "step": "pick_location",
+      "do": "blur"
+    },
+    {
+      "step": "add_favorite",
+      "do": "click",
+      "text": "加入常用"
+    },
+    {
+      "step": "remove_favorite",
+      "do": "click",
+      "text": "移除常用"
+    }
+  ]
+}

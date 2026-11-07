@@ -1,0 +1,41 @@
+{
+  "name": "do_search_noresult",
+  "description": "Plain 申辦服務 (districtOffice), goal search_service: the user searches 退費 (no item matches), the card asks for a simpler word; the user clears the box, types 補助 and presses the magnifier.",
+  "page": "district_office",
+  "capability": "districtOffice",
+  "goals": [
+    "search_service"
+  ],
+  "expect": {
+    "done": true
+  },
+  "actions": [
+    {
+      "step": "search_service",
+      "do": "type",
+      "placeholder": "您遇到哪些問題?",
+      "value": "退費"
+    },
+    {
+      "step": "search_service",
+      "do": "click",
+      "selector": "button.search-button"
+    },
+    {
+      "step": "search_service",
+      "do": "clear",
+      "placeholder": "您遇到哪些問題?"
+    },
+    {
+      "step": "search_service",
+      "do": "type",
+      "placeholder": "您遇到哪些問題?",
+      "value": "補助"
+    },
+    {
+      "step": "search_service",
+      "do": "click",
+      "selector": "button.search-button"
+    }
+  ]
+}

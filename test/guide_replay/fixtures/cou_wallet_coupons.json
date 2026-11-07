@@ -1,0 +1,440 @@
+{
+ "name": "cou_wallet_coupons",
+ "description": "wallet default (wallet_coupons): 票夾 -> 優惠券.",
+ "page": "coupon_wallet",
+ "start": null,
+ "capability": "wallet",
+ "goals": [],
+ "expect": {
+  "done": true
+ },
+ "recordedAt": "2026-11-07T18:22:46.855Z",
+ "durationMs": 5119,
+ "viewport": {
+  "width": 390,
+  "height": 844,
+  "deviceScaleFactor": 3,
+  "isMobile": true,
+  "hasTouch": true
+ },
+ "failed": null,
+ "steps": [
+  {
+   "action": null,
+   "before": null,
+   "after": {
+    "path": "/ticket-wallet",
+    "query": {},
+    "flags": {
+     "tab": "入場券",
+     "subTab": "我的訂單",
+     "cards": 0,
+     "cardsBelow": false,
+     "name": "",
+     "period": "",
+     "rule": "",
+     "desc": "",
+     "remain": "",
+     "hasAdd": false,
+     "addBelow": false,
+     "useLabel": "",
+     "useBelow": false,
+     "addAsk": false,
+     "added": false,
+     "useAsk": false,
+     "used": false,
+     "items": 2,
+     "itemsBelow": false,
+     "rows": 2,
+     "firstItem": "臺北市立美術館",
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "coupon.page_back",
+     "wallet.items",
+     "wallet.rows",
+     "wallet.sub_orders",
+     "wallet.tab_coupons",
+     "wallet.tab_tickets"
+    ],
+    "rects": {
+     "coupon.page_back": [
+      16,
+      8,
+      24,
+      24
+     ],
+     "wallet.tab_coupons": [
+      195,
+      56,
+      179,
+      24
+     ],
+     "wallet.tab_tickets": [
+      16,
+      56,
+      179,
+      24
+     ],
+     "wallet.sub_orders": [
+      0,
+      99,
+      195,
+      41
+     ],
+     "wallet.items": [
+      16,
+      159,
+      358,
+      236
+     ],
+     "wallet.rows": [
+      16,
+      159,
+      358,
+      236
+     ]
+    }
+   },
+   "facts": {
+    "url": "/ticket-wallet",
+    "title": "票夾",
+    "fields": [],
+    "starred": [],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "入場券",
+      "disabled": false,
+      "rect": [
+       16,
+       56,
+       179,
+       24
+      ]
+     },
+     {
+      "text": "優惠券",
+      "disabled": false,
+      "rect": [
+       195,
+       56,
+       179,
+       24
+      ]
+     },
+     {
+      "text": "我的訂單",
+      "disabled": false,
+      "rect": [
+       0,
+       99,
+       195,
+       41
+      ]
+     },
+     {
+      "text": "已結束",
+      "disabled": false,
+      "rect": [
+       195,
+       99,
+       195,
+       41
+      ]
+     },
+     {
+      "text": "未兌換",
+      "disabled": false,
+      "rect": [
+       390,
+       117,
+       130,
+       41
+      ]
+     },
+     {
+      "text": "已兌換",
+      "disabled": false,
+      "rect": [
+       520,
+       117,
+       130,
+       41
+      ]
+     },
+     {
+      "text": "已過期",
+      "disabled": false,
+      "rect": [
+       650,
+       117,
+       130,
+       41
+      ]
+     }
+    ],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 851
+   }
+  },
+  {
+   "action": {
+    "step": "wallet_coupons",
+    "do": "click",
+    "text": "優惠券",
+    "within": "section.tabs:not(.tabs__content-type)",
+    "hit": {
+     "x": 285,
+     "y": 68,
+     "targets": [
+      "wallet.tab_coupons"
+     ]
+    }
+   },
+   "before": {
+    "path": "/ticket-wallet",
+    "query": {},
+    "flags": {
+     "tab": "入場券",
+     "subTab": "我的訂單",
+     "cards": 0,
+     "cardsBelow": false,
+     "name": "",
+     "period": "",
+     "rule": "",
+     "desc": "",
+     "remain": "",
+     "hasAdd": false,
+     "addBelow": false,
+     "useLabel": "",
+     "useBelow": false,
+     "addAsk": false,
+     "added": false,
+     "useAsk": false,
+     "used": false,
+     "items": 2,
+     "itemsBelow": false,
+     "rows": 2,
+     "firstItem": "臺北市立美術館",
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "coupon.page_back",
+     "wallet.items",
+     "wallet.rows",
+     "wallet.sub_orders",
+     "wallet.tab_coupons",
+     "wallet.tab_tickets"
+    ],
+    "rects": {
+     "coupon.page_back": [
+      16,
+      8,
+      24,
+      24
+     ],
+     "wallet.tab_coupons": [
+      195,
+      56,
+      179,
+      24
+     ],
+     "wallet.tab_tickets": [
+      16,
+      56,
+      179,
+      24
+     ],
+     "wallet.sub_orders": [
+      0,
+      99,
+      195,
+      41
+     ],
+     "wallet.items": [
+      16,
+      159,
+      358,
+      236
+     ],
+     "wallet.rows": [
+      16,
+      159,
+      358,
+      236
+     ]
+    }
+   },
+   "after": {
+    "path": "/ticket-wallet",
+    "query": {},
+    "flags": {
+     "tab": "優惠券",
+     "subTab": "未兌換",
+     "cards": 0,
+     "cardsBelow": false,
+     "name": "",
+     "period": "",
+     "rule": "",
+     "desc": "",
+     "remain": "",
+     "hasAdd": false,
+     "addBelow": false,
+     "useLabel": "",
+     "useBelow": false,
+     "addAsk": false,
+     "added": false,
+     "useAsk": false,
+     "used": false,
+     "items": 1,
+     "itemsBelow": false,
+     "rows": 2,
+     "firstItem": "郭董私房菜",
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "coupon.page_back",
+     "wallet.items",
+     "wallet.rows",
+     "wallet.sub_unused",
+     "wallet.sub_used",
+     "wallet.tab_coupons",
+     "wallet.tab_tickets"
+    ],
+    "rects": {
+     "coupon.page_back": [
+      16,
+      8,
+      24,
+      24
+     ],
+     "wallet.tab_coupons": [
+      195,
+      56,
+      179,
+      24
+     ],
+     "wallet.tab_tickets": [
+      16,
+      56,
+      179,
+      24
+     ],
+     "wallet.sub_unused": [
+      0,
+      117,
+      130,
+      41
+     ],
+     "wallet.sub_used": [
+      130,
+      117,
+      130,
+      41
+     ],
+     "wallet.items": [
+      16,
+      177,
+      358,
+      112
+     ],
+     "wallet.rows": [
+      16,
+      159,
+      358,
+      130
+     ]
+    }
+   },
+   "facts": {
+    "url": "/ticket-wallet",
+    "title": "票夾",
+    "fields": [],
+    "starred": [],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "入場券",
+      "disabled": false,
+      "rect": [
+       16,
+       56,
+       179,
+       24
+      ]
+     },
+     {
+      "text": "優惠券",
+      "disabled": false,
+      "rect": [
+       195,
+       56,
+       179,
+       24
+      ]
+     },
+     {
+      "text": "我的訂單",
+      "disabled": false,
+      "rect": [
+       -390,
+       99,
+       195,
+       41
+      ]
+     },
+     {
+      "text": "已結束",
+      "disabled": false,
+      "rect": [
+       -195,
+       99,
+       195,
+       41
+      ]
+     },
+     {
+      "text": "未兌換",
+      "disabled": false,
+      "rect": [
+       0,
+       117,
+       130,
+       41
+      ]
+     },
+     {
+      "text": "已兌換",
+      "disabled": false,
+      "rect": [
+       130,
+       117,
+       130,
+       41
+      ]
+     },
+     {
+      "text": "已過期",
+      "disabled": false,
+      "rect": [
+       260,
+       117,
+       130,
+       41
+      ]
+     }
+    ],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 851
+   }
+  }
+ ]
+}

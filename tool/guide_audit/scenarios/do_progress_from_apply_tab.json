@@ -1,0 +1,20 @@
+{
+  "name": "do_progress_from_apply_tab",
+  "description": "check_progress, goal check_progress, page opened at / (申辦 tab, start /): the user taps 查詢 as the card says.",
+  "page": "district_office",
+  "capability": "districtOffice.progress",
+  "start": "/",
+  "goals": [
+    "check_progress"
+  ],
+  "expect": {
+    "done": true
+  },
+  "actions": [
+    {
+      "step": "check_progress",
+      "do": "click",
+      "text": "查詢"
+    }
+  ]
+}

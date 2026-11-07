@@ -1,0 +1,30 @@
+{
+  "name": "cit_progress_case_detail",
+  "description": "goal case_detail: 查詢 -> case -> 詳細內容.",
+  "page": "citizen_report",
+  "capability": "reportIssue.progress",
+  "start": "/citizen-report/",
+  "goals": [
+    "case_detail"
+  ],
+  "expect": {
+    "done": true
+  },
+  "actions": [
+    {
+      "step": "open_cases",
+      "do": "click",
+      "text": "查詢"
+    },
+    {
+      "step": "open_case",
+      "do": "click",
+      "text": "test"
+    },
+    {
+      "step": "case_detail",
+      "do": "click",
+      "text": "詳細內容"
+    }
+  ]
+}

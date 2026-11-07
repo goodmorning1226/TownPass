@@ -1,0 +1,34 @@
+{
+  "name": "fees_other_company",
+  "description": "fees.other: 規費 -> 公司登記費 (fee-1). Its 手機號碼 hint is 「範例：0910999999，不含分隔符號」; the card must say type 「0910999999」 without - or spaces (FEE-2). The user types a test number and queries; no bills in the demo, so the guide ends on the 目前查無待繳帳單 done card (FEE-5).",
+  "page": "fees",
+  "capability": "fees.other",
+  "goals": [],
+  "expect": {
+    "done": true
+  },
+  "actions": [
+    {
+      "step": "pick_fee",
+      "do": "click",
+      "text": "規費"
+    },
+    {
+      "step": "pick_fee",
+      "do": "click",
+      "text": "公司登記費"
+    },
+    {
+      "step": "enter_number",
+      "do": "type",
+      "selector": ".tab-view #phone_number",
+      "value": "0900000000"
+    },
+    {
+      "step": "query_bill",
+      "do": "click",
+      "text": "查詢",
+      "within": ".tab-view"
+    }
+  ]
+}

@@ -1,0 +1,6 @@
+{
+  "name": "lib_ranking_direct",
+  "description": "library.ranking opened through capabilities.json navigation (parents /library-service/ then /library-service/ranking-list), i.e. already on the list: guide should be done at once.",
+  "page": "library", "capability": "library.ranking", "goals": [], "expect": { "done": true },
+  "actions": []
+}

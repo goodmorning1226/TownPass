@@ -1,0 +1,16 @@
+{
+  "name": "disaster_d31_in_app",
+  "description": "Control: 土石流 (D-3-1) opened the way the app opens it (/disaster-report, then the in-page route). The form has the 災情描述 checkboxes; the user follows the cards and the report goes through.",
+  "page": "disaster_report",
+  "capability": "disasterReport.form.D-3-1",
+  "goals": [],
+  "expect": { "done": true },
+  "actions": [
+    { "step": "enter_location", "do": "type", "selector": "#location", "value": "臺北市信義區市府路1號" },
+    { "step": "describe_disaster", "do": "check", "text": "道路" },
+    { "step": "give_consent", "do": "scroll", "to": "bottom" },
+    { "step": "give_consent", "do": "check", "text": "提供個人資料給承辦人員" },
+    { "step": "send_report", "do": "click", "text": "送出" },
+    { "step": "done", "do": "click", "text": "確認" }
+  ]
+}

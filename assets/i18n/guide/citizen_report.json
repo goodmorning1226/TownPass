@@ -31,13 +31,6 @@
    "id": "Pilih juga di bagian “{page:個人資料是否提供給承辦}”. ",
    "th": "เลือกที่ “{page:個人資料是否提供給承辦}” ด้วย "
   },
-  "「個人資料是否提供給承辦」現在選「{consent}」，想改可以點另一個。": {
-   "en": "Under “{page:個人資料是否提供給承辦}”, “{consent}” is chosen now. To change it, tap the other one. ",
-   "ja": "「{page:個人資料是否提供給承辦}」は今「{consent}」になっています。変えたいときはもう一方をタップしてください。",
-   "vi": "Ở mục “{page:個人資料是否提供給承辦}” hiện đang chọn “{consent}”. Muốn đổi thì chạm vào lựa chọn còn lại. ",
-   "id": "Di bagian “{page:個人資料是否提供給承辦}” sekarang terpilih “{consent}”. Kalau mau ganti, ketuk pilihan yang lain. ",
-   "th": "ที่ “{page:個人資料是否提供給承辦}” ตอนนี้เลือก “{consent}” อยู่ ถ้าอยากเปลี่ยนให้แตะอีกตัวเลือกหนึ่ง "
-  },
   "「描述」要寫人、事、時、地、物，例如「11月7日晚上，〇〇路口的路燈不亮，很暗很危險」。": {
    "en": "In “{page:描述}”, write who, what, when, where and which thing, e.g. “11月7日晚上，〇〇路口的路燈不亮，很暗很危險” (on the evening of 7 Nov the street light at the 〇〇 crossing is out; it is dark and dangerous).",
    "ja": "「{page:描述}」には、誰が・何を・いつ・どこで・何が、を書きます。例：「11月7日晚上，〇〇路口的路燈不亮，很暗很危險」（11月7日の夜、〇〇交差点の街灯がつかず、暗くて危ない）。",
@@ -402,26 +395,12 @@
    "id": "Sudah! Kasus yang cocok ada di bawah.",
    "th": "ค้นหาเสร็จแล้ว! เรื่องที่ตรงกันอยู่ด้านล่าง"
   },
-  "接著在「案件主旨」寫一句話說明要反映什麼。": {
-   "en": "Next, write one sentence in “{page:案件主旨}” about what you want to report.",
-   "ja": "次に「{page:案件主旨}」に、伝えたいことを一文で書いてください。",
-   "vi": "Tiếp theo, viết một câu ở “{page:案件主旨}” nói bạn muốn phản ánh gì.",
-   "id": "Lalu tulis satu kalimat di “{page:案件主旨}” tentang apa yang ingin Anda sampaikan.",
-   "th": "ต่อไป เขียนหนึ่งประโยคใน “{page:案件主旨}” ว่าอยากแจ้งเรื่องอะไร"
-  },
   "搜尋陳情類別": {
    "en": "Search for a complaint category",
    "ja": "陳情のカテゴリーを検索する",
    "vi": "Tìm loại phản ánh",
    "id": "Cari kategori keluhan",
    "th": "ค้นหาหมวดหมู่เรื่องร้องเรียน"
-  },
-  "最多可以加 10 個檔案。都好了就往下按「送出」。": {
-   "en": "You can add up to 10 files. When everything is ready, scroll down and tap “{page:送出}”.",
-   "ja": "ファイルは 10 個まで付けられます。準備ができたら、下の「{page:送出}」を押してください。",
-   "vi": "Có thể thêm tối đa 10 tệp. Xong hết thì cuộn xuống bấm “{page:送出}”.",
-   "id": "Anda bisa menambah hingga 10 file. Kalau semua sudah siap, gulir ke bawah dan tekan “{page:送出}”.",
-   "th": "แนบได้สูงสุด 10 ไฟล์ ถ้าเรียบร้อยแล้ว เลื่อนลงแล้วกด “{page:送出}”"
   },
   "最後確認一下內容。": {
    "en": "Last, check what you wrote. ",
@@ -891,6 +870,34 @@
    "vi": ", ",
    "id": ", ",
    "th": " และ "
+  },
+  "接著在「案件主旨」和「描述」寫清楚要反映的事（有「*」的兩格一定要寫），再自己按「送出」。": {
+   "en": "Next, write clearly what you want to report in “{page:案件主旨}” and “{page:描述}” (the two boxes with “*” must be filled in), then tap “{page:送出}” yourself.",
+   "ja": "次に「{page:案件主旨}」と「{page:描述}」に、伝えたいことをはっきり書いてください（「*」の付いた2つの欄は必ず書きます）。それから自分で「{page:送出}」を押してください。",
+   "vi": "Tiếp theo, viết rõ điều bạn muốn phản ánh ở “{page:案件主旨}” và “{page:描述}” (hai ô có dấu “*” bắt buộc phải điền), rồi tự bấm “{page:送出}”.",
+   "id": "Lalu tulis dengan jelas apa yang ingin Anda sampaikan di “{page:案件主旨}” dan “{page:描述}” (dua kotak bertanda “*” wajib diisi), lalu tekan sendiri “{page:送出}”.",
+   "th": "ต่อไป เขียนเรื่องที่อยากแจ้งให้ชัดเจนใน “{page:案件主旨}” และ “{page:描述}” (สองช่องที่มี “*” ต้องกรอก) แล้วกด “{page:送出}” เอง"
+  },
+  "最多可以加 10 個檔案。接著在「案件主旨」和「描述」寫清楚要反映的事（有「*」的兩格一定要寫），再自己按「送出」。": {
+   "en": "You can add up to 10 files. Next, write clearly what you want to report in “{page:案件主旨}” and “{page:描述}” (the two boxes with “*” must be filled in), then tap “{page:送出}” yourself.",
+   "ja": "ファイルは 10 個まで付けられます。次に「{page:案件主旨}」と「{page:描述}」に、伝えたいことをはっきり書いてください（「*」の付いた2つの欄は必ず書きます）。それから自分で「{page:送出}」を押してください。",
+   "vi": "Có thể thêm tối đa 10 tệp. Tiếp theo, viết rõ điều bạn muốn phản ánh ở “{page:案件主旨}” và “{page:描述}” (hai ô có dấu “*” bắt buộc phải điền), rồi tự bấm “{page:送出}”.",
+   "id": "Anda bisa menambah hingga 10 file. Lalu tulis dengan jelas apa yang ingin Anda sampaikan di “{page:案件主旨}” dan “{page:描述}” (dua kotak bertanda “*” wajib diisi), lalu tekan sendiri “{page:送出}”.",
+   "th": "แนบได้สูงสุด 10 ไฟล์ ต่อไป เขียนเรื่องที่อยากแจ้งให้ชัดเจนใน “{page:案件主旨}” และ “{page:描述}” (สองช่องที่มี “*” ต้องกรอก) แล้วกด “{page:送出}” เอง"
+  },
+  "選「不同意」時這個網站不能送出（「送出」變成灰色）。要送出，請改選「同意」。": {
+   "en": "With “{page:不同意}” chosen, this site can’t send the report (“{page:送出}” turns grey). To send it, choose “{page:同意}” instead.",
+   "ja": "「{page:不同意}」を選ぶと、このサイトでは送れません（「{page:送出}」が灰色になります）。送るには「{page:同意}」に変えてください。",
+   "vi": "Khi chọn “{page:不同意}”, trang này không gửi được (“{page:送出}” chuyển sang màu xám). Muốn gửi, hãy đổi sang “{page:同意}”.",
+   "id": "Jika memilih “{page:不同意}”, situs ini tidak bisa mengirim (“{page:送出}” jadi abu-abu). Untuk mengirim, pilih “{page:同意}”.",
+   "th": "ถ้าเลือก “{page:不同意}” เว็บนี้จะส่งไม่ได้ (“{page:送出}” กลายเป็นสีเทา) ถ้าจะส่ง ให้เปลี่ยนไปเลือก “{page:同意}”"
+  },
+  "「個人資料是否提供給承辦」現在選「{consent}」。選「不同意」就不能送出喔。": {
+   "en": "Under “{page:個人資料是否提供給承辦}”, “{consent}” is chosen now. With “{page:不同意}”, it can’t be sent. ",
+   "ja": "「{page:個人資料是否提供給承辦}」は今「{consent}」になっています。「{page:不同意}」を選ぶと送れません。",
+   "vi": "Ở mục “{page:個人資料是否提供給承辦}” hiện đang chọn “{consent}”. Nếu chọn “{page:不同意}” thì không gửi được. ",
+   "id": "Di bagian “{page:個人資料是否提供給承辦}” sekarang terpilih “{consent}”. Kalau memilih “{page:不同意}”, tidak bisa dikirim. ",
+   "th": "ที่ “{page:個人資料是否提供給承辦}” ตอนนี้เลือก “{consent}” อยู่ ถ้าเลือก “{page:不同意}” จะส่งไม่ได้ "
   }
  }
 }

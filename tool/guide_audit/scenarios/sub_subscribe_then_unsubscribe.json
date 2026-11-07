@@ -1,0 +1,37 @@
+{
+  "name": "sub_subscribe_then_unsubscribe",
+  "description": "goals subscribe + unsubscribe: open 健康報報, 訂閱, then open it again and 取消訂閱.",
+  "page": "subscription",
+  "capability": "subscription",
+  "goals": [
+    "subscribe",
+    "unsubscribe"
+  ],
+  "expect": {
+    "done": true
+  },
+  "actions": [
+    {
+      "step": "pick_topic",
+      "do": "click",
+      "text": "健康報報"
+    },
+    {
+      "step": "subscribe",
+      "do": "click",
+      "selector": "div.subscription-wrapper button.card-button",
+      "nth": 6
+    },
+    {
+      "step": "unsubscribe",
+      "do": "click",
+      "text": "健康報報"
+    },
+    {
+      "step": "unsubscribe",
+      "do": "click",
+      "selector": "div.subscription-wrapper button.card-button",
+      "nth": 6
+    }
+  ]
+}

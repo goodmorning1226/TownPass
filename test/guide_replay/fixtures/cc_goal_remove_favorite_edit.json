@@ -1,0 +1,1975 @@
+{
+ "name": "cc_goal_remove_favorite_edit",
+ "description": "reservation, goals add_favorite + remove_favorite: add on the unit page, go back to the home list, open 變更 and press 移除地點 with nothing ticked (nothing removed: not done), then 變更 → tick → 移除地點.",
+ "page": "counter_calling",
+ "start": null,
+ "capability": "reservation",
+ "goals": [
+  "add_favorite",
+  "remove_favorite"
+ ],
+ "expect": {
+  "done": true
+ },
+ "recordedAt": "2026-11-07T18:55:46.906Z",
+ "durationMs": 13423,
+ "viewport": {
+  "width": 390,
+  "height": 844,
+  "deviceScaleFactor": 3,
+  "isMobile": true,
+  "hasTouch": true
+ },
+ "failed": null,
+ "steps": [
+  {
+   "action": null,
+   "before": null,
+   "after": {
+    "path": "/counter-calling/",
+    "query": {},
+    "flags": {
+     "unitCount": 5,
+     "unitsBelow": false,
+     "favorites": 0,
+     "favAtLeast1": false,
+     "favAtLeast2": false,
+     "favAtLeast3": false,
+     "favAtLeast4": false,
+     "favAtLeast5": false,
+     "favAtLeast6": false,
+     "favAtLeast7": false,
+     "favAtLeast8": false,
+     "favAtLeast9": false,
+     "favAtLeast10": false,
+     "favNames": "",
+     "unitName": "",
+     "location": "",
+     "locationName": "",
+     "firstLocation": "",
+     "locationCount": 0,
+     "locationFocus": false,
+     "locationPicked": false,
+     "favText": "",
+     "favOn": false,
+     "counters": "",
+     "countersBottom": 0,
+     "editOpen": false,
+     "editHasInputs": false,
+     "editTicked": false,
+     "editBottom": 0,
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "counter.units"
+    ],
+    "rects": {
+     "counter.units": [
+      20,
+      68,
+      350,
+      448
+     ]
+    }
+   },
+   "facts": {
+    "url": "/counter-calling/",
+    "title": "臨櫃叫號",
+    "fields": [],
+    "starred": [],
+    "errors": [],
+    "buttons": [],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  },
+  {
+   "action": {
+    "step": "pick_unit",
+    "do": "click",
+    "text": "區公所",
+    "hit": {
+     "x": 195,
+     "y": 292,
+     "targets": [
+      "counter.units"
+     ]
+    }
+   },
+   "before": {
+    "path": "/counter-calling/",
+    "query": {},
+    "flags": {
+     "unitCount": 5,
+     "unitsBelow": false,
+     "favorites": 0,
+     "favAtLeast1": false,
+     "favAtLeast2": false,
+     "favAtLeast3": false,
+     "favAtLeast4": false,
+     "favAtLeast5": false,
+     "favAtLeast6": false,
+     "favAtLeast7": false,
+     "favAtLeast8": false,
+     "favAtLeast9": false,
+     "favAtLeast10": false,
+     "favNames": "",
+     "unitName": "",
+     "location": "",
+     "locationName": "",
+     "firstLocation": "",
+     "locationCount": 0,
+     "locationFocus": false,
+     "locationPicked": false,
+     "favText": "",
+     "favOn": false,
+     "counters": "",
+     "countersBottom": 0,
+     "editOpen": false,
+     "editHasInputs": false,
+     "editTicked": false,
+     "editBottom": 0,
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "counter.units"
+    ],
+    "rects": {
+     "counter.units": [
+      20,
+      68,
+      350,
+      448
+     ]
+    }
+   },
+   "after": {
+    "path": "/counter-calling/c-3",
+    "query": {},
+    "flags": {
+     "unitCount": 0,
+     "unitsBelow": false,
+     "favorites": 0,
+     "favAtLeast1": false,
+     "favAtLeast2": false,
+     "favAtLeast3": false,
+     "favAtLeast4": false,
+     "favAtLeast5": false,
+     "favAtLeast6": false,
+     "favAtLeast7": false,
+     "favAtLeast8": false,
+     "favAtLeast9": false,
+     "favAtLeast10": false,
+     "favNames": "",
+     "unitName": "區公所",
+     "location": "c-3-1",
+     "locationName": "臺北市萬華區公所",
+     "firstLocation": "臺北市萬華區公所",
+     "locationCount": 2,
+     "locationFocus": false,
+     "locationPicked": false,
+     "favText": "加入常用",
+     "favOn": false,
+     "counters": "綜合櫃檯|23|0;兵役服務|703|0;博愛櫃檯|903|6",
+     "countersBottom": 454,
+     "editOpen": false,
+     "editHasInputs": false,
+     "editTicked": false,
+     "editBottom": 0,
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "counter.counters",
+     "counter.favorite",
+     "counter.location"
+    ],
+    "rects": {
+     "counter.location": [
+      20,
+      68,
+      350,
+      50
+     ],
+     "counter.counters": [
+      20,
+      222,
+      350,
+      232
+     ],
+     "counter.favorite": [
+      282,
+      182,
+      88,
+      24
+     ]
+    }
+   },
+   "facts": {
+    "url": "/counter-calling/c-3",
+    "title": "臨櫃叫號",
+    "fields": [
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "c-3",
+      "name": "",
+      "label": "選擇地點",
+      "placeholder": "",
+      "value": "c-3-1",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       20,
+       68,
+       350,
+       50
+      ]
+     }
+    ],
+    "starred": [],
+    "errors": [],
+    "buttons": [],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  },
+  {
+   "action": {
+    "step": "pick_location",
+    "do": "click",
+    "selector": "select.base-select",
+    "hit": {
+     "x": 195,
+     "y": 93,
+     "targets": [
+      "counter.location"
+     ]
+    }
+   },
+   "before": {
+    "path": "/counter-calling/c-3",
+    "query": {},
+    "flags": {
+     "unitCount": 0,
+     "unitsBelow": false,
+     "favorites": 0,
+     "favAtLeast1": false,
+     "favAtLeast2": false,
+     "favAtLeast3": false,
+     "favAtLeast4": false,
+     "favAtLeast5": false,
+     "favAtLeast6": false,
+     "favAtLeast7": false,
+     "favAtLeast8": false,
+     "favAtLeast9": false,
+     "favAtLeast10": false,
+     "favNames": "",
+     "unitName": "區公所",
+     "location": "c-3-1",
+     "locationName": "臺北市萬華區公所",
+     "firstLocation": "臺北市萬華區公所",
+     "locationCount": 2,
+     "locationFocus": false,
+     "locationPicked": false,
+     "favText": "加入常用",
+     "favOn": false,
+     "counters": "綜合櫃檯|23|0;兵役服務|703|0;博愛櫃檯|903|6",
+     "countersBottom": 454,
+     "editOpen": false,
+     "editHasInputs": false,
+     "editTicked": false,
+     "editBottom": 0,
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "counter.counters",
+     "counter.favorite",
+     "counter.location"
+    ],
+    "rects": {
+     "counter.location": [
+      20,
+      68,
+      350,
+      50
+     ],
+     "counter.counters": [
+      20,
+      222,
+      350,
+      232
+     ],
+     "counter.favorite": [
+      282,
+      182,
+      88,
+      24
+     ]
+    }
+   },
+   "after": {
+    "path": "/counter-calling/c-3",
+    "query": {},
+    "flags": {
+     "unitCount": 0,
+     "unitsBelow": false,
+     "favorites": 0,
+     "favAtLeast1": false,
+     "favAtLeast2": false,
+     "favAtLeast3": false,
+     "favAtLeast4": false,
+     "favAtLeast5": false,
+     "favAtLeast6": false,
+     "favAtLeast7": false,
+     "favAtLeast8": false,
+     "favAtLeast9": false,
+     "favAtLeast10": false,
+     "favNames": "",
+     "unitName": "區公所",
+     "location": "c-3-1",
+     "locationName": "臺北市萬華區公所",
+     "firstLocation": "臺北市萬華區公所",
+     "locationCount": 2,
+     "locationFocus": true,
+     "locationPicked": true,
+     "favText": "加入常用",
+     "favOn": false,
+     "counters": "綜合櫃檯|23|0;兵役服務|703|0;博愛櫃檯|903|6",
+     "countersBottom": 454,
+     "editOpen": false,
+     "editHasInputs": false,
+     "editTicked": false,
+     "editBottom": 0,
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "counter.counters",
+     "counter.favorite",
+     "counter.location"
+    ],
+    "rects": {
+     "counter.location": [
+      20,
+      68,
+      350,
+      50
+     ],
+     "counter.counters": [
+      20,
+      222,
+      350,
+      232
+     ],
+     "counter.favorite": [
+      282,
+      182,
+      88,
+      24
+     ]
+    }
+   },
+   "facts": {
+    "url": "/counter-calling/c-3",
+    "title": "臨櫃叫號",
+    "fields": [
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "c-3",
+      "name": "",
+      "label": "選擇地點",
+      "placeholder": "",
+      "value": "c-3-1",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       20,
+       68,
+       350,
+       50
+      ]
+     }
+    ],
+    "starred": [],
+    "errors": [],
+    "buttons": [],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  },
+  {
+   "action": {
+    "step": "pick_location",
+    "do": "select",
+    "selector": "select.base-select",
+    "value": "c-3-2",
+    "hit": {
+     "x": 195,
+     "y": 93,
+     "targets": [
+      "counter.location"
+     ]
+    }
+   },
+   "before": {
+    "path": "/counter-calling/c-3",
+    "query": {},
+    "flags": {
+     "unitCount": 0,
+     "unitsBelow": false,
+     "favorites": 0,
+     "favAtLeast1": false,
+     "favAtLeast2": false,
+     "favAtLeast3": false,
+     "favAtLeast4": false,
+     "favAtLeast5": false,
+     "favAtLeast6": false,
+     "favAtLeast7": false,
+     "favAtLeast8": false,
+     "favAtLeast9": false,
+     "favAtLeast10": false,
+     "favNames": "",
+     "unitName": "區公所",
+     "location": "c-3-1",
+     "locationName": "臺北市萬華區公所",
+     "firstLocation": "臺北市萬華區公所",
+     "locationCount": 2,
+     "locationFocus": true,
+     "locationPicked": true,
+     "favText": "加入常用",
+     "favOn": false,
+     "counters": "綜合櫃檯|23|0;兵役服務|703|0;博愛櫃檯|903|6",
+     "countersBottom": 454,
+     "editOpen": false,
+     "editHasInputs": false,
+     "editTicked": false,
+     "editBottom": 0,
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "counter.counters",
+     "counter.favorite",
+     "counter.location"
+    ],
+    "rects": {
+     "counter.location": [
+      20,
+      68,
+      350,
+      50
+     ],
+     "counter.counters": [
+      20,
+      222,
+      350,
+      232
+     ],
+     "counter.favorite": [
+      282,
+      182,
+      88,
+      24
+     ]
+    }
+   },
+   "after": {
+    "path": "/counter-calling/c-3",
+    "query": {},
+    "flags": {
+     "unitCount": 0,
+     "unitsBelow": false,
+     "favorites": 0,
+     "favAtLeast1": false,
+     "favAtLeast2": false,
+     "favAtLeast3": false,
+     "favAtLeast4": false,
+     "favAtLeast5": false,
+     "favAtLeast6": false,
+     "favAtLeast7": false,
+     "favAtLeast8": false,
+     "favAtLeast9": false,
+     "favAtLeast10": false,
+     "favNames": "",
+     "unitName": "區公所",
+     "location": "c-3-2",
+     "locationName": "臺北市中正區公所",
+     "firstLocation": "臺北市萬華區公所",
+     "locationCount": 2,
+     "locationFocus": true,
+     "locationPicked": true,
+     "favText": "加入常用",
+     "favOn": false,
+     "counters": "博愛櫃檯|000|0;社會業務|000|0;民政業務|000|0;兵役服務|000|0",
+     "countersBottom": 518,
+     "editOpen": false,
+     "editHasInputs": false,
+     "editTicked": false,
+     "editBottom": 0,
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "counter.counters",
+     "counter.favorite",
+     "counter.location"
+    ],
+    "rects": {
+     "counter.location": [
+      20,
+      68,
+      350,
+      50
+     ],
+     "counter.counters": [
+      20,
+      222,
+      350,
+      296
+     ],
+     "counter.favorite": [
+      282,
+      182,
+      88,
+      24
+     ]
+    }
+   },
+   "facts": {
+    "url": "/counter-calling/c-3",
+    "title": "臨櫃叫號",
+    "fields": [
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "c-3",
+      "name": "",
+      "label": "選擇地點",
+      "placeholder": "",
+      "value": "c-3-2",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       20,
+       68,
+       350,
+       50
+      ]
+     }
+    ],
+    "starred": [],
+    "errors": [],
+    "buttons": [],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  },
+  {
+   "action": {
+    "step": "pick_location",
+    "do": "blur",
+    "hit": null
+   },
+   "before": {
+    "path": "/counter-calling/c-3",
+    "query": {},
+    "flags": {
+     "unitCount": 0,
+     "unitsBelow": false,
+     "favorites": 0,
+     "favAtLeast1": false,
+     "favAtLeast2": false,
+     "favAtLeast3": false,
+     "favAtLeast4": false,
+     "favAtLeast5": false,
+     "favAtLeast6": false,
+     "favAtLeast7": false,
+     "favAtLeast8": false,
+     "favAtLeast9": false,
+     "favAtLeast10": false,
+     "favNames": "",
+     "unitName": "區公所",
+     "location": "c-3-2",
+     "locationName": "臺北市中正區公所",
+     "firstLocation": "臺北市萬華區公所",
+     "locationCount": 2,
+     "locationFocus": true,
+     "locationPicked": true,
+     "favText": "加入常用",
+     "favOn": false,
+     "counters": "博愛櫃檯|000|0;社會業務|000|0;民政業務|000|0;兵役服務|000|0",
+     "countersBottom": 518,
+     "editOpen": false,
+     "editHasInputs": false,
+     "editTicked": false,
+     "editBottom": 0,
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "counter.counters",
+     "counter.favorite",
+     "counter.location"
+    ],
+    "rects": {
+     "counter.location": [
+      20,
+      68,
+      350,
+      50
+     ],
+     "counter.counters": [
+      20,
+      222,
+      350,
+      296
+     ],
+     "counter.favorite": [
+      282,
+      182,
+      88,
+      24
+     ]
+    }
+   },
+   "after": {
+    "path": "/counter-calling/c-3",
+    "query": {},
+    "flags": {
+     "unitCount": 0,
+     "unitsBelow": false,
+     "favorites": 0,
+     "favAtLeast1": false,
+     "favAtLeast2": false,
+     "favAtLeast3": false,
+     "favAtLeast4": false,
+     "favAtLeast5": false,
+     "favAtLeast6": false,
+     "favAtLeast7": false,
+     "favAtLeast8": false,
+     "favAtLeast9": false,
+     "favAtLeast10": false,
+     "favNames": "",
+     "unitName": "區公所",
+     "location": "c-3-2",
+     "locationName": "臺北市中正區公所",
+     "firstLocation": "臺北市萬華區公所",
+     "locationCount": 2,
+     "locationFocus": false,
+     "locationPicked": true,
+     "favText": "加入常用",
+     "favOn": false,
+     "counters": "博愛櫃檯|000|0;社會業務|000|0;民政業務|000|0;兵役服務|000|0",
+     "countersBottom": 518,
+     "editOpen": false,
+     "editHasInputs": false,
+     "editTicked": false,
+     "editBottom": 0,
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "counter.counters",
+     "counter.favorite",
+     "counter.location"
+    ],
+    "rects": {
+     "counter.location": [
+      20,
+      68,
+      350,
+      50
+     ],
+     "counter.counters": [
+      20,
+      222,
+      350,
+      296
+     ],
+     "counter.favorite": [
+      282,
+      182,
+      88,
+      24
+     ]
+    }
+   },
+   "facts": {
+    "url": "/counter-calling/c-3",
+    "title": "臨櫃叫號",
+    "fields": [
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "c-3",
+      "name": "",
+      "label": "選擇地點",
+      "placeholder": "",
+      "value": "c-3-2",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       20,
+       68,
+       350,
+       50
+      ]
+     }
+    ],
+    "starred": [],
+    "errors": [],
+    "buttons": [],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  },
+  {
+   "action": {
+    "step": "add_favorite",
+    "do": "click",
+    "text": "加入常用",
+    "hit": {
+     "x": 326,
+     "y": 194,
+     "targets": [
+      "counter.favorite"
+     ]
+    }
+   },
+   "before": {
+    "path": "/counter-calling/c-3",
+    "query": {},
+    "flags": {
+     "unitCount": 0,
+     "unitsBelow": false,
+     "favorites": 0,
+     "favAtLeast1": false,
+     "favAtLeast2": false,
+     "favAtLeast3": false,
+     "favAtLeast4": false,
+     "favAtLeast5": false,
+     "favAtLeast6": false,
+     "favAtLeast7": false,
+     "favAtLeast8": false,
+     "favAtLeast9": false,
+     "favAtLeast10": false,
+     "favNames": "",
+     "unitName": "區公所",
+     "location": "c-3-2",
+     "locationName": "臺北市中正區公所",
+     "firstLocation": "臺北市萬華區公所",
+     "locationCount": 2,
+     "locationFocus": false,
+     "locationPicked": true,
+     "favText": "加入常用",
+     "favOn": false,
+     "counters": "博愛櫃檯|000|0;社會業務|000|0;民政業務|000|0;兵役服務|000|0",
+     "countersBottom": 518,
+     "editOpen": false,
+     "editHasInputs": false,
+     "editTicked": false,
+     "editBottom": 0,
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "counter.counters",
+     "counter.favorite",
+     "counter.location"
+    ],
+    "rects": {
+     "counter.location": [
+      20,
+      68,
+      350,
+      50
+     ],
+     "counter.counters": [
+      20,
+      222,
+      350,
+      296
+     ],
+     "counter.favorite": [
+      282,
+      182,
+      88,
+      24
+     ]
+    }
+   },
+   "after": {
+    "path": "/counter-calling/c-3",
+    "query": {},
+    "flags": {
+     "unitCount": 0,
+     "unitsBelow": false,
+     "favorites": 0,
+     "favAtLeast1": false,
+     "favAtLeast2": false,
+     "favAtLeast3": false,
+     "favAtLeast4": false,
+     "favAtLeast5": false,
+     "favAtLeast6": false,
+     "favAtLeast7": false,
+     "favAtLeast8": false,
+     "favAtLeast9": false,
+     "favAtLeast10": false,
+     "favNames": "",
+     "unitName": "區公所",
+     "location": "c-3-2",
+     "locationName": "臺北市中正區公所",
+     "firstLocation": "臺北市萬華區公所",
+     "locationCount": 2,
+     "locationFocus": false,
+     "locationPicked": true,
+     "favText": "移除常用",
+     "favOn": true,
+     "counters": "博愛櫃檯|000|0;社會業務|000|0;民政業務|000|0;兵役服務|000|0",
+     "countersBottom": 518,
+     "editOpen": false,
+     "editHasInputs": false,
+     "editTicked": false,
+     "editBottom": 0,
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "counter.counters",
+     "counter.favorite",
+     "counter.location"
+    ],
+    "rects": {
+     "counter.location": [
+      20,
+      68,
+      350,
+      50
+     ],
+     "counter.counters": [
+      20,
+      222,
+      350,
+      296
+     ],
+     "counter.favorite": [
+      282,
+      182,
+      88,
+      24
+     ]
+    }
+   },
+   "facts": {
+    "url": "/counter-calling/c-3",
+    "title": "臨櫃叫號",
+    "fields": [
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "c-3",
+      "name": "",
+      "label": "選擇地點",
+      "placeholder": "",
+      "value": "c-3-2",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       20,
+       68,
+       350,
+       50
+      ]
+     }
+    ],
+    "starred": [],
+    "errors": [],
+    "buttons": [],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  },
+  {
+   "action": {
+    "step": "remove_favorite",
+    "do": "back",
+    "hit": null
+   },
+   "before": {
+    "path": "/counter-calling/c-3",
+    "query": {},
+    "flags": {
+     "unitCount": 0,
+     "unitsBelow": false,
+     "favorites": 0,
+     "favAtLeast1": false,
+     "favAtLeast2": false,
+     "favAtLeast3": false,
+     "favAtLeast4": false,
+     "favAtLeast5": false,
+     "favAtLeast6": false,
+     "favAtLeast7": false,
+     "favAtLeast8": false,
+     "favAtLeast9": false,
+     "favAtLeast10": false,
+     "favNames": "",
+     "unitName": "區公所",
+     "location": "c-3-2",
+     "locationName": "臺北市中正區公所",
+     "firstLocation": "臺北市萬華區公所",
+     "locationCount": 2,
+     "locationFocus": false,
+     "locationPicked": true,
+     "favText": "移除常用",
+     "favOn": true,
+     "counters": "博愛櫃檯|000|0;社會業務|000|0;民政業務|000|0;兵役服務|000|0",
+     "countersBottom": 518,
+     "editOpen": false,
+     "editHasInputs": false,
+     "editTicked": false,
+     "editBottom": 0,
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "counter.counters",
+     "counter.favorite",
+     "counter.location"
+    ],
+    "rects": {
+     "counter.location": [
+      20,
+      68,
+      350,
+      50
+     ],
+     "counter.counters": [
+      20,
+      222,
+      350,
+      296
+     ],
+     "counter.favorite": [
+      282,
+      182,
+      88,
+      24
+     ]
+    }
+   },
+   "after": {
+    "path": "/counter-calling/",
+    "query": {},
+    "flags": {
+     "unitCount": 5,
+     "unitsBelow": false,
+     "favorites": 1,
+     "favAtLeast1": true,
+     "favAtLeast2": false,
+     "favAtLeast3": false,
+     "favAtLeast4": false,
+     "favAtLeast5": false,
+     "favAtLeast6": false,
+     "favAtLeast7": false,
+     "favAtLeast8": false,
+     "favAtLeast9": false,
+     "favAtLeast10": false,
+     "favNames": "臺北市中正區公所",
+     "unitName": "",
+     "location": "",
+     "locationName": "",
+     "firstLocation": "",
+     "locationCount": 0,
+     "locationFocus": false,
+     "locationPicked": false,
+     "favText": "",
+     "favOn": false,
+     "counters": "",
+     "countersBottom": 0,
+     "editOpen": false,
+     "editHasInputs": false,
+     "editTicked": false,
+     "editBottom": 0,
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "counter.edit",
+     "counter.favorites",
+     "counter.units"
+    ],
+    "rects": {
+     "counter.units": [
+      20,
+      247,
+      350,
+      448
+     ],
+     "counter.favorites": [
+      20,
+      68,
+      350,
+      65
+     ],
+     "counter.edit": [
+      338,
+      32,
+      32,
+      36
+     ]
+    }
+   },
+   "facts": {
+    "url": "/counter-calling/",
+    "title": "臨櫃叫號",
+    "fields": [],
+    "starred": [],
+    "errors": [],
+    "buttons": [],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 1023
+   }
+  },
+  {
+   "action": {
+    "step": "remove_favorite",
+    "do": "click",
+    "text": "變更",
+    "hit": {
+     "x": 354,
+     "y": 50,
+     "targets": [
+      "counter.edit"
+     ]
+    }
+   },
+   "before": {
+    "path": "/counter-calling/",
+    "query": {},
+    "flags": {
+     "unitCount": 5,
+     "unitsBelow": false,
+     "favorites": 1,
+     "favAtLeast1": true,
+     "favAtLeast2": false,
+     "favAtLeast3": false,
+     "favAtLeast4": false,
+     "favAtLeast5": false,
+     "favAtLeast6": false,
+     "favAtLeast7": false,
+     "favAtLeast8": false,
+     "favAtLeast9": false,
+     "favAtLeast10": false,
+     "favNames": "臺北市中正區公所",
+     "unitName": "",
+     "location": "",
+     "locationName": "",
+     "firstLocation": "",
+     "locationCount": 0,
+     "locationFocus": false,
+     "locationPicked": false,
+     "favText": "",
+     "favOn": false,
+     "counters": "",
+     "countersBottom": 0,
+     "editOpen": false,
+     "editHasInputs": false,
+     "editTicked": false,
+     "editBottom": 0,
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "counter.edit",
+     "counter.favorites",
+     "counter.units"
+    ],
+    "rects": {
+     "counter.units": [
+      20,
+      247,
+      350,
+      448
+     ],
+     "counter.favorites": [
+      20,
+      68,
+      350,
+      65
+     ],
+     "counter.edit": [
+      338,
+      32,
+      32,
+      36
+     ]
+    }
+   },
+   "after": {
+    "path": "/counter-calling/",
+    "query": {},
+    "flags": {
+     "unitCount": 5,
+     "unitsBelow": false,
+     "favorites": 1,
+     "favAtLeast1": true,
+     "favAtLeast2": false,
+     "favAtLeast3": false,
+     "favAtLeast4": false,
+     "favAtLeast5": false,
+     "favAtLeast6": false,
+     "favAtLeast7": false,
+     "favAtLeast8": false,
+     "favAtLeast9": false,
+     "favAtLeast10": false,
+     "favNames": "臺北市中正區公所",
+     "unitName": "",
+     "location": "",
+     "locationName": "",
+     "firstLocation": "",
+     "locationCount": 0,
+     "locationFocus": false,
+     "locationPicked": false,
+     "favText": "",
+     "favOn": false,
+     "counters": "",
+     "countersBottom": 0,
+     "editOpen": true,
+     "editHasInputs": true,
+     "editTicked": false,
+     "editBottom": 209,
+     "__bottomBar": 0,
+     "__dialog": true
+    },
+    "visible": [
+     "counter.edit",
+     "counter.edit_items",
+     "counter.edit_remove",
+     "counter.favorites",
+     "counter.units"
+    ],
+    "rects": {
+     "counter.units": [
+      20,
+      247,
+      350,
+      448
+     ],
+     "counter.favorites": [
+      20,
+      68,
+      350,
+      65
+     ],
+     "counter.edit": [
+      338,
+      32,
+      32,
+      36
+     ],
+     "counter.edit_items": [
+      20,
+      68,
+      350,
+      65
+     ],
+     "counter.edit_remove": [
+      20,
+      161,
+      350,
+      48
+     ]
+    }
+   },
+   "facts": {
+    "url": "/counter-calling/",
+    "title": "臨櫃叫號",
+    "fields": [
+     {
+      "tag": "input",
+      "type": "checkbox",
+      "id": "臺北市中正區公所",
+      "name": "",
+      "label": "臺北市中正區公所",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       20,
+       100,
+       0,
+       0
+      ]
+     }
+    ],
+    "starred": [],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "移除地點",
+      "disabled": false,
+      "rect": [
+       20,
+       161,
+       350,
+       48
+      ]
+     }
+    ],
+    "disabledButtons": [],
+    "dialogs": [
+     "請選擇要移除的地點 臺北市中正區公所 移除地點"
+    ],
+    "scrollY": 0,
+    "scrollHeight": 1023
+   }
+  },
+  {
+   "action": {
+    "step": "remove_favorite",
+    "do": "click",
+    "text": "移除地點",
+    "hit": {
+     "x": 195,
+     "y": 185,
+     "targets": [
+      "counter.edit_remove"
+     ]
+    }
+   },
+   "before": {
+    "path": "/counter-calling/",
+    "query": {},
+    "flags": {
+     "unitCount": 5,
+     "unitsBelow": false,
+     "favorites": 1,
+     "favAtLeast1": true,
+     "favAtLeast2": false,
+     "favAtLeast3": false,
+     "favAtLeast4": false,
+     "favAtLeast5": false,
+     "favAtLeast6": false,
+     "favAtLeast7": false,
+     "favAtLeast8": false,
+     "favAtLeast9": false,
+     "favAtLeast10": false,
+     "favNames": "臺北市中正區公所",
+     "unitName": "",
+     "location": "",
+     "locationName": "",
+     "firstLocation": "",
+     "locationCount": 0,
+     "locationFocus": false,
+     "locationPicked": false,
+     "favText": "",
+     "favOn": false,
+     "counters": "",
+     "countersBottom": 0,
+     "editOpen": true,
+     "editHasInputs": true,
+     "editTicked": false,
+     "editBottom": 209,
+     "__bottomBar": 0,
+     "__dialog": true
+    },
+    "visible": [
+     "counter.edit",
+     "counter.edit_items",
+     "counter.edit_remove",
+     "counter.favorites",
+     "counter.units"
+    ],
+    "rects": {
+     "counter.units": [
+      20,
+      247,
+      350,
+      448
+     ],
+     "counter.favorites": [
+      20,
+      68,
+      350,
+      65
+     ],
+     "counter.edit": [
+      338,
+      32,
+      32,
+      36
+     ],
+     "counter.edit_items": [
+      20,
+      68,
+      350,
+      65
+     ],
+     "counter.edit_remove": [
+      20,
+      161,
+      350,
+      48
+     ]
+    }
+   },
+   "after": {
+    "path": "/counter-calling/",
+    "query": {},
+    "flags": {
+     "unitCount": 5,
+     "unitsBelow": false,
+     "favorites": 1,
+     "favAtLeast1": true,
+     "favAtLeast2": false,
+     "favAtLeast3": false,
+     "favAtLeast4": false,
+     "favAtLeast5": false,
+     "favAtLeast6": false,
+     "favAtLeast7": false,
+     "favAtLeast8": false,
+     "favAtLeast9": false,
+     "favAtLeast10": false,
+     "favNames": "臺北市中正區公所",
+     "unitName": "",
+     "location": "",
+     "locationName": "",
+     "firstLocation": "",
+     "locationCount": 0,
+     "locationFocus": false,
+     "locationPicked": false,
+     "favText": "",
+     "favOn": false,
+     "counters": "",
+     "countersBottom": 0,
+     "editOpen": false,
+     "editHasInputs": false,
+     "editTicked": false,
+     "editBottom": 0,
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "counter.edit",
+     "counter.favorites",
+     "counter.units"
+    ],
+    "rects": {
+     "counter.units": [
+      20,
+      247,
+      350,
+      448
+     ],
+     "counter.favorites": [
+      20,
+      68,
+      350,
+      65
+     ],
+     "counter.edit": [
+      338,
+      32,
+      32,
+      36
+     ]
+    }
+   },
+   "facts": {
+    "url": "/counter-calling/",
+    "title": "臨櫃叫號",
+    "fields": [],
+    "starred": [],
+    "errors": [],
+    "buttons": [],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 1023
+   }
+  },
+  {
+   "action": {
+    "step": "remove_favorite",
+    "do": "click",
+    "text": "變更",
+    "hit": {
+     "x": 354,
+     "y": 50,
+     "targets": [
+      "counter.edit"
+     ]
+    }
+   },
+   "before": {
+    "path": "/counter-calling/",
+    "query": {},
+    "flags": {
+     "unitCount": 5,
+     "unitsBelow": false,
+     "favorites": 1,
+     "favAtLeast1": true,
+     "favAtLeast2": false,
+     "favAtLeast3": false,
+     "favAtLeast4": false,
+     "favAtLeast5": false,
+     "favAtLeast6": false,
+     "favAtLeast7": false,
+     "favAtLeast8": false,
+     "favAtLeast9": false,
+     "favAtLeast10": false,
+     "favNames": "臺北市中正區公所",
+     "unitName": "",
+     "location": "",
+     "locationName": "",
+     "firstLocation": "",
+     "locationCount": 0,
+     "locationFocus": false,
+     "locationPicked": false,
+     "favText": "",
+     "favOn": false,
+     "counters": "",
+     "countersBottom": 0,
+     "editOpen": false,
+     "editHasInputs": false,
+     "editTicked": false,
+     "editBottom": 0,
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "counter.edit",
+     "counter.favorites",
+     "counter.units"
+    ],
+    "rects": {
+     "counter.units": [
+      20,
+      247,
+      350,
+      448
+     ],
+     "counter.favorites": [
+      20,
+      68,
+      350,
+      65
+     ],
+     "counter.edit": [
+      338,
+      32,
+      32,
+      36
+     ]
+    }
+   },
+   "after": {
+    "path": "/counter-calling/",
+    "query": {},
+    "flags": {
+     "unitCount": 5,
+     "unitsBelow": false,
+     "favorites": 1,
+     "favAtLeast1": true,
+     "favAtLeast2": false,
+     "favAtLeast3": false,
+     "favAtLeast4": false,
+     "favAtLeast5": false,
+     "favAtLeast6": false,
+     "favAtLeast7": false,
+     "favAtLeast8": false,
+     "favAtLeast9": false,
+     "favAtLeast10": false,
+     "favNames": "臺北市中正區公所",
+     "unitName": "",
+     "location": "",
+     "locationName": "",
+     "firstLocation": "",
+     "locationCount": 0,
+     "locationFocus": false,
+     "locationPicked": false,
+     "favText": "",
+     "favOn": false,
+     "counters": "",
+     "countersBottom": 0,
+     "editOpen": true,
+     "editHasInputs": true,
+     "editTicked": false,
+     "editBottom": 209,
+     "__bottomBar": 0,
+     "__dialog": true
+    },
+    "visible": [
+     "counter.edit",
+     "counter.edit_items",
+     "counter.edit_remove",
+     "counter.favorites",
+     "counter.units"
+    ],
+    "rects": {
+     "counter.units": [
+      20,
+      247,
+      350,
+      448
+     ],
+     "counter.favorites": [
+      20,
+      68,
+      350,
+      65
+     ],
+     "counter.edit": [
+      338,
+      32,
+      32,
+      36
+     ],
+     "counter.edit_items": [
+      20,
+      68,
+      350,
+      65
+     ],
+     "counter.edit_remove": [
+      20,
+      161,
+      350,
+      48
+     ]
+    }
+   },
+   "facts": {
+    "url": "/counter-calling/",
+    "title": "臨櫃叫號",
+    "fields": [
+     {
+      "tag": "input",
+      "type": "checkbox",
+      "id": "臺北市中正區公所",
+      "name": "",
+      "label": "臺北市中正區公所",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       20,
+       100,
+       0,
+       0
+      ]
+     }
+    ],
+    "starred": [],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "移除地點",
+      "disabled": false,
+      "rect": [
+       20,
+       161,
+       350,
+       48
+      ]
+     }
+    ],
+    "disabledButtons": [],
+    "dialogs": [
+     "請選擇要移除的地點 臺北市中正區公所 移除地點"
+    ],
+    "scrollY": 0,
+    "scrollHeight": 1023
+   }
+  },
+  {
+   "action": {
+    "step": "remove_favorite",
+    "do": "click",
+    "selector": "label.edit-regularly-used-wrapper",
+    "hit": {
+     "x": 195,
+     "y": 101,
+     "targets": [
+      "counter.edit_items",
+      "counter.favorites"
+     ]
+    }
+   },
+   "before": {
+    "path": "/counter-calling/",
+    "query": {},
+    "flags": {
+     "unitCount": 5,
+     "unitsBelow": false,
+     "favorites": 1,
+     "favAtLeast1": true,
+     "favAtLeast2": false,
+     "favAtLeast3": false,
+     "favAtLeast4": false,
+     "favAtLeast5": false,
+     "favAtLeast6": false,
+     "favAtLeast7": false,
+     "favAtLeast8": false,
+     "favAtLeast9": false,
+     "favAtLeast10": false,
+     "favNames": "臺北市中正區公所",
+     "unitName": "",
+     "location": "",
+     "locationName": "",
+     "firstLocation": "",
+     "locationCount": 0,
+     "locationFocus": false,
+     "locationPicked": false,
+     "favText": "",
+     "favOn": false,
+     "counters": "",
+     "countersBottom": 0,
+     "editOpen": true,
+     "editHasInputs": true,
+     "editTicked": false,
+     "editBottom": 209,
+     "__bottomBar": 0,
+     "__dialog": true
+    },
+    "visible": [
+     "counter.edit",
+     "counter.edit_items",
+     "counter.edit_remove",
+     "counter.favorites",
+     "counter.units"
+    ],
+    "rects": {
+     "counter.units": [
+      20,
+      247,
+      350,
+      448
+     ],
+     "counter.favorites": [
+      20,
+      68,
+      350,
+      65
+     ],
+     "counter.edit": [
+      338,
+      32,
+      32,
+      36
+     ],
+     "counter.edit_items": [
+      20,
+      68,
+      350,
+      65
+     ],
+     "counter.edit_remove": [
+      20,
+      161,
+      350,
+      48
+     ]
+    }
+   },
+   "after": {
+    "path": "/counter-calling/",
+    "query": {},
+    "flags": {
+     "unitCount": 5,
+     "unitsBelow": false,
+     "favorites": 1,
+     "favAtLeast1": true,
+     "favAtLeast2": false,
+     "favAtLeast3": false,
+     "favAtLeast4": false,
+     "favAtLeast5": false,
+     "favAtLeast6": false,
+     "favAtLeast7": false,
+     "favAtLeast8": false,
+     "favAtLeast9": false,
+     "favAtLeast10": false,
+     "favNames": "臺北市中正區公所",
+     "unitName": "",
+     "location": "",
+     "locationName": "",
+     "firstLocation": "",
+     "locationCount": 0,
+     "locationFocus": false,
+     "locationPicked": false,
+     "favText": "",
+     "favOn": false,
+     "counters": "",
+     "countersBottom": 0,
+     "editOpen": true,
+     "editHasInputs": true,
+     "editTicked": true,
+     "editBottom": 209,
+     "__bottomBar": 0,
+     "__dialog": true
+    },
+    "visible": [
+     "counter.edit",
+     "counter.edit_items",
+     "counter.edit_remove",
+     "counter.favorites",
+     "counter.units"
+    ],
+    "rects": {
+     "counter.units": [
+      20,
+      247,
+      350,
+      448
+     ],
+     "counter.favorites": [
+      20,
+      68,
+      350,
+      65
+     ],
+     "counter.edit": [
+      338,
+      32,
+      32,
+      36
+     ],
+     "counter.edit_items": [
+      20,
+      68,
+      350,
+      65
+     ],
+     "counter.edit_remove": [
+      20,
+      161,
+      350,
+      48
+     ]
+    }
+   },
+   "facts": {
+    "url": "/counter-calling/",
+    "title": "臨櫃叫號",
+    "fields": [
+     {
+      "tag": "input",
+      "type": "checkbox",
+      "id": "臺北市中正區公所",
+      "name": "",
+      "label": "臺北市中正區公所",
+      "placeholder": "",
+      "value": "checked",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       20,
+       100,
+       0,
+       0
+      ]
+     }
+    ],
+    "starred": [],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "移除地點",
+      "disabled": false,
+      "rect": [
+       20,
+       161,
+       350,
+       48
+      ]
+     }
+    ],
+    "disabledButtons": [],
+    "dialogs": [
+     "請選擇要移除的地點 臺北市中正區公所 移除地點"
+    ],
+    "scrollY": 0,
+    "scrollHeight": 1023
+   }
+  },
+  {
+   "action": {
+    "step": "remove_favorite",
+    "do": "click",
+    "text": "移除地點",
+    "hit": {
+     "x": 195,
+     "y": 185,
+     "targets": [
+      "counter.edit_remove"
+     ]
+    }
+   },
+   "before": {
+    "path": "/counter-calling/",
+    "query": {},
+    "flags": {
+     "unitCount": 5,
+     "unitsBelow": false,
+     "favorites": 1,
+     "favAtLeast1": true,
+     "favAtLeast2": false,
+     "favAtLeast3": false,
+     "favAtLeast4": false,
+     "favAtLeast5": false,
+     "favAtLeast6": false,
+     "favAtLeast7": false,
+     "favAtLeast8": false,
+     "favAtLeast9": false,
+     "favAtLeast10": false,
+     "favNames": "臺北市中正區公所",
+     "unitName": "",
+     "location": "",
+     "locationName": "",
+     "firstLocation": "",
+     "locationCount": 0,
+     "locationFocus": false,
+     "locationPicked": false,
+     "favText": "",
+     "favOn": false,
+     "counters": "",
+     "countersBottom": 0,
+     "editOpen": true,
+     "editHasInputs": true,
+     "editTicked": true,
+     "editBottom": 209,
+     "__bottomBar": 0,
+     "__dialog": true
+    },
+    "visible": [
+     "counter.edit",
+     "counter.edit_items",
+     "counter.edit_remove",
+     "counter.favorites",
+     "counter.units"
+    ],
+    "rects": {
+     "counter.units": [
+      20,
+      247,
+      350,
+      448
+     ],
+     "counter.favorites": [
+      20,
+      68,
+      350,
+      65
+     ],
+     "counter.edit": [
+      338,
+      32,
+      32,
+      36
+     ],
+     "counter.edit_items": [
+      20,
+      68,
+      350,
+      65
+     ],
+     "counter.edit_remove": [
+      20,
+      161,
+      350,
+      48
+     ]
+    }
+   },
+   "after": {
+    "path": "/counter-calling/",
+    "query": {},
+    "flags": {
+     "unitCount": 5,
+     "unitsBelow": false,
+     "favorites": 0,
+     "favAtLeast1": false,
+     "favAtLeast2": false,
+     "favAtLeast3": false,
+     "favAtLeast4": false,
+     "favAtLeast5": false,
+     "favAtLeast6": false,
+     "favAtLeast7": false,
+     "favAtLeast8": false,
+     "favAtLeast9": false,
+     "favAtLeast10": false,
+     "favNames": "",
+     "unitName": "",
+     "location": "",
+     "locationName": "",
+     "firstLocation": "",
+     "locationCount": 0,
+     "locationFocus": false,
+     "locationPicked": false,
+     "favText": "",
+     "favOn": false,
+     "counters": "",
+     "countersBottom": 0,
+     "editOpen": false,
+     "editHasInputs": false,
+     "editTicked": false,
+     "editBottom": 0,
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "counter.units"
+    ],
+    "rects": {
+     "counter.units": [
+      20,
+      68,
+      350,
+      448
+     ]
+    }
+   },
+   "facts": {
+    "url": "/counter-calling/",
+    "title": "臨櫃叫號",
+    "fields": [],
+    "starred": [],
+    "errors": [],
+    "buttons": [],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  }
+ ]
+}

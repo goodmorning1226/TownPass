@@ -1,0 +1,332 @@
+{
+ "name": "lib_ranking_in_app",
+ "description": "library.ranking (goal open_ranking). The app opens the library home (openFor -> home); the user scrolls as told and taps 點閱排行 更多.",
+ "page": "library",
+ "start": "/library-service/",
+ "capability": "library.ranking",
+ "goals": [],
+ "expect": {
+  "done": true
+ },
+ "recordedAt": "2026-11-07T19:01:08.719Z",
+ "durationMs": 3969,
+ "viewport": {
+  "width": 390,
+  "height": 844,
+  "deviceScaleFactor": 3,
+  "isMobile": true,
+  "hasTouch": true
+ },
+ "failed": null,
+ "steps": [
+  {
+   "action": null,
+   "before": null,
+   "after": {
+    "path": "/library-service/",
+    "query": {},
+    "flags": {
+     "tab": "館藏查詢",
+     "input": "",
+     "results": 7,
+     "branch": "",
+     "branchName": "",
+     "branchList": false,
+     "reserveEnabled": false,
+     "reserved": false,
+     "reserveFailed": false,
+     "failReason": "",
+     "notReservable": false,
+     "dialogOpen": false,
+     "bookTitle": "",
+     "seriesCount": 0,
+     "seriesTicked": 0,
+     "seriesLimit": false,
+     "noBranch": false,
+     "pickupOpen": false,
+     "__bottomBar": 74,
+     "__dialog": false
+    },
+    "visible": [
+     "library.ranking_more",
+     "library.search_entry",
+     "library.tab_map",
+     "library.tab_records",
+     "library.tab_search"
+    ],
+    "rects": {
+     "library.tab_search": [
+      16,
+      8,
+      119.3,
+      24
+     ],
+     "library.tab_records": [
+      135.3,
+      8,
+      119.3,
+      24
+     ],
+     "library.tab_map": [
+      254.7,
+      8,
+      119.3,
+      24
+     ],
+     "library.search_entry": [
+      16,
+      59,
+      358,
+      44
+     ],
+     "library.ranking_more": [
+      342,
+      438.3,
+      32,
+      24
+     ]
+    }
+   },
+   "facts": {
+    "url": "/library-service/",
+    "title": "圖書借閱",
+    "fields": [
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "reservation-list",
+      "name": "",
+      "label": "",
+      "placeholder": "",
+      "value": "reservation-list",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       406,
+       59,
+       358,
+       48
+      ]
+     }
+    ],
+    "starred": [],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "館藏查詢",
+      "disabled": false,
+      "rect": [
+       16,
+       8,
+       119,
+       24
+      ]
+     },
+     {
+      "text": "我的紀錄",
+      "disabled": false,
+      "rect": [
+       135,
+       8,
+       119,
+       24
+      ]
+     },
+     {
+      "text": "分館地圖",
+      "disabled": false,
+      "rect": [
+       255,
+       8,
+       119,
+       24
+      ]
+     },
+     {
+      "text": "可取書(1)",
+      "disabled": false,
+      "rect": [
+       422,
+       131,
+       326,
+       24
+      ]
+     },
+     {
+      "text": "處理中(1)",
+      "disabled": false,
+      "rect": [
+       422,
+       191,
+       326,
+       24
+      ]
+     },
+     {
+      "text": "排序中(0)",
+      "disabled": false,
+      "rect": [
+       422,
+       251,
+       326,
+       24
+      ]
+     },
+     {
+      "text": "確定",
+      "disabled": false,
+      "rect": [
+       1058,
+       133,
+       78,
+       36
+      ]
+     },
+     {
+      "text": "確認",
+      "disabled": false,
+      "rect": [
+       825,
+       492,
+       300,
+       40
+      ]
+     }
+    ],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  },
+  {
+   "action": {
+    "step": "open_ranking",
+    "do": "click",
+    "selector": "a[href$=\"ranking-list\"]",
+    "hit": {
+     "x": 358,
+     "y": 450,
+     "targets": [
+      "library.ranking_more"
+     ]
+    }
+   },
+   "before": {
+    "path": "/library-service/",
+    "query": {},
+    "flags": {
+     "tab": "館藏查詢",
+     "input": "",
+     "results": 7,
+     "branch": "",
+     "branchName": "",
+     "branchList": false,
+     "reserveEnabled": false,
+     "reserved": false,
+     "reserveFailed": false,
+     "failReason": "",
+     "notReservable": false,
+     "dialogOpen": false,
+     "bookTitle": "",
+     "seriesCount": 0,
+     "seriesTicked": 0,
+     "seriesLimit": false,
+     "noBranch": false,
+     "pickupOpen": false,
+     "__bottomBar": 74,
+     "__dialog": false
+    },
+    "visible": [
+     "library.ranking_more",
+     "library.search_entry",
+     "library.tab_map",
+     "library.tab_records",
+     "library.tab_search"
+    ],
+    "rects": {
+     "library.tab_search": [
+      16,
+      8,
+      119.3,
+      24
+     ],
+     "library.tab_records": [
+      135.3,
+      8,
+      119.3,
+      24
+     ],
+     "library.tab_map": [
+      254.7,
+      8,
+      119.3,
+      24
+     ],
+     "library.search_entry": [
+      16,
+      59,
+      358,
+      44
+     ],
+     "library.ranking_more": [
+      342,
+      438.3,
+      32,
+      24
+     ]
+    }
+   },
+   "after": {
+    "path": "/library-service/ranking-list",
+    "query": {},
+    "flags": {
+     "tab": "",
+     "input": "",
+     "results": 6,
+     "branch": "",
+     "branchName": "",
+     "branchList": false,
+     "reserveEnabled": false,
+     "reserved": false,
+     "reserveFailed": false,
+     "failReason": "",
+     "notReservable": false,
+     "dialogOpen": false,
+     "bookTitle": "",
+     "seriesCount": 0,
+     "seriesTicked": 0,
+     "seriesLimit": false,
+     "noBranch": false,
+     "pickupOpen": false,
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "library.results"
+    ],
+    "rects": {
+     "library.results": [
+      16,
+      16,
+      358,
+      639.6
+     ]
+    }
+   },
+   "facts": {
+    "url": "/library-service/ranking-list",
+    "title": "點閱排行",
+    "fields": [],
+    "starred": [],
+    "errors": [],
+    "buttons": [],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  }
+ ]
+}

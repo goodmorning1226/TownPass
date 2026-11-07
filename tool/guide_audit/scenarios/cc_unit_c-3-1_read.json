@@ -1,0 +1,11 @@
+{
+  "name": "cc_unit_c-3-1_read",
+  "description": "reservation.c-3-1 default (read_counters), opened the app's way (/counter-calling/ then /counter-calling/c-3?subId=c-3-1).",
+  "page": "counter_calling",
+  "capability": "reservation.c-3-1",
+  "goals": [],
+  "expect": {
+    "done": true
+  },
+  "actions": []
+}

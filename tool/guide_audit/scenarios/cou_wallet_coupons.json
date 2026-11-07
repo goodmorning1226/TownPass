@@ -1,0 +1,18 @@
+{
+  "name": "cou_wallet_coupons",
+  "description": "wallet default (wallet_coupons): 票夾 -> 優惠券.",
+  "page": "coupon_wallet",
+  "capability": "wallet",
+  "goals": [],
+  "expect": {
+    "done": true
+  },
+  "actions": [
+    {
+      "step": "wallet_coupons",
+      "do": "click",
+      "text": "優惠券",
+      "within": "section.tabs:not(.tabs__content-type)"
+    }
+  ]
+}

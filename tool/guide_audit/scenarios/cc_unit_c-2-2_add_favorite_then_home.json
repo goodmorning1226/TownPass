@@ -1,0 +1,23 @@
+{
+  "name": "cc_unit_c-2-2_add_favorite_then_home",
+  "description": "reservation.c-2-2, goal add_favorite: press 加入常用, then go back to the home list as the done card says.",
+  "page": "counter_calling",
+  "capability": "reservation.c-2-2",
+  "goals": [
+    "add_favorite"
+  ],
+  "expect": {
+    "done": true
+  },
+  "actions": [
+    {
+      "step": "add_favorite",
+      "do": "click",
+      "text": "加入常用"
+    },
+    {
+      "step": "done",
+      "do": "back"
+    }
+  ]
+}

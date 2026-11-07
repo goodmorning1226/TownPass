@@ -10,9 +10,15 @@ import 'package:town_pass/page/guided_assistant/web/web_page_state.dart';
 ///   `/disaster-report`  search box + accordion of 災情類別 groups
 ///                        (民生、基礎設施災情 / 橋梁災情 / 土石災情 / 火災)
 ///   `/disaster-report/form/D-x-y`  標注災情發生地點, 地點描述, 災情描述
-///                        checkboxes (only some forms), 補充描述, 附件,
+///                        (checkboxes and number boxes, 補充描述), 附件,
 ///                        提供個人資料給承辦人員, 送出 (disabled until that
 ///                        box is ticked)
+///                        A form opened through the list has the 災情描述
+///                        checkboxes; the same form loaded directly (reload,
+///                        loadUrl fallback, deep link) has none and no number
+///                        boxes, only 補充描述. 「* 災情描述(至少勾選一項)」
+///                        takes any one of: a ticked box, a filled number box,
+///                        or 補充描述 text.
 ///   dialog 通報成功 / 確認 -> back to `/disaster-report` (the demo site sends
 ///                        nothing)
 ///
@@ -26,6 +32,11 @@ const _form = '/disaster-report/form/';
 /// The 災情描述 checkbox labels (傷亡, 受困, 道路...). Their wrapper has the
 /// class `gap-1.5`; the upload boxes use `gap-x-4` and do not match.
 const _checks = '''qa('div[class~="gap-1.5"] > label').filter(shown)''';
+
+/// The number boxes in 災情描述 (路燈傾倒(失明盞), 沖刷(根)...): text inputs in
+/// the describe list, not the address box.
+const _numbers =
+    '''qa('form ul.gap-y-5 input.base-input').filter((i) => i.id !== 'location').filter(shown)''';
 
 const _consent = "byText('label', '提供個人資料給承辦人員')";
 const _send = "byText('form > button.base-button', '送出')";
@@ -49,6 +60,7 @@ const disasterReportPageSpec = WebPageSpec(
     'disaster.location': "q('#location')",
     'disaster.locate': "(() => { const i = q('#location'); return i && i.parentElement ? i.parentElement.querySelector('button') : null; })()",
     'disaster.checks': _checks,
+    'disaster.numbers': _numbers,
     'disaster.extra': "q('#additional_disc')",
     'disaster.note': 'readArea($_note)',
     'disaster.consent': _consent,
@@ -70,6 +82,19 @@ const disasterReportPageSpec = WebPageSpec(
     'checked':
         '''qa('div[class~="gap-1.5"] input').filter((i) => i.checked).length''',
     'checksOff': '$_offFn($_checks[0])',
+    // The form has a 道路 box (D-2-1 has only 傷亡/受困/失蹤).
+    'hasRoad': "$_checks.some((l) => orig(l).trim() === '道路')",
+    'hasNumbers': '$_numbers.length > 0',
+    // Number boxes filled in.
+    'numbers': "$_numbers.filter((i) => (i.value || '').trim() !== '').length",
+    // 補充描述 has text.
+    'extraText': "!!(q('#additional_disc') || {}).value && q('#additional_disc').value.trim() !== ''",
+    'extraFocus': "!!q('#additional_disc') && document.activeElement === q('#additional_disc')",
+    'extraOff': "$_offFn(q('#additional_disc'))",
+    // 送出 was pressed with no 災情描述: the red 「至少勾選一項」 (it stays
+    // until the next 送出, also after something is described).
+    'needDescribe':
+        "qa('form p').some((p) => shown(p) && orig(p).trim() === '至少勾選一項')",
     'consentOff': '$_offFn($_consent)',
     // Scrolled to the end of the 注意事項 (latched).
     'noteRead':
@@ -96,10 +121,54 @@ const _readNote = '建議還是把注意事項看完喔。';
 /// A fire form (D-4-x): remind them to call 119 first.
 bool _fire(WebPageState s) => s.now.pathStarts('${_form}D-4-');
 
+/// 災情分類 of each form (the titles in capabilities.json, as the page shows
+/// them). A directly loaded form leaves 災情分類 empty; the path still says
+/// which form it is.
+const _formTitles = {
+  'D-1-1': '電線(桿)或纜線受損',
+  'D-1-2': '變電所、電廠受災',
+  'D-1-3': '路燈故障',
+  'D-1-4': '電力停電',
+  'D-2-1': '橋樑基礎沖刷',
+  'D-2-2': '橋樑斷裂',
+  'D-2-3': '前述以外之橋梁災情',
+  'D-3-1': '土石流',
+  'D-3-2': '土石崩落',
+  'D-3-3': '堰塞湖',
+  'D-4-1': '建築物火災',
+  'D-4-2': '危險物品火災',
+  'D-4-3': '工廠火災',
+  'D-4-4': '其他(前述以外火災)',
+};
+
 String _category(WebPageState s) {
-  final c = s.now.text('category');
+  var c = s.now.text('category');
+  if (c.isEmpty && _onForm(s)) {
+    final code = (s.now.path ?? '').substring(_form.length).split('/').first;
+    c = _formTitles[code] ?? '';
+  }
   return c.isEmpty ? '' : gt('「{c}」', {'c': pg(c)});
 }
+
+/// Something is given in 災情描述: a box, a number, or 補充描述 (once the
+/// keyboard is put away).
+bool _described(WebPageState s) =>
+    s.now.number('checked') > 0 ||
+    s.now.number('numbers') > 0 ||
+    (s.now.flag('extraText') && !s.now.flag('extraFocus'));
+
+/// The describe step's target: the boxes, or 補充描述 on a form without
+/// boxes; null while it is off screen.
+String? _describeTarget(WebPageState s) {
+  if (!_onForm(s)) return null;
+  if (s.now.flag('hasChecks')) {
+    return s.now.text('checksOff').isEmpty ? 'disaster.checks' : null;
+  }
+  return s.now.text('extraOff').isEmpty ? 'disaster.extra' : null;
+}
+
+String _describeOff(WebPageState s) =>
+    s.now.text(s.now.flag('hasChecks') ? 'checksOff' : 'extraOff');
 
 String _scroll(String off) => switch (off) {
   'below' => gt('它在下面，先往下滑。'),
@@ -206,34 +275,65 @@ final List<GuideComponent> disasterReportComponents = [
     requires: const ['enter_location'],
     taskTitle: '描述災情',
     doneText: '災情狀況勾好了！',
+    doneTextOf: (s) =>
+        s.now.number('checked') > 0 ? gt('災情狀況勾好了！') : gt('災情狀況填好了！'),
     doneDetail: '下面的「補充描述」可以多寫一點，也可以按「最多上傳 3個檔案」附照片，都不是一定要。',
     doneTarget: (s) => _onForm(s) ? 'disaster.extra' : null,
     steps: [
       GuideStep(
-        target: (s) => _onForm(s) && s.now.text('checksOff').isEmpty
-            ? 'disaster.checks'
-            : null,
-        // Ticking the consent box also lets this step go (see isDone).
-        alsoUsable: const ['disaster.consent', 'disaster.extra'],
-        locks: (s) => s.now.text('checksOff').isEmpty,
+        target: _describeTarget,
+        // Any 災情描述 input counts (see _described). The consent box stays
+        // usable, but ticking it does not finish this step.
+        alsoUsable: const [
+          'disaster.checks',
+          'disaster.numbers',
+          'disaster.extra',
+          'disaster.consent',
+        ],
+        locks: (s) => _describeOff(s).isEmpty,
         arrow: _no,
-        scrollHint: (s) => s.now.text('checksOff').isNotEmpty,
-        label: (_) => '勾選',
+        scrollHint: (s) => _describeOff(s).isNotEmpty,
+        label: (s) => s.now.flag('hasChecks') ? '勾選' : '打字',
         card: (s) {
-          final scroll = _scroll(s.now.text('checksOff'));
+          final failed = s.now.flag('needDescribe')
+              ? gt('「送出」沒有成功，因為還沒填「災情描述」。')
+              : '';
+          final scroll = _scroll(_describeOff(s));
+          if (!s.now.flag('hasChecks')) {
+            return gt(
+              '{failed}{scroll}這一頁的「災情描述」沒有可以勾的選項，請在「補充描述」寫看到的狀況，例如「路燈不亮」或「道路被土石擋住」。',
+              {'failed': failed, 'scroll': scroll},
+            );
+          }
+          if (!s.now.flag('hasRoad') && s.now.flag('hasNumbers')) {
+            return gt(
+              '{failed}{scroll}在「災情描述」勾看到的狀況，或填下面的數字（例如沖刷幾根），至少填一項。有人受傷、受困，請直接打 119。',
+              {'failed': failed, 'scroll': scroll},
+            );
+          }
+          if (!s.now.flag('hasRoad')) {
+            return gt(
+              '{failed}{scroll}在「災情描述」勾你看到的狀況，至少勾一個。有人受傷、受困，請直接打 119。',
+              {'failed': failed, 'scroll': scroll},
+            );
+          }
           return gt(
-            '{scroll}在「災情描述」勾你看到的狀況，至少勾一個，例如「道路」表示影響到馬路。有人受傷、受困，請直接打 119。',
-            {'scroll': scroll},
+            '{failed}{scroll}在「災情描述」勾你看到的狀況，至少勾一個，例如「道路」表示影響到馬路。有人受傷、受困，請直接打 119。',
+            {'failed': failed, 'scroll': scroll},
           );
         },
-        detail: (_) => '「人員傷亡」和「影響交通」下面的小方框，點一下就是勾選。下面還可以寫「補充描述」或附照片。',
-        // Forms without checkboxes (e.g. 建築物火災) skip this step.
-        isDone: (s) =>
-            _reported(s) ||
-            (_onForm(s) &&
-                (!s.now.flag('hasChecks') ||
-                    s.now.number('checked') > 0 ||
-                    s.now.flag('sendEnabled'))),
+        detail: (s) {
+          if (!s.now.flag('hasChecks')) {
+            return '點一下「補充描述」的框框，寫你看到的狀況，寫完按鍵盤上的「完成」收起鍵盤。';
+          }
+          if (!s.now.flag('hasRoad')) {
+            return '「人員傷亡」下面的小方框，點一下就是勾選；也可以在下面的格子填數字，或寫「補充描述」。';
+          }
+          return '「人員傷亡」和「影響交通」下面的小方框，點一下就是勾選。下面還可以寫「補充描述」或附照片。';
+        },
+        // A ticked box, a filled number box or 補充描述 text. A form loaded
+        // directly (reload, loadUrl fallback) has no boxes: 補充描述 then.
+        isDone: (s) => _reported(s) || (_onForm(s) && _described(s)),
         cardTop: (_) => 70,
       ),
     ],
@@ -300,12 +400,23 @@ final List<GuideComponent> disasterReportComponents = [
     doneTarget: (_) => 'disaster.ok',
     steps: [
       GuideStep(
-        target: (s) => _onForm(s) ? 'disaster.send' : null,
+        target: (s) {
+          if (!_onForm(s)) return null;
+          if (s.now.flag('needDescribe') && !_described(s)) {
+            return _describeTarget(s);
+          }
+          return 'disaster.send';
+        },
         arrow: _no,
-        locks: (s) => s.now.text('sendOff').isEmpty,
+        locks: (s) => s.now.flag('needDescribe') && !_described(s)
+            ? false
+            : s.now.text('sendOff').isEmpty,
         scrollHint: (s) => s.now.text('sendOff').isNotEmpty,
         label: (_) => '確認',
         card: (s) {
+          if (s.now.flag('needDescribe') && !_described(s)) {
+            return '還沒填災情描述，請往上滑，勾一個狀況或寫補充描述。';
+          }
           if (!s.now.flag('sendEnabled')) {
             return '「送出」還是灰色的。先勾「提供個人資料給承辦人員」，它才會變成可以按。';
           }

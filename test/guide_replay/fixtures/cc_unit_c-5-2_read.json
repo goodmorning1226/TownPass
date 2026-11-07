@@ -1,0 +1,122 @@
+{
+ "name": "cc_unit_c-5-2_read",
+ "description": "reservation.c-5-2 default (read_counters), opened the app's way (/counter-calling/ then /counter-calling/c-5?subId=c-5-2).",
+ "page": "counter_calling",
+ "start": null,
+ "capability": "reservation.c-5-2",
+ "goals": [],
+ "expect": {
+  "done": true
+ },
+ "recordedAt": "2026-11-07T18:56:39.896Z",
+ "durationMs": 3159,
+ "viewport": {
+  "width": 390,
+  "height": 844,
+  "deviceScaleFactor": 3,
+  "isMobile": true,
+  "hasTouch": true
+ },
+ "failed": null,
+ "steps": [
+  {
+   "action": null,
+   "before": null,
+   "after": {
+    "path": "/counter-calling/c-5",
+    "query": {
+     "subId": "c-5-2"
+    },
+    "flags": {
+     "unitCount": 0,
+     "unitsBelow": false,
+     "favorites": 0,
+     "favAtLeast1": false,
+     "favAtLeast2": false,
+     "favAtLeast3": false,
+     "favAtLeast4": false,
+     "favAtLeast5": false,
+     "favAtLeast6": false,
+     "favAtLeast7": false,
+     "favAtLeast8": false,
+     "favAtLeast9": false,
+     "favAtLeast10": false,
+     "favNames": "",
+     "unitName": "就業服務站",
+     "location": "c-5-2",
+     "locationName": "西門就業服務站",
+     "firstLocation": "艋舺就業服務站",
+     "locationCount": 2,
+     "locationFocus": false,
+     "locationPicked": true,
+     "favText": "加入常用",
+     "favOn": false,
+     "counters": "綜合受理|075|0",
+     "countersBottom": 326,
+     "editOpen": false,
+     "editHasInputs": false,
+     "editTicked": false,
+     "editBottom": 0,
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "counter.counters",
+     "counter.favorite",
+     "counter.location"
+    ],
+    "rects": {
+     "counter.location": [
+      20,
+      68,
+      350,
+      50
+     ],
+     "counter.counters": [
+      20,
+      222,
+      350,
+      104
+     ],
+     "counter.favorite": [
+      282,
+      182,
+      88,
+      24
+     ]
+    }
+   },
+   "facts": {
+    "url": "/counter-calling/c-5?subId=c-5-2",
+    "title": "臨櫃叫號",
+    "fields": [
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "c-5",
+      "name": "",
+      "label": "選擇地點",
+      "placeholder": "",
+      "value": "c-5-2",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       20,
+       68,
+       350,
+       50
+      ]
+     }
+    ],
+    "starred": [],
+    "errors": [],
+    "buttons": [],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  }
+ ]
+}

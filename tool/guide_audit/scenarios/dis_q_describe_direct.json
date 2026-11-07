@@ -1,0 +1,27 @@
+{
+  "name": "dis_q_describe_direct",
+  "description": "DIS-1: question plan describe_disaster alone on 路燈故障 loaded directly: no boxes, the step is skipped and the guide is done without any 災情描述. Fixed: the describe card asks for 補充描述 on a form without boxes.",
+  "page": "disaster_report",
+  "capability": "disasterReport.form.D-1-3",
+  "start": "/disaster-report/form/D-1-3",
+  "goals": [
+    "describe_disaster"
+  ],
+  "expect": {
+    "done": true
+  },
+  "actions": [
+    {
+      "step": "enter_location",
+      "do": "type",
+      "selector": "#location",
+      "value": "臺北市信義區市府路1號"
+    },
+    {
+      "step": "describe_disaster",
+      "do": "type",
+      "selector": "#additional_disc",
+      "value": "道路被土石擋住"
+    }
+  ]
+}

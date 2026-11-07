@@ -1,0 +1,25 @@
+{
+  "name": "pol_records_goal_detail",
+  "description": "police.records with goal record_detail: open the closed case and tap 詳細內容.",
+  "page": "police_report",
+  "capability": "police.records",
+  "goals": [
+    "record_detail"
+  ],
+  "expect": {
+    "done": true
+  },
+  "actions": [
+    {
+      "step": "open_record",
+      "do": "click",
+      "selector": "a[href^=\"/police-report/record/\"]",
+      "nth": 1
+    },
+    {
+      "step": "record_detail",
+      "do": "click",
+      "text": "詳細內容"
+    }
+  ]
+}

@@ -18,6 +18,10 @@
     "library.records": [
       "open_records",
       "check_pickup"
+    ],
+    "library.reservations": [
+      "open_records",
+      "check_pickup"
     ]
   },
   "entry_goals": {},

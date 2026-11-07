@@ -1,0 +1,35 @@
+{
+  "name": "fees_other_search",
+  "description": "fees.other: the pick_fee detail says 找不到可以按上面的搜尋框打名稱; the user taps the search box link, and on /fee-payment/search the card says type the name, tap 放大鏡, tap the result (FEE-3).",
+  "page": "fees",
+  "capability": "fees.other",
+  "goals": [
+    "pick_fee"
+  ],
+  "expect": {
+    "done": true
+  },
+  "actions": [
+    {
+      "step": "pick_fee",
+      "do": "click",
+      "selector": "a[href=\"/fee-payment/search\"]"
+    },
+    {
+      "step": "pick_fee",
+      "do": "type",
+      "placeholder": "搜尋繳費關鍵字",
+      "value": "水費"
+    },
+    {
+      "step": "pick_fee",
+      "do": "click",
+      "selector": "button.search-button"
+    },
+    {
+      "step": "pick_fee",
+      "do": "click",
+      "text": "水費"
+    }
+  ]
+}

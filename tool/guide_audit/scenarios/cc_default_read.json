@@ -1,0 +1,32 @@
+{
+  "name": "cc_default_read",
+  "description": "reservation default plan (pick_unit, pick_location, read_counters), opened the app's way. 戶政事務所, then 中正區戶政事務所.",
+  "page": "counter_calling",
+  "capability": "reservation",
+  "goals": [],
+  "expect": {
+    "done": true
+  },
+  "actions": [
+    {
+      "step": "pick_unit",
+      "do": "click",
+      "text": "戶政事務所"
+    },
+    {
+      "step": "pick_location",
+      "do": "click",
+      "selector": "select.base-select"
+    },
+    {
+      "step": "pick_location",
+      "do": "select",
+      "selector": "select.base-select",
+      "value": "c-2-2"
+    },
+    {
+      "step": "pick_location",
+      "do": "blur"
+    }
+  ]
+}

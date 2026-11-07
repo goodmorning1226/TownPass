@@ -1,0 +1,12 @@
+{
+  "name": "lib_hot_reserve",
+  "description": "Goals hot_keyword + reserve, app way. User taps 小說 (查無資料); the pick_book card says type a new title in the box (the hot keywords are gone).",
+  "page": "library",
+  "capability": "library",
+  "goals": ["hot_keyword", "reserve"],
+  "expect": { "done": false },
+  "actions": [
+    { "step": "open_search", "do": "click", "selector": "a.search-bar" },
+    { "step": "hot_keyword", "do": "click", "text": "小說" }
+  ]
+}

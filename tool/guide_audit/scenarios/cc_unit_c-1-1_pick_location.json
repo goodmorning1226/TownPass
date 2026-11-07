@@ -1,0 +1,29 @@
+{
+  "name": "cc_unit_c-1-1_pick_location",
+  "description": "reservation.c-1-1, goal pick_location (換地點): the user wants another place.",
+  "page": "counter_calling",
+  "capability": "reservation.c-1-1",
+  "goals": [
+    "pick_location"
+  ],
+  "expect": {
+    "done": true
+  },
+  "actions": [
+    {
+      "step": "pick_location",
+      "do": "click",
+      "selector": "select.base-select"
+    },
+    {
+      "step": "pick_location",
+      "do": "select",
+      "selector": "select.base-select",
+      "value": "c-1-2"
+    },
+    {
+      "step": "pick_location",
+      "do": "blur"
+    }
+  ]
+}

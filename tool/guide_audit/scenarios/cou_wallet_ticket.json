@@ -1,0 +1,20 @@
+{
+  "name": "cou_wallet_ticket",
+  "description": "wallet goal wallet_ticket: 入場券 -> 我的訂單 -> tap a ticket -> QR code.",
+  "page": "coupon_wallet",
+  "capability": "wallet",
+  "goals": [
+    "wallet_ticket"
+  ],
+  "expect": {
+    "done": true
+  },
+  "actions": [
+    {
+      "step": "wallet_ticket",
+      "do": "click",
+      "text": "臺北市立美術館",
+      "nth": 0
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "name": "cit_progress_open_cases",
+  "description": "goal open_cases: 查詢.",
+  "page": "citizen_report",
+  "capability": "reportIssue.progress",
+  "start": "/citizen-report/",
+  "goals": [
+    "open_cases"
+  ],
+  "expect": {
+    "done": true
+  },
+  "actions": [
+    {
+      "step": "open_cases",
+      "do": "click",
+      "text": "查詢"
+    }
+  ]
+}

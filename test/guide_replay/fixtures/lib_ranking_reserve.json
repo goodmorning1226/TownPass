@@ -1,0 +1,1687 @@
+{
+ "name": "lib_ranking_reserve",
+ "description": "Goals open_ranking + reserve (capability library): 更多 on 點閱排行, pick the top book from the list, 取書館, ✕, 預約.",
+ "page": "library",
+ "start": null,
+ "capability": "library",
+ "goals": [
+  "open_ranking",
+  "reserve"
+ ],
+ "expect": {
+  "done": true
+ },
+ "recordedAt": "2026-11-07T19:01:21.147Z",
+ "durationMs": 9311,
+ "viewport": {
+  "width": 390,
+  "height": 844,
+  "deviceScaleFactor": 3,
+  "isMobile": true,
+  "hasTouch": true
+ },
+ "failed": null,
+ "steps": [
+  {
+   "action": null,
+   "before": null,
+   "after": {
+    "path": "/library-service/",
+    "query": {},
+    "flags": {
+     "tab": "館藏查詢",
+     "input": "",
+     "results": 7,
+     "branch": "",
+     "branchName": "",
+     "branchList": false,
+     "reserveEnabled": false,
+     "reserved": false,
+     "reserveFailed": false,
+     "failReason": "",
+     "notReservable": false,
+     "dialogOpen": false,
+     "bookTitle": "",
+     "seriesCount": 0,
+     "seriesTicked": 0,
+     "seriesLimit": false,
+     "noBranch": false,
+     "pickupOpen": false,
+     "__bottomBar": 74,
+     "__dialog": false
+    },
+    "visible": [
+     "library.ranking_more",
+     "library.search_entry",
+     "library.tab_map",
+     "library.tab_records",
+     "library.tab_search"
+    ],
+    "rects": {
+     "library.tab_search": [
+      16,
+      8,
+      119.3,
+      24
+     ],
+     "library.tab_records": [
+      135.3,
+      8,
+      119.3,
+      24
+     ],
+     "library.tab_map": [
+      254.7,
+      8,
+      119.3,
+      24
+     ],
+     "library.search_entry": [
+      16,
+      59,
+      358,
+      44
+     ],
+     "library.ranking_more": [
+      342,
+      438.3,
+      32,
+      24
+     ]
+    }
+   },
+   "facts": {
+    "url": "/library-service/",
+    "title": "圖書借閱",
+    "fields": [
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "reservation-list",
+      "name": "",
+      "label": "",
+      "placeholder": "",
+      "value": "reservation-list",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       406,
+       59,
+       358,
+       48
+      ]
+     }
+    ],
+    "starred": [],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "館藏查詢",
+      "disabled": false,
+      "rect": [
+       16,
+       8,
+       119,
+       24
+      ]
+     },
+     {
+      "text": "我的紀錄",
+      "disabled": false,
+      "rect": [
+       135,
+       8,
+       119,
+       24
+      ]
+     },
+     {
+      "text": "分館地圖",
+      "disabled": false,
+      "rect": [
+       255,
+       8,
+       119,
+       24
+      ]
+     },
+     {
+      "text": "可取書(1)",
+      "disabled": false,
+      "rect": [
+       422,
+       131,
+       326,
+       24
+      ]
+     },
+     {
+      "text": "處理中(1)",
+      "disabled": false,
+      "rect": [
+       422,
+       191,
+       326,
+       24
+      ]
+     },
+     {
+      "text": "排序中(0)",
+      "disabled": false,
+      "rect": [
+       422,
+       251,
+       326,
+       24
+      ]
+     },
+     {
+      "text": "確定",
+      "disabled": false,
+      "rect": [
+       1058,
+       133,
+       78,
+       36
+      ]
+     },
+     {
+      "text": "確認",
+      "disabled": false,
+      "rect": [
+       825,
+       492,
+       300,
+       40
+      ]
+     }
+    ],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  },
+  {
+   "action": {
+    "step": "open_ranking",
+    "do": "click",
+    "selector": "a[href$=\"ranking-list\"]",
+    "hit": {
+     "x": 358,
+     "y": 450,
+     "targets": [
+      "library.ranking_more"
+     ]
+    }
+   },
+   "before": {
+    "path": "/library-service/",
+    "query": {},
+    "flags": {
+     "tab": "館藏查詢",
+     "input": "",
+     "results": 7,
+     "branch": "",
+     "branchName": "",
+     "branchList": false,
+     "reserveEnabled": false,
+     "reserved": false,
+     "reserveFailed": false,
+     "failReason": "",
+     "notReservable": false,
+     "dialogOpen": false,
+     "bookTitle": "",
+     "seriesCount": 0,
+     "seriesTicked": 0,
+     "seriesLimit": false,
+     "noBranch": false,
+     "pickupOpen": false,
+     "__bottomBar": 74,
+     "__dialog": false
+    },
+    "visible": [
+     "library.ranking_more",
+     "library.search_entry",
+     "library.tab_map",
+     "library.tab_records",
+     "library.tab_search"
+    ],
+    "rects": {
+     "library.tab_search": [
+      16,
+      8,
+      119.3,
+      24
+     ],
+     "library.tab_records": [
+      135.3,
+      8,
+      119.3,
+      24
+     ],
+     "library.tab_map": [
+      254.7,
+      8,
+      119.3,
+      24
+     ],
+     "library.search_entry": [
+      16,
+      59,
+      358,
+      44
+     ],
+     "library.ranking_more": [
+      342,
+      438.3,
+      32,
+      24
+     ]
+    }
+   },
+   "after": {
+    "path": "/library-service/ranking-list",
+    "query": {},
+    "flags": {
+     "tab": "",
+     "input": "",
+     "results": 6,
+     "branch": "",
+     "branchName": "",
+     "branchList": false,
+     "reserveEnabled": false,
+     "reserved": false,
+     "reserveFailed": false,
+     "failReason": "",
+     "notReservable": false,
+     "dialogOpen": false,
+     "bookTitle": "",
+     "seriesCount": 0,
+     "seriesTicked": 0,
+     "seriesLimit": false,
+     "noBranch": false,
+     "pickupOpen": false,
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "library.results"
+    ],
+    "rects": {
+     "library.results": [
+      16,
+      16,
+      358,
+      639.6
+     ]
+    }
+   },
+   "facts": {
+    "url": "/library-service/ranking-list",
+    "title": "點閱排行",
+    "fields": [],
+    "starred": [],
+    "errors": [],
+    "buttons": [],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  },
+  {
+   "action": {
+    "step": "pick_book",
+    "do": "click",
+    "text": "歡迎光臨錢天堂 : 神奇柑仔店大圖鑑",
+    "hit": {
+     "x": 195,
+     "y": 299,
+     "targets": [
+      "library.results"
+     ]
+    }
+   },
+   "before": {
+    "path": "/library-service/ranking-list",
+    "query": {},
+    "flags": {
+     "tab": "",
+     "input": "",
+     "results": 6,
+     "branch": "",
+     "branchName": "",
+     "branchList": false,
+     "reserveEnabled": false,
+     "reserved": false,
+     "reserveFailed": false,
+     "failReason": "",
+     "notReservable": false,
+     "dialogOpen": false,
+     "bookTitle": "",
+     "seriesCount": 0,
+     "seriesTicked": 0,
+     "seriesLimit": false,
+     "noBranch": false,
+     "pickupOpen": false,
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "library.results"
+    ],
+    "rects": {
+     "library.results": [
+      16,
+      16,
+      358,
+      639.6
+     ]
+    }
+   },
+   "after": {
+    "path": "/library-service/book-detail/lib-book-5",
+    "query": {},
+    "flags": {
+     "tab": "",
+     "input": "",
+     "results": 0,
+     "branch": "",
+     "branchName": "",
+     "branchList": false,
+     "reserveEnabled": false,
+     "reserved": false,
+     "reserveFailed": false,
+     "failReason": "",
+     "notReservable": false,
+     "dialogOpen": false,
+     "bookTitle": "歡迎光臨錢天堂 : 神奇柑仔店大圖鑑",
+     "seriesCount": 0,
+     "seriesTicked": 0,
+     "seriesLimit": false,
+     "noBranch": false,
+     "pickupOpen": false,
+     "__bottomBar": 176,
+     "__dialog": false
+    },
+    "visible": [
+     "library.branch_field",
+     "library.reserve"
+    ],
+    "rects": {
+     "library.branch_field": [
+      16,
+      716,
+      358,
+      56
+     ],
+     "library.reserve": [
+      16,
+      780,
+      358,
+      48
+     ]
+    }
+   },
+   "facts": {
+    "url": "/library-service/book-detail/lib-book-5",
+    "title": "詳細內容",
+    "fields": [
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "lib-book-5",
+      "name": "",
+      "label": "取書館",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       716,
+       358,
+       48
+      ]
+     }
+    ],
+    "starred": [],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "預約",
+      "disabled": true,
+      "rect": [
+       16,
+       780,
+       358,
+       48
+      ]
+     }
+    ],
+    "disabledButtons": [
+     "預約"
+    ],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  },
+  {
+   "action": {
+    "step": "choose_branch",
+    "do": "click",
+    "selector": "div.fixed.bottom-0 .base-select-wrapper",
+    "hit": {
+     "x": 195,
+     "y": 744,
+     "targets": [
+      "library.branch_field"
+     ]
+    }
+   },
+   "before": {
+    "path": "/library-service/book-detail/lib-book-5",
+    "query": {},
+    "flags": {
+     "tab": "",
+     "input": "",
+     "results": 0,
+     "branch": "",
+     "branchName": "",
+     "branchList": false,
+     "reserveEnabled": false,
+     "reserved": false,
+     "reserveFailed": false,
+     "failReason": "",
+     "notReservable": false,
+     "dialogOpen": false,
+     "bookTitle": "歡迎光臨錢天堂 : 神奇柑仔店大圖鑑",
+     "seriesCount": 0,
+     "seriesTicked": 0,
+     "seriesLimit": false,
+     "noBranch": false,
+     "pickupOpen": false,
+     "__bottomBar": 176,
+     "__dialog": false
+    },
+    "visible": [
+     "library.branch_field",
+     "library.reserve"
+    ],
+    "rects": {
+     "library.branch_field": [
+      16,
+      716,
+      358,
+      56
+     ],
+     "library.reserve": [
+      16,
+      780,
+      358,
+      48
+     ]
+    }
+   },
+   "after": {
+    "path": "/library-service/book-detail/lib-book-5",
+    "query": {},
+    "flags": {
+     "tab": "離我最近",
+     "input": "",
+     "results": 0,
+     "branch": "",
+     "branchName": "",
+     "branchList": true,
+     "reserveEnabled": false,
+     "reserved": false,
+     "reserveFailed": false,
+     "failReason": "",
+     "notReservable": false,
+     "dialogOpen": true,
+     "bookTitle": "歡迎光臨錢天堂 : 神奇柑仔店大圖鑑",
+     "seriesCount": 0,
+     "seriesTicked": 0,
+     "seriesLimit": false,
+     "noBranch": false,
+     "pickupOpen": false,
+     "__bottomBar": 176,
+     "__dialog": true
+    },
+    "visible": [
+     "library.branch_close",
+     "library.branch_field",
+     "library.branch_list",
+     "library.reserve"
+    ],
+    "rects": {
+     "library.branch_field": [
+      16,
+      716,
+      358,
+      56
+     ],
+     "library.branch_list": [
+      39,
+      193,
+      312,
+      458
+     ],
+     "library.branch_close": [
+      315,
+      209,
+      24,
+      24
+     ],
+     "library.reserve": [
+      16,
+      780,
+      358,
+      48
+     ]
+    }
+   },
+   "facts": {
+    "url": "/library-service/book-detail/lib-book-5",
+    "title": "詳細內容",
+    "fields": [
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "lib-book-5",
+      "name": "",
+      "label": "取書館",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       716,
+       358,
+       48
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "radio",
+      "id": "lib-3",
+      "name": "library",
+      "label": "B12三興",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       0,
+       0,
+       0,
+       0
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "radio",
+      "id": "lib-1",
+      "name": "library",
+      "label": "BFB臺北市政府借書站(取書期限3日，無法申請請預約延長2日)",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       0,
+       0,
+       0,
+       0
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "radio",
+      "id": "lib-2",
+      "name": "library",
+      "label": "C21延吉",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       0,
+       0,
+       0,
+       0
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "radio",
+      "id": "lib-5",
+      "name": "library",
+      "label": "CFB 信義安和借書站",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       0,
+       0,
+       0,
+       0
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "radio",
+      "id": "lib-6",
+      "name": "library",
+      "label": "B13六合",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       0,
+       0,
+       0,
+       0
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "radio",
+      "id": "lib-4",
+      "name": "library",
+      "label": "B11永春",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       0,
+       0,
+       0,
+       0
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "radio",
+      "id": "信義區",
+      "name": "library",
+      "label": "信義區",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       0,
+       0,
+       0,
+       0
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "radio",
+      "id": "大安區",
+      "name": "library",
+      "label": "大安區",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       0,
+       0,
+       0,
+       0
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "radio",
+      "id": "lib-1",
+      "name": "library",
+      "label": "BFB臺北市政府借書站(取書期限3日，無法申請請預約延長2日)",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       0,
+       0,
+       0,
+       0
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "radio",
+      "id": "lib-2",
+      "name": "library",
+      "label": "C21延吉",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       0,
+       0,
+       0,
+       0
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "radio",
+      "id": "lib-3",
+      "name": "library",
+      "label": "B12三興",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       0,
+       0,
+       0,
+       0
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "radio",
+      "id": "lib-4",
+      "name": "library",
+      "label": "B11永春",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       0,
+       0,
+       0,
+       0
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "radio",
+      "id": "lib-5",
+      "name": "library",
+      "label": "CFB 信義安和借書站",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       0,
+       0,
+       0,
+       0
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "radio",
+      "id": "lib-6",
+      "name": "library",
+      "label": "B13六合",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       0,
+       0,
+       0,
+       0
+      ]
+     }
+    ],
+    "starred": [],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "預約",
+      "disabled": true,
+      "rect": [
+       16,
+       780,
+       358,
+       48
+      ]
+     },
+     {
+      "text": "離我最近",
+      "disabled": false,
+      "rect": [
+       71,
+       257,
+       124,
+       20
+      ]
+     },
+     {
+      "text": "依行政區選擇",
+      "disabled": false,
+      "rect": [
+       195,
+       257,
+       124,
+       20
+      ]
+     }
+    ],
+    "disabledButtons": [
+     "預約"
+    ],
+    "dialogs": [
+     "請選擇取書館 離我最近 依行政區選擇 B12三興 0.4 公里 BFB臺北市政府借書站(取書期限3日，無法申請請預約延長2日) 0.6 公里 C21延吉 0.7 公里 CFB 信義安和借書站 1 公里 B13六合 1.2 公里 B11永春 2.1 公里 信義區 大安區 台北市 共 6 個取書館與站點 BFB臺北市政府借書站(取書期限3日，無法申請請預約延長2日) C21延吉 B12三興 B11永春…"
+    ],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  },
+  {
+   "action": {
+    "step": "choose_branch",
+    "do": "click",
+    "text": "B12三興",
+    "within": "[id^=headlessui-dialog-panel]",
+    "hit": {
+     "x": 164,
+     "y": 306,
+     "targets": [
+      "library.branch_list"
+     ]
+    }
+   },
+   "before": {
+    "path": "/library-service/book-detail/lib-book-5",
+    "query": {},
+    "flags": {
+     "tab": "離我最近",
+     "input": "",
+     "results": 0,
+     "branch": "",
+     "branchName": "",
+     "branchList": true,
+     "reserveEnabled": false,
+     "reserved": false,
+     "reserveFailed": false,
+     "failReason": "",
+     "notReservable": false,
+     "dialogOpen": true,
+     "bookTitle": "歡迎光臨錢天堂 : 神奇柑仔店大圖鑑",
+     "seriesCount": 0,
+     "seriesTicked": 0,
+     "seriesLimit": false,
+     "noBranch": false,
+     "pickupOpen": false,
+     "__bottomBar": 176,
+     "__dialog": true
+    },
+    "visible": [
+     "library.branch_close",
+     "library.branch_field",
+     "library.branch_list",
+     "library.reserve"
+    ],
+    "rects": {
+     "library.branch_field": [
+      16,
+      716,
+      358,
+      56
+     ],
+     "library.branch_list": [
+      39,
+      193,
+      312,
+      458
+     ],
+     "library.branch_close": [
+      315,
+      209,
+      24,
+      24
+     ],
+     "library.reserve": [
+      16,
+      780,
+      358,
+      48
+     ]
+    }
+   },
+   "after": {
+    "path": "/library-service/book-detail/lib-book-5",
+    "query": {},
+    "flags": {
+     "tab": "離我最近",
+     "input": "",
+     "results": 0,
+     "branch": "lib-3",
+     "branchName": "B12三興",
+     "branchList": true,
+     "reserveEnabled": true,
+     "reserved": false,
+     "reserveFailed": false,
+     "failReason": "",
+     "notReservable": false,
+     "dialogOpen": true,
+     "bookTitle": "歡迎光臨錢天堂 : 神奇柑仔店大圖鑑",
+     "seriesCount": 0,
+     "seriesTicked": 0,
+     "seriesLimit": false,
+     "noBranch": false,
+     "pickupOpen": false,
+     "__bottomBar": 176,
+     "__dialog": true
+    },
+    "visible": [
+     "library.branch_close",
+     "library.branch_field",
+     "library.branch_list",
+     "library.reserve"
+    ],
+    "rects": {
+     "library.branch_field": [
+      16,
+      716,
+      358,
+      56
+     ],
+     "library.branch_list": [
+      39,
+      193,
+      312,
+      458
+     ],
+     "library.branch_close": [
+      315,
+      209,
+      24,
+      24
+     ],
+     "library.reserve": [
+      16,
+      780,
+      358,
+      48
+     ]
+    }
+   },
+   "facts": {
+    "url": "/library-service/book-detail/lib-book-5",
+    "title": "詳細內容",
+    "fields": [
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "lib-book-5",
+      "name": "",
+      "label": "取書館",
+      "placeholder": "",
+      "value": "lib-3",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       716,
+       358,
+       48
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "radio",
+      "id": "lib-3",
+      "name": "library",
+      "label": "B12三興",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       0,
+       0,
+       0,
+       0
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "radio",
+      "id": "lib-1",
+      "name": "library",
+      "label": "BFB臺北市政府借書站(取書期限3日，無法申請請預約延長2日)",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       0,
+       0,
+       0,
+       0
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "radio",
+      "id": "lib-2",
+      "name": "library",
+      "label": "C21延吉",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       0,
+       0,
+       0,
+       0
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "radio",
+      "id": "lib-5",
+      "name": "library",
+      "label": "CFB 信義安和借書站",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       0,
+       0,
+       0,
+       0
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "radio",
+      "id": "lib-6",
+      "name": "library",
+      "label": "B13六合",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       0,
+       0,
+       0,
+       0
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "radio",
+      "id": "lib-4",
+      "name": "library",
+      "label": "B11永春",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       0,
+       0,
+       0,
+       0
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "radio",
+      "id": "信義區",
+      "name": "library",
+      "label": "信義區",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       0,
+       0,
+       0,
+       0
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "radio",
+      "id": "大安區",
+      "name": "library",
+      "label": "大安區",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       0,
+       0,
+       0,
+       0
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "radio",
+      "id": "lib-1",
+      "name": "library",
+      "label": "BFB臺北市政府借書站(取書期限3日，無法申請請預約延長2日)",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       0,
+       0,
+       0,
+       0
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "radio",
+      "id": "lib-2",
+      "name": "library",
+      "label": "C21延吉",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       0,
+       0,
+       0,
+       0
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "radio",
+      "id": "lib-3",
+      "name": "library",
+      "label": "B12三興",
+      "placeholder": "",
+      "value": "checked",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       0,
+       0,
+       0,
+       0
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "radio",
+      "id": "lib-4",
+      "name": "library",
+      "label": "B11永春",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       0,
+       0,
+       0,
+       0
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "radio",
+      "id": "lib-5",
+      "name": "library",
+      "label": "CFB 信義安和借書站",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       0,
+       0,
+       0,
+       0
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "radio",
+      "id": "lib-6",
+      "name": "library",
+      "label": "B13六合",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       0,
+       0,
+       0,
+       0
+      ]
+     }
+    ],
+    "starred": [],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "預約",
+      "disabled": false,
+      "rect": [
+       16,
+       780,
+       358,
+       48
+      ]
+     },
+     {
+      "text": "離我最近",
+      "disabled": false,
+      "rect": [
+       71,
+       257,
+       124,
+       20
+      ]
+     },
+     {
+      "text": "依行政區選擇",
+      "disabled": false,
+      "rect": [
+       195,
+       257,
+       124,
+       20
+      ]
+     }
+    ],
+    "disabledButtons": [],
+    "dialogs": [
+     "請選擇取書館 離我最近 依行政區選擇 B12三興 BFB臺北市政府借書站(取書期限3日，無法申請請預約延長2日) 0.6 公里 C21延吉 0.7 公里 CFB 信義安和借書站 1 公里 B13六合 1.2 公里 B11永春 2.1 公里 信義區 大安區 台北市 共 6 個取書館與站點 BFB臺北市政府借書站(取書期限3日，無法申請請預約延長2日) C21延吉 B12三興 B11永春 CFB 信義…"
+    ],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  },
+  {
+   "action": {
+    "step": "choose_branch",
+    "do": "click",
+    "selector": "[id^=headlessui-dialog-title] button",
+    "hit": {
+     "x": 327,
+     "y": 221,
+     "targets": [
+      "library.branch_close",
+      "library.branch_list"
+     ]
+    }
+   },
+   "before": {
+    "path": "/library-service/book-detail/lib-book-5",
+    "query": {},
+    "flags": {
+     "tab": "離我最近",
+     "input": "",
+     "results": 0,
+     "branch": "lib-3",
+     "branchName": "B12三興",
+     "branchList": true,
+     "reserveEnabled": true,
+     "reserved": false,
+     "reserveFailed": false,
+     "failReason": "",
+     "notReservable": false,
+     "dialogOpen": true,
+     "bookTitle": "歡迎光臨錢天堂 : 神奇柑仔店大圖鑑",
+     "seriesCount": 0,
+     "seriesTicked": 0,
+     "seriesLimit": false,
+     "noBranch": false,
+     "pickupOpen": false,
+     "__bottomBar": 176,
+     "__dialog": true
+    },
+    "visible": [
+     "library.branch_close",
+     "library.branch_field",
+     "library.branch_list",
+     "library.reserve"
+    ],
+    "rects": {
+     "library.branch_field": [
+      16,
+      716,
+      358,
+      56
+     ],
+     "library.branch_list": [
+      39,
+      193,
+      312,
+      458
+     ],
+     "library.branch_close": [
+      315,
+      209,
+      24,
+      24
+     ],
+     "library.reserve": [
+      16,
+      780,
+      358,
+      48
+     ]
+    }
+   },
+   "after": {
+    "path": "/library-service/book-detail/lib-book-5",
+    "query": {},
+    "flags": {
+     "tab": "",
+     "input": "",
+     "results": 0,
+     "branch": "lib-3",
+     "branchName": "B12三興",
+     "branchList": false,
+     "reserveEnabled": true,
+     "reserved": false,
+     "reserveFailed": false,
+     "failReason": "",
+     "notReservable": false,
+     "dialogOpen": false,
+     "bookTitle": "歡迎光臨錢天堂 : 神奇柑仔店大圖鑑",
+     "seriesCount": 0,
+     "seriesTicked": 0,
+     "seriesLimit": false,
+     "noBranch": false,
+     "pickupOpen": false,
+     "__bottomBar": 176,
+     "__dialog": false
+    },
+    "visible": [
+     "library.branch_field",
+     "library.reserve"
+    ],
+    "rects": {
+     "library.branch_field": [
+      16,
+      716,
+      358,
+      56
+     ],
+     "library.reserve": [
+      16,
+      780,
+      358,
+      48
+     ]
+    }
+   },
+   "facts": {
+    "url": "/library-service/book-detail/lib-book-5",
+    "title": "詳細內容",
+    "fields": [
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "lib-book-5",
+      "name": "",
+      "label": "取書館",
+      "placeholder": "",
+      "value": "lib-3",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       716,
+       358,
+       48
+      ]
+     }
+    ],
+    "starred": [],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "預約",
+      "disabled": false,
+      "rect": [
+       16,
+       780,
+       358,
+       48
+      ]
+     }
+    ],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  },
+  {
+   "action": {
+    "step": "reserve",
+    "do": "click",
+    "selector": "div.fixed.bottom-0 button.base-button",
+    "hit": {
+     "x": 195,
+     "y": 804,
+     "targets": [
+      "library.reserve"
+     ]
+    }
+   },
+   "before": {
+    "path": "/library-service/book-detail/lib-book-5",
+    "query": {},
+    "flags": {
+     "tab": "",
+     "input": "",
+     "results": 0,
+     "branch": "lib-3",
+     "branchName": "B12三興",
+     "branchList": false,
+     "reserveEnabled": true,
+     "reserved": false,
+     "reserveFailed": false,
+     "failReason": "",
+     "notReservable": false,
+     "dialogOpen": false,
+     "bookTitle": "歡迎光臨錢天堂 : 神奇柑仔店大圖鑑",
+     "seriesCount": 0,
+     "seriesTicked": 0,
+     "seriesLimit": false,
+     "noBranch": false,
+     "pickupOpen": false,
+     "__bottomBar": 176,
+     "__dialog": false
+    },
+    "visible": [
+     "library.branch_field",
+     "library.reserve"
+    ],
+    "rects": {
+     "library.branch_field": [
+      16,
+      716,
+      358,
+      56
+     ],
+     "library.reserve": [
+      16,
+      780,
+      358,
+      48
+     ]
+    }
+   },
+   "after": {
+    "path": "/library-service/book-detail/lib-book-5",
+    "query": {},
+    "flags": {
+     "tab": "",
+     "input": "",
+     "results": 0,
+     "branch": "lib-3",
+     "branchName": "B12三興",
+     "branchList": false,
+     "reserveEnabled": true,
+     "reserved": true,
+     "reserveFailed": false,
+     "failReason": "",
+     "notReservable": false,
+     "dialogOpen": true,
+     "bookTitle": "歡迎光臨錢天堂 : 神奇柑仔店大圖鑑",
+     "seriesCount": 0,
+     "seriesTicked": 0,
+     "seriesLimit": false,
+     "noBranch": false,
+     "pickupOpen": false,
+     "__bottomBar": 176,
+     "__dialog": true
+    },
+    "visible": [
+     "library.branch_field",
+     "library.reserve",
+     "library.reserve_result"
+    ],
+    "rects": {
+     "library.branch_field": [
+      16,
+      716,
+      358,
+      56
+     ],
+     "library.reserve": [
+      16,
+      780,
+      358,
+      48
+     ],
+     "library.reserve_result": [
+      39,
+      263.5,
+      312,
+      317
+     ]
+    }
+   },
+   "facts": {
+    "url": "/library-service/book-detail/lib-book-5",
+    "title": "詳細內容",
+    "fields": [
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "lib-book-5",
+      "name": "",
+      "label": "取書館",
+      "placeholder": "",
+      "value": "lib-3",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       716,
+       358,
+       48
+      ]
+     }
+    ],
+    "starred": [],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "預約",
+      "disabled": false,
+      "rect": [
+       16,
+       780,
+       358,
+       48
+      ]
+     },
+     {
+      "text": "返回首頁",
+      "disabled": false,
+      "rect": [
+       39,
+       545,
+       156,
+       32
+      ]
+     },
+     {
+      "text": "查看預約清單",
+      "disabled": false,
+      "rect": [
+       195,
+       545,
+       156,
+       32
+      ]
+     }
+    ],
+    "disabledButtons": [],
+    "dialogs": [
+     "預約成功 本次預約成功 1 筆 取書館：B12三興 到館通知：目前無通知。可前往圖書館 登入個人書房，設定通知方式。 返回首頁 查看預約清單"
+    ],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  }
+ ]
+}

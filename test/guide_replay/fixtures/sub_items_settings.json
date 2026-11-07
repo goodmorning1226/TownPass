@@ -1,0 +1,411 @@
+{
+ "name": "sub_items_settings",
+ "description": "subscription.items goal open_settings: press 設定.",
+ "page": "subscription",
+ "start": null,
+ "capability": "subscription.items",
+ "goals": [
+  "open_settings"
+ ],
+ "expect": {
+  "done": true
+ },
+ "recordedAt": "2026-11-07T18:28:14.026Z",
+ "durationMs": 4115,
+ "viewport": {
+  "width": 390,
+  "height": 844,
+  "deviceScaleFactor": 3,
+  "isMobile": true,
+  "hasTouch": true
+ },
+ "failed": null,
+ "steps": [
+  {
+   "action": null,
+   "before": null,
+   "after": {
+    "path": "/subscription/item-list",
+    "query": {},
+    "flags": {
+     "count": 0,
+     "cards": 0,
+     "titles": "",
+     "onTitles": "",
+     "openOff": false,
+     "openOn": false,
+     "openOffTitle": "",
+     "openOnTitle": "",
+     "openOffDesc": "",
+     "subTop": 0,
+     "unsubTop": 0,
+     "subBelow": false,
+     "unsubBelow": false,
+     "offBelow": false,
+     "onBelow": false,
+     "openOff0": false,
+     "openOn0": false,
+     "on0": false,
+     "openOff1": false,
+     "openOn1": false,
+     "on1": false,
+     "openOff2": false,
+     "openOn2": false,
+     "on2": false,
+     "openOff3": false,
+     "openOn3": false,
+     "on3": false,
+     "openOff4": false,
+     "openOn4": false,
+     "on4": false,
+     "openOff5": false,
+     "openOn5": false,
+     "on5": false,
+     "openOff6": false,
+     "openOn6": false,
+     "on6": false,
+     "openOff7": false,
+     "openOn7": false,
+     "on7": false,
+     "openOff8": false,
+     "openOn8": false,
+     "on8": false,
+     "openOff9": false,
+     "openOn9": false,
+     "on9": false,
+     "openOff10": false,
+     "openOn10": false,
+     "on10": false,
+     "openOff11": false,
+     "openOn11": false,
+     "on11": false,
+     "items": 3,
+     "itemsBelow": false,
+     "unread": 3,
+     "firstItem": "交通措施|2024/10/11",
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "sub.items",
+     "sub.settings"
+    ],
+    "rects": {
+     "sub.items": [
+      0,
+      56,
+      390,
+      579
+     ],
+     "sub.settings": [
+      314,
+      16,
+      56,
+      24
+     ]
+    }
+   },
+   "facts": {
+    "url": "/subscription/item-list",
+    "title": "訂閱",
+    "fields": [],
+    "starred": [],
+    "errors": [],
+    "buttons": [],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 1399
+   }
+  },
+  {
+   "action": {
+    "step": "open_settings",
+    "do": "click",
+    "text": "設定",
+    "hit": {
+     "x": 342,
+     "y": 28,
+     "targets": [
+      "sub.settings"
+     ]
+    }
+   },
+   "before": {
+    "path": "/subscription/item-list",
+    "query": {},
+    "flags": {
+     "count": 0,
+     "cards": 0,
+     "titles": "",
+     "onTitles": "",
+     "openOff": false,
+     "openOn": false,
+     "openOffTitle": "",
+     "openOnTitle": "",
+     "openOffDesc": "",
+     "subTop": 0,
+     "unsubTop": 0,
+     "subBelow": false,
+     "unsubBelow": false,
+     "offBelow": false,
+     "onBelow": false,
+     "openOff0": false,
+     "openOn0": false,
+     "on0": false,
+     "openOff1": false,
+     "openOn1": false,
+     "on1": false,
+     "openOff2": false,
+     "openOn2": false,
+     "on2": false,
+     "openOff3": false,
+     "openOn3": false,
+     "on3": false,
+     "openOff4": false,
+     "openOn4": false,
+     "on4": false,
+     "openOff5": false,
+     "openOn5": false,
+     "on5": false,
+     "openOff6": false,
+     "openOn6": false,
+     "on6": false,
+     "openOff7": false,
+     "openOn7": false,
+     "on7": false,
+     "openOff8": false,
+     "openOn8": false,
+     "on8": false,
+     "openOff9": false,
+     "openOn9": false,
+     "on9": false,
+     "openOff10": false,
+     "openOn10": false,
+     "on10": false,
+     "openOff11": false,
+     "openOn11": false,
+     "on11": false,
+     "items": 3,
+     "itemsBelow": false,
+     "unread": 3,
+     "firstItem": "交通措施|2024/10/11",
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "sub.items",
+     "sub.settings"
+    ],
+    "rects": {
+     "sub.items": [
+      0,
+      56,
+      390,
+      579
+     ],
+     "sub.settings": [
+      314,
+      16,
+      56,
+      24
+     ]
+    }
+   },
+   "after": {
+    "path": "/subscription",
+    "query": {},
+    "flags": {
+     "count": 0,
+     "cards": 10,
+     "titles": "體育樂園|臺北旅遊網最新消息|交通措施|銀髮資訊|圖書到期通知|新住民心服務|健康報報|停車費通知|空品資訊|防汛資訊",
+     "onTitles": "",
+     "openOff": false,
+     "openOn": false,
+     "openOffTitle": "",
+     "openOnTitle": "",
+     "openOffDesc": "",
+     "subTop": 0,
+     "unsubTop": 0,
+     "subBelow": false,
+     "unsubBelow": false,
+     "offBelow": true,
+     "onBelow": false,
+     "openOff0": false,
+     "openOn0": false,
+     "on0": false,
+     "openOff1": false,
+     "openOn1": false,
+     "on1": false,
+     "openOff2": false,
+     "openOn2": false,
+     "on2": false,
+     "openOff3": false,
+     "openOn3": false,
+     "on3": false,
+     "openOff4": false,
+     "openOn4": false,
+     "on4": false,
+     "openOff5": false,
+     "openOn5": false,
+     "on5": false,
+     "openOff6": false,
+     "openOn6": false,
+     "on6": false,
+     "openOff7": false,
+     "openOn7": false,
+     "on7": false,
+     "openOff8": false,
+     "openOn8": false,
+     "on8": false,
+     "openOff9": false,
+     "openOn9": false,
+     "on9": false,
+     "openOff10": false,
+     "openOn10": false,
+     "on10": false,
+     "openOff11": false,
+     "openOn11": false,
+     "on11": false,
+     "items": 0,
+     "itemsBelow": false,
+     "unread": 0,
+     "firstItem": "",
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "sub.cards_off",
+     "sub.count"
+    ],
+    "rects": {
+     "sub.cards_off": [
+      40,
+      163,
+      310,
+      681
+     ],
+     "sub.count": [
+      20,
+      103,
+      350,
+      24
+     ]
+    }
+   },
+   "facts": {
+    "url": "/subscription",
+    "title": "訂閱",
+    "fields": [],
+    "starred": [],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "訂閱",
+      "disabled": false,
+      "rect": [
+       48,
+       283,
+       294,
+       32
+      ]
+     },
+     {
+      "text": "訂閱",
+      "disabled": false,
+      "rect": [
+       48,
+       383,
+       294,
+       32
+      ]
+     },
+     {
+      "text": "訂閱",
+      "disabled": false,
+      "rect": [
+       48,
+       459,
+       294,
+       32
+      ]
+     },
+     {
+      "text": "訂閱",
+      "disabled": false,
+      "rect": [
+       48,
+       583,
+       294,
+       32
+      ]
+     },
+     {
+      "text": "訂閱",
+      "disabled": false,
+      "rect": [
+       48,
+       707,
+       294,
+       32
+      ]
+     },
+     {
+      "text": "訂閱",
+      "disabled": false,
+      "rect": [
+       48,
+       783,
+       294,
+       32
+      ]
+     },
+     {
+      "text": "訂閱",
+      "disabled": false,
+      "rect": [
+       48,
+       859,
+       294,
+       32
+      ]
+     },
+     {
+      "text": "訂閱",
+      "disabled": false,
+      "rect": [
+       48,
+       983,
+       294,
+       32
+      ]
+     },
+     {
+      "text": "訂閱",
+      "disabled": false,
+      "rect": [
+       48,
+       1083,
+       294,
+       32
+      ]
+     },
+     {
+      "text": "訂閱",
+      "disabled": false,
+      "rect": [
+       48,
+       1183,
+       294,
+       32
+      ]
+     }
+    ],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  }
+ ]
+}

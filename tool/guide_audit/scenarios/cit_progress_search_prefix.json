@@ -1,0 +1,26 @@
+{
+  "name": "cit_progress_search_prefix",
+  "description": "goal search_case: the user types only the common prefix A10-1130930 (card: 「打一部分也可以」) and has not pressed the magnifier yet.",
+  "page": "citizen_report",
+  "capability": "reportIssue.progress",
+  "start": "/citizen-report/",
+  "goals": [
+    "search_case"
+  ],
+  "expect": {
+    "done": false
+  },
+  "actions": [
+    {
+      "step": "open_cases",
+      "do": "click",
+      "text": "查詢"
+    },
+    {
+      "step": "search_case",
+      "do": "type",
+      "placeholder": "搜尋案號關鍵字",
+      "value": "A10-1130930"
+    }
+  ]
+}

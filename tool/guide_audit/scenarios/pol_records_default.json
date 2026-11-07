@@ -1,0 +1,18 @@
+{
+  "name": "pol_records_default",
+  "description": "police.records default (open_record), opened the app's way (/police-report then /police-report/record). Tap the first (處理中) case.",
+  "page": "police_report",
+  "capability": "police.records",
+  "goals": [],
+  "expect": {
+    "done": true
+  },
+  "actions": [
+    {
+      "step": "open_record",
+      "do": "click",
+      "selector": "a[href^=\"/police-report/record/\"]",
+      "nth": 0
+    }
+  ]
+}

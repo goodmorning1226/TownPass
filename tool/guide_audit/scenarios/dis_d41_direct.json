@@ -1,0 +1,45 @@
+{
+  "name": "dis_d41_direct",
+  "description": "DIS-1: D-4-1 loaded directly (reload / loadUrl fallback): no 災情描述 checkboxes, 補充描述 then required; only the cards are followed. Fixed: the describe card asks for 補充描述 on a form without boxes.",
+  "page": "disaster_report",
+  "capability": "disasterReport.form.D-4-1",
+  "start": "/disaster-report/form/D-4-1",
+  "goals": [],
+  "expect": {
+    "done": true
+  },
+  "actions": [
+    {
+      "step": "enter_location",
+      "do": "type",
+      "selector": "#location",
+      "value": "臺北市信義區市府路1號"
+    },
+    {
+      "step": "describe_disaster",
+      "do": "type",
+      "selector": "#additional_disc",
+      "value": "道路被土石擋住"
+    },
+    {
+      "step": "give_consent",
+      "do": "scroll",
+      "to": "bottom"
+    },
+    {
+      "step": "give_consent",
+      "do": "check",
+      "text": "提供個人資料給承辦人員"
+    },
+    {
+      "step": "send_report",
+      "do": "click",
+      "text": "送出"
+    },
+    {
+      "step": "done",
+      "do": "click",
+      "text": "確認"
+    }
+  ]
+}

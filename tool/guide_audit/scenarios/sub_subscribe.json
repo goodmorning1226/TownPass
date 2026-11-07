@@ -1,0 +1,23 @@
+{
+  "name": "sub_subscribe",
+  "description": "subscription default (subscribe): open the card's example 停車費通知, press 訂閱.",
+  "page": "subscription",
+  "capability": "subscription",
+  "goals": [],
+  "expect": {
+    "done": true
+  },
+  "actions": [
+    {
+      "step": "pick_topic",
+      "do": "click",
+      "text": "停車費通知"
+    },
+    {
+      "step": "subscribe",
+      "do": "click",
+      "selector": "div.subscription-wrapper button.card-button",
+      "nth": 7
+    }
+  ]
+}

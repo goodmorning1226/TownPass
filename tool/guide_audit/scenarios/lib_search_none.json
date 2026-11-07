@@ -1,0 +1,13 @@
+{
+  "name": "lib_search_none",
+  "description": "Goal search_keyword (plan open_search, search_keyword), app way. The user types a title the demo does not have (哈利波特); page 查無資料.",
+  "page": "library",
+  "capability": "library",
+  "goals": ["search_keyword"],
+  "expect": { "done": true },
+  "actions": [
+    { "step": "open_search", "do": "click", "selector": "a.search-bar" },
+    { "step": "search_keyword", "do": "type", "selector": "input.base-input", "value": "哈利波特" },
+    { "step": "search_keyword", "do": "click", "selector": "button.search-button" }
+  ]
+}

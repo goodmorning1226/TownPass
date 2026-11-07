@@ -1,0 +1,12 @@
+{
+  "name": "cit_fill_location",
+  "description": "goal fill_location: pick a category, type 發生地點.",
+  "page": "citizen_report",
+  "capability": "reportIssue",
+  "goals": ["fill_location"],
+  "expect": { "done": true },
+  "actions": [
+    { "step": "pick_category", "do": "click", "text": "教育事務", "nth": 0 },
+    { "step": "fill_location", "do": "type", "selector": "#location", "value": "臺北市信義區市府路1號" }
+  ]
+}

@@ -1,0 +1,486 @@
+{
+ "name": "fees_tuition",
+ "description": "fees.tuition default goal: fill the form as the cards say, 查詢. The demo has no bills for fee-7 (目前查無…待繳帳單). The guide ends on a non-success done card (目前查無待繳帳單) ringing the message.",
+ "page": "fees",
+ "start": null,
+ "capability": "fees.tuition",
+ "goals": [],
+ "expect": {
+  "done": true
+ },
+ "recordedAt": "2026-11-07T18:55:15.831Z",
+ "durationMs": 4811,
+ "viewport": {
+  "width": 390,
+  "height": 844,
+  "deviceScaleFactor": 3,
+  "isMobile": true,
+  "hasTouch": true
+ },
+ "failed": null,
+ "steps": [
+  {
+   "action": null,
+   "before": null,
+   "after": {
+    "path": "/fee-payment/detail/fee-7/",
+    "query": {},
+    "flags": {
+     "feeName": "學雜費",
+     "firstTab": "繳費編號",
+     "onInputTab": true,
+     "hasFields": true,
+     "filled": false,
+     "fieldKind": "text",
+     "fieldName": "繳費編號",
+     "fieldHint": "逾繳費期限，不提供查詢繳費功能",
+     "fieldChoices": "",
+     "calendar": false,
+     "calTitle": "",
+     "calNav": false,
+     "searchTyped": false,
+     "searchResults": 0,
+     "noBill": false,
+     "alert": false,
+     "alertText": "",
+     "groupOpen": false,
+     "bills": 0,
+     "selected": 0,
+     "total": "",
+     "amount": "",
+     "payEnabled": false,
+     "methodsBelow": false,
+     "payConfirm": false,
+     "paid": false,
+     "paidMethod": "",
+     "noRecords": false,
+     "filtered": false,
+     "__bottomBar": 128,
+     "__dialog": false
+    },
+    "visible": [
+     "fees.field",
+     "fees.query",
+     "fees.tab_input"
+    ],
+    "rects": {
+     "fees.tab_input": [
+      16,
+      48,
+      179,
+      24
+     ],
+     "fees.field": [
+      16,
+      159,
+      358,
+      44
+     ],
+     "fees.query": [
+      16,
+      772,
+      358,
+      48
+     ]
+    }
+   },
+   "facts": {
+    "url": "/fee-payment/detail/fee-7/",
+    "title": "繳費項目",
+    "fields": [
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "payment_number",
+      "name": "",
+      "label": "繳費編號",
+      "placeholder": "請輸入繳費編號",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       159,
+       358,
+       44
+      ]
+     }
+    ],
+    "starred": [],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "繳費編號",
+      "disabled": false,
+      "rect": [
+       16,
+       48,
+       179,
+       24
+      ]
+     },
+     {
+      "text": "掃描",
+      "disabled": false,
+      "rect": [
+       195,
+       48,
+       179,
+       24
+      ]
+     },
+     {
+      "text": "查詢",
+      "disabled": false,
+      "rect": [
+       16,
+       772,
+       358,
+       48
+      ]
+     }
+    ],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  },
+  {
+   "action": {
+    "step": "enter_number",
+    "do": "type",
+    "selector": "#payment_number",
+    "value": "TEST0001",
+    "hit": {
+     "x": 195,
+     "y": 181,
+     "targets": [
+      "fees.field"
+     ]
+    }
+   },
+   "before": {
+    "path": "/fee-payment/detail/fee-7/",
+    "query": {},
+    "flags": {
+     "feeName": "學雜費",
+     "firstTab": "繳費編號",
+     "onInputTab": true,
+     "hasFields": true,
+     "filled": false,
+     "fieldKind": "text",
+     "fieldName": "繳費編號",
+     "fieldHint": "逾繳費期限，不提供查詢繳費功能",
+     "fieldChoices": "",
+     "calendar": false,
+     "calTitle": "",
+     "calNav": false,
+     "searchTyped": false,
+     "searchResults": 0,
+     "noBill": false,
+     "alert": false,
+     "alertText": "",
+     "groupOpen": false,
+     "bills": 0,
+     "selected": 0,
+     "total": "",
+     "amount": "",
+     "payEnabled": false,
+     "methodsBelow": false,
+     "payConfirm": false,
+     "paid": false,
+     "paidMethod": "",
+     "noRecords": false,
+     "filtered": false,
+     "__bottomBar": 128,
+     "__dialog": false
+    },
+    "visible": [
+     "fees.field",
+     "fees.query",
+     "fees.tab_input"
+    ],
+    "rects": {
+     "fees.tab_input": [
+      16,
+      48,
+      179,
+      24
+     ],
+     "fees.field": [
+      16,
+      159,
+      358,
+      44
+     ],
+     "fees.query": [
+      16,
+      772,
+      358,
+      48
+     ]
+    }
+   },
+   "after": {
+    "path": "/fee-payment/detail/fee-7/",
+    "query": {},
+    "flags": {
+     "feeName": "學雜費",
+     "firstTab": "繳費編號",
+     "onInputTab": true,
+     "hasFields": true,
+     "filled": true,
+     "fieldKind": "",
+     "fieldName": "",
+     "fieldHint": "",
+     "fieldChoices": "",
+     "calendar": false,
+     "calTitle": "",
+     "calNav": false,
+     "searchTyped": false,
+     "searchResults": 0,
+     "noBill": false,
+     "alert": false,
+     "alertText": "",
+     "groupOpen": false,
+     "bills": 0,
+     "selected": 0,
+     "total": "",
+     "amount": "",
+     "payEnabled": false,
+     "methodsBelow": false,
+     "payConfirm": false,
+     "paid": false,
+     "paidMethod": "",
+     "noRecords": false,
+     "filtered": false,
+     "__bottomBar": 128,
+     "__dialog": false
+    },
+    "visible": [
+     "fees.query",
+     "fees.tab_input"
+    ],
+    "rects": {
+     "fees.tab_input": [
+      16,
+      48,
+      179,
+      24
+     ],
+     "fees.query": [
+      16,
+      772,
+      358,
+      48
+     ]
+    }
+   },
+   "facts": {
+    "url": "/fee-payment/detail/fee-7/",
+    "title": "繳費項目",
+    "fields": [
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "payment_number",
+      "name": "",
+      "label": "繳費編號",
+      "placeholder": "請輸入繳費編號",
+      "value": "TEST0001",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       159,
+       358,
+       44
+      ]
+     }
+    ],
+    "starred": [],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "繳費編號",
+      "disabled": false,
+      "rect": [
+       16,
+       48,
+       179,
+       24
+      ]
+     },
+     {
+      "text": "掃描",
+      "disabled": false,
+      "rect": [
+       195,
+       48,
+       179,
+       24
+      ]
+     },
+     {
+      "text": "查詢",
+      "disabled": false,
+      "rect": [
+       16,
+       772,
+       358,
+       48
+      ]
+     }
+    ],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  },
+  {
+   "action": {
+    "step": "query_bill",
+    "do": "click",
+    "text": "查詢",
+    "within": ".tab-view",
+    "hit": {
+     "x": 195,
+     "y": 796,
+     "targets": [
+      "fees.query"
+     ]
+    }
+   },
+   "before": {
+    "path": "/fee-payment/detail/fee-7/",
+    "query": {},
+    "flags": {
+     "feeName": "學雜費",
+     "firstTab": "繳費編號",
+     "onInputTab": true,
+     "hasFields": true,
+     "filled": true,
+     "fieldKind": "",
+     "fieldName": "",
+     "fieldHint": "",
+     "fieldChoices": "",
+     "calendar": false,
+     "calTitle": "",
+     "calNav": false,
+     "searchTyped": false,
+     "searchResults": 0,
+     "noBill": false,
+     "alert": false,
+     "alertText": "",
+     "groupOpen": false,
+     "bills": 0,
+     "selected": 0,
+     "total": "",
+     "amount": "",
+     "payEnabled": false,
+     "methodsBelow": false,
+     "payConfirm": false,
+     "paid": false,
+     "paidMethod": "",
+     "noRecords": false,
+     "filtered": false,
+     "__bottomBar": 128,
+     "__dialog": false
+    },
+    "visible": [
+     "fees.query",
+     "fees.tab_input"
+    ],
+    "rects": {
+     "fees.tab_input": [
+      16,
+      48,
+      179,
+      24
+     ],
+     "fees.query": [
+      16,
+      772,
+      358,
+      48
+     ]
+    }
+   },
+   "after": {
+    "path": "/fee-payment/result/fee-7",
+    "query": {},
+    "flags": {
+     "feeName": "",
+     "firstTab": "",
+     "onInputTab": false,
+     "hasFields": false,
+     "filled": false,
+     "fieldKind": "",
+     "fieldName": "",
+     "fieldHint": "",
+     "fieldChoices": "",
+     "calendar": false,
+     "calTitle": "",
+     "calNav": false,
+     "searchTyped": false,
+     "searchResults": 0,
+     "noBill": true,
+     "alert": false,
+     "alertText": "",
+     "groupOpen": false,
+     "bills": 0,
+     "selected": 0,
+     "total": "",
+     "amount": "",
+     "payEnabled": false,
+     "methodsBelow": false,
+     "payConfirm": false,
+     "paid": false,
+     "paidMethod": "",
+     "noRecords": false,
+     "filtered": false,
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "fees.no_bill"
+    ],
+    "rects": {
+     "fees.no_bill": [
+      32,
+      220,
+      326,
+      72
+     ]
+    }
+   },
+   "facts": {
+    "url": "/fee-payment/result/fee-7",
+    "title": "繳費項目",
+    "fields": [],
+    "starred": [],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "回到城市通",
+      "disabled": false,
+      "rect": [
+       114,
+       332,
+       163,
+       48
+      ]
+     }
+    ],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  }
+ ]
+}

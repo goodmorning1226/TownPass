@@ -1,0 +1,36 @@
+{
+  "name": "fees_parking_pick_one",
+  "description": "fees.parking, goal pick_bill: 機車, plate, 查詢, tick one of the 4 bills (A2222222222); done card points at 前往繳費.",
+  "page": "fees",
+  "capability": "fees.parking",
+  "goals": [
+    "pick_bill"
+  ],
+  "expect": {
+    "done": true
+  },
+  "actions": [
+    {
+      "step": "enter_number",
+      "do": "click",
+      "text": "機車"
+    },
+    {
+      "step": "enter_number",
+      "do": "type",
+      "selector": ".tab-view input[type=text]",
+      "value": "TST-0002"
+    },
+    {
+      "step": "query_bill",
+      "do": "click",
+      "text": "查詢",
+      "within": ".tab-view"
+    },
+    {
+      "step": "pick_bill",
+      "do": "click",
+      "selector": "label[for=\"A2222222222\"]"
+    }
+  ]
+}

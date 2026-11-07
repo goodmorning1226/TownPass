@@ -1,0 +1,1207 @@
+{
+ "name": "cit_progress_search_case",
+ "description": "goal search_case: 查詢, type a case number (the card's A10- format), press the magnifier.",
+ "page": "citizen_report",
+ "start": "/citizen-report/",
+ "capability": "reportIssue.progress",
+ "goals": [
+  "search_case"
+ ],
+ "expect": {
+  "done": true
+ },
+ "recordedAt": "2026-11-07T18:19:05.329Z",
+ "durationMs": 6364,
+ "viewport": {
+  "width": 390,
+  "height": 844,
+  "deviceScaleFactor": 3,
+  "isMobile": true,
+  "hasTouch": true
+ },
+ "failed": null,
+ "steps": [
+  {
+   "action": null,
+   "before": null,
+   "after": {
+    "path": "/citizen-report/",
+    "query": {},
+    "flags": {
+     "vh": 844,
+     "topTab": "通報",
+     "subTab": "有話要說",
+     "groupOpen": false,
+     "searchInput": "",
+     "searchResults": 0,
+     "noResults": false,
+     "category": "",
+     "location": "",
+     "title": "",
+     "description": "",
+     "focus": "",
+     "titleWarn": false,
+     "descWarn": false,
+     "photos": 0,
+     "consent": "",
+     "sendEnabled": false,
+     "accepted": false,
+     "caseKeyword": "",
+     "caseCount": 0,
+     "noCases": false,
+     "casesFiltered": false,
+     "detailTab": "",
+     "caseStatus": "",
+     "caseSubject": "",
+     "replyFrom": "",
+     "expectDone": "",
+     "gridTop": 153,
+     "gridBot": 655,
+     "listTop": -9999,
+     "listBot": -9999,
+     "rowTop": -9999,
+     "rowBot": -9999,
+     "resultsTop": -9999,
+     "resultsBot": -9999,
+     "locTop": -9999,
+     "locBot": -9999,
+     "titleTop": -9999,
+     "titleBot": -9999,
+     "descTop": -9999,
+     "descBot": -9999,
+     "photoTop": -9999,
+     "photoBot": -9999,
+     "consentTop": -9999,
+     "consentBot": -9999,
+     "sendTop": -9999,
+     "sendBot": -9999,
+     "callTop": 761,
+     "callBot": 815,
+     "casesTop": -9999,
+     "casesBot": -9999,
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "report.call_1999",
+     "report.categories",
+     "report.more_items",
+     "report.search_entry",
+     "report.tab_query",
+     "report.tab_report"
+    ],
+    "rects": {
+     "report.tab_report": [
+      16,
+      8,
+      179,
+      24
+     ],
+     "report.tab_query": [
+      195,
+      8,
+      179,
+      24
+     ],
+     "report.search_entry": [
+      16,
+      97,
+      358,
+      44
+     ],
+     "report.categories": [
+      16,
+      153,
+      358,
+      502
+     ],
+     "report.more_items": [
+      16,
+      671,
+      358,
+      54
+     ],
+     "report.call_1999": [
+      16,
+      761,
+      358,
+      54
+     ]
+    }
+   },
+   "facts": {
+    "url": "/citizen-report/",
+    "title": "有話要說",
+    "fields": [
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "",
+      "name": "",
+      "label": "選擇要通報項目",
+      "placeholder": "您遇到哪些問題?",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       97,
+       314,
+       44
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "",
+      "name": "",
+      "label": "有話要說 災情通報",
+      "placeholder": "搜尋案號關鍵字",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       406,
+       123,
+       262,
+       44
+      ]
+     }
+    ],
+    "starred": [],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "通報",
+      "disabled": false,
+      "rect": [
+       16,
+       8,
+       179,
+       24
+      ]
+     },
+     {
+      "text": "查詢",
+      "disabled": false,
+      "rect": [
+       195,
+       8,
+       179,
+       24
+      ]
+     },
+     {
+      "text": "撥打1999專線",
+      "disabled": false,
+      "rect": [
+       16,
+       761,
+       358,
+       54
+      ]
+     },
+     {
+      "text": "有話要說",
+      "disabled": false,
+      "rect": [
+       406,
+       67,
+       179,
+       41
+      ]
+     },
+     {
+      "text": "災情通報",
+      "disabled": false,
+      "rect": [
+       585,
+       67,
+       179,
+       41
+      ]
+     }
+    ],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  },
+  {
+   "action": {
+    "step": "open_cases",
+    "do": "click",
+    "text": "查詢",
+    "hit": {
+     "x": 285,
+     "y": 20,
+     "targets": [
+      "report.tab_query"
+     ]
+    }
+   },
+   "before": {
+    "path": "/citizen-report/",
+    "query": {},
+    "flags": {
+     "vh": 844,
+     "topTab": "通報",
+     "subTab": "有話要說",
+     "groupOpen": false,
+     "searchInput": "",
+     "searchResults": 0,
+     "noResults": false,
+     "category": "",
+     "location": "",
+     "title": "",
+     "description": "",
+     "focus": "",
+     "titleWarn": false,
+     "descWarn": false,
+     "photos": 0,
+     "consent": "",
+     "sendEnabled": false,
+     "accepted": false,
+     "caseKeyword": "",
+     "caseCount": 0,
+     "noCases": false,
+     "casesFiltered": false,
+     "detailTab": "",
+     "caseStatus": "",
+     "caseSubject": "",
+     "replyFrom": "",
+     "expectDone": "",
+     "gridTop": 153,
+     "gridBot": 655,
+     "listTop": -9999,
+     "listBot": -9999,
+     "rowTop": -9999,
+     "rowBot": -9999,
+     "resultsTop": -9999,
+     "resultsBot": -9999,
+     "locTop": -9999,
+     "locBot": -9999,
+     "titleTop": -9999,
+     "titleBot": -9999,
+     "descTop": -9999,
+     "descBot": -9999,
+     "photoTop": -9999,
+     "photoBot": -9999,
+     "consentTop": -9999,
+     "consentBot": -9999,
+     "sendTop": -9999,
+     "sendBot": -9999,
+     "callTop": 761,
+     "callBot": 815,
+     "casesTop": -9999,
+     "casesBot": -9999,
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "report.call_1999",
+     "report.categories",
+     "report.more_items",
+     "report.search_entry",
+     "report.tab_query",
+     "report.tab_report"
+    ],
+    "rects": {
+     "report.tab_report": [
+      16,
+      8,
+      179,
+      24
+     ],
+     "report.tab_query": [
+      195,
+      8,
+      179,
+      24
+     ],
+     "report.search_entry": [
+      16,
+      97,
+      358,
+      44
+     ],
+     "report.categories": [
+      16,
+      153,
+      358,
+      502
+     ],
+     "report.more_items": [
+      16,
+      671,
+      358,
+      54
+     ],
+     "report.call_1999": [
+      16,
+      761,
+      358,
+      54
+     ]
+    }
+   },
+   "after": {
+    "path": "/citizen-report/",
+    "query": {},
+    "flags": {
+     "vh": 844,
+     "topTab": "查詢",
+     "subTab": "有話要說",
+     "groupOpen": false,
+     "searchInput": "",
+     "searchResults": 0,
+     "noResults": false,
+     "category": "",
+     "location": "",
+     "title": "",
+     "description": "",
+     "focus": "",
+     "titleWarn": false,
+     "descWarn": false,
+     "photos": 0,
+     "consent": "",
+     "sendEnabled": false,
+     "accepted": false,
+     "caseKeyword": "",
+     "caseCount": 3,
+     "noCases": false,
+     "casesFiltered": false,
+     "detailTab": "",
+     "caseStatus": "",
+     "caseSubject": "",
+     "replyFrom": "",
+     "expectDone": "",
+     "gridTop": -9999,
+     "gridBot": -9999,
+     "listTop": -9999,
+     "listBot": -9999,
+     "rowTop": -9999,
+     "rowBot": -9999,
+     "resultsTop": -9999,
+     "resultsBot": -9999,
+     "locTop": -9999,
+     "locBot": -9999,
+     "titleTop": -9999,
+     "titleBot": -9999,
+     "descTop": -9999,
+     "descBot": -9999,
+     "photoTop": -9999,
+     "photoBot": -9999,
+     "consentTop": -9999,
+     "consentBot": -9999,
+     "sendTop": -9999,
+     "sendBot": -9999,
+     "callTop": -9999,
+     "callBot": -9999,
+     "casesTop": 231,
+     "casesBot": 471,
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "report.case_search",
+     "report.cases",
+     "report.sub_disaster",
+     "report.sub_report",
+     "report.tab_query",
+     "report.tab_report"
+    ],
+    "rects": {
+     "report.tab_report": [
+      16,
+      8,
+      179,
+      24
+     ],
+     "report.tab_query": [
+      195,
+      8,
+      179,
+      24
+     ],
+     "report.sub_report": [
+      16,
+      67,
+      179,
+      41
+     ],
+     "report.sub_disaster": [
+      195,
+      67,
+      179,
+      41
+     ],
+     "report.case_search": [
+      16,
+      123,
+      358,
+      44
+     ],
+     "report.cases": [
+      16,
+      231,
+      358,
+      240
+     ]
+    }
+   },
+   "facts": {
+    "url": "/citizen-report/",
+    "title": "有話要說",
+    "fields": [
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "",
+      "name": "",
+      "label": "選擇要通報項目",
+      "placeholder": "您遇到哪些問題?",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       -374,
+       97,
+       314,
+       44
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "",
+      "name": "",
+      "label": "有話要說 災情通報",
+      "placeholder": "搜尋案號關鍵字",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       123,
+       262,
+       44
+      ]
+     }
+    ],
+    "starred": [],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "通報",
+      "disabled": false,
+      "rect": [
+       16,
+       8,
+       179,
+       24
+      ]
+     },
+     {
+      "text": "查詢",
+      "disabled": false,
+      "rect": [
+       195,
+       8,
+       179,
+       24
+      ]
+     },
+     {
+      "text": "撥打1999專線",
+      "disabled": false,
+      "rect": [
+       -374,
+       761,
+       358,
+       54
+      ]
+     },
+     {
+      "text": "有話要說",
+      "disabled": false,
+      "rect": [
+       16,
+       67,
+       179,
+       41
+      ]
+     },
+     {
+      "text": "災情通報",
+      "disabled": false,
+      "rect": [
+       195,
+       67,
+       179,
+       41
+      ]
+     }
+    ],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  },
+  {
+   "action": {
+    "step": "search_case",
+    "do": "type",
+    "placeholder": "搜尋案號關鍵字",
+    "value": "A10-1130930-00161",
+    "hit": {
+     "x": 147,
+     "y": 145,
+     "targets": [
+      "report.case_search"
+     ]
+    }
+   },
+   "before": {
+    "path": "/citizen-report/",
+    "query": {},
+    "flags": {
+     "vh": 844,
+     "topTab": "查詢",
+     "subTab": "有話要說",
+     "groupOpen": false,
+     "searchInput": "",
+     "searchResults": 0,
+     "noResults": false,
+     "category": "",
+     "location": "",
+     "title": "",
+     "description": "",
+     "focus": "",
+     "titleWarn": false,
+     "descWarn": false,
+     "photos": 0,
+     "consent": "",
+     "sendEnabled": false,
+     "accepted": false,
+     "caseKeyword": "",
+     "caseCount": 3,
+     "noCases": false,
+     "casesFiltered": false,
+     "detailTab": "",
+     "caseStatus": "",
+     "caseSubject": "",
+     "replyFrom": "",
+     "expectDone": "",
+     "gridTop": -9999,
+     "gridBot": -9999,
+     "listTop": -9999,
+     "listBot": -9999,
+     "rowTop": -9999,
+     "rowBot": -9999,
+     "resultsTop": -9999,
+     "resultsBot": -9999,
+     "locTop": -9999,
+     "locBot": -9999,
+     "titleTop": -9999,
+     "titleBot": -9999,
+     "descTop": -9999,
+     "descBot": -9999,
+     "photoTop": -9999,
+     "photoBot": -9999,
+     "consentTop": -9999,
+     "consentBot": -9999,
+     "sendTop": -9999,
+     "sendBot": -9999,
+     "callTop": -9999,
+     "callBot": -9999,
+     "casesTop": 231,
+     "casesBot": 471,
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "report.case_search",
+     "report.cases",
+     "report.sub_disaster",
+     "report.sub_report",
+     "report.tab_query",
+     "report.tab_report"
+    ],
+    "rects": {
+     "report.tab_report": [
+      16,
+      8,
+      179,
+      24
+     ],
+     "report.tab_query": [
+      195,
+      8,
+      179,
+      24
+     ],
+     "report.sub_report": [
+      16,
+      67,
+      179,
+      41
+     ],
+     "report.sub_disaster": [
+      195,
+      67,
+      179,
+      41
+     ],
+     "report.case_search": [
+      16,
+      123,
+      358,
+      44
+     ],
+     "report.cases": [
+      16,
+      231,
+      358,
+      240
+     ]
+    }
+   },
+   "after": {
+    "path": "/citizen-report/",
+    "query": {},
+    "flags": {
+     "vh": 844,
+     "topTab": "查詢",
+     "subTab": "有話要說",
+     "groupOpen": false,
+     "searchInput": "",
+     "searchResults": 0,
+     "noResults": false,
+     "category": "",
+     "location": "",
+     "title": "",
+     "description": "",
+     "focus": "",
+     "titleWarn": false,
+     "descWarn": false,
+     "photos": 0,
+     "consent": "",
+     "sendEnabled": false,
+     "accepted": false,
+     "caseKeyword": "A10-1130930-00161",
+     "caseCount": 3,
+     "noCases": false,
+     "casesFiltered": false,
+     "detailTab": "",
+     "caseStatus": "",
+     "caseSubject": "",
+     "replyFrom": "",
+     "expectDone": "",
+     "gridTop": -9999,
+     "gridBot": -9999,
+     "listTop": -9999,
+     "listBot": -9999,
+     "rowTop": -9999,
+     "rowBot": -9999,
+     "resultsTop": -9999,
+     "resultsBot": -9999,
+     "locTop": -9999,
+     "locBot": -9999,
+     "titleTop": -9999,
+     "titleBot": -9999,
+     "descTop": -9999,
+     "descBot": -9999,
+     "photoTop": -9999,
+     "photoBot": -9999,
+     "consentTop": -9999,
+     "consentBot": -9999,
+     "sendTop": -9999,
+     "sendBot": -9999,
+     "callTop": -9999,
+     "callBot": -9999,
+     "casesTop": 231,
+     "casesBot": 471,
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "report.case_search",
+     "report.cases",
+     "report.sub_disaster",
+     "report.sub_report",
+     "report.tab_query",
+     "report.tab_report"
+    ],
+    "rects": {
+     "report.tab_report": [
+      16,
+      8,
+      179,
+      24
+     ],
+     "report.tab_query": [
+      195,
+      8,
+      179,
+      24
+     ],
+     "report.sub_report": [
+      16,
+      67,
+      179,
+      41
+     ],
+     "report.sub_disaster": [
+      195,
+      67,
+      179,
+      41
+     ],
+     "report.case_search": [
+      16,
+      123,
+      358,
+      44
+     ],
+     "report.cases": [
+      16,
+      231,
+      358,
+      240
+     ]
+    }
+   },
+   "facts": {
+    "url": "/citizen-report/",
+    "title": "有話要說",
+    "fields": [
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "",
+      "name": "",
+      "label": "選擇要通報項目",
+      "placeholder": "您遇到哪些問題?",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       -374,
+       97,
+       314,
+       44
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "",
+      "name": "",
+      "label": "有話要說 災情通報",
+      "placeholder": "搜尋案號關鍵字",
+      "value": "A10-1130930-00161",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       123,
+       262,
+       44
+      ]
+     }
+    ],
+    "starred": [],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "通報",
+      "disabled": false,
+      "rect": [
+       16,
+       8,
+       179,
+       24
+      ]
+     },
+     {
+      "text": "查詢",
+      "disabled": false,
+      "rect": [
+       195,
+       8,
+       179,
+       24
+      ]
+     },
+     {
+      "text": "撥打1999專線",
+      "disabled": false,
+      "rect": [
+       -374,
+       761,
+       358,
+       54
+      ]
+     },
+     {
+      "text": "有話要說",
+      "disabled": false,
+      "rect": [
+       16,
+       67,
+       179,
+       41
+      ]
+     },
+     {
+      "text": "災情通報",
+      "disabled": false,
+      "rect": [
+       195,
+       67,
+       179,
+       41
+      ]
+     }
+    ],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  },
+  {
+   "action": {
+    "step": "search_case",
+    "do": "click",
+    "selector": "div.mt-3 div.flex-grow > button.search-button",
+    "hit": {
+     "x": 296,
+     "y": 145,
+     "targets": [
+      "report.case_search"
+     ]
+    }
+   },
+   "before": {
+    "path": "/citizen-report/",
+    "query": {},
+    "flags": {
+     "vh": 844,
+     "topTab": "查詢",
+     "subTab": "有話要說",
+     "groupOpen": false,
+     "searchInput": "",
+     "searchResults": 0,
+     "noResults": false,
+     "category": "",
+     "location": "",
+     "title": "",
+     "description": "",
+     "focus": "",
+     "titleWarn": false,
+     "descWarn": false,
+     "photos": 0,
+     "consent": "",
+     "sendEnabled": false,
+     "accepted": false,
+     "caseKeyword": "A10-1130930-00161",
+     "caseCount": 3,
+     "noCases": false,
+     "casesFiltered": false,
+     "detailTab": "",
+     "caseStatus": "",
+     "caseSubject": "",
+     "replyFrom": "",
+     "expectDone": "",
+     "gridTop": -9999,
+     "gridBot": -9999,
+     "listTop": -9999,
+     "listBot": -9999,
+     "rowTop": -9999,
+     "rowBot": -9999,
+     "resultsTop": -9999,
+     "resultsBot": -9999,
+     "locTop": -9999,
+     "locBot": -9999,
+     "titleTop": -9999,
+     "titleBot": -9999,
+     "descTop": -9999,
+     "descBot": -9999,
+     "photoTop": -9999,
+     "photoBot": -9999,
+     "consentTop": -9999,
+     "consentBot": -9999,
+     "sendTop": -9999,
+     "sendBot": -9999,
+     "callTop": -9999,
+     "callBot": -9999,
+     "casesTop": 231,
+     "casesBot": 471,
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "report.case_search",
+     "report.cases",
+     "report.sub_disaster",
+     "report.sub_report",
+     "report.tab_query",
+     "report.tab_report"
+    ],
+    "rects": {
+     "report.tab_report": [
+      16,
+      8,
+      179,
+      24
+     ],
+     "report.tab_query": [
+      195,
+      8,
+      179,
+      24
+     ],
+     "report.sub_report": [
+      16,
+      67,
+      179,
+      41
+     ],
+     "report.sub_disaster": [
+      195,
+      67,
+      179,
+      41
+     ],
+     "report.case_search": [
+      16,
+      123,
+      358,
+      44
+     ],
+     "report.cases": [
+      16,
+      231,
+      358,
+      240
+     ]
+    }
+   },
+   "after": {
+    "path": "/citizen-report/",
+    "query": {},
+    "flags": {
+     "vh": 844,
+     "topTab": "查詢",
+     "subTab": "有話要說",
+     "groupOpen": false,
+     "searchInput": "",
+     "searchResults": 0,
+     "noResults": false,
+     "category": "",
+     "location": "",
+     "title": "",
+     "description": "",
+     "focus": "",
+     "titleWarn": false,
+     "descWarn": false,
+     "photos": 0,
+     "consent": "",
+     "sendEnabled": false,
+     "accepted": false,
+     "caseKeyword": "A10-1130930-00161",
+     "caseCount": 1,
+     "noCases": false,
+     "casesFiltered": true,
+     "detailTab": "",
+     "caseStatus": "",
+     "caseSubject": "",
+     "replyFrom": "",
+     "expectDone": "",
+     "gridTop": -9999,
+     "gridBot": -9999,
+     "listTop": -9999,
+     "listBot": -9999,
+     "rowTop": -9999,
+     "rowBot": -9999,
+     "resultsTop": -9999,
+     "resultsBot": -9999,
+     "locTop": -9999,
+     "locBot": -9999,
+     "titleTop": -9999,
+     "titleBot": -9999,
+     "descTop": -9999,
+     "descBot": -9999,
+     "photoTop": -9999,
+     "photoBot": -9999,
+     "consentTop": -9999,
+     "consentBot": -9999,
+     "sendTop": -9999,
+     "sendBot": -9999,
+     "callTop": -9999,
+     "callBot": -9999,
+     "casesTop": 231,
+     "casesBot": 303,
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "report.case_search",
+     "report.cases",
+     "report.sub_disaster",
+     "report.sub_report",
+     "report.tab_query",
+     "report.tab_report"
+    ],
+    "rects": {
+     "report.tab_report": [
+      16,
+      8,
+      179,
+      24
+     ],
+     "report.tab_query": [
+      195,
+      8,
+      179,
+      24
+     ],
+     "report.sub_report": [
+      16,
+      67,
+      179,
+      41
+     ],
+     "report.sub_disaster": [
+      195,
+      67,
+      179,
+      41
+     ],
+     "report.case_search": [
+      16,
+      123,
+      358,
+      44
+     ],
+     "report.cases": [
+      16,
+      231,
+      358,
+      72
+     ]
+    }
+   },
+   "facts": {
+    "url": "/citizen-report/",
+    "title": "有話要說",
+    "fields": [
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "",
+      "name": "",
+      "label": "選擇要通報項目",
+      "placeholder": "您遇到哪些問題?",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       -374,
+       97,
+       314,
+       44
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "",
+      "name": "",
+      "label": "有話要說 災情通報",
+      "placeholder": "搜尋案號關鍵字",
+      "value": "A10-1130930-00161",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       123,
+       262,
+       44
+      ]
+     }
+    ],
+    "starred": [],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "通報",
+      "disabled": false,
+      "rect": [
+       16,
+       8,
+       179,
+       24
+      ]
+     },
+     {
+      "text": "查詢",
+      "disabled": false,
+      "rect": [
+       195,
+       8,
+       179,
+       24
+      ]
+     },
+     {
+      "text": "撥打1999專線",
+      "disabled": false,
+      "rect": [
+       -374,
+       761,
+       358,
+       54
+      ]
+     },
+     {
+      "text": "有話要說",
+      "disabled": false,
+      "rect": [
+       16,
+       67,
+       179,
+       41
+      ]
+     },
+     {
+      "text": "災情通報",
+      "disabled": false,
+      "rect": [
+       195,
+       67,
+       179,
+       41
+      ]
+     }
+    ],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  }
+ ]
+}

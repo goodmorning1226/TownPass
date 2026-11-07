@@ -1,0 +1,1035 @@
+{
+ "name": "lib_pick_book",
+ "description": "Goal pick_book, app way: search 神奇柑仔店, pick the reservable book; done card on its detail.",
+ "page": "library",
+ "start": null,
+ "capability": "library",
+ "goals": [
+  "pick_book"
+ ],
+ "expect": {
+  "done": true
+ },
+ "recordedAt": "2026-11-07T19:00:46.519Z",
+ "durationMs": 7136,
+ "viewport": {
+  "width": 390,
+  "height": 844,
+  "deviceScaleFactor": 3,
+  "isMobile": true,
+  "hasTouch": true
+ },
+ "failed": null,
+ "steps": [
+  {
+   "action": null,
+   "before": null,
+   "after": {
+    "path": "/library-service/",
+    "query": {},
+    "flags": {
+     "tab": "館藏查詢",
+     "input": "",
+     "results": 7,
+     "branch": "",
+     "branchName": "",
+     "branchList": false,
+     "reserveEnabled": false,
+     "reserved": false,
+     "reserveFailed": false,
+     "failReason": "",
+     "notReservable": false,
+     "dialogOpen": false,
+     "bookTitle": "",
+     "seriesCount": 0,
+     "seriesTicked": 0,
+     "seriesLimit": false,
+     "noBranch": false,
+     "pickupOpen": false,
+     "__bottomBar": 74,
+     "__dialog": false
+    },
+    "visible": [
+     "library.ranking_more",
+     "library.search_entry",
+     "library.tab_map",
+     "library.tab_records",
+     "library.tab_search"
+    ],
+    "rects": {
+     "library.tab_search": [
+      16,
+      8,
+      119.3,
+      24
+     ],
+     "library.tab_records": [
+      135.3,
+      8,
+      119.3,
+      24
+     ],
+     "library.tab_map": [
+      254.7,
+      8,
+      119.3,
+      24
+     ],
+     "library.search_entry": [
+      16,
+      59,
+      358,
+      44
+     ],
+     "library.ranking_more": [
+      342,
+      438.3,
+      32,
+      24
+     ]
+    }
+   },
+   "facts": {
+    "url": "/library-service/",
+    "title": "圖書借閱",
+    "fields": [
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "reservation-list",
+      "name": "",
+      "label": "",
+      "placeholder": "",
+      "value": "reservation-list",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       406,
+       59,
+       358,
+       48
+      ]
+     }
+    ],
+    "starred": [],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "館藏查詢",
+      "disabled": false,
+      "rect": [
+       16,
+       8,
+       119,
+       24
+      ]
+     },
+     {
+      "text": "我的紀錄",
+      "disabled": false,
+      "rect": [
+       135,
+       8,
+       119,
+       24
+      ]
+     },
+     {
+      "text": "分館地圖",
+      "disabled": false,
+      "rect": [
+       255,
+       8,
+       119,
+       24
+      ]
+     },
+     {
+      "text": "可取書(1)",
+      "disabled": false,
+      "rect": [
+       422,
+       131,
+       326,
+       24
+      ]
+     },
+     {
+      "text": "處理中(1)",
+      "disabled": false,
+      "rect": [
+       422,
+       191,
+       326,
+       24
+      ]
+     },
+     {
+      "text": "排序中(0)",
+      "disabled": false,
+      "rect": [
+       422,
+       251,
+       326,
+       24
+      ]
+     },
+     {
+      "text": "確定",
+      "disabled": false,
+      "rect": [
+       1058,
+       133,
+       78,
+       36
+      ]
+     },
+     {
+      "text": "確認",
+      "disabled": false,
+      "rect": [
+       825,
+       492,
+       300,
+       40
+      ]
+     }
+    ],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  },
+  {
+   "action": {
+    "step": "open_search",
+    "do": "click",
+    "selector": "a.search-bar",
+    "hit": {
+     "x": 195,
+     "y": 81,
+     "targets": [
+      "library.search_entry"
+     ]
+    }
+   },
+   "before": {
+    "path": "/library-service/",
+    "query": {},
+    "flags": {
+     "tab": "館藏查詢",
+     "input": "",
+     "results": 7,
+     "branch": "",
+     "branchName": "",
+     "branchList": false,
+     "reserveEnabled": false,
+     "reserved": false,
+     "reserveFailed": false,
+     "failReason": "",
+     "notReservable": false,
+     "dialogOpen": false,
+     "bookTitle": "",
+     "seriesCount": 0,
+     "seriesTicked": 0,
+     "seriesLimit": false,
+     "noBranch": false,
+     "pickupOpen": false,
+     "__bottomBar": 74,
+     "__dialog": false
+    },
+    "visible": [
+     "library.ranking_more",
+     "library.search_entry",
+     "library.tab_map",
+     "library.tab_records",
+     "library.tab_search"
+    ],
+    "rects": {
+     "library.tab_search": [
+      16,
+      8,
+      119.3,
+      24
+     ],
+     "library.tab_records": [
+      135.3,
+      8,
+      119.3,
+      24
+     ],
+     "library.tab_map": [
+      254.7,
+      8,
+      119.3,
+      24
+     ],
+     "library.search_entry": [
+      16,
+      59,
+      358,
+      44
+     ],
+     "library.ranking_more": [
+      342,
+      438.3,
+      32,
+      24
+     ]
+    }
+   },
+   "after": {
+    "path": "/library-service/keyword-search",
+    "query": {},
+    "flags": {
+     "tab": "",
+     "input": "",
+     "results": 0,
+     "branch": "",
+     "branchName": "",
+     "branchList": false,
+     "reserveEnabled": false,
+     "reserved": false,
+     "reserveFailed": false,
+     "failReason": "",
+     "notReservable": false,
+     "dialogOpen": false,
+     "bookTitle": "",
+     "seriesCount": 0,
+     "seriesTicked": 0,
+     "seriesLimit": false,
+     "noBranch": false,
+     "pickupOpen": false,
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "library.hot_keywords",
+     "library.search_row"
+    ],
+    "rects": {
+     "library.search_row": [
+      16,
+      24,
+      358,
+      48
+     ],
+     "library.hot_keywords": [
+      16,
+      128,
+      358,
+      184
+     ]
+    }
+   },
+   "facts": {
+    "url": "/library-service/keyword-search",
+    "title": "關鍵字搜尋",
+    "fields": [
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "all",
+      "name": "",
+      "label": "",
+      "placeholder": "",
+      "value": "all",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       24,
+       100,
+       48
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "",
+      "name": "",
+      "label": "全部 書名 著者 出版項 主題 ISBN",
+      "placeholder": "輸入關鍵字",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       116,
+       24,
+       214,
+       48
+      ]
+     }
+    ],
+    "starred": [],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "神奇柑仔店",
+      "disabled": false,
+      "rect": [
+       16,
+       128,
+       112,
+       40
+      ]
+     },
+     {
+      "text": "東野圭吾",
+      "disabled": false,
+      "rect": [
+       136,
+       128,
+       96,
+       40
+      ]
+     },
+     {
+      "text": "小說",
+      "disabled": false,
+      "rect": [
+       240,
+       128,
+       64,
+       40
+      ]
+     },
+     {
+      "text": "如果歷史是一群喵",
+      "disabled": false,
+      "rect": [
+       16,
+       176,
+       160,
+       40
+      ]
+     },
+     {
+      "text": "X尋寶探險隊",
+      "disabled": false,
+      "rect": [
+       184,
+       176,
+       122,
+       40
+      ]
+     },
+     {
+      "text": "857.7",
+      "disabled": false,
+      "rect": [
+       16,
+       224,
+       73,
+       40
+      ]
+     },
+     {
+      "text": "漫畫",
+      "disabled": false,
+      "rect": [
+       97,
+       224,
+       64,
+       40
+      ]
+     },
+     {
+      "text": "屁屁偵探",
+      "disabled": false,
+      "rect": [
+       169,
+       224,
+       96,
+       40
+      ]
+     },
+     {
+      "text": "哈利波特",
+      "disabled": false,
+      "rect": [
+       273,
+       224,
+       96,
+       40
+      ]
+     },
+     {
+      "text": "名偵探柯南",
+      "disabled": false,
+      "rect": [
+       16,
+       272,
+       112,
+       40
+      ]
+     }
+    ],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  },
+  {
+   "action": {
+    "step": "search_keyword",
+    "do": "type",
+    "selector": "input.base-input",
+    "value": "神奇柑仔店",
+    "hit": {
+     "x": 223,
+     "y": 48,
+     "targets": [
+      "library.search_row"
+     ]
+    }
+   },
+   "before": {
+    "path": "/library-service/keyword-search",
+    "query": {},
+    "flags": {
+     "tab": "",
+     "input": "",
+     "results": 0,
+     "branch": "",
+     "branchName": "",
+     "branchList": false,
+     "reserveEnabled": false,
+     "reserved": false,
+     "reserveFailed": false,
+     "failReason": "",
+     "notReservable": false,
+     "dialogOpen": false,
+     "bookTitle": "",
+     "seriesCount": 0,
+     "seriesTicked": 0,
+     "seriesLimit": false,
+     "noBranch": false,
+     "pickupOpen": false,
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "library.hot_keywords",
+     "library.search_row"
+    ],
+    "rects": {
+     "library.search_row": [
+      16,
+      24,
+      358,
+      48
+     ],
+     "library.hot_keywords": [
+      16,
+      128,
+      358,
+      184
+     ]
+    }
+   },
+   "after": {
+    "path": "/library-service/keyword-search",
+    "query": {},
+    "flags": {
+     "tab": "",
+     "input": "神奇柑仔店",
+     "results": 0,
+     "branch": "",
+     "branchName": "",
+     "branchList": false,
+     "reserveEnabled": false,
+     "reserved": false,
+     "reserveFailed": false,
+     "failReason": "",
+     "notReservable": false,
+     "dialogOpen": false,
+     "bookTitle": "",
+     "seriesCount": 0,
+     "seriesTicked": 0,
+     "seriesLimit": false,
+     "noBranch": false,
+     "pickupOpen": false,
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "library.hot_keywords",
+     "library.search_row"
+    ],
+    "rects": {
+     "library.search_row": [
+      16,
+      24,
+      358,
+      48
+     ],
+     "library.hot_keywords": [
+      16,
+      128,
+      358,
+      184
+     ]
+    }
+   },
+   "facts": {
+    "url": "/library-service/keyword-search",
+    "title": "關鍵字搜尋",
+    "fields": [
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "all",
+      "name": "",
+      "label": "",
+      "placeholder": "",
+      "value": "all",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       24,
+       100,
+       48
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "",
+      "name": "",
+      "label": "全部 書名 著者 出版項 主題 ISBN",
+      "placeholder": "輸入關鍵字",
+      "value": "神奇柑仔店",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       116,
+       24,
+       214,
+       48
+      ]
+     }
+    ],
+    "starred": [],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "神奇柑仔店",
+      "disabled": false,
+      "rect": [
+       16,
+       128,
+       112,
+       40
+      ]
+     },
+     {
+      "text": "東野圭吾",
+      "disabled": false,
+      "rect": [
+       136,
+       128,
+       96,
+       40
+      ]
+     },
+     {
+      "text": "小說",
+      "disabled": false,
+      "rect": [
+       240,
+       128,
+       64,
+       40
+      ]
+     },
+     {
+      "text": "如果歷史是一群喵",
+      "disabled": false,
+      "rect": [
+       16,
+       176,
+       160,
+       40
+      ]
+     },
+     {
+      "text": "X尋寶探險隊",
+      "disabled": false,
+      "rect": [
+       184,
+       176,
+       122,
+       40
+      ]
+     },
+     {
+      "text": "857.7",
+      "disabled": false,
+      "rect": [
+       16,
+       224,
+       73,
+       40
+      ]
+     },
+     {
+      "text": "漫畫",
+      "disabled": false,
+      "rect": [
+       97,
+       224,
+       64,
+       40
+      ]
+     },
+     {
+      "text": "屁屁偵探",
+      "disabled": false,
+      "rect": [
+       169,
+       224,
+       96,
+       40
+      ]
+     },
+     {
+      "text": "哈利波特",
+      "disabled": false,
+      "rect": [
+       273,
+       224,
+       96,
+       40
+      ]
+     },
+     {
+      "text": "名偵探柯南",
+      "disabled": false,
+      "rect": [
+       16,
+       272,
+       112,
+       40
+      ]
+     }
+    ],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  },
+  {
+   "action": {
+    "step": "search_keyword",
+    "do": "click",
+    "selector": "button.search-button",
+    "hit": {
+     "x": 348,
+     "y": 46,
+     "targets": [
+      "library.search_row"
+     ]
+    }
+   },
+   "before": {
+    "path": "/library-service/keyword-search",
+    "query": {},
+    "flags": {
+     "tab": "",
+     "input": "神奇柑仔店",
+     "results": 0,
+     "branch": "",
+     "branchName": "",
+     "branchList": false,
+     "reserveEnabled": false,
+     "reserved": false,
+     "reserveFailed": false,
+     "failReason": "",
+     "notReservable": false,
+     "dialogOpen": false,
+     "bookTitle": "",
+     "seriesCount": 0,
+     "seriesTicked": 0,
+     "seriesLimit": false,
+     "noBranch": false,
+     "pickupOpen": false,
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "library.hot_keywords",
+     "library.search_row"
+    ],
+    "rects": {
+     "library.search_row": [
+      16,
+      24,
+      358,
+      48
+     ],
+     "library.hot_keywords": [
+      16,
+      128,
+      358,
+      184
+     ]
+    }
+   },
+   "after": {
+    "path": "/library-service/keyword-search",
+    "query": {
+     "search": "神奇柑仔店",
+     "type": "all"
+    },
+    "flags": {
+     "tab": "",
+     "input": "神奇柑仔店",
+     "results": 2,
+     "branch": "",
+     "branchName": "",
+     "branchList": false,
+     "reserveEnabled": false,
+     "reserved": false,
+     "reserveFailed": false,
+     "failReason": "",
+     "notReservable": false,
+     "dialogOpen": false,
+     "bookTitle": "",
+     "seriesCount": 0,
+     "seriesTicked": 0,
+     "seriesLimit": false,
+     "noBranch": false,
+     "pickupOpen": false,
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "library.results",
+     "library.search_row"
+    ],
+    "rects": {
+     "library.search_row": [
+      16,
+      24,
+      358,
+      48
+     ],
+     "library.results": [
+      16,
+      72,
+      358,
+      264
+     ]
+    }
+   },
+   "facts": {
+    "url": "/library-service/keyword-search?search=%E7%A5%9E%E5%A5%87%E6%9F%91%E4%BB%94%E5%BA%97&type=all",
+    "title": "關鍵字搜尋",
+    "fields": [
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "all",
+      "name": "",
+      "label": "",
+      "placeholder": "",
+      "value": "all",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       24,
+       100,
+       48
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "",
+      "name": "",
+      "label": "全部 書名 著者 出版項 主題 ISBN",
+      "placeholder": "輸入關鍵字",
+      "value": "神奇柑仔店",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       116,
+       24,
+       214,
+       48
+      ]
+     }
+    ],
+    "starred": [],
+    "errors": [],
+    "buttons": [],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  },
+  {
+   "action": {
+    "step": "pick_book",
+    "do": "click",
+    "text": "歡迎光臨錢天堂 : 神奇柑仔店大圖鑑",
+    "hit": {
+     "x": 195,
+     "y": 138,
+     "targets": [
+      "library.results"
+     ]
+    }
+   },
+   "before": {
+    "path": "/library-service/keyword-search",
+    "query": {
+     "search": "神奇柑仔店",
+     "type": "all"
+    },
+    "flags": {
+     "tab": "",
+     "input": "神奇柑仔店",
+     "results": 2,
+     "branch": "",
+     "branchName": "",
+     "branchList": false,
+     "reserveEnabled": false,
+     "reserved": false,
+     "reserveFailed": false,
+     "failReason": "",
+     "notReservable": false,
+     "dialogOpen": false,
+     "bookTitle": "",
+     "seriesCount": 0,
+     "seriesTicked": 0,
+     "seriesLimit": false,
+     "noBranch": false,
+     "pickupOpen": false,
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "library.results",
+     "library.search_row"
+    ],
+    "rects": {
+     "library.search_row": [
+      16,
+      24,
+      358,
+      48
+     ],
+     "library.results": [
+      16,
+      72,
+      358,
+      264
+     ]
+    }
+   },
+   "after": {
+    "path": "/library-service/book-detail/lib-book-5",
+    "query": {},
+    "flags": {
+     "tab": "",
+     "input": "",
+     "results": 0,
+     "branch": "",
+     "branchName": "",
+     "branchList": false,
+     "reserveEnabled": false,
+     "reserved": false,
+     "reserveFailed": false,
+     "failReason": "",
+     "notReservable": false,
+     "dialogOpen": false,
+     "bookTitle": "歡迎光臨錢天堂 : 神奇柑仔店大圖鑑",
+     "seriesCount": 0,
+     "seriesTicked": 0,
+     "seriesLimit": false,
+     "noBranch": false,
+     "pickupOpen": false,
+     "__bottomBar": 176,
+     "__dialog": false
+    },
+    "visible": [
+     "library.branch_field",
+     "library.reserve"
+    ],
+    "rects": {
+     "library.branch_field": [
+      16,
+      716,
+      358,
+      56
+     ],
+     "library.reserve": [
+      16,
+      780,
+      358,
+      48
+     ]
+    }
+   },
+   "facts": {
+    "url": "/library-service/book-detail/lib-book-5",
+    "title": "詳細內容",
+    "fields": [
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "lib-book-5",
+      "name": "",
+      "label": "取書館",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       716,
+       358,
+       48
+      ]
+     }
+    ],
+    "starred": [],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "預約",
+      "disabled": true,
+      "rect": [
+       16,
+       780,
+       358,
+       48
+      ]
+     }
+    ],
+    "disabledButtons": [
+     "預約"
+    ],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  }
+ ]
+}

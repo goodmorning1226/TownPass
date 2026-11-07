@@ -1,0 +1,14 @@
+{
+  "name": "cit_search_item",
+  "description": "goal search_item: tap 您遇到哪些問題?, type the card's example 教育, press the magnifier, pick the result, then the done card.",
+  "page": "citizen_report",
+  "capability": "reportIssue",
+  "goals": ["search_item"],
+  "expect": { "done": true },
+  "actions": [
+    { "step": "search_item", "do": "click", "placeholder": "您遇到哪些問題?" },
+    { "step": "search_item", "do": "type", "placeholder": "您遇到哪些問題?", "value": "教育" },
+    { "step": "search_item", "do": "click", "selector": "div.flex.mt-2 > button.search-button" },
+    { "step": "search_item", "do": "click", "text": "教育事務(校園、教師、幼兒園、圖書館、補教業)" }
+  ]
+}

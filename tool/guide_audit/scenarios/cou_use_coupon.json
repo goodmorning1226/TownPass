@@ -1,0 +1,46 @@
+{
+  "name": "cou_use_coupon",
+  "description": "coupon.list goal use_coupon: pick a coupon, 立即使用, 使用, 確定.",
+  "page": "coupon_wallet",
+  "capability": "coupon.list",
+  "goals": [
+    "use_coupon"
+  ],
+  "expect": {
+    "done": true
+  },
+  "actions": [
+    {
+      "do": "click",
+      "selector": "div.py-2.px-4 > div.flex.justify-between > a",
+      "step": "coupon_home"
+    },
+    {
+      "step": "coupon_tab",
+      "do": "click",
+      "text": "優惠券",
+      "within": "section.tabs:not(.tabs__content-type)"
+    },
+    {
+      "step": "pick_coupon",
+      "do": "click",
+      "text": "阿爸手工皂"
+    },
+    {
+      "step": "use_coupon",
+      "do": "click",
+      "text": "立即使用"
+    },
+    {
+      "step": "use_coupon",
+      "do": "click",
+      "text": "使用",
+      "within": "[role=dialog], .modal, body"
+    },
+    {
+      "step": "done",
+      "do": "click",
+      "text": "確定"
+    }
+  ]
+}

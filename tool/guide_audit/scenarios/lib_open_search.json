@@ -1,0 +1,6 @@
+{
+  "name": "lib_open_search",
+  "description": "Goal open_search only, app way.",
+  "page": "library", "capability": "library", "goals": ["open_search"], "expect": { "done": true },
+  "actions": [ { "step": "open_search", "do": "click", "selector": "a.search-bar" } ]
+}

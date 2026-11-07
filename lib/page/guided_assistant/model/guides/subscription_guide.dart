@@ -137,7 +137,24 @@ int _unsubscribedCard(WebPageState s) {
   return -1;
 }
 
-bool _subscribed(WebPageState s) => _onHome(s) && _subscribedCard(s) >= 0;
+/// A card the user subscribed (opened while not subscribed, then opened
+/// again while subscribed) and has since cancelled: pick_topic and subscribe
+/// stay done after 取消訂閱 in a subscribe-then-unsubscribe plan.
+bool _subscribedThenCancelled(WebPageState s) {
+  if (!_onHome(s)) return false;
+  final n = s.now.number('cards');
+  for (var i = 0; i < n && i < _maxCards; i++) {
+    if (s.latched('openOff$i') &&
+        s.latched('openOn$i') &&
+        !s.now.flag('on$i')) {
+      return true;
+    }
+  }
+  return false;
+}
+
+bool _subscribed(WebPageState s) =>
+    (_onHome(s) && _subscribedCard(s) >= 0) || _subscribedThenCancelled(s);
 bool _unsubscribed(WebPageState s) => _onHome(s) && _unsubscribedCard(s) >= 0;
 
 String _cardTitle(WebPageState s, int i) {

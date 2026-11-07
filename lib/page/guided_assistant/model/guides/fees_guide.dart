@@ -23,6 +23,8 @@ const _result = '/fee-payment/result/';
 const _payment = '/fee-payment/payment/';
 const _finished = '/fee-payment/fee-payment-finished/';
 const _history = '/fee-payment/history';
+const _search = '/fee-payment/search';
+const _scan = '/fee-payment/scan';
 
 /// The visible tab of a detail page (輸入資料 / 繳費編號 / 掃描 slide
 /// sideways; only one is in the viewport).
@@ -50,7 +52,8 @@ const _field = r'''((v) => {
 
 const _emptyField = '$_field($_view)';
 
-/// Name, hint and kind of the first empty field.
+/// Name, hint and kind of the first empty field. A readonly input is a
+/// date picker (出生日期): tapping it opens a calendar, typing does nothing.
 const _fieldInfo = r'''((f) => {
   if (!f) return { kind: '', name: '', hint: '', choices: '' };
   if (Array.isArray(f)) {
@@ -65,12 +68,24 @@ const _fieldInfo = r'''((f) => {
     if (p.tagName === 'P' && !p.classList.contains('field-label')) { hint = txt(p); break; }
     if (p.tagName === 'LABEL' || p.tagName === 'INPUT') break;
   }
+  const group = txt(g && g.querySelector('.field-label'));
+  if (f.tagName === 'INPUT' && f.readOnly) {
+    return { kind: 'date', name: txt(label) || group, hint, choices: '' };
+  }
   const name = txt(label) || (ph(f) || '').replace(/^請(輸入|選擇)/, '') ||
-    (hint ? '' : txt(g && g.querySelector('.field-label')));
+    (hint ? '' : group);
   return { kind: f.tagName === 'SELECT' ? 'select' : 'text', name, hint, choices: '' };
 })''';
 
 const _info = '$_fieldInfo($_emptyField)';
+
+/// The date picker's calendar (v-calendar popovers: days, and the month /
+/// year panel that opens from its title).
+const _calendar = "qa('.vc-popover-content-wrapper').filter(shown)";
+
+/// result/ with 目前查無「X」待繳帳單 (the demo has no bills for most fees).
+const _noBillJs =
+    "(location.pathname.startsWith('$_result') && orig(q('#app')).includes('目前查無'))";
 
 const feesPageSpec = WebPageSpec(
   targets: {
@@ -78,9 +93,17 @@ const feesPageSpec = WebPageSpec(
     'fees.fee_groups': "qa('ul > li.px-4.py-2 > button').filter(shown)",
     'fees.fee_items': "qa('ul > li.mb-3 > a').filter(shown).filter(opened)",
     'fees.fee_search': "q('a[href=\"/fee-payment/search\"]')",
+    // search/: the search box, its 放大鏡 button and the results.
+    'fees.search_box':
+        "location.pathname.startsWith('$_search') ? q('input[placeholder=\"搜尋繳費關鍵字\"]') : null",
+    'fees.search_button':
+        "location.pathname.startsWith('$_search') ? q('button.search-button') : null",
+    'fees.search_results':
+        "location.pathname.startsWith('$_search') ? qa('a[href^=\"/fee-payment/detail/\"]').filter(shown) : null",
     // detail/: the bill number form.
     'fees.tab_input': "q('section.tabs > button.tab-label')",
     'fees.field': _emptyField,
+    'fees.calendar': _calendar,
     'fees.query':
         "(() => { const v = $_view; return v ? [...v.querySelectorAll('.floating-box button.base-button')].find(shown) || null : null; })()",
     'fees.alert_ok': "dialogButton('提醒', '確認')",
@@ -88,6 +111,9 @@ const feesPageSpec = WebPageSpec(
     'fees.bills': "qa('section.p-4.mt-16 > div.rounded').filter(shown)",
     'fees.pay_all': "byText('section.p-4.mt-16 a', '全部繳清')",
     'fees.to_pay': "q('div.fixed.bottom-0 button.base-button')",
+    // result/ without bills: the 目前查無…待繳帳單 message.
+    'fees.no_bill':
+        "$_noBillJs ? q('#app img[alt=\"nodata-icon\"] + p') || q('#app img[alt=\"nodata-icon\"]') : null",
     // payment/: payment methods and the 提醒 dialog (否 / 是).
     'fees.methods': "qa('div.grid.grid-cols-2 > button.rounded-md')",
     'fees.pay_yes': "dialogButton('提醒', '是')",
@@ -113,6 +139,14 @@ const feesPageSpec = WebPageSpec(
     'fieldName': '$_info.name',
     'fieldHint': '$_info.hint',
     'fieldChoices': '$_info.choices',
+    'calendar': '$_calendar.length > 0',
+    'calTitle':
+        "txt(qa('.vc-popover-content-wrapper button.vc-title').find(shown))",
+    'calNav': "qa('.vc-nav-container').some(shown)",
+    'searchTyped': "(() => { const i = q('input[placeholder=\"搜尋繳費關鍵字\"]'); return !!i && !!(i.value || '').trim(); })()",
+    'searchResults':
+        "location.pathname.startsWith('$_search') ? qa('a[href^=\"/fee-payment/detail/\"]').filter(shown).length : 0",
+    'noBill': _noBillJs,
     'alert': "!!dialogButton('提醒', '確認')",
     'alertText': r"""(() => { const p = dialog('提醒'); if (!p) return ''; return txt(p).split('\n').map((x) => x.trim()).filter((x) => x && x !== '提醒' && x !== '確認')[0] || ''; })()""",
     'groupOpen': "qa('ul > li.mb-3 > a').filter(shown).some(opened)",
@@ -146,6 +180,19 @@ int _stage(WebPageState s) {
 bool _paid(WebPageState s) => s.latched('paid') || _stage(s) == 4;
 bool _no(WebPageState s) => false;
 bool _onDetail(WebPageState s) => _stage(s) == 1;
+bool _onSearch(WebPageState s) => s.now.pathStarts(_search);
+bool _onScan(WebPageState s) => s.now.pathStarts(_scan);
+
+/// result/ says 目前查無「X」待繳帳單: nothing to pay, the guide ends there
+/// (not as a payment).
+bool _noBill(WebPageState s) => _stage(s) == 2 && s.now.flag('noBill');
+
+const _noBillText = '畫面寫「目前查無待繳帳單」，可能已經繳過或還沒出帳。可以按左上角「‹」檢查號碼，或按「回到城市通」。';
+
+/// Done card of the components after 查詢: on 目前查無…待繳帳單 the guide
+/// ends without a payment.
+String _noBillLabel(WebPageState s) => _noBill(s) ? '沒有待繳帳單' : '完成了';
+String? _noBillTarget(WebPageState s) => _noBill(s) ? 'fees.no_bill' : null;
 
 /// The 提醒 dialog after 查詢 (e.g. 請確認資料是否含空白或符號).
 bool _alert(WebPageState s) => _onDetail(s) && s.now.flag('alert');
@@ -178,6 +225,8 @@ String _fieldCard(WebPageState s) {
   final name = s.now.text('fieldName');
   final hint = s.now.text('fieldHint');
   switch (s.now.text('fieldKind')) {
+    case 'date':
+      return _dateCard(s, name);
     case 'choice':
       final choices = s.now.text('fieldChoices').split('|');
       return gt('先選一個：點「{choices}」。', {
@@ -189,8 +238,14 @@ String _fieldCard(WebPageState s) {
   if (hint.startsWith('範例')) {
     final sample = hint
         .replaceFirst(RegExp(r'^範例[:：]\s*'), '')
-        .replaceAll(RegExp(r'[（(]含分隔符號[)）]'), '');
-    final dash = hint.contains('分隔符號') ? gt('中間的符號也要打。') : '';
+        .replaceAll(RegExp(r'[（(]含分隔符號[)）]'), '')
+        .replaceAll(RegExp(r'[，,、]\s*不含分隔符號'), '')
+        .trim();
+    final dash = hint.contains('不含分隔符號')
+        ? gt('不要打 - 或空白。')
+        : hint.contains('含分隔符號')
+        ? gt('中間的符號也要打。')
+        : '';
     return name.isEmpty
         ? gt('點一下框框，照這個樣子打：「{sample}」，{dash}', {'sample': sample, 'dash': dash})
         : gt('點一下「{name}」的框框，照這個樣子打：「{sample}」，{dash}', {
@@ -202,6 +257,29 @@ String _fieldCard(WebPageState s) {
   if (name.isEmpty) return '點一下亮起來的框框，照帳單上的號碼打進去。';
   return gt('點一下框框，打上帳單上的「{name}」。', {'name': pg(name)});
 }
+
+/// 出生日期: a readonly box that opens a calendar on the current month; the
+/// title (e.g. 「11月 2026」) opens the month panel, whose year in the
+/// middle opens the years, with arrows on both sides.
+String _dateCard(WebPageState s, String name) {
+  final field = name.isEmpty ? gt('日期') : pg(name);
+  if (!s.now.flag('calendar')) {
+    return gt('點一下「{name}」的框框，會跳出月曆。先點月曆最上面的「月份 年份」，換到你出生的年和月，再點日期。', {
+      'name': field,
+    });
+  }
+  if (s.now.flag('calNav')) {
+    return '按左右的箭頭換年份，點中間的年份可以看更多年。選好年，點你出生的月份，再點那一天。';
+  }
+  final title = s.now.text('calTitle');
+  return title.isEmpty
+      ? '先點月曆最上面的「月份 年份」，換到你出生的年和月，再點那一天。'
+      : gt('先點月曆最上面的「{title}」，換到你出生的年和月，再點那一天。', {'title': pg(title)});
+}
+
+/// The current field is picked, not typed (radio, select, date picker).
+bool _picking(WebPageState s) =>
+    const {'choice', 'select', 'date'}.contains(s.now.text('fieldKind'));
 
 final List<GuideComponent> feesComponents = [
   GuideComponent(
@@ -217,16 +295,44 @@ final List<GuideComponent> feesComponents = [
     steps: [
       GuideStep(
         target: (s) {
-          if (_stage(s) != 0) return null;
+          if (_stage(s) != 0 || _onScan(s)) return null;
+          if (_onSearch(s)) {
+            if (s.now.number('searchResults') > 0) return 'fees.search_results';
+            return s.now.flag('searchTyped')
+                ? 'fees.search_button'
+                : 'fees.search_box';
+          }
           return s.now.flag('groupOpen') ? 'fees.fee_items' : 'fees.fee_groups';
         },
-        alsoUsable: const ['fees.fee_groups', 'fees.fee_search'],
+        alsoUsable: const [
+          'fees.fee_groups',
+          'fees.fee_search',
+          'fees.search_box',
+          'fees.search_button',
+          'fees.search_results',
+        ],
+        // 掃描 (地方稅): the camera page, nothing to point at.
+        locks: (s) => !_onScan(s),
         arrow: _no,
         label: (_) => '點一下',
-        card: (s) => s.now.flag('groupOpen')
-            ? '點你要繳的那一項，例如「水費」或「停車費」。'
-            : '你要繳哪一種費用？先點一個大類打開來看，例如「規費」。',
-        detail: (_) => '在清單點你要繳的費用。找不到可以按上面的搜尋框打名稱。',
+        card: (s) {
+          if (_onScan(s)) {
+            return '地方稅要用相機掃描帳單，這裡沒辦法一步一步帶你。按左上角「‹」回去選別的費用。';
+          }
+          if (_onSearch(s)) {
+            return s.now.number('searchResults') > 0
+                ? '點下面你要繳的那一項，例如「水費」。'
+                : '打費用名稱，例如「水費」，按放大鏡，再點下面的結果。';
+          }
+          return s.now.flag('groupOpen')
+              ? '點你要繳的那一項，例如「水費」或「停車費」。'
+              : '你要繳哪一種費用？先點一個大類打開來看，例如「規費」。';
+        },
+        detail: (s) {
+          if (_onScan(s)) return '這一項要用相機掃描帳單。按左上角「‹」回去選別的費用。';
+          if (_onSearch(s)) return '在上面的框框打費用名稱，按放大鏡，再點下面的結果。';
+          return '在清單點你要繳的費用。找不到可以按上面的搜尋框打名稱。';
+        },
         isDone: (s) => _stage(s) >= 1 || _paid(s),
         cardTop: (_) => 420,
       ),
@@ -248,10 +354,18 @@ final List<GuideComponent> feesComponents = [
         target: (s) {
           if (_alert(s)) return 'fees.alert_ok';
           if (_scanTab(s)) return 'fees.tab_input';
+          // 出生日期: the calendar that opened from the box.
+          if (s.now.text('fieldKind') == 'date' && s.now.flag('calendar')) {
+            return 'fees.calendar';
+          }
           return 'fees.field';
         },
+        alsoUsable: const ['fees.calendar'],
         arrow: _scanTab,
-        label: (_) => '打字',
+        label: (s) {
+          if (_alert(s) || _scanTab(s)) return '點一下';
+          return _picking(s) ? '選擇' : '打字';
+        },
         card: (s) {
           if (_alert(s)) return _alertCard(s);
           if (_scanTab(s)) {
@@ -268,6 +382,11 @@ final List<GuideComponent> feesComponents = [
           final where = name.isEmpty
               ? gt('號碼')
               : gt('「{name}」', {'name': pg(name)});
+          if (s.now.text('fieldKind') == 'date') {
+            return gt('{where}要在月曆上選：點框框，點月曆最上面的月份和年份換到你出生的年和月，再點那一天。', {
+              'where': where,
+            });
+          }
           return hint.isEmpty || hint.startsWith('範例')
               ? gt('{where}印在帳單上。點一下亮起來的框框，照帳單打進去。', {'where': where})
               : gt('{where}印在帳單上（{hint}）。點一下亮起來的框框，照帳單打進去。', {
@@ -290,7 +409,13 @@ final List<GuideComponent> feesComponents = [
     taskTitle: '查帳單',
     doneText: '查到了！這些是要繳的帳單。',
     doneDetail: '在帳單右邊的小方框打勾，就是要繳這一張。',
-    doneTarget: (s) => _stage(s) == 2 ? 'fees.bills' : null,
+    doneTarget: (s) => _noBill(s)
+        ? 'fees.no_bill'
+        : _stage(s) == 2
+        ? 'fees.bills'
+        : null,
+    doneLabelOf: _noBillLabel,
+    doneTextOf: (s) => _noBill(s) ? _noBillText : '查到了！這些是要繳的帳單。',
     steps: [
       GuideStep(
         target: (s) => _alert(s) ? 'fees.alert_ok' : 'fees.query',
@@ -314,7 +439,10 @@ final List<GuideComponent> feesComponents = [
     taskTitle: '選帳單',
     doneText: '帳單選好了！',
     doneDetail: '按下面的「前往繳費」，選付款方式。',
-    doneTarget: (s) => _stage(s) == 2 ? 'fees.to_pay' : null,
+    doneTarget: (s) =>
+        _noBillTarget(s) ?? (_stage(s) == 2 ? 'fees.to_pay' : null),
+    doneLabelOf: _noBillLabel,
+    doneTextOf: (s) => _noBill(s) ? _noBillText : '帳單選好了！',
     steps: [
       GuideStep(
         target: (s) {
@@ -339,6 +467,7 @@ final List<GuideComponent> feesComponents = [
         isDone: (s) =>
             _stage(s) >= 3 ||
             _paid(s) ||
+            _noBill(s) ||
             (_stage(s) == 2 && s.now.number('selected') > 0),
         cardTop: (_) => 420,
       ),
@@ -353,7 +482,10 @@ final List<GuideComponent> feesComponents = [
     taskTitle: '前往繳費',
     doneText: '到付款頁了！選一個付款方式。',
     doneDetail: '在「請選擇繳費方式」點一個你常用的付款方式。',
-    doneTarget: (s) => _stage(s) == 3 ? 'fees.methods' : null,
+    doneTarget: (s) =>
+        _noBillTarget(s) ?? (_stage(s) == 3 ? 'fees.methods' : null),
+    doneLabelOf: _noBillLabel,
+    doneTextOf: (s) => _noBill(s) ? _noBillText : '到付款頁了！選一個付款方式。',
     steps: [
       GuideStep(
         target: (_) => 'fees.to_pay',
@@ -365,7 +497,7 @@ final List<GuideComponent> feesComponents = [
               : gt('選好了！總金額是 {total}。按下面的「前往繳費」。', {'total': total});
         },
         detail: (_) => '按畫面最下面的「前往繳費」。',
-        isDone: (s) => _stage(s) >= 3 || _paid(s),
+        isDone: (s) => _stage(s) >= 3 || _paid(s) || _noBill(s),
         cardTop: (_) => 300,
       ),
     ],
@@ -379,7 +511,10 @@ final List<GuideComponent> feesComponents = [
     taskTitle: '選付款方式',
     doneText: '付款方式選好了！',
     doneDetail: '看一下提醒，沒問題就自己按「是」。',
-    doneTarget: (s) => _stage(s) == 3 ? 'fees.pay_yes' : null,
+    doneTarget: (s) =>
+        _noBillTarget(s) ?? (_stage(s) == 3 ? 'fees.pay_yes' : null),
+    doneLabelOf: _noBillLabel,
+    doneTextOf: (s) => _noBill(s) ? _noBillText : '付款方式選好了！',
     steps: [
       GuideStep(
         target: (s) => _stage(s) == 3 ? 'fees.methods' : null,
@@ -390,7 +525,10 @@ final List<GuideComponent> feesComponents = [
             ? '選一個你平常用的付款方式，例如「悠遊付」。下面還有，可以往下滑看看。'
             : '選一個你平常用的付款方式，例如「悠遊付」。',
         detail: (_) => '在「請選擇繳費方式」點一個你常用的付款方式。',
-        isDone: (s) => _paid(s) || (_stage(s) == 3 && s.now.flag('payConfirm')),
+        isDone: (s) =>
+            _paid(s) ||
+            _noBill(s) ||
+            (_stage(s) == 3 && s.now.flag('payConfirm')),
         cardTop: (_) => 70,
       ),
     ],
@@ -405,8 +543,11 @@ final List<GuideComponent> feesComponents = [
     taskTitle: '繳費',
     doneText: '繳好了！這是示範網站，沒有真的扣款喔。',
     doneDetail: '繳好了。這是示範網站，沒有真的扣款。',
-    doneTarget: (s) => _stage(s) == 4 ? 'fees.paid_info' : null,
+    doneTarget: (s) =>
+        _noBillTarget(s) ?? (_stage(s) == 4 ? 'fees.paid_info' : null),
+    doneLabelOf: _noBillLabel,
     doneTextOf: (s) {
+      if (_noBill(s)) return _noBillText;
       final method = s.now.text('paidMethod');
       final amount = s.now.text('amount');
       if (method.isEmpty || amount.isEmpty) {
@@ -435,7 +576,7 @@ final List<GuideComponent> feesComponents = [
           );
         },
         detail: (_) => '看一下費用和金額對不對，沒問題就自己按「是」；不想繳就按「否」。',
-        isDone: _paid,
+        isDone: (s) => _paid(s) || _noBill(s),
         cardTop: (_) => 60,
       ),
     ],
@@ -478,11 +619,13 @@ final feesPage = GuidePage(
   spec: feesPageSpec,
   onPage: onFees,
   pathPrefixes: const ['/fee-payment'],
-  // 繳費查詢 (fees.search) has no guide.
+  // 繳費查詢 (fees.search) has no guide of its own; a running fees.other
+  // guide still follows the user there (pick_fee's search state).
   pathExcludes: const ['/fee-payment/search'],
   components: feesComponents,
   defaultGoal: feesDefaultGoal,
-  // 地方稅 (tax-1) and 掃描繳費 open the camera page and have no guide.
+  // 地方稅 (tax-1) and 掃描繳費 open the camera page and have no guide
+  // (pick_fee only says so and points back).
   capabilities: const [
     'fees.parking',
     'fees.water',

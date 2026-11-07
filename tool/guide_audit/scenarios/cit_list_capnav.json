@@ -1,0 +1,44 @@
+{
+  "name": "cit_list_capnav",
+  "description": "reportIssue.list (陳情分類) opened by its capabilities.json navigation (/citizen-report/ then in-page /citizen-report/list); no capability_goals, so the default submit_report plan runs. Open a group, pick 道路散落物或油漬處理 (a one-line item: the centre of a two-line item such as 文化事務 falls between the inline link's line boxes, so a synthetic centre click misses the link), write 主旨/描述, 送出, 確認.",
+  "page": "citizen_report",
+  "capability": "reportIssue.list",
+  "goals": [],
+  "expect": {
+    "done": true
+  },
+  "actions": [
+    {
+      "step": "pick_category",
+      "do": "click",
+      "text": "垃圾、噪音、汙染及資源回收"
+    },
+    {
+      "step": "pick_category",
+      "do": "click",
+      "text": "道路散落物或油漬處理"
+    },
+    {
+      "step": "fill_form",
+      "do": "type",
+      "selector": "#title",
+      "value": "測試主旨（示範）"
+    },
+    {
+      "step": "fill_form",
+      "do": "type",
+      "selector": "#description",
+      "value": "測試描述，示範用假資料"
+    },
+    {
+      "step": "submit_report",
+      "do": "click",
+      "text": "送出"
+    },
+    {
+      "step": "done",
+      "do": "click",
+      "text": "確認"
+    }
+  ]
+}

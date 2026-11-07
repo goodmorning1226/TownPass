@@ -1,0 +1,26 @@
+{
+  "name": "cit_progress_disaster",
+  "description": "goal disaster_cases: 查詢 -> 災情通報.",
+  "page": "citizen_report",
+  "capability": "reportIssue.progress",
+  "start": "/citizen-report/",
+  "goals": [
+    "disaster_cases"
+  ],
+  "expect": {
+    "done": true
+  },
+  "actions": [
+    {
+      "step": "open_cases",
+      "do": "click",
+      "text": "查詢"
+    },
+    {
+      "step": "disaster_cases",
+      "do": "click",
+      "text": "災情通報",
+      "within": "section.tabs__content-type"
+    }
+  ]
+}

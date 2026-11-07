@@ -1,0 +1,420 @@
+{
+ "name": "pol_records_goal_detail",
+ "description": "police.records with goal record_detail: open the closed case and tap 詳細內容.",
+ "page": "police_report",
+ "start": null,
+ "capability": "police.records",
+ "goals": [
+  "record_detail"
+ ],
+ "expect": {
+  "done": true
+ },
+ "recordedAt": "2026-11-07T19:01:15.399Z",
+ "durationMs": 5289,
+ "viewport": {
+  "width": 390,
+  "height": 844,
+  "deviceScaleFactor": 3,
+  "isMobile": true,
+  "hasTouch": true
+ },
+ "failed": null,
+ "steps": [
+  {
+   "action": null,
+   "before": null,
+   "after": {
+    "path": "/police-report/record",
+    "query": {},
+    "flags": {
+     "noticeEnabled": false,
+     "noticeRead": false,
+     "statementRead": false,
+     "statementBox": false,
+     "formStep": 0,
+     "fieldKey": "",
+     "typing": false,
+     "fieldTop": 0,
+     "fieldOff": "",
+     "agreeOff": "",
+     "nextOff": "",
+     "sendOff": "",
+     "nextEnabled": false,
+     "sendEnabled": false,
+     "warn": 0,
+     "month": "",
+     "time": "",
+     "role": "",
+     "date": "",
+     "reported": false,
+     "records": 2,
+     "open": 1,
+     "tab": "",
+     "status": "處理中",
+     "caseNo": "",
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "police.records"
+    ],
+    "rects": {
+     "police.records": [
+      16,
+      16,
+      358,
+      168
+     ]
+    }
+   },
+   "facts": {
+    "url": "/police-report/record",
+    "title": "警政報案",
+    "fields": [],
+    "starred": [],
+    "errors": [],
+    "buttons": [],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  },
+  {
+   "action": {
+    "step": "open_record",
+    "do": "click",
+    "selector": "a[href^=\"/police-report/record/\"]",
+    "nth": 1,
+    "hit": {
+     "x": 195,
+     "y": 148,
+     "targets": [
+      "police.records"
+     ]
+    }
+   },
+   "before": {
+    "path": "/police-report/record",
+    "query": {},
+    "flags": {
+     "noticeEnabled": false,
+     "noticeRead": false,
+     "statementRead": false,
+     "statementBox": false,
+     "formStep": 0,
+     "fieldKey": "",
+     "typing": false,
+     "fieldTop": 0,
+     "fieldOff": "",
+     "agreeOff": "",
+     "nextOff": "",
+     "sendOff": "",
+     "nextEnabled": false,
+     "sendEnabled": false,
+     "warn": 0,
+     "month": "",
+     "time": "",
+     "role": "",
+     "date": "",
+     "reported": false,
+     "records": 2,
+     "open": 1,
+     "tab": "",
+     "status": "處理中",
+     "caseNo": "",
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "police.records"
+    ],
+    "rects": {
+     "police.records": [
+      16,
+      16,
+      358,
+      168
+     ]
+    }
+   },
+   "after": {
+    "path": "/police-report/record/W10-1090102-0026",
+    "query": {},
+    "flags": {
+     "noticeEnabled": false,
+     "noticeRead": false,
+     "statementRead": false,
+     "statementBox": false,
+     "formStep": 0,
+     "fieldKey": "",
+     "typing": false,
+     "fieldTop": 0,
+     "fieldOff": "",
+     "agreeOff": "",
+     "nextOff": "",
+     "sendOff": "",
+     "nextEnabled": false,
+     "sendEnabled": false,
+     "warn": 0,
+     "month": "",
+     "time": "",
+     "role": "",
+     "date": "",
+     "reported": false,
+     "records": 0,
+     "open": 0,
+     "tab": "回覆",
+     "status": "已結案",
+     "caseNo": "W10-1090102-0026",
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "police.back",
+     "police.tab_detail",
+     "police.tab_reply",
+     "police.tabs"
+    ],
+    "rects": {
+     "police.tab_reply": [
+      16,
+      56,
+      179,
+      24
+     ],
+     "police.tab_detail": [
+      195,
+      56,
+      179,
+      24
+     ],
+     "police.tabs": [
+      0,
+      48,
+      390,
+      43
+     ],
+     "police.back": [
+      10,
+      16,
+      24,
+      24
+     ]
+    }
+   },
+   "facts": {
+    "url": "/police-report/record/W10-1090102-0026",
+    "title": "警政報案",
+    "fields": [],
+    "starred": [],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "回覆",
+      "disabled": false,
+      "rect": [
+       16,
+       56,
+       179,
+       24
+      ]
+     },
+     {
+      "text": "詳細內容",
+      "disabled": false,
+      "rect": [
+       195,
+       56,
+       179,
+       24
+      ]
+     }
+    ],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 852
+   }
+  },
+  {
+   "action": {
+    "step": "record_detail",
+    "do": "click",
+    "text": "詳細內容",
+    "hit": {
+     "x": 285,
+     "y": 68,
+     "targets": [
+      "police.tab_detail",
+      "police.tabs"
+     ]
+    }
+   },
+   "before": {
+    "path": "/police-report/record/W10-1090102-0026",
+    "query": {},
+    "flags": {
+     "noticeEnabled": false,
+     "noticeRead": false,
+     "statementRead": false,
+     "statementBox": false,
+     "formStep": 0,
+     "fieldKey": "",
+     "typing": false,
+     "fieldTop": 0,
+     "fieldOff": "",
+     "agreeOff": "",
+     "nextOff": "",
+     "sendOff": "",
+     "nextEnabled": false,
+     "sendEnabled": false,
+     "warn": 0,
+     "month": "",
+     "time": "",
+     "role": "",
+     "date": "",
+     "reported": false,
+     "records": 0,
+     "open": 0,
+     "tab": "回覆",
+     "status": "已結案",
+     "caseNo": "W10-1090102-0026",
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "police.back",
+     "police.tab_detail",
+     "police.tab_reply",
+     "police.tabs"
+    ],
+    "rects": {
+     "police.tab_reply": [
+      16,
+      56,
+      179,
+      24
+     ],
+     "police.tab_detail": [
+      195,
+      56,
+      179,
+      24
+     ],
+     "police.tabs": [
+      0,
+      48,
+      390,
+      43
+     ],
+     "police.back": [
+      10,
+      16,
+      24,
+      24
+     ]
+    }
+   },
+   "after": {
+    "path": "/police-report/record/W10-1090102-0026",
+    "query": {},
+    "flags": {
+     "noticeEnabled": false,
+     "noticeRead": false,
+     "statementRead": false,
+     "statementBox": false,
+     "formStep": 0,
+     "fieldKey": "",
+     "typing": false,
+     "fieldTop": 0,
+     "fieldOff": "",
+     "agreeOff": "",
+     "nextOff": "",
+     "sendOff": "",
+     "nextEnabled": false,
+     "sendEnabled": false,
+     "warn": 0,
+     "month": "",
+     "time": "",
+     "role": "",
+     "date": "",
+     "reported": false,
+     "records": 0,
+     "open": 0,
+     "tab": "詳細內容",
+     "status": "已結案",
+     "caseNo": "W10-1090102-0026",
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "police.back",
+     "police.tab_detail",
+     "police.tab_reply",
+     "police.tabs"
+    ],
+    "rects": {
+     "police.tab_reply": [
+      16,
+      56,
+      179,
+      24
+     ],
+     "police.tab_detail": [
+      195,
+      56,
+      179,
+      24
+     ],
+     "police.tabs": [
+      0,
+      48,
+      390,
+      43
+     ],
+     "police.back": [
+      10,
+      16,
+      24,
+      24
+     ]
+    }
+   },
+   "facts": {
+    "url": "/police-report/record/W10-1090102-0026",
+    "title": "警政報案",
+    "fields": [],
+    "starred": [],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "回覆",
+      "disabled": false,
+      "rect": [
+       16,
+       56,
+       179,
+       24
+      ]
+     },
+     {
+      "text": "詳細內容",
+      "disabled": false,
+      "rect": [
+       195,
+       56,
+       179,
+       24
+      ]
+     }
+    ],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 852
+   }
+  }
+ ]
+}

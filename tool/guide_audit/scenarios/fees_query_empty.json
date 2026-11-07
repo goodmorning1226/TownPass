@@ -1,0 +1,35 @@
+{
+  "name": "fees_query_empty",
+  "description": "fees.water: the user presses 查詢 before typing (against the card); the page shows 提醒 請確認資料是否含空白或符號; the card then points at 確認; the user follows it, types and queries.",
+  "page": "fees",
+  "capability": "fees.water",
+  "goals": [],
+  "expect": {
+    "done": false
+  },
+  "actions": [
+    {
+      "step": "enter_number",
+      "do": "click",
+      "text": "查詢",
+      "within": ".tab-view"
+    },
+    {
+      "step": "enter_number",
+      "do": "click",
+      "text": "確認"
+    },
+    {
+      "step": "enter_number",
+      "do": "type",
+      "selector": "#water_number",
+      "value": "1234567890"
+    },
+    {
+      "step": "query_bill",
+      "do": "click",
+      "text": "查詢",
+      "within": ".tab-view"
+    }
+  ]
+}

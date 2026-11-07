@@ -315,6 +315,12 @@ double? _pickCardTop(WebPageState s) {
 
 bool _onFormOrSent(WebPageState s) => _onForm(s) || _accepted(s);
 
+/// 個人資料 is 不同意: the page greys out 送出 and shows no message.
+bool _disagree(WebPageState s) => _onForm(s) && s.now.text('consent') == '不同意';
+
+/// The 送出 step's element: 送出, or the 個人資料 choice while 不同意.
+String _sendKey(WebPageState s) => _disagree(s) ? 'consent' : 'send';
+
 /// A form field step: ring the field, tell what to write. The step is done
 /// once the box has text and the keyboard is put away ([id] is the box's
 /// element id), so the card does not move on after the first letter.
@@ -434,7 +440,7 @@ final List<GuideComponent> citizenReportComponents = [
     requires: const ['pick_category|search_item'],
     taskTitle: '寫發生地點',
     doneText: '地點寫好了！',
-    doneDetail: '接著在「案件主旨」寫一句話說明要反映什麼。',
+    doneDetail: '接著在「案件主旨」和「描述」寫清楚要反映的事（有「*」的兩格一定要寫），再自己按「送出」。',
     doneTarget: _titleDone,
     steps: [
       _fieldStep(
@@ -488,7 +494,7 @@ final List<GuideComponent> citizenReportComponents = [
     requires: const ['pick_category|search_item'],
     taskTitle: '加上照片',
     doneText: '照片加好了！',
-    doneDetail: '最多可以加 10 個檔案。都好了就往下按「送出」。',
+    doneDetail: '最多可以加 10 個檔案。接著在「案件主旨」和「描述」寫清楚要反映的事（有「*」的兩格一定要寫），再自己按「送出」。',
     doneTarget: (s) => _onForm(s) ? 'report.send' : null,
     steps: [
       GuideStep(
@@ -519,14 +525,22 @@ final List<GuideComponent> citizenReportComponents = [
     doneTarget: (_) => 'report.ok',
     steps: [
       GuideStep(
-        target: (s) => _onForm(s) ? 'report.send' : null,
+        // 不同意 greys out 送出 (no message): point at the 個人資料 choice.
+        target: (s) => !_onForm(s)
+            ? null
+            : _disagree(s)
+            ? 'report.consent'
+            : 'report.send',
         // The card says the 個人資料 choice can still be changed.
         alsoUsable: const ['report.consent'],
         arrow: _no,
-        locks: (s) => !_off(s, 'send'),
-        scrollHint: (s) => _off(s, 'send'),
+        locks: (s) => !_off(s, _sendKey(s)),
+        scrollHint: (s) => _off(s, _sendKey(s)),
         label: (_) => '確認',
         card: (s) {
+          if (_disagree(s)) {
+            return '選「不同意」時這個網站不能送出（「送出」變成灰色）。要送出，請改選「同意」。';
+          }
           if (_off(s, 'send')) return '往下滑一點，就會看到「送出」。';
           if (!s.now.flag('sendEnabled')) {
             return '「送出」現在還不能按。往上看看有沒有紅字，把漏掉的格子補好。';
@@ -540,7 +554,7 @@ final List<GuideComponent> citizenReportComponents = [
           final consent = s.now.text('consent');
           final agree = consent.isEmpty
               ? gt('「個人資料是否提供給承辦」也選一下。')
-              : gt('「個人資料是否提供給承辦」現在選「{consent}」，想改可以點另一個。', {
+              : gt('「個人資料是否提供給承辦」現在選「{consent}」。選「不同意」就不能送出喔。', {
                   'consent': pg(consent),
                 });
           final stale = s.now.flag('titleWarn') || s.now.flag('descWarn')
@@ -557,7 +571,7 @@ final List<GuideComponent> citizenReportComponents = [
         },
         detail: (_) => '看一下內容對不對，沒問題就自己按「送出」。不想送了，按左上角的「‹」離開就好。',
         isDone: _accepted,
-        cardTop: (s) => _near(s, 'send'),
+        cardTop: (s) => _near(s, _sendKey(s)),
       ),
     ],
   ),

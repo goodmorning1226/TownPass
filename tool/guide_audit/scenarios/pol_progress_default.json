@@ -1,0 +1,23 @@
+{
+  "name": "pol_progress_default",
+  "description": "police.progress default (record_detail): open the 處理中 case, tap 詳細內容.",
+  "page": "police_report",
+  "capability": "police.progress",
+  "goals": [],
+  "expect": {
+    "done": true
+  },
+  "actions": [
+    {
+      "step": "open_record",
+      "do": "click",
+      "selector": "a[href^=\"/police-report/record/\"]",
+      "nth": 0
+    },
+    {
+      "step": "record_detail",
+      "do": "click",
+      "text": "詳細內容"
+    }
+  ]
+}

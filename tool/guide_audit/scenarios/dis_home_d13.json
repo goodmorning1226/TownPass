@@ -1,0 +1,53 @@
+{
+  "name": "dis_home_d13",
+  "description": "Plain disasterReport from the category list: 民生、基礎設施災情 -> 路燈故障, then the cards to 通報成功 and 確認 back to the list.",
+  "page": "disaster_report",
+  "capability": "disasterReport",
+  "goals": [],
+  "expect": {
+    "done": true
+  },
+  "actions": [
+    {
+      "step": "pick_category",
+      "do": "click",
+      "text": "民生、基礎設施災情"
+    },
+    {
+      "step": "pick_category",
+      "do": "click",
+      "text": "路燈故障"
+    },
+    {
+      "step": "enter_location",
+      "do": "type",
+      "selector": "#location",
+      "value": "臺北市信義區市府路1號"
+    },
+    {
+      "step": "describe_disaster",
+      "do": "check",
+      "text": "道路"
+    },
+    {
+      "step": "give_consent",
+      "do": "scroll",
+      "to": "bottom"
+    },
+    {
+      "step": "give_consent",
+      "do": "check",
+      "text": "提供個人資料給承辦人員"
+    },
+    {
+      "step": "send_report",
+      "do": "click",
+      "text": "送出"
+    },
+    {
+      "step": "done",
+      "do": "click",
+      "text": "確認"
+    }
+  ]
+}

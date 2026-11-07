@@ -1,0 +1,19 @@
+{
+  "name": "do_view_closed",
+  "description": "districtOffice.progress, goal view_closed (opened like the app at /?isSearch=1): the user taps 已結案.",
+  "page": "district_office",
+  "capability": "districtOffice.progress",
+  "goals": [
+    "view_closed"
+  ],
+  "expect": {
+    "done": true
+  },
+  "actions": [
+    {
+      "step": "view_closed",
+      "do": "click",
+      "text": "已結案(1)"
+    }
+  ]
+}

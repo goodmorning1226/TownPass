@@ -1,0 +1,50 @@
+{
+  "name": "cit_report_disagree",
+  "description": "Default plan; the user picks 不同意 for 個人資料: the page greys out 送出 (disabled, no message). The card says 不同意 can't be sent and points at the 個人資料 choice; the user switches to 同意, presses 送出, then 確認 (CIT-1 fix).",
+  "page": "citizen_report",
+  "capability": "reportIssue",
+  "goals": [],
+  "expect": {
+    "done": true
+  },
+  "actions": [
+    {
+      "step": "pick_category",
+      "do": "click",
+      "text": "公車、計程車、復康巴士問題",
+      "nth": 0
+    },
+    {
+      "step": "fill_form",
+      "do": "type",
+      "selector": "#title",
+      "value": "測試主旨（示範）"
+    },
+    {
+      "step": "fill_form",
+      "do": "type",
+      "selector": "#description",
+      "value": "測試描述，示範用假資料"
+    },
+    {
+      "step": "submit_report",
+      "do": "check",
+      "text": "不同意"
+    },
+    {
+      "step": "submit_report",
+      "do": "check",
+      "text": "同意"
+    },
+    {
+      "step": "submit_report",
+      "do": "click",
+      "text": "送出"
+    },
+    {
+      "step": "done",
+      "do": "click",
+      "text": "確認"
+    }
+  ]
+}

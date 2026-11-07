@@ -1,0 +1,1180 @@
+{
+ "name": "cou_wallet_use",
+ "description": "wallet goal use_coupon: 優惠券 -> 未兌換 coupon -> 兌換 -> 使用 -> 確定.",
+ "page": "coupon_wallet",
+ "start": null,
+ "capability": "wallet",
+ "goals": [
+  "use_coupon"
+ ],
+ "expect": {
+  "done": true
+ },
+ "recordedAt": "2026-11-07T18:26:44.953Z",
+ "durationMs": 9378,
+ "viewport": {
+  "width": 390,
+  "height": 844,
+  "deviceScaleFactor": 3,
+  "isMobile": true,
+  "hasTouch": true
+ },
+ "failed": null,
+ "steps": [
+  {
+   "action": null,
+   "before": null,
+   "after": {
+    "path": "/ticket-wallet",
+    "query": {},
+    "flags": {
+     "tab": "入場券",
+     "subTab": "我的訂單",
+     "cards": 0,
+     "cardsBelow": false,
+     "name": "",
+     "period": "",
+     "rule": "",
+     "desc": "",
+     "remain": "",
+     "hasAdd": false,
+     "addBelow": false,
+     "useLabel": "",
+     "useBelow": false,
+     "addAsk": false,
+     "added": false,
+     "useAsk": false,
+     "used": false,
+     "items": 2,
+     "itemsBelow": false,
+     "rows": 2,
+     "firstItem": "臺北市立美術館",
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "coupon.page_back",
+     "wallet.items",
+     "wallet.rows",
+     "wallet.sub_orders",
+     "wallet.tab_coupons",
+     "wallet.tab_tickets"
+    ],
+    "rects": {
+     "coupon.page_back": [
+      16,
+      8,
+      24,
+      24
+     ],
+     "wallet.tab_coupons": [
+      195,
+      56,
+      179,
+      24
+     ],
+     "wallet.tab_tickets": [
+      16,
+      56,
+      179,
+      24
+     ],
+     "wallet.sub_orders": [
+      0,
+      99,
+      195,
+      41
+     ],
+     "wallet.items": [
+      16,
+      159,
+      358,
+      236
+     ],
+     "wallet.rows": [
+      16,
+      159,
+      358,
+      236
+     ]
+    }
+   },
+   "facts": {
+    "url": "/ticket-wallet",
+    "title": "票夾",
+    "fields": [],
+    "starred": [],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "入場券",
+      "disabled": false,
+      "rect": [
+       16,
+       56,
+       179,
+       24
+      ]
+     },
+     {
+      "text": "優惠券",
+      "disabled": false,
+      "rect": [
+       195,
+       56,
+       179,
+       24
+      ]
+     },
+     {
+      "text": "我的訂單",
+      "disabled": false,
+      "rect": [
+       0,
+       99,
+       195,
+       41
+      ]
+     },
+     {
+      "text": "已結束",
+      "disabled": false,
+      "rect": [
+       195,
+       99,
+       195,
+       41
+      ]
+     },
+     {
+      "text": "未兌換",
+      "disabled": false,
+      "rect": [
+       390,
+       117,
+       130,
+       41
+      ]
+     },
+     {
+      "text": "已兌換",
+      "disabled": false,
+      "rect": [
+       520,
+       117,
+       130,
+       41
+      ]
+     },
+     {
+      "text": "已過期",
+      "disabled": false,
+      "rect": [
+       650,
+       117,
+       130,
+       41
+      ]
+     }
+    ],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 851
+   }
+  },
+  {
+   "action": {
+    "step": "wallet_coupons",
+    "do": "click",
+    "text": "優惠券",
+    "within": "section.tabs:not(.tabs__content-type)",
+    "hit": {
+     "x": 285,
+     "y": 68,
+     "targets": [
+      "wallet.tab_coupons"
+     ]
+    }
+   },
+   "before": {
+    "path": "/ticket-wallet",
+    "query": {},
+    "flags": {
+     "tab": "入場券",
+     "subTab": "我的訂單",
+     "cards": 0,
+     "cardsBelow": false,
+     "name": "",
+     "period": "",
+     "rule": "",
+     "desc": "",
+     "remain": "",
+     "hasAdd": false,
+     "addBelow": false,
+     "useLabel": "",
+     "useBelow": false,
+     "addAsk": false,
+     "added": false,
+     "useAsk": false,
+     "used": false,
+     "items": 2,
+     "itemsBelow": false,
+     "rows": 2,
+     "firstItem": "臺北市立美術館",
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "coupon.page_back",
+     "wallet.items",
+     "wallet.rows",
+     "wallet.sub_orders",
+     "wallet.tab_coupons",
+     "wallet.tab_tickets"
+    ],
+    "rects": {
+     "coupon.page_back": [
+      16,
+      8,
+      24,
+      24
+     ],
+     "wallet.tab_coupons": [
+      195,
+      56,
+      179,
+      24
+     ],
+     "wallet.tab_tickets": [
+      16,
+      56,
+      179,
+      24
+     ],
+     "wallet.sub_orders": [
+      0,
+      99,
+      195,
+      41
+     ],
+     "wallet.items": [
+      16,
+      159,
+      358,
+      236
+     ],
+     "wallet.rows": [
+      16,
+      159,
+      358,
+      236
+     ]
+    }
+   },
+   "after": {
+    "path": "/ticket-wallet",
+    "query": {},
+    "flags": {
+     "tab": "優惠券",
+     "subTab": "未兌換",
+     "cards": 0,
+     "cardsBelow": false,
+     "name": "",
+     "period": "",
+     "rule": "",
+     "desc": "",
+     "remain": "",
+     "hasAdd": false,
+     "addBelow": false,
+     "useLabel": "",
+     "useBelow": false,
+     "addAsk": false,
+     "added": false,
+     "useAsk": false,
+     "used": false,
+     "items": 1,
+     "itemsBelow": false,
+     "rows": 2,
+     "firstItem": "郭董私房菜",
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "coupon.page_back",
+     "wallet.items",
+     "wallet.rows",
+     "wallet.sub_unused",
+     "wallet.sub_used",
+     "wallet.tab_coupons",
+     "wallet.tab_tickets"
+    ],
+    "rects": {
+     "coupon.page_back": [
+      16,
+      8,
+      24,
+      24
+     ],
+     "wallet.tab_coupons": [
+      195,
+      56,
+      179,
+      24
+     ],
+     "wallet.tab_tickets": [
+      16,
+      56,
+      179,
+      24
+     ],
+     "wallet.sub_unused": [
+      0,
+      117,
+      130,
+      41
+     ],
+     "wallet.sub_used": [
+      130,
+      117,
+      130,
+      41
+     ],
+     "wallet.items": [
+      16,
+      177,
+      358,
+      112
+     ],
+     "wallet.rows": [
+      16,
+      159,
+      358,
+      130
+     ]
+    }
+   },
+   "facts": {
+    "url": "/ticket-wallet",
+    "title": "票夾",
+    "fields": [],
+    "starred": [],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "入場券",
+      "disabled": false,
+      "rect": [
+       16,
+       56,
+       179,
+       24
+      ]
+     },
+     {
+      "text": "優惠券",
+      "disabled": false,
+      "rect": [
+       195,
+       56,
+       179,
+       24
+      ]
+     },
+     {
+      "text": "我的訂單",
+      "disabled": false,
+      "rect": [
+       -390,
+       99,
+       195,
+       41
+      ]
+     },
+     {
+      "text": "已結束",
+      "disabled": false,
+      "rect": [
+       -195,
+       99,
+       195,
+       41
+      ]
+     },
+     {
+      "text": "未兌換",
+      "disabled": false,
+      "rect": [
+       0,
+       117,
+       130,
+       41
+      ]
+     },
+     {
+      "text": "已兌換",
+      "disabled": false,
+      "rect": [
+       130,
+       117,
+       130,
+       41
+      ]
+     },
+     {
+      "text": "已過期",
+      "disabled": false,
+      "rect": [
+       260,
+       117,
+       130,
+       41
+      ]
+     }
+    ],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 851
+   }
+  },
+  {
+   "action": {
+    "step": "wallet_pick",
+    "do": "click",
+    "selector": "ul.p-4.flex.flex-col.gap-y-3 > li > a",
+    "nth": 1,
+    "hit": {
+     "x": 195,
+     "y": 233,
+     "targets": [
+      "wallet.items",
+      "wallet.rows"
+     ]
+    }
+   },
+   "before": {
+    "path": "/ticket-wallet",
+    "query": {},
+    "flags": {
+     "tab": "優惠券",
+     "subTab": "未兌換",
+     "cards": 0,
+     "cardsBelow": false,
+     "name": "",
+     "period": "",
+     "rule": "",
+     "desc": "",
+     "remain": "",
+     "hasAdd": false,
+     "addBelow": false,
+     "useLabel": "",
+     "useBelow": false,
+     "addAsk": false,
+     "added": false,
+     "useAsk": false,
+     "used": false,
+     "items": 1,
+     "itemsBelow": false,
+     "rows": 2,
+     "firstItem": "郭董私房菜",
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "coupon.page_back",
+     "wallet.items",
+     "wallet.rows",
+     "wallet.sub_unused",
+     "wallet.sub_used",
+     "wallet.tab_coupons",
+     "wallet.tab_tickets"
+    ],
+    "rects": {
+     "coupon.page_back": [
+      16,
+      8,
+      24,
+      24
+     ],
+     "wallet.tab_coupons": [
+      195,
+      56,
+      179,
+      24
+     ],
+     "wallet.tab_tickets": [
+      16,
+      56,
+      179,
+      24
+     ],
+     "wallet.sub_unused": [
+      0,
+      117,
+      130,
+      41
+     ],
+     "wallet.sub_used": [
+      130,
+      117,
+      130,
+      41
+     ],
+     "wallet.items": [
+      16,
+      177,
+      358,
+      112
+     ],
+     "wallet.rows": [
+      16,
+      159,
+      358,
+      130
+     ]
+    }
+   },
+   "after": {
+    "path": "/coupon/coupon-detail/c-1",
+    "query": {
+     "needUse": "Y",
+     "walletTab": "2"
+    },
+    "flags": {
+     "tab": "",
+     "subTab": "優惠說明",
+     "cards": 0,
+     "cardsBelow": false,
+     "name": "郭董私房菜",
+     "period": "2024/06/10~2024/08/10",
+     "rule": "每會員限領1份",
+     "desc": "住宿9折 不限平假日",
+     "remain": "",
+     "hasAdd": false,
+     "addBelow": false,
+     "useLabel": "兌換",
+     "useBelow": false,
+     "addAsk": false,
+     "added": false,
+     "useAsk": false,
+     "used": false,
+     "items": 0,
+     "itemsBelow": false,
+     "rows": 0,
+     "firstItem": "",
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "coupon.detail_back",
+     "coupon.use"
+    ],
+    "rects": {
+     "coupon.detail_back": [
+      16,
+      16,
+      24,
+      24
+     ],
+     "coupon.use": [
+      16,
+      716,
+      358,
+      48
+     ]
+    }
+   },
+   "facts": {
+    "url": "/coupon/coupon-detail/c-1?needUse=Y&walletTab=2",
+    "title": "優惠",
+    "fields": [],
+    "starred": [],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "優惠說明",
+      "disabled": false,
+      "rect": [
+       16,
+       324,
+       179,
+       41
+      ]
+     },
+     {
+      "text": "店家資訊",
+      "disabled": false,
+      "rect": [
+       195,
+       324,
+       179,
+       41
+      ]
+     },
+     {
+      "text": "兌換",
+      "disabled": false,
+      "rect": [
+       16,
+       716,
+       358,
+       48
+      ]
+     }
+    ],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  },
+  {
+   "action": {
+    "step": "use_coupon",
+    "do": "click",
+    "text": "兌換",
+    "hit": {
+     "x": 195,
+     "y": 740,
+     "targets": [
+      "coupon.use"
+     ]
+    }
+   },
+   "before": {
+    "path": "/coupon/coupon-detail/c-1",
+    "query": {
+     "needUse": "Y",
+     "walletTab": "2"
+    },
+    "flags": {
+     "tab": "",
+     "subTab": "優惠說明",
+     "cards": 0,
+     "cardsBelow": false,
+     "name": "郭董私房菜",
+     "period": "2024/06/10~2024/08/10",
+     "rule": "每會員限領1份",
+     "desc": "住宿9折 不限平假日",
+     "remain": "",
+     "hasAdd": false,
+     "addBelow": false,
+     "useLabel": "兌換",
+     "useBelow": false,
+     "addAsk": false,
+     "added": false,
+     "useAsk": false,
+     "used": false,
+     "items": 0,
+     "itemsBelow": false,
+     "rows": 0,
+     "firstItem": "",
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "coupon.detail_back",
+     "coupon.use"
+    ],
+    "rects": {
+     "coupon.detail_back": [
+      16,
+      16,
+      24,
+      24
+     ],
+     "coupon.use": [
+      16,
+      716,
+      358,
+      48
+     ]
+    }
+   },
+   "after": {
+    "path": "/coupon/coupon-detail/c-1",
+    "query": {
+     "needUse": "Y",
+     "walletTab": "2"
+    },
+    "flags": {
+     "tab": "",
+     "subTab": "優惠說明",
+     "cards": 0,
+     "cardsBelow": false,
+     "name": "郭董私房菜",
+     "period": "2024/06/10~2024/08/10",
+     "rule": "每會員限領1份",
+     "desc": "住宿9折 不限平假日",
+     "remain": "",
+     "hasAdd": false,
+     "addBelow": false,
+     "useLabel": "兌換",
+     "useBelow": false,
+     "addAsk": false,
+     "added": false,
+     "useAsk": true,
+     "used": false,
+     "items": 0,
+     "itemsBelow": false,
+     "rows": 0,
+     "firstItem": "",
+     "__bottomBar": 0,
+     "__dialog": true
+    },
+    "visible": [
+     "coupon.detail_back",
+     "coupon.use",
+     "coupon.use_no",
+     "coupon.use_yes"
+    ],
+    "rects": {
+     "coupon.detail_back": [
+      16,
+      16,
+      24,
+      24
+     ],
+     "coupon.use": [
+      16,
+      716,
+      358,
+      48
+     ],
+     "coupon.use_yes": [
+      195,
+      508.5,
+      156,
+      32
+     ],
+     "coupon.use_no": [
+      39,
+      508.5,
+      156,
+      32
+     ]
+    }
+   },
+   "facts": {
+    "url": "/coupon/coupon-detail/c-1?needUse=Y&walletTab=2",
+    "title": "優惠",
+    "fields": [],
+    "starred": [],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "優惠說明",
+      "disabled": false,
+      "rect": [
+       16,
+       324,
+       179,
+       41
+      ]
+     },
+     {
+      "text": "店家資訊",
+      "disabled": false,
+      "rect": [
+       195,
+       324,
+       179,
+       41
+      ]
+     },
+     {
+      "text": "兌換",
+      "disabled": false,
+      "rect": [
+       16,
+       716,
+       358,
+       48
+      ]
+     },
+     {
+      "text": "取消",
+      "disabled": false,
+      "rect": [
+       39,
+       509,
+       156,
+       32
+      ]
+     },
+     {
+      "text": "使用",
+      "disabled": false,
+      "rect": [
+       195,
+       509,
+       156,
+       32
+      ]
+     }
+    ],
+    "disabledButtons": [],
+    "dialogs": [
+     "確認使用本優惠? 注意！點選使用立即進行兌換 取消 使用"
+    ],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  },
+  {
+   "action": {
+    "step": "use_coupon",
+    "do": "click",
+    "text": "使用",
+    "hit": {
+     "x": 273,
+     "y": 525,
+     "targets": [
+      "coupon.use_yes"
+     ]
+    }
+   },
+   "before": {
+    "path": "/coupon/coupon-detail/c-1",
+    "query": {
+     "needUse": "Y",
+     "walletTab": "2"
+    },
+    "flags": {
+     "tab": "",
+     "subTab": "優惠說明",
+     "cards": 0,
+     "cardsBelow": false,
+     "name": "郭董私房菜",
+     "period": "2024/06/10~2024/08/10",
+     "rule": "每會員限領1份",
+     "desc": "住宿9折 不限平假日",
+     "remain": "",
+     "hasAdd": false,
+     "addBelow": false,
+     "useLabel": "兌換",
+     "useBelow": false,
+     "addAsk": false,
+     "added": false,
+     "useAsk": true,
+     "used": false,
+     "items": 0,
+     "itemsBelow": false,
+     "rows": 0,
+     "firstItem": "",
+     "__bottomBar": 0,
+     "__dialog": true
+    },
+    "visible": [
+     "coupon.detail_back",
+     "coupon.use",
+     "coupon.use_no",
+     "coupon.use_yes"
+    ],
+    "rects": {
+     "coupon.detail_back": [
+      16,
+      16,
+      24,
+      24
+     ],
+     "coupon.use": [
+      16,
+      716,
+      358,
+      48
+     ],
+     "coupon.use_yes": [
+      195,
+      508.5,
+      156,
+      32
+     ],
+     "coupon.use_no": [
+      39,
+      508.5,
+      156,
+      32
+     ]
+    }
+   },
+   "after": {
+    "path": "/coupon/coupon-detail/c-1",
+    "query": {
+     "needUse": "Y",
+     "walletTab": "2"
+    },
+    "flags": {
+     "tab": "",
+     "subTab": "優惠說明",
+     "cards": 0,
+     "cardsBelow": false,
+     "name": "郭董私房菜",
+     "period": "2024/06/10~2024/08/10",
+     "rule": "每會員限領1份",
+     "desc": "住宿9折 不限平假日",
+     "remain": "",
+     "hasAdd": false,
+     "addBelow": false,
+     "useLabel": "兌換",
+     "useBelow": false,
+     "addAsk": false,
+     "added": false,
+     "useAsk": false,
+     "used": true,
+     "items": 0,
+     "itemsBelow": false,
+     "rows": 0,
+     "firstItem": "",
+     "__bottomBar": 0,
+     "__dialog": true
+    },
+    "visible": [
+     "coupon.detail_back",
+     "coupon.use",
+     "coupon.used_ok"
+    ],
+    "rects": {
+     "coupon.detail_back": [
+      16,
+      16,
+      24,
+      24
+     ],
+     "coupon.use": [
+      16,
+      716,
+      358,
+      48
+     ],
+     "coupon.used_ok": [
+      39,
+      496.5,
+      312,
+      32
+     ]
+    }
+   },
+   "facts": {
+    "url": "/coupon/coupon-detail/c-1?needUse=Y&walletTab=2",
+    "title": "優惠",
+    "fields": [],
+    "starred": [],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "優惠說明",
+      "disabled": false,
+      "rect": [
+       16,
+       324,
+       179,
+       41
+      ]
+     },
+     {
+      "text": "店家資訊",
+      "disabled": false,
+      "rect": [
+       195,
+       324,
+       179,
+       41
+      ]
+     },
+     {
+      "text": "兌換",
+      "disabled": false,
+      "rect": [
+       16,
+       716,
+       358,
+       48
+      ]
+     },
+     {
+      "text": "確定",
+      "disabled": false,
+      "rect": [
+       39,
+       497,
+       312,
+       32
+      ]
+     }
+    ],
+    "disabledButtons": [],
+    "dialogs": [
+     "優惠已兌換 確定"
+    ],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  },
+  {
+   "action": {
+    "step": "done",
+    "do": "click",
+    "text": "確定",
+    "hit": {
+     "x": 195,
+     "y": 513,
+     "targets": [
+      "coupon.used_ok"
+     ]
+    }
+   },
+   "before": {
+    "path": "/coupon/coupon-detail/c-1",
+    "query": {
+     "needUse": "Y",
+     "walletTab": "2"
+    },
+    "flags": {
+     "tab": "",
+     "subTab": "優惠說明",
+     "cards": 0,
+     "cardsBelow": false,
+     "name": "郭董私房菜",
+     "period": "2024/06/10~2024/08/10",
+     "rule": "每會員限領1份",
+     "desc": "住宿9折 不限平假日",
+     "remain": "",
+     "hasAdd": false,
+     "addBelow": false,
+     "useLabel": "兌換",
+     "useBelow": false,
+     "addAsk": false,
+     "added": false,
+     "useAsk": false,
+     "used": true,
+     "items": 0,
+     "itemsBelow": false,
+     "rows": 0,
+     "firstItem": "",
+     "__bottomBar": 0,
+     "__dialog": true
+    },
+    "visible": [
+     "coupon.detail_back",
+     "coupon.use",
+     "coupon.used_ok"
+    ],
+    "rects": {
+     "coupon.detail_back": [
+      16,
+      16,
+      24,
+      24
+     ],
+     "coupon.use": [
+      16,
+      716,
+      358,
+      48
+     ],
+     "coupon.used_ok": [
+      39,
+      496.5,
+      312,
+      32
+     ]
+    }
+   },
+   "after": {
+    "path": "/coupon/coupon-detail/c-1",
+    "query": {
+     "needUse": "Y",
+     "walletTab": "2"
+    },
+    "flags": {
+     "tab": "",
+     "subTab": "優惠說明",
+     "cards": 0,
+     "cardsBelow": false,
+     "name": "郭董私房菜",
+     "period": "2024/06/10~2024/08/10",
+     "rule": "每會員限領1份",
+     "desc": "住宿9折 不限平假日",
+     "remain": "",
+     "hasAdd": false,
+     "addBelow": false,
+     "useLabel": "兌換",
+     "useBelow": false,
+     "addAsk": false,
+     "added": false,
+     "useAsk": false,
+     "used": false,
+     "items": 0,
+     "itemsBelow": false,
+     "rows": 0,
+     "firstItem": "",
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "coupon.detail_back",
+     "coupon.use"
+    ],
+    "rects": {
+     "coupon.detail_back": [
+      16,
+      16,
+      24,
+      24
+     ],
+     "coupon.use": [
+      16,
+      716,
+      358,
+      48
+     ]
+    }
+   },
+   "facts": {
+    "url": "/coupon/coupon-detail/c-1?needUse=Y&walletTab=2",
+    "title": "優惠",
+    "fields": [],
+    "starred": [],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "優惠說明",
+      "disabled": false,
+      "rect": [
+       16,
+       324,
+       179,
+       41
+      ]
+     },
+     {
+      "text": "店家資訊",
+      "disabled": false,
+      "rect": [
+       195,
+       324,
+       179,
+       41
+      ]
+     },
+     {
+      "text": "兌換",
+      "disabled": false,
+      "rect": [
+       16,
+       716,
+       358,
+       48
+      ]
+     }
+    ],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  }
+ ]
+}

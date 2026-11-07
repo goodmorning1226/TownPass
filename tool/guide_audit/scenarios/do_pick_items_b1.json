@@ -1,0 +1,30 @@
+{
+  "name": "do_pick_items_b1",
+  "description": "Question plan pick_items alone on 本市警察局受理之違規申訴案件 (districtOffice.form.b-1, opened like the app): the user taps the 申訴項目 box, ticks one item and 確認.",
+  "page": "district_office",
+  "capability": "districtOffice.form.b-1",
+  "goals": [
+    "pick_items"
+  ],
+  "expect": {
+    "done": true
+  },
+  "actions": [
+    {
+      "step": "pick_items",
+      "do": "click",
+      "selector": ".base-multiple-select-wrapper input"
+    },
+    {
+      "step": "pick_items",
+      "do": "check",
+      "text": "車型車色不符"
+    },
+    {
+      "step": "pick_items",
+      "do": "click",
+      "text": "確認",
+      "within": "[id^=\"headlessui-dialog-panel\"]"
+    }
+  ]
+}

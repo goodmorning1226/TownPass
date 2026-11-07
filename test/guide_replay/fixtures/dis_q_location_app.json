@@ -1,0 +1,717 @@
+{
+ "name": "dis_q_location_app",
+ "description": "Question plan enter_location alone on 路燈故障 (app-opened).",
+ "page": "disaster_report",
+ "start": null,
+ "capability": "disasterReport.form.D-1-3",
+ "goals": [
+  "enter_location"
+ ],
+ "expect": {
+  "done": true
+ },
+ "recordedAt": "2026-11-07T18:59:10.688Z",
+ "durationMs": 4711,
+ "viewport": {
+  "width": 390,
+  "height": 844,
+  "deviceScaleFactor": 3,
+  "isMobile": true,
+  "hasTouch": true
+ },
+ "failed": null,
+ "steps": [
+  {
+   "action": null,
+   "before": null,
+   "after": {
+    "path": "/disaster-report/form/D-1-3",
+    "query": {},
+    "flags": {
+     "noResults": false,
+     "query": "",
+     "groupOpen": false,
+     "category": "路燈故障",
+     "location": "",
+     "locationFocus": false,
+     "hasChecks": true,
+     "checked": 0,
+     "checksOff": "",
+     "hasRoad": true,
+     "hasNumbers": true,
+     "numbers": 0,
+     "extraText": false,
+     "extraFocus": false,
+     "extraOff": "below",
+     "needDescribe": false,
+     "consentOff": "below",
+     "noteRead": false,
+     "sendOff": "below",
+     "sendEnabled": false,
+     "reported": false,
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "disaster.checks",
+     "disaster.locate",
+     "disaster.location",
+     "disaster.numbers"
+    ],
+    "rects": {
+     "disaster.location": [
+      16,
+      132,
+      358,
+      44
+     ],
+     "disaster.locate": [
+      346,
+      144,
+      20,
+      20
+     ],
+     "disaster.checks": [
+      29,
+      567,
+      196,
+      100
+     ],
+     "disaster.numbers": [
+      29,
+      719,
+      332,
+      125
+     ]
+    }
+   },
+   "facts": {
+    "url": "/disaster-report/form/D-1-3",
+    "title": "災情通報",
+    "fields": [
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "location",
+      "name": "",
+      "label": "* 標注災情發生地點",
+      "placeholder": "可直接定位或輸入完整地址",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       132,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "textarea",
+      "type": "textarea",
+      "id": "desc",
+      "name": "",
+      "label": "地點描述",
+      "placeholder": "地點位置補充說明",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       234,
+       358,
+       224
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "checkbox",
+      "id": "傷亡",
+      "name": "",
+      "label": "傷亡",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       29,
+       579,
+       0,
+       0
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "checkbox",
+      "id": "受困",
+      "name": "",
+      "label": "受困",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       91,
+       579,
+       0,
+       0
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "checkbox",
+      "id": "失蹤",
+      "name": "",
+      "label": "失蹤",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       153,
+       579,
+       0,
+       0
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "checkbox",
+      "id": "道路",
+      "name": "",
+      "label": "道路",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       29,
+       655,
+       0,
+       0
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "checkbox",
+      "id": "巷弄",
+      "name": "",
+      "label": "巷弄",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       91,
+       655,
+       0,
+       0
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "checkbox",
+      "id": "人行道",
+      "name": "",
+      "label": "人行道",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       153,
+       655,
+       0,
+       0
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "street_lamp_fall",
+      "name": "",
+      "label": "路燈傾倒(傾倒盞)：",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       29,
+       719,
+       332,
+       44
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "street_lamp_lost",
+      "name": "",
+      "label": "路燈傾倒(失明盞)：",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       29,
+       815,
+       332,
+       44
+      ]
+     },
+     {
+      "tag": "textarea",
+      "type": "textarea",
+      "id": "additional_disc",
+      "name": "",
+      "label": "補充描述：",
+      "placeholder": "災情細節說明",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       29,
+       911,
+       332,
+       128
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "checkbox",
+      "id": "Y",
+      "name": "",
+      "label": "提供個人資料給承辦人員",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       1334,
+       0,
+       0
+      ]
+     }
+    ],
+    "starred": [
+     "標注災情發生地點",
+     "災情描述(至少勾選一項)"
+    ],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "送出",
+      "disabled": true,
+      "rect": [
+       16,
+       1368,
+       358,
+       48
+      ]
+     }
+    ],
+    "disabledButtons": [
+     "送出"
+    ],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 1432
+   }
+  },
+  {
+   "action": {
+    "step": "enter_location",
+    "do": "type",
+    "selector": "#location",
+    "value": "臺北市信義區市府路1號",
+    "hit": {
+     "x": 195,
+     "y": 154,
+     "targets": [
+      "disaster.location"
+     ]
+    }
+   },
+   "before": {
+    "path": "/disaster-report/form/D-1-3",
+    "query": {},
+    "flags": {
+     "noResults": false,
+     "query": "",
+     "groupOpen": false,
+     "category": "路燈故障",
+     "location": "",
+     "locationFocus": false,
+     "hasChecks": true,
+     "checked": 0,
+     "checksOff": "",
+     "hasRoad": true,
+     "hasNumbers": true,
+     "numbers": 0,
+     "extraText": false,
+     "extraFocus": false,
+     "extraOff": "below",
+     "needDescribe": false,
+     "consentOff": "below",
+     "noteRead": false,
+     "sendOff": "below",
+     "sendEnabled": false,
+     "reported": false,
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "disaster.checks",
+     "disaster.locate",
+     "disaster.location",
+     "disaster.numbers"
+    ],
+    "rects": {
+     "disaster.location": [
+      16,
+      132,
+      358,
+      44
+     ],
+     "disaster.locate": [
+      346,
+      144,
+      20,
+      20
+     ],
+     "disaster.checks": [
+      29,
+      567,
+      196,
+      100
+     ],
+     "disaster.numbers": [
+      29,
+      719,
+      332,
+      125
+     ]
+    }
+   },
+   "after": {
+    "path": "/disaster-report/form/D-1-3",
+    "query": {},
+    "flags": {
+     "noResults": false,
+     "query": "",
+     "groupOpen": false,
+     "category": "路燈故障",
+     "location": "臺北市信義區市府路1號",
+     "locationFocus": false,
+     "hasChecks": true,
+     "checked": 0,
+     "checksOff": "",
+     "hasRoad": true,
+     "hasNumbers": true,
+     "numbers": 0,
+     "extraText": false,
+     "extraFocus": false,
+     "extraOff": "below",
+     "needDescribe": false,
+     "consentOff": "below",
+     "noteRead": false,
+     "sendOff": "below",
+     "sendEnabled": false,
+     "reported": false,
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "disaster.checks",
+     "disaster.locate",
+     "disaster.location",
+     "disaster.numbers"
+    ],
+    "rects": {
+     "disaster.location": [
+      16,
+      132,
+      358,
+      44
+     ],
+     "disaster.locate": [
+      346,
+      144,
+      20,
+      20
+     ],
+     "disaster.checks": [
+      29,
+      567,
+      196,
+      100
+     ],
+     "disaster.numbers": [
+      29,
+      719,
+      332,
+      125
+     ]
+    }
+   },
+   "facts": {
+    "url": "/disaster-report/form/D-1-3",
+    "title": "災情通報",
+    "fields": [
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "location",
+      "name": "",
+      "label": "* 標注災情發生地點",
+      "placeholder": "可直接定位或輸入完整地址",
+      "value": "臺北市信義區市府路1號",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       132,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "textarea",
+      "type": "textarea",
+      "id": "desc",
+      "name": "",
+      "label": "地點描述",
+      "placeholder": "地點位置補充說明",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       234,
+       358,
+       224
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "checkbox",
+      "id": "傷亡",
+      "name": "",
+      "label": "傷亡",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       29,
+       579,
+       0,
+       0
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "checkbox",
+      "id": "受困",
+      "name": "",
+      "label": "受困",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       91,
+       579,
+       0,
+       0
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "checkbox",
+      "id": "失蹤",
+      "name": "",
+      "label": "失蹤",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       153,
+       579,
+       0,
+       0
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "checkbox",
+      "id": "道路",
+      "name": "",
+      "label": "道路",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       29,
+       655,
+       0,
+       0
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "checkbox",
+      "id": "巷弄",
+      "name": "",
+      "label": "巷弄",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       91,
+       655,
+       0,
+       0
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "checkbox",
+      "id": "人行道",
+      "name": "",
+      "label": "人行道",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       153,
+       655,
+       0,
+       0
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "street_lamp_fall",
+      "name": "",
+      "label": "路燈傾倒(傾倒盞)：",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       29,
+       719,
+       332,
+       44
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "street_lamp_lost",
+      "name": "",
+      "label": "路燈傾倒(失明盞)：",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       29,
+       815,
+       332,
+       44
+      ]
+     },
+     {
+      "tag": "textarea",
+      "type": "textarea",
+      "id": "additional_disc",
+      "name": "",
+      "label": "補充描述：",
+      "placeholder": "災情細節說明",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       29,
+       911,
+       332,
+       128
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "checkbox",
+      "id": "Y",
+      "name": "",
+      "label": "提供個人資料給承辦人員",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       1334,
+       0,
+       0
+      ]
+     }
+    ],
+    "starred": [
+     "標注災情發生地點",
+     "災情描述(至少勾選一項)"
+    ],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "送出",
+      "disabled": true,
+      "rect": [
+       16,
+       1368,
+       358,
+       48
+      ]
+     }
+    ],
+    "disabledButtons": [
+     "送出"
+    ],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 1432
+   }
+  }
+ ]
+}

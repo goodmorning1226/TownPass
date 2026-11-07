@@ -1,0 +1,19 @@
+{
+  "name": "fees_history_item",
+  "description": "fees.history: user changes 所有項目 to 停車費 (the card for a non-empty list names 所有項目; here the list is empty so the card says 近1年 -> 近3年; this checks any filter completes the step and the done text for an empty result).",
+  "page": "fees",
+  "capability": "fees.history",
+  "goals": [],
+  "expect": {
+    "done": true
+  },
+  "actions": [
+    {
+      "step": "filter_history",
+      "do": "select",
+      "selector": "select.base-select",
+      "nth": 1,
+      "value": "fee-5"
+    }
+  ]
+}

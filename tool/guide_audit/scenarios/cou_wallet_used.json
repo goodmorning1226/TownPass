@@ -1,0 +1,25 @@
+{
+  "name": "cou_wallet_used",
+  "description": "wallet goal wallet_used: 優惠券 -> 已兌換.",
+  "page": "coupon_wallet",
+  "capability": "wallet",
+  "goals": [
+    "wallet_used"
+  ],
+  "expect": {
+    "done": true
+  },
+  "actions": [
+    {
+      "step": "wallet_coupons",
+      "do": "click",
+      "text": "優惠券",
+      "within": "section.tabs:not(.tabs__content-type)"
+    },
+    {
+      "step": "wallet_used",
+      "do": "click",
+      "text": "已兌換"
+    }
+  ]
+}

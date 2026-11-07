@@ -1,0 +1,13 @@
+{
+  "name": "cc_goal_remove_favorite_empty",
+  "description": "reservation, goal remove_favorite on a fresh page (no 常用地點).",
+  "page": "counter_calling",
+  "capability": "reservation",
+  "goals": [
+    "remove_favorite"
+  ],
+  "expect": {
+    "done": true
+  },
+  "actions": []
+}

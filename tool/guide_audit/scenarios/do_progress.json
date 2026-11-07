@@ -1,0 +1,11 @@
+{
+  "name": "do_progress",
+  "description": "districtOffice.progress opened like the app (/?isSearch=1, default goal check_progress): the 查詢 tab is open at once; the guide should be done and describe the 申辦中 cases.",
+  "page": "district_office",
+  "capability": "districtOffice.progress",
+  "goals": [],
+  "expect": {
+    "done": true
+  },
+  "actions": []
+}

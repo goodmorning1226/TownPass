@@ -1,0 +1,21 @@
+{
+  "name": "lib_pickup_direct",
+  "description": "library.records with goal check_pickup via capabilities.json navigation (/library-service/?type=1): only 可取書 left.",
+  "page": "library",
+  "capability": "library.records",
+  "goals": [
+    "check_pickup"
+  ],
+  "expect": {
+    "done": true
+  },
+  "actions": [
+    {
+      "step": "check_pickup",
+      "do": "click",
+      "text": "可取書",
+      "exact": false,
+      "within": "li"
+    }
+  ]
+}

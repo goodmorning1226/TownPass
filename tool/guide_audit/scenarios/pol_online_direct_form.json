@@ -1,0 +1,107 @@
+{
+  "name": "pol_online_direct_form",
+  "description": "police.online default plan, form loaded directly (reload / deep link): read_notice counts as done.",
+  "page": "police_report",
+  "capability": "police.online",
+  "goals": [],
+  "expect": {
+    "done": true
+  },
+  "actions": [
+    {
+      "step": "fill_contact",
+      "do": "type",
+      "selector": "#mobile_number",
+      "value": "0912345678"
+    },
+    {
+      "step": "fill_contact",
+      "do": "type",
+      "selector": "#mail",
+      "value": "test@example.com"
+    },
+    {
+      "step": "fill_contact",
+      "do": "select",
+      "selector": "select#county",
+      "value": "臺北市"
+    },
+    {
+      "step": "fill_contact",
+      "do": "select",
+      "selector": "select#city",
+      "value": "信義區"
+    },
+    {
+      "step": "fill_contact",
+      "do": "type",
+      "placeholder": "請輸入詳細地址",
+      "value": "市府路1號"
+    },
+    {
+      "step": "fill_contact",
+      "do": "check",
+      "text": "同通訊地址"
+    },
+    {
+      "step": "next_step",
+      "do": "check",
+      "text": "本人已詳閱並同意以上內容"
+    },
+    {
+      "step": "next_step",
+      "do": "click",
+      "text": "下一步"
+    },
+    {
+      "step": "fill_case",
+      "do": "select",
+      "selector": "#your_role",
+      "value": "當事人"
+    },
+    {
+      "step": "fill_case",
+      "do": "type",
+      "selector": "#location",
+      "value": "臺北市信義區市府路1號"
+    },
+    {
+      "step": "fill_case",
+      "do": "click",
+      "selector": "input.base-input[readonly]"
+    },
+    {
+      "step": "fill_case",
+      "do": "click",
+      "selector": ".vc-day:not(.is-not-in-month) .vc-day-content",
+      "nth": 0
+    },
+    {
+      "step": "fill_case",
+      "do": "type",
+      "selector": "#case_summary",
+      "value": "測試用案情摘要，示範資料。"
+    },
+    {
+      "step": "agree_case",
+      "do": "scroll",
+      "to": "bottom"
+    },
+    {
+      "step": "agree_case",
+      "do": "check",
+      "text": "本人已詳閱並同意以上內容"
+    },
+    {
+      "step": "submit_report",
+      "do": "click",
+      "text": "送出"
+    },
+    {
+      "step": "done",
+      "do": "click",
+      "text": "確認"
+    }
+  ],
+  "start": "/police-report/form"
+}

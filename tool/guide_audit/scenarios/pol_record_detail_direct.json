@@ -1,0 +1,34 @@
+{
+  "name": "pol_record_detail_direct",
+  "description": "police.progress, case URL loaded directly (reload with the list behind it): the page shows empty fields; the card sends the user back with ‹ to open the case again.",
+  "page": "police_report",
+  "capability": "police.progress",
+  "start": "/police-report/record",
+  "goals": [],
+  "expect": {
+    "done": true
+  },
+  "actions": [
+    {
+      "step": "record_detail",
+      "do": "goto",
+      "url": "/police-report/record/W10-1090102-00225"
+    },
+    {
+      "step": "record_detail",
+      "do": "click",
+      "selector": "section.fixed.top-0 button"
+    },
+    {
+      "step": "open_record",
+      "do": "click",
+      "selector": "a[href^=\"/police-report/record/\"]",
+      "nth": 1
+    },
+    {
+      "step": "record_detail",
+      "do": "click",
+      "text": "詳細內容"
+    }
+  ]
+}

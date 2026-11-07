@@ -1,0 +1,12 @@
+{
+  "name": "lib_reservations",
+  "description": "library.reservations (預約清單 / 取書通知): capability_goals open_records (default), app way (home): 我的紀錄, where the 預約清單 is.",
+  "page": "library",
+  "capability": "library.reservations",
+  "start": "/library-service/",
+  "goals": [],
+  "expect": { "done": true },
+  "actions": [
+    { "step": "open_records", "do": "click", "text": "我的紀錄" }
+  ]
+}

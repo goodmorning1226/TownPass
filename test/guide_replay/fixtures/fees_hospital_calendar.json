@@ -1,0 +1,1853 @@
+{
+ "name": "fees_hospital_calendar",
+ "description": "fees.hospital control: 證件號碼, tap the 出生日期 box and pick a day of the current month in the calendar, 院區 as the card says, 查詢: the demo has no 聯醫 bills (目前查無…待繳帳單), the guide ends on the no-bill done card.",
+ "page": "fees",
+ "start": null,
+ "capability": "fees.hospital",
+ "goals": [],
+ "expect": {
+  "done": true
+ },
+ "recordedAt": "2026-11-07T18:54:52.491Z",
+ "durationMs": 7570,
+ "viewport": {
+  "width": 390,
+  "height": 844,
+  "deviceScaleFactor": 3,
+  "isMobile": true,
+  "hasTouch": true
+ },
+ "failed": null,
+ "steps": [
+  {
+   "action": null,
+   "before": null,
+   "after": {
+    "path": "/fee-payment/detail/fee-9/",
+    "query": {},
+    "flags": {
+     "feeName": "聯合醫院醫療費",
+     "firstTab": "輸入資料",
+     "onInputTab": true,
+     "hasFields": true,
+     "filled": false,
+     "fieldKind": "text",
+     "fieldName": "證件號碼",
+     "fieldHint": "",
+     "fieldChoices": "",
+     "calendar": false,
+     "calTitle": "",
+     "calNav": false,
+     "searchTyped": false,
+     "searchResults": 0,
+     "noBill": false,
+     "alert": false,
+     "alertText": "",
+     "groupOpen": false,
+     "bills": 0,
+     "selected": 0,
+     "total": "",
+     "amount": "",
+     "payEnabled": false,
+     "methodsBelow": false,
+     "payConfirm": false,
+     "paid": false,
+     "paidMethod": "",
+     "noRecords": false,
+     "filtered": false,
+     "__bottomBar": 128,
+     "__dialog": false
+    },
+    "visible": [
+     "fees.field",
+     "fees.filters",
+     "fees.query",
+     "fees.tab_input"
+    ],
+    "rects": {
+     "fees.tab_input": [
+      16,
+      48,
+      119.3,
+      24
+     ],
+     "fees.field": [
+      16,
+      131,
+      358,
+      44
+     ],
+     "fees.query": [
+      16,
+      772,
+      358,
+      48
+     ],
+     "fees.filters": [
+      16,
+      343,
+      358,
+      48
+     ]
+    }
+   },
+   "facts": {
+    "url": "/fee-payment/detail/fee-9/",
+    "title": "繳費項目",
+    "fields": [
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "tax_id",
+      "name": "",
+      "label": "證件號碼",
+      "placeholder": "請輸入證件號碼",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       131,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "",
+      "name": "",
+      "label": "範例：1912-01-01(含分隔符號)",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       251,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "office",
+      "name": "",
+      "label": "院區",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       343,
+       358,
+       48
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "payment_number",
+      "name": "",
+      "label": "繳費編號",
+      "placeholder": "請輸入繳費編號",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       406,
+       159,
+       358,
+       44
+      ]
+     }
+    ],
+    "starred": [],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "輸入資料",
+      "disabled": false,
+      "rect": [
+       16,
+       48,
+       119,
+       24
+      ]
+     },
+     {
+      "text": "繳費編號",
+      "disabled": false,
+      "rect": [
+       135,
+       48,
+       119,
+       24
+      ]
+     },
+     {
+      "text": "掃描",
+      "disabled": false,
+      "rect": [
+       255,
+       48,
+       119,
+       24
+      ]
+     },
+     {
+      "text": "查詢",
+      "disabled": false,
+      "rect": [
+       16,
+       772,
+       358,
+       48
+      ]
+     },
+     {
+      "text": "查詢",
+      "disabled": false,
+      "rect": [
+       406,
+       772,
+       358,
+       48
+      ]
+     }
+    ],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  },
+  {
+   "action": {
+    "step": "enter_number",
+    "do": "type",
+    "selector": "#tax_id",
+    "value": "A123456789",
+    "hit": {
+     "x": 195,
+     "y": 153,
+     "targets": [
+      "fees.field"
+     ]
+    }
+   },
+   "before": {
+    "path": "/fee-payment/detail/fee-9/",
+    "query": {},
+    "flags": {
+     "feeName": "聯合醫院醫療費",
+     "firstTab": "輸入資料",
+     "onInputTab": true,
+     "hasFields": true,
+     "filled": false,
+     "fieldKind": "text",
+     "fieldName": "證件號碼",
+     "fieldHint": "",
+     "fieldChoices": "",
+     "calendar": false,
+     "calTitle": "",
+     "calNav": false,
+     "searchTyped": false,
+     "searchResults": 0,
+     "noBill": false,
+     "alert": false,
+     "alertText": "",
+     "groupOpen": false,
+     "bills": 0,
+     "selected": 0,
+     "total": "",
+     "amount": "",
+     "payEnabled": false,
+     "methodsBelow": false,
+     "payConfirm": false,
+     "paid": false,
+     "paidMethod": "",
+     "noRecords": false,
+     "filtered": false,
+     "__bottomBar": 128,
+     "__dialog": false
+    },
+    "visible": [
+     "fees.field",
+     "fees.filters",
+     "fees.query",
+     "fees.tab_input"
+    ],
+    "rects": {
+     "fees.tab_input": [
+      16,
+      48,
+      119.3,
+      24
+     ],
+     "fees.field": [
+      16,
+      131,
+      358,
+      44
+     ],
+     "fees.query": [
+      16,
+      772,
+      358,
+      48
+     ],
+     "fees.filters": [
+      16,
+      343,
+      358,
+      48
+     ]
+    }
+   },
+   "after": {
+    "path": "/fee-payment/detail/fee-9/",
+    "query": {},
+    "flags": {
+     "feeName": "聯合醫院醫療費",
+     "firstTab": "輸入資料",
+     "onInputTab": true,
+     "hasFields": true,
+     "filled": false,
+     "fieldKind": "date",
+     "fieldName": "出生日期",
+     "fieldHint": "範例：1912-01-01(含分隔符號)",
+     "fieldChoices": "",
+     "calendar": false,
+     "calTitle": "",
+     "calNav": false,
+     "searchTyped": false,
+     "searchResults": 0,
+     "noBill": false,
+     "alert": false,
+     "alertText": "",
+     "groupOpen": false,
+     "bills": 0,
+     "selected": 0,
+     "total": "",
+     "amount": "",
+     "payEnabled": false,
+     "methodsBelow": false,
+     "payConfirm": false,
+     "paid": false,
+     "paidMethod": "",
+     "noRecords": false,
+     "filtered": false,
+     "__bottomBar": 128,
+     "__dialog": false
+    },
+    "visible": [
+     "fees.field",
+     "fees.filters",
+     "fees.query",
+     "fees.tab_input"
+    ],
+    "rects": {
+     "fees.tab_input": [
+      16,
+      48,
+      119.3,
+      24
+     ],
+     "fees.field": [
+      16,
+      251,
+      358,
+      44
+     ],
+     "fees.query": [
+      16,
+      772,
+      358,
+      48
+     ],
+     "fees.filters": [
+      16,
+      343,
+      358,
+      48
+     ]
+    }
+   },
+   "facts": {
+    "url": "/fee-payment/detail/fee-9/",
+    "title": "繳費項目",
+    "fields": [
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "tax_id",
+      "name": "",
+      "label": "證件號碼",
+      "placeholder": "請輸入證件號碼",
+      "value": "A123456789",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       131,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "",
+      "name": "",
+      "label": "範例：1912-01-01(含分隔符號)",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       251,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "office",
+      "name": "",
+      "label": "院區",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       343,
+       358,
+       48
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "payment_number",
+      "name": "",
+      "label": "繳費編號",
+      "placeholder": "請輸入繳費編號",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       406,
+       159,
+       358,
+       44
+      ]
+     }
+    ],
+    "starred": [],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "輸入資料",
+      "disabled": false,
+      "rect": [
+       16,
+       48,
+       119,
+       24
+      ]
+     },
+     {
+      "text": "繳費編號",
+      "disabled": false,
+      "rect": [
+       135,
+       48,
+       119,
+       24
+      ]
+     },
+     {
+      "text": "掃描",
+      "disabled": false,
+      "rect": [
+       255,
+       48,
+       119,
+       24
+      ]
+     },
+     {
+      "text": "查詢",
+      "disabled": false,
+      "rect": [
+       16,
+       772,
+       358,
+       48
+      ]
+     },
+     {
+      "text": "查詢",
+      "disabled": false,
+      "rect": [
+       406,
+       772,
+       358,
+       48
+      ]
+     }
+    ],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  },
+  {
+   "action": {
+    "step": "enter_number",
+    "do": "click",
+    "selector": ".tab-view input[readonly]",
+    "hit": {
+     "x": 195,
+     "y": 273,
+     "targets": [
+      "fees.field"
+     ]
+    }
+   },
+   "before": {
+    "path": "/fee-payment/detail/fee-9/",
+    "query": {},
+    "flags": {
+     "feeName": "聯合醫院醫療費",
+     "firstTab": "輸入資料",
+     "onInputTab": true,
+     "hasFields": true,
+     "filled": false,
+     "fieldKind": "date",
+     "fieldName": "出生日期",
+     "fieldHint": "範例：1912-01-01(含分隔符號)",
+     "fieldChoices": "",
+     "calendar": false,
+     "calTitle": "",
+     "calNav": false,
+     "searchTyped": false,
+     "searchResults": 0,
+     "noBill": false,
+     "alert": false,
+     "alertText": "",
+     "groupOpen": false,
+     "bills": 0,
+     "selected": 0,
+     "total": "",
+     "amount": "",
+     "payEnabled": false,
+     "methodsBelow": false,
+     "payConfirm": false,
+     "paid": false,
+     "paidMethod": "",
+     "noRecords": false,
+     "filtered": false,
+     "__bottomBar": 128,
+     "__dialog": false
+    },
+    "visible": [
+     "fees.field",
+     "fees.filters",
+     "fees.query",
+     "fees.tab_input"
+    ],
+    "rects": {
+     "fees.tab_input": [
+      16,
+      48,
+      119.3,
+      24
+     ],
+     "fees.field": [
+      16,
+      251,
+      358,
+      44
+     ],
+     "fees.query": [
+      16,
+      772,
+      358,
+      48
+     ],
+     "fees.filters": [
+      16,
+      343,
+      358,
+      48
+     ]
+    }
+   },
+   "after": {
+    "path": "/fee-payment/detail/fee-9/",
+    "query": {},
+    "flags": {
+     "feeName": "聯合醫院醫療費",
+     "firstTab": "輸入資料",
+     "onInputTab": true,
+     "hasFields": true,
+     "filled": false,
+     "fieldKind": "date",
+     "fieldName": "出生日期",
+     "fieldHint": "範例：1912-01-01(含分隔符號)",
+     "fieldChoices": "",
+     "calendar": true,
+     "calTitle": "11月 2026",
+     "calNav": false,
+     "searchTyped": false,
+     "searchResults": 0,
+     "noBill": false,
+     "alert": false,
+     "alertText": "",
+     "groupOpen": false,
+     "bills": 0,
+     "selected": 0,
+     "total": "",
+     "amount": "",
+     "payEnabled": false,
+     "methodsBelow": false,
+     "payConfirm": false,
+     "paid": false,
+     "paidMethod": "",
+     "noRecords": false,
+     "filtered": false,
+     "__bottomBar": 128,
+     "__dialog": false
+    },
+    "visible": [
+     "fees.calendar",
+     "fees.field",
+     "fees.filters",
+     "fees.query",
+     "fees.tab_input"
+    ],
+    "rects": {
+     "fees.tab_input": [
+      16,
+      48,
+      119.3,
+      24
+     ],
+     "fees.field": [
+      16,
+      251,
+      358,
+      44
+     ],
+     "fees.calendar": [
+      16,
+      295,
+      252,
+      282
+     ],
+     "fees.query": [
+      16,
+      772,
+      358,
+      48
+     ],
+     "fees.filters": [
+      16,
+      343,
+      358,
+      48
+     ]
+    }
+   },
+   "facts": {
+    "url": "/fee-payment/detail/fee-9/",
+    "title": "繳費項目",
+    "fields": [
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "tax_id",
+      "name": "",
+      "label": "證件號碼",
+      "placeholder": "請輸入證件號碼",
+      "value": "A123456789",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       131,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "",
+      "name": "",
+      "label": "範例：1912-01-01(含分隔符號)",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       251,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "office",
+      "name": "",
+      "label": "院區",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       343,
+       358,
+       48
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "payment_number",
+      "name": "",
+      "label": "繳費編號",
+      "placeholder": "請輸入繳費編號",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       406,
+       159,
+       358,
+       44
+      ]
+     }
+    ],
+    "starred": [],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "輸入資料",
+      "disabled": false,
+      "rect": [
+       16,
+       48,
+       119,
+       24
+      ]
+     },
+     {
+      "text": "繳費編號",
+      "disabled": false,
+      "rect": [
+       135,
+       48,
+       119,
+       24
+      ]
+     },
+     {
+      "text": "掃描",
+      "disabled": false,
+      "rect": [
+       255,
+       48,
+       119,
+       24
+      ]
+     },
+     {
+      "text": "11月 2026",
+      "disabled": false,
+      "rect": [
+       92,
+       316,
+       100,
+       30
+      ]
+     },
+     {
+      "text": "1",
+      "disabled": false,
+      "rect": [
+       26,
+       380,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "2",
+      "disabled": false,
+      "rect": [
+       60,
+       380,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "3",
+      "disabled": false,
+      "rect": [
+       94,
+       380,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "4",
+      "disabled": false,
+      "rect": [
+       128,
+       380,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "5",
+      "disabled": false,
+      "rect": [
+       162,
+       380,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "6",
+      "disabled": false,
+      "rect": [
+       196,
+       380,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "7",
+      "disabled": false,
+      "rect": [
+       230,
+       380,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "8",
+      "disabled": false,
+      "rect": [
+       26,
+       412,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "9",
+      "disabled": false,
+      "rect": [
+       60,
+       412,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "10",
+      "disabled": false,
+      "rect": [
+       94,
+       412,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "11",
+      "disabled": false,
+      "rect": [
+       128,
+       412,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "12",
+      "disabled": false,
+      "rect": [
+       162,
+       412,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "13",
+      "disabled": false,
+      "rect": [
+       196,
+       412,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "14",
+      "disabled": false,
+      "rect": [
+       230,
+       412,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "15",
+      "disabled": false,
+      "rect": [
+       26,
+       444,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "16",
+      "disabled": false,
+      "rect": [
+       60,
+       444,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "17",
+      "disabled": false,
+      "rect": [
+       94,
+       444,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "18",
+      "disabled": false,
+      "rect": [
+       128,
+       444,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "19",
+      "disabled": false,
+      "rect": [
+       162,
+       444,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "20",
+      "disabled": false,
+      "rect": [
+       196,
+       444,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "21",
+      "disabled": false,
+      "rect": [
+       230,
+       444,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "22",
+      "disabled": false,
+      "rect": [
+       26,
+       476,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "23",
+      "disabled": false,
+      "rect": [
+       60,
+       476,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "24",
+      "disabled": false,
+      "rect": [
+       94,
+       476,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "25",
+      "disabled": false,
+      "rect": [
+       128,
+       476,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "26",
+      "disabled": false,
+      "rect": [
+       162,
+       476,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "27",
+      "disabled": false,
+      "rect": [
+       196,
+       476,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "28",
+      "disabled": false,
+      "rect": [
+       230,
+       476,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "29",
+      "disabled": false,
+      "rect": [
+       26,
+       508,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "30",
+      "disabled": false,
+      "rect": [
+       60,
+       508,
+       28,
+       28
+      ]
+     },
+     {
+      "text": "查詢",
+      "disabled": false,
+      "rect": [
+       16,
+       772,
+       358,
+       48
+      ]
+     },
+     {
+      "text": "查詢",
+      "disabled": false,
+      "rect": [
+       406,
+       772,
+       358,
+       48
+      ]
+     }
+    ],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  },
+  {
+   "action": {
+    "step": "enter_number",
+    "do": "click",
+    "text": "15",
+    "within": ".vc-popover-content-wrapper",
+    "hit": {
+     "x": 40,
+     "y": 458,
+     "targets": [
+      "fees.calendar"
+     ]
+    }
+   },
+   "before": {
+    "path": "/fee-payment/detail/fee-9/",
+    "query": {},
+    "flags": {
+     "feeName": "聯合醫院醫療費",
+     "firstTab": "輸入資料",
+     "onInputTab": true,
+     "hasFields": true,
+     "filled": false,
+     "fieldKind": "date",
+     "fieldName": "出生日期",
+     "fieldHint": "範例：1912-01-01(含分隔符號)",
+     "fieldChoices": "",
+     "calendar": true,
+     "calTitle": "11月 2026",
+     "calNav": false,
+     "searchTyped": false,
+     "searchResults": 0,
+     "noBill": false,
+     "alert": false,
+     "alertText": "",
+     "groupOpen": false,
+     "bills": 0,
+     "selected": 0,
+     "total": "",
+     "amount": "",
+     "payEnabled": false,
+     "methodsBelow": false,
+     "payConfirm": false,
+     "paid": false,
+     "paidMethod": "",
+     "noRecords": false,
+     "filtered": false,
+     "__bottomBar": 128,
+     "__dialog": false
+    },
+    "visible": [
+     "fees.calendar",
+     "fees.field",
+     "fees.filters",
+     "fees.query",
+     "fees.tab_input"
+    ],
+    "rects": {
+     "fees.tab_input": [
+      16,
+      48,
+      119.3,
+      24
+     ],
+     "fees.field": [
+      16,
+      251,
+      358,
+      44
+     ],
+     "fees.calendar": [
+      16,
+      295,
+      252,
+      282
+     ],
+     "fees.query": [
+      16,
+      772,
+      358,
+      48
+     ],
+     "fees.filters": [
+      16,
+      343,
+      358,
+      48
+     ]
+    }
+   },
+   "after": {
+    "path": "/fee-payment/detail/fee-9/",
+    "query": {},
+    "flags": {
+     "feeName": "聯合醫院醫療費",
+     "firstTab": "輸入資料",
+     "onInputTab": true,
+     "hasFields": true,
+     "filled": false,
+     "fieldKind": "select",
+     "fieldName": "院區",
+     "fieldHint": "",
+     "fieldChoices": "",
+     "calendar": false,
+     "calTitle": "",
+     "calNav": false,
+     "searchTyped": false,
+     "searchResults": 0,
+     "noBill": false,
+     "alert": false,
+     "alertText": "",
+     "groupOpen": false,
+     "bills": 0,
+     "selected": 0,
+     "total": "",
+     "amount": "",
+     "payEnabled": false,
+     "methodsBelow": false,
+     "payConfirm": false,
+     "paid": false,
+     "paidMethod": "",
+     "noRecords": false,
+     "filtered": false,
+     "__bottomBar": 128,
+     "__dialog": false
+    },
+    "visible": [
+     "fees.field",
+     "fees.filters",
+     "fees.query",
+     "fees.tab_input"
+    ],
+    "rects": {
+     "fees.tab_input": [
+      16,
+      48,
+      119.3,
+      24
+     ],
+     "fees.field": [
+      16,
+      343,
+      358,
+      48
+     ],
+     "fees.query": [
+      16,
+      772,
+      358,
+      48
+     ],
+     "fees.filters": [
+      16,
+      343,
+      358,
+      48
+     ]
+    }
+   },
+   "facts": {
+    "url": "/fee-payment/detail/fee-9/",
+    "title": "繳費項目",
+    "fields": [
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "tax_id",
+      "name": "",
+      "label": "證件號碼",
+      "placeholder": "請輸入證件號碼",
+      "value": "A123456789",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       131,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "",
+      "name": "",
+      "label": "範例：1912-01-01(含分隔符號)",
+      "placeholder": "",
+      "value": "2026-11-15",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       251,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "office",
+      "name": "",
+      "label": "院區",
+      "placeholder": "",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       343,
+       358,
+       48
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "payment_number",
+      "name": "",
+      "label": "繳費編號",
+      "placeholder": "請輸入繳費編號",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       406,
+       159,
+       358,
+       44
+      ]
+     }
+    ],
+    "starred": [],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "輸入資料",
+      "disabled": false,
+      "rect": [
+       16,
+       48,
+       119,
+       24
+      ]
+     },
+     {
+      "text": "繳費編號",
+      "disabled": false,
+      "rect": [
+       135,
+       48,
+       119,
+       24
+      ]
+     },
+     {
+      "text": "掃描",
+      "disabled": false,
+      "rect": [
+       255,
+       48,
+       119,
+       24
+      ]
+     },
+     {
+      "text": "查詢",
+      "disabled": false,
+      "rect": [
+       16,
+       772,
+       358,
+       48
+      ]
+     },
+     {
+      "text": "查詢",
+      "disabled": false,
+      "rect": [
+       406,
+       772,
+       358,
+       48
+      ]
+     }
+    ],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  },
+  {
+   "action": {
+    "step": "enter_number",
+    "do": "select",
+    "selector": "#office",
+    "value": "中興",
+    "hit": {
+     "x": 195,
+     "y": 367,
+     "targets": [
+      "fees.field",
+      "fees.filters"
+     ]
+    }
+   },
+   "before": {
+    "path": "/fee-payment/detail/fee-9/",
+    "query": {},
+    "flags": {
+     "feeName": "聯合醫院醫療費",
+     "firstTab": "輸入資料",
+     "onInputTab": true,
+     "hasFields": true,
+     "filled": false,
+     "fieldKind": "select",
+     "fieldName": "院區",
+     "fieldHint": "",
+     "fieldChoices": "",
+     "calendar": false,
+     "calTitle": "",
+     "calNav": false,
+     "searchTyped": false,
+     "searchResults": 0,
+     "noBill": false,
+     "alert": false,
+     "alertText": "",
+     "groupOpen": false,
+     "bills": 0,
+     "selected": 0,
+     "total": "",
+     "amount": "",
+     "payEnabled": false,
+     "methodsBelow": false,
+     "payConfirm": false,
+     "paid": false,
+     "paidMethod": "",
+     "noRecords": false,
+     "filtered": false,
+     "__bottomBar": 128,
+     "__dialog": false
+    },
+    "visible": [
+     "fees.field",
+     "fees.filters",
+     "fees.query",
+     "fees.tab_input"
+    ],
+    "rects": {
+     "fees.tab_input": [
+      16,
+      48,
+      119.3,
+      24
+     ],
+     "fees.field": [
+      16,
+      343,
+      358,
+      48
+     ],
+     "fees.query": [
+      16,
+      772,
+      358,
+      48
+     ],
+     "fees.filters": [
+      16,
+      343,
+      358,
+      48
+     ]
+    }
+   },
+   "after": {
+    "path": "/fee-payment/detail/fee-9/",
+    "query": {},
+    "flags": {
+     "feeName": "聯合醫院醫療費",
+     "firstTab": "輸入資料",
+     "onInputTab": true,
+     "hasFields": true,
+     "filled": true,
+     "fieldKind": "",
+     "fieldName": "",
+     "fieldHint": "",
+     "fieldChoices": "",
+     "calendar": false,
+     "calTitle": "",
+     "calNav": false,
+     "searchTyped": false,
+     "searchResults": 0,
+     "noBill": false,
+     "alert": false,
+     "alertText": "",
+     "groupOpen": false,
+     "bills": 0,
+     "selected": 0,
+     "total": "",
+     "amount": "",
+     "payEnabled": false,
+     "methodsBelow": false,
+     "payConfirm": false,
+     "paid": false,
+     "paidMethod": "",
+     "noRecords": false,
+     "filtered": false,
+     "__bottomBar": 128,
+     "__dialog": false
+    },
+    "visible": [
+     "fees.filters",
+     "fees.query",
+     "fees.tab_input"
+    ],
+    "rects": {
+     "fees.tab_input": [
+      16,
+      48,
+      119.3,
+      24
+     ],
+     "fees.query": [
+      16,
+      772,
+      358,
+      48
+     ],
+     "fees.filters": [
+      16,
+      343,
+      358,
+      48
+     ]
+    }
+   },
+   "facts": {
+    "url": "/fee-payment/detail/fee-9/",
+    "title": "繳費項目",
+    "fields": [
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "tax_id",
+      "name": "",
+      "label": "證件號碼",
+      "placeholder": "請輸入證件號碼",
+      "value": "A123456789",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       131,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "",
+      "name": "",
+      "label": "範例：1912-01-01(含分隔符號)",
+      "placeholder": "",
+      "value": "2026-11-15",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       251,
+       358,
+       44
+      ]
+     },
+     {
+      "tag": "select",
+      "type": "select-one",
+      "id": "office",
+      "name": "",
+      "label": "院區",
+      "placeholder": "",
+      "value": "中興",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       343,
+       358,
+       48
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "payment_number",
+      "name": "",
+      "label": "繳費編號",
+      "placeholder": "請輸入繳費編號",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       406,
+       159,
+       358,
+       44
+      ]
+     }
+    ],
+    "starred": [],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "輸入資料",
+      "disabled": false,
+      "rect": [
+       16,
+       48,
+       119,
+       24
+      ]
+     },
+     {
+      "text": "繳費編號",
+      "disabled": false,
+      "rect": [
+       135,
+       48,
+       119,
+       24
+      ]
+     },
+     {
+      "text": "掃描",
+      "disabled": false,
+      "rect": [
+       255,
+       48,
+       119,
+       24
+      ]
+     },
+     {
+      "text": "查詢",
+      "disabled": false,
+      "rect": [
+       16,
+       772,
+       358,
+       48
+      ]
+     },
+     {
+      "text": "查詢",
+      "disabled": false,
+      "rect": [
+       406,
+       772,
+       358,
+       48
+      ]
+     }
+    ],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  },
+  {
+   "action": {
+    "step": "query_bill",
+    "do": "click",
+    "text": "查詢",
+    "within": ".tab-view",
+    "hit": {
+     "x": 195,
+     "y": 796,
+     "targets": [
+      "fees.query"
+     ]
+    }
+   },
+   "before": {
+    "path": "/fee-payment/detail/fee-9/",
+    "query": {},
+    "flags": {
+     "feeName": "聯合醫院醫療費",
+     "firstTab": "輸入資料",
+     "onInputTab": true,
+     "hasFields": true,
+     "filled": true,
+     "fieldKind": "",
+     "fieldName": "",
+     "fieldHint": "",
+     "fieldChoices": "",
+     "calendar": false,
+     "calTitle": "",
+     "calNav": false,
+     "searchTyped": false,
+     "searchResults": 0,
+     "noBill": false,
+     "alert": false,
+     "alertText": "",
+     "groupOpen": false,
+     "bills": 0,
+     "selected": 0,
+     "total": "",
+     "amount": "",
+     "payEnabled": false,
+     "methodsBelow": false,
+     "payConfirm": false,
+     "paid": false,
+     "paidMethod": "",
+     "noRecords": false,
+     "filtered": false,
+     "__bottomBar": 128,
+     "__dialog": false
+    },
+    "visible": [
+     "fees.filters",
+     "fees.query",
+     "fees.tab_input"
+    ],
+    "rects": {
+     "fees.tab_input": [
+      16,
+      48,
+      119.3,
+      24
+     ],
+     "fees.query": [
+      16,
+      772,
+      358,
+      48
+     ],
+     "fees.filters": [
+      16,
+      343,
+      358,
+      48
+     ]
+    }
+   },
+   "after": {
+    "path": "/fee-payment/result/fee-9",
+    "query": {},
+    "flags": {
+     "feeName": "",
+     "firstTab": "",
+     "onInputTab": false,
+     "hasFields": false,
+     "filled": false,
+     "fieldKind": "",
+     "fieldName": "",
+     "fieldHint": "",
+     "fieldChoices": "",
+     "calendar": false,
+     "calTitle": "",
+     "calNav": false,
+     "searchTyped": false,
+     "searchResults": 0,
+     "noBill": true,
+     "alert": false,
+     "alertText": "",
+     "groupOpen": false,
+     "bills": 0,
+     "selected": 0,
+     "total": "",
+     "amount": "",
+     "payEnabled": false,
+     "methodsBelow": false,
+     "payConfirm": false,
+     "paid": false,
+     "paidMethod": "",
+     "noRecords": false,
+     "filtered": false,
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "fees.no_bill"
+    ],
+    "rects": {
+     "fees.no_bill": [
+      32,
+      220,
+      326,
+      72
+     ]
+    }
+   },
+   "facts": {
+    "url": "/fee-payment/result/fee-9",
+    "title": "繳費項目",
+    "fields": [],
+    "starred": [],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "回到城市通",
+      "disabled": false,
+      "rect": [
+       114,
+       332,
+       163,
+       48
+      ]
+     }
+    ],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  }
+ ]
+}

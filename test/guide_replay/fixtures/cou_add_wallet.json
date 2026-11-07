@@ -1,0 +1,1050 @@
+{
+ "name": "cou_add_wallet",
+ "description": "coupon.list goal add_wallet: pick a coupon, 加入票夾, 存入票夾.",
+ "page": "coupon_wallet",
+ "start": null,
+ "capability": "coupon.list",
+ "goals": [
+  "add_wallet"
+ ],
+ "expect": {
+  "done": true
+ },
+ "recordedAt": "2026-11-07T18:22:19.826Z",
+ "durationMs": 9756,
+ "viewport": {
+  "width": 390,
+  "height": 844,
+  "deviceScaleFactor": 3,
+  "isMobile": true,
+  "hasTouch": true
+ },
+ "failed": null,
+ "steps": [
+  {
+   "action": null,
+   "before": null,
+   "after": {
+    "path": "/coupon/list",
+    "query": {},
+    "flags": {
+     "tab": "",
+     "subTab": "",
+     "cards": 0,
+     "cardsBelow": false,
+     "name": "",
+     "period": "",
+     "rule": "",
+     "desc": "",
+     "remain": "",
+     "hasAdd": false,
+     "addBelow": false,
+     "useLabel": "",
+     "useBelow": false,
+     "addAsk": false,
+     "added": false,
+     "useAsk": false,
+     "used": false,
+     "items": 0,
+     "itemsBelow": false,
+     "rows": 0,
+     "firstItem": "",
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "coupon.page_back"
+    ],
+    "rects": {
+     "coupon.page_back": [
+      16,
+      8,
+      24,
+      28
+     ]
+    }
+   },
+   "facts": {
+    "url": "/coupon/list",
+    "title": "優惠",
+    "fields": [
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "",
+      "name": "",
+      "label": "優惠券搜尋",
+      "placeholder": "輸入店家名稱",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       48,
+       314,
+       44
+      ]
+     }
+    ],
+    "starred": [],
+    "errors": [],
+    "buttons": [],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  },
+  {
+   "action": {
+    "do": "click",
+    "selector": "div.py-2.px-4 > div.flex.justify-between > a",
+    "step": "coupon_home",
+    "hit": {
+     "x": 28,
+     "y": 22,
+     "targets": [
+      "coupon.page_back"
+     ]
+    }
+   },
+   "before": {
+    "path": "/coupon/list",
+    "query": {},
+    "flags": {
+     "tab": "",
+     "subTab": "",
+     "cards": 0,
+     "cardsBelow": false,
+     "name": "",
+     "period": "",
+     "rule": "",
+     "desc": "",
+     "remain": "",
+     "hasAdd": false,
+     "addBelow": false,
+     "useLabel": "",
+     "useBelow": false,
+     "addAsk": false,
+     "added": false,
+     "useAsk": false,
+     "used": false,
+     "items": 0,
+     "itemsBelow": false,
+     "rows": 0,
+     "firstItem": "",
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "coupon.page_back"
+    ],
+    "rects": {
+     "coupon.page_back": [
+      16,
+      8,
+      24,
+      28
+     ]
+    }
+   },
+   "after": {
+    "path": "/coupon",
+    "query": {},
+    "flags": {
+     "tab": "入場券",
+     "subTab": "",
+     "cards": 0,
+     "cardsBelow": false,
+     "name": "",
+     "period": "",
+     "rule": "",
+     "desc": "",
+     "remain": "",
+     "hasAdd": false,
+     "addBelow": false,
+     "useLabel": "",
+     "useBelow": false,
+     "addAsk": false,
+     "added": false,
+     "useAsk": false,
+     "used": false,
+     "items": 0,
+     "itemsBelow": false,
+     "rows": 0,
+     "firstItem": "",
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "coupon.tab_coupons"
+    ],
+    "rects": {
+     "coupon.tab_coupons": [
+      195,
+      8,
+      179,
+      24
+     ]
+    }
+   },
+   "facts": {
+    "url": "/coupon",
+    "title": "優惠",
+    "fields": [
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "",
+      "name": "",
+      "label": "",
+      "placeholder": "搜尋票券或場館名稱",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       59,
+       314,
+       44
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "",
+      "name": "",
+      "label": "",
+      "placeholder": "輸入店家名稱",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       406,
+       59,
+       314,
+       44
+      ]
+     }
+    ],
+    "starred": [],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "入場券",
+      "disabled": false,
+      "rect": [
+       16,
+       8,
+       179,
+       24
+      ]
+     },
+     {
+      "text": "優惠券",
+      "disabled": false,
+      "rect": [
+       195,
+       8,
+       179,
+       24
+      ]
+     }
+    ],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  },
+  {
+   "action": {
+    "step": "coupon_tab",
+    "do": "click",
+    "text": "優惠券",
+    "within": "section.tabs:not(.tabs__content-type)",
+    "hit": {
+     "x": 285,
+     "y": 20,
+     "targets": [
+      "coupon.tab_coupons"
+     ]
+    }
+   },
+   "before": {
+    "path": "/coupon",
+    "query": {},
+    "flags": {
+     "tab": "入場券",
+     "subTab": "",
+     "cards": 0,
+     "cardsBelow": false,
+     "name": "",
+     "period": "",
+     "rule": "",
+     "desc": "",
+     "remain": "",
+     "hasAdd": false,
+     "addBelow": false,
+     "useLabel": "",
+     "useBelow": false,
+     "addAsk": false,
+     "added": false,
+     "useAsk": false,
+     "used": false,
+     "items": 0,
+     "itemsBelow": false,
+     "rows": 0,
+     "firstItem": "",
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "coupon.tab_coupons"
+    ],
+    "rects": {
+     "coupon.tab_coupons": [
+      195,
+      8,
+      179,
+      24
+     ]
+    }
+   },
+   "after": {
+    "path": "/coupon",
+    "query": {},
+    "flags": {
+     "tab": "優惠券",
+     "subTab": "",
+     "cards": 3,
+     "cardsBelow": false,
+     "name": "",
+     "period": "",
+     "rule": "",
+     "desc": "",
+     "remain": "",
+     "hasAdd": false,
+     "addBelow": false,
+     "useLabel": "",
+     "useBelow": false,
+     "addAsk": false,
+     "added": false,
+     "useAsk": false,
+     "used": false,
+     "items": 0,
+     "itemsBelow": false,
+     "rows": 0,
+     "firstItem": "",
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "coupon.cards",
+     "coupon.tab_coupons"
+    ],
+    "rects": {
+     "coupon.tab_coupons": [
+      195,
+      8,
+      179,
+      24
+     ],
+     "coupon.cards": [
+      17,
+      176,
+      356,
+      604
+     ]
+    }
+   },
+   "facts": {
+    "url": "/coupon",
+    "title": "優惠",
+    "fields": [
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "",
+      "name": "",
+      "label": "",
+      "placeholder": "搜尋票券或場館名稱",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       -374,
+       59,
+       314,
+       44
+      ]
+     },
+     {
+      "tag": "input",
+      "type": "text",
+      "id": "",
+      "name": "",
+      "label": "",
+      "placeholder": "輸入店家名稱",
+      "value": "",
+      "required": false,
+      "invalid": false,
+      "disabled": false,
+      "rect": [
+       16,
+       59,
+       314,
+       44
+      ]
+     }
+    ],
+    "starred": [],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "入場券",
+      "disabled": false,
+      "rect": [
+       16,
+       8,
+       179,
+       24
+      ]
+     },
+     {
+      "text": "優惠券",
+      "disabled": false,
+      "rect": [
+       195,
+       8,
+       179,
+       24
+      ]
+     }
+    ],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  },
+  {
+   "action": {
+    "step": "pick_coupon",
+    "do": "click",
+    "text": "阿爸手工皂",
+    "hit": {
+     "x": 195,
+     "y": 478,
+     "targets": [
+      "coupon.cards"
+     ]
+    }
+   },
+   "before": {
+    "path": "/coupon",
+    "query": {},
+    "flags": {
+     "tab": "優惠券",
+     "subTab": "",
+     "cards": 3,
+     "cardsBelow": false,
+     "name": "",
+     "period": "",
+     "rule": "",
+     "desc": "",
+     "remain": "",
+     "hasAdd": false,
+     "addBelow": false,
+     "useLabel": "",
+     "useBelow": false,
+     "addAsk": false,
+     "added": false,
+     "useAsk": false,
+     "used": false,
+     "items": 0,
+     "itemsBelow": false,
+     "rows": 0,
+     "firstItem": "",
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "coupon.cards",
+     "coupon.tab_coupons"
+    ],
+    "rects": {
+     "coupon.tab_coupons": [
+      195,
+      8,
+      179,
+      24
+     ],
+     "coupon.cards": [
+      17,
+      176,
+      356,
+      604
+     ]
+    }
+   },
+   "after": {
+    "path": "/coupon/coupon-detail/c-2",
+    "query": {
+     "tab": "2"
+    },
+    "flags": {
+     "tab": "",
+     "subTab": "優惠說明",
+     "cards": 0,
+     "cardsBelow": false,
+     "name": "阿爸手工皂",
+     "period": "2024/06/10~2024/08/10",
+     "rule": "無領取限制",
+     "desc": "住宿9折 不限平假日",
+     "remain": "158",
+     "hasAdd": true,
+     "addBelow": false,
+     "useLabel": "立即使用",
+     "useBelow": false,
+     "addAsk": false,
+     "added": false,
+     "useAsk": false,
+     "used": false,
+     "items": 0,
+     "itemsBelow": false,
+     "rows": 0,
+     "firstItem": "",
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "coupon.add",
+     "coupon.detail_back",
+     "coupon.use"
+    ],
+    "rects": {
+     "coupon.detail_back": [
+      16,
+      16,
+      24,
+      24
+     ],
+     "coupon.add": [
+      16,
+      732,
+      175,
+      50
+     ],
+     "coupon.use": [
+      199,
+      732,
+      175,
+      50
+     ]
+    }
+   },
+   "facts": {
+    "url": "/coupon/coupon-detail/c-2?tab=2",
+    "title": "優惠",
+    "fields": [],
+    "starred": [],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "優惠說明",
+      "disabled": false,
+      "rect": [
+       16,
+       324,
+       179,
+       41
+      ]
+     },
+     {
+      "text": "店家資訊",
+      "disabled": false,
+      "rect": [
+       195,
+       324,
+       179,
+       41
+      ]
+     },
+     {
+      "text": "加入票夾",
+      "disabled": false,
+      "rect": [
+       16,
+       732,
+       175,
+       50
+      ]
+     },
+     {
+      "text": "立即使用",
+      "disabled": false,
+      "rect": [
+       199,
+       732,
+       175,
+       50
+      ]
+     }
+    ],
+    "disabledButtons": [],
+    "dialogs": [],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  },
+  {
+   "action": {
+    "step": "add_wallet",
+    "do": "click",
+    "text": "加入票夾",
+    "hit": {
+     "x": 104,
+     "y": 757,
+     "targets": [
+      "coupon.add"
+     ]
+    }
+   },
+   "before": {
+    "path": "/coupon/coupon-detail/c-2",
+    "query": {
+     "tab": "2"
+    },
+    "flags": {
+     "tab": "",
+     "subTab": "優惠說明",
+     "cards": 0,
+     "cardsBelow": false,
+     "name": "阿爸手工皂",
+     "period": "2024/06/10~2024/08/10",
+     "rule": "無領取限制",
+     "desc": "住宿9折 不限平假日",
+     "remain": "158",
+     "hasAdd": true,
+     "addBelow": false,
+     "useLabel": "立即使用",
+     "useBelow": false,
+     "addAsk": false,
+     "added": false,
+     "useAsk": false,
+     "used": false,
+     "items": 0,
+     "itemsBelow": false,
+     "rows": 0,
+     "firstItem": "",
+     "__bottomBar": 0,
+     "__dialog": false
+    },
+    "visible": [
+     "coupon.add",
+     "coupon.detail_back",
+     "coupon.use"
+    ],
+    "rects": {
+     "coupon.detail_back": [
+      16,
+      16,
+      24,
+      24
+     ],
+     "coupon.add": [
+      16,
+      732,
+      175,
+      50
+     ],
+     "coupon.use": [
+      199,
+      732,
+      175,
+      50
+     ]
+    }
+   },
+   "after": {
+    "path": "/coupon/coupon-detail/c-2",
+    "query": {
+     "tab": "2"
+    },
+    "flags": {
+     "tab": "",
+     "subTab": "優惠說明",
+     "cards": 0,
+     "cardsBelow": false,
+     "name": "阿爸手工皂",
+     "period": "2024/06/10~2024/08/10",
+     "rule": "無領取限制",
+     "desc": "住宿9折 不限平假日",
+     "remain": "158",
+     "hasAdd": true,
+     "addBelow": false,
+     "useLabel": "立即使用",
+     "useBelow": false,
+     "addAsk": true,
+     "added": false,
+     "useAsk": false,
+     "used": false,
+     "items": 0,
+     "itemsBelow": false,
+     "rows": 0,
+     "firstItem": "",
+     "__bottomBar": 0,
+     "__dialog": true
+    },
+    "visible": [
+     "coupon.add",
+     "coupon.add_no",
+     "coupon.add_yes",
+     "coupon.detail_back",
+     "coupon.use"
+    ],
+    "rects": {
+     "coupon.detail_back": [
+      16,
+      16,
+      24,
+      24
+     ],
+     "coupon.add": [
+      16,
+      732,
+      175,
+      50
+     ],
+     "coupon.use": [
+      199,
+      732,
+      175,
+      50
+     ],
+     "coupon.add_yes": [
+      195,
+      496.5,
+      156,
+      32
+     ],
+     "coupon.add_no": [
+      39,
+      496.5,
+      156,
+      32
+     ]
+    }
+   },
+   "facts": {
+    "url": "/coupon/coupon-detail/c-2?tab=2",
+    "title": "優惠",
+    "fields": [],
+    "starred": [],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "優惠說明",
+      "disabled": false,
+      "rect": [
+       16,
+       324,
+       179,
+       41
+      ]
+     },
+     {
+      "text": "店家資訊",
+      "disabled": false,
+      "rect": [
+       195,
+       324,
+       179,
+       41
+      ]
+     },
+     {
+      "text": "加入票夾",
+      "disabled": false,
+      "rect": [
+       16,
+       732,
+       175,
+       50
+      ]
+     },
+     {
+      "text": "立即使用",
+      "disabled": false,
+      "rect": [
+       199,
+       732,
+       175,
+       50
+      ]
+     },
+     {
+      "text": "取消",
+      "disabled": false,
+      "rect": [
+       39,
+       497,
+       156,
+       32
+      ]
+     },
+     {
+      "text": "存入票夾",
+      "disabled": false,
+      "rect": [
+       195,
+       497,
+       156,
+       32
+      ]
+     }
+    ],
+    "disabledButtons": [],
+    "dialogs": [
+     "領取本優惠? 取消 存入票夾"
+    ],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  },
+  {
+   "action": {
+    "step": "add_wallet",
+    "do": "click",
+    "text": "存入票夾",
+    "hit": {
+     "x": 273,
+     "y": 513,
+     "targets": [
+      "coupon.add_yes"
+     ]
+    }
+   },
+   "before": {
+    "path": "/coupon/coupon-detail/c-2",
+    "query": {
+     "tab": "2"
+    },
+    "flags": {
+     "tab": "",
+     "subTab": "優惠說明",
+     "cards": 0,
+     "cardsBelow": false,
+     "name": "阿爸手工皂",
+     "period": "2024/06/10~2024/08/10",
+     "rule": "無領取限制",
+     "desc": "住宿9折 不限平假日",
+     "remain": "158",
+     "hasAdd": true,
+     "addBelow": false,
+     "useLabel": "立即使用",
+     "useBelow": false,
+     "addAsk": true,
+     "added": false,
+     "useAsk": false,
+     "used": false,
+     "items": 0,
+     "itemsBelow": false,
+     "rows": 0,
+     "firstItem": "",
+     "__bottomBar": 0,
+     "__dialog": true
+    },
+    "visible": [
+     "coupon.add",
+     "coupon.add_no",
+     "coupon.add_yes",
+     "coupon.detail_back",
+     "coupon.use"
+    ],
+    "rects": {
+     "coupon.detail_back": [
+      16,
+      16,
+      24,
+      24
+     ],
+     "coupon.add": [
+      16,
+      732,
+      175,
+      50
+     ],
+     "coupon.use": [
+      199,
+      732,
+      175,
+      50
+     ],
+     "coupon.add_yes": [
+      195,
+      496.5,
+      156,
+      32
+     ],
+     "coupon.add_no": [
+      39,
+      496.5,
+      156,
+      32
+     ]
+    }
+   },
+   "after": {
+    "path": "/coupon/coupon-detail/c-2",
+    "query": {
+     "tab": "2"
+    },
+    "flags": {
+     "tab": "",
+     "subTab": "優惠說明",
+     "cards": 0,
+     "cardsBelow": false,
+     "name": "阿爸手工皂",
+     "period": "2024/06/10~2024/08/10",
+     "rule": "無領取限制",
+     "desc": "住宿9折 不限平假日",
+     "remain": "158",
+     "hasAdd": true,
+     "addBelow": false,
+     "useLabel": "立即使用",
+     "useBelow": false,
+     "addAsk": false,
+     "added": true,
+     "useAsk": false,
+     "used": false,
+     "items": 0,
+     "itemsBelow": false,
+     "rows": 0,
+     "firstItem": "",
+     "__bottomBar": 0,
+     "__dialog": true
+    },
+    "visible": [
+     "coupon.add",
+     "coupon.added_dialog",
+     "coupon.added_use",
+     "coupon.detail_back",
+     "coupon.use"
+    ],
+    "rects": {
+     "coupon.detail_back": [
+      16,
+      16,
+      24,
+      24
+     ],
+     "coupon.add": [
+      16,
+      732,
+      175,
+      50
+     ],
+     "coupon.use": [
+      199,
+      732,
+      175,
+      50
+     ],
+     "coupon.added_use": [
+      195,
+      496.5,
+      156,
+      32
+     ],
+     "coupon.added_dialog": [
+      39,
+      311.5,
+      312,
+      221
+     ]
+    }
+   },
+   "facts": {
+    "url": "/coupon/coupon-detail/c-2?tab=2",
+    "title": "優惠",
+    "fields": [],
+    "starred": [],
+    "errors": [],
+    "buttons": [
+     {
+      "text": "優惠說明",
+      "disabled": false,
+      "rect": [
+       16,
+       324,
+       179,
+       41
+      ]
+     },
+     {
+      "text": "店家資訊",
+      "disabled": false,
+      "rect": [
+       195,
+       324,
+       179,
+       41
+      ]
+     },
+     {
+      "text": "加入票夾",
+      "disabled": false,
+      "rect": [
+       16,
+       732,
+       175,
+       50
+      ]
+     },
+     {
+      "text": "立即使用",
+      "disabled": false,
+      "rect": [
+       199,
+       732,
+       175,
+       50
+      ]
+     },
+     {
+      "text": "更多優惠",
+      "disabled": false,
+      "rect": [
+       39,
+       497,
+       156,
+       32
+      ]
+     },
+     {
+      "text": "使用優惠",
+      "disabled": false,
+      "rect": [
+       195,
+       497,
+       156,
+       32
+      ]
+     }
+    ],
+    "disabledButtons": [],
+    "dialogs": [
+     "領取成功，已存入我的票夾 更多優惠 使用優惠"
+    ],
+    "scrollY": 0,
+    "scrollHeight": 844
+   }
+  }
+ ]
+}
