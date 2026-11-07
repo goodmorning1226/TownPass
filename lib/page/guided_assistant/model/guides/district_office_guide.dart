@@ -112,6 +112,8 @@ final _targets = <String, String>{
   'district.next': "byText('form button.base-button', '下一步')",
   'district.prev': "byText('form a.base-button', '上一步')",
   // Form step 2.
+  // The 個人資料是否提供給承辦員 heading and its sentence (above 同意/不同意).
+  'district.consent_text': 'readArea($_consentText)',
   'district.consent': "qa('section.px-4.mt-4 > div.flex.flex-wrap.gap-4.mt-2 > label').filter(shown)",
   'district.edit': "byText('div.pb-8 button.base-button', '修改')",
   'district.submit': "byText('div.pb-8 button.base-button', '送出')",
@@ -123,6 +125,8 @@ final _targets = <String, String>{
   'district.closed_tab':
       "(() => { const b = byText('$_situation', '已結案'); return inView(b) ? b : null; })()",
 };
+
+const _consentText = "textBetween('section.px-4.mt-4', '個人資料是否提供給承辦員', '同意')";
 
 /// `top,bottom,where` of a target in the viewport (where: in / below /
 /// above), for the card position and the 滑動 hint.
@@ -165,6 +169,8 @@ final districtOfficePageSpec = WebPageSpec(
     'warn': r"""(() => { const m = ((q('#app') || {}).innerText || '').match(/([^\n]+?)不能為空/); return m ? m[1].trim() : ''; })()""",
     'consentChoice': "(() => { const l = qa('section.px-4.mt-4 > div.flex.flex-wrap.gap-4.mt-2 > label').find((x) => x.querySelector('input:checked')); return l ? txt(l) : ''; })()",
     'submitted': "!!dialog('案件已完成申辦')",
+    // Scrolled to the end of the consent sentence (latched).
+    'consentRead': 'readToEnd($_consentText)',
     'situation': "txt(q('$_situation--active'))",
     'activeCount': r"""(() => { const m = txt(byText('div.p-4 > section.grid.grid-cols-2 > button.situation-button', '申辦中')).match(/\((\d+)\)/); return m ? Number(m[1]) : null; })()""",
     'closedCount': r"""(() => { const m = txt(byText('div.p-4 > section.grid.grid-cols-2 > button.situation-button', '已結案')).match(/\((\d+)\)/); return m ? Number(m[1]) : null; })()""",
@@ -173,7 +179,7 @@ final districtOfficePageSpec = WebPageSpec(
     'firstStatus': '$_caseStatus($_cases[0])',
     for (final e in _targets.entries) 'pos.${e.key}': _posJs(e.value),
   },
-  latchFlags: const {'submitted', 'formSeen'},
+  latchFlags: const {'submitted', 'formSeen', 'consentRead'},
 );
 
 bool onDistrictOffice(WebSnapshot s) => s.pathIs('/') || s.pathStarts('/form/');
@@ -185,6 +191,10 @@ bool _step2(WebPageState s) => _onForm(s) && s.now.flag('step2');
 bool _submitted(WebPageState s) => s.latched('submitted');
 bool _queryTab(WebPageState s) => _home(s) && s.now.text('tab') == '查詢';
 bool _no(WebPageState s) => false;
+bool _consentRead(WebPageState s) => s.latched('consentRead');
+
+/// Said when 同意/不同意 was picked before the sentence was read.
+const _readNote = '建議還是把說明看完喔。';
 
 // ---- Card position ---------------------------------------------------------
 
@@ -648,16 +658,33 @@ final List<GuideComponent> districtOfficeComponents = [
     requires: const ['next_step'],
     taskTitle: '選同意或不同意',
     doneText: '選好了！',
+    doneTextOf: (s) => '${_consentRead(s) ? '' : _readNote}選好了！',
     doneDetail: '資料沒問題，就自己按最下面的「送出」。',
     doneTarget: (s) => _step2(s) ? 'district.submit' : null,
     steps: [
+      // Read first: outline only, so the page can be scrolled.
+      GuideStep(
+        target: (s) => _step2(s) ? 'district.consent_text' : null,
+        alsoUsable: const ['district.submit'],
+        locks: _no,
+        arrow: _no,
+        scrollHint: _step2,
+        label: (_) => '往下滑',
+        card: (_) => '先往下滑，把「個人資料是否提供給承辦員」這段說明看完喔。看到了，我再告訴你要按哪裡。',
+        detail: (_) => '這段是說：承辦員依法辦案需要時，可以透過申請程序取得你的個人資料。',
+        isDone: (s) =>
+            _submitted(s) ||
+            (_step2(s) &&
+                (_consentRead(s) || s.now.text('consentChoice').isNotEmpty)),
+        cardTop: (s) => _cardNear(s, 'district.consent_text'),
+      ),
       GuideStep(
         target: (s) => _step2(s) ? 'district.consent' : null,
         alsoUsable: const ['district.submit'],
         arrow: _no,
         label: (_) => '選一個',
         card: (s) =>
-            '${_scrollWord(s, 'district.consent')}「個人資料是否提供給承辦員」是問：承辦員辦案需要時，可不可以申請看你的資料。選「同意」或「不同意」都可以。',
+            '說明看完了！${_scrollWord(s, 'district.consent')}「個人資料是否提供給承辦員」是問：承辦員辦案需要時，可不可以申請看你的資料。選「同意」或「不同意」都可以。',
         detail: (_) => '這一題不選也可以送出。選「同意」，承辦員依法辦案需要時可以申請取得你的個人資料。',
         isDone: (s) =>
             _submitted(s) ||
@@ -691,7 +718,11 @@ final List<GuideComponent> districtOfficeComponents = [
         label: (_) => '確認',
         card: (s) {
           final scroll = _offScreen(s, 'district.submit') ? '往下滑，' : '';
-          return '這是你填的資料，$scroll從上到下檢查一遍。「個人資料是否提供給承辦員」選不選都可以。沒問題就自己按「送出」喔；要改就按「修改」。這是示範網站，不會真的送出。';
+          final note =
+              s.now.text('consentChoice').isNotEmpty && !_consentRead(s)
+              ? _readNote
+              : '';
+          return '$note這是你填的資料，$scroll從上到下檢查一遍。「個人資料是否提供給承辦員」選不選都可以。沒問題就自己按「送出」喔；要改就按「修改」。這是示範網站，不會真的送出。';
         },
         detail: (_) => '檢查一下資料對不對，沒問題就自己按最下面的「送出」；要改就按「修改」。',
         isDone: _submitted,

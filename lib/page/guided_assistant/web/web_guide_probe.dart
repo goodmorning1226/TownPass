@@ -19,7 +19,12 @@ class WebPageSpec {
   /// Helpers usable in expressions: q, qa, shown, byText, txt, inView (in
   /// the viewport horizontally, for tab views), opened (not inside a
   /// collapsed `grid-rows-[0fr]` group), dialog(title),
-  /// dialogButton(title, label).
+  /// dialogButton(title, label), textBetween(scope, head, stop) (the shown
+  /// text pieces from [head] up to the [stop] text or a control, e.g. a
+  /// consent statement), scrollBox(el) (nearest scrolling ancestor),
+  /// readArea(el or list) (each part, or the box it scrolls in, for a ring)
+  /// and readToEnd(el or list) (the user has scrolled to its end, or it
+  /// fits on screen; see `_helpers`).
   final Map<String, String> flags;
 
   /// Flags that, once true, stay true for the guide run (see
@@ -65,6 +70,38 @@ class WebPageSpec {
     dialog = (title) => { const t = byText('[id^="headlessui-dialog-title"]', title); return t ? t.closest('[id^="headlessui-dialog-panel"]') : null; },
     dialogButton = (title, label) => { const p = dialog(title); return p ? [...p.querySelectorAll('button')].filter(shown).find((b) => txt(b) === label) || null : null; },
     bottomBar = () => { let h = 0; for (const e of qa('.fixed, .floating-box, .sticky')) { if (!shown(e) || e.closest('[id^="headlessui-dialog"]')) continue; const r = e.getBoundingClientRect(); if (r.bottom >= innerHeight - 2 && r.top > innerHeight / 2) h = Math.max(h, innerHeight - r.top); } return Math.round(h); },
+    leaf = (e) => ![...e.children].some(shown),
+    textBetween = (scope, head, stop) => {
+      const all = qa(scope + ' *').filter((e) => shown(e) && leaf(e));
+      const i = all.findIndex((e) => txt(e).startsWith(head));
+      if (i < 0) return null;
+      const out = [];
+      for (const e of all.slice(i)) {
+        if (e.matches('input, button, select, textarea') || (out.length && txt(e).startsWith(stop)) || out.length > 150) break;
+        out.push(e);
+      }
+      return out;
+    },
+    scrollsY = (e) => { const st = getComputedStyle(e); return /(auto|scroll)/.test(st.overflowY) && e.scrollHeight > e.clientHeight + 2; },
+    scrollBox = (e) => { let b = e && e.parentElement; while (b && b !== document.body && b !== document.documentElement) { if (scrollsY(b)) return b; b = b.parentElement; } return null; },
+    readArea = (x) => { const a = (Array.isArray(x) ? x : [x]).filter(shown); return a.length ? [...new Set(a.map((e) => scrollBox(e) || e))] : null; },
+    readToEnd = (x) => {
+      // A part that scrolls by itself must be at its end. Else its nearest
+      // scrolling ancestor (or the document) is at its end, or the lowest
+      // part's bottom is inside that scroller's visible area (above a fixed
+      // bottom bar). Content that fits without scrolling counts as read.
+      const a = (Array.isArray(x) ? x : [x]).filter(shown);
+      if (!a.length) return false;
+      const end = (s) => s.scrollTop + s.clientHeight >= s.scrollHeight - 8;
+      const own = a.filter(scrollsY);
+      if (own.length) return own.every(end);
+      const e = a.reduce((p, c) => c.getBoundingClientRect().bottom > p.getBoundingClientRect().bottom ? c : p);
+      const bottom = e.getBoundingClientRect().bottom;
+      const box = scrollBox(e);
+      if (box) return end(box) || bottom <= box.getBoundingClientRect().bottom + 4;
+      const d = document.scrollingElement || document.documentElement;
+      return d.scrollTop + innerHeight >= d.scrollHeight - 8 || bottom <= innerHeight - bottomBar() + 4;
+    },
     rectOf = (e) => {
       const all = (Array.isArray(e) ? e : [e]).filter(shown);
       if (!all.length) return null;
