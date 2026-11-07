@@ -249,7 +249,7 @@ adb -s <實際device_serial> emu avd hostmicon
 
 從 Android Studio 開的模擬器，則在側欄 ⋯ → Extended controls → Microphone 開啟「Virtual microphone uses host audio input」。
 每次重開模擬器都要重新設定。麥克風會用 Windows「設定 → 系統 → 音效 → 輸入」的預設裝置；用 AirPods 等藍牙耳機時，先把它設為預設再開模擬器。
-模擬器麥克風音質比實機差，辨識率不好時請改用 USB 實機比較，再判斷是不是模型問題。
+模擬器的麥克風／喇叭轉接不穩：可能整段錄到 0 音量、朗讀爆音或卡頓；Windows 預設喇叭若是 Steam 等虛擬裝置或被靜音也會聽不到，且模擬器只在開機時選定裝置，改完要重開模擬器。2026-11-07 用 Android 實機測試辨識、連續錄音與跳轉皆正常，語音問題請優先用 USB 實機判斷，不要先改 App。
 
 **模擬器開不了服務頁（`ERR_NAME_NOT_RESOLVED`）**：表示模擬器查不到網址（DNS），常見於手機熱點或公共 Wi-Fi。
 模擬器能 ping 到 `8.8.8.8` 但查不到網域時，關閉模擬器後用公用 DNS 重開：
