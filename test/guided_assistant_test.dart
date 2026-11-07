@@ -17,6 +17,7 @@ import 'package:town_pass/page/guided_assistant/model/mock_assistant_engine.dart
 import 'package:town_pass/page/guided_assistant/web/web_guide_probe.dart';
 import 'package:town_pass/page/guided_assistant/web/web_page_state.dart';
 import 'package:town_pass/page/guided_assistant/widget/guided_assistant_host.dart';
+import 'package:town_pass/page/guided_assistant/widget/guided_assistant_sheet.dart';
 import 'package:town_pass/service/assistant_action_executor.dart';
 import 'package:town_pass/service/assistant_service.dart';
 import 'package:town_pass/service/assistant_speaker.dart';
@@ -795,6 +796,42 @@ void main() {
         },
       });
       expect(r.guide?['components'], ['open_map']);
+    });
+  });
+
+  group('assistant sheet', () {
+    setUp(() {
+      SharedPreferences.setMockInitialValues({});
+      Get.testMode = true;
+    });
+    tearDown(Get.reset);
+
+    testWidgets('the text box stays above the keyboard', (tester) async {
+      final c = makeController();
+      c.startGuide('library');
+      c.typing.value = true;
+      tester.view.physicalSize = const Size(402, 874);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      Future<void> pumpWith(double keyboard) => tester.pumpWidget(
+        MaterialApp(
+          home: MediaQuery(
+            data: MediaQueryData(
+              size: const Size(402, 874),
+              viewInsets: EdgeInsets.only(bottom: keyboard),
+            ),
+            child: GuidedAssistantSheet(controller: c),
+          ),
+        ),
+      );
+      await pumpWith(0);
+      await pumpWith(336);
+      await tester.pump();
+      final box = tester.getRect(find.byType(TextField));
+      expect(box.bottom, lessThanOrEqualTo(874 - 336));
+      expect(tester.takeException(), isNull, reason: 'no overflow');
+      c.task.value = null;
+      await tester.pump(const Duration(seconds: 4));
     });
   });
 

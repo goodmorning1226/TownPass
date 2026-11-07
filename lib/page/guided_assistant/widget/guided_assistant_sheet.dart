@@ -58,22 +58,32 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
 
   @override
   Widget build(BuildContext context) {
+    // The sheet lives in an overlay, not a Scaffold, so nothing lifts it for
+    // the keyboard: keep the text box above it ourselves.
+    final keyboard = MediaQuery.viewInsetsOf(context).bottom;
+    final typingOpen = keyboard > 0;
     return Material(
       color: TPColors.white,
-      child: SafeArea(
-        child: Obx(
-          () => Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              _header(),
-              // An ended task (我自己來, 結束引導) keeps its card so 繼續引導
-              // can pick it up again.
-              if (c.task.value != null &&
-                  c.task.value!.status != TaskStatus.finished)
-                _taskCard(c.task.value!),
-              Expanded(child: _chat()),
-              _bottom(context),
-            ],
+      child: Padding(
+        padding: EdgeInsets.only(bottom: keyboard),
+        child: SafeArea(
+          bottom: !typingOpen,
+          child: Obx(
+            () => Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _header(),
+                // An ended task (我自己來, 結束引導) keeps its card so 繼續引導
+                // can pick it up again. While typing it folds away so the chat
+                // and the text box keep their room.
+                if (!typingOpen &&
+                    c.task.value != null &&
+                    c.task.value!.status != TaskStatus.finished)
+                  _taskCard(c.task.value!),
+                Expanded(child: _chat()),
+                _bottom(context, typingOpen: typingOpen),
+              ],
+            ),
           ),
         ),
       ),
@@ -510,8 +520,9 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
     );
   }
 
-  Widget _bottom(BuildContext context) {
-    final chips = c.chips;
+  Widget _bottom(BuildContext context, {bool typingOpen = false}) {
+    // Chips hide while the keyboard is up (the text box is in use).
+    final chips = typingOpen ? const <String>[] : c.chips;
     return Container(
       color: TPColors.white,
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
