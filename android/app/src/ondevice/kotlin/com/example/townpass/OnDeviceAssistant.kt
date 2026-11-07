@@ -70,11 +70,14 @@ object OnDeviceAssistant {
             Log.w(TAG, "missing model ${model.absolutePath}; run scripts/push_assistant_models.ps1")
             return
         }
+        val executable = File(app.applicationInfo.nativeLibraryDir, binary)
+        // Servers left by an earlier App process (force-stop or reinstall does not
+        // always end them) may sit in the wrong CPU group or point at an old APK.
+        stopStale(binary)
         if (listening(port)) {
-            Log.i(TAG, "$binary already listening on $port")
+            Log.w(TAG, "port $port is in use by another process; not starting $binary")
             return
         }
-        val executable = File(app.applicationInfo.nativeLibraryDir, binary)
         val command = listOf(executable.absolutePath, "-m", model.absolutePath,
             "--host", "127.0.0.1", "--port", port.toString()) + extra
         val builder = ProcessBuilder(command).redirectErrorStream(true)
@@ -84,6 +87,28 @@ object OnDeviceAssistant {
         builder.redirectOutput(File(if (debuggable) "${app.cacheDir}/$binary.log" else "/dev/null"))
         synchronized(processes) { processes += builder.start() }
         Log.i(TAG, "started $binary on $port")
+    }
+
+    /** Ends this App's (same user id) leftover copies of [binary] and waits for them to exit. */
+    private fun stopStale(binary: String) {
+        val self = android.os.Process.myPid()
+        val stale = File("/proc").listFiles().orEmpty().mapNotNull { dir ->
+            val pid = dir.name.toIntOrNull() ?: return@mapNotNull null
+            if (pid == self) return@mapNotNull null
+            val command = try {
+                File(dir, "cmdline").readText().substringBefore('\u0000')
+            } catch (_: Exception) {
+                return@mapNotNull null
+            }
+            pid.takeIf { command.endsWith("/$binary") }
+        }
+        if (stale.isEmpty()) return
+        stale.forEach { android.os.Process.killProcess(it) }
+        Log.i(TAG, "stopped leftover $binary: $stale")
+        val deadline = System.currentTimeMillis() + 5_000
+        while (stale.any { File("/proc/$it").exists() } && System.currentTimeMillis() < deadline) {
+            Thread.sleep(100)
+        }
     }
 
     /** Waits (up to 30 s) until this thread is in the foreground CPU group ("top-app"). */
