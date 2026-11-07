@@ -1337,10 +1337,11 @@ class GuidedAssistantController extends GetxController {
     task.value = t.copyWith(status: TaskStatus.on, left: false);
   }
 
+  /// 結束引導: the task is gone, so the assistant is a plain chat again
+  /// (no task card, 繼續引導 or step list). Asking again starts a new guide.
   void endGuide() {
-    final t = task.value;
-    if (t == null) return;
-    task.value = t.copyWith(status: TaskStatus.ended, left: false);
+    if (task.value == null) return;
+    task.value = null;
     todoOpen.value = false;
     _say(_bot(Replies.ended));
   }
