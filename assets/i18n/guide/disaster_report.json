@@ -1,0 +1,371 @@
+{
+ "version": 1,
+ "status": "DRAFT translations (machine-assisted, 2026-11-08), pending native-speaker review. Keys are the Chinese source texts in lib/page/guided_assistant/; keep {name} placeholders; {page:X} shows the page's own word X as the page shows it (translated by PageTranslation).",
+ "section": "disaster_report",
+ "strings": {
+  "{fire}{what}點一下框框，打災情發生的地址，例如「臺北市信義區市府路1號」；也可以按框框右邊的定位圖示，直接用你現在的位置。": {
+   "en": "{fire}{what}Tap the box and type the address where it happened, e.g. “臺北市信義區市府路1號”. Or tap the location icon on the right of the box to use where you are now.",
+   "ja": "{fire}{what}枠をタップして、災害が起きた場所の住所を入力してください。例：「臺北市信義區市府路1號」。枠の右の位置アイコンを押すと、今いる場所をそのまま使えます。",
+   "vi": "{fire}{what}Chạm vào ô, gõ địa chỉ nơi xảy ra thiên tai, ví dụ “臺北市信義區市府路1號”; hoặc bấm biểu tượng định vị bên phải ô để dùng vị trí hiện tại của bạn.",
+   "id": "{fire}{what}Ketuk kotaknya dan ketik alamat lokasi bencana, misalnya “臺北市信義區市府路1號”. Atau tekan ikon lokasi di kanan kotak untuk memakai lokasi Anda sekarang.",
+   "th": "{fire}{what}แตะที่ช่อง พิมพ์ที่อยู่ที่เกิดภัย เช่น “臺北市信義區市府路1號” หรือกดไอคอนตำแหน่งทางขวาของช่อง เพื่อใช้ตำแหน่งปัจจุบันของคุณ"
+  },
+  "{note}{scroll}最後確認一下：{at}{cat}沒問題就自己按「送出」喔。這是示範網站，不會真的通報。": {
+   "en": "{note}{scroll}Last check. {at}{cat}If everything looks right, tap “{page:送出}” yourself. This is a demo site, so nothing is really reported.",
+   "ja": "{note}{scroll}最後に確認しましょう。{at}{cat}問題なければ、ご自身で「{page:送出}」を押してください。これはデモサイトなので、実際には通報されません。",
+   "vi": "{note}{scroll}Kiểm tra lần cuối. {at}{cat}Nếu không có vấn đề gì, bạn tự bấm “{page:送出}” nhé. Đây là trang web mẫu, sẽ không báo thật.",
+   "id": "{note}{scroll}Periksa sekali lagi. {at}{cat}Kalau sudah benar, tekan sendiri “{page:送出}”. Ini situs demo, jadi tidak benar-benar dilaporkan.",
+   "th": "{note}{scroll}ตรวจสอบครั้งสุดท้าย {at}{cat}ถ้าไม่มีปัญหา กด “{page:送出}” ด้วยตัวเองได้เลย นี่เป็นเว็บไซต์สาธิต จะไม่แจ้งจริง"
+  },
+  "{note}勾好了！「送出」現在可以按了。": {
+   "en": "{note}Ticked! You can tap “{page:送出}” now.",
+   "ja": "{note}チェックできました！「{page:送出}」が押せるようになりました。",
+   "vi": "{note}Đánh dấu xong rồi! Giờ bấm “{page:送出}” được rồi.",
+   "id": "{note}Sudah dicentang! Sekarang “{page:送出}” bisa ditekan.",
+   "th": "{note}ติ๊กแล้ว! ตอนนี้กด “{page:送出}” ได้แล้ว"
+  },
+  "{scroll}在「災情描述」勾你看到的狀況，至少勾一個，例如「道路」表示影響到馬路。有人受傷、受困，請直接打 119。": {
+   "en": "{scroll}Under “{page:災情描述}”, tick what you see, at least one. For example, “{page:道路}” means the road is affected. If someone is hurt or trapped, call 119 right away.",
+   "ja": "{scroll}「{page:災情描述}」で、見た状況にチェックしてください。少なくとも一つです。例えば「{page:道路}」は道路に影響があるという意味です。けが人や閉じ込められた人がいるときは、すぐ 119 に電話してください。",
+   "vi": "{scroll}Ở “{page:災情描述}”, đánh dấu tình trạng bạn thấy, ít nhất một ô, ví dụ “{page:道路}” nghĩa là ảnh hưởng đến đường. Có người bị thương hoặc mắc kẹt, hãy gọi ngay 119.",
+   "id": "{scroll}Di “{page:災情描述}”, centang keadaan yang Anda lihat, minimal satu. Misalnya “{page:道路}” berarti jalan terdampak. Kalau ada yang terluka atau terjebak, langsung telepon 119.",
+   "th": "{scroll}ที่ “{page:災情描述}” ติ๊กสิ่งที่คุณเห็น อย่างน้อยหนึ่งข้อ เช่น “{page:道路}” หมายถึงกระทบถนน ถ้ามีคนบาดเจ็บหรือติดอยู่ ให้โทร 119 ทันที"
+  },
+  "「人員傷亡」和「影響交通」下面的小方框，點一下就是勾選。下面還可以寫「補充描述」或附照片。": {
+   "en": "Tap the small boxes under “{page:人員傷亡}” and “{page:影響交通}” to tick them. Below that you can also write “{page:補充描述}” or add photos.",
+   "ja": "「{page:人員傷亡}」と「{page:影響交通}」の下の小さな四角をタップするとチェックできます。その下で「{page:補充描述}」を書いたり、写真を付けたりもできます。",
+   "vi": "Chạm vào các ô nhỏ dưới “{page:人員傷亡}” và “{page:影響交通}” để đánh dấu. Bên dưới còn có thể viết “{page:補充描述}” hoặc đính kèm ảnh.",
+   "id": "Ketuk kotak kecil di bawah “{page:人員傷亡}” dan “{page:影響交通}” untuk mencentang. Di bawahnya Anda juga bisa menulis “{page:補充描述}” atau melampirkan foto.",
+   "th": "แตะช่องสี่เหลี่ยมเล็กใต้ “{page:人員傷亡}” และ “{page:影響交通}” เพื่อติ๊ก ด้านล่างยังเขียน “{page:補充描述}” หรือแนบรูปได้"
+  },
+  "「送出」還是灰色的。先勾「提供個人資料給承辦人員」，它才會變成可以按。": {
+   "en": "“{page:送出}” is still grey. Tick “{page:提供個人資料給承辦人員}” first, then it can be tapped.",
+   "ja": "「{page:送出}」はまだ灰色です。先に「{page:提供個人資料給承辦人員}」にチェックすると、押せるようになります。",
+   "vi": "“{page:送出}” vẫn còn màu xám. Hãy đánh dấu “{page:提供個人資料給承辦人員}” trước, nút đó mới bấm được.",
+   "id": "“{page:送出}” masih abu-abu. Centang dulu “{page:提供個人資料給承辦人員}”, baru tombolnya bisa ditekan.",
+   "th": "“{page:送出}” ยังเป็นสีเทา ติ๊ก “{page:提供個人資料給承辦人員}” ก่อน แล้วจึงจะกดได้"
+  },
+  "下面的「地點描述」可以補充說明，例如「公園門口旁邊」，不寫也可以。": {
+   "en": "In “{page:地點描述}” below you can add more detail, e.g. “公園門口旁邊” (next to the park entrance). You can leave it empty.",
+   "ja": "下の「{page:地點描述}」で補足できます。例：「公園門口旁邊」（公園の入口の横）。書かなくても大丈夫です。",
+   "vi": "Ở “{page:地點描述}” bên dưới có thể nói thêm, ví dụ “公園門口旁邊” (cạnh cổng công viên), không viết cũng được.",
+   "id": "Di “{page:地點描述}” di bawah Anda bisa menambah keterangan, misalnya “公園門口旁邊” (di samping pintu taman). Boleh dikosongkan.",
+   "th": "ที่ “{page:地點描述}” ด้านล่างเขียนอธิบายเพิ่มได้ เช่น “公園門口旁邊” (ข้างประตูสวน) ไม่เขียนก็ได้"
+  },
+  "下面的「補充描述」可以多寫一點，也可以按「最多上傳 3個檔案」附照片，都不是一定要。": {
+   "en": "In “{page:補充描述}” below you can write more, and you can tap “{page:最多上傳 3個檔案}” to add photos. Neither is required.",
+   "ja": "下の「{page:補充描述}」にもう少し書いたり、「{page:最多上傳 3個檔案}」を押して写真を付けたりできます。どちらも必須ではありません。",
+   "vi": "Ở “{page:補充描述}” bên dưới có thể viết thêm, cũng có thể bấm “{page:最多上傳 3個檔案}” để đính kèm ảnh, đều không bắt buộc.",
+   "id": "Di “{page:補充描述}” di bawah Anda bisa menulis lebih banyak, dan bisa menekan “{page:最多上傳 3個檔案}” untuk melampirkan foto. Keduanya tidak wajib.",
+   "th": "ที่ “{page:補充描述}” ด้านล่างเขียนเพิ่มได้ และกด “{page:最多上傳 3個檔案}” เพื่อแนบรูปได้ ไม่บังคับทั้งสองอย่าง"
+  },
+  "你選的是{cat}。": {
+   "en": "You picked {cat}. ",
+   "ja": "選んだのは{cat}です。",
+   "vi": "Bạn đã chọn {cat}. ",
+   "id": "Anda memilih {cat}. ",
+   "th": "คุณเลือก {cat} "
+  },
+  "勾好了！「送出」現在可以按了。": {
+   "en": "Ticked! You can tap “{page:送出}” now.",
+   "ja": "チェックできました！「{page:送出}」が押せるようになりました。",
+   "vi": "Đánh dấu xong rồi! Giờ bấm “{page:送出}” được rồi.",
+   "id": "Sudah dicentang! Sekarang “{page:送出}” bisa ditekan.",
+   "th": "ติ๊กแล้ว! ตอนนี้กด “{page:送出}” ได้แล้ว"
+  },
+  "勾選「提供個人資料給承辦人員」": {
+   "en": "Tick “{page:提供個人資料給承辦人員}”",
+   "ja": "「{page:提供個人資料給承辦人員}」にチェックする",
+   "vi": "Đánh dấu “{page:提供個人資料給承辦人員}”",
+   "id": "Centang “{page:提供個人資料給承辦人員}”",
+   "th": "ติ๊ก “{page:提供個人資料給承辦人員}”"
+  },
+  "勾選災情狀況": {
+   "en": "Tick what you see",
+   "ja": "災害の状況にチェックする",
+   "vi": "Đánh dấu tình trạng thiên tai",
+   "id": "Centang keadaan bencana",
+   "th": "ติ๊กสภาพภัยพิบัติ"
+  },
+  "同意提供聯絡資料": {
+   "en": "Agree to share contact details",
+   "ja": "連絡先の提供に同意する",
+   "vi": "Đồng ý cung cấp thông tin liên lạc",
+   "id": "Setujui berbagi data kontak",
+   "th": "ยินยอมให้ข้อมูลติดต่อ"
+  },
+  "回到災情通報": {
+   "en": "Back to Disaster report",
+   "ja": "災害通報に戻る",
+   "vi": "Quay lại Báo cáo thiên tai",
+   "id": "Kembali ke Laporan bencana",
+   "th": "กลับไปที่แจ้งภัยพิบัติ"
+  },
+  "回到災情通報畫面": {
+   "en": "Back to the Disaster report screen",
+   "ja": "災害通報の画面に戻る",
+   "vi": "Quay lại màn hình Báo cáo thiên tai",
+   "id": "Kembali ke layar Laporan bencana",
+   "th": "กลับไปที่หน้าจอแจ้งภัยพิบัติ"
+  },
+  "在「標注災情發生地點」打地址，或按框框右邊的定位圖示。": {
+   "en": "Type the address in “{page:標注災情發生地點}”, or tap the location icon on the right of the box.",
+   "ja": "「{page:標注災情發生地點}」に住所を入力するか、枠の右の位置アイコンを押してください。",
+   "vi": "Gõ địa chỉ vào “{page:標注災情發生地點}”, hoặc bấm biểu tượng định vị bên phải ô.",
+   "id": "Ketik alamat di “{page:標注災情發生地點}”, atau tekan ikon lokasi di kanan kotak.",
+   "th": "พิมพ์ที่อยู่ใน “{page:標注災情發生地點}” หรือกดไอคอนตำแหน่งทางขวาของช่อง"
+  },
+  "在「標注災情發生地點」打完整地址。按右邊的定位圖示會問你能不能用位置，按「允許」就會自動填。": {
+   "en": "Type the full address in “{page:標注災情發生地點}”. If you tap the location icon on the right, you’ll be asked whether your location can be used; tap “Allow” and it fills in by itself.",
+   "ja": "「{page:標注災情發生地點}」に住所を全部入力してください。右の位置アイコンを押すと位置情報を使ってよいか聞かれるので、「許可」を押すと自動で入ります。",
+   "vi": "Gõ địa chỉ đầy đủ vào “{page:標注災情發生地點}”. Bấm biểu tượng định vị bên phải sẽ được hỏi có cho dùng vị trí không, bấm “Cho phép” là tự điền.",
+   "id": "Ketik alamat lengkap di “{page:標注災情發生地點}”. Kalau menekan ikon lokasi di kanan, Anda akan ditanya apakah lokasi boleh dipakai; tekan “Izinkan” dan alamat terisi sendiri.",
+   "th": "พิมพ์ที่อยู่เต็มใน “{page:標注災情發生地點}” ถ้ากดไอคอนตำแหน่งทางขวา จะมีถามว่าให้ใช้ตำแหน่งได้ไหม กด “อนุญาต” แล้วจะกรอกให้อัตโนมัติ"
+  },
+  "地址打完後，按鍵盤上的「完成」或「✓」收起鍵盤，就到下一步。": {
+   "en": "After typing the address, tap “Done” or “✓” on the keyboard to close it, and we’ll go to the next step.",
+   "ja": "住所を入力したら、キーボードの「完了」か「✓」を押してキーボードを閉じると、次に進みます。",
+   "vi": "Gõ xong địa chỉ, bấm “Xong” hoặc “✓” trên bàn phím để ẩn bàn phím, rồi sang bước tiếp theo.",
+   "id": "Setelah mengetik alamat, tekan “Selesai” atau “✓” di keyboard untuk menutupnya, lalu lanjut ke langkah berikutnya.",
+   "th": "พิมพ์ที่อยู่เสร็จแล้ว กด “เสร็จ” หรือ “✓” บนแป้นพิมพ์เพื่อปิดแป้นพิมพ์ แล้วจะไปขั้นตอนถัดไป"
+  },
+  "地點填好了！": {
+   "en": "The place is filled in!",
+   "ja": "場所を入力できました！",
+   "vi": "Đã điền xong địa điểm!",
+   "id": "Lokasi sudah diisi!",
+   "th": "กรอกสถานที่เรียบร้อยแล้ว!"
+  },
+  "地點是「{where}」，": {
+   "en": "Place: “{where}”. ",
+   "ja": "場所は「{where}」、",
+   "vi": "Địa điểm: “{where}”. ",
+   "id": "Lokasi: “{where}”. ",
+   "th": "สถานที่: “{where}” "
+  },
+  "填災情地點": {
+   "en": "Fill in the disaster location",
+   "ja": "災害の場所を入力する",
+   "vi": "Điền địa điểm thiên tai",
+   "id": "Isi lokasi bencana",
+   "th": "กรอกสถานที่เกิดภัย"
+  },
+  "填災情發生地點": {
+   "en": "Fill in where the disaster happened",
+   "ja": "災害が起きた場所を入力する",
+   "vi": "Điền nơi xảy ra thiên tai",
+   "id": "Isi tempat terjadinya bencana",
+   "th": "กรอกสถานที่ที่เกิดภัยพิบัติ"
+  },
+  "失火了請先打 119！": {
+   "en": "If there’s a fire, call 119 first! ",
+   "ja": "火事のときは、まず 119 に電話してください！",
+   "vi": "Nếu có cháy, hãy gọi 119 trước! ",
+   "id": "Kalau ada kebakaran, telepon 119 dulu! ",
+   "th": "ถ้าไฟไหม้ ให้โทร 119 ก่อน! "
+  },
+  "好的！已經幫你打開「災情通報」。我們先選災情類別，再填地點和狀況，最後由你自己按「送出」。如果有人受傷、失火或有立即危險，請直接打 119！": {
+   "en": "OK! I’ve opened “Disaster report” for you. First we pick a disaster category, then fill in the place and what you see, and at the end you tap “{page:送出}” yourself. If someone is hurt, there is a fire or there is immediate danger, call 119 right away!",
+   "ja": "わかりました！「災害通報」を開きました。まず災害のカテゴリーを選び、場所と状況を入力して、最後にご自身で「{page:送出}」を押します。けが人がいる、火事、またはすぐに危険があるときは、すぐ 119 に電話してください！",
+   "vi": "Được rồi! Mình đã mở “Báo cáo thiên tai” cho bạn. Trước tiên chọn loại thiên tai, rồi điền địa điểm và tình trạng, cuối cùng bạn tự bấm “{page:送出}”. Nếu có người bị thương, có cháy hoặc nguy hiểm ngay lập tức, hãy gọi ngay 119!",
+   "id": "Baik! “Laporan bencana” sudah saya bukakan. Pertama pilih kategori bencana, lalu isi lokasi dan keadaannya, terakhir Anda sendiri yang menekan “{page:送出}”. Kalau ada yang terluka, ada kebakaran, atau ada bahaya langsung, segera telepon 119!",
+   "th": "ได้เลย! เปิด “แจ้งภัยพิบัติ” ให้แล้ว ก่อนอื่นเลือกหมวดหมู่ภัย แล้วกรอกสถานที่และสภาพ สุดท้ายคุณกด “{page:送出}” เอง ถ้ามีคนบาดเจ็บ ไฟไหม้ หรือมีอันตรายเฉพาะหน้า ให้โทร 119 ทันที!"
+  },
+  "好的！已經幫你打開「災情通報」，我會在畫面上一步一步帶你做。緊急狀況請直接打 119。": {
+   "en": "OK! I’ve opened “Disaster report” for you. I’ll guide you on the screen step by step. In an emergency, call 119 right away.",
+   "ja": "わかりました！「災害通報」を開きました。画面上で一歩ずつご案内します。緊急のときは、すぐ 119 に電話してください。",
+   "vi": "Được rồi! Mình đã mở “Báo cáo thiên tai” cho bạn, mình sẽ hướng dẫn từng bước trên màn hình. Trường hợp khẩn cấp, hãy gọi ngay 119.",
+   "id": "Baik! “Laporan bencana” sudah saya bukakan. Saya akan memandu langkah demi langkah di layar. Dalam keadaan darurat, segera telepon 119.",
+   "th": "ได้เลย! เปิด “แจ้งภัยพิบัติ” ให้แล้ว จะช่วยแนะนำบนหน้าจอทีละขั้นตอน กรณีฉุกเฉินให้โทร 119 ทันที"
+  },
+  "好的！災情通報打開了，我們一起來{task}。": {
+   "en": "OK! Disaster report is open. Let’s do this together: {task}.",
+   "ja": "わかりました！災害通報を開きました。一緒に進めましょう：{task}。",
+   "vi": "Được rồi! Đã mở Báo cáo thiên tai. Mình cùng làm nhé: {task}.",
+   "id": "Baik! Laporan bencana sudah terbuka. Ayo kita lakukan bersama: {task}.",
+   "th": "ได้เลย! เปิดแจ้งภัยพิบัติแล้ว มาทำด้วยกัน: {task}"
+  },
+  "好的！災情通報打開了，我們先選災情類別。緊急狀況請直接打 119。": {
+   "en": "OK! Disaster report is open. First, let’s pick a disaster category. In an emergency, call 119 right away.",
+   "ja": "わかりました！災害通報を開きました。まず災害のカテゴリーを選びましょう。緊急のときは、すぐ 119 に電話してください。",
+   "vi": "Được rồi! Đã mở Báo cáo thiên tai. Trước tiên mình chọn loại thiên tai nhé. Trường hợp khẩn cấp, hãy gọi ngay 119.",
+   "id": "Baik! Laporan bencana sudah terbuka. Pertama, kita pilih kategori bencana. Dalam keadaan darurat, segera telepon 119.",
+   "th": "ได้เลย! เปิดแจ้งภัยพิบัติแล้ว ก่อนอื่นมาเลือกหมวดหมู่ภัยกัน กรณีฉุกเฉินให้โทร 119 ทันที"
+  },
+  "它在上面，先往上滑。": {
+   "en": "It’s further up, so scroll up first. ",
+   "ja": "上のほうにあるので、まず上にスクロールしてください。",
+   "vi": "Nó ở bên trên, hãy cuộn lên trước. ",
+   "id": "Letaknya di atas, gulir ke atas dulu. ",
+   "th": "อยู่ด้านบน เลื่อนขึ้นก่อน "
+  },
+  "它在下面，先往下滑。": {
+   "en": "It’s further down, so scroll down first. ",
+   "ja": "下のほうにあるので、まず下にスクロールしてください。",
+   "vi": "Nó ở bên dưới, hãy cuộn xuống trước. ",
+   "id": "Letaknya di bawah, gulir ke bawah dulu. ",
+   "th": "อยู่ด้านล่าง เลื่อนลงก่อน "
+  },
+  "建議還是把注意事項看完喔。": {
+   "en": "It’s still a good idea to read “{page:注意事項}” to the end. ",
+   "ja": "「{page:注意事項}」は最後まで読んでおくのがおすすめです。",
+   "vi": "Bạn vẫn nên đọc hết “{page:注意事項}” nhé. ",
+   "id": "Sebaiknya tetap baca “{page:注意事項}” sampai habis. ",
+   "th": "ควรอ่าน “{page:注意事項}” ให้จบก่อนนะ "
+  },
+  "往下滑到最下面，點「提供個人資料給承辦人員」前面的小方框。沒勾的話「送出」是灰色的，按不下去。": {
+   "en": "Scroll to the very bottom and tap the small box in front of “{page:提供個人資料給承辦人員}”. If it’s not ticked, “{page:送出}” stays grey and can’t be tapped.",
+   "ja": "一番下までスクロールして、「{page:提供個人資料給承辦人員}」の前の小さな四角をタップしてください。チェックしないと「{page:送出}」は灰色のままで押せません。",
+   "vi": "Cuộn xuống dưới cùng, chạm vào ô nhỏ phía trước “{page:提供個人資料給承辦人員}”. Nếu chưa đánh dấu thì “{page:送出}” có màu xám, không bấm được.",
+   "id": "Gulir ke paling bawah dan ketuk kotak kecil di depan “{page:提供個人資料給承辦人員}”. Kalau belum dicentang, “{page:送出}” berwarna abu-abu dan tidak bisa ditekan.",
+   "th": "เลื่อนลงไปล่างสุด แตะช่องสี่เหลี่ยมเล็กหน้า “{page:提供個人資料給承辦人員}” ถ้ายังไม่ติ๊ก “{page:送出}” จะเป็นสีเทาและกดไม่ได้"
+  },
+  "按「確認」會回到災情類別清單。這是示範網站，沒有真的通報喔。": {
+   "en": "Tapping “{page:確認}” takes you back to the disaster category list. This is a demo site, so nothing was really reported.",
+   "ja": "「{page:確認}」を押すと、災害のカテゴリー一覧に戻ります。これはデモサイトなので、実際には通報されていません。",
+   "vi": "Bấm “{page:確認}” sẽ quay lại danh sách loại thiên tai. Đây là trang web mẫu, không báo thật đâu.",
+   "id": "Tekan “{page:確認}” untuk kembali ke daftar kategori bencana. Ini situs demo, jadi tidak benar-benar dilaporkan.",
+   "th": "กด “{page:確認}” จะกลับไปที่รายการหมวดหมู่ภัย นี่เป็นเว็บไซต์สาธิต ไม่ได้แจ้งจริง"
+  },
+  "描述災情": {
+   "en": "Describe the disaster",
+   "ja": "災害の様子を伝える",
+   "vi": "Mô tả thiên tai",
+   "id": "Jelaskan bencananya",
+   "th": "อธิบายภัยพิบัติ"
+  },
+  "最下面有一段「注意事項」。先往下滑，把它看完喔。看到了，我再告訴你要按哪裡。": {
+   "en": "At the bottom there is a “{page:注意事項}” section. Scroll down and read it all first. Once you have, I’ll tell you where to tap.",
+   "ja": "一番下に「{page:注意事項}」があります。まず下にスクロールして、最後まで読んでください。読めたら、どこを押すかお伝えします。",
+   "vi": "Ở dưới cùng có phần “{page:注意事項}”. Hãy cuộn xuống đọc hết trước nhé. Đọc xong, mình sẽ chỉ bạn bấm vào đâu.",
+   "id": "Di paling bawah ada bagian “{page:注意事項}”. Gulir ke bawah dan baca sampai habis dulu. Setelah itu, saya beri tahu bagian yang harus ditekan.",
+   "th": "ด้านล่างสุดมีส่วน “{page:注意事項}” เลื่อนลงไปอ่านให้จบก่อน อ่านแล้วจะบอกว่าต้องกดตรงไหน"
+  },
+  "注意事項是說：承辦人員依法辦案需要時，可以經過申請和主管同意，取得你的個人資料。": {
+   "en": "The notes say: when the staff need it to handle the case under the law, they can get your personal data after applying and getting a supervisor’s approval.",
+   "ja": "注意事項の内容：担当者は法律に基づいて案件を処理するために必要なとき、申請して上司の同意を得れば、あなたの個人情報を取得できます。",
+   "vi": "Phần lưu ý nói: khi nhân viên phụ trách cần để xử lý vụ việc theo luật, họ có thể lấy thông tin cá nhân của bạn sau khi xin phép và được cấp trên đồng ý.",
+   "id": "Catatannya berbunyi: bila petugas memerlukannya untuk menangani kasus sesuai hukum, mereka dapat memperoleh data pribadi Anda setelah mengajukan permohonan dan disetujui atasan.",
+   "th": "ข้อควรทราบบอกว่า: เมื่อเจ้าหน้าที่จำเป็นต้องใช้เพื่อดำเนินการตามกฎหมาย สามารถยื่นขอและได้รับความเห็นชอบจากหัวหน้า แล้วนำข้อมูลส่วนบุคคลของคุณไปใช้ได้"
+  },
+  "注意事項看完了！{scroll}勾一下最下面的「提供個人資料給承辦人員」，承辦人員才能跟你聯絡。勾了以後，灰色的「送出」才會變成可以按。": {
+   "en": "You’ve read the notes! {scroll}Tick “{page:提供個人資料給承辦人員}” at the very bottom so the staff can contact you. Once it’s ticked, the grey “{page:送出}” can be tapped.",
+   "ja": "注意事項を読み終えました！{scroll}一番下の「{page:提供個人資料給承辦人員}」にチェックすると、担当者があなたに連絡できます。チェックすると、灰色の「{page:送出}」が押せるようになります。",
+   "vi": "Đã đọc xong phần lưu ý! {scroll}Đánh dấu “{page:提供個人資料給承辦人員}” ở dưới cùng để nhân viên phụ trách có thể liên lạc với bạn. Đánh dấu rồi, nút “{page:送出}” màu xám mới bấm được.",
+   "id": "Catatannya sudah dibaca! {scroll}Centang “{page:提供個人資料給承辦人員}” di paling bawah agar petugas bisa menghubungi Anda. Setelah dicentang, tombol abu-abu “{page:送出}” baru bisa ditekan.",
+   "th": "อ่านข้อควรทราบจบแล้ว! {scroll}ติ๊ก “{page:提供個人資料給承辦人員}” ที่ล่างสุด เจ้าหน้าที่จึงจะติดต่อคุณได้ ติ๊กแล้ว ปุ่ม “{page:送出}” สีเทาจึงจะกดได้"
+  },
+  "清單有「民生、基礎設施災情」「橋梁災情」「土石災情」「火災」四大類，點一下就會打開，再點裡面最符合的一項。": {
+   "en": "The list has four main groups: “{page:民生、基礎設施災情}”, “{page:橋梁災情}”, “{page:土石災情}” and “{page:火災}”. Tap one to open it, then tap the item inside that fits best.",
+   "ja": "一覧には「{page:民生、基礎設施災情}」「{page:橋梁災情}」「{page:土石災情}」「{page:火災}」の4つの大きな分類があります。タップすると開くので、中から一番合うものをタップしてください。",
+   "vi": "Danh sách có bốn nhóm lớn: “{page:民生、基礎設施災情}”, “{page:橋梁災情}”, “{page:土石災情}” và “{page:火災}”. Chạm vào để mở ra, rồi chạm vào mục phù hợp nhất bên trong.",
+   "id": "Daftarnya punya empat kelompok besar: “{page:民生、基礎設施災情}”, “{page:橋梁災情}”, “{page:土石災情}”, dan “{page:火災}”. Ketuk untuk membukanya, lalu ketuk item yang paling cocok di dalamnya.",
+   "th": "รายการมีสี่หมวดใหญ่: “{page:民生、基礎設施災情}” “{page:橋梁災情}” “{page:土石災情}” และ “{page:火災}” แตะเพื่อเปิด แล้วแตะรายการข้างในที่ตรงที่สุด"
+  },
+  "災情是{cat}。": {
+   "en": "Disaster: {cat}. ",
+   "ja": "災害は{cat}です。",
+   "vi": "Thiên tai: {cat}. ",
+   "id": "Bencana: {cat}. ",
+   "th": "ภัยพิบัติ: {cat} "
+  },
+  "災情狀況勾好了！": {
+   "en": "Ticked what you see!",
+   "ja": "災害の状況にチェックできました！",
+   "vi": "Đã đánh dấu xong tình trạng thiên tai!",
+   "id": "Keadaan bencana sudah dicentang!",
+   "th": "ติ๊กสภาพภัยพิบัติเรียบร้อยแล้ว!"
+  },
+  "災情通報": {
+   "en": "Disaster report",
+   "ja": "災害通報",
+   "vi": "Báo cáo thiên tai",
+   "id": "Laporan bencana",
+   "th": "แจ้งภัยพิบัติ"
+  },
+  "災情類別選好了！接下來填災情發生的地點。": {
+   "en": "Disaster category picked! Next, fill in where it happened.",
+   "ja": "災害のカテゴリーを選びました！次に、起きた場所を入力しましょう。",
+   "vi": "Đã chọn xong loại thiên tai! Tiếp theo, điền nơi xảy ra.",
+   "id": "Kategori bencana sudah dipilih! Selanjutnya, isi tempat kejadiannya.",
+   "th": "เลือกหมวดหมู่ภัยแล้ว! ต่อไป กรอกสถานที่ที่เกิดเหตุ"
+  },
+  "看一下地點和狀況對不對，沒問題就自己按最下面的「送出」。": {
+   "en": "Check that the place and situation are right, then tap “{page:送出}” at the very bottom yourself.",
+   "ja": "場所と状況が正しいか確認して、問題なければご自身で一番下の「{page:送出}」を押してください。",
+   "vi": "Xem lại địa điểm và tình trạng có đúng không, không sao thì tự bấm “{page:送出}” ở dưới cùng.",
+   "id": "Periksa apakah lokasi dan keadaannya benar, lalu tekan sendiri “{page:送出}” di paling bawah.",
+   "th": "ดูว่าสถานที่และสภาพถูกต้องไหม ถ้าไม่มีปัญหา กด “{page:送出}” ที่ล่างสุดด้วยตัวเอง"
+  },
+  "看一下填的內容對不對，再自己按「送出」。": {
+   "en": "Check that what you filled in is right, then tap “{page:送出}” yourself.",
+   "ja": "入力した内容が正しいか確認してから、ご自身で「{page:送出}」を押してください。",
+   "vi": "Xem lại nội dung đã điền có đúng không, rồi tự bấm “{page:送出}”.",
+   "id": "Periksa apakah isian Anda benar, lalu tekan sendiri “{page:送出}”.",
+   "th": "ดูว่าสิ่งที่กรอกถูกต้องไหม แล้วกด “{page:送出}” ด้วยตัวเอง"
+  },
+  "看到路燈壞了、停電、橋梁或土石災情，可以在這裡通報：先選災情類別，再填地點和狀況，最後送出。有人受傷或有立即危險，請直接打 119。": {
+   "en": "If you see a broken street light, a power cut, or bridge or landslide damage, you can report it here: pick a disaster category, fill in the place and situation, then send it. If someone is hurt or there is immediate danger, call 119 right away.",
+   "ja": "街灯の故障、停電、橋や土砂の災害を見つけたら、ここで通報できます。災害のカテゴリーを選び、場所と状況を入力して送信します。けが人がいる、またはすぐに危険があるときは、すぐ 119 に電話してください。",
+   "vi": "Thấy đèn đường hỏng, mất điện, sự cố cầu hoặc sạt lở đất, bạn có thể báo ở đây: chọn loại thiên tai, điền địa điểm và tình trạng, rồi gửi. Có người bị thương hoặc nguy hiểm ngay lập tức, hãy gọi ngay 119.",
+   "id": "Kalau melihat lampu jalan rusak, listrik padam, kerusakan jembatan, atau tanah longsor, Anda bisa melaporkannya di sini: pilih kategori bencana, isi lokasi dan keadaannya, lalu kirim. Kalau ada yang terluka atau ada bahaya langsung, segera telepon 119.",
+   "th": "ถ้าเห็นไฟถนนเสีย ไฟดับ สะพานเสียหาย หรือดินถล่ม แจ้งได้ที่นี่ เลือกหมวดหมู่ภัย กรอกสถานที่และสภาพ แล้วส่ง ถ้ามีคนบาดเจ็บหรือมีอันตรายเฉพาะหน้า ให้โทร 119 ทันที"
+  },
+  "這幾個字沒有找到。把框框裡的字刪掉，再按右邊的放大鏡，清單就會回來，從清單選比較好找。": {
+   "en": "Nothing was found for those words. Delete the words in the box and tap the magnifying glass on the right; the list will come back, and picking from the list is easier.",
+   "ja": "その言葉では見つかりませんでした。枠の中の字を消して右の虫めがねを押すと一覧が戻ります。一覧から選ぶほうが探しやすいです。",
+   "vi": "Không tìm thấy với mấy chữ này. Xóa chữ trong ô rồi bấm kính lúp bên phải, danh sách sẽ hiện lại, chọn từ danh sách dễ tìm hơn.",
+   "id": "Kata-kata itu tidak ditemukan. Hapus tulisan di kotak, lalu tekan kaca pembesar di kanan; daftarnya akan muncul lagi, dan memilih dari daftar lebih mudah.",
+   "th": "ไม่พบคำเหล่านี้ ลบคำในช่องออก แล้วกดแว่นขยายทางขวา รายการจะกลับมา เลือกจากรายการจะหาง่ายกว่า"
+  },
+  "這是「災情通報」": {
+   "en": "This is “Disaster report”",
+   "ja": "これは「災害通報」です",
+   "vi": "Đây là “Báo cáo thiên tai”",
+   "id": "Ini “Laporan bencana”",
+   "th": "นี่คือ “แจ้งภัยพิบัติ”"
+  },
+  "通報好了！畫面寫「通報成功」。這是示範網站，沒有真的通報喔。真的有災情又很緊急，請打 119。": {
+   "en": "Reported! The screen says “{page:通報成功}”. This is a demo site, so nothing was really reported. If there is a real disaster and it’s urgent, call 119.",
+   "ja": "通報しました！画面に「{page:通報成功}」と出ています。これはデモサイトなので、実際には通報されていません。本当に災害があって緊急のときは、119 に電話してください。",
+   "vi": "Đã báo xong! Màn hình ghi “{page:通報成功}”. Đây là trang web mẫu, không báo thật đâu. Nếu thật sự có thiên tai và khẩn cấp, hãy gọi 119.",
+   "id": "Sudah dilaporkan! Layar menampilkan “{page:通報成功}”. Ini situs demo, jadi tidak benar-benar dilaporkan. Kalau benar-benar ada bencana dan mendesak, telepon 119.",
+   "th": "แจ้งแล้ว! หน้าจอเขียนว่า “{page:通報成功}” นี่เป็นเว็บไซต์สาธิต ไม่ได้แจ้งจริง ถ้ามีภัยจริงและเร่งด่วน ให้โทร 119"
+  },
+  "通報災情": {
+   "en": "Report a disaster",
+   "ja": "災害を通報する",
+   "vi": "Báo cáo thiên tai",
+   "id": "Laporkan bencana",
+   "th": "แจ้งภัยพิบัติ"
+  },
+  "遇到哪一種災情？先點一個大類打開來看，例如「民生、基礎設施災情」。有人受傷或有危險，請先打 119！": {
+   "en": "What kind of disaster is it? First tap a main group to open it, e.g. “{page:民生、基礎設施災情}”. If someone is hurt or in danger, call 119 first!",
+   "ja": "どんな災害ですか？まず大きな分類を一つタップして開いてみてください。例：「{page:民生、基礎設施災情}」。けが人がいる、または危険なときは、先に 119 に電話してください！",
+   "vi": "Bạn gặp loại thiên tai nào? Trước tiên chạm vào một nhóm lớn để mở ra xem, ví dụ “{page:民生、基礎設施災情}”. Có người bị thương hoặc nguy hiểm, hãy gọi 119 trước!",
+   "id": "Bencana jenis apa? Ketuk dulu satu kelompok besar untuk membukanya, misalnya “{page:民生、基礎設施災情}”. Kalau ada yang terluka atau dalam bahaya, telepon 119 dulu!",
+   "th": "เจอภัยแบบไหน แตะหมวดใหญ่ก่อนเพื่อเปิดดู เช่น “{page:民生、基礎設施災情}” ถ้ามีคนบาดเจ็บหรือมีอันตราย ให้โทร 119 ก่อน!"
+  },
+  "選災情類別": {
+   "en": "Pick a disaster category",
+   "ja": "災害のカテゴリーを選ぶ",
+   "vi": "Chọn loại thiên tai",
+   "id": "Pilih kategori bencana",
+   "th": "เลือกหมวดหมู่ภัยพิบัติ"
+  },
+  "開啟災情通報": {
+   "en": "Open Disaster report",
+   "ja": "災害通報を開く",
+   "vi": "Mở Báo cáo thiên tai",
+   "id": "Buka Laporan bencana",
+   "th": "เปิดแจ้งภัยพิบัติ"
+  },
+  "點最符合的那一項，例如「路燈故障」或「電力停電」。沒有一樣的，就選最接近的。": {
+   "en": "Tap the item that fits best, e.g. “{page:路燈故障}” or “{page:電力停電}”. If none is exactly right, pick the closest.",
+   "ja": "一番合う項目をタップしてください。例：「{page:路燈故障}」や「{page:電力停電}」。同じものがなければ、一番近いものを選んでください。",
+   "vi": "Chạm vào mục phù hợp nhất, ví dụ “{page:路燈故障}” hoặc “{page:電力停電}”. Không có mục giống hệt thì chọn mục gần nhất.",
+   "id": "Ketuk item yang paling cocok, misalnya “{page:路燈故障}” atau “{page:電力停電}”. Kalau tidak ada yang sama persis, pilih yang paling mirip.",
+   "th": "แตะรายการที่ตรงที่สุด เช่น “{page:路燈故障}” หรือ “{page:電力停電}” ถ้าไม่มีที่ตรงเป๊ะ ให้เลือกอันที่ใกล้เคียงที่สุด"
+  }
+ }
+}

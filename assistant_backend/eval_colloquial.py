@@ -13,7 +13,9 @@ Scoring per item:
 - greeting / chitchat / out_of_scope, and negation without expected ids
   ("I don't want X"): correct when nothing is opened; "not X but Y" is scored
   like a service request for Y.
-Also scores eval_foreign_holdout.json (--cases).
+Also scores eval_foreign_holdout.json (--cases). Titles also count in the
+request's language (capabilities_i18n.json); until 2026-11-07 a foreign offer
+or "not connected" reply naming the right service was scored as missed.
 The set is never used to tune rules; it is the honest estimate.
 """
 import argparse
@@ -45,11 +47,15 @@ def score(item, reply, registry_titles):
         if opened:
             return "correct" if opened in expected or any(e.split(".")[0] == opened for e in expected) else \
                 "wrong_navigation"
+        # Replies in another language carry that language's titles (capabilities_i18n.json).
+        language = item.get("language", "zh")
         if kind == "unsupported" and reply.get("message") and any(
-                registry_titles.get(e, "\0") in reply["message"] for e in expected):
+                title in reply["message"] for e in expected
+                for title in (registry_titles.get(e, "\0"), registry_titles.get((e, language), "\0"))):
             return "correct"
         offered = {c.get("title") for c in reply.get("choices") or []}
-        if kind == "confirm_candidates" and any(registry_titles.get(e) in offered for e in expected):
+        if kind == "confirm_candidates" and any(registry_titles.get(e) in offered or
+                                                registry_titles.get((e, language)) in offered for e in expected):
             return "confirmed"
         return "missed"
     return "wrong_navigation" if opened else "correct"
@@ -66,6 +72,11 @@ def main():
     catalog = json.loads((pathlib.Path(__file__).resolve().parent.parent / "assets/assistant/capabilities.json")
                          .read_text(encoding="utf-8"))["capabilities"]
     titles = {entry["id"]: entry["title"] for entry in catalog}
+    names = pathlib.Path(__file__).resolve().parent.parent / "assets/assistant/capabilities_i18n.json"
+    for entry_id, local in json.loads(names.read_text(encoding="utf-8"))["capabilities"].items():
+        for language, value in local.items():
+            if value and value.get("title"):
+                titles[(entry_id, language)] = value["title"]
     rows = []
     for index, item in enumerate(items, 1):
         started = time.monotonic()
@@ -78,6 +89,8 @@ def main():
         seconds = time.monotonic() - started
         rows.append({**item, "outcome": outcome, "seconds": round(seconds, 2), "kind": reply.get("kind"),
                      "destination": reply.get("destination"), "route": (reply.get("metrics") or {}).get("route"),
+                     "choices": [c.get("title") for c in reply.get("choices") or []],
+                     "semantic": (reply.get("metrics") or {}).get("semantic"),
                      "model_calls": len((reply.get("metrics") or {}).get("model_timings") or []) or None,
                      "message": (reply.get("message") or reply.get("error") or "")[:120]})
         print(f"{index}/{len(items)} {outcome:16} {item['language']} {item['intent']:12} {seconds:.1f}s {item['text']}",

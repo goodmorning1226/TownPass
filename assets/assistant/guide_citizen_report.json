@@ -1,0 +1,211 @@
+{
+  "version": 1,
+  "_comment": "Teaching components of one service page. Shared by the App (guides/<page>_guide.dart holds the pre-written step texts) and the backend (guide.py picks a set). The model may only choose ids listed here; prerequisites are added and ordered by the validator, never by the model. capabilities: capability ids (or roots like 'fees') whose pages this guide runs on. capability_goals: the only goals that fit that sub-page, first = its default. entry_goals: components always added for that capability.",
+  "page": "citizen_report",
+  "capability": "reportIssue",
+  "capabilities": [
+    "reportIssue"
+  ],
+  "title": "有話要說",
+  "default_goal": "submit_report",
+  "capability_goals": {
+    "reportIssue.progress": [
+      "open_case",
+      "search_case",
+      "case_detail",
+      "disaster_cases",
+      "open_cases"
+    ],
+    "reportIssue.prefill": [
+      "submit_report",
+      "fill_form",
+      "fill_location",
+      "add_photo"
+    ]
+  },
+  "entry_goals": {},
+  "components": [
+    {
+      "id": "pick_category",
+      "title": "選要反映的類別",
+      "description": "在「通報」點一個最接近的類別，或按「更多項目」看全部",
+      "keywords": [
+        "案件類別",
+        "通報項目",
+        "更多項目",
+        "選類別",
+        "哪一類",
+        "自動選擇案件類別"
+      ],
+      "requires": []
+    },
+    {
+      "id": "search_item",
+      "title": "用搜尋找類別",
+      "description": "在「您遇到哪些問題?」搜尋框打字，找到要反映的類別",
+      "keywords": [
+        "搜尋類別",
+        "找類別",
+        "遇到哪些問題",
+        "不知道選哪個",
+        "打字找"
+      ],
+      "requires": []
+    },
+    {
+      "id": "fill_location",
+      "title": "寫發生地點",
+      "description": "在「發生地點」打事情發生的完整地址（可以不寫）",
+      "keywords": [
+        "發生地點",
+        "完整地址",
+        "在哪裡發生",
+        "寫地址"
+      ],
+      "requires": [
+        "pick_category|search_item"
+      ]
+    },
+    {
+      "id": "fill_form",
+      "title": "寫主旨和描述",
+      "description": "在「案件主旨」寫一句話，在「描述」寫清楚人、事、時、地、物",
+      "keywords": [
+        "案件主旨",
+        "主旨",
+        "描述",
+        "怎麼寫",
+        "要寫什麼",
+        "人事時地物"
+      ],
+      "requires": [
+        "pick_category|search_item"
+      ]
+    },
+    {
+      "id": "add_photo",
+      "title": "加上照片",
+      "description": "在「新增附件」點方框，選照片、錄影或錄音（可以不加）",
+      "keywords": [
+        "附件",
+        "照片",
+        "拍照",
+        "上傳",
+        "錄影",
+        "錄音"
+      ],
+      "requires": [
+        "pick_category|search_item"
+      ]
+    },
+    {
+      "id": "submit_report",
+      "title": "確認後按「送出」",
+      "description": "看清楚內容和「個人資料是否提供給承辦」，再自己按「送出」",
+      "keywords": [
+        "陳情",
+        "我要反映",
+        "有話要說",
+        "申訴",
+        "檢舉",
+        "投訴",
+        "送出陳情"
+      ],
+      "requires": [
+        "fill_form"
+      ]
+    },
+    {
+      "id": "open_cases",
+      "title": "打開「查詢」",
+      "description": "點上面的「查詢」，看自己陳情過的案件",
+      "keywords": [
+        "查詢案件",
+        "我的陳情",
+        "陳情紀錄",
+        "陳情記錄",
+        "反映過的"
+      ],
+      "requires": []
+    },
+    {
+      "id": "disaster_cases",
+      "title": "切到「災情通報」",
+      "description": "在「查詢」點「災情通報」，看通報過的災情案件",
+      "keywords": [
+        "災情案件",
+        "災情通報的案件",
+        "災情的進度",
+        "通報過的災情"
+      ],
+      "requires": [
+        "open_cases"
+      ]
+    },
+    {
+      "id": "search_case",
+      "title": "用案號找案件",
+      "description": "在「搜尋案號關鍵字」打案號，按放大鏡",
+      "keywords": [
+        "案號",
+        "案件編號",
+        "搜尋案號",
+        "編號找"
+      ],
+      "requires": [
+        "open_cases"
+      ]
+    },
+    {
+      "id": "open_case",
+      "title": "看案件處理進度",
+      "description": "在「查詢」點一件案件，看處理中還是處理完成",
+      "keywords": [
+        "陳情進度",
+        "處理進度",
+        "辦到哪",
+        "處理到哪",
+        "回覆了沒",
+        "辦好了沒",
+        "案件進度"
+      ],
+      "requires": [
+        "open_cases"
+      ]
+    },
+    {
+      "id": "case_detail",
+      "title": "看「詳細內容」",
+      "description": "在案件頁點「詳細內容」，看當初寫的主旨和案件資訊",
+      "keywords": [
+        "詳細內容",
+        "案件資訊",
+        "辦理機關",
+        "當初寫的",
+        "受理時間"
+      ],
+      "requires": [
+        "open_case"
+      ]
+    },
+    {
+      "id": "call_1999",
+      "title": "找「撥打1999專線」",
+      "description": "在「通報」最下面找到「撥打1999專線」，用講的反映",
+      "keywords": [
+        "1999",
+        "撥打1999",
+        "市民熱線",
+        "語音通報",
+        "打電話反映",
+        "用講的"
+      ],
+      "requires": []
+    }
+  ],
+  "generic_keywords": [
+    "陳情",
+    "反映",
+    "有話要說"
+  ]
+}

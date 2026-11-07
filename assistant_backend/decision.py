@@ -45,7 +45,9 @@ Negation without a positive replacement, or cancellation: cancel.
 Never submit, reserve, borrow, pay, or claim completion. Do not ask for a title when simply opening the library.
 Output one tool call only, no prose."""
 
-POLICIES = {"capability": CAPABILITY_POLICY, "library": LIBRARY_POLICY}
+from guide import GUIDE_INSTRUCTION, GUIDE_POLICY  # noqa: E402
+
+POLICIES = {"capability": CAPABILITY_POLICY, "library": LIBRARY_POLICY, "guide": GUIDE_POLICY}
 
 INSTRUCTIONS = {
     "capability": "Use only the supplied tools and IDs. Follow the system policy and preserve user confirmation "
@@ -54,6 +56,7 @@ INSTRUCTIONS = {
                "asking for a title. Only action_object_only evidence requires deciding if the object is a book, "
                "non-book, or unclear. Confirmed book requests with no matched books use open_library. Never "
                "navigate to empty search results.",
+    "guide": GUIDE_INSTRUCTION,
 }
 
 RETRY = "Invalid output. Return exactly ONE tool proposal with the provided schema. No prose or invented values."
@@ -96,7 +99,9 @@ LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 def choice_options(tools):
     """Every tool with each allowed argument combination, lettered A, B, C...
-    The model writes only {"choice": "A"} (~5 tokens instead of ~15-35)."""
+    The model writes only {"choice": "A"} (~5 tokens instead of ~15-35).
+    More than 26 combinations is a caller error (they used to be cut silently,
+    so some tool calls could never be chosen): ValueError."""
     import itertools
     options = []
     for tool in tools:
@@ -104,10 +109,10 @@ def choice_options(tools):
         properties = function["parameters"]["properties"]
         keys = list(properties)
         for values in itertools.product(*[properties[key]["enum"] for key in keys]):
+            if len(options) == len(LETTERS):
+                raise ValueError(f"more than {len(LETTERS)} lettered options (at {function['name']})")
             options.append({"choice": LETTERS[len(options)], "tool": function["name"],
                             "arguments": dict(zip(keys, values)), "description": function["description"]})
-            if len(options) == len(LETTERS):
-                return options
     return options
 
 

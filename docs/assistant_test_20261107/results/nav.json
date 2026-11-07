@@ -1,0 +1,3120 @@
+[
+ {
+  "id": "nav-001",
+  "category": "app",
+  "language": "zh-Hant",
+  "input": "帶我回到一開始那個主頁",
+  "session": "nav-001-rerun",
+  "expected": "navigate capability app.home (首頁)",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。",
+   "elapsed_ms": 32613,
+   "model_calls": 1
+  },
+  "verdict": "FAIL",
+  "note": "No keyword: 主頁 is not in app.home keywords (回首頁,主畫面); search() is substring-only, no semantic fallback. Re-run after the 22:01 FAQ-embedding fix (first run hit embedding timeout); result shown is the re-run."
+ },
+ {
+  "id": "nav-002",
+  "category": "app",
+  "language": "zh-Hant",
+  "input": "我想看看這個App裡面有哪些功能可以用",
+  "session": "nav-002",
+  "expected": "navigate capability app.services (服務總覽)",
+  "observed": {
+   "kind": "capability_list",
+   "action": null,
+   "destination": null,
+   "route": "listing",
+   "language": "zh",
+   "choices": [
+    "首頁",
+    "服務總覽",
+    "優惠",
+    "帳務",
+    "帳號",
+    "設定",
+    "基本資料",
+    "App 起始頁面"
+   ],
+   "message": "App 功能（未串接項目會標示）：\n• 首頁\n• 服務總覽\n• 優惠\n• 帳務\n• 帳號\n• 設定\n• 基本資料\n• App 起始頁面\n可輸入「下一頁」繼續查看。",
+   "elapsed_ms": 0,
+   "model_calls": 0
+  },
+  "verdict": "PASS",
+  "note": "Listing of features (capability_list) answers the need; does not open 服務總覽 tab but user is helped."
+ },
+ {
+  "id": "nav-003",
+  "category": "app",
+  "language": "zh-Hant",
+  "input": "有沒有什麼便宜的好康可以拿",
+  "session": "nav-003-rerun",
+  "expected": "navigate capability app.perks (優惠)",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。",
+   "elapsed_ms": 26972,
+   "model_calls": 1
+  },
+  "verdict": "FAIL",
+  "note": "好康/便宜 not in app.perks keywords (優惠,優惠券,折扣). Re-run after the 22:01 FAQ-embedding fix (first run hit embedding timeout); result shown is the re-run."
+ },
+ {
+  "id": "nav-004",
+  "category": "app",
+  "language": "zh-Hant",
+  "input": "我想看我要繳的錢有哪些",
+  "session": "nav-004-rerun",
+  "expected": "navigate capability app.bills (帳務)",
+  "observed": {
+   "kind": "reply",
+   "action": "request_clarification",
+   "destination": null,
+   "route": "library_model",
+   "language": "zh",
+   "choices": [],
+   "message": "你想先使用哪個服務？可以描述想做的事，或問「有哪些功能」。",
+   "elapsed_ms": 33110,
+   "model_calls": 1
+  },
+  "verdict": "FAIL",
+  "note": "No catalogue hit (繳的錢 not a keyword of app.bills); LIBRARY_CUE matches 看 (workflow.py:28) so the turn goes to the library model, which asks to clarify. Re-run after the 22:01 FAQ-embedding fix (first run hit embedding timeout); result shown is the re-run."
+ },
+ {
+  "id": "nav-005",
+  "category": "app",
+  "language": "zh-Hant",
+  "input": "打開App的時候想讓它直接跳到別的畫面",
+  "session": "nav-005-rerun",
+  "expected": "navigate capability start_page (App 起始頁面)",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。",
+   "elapsed_ms": 29449,
+   "model_calls": 1
+  },
+  "verdict": "FAIL",
+  "note": "No keyword hit for start_page (起始頁,預設頁面,啟動頁). Re-run after the 22:01 FAQ-embedding fix (first run hit embedding timeout); result shown is the re-run."
+ },
+ {
+  "id": "nav-006",
+  "category": "app",
+  "language": "zh-Hant",
+  "input": "把我最常用的那幾個功能放到最上面",
+  "session": "nav-006",
+  "expected": "navigate capability pinned (我的服務與置頂)",
+  "observed": {
+   "kind": "capability_list",
+   "action": null,
+   "destination": null,
+   "route": "intent_listing",
+   "language": "zh",
+   "choices": [
+    "首頁",
+    "服務總覽",
+    "優惠",
+    "帳務",
+    "帳號",
+    "設定",
+    "基本資料",
+    "App 起始頁面"
+   ],
+   "message": "目前助理可以開啟的功能：\n• 首頁\n• 服務總覽\n• 優惠\n• 帳務\n• 帳號\n• 設定\n• 基本資料\n• App 起始頁面\n可輸入「下一頁」繼續查看。",
+   "elapsed_ms": 34293,
+   "model_calls": 1
+  },
+  "verdict": "FAIL",
+  "note": "Intent fallback listed all features instead of opening 我的服務與置頂 (置頂/常用服務 keywords not said; 最常用 != 常用服務)."
+ },
+ {
+  "id": "nav-007",
+  "category": "app",
+  "language": "zh-Hant",
+  "input": "市政府寄給我的通知在哪裡看",
+  "session": "nav-007",
+  "expected": "navigate capability messages (訊息)",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "messages"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「訊息」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 37279,
+   "model_calls": 1
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "nav-008",
+  "category": "app",
+  "language": "zh-Hant",
+  "input": "最近台北有什麼好玩的可以參加",
+  "session": "nav-008-rerun",
+  "expected": "navigate capability activities (活動資訊)",
+  "observed": {
+   "kind": "reply",
+   "action": "faq_answer",
+   "destination": null,
+   "route": "faq_medium",
+   "language": "zh",
+   "choices": [
+    "大巨蛋園區周邊有什麼好逛的?",
+    "如何參加U-Sport臺北樂運動計畫?",
+    "誰可以參加U-Sport臺北樂運動計畫?"
+   ],
+   "message": "你是不是想問以下的問題？請選擇一題，我再顯示答案。本服務僅涵蓋臺北市政府 FAQ。",
+   "elapsed_ms": 30928,
+   "model_calls": 1
+  },
+  "verdict": "FAIL",
+  "note": "活動 not said; FAQ middle band offered 大巨蛋/U-Sport questions instead of 活動資訊. Re-run after the 22:01 FAQ-embedding fix (first run hit embedding timeout); result shown is the re-run."
+ },
+ {
+  "id": "nav-009",
+  "category": "app",
+  "language": "zh-Hant",
+  "input": "我要用手機存發票",
+  "session": "nav-009",
+  "expected": "navigate capability invoice (手機載具)",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "invoice"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「手機載具」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 37689,
+   "model_calls": 1
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "nav-010",
+  "category": "app",
+  "language": "zh-Hant",
+  "input": "這個App很難用我想跟你們抱怨一下",
+  "session": "nav-010-rerun",
+  "expected": "navigate capability feedback (意見回饋)",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。",
+   "elapsed_ms": 32678,
+   "model_calls": 1
+  },
+  "verdict": "FAIL",
+  "note": "抱怨 not in feedback keywords (意見回饋,App問題). Re-run after the 22:01 FAQ-embedding fix (first run hit embedding timeout); result shown is the re-run."
+ },
+ {
+  "id": "nav-011",
+  "category": "app",
+  "language": "zh-Hant",
+  "input": "畫面可以換成英文的嗎",
+  "session": "nav-011",
+  "expected": "navigate capability language (語言)",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "language"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「語言」頁面繼續操作。",
+   "elapsed_ms": 48049,
+   "model_calls": 1
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "nav-012",
+  "category": "app",
+  "language": "zh-Hant",
+  "input": "不要一直跳提醒給我，我想關掉",
+  "session": "nav-012",
+  "expected": "navigate capability notification_settings (通知提醒設定)",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。",
+   "elapsed_ms": 48356,
+   "model_calls": 1
+  },
+  "verdict": "FAIL",
+  "note": "No hit: 提醒開關 / 通知設定 not substrings of 跳提醒...關掉."
+ },
+ {
+  "id": "nav-013",
+  "category": "app",
+  "language": "zh-Hant",
+  "input": "我想看台北市政府最近發布的消息",
+  "session": "nav-013",
+  "expected": "honest not-connected explanation for news (市政新聞)",
+  "observed": {
+   "kind": "reply",
+   "action": "request_clarification",
+   "destination": null,
+   "route": "library_model",
+   "language": "zh",
+   "choices": [],
+   "message": "你想先使用哪個服務？可以描述想做的事，或問「有哪些功能」。",
+   "elapsed_ms": 45307,
+   "model_calls": 1
+  },
+  "verdict": "CONCERN",
+  "note": "no explanation that news is not connected (reply/request_clarification)"
+ },
+ {
+  "id": "nav-014",
+  "category": "app",
+  "language": "zh-Hant",
+  "input": "幫我打電話給市政府客服專線",
+  "session": "nav-014",
+  "expected": "honest not-connected explanation for 1999 (1999)",
+  "observed": {
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "sound_model",
+   "language": "zh",
+   "choices": [
+    "申辦服務"
+   ],
+   "message": "聽起來像是以下服務，你想用哪一個？請先確認。",
+   "elapsed_ms": 43611,
+   "model_calls": 1
+  },
+  "verdict": "FAIL",
+  "note": "Sound fallback offered 申辦服務 for a 1999 call request; never says 1999 is not dialled by the assistant (reason text exists in catalogue). 客服專線 not a 1999 keyword."
+ },
+ {
+  "id": "nav-015",
+  "category": "app",
+  "language": "zh-Hant",
+  "input": "市政議題可以在網路上表決嗎",
+  "session": "nav-015",
+  "expected": "honest not-connected explanation for iVoting (網路投票)",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。",
+   "elapsed_ms": 33388,
+   "model_calls": 1
+  },
+  "verdict": "CONCERN",
+  "note": "no explanation that iVoting is not connected (reply/no_related)"
+ },
+ {
+  "id": "nav-016",
+  "category": "app",
+  "language": "zh-Hant",
+  "input": "我想看台北市的各種統計數字圖表",
+  "session": "nav-016",
+  "expected": "honest not-connected explanation for dashboard (市政資訊儀表板)",
+  "observed": {
+   "kind": "unsupported",
+   "action": null,
+   "destination": null,
+   "route": "unavailable_direct",
+   "language": "zh",
+   "choices": [],
+   "message": "市政資訊儀表板：外部網域連線尚待重新驗證。",
+   "elapsed_ms": 4,
+   "model_calls": 0
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "nav-017",
+  "category": "app",
+  "language": "zh-Hant",
+  "input": "市府有沒有問卷讓我填寫看法",
+  "session": "nav-017",
+  "expected": "honest not-connected explanation for survey (意見調查)",
+  "observed": {
+   "kind": "unsupported",
+   "action": null,
+   "destination": null,
+   "route": "unavailable_direct",
+   "language": "zh",
+   "choices": [],
+   "message": "意見調查：原服務未提供入口。",
+   "elapsed_ms": 8,
+   "model_calls": 0
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "nav-018",
+  "category": "app",
+  "language": "zh-Hant",
+  "input": "我要找我們這裡的里長",
+  "session": "nav-018",
+  "expected": "honest not-connected explanation for neighborhood (里辦服務)",
+  "observed": {
+   "kind": "unsupported",
+   "action": null,
+   "destination": null,
+   "route": "unavailable_direct",
+   "language": "zh",
+   "choices": [],
+   "message": "里辦服務：原服務未提供入口。",
+   "elapsed_ms": 9,
+   "model_calls": 0
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "nav-019",
+  "category": "app",
+  "language": "zh-Hant",
+  "input": "我想預約打流感針",
+  "session": "nav-019",
+  "expected": "honest not-connected explanation for vaccineAppointment (疫苗預約)",
+  "observed": {
+   "kind": "reply",
+   "action": "faq_answer",
+   "destination": null,
+   "route": "faq_medium",
+   "language": "zh",
+   "choices": [
+    "我想具名抽血驗梅毒及愛滋,可預約掛號嗎?",
+    "初診可否預約掛號?初診掛號需持什麼證件?門診所需費用約多少?持殘障手冊、重大傷病卡是否可減免費用?",
+    "請問上次我到聯合醫院林中昆(昆明)院區門診抽血篩檢(愛滋及梅毒.),我想查詢結果?"
+   ],
+   "message": "你是不是想問以下的問題？請選擇一題，我再顯示答案。本服務僅涵蓋臺北市政府 FAQ。",
+   "elapsed_ms": 35552,
+   "model_calls": 1
+  },
+  "verdict": "CONCERN",
+  "note": "no explanation that vaccineAppointment is not connected (reply/faq_answer)"
+ },
+ {
+  "id": "nav-020",
+  "category": "app",
+  "language": "zh-Hant",
+  "input": "幫我在聯合醫院約明天看醫生",
+  "session": "nav-020",
+  "expected": "honest not-connected explanation for medicalAppointment (聯醫掛號)",
+  "observed": {
+   "kind": "reply",
+   "action": "request_clarification",
+   "destination": null,
+   "route": "library_model",
+   "language": "zh",
+   "choices": [],
+   "message": "你想先使用哪個服務？可以描述想做的事，或問「有哪些功能」。",
+   "elapsed_ms": 32411,
+   "model_calls": 1
+  },
+  "verdict": "CONCERN",
+  "note": "掛號/聯醫 not said (聯合醫院 != 聯醫 substring); 看 sends it to the library model, which clarifies. Not harmful but no honest 'not connected' explanation."
+ },
+ {
+  "id": "nav-021",
+  "category": "app",
+  "language": "zh-Hant",
+  "input": "我想聽台北的廣播節目",
+  "session": "nav-021",
+  "expected": "honest not-connected explanation for cityRadio (台北電台)",
+  "observed": {
+   "kind": "unsupported",
+   "action": null,
+   "destination": null,
+   "route": "unavailable_direct",
+   "language": "zh",
+   "choices": [],
+   "message": "台北電台：尚無核對過的播放入口。",
+   "elapsed_ms": 62,
+   "model_calls": 0
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "nav-022",
+  "category": "app",
+  "language": "zh-Hant",
+  "input": "帶小孩去哪裡有室內遊戲空間",
+  "session": "nav-022",
+  "expected": "honest not-connected explanation for familyCenter (親子館)",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。",
+   "elapsed_ms": 26547,
+   "model_calls": 1
+  },
+  "verdict": "CONCERN",
+  "note": "no explanation that familyCenter is not connected (reply/no_related)"
+ },
+ {
+  "id": "nav-023",
+  "category": "app",
+  "language": "zh-Hant",
+  "input": "附近哪裡有樹多可以散步的地方",
+  "session": "nav-023",
+  "expected": "honest not-connected explanation for greenMap (簡單森呼吸)",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。",
+   "elapsed_ms": 54475,
+   "model_calls": 1
+  },
+  "verdict": "CONCERN",
+  "note": "no explanation that greenMap is not connected (reply/no_related)"
+ },
+ {
+  "id": "nav-024",
+  "category": "app",
+  "language": "zh-Hant",
+  "input": "哪裡可以帶我家小狗去散步",
+  "session": "nav-024",
+  "expected": "honest not-connected explanation for petFriendlyMap (寵物安心遛)",
+  "observed": {
+   "kind": "unsupported",
+   "action": null,
+   "destination": null,
+   "route": "unavailable_direct",
+   "language": "zh",
+   "choices": [],
+   "message": "寵物安心遛：原服務未提供入口。",
+   "elapsed_ms": 16,
+   "model_calls": 0
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "nav-025",
+  "category": "app",
+  "language": "zh-Hant",
+  "input": "我要回報家裡水錶的數字",
+  "session": "nav-025",
+  "expected": "honest not-connected explanation for waterMeter (用水服務)",
+  "observed": {
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "sound_model",
+   "language": "zh",
+   "choices": [
+    "用水服務"
+   ],
+   "message": "聽起來像是以下服務，你想用哪一個？請先確認。",
+   "elapsed_ms": 39470,
+   "model_calls": 1
+  },
+  "verdict": "CONCERN",
+  "note": "Sound fallback (水錶 vs 水表) offered the off 用水服務 entry as a choice instead of explaining directly; 水錶 variant missing from keywords/VARIANTS."
+ },
+ {
+  "id": "nav-026",
+  "category": "app",
+  "language": "zh-Hant",
+  "input": "我想知道最近菜價跟物資行情",
+  "session": "nav-026",
+  "expected": "honest not-connected explanation for essentialGoods (民生物資)",
+  "observed": {
+   "kind": "unsupported",
+   "action": null,
+   "destination": null,
+   "route": "unavailable_direct",
+   "language": "zh",
+   "choices": [],
+   "message": "民生物資：原服務未提供資料來源。",
+   "elapsed_ms": 51,
+   "model_calls": 0
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "nav-027",
+  "category": "app",
+  "language": "zh-Hant",
+  "input": "幫我找我附近有什麼地方",
+  "session": "nav-027",
+  "expected": "honest not-connected explanation for locationSearch (找地點)",
+  "observed": {
+   "kind": "reply",
+   "action": "request_clarification",
+   "destination": null,
+   "route": "library_model",
+   "language": "zh",
+   "choices": [],
+   "message": "你想先使用哪個服務？可以描述想做的事，或問「有哪些功能」。",
+   "elapsed_ms": 37955,
+   "model_calls": 1
+  },
+  "verdict": "CONCERN",
+  "note": "no explanation that locationSearch is not connected (reply/request_clarification)"
+ },
+ {
+  "id": "nav-028",
+  "category": "app",
+  "language": "zh-Hant",
+  "input": "木柵那個看動物的地方怎麼逛",
+  "session": "nav-028",
+  "expected": "honest not-connected explanation for zoo (愛遊動物園)",
+  "observed": {
+   "kind": "reply",
+   "action": "request_clarification",
+   "destination": null,
+   "route": "library_model",
+   "language": "zh",
+   "choices": [],
+   "message": "你想先使用哪個服務？可以描述想做的事，或問「有哪些功能」。",
+   "elapsed_ms": 32451,
+   "model_calls": 1
+  },
+  "verdict": "CONCERN",
+  "note": "no explanation that zoo is not connected (reply/request_clarification)"
+ },
+ {
+  "id": "nav-029",
+  "category": "app",
+  "language": "zh-Hant",
+  "input": "我想知道公家機關櫃台現在叫到幾號",
+  "session": "nav-029",
+  "expected": "navigate capability reservation (臨櫃叫號)",
+  "observed": {
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "sound_model",
+   "language": "zh",
+   "choices": [
+    "臨櫃叫號"
+   ],
+   "message": "聽起來像是以下服務，你想用哪一個？請先確認。",
+   "elapsed_ms": 17646,
+   "model_calls": 1
+  },
+  "verdict": "CONCERN",
+  "note": "asked to confirm; expected id among choices"
+ },
+ {
+  "id": "nav-030",
+  "category": "app",
+  "language": "zh-Hant",
+  "input": "古亭那邊辦土地登記的地方現在幾號",
+  "session": "nav-030",
+  "expected": "navigate capability reservation.c-1-1 (古亭地政事務所)",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請補充想使用的服務或操作，也可以問「有哪些功能」。",
+   "elapsed_ms": 15060,
+   "model_calls": 1
+  },
+  "verdict": "FAIL",
+  "note": "Only parent reservation matched (現在幾號); 古亭 alone is not a child keyword (古亭地政 is). Model then asked to clarify instead of opening reservation or the 古亭 office."
+ },
+ {
+  "id": "nav-031",
+  "category": "app",
+  "language": "zh-Hant",
+  "input": "中山區辦土地的事務所排隊到哪了",
+  "session": "nav-031",
+  "expected": "navigate capability reservation.c-1-2 (中山地政事務所)",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "reservation"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「臨櫃叫號」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 20198,
+   "model_calls": 1
+  },
+  "verdict": "CONCERN",
+  "note": "Opened parent 臨櫃叫號, not 中山地政事務所: 中山 + 土地 does not hit keyword 中山地政. One tap away."
+ },
+ {
+  "id": "nav-032",
+  "category": "app",
+  "language": "zh-Hant",
+  "input": "萬華辦身分證的地方排隊狀況",
+  "session": "nav-032",
+  "expected": "navigate capability reservation.c-2-1 (萬華區戶政事務所)",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "reservation"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「臨櫃叫號」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 29935,
+   "model_calls": 1
+  },
+  "verdict": "CONCERN",
+  "note": "Opened parent 臨櫃叫號 not 萬華戶政 (身分證 -> 戶政 is not in keywords)."
+ },
+ {
+  "id": "nav-033",
+  "category": "app",
+  "language": "zh-Hant",
+  "input": "中正區戶口登記那邊現在叫幾號",
+  "session": "nav-033",
+  "expected": "navigate capability reservation.c-2-2 (中正區戶政事務所)",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。",
+   "elapsed_ms": 30476,
+   "model_calls": 1
+  },
+  "verdict": "FAIL",
+  "note": "中正區戶口登記 / 叫幾號 hit nothing (keywords need 戶政, 現在幾號, 叫號)."
+ },
+ {
+  "id": "nav-034",
+  "category": "app",
+  "language": "zh-Hant",
+  "input": "萬華區區公所現在人多嗎要等多久",
+  "session": "nav-034",
+  "expected": "navigate capability reservation.c-3-1 (臺北市萬華區公所)",
+  "observed": {
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "sound_model",
+   "language": "zh",
+   "choices": [
+    "臺北市萬華區公所"
+   ],
+   "message": "聽起來像是以下服務，你想用哪一個？請先確認。",
+   "elapsed_ms": 35202,
+   "model_calls": 1
+  },
+  "verdict": "CONCERN",
+  "note": "asked to confirm; expected id among choices"
+ },
+ {
+  "id": "nav-035",
+  "category": "app",
+  "language": "zh-Hant",
+  "input": "中正區區公所櫃台叫號到幾號",
+  "session": "nav-035",
+  "expected": "navigate capability reservation.c-3-2 (臺北市中正區公所)",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "reservation"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「臨櫃叫號」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 32536,
+   "model_calls": 1
+  },
+  "verdict": "CONCERN",
+  "note": "Opened parent 臨櫃叫號 (叫號); 中正區區公所 does not contain the child keyword 中正區公所 (extra 區), so the specific office was missed."
+ },
+ {
+  "id": "nav-036",
+  "category": "app",
+  "language": "zh-Hant",
+  "input": "萬華繳稅的那個分處現在叫到幾號",
+  "session": "nav-036",
+  "expected": "navigate capability reservation.c-4-1 (稅捐處萬華分處)",
+  "observed": {
+   "kind": "reply",
+   "action": "faq_answer",
+   "destination": null,
+   "route": "faq_medium",
+   "language": "zh",
+   "choices": [
+    "請問臺北市稅捐處萬華分處的電話和地址?"
+   ],
+   "message": "你是不是想問以下的問題？請選擇一題，我再顯示答案。本服務僅涵蓋臺北市政府 FAQ。",
+   "elapsed_ms": 37917,
+   "model_calls": 1
+  },
+  "verdict": "FAIL",
+  "note": "No catalogue hit (萬華分處 not said as written: 萬華...分處); FAQ offered 萬華分處 phone/address question."
+ },
+ {
+  "id": "nav-037",
+  "category": "app",
+  "language": "zh-Hant",
+  "input": "大同區稅務機關排隊狀況",
+  "session": "nav-037",
+  "expected": "navigate capability reservation.c-4-2 (稅捐處大同分處)",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "reservation"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「臨櫃叫號」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 29352,
+   "model_calls": 1
+  },
+  "verdict": "CONCERN",
+  "note": "Opened parent 臨櫃叫號; 大同區稅務 does not contain 大同稅捐/大同分處."
+ },
+ {
+  "id": "nav-038",
+  "category": "app",
+  "language": "zh-Hant",
+  "input": "艋舺找工作的服務站現在幾號",
+  "session": "nav-038",
+  "expected": "navigate capability reservation.c-5-1 (艋舺就業服務站)",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "reservation"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「臨櫃叫號」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 42830,
+   "model_calls": 1
+  },
+  "verdict": "CONCERN",
+  "note": "Opened parent 臨櫃叫號; 艋舺找工作的服務站 does not contain 艋舺就業服務站/就服站."
+ },
+ {
+  "id": "nav-039",
+  "category": "app",
+  "language": "zh-Hant",
+  "input": "西門町找工作的服務站要排多久",
+  "session": "nav-039",
+  "expected": "navigate capability reservation.c-5-2 (西門就業服務站)",
+  "observed": {
+   "kind": "reply",
+   "action": "request_clarification",
+   "destination": null,
+   "route": "library_model",
+   "language": "zh",
+   "choices": [],
+   "message": "你想先使用哪個服務？可以描述想做的事，或問「有哪些功能」。",
+   "elapsed_ms": 39740,
+   "model_calls": 1
+  },
+  "verdict": "FAIL",
+  "note": "西門町找工作 - no keyword; 找 triggers library model (LIBRARY_CUE) which clarifies."
+ },
+ {
+  "id": "nav-040",
+  "category": "account",
+  "language": "zh-Hant",
+  "input": "我想看我自己的會員帳戶",
+  "session": "nav-040",
+  "expected": "navigate capability account (帳號)",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "account"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「帳號」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 35426,
+   "model_calls": 1
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "nav-041",
+  "category": "account",
+  "language": "zh-Hant",
+  "input": "我要調整App的一些選項",
+  "session": "nav-041",
+  "expected": "navigate capability settings (設定)",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請補充想使用的服務或操作，也可以問「有哪些功能」。",
+   "elapsed_ms": 42045,
+   "model_calls": 1
+  },
+  "verdict": "FAIL",
+  "note": "選項 is a feature word of off entries iVoting/survey (capabilities.json features), so those two were the only candidates; model clarified. Settings never retrieved (調整/選項 not keywords)."
+ },
+ {
+  "id": "nav-042",
+  "category": "account",
+  "language": "zh-Hant",
+  "input": "我搬家了要改地址",
+  "session": "nav-042",
+  "expected": "navigate capability profile (基本資料)",
+  "observed": {
+   "kind": "unsupported",
+   "action": null,
+   "destination": null,
+   "route": "unavailable_direct",
+   "language": "zh",
+   "choices": [],
+   "message": "陳情表單預填：原表單尚未提供受控預填與回讀 Adapter；可先開有話要說。",
+   "elapsed_ms": 16,
+   "model_calls": 0
+  },
+  "verdict": "FAIL",
+  "note": "Misleading: 地址 is a keyword of off reportIssue.prefill, so a single exact off match short-circuits to its unsupported reason (workflow.py unavailable_direct) — user wanting to change their address is told about 陳情表單預填. profile has 住址 not 地址."
+ },
+ {
+  "id": "nav-043",
+  "category": "account",
+  "language": "zh-Hant",
+  "input": "哪些服務拿過我的資料我想查一下",
+  "session": "nav-043",
+  "expected": "navigate capability authorization (歷程與授權管理)",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請補充想使用的服務或操作，也可以問「有哪些功能」。",
+   "elapsed_ms": 33966,
+   "model_calls": 1
+  },
+  "verdict": "FAIL",
+  "note": "Retrieval hit profile (我的資料) not authorization; model clarified. 授權/歷程 not said."
+ },
+ {
+  "id": "nav-044",
+  "category": "account",
+  "language": "zh-Hant",
+  "input": "我不想用了，把我的會員註銷掉",
+  "session": "nav-044",
+  "expected": "navigate capability suspend (停用帳號)",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。",
+   "elapsed_ms": 41553,
+   "model_calls": 1
+  },
+  "verdict": "FAIL",
+  "note": "註銷 not a keyword (停用帳號,刪除帳號); also positive_text drops the clause 我不想用了."
+ },
+ {
+  "id": "nav-045",
+  "category": "account",
+  "language": "zh-Hant",
+  "input": "我想用指紋登入",
+  "session": "nav-045",
+  "expected": "honest not-connected explanation for quick_login (快速登入)",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。",
+   "elapsed_ms": 48133,
+   "model_calls": 1
+  },
+  "verdict": "CONCERN",
+  "note": "指紋 not a quick_login keyword (生物辨識 is); generic no_related instead of explaining quick login is not connected."
+ },
+ {
+  "id": "nav-046",
+  "category": "account",
+  "language": "zh-Hant",
+  "input": "我要退出目前登入的身分",
+  "session": "nav-046",
+  "expected": "honest not-connected explanation for logout (登出)",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。",
+   "elapsed_ms": 41007,
+   "model_calls": 1
+  },
+  "verdict": "CONCERN",
+  "note": "退出/登入 not logout keywords; generic no_related."
+ },
+ {
+  "id": "nav-047",
+  "category": "account",
+  "language": "zh-Hant",
+  "input": "我想多綁一張信用卡來扣款",
+  "session": "nav-047",
+  "expected": "honest not-connected explanation for bill_settings (我的帳務設定)",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。",
+   "elapsed_ms": 42626,
+   "model_calls": 1
+  },
+  "verdict": "CONCERN",
+  "note": "No hit for bill_settings; generic no_related."
+ },
+ {
+  "id": "nav-048",
+  "category": "library",
+  "language": "zh-Hant",
+  "input": "我想找一本書來看",
+  "session": "nav-048",
+  "expected": "navigate capability library (圖書借閱)",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_library",
+   "destination": {
+    "kind": "home"
+   },
+   "route": "library_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在圖書借閱頁搜尋想看的書。這裡使用示範資料。",
+   "elapsed_ms": 39305,
+   "model_calls": 1
+  },
+  "verdict": "PASS",
+  "note": "Opened library home (destination kind home) - correct."
+ },
+ {
+  "id": "nav-049",
+  "category": "library",
+  "language": "zh-Hant",
+  "input": "現在圖書館最受歡迎的書是哪幾本",
+  "session": "nav-049",
+  "expected": "navigate capability library.ranking (圖書點閱排行榜)",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_library",
+   "destination": {
+    "kind": "home"
+   },
+   "route": "library_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在圖書借閱頁搜尋想看的書。這裡使用示範資料。",
+   "elapsed_ms": 36747,
+   "model_calls": 1
+  },
+  "verdict": "CONCERN",
+  "note": "Opened library home instead of 排行榜: 最受歡迎 not a ranking keyword (熱門,人氣...)."
+ },
+ {
+  "id": "nav-050",
+  "category": "library",
+  "language": "zh-Hant",
+  "input": "圖書館最近有發布什麼通知嗎",
+  "session": "nav-050",
+  "expected": "navigate capability library.notices (圖書公告)",
+  "observed": {
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [
+    "訊息",
+    "圖書借閱"
+   ],
+   "message": "你想使用哪個功能？請先確認。",
+   "elapsed_ms": 36841,
+   "model_calls": 1
+  },
+  "verdict": "FAIL",
+  "note": "Retrieved messages (通知) and library (圖書) but not library.notices (公告/消息 not said); offered 訊息 vs 圖書借閱."
+ },
+ {
+  "id": "nav-051",
+  "category": "library",
+  "language": "zh-Hant",
+  "input": "我之前在圖書館拿了哪些書",
+  "session": "nav-051",
+  "expected": "navigate capability library.records (我的借閱紀錄)",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_library",
+   "destination": {
+    "kind": "home"
+   },
+   "route": "library_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在圖書借閱頁搜尋想看的書。這裡使用示範資料。",
+   "elapsed_ms": 41338,
+   "model_calls": 1
+  },
+  "verdict": "CONCERN",
+  "note": "Library home instead of 借閱紀錄 (拿了哪些書 is not a records keyword: 借了哪些, 借過)."
+ },
+ {
+  "id": "nav-052",
+  "category": "library",
+  "language": "zh-Hant",
+  "input": "我預定要拿的書到了沒",
+  "session": "nav-052",
+  "expected": "navigate capability library.reservations (圖書預約清單)",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_library",
+   "destination": {
+    "kind": "home"
+   },
+   "route": "library_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在圖書借閱頁搜尋想看的書。這裡使用示範資料。",
+   "elapsed_ms": 38916,
+   "model_calls": 1
+  },
+  "verdict": "CONCERN",
+  "note": "Library home instead of 圖書預約清單 (預定 vs 預約 not handled)."
+ },
+ {
+  "id": "nav-053",
+  "category": "library",
+  "language": "zh-Hant",
+  "input": "離我最近的圖書館在哪裡",
+  "session": "nav-053",
+  "expected": "honest not-connected explanation for library.map (圖書館地圖)",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_library",
+   "destination": {
+    "kind": "home"
+   },
+   "route": "library_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在圖書借閱頁搜尋想看的書。這裡使用示範資料。",
+   "elapsed_ms": 38581,
+   "model_calls": 1
+  },
+  "verdict": "FAIL",
+  "note": "Off entry library.map (圖書館地圖) not retrieved; the library model navigated to library home instead of saying the map is not connected."
+ },
+ {
+  "id": "nav-054",
+  "category": "library",
+  "language": "zh-Hant",
+  "input": "幫我把要去哪間分館拿書先選好",
+  "session": "nav-054",
+  "expected": "honest not-connected explanation for library.prefill (冊次與取書館選擇)",
+  "observed": {
+   "kind": "reply",
+   "action": "request_clarification",
+   "destination": null,
+   "route": "library_model",
+   "language": "zh",
+   "choices": [],
+   "message": "你想先使用哪個服務？可以描述想做的事，或問「有哪些功能」。",
+   "elapsed_ms": 40569,
+   "model_calls": 1
+  },
+  "verdict": "CONCERN",
+  "note": "Library model asked to clarify; no mention that 取書館預填 is not available (can select on book page)."
+ },
+ {
+  "id": "nav-055",
+  "category": "fees",
+  "language": "zh-Hant",
+  "input": "我上個月到底付過哪些費用",
+  "session": "nav-055",
+  "expected": "navigate capability fees.history (帳務紀錄)",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "fees.history"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「帳務紀錄」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 39035,
+   "model_calls": 1
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "nav-056",
+  "category": "fees",
+  "language": "zh-Hant",
+  "input": "我拿手機拍帳單上的條碼來付錢",
+  "session": "nav-056",
+  "expected": "navigate capability fees.scan (掃描繳費)",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "app.bills"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「帳務」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 29836,
+   "model_calls": 1
+  },
+  "verdict": "CONCERN",
+  "note": "Opened parent 帳務 tab, not 掃描繳費 (掃描/掃帳單 not said; 條碼 missing)."
+ },
+ {
+  "id": "nav-057",
+  "category": "fees",
+  "language": "zh-Hant",
+  "input": "路邊停車單要在哪裡付",
+  "session": "nav-057",
+  "expected": "navigate capability fees.parking (停車費)",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "fees.parking"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「停車費」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 32815,
+   "model_calls": 1
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "nav-058",
+  "category": "fees",
+  "language": "zh-Hant",
+  "input": "自來水帳單要繳",
+  "session": "nav-058",
+  "expected": "navigate capability fees.water (水費)",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "fees.water"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「水費」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 30954,
+   "model_calls": 1
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "nav-059",
+  "category": "fees",
+  "language": "zh-Hant",
+  "input": "我的房屋稅要去哪裡繳",
+  "session": "nav-059",
+  "expected": "navigate capability fees.tax (地方稅)",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "fees.tax"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「地方稅」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 26432,
+   "model_calls": 1
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "nav-060",
+  "category": "fees",
+  "language": "zh-Hant",
+  "input": "小孩學校開學要繳的錢",
+  "session": "nav-060",
+  "expected": "navigate capability fees.tuition (學雜費)",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。",
+   "elapsed_ms": 43362,
+   "model_calls": 1
+  },
+  "verdict": "FAIL",
+  "note": "學費/學雜/註冊 not said; 開學要繳的錢 has no pay_word for fees.tuition."
+ },
+ {
+  "id": "nav-061",
+  "category": "fees",
+  "language": "zh-Hant",
+  "input": "我住社會住宅要繳房租",
+  "session": "nav-061",
+  "expected": "navigate capability fees.housing (國／社宅租金維管費)",
+  "observed": {
+   "kind": "reply",
+   "action": "faq_answer",
+   "destination": null,
+   "route": "faq_medium",
+   "language": "zh",
+   "choices": [
+    "承租社會住宅資格為何?",
+    "如何承租社會住宅?"
+   ],
+   "message": "你是不是想問以下的問題？請選擇一題，我再顯示答案。本服務僅涵蓋臺北市政府 FAQ。",
+   "elapsed_ms": 28542,
+   "model_calls": 1
+  },
+  "verdict": "FAIL",
+  "note": "pay_words 社宅/租金 are not substrings of 社會住宅/房租; FAQ offered eligibility questions instead of the rent payment page."
+ },
+ {
+  "id": "nav-062",
+  "category": "fees",
+  "language": "zh-Hant",
+  "input": "我要付在聯合醫院看病的錢",
+  "session": "nav-062",
+  "expected": "navigate capability fees.hospital (聯醫醫療費)",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "fees.hospital"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「聯醫醫療費」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 25971,
+   "model_calls": 1
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "nav-063",
+  "category": "fees",
+  "language": "zh-Hant",
+  "input": "平價住宅每個月的管理費要繳",
+  "session": "nav-063",
+  "expected": "navigate capability fees.maintenance (平價住宅維護費)",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "fees.maintenance"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「平價住宅維護費」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 29800,
+   "model_calls": 1
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "nav-064",
+  "category": "fees",
+  "language": "zh-Hant",
+  "input": "我報名了公務人員訓練處的課要付費",
+  "session": "nav-064",
+  "expected": "navigate capability fees.course (公訓處自費課程)",
+  "observed": {
+   "kind": "unsupported",
+   "action": null,
+   "destination": null,
+   "route": "unavailable_direct",
+   "language": "zh",
+   "choices": [],
+   "message": "親子館：原服務未提供入口。",
+   "elapsed_ms": 7,
+   "model_calls": 0
+  },
+  "verdict": "FAIL",
+  "note": "Misleading: 報名 is a feature word of off familyCenter; the lone feature-only match (score 2) triggered unavailable_direct and told the user 親子館 is not available. pay_word 課程 not matched (text says 課)."
+ },
+ {
+  "id": "nav-065",
+  "category": "fees",
+  "language": "zh-Hant",
+  "input": "我要繳一筆不在上面分類裡的費用",
+  "session": "nav-065",
+  "expected": "navigate capability fees.other (其他繳費)",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請補充想使用的服務或操作，也可以問「有哪些功能」。",
+   "elapsed_ms": 32912,
+   "model_calls": 1
+  },
+  "verdict": "FAIL",
+  "note": "Only reportIssue matched via feature word 分類 (score 2); model clarified. 其他繳費 not reachable by paraphrase."
+ },
+ {
+  "id": "nav-066",
+  "category": "fees",
+  "language": "zh-Hant",
+  "input": "我不知道要繳的費用叫什麼，幫我查一下",
+  "session": "nav-066",
+  "expected": "navigate capability fees.search (繳費查詢)",
+  "observed": {
+   "kind": "reply",
+   "action": "faq_answer",
+   "destination": null,
+   "route": "faq_medium",
+   "language": "zh",
+   "choices": [
+    "我已繳納地方稅費用,為何無法查詢/申請繳納證明?",
+    "我使用pay.taipei網站,如何查詢繳費紀錄?",
+    "【校園繳費】如何繳費?提供何種繳費方式?"
+   ],
+   "message": "你是不是想問以下的問題？請選擇一題，我再顯示答案。本服務僅涵蓋臺北市政府 FAQ。",
+   "elapsed_ms": 27029,
+   "model_calls": 1
+  },
+  "verdict": "FAIL",
+  "note": "繳費查詢 not said as written; FAQ choices instead of 繳費查詢 page."
+ },
+ {
+  "id": "nav-067",
+  "category": "police",
+  "language": "zh-Hant",
+  "input": "我要找警察局的服務",
+  "session": "nav-067",
+  "expected": "navigate capability police (警政服務)",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "police"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「警政服務」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 22369,
+   "model_calls": 1
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "nav-068",
+  "category": "police",
+  "language": "zh-Hant",
+  "input": "我的機車被偷了想在網路上報警",
+  "session": "nav-068",
+  "expected": "navigate capability police.online (線上報案)",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "police"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「警政服務」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 10203,
+   "model_calls": 1
+  },
+  "verdict": "CONCERN",
+  "note": "Opened parent 警政服務, not 線上報案 (網路上報警 does not contain 網路報案/線上報案)."
+ },
+ {
+  "id": "nav-069",
+  "category": "police",
+  "language": "zh-Hant",
+  "input": "我之前報過的案子清單在哪看",
+  "session": "nav-069",
+  "expected": "navigate capability police.records (報案紀錄)",
+  "observed": {
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [
+    "申辦案件進度",
+    "陳情案件進度",
+    "災情案件進度",
+    "警政案件進度"
+   ],
+   "message": "你想使用哪個功能？請先確認。",
+   "elapsed_ms": 11637,
+   "model_calls": 1
+  },
+  "verdict": "CONCERN",
+  "note": "案子 is a shared keyword of all four *.progress entries (incl. the off disaster one); user must choose. 警政案件進度 opens the same /police-report/record page, so the right page is reachable; police.records itself was not retrieved."
+ },
+ {
+  "id": "nav-070",
+  "category": "police",
+  "language": "zh-Hant",
+  "input": "我報警的那個案子警察處理得怎樣了",
+  "session": "nav-070",
+  "expected": "navigate capability police.progress (警政案件進度)",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "police.progress"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「警政案件進度」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 15780,
+   "model_calls": 1
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "nav-071",
+  "category": "districtOffice",
+  "language": "zh-Hant",
+  "input": "我要在網路上辦區公所的事情",
+  "session": "nav-071",
+  "expected": "navigate capability districtOffice (申辦服務)",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。",
+   "elapsed_ms": 26278,
+   "model_calls": 1
+  },
+  "verdict": "FAIL",
+  "note": "申辦/申請 not said; 區公所 not a districtOffice keyword."
+ },
+ {
+  "id": "nav-072",
+  "category": "districtOffice",
+  "language": "zh-Hant",
+  "input": "我上次送出的申請辦好了沒",
+  "session": "nav-072",
+  "expected": "navigate capability districtOffice.progress (申辦案件進度)",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "districtOffice.progress"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「申辦案件進度」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 16143,
+   "model_calls": 1
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "nav-073",
+  "category": "districtOffice",
+  "language": "zh-Hant",
+  "input": "我收到台北市的超速單，覺得不合理想要申訴",
+  "session": "nav-073",
+  "expected": "navigate capability districtOffice.form.a-1 (裁決所受理之申訴案件(本市))",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "reportIssue"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「有話要說」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 10184,
+   "model_calls": 1
+  },
+  "verdict": "FAIL",
+  "note": "Wrong service: 申訴 is a reportIssue keyword, so 超速單申訴 opened 有話要說 instead of the 裁決所 traffic-ticket appeal form a-1 (keywords need 罰單申訴/交通違規申訴)."
+ },
+ {
+  "id": "nav-074",
+  "category": "districtOffice",
+  "language": "zh-Hant",
+  "input": "我在新北被開了交通罰單想申訴",
+  "session": "nav-074",
+  "expected": "navigate capability districtOffice.form.a-2 (裁決所受理之申訴案件(外縣市))",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請補充想使用的服務或操作，也可以問「有哪些功能」。",
+   "elapsed_ms": 11418,
+   "model_calls": 1
+  },
+  "verdict": "FAIL",
+  "note": "Only reportIssue matched (申訴); 罰單想申訴 is not a substring of 罰單申訴/外縣市罰單申訴. Model then clarified instead of offering anything."
+ },
+ {
+  "id": "nav-075",
+  "category": "districtOffice",
+  "language": "zh-Hant",
+  "input": "停車開單開錯了我要抗議",
+  "session": "nav-075",
+  "expected": "navigate capability districtOffice.form.a-3 (停管處受理之申訴案件)",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。",
+   "elapsed_ms": 11942,
+   "model_calls": 1
+  },
+  "verdict": "FAIL",
+  "note": "停車開單 ... 抗議: no keyword (停車罰單申訴)."
+ },
+ {
+  "id": "nav-076",
+  "category": "districtOffice",
+  "language": "zh-Hant",
+  "input": "警察開給我的紅單我不服",
+  "session": "nav-076",
+  "expected": "navigate capability districtOffice.form.b-1 (本市警察局受理之違規申訴案件)",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請補充想使用的服務或操作，也可以問「有哪些功能」。",
+   "elapsed_ms": 16927,
+   "model_calls": 1
+  },
+  "verdict": "FAIL",
+  "note": "Only police matched (警察); 紅單 not a b-1 keyword. Model clarified."
+ },
+ {
+  "id": "nav-077",
+  "category": "districtOffice",
+  "language": "zh-Hant",
+  "input": "我爸七十歲了健保費可以補助嗎",
+  "session": "nav-077",
+  "expected": "navigate capability districtOffice.form.c-1 (老人全民健康保險保險費自付額補助)",
+  "observed": {
+   "kind": "reply",
+   "action": "faq_answer",
+   "destination": null,
+   "route": "faq_medium",
+   "language": "zh",
+   "choices": [
+    "我已經超過65歲,怎麼沒老人健保補助(還在繳健保費)?",
+    "我知道有老人健保補助,退休後如果依附子女加保還會被補助嗎?",
+    "我原本設籍臺北市二三十年,有事暫時遷出沒過幾天就再遷回來,這樣就沒老人健保補助嗎?"
+   ],
+   "message": "你是不是想問以下的問題？請選擇一題，我再顯示答案。本服務僅涵蓋臺北市政府 FAQ。",
+   "elapsed_ms": 10850,
+   "model_calls": 1
+  },
+  "verdict": "FAIL",
+  "note": "No keyword hit (老人健保補助 not said); FAQ choices about 老人健保補助 eligibility are relevant but no form page."
+ },
+ {
+  "id": "nav-078",
+  "category": "districtOffice",
+  "language": "zh-Hant",
+  "input": "遭受性侵的受害者可以申請什麼補助",
+  "session": "nav-078",
+  "expected": "navigate capability districtOffice.form.c-2 (臺北市性侵害被害人補助)",
+  "observed": {
+   "kind": "reply",
+   "action": "faq_answer",
+   "destination": null,
+   "route": "faq_medium",
+   "language": "zh",
+   "choices": [
+    "勞工遭遇職業災害致身體遺存障害,必需使用輔助器具者,可否申請補助?",
+    "勞工保險被保險人發生職業災害成殘後可申請何種補助?",
+    "申請特殊境遇家庭扶助,各項補助申請期限為何?"
+   ],
+   "message": "你是不是想問以下的問題？請選擇一題，我再顯示答案。本服務僅涵蓋臺北市政府 FAQ。",
+   "elapsed_ms": 10381,
+   "model_calls": 1
+  },
+  "verdict": "FAIL",
+  "note": "No hit; FAQ choices irrelevant (labour accident subsidies) for a sexual-assault victim - poor and sensitive."
+ },
+ {
+  "id": "nav-079",
+  "category": "districtOffice",
+  "language": "zh-Hant",
+  "input": "我被另一半打，可以申請什麼經濟補助",
+  "session": "nav-079",
+  "expected": "navigate capability districtOffice.form.c-3 (臺北市家庭暴力被害人補助)",
+  "observed": {
+   "kind": "reply",
+   "action": "faq_answer",
+   "destination": null,
+   "route": "faq_medium",
+   "language": "zh",
+   "choices": [
+    "弱勢家庭可以申請哪些經濟補助?",
+    "勞工遭遇職業災害致身體遺存障害,必需使用輔助器具者,可否申請補助?",
+    "新住民有哪些經濟補助?"
+   ],
+   "message": "你是不是想問以下的問題？請選擇一題，我再顯示答案。本服務僅涵蓋臺北市政府 FAQ。",
+   "elapsed_ms": 4460,
+   "model_calls": 1
+  },
+  "verdict": "FAIL",
+  "note": "家暴 not said literally; FAQ choices generic. Sensitive case - should reach c-3 form."
+ },
+ {
+  "id": "nav-080",
+  "category": "districtOffice",
+  "language": "zh-Hant",
+  "input": "單親又遭受家暴的家庭扶助怎麼申請",
+  "session": "nav-080",
+  "expected": "navigate capability districtOffice.form.c-4 (特殊境遇家庭扶助之家庭暴力被害人補助)",
+  "observed": {
+   "kind": "reply",
+   "action": "faq_answer",
+   "destination": null,
+   "route": "faq_medium",
+   "language": "zh",
+   "choices": [
+    "特殊境遇家庭扶助申請表格要去哪裡索取?",
+    "申請特殊境遇家庭扶助應具備什麼條件?",
+    "已有低收入戶資格,可否申請特殊境遇家庭扶助?"
+   ],
+   "message": "你是不是想問以下的問題？請選擇一題，我再顯示答案。本服務僅涵蓋臺北市政府 FAQ。",
+   "elapsed_ms": 4952,
+   "model_calls": 1
+  },
+  "verdict": "FAIL",
+  "note": "Neither 家暴補助 nor 特殊境遇家庭扶助 matched exactly (家暴的家庭扶助); FAQ offered 特殊境遇 questions."
+ },
+ {
+  "id": "nav-081",
+  "category": "districtOffice",
+  "language": "zh-Hant",
+  "input": "身障者社會保險費補助要改成別的方式",
+  "session": "nav-081",
+  "expected": "navigate capability districtOffice.form.c-5 (臺北市身心障礙者參加社會保險保險費補助方式變更)",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。",
+   "elapsed_ms": 6298,
+   "model_calls": 1
+  },
+  "verdict": "FAIL",
+  "note": "did not open districtOffice.form.c-5 (reply/no_related)"
+ },
+ {
+  "id": "nav-082",
+  "category": "districtOffice",
+  "language": "zh-Hant",
+  "input": "我是原住民家裡突然出事需要急用的慰問金",
+  "session": "nav-082",
+  "expected": "navigate capability districtOffice.form.d-1 (原住民急難關懷慰問金)",
+  "observed": {
+   "kind": "reply",
+   "action": "faq_answer",
+   "destination": null,
+   "route": "faq_medium",
+   "language": "zh",
+   "choices": [
+    "請問家裡若突然發生變故(例如家人生重病、過世...等),可以申請急難救助嗎?"
+   ],
+   "message": "你是不是想問以下的問題？請選擇一題，我再顯示答案。本服務僅涵蓋臺北市政府 FAQ。",
+   "elapsed_ms": 6071,
+   "model_calls": 1
+  },
+  "verdict": "FAIL",
+  "note": "did not open districtOffice.form.d-1 (reply/faq_answer)"
+ },
+ {
+  "id": "nav-083",
+  "category": "districtOffice",
+  "language": "zh-Hant",
+  "input": "原住民考到技術士證照有獎金嗎",
+  "session": "nav-083",
+  "expected": "navigate capability districtOffice.form.d-2 (原住民參加技術士技能檢定獎勵金申請)",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。",
+   "elapsed_ms": 6520,
+   "model_calls": 1
+  },
+  "verdict": "FAIL",
+  "note": "did not open districtOffice.form.d-2 (reply/no_related)"
+ },
+ {
+  "id": "nav-084",
+  "category": "reportIssue",
+  "language": "zh-Hant",
+  "input": "我家附近工地太吵我要向市政府反應",
+  "session": "nav-084",
+  "expected": "navigate capability reportIssue (有話要說)",
+  "observed": {
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "sound_model",
+   "language": "zh",
+   "choices": [
+    "有話要說"
+   ],
+   "message": "聽起來像是以下服務，你想用哪一個？請先確認。",
+   "elapsed_ms": 5579,
+   "model_calls": 1
+  },
+  "verdict": "CONCERN",
+  "note": "No exact hit (反應 vs keyword 反映); sound fallback offered 有話要說 for confirmation. Clear intent, extra step."
+ },
+ {
+  "id": "nav-085",
+  "category": "reportIssue",
+  "language": "zh-Hant",
+  "input": "我向市府陳情的事情現在處理到哪",
+  "session": "nav-085",
+  "expected": "navigate capability reportIssue.progress (陳情案件進度)",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "reportIssue.progress"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「陳情案件進度」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 3871,
+   "model_calls": 1
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "nav-086",
+  "category": "reportIssue",
+  "language": "zh-Hant",
+  "input": "可以跟市府投訴哪些類型的問題",
+  "session": "nav-086",
+  "expected": "navigate capability reportIssue.list (陳情分類)",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "reportIssue"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「有話要說」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 4074,
+   "model_calls": 1
+  },
+  "verdict": "CONCERN",
+  "note": "Opened parent 有話要說, not 陳情分類 list."
+ },
+ {
+  "id": "nav-087",
+  "category": "reportIssue",
+  "language": "zh-Hant",
+  "input": "幫我把陳情內容先填好地址跟描述",
+  "session": "nav-087",
+  "expected": "honest not-connected explanation for reportIssue.prefill (陳情表單預填)",
+  "observed": {
+   "kind": "unsupported",
+   "action": null,
+   "destination": null,
+   "route": "unavailable_direct",
+   "language": "zh",
+   "choices": [],
+   "message": "陳情表單預填：原表單尚未提供受控預填與回讀 Adapter；可先開有話要說。",
+   "elapsed_ms": 3,
+   "model_calls": 0
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "nav-088",
+  "category": "disasterReport",
+  "language": "zh-Hant",
+  "input": "颱風過後我家這邊有災害要回報",
+  "session": "nav-088",
+  "expected": "navigate capability disasterReport (災情通報)",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。",
+   "elapsed_ms": 6775,
+   "model_calls": 1
+  },
+  "verdict": "FAIL",
+  "note": "災害要回報 does not contain 災情/災害通報."
+ },
+ {
+  "id": "nav-089",
+  "category": "disasterReport",
+  "language": "zh-Hant",
+  "input": "我通報的災情處理到哪了",
+  "session": "nav-089",
+  "expected": "honest not-connected explanation for disasterReport.progress (災情案件進度)",
+  "observed": {
+   "kind": "unsupported",
+   "action": null,
+   "destination": null,
+   "route": "unavailable_direct",
+   "language": "zh",
+   "choices": [],
+   "message": "災情案件進度：原示範資料尚無可核對的案件查詢接口。",
+   "elapsed_ms": 7,
+   "model_calls": 0
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "nav-090",
+  "category": "disasterReport",
+  "language": "zh-Hant",
+  "input": "颱風把電線吹斷掛在路上",
+  "session": "nav-090",
+  "expected": "navigate capability disasterReport.form.D-1-1 (電線(桿)或纜線受損)",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。",
+   "elapsed_ms": 6357,
+   "model_calls": 1
+  },
+  "verdict": "FAIL",
+  "note": "電線吹斷 vs keyword 電線斷了 - substring miss; no_related. Safety-relevant (downed power line)."
+ },
+ {
+  "id": "nav-091",
+  "category": "disasterReport",
+  "language": "zh-Hant",
+  "input": "附近的變電站淹水了",
+  "session": "nav-091",
+  "expected": "navigate capability disasterReport.form.D-1-2 (變電所、電廠受災)",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "disasterReport"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「災情通報」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 4010,
+   "model_calls": 1
+  },
+  "verdict": "CONCERN",
+  "note": "淹水 hit parent disasterReport; 變電站 vs keyword 變電所 missed the specific form."
+ },
+ {
+  "id": "nav-092",
+  "category": "disasterReport",
+  "language": "zh-Hant",
+  "input": "巷口的燈晚上都不會亮",
+  "session": "nav-092",
+  "expected": "navigate capability disasterReport.form.D-1-3 (路燈故障)",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。",
+   "elapsed_ms": 5525,
+   "model_calls": 1
+  },
+  "verdict": "FAIL",
+  "note": "燈...不會亮 - keyword is 路燈不亮; substring miss."
+ },
+ {
+  "id": "nav-093",
+  "category": "disasterReport",
+  "language": "zh-Hant",
+  "input": "我們整條街都沒有電",
+  "session": "nav-093",
+  "expected": "navigate capability disasterReport.form.D-1-4 (電力停電)",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。",
+   "elapsed_ms": 6075,
+   "model_calls": 1
+  },
+  "verdict": "FAIL",
+  "note": "沒有電 vs keyword 沒電了/停電."
+ },
+ {
+  "id": "nav-094",
+  "category": "disasterReport",
+  "language": "zh-Hant",
+  "input": "大水把橋下面的基座沖壞了",
+  "session": "nav-094",
+  "expected": "navigate capability disasterReport.form.D-2-1 (橋樑基礎沖刷)",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。",
+   "elapsed_ms": 6430,
+   "model_calls": 1
+  },
+  "verdict": "FAIL",
+  "note": "did not open disasterReport.form.D-2-1 (reply/no_related)"
+ },
+ {
+  "id": "nav-095",
+  "category": "disasterReport",
+  "language": "zh-Hant",
+  "input": "河上的橋整個垮掉了",
+  "session": "nav-095",
+  "expected": "navigate capability disasterReport.form.D-2-2 (橋樑斷裂)",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。",
+   "elapsed_ms": 6119,
+   "model_calls": 1
+  },
+  "verdict": "FAIL",
+  "note": "did not open disasterReport.form.D-2-2 (reply/no_related)"
+ },
+ {
+  "id": "nav-096",
+  "category": "disasterReport",
+  "language": "zh-Hant",
+  "input": "橋面裂開有個大洞",
+  "session": "nav-096",
+  "expected": "navigate capability disasterReport.form.D-2-3 (前述以外之橋梁災情)",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。",
+   "elapsed_ms": 6660,
+   "model_calls": 1
+  },
+  "verdict": "FAIL",
+  "note": "did not open disasterReport.form.D-2-3 (reply/no_related)"
+ },
+ {
+  "id": "nav-097",
+  "category": "disasterReport",
+  "language": "zh-Hant",
+  "input": "山上泥漿和石頭一起衝下來",
+  "session": "nav-097",
+  "expected": "navigate capability disasterReport.form.D-3-1 (土石流)",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。",
+   "elapsed_ms": 6376,
+   "model_calls": 1
+  },
+  "verdict": "FAIL",
+  "note": "did not open disasterReport.form.D-3-1 (reply/no_related)"
+ },
+ {
+  "id": "nav-098",
+  "category": "disasterReport",
+  "language": "zh-Hant",
+  "input": "山坡上的石頭掉到馬路上",
+  "session": "nav-098",
+  "expected": "navigate capability disasterReport.form.D-3-2 (土石崩落)",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。",
+   "elapsed_ms": 7126,
+   "model_calls": 1
+  },
+  "verdict": "FAIL",
+  "note": "did not open disasterReport.form.D-3-2 (reply/no_related)"
+ },
+ {
+  "id": "nav-099",
+  "category": "disasterReport",
+  "language": "zh-Hant",
+  "input": "山崩把河道堵住形成一個湖",
+  "session": "nav-099",
+  "expected": "navigate capability disasterReport.form.D-3-3 (堰塞湖)",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "disasterReport.form.D-3-2"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「土石崩落」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 4430,
+   "model_calls": 1
+  },
+  "verdict": "FAIL",
+  "note": "山崩 is a D-3-2 keyword so 堰塞湖 (D-3-3) request opened 土石崩落 form."
+ },
+ {
+  "id": "nav-100",
+  "category": "disasterReport",
+  "language": "zh-Hant",
+  "input": "對面公寓燒起來了",
+  "session": "nav-100",
+  "expected": "navigate capability disasterReport.form.D-4-1 (建築物火災)",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。",
+   "elapsed_ms": 6588,
+   "model_calls": 1
+  },
+  "verdict": "FAIL",
+  "note": "Fire in progress: no hit (燒起來 not a keyword), generic no_related mentioning only 1999 - no 119 emergency advice. Safety concern."
+ },
+ {
+  "id": "nav-101",
+  "category": "disasterReport",
+  "language": "zh-Hant",
+  "input": "瓦斯桶爆炸起火",
+  "session": "nav-101",
+  "expected": "navigate capability disasterReport.form.D-4-2 (危險物品火災)",
+  "observed": {
+   "kind": "reply",
+   "action": "faq_answer",
+   "destination": null,
+   "route": "faq_medium",
+   "language": "zh",
+   "choices": [
+    "現場有聞到瓦斯氣體外洩、瓦斯管線或鋼瓶有冒出火光、火花、爆炸聲,該如何處理?",
+    "懷疑瓦斯行超量儲存或經常違規停放載滿瓦斯桶的貨車,有危害公安之虞,要如何檢舉?",
+    "有店家於防火巷擺放瓦斯鋼瓶(桶)、堆積雜物及垃圾,影響公共安全。"
+   ],
+   "message": "你是不是想問以下的問題？請選擇一題，我再顯示答案。本服務僅涵蓋臺北市政府 FAQ。",
+   "elapsed_ms": 6192,
+   "model_calls": 1
+  },
+  "verdict": "FAIL",
+  "note": "Gas cylinder fire: FAQ choices, no disaster form, no 119 advice. Safety concern."
+ },
+ {
+  "id": "nav-102",
+  "category": "disasterReport",
+  "language": "zh-Hant",
+  "input": "工業區的廠房冒出大火",
+  "session": "nav-102",
+  "expected": "navigate capability disasterReport.form.D-4-3 (工廠火災)",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。",
+   "elapsed_ms": 6201,
+   "model_calls": 1
+  },
+  "verdict": "FAIL",
+  "note": "Factory fire (廠房 vs 工廠) - no_related, no 119 advice."
+ },
+ {
+  "id": "nav-103",
+  "category": "disasterReport",
+  "language": "zh-Hant",
+  "input": "路邊的垃圾堆著火了",
+  "session": "nav-103",
+  "expected": "navigate capability disasterReport.form.D-4-4 (其他(前述以外火災))",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。",
+   "elapsed_ms": 6966,
+   "model_calls": 1
+  },
+  "verdict": "FAIL",
+  "note": "著火 not a keyword; no_related, no 119 advice."
+ },
+ {
+  "id": "nav-104",
+  "category": "qna",
+  "language": "zh-Hant",
+  "input": "大家常問的問題在哪裡看",
+  "session": "nav-104",
+  "expected": "navigate capability qna (常見問答)",
+  "observed": {
+   "kind": "reply",
+   "action": "request_clarification",
+   "destination": null,
+   "route": "library_model",
+   "language": "zh",
+   "choices": [],
+   "message": "你想先使用哪個服務？可以描述想做的事，或問「有哪些功能」。",
+   "elapsed_ms": 5907,
+   "model_calls": 1
+  },
+  "verdict": "FAIL",
+  "note": "常問的問題 not 常見問題; 看 sends it to the library model which clarifies."
+ },
+ {
+  "id": "nav-105",
+  "category": "qna",
+  "language": "zh-Hant",
+  "input": "我想按照主題分類看所有的問答",
+  "session": "nav-105",
+  "expected": "navigate capability qna.categories (常見問答分類)",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "qna"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「常見問答」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 4610,
+   "model_calls": 1
+  },
+  "verdict": "CONCERN",
+  "note": "Opened parent 常見問答 not 分類 (問答分類 not said literally)."
+ },
+ {
+  "id": "nav-106",
+  "category": "subscription/wallet/coupon",
+  "language": "zh-Hant",
+  "input": "有哪些折價券可以用",
+  "session": "nav-106",
+  "expected": "navigate capability coupon.list (優惠列表)",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。",
+   "elapsed_ms": 10850,
+   "model_calls": 1
+  },
+  "verdict": "FAIL",
+  "note": "折價券 not in coupon/perks keywords (優惠券,折扣)."
+ },
+ {
+  "id": "nav-107",
+  "category": "subscription/wallet/coupon",
+  "language": "zh-Hant",
+  "input": "我買的票存在哪裡",
+  "session": "nav-107",
+  "expected": "navigate capability wallet (票夾)",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。",
+   "elapsed_ms": 6230,
+   "model_calls": 1
+  },
+  "verdict": "FAIL",
+  "note": "票 alone not a wallet keyword (票夾,我的票券,取票)."
+ },
+ {
+  "id": "nav-108",
+  "category": "subscription/wallet/coupon",
+  "language": "zh-Hant",
+  "input": "我訂了哪些服務",
+  "session": "nav-108",
+  "expected": "navigate capability subscription (訂閱總覽)",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。",
+   "elapsed_ms": 5679,
+   "model_calls": 1
+  },
+  "verdict": "FAIL",
+  "note": "訂了 vs 訂閱 - no hit."
+ },
+ {
+  "id": "nav-109",
+  "category": "subscription/wallet/coupon",
+  "language": "zh-Hant",
+  "input": "我訂的每一項東西的細節",
+  "session": "nav-109",
+  "expected": "navigate capability subscription.items (訂閱項目)",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。",
+   "elapsed_ms": 5770,
+   "model_calls": 1
+  },
+  "verdict": "FAIL",
+  "note": "No hit."
+ },
+ {
+  "id": "nav-110",
+  "category": "fees",
+  "language": "zh-Hant",
+  "input": "聯醫醫療費",
+  "session": "nav-110",
+  "expected": "navigate capability fees.hospital (聯醫醫療費) [literal]",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "fees.hospital"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「聯醫醫療費」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 3355,
+   "model_calls": 1
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "nav-111",
+  "category": "fees",
+  "language": "zh-Hant",
+  "input": "國／社宅租金維管費",
+  "session": "nav-111",
+  "expected": "navigate capability fees.housing (國／社宅租金維管費) [literal]",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "fees.housing"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「國／社宅租金維管費」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 4120,
+   "model_calls": 1
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "nav-112",
+  "category": "fees",
+  "language": "zh-Hant",
+  "input": "公訓處自費課程",
+  "session": "nav-112",
+  "expected": "navigate capability fees.course (公訓處自費課程) [literal]",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "fees.course"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「公訓處自費課程」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 3817,
+   "model_calls": 1
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "nav-113",
+  "category": "fees",
+  "language": "zh-Hant",
+  "input": "其他繳費",
+  "session": "nav-113",
+  "expected": "navigate capability fees.other (其他繳費) [literal]",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "fees.other"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「其他繳費」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 4029,
+   "model_calls": 1
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "nav-114",
+  "category": "fees",
+  "language": "zh-Hant",
+  "input": "繳稅",
+  "session": "nav-114",
+  "expected": "navigate capability fees.tax (地方稅) [literal]",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "fees.tax"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「地方稅」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 12803,
+   "model_calls": 1
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "nav-115",
+  "category": "app",
+  "language": "zh-Hant",
+  "input": "意見回饋",
+  "session": "nav-115",
+  "expected": "navigate capability feedback (意見回饋) [literal]",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "feedback"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「意見回饋」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 18535,
+   "model_calls": 1
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "nav-116",
+  "category": "app",
+  "language": "zh-Hant",
+  "input": "手機載具",
+  "session": "nav-116",
+  "expected": "navigate capability invoice (手機載具) [literal]",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "invoice"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「手機載具」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 32412,
+   "model_calls": 1
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "nav-117",
+  "category": "account",
+  "language": "zh-Hant",
+  "input": "授權管理",
+  "session": "nav-117",
+  "expected": "navigate capability authorization (歷程與授權管理) [literal]",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "authorization"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「歷程與授權管理」頁面繼續操作。目前只有示範內容，暫時無法查看實際紀錄或管理授權。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 22131,
+   "model_calls": 1
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "nav-118",
+  "category": "library",
+  "language": "zh-Hant",
+  "input": "圖書預約清單",
+  "session": "nav-118",
+  "expected": "navigate capability library.reservations (圖書預約清單) [literal]",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "library.reservations"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「圖書預約清單」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 26284,
+   "model_calls": 1
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "nav-119",
+  "category": "police",
+  "language": "zh-Hant",
+  "input": "報案紀錄",
+  "session": "nav-119",
+  "expected": "navigate capability police.records (報案紀錄) [literal]",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "police.records"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「報案紀錄」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 32858,
+   "model_calls": 1
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "nav-120",
+  "category": "districtOffice",
+  "language": "zh-Hant",
+  "input": "特殊境遇家庭扶助",
+  "session": "nav-120",
+  "expected": "navigate capability districtOffice.form.c-4 (特殊境遇家庭扶助之家庭暴力被害人補助) [literal]",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "districtOffice.form.c-4"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「特殊境遇家庭扶助之家庭暴力被害人補助」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 24331,
+   "model_calls": 1
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "nav-121",
+  "category": "districtOffice",
+  "language": "zh-Hant",
+  "input": "外縣市罰單申訴",
+  "session": "nav-121",
+  "expected": "navigate capability districtOffice.form.a-2 (裁決所受理之申訴案件(外縣市)) [literal]",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "districtOffice.form.a-2"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「裁決所受理之申訴案件(外縣市)」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 26663,
+   "model_calls": 1
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "nav-122",
+  "category": "disasterReport",
+  "language": "zh-Hant",
+  "input": "橋墩被沖刷",
+  "session": "nav-122",
+  "expected": "navigate capability disasterReport.form.D-2-1 (橋樑基礎沖刷) [literal]",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "disasterReport.form.D-2-1"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「橋樑基礎沖刷」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 21543,
+   "model_calls": 1
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "nav-123",
+  "category": "disasterReport",
+  "language": "zh-Hant",
+  "input": "其他火災",
+  "session": "nav-123",
+  "expected": "navigate capability disasterReport.form.D-4-4 (其他(前述以外火災)) [literal]",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "disasterReport.form.D-4-4"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「其他(前述以外火災)」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 29762,
+   "model_calls": 1
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "nav-124",
+  "category": "subscription/wallet/coupon",
+  "language": "zh-Hant",
+  "input": "訂閱項目",
+  "session": "nav-124",
+  "expected": "navigate capability subscription.items (訂閱項目) [literal]",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "subscription.items"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「訂閱項目」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 22246,
+   "model_calls": 1
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "nav-125",
+  "category": "app",
+  "language": "zh-Hant",
+  "input": "聯醫掛號",
+  "session": "nav-125",
+  "expected": "honest not-connected explanation for medicalAppointment (聯醫掛號) [literal]",
+  "observed": {
+   "kind": "unsupported",
+   "action": null,
+   "destination": null,
+   "route": "unavailable_direct",
+   "language": "zh",
+   "choices": [],
+   "message": "聯醫掛號：尚無正式掛號入口與 API。",
+   "elapsed_ms": 6,
+   "model_calls": 0
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "nav-126",
+  "category": "app",
+  "language": "zh-Hant",
+  "input": "簡單森呼吸",
+  "session": "nav-126",
+  "expected": "honest not-connected explanation for greenMap (簡單森呼吸) [literal]",
+  "observed": {
+   "kind": "unsupported",
+   "action": null,
+   "destination": null,
+   "route": "unavailable_direct",
+   "language": "zh",
+   "choices": [],
+   "message": "簡單森呼吸：尚無核對過的地點資料。",
+   "elapsed_ms": 55,
+   "model_calls": 0
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "nav-127",
+  "category": "fees",
+  "language": "zh-Hant",
+  "input": "打開帳務",
+  "session": "nav-127",
+  "expected": "navigate capability app.bills (帳務) [parent]",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "app.bills"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「帳務」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 25946,
+   "model_calls": 1
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "nav-128",
+  "category": "fees",
+  "language": "zh-Hant",
+  "input": "打開帳務裡的水費",
+  "session": "nav-128",
+  "expected": "navigate capability fees.water (水費) [parent]",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "fees.water"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「水費」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 22414,
+   "model_calls": 1
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "nav-129",
+  "category": "police",
+  "language": "zh-Hant",
+  "input": "打開警政服務",
+  "session": "nav-129",
+  "expected": "navigate capability police (警政服務) [parent]",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "police"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「警政服務」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 25190,
+   "model_calls": 1
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "nav-130",
+  "category": "police",
+  "language": "zh-Hant",
+  "input": "我要用警政服務線上報案",
+  "session": "nav-130",
+  "expected": "navigate capability police.online (線上報案) [parent]",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "police.online"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「線上報案」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 23356,
+   "model_calls": 1
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "nav-131",
+  "category": "police",
+  "language": "zh-Hant",
+  "input": "警政服務裡面看我的報案紀錄",
+  "session": "nav-131",
+  "expected": "navigate capability police.records (報案紀錄) [parent]",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "police.records"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「報案紀錄」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 30289,
+   "model_calls": 1
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "nav-132",
+  "category": "districtOffice",
+  "language": "zh-Hant",
+  "input": "打開申辦服務",
+  "session": "nav-132",
+  "expected": "navigate capability districtOffice (申辦服務) [parent]",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "districtOffice"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「申辦服務」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 29983,
+   "model_calls": 1
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "nav-133",
+  "category": "districtOffice",
+  "language": "zh-Hant",
+  "input": "我要在申辦服務申請老人健保補助",
+  "session": "nav-133",
+  "expected": "navigate capability districtOffice.form.c-1 (老人全民健康保險保險費自付額補助) [parent]",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "districtOffice.form.c-1"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「老人全民健康保險保險費自付額補助」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 26001,
+   "model_calls": 1
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "nav-134",
+  "category": "disasterReport",
+  "language": "zh-Hant",
+  "input": "打開災情通報",
+  "session": "nav-134",
+  "expected": "navigate capability disasterReport (災情通報) [parent]",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "disasterReport"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「災情通報」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 24745,
+   "model_calls": 1
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "nav-135",
+  "category": "disasterReport",
+  "language": "zh-Hant",
+  "input": "我要災情通報，有落石",
+  "session": "nav-135",
+  "expected": "navigate capability disasterReport.form.D-3-2 (土石崩落) [parent]",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "disasterReport.form.D-3-2"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「土石崩落」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 28201,
+   "model_calls": 1
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "nav-136",
+  "category": "reportIssue",
+  "language": "zh-Hant",
+  "input": "打開有話要說",
+  "session": "nav-136",
+  "expected": "navigate capability reportIssue (有話要說) [parent]",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "reportIssue"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「有話要說」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 23312,
+   "model_calls": 1
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "nav-137",
+  "category": "library",
+  "language": "zh-Hant",
+  "input": "打開圖書借閱的借閱紀錄",
+  "session": "nav-137",
+  "expected": "navigate capability library.records (我的借閱紀錄) [parent]",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "library.records"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「我的借閱紀錄」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 28116,
+   "model_calls": 1
+  },
+  "verdict": "PASS",
+  "note": ""
+ }
+]

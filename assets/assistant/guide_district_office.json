@@ -1,0 +1,207 @@
+{
+  "version": 1,
+  "_comment": "Teaching components of one service page. Shared by the App (guides/<page>_guide.dart holds the pre-written step texts) and the backend (guide.py picks a set). The model may only choose ids listed here; prerequisites are added and ordered by the validator, never by the model. capabilities: capability ids (or roots like 'fees') whose pages this guide runs on. capability_goals: the only goals that fit that sub-page, first = its default. entry_goals: components always added for that capability. capability_done: components already done when the page opens at that capability (it opens past them, e.g. straight on a form): they count as met prerequisites and are left out of the plan unless asked for as a goal. A key of these three tables ending in '*' is a prefix: it covers every capability id starting with the text before the '*' (an exact key wins, then the longest prefix).",
+  "page": "district_office",
+  "capability": "districtOffice",
+  "capabilities": [
+    "districtOffice",
+    "districtOffice.progress"
+  ],
+  "title": "申辦服務",
+  "default_goal": "submit",
+  "capability_goals": {
+    "districtOffice.progress": [
+      "check_progress",
+      "view_closed"
+    ],
+    "districtOffice.form.*": [
+      "submit",
+      "fill_basic",
+      "fill_details",
+      "pick_items",
+      "pick_date",
+      "next_step",
+      "consent"
+    ]
+  },
+  "entry_goals": {},
+  "capability_done": {
+    "districtOffice.form.*": [
+      "search_service",
+      "open_service"
+    ]
+  },
+  "components": [
+    {
+      "id": "search_service",
+      "title": "用關鍵字找申辦項目",
+      "description": "在上面的搜尋框打想辦的事，例如補助，再按放大鏡",
+      "keywords": [
+        "搜尋申辦",
+        "找申辦項目",
+        "找不到項目",
+        "打關鍵字",
+        "遇到哪些問題",
+        "找不到我要申請",
+        "找不到要申請"
+      ],
+      "requires": []
+    },
+    {
+      "id": "open_service",
+      "title": "點要申辦的項目",
+      "description": "在申辦清單打開申訴類或補助類，點要申請的項目",
+      "keywords": [
+        "申辦項目",
+        "補助類",
+        "申訴類",
+        "要申請哪",
+        "申請項目",
+        "哪一項"
+      ],
+      "requires": []
+    },
+    {
+      "id": "fill_basic",
+      "title": "填寫基本資料",
+      "description": "在表單的基本資料填電子信箱、縣市、鄉鎮區和通訊地址",
+      "keywords": [
+        "基本資料",
+        "電子信箱",
+        "通訊地址",
+        "鄉鎮區",
+        "縣市"
+      ],
+      "requires": [
+        "open_service"
+      ]
+    },
+    {
+      "id": "fill_details",
+      "title": "填寫申辦服務資料",
+      "description": "在申辦服務資料一格一格填好，有星號的都要填",
+      "keywords": [
+        "申辦服務資料",
+        "申訴內容",
+        "承辦機關",
+        "駕駛人姓名",
+        "寄發",
+        "申請表單"
+      ],
+      "requires": [
+        "open_service"
+      ]
+    },
+    {
+      "id": "pick_items",
+      "title": "選申訴項目（可多選）",
+      "description": "點申訴項目的框框，在跳出的選單勾選，再按確認",
+      "keywords": [
+        "申訴項目",
+        "可多選",
+        "多選",
+        "勾好幾個"
+      ],
+      "requires": [
+        "open_service"
+      ]
+    },
+    {
+      "id": "pick_date",
+      "title": "在日曆選日期",
+      "description": "點日期的框框，在跳出的日曆點那一天",
+      "keywords": [
+        "肇事日期",
+        "選日期",
+        "日曆",
+        "哪一天",
+        "月份",
+        "日期要怎麼選",
+        "怎麼選日期"
+      ],
+      "requires": [
+        "open_service"
+      ]
+    },
+    {
+      "id": "next_step",
+      "title": "按「下一步」檢查資料",
+      "description": "表單填好後滑到最下面按下一步，到確認頁",
+      "keywords": [
+        "下一步",
+        "不能為空",
+        "紅字",
+        "填好了"
+      ],
+      "requires": [
+        "fill_basic",
+        "fill_details"
+      ]
+    },
+    {
+      "id": "consent",
+      "title": "選要不要提供個人資料",
+      "description": "在確認頁的個人資料是否提供給承辦員選同意或不同意",
+      "keywords": [
+        "提供給承辦員",
+        "個人資料",
+        "不同意",
+        "同意"
+      ],
+      "requires": [
+        "next_step"
+      ]
+    },
+    {
+      "id": "submit",
+      "title": "確認後自己按「送出」",
+      "description": "在確認頁檢查填的資料，沒問題再自己按送出",
+      "keywords": [
+        "送出",
+        "申辦",
+        "申請",
+        "區公所",
+        "辦補助",
+        "提出申請"
+      ],
+      "requires": [
+        "next_step"
+      ]
+    },
+    {
+      "id": "check_progress",
+      "title": "到「查詢」看案件進度",
+      "description": "點上面的查詢，看申辦中的案件辦到哪裡",
+      "keywords": [
+        "申辦進度",
+        "案件進度",
+        "辦到哪",
+        "申辦中",
+        "待審核",
+        "案件查詢",
+        "處理到哪"
+      ],
+      "requires": []
+    },
+    {
+      "id": "view_closed",
+      "title": "看已結案的案件",
+      "description": "在查詢點已結案，看已經辦完的案件",
+      "keywords": [
+        "已結案",
+        "辦完",
+        "結案",
+        "辦好了",
+        "辦好的"
+      ],
+      "requires": [
+        "check_progress"
+      ]
+    }
+  ],
+  "generic_keywords": [
+    "申辦",
+    "申請",
+    "區公所"
+  ]
+}

@@ -322,3 +322,24 @@ class ForeignFaqTests(unittest.TestCase):
     def test_without_an_index_nothing_is_asked(self):
         app = Assistant(FakeCatalog(), lambda messages, tools: first(tools))
         self.assertNotEqual(self.turn(app)["action"], "translate_for_faq")
+
+
+class ForeignFaqHttpTests(unittest.TestCase):
+    """faq_text must pass the HTTP field allowlist (unit tests call turn() directly)."""
+
+    def test_the_http_endpoint_accepts_faq_text(self):
+        import threading
+        import urllib.request
+        from http.server import ThreadingHTTPServer
+        from server import make_handler
+        app = Assistant(FakeCatalog(), lambda messages, tools: first(tools), faq=FakeFaq([]))
+        httpd = ThreadingHTTPServer(("127.0.0.1", 0), make_handler(app))
+        threading.Thread(target=httpd.serve_forever, daemon=True).start()
+        self.addCleanup(httpd.server_close)
+        self.addCleanup(httpd.shutdown)
+        body = json.dumps({"text": "is the eye check free", "request_id": "r1", "session_id": "s",
+                           "language": "en", "faq_text": "眼睛檢查免費嗎"}).encode()
+        request = urllib.request.Request(f"http://127.0.0.1:{httpd.server_address[1]}/v1/assistant/turns",
+                                         data=body, headers={"Content-Type": "application/json"})
+        with urllib.request.urlopen(request, timeout=30) as response:
+            self.assertEqual(response.status, 200)

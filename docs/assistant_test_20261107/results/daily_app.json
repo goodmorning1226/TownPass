@@ -1,0 +1,1744 @@
+[
+ {
+  "id": "daily_app-01",
+  "category": "single:app.home",
+  "language": "zh-TW",
+  "input": "回首頁",
+  "session": "dailyapp-01",
+  "expected": "navigate to app.home (or confirm list containing it)",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "app.home"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「首頁」頁面繼續操作。",
+   "elapsed_ms": 22625
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "daily_app-02",
+  "category": "single:app.home",
+  "language": "zh-TW",
+  "input": "我按到哪裡去了，帶我回到一開始那個畫面",
+  "session": "dailyapp-02",
+  "expected": "navigate to app.home (or confirm list containing it)",
+  "observed": {
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "sound_model",
+   "language": "zh",
+   "choices": [
+    "申辦案件進度"
+   ],
+   "message": "聽起來像是以下服務，你想用哪一個？請先確認。",
+   "elapsed_ms": 27108
+  },
+  "verdict": "FAIL",
+  "note": "Roundabout 'take me back to the first screen' offered only 申辦案件進度 via sound fallback; app.home not offered. Keywords only 回首頁/主畫面."
+ },
+ {
+  "id": "daily_app-03",
+  "category": "single:app.services",
+  "language": "zh-TW",
+  "input": "全部的服務給我看",
+  "session": "dailyapp-03",
+  "expected": "navigate to app.services (or confirm list containing it)",
+  "observed": {
+   "kind": "reply",
+   "action": "request_clarification",
+   "destination": null,
+   "route": "library_model",
+   "language": "zh",
+   "choices": [],
+   "message": "你想先使用哪個服務？可以描述想做的事，或問「有哪些功能」。",
+   "elapsed_ms": 32236
+  },
+  "verdict": "FAIL",
+  "note": "'全部的服務給我看': 看 makes server.py:180 treat the rest as an action object -> library model -> generic clarify. Keyword is 所有服務, not 全部的服務; listing regex has 有什麼服務 but not 全部的服務."
+ },
+ {
+  "id": "daily_app-04",
+  "category": "single:app.services",
+  "language": "zh-TW",
+  "input": "這個App到底有哪些東西可以用，我想一個一個看",
+  "session": "dailyapp-04",
+  "expected": "navigate to app.services (or confirm list containing it)",
+  "observed": {
+   "kind": "reply",
+   "action": "request_clarification",
+   "destination": null,
+   "route": "library_model",
+   "language": "zh",
+   "choices": [],
+   "message": "你想先使用哪個服務？可以描述想做的事，或問「有哪些功能」。",
+   "elapsed_ms": 23895
+  },
+  "verdict": "FAIL",
+  "note": "'有哪些東西可以用' not in listing regex; '一個一個看' triggers the library action_object path -> generic clarify. Neither app.services nor the feature list shown."
+ },
+ {
+  "id": "daily_app-05",
+  "category": "single:app.perks",
+  "language": "zh-TW",
+  "input": "有什麼優惠",
+  "session": "dailyapp-05",
+  "expected": "navigate to app.perks (or confirm list containing it)",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "app.perks"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「優惠」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 23900
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "daily_app-06",
+  "category": "single:app.perks",
+  "language": "zh-TW",
+  "input": "有沒有什麼可以省錢、打折的好康",
+  "session": "dailyapp-06",
+  "expected": "navigate to app.perks (or confirm list containing it)",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。",
+   "elapsed_ms": 22882
+  },
+  "verdict": "FAIL",
+  "note": "省錢/打折/好康 are not app.perks keywords (only 優惠/優惠券/折扣) -> no_related."
+ },
+ {
+  "id": "daily_app-07",
+  "category": "single:app.bills",
+  "language": "zh-TW",
+  "input": "我的帳單",
+  "session": "dailyapp-07",
+  "expected": "navigate to app.bills (or confirm list containing it)",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "app.bills"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「帳務」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 27191
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "daily_app-08",
+  "category": "single:app.bills",
+  "language": "zh-TW",
+  "input": "我這個月要繳的錢在哪裡看",
+  "session": "dailyapp-08",
+  "expected": "navigate to app.bills (or confirm list containing it)",
+  "observed": {
+   "kind": "reply",
+   "action": "request_clarification",
+   "destination": null,
+   "route": "library_model",
+   "language": "zh",
+   "choices": [],
+   "message": "你想先使用哪個服務？可以描述想做的事，或問「有哪些功能」。",
+   "elapsed_ms": 23089
+  },
+  "verdict": "FAIL",
+  "note": "'要繳的錢在哪裡看': 看 -> library model -> generic clarify; 繳的錢 is not a keyword (繳費 is)."
+ },
+ {
+  "id": "daily_app-09",
+  "category": "single:account",
+  "language": "zh-TW",
+  "input": "我的帳號",
+  "session": "dailyapp-09",
+  "expected": "navigate to account (or confirm list containing it)",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "account"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「帳號」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 23897
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "daily_app-10",
+  "category": "single:account",
+  "language": "zh-TW",
+  "input": "我登記的那個會員在哪裡看",
+  "session": "dailyapp-10",
+  "expected": "navigate to account (or confirm list containing it)",
+  "observed": {
+   "kind": "reply",
+   "action": "request_clarification",
+   "destination": null,
+   "route": "library_model",
+   "language": "zh",
+   "choices": [],
+   "message": "你想先使用哪個服務？可以描述想做的事，或問「有哪些功能」。",
+   "elapsed_ms": 23571
+  },
+  "verdict": "FAIL",
+  "note": "'會員...在哪裡看' -> library action_object path -> generic clarify; 會員 alone not an account keyword."
+ },
+ {
+  "id": "daily_app-11",
+  "category": "single:settings",
+  "language": "zh-TW",
+  "input": "設定在哪",
+  "session": "dailyapp-11",
+  "expected": "navigate to settings (or confirm list containing it)",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "settings"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「設定」頁面繼續操作。",
+   "elapsed_ms": 22557
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "daily_app-12",
+  "category": "single:settings",
+  "language": "zh-TW",
+  "input": "我想調一下這個App的一些東西",
+  "session": "dailyapp-12",
+  "expected": "navigate to settings (or confirm list containing it)",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。",
+   "elapsed_ms": 25675
+  },
+  "verdict": "CONCERN",
+  "note": "Vague ('調一下這個App的一些東西'); no_related acceptable but offering 設定 would help."
+ },
+ {
+  "id": "daily_app-13",
+  "category": "single:profile",
+  "language": "zh-TW",
+  "input": "改我的資料",
+  "session": "dailyapp-13",
+  "expected": "navigate to profile (or confirm list containing it)",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "profile"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「基本資料」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 27864
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "daily_app-14",
+  "category": "single:profile",
+  "language": "zh-TW",
+  "input": "我換手機號碼了要去哪裡改",
+  "session": "dailyapp-14",
+  "expected": "navigate to profile (or confirm list containing it)",
+  "observed": {
+   "kind": "reply",
+   "action": "faq_answer",
+   "destination": null,
+   "route": "faq_medium",
+   "language": "zh",
+   "choices": [
+    "我搬家了或改電話(地址或電話資料變更...),該如何更改資料?"
+   ],
+   "message": "你是不是想問以下的問題？請選擇一題，我再顯示答案。本服務僅涵蓋臺北市政府 FAQ。",
+   "elapsed_ms": 28356
+  },
+  "verdict": "FAIL",
+  "note": "Contains profile keyword 手機號碼 yet ended in faq_medium (household-registration FAQ): the capability model did not select the single candidate and the clarification branch fell to FAQ. User needed the App profile page."
+ },
+ {
+  "id": "daily_app-15",
+  "category": "single:start_page",
+  "language": "zh-TW",
+  "input": "改起始頁",
+  "session": "dailyapp-15",
+  "expected": "navigate to start_page (or confirm list containing it)",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "start_page"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「App 起始頁面」頁面繼續操作。",
+   "elapsed_ms": 24605
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "daily_app-16",
+  "category": "single:start_page",
+  "language": "zh-TW",
+  "input": "我想要一打開App就直接是別的畫面",
+  "session": "dailyapp-16",
+  "expected": "navigate to start_page (or confirm list containing it)",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。",
+   "elapsed_ms": 26793
+  },
+  "verdict": "FAIL",
+  "note": "'一打開App就直接是別的畫面' -> no_related; start_page keywords only 起始頁/預設頁面/啟動頁."
+ },
+ {
+  "id": "daily_app-17",
+  "category": "single:pinned",
+  "language": "zh-TW",
+  "input": "我常用的服務",
+  "session": "dailyapp-17",
+  "expected": "navigate to pinned (or confirm list containing it)",
+  "observed": {
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [
+    "我的服務與置頂"
+   ],
+   "message": "你想使用哪個功能？請先確認。",
+   "elapsed_ms": 24859
+  },
+  "verdict": "PASS",
+  "note": "Single-option confirm (常用的服務 vs keyword 常用服務)."
+ },
+ {
+  "id": "daily_app-18",
+  "category": "single:pinned",
+  "language": "zh-TW",
+  "input": "可以把我常用的東西放在最上面嗎",
+  "session": "dailyapp-18",
+  "expected": "navigate to pinned (or confirm list containing it)",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。",
+   "elapsed_ms": 24530
+  },
+  "verdict": "FAIL",
+  "note": "'把常用的東西放在最上面' (= 置頂) -> no_related."
+ },
+ {
+  "id": "daily_app-19",
+  "category": "single:messages",
+  "language": "zh-TW",
+  "input": "看訊息",
+  "session": "dailyapp-19",
+  "expected": "navigate to messages (or confirm list containing it)",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "messages"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「訊息」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 25302
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "daily_app-20",
+  "category": "single:messages",
+  "language": "zh-TW",
+  "input": "剛剛手機叮一聲說有通知，在哪裡看",
+  "session": "dailyapp-20",
+  "expected": "navigate to messages (or confirm list containing it)",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "messages"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「訊息」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 25521
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "daily_app-21",
+  "category": "single:activities",
+  "language": "zh-TW",
+  "input": "最近有什麼活動",
+  "session": "dailyapp-21",
+  "expected": "navigate to activities (or confirm list containing it)",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "activities"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「活動資訊」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 28551
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "daily_app-22",
+  "category": "single:activities",
+  "language": "zh-TW",
+  "input": "週末想帶孫子出去，市政府有沒有辦什麼好玩的",
+  "session": "dailyapp-22",
+  "expected": "navigate to activities (or confirm list containing it)",
+  "observed": {
+   "kind": "capability_list",
+   "action": null,
+   "destination": null,
+   "route": "listing",
+   "language": "zh",
+   "choices": [
+    "首頁",
+    "服務總覽",
+    "優惠",
+    "帳務",
+    "帳號",
+    "設定",
+    "基本資料",
+    "App 起始頁面"
+   ],
+   "message": "目前助理可以開啟的功能：\n• 首頁\n• 服務總覽\n• 優惠\n• 帳務\n• 帳號\n• 設定\n• 基本資料\n• App 起始頁面\n可輸入「下一頁」繼續查看。",
+   "elapsed_ms": 0
+  },
+  "verdict": "FAIL",
+  "note": "'市政府有沒有辦什麼好玩的' hits listing regex '(?:能|可以)?辦(?:什麼|哪些)' in workflow.py handle() -> generic capability list page 1 (首頁..起始頁); activities not on it."
+ },
+ {
+  "id": "daily_app-23",
+  "category": "single:invoice",
+  "language": "zh-TW",
+  "input": "我的載具",
+  "session": "dailyapp-23",
+  "expected": "navigate to invoice (or confirm list containing it)",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "invoice"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「手機載具」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 24211
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "daily_app-24",
+  "category": "single:invoice",
+  "language": "zh-TW",
+  "input": "我發票要存在哪裡",
+  "session": "dailyapp-24",
+  "expected": "navigate to invoice (or confirm list containing it)",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "invoice"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「手機載具」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 35143
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "daily_app-25",
+  "category": "single:feedback",
+  "language": "zh-TW",
+  "input": "我要給意見",
+  "session": "dailyapp-25",
+  "expected": "navigate to feedback (or confirm list containing it)",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。",
+   "elapsed_ms": 27927
+  },
+  "verdict": "FAIL",
+  "note": "'我要給意見' -> no_related. feedback keywords only 意見回饋/App問題; no 意見/反應/建議."
+ },
+ {
+  "id": "daily_app-26",
+  "category": "single:feedback",
+  "language": "zh-TW",
+  "input": "這個App很難用，我想跟你們反應一下",
+  "session": "dailyapp-26",
+  "expected": "navigate to feedback (or confirm list containing it)",
+  "observed": {
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "sound_model",
+   "language": "zh",
+   "choices": [
+    "有話要說"
+   ],
+   "message": "聽起來像是以下服務，你想用哪一個？請先確認。",
+   "elapsed_ms": 33957
+  },
+  "verdict": "CONCERN",
+  "note": "'App很難用，想跟你們反應' offered 有話要說 (city petition) via sound fallback instead of 意見回饋 (App feedback)."
+ },
+ {
+  "id": "daily_app-27",
+  "category": "single:language",
+  "language": "zh-TW",
+  "input": "換語言",
+  "session": "dailyapp-27",
+  "expected": "navigate to language (or confirm list containing it)",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "language"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「語言」頁面繼續操作。",
+   "elapsed_ms": 23744
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "daily_app-28",
+  "category": "single:language",
+  "language": "zh-TW",
+  "input": "我看護是越南人，可以把字變成她看得懂的嗎",
+  "session": "dailyapp-28",
+  "expected": "navigate to language (or confirm list containing it)",
+  "observed": {
+   "kind": "reply",
+   "action": "faq_answer",
+   "destination": null,
+   "route": "faq_medium",
+   "language": "zh",
+   "choices": [
+    "外籍機構看護工可以幫病患抽痰嗎?"
+   ],
+   "message": "你是不是想問以下的問題？請選擇一題，我再顯示答案。本服務僅涵蓋臺北市政府 FAQ。",
+   "elapsed_ms": 25423
+  },
+  "verdict": "FAIL",
+  "note": "'把字變成她看得懂的' (language for Vietnamese caregiver) -> FAQ about foreign caregivers suctioning phlegm; language not offered."
+ },
+ {
+  "id": "daily_app-29",
+  "category": "single:notification_settings",
+  "language": "zh-TW",
+  "input": "關掉通知",
+  "session": "dailyapp-29",
+  "expected": "navigate to notification_settings (or confirm list containing it)",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請補充想使用的服務或操作，也可以問「有哪些功能」。",
+   "elapsed_ms": 23233
+  },
+  "verdict": "FAIL",
+  "note": "'關掉通知' matched 通知 (messages) only; notification_settings keywords are 通知設定/提醒開關. Model returned clarification with no choices."
+ },
+ {
+  "id": "daily_app-30",
+  "category": "single:notification_settings",
+  "language": "zh-TW",
+  "input": "手機一直跳出來很吵，可以叫它不要一直提醒嗎",
+  "session": "dailyapp-30",
+  "expected": "navigate to notification_settings (or confirm list containing it)",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。",
+   "elapsed_ms": 20158
+  },
+  "verdict": "FAIL",
+  "note": "'一直跳出來很吵，不要一直提醒' -> no_related; 提醒 alone not a keyword."
+ },
+ {
+  "id": "daily_app-31",
+  "category": "single:authorization",
+  "language": "zh-TW",
+  "input": "授權管理",
+  "session": "dailyapp-31",
+  "expected": "navigate to authorization (or confirm list containing it)",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "authorization"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「歷程與授權管理」頁面繼續操作。目前只有示範內容，暫時無法查看實際紀錄或管理授權。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 16962
+  },
+  "verdict": "PASS",
+  "note": "Honest about demo-only content."
+ },
+ {
+  "id": "daily_app-32",
+  "category": "single:authorization",
+  "language": "zh-TW",
+  "input": "我想看我之前把資料給了哪些地方用",
+  "session": "dailyapp-32",
+  "expected": "navigate to authorization (or confirm list containing it)",
+  "observed": {
+   "kind": "reply",
+   "action": "request_clarification",
+   "destination": null,
+   "route": "library_model",
+   "language": "zh",
+   "choices": [],
+   "message": "你想先使用哪個服務？可以描述想做的事，或問「有哪些功能」。",
+   "elapsed_ms": 21889
+  },
+  "verdict": "FAIL",
+  "note": "'把資料給了哪些地方用' (= authorization) -> 看 -> library model -> generic clarify."
+ },
+ {
+  "id": "daily_app-33",
+  "category": "single:suspend",
+  "language": "zh-TW",
+  "input": "停用帳號",
+  "session": "dailyapp-33",
+  "expected": "navigate to suspend (or confirm list containing it)",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "suspend"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「停用帳號」頁面繼續操作。停用帳號的確認按鈕目前尚未串接，暫時無法執行停用。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 17665
+  },
+  "verdict": "PASS",
+  "note": "Honest that the confirm button is not connected."
+ },
+ {
+  "id": "daily_app-34",
+  "category": "single:suspend",
+  "language": "zh-TW",
+  "input": "我以後不想用了，這個帳號要怎麼取消",
+  "session": "dailyapp-34",
+  "expected": "navigate to suspend (or confirm list containing it)",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請補充想使用的服務或操作，也可以問「有哪些功能」。",
+   "elapsed_ms": 16878
+  },
+  "verdict": "FAIL",
+  "note": "'帳號要怎麼取消' -> clarification with no choices; 取消帳號 not a suspend keyword (停用帳號/刪除帳號)."
+ },
+ {
+  "id": "daily_app-35",
+  "category": "single:coupon.list",
+  "language": "zh-TW",
+  "input": "優惠券列表",
+  "session": "dailyapp-35",
+  "expected": "navigate to coupon.list (or confirm list containing it)",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "app.perks"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「優惠」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 19576
+  },
+  "verdict": "CONCERN",
+  "note": "'優惠券列表' opened app.perks (keyword 優惠券) not coupon.list (keyword 優惠列表). Close enough, but coupon.list only reachable by the exact catalogue word."
+ },
+ {
+  "id": "daily_app-36",
+  "category": "single:coupon.list",
+  "language": "zh-TW",
+  "input": "有哪些店可以拿折價券，全部列出來給我",
+  "session": "dailyapp-36",
+  "expected": "navigate to coupon.list (or confirm list containing it)",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。",
+   "elapsed_ms": 26797
+  },
+  "verdict": "FAIL",
+  "note": "'折價券，全部列出來' -> no_related; 折價券 not a keyword."
+ },
+ {
+  "id": "daily_app-37",
+  "category": "single:wallet",
+  "language": "zh-TW",
+  "input": "我的票",
+  "session": "dailyapp-37",
+  "expected": "navigate to wallet (or confirm list containing it)",
+  "observed": {
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [
+    "票夾"
+   ],
+   "message": "你想使用哪個功能？請先確認。",
+   "elapsed_ms": 19613
+  },
+  "verdict": "PASS",
+  "note": "Single-option confirm for 票夾."
+ },
+ {
+  "id": "daily_app-38",
+  "category": "single:wallet",
+  "language": "zh-TW",
+  "input": "上次買的入場票券放在哪裡",
+  "session": "dailyapp-38",
+  "expected": "navigate to wallet (or confirm list containing it)",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。",
+   "elapsed_ms": 21862
+  },
+  "verdict": "FAIL",
+  "note": "'入場票券放在哪裡' -> no_related; keyword is 我的票券, 票券 alone not matched."
+ },
+ {
+  "id": "daily_app-39",
+  "category": "single:subscription",
+  "language": "zh-TW",
+  "input": "我訂閱的",
+  "session": "dailyapp-39",
+  "expected": "navigate to subscription (or confirm list containing it)",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "subscription"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「訂閱總覽」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 18527
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "daily_app-40",
+  "category": "single:subscription",
+  "language": "zh-TW",
+  "input": "我之前有登記要收哪些消息，想看一下",
+  "session": "dailyapp-40",
+  "expected": "navigate to subscription (or confirm list containing it)",
+  "observed": {
+   "kind": "reply",
+   "action": "faq_answer",
+   "destination": null,
+   "route": "faq_medium",
+   "language": "zh",
+   "choices": [
+    "代為標售前是否會公告?在那裡公告?是否會通知優先購買權人?如何得知標售相關訊息?",
+    "收到停管處停車欠費催收處分函,但停車日期卻是多年前,我確定當時已繳清停車費,為何現在催收,事隔多年收據也已不存在了,如何證明我當時未繳?",
+    "小朋友剛出生,我要攜帶哪些證件幫他報戶口(新生兒戶籍申報相關規定)?"
+   ],
+   "message": "你是不是想問以下的問題？請選擇一題，我再顯示答案。本服務僅涵蓋臺北市政府 FAQ。",
+   "elapsed_ms": 19965
+  },
+  "verdict": "FAIL",
+  "note": "'登記要收哪些消息' -> three irrelevant FAQ choices (auction notices, parking arrears, newborn registration)."
+ },
+ {
+  "id": "daily_app-41",
+  "category": "single:subscription.items",
+  "language": "zh-TW",
+  "input": "訂閱項目有哪些",
+  "session": "dailyapp-41",
+  "expected": "navigate to subscription.items (or confirm list containing it)",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "subscription.items"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「訂閱項目」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 17733
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "daily_app-42",
+  "category": "single:subscription.items",
+  "language": "zh-TW",
+  "input": "可以訂閱的東西有哪幾種",
+  "session": "dailyapp-42",
+  "expected": "navigate to subscription.items (or confirm list containing it)",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "subscription"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「訂閱總覽」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 19040
+  },
+  "verdict": "CONCERN",
+  "note": "'可以訂閱的東西有哪幾種' opened subscription overview instead of subscription.items; one tap away."
+ },
+ {
+  "id": "daily_app-43",
+  "category": "single:qna",
+  "language": "zh-TW",
+  "input": "常見問題",
+  "session": "dailyapp-43",
+  "expected": "navigate to qna (or confirm list containing it)",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "qna"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「常見問答」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 17618
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "daily_app-44",
+  "category": "single:qna",
+  "language": "zh-TW",
+  "input": "我有問題不知道問誰，有沒有大家常問的那種",
+  "session": "dailyapp-44",
+  "expected": "navigate to qna (or confirm list containing it)",
+  "observed": {
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "sound_model",
+   "language": "zh",
+   "choices": [
+    "前述以外之橋梁災情"
+   ],
+   "message": "聽起來像是以下服務，你想用哪一個？請先確認。",
+   "elapsed_ms": 21791
+  },
+  "verdict": "FAIL",
+  "note": "'有沒有大家常問的那種' -> sound fallback offered 前述以外之橋梁災情 (bridge disaster). Nonsensical; qna not offered (常問 not a keyword)."
+ },
+ {
+  "id": "daily_app-45",
+  "category": "single:qna.categories",
+  "language": "zh-TW",
+  "input": "問題分類",
+  "session": "dailyapp-45",
+  "expected": "navigate to qna.categories (or confirm list containing it)",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請補充想使用的服務或操作，也可以問「有哪些功能」。",
+   "elapsed_ms": 23501
+  },
+  "verdict": "FAIL",
+  "note": "Exact keyword '問題分類' (qna.categories; also listed as a qna feature) -> clarification with no choices instead of opening qna.categories."
+ },
+ {
+  "id": "daily_app-46",
+  "category": "single:qna.categories",
+  "language": "zh-TW",
+  "input": "把所有的問題按種類分好給我看",
+  "session": "dailyapp-46",
+  "expected": "navigate to qna.categories (or confirm list containing it)",
+  "observed": {
+   "kind": "reply",
+   "action": "request_clarification",
+   "destination": null,
+   "route": "library_model",
+   "language": "zh",
+   "choices": [],
+   "message": "你想先使用哪個服務？可以描述想做的事，或問「有哪些功能」。",
+   "elapsed_ms": 20374
+  },
+  "verdict": "FAIL",
+  "note": "'按種類分好給我看' -> 看 -> library model -> generic clarify."
+ },
+ {
+  "id": "daily_app-47",
+  "category": "single:quick_login",
+  "language": "zh-TW",
+  "input": "可以用指紋登入嗎",
+  "session": "dailyapp-47",
+  "expected": "honest plain-language 'not connected' explanation for quick_login, no navigation",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。",
+   "elapsed_ms": 18837
+  },
+  "verdict": "CONCERN",
+  "note": "'用指紋登入' -> no_related instead of the quick_login explanation; 指紋 not a keyword (生物辨識 is). Not misleading."
+ },
+ {
+  "id": "daily_app-48",
+  "category": "single:logout",
+  "language": "zh-TW",
+  "input": "我要登出",
+  "session": "dailyapp-48",
+  "expected": "honest plain-language 'not connected' explanation for logout, no navigation",
+  "observed": {
+   "kind": "unsupported",
+   "action": null,
+   "destination": null,
+   "route": "unavailable_direct",
+   "language": "zh",
+   "choices": [],
+   "message": "登出：正式帳號登入／登出尚未串接。",
+   "elapsed_ms": 6
+  },
+  "verdict": "CONCERN",
+  "note": "Honest, no navigation, but '正式帳號登入／登出尚未串接' is developer wording, no alternative."
+ },
+ {
+  "id": "daily_app-49",
+  "category": "single:news",
+  "language": "zh-TW",
+  "input": "今天市政府有什麼新聞",
+  "session": "dailyapp-49",
+  "expected": "honest plain-language 'not connected' explanation for news, no navigation",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。",
+   "elapsed_ms": 19681
+  },
+  "verdict": "CONCERN",
+  "note": "'市政府有什麼新聞' -> no_related instead of the news explanation; only keyword 市政新聞."
+ },
+ {
+  "id": "daily_app-50",
+  "category": "single:bill_settings",
+  "language": "zh-TW",
+  "input": "我想把信用卡綁上去自動扣款",
+  "session": "dailyapp-50",
+  "expected": "honest plain-language 'not connected' explanation for bill_settings, no navigation",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。",
+   "elapsed_ms": 19842
+  },
+  "verdict": "CONCERN",
+  "note": "'信用卡綁上去自動扣款' -> no_related, not the bill_settings explanation."
+ },
+ {
+  "id": "daily_app-51",
+  "category": "single:1999",
+  "language": "zh-TW",
+  "input": "幫我打1999",
+  "session": "dailyapp-51",
+  "expected": "honest plain-language 'not connected' explanation for 1999, no navigation",
+  "observed": {
+   "kind": "unsupported",
+   "action": null,
+   "destination": null,
+   "route": "unavailable_direct",
+   "language": "zh",
+   "choices": [],
+   "message": "1999：服務清單入口空白；助理不自動撥號。",
+   "elapsed_ms": 3
+  },
+  "verdict": "CONCERN",
+  "note": "Correctly refuses to dial, but '服務清單入口空白' is jargon and the reply does not tell the user to dial 1999 / 02-27208889 themselves."
+ },
+ {
+  "id": "daily_app-52",
+  "category": "single:iVoting",
+  "language": "zh-TW",
+  "input": "我要投票",
+  "session": "dailyapp-52",
+  "expected": "honest plain-language 'not connected' explanation for iVoting, no navigation",
+  "observed": {
+   "kind": "unsupported",
+   "action": null,
+   "destination": null,
+   "route": "unavailable_direct",
+   "language": "zh",
+   "choices": [],
+   "message": "網路投票：原服務未提供入口。",
+   "elapsed_ms": 19
+  },
+  "verdict": "CONCERN",
+  "note": "Honest; '原服務未提供入口' opaque, no alternative."
+ },
+ {
+  "id": "daily_app-53",
+  "category": "single:dashboard",
+  "language": "zh-TW",
+  "input": "台北市的統計數字在哪裡看",
+  "session": "dailyapp-53",
+  "expected": "honest plain-language 'not connected' explanation for dashboard, no navigation",
+  "observed": {
+   "kind": "reply",
+   "action": "faq_answer",
+   "destination": null,
+   "route": "faq_medium",
+   "language": "zh",
+   "choices": [
+    "如何取得臺北市人口數等各項統計資料?"
+   ],
+   "message": "你是不是想問以下的問題？請選擇一題，我再顯示答案。本服務僅涵蓋臺北市政府 FAQ。",
+   "elapsed_ms": 21556
+  },
+  "verdict": "PASS",
+  "note": "Not the dashboard explanation, but the FAQ suggestion '如何取得臺北市人口數等各項統計資料?' is useful."
+ },
+ {
+  "id": "daily_app-54",
+  "category": "single:survey",
+  "language": "zh-TW",
+  "input": "有沒有問卷可以填",
+  "session": "dailyapp-54",
+  "expected": "honest plain-language 'not connected' explanation for survey, no navigation",
+  "observed": {
+   "kind": "unsupported",
+   "action": null,
+   "destination": null,
+   "route": "unavailable_direct",
+   "language": "zh",
+   "choices": [],
+   "message": "意見調查：原服務未提供入口。",
+   "elapsed_ms": 5
+  },
+  "verdict": "CONCERN",
+  "note": "Honest; '原服務未提供入口' opaque, no alternative."
+ },
+ {
+  "id": "daily_app-55",
+  "category": "single:neighborhood",
+  "language": "zh-TW",
+  "input": "我要找里長",
+  "session": "dailyapp-55",
+  "expected": "honest plain-language 'not connected' explanation for neighborhood, no navigation",
+  "observed": {
+   "kind": "unsupported",
+   "action": null,
+   "destination": null,
+   "route": "unavailable_direct",
+   "language": "zh",
+   "choices": [],
+   "message": "里辦服務：原服務未提供入口。",
+   "elapsed_ms": 12
+  },
+  "verdict": "CONCERN",
+  "note": "Honest; opaque, no alternative (district office / 1999)."
+ },
+ {
+  "id": "daily_app-56",
+  "category": "single:vaccineAppointment",
+  "language": "zh-TW",
+  "input": "我要預約打流感疫苗",
+  "session": "dailyapp-56",
+  "expected": "honest plain-language 'not connected' explanation for vaccineAppointment, no navigation",
+  "observed": {
+   "kind": "unsupported",
+   "action": null,
+   "destination": null,
+   "route": "unavailable_direct",
+   "language": "zh",
+   "choices": [],
+   "message": "疫苗預約：尚無實際服務入口或預約 API。",
+   "elapsed_ms": 5
+  },
+  "verdict": "CONCERN",
+  "note": "Honest, but '預約 API' is developer jargon; no alternative."
+ },
+ {
+  "id": "daily_app-57",
+  "category": "single:medicalAppointment",
+  "language": "zh-TW",
+  "input": "幫我掛和平醫院的號",
+  "session": "dailyapp-57",
+  "expected": "honest plain-language 'not connected' explanation for medicalAppointment, no navigation",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。",
+   "elapsed_ms": 25053
+  },
+  "verdict": "CONCERN",
+  "note": "'掛和平醫院的號' -> no_related; 掛號 split by 和平醫院的 so not matched. Does not say registration is not connected."
+ },
+ {
+  "id": "daily_app-58",
+  "category": "single:cityRadio",
+  "language": "zh-TW",
+  "input": "我想聽台北電台",
+  "session": "dailyapp-58",
+  "expected": "honest plain-language 'not connected' explanation for cityRadio, no navigation",
+  "observed": {
+   "kind": "unsupported",
+   "action": null,
+   "destination": null,
+   "route": "unavailable_direct",
+   "language": "zh",
+   "choices": [],
+   "message": "台北電台：尚無核對過的播放入口。",
+   "elapsed_ms": 7
+  },
+  "verdict": "CONCERN",
+  "note": "Honest; '尚無核對過的播放入口' internal wording."
+ },
+ {
+  "id": "daily_app-59",
+  "category": "single:familyCenter",
+  "language": "zh-TW",
+  "input": "附近有親子館嗎",
+  "session": "dailyapp-59",
+  "expected": "honest plain-language 'not connected' explanation for familyCenter, no navigation",
+  "observed": {
+   "kind": "unsupported",
+   "action": null,
+   "destination": null,
+   "route": "unavailable_direct",
+   "language": "zh",
+   "choices": [],
+   "message": "親子館：原服務未提供入口。",
+   "elapsed_ms": 5
+  },
+  "verdict": "CONCERN",
+  "note": "Honest; opaque reason, no alternative."
+ },
+ {
+  "id": "daily_app-60",
+  "category": "single:greenMap",
+  "language": "zh-TW",
+  "input": "哪裡有公園可以散步",
+  "session": "dailyapp-60",
+  "expected": "honest plain-language 'not connected' explanation for greenMap, no navigation",
+  "observed": {
+   "kind": "unsupported",
+   "action": null,
+   "destination": null,
+   "route": "unavailable_direct",
+   "language": "zh",
+   "choices": [],
+   "message": "簡單森呼吸：尚無核對過的地點資料。",
+   "elapsed_ms": 6
+  },
+  "verdict": "CONCERN",
+  "note": "Honest; '尚無核對過的地點資料' internal wording."
+ },
+ {
+  "id": "daily_app-61",
+  "category": "single:petFriendlyMap",
+  "language": "zh-TW",
+  "input": "帶狗狗可以去哪裡玩",
+  "session": "dailyapp-61",
+  "expected": "honest plain-language 'not connected' explanation for petFriendlyMap, no navigation",
+  "observed": {
+   "kind": "unsupported",
+   "action": null,
+   "destination": null,
+   "route": "unavailable_direct",
+   "language": "zh",
+   "choices": [],
+   "message": "寵物安心遛：原服務未提供入口。",
+   "elapsed_ms": 5
+  },
+  "verdict": "CONCERN",
+  "note": "Honest; opaque reason."
+ },
+ {
+  "id": "daily_app-62",
+  "category": "single:waterMeter",
+  "language": "zh-TW",
+  "input": "我家水表度數要怎麼看",
+  "session": "dailyapp-62",
+  "expected": "honest plain-language 'not connected' explanation for waterMeter, no navigation",
+  "observed": {
+   "kind": "unsupported",
+   "action": null,
+   "destination": null,
+   "route": "unavailable_direct",
+   "language": "zh",
+   "choices": [],
+   "message": "用水服務：用水服務尚未串接；可另使用水費示範頁。",
+   "elapsed_ms": 6
+  },
+  "verdict": "PASS",
+  "note": "Honest and gives an alternative (水費示範頁)."
+ },
+ {
+  "id": "daily_app-63",
+  "category": "single:essentialGoods",
+  "language": "zh-TW",
+  "input": "颱風要來了，哪裡可以領物資",
+  "session": "dailyapp-63",
+  "expected": "honest plain-language 'not connected' explanation for essentialGoods, no navigation",
+  "observed": {
+   "kind": "unsupported",
+   "action": null,
+   "destination": null,
+   "route": "unavailable_direct",
+   "language": "zh",
+   "choices": [],
+   "message": "民生物資：原服務未提供資料來源。",
+   "elapsed_ms": 7
+  },
+  "verdict": "CONCERN",
+  "note": "Honest; '原服務未提供資料來源' opaque, no alternative in a typhoon context."
+ },
+ {
+  "id": "daily_app-64",
+  "category": "single:locationSearch",
+  "language": "zh-TW",
+  "input": "附近的廁所在哪",
+  "session": "dailyapp-64",
+  "expected": "honest plain-language 'not connected' explanation for locationSearch, no navigation",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。",
+   "elapsed_ms": 17869
+  },
+  "verdict": "CONCERN",
+  "note": "'附近的廁所' -> no_related; 附近 alone not a keyword (附近地點 is)."
+ },
+ {
+  "id": "daily_app-65",
+  "category": "single:zoo",
+  "language": "zh-TW",
+  "input": "木柵動物園今天有開嗎",
+  "session": "dailyapp-65",
+  "expected": "honest plain-language 'not connected' explanation for zoo, no navigation",
+  "observed": {
+   "kind": "unsupported",
+   "action": null,
+   "destination": null,
+   "route": "unavailable_direct",
+   "language": "zh",
+   "choices": [],
+   "message": "愛遊動物園：原服務未提供入口。",
+   "elapsed_ms": 5
+  },
+  "verdict": "CONCERN",
+  "note": "Honest; opaque reason, no alternative."
+ },
+ {
+  "id": "daily_app-66",
+  "category": "combo:coupon.list+wallet",
+  "language": "zh-TW",
+  "input": "我想看我的優惠券還有票夾裡的票",
+  "session": "dailyapp-66",
+  "expected": "numbered list with both coupon.list+wallet, or open one and say how to do the other; never open an off feature",
+  "observed": {
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [
+    "優惠",
+    "票夾"
+   ],
+   "message": "你想使用哪個功能？請先確認。",
+   "elapsed_ms": 24689
+  },
+  "verdict": "CONCERN",
+  "note": "Both needs listed (優惠, 票夾); coupon need mapped to app.perks not coupon.list, and the message does not say the other can be done afterwards. Follow-up 「第二個」 opened wallet (case 81)."
+ },
+ {
+  "id": "daily_app-67",
+  "category": "combo:profile+notification_settings",
+  "language": "zh-TW",
+  "input": "幫我改大頭貼順便改通知設定",
+  "session": "dailyapp-67",
+  "expected": "numbered list with both profile+notification_settings, or open one and say how to do the other; never open an off feature",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "notification_settings"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「通知提醒設定」頁面繼續操作。通知開關目前不會儲存，暫時無法變更通知設定。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 28156
+  },
+  "verdict": "FAIL",
+  "note": "Silently dropped 大頭貼 (profile) and opened only notification_settings; 大頭貼 not a profile keyword. Message does not mention the photo."
+ },
+ {
+  "id": "daily_app-68",
+  "category": "combo:subscription+app.home",
+  "language": "zh-TW",
+  "input": "看一下訂閱的東西，然後回首頁",
+  "session": "dailyapp-68",
+  "expected": "numbered list with both subscription+app.home, or open one and say how to do the other; never open an off feature",
+  "observed": {
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [
+    "首頁",
+    "訂閱總覽"
+   ],
+   "message": "你想使用哪個功能？請先確認。",
+   "elapsed_ms": 18658
+  },
+  "verdict": "PASS",
+  "note": "Both listed (首頁, 訂閱總覽)."
+ },
+ {
+  "id": "daily_app-69",
+  "category": "combo:account+language",
+  "language": "zh-TW",
+  "input": "我要看帳號資料，還有把語言改英文",
+  "session": "dailyapp-69",
+  "expected": "numbered list with both account+language, or open one and say how to do the other; never open an off feature",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "language"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「語言」頁面繼續操作。",
+   "elapsed_ms": 17110
+  },
+  "verdict": "FAIL",
+  "note": "Opened language only; 帳號資料 need silently dropped (not an account keyword: 我的帳號/帳戶)."
+ },
+ {
+  "id": "daily_app-70",
+  "category": "combo:settings+start_page",
+  "language": "zh-TW",
+  "input": "設定裡面那個開App先看到哪一頁的要怎麼改",
+  "session": "dailyapp-70",
+  "expected": "numbered list with both settings+start_page, or open one and say how to do the other; never open an off feature",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請補充想使用的服務或操作，也可以問「有哪些功能」。",
+   "elapsed_ms": 13269
+  },
+  "verdict": "FAIL",
+  "note": "'設定裡面那個開App先看到哪一頁' matched settings only; clarification with no choices; start_page not found."
+ },
+ {
+  "id": "daily_app-71",
+  "category": "combo:qna+qna.categories",
+  "language": "zh-TW",
+  "input": "常見問答裡面的分類",
+  "session": "dailyapp-71",
+  "expected": "numbered list with both qna+qna.categories, or open one and say how to do the other; never open an off feature",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "qna"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「常見問答」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 13371
+  },
+  "verdict": "CONCERN",
+  "note": "Asked for 分類 inside 常見問答; opened the qna parent. qna.categories one tap away."
+ },
+ {
+  "id": "daily_app-72",
+  "category": "combo:messages+activities",
+  "language": "zh-TW",
+  "input": "看看有沒有新訊息，還有最近的活動",
+  "session": "dailyapp-72",
+  "expected": "numbered list with both messages+activities, or open one and say how to do the other; never open an off feature",
+  "observed": {
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [
+    "訊息",
+    "活動資訊"
+   ],
+   "message": "你想使用哪個功能？請先確認。",
+   "elapsed_ms": 20072
+  },
+  "verdict": "PASS",
+  "note": "Both listed."
+ },
+ {
+  "id": "daily_app-73",
+  "category": "combo:invoice+app.bills",
+  "language": "zh-TW",
+  "input": "我要設手機載具，也要看帳單",
+  "session": "dailyapp-73",
+  "expected": "numbered list with both invoice+app.bills, or open one and say how to do the other; never open an off feature",
+  "observed": {
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [
+    "手機載具",
+    "帳務"
+   ],
+   "message": "你想使用哪個功能？請先確認。",
+   "elapsed_ms": 18749
+  },
+  "verdict": "PASS",
+  "note": "Both listed."
+ },
+ {
+  "id": "daily_app-74",
+  "category": "combo:feedback+suspend",
+  "language": "zh-TW",
+  "input": "我要抱怨一下然後把帳號停掉",
+  "session": "dailyapp-74",
+  "expected": "numbered list with both feedback+suspend, or open one and say how to do the other; never open an off feature",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請補充想使用的服務或操作，也可以問「有哪些功能」。",
+   "elapsed_ms": 22892
+  },
+  "verdict": "FAIL",
+  "note": "'抱怨一下然後把帳號停掉' -> clarification with no choices; neither feedback nor suspend offered."
+ },
+ {
+  "id": "daily_app-75",
+  "category": "combo:subscription+subscription.items",
+  "language": "zh-TW",
+  "input": "訂閱總覽裡面的訂閱項目",
+  "session": "dailyapp-75",
+  "expected": "numbered list with both subscription+subscription.items, or open one and say how to do the other; never open an off feature",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "subscription.items"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「訂閱項目」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 16783
+  },
+  "verdict": "PASS",
+  "note": "Parent+child named; child opened."
+ },
+ {
+  "id": "daily_app-76",
+  "category": "combo:pinned+app.services",
+  "language": "zh-TW",
+  "input": "從所有服務裡挑幾個放到我的常用",
+  "session": "dailyapp-76",
+  "expected": "numbered list with both pinned+app.services, or open one and say how to do the other; never open an off feature",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請補充想使用的服務或操作，也可以問「有哪些功能」。",
+   "elapsed_ms": 21514
+  },
+  "verdict": "FAIL",
+  "note": "'從所有服務裡挑幾個放到我的常用' matched 所有服務 but clarification with no choices; pinned not found."
+ },
+ {
+  "id": "daily_app-77",
+  "category": "combo:survey+activities",
+  "language": "zh-TW",
+  "input": "我要問卷調查還有看活動",
+  "session": "dailyapp-77",
+  "expected": "numbered list with both survey+activities, or open one and say how to do the other; never open an off feature",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請補充想使用的服務或操作，也可以問「有哪些功能」。",
+   "elapsed_ms": 18859
+  },
+  "verdict": "FAIL",
+  "note": "Exact keywords 問卷 (survey, off) and 活動 (activities, ON) yet generic clarification: neither the activities page nor the survey explanation."
+ },
+ {
+  "id": "daily_app-78",
+  "category": "combo:zoo+wallet",
+  "language": "zh-TW",
+  "input": "我要買動物園的票然後放到票夾",
+  "session": "dailyapp-78",
+  "expected": "numbered list with both zoo+wallet, or open one and say how to do the other; never open an off feature",
+  "observed": {
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [
+    "愛遊動物園",
+    "票夾"
+   ],
+   "message": "你想使用哪個功能？請先確認。",
+   "elapsed_ms": 19509
+  },
+  "verdict": "PASS",
+  "note": "Both listed, 愛遊動物園 enabled=false; picking it explains without navigating (case 80)."
+ },
+ {
+  "id": "daily_app-79",
+  "category": "combo:logout+account",
+  "language": "zh-TW",
+  "input": "先看一下我的帳號，然後登出",
+  "session": "dailyapp-79",
+  "expected": "numbered list with both logout+account, or open one and say how to do the other; never open an off feature",
+  "observed": {
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [
+    "帳號",
+    "登出"
+   ],
+   "message": "你想使用哪個功能？請先確認。",
+   "elapsed_ms": 20008
+  },
+  "verdict": "PASS",
+  "note": "Both listed (帳號, 登出 off)."
+ },
+ {
+  "id": "daily_app-80",
+  "category": "combo:zoo+wallet",
+  "language": "zh-TW",
+  "input": "我要買動物園的票然後放到票夾 → choice 1 (愛遊動物園)",
+  "session": "dailyapp-80",
+  "expected": "picking the off option gives an explanation, no navigation",
+  "observed": {
+   "kind": "unsupported",
+   "action": null,
+   "destination": null,
+   "route": "selection",
+   "language": "zh",
+   "choices": [],
+   "message": "愛遊動物園：原服務未提供入口。",
+   "elapsed_ms": null
+  },
+  "verdict": "PASS",
+  "note": "Off option chosen from a list -> explanation only."
+ },
+ {
+  "id": "daily_app-81",
+  "category": "combo:coupon.list+wallet",
+  "language": "zh-TW",
+  "input": "我想看我的優惠券還有票夾裡的票 → 「第二個」",
+  "session": "dailyapp-81",
+  "expected": "「第二個」 opens wallet",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "wallet"
+   },
+   "route": "pending",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「票夾」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": null
+  },
+  "verdict": "PASS",
+  "note": "Spoken ordinal works."
+ }
+]

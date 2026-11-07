@@ -229,3 +229,75 @@ dev 差 1 題（基線 181）屬模型輸出的正常變動，非本次改動。
   repo 外：`D:\TownPassAssistant\models\device\multilingual-e5-small-q8_0.gguf`、`D:\TownPassAssistant\models\faq-e5\`、
   `D:\TownPassAssistant\faq-e5-index\`、`D:\TownPassAssistant\source\multilingual-e5-small\`、`%LOCALAPPDATA%\TownPassAssistant\faq_rag`、
   `D:\TownPassAssistant\native-src\llama.cpp\build-host\`。
+
+## 9. 台北通常見問答（App 自身的 Q&A）
+
+`feat/townpass-qna`（自 `feat/asr-ablation` 的 `5f940d6` 分出，未提交）。
+
+### 9.1 來源與為何只在執行時下載
+
+- 來源：官方網頁服務的常見問答頁所讀的 `https://taipei-pass-service.vercel.app/mock/qna_list.json`
+  （登入註冊、卡證、優惠、服務、帳單、下載安裝等約 10 題）。
+- 該網頁 repository **沒有授權條款**，因此問答文字**不存進本 repo**（程式、測試、fixture、文件都沒有；測試用自編的範例題）。
+  後端在執行時下載、只放在記憶體；另寫一份快取在 repo 外（系統暫存資料夾 `TownPassAssistant/qna_cache.json`，
+  手機為 App 的暫存目錄；`TOWNPASS_QNA_CACHE` 可改路徑），快取 24 小時內有效，**最多一天下載一次**。
+- 本節的分數表只列自己寫的問法與分數，不引用原題目文字。
+
+### 9.2 做法（`assistant_backend/qna.py`）
+
+- 解析採防禦式：形狀不符（不是 `{"data": [{"list": [...]}]}`）→ 0 題；逐題略過缺題目／答案、重複 ID；
+  上限 1 MB、200 題、題目 200 字、答案 2000 字；去除 HTML（連結保留為「文字（網址）」）。ID 加 `qna:` 前綴，不與市府 FAQ 衝突。
+- 以同一個 e5 embedding 伺服器（`TOWNPASS_FAQ_EMBED_URL`）把題目以 `passage: <題目>` 編碼（10 題，一次請求）。
+- `CombinedIndex` 包住 `faq.FaqIndex`（組合，`faq.py` 未改）：查詢只做一次 embedding，兩邊各取前幾名後**依分數合併**，
+  同一題（去標點後相同；市府 FAQ 的資訊局也收錄了部分台北通問答）只留一筆，同分時 App 問答優先。
+  回傳格式與 `FaqIndex.search` 相同，`department` 為「台北通」並帶 `source: "townpass_qna"`。App 問答尚未載入時直接用原本的市府 FAQ 搜尋（行為不變）。
+- 背景載入：電腦 `server.py`、手機 `device_main._load_faq` 都以 `qna.with_qna(...)` 包裝；啟動後另開執行緒下載並編碼，
+  embedding 伺服器尚未就緒時每 5 秒重試、最多 5 分鐘；之後每次 FAQ 查詢若已到期（成功後 24 小時、下載失敗 30 分鐘、
+  embedding 失敗 60 秒）就在背景重試。**任何一輪都不會等待下載或編碼。**
+
+### 9.3 回覆
+
+- 沿用 `faq_answer` 與既有 choices，contract 3、回覆種類都沒有新增。
+- 答案結尾為「資料來源：台北通常見問答。更多說明可開啟 App 的「常見問答」頁面。」，並附一個選項「開啟「常見問答」頁面」
+  （`entry_id` 為目錄既有的 `qna`，選了就是一般的 `open_capability` 到 `/qna`）；外語則用該頁的外語名稱，內容仍標 `content_language: "zh"`。
+- 「你是不是想問」的選項中含台北通題目時，說明改為「本服務涵蓋臺北市政府 FAQ 與台北通常見問答。」；只有市府 FAQ 時與原本相同。
+- 仍是第二層：工具呼叫先找到服務（如「優惠券怎麼用」→ 優惠頁、「停車費繳了帳單怎麼沒顯示」→ 停車費）時不會查問答。
+
+### 9.4 門檻與分數（2026-11-07，e5 q8_0，自寫問法）
+
+沿用市府 FAQ 的 0.915／0.88。14 句自寫的正例與 10 句負例：
+
+| 索引文字 | 前 1 名正確 | 正例 ≥ 0.88 | 負例最高分 |
+| --- | --- | --- | --- |
+| `passage: [台北通] 題目` | 13/14 | 8/14 | 0.850 |
+| **`passage: 題目`（採用）** | 13/14 | 13/14 | 0.868 |
+| `passage: 台北通App 題目` | 12/14 | 11/14 | 0.862 |
+| `passage: 題目\n答案前 120 字` | 13/14 | 13/14 | 0.869 |
+
+採用版分數例：「台北通有實體卡嗎」0.939（直接回答）、「可以申請實體卡片嗎」0.931、「優惠券怎麼用」0.928、
+「台北通要怎麼登入」0.913、「手機驗證說我生日錯誤」0.910、「一定要實名認證嗎」0.905、「註冊會員一直沒收到審核通知」0.897、
+「怎麼取消第三方授權」0.882（以上為選項）；「一般會員跟金質會員差在哪」0.854（沒找到）。
+負例（天氣、披薩、水費逾期、低收入戶、捷運遺失物、市長、機票、醫院、垃圾車、情詩）在問答上最高 0.868，均低於 0.88；
+市府 FAQ smoke 的 top-1 不變。正例僅 14 句，門檻未另外校正。
+
+### 9.5 驗證
+
+- `test_qna.py` 18 項（假下載、假 embedding，不連網）：解析與 HTML、形狀不符、大小上限、`passage:` 前綴、離線 → 0 題、
+  embedding 未就緒後重試、快取一天、關閉開關、背景重試、合併排序、同題去重、答案標示來源與「常見問答」選項、外語路徑。
+- 全部 Python 測試 172 項通過（有索引與 e5 伺服器；沒有伺服器時 172 項中 1 項略過）。
+- 端對端（臨時後端 :8841 + e5 :8840，Ollama ministral-3:3b，CPU 滿載）：啟動後約 5 秒載入 10 題（`faq_entries` 8131）。
+  「台北通要怎麼登入」「一定要實名認證嗎」「怎麼取消第三方授權」「手機驗證說我生日錯誤」「註冊會員一直沒收到審核通知」→ 台北通選項，
+  選後顯示答案、來源與「開啟「常見問答」頁面」；「台北通有實體卡嗎」→ 直接回答。「優惠券怎麼用」「怎麼領優惠券」→ 優惠頁、
+  「停車費繳了帳單怎麼沒顯示」→ 停車費頁（工具呼叫優先）；「我用悠遊付註冊的帳號怎麼登入」→ 服務候選（學雜費／帳號）、
+  「台北通支援哪些手機」→ 聲音相近的「訊息」候選，兩句都沒進到 FAQ 層（既有的層級順序，非本次改動）。
+- `evaluate.py`（292 題）：dev 188/190、held-out 97/102，wrong_service 0、unexpected_navigation 0；
+  7 個失敗都不是 FAQ／問答造成（唯一經過 FAQ 的一輪仍是「醫院在哪裡」的市府選項，與 6.1 相同）。
+- 測量時另有程式讓 CPU 滿載，10 題一次編碼超過查詢用的 5 秒逾時，因此背景編碼改用 30 秒逾時（查詢仍為 5 秒）。
+
+### 9.6 離線、手機與關閉
+
+- 離線或下載失敗：沒有台北通題目，助理與原本相同（只用市府 FAQ）；之後每 30 分鐘在背景重試。
+- 手機：Chaquopy 的 Python 直接以 HTTPS 下載；需要網路權限（debug 有 `INTERNET`；release 依賴合併後的 manifest）。
+  **未在手機上驗證**（Chaquopy 的 SSL 憑證、暫存目錄位置、速度）。編碼 10 題約一次 embedding 請求。
+- 關閉：環境變數 `TOWNPASS_QNA=0`（電腦於啟動後端前設定；手機可在 `device_main.configure` 加上）；
+  `TOWNPASS_QNA_URL` 可改來源。回復：刪除 `qna.py`、`test_qna.py`，還原 `workflow.py`、`server.py`、`device_main.py` 與本節。

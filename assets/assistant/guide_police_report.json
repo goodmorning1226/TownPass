@@ -1,0 +1,151 @@
+{
+  "version": 1,
+  "_comment": "Teaching components of one service page. Shared by the App (guides/<page>_guide.dart holds the pre-written step texts) and the backend (guide.py picks a set). The model may only choose ids listed here; prerequisites are added and ordered by the validator, never by the model. capabilities: capability ids (or roots like 'fees') whose pages this guide runs on. capability_goals: the only goals that fit that sub-page, first = its default. entry_goals: components always added for that capability.",
+  "page": "police_report",
+  "capability": "police.online",
+  "capabilities": [
+    "police.online",
+    "police.records",
+    "police.progress"
+  ],
+  "title": "線上報案",
+  "default_goal": "submit_report",
+  "capability_goals": {
+    "police.online": [
+      "submit_report",
+      "read_notice",
+      "fill_contact",
+      "next_step",
+      "fill_case",
+      "agree_case"
+    ],
+    "police.records": [
+      "open_record",
+      "record_detail"
+    ],
+    "police.progress": [
+      "record_detail",
+      "open_record"
+    ]
+  },
+  "entry_goals": {},
+  "components": [
+    {
+      "id": "read_notice",
+      "title": "看須知，按「同意」",
+      "description": "看網路報案使用須知，勾選本人已詳閱須知並同意繼續，再按「同意」",
+      "keywords": [
+        "報案須知",
+        "網路報案須知",
+        "報案注意事項"
+      ],
+      "requires": []
+    },
+    {
+      "id": "fill_contact",
+      "title": "填聯絡資料",
+      "description": "在第 1 步填手機號碼、電子信箱、通訊地址和戶籍地址",
+      "keywords": [
+        "報案人資料",
+        "報案聯絡資料",
+        "戶籍地址",
+        "同通訊地址"
+      ],
+      "requires": [
+        "read_notice"
+      ]
+    },
+    {
+      "id": "next_step",
+      "title": "勾選同意，按「下一步」",
+      "description": "在第 1 步最下面勾選本人已詳閱並同意以上內容，再按「下一步」",
+      "keywords": [
+        "報案下一步",
+        "報案第二步"
+      ],
+      "requires": [
+        "fill_contact"
+      ]
+    },
+    {
+      "id": "fill_case",
+      "title": "填案件資料",
+      "description": "在第 2 步選報案人類別，填發生地點、用月曆選發生日期、寫案情摘要",
+      "keywords": [
+        "案情",
+        "案情摘要",
+        "報案人類別",
+        "發生日期",
+        "被害人"
+      ],
+      "requires": [
+        "next_step"
+      ]
+    },
+    {
+      "id": "agree_case",
+      "title": "勾選同意個資聲明",
+      "description": "在第 2 步最下面勾選本人已詳閱並同意以上內容，「送出」才會變成可以按",
+      "keywords": [
+        "個資聲明",
+        "個人資料收集聲明",
+        "報案送出不能按"
+      ],
+      "requires": [
+        "fill_case"
+      ]
+    },
+    {
+      "id": "submit_report",
+      "title": "確認後按「送出」",
+      "description": "看清楚報案資料，再自己按「送出」",
+      "keywords": [
+        "報案",
+        "網路報案",
+        "線上報案",
+        "報警",
+        "被偷",
+        "被騙",
+        "詐騙",
+        "遭竊"
+      ],
+      "requires": [
+        "agree_case"
+      ]
+    },
+    {
+      "id": "open_record",
+      "title": "在報案紀錄點一筆案件",
+      "description": "看報案紀錄清單，每筆寫著處理中或已結案，點一筆看詳細",
+      "keywords": [
+        "報案紀錄",
+        "報案記錄",
+        "報過的案"
+      ],
+      "requires": []
+    },
+    {
+      "id": "record_detail",
+      "title": "看案件的回覆和詳細內容",
+      "description": "在案件頁看處理狀態和回覆，點「詳細內容」看報案內容",
+      "keywords": [
+        "報案進度",
+        "報案處理",
+        "報案結案",
+        "警察回覆",
+        "案件編號",
+        "現在怎樣",
+        "有回覆",
+        "回覆我"
+      ],
+      "requires": [
+        "open_record"
+      ]
+    }
+  ],
+  "generic_keywords": [
+    "線上報案",
+    "網路報案",
+    "報案"
+  ]
+}

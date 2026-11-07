@@ -1,0 +1,700 @@
+{
+ "version": 1,
+ "status": "DRAFT translations (machine-assisted, 2026-11-08), pending native-speaker review. Keys are the Chinese source texts in lib/page/guided_assistant/; keep {name} placeholders; {page:X} shows the page's own word X as the page shows it (translated by PageTranslation).",
+ "section": "police_report",
+ "strings": {
+  "{at}接著在「案情摘要」寫下發生什麼事：什麼人、什麼事、什麼時候、在哪裡、什麼東西。": {
+   "en": "{at}Next, in “{page:案情摘要}”, write what happened: who, what, when, where, and what items.",
+   "ja": "{at}次に「{page:案情摘要}」に、何があったかを書いてください。誰が、何を、いつ、どこで、どんな物か。",
+   "vi": "{at}Tiếp theo, ở “{page:案情摘要}”, hãy viết chuyện gì đã xảy ra: ai, việc gì, khi nào, ở đâu, đồ vật gì.",
+   "id": "{at}Lalu di “{page:案情摘要}”, tulis apa yang terjadi: siapa, apa, kapan, di mana, dan barang apa.",
+   "th": "{at}จากนั้นใน “{page:案情摘要}” เขียนว่าเกิดอะไรขึ้น: ใคร ทำอะไร เมื่อไร ที่ไหน และสิ่งของอะไร"
+  },
+  "{note}{scroll}最後確認一下{check}。沒問題就自己按「送出」喔。這是示範網站，不會真的報案。": {
+   "en": "{note}{scroll}Check everything one last time{check}. If it all looks right, tap “{page:送出}” yourself. This is a demo site, so no real report will be made.",
+   "ja": "{note}{scroll}最後に確認しましょう{check}。問題なければ、ご自分で「{page:送出}」を押してください。これはデモサイトなので、本当に通報されることはありません。",
+   "vi": "{note}{scroll}Kiểm tra lại lần cuối{check}. Nếu không có vấn đề gì, bạn tự bấm “{page:送出}” nhé. Đây là trang web mẫu, sẽ không trình báo thật.",
+   "id": "{note}{scroll}Periksa sekali lagi{check}. Kalau sudah benar, tekan sendiri “{page:送出}”. Ini situs demo, jadi tidak benar-benar melapor.",
+   "th": "{note}{scroll}ตรวจสอบอีกครั้ง{check} ถ้าไม่มีปัญหา กด “{page:送出}” ด้วยตัวเอง นี่เป็นเว็บไซต์สาธิต จะไม่แจ้งความจริง"
+  },
+  "{note}勾好了！按下面的「同意」，開始填報案資料。": {
+   "en": "{note}Ticked! Now tap “{page:同意}” below to start filling in the report.",
+   "ja": "{note}チェックできました！下の「{page:同意}」を押して、通報の入力を始めましょう。",
+   "vi": "{note}Đã đánh dấu! Bấm “{page:同意}” ở dưới để bắt đầu điền thông tin trình báo.",
+   "id": "{note}Sudah dicentang! Tekan “{page:同意}” di bawah untuk mulai mengisi laporan.",
+   "th": "{note}ติ๊กแล้ว! กด “{page:同意}” ด้านล่าง เพื่อเริ่มกรอกข้อมูลแจ้งความ"
+  },
+  "{now}上面「回覆」是警察的回覆。點「詳細內容」，可以看你報案時寫的內容。": {
+   "en": "{now}“{page:回覆}” at the top is the police's reply. Tap “{page:詳細內容}” to see what you wrote in your report.",
+   "ja": "{now}上の「{page:回覆}」は警察からの返信です。「{page:詳細內容}」を押すと、通報したときに書いた内容が見られます。",
+   "vi": "{now}“{page:回覆}” ở trên là phản hồi của cảnh sát. Bấm “{page:詳細內容}” để xem nội dung bạn đã viết khi trình báo.",
+   "id": "{now}“{page:回覆}” di atas adalah balasan polisi. Tekan “{page:詳細內容}” untuk melihat isi laporan yang Anda tulis.",
+   "th": "{now}“{page:回覆}” ด้านบนคือคำตอบจากตำรวจ กด “{page:詳細內容}” เพื่อดูสิ่งที่คุณเขียนตอนแจ้งความ"
+  },
+  "{scroll}勾「本人已詳閱並同意以上內容」，下面灰色的「下一步」才會變成可以按。": {
+   "en": "{scroll}Tick “{page:本人已詳閱並同意以上內容}”. Then the grey “{page:下一步}” button below can be tapped.",
+   "ja": "{scroll}「{page:本人已詳閱並同意以上內容}」にチェックを入れると、下の灰色の「{page:下一步}」が押せるようになります。",
+   "vi": "{scroll}Đánh dấu “{page:本人已詳閱並同意以上內容}”, nút “{page:下一步}” màu xám ở dưới mới bấm được.",
+   "id": "{scroll}Centang “{page:本人已詳閱並同意以上內容}”, baru tombol abu-abu “{page:下一步}” di bawah bisa ditekan.",
+   "th": "{scroll}ติ๊ก “{page:本人已詳閱並同意以上內容}” แล้วปุ่ม “{page:下一步}” สีเทาด้านล่างจึงจะกดได้"
+  },
+  "{scroll}按「下一步」，接著填案件的資料。": {
+   "en": "{scroll}Tap “{page:下一步}”, then fill in the case details.",
+   "ja": "{scroll}「{page:下一步}」を押して、次に事件の内容を入力します。",
+   "vi": "{scroll}Bấm “{page:下一步}”, rồi điền thông tin vụ việc.",
+   "id": "{scroll}Tekan “{page:下一步}”, lalu isi data kasusnya.",
+   "th": "{scroll}กด “{page:下一步}” แล้วกรอกข้อมูลของเหตุการณ์"
+  },
+  "、": {
+   "en": ", ",
+   "ja": "、",
+   "vi": ", ",
+   "id": ", ",
+   "th": ", "
+  },
+  "「報案人類別」點一下選一個；「發生日期」點框框會跳出月曆，點那一天；「發生時間」已先填現在的時間；「案情摘要」寫發生了什麼事。": {
+   "en": "“{page:報案人類別}”: tap and pick one. “{page:發生日期}”: tap the box to open the calendar, then tap the day. “{page:發生時間}” is already set to the current time. “{page:案情摘要}”: write what happened.",
+   "ja": "「{page:報案人類別}」は押して1つ選びます。「{page:發生日期}」は枠を押すとカレンダーが出るので、その日を押します。「{page:發生時間}」には今の時刻が入っています。「{page:案情摘要}」には何があったかを書きます。",
+   "vi": "“{page:報案人類別}”: bấm và chọn một mục. “{page:發生日期}”: bấm vào ô sẽ hiện lịch, chọn ngày đó. “{page:發生時間}” đã điền sẵn giờ hiện tại. “{page:案情摘要}”: viết chuyện gì đã xảy ra.",
+   "id": "“{page:報案人類別}”: tekan dan pilih satu. “{page:發生日期}”: tekan kotaknya, kalender akan muncul, lalu pilih tanggalnya. “{page:發生時間}” sudah diisi jam sekarang. “{page:案情摘要}”: tulis apa yang terjadi.",
+   "th": "“{page:報案人類別}” กดแล้วเลือกหนึ่งอย่าง “{page:發生日期}” กดช่องแล้วจะมีปฏิทินขึ้นมา กดวันที่เกิดเหตุ “{page:發生時間}” ใส่เวลาปัจจุบันไว้แล้ว “{page:案情摘要}” เขียนว่าเกิดอะไรขึ้น"
+  },
+  "「戶籍地址」再點「請選擇區域」選一個區。": {
+   "en": "For “{page:戶籍地址}”, tap “{page:請選擇區域}” and pick a district.",
+   "ja": "「{page:戶籍地址}」も「{page:請選擇區域}」を押して区を選んでください。",
+   "vi": "Ở “{page:戶籍地址}”, bấm “{page:請選擇區域}” và chọn một quận.",
+   "id": "Untuk “{page:戶籍地址}”, tekan “{page:請選擇區域}” lalu pilih distriknya.",
+   "th": "ที่ “{page:戶籍地址}” กด “{page:請選擇區域}” แล้วเลือกเขต"
+  },
+  "「戶籍地址」跟上面的通訊地址一樣的話，勾「同通訊地址」就好；不一樣就點「請選擇縣市」自己選。": {
+   "en": "If your “{page:戶籍地址}” is the same as the mailing address above, just tick “{page:同通訊地址}”. If not, tap “{page:請選擇縣市}” and choose it yourself.",
+   "ja": "「{page:戶籍地址}」が上の連絡先住所と同じなら、「{page:同通訊地址}」にチェックするだけでOKです。違う場合は「{page:請選擇縣市}」を押して選んでください。",
+   "vi": "Nếu “{page:戶籍地址}” giống địa chỉ liên lạc ở trên, chỉ cần đánh dấu “{page:同通訊地址}”. Nếu khác, bấm “{page:請選擇縣市}” và tự chọn.",
+   "id": "Kalau “{page:戶籍地址}” sama dengan alamat surat di atas, cukup centang “{page:同通訊地址}”. Kalau berbeda, tekan “{page:請選擇縣市}” dan pilih sendiri.",
+   "th": "ถ้า “{page:戶籍地址}” เหมือนกับที่อยู่ติดต่อด้านบน ติ๊ก “{page:同通訊地址}” ได้เลย ถ้าไม่เหมือน กด “{page:請選擇縣市}” แล้วเลือกเอง"
+  },
+  "「發生時間」已經先填「{time}」，不對可以點時、分改。": {
+   "en": "“{page:發生時間}” is already set to “{time}”. If that's wrong, tap the hour or minute to change it. ",
+   "ja": "「{page:發生時間}」には「{time}」が入っています。違うときは時・分を押して直せます。",
+   "vi": "“{page:發生時間}” đã điền sẵn “{time}”. Nếu chưa đúng, bấm vào giờ, phút để sửa. ",
+   "id": "“{page:發生時間}” sudah diisi “{time}”. Kalau salah, tekan jam atau menitnya untuk mengubah. ",
+   "th": "“{page:發生時間}” ใส่ “{time}” ไว้แล้ว ถ้าไม่ถูก กดที่ชั่วโมงหรือนาทีเพื่อแก้ "
+  },
+  "「送出」還是灰色的。先勾「本人已詳閱並同意以上內容」，它才會變成可以按。": {
+   "en": "“{page:送出}” is still grey. Tick “{page:本人已詳閱並同意以上內容}” first, then it can be tapped.",
+   "ja": "「{page:送出}」はまだ灰色です。先に「{page:本人已詳閱並同意以上內容}」にチェックすると、押せるようになります。",
+   "vi": "“{page:送出}” vẫn còn màu xám. Hãy đánh dấu “{page:本人已詳閱並同意以上內容}” trước, nút mới bấm được.",
+   "id": "“{page:送出}” masih abu-abu. Centang dulu “{page:本人已詳閱並同意以上內容}”, baru tombolnya bisa ditekan.",
+   "th": "“{page:送出}” ยังเป็นสีเทา ติ๊ก “{page:本人已詳閱並同意以上內容}” ก่อน แล้วจึงจะกดได้"
+  },
+  "「通訊地址」先點「請選擇縣市」，選你住的縣市。": {
+   "en": "For “{page:通訊地址}”, first tap “{page:請選擇縣市}” and pick the city or county you live in.",
+   "ja": "「{page:通訊地址}」は、まず「{page:請選擇縣市}」を押して、住んでいる県・市を選んでください。",
+   "vi": "Ở “{page:通訊地址}”, trước tiên bấm “{page:請選擇縣市}” và chọn thành phố/huyện bạn sống.",
+   "id": "Untuk “{page:通訊地址}”, tekan dulu “{page:請選擇縣市}” lalu pilih kota/kabupaten tempat Anda tinggal.",
+   "th": "ที่ “{page:通訊地址}” กด “{page:請選擇縣市}” ก่อน แล้วเลือกเมืองหรือเทศมณฑลที่คุณอาศัยอยู่"
+  },
+  "上面「回覆」是警察的回覆，「詳細內容」是你報案時寫的內容。": {
+   "en": "“{page:回覆}” at the top is the police's reply, and “{page:詳細內容}” is what you wrote in your report.",
+   "ja": "上の「{page:回覆}」は警察からの返信、「{page:詳細內容}」は通報したときに書いた内容です。",
+   "vi": "“{page:回覆}” ở trên là phản hồi của cảnh sát, “{page:詳細內容}” là nội dung bạn đã viết khi trình báo.",
+   "id": "“{page:回覆}” di atas adalah balasan polisi, dan “{page:詳細內容}” adalah isi laporan yang Anda tulis.",
+   "th": "“{page:回覆}” ด้านบนคือคำตอบจากตำรวจ ส่วน “{page:詳細內容}” คือสิ่งที่คุณเขียนตอนแจ้งความ"
+  },
+  "下面是「個人資料收集聲明」。先往下滑，把聲明看完喔。看到最下面，我再告訴你要按哪裡。": {
+   "en": "Below is the “Personal Data Collection Statement”. Scroll down and read it all first. When you reach the bottom, I'll tell you what to tap.",
+   "ja": "下は「個人情報収集に関する声明」です。まず下にスクロールして、最後まで読んでください。一番下まで来たら、どこを押すかお伝えします。",
+   "vi": "Bên dưới là “Tuyên bố thu thập dữ liệu cá nhân”. Hãy kéo xuống và đọc hết trước nhé. Khi đến cuối, mình sẽ chỉ bạn bấm vào đâu.",
+   "id": "Di bawah ini ada “Pernyataan Pengumpulan Data Pribadi”. Gulir ke bawah dan baca sampai habis dulu. Setelah sampai di bawah, saya akan beri tahu apa yang perlu ditekan.",
+   "th": "ด้านล่างคือ “คำชี้แจงการเก็บข้อมูลส่วนบุคคล” เลื่อนลงแล้วอ่านให้จบก่อน พอถึงด้านล่างสุดแล้ว จะบอกว่าต้องกดตรงไหน"
+  },
+  "下面是「個人資料收集聲明」。先往下滑，灰色框裡的字也要用手指在框裡往上推，把聲明看完喔。看到最下面，我再告訴你要按哪裡。": {
+   "en": "Below is the “Personal Data Collection Statement”. Scroll down first. For the text in the grey box, also push it up with your finger inside the box, and read it all. When you reach the bottom, I'll tell you what to tap.",
+   "ja": "下は「個人情報収集に関する声明」です。まず下にスクロールしてください。灰色の枠の中の文字は、枠の中を指で上に押して、最後まで読んでください。一番下まで来たら、どこを押すかお伝えします。",
+   "vi": "Bên dưới là “Tuyên bố thu thập dữ liệu cá nhân”. Hãy kéo xuống trước. Chữ trong khung xám thì dùng ngón tay đẩy lên ngay trong khung, đọc hết nhé. Khi đến cuối, mình sẽ chỉ bạn bấm vào đâu.",
+   "id": "Di bawah ini ada “Pernyataan Pengumpulan Data Pribadi”. Gulir ke bawah dulu. Teks di kotak abu-abu juga perlu digeser ke atas dengan jari di dalam kotaknya, baca sampai habis. Setelah sampai di bawah, saya akan beri tahu apa yang perlu ditekan.",
+   "th": "ด้านล่างคือ “คำชี้แจงการเก็บข้อมูลส่วนบุคคล” เลื่อนลงก่อน ข้อความในกรอบสีเทาให้ใช้นิ้วดันขึ้นในกรอบด้วย อ่านให้จบ พอถึงด้านล่างสุดแล้ว จะบอกว่าต้องกดตรงไหน"
+  },
+  "不緊急的案件可以在網路上報案：先看須知，再填聯絡資料和案情，最後送出。也可以看報案紀錄和處理進度。緊急事件請馬上打 110。": {
+   "en": "Cases that are not urgent can be reported online: read the notice, fill in your contact details and what happened, then send it. You can also see your past reports and their progress. In an emergency, call 110 right away.",
+   "ja": "緊急でない事件はネットで通報できます。まず注意事項を読み、連絡先と事件の内容を入力して、最後に送信します。通報の記録や処理の進み具合も見られます。緊急の場合はすぐに 110 に電話してください。",
+   "vi": "Vụ việc không khẩn cấp có thể trình báo qua mạng: đọc phần lưu ý, điền thông tin liên lạc và nội dung vụ việc, rồi gửi đi. Bạn cũng có thể xem hồ sơ trình báo và tiến độ xử lý. Trường hợp khẩn cấp, hãy gọi ngay 110.",
+   "id": "Kasus yang tidak darurat bisa dilaporkan online: baca ketentuannya, isi data kontak dan kejadiannya, lalu kirim. Anda juga bisa melihat riwayat laporan dan perkembangannya. Dalam keadaan darurat, segera telepon 110.",
+   "th": "เรื่องที่ไม่เร่งด่วนแจ้งความทางออนไลน์ได้: อ่านข้อควรทราบ กรอกข้อมูลติดต่อและรายละเอียดเหตุการณ์ แล้วส่ง ดูประวัติการแจ้งความและความคืบหน้าได้ด้วย กรณีฉุกเฉินโทร 110 ทันที"
+  },
+  "再點旁邊的「請選擇區域」，選你住的區。": {
+   "en": "Then tap “{page:請選擇區域}” next to it and pick your district.",
+   "ja": "次に隣の「{page:請選擇區域}」を押して、住んでいる区を選んでください。",
+   "vi": "Rồi bấm “{page:請選擇區域}” bên cạnh và chọn quận bạn sống.",
+   "id": "Lalu tekan “{page:請選擇區域}” di sebelahnya dan pilih distrik tempat Anda tinggal.",
+   "th": "แล้วกด “{page:請選擇區域}” ที่อยู่ข้างๆ เลือกเขตที่คุณอาศัยอยู่"
+  },
+  "到下一步": {
+   "en": "Go to the next step",
+   "ja": "次のステップへ",
+   "vi": "Sang bước tiếp theo",
+   "id": "Lanjut ke langkah berikutnya",
+   "th": "ไปขั้นตอนถัดไป"
+  },
+  "到第 2 步了！接下來填案件的資料。": {
+   "en": "You're on step 2! Next, fill in the case details.",
+   "ja": "ステップ2に進みました！次は事件の内容を入力します。",
+   "vi": "Đã sang bước 2! Tiếp theo, điền thông tin vụ việc.",
+   "id": "Sudah di langkah 2! Selanjutnya, isi data kasusnya.",
+   "th": "มาถึงขั้นตอนที่ 2 แล้ว! ต่อไปกรอกข้อมูลของเหตุการณ์"
+  },
+  "勾選同意個資聲明": {
+   "en": "Tick to agree to the personal data statement",
+   "ja": "個人情報の声明に同意する",
+   "vi": "Đánh dấu đồng ý tuyên bố dữ liệu cá nhân",
+   "id": "Centang setuju pernyataan data pribadi",
+   "th": "ติ๊กยอมรับคำชี้แจงข้อมูลส่วนบุคคล"
+  },
+  "勾選同意，按「下一步」": {
+   "en": "Tick to agree, then tap “{page:下一步}”",
+   "ja": "同意にチェックして「{page:下一步}」を押す",
+   "vi": "Đánh dấu đồng ý, bấm “{page:下一步}”",
+   "id": "Centang setuju, tekan “{page:下一步}”",
+   "th": "ติ๊กยอมรับ แล้วกด “{page:下一步}”"
+  },
+  "同意個資聲明": {
+   "en": "Agree to the personal data statement",
+   "ja": "個人情報の声明に同意",
+   "vi": "Đồng ý tuyên bố dữ liệu cá nhân",
+   "id": "Setujui pernyataan data pribadi",
+   "th": "ยอมรับคำชี้แจงข้อมูลส่วนบุคคล"
+  },
+  "同意好了！接下來填你的聯絡資料。": {
+   "en": "Agreed! Next, fill in your contact details.",
+   "ja": "同意できました！次は連絡先を入力します。",
+   "vi": "Đã đồng ý! Tiếp theo, điền thông tin liên lạc của bạn.",
+   "id": "Sudah setuju! Selanjutnya, isi data kontak Anda.",
+   "th": "ยอมรับแล้ว! ต่อไปกรอกข้อมูลติดต่อของคุณ"
+  },
+  "回到報案紀錄": {
+   "en": "Back to my police reports",
+   "ja": "通報の記録に戻る",
+   "vi": "Quay lại hồ sơ trình báo",
+   "id": "Kembali ke riwayat laporan",
+   "th": "กลับไปที่ประวัติการแจ้งความ"
+  },
+  "回到線上報案": {
+   "en": "Back to the online police report",
+   "ja": "オンライン通報に戻る",
+   "vi": "Quay lại trình báo trực tuyến",
+   "id": "Kembali ke lapor polisi online",
+   "th": "กลับไปที่แจ้งความออนไลน์"
+  },
+  "回到線上報案畫面": {
+   "en": "Back to the online police report page",
+   "ja": "オンライン通報の画面に戻る",
+   "vi": "Quay lại màn hình trình báo trực tuyến",
+   "id": "Kembali ke halaman lapor polisi online",
+   "th": "กลับไปที่หน้าแจ้งความออนไลน์"
+  },
+  "在「戶籍地址」的「請輸入詳細地址」打路名和門牌。": {
+   "en": "In “{page:請輸入詳細地址}” under “{page:戶籍地址}”, type the street and house number.",
+   "ja": "「{page:戶籍地址}」の「{page:請輸入詳細地址}」に、通り名と番地を入力してください。",
+   "vi": "Ở ô “{page:請輸入詳細地址}” của “{page:戶籍地址}”, nhập tên đường và số nhà.",
+   "id": "Di “{page:請輸入詳細地址}” pada “{page:戶籍地址}”, ketik nama jalan dan nomor rumah.",
+   "th": "ที่ “{page:請輸入詳細地址}” ของ “{page:戶籍地址}” พิมพ์ชื่อถนนและเลขที่บ้าน"
+  },
+  "在「標注發生地點」打事情發生的地址，或按框框右邊的定位圖示。": {
+   "en": "In “{page:標注發生地點}”, type the address where it happened, or tap the location icon on the right of the box.",
+   "ja": "「{page:標注發生地點}」に起きた場所の住所を入力するか、枠の右にある位置アイコンを押してください。",
+   "vi": "Ở “{page:標注發生地點}”, nhập địa chỉ nơi xảy ra sự việc, hoặc bấm biểu tượng định vị bên phải ô.",
+   "id": "Di “{page:標注發生地點}”, ketik alamat tempat kejadian, atau tekan ikon lokasi di sebelah kanan kotak.",
+   "th": "ที่ “{page:標注發生地點}” พิมพ์ที่อยู่ที่เกิดเหตุ หรือกดไอคอนระบุตำแหน่งทางขวาของช่อง"
+  },
+  "在「請輸入詳細地址」打路名和門牌，例如「市府路1號」。": {
+   "en": "In “{page:請輸入詳細地址}”, type the street and house number, e.g. “市府路1號”.",
+   "ja": "「{page:請輸入詳細地址}」に通り名と番地を入力してください。例：「市府路1號」。",
+   "vi": "Ở “{page:請輸入詳細地址}”, nhập tên đường và số nhà, ví dụ “市府路1號”.",
+   "id": "Di “{page:請輸入詳細地址}”, ketik nama jalan dan nomor rumah, misalnya “市府路1號”.",
+   "th": "ที่ “{page:請輸入詳細地址}” พิมพ์ชื่อถนนและเลขที่บ้าน เช่น “市府路1號”"
+  },
+  "在報案紀錄點一筆案件": {
+   "en": "Open a case in my police reports",
+   "ja": "通報の記録で案件を1つ開く",
+   "vi": "Mở một vụ trong hồ sơ trình báo",
+   "id": "Buka satu kasus di riwayat laporan",
+   "th": "เปิดคดีหนึ่งรายการในประวัติการแจ้งความ"
+  },
+  "在月曆點事情發生的那一天。{at}要換月份就按月曆兩邊的箭頭。": {
+   "en": "On the calendar, tap the day it happened. {at}To change the month, tap the arrows on either side of the calendar.",
+   "ja": "カレンダーで起きた日を押してください。{at}月を変えるには、カレンダーの両側の矢印を押します。",
+   "vi": "Trên lịch, bấm vào ngày xảy ra sự việc. {at}Muốn đổi tháng, bấm mũi tên ở hai bên lịch.",
+   "id": "Di kalender, tekan tanggal kejadiannya. {at}Untuk ganti bulan, tekan panah di kedua sisi kalender.",
+   "th": "ในปฏิทิน กดวันที่เกิดเหตุ {at}ถ้าจะเปลี่ยนเดือน กดลูกศรสองข้างของปฏิทิน"
+  },
+  "報案": {
+   "en": "Police report",
+   "ja": "通報",
+   "vi": "Trình báo",
+   "id": "Lapor polisi",
+   "th": "แจ้งความ"
+  },
+  "報案人類別「{role}」": {
+   "en": "“{page:報案人類別}” set to “{role}”",
+   "ja": "「{page:報案人類別}」が「{role}」",
+   "vi": "“{page:報案人類別}” là “{role}”",
+   "id": "“{page:報案人類別}” adalah “{role}”",
+   "th": "“{page:報案人類別}” เป็น “{role}”"
+  },
+  "填案件資料": {
+   "en": "Fill in the case details",
+   "ja": "事件の内容を入力",
+   "vi": "Điền thông tin vụ việc",
+   "id": "Isi data kasus",
+   "th": "กรอกข้อมูลเหตุการณ์"
+  },
+  "填聯絡資料": {
+   "en": "Fill in your contact details",
+   "ja": "連絡先を入力",
+   "vi": "Điền thông tin liên lạc",
+   "id": "Isi data kontak",
+   "th": "กรอกข้อมูลติดต่อ"
+  },
+  "填資料": {
+   "en": "Fill in",
+   "ja": "入力する",
+   "vi": "Điền",
+   "id": "Isi",
+   "th": "กรอกข้อมูล"
+  },
+  "好的！報案紀錄打開了，我們一起來{task}。": {
+   "en": "OK! Your police reports are open. Let's get started: {task}.",
+   "ja": "はい！通報の記録を開きました。一緒に始めましょう：{task}。",
+   "vi": "Được rồi! Hồ sơ trình báo đã mở. Cùng bắt đầu nhé: {task}.",
+   "id": "Baik! Riwayat laporan polisi sudah terbuka. Ayo mulai bersama: {task}.",
+   "th": "ได้เลย! เปิดประวัติการแจ้งความแล้ว มาเริ่มกันเลย: {task}"
+  },
+  "好的！已經幫你打開「報案紀錄」，我會帶你看案件的處理情形。": {
+   "en": "OK! I've opened “My police reports” for you. I'll show you how your cases are being handled.",
+   "ja": "はい！「通報の記録」を開きました。案件の処理状況を一緒に見ていきましょう。",
+   "vi": "Được rồi! Mình đã mở “Hồ sơ trình báo” cho bạn. Mình sẽ hướng dẫn bạn xem tình hình xử lý vụ việc.",
+   "id": "Baik! Saya sudah membuka “Riwayat laporan polisi” untuk Anda. Saya akan memandu Anda melihat perkembangan kasusnya.",
+   "th": "ได้เลย! เปิด “ประวัติการแจ้งความ” ให้แล้ว จะพาดูว่าคดีดำเนินการไปถึงไหน"
+  },
+  "好的！已經幫你打開「線上報案」。我們先看須知，再填你的聯絡資料和案情，最後由你自己按「送出」。網路報案不是緊急報案，如果現在有危險，請馬上打 110！": {
+   "en": "OK! I've opened “Report to the police online” for you. First we'll read the notice, then fill in your contact details and what happened, and at the end you tap “{page:送出}” yourself. An online report is not an emergency report. If you are in danger now, call 110 right away!",
+   "ja": "はい！「オンライン通報」を開きました。まず注意事項を読み、連絡先と事件の内容を入力して、最後にご自分で「{page:送出}」を押します。ネット通報は緊急通報ではありません。今危険な状況なら、すぐに 110 に電話してください！",
+   "vi": "Được rồi! Mình đã mở “Trình báo trực tuyến” cho bạn. Trước tiên mình cùng đọc phần lưu ý, rồi điền thông tin liên lạc và nội dung vụ việc, cuối cùng bạn tự bấm “{page:送出}”. Trình báo qua mạng không phải trình báo khẩn cấp. Nếu bây giờ bạn đang gặp nguy hiểm, hãy gọi ngay 110!",
+   "id": "Baik! Saya sudah membuka “Lapor polisi online” untuk Anda. Kita baca ketentuannya dulu, lalu isi data kontak dan kejadiannya, dan terakhir Anda sendiri yang menekan “{page:送出}”. Laporan online bukan laporan darurat. Kalau sekarang Anda dalam bahaya, segera telepon 110!",
+   "th": "ได้เลย! เปิด “แจ้งความออนไลน์” ให้แล้ว เราจะอ่านข้อควรทราบก่อน แล้วกรอกข้อมูลติดต่อและรายละเอียดเหตุการณ์ สุดท้ายคุณกด “{page:送出}” เอง การแจ้งความออนไลน์ไม่ใช่การแจ้งเหตุฉุกเฉิน ถ้าตอนนี้มีอันตราย โทร 110 ทันที!"
+  },
+  "好的！已經幫你打開「線上報案」，我會在畫面上一步一步帶你做。緊急狀況請直接打 110。": {
+   "en": "OK! I've opened “Report to the police online” for you. I'll guide you step by step on the screen. In an emergency, call 110 directly.",
+   "ja": "はい！「オンライン通報」を開きました。画面の上で一つずつご案内します。緊急の場合は直接 110 に電話してください。",
+   "vi": "Được rồi! Mình đã mở “Trình báo trực tuyến” cho bạn. Mình sẽ hướng dẫn từng bước trên màn hình. Trường hợp khẩn cấp, hãy gọi thẳng 110.",
+   "id": "Baik! Saya sudah membuka “Lapor polisi online” untuk Anda. Saya akan memandu langkah demi langkah di layar. Dalam keadaan darurat, langsung telepon 110.",
+   "th": "ได้เลย! เปิด “แจ้งความออนไลน์” ให้แล้ว จะพาทำทีละขั้นตอนบนหน้าจอ กรณีฉุกเฉินโทร 110 ได้เลย"
+  },
+  "好的！線上報案打開了，我們一起來{task}。": {
+   "en": "OK! The online police report is open. Let's get started: {task}.",
+   "ja": "はい！オンライン通報を開きました。一緒に始めましょう：{task}。",
+   "vi": "Được rồi! Trình báo trực tuyến đã mở. Cùng bắt đầu nhé: {task}.",
+   "id": "Baik! Lapor polisi online sudah terbuka. Ayo mulai bersama: {task}.",
+   "th": "ได้เลย! เปิดแจ้งความออนไลน์แล้ว มาเริ่มกันเลย: {task}"
+  },
+  "好的！線上報案打開了，我們先看須知。有危險請馬上打 110。": {
+   "en": "OK! The online police report is open. Let's read the notice first. If you are in danger, call 110 right away.",
+   "ja": "はい！オンライン通報を開きました。まず注意事項を読みましょう。危険なときはすぐに 110 に電話してください。",
+   "vi": "Được rồi! Trình báo trực tuyến đã mở. Mình cùng đọc phần lưu ý trước nhé. Nếu gặp nguy hiểm, hãy gọi ngay 110.",
+   "id": "Baik! Lapor polisi online sudah terbuka. Kita baca ketentuannya dulu. Kalau dalam bahaya, segera telepon 110.",
+   "th": "ได้เลย! เปิดแจ้งความออนไลน์แล้ว มาอ่านข้อควรทราบกันก่อน ถ้ามีอันตราย โทร 110 ทันที"
+  },
+  "姓名和身分證字號已經帶好了。點「手機號碼」的框框，打你的手機號碼，例如 0912345678。": {
+   "en": "Your name and ID number are already filled in. Tap the “{page:手機號碼}” box and type your mobile number, e.g. 0912345678.",
+   "ja": "名前と身分証番号はすでに入っています。「{page:手機號碼}」の枠を押して、携帯電話の番号を入力してください。例：0912345678。",
+   "vi": "Họ tên và số giấy tờ tùy thân đã được điền sẵn. Bấm vào ô “{page:手機號碼}” và nhập số điện thoại di động của bạn, ví dụ 0912345678.",
+   "id": "Nama dan nomor identitas sudah terisi. Tekan kotak “{page:手機號碼}” dan ketik nomor HP Anda, misalnya 0912345678.",
+   "th": "ชื่อและเลขบัตรประจำตัวใส่ไว้ให้แล้ว กดช่อง “{page:手機號碼}” แล้วพิมพ์เบอร์มือถือของคุณ เช่น 0912345678"
+  },
+  "建議還是把內容看完喔。": {
+   "en": "It's still a good idea to read it all. ",
+   "ja": "内容は最後まで読んでおくのがおすすめです。",
+   "vi": "Bạn nên đọc hết nội dung nhé. ",
+   "id": "Sebaiknya tetap baca isinya sampai habis. ",
+   "th": "แนะนำให้อ่านเนื้อหาให้จบ "
+  },
+  "往下滑到最下面，點「本人已詳閱並同意以上內容」前面的小方框。": {
+   "en": "Scroll to the very bottom and tap the small box in front of “{page:本人已詳閱並同意以上內容}”.",
+   "ja": "一番下までスクロールして、「{page:本人已詳閱並同意以上內容}」の前の小さな四角を押してください。",
+   "vi": "Kéo xuống cuối cùng, bấm vào ô vuông nhỏ trước “{page:本人已詳閱並同意以上內容}”.",
+   "id": "Gulir sampai paling bawah, lalu tekan kotak kecil di depan “{page:本人已詳閱並同意以上內容}”.",
+   "th": "เลื่อนลงไปล่างสุด แล้วกดช่องสี่เหลี่ยมเล็กหน้า “{page:本人已詳閱並同意以上內容}”"
+  },
+  "往下滑，勾「本人已詳閱並同意以上內容」，再按「下一步」。": {
+   "en": "Scroll down, tick “{page:本人已詳閱並同意以上內容}”, then tap “{page:下一步}”.",
+   "ja": "下にスクロールして「{page:本人已詳閱並同意以上內容}」にチェックし、「{page:下一步}」を押してください。",
+   "vi": "Kéo xuống, đánh dấu “{page:本人已詳閱並同意以上內容}”, rồi bấm “{page:下一步}”.",
+   "id": "Gulir ke bawah, centang “{page:本人已詳閱並同意以上內容}”, lalu tekan “{page:下一步}”.",
+   "th": "เลื่อนลง ติ๊ก “{page:本人已詳閱並同意以上內容}” แล้วกด “{page:下一步}”"
+  },
+  "打好了就按鍵盤上的「完成」或「✓」。": {
+   "en": " When you're done typing, tap “Done” or “✓” on the keyboard.",
+   "ja": "入力が終わったら、キーボードの「完了」か「✓」を押してください。",
+   "vi": " Gõ xong thì bấm “Xong” hoặc “✓” trên bàn phím.",
+   "id": " Kalau sudah selesai mengetik, tekan “Selesai” atau “✓” di keyboard.",
+   "th": " พิมพ์เสร็จแล้วกด “เสร็จ” หรือ “✓” บนแป้นพิมพ์"
+  },
+  "打開這筆案件了！": {
+   "en": "This case is open!",
+   "ja": "この案件を開きました！",
+   "vi": "Đã mở vụ việc này!",
+   "id": "Kasus ini sudah terbuka!",
+   "th": "เปิดคดีนี้แล้ว!"
+  },
+  "按「確認」會回到須知頁。這是示範網站，沒有真的報案喔。真的報案後，像竊盜、詐騙這類案件，警察還會請你到派出所做筆錄。": {
+   "en": "Tapping “{page:確認}” takes you back to the notice page. This is a demo site, so no real report was made. After a real report, for cases like theft or fraud, the police will also ask you to come to the police station to give a statement.",
+   "ja": "「{page:確認}」を押すと注意事項のページに戻ります。これはデモサイトなので、本当に通報されてはいません。実際に通報した後、窃盗や詐欺などの事件では、警察から派出所で調書を取るよう求められます。",
+   "vi": "Bấm “{page:確認}” sẽ quay lại trang lưu ý. Đây là trang web mẫu, chưa trình báo thật đâu. Khi trình báo thật, với các vụ như trộm cắp, lừa đảo, cảnh sát sẽ mời bạn đến đồn để lấy lời khai.",
+   "id": "Menekan “{page:確認}” akan kembali ke halaman ketentuan. Ini situs demo, jadi tidak benar-benar melapor. Setelah melapor sungguhan, untuk kasus seperti pencurian atau penipuan, polisi akan meminta Anda datang ke kantor polisi untuk memberi keterangan.",
+   "th": "กด “{page:確認}” จะกลับไปที่หน้าข้อควรทราบ นี่เป็นเว็บไซต์สาธิต ยังไม่ได้แจ้งความจริง เมื่อแจ้งความจริงแล้ว คดีอย่างลักทรัพย์หรือฉ้อโกง ตำรวจจะขอให้ไปให้ปากคำที่สถานีตำรวจ"
+  },
+  "按左上角的「‹」可以回到報案紀錄。網路報案大約 5 天內回覆（假日順延）。": {
+   "en": "Tap “‹” at the top left to go back to your police reports. Online reports are answered within about 5 days (later if there are holidays).",
+   "ja": "左上の「‹」を押すと通報の記録に戻れます。ネット通報への返信は約5日以内です（休日は順延）。",
+   "vi": "Bấm “‹” ở góc trên bên trái để quay lại hồ sơ trình báo. Trình báo qua mạng sẽ được phản hồi trong khoảng 5 ngày (gặp ngày nghỉ thì lùi lại).",
+   "id": "Tekan “‹” di kiri atas untuk kembali ke riwayat laporan. Laporan online dibalas dalam sekitar 5 hari (diundur jika ada hari libur).",
+   "th": "กด “‹” มุมซ้ายบนเพื่อกลับไปที่ประวัติการแจ้งความ การแจ้งความออนไลน์จะได้รับคำตอบภายในประมาณ 5 วัน (เลื่อนออกไปถ้าตรงกับวันหยุด)"
+  },
+  "按畫面最下面的「下一步」。": {
+   "en": "Tap “{page:下一步}” at the very bottom of the screen.",
+   "ja": "画面の一番下の「{page:下一步}」を押してください。",
+   "vi": "Bấm “{page:下一步}” ở cuối màn hình.",
+   "id": "Tekan “{page:下一步}” di bagian paling bawah layar.",
+   "th": "กด “{page:下一步}” ที่ล่างสุดของหน้าจอ"
+  },
+  "按畫面最下面的「同意」。": {
+   "en": "Tap “{page:同意}” at the very bottom of the screen.",
+   "ja": "画面の一番下の「{page:同意}」を押してください。",
+   "vi": "Bấm “{page:同意}” ở cuối màn hình.",
+   "id": "Tekan “{page:同意}” di bagian paling bawah layar.",
+   "th": "กด “{page:同意}” ที่ล่างสุดของหน้าจอ"
+  },
+  "有 {open} 筆還在「處理中」": {
+   "en": "{open} still “{page:處理中}”",
+   "ja": "{open}件がまだ「{page:處理中}」",
+   "vi": "{open} vụ vẫn đang “{page:處理中}”",
+   "id": "{open} masih “{page:處理中}”",
+   "th": "{open} รายการยัง “{page:處理中}”"
+  },
+  "有「*」的都要填：手機號碼、電子信箱、通訊地址、戶籍地址。住家電話可以不填。戶籍地址一樣的話勾「同通訊地址」。": {
+   "en": "Everything marked “*” must be filled in: mobile number, e-mail, mailing address and registered address. Home phone is optional. If the registered address is the same, tick “{page:同通訊地址}”.",
+   "ja": "「*」の付いた項目は必須です：携帯電話番号、メールアドレス、連絡先住所、戸籍住所。自宅の電話は空欄でも大丈夫です。戸籍住所が同じなら「{page:同通訊地址}」にチェックしてください。",
+   "vi": "Những mục có “*” đều phải điền: số di động, e-mail, địa chỉ liên lạc, địa chỉ hộ khẩu. Điện thoại nhà có thể bỏ trống. Nếu địa chỉ hộ khẩu giống nhau, đánh dấu “{page:同通訊地址}”.",
+   "id": "Semua yang bertanda “*” wajib diisi: nomor HP, e-mail, alamat surat, dan alamat domisili resmi. Telepon rumah boleh dikosongkan. Kalau alamat domisili resminya sama, centang “{page:同通訊地址}”.",
+   "th": "ช่องที่มี “*” ต้องกรอกทั้งหมด: เบอร์มือถือ อีเมล ที่อยู่ติดต่อ ที่อยู่ตามทะเบียนบ้าน เบอร์โทรบ้านไม่ต้องกรอกก็ได้ ถ้าที่อยู่ตามทะเบียนบ้านเหมือนกัน ติ๊ก “{page:同通訊地址}”"
+  },
+  "案件 {no}": {
+   "en": "case {no}",
+   "ja": "案件 {no}",
+   "vi": "vụ việc {no}",
+   "id": "kasus {no}",
+   "th": "คดี {no}"
+  },
+  "案件資料填好了！": {
+   "en": "The case details are filled in!",
+   "ja": "事件の内容を入力できました！",
+   "vi": "Đã điền xong thông tin vụ việc!",
+   "id": "Data kasus sudah terisi!",
+   "th": "กรอกข้อมูลเหตุการณ์เรียบร้อยแล้ว!"
+  },
+  "每一筆左邊是報案日期和編號，右邊寫「處理中」或「已結案」。點一筆可以看警察的回覆。": {
+   "en": "Each entry shows the report date and number on the left, and “{page:處理中}” or “{page:已結案}” on the right. Tap one to see the police's reply.",
+   "ja": "各行の左に通報日と番号、右に「{page:處理中}」か「{page:已結案}」が書かれています。1件押すと警察の返信が見られます。",
+   "vi": "Mỗi dòng bên trái là ngày trình báo và số hồ sơ, bên phải ghi “{page:處理中}” hoặc “{page:已結案}”. Bấm vào một dòng để xem phản hồi của cảnh sát.",
+   "id": "Setiap baris menunjukkan tanggal dan nomor laporan di kiri, dan “{page:處理中}” atau “{page:已結案}” di kanan. Tekan salah satu untuk melihat balasan polisi.",
+   "th": "แต่ละรายการ ทางซ้ายคือวันที่แจ้งความและเลขที่ ทางขวาเขียนว่า “{page:處理中}” หรือ “{page:已結案}” กดรายการใดก็ได้เพื่อดูคำตอบจากตำรวจ"
+  },
+  "照畫面填手機號碼、電子信箱和地址。": {
+   "en": "Follow the screen to fill in your mobile number, e-mail and address.",
+   "ja": "画面に沿って、携帯電話番号、メールアドレス、住所を入力してください。",
+   "vi": "Làm theo màn hình để điền số di động, e-mail và địa chỉ.",
+   "id": "Ikuti layar untuk mengisi nomor HP, e-mail, dan alamat.",
+   "th": "ทำตามหน้าจอ กรอกเบอร์มือถือ อีเมล และที่อยู่"
+  },
+  "照畫面把案件資料填好。": {
+   "en": "Follow the screen to fill in the case details.",
+   "ja": "画面に沿って事件の内容を入力してください。",
+   "vi": "Làm theo màn hình để điền thông tin vụ việc.",
+   "id": "Ikuti layar untuk mengisi data kasus.",
+   "th": "ทำตามหน้าจอ กรอกข้อมูลเหตุการณ์ให้ครบ"
+  },
+  "照畫面把聯絡資料填好。": {
+   "en": "Follow the screen to fill in your contact details.",
+   "ja": "画面に沿って連絡先を入力してください。",
+   "vi": "Làm theo màn hình để điền thông tin liên lạc.",
+   "id": "Ikuti layar untuk mengisi data kontak.",
+   "th": "ทำตามหน้าจอ กรอกข้อมูลติดต่อให้ครบ"
+  },
+  "照畫面選報案人類別，再填發生地點、日期和案情摘要。": {
+   "en": "Follow the screen: choose the reporter type, then fill in the place, date and case summary.",
+   "ja": "画面に沿って通報者の種類を選び、発生場所・日付・事件の概要を入力してください。",
+   "vi": "Làm theo màn hình: chọn loại người trình báo, rồi điền địa điểm, ngày và tóm tắt vụ việc.",
+   "id": "Ikuti layar: pilih jenis pelapor, lalu isi tempat, tanggal, dan ringkasan kejadian.",
+   "th": "ทำตามหน้าจอ เลือกประเภทผู้แจ้ง แล้วกรอกสถานที่ วันที่ และสรุปเหตุการณ์"
+  },
+  "現在是「{month}」，": {
+   "en": "It's now showing “{month}”. ",
+   "ja": "今は「{month}」です。",
+   "vi": "Hiện đang là “{month}”. ",
+   "id": "Sekarang “{month}”. ",
+   "th": "ตอนนี้เป็น “{month}” "
+  },
+  "發生日期 {date}": {
+   "en": "“{page:發生日期}” {date}",
+   "ja": "「{page:發生日期}」{date}",
+   "vi": "“{page:發生日期}” {date}",
+   "id": "“{page:發生日期}” {date}",
+   "th": "“{page:發生日期}” {date}"
+  },
+  "看一下填的資料對不對，沒問題就自己按最下面的「送出」。不想報了，按左上角的「‹」離開就好。": {
+   "en": "Check that what you filled in is right. If it is, tap “{page:送出}” at the bottom yourself. If you don't want to report anymore, just tap “‹” at the top left to leave.",
+   "ja": "入力した内容が正しいか確認して、問題なければご自分で一番下の「{page:送出}」を押してください。通報をやめるなら、左上の「‹」を押して離れれば大丈夫です。",
+   "vi": "Xem lại thông tin đã điền có đúng không, nếu không có vấn đề gì thì tự bấm “{page:送出}” ở cuối. Nếu không muốn trình báo nữa, chỉ cần bấm “‹” ở góc trên bên trái để thoát.",
+   "id": "Periksa apakah data yang diisi sudah benar. Kalau sudah, tekan sendiri “{page:送出}” di paling bawah. Kalau tidak jadi melapor, cukup tekan “‹” di kiri atas untuk keluar.",
+   "th": "ดูว่าข้อมูลที่กรอกถูกต้องไหม ถ้าไม่มีปัญหา กด “{page:送出}” ด้านล่างสุดด้วยตัวเอง ถ้าไม่อยากแจ้งแล้ว กด “‹” มุมซ้ายบนเพื่อออกได้เลย"
+  },
+  "看報案紀錄": {
+   "en": "View my police reports",
+   "ja": "通報の記録を見る",
+   "vi": "Xem hồ sơ trình báo",
+   "id": "Lihat riwayat laporan",
+   "th": "ดูประวัติการแจ้งความ"
+  },
+  "看報案進度": {
+   "en": "Check my case progress",
+   "ja": "通報の進み具合を見る",
+   "vi": "Xem tiến độ trình báo",
+   "id": "Lihat status laporan",
+   "th": "ดูความคืบหน้าการแจ้งความ"
+  },
+  "看報案須知": {
+   "en": "Read the reporting notice",
+   "ja": "通報の注意事項を読む",
+   "vi": "Đọc lưu ý trình báo",
+   "id": "Baca ketentuan melapor",
+   "th": "อ่านข้อควรทราบการแจ้งความ"
+  },
+  "看案件的回覆和詳細內容": {
+   "en": "See the reply and details of a case",
+   "ja": "案件の返信と詳しい内容を見る",
+   "vi": "Xem phản hồi và chi tiết vụ việc",
+   "id": "Lihat balasan dan detail kasus",
+   "th": "ดูคำตอบและรายละเอียดของคดี"
+  },
+  "看須知，按「同意」": {
+   "en": "Read the notice, then tap “{page:同意}”",
+   "ja": "注意事項を読んで「{page:同意}」を押す",
+   "vi": "Đọc lưu ý, bấm “{page:同意}”",
+   "id": "Baca ketentuan, tekan “{page:同意}”",
+   "th": "อ่านข้อควรทราบ แล้วกด “{page:同意}”"
+  },
+  "紅字「不能為空」就是還沒填的格子。": {
+   "en": "The red “{page:不能為空}” marks a box that is still empty. ",
+   "ja": "赤い「{page:不能為空}」の文字は、まだ入力していない欄です。",
+   "vi": "Chữ đỏ “{page:不能為空}” là ô chưa điền. ",
+   "id": "Tulisan merah “{page:不能為空}” menandai kotak yang belum diisi. ",
+   "th": "ตัวหนังสือสีแดง “{page:不能為空}” คือช่องที่ยังไม่ได้กรอก "
+  },
+  "網路報案": {
+   "en": "Report to the police online",
+   "ja": "オンライン通報",
+   "vi": "Trình báo trực tuyến",
+   "id": "Lapor polisi online",
+   "th": "แจ้งความออนไลน์"
+  },
+  "網路報案大約 5 天內會回覆（假日順延）。": {
+   "en": " Online reports are answered within about 5 days (later if there are holidays).",
+   "ja": "ネット通報には約5日以内に返信があります（休日は順延）。",
+   "vi": " Trình báo qua mạng sẽ được phản hồi trong khoảng 5 ngày (gặp ngày nghỉ thì lùi lại).",
+   "id": " Laporan online akan dibalas dalam sekitar 5 hari (diundur jika ada hari libur).",
+   "th": " การแจ้งความออนไลน์จะได้รับคำตอบภายในประมาณ 5 วัน (เลื่อนออกไปถ้าตรงกับวันหยุด)"
+  },
+  "線上報案": {
+   "en": "Report to the police online",
+   "ja": "オンライン通報",
+   "vi": "Trình báo trực tuyến",
+   "id": "Lapor polisi online",
+   "th": "แจ้งความออนไลน์"
+  },
+  "聯絡資料填好了！": {
+   "en": "Your contact details are filled in!",
+   "ja": "連絡先を入力できました！",
+   "vi": "Đã điền xong thông tin liên lạc!",
+   "id": "Data kontak sudah terisi!",
+   "th": "กรอกข้อมูลติดต่อเรียบร้อยแล้ว!"
+  },
+  "聲明是說：警察局會用你填的資料確認你的身分、跟你聯絡；你也可以要求查詢、更正或刪除自己的資料。往下滑到最下面就看完了。": {
+   "en": "The statement says: the police department will use the information you fill in to confirm who you are and to contact you; you can also ask to view, correct or delete your own data. Scroll to the very bottom and you're done reading.",
+   "ja": "声明の内容：警察局は入力された情報を、本人確認と連絡のために使います。自分の情報の照会・訂正・削除を求めることもできます。一番下までスクロールすれば読み終わりです。",
+   "vi": "Tuyên bố nói rằng: sở cảnh sát sẽ dùng thông tin bạn điền để xác nhận danh tính và liên lạc với bạn; bạn cũng có thể yêu cầu xem, sửa hoặc xóa dữ liệu của mình. Kéo xuống cuối là đọc xong.",
+   "id": "Isi pernyataannya: kepolisian akan memakai data yang Anda isi untuk memastikan identitas Anda dan menghubungi Anda; Anda juga bisa meminta melihat, memperbaiki, atau menghapus data Anda sendiri. Gulir sampai paling bawah, selesai dibaca.",
+   "th": "คำชี้แจงบอกว่า: สำนักงานตำรวจจะใช้ข้อมูลที่คุณกรอกเพื่อยืนยันตัวตนและติดต่อคุณ คุณยังขอดู แก้ไข หรือลบข้อมูลของตัวเองได้ เลื่อนลงไปล่างสุดก็อ่านจบแล้ว"
+  },
+  "聲明看完了！{scroll}勾「本人已詳閱並同意以上內容」，灰色的「送出」才會變成可以按。": {
+   "en": "You've read the statement! {scroll}Tick “{page:本人已詳閱並同意以上內容}”. Then the grey “{page:送出}” can be tapped.",
+   "ja": "声明を読み終わりました！{scroll}「{page:本人已詳閱並同意以上內容}」にチェックすると、灰色の「{page:送出}」が押せるようになります。",
+   "vi": "Đã đọc xong tuyên bố! {scroll}Đánh dấu “{page:本人已詳閱並同意以上內容}”, nút “{page:送出}” màu xám mới bấm được.",
+   "id": "Pernyataan sudah dibaca! {scroll}Centang “{page:本人已詳閱並同意以上內容}”, baru tombol abu-abu “{page:送出}” bisa ditekan.",
+   "th": "อ่านคำชี้แจงจบแล้ว! {scroll}ติ๊ก “{page:本人已詳閱並同意以上內容}” แล้วปุ่ม “{page:送出}” สีเทาจึงจะกดได้"
+  },
+  "要附照片可以按「上傳附件」，不附也可以。往下滑勾同意，再按「送出」。": {
+   "en": "To add a photo, tap “{page:上傳附件}”. It's fine not to add one. Scroll down, tick to agree, then tap “{page:送出}”.",
+   "ja": "写真を付けるなら「{page:上傳附件}」を押します。付けなくても大丈夫です。下にスクロールして同意にチェックし、「{page:送出}」を押してください。",
+   "vi": "Muốn đính kèm ảnh thì bấm “{page:上傳附件}”, không đính kèm cũng được. Kéo xuống đánh dấu đồng ý, rồi bấm “{page:送出}”.",
+   "id": "Kalau mau melampirkan foto, tekan “{page:上傳附件}”. Tidak melampirkan juga tidak apa-apa. Gulir ke bawah, centang setuju, lalu tekan “{page:送出}”.",
+   "th": "ถ้าจะแนบรูป กด “{page:上傳附件}” ไม่แนบก็ได้ เลื่อนลง ติ๊กยอมรับ แล้วกด “{page:送出}”"
+  },
+  "送出了！畫面寫「通報成功」。這是示範網站，沒有真的報案喔。真的要報案，請打 110 或到派出所。": {
+   "en": "Sent! The screen says “{page:通報成功}”. This is a demo site, so no real report was made. To really report something, call 110 or go to a police station.",
+   "ja": "送信しました！画面に「{page:通報成功}」と出ています。これはデモサイトなので、本当に通報されてはいません。実際に通報するときは、110 に電話するか派出所へ行ってください。",
+   "vi": "Đã gửi! Màn hình ghi “{page:通報成功}”. Đây là trang web mẫu, chưa trình báo thật đâu. Muốn trình báo thật, hãy gọi 110 hoặc đến đồn cảnh sát.",
+   "id": "Terkirim! Layar menampilkan “{page:通報成功}”. Ini situs demo, jadi tidak benar-benar melapor. Untuk melapor sungguhan, telepon 110 atau datang ke kantor polisi.",
+   "th": "ส่งแล้ว! หน้าจอขึ้นว่า “{page:通報成功}” นี่เป็นเว็บไซต์สาธิต ยังไม่ได้แจ้งความจริง ถ้าจะแจ้งความจริง โทร 110 หรือไปที่สถานีตำรวจ"
+  },
+  "這就是{which}的詳細內容！": {
+   "en": "Here are the details of {which}!",
+   "ja": "これが{which}の詳しい内容です！",
+   "vi": "Đây là chi tiết của {which}!",
+   "id": "Ini detail {which}!",
+   "th": "นี่คือรายละเอียดของ{which}!"
+  },
+  "這就是{which}的詳細內容，現在是「{status}」。{note}": {
+   "en": "Here are the details of {which}. It is now “{status}”.{note}",
+   "ja": "これが{which}の詳しい内容で、今は「{status}」です。{note}",
+   "vi": "Đây là chi tiết của {which}, hiện đang “{status}”.{note}",
+   "id": "Ini detail {which}, sekarang statusnya “{status}”.{note}",
+   "th": "นี่คือรายละเอียดของ{which} ตอนนี้อยู่ในสถานะ “{status}”{note}"
+  },
+  "這就是你報案寫的內容！": {
+   "en": "This is what you wrote in your report!",
+   "ja": "これが通報で書いた内容です！",
+   "vi": "Đây là nội dung bạn đã viết khi trình báo!",
+   "id": "Ini isi laporan yang Anda tulis!",
+   "th": "นี่คือสิ่งที่คุณเขียนตอนแจ้งความ!"
+  },
+  "這是「線上報案」": {
+   "en": "This is “Report to the police online”",
+   "ja": "これは「オンライン通報」です",
+   "vi": "Đây là “Trình báo trực tuyến”",
+   "id": "Ini “Lapor polisi online”",
+   "th": "นี่คือ “แจ้งความออนไลน์”"
+  },
+  "這是你的報案紀錄，共 {n} 筆，{doing}。點一筆就能看詳細內容。": {
+   "en": "These are your police reports: {n} in total, {doing}. Tap one to see the details.",
+   "ja": "これはあなたの通報の記録です。全部で{n}件、{doing}。1件押すと詳しい内容が見られます。",
+   "vi": "Đây là hồ sơ trình báo của bạn, tổng cộng {n} vụ, {doing}. Bấm vào một vụ để xem chi tiết.",
+   "id": "Ini riwayat laporan Anda, total {n} laporan, {doing}. Tekan salah satu untuk melihat detailnya.",
+   "th": "นี่คือประวัติการแจ้งความของคุณ ทั้งหมด {n} รายการ {doing} กดรายการใดก็ได้เพื่อดูรายละเอียด"
+  },
+  "這是網路報案的須知。網路報案不是緊急報案，現在有危險請馬上打 110！先往下滑，把須知看完喔。看到最下面，我再告訴你要按哪裡。": {
+   "en": "This is the notice for online police reports. An online report is not an emergency report. If you are in danger now, call 110 right away! Scroll down first and read the whole notice. When you reach the bottom, I'll tell you what to tap.",
+   "ja": "これはネット通報の注意事項です。ネット通報は緊急通報ではありません。今危険なら、すぐに 110 に電話してください！まず下にスクロールして、注意事項を最後まで読んでください。一番下まで来たら、どこを押すかお伝えします。",
+   "vi": "Đây là phần lưu ý khi trình báo qua mạng. Trình báo qua mạng không phải trình báo khẩn cấp. Nếu bây giờ đang gặp nguy hiểm, hãy gọi ngay 110! Trước tiên hãy kéo xuống và đọc hết phần lưu ý nhé. Khi đến cuối, mình sẽ chỉ bạn bấm vào đâu.",
+   "id": "Ini ketentuan lapor polisi online. Laporan online bukan laporan darurat. Kalau sekarang Anda dalam bahaya, segera telepon 110! Gulir ke bawah dulu dan baca ketentuannya sampai habis. Setelah sampai di bawah, saya akan beri tahu apa yang perlu ditekan.",
+   "th": "นี่คือข้อควรทราบของการแจ้งความออนไลน์ การแจ้งความออนไลน์ไม่ใช่การแจ้งเหตุฉุกเฉิน ถ้าตอนนี้มีอันตราย โทร 110 ทันที! เลื่อนลงแล้วอ่านข้อควรทราบให้จบก่อน พอถึงด้านล่างสุดแล้ว จะบอกว่าต้องกดตรงไหน"
+  },
+  "這筆案件": {
+   "en": "this case",
+   "ja": "この案件",
+   "vi": "vụ việc này",
+   "id": "kasus ini",
+   "th": "คดีนี้"
+  },
+  "這筆案件現在是「{status}」。": {
+   "en": "This case is now “{status}”. ",
+   "ja": "この案件は今「{status}」です。",
+   "vi": "Vụ việc này hiện đang “{status}”. ",
+   "id": "Status kasus ini sekarang “{status}”. ",
+   "th": "คดีนี้ตอนนี้อยู่ในสถานะ “{status}” "
+  },
+  "這裡目前沒有報案紀錄。": {
+   "en": "There are no police reports here yet.",
+   "ja": "ここにはまだ通報の記録がありません。",
+   "vi": "Ở đây hiện chưa có hồ sơ trình báo nào.",
+   "id": "Belum ada riwayat laporan di sini.",
+   "th": "ตอนนี้ยังไม่มีประวัติการแจ้งความ"
+  },
+  "還有格子沒填好，紅字「不能為空」的地方要補上。往上滑看看。": {
+   "en": "Some boxes are not filled in yet. Fill in the places with the red “{page:不能為空}”. Scroll up to have a look.",
+   "ja": "まだ入力していない欄があります。赤い「{page:不能為空}」の所を埋めてください。上にスクロールして見てみましょう。",
+   "vi": "Vẫn còn ô chưa điền xong, chỗ có chữ đỏ “{page:不能為空}” cần điền thêm. Kéo lên xem thử nhé.",
+   "id": "Masih ada kotak yang belum diisi. Lengkapi bagian dengan tulisan merah “{page:不能為空}”. Coba gulir ke atas.",
+   "th": "ยังมีช่องที่กรอกไม่ครบ ตรงที่มีตัวหนังสือสีแดง “{page:不能為空}” ต้องกรอกเพิ่ม ลองเลื่อนขึ้นดู"
+  },
+  "都已經結案了": {
+   "en": "all of them are closed",
+   "ja": "すべて終結しています",
+   "vi": "tất cả đã kết thúc",
+   "id": "semuanya sudah selesai",
+   "th": "ปิดคดีหมดแล้ว"
+  },
+  "開啟線上報案": {
+   "en": "Open “Report to the police online”",
+   "ja": "オンライン通報を開く",
+   "vi": "Mở Trình báo trực tuyến",
+   "id": "Buka Lapor polisi online",
+   "th": "เปิดแจ้งความออนไลน์"
+  },
+  "須知看完了！勾下面的「本人已詳閱須知並同意繼續」。": {
+   "en": "You've read the notice! Tick “{page:本人已詳閱須知並同意繼續}” below.",
+   "ja": "注意事項を読み終わりました！下の「{page:本人已詳閱須知並同意繼續}」にチェックしてください。",
+   "vi": "Đã đọc xong lưu ý! Đánh dấu “{page:本人已詳閱須知並同意繼續}” ở dưới.",
+   "id": "Ketentuan sudah dibaca! Centang “{page:本人已詳閱須知並同意繼續}” di bawah.",
+   "th": "อ่านข้อควรทราบจบแล้ว! ติ๊ก “{page:本人已詳閱須知並同意繼續}” ด้านล่าง"
+  },
+  "須知重點：緊急事件請打 110；網路報案大約 5 天內回覆；像竊盜、詐騙這類案件，之後還要到派出所做筆錄。往下滑到最下面就看完了。": {
+   "en": "Key points: in an emergency, call 110; online reports are answered within about 5 days; for cases like theft or fraud, you will also need to go to the police station later to give a statement. Scroll to the very bottom and you're done reading.",
+   "ja": "注意事項のポイント：緊急の場合は 110 に電話してください。ネット通報への返信は約5日以内です。窃盗や詐欺などの事件は、後で派出所に行って調書を取る必要があります。一番下までスクロールすれば読み終わりです。",
+   "vi": "Điểm chính: trường hợp khẩn cấp hãy gọi 110; trình báo qua mạng được phản hồi trong khoảng 5 ngày; với các vụ như trộm cắp, lừa đảo, sau đó bạn còn phải đến đồn cảnh sát để lấy lời khai. Kéo xuống cuối là đọc xong.",
+   "id": "Poin penting: dalam keadaan darurat, telepon 110; laporan online dibalas dalam sekitar 5 hari; untuk kasus seperti pencurian atau penipuan, nanti Anda juga perlu ke kantor polisi untuk memberi keterangan. Gulir sampai paling bawah, selesai dibaca.",
+   "th": "ประเด็นสำคัญ: กรณีฉุกเฉินโทร 110 การแจ้งความออนไลน์จะได้รับคำตอบภายในประมาณ 5 วัน คดีอย่างลักทรัพย์หรือฉ้อโกง ภายหลังต้องไปให้ปากคำที่สถานีตำรวจด้วย เลื่อนลงไปล่างสุดก็อ่านจบแล้ว"
+  },
+  "點「報案人類別」選一個：自己遇到的選「當事人」，東西被偷、被騙選「被害人」，看到別人違法選「檢舉人」。": {
+   "en": "Tap “{page:報案人類別}” and pick one: if it happened to you, pick “{page:當事人}”; if something was stolen or you were cheated, pick “{page:被害人}”; if you saw someone else break the law, pick “{page:檢舉人}”.",
+   "ja": "「{page:報案人類別}」を押して1つ選んでください。自分が関わったことなら「{page:當事人}」、物を盗まれた・だまされたなら「{page:被害人}」、他人の違法行為を見たなら「{page:檢舉人}」です。",
+   "vi": "Bấm “{page:報案人類別}” và chọn một mục: việc bạn gặp phải thì chọn “{page:當事人}”, bị mất trộm, bị lừa thì chọn “{page:被害人}”, thấy người khác phạm pháp thì chọn “{page:檢舉人}”.",
+   "id": "Tekan “{page:報案人類別}” dan pilih satu: kalau Anda yang mengalaminya, pilih “{page:當事人}”; kalau barang dicuri atau ditipu, pilih “{page:被害人}”; kalau melihat orang lain melanggar hukum, pilih “{page:檢舉人}”.",
+   "th": "กด “{page:報案人類別}” แล้วเลือกหนึ่งอย่าง: ถ้าเกิดกับตัวเอง เลือก “{page:當事人}” ถ้าของถูกขโมยหรือถูกหลอก เลือก “{page:被害人}” ถ้าเห็นคนอื่นทำผิดกฎหมาย เลือก “{page:檢舉人}”"
+  },
+  "點「發生日期」的框框，會跳出月曆。": {
+   "en": "Tap the “{page:發生日期}” box and a calendar will pop up.",
+   "ja": "「{page:發生日期}」の枠を押すと、カレンダーが出ます。",
+   "vi": "Bấm vào ô “{page:發生日期}”, lịch sẽ hiện ra.",
+   "id": "Tekan kotak “{page:發生日期}”, kalender akan muncul.",
+   "th": "กดช่อง “{page:發生日期}” แล้วปฏิทินจะขึ้นมา"
+  },
+  "點「電子信箱」的框框，打你的 E-mail，警察會用它回覆你。": {
+   "en": "Tap the “{page:電子信箱}” box and type your e-mail. The police will use it to reply to you.",
+   "ja": "「{page:電子信箱}」の枠を押して、メールアドレスを入力してください。警察はこれを使って返信します。",
+   "vi": "Bấm vào ô “{page:電子信箱}” và nhập e-mail của bạn, cảnh sát sẽ dùng nó để phản hồi bạn.",
+   "id": "Tekan kotak “{page:電子信箱}” dan ketik e-mail Anda. Polisi akan membalas lewat e-mail itu.",
+   "th": "กดช่อง “{page:電子信箱}” แล้วพิมพ์อีเมลของคุณ ตำรวจจะใช้อีเมลนี้ตอบกลับคุณ"
+  },
+  "點畫面上方的「詳細內容」。按左上角的「‹」可以回到紀錄清單。": {
+   "en": "Tap “{page:詳細內容}” at the top of the screen. Tap “‹” at the top left to go back to the list.",
+   "ja": "画面上の「{page:詳細內容}」を押してください。左上の「‹」を押すと一覧に戻れます。",
+   "vi": "Bấm “{page:詳細內容}” ở phía trên màn hình. Bấm “‹” ở góc trên bên trái để quay lại danh sách.",
+   "id": "Tekan “{page:詳細內容}” di bagian atas layar. Tekan “‹” di kiri atas untuk kembali ke daftar.",
+   "th": "กด “{page:詳細內容}” ด้านบนของหน้าจอ กด “‹” มุมซ้ายบนเพื่อกลับไปที่รายการ"
+  },
+  "點畫面最下面「本人已詳閱須知並同意繼續」前面的小方框。": {
+   "en": "Tap the small box in front of “{page:本人已詳閱須知並同意繼續}” at the very bottom of the screen.",
+   "ja": "画面の一番下の「{page:本人已詳閱須知並同意繼續}」の前にある小さな四角を押してください。",
+   "vi": "Bấm vào ô vuông nhỏ trước “{page:本人已詳閱須知並同意繼續}” ở cuối màn hình.",
+   "id": "Tekan kotak kecil di depan “{page:本人已詳閱須知並同意繼續}” di paling bawah layar.",
+   "th": "กดช่องสี่เหลี่ยมเล็กหน้า “{page:本人已詳閱須知並同意繼續}” ที่ล่างสุดของหน้าจอ"
+  },
+  "：{what}": {
+   "en": ": {what}",
+   "ja": "：{what}",
+   "vi": ": {what}",
+   "id": ": {what}",
+   "th": ": {what}"
+  }
+ }
+}

@@ -1,0 +1,101 @@
+{
+  "version": 1,
+  "_comment": "Teaching components of one service page. Shared by the App (guides/<page>_guide.dart holds the pre-written step texts) and the backend (guide.py picks a set). The model may only choose ids listed here; prerequisites are added and ordered by the validator, never by the model. capabilities: capability ids (or roots like 'fees') whose pages this guide runs on. capability_goals: the only goals that fit that sub-page, first = its default. entry_goals: components always added for that capability. capability_done: components already done when the page opens at that capability (it opens past them, e.g. straight on a form): they count as met prerequisites and are left out of the plan unless asked for as a goal. A key of these three tables ending in '*' is a prefix: it covers every capability id starting with the text before the '*' (an exact key wins, then the longest prefix).",
+  "page": "disaster_report",
+  "capability": "disasterReport",
+  "capabilities": [
+    "disasterReport"
+  ],
+  "title": "災情通報",
+  "default_goal": "send_report",
+  "capability_goals": {
+    "disasterReport.form.*": [
+      "send_report",
+      "enter_location",
+      "describe_disaster",
+      "give_consent"
+    ]
+  },
+  "entry_goals": {},
+  "capability_done": {
+    "disasterReport.form.*": [
+      "pick_category"
+    ]
+  },
+  "components": [
+    {
+      "id": "pick_category",
+      "title": "選災情類別",
+      "description": "在災情類別清單點一個大類打開，再點最符合的災情，例如路燈故障",
+      "keywords": [
+        "災情類別",
+        "災情種類",
+        "哪一類災情",
+        "災情分類"
+      ],
+      "requires": []
+    },
+    {
+      "id": "enter_location",
+      "title": "填災情發生地點",
+      "description": "在「標注災情發生地點」打地址，或按定位圖示",
+      "keywords": [
+        "災情地點",
+        "災情發生地點",
+        "災情在哪裡",
+        "災情地址"
+      ],
+      "requires": [
+        "pick_category"
+      ]
+    },
+    {
+      "id": "describe_disaster",
+      "title": "勾選災情狀況",
+      "description": "在「災情描述」勾選看到的狀況，例如有人受困、影響道路",
+      "keywords": [
+        "災情描述",
+        "災情狀況",
+        "傷亡",
+        "受困",
+        "影響交通"
+      ],
+      "requires": [
+        "enter_location"
+      ]
+    },
+    {
+      "id": "give_consent",
+      "title": "勾選「提供個人資料給承辦人員」",
+      "description": "在最下面勾選提供個人資料給承辦人員，「送出」才會變成可以按",
+      "keywords": [
+        "提供個人資料給承辦人員",
+        "承辦人員",
+        "送出不能按",
+        "送出灰色"
+      ],
+      "requires": [
+        "describe_disaster"
+      ]
+    },
+    {
+      "id": "send_report",
+      "title": "確認後按「送出」",
+      "description": "看清楚地點和狀況，再自己按「送出」通報災情",
+      "keywords": [
+        "通報災情",
+        "災情通報",
+        "回報災情",
+        "報災情",
+        "災害通報"
+      ],
+      "requires": [
+        "give_consent"
+      ]
+    }
+  ],
+  "generic_keywords": [
+    "災情",
+    "通報"
+  ]
+}

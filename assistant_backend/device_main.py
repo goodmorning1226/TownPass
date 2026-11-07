@@ -9,6 +9,7 @@ side, the HTTP contract and the decision path are unchanged:
   127.0.0.1:8770  speech recognition (asr_server.py, whisper.cpp engine)
   llama-server / whisper-server on the ports passed in (loopback only)
   llama-server --embedding on faq_port for the optional FAQ layer (faq.py)
+    and the catalogue's semantic retrieval (semantic.py)
 """
 from __future__ import annotations
 
@@ -71,7 +72,8 @@ def warm_up(recognizer, model_url, limit_s=900):
     # The same fixed system messages decision.decide sends, one per task, so each
     # of llama-server's two slots keeps one of them in its prompt cache.
     decision = True
-    for task in ("library", "capability"):
+    from decision import POLICIES
+    for task in POLICIES:  # library, capability, guide: one llama-server slot each
         messages = [{"role": "system", "content": system_prompt(task)}, {"role": "user", "content": "{}"}]
         decision = _retry(lambda: fetch_json(model_url + "/v1/chat/completions", {
             "messages": messages, "temperature": 0, "max_tokens": 1}, timeout=300), deadline) and decision
@@ -81,11 +83,16 @@ def warm_up(recognizer, model_url, limit_s=900):
 
 
 def _load_faq(backend):
-    """Attach the FAQ index once read (~1 s); until then requests run without FAQ."""
+    """Attach the FAQ index once read (~1 s); until then requests run without FAQ.
+
+    The App's own Q&A (qna.py) is then downloaded and embedded in its own
+    background thread; offline it simply stays empty.
+    """
     import time
     import faq
+    import qna
     started = time.monotonic()
-    backend.faq = faq.load_default()
+    backend.faq = qna.with_qna(faq.load_default())
     print(f"timing faq-load entries={backend.faq.count if backend.faq else 0} "
           f"{time.monotonic() - started:.1f}s", flush=True)
 
@@ -131,6 +138,10 @@ def start(model_port=8771, whisper_port=8772, assistant_port=8765, asr_port=8770
         _serve(assistant)
         if faq_port and faq_dir:
             threading.Thread(target=_load_faq, args=(backend,), name="assistant-faq", daemon=True).start()
+            # Version C uses the same e5 server; its catalogue vectors are built (or read
+            # from models/semantic_cache) in the background once the server answers.
+            import semantic
+            backend.semantic = semantic.load_default(backend.workflow.registry)
         threading.Thread(target=warm_up, args=(recognizer if whisper else None, os.environ["TOWNPASS_MODEL_URL"]),
                          name="assistant-warm-up", daemon=True).start()
         _started.set()

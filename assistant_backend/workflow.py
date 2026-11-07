@@ -5,7 +5,9 @@ shared capability catalogue and the book catalogue, then one model decision
 (decision.decide) among the retrieved candidates, then session-bound
 candidate confirmation. When that tool-calling layer finds no service (no
 retrieval match, or the model asks for clarification / rejects the request),
-the Taipei FAQ index (faq.py) is the second layer; when it has no confident
+the Taipei FAQ index (faq.py, with the App's own Q&A from qna.py) is the second
+layer (before it, version C's semantic catalogue retrieval, semantic.py, may
+offer services worded differently, and version B's intent fallback); when it has no confident
 answer either, the turn says that nothing related was found. Every turn
 returns exactly one reply.
 """
@@ -17,8 +19,10 @@ import time
 import uuid
 
 import i18n
+import qna
 from decision import decide
 from faq import SCOPE_NOTE
+from guide import GuidePlanner
 from page_context import current_root, model_view
 from phonetic import exact_homophone, rank_books, term_matches
 from registry import Registry, book_fuzzy, primary_title, single_substitution
@@ -56,6 +60,10 @@ OPENING_SOUND_CONFIRM = 0.5
 # Version B: ask the model what kind of message an unmatched request is
 # (docs/AI_SERVICE_COVERAGE_PLAN.md; A/B evaluated with eval_colloquial.json).
 INTENT_FALLBACK = os.environ.get("TOWNPASS_INTENT_FALLBACK", "1") == "1"
+# Version C: semantic retrieval over the catalogue (semantic.py) before the intent fallback.
+SEMANTIC_MIN_CHARS = 2
+SEMANTIC_NOTE = ("These candidates were found by similar meaning, not by matching words. "
+                 "Offer them only if one is what the user asks for; otherwise ask to clarify.")
 FALLBACK_SOUND = 0.8  # misheard words ~1.0 after folding; chance matches <= 0.74
 FALLBACK_LIMIT = 3
 COMMAND_SOUND = 0.8  # "下一個" is 0.78 and stays unmatched
@@ -105,6 +113,7 @@ def sound_ordinal(text):
 # retrieval (rag_handoff/HANDOFF.md section 7), so they skip it.
 FAQ_MIN_CHARS = 4
 FAQ_ANSWER_LIMIT = 600
+QNA_PAGE_NOTE = "更多說明可開啟 App 的「常見問答」頁面。"
 NO_RELATED = ("抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；"
               "也可以撥打市民熱線 1999（外縣市 02-27208889）。")
 
@@ -117,6 +126,7 @@ class Workflow:
         self.validate = validate
         self.error = error
         self.registry = Registry()
+        self.guides = GuidePlanner()
         self.pending = {}
         self.lock = threading.RLock()
 
@@ -128,7 +138,7 @@ class Workflow:
                 "message": message, "destination": None, "choices": [], "data_mode": "demo",
                 "language": payload.get("language", "zh"), **extra}
 
-    def _decide(self, text, entries, confirmation=False, context=None, sound=None):
+    def _decide(self, text, entries, confirmation=False, context=None, sound=None, note=None):
         """Capability (or candidate-confirmation) decision among retrieved entries."""
         if confirmation:
             tools = [self.tool("confirm_candidates", "Show these candidates and wait for user selection; do not navigate.")]
@@ -140,6 +150,7 @@ class Workflow:
                     "features": e.get("features", []), "available": e["enabled"],
                     **({"heard_as": sound[e["id"]]} if sound and e["id"] in sound else {})} for e in entries],
                     **({"note": "The text may be misheard speech; heard_as pairs sound alike."} if sound else {}),
+                    **({"note": note} if note else {}),
                     **({"page_hint": model_view(context)} if context else {})}
         return decide(self.owner, "capability", evidence, tools, self.validate, self.error)
 
@@ -201,7 +212,18 @@ class Workflow:
         answer = entry["answer"].strip()
         if len(answer) > FAQ_ANSWER_LIMIT:
             answer = answer[:FAQ_ANSWER_LIMIT].rstrip() + "…（內容較長，完整說明請洽 1999 或該機關網站）"
+        if qna.is_qna(entry):
+            return f"【{entry['question'].strip()}】\n{answer}\n{qna.SOURCE_NOTE}{QNA_PAGE_NOTE}"
         return f"【{entry['question'].strip()}】\n{answer}\n資料來源：{entry['department']}。{SCOPE_NOTE}"
+
+    def _qna_page(self, payload, entry):
+        """An answer from the App's own Q&A also offers its 常見問答 page, as a choice."""
+        page = self.registry.by_id.get("qna")
+        if not qna.is_qna(entry) or not page or not page["enabled"]:
+            return []
+        if payload.get("language", "zh") != "zh":
+            return self._cap_items([page], payload["language"])
+        return [{"title": f"開啟「{page['title']}」頁面", "subtitle": qna.DEPARTMENT, "entry_id": page["id"]}]
 
     def _faq(self, payload, text):
         """Second layer: Taipei FAQ when tool calling found no service.
@@ -223,11 +245,14 @@ class Workflow:
                    for hit in (hits[1:] if confidence == "high" else hits)]
         if confidence == "high":
             message = self._faq_text(hits[0])
+            if choices:
+                message += "\n\n也可以查看以下相關問答："
+            choices += self._qna_page(payload, hits[0])
             if not choices:
                 return self.reply(payload, message, action="faq_answer")
-            message += "\n\n也可以查看以下相關問答："
         else:
-            message = f"你是不是想問以下的問題？請選擇一題，我再顯示答案。{SCOPE_NOTE}"
+            scope = qna.SCOPE_NOTE if any(qna.is_qna(hit) for hit in hits) else SCOPE_NOTE
+            message = f"你是不是想問以下的問題？請選擇一題，我再顯示答案。{scope}"
         return self._offer(payload, choices, message, kind="reply", action="faq_answer")
 
     def _foreign_faq(self, payload):
@@ -447,8 +472,11 @@ class Workflow:
             entry = self.owner.faq.by_id.get(item["faq_id"]) if self.owner.faq else None
             if entry is None:
                 raise self.error("FAQ 資料已變更，請重新提問。")
-            return self.reply(payload, self._faq_text(entry), action="faq_answer",
-                              **({"content_language": "zh"} if payload.get("language", "zh") != "zh" else {}))
+            foreign = {"content_language": "zh"} if payload.get("language", "zh") != "zh" else {}
+            page = self._qna_page(payload, entry)
+            if page:
+                return self._offer(payload, page, self._faq_text(entry), kind="reply", action="faq_answer", **foreign)
+            return self.reply(payload, self._faq_text(entry), action="faq_answer", **foreign)
         books = self.owner.catalog.books()
         if not any(b["id"] == item["book_id"] for b in books):
             raise self.error("書目已變更，請重新搜尋。")
@@ -495,7 +523,8 @@ class Workflow:
             return self._list(payload)
         matches = self.registry.search_language(i18n.positive_text(text, language), language)
         if not matches:
-            decided = self._intent_fallback(payload, text)
+            decided = (self._semantic_fallback(payload, text, i18n.positive_text(text, language))
+                       or self._intent_fallback(payload, text))
             if decided:
                 return decided
             faq = self._foreign_faq(payload)
@@ -517,6 +546,28 @@ class Workflow:
         return self.reply(payload, i18n.t("clarify", language))
 
     def handle(self, payload):
+        """One reply. Which page opens is decided by the page stage below
+        (unchanged). When that page has teaching components, the guide stage
+        (guide.py) adds which ones to teach, as reply["guide"]. Every path
+        that navigates passes here, the other languages included."""
+        reply = self._handle(payload)
+        page = self.guides.page_for(reply.get("destination")) if reply.get("kind") == "navigate" else None
+        if page:
+            if reply.get("language", "zh") != "zh":
+                # The guide stage's keywords and question rules are Chinese: the
+                # (sub-)page's whole task, without a model call.
+                plan, route = self.guides.default_plan(page, reply.get("destination")), "guide_default_language"
+            else:
+                text = payload.get("text", "").strip()
+                from server import positive_text
+                plan, route = self.guides.plan(self.owner, page, positive_text(text) or text, self.tool,
+                                               self.validate, self.error, decide,
+                                               destination=reply.get("destination"))
+            self.owner.usage.guide_route = route
+            reply["guide"] = plan
+        return reply
+
+    def _handle(self, payload):
         text = payload.get("text", "").strip()
         session = payload["session_id"]
         with self.lock:
@@ -654,7 +705,9 @@ class Workflow:
         if listing_by_sound(text):
             self._trace("listing_sound")
             return self._list(payload)
-        decided = self._intent_fallback(payload, text)
+        # After listing_by_sound: a "what can you do" question worded differently
+        # must show the list (no model call), not services that happen to be close.
+        decided = self._semantic_fallback(payload, text, positive_text(text)) or self._intent_fallback(payload, text)
         if decided:
             return decided
         self._trace("no_match")
@@ -691,6 +744,37 @@ class Workflow:
         if name == "city_question":
             return self._faq(payload, text) if language == "zh" else self._foreign_faq(payload)
         return None
+
+    def _semantic_fallback(self, payload, text, positive):
+        """Version C (semantic.py): keyword retrieval found nothing, so services
+        whose catalogue texts mean about the same as the request (e5 cosine) go to
+        the model, which may only offer them (never navigate) or ask to clarify;
+        a clarification continues to the intent fallback. Off when the index is
+        missing, still building or its embedding server does not answer.
+        positive: the request without negated parts ("I don't want books" ->
+        ""), which is what is embedded; e5 does not understand negation, so a
+        refusal must not bring back the service it refuses."""
+        index = getattr(self.owner, "semantic", None)
+        if index is None or not index.ready or len(re.findall(r"\w", positive)) < SEMANTIC_MIN_CHARS:
+            return None
+        started = time.monotonic()
+        found = index.search(positive)
+        # For metrics: embedding + scoring time and what was found, even when a
+        # later layer decides the turn.
+        self.owner.usage.semantic = {"ms": round((time.monotonic() - started) * 1000),
+                                     "candidates": [[entry["id"], score] for score, entry in found]}
+        if not found:
+            return None
+        entries = [entry for _, entry in found]
+        self._trace("semantic_model", [e["id"] for e in entries])
+        name, _ = self._decide(text, entries, confirmation=True, context=payload.get("page_context"),
+                               note=SEMANTIC_NOTE)
+        self.owner.usage.semantic["decision"] = name
+        if name != "confirm_candidates":
+            return None
+        language = payload.get("language", "zh")
+        message = i18n.t("confirm_capability", language) if language != "zh" else "你是不是要用以下服務？請先確認。"
+        return self._offer(payload, self._cap_items(entries, language), message)
 
     def _sound_candidates(self, text):
         """Services one of whose words sounds like a stretch of text the catalogue did

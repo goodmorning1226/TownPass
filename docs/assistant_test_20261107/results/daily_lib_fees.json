@@ -1,0 +1,1954 @@
+[
+ {
+  "id": "daily_lib_fees-01",
+  "category": "single:app.bills",
+  "language": "zh-TW",
+  "input": "我的帳單",
+  "session": "dlf-00",
+  "expected": "navigate to app.bills",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "app.bills"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 11498,
+   "choices": [],
+   "message": "請在原本的「帳務」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "As expected."
+ },
+ {
+  "id": "daily_lib_fees-02",
+  "category": "single:app.bills",
+  "language": "zh-TW",
+  "input": "我想看看我這個月有哪些錢要繳",
+  "session": "dlf-01",
+  "expected": "navigate to app.bills",
+  "observed": {
+   "kind": "reply",
+   "action": "request_clarification",
+   "destination": null,
+   "route": "library_model",
+   "language": "zh",
+   "elapsed_ms": 17194,
+   "choices": [],
+   "message": "你想先使用哪個服務？可以描述想做的事，或問「有哪些功能」。"
+  },
+  "verdict": "FAIL",
+  "note": "No keyword match (「錢要繳」 is not 繳費/帳單); LIBRARY_CUE matched 「看」 so it went to the library model, which asked to clarify. 帳務 was not opened."
+ },
+ {
+  "id": "daily_lib_fees-03",
+  "category": "single:app.bills",
+  "language": "zh-TW",
+  "input": "最近收到好幾張單子，要在哪裡看我該繳什麼",
+  "session": "dlf-02",
+  "expected": "navigate to app.bills",
+  "observed": {
+   "kind": "reply",
+   "action": "faq_answer",
+   "destination": null,
+   "route": "faq_medium",
+   "language": "zh",
+   "elapsed_ms": 31518,
+   "choices": [
+    "非代繳戶收到電子帳單後如何繳費?",
+    "我要索取一些空白申請書表格,要到哪裡索取?",
+    "為什麼我有收到退費通知單,卻無法於一站式服務網頁查無重複繳費折抵資料?"
+   ],
+   "message": "你是不是想問以下的問題？請選擇一題，我再顯示答案。本服務僅涵蓋臺北市政府 FAQ。"
+  },
+  "verdict": "FAIL",
+  "note": "No catalogue match; FAQ 'did you mean' with mostly unrelated questions (blank forms, refund notice). 帳務 was not offered."
+ },
+ {
+  "id": "daily_lib_fees-04",
+  "category": "single:library",
+  "language": "zh-TW",
+  "input": "我要借書",
+  "session": "dlf-03",
+  "expected": "navigate to library",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_library",
+   "destination": {
+    "kind": "home"
+   },
+   "route": "library_model",
+   "language": "zh",
+   "elapsed_ms": 21338,
+   "choices": [],
+   "message": "請在圖書借閱頁搜尋想看的書。這裡使用示範資料。"
+  },
+  "verdict": "PASS",
+  "note": "As expected."
+ },
+ {
+  "id": "daily_lib_fees-05",
+  "category": "single:library",
+  "language": "zh-TW",
+  "input": "想找本書來看，市立圖書館那個",
+  "session": "dlf-04",
+  "expected": "navigate to library",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_library",
+   "destination": {
+    "kind": "home"
+   },
+   "route": "library_model",
+   "language": "zh",
+   "elapsed_ms": 25520,
+   "choices": [],
+   "message": "請在圖書借閱頁搜尋想看的書。這裡使用示範資料。"
+  },
+  "verdict": "PASS",
+  "note": "As expected."
+ },
+ {
+  "id": "daily_lib_fees-06",
+  "category": "single:library",
+  "language": "zh-TW",
+  "input": "孫子想看故事書，可以在這裡借嗎",
+  "session": "dlf-05",
+  "expected": "navigate to library",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_library",
+   "destination": {
+    "kind": "home"
+   },
+   "route": "library_model",
+   "language": "zh",
+   "elapsed_ms": 31749,
+   "choices": [],
+   "message": "請在圖書借閱頁搜尋想看的書。這裡使用示範資料。"
+  },
+  "verdict": "PASS",
+  "note": "As expected."
+ },
+ {
+  "id": "daily_lib_fees-07",
+  "category": "single:library.ranking",
+  "language": "zh-TW",
+  "input": "最近大家都在看什麼書",
+  "session": "dlf-06",
+  "expected": "navigate to library.ranking",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "library.ranking"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 23035,
+   "choices": [],
+   "message": "請在原本的「圖書點閱排行榜」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "As expected."
+ },
+ {
+  "id": "daily_lib_fees-08",
+  "category": "single:library.ranking",
+  "language": "zh-TW",
+  "input": "圖書館最紅的書是哪幾本，給我看一下",
+  "session": "dlf-07",
+  "expected": "navigate to library.ranking",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_library",
+   "destination": {
+    "kind": "home"
+   },
+   "route": "library_model",
+   "language": "zh",
+   "elapsed_ms": 26448,
+   "choices": [],
+   "message": "請在圖書借閱頁搜尋想看的書。這裡使用示範資料。"
+  },
+  "verdict": "CONCERN",
+  "note": "Only 圖書 matched (no 最紅/熱門), so library-only path workflow.py:547 → library home; less specific than ranking."
+ },
+ {
+  "id": "daily_lib_fees-09",
+  "category": "single:library.ranking",
+  "language": "zh-TW",
+  "input": "不知道要借什麼，有沒有比較多人借的書",
+  "session": "dlf-08",
+  "expected": "navigate to library.ranking",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 22061,
+   "choices": [],
+   "message": "請補充想使用的服務或操作，也可以問「有哪些功能」。"
+  },
+  "verdict": "FAIL",
+  "note": "「比較多人借」 does not contain keyword 最多人借; 「借的書」 hit library.records; model asked to clarify (rightly not opening records). Ranking not offered."
+ },
+ {
+  "id": "daily_lib_fees-10",
+  "category": "single:library.notices",
+  "language": "zh-TW",
+  "input": "圖書館有什麼消息",
+  "session": "dlf-09",
+  "expected": "navigate to library.notices",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_library",
+   "destination": {
+    "kind": "home"
+   },
+   "route": "library_model",
+   "language": "zh",
+   "elapsed_ms": 28764,
+   "choices": [],
+   "message": "請在圖書借閱頁搜尋想看的書。這裡使用示範資料。"
+  },
+  "verdict": "CONCERN",
+  "note": "「圖書館…消息」 ≠ keyword 圖書館消息 (substring not contiguous); only 圖書 → library home. Less specific."
+ },
+ {
+  "id": "daily_lib_fees-11",
+  "category": "single:library.notices",
+  "language": "zh-TW",
+  "input": "圖書館最近有沒有公布什麼休館或活動的事情",
+  "session": "dlf-10",
+  "expected": "navigate to library.notices",
+  "observed": {
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 22469,
+   "choices": [
+    "活動資訊",
+    "圖書借閱"
+   ],
+   "message": "你想使用哪個功能？請先確認。"
+  },
+  "verdict": "CONCERN",
+  "note": "Choices 活動資訊 + 圖書借閱 (parent); 圖書公告 missing — 公布 is not a keyword (公告 is)."
+ },
+ {
+  "id": "daily_lib_fees-12",
+  "category": "single:library.notices",
+  "language": "zh-TW",
+  "input": "過年圖書館有開嗎，有沒有公告",
+  "session": "dlf-11",
+  "expected": "navigate to library.notices",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "library.notices"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 26068,
+   "choices": [],
+   "message": "請在原本的「圖書公告」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "As expected."
+ },
+ {
+  "id": "daily_lib_fees-13",
+  "category": "single:library.records",
+  "language": "zh-TW",
+  "input": "我借的書",
+  "session": "dlf-12",
+  "expected": "navigate to library.records",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "library.records"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 21413,
+   "choices": [],
+   "message": "請在原本的「我的借閱紀錄」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "As expected."
+ },
+ {
+  "id": "daily_lib_fees-14",
+  "category": "single:library.records",
+  "language": "zh-TW",
+  "input": "我想看我之前在圖書館借過哪些書",
+  "session": "dlf-13",
+  "expected": "navigate to library.records",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "library.records"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 25111,
+   "choices": [],
+   "message": "請在原本的「我的借閱紀錄」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "As expected."
+ },
+ {
+  "id": "daily_lib_fees-15",
+  "category": "single:library.records",
+  "language": "zh-TW",
+  "input": "我上次借的書什麼時候到期",
+  "session": "dlf-14",
+  "expected": "navigate to library.records",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "library.records"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 22680,
+   "choices": [],
+   "message": "請在原本的「我的借閱紀錄」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "As expected."
+ },
+ {
+  "id": "daily_lib_fees-16",
+  "category": "single:library.reservations",
+  "language": "zh-TW",
+  "input": "我預約的書",
+  "session": "dlf-15",
+  "expected": "navigate to library.reservations",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_library",
+   "destination": {
+    "kind": "home"
+   },
+   "route": "library_model",
+   "language": "zh",
+   "elapsed_ms": 29112,
+   "choices": [],
+   "message": "請在圖書借閱頁搜尋想看的書。這裡使用示範資料。"
+  },
+  "verdict": "CONCERN",
+  "note": "library.reservations keywords are only 預約清單/取書通知; 「預約的書」 matched nothing → library home (parent)."
+ },
+ {
+  "id": "daily_lib_fees-17",
+  "category": "single:library.reservations",
+  "language": "zh-TW",
+  "input": "我之前排隊等的那本書到了沒，在哪裡看",
+  "session": "dlf-16",
+  "expected": "navigate to library.reservations",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 29782,
+   "choices": [],
+   "message": "請補充想使用的服務或操作，也可以問「有哪些功能」。"
+  },
+  "verdict": "FAIL",
+  "note": "「排隊」 matched reservation (臨櫃叫號); model clarified with generic text. Reservation list not opened or offered."
+ },
+ {
+  "id": "daily_lib_fees-18",
+  "category": "single:library.reservations",
+  "language": "zh-TW",
+  "input": "預約的書可以去拿了嗎",
+  "session": "dlf-17",
+  "expected": "navigate to library.reservations",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_library",
+   "destination": {
+    "kind": "home"
+   },
+   "route": "library_model",
+   "language": "zh",
+   "elapsed_ms": 23596,
+   "choices": [],
+   "message": "請在圖書借閱頁搜尋想看的書。這裡使用示範資料。"
+  },
+  "verdict": "CONCERN",
+  "note": "Same as 15: 「預約」 alone not a keyword → library home."
+ },
+ {
+  "id": "daily_lib_fees-19",
+  "category": "single:library.map",
+  "language": "zh-TW",
+  "input": "最近的圖書館在哪裡",
+  "session": "dlf-18",
+  "expected": "honest 'not connected' explanation, no navigation",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_library",
+   "destination": {
+    "kind": "home"
+   },
+   "route": "library_model",
+   "language": "zh",
+   "elapsed_ms": 24798,
+   "choices": [],
+   "message": "請在圖書借閱頁搜尋想看的書。這裡使用示範資料。"
+  },
+  "verdict": "FAIL",
+  "note": "Off feature library.map: keywords 圖書館地圖/找圖書館 do not match 「圖書館在哪裡」; only 圖書 → library home navigation with no word that the map is not connected."
+ },
+ {
+  "id": "daily_lib_fees-20",
+  "category": "single:library.prefill",
+  "language": "zh-TW",
+  "input": "幫我先選好要在哪個分館取書",
+  "session": "dlf-19",
+  "expected": "honest 'not connected' explanation, no navigation",
+  "observed": {
+   "kind": "reply",
+   "action": "request_clarification",
+   "destination": null,
+   "route": "library_model",
+   "language": "zh",
+   "elapsed_ms": 27541,
+   "choices": [],
+   "message": "你想先使用哪個服務？可以描述想做的事，或問「有哪些功能」。"
+  },
+  "verdict": "CONCERN",
+  "note": "No navigation (good) but generic clarification instead of the honest 'not connected yet, choose pickup branch on the book page' reason."
+ },
+ {
+  "id": "daily_lib_fees-21",
+  "category": "single:fees.history",
+  "language": "zh-TW",
+  "input": "我繳過的費用",
+  "session": "dlf-20",
+  "expected": "navigate to fees.history",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "fees.history"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 22867,
+   "choices": [],
+   "message": "請在原本的「帳務紀錄」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "As expected."
+ },
+ {
+  "id": "daily_lib_fees-22",
+  "category": "single:fees.history",
+  "language": "zh-TW",
+  "input": "我想看以前在這個App付過哪些錢",
+  "session": "dlf-21",
+  "expected": "navigate to fees.history",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "fees.history"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 27559,
+   "choices": [],
+   "message": "請在原本的「帳務紀錄」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "As expected."
+ },
+ {
+  "id": "daily_lib_fees-23",
+  "category": "single:fees.history",
+  "language": "zh-TW",
+  "input": "上個月水費我到底繳了沒有，哪裡查得到",
+  "session": "dlf-22",
+  "expected": "navigate to fees.history",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "fees.water"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 29284,
+   "choices": [],
+   "message": "請在原本的「水費」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "CONCERN",
+  "note": "Opened 水費 instead of 帳務紀錄; for 'did I pay last month' the history page is the answer. Water page is a defensible but different service — 繳了沒 is not a fees.history keyword (繳過/繳了什麼 are)."
+ },
+ {
+  "id": "daily_lib_fees-24",
+  "category": "single:fees.scan",
+  "language": "zh-TW",
+  "input": "掃帳單",
+  "session": "dlf-23",
+  "expected": "navigate to fees.scan",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "fees.scan"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 29854,
+   "choices": [],
+   "message": "請在原本的「掃描繳費」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "As expected."
+ },
+ {
+  "id": "daily_lib_fees-25",
+  "category": "single:fees.scan",
+  "language": "zh-TW",
+  "input": "手上有一張繳費單，想用手機照那個條碼來付",
+  "session": "dlf-24",
+  "expected": "navigate to fees.scan",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "app.bills"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 25785,
+   "choices": [],
+   "message": "請在原本的「帳務」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "CONCERN",
+  "note": "Only 繳費 (app.bills) matched; 條碼/照 not keywords of fees.scan → opened parent 帳務 tab."
+ },
+ {
+  "id": "daily_lib_fees-26",
+  "category": "single:fees.scan",
+  "language": "zh-TW",
+  "input": "單子上有QR code，可以直接掃來繳嗎",
+  "session": "dlf-25",
+  "expected": "navigate to fees.scan",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "elapsed_ms": 34338,
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。"
+  },
+  "verdict": "FAIL",
+  "note": "「掃來繳」/QR code not keywords (only 掃描繳費/掃帳單); no PAY_CUE subject → no_related. Scan page exists."
+ },
+ {
+  "id": "daily_lib_fees-27",
+  "category": "single:fees.parking",
+  "language": "zh-TW",
+  "input": "繳停車費",
+  "session": "dlf-26",
+  "expected": "navigate to fees.parking",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "fees.parking"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 25816,
+   "choices": [],
+   "message": "請在原本的「停車費」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "As expected."
+ },
+ {
+  "id": "daily_lib_fees-28",
+  "category": "single:fees.parking",
+  "language": "zh-TW",
+  "input": "車子停路邊被夾了一張單子，要付錢",
+  "session": "dlf-27",
+  "expected": "navigate to fees.parking",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "fees.parking"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 33612,
+   "choices": [],
+   "message": "請在原本的「停車費」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "As expected."
+ },
+ {
+  "id": "daily_lib_fees-29",
+  "category": "single:fees.parking",
+  "language": "zh-TW",
+  "input": "雨刷上夾的停車單要去哪裡繳",
+  "session": "dlf-28",
+  "expected": "navigate to fees.parking",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "fees.parking"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 27144,
+   "choices": [],
+   "message": "請在原本的「停車費」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "As expected."
+ },
+ {
+  "id": "daily_lib_fees-30",
+  "category": "single:fees.water",
+  "language": "zh-TW",
+  "input": "繳水費",
+  "session": "dlf-29",
+  "expected": "navigate to fees.water",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "fees.water"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 18492,
+   "choices": [],
+   "message": "請在原本的「水費」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "As expected."
+ },
+ {
+  "id": "daily_lib_fees-31",
+  "category": "single:fees.water",
+  "language": "zh-TW",
+  "input": "自來水的錢要付了",
+  "session": "dlf-30",
+  "expected": "navigate to fees.water",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "fees.water"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 28685,
+   "choices": [],
+   "message": "請在原本的「水費」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "As expected."
+ },
+ {
+  "id": "daily_lib_fees-32",
+  "category": "single:fees.water",
+  "language": "zh-TW",
+  "input": "水費單寄來了，用手機可以繳嗎",
+  "session": "dlf-31",
+  "expected": "navigate to fees.water",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "fees.water"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 16648,
+   "choices": [],
+   "message": "請在原本的「水費」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "As expected."
+ },
+ {
+  "id": "daily_lib_fees-33",
+  "category": "single:fees.tax",
+  "language": "zh-TW",
+  "input": "繳稅",
+  "session": "dlf-32",
+  "expected": "navigate to fees.tax",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "fees.tax"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 20465,
+   "choices": [],
+   "message": "請在原本的「地方稅」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "As expected."
+ },
+ {
+  "id": "daily_lib_fees-34",
+  "category": "single:fees.tax",
+  "language": "zh-TW",
+  "input": "房屋稅跟牌照稅要繳了",
+  "session": "dlf-33",
+  "expected": "navigate to fees.tax",
+  "observed": {
+   "kind": "reply",
+   "action": "faq_answer",
+   "destination": null,
+   "route": "faq_medium",
+   "language": "zh",
+   "elapsed_ms": 16252,
+   "choices": [
+    "我的房屋稅、地價稅和使用牌照稅是用銀行帳戶辦理長期約定轉帳繳納的,應該如何取得轉帳繳納證明呢?",
+    "車輛辦理繳銷、報停、報廢手續後,使用牌照稅如何計徵?",
+    "我想了解最近辦理房屋稅、地價稅和使用牌照稅退稅的情形,可以向哪裡詢問?"
+   ],
+   "message": "你是不是想問以下的問題？請選擇一題，我再顯示答案。本服務僅涵蓋臺北市政府 FAQ。"
+  },
+  "verdict": "FAIL",
+  "note": "Retrieval matched fees.tax (pay_word 稅, score 6) as the only candidate, but the model chose clarification → FAQ medium list about tax transfer proofs/refunds. 地方稅 page not opened. Guess: low score/two named taxes made the 3B model hesitate."
+ },
+ {
+  "id": "daily_lib_fees-35",
+  "category": "single:fees.tax",
+  "language": "zh-TW",
+  "input": "房屋稅單寄來了要去哪裡繳",
+  "session": "dlf-34",
+  "expected": "navigate to fees.tax",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "fees.tax"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 22649,
+   "choices": [],
+   "message": "請在原本的「地方稅」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "As expected."
+ },
+ {
+  "id": "daily_lib_fees-36",
+  "category": "single:fees.tuition",
+  "language": "zh-TW",
+  "input": "繳學費",
+  "session": "dlf-35",
+  "expected": "navigate to fees.tuition",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "fees.tuition"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 15561,
+   "choices": [],
+   "message": "請在原本的「學雜費」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "As expected."
+ },
+ {
+  "id": "daily_lib_fees-37",
+  "category": "single:fees.tuition",
+  "language": "zh-TW",
+  "input": "小孩開學要交的註冊的錢",
+  "session": "dlf-36",
+  "expected": "navigate to fees.tuition",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "fees.tuition"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 19699,
+   "choices": [],
+   "message": "請在原本的「學雜費」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "As expected."
+ },
+ {
+  "id": "daily_lib_fees-38",
+  "category": "single:fees.tuition",
+  "language": "zh-TW",
+  "input": "學校發的學雜費單可以在這邊付嗎",
+  "session": "dlf-37",
+  "expected": "navigate to fees.tuition",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "fees.tuition"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 24881,
+   "choices": [],
+   "message": "請在原本的「學雜費」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "As expected."
+ },
+ {
+  "id": "daily_lib_fees-39",
+  "category": "single:fees.housing",
+  "language": "zh-TW",
+  "input": "社宅房租",
+  "session": "dlf-38",
+  "expected": "navigate to fees.housing",
+  "observed": {
+   "kind": "reply",
+   "action": "faq_answer",
+   "destination": null,
+   "route": "faq_medium",
+   "language": "zh",
+   "elapsed_ms": 22059,
+   "choices": [
+    "已承租本市一般出租國宅、中繼國宅、社會住宅,是否仍可提出申請其他社會住宅?"
+   ],
+   "message": "你是不是想問以下的問題？請選擇一題，我再顯示答案。本服務僅涵蓋臺北市政府 FAQ。"
+  },
+  "verdict": "FAIL",
+  "note": "pay_words 社宅/租金 only count with PAY_CUE (繳|付|交|帳|錢|費) — 「房租」 has none (registry.py:7). Fell to FAQ with an unrelated social-housing application question."
+ },
+ {
+  "id": "daily_lib_fees-40",
+  "category": "single:fees.housing",
+  "language": "zh-TW",
+  "input": "我住社會住宅，每個月的租金要繳",
+  "session": "dlf-39",
+  "expected": "navigate to fees.housing",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "fees.housing"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 18173,
+   "choices": [],
+   "message": "請在原本的「國／社宅租金維管費」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "As expected."
+ },
+ {
+  "id": "daily_lib_fees-41",
+  "category": "single:fees.housing",
+  "language": "zh-TW",
+  "input": "住國宅的房租跟管理費在哪裡繳",
+  "session": "dlf-40",
+  "expected": "navigate to fees.housing",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "fees.housing"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 18773,
+   "choices": [],
+   "message": "請在原本的「國／社宅租金維管費」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "As expected."
+ },
+ {
+  "id": "daily_lib_fees-42",
+  "category": "single:fees.hospital",
+  "language": "zh-TW",
+  "input": "繳醫藥費",
+  "session": "dlf-41",
+  "expected": "navigate to fees.hospital",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "fees.hospital"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 16316,
+   "choices": [],
+   "message": "請在原本的「聯醫醫療費」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "As expected."
+ },
+ {
+  "id": "daily_lib_fees-43",
+  "category": "single:fees.hospital",
+  "language": "zh-TW",
+  "input": "在市立聯合醫院看病的錢還沒付",
+  "session": "dlf-42",
+  "expected": "navigate to fees.hospital",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "fees.hospital"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 21698,
+   "choices": [],
+   "message": "請在原本的「聯醫醫療費」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "As expected."
+ },
+ {
+  "id": "daily_lib_fees-44",
+  "category": "single:fees.hospital",
+  "language": "zh-TW",
+  "input": "去和平醫院看完病忘了批價，可以在手機上繳嗎",
+  "session": "dlf-43",
+  "expected": "navigate to fees.hospital",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "fees.hospital"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 18966,
+   "choices": [],
+   "message": "請在原本的「聯醫醫療費」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "As expected."
+ },
+ {
+  "id": "daily_lib_fees-45",
+  "category": "single:fees.maintenance",
+  "language": "zh-TW",
+  "input": "平價住宅的費用",
+  "session": "dlf-44",
+  "expected": "navigate to fees.maintenance",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "fees.maintenance"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 16705,
+   "choices": [],
+   "message": "請在原本的「平價住宅維護費」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "As expected."
+ },
+ {
+  "id": "daily_lib_fees-46",
+  "category": "single:fees.maintenance",
+  "language": "zh-TW",
+  "input": "我住平宅，要繳那個維護的錢",
+  "session": "dlf-45",
+  "expected": "navigate to fees.maintenance",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "elapsed_ms": 19192,
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。"
+  },
+  "verdict": "FAIL",
+  "note": "「平宅」 and 「維護的錢」 are not keywords/pay_words (平價住宅, 維護費 are) → no_related."
+ },
+ {
+  "id": "daily_lib_fees-47",
+  "category": "single:fees.maintenance",
+  "language": "zh-TW",
+  "input": "住平價住宅每個月要交的維護費怎麼繳",
+  "session": "dlf-46",
+  "expected": "navigate to fees.maintenance",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "fees.maintenance"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 24774,
+   "choices": [],
+   "message": "請在原本的「平價住宅維護費」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "As expected."
+ },
+ {
+  "id": "daily_lib_fees-48",
+  "category": "single:fees.course",
+  "language": "zh-TW",
+  "input": "公訓處上課的錢",
+  "session": "dlf-47",
+  "expected": "navigate to fees.course",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "fees.course"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 18719,
+   "choices": [],
+   "message": "請在原本的「公訓處自費課程」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "As expected."
+ },
+ {
+  "id": "daily_lib_fees-49",
+  "category": "single:fees.course",
+  "language": "zh-TW",
+  "input": "報名了公務人員訓練處的自費班，要繳學費",
+  "session": "dlf-48",
+  "expected": "navigate to fees.course",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "fees.tuition"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 18624,
+   "choices": [],
+   "message": "請在原本的「學雜費」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "FAIL",
+  "note": "Full name 公務人員訓練處 not a keyword (only 公訓處); 學費 matched fees.tuition → wrong bill opened."
+ },
+ {
+  "id": "daily_lib_fees-50",
+  "category": "single:fees.course",
+  "language": "zh-TW",
+  "input": "我在公訓處報了課，費用要去哪裡付",
+  "session": "dlf-49",
+  "expected": "navigate to fees.course",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "fees.course"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 20713,
+   "choices": [],
+   "message": "請在原本的「公訓處自費課程」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "As expected."
+ },
+ {
+  "id": "daily_lib_fees-51",
+  "category": "single:fees.other",
+  "language": "zh-TW",
+  "input": "其他的費用",
+  "session": "dlf-50",
+  "expected": "navigate to fees.other",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "elapsed_ms": 19588,
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。"
+  },
+  "verdict": "CONCERN",
+  "note": "Vague, but no_related is unhelpful; only keyword is 其他繳費. Should offer 其他繳費 / 繳費查詢."
+ },
+ {
+  "id": "daily_lib_fees-52",
+  "category": "single:fees.other",
+  "language": "zh-TW",
+  "input": "我要繳的那個不是水費也不是稅，是別的",
+  "session": "dlf-51",
+  "expected": "navigate to fees.other",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "elapsed_ms": 23039,
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。"
+  },
+  "verdict": "FAIL",
+  "note": "positive_text keeps only 「別的」 after 不是…是; no match → no_related. 其他繳費 not offered."
+ },
+ {
+  "id": "daily_lib_fees-53",
+  "category": "single:fees.other",
+  "language": "zh-TW",
+  "input": "有些單子不在上面那幾種，還能在哪裡繳",
+  "session": "dlf-52",
+  "expected": "navigate to fees.other",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "elapsed_ms": 25372,
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。"
+  },
+  "verdict": "FAIL",
+  "note": "No keyword (單子/繳 without subject) → no_related; 其他繳費/繳費查詢 not offered."
+ },
+ {
+  "id": "daily_lib_fees-54",
+  "category": "single:fees.search",
+  "language": "zh-TW",
+  "input": "查繳費項目",
+  "session": "dlf-53",
+  "expected": "navigate to fees.search",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "fees.search"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 20884,
+   "choices": [],
+   "message": "請在原本的「繳費查詢」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "As expected."
+ },
+ {
+  "id": "daily_lib_fees-55",
+  "category": "single:fees.search",
+  "language": "zh-TW",
+  "input": "我不知道我要繳的那個叫什麼，可以搜尋看看嗎",
+  "session": "dlf-54",
+  "expected": "navigate to fees.search",
+  "observed": {
+   "kind": "reply",
+   "action": "request_clarification",
+   "destination": null,
+   "route": "library_model",
+   "language": "zh",
+   "elapsed_ms": 26145,
+   "choices": [],
+   "message": "你想先使用哪個服務？可以描述想做的事，或問「有哪些功能」。"
+  },
+  "verdict": "FAIL",
+  "note": "「搜尋」 triggered LIBRARY_CUE → library model → clarification. 繳費查詢 not offered (keywords 繳費查詢/查繳費 only)."
+ },
+ {
+  "id": "daily_lib_fees-56",
+  "category": "single:fees.search",
+  "language": "zh-TW",
+  "input": "想找找看有沒有可以繳罰單的項目",
+  "session": "dlf-55",
+  "expected": "navigate to fees.search",
+  "observed": {
+   "kind": "reply",
+   "action": "request_clarification",
+   "destination": null,
+   "route": "library_model",
+   "language": "zh",
+   "elapsed_ms": 28733,
+   "choices": [],
+   "message": "你想先使用哪個服務？可以描述想做的事，或問「有哪些功能」。"
+  },
+  "verdict": "FAIL",
+  "note": "「找找看…繳罰單的項目」 matches nothing (找繳費項目 is contiguous only); routed to library model → clarification."
+ },
+ {
+  "id": "daily_lib_fees-57",
+  "category": "combo:fees.water+fees.history",
+  "language": "zh-TW",
+  "input": "繳水費順便看我繳過哪些費用",
+  "session": "dlf-56",
+  "expected": "numbered list with both needs, or open one and explain the other",
+  "observed": {
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 19034,
+   "choices": [
+    "帳務紀錄",
+    "水費"
+   ],
+   "message": "你想使用哪個功能？請先確認。"
+  },
+  "verdict": "PASS",
+  "note": "As expected."
+ },
+ {
+  "id": "daily_lib_fees-58",
+  "category": "combo:fees.parking+fees.tax",
+  "language": "zh-TW",
+  "input": "停車費跟地方稅都要繳",
+  "session": "dlf-57",
+  "expected": "numbered list with both needs, or open one and explain the other",
+  "observed": {
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 17713,
+   "choices": [
+    "停車費",
+    "地方稅"
+   ],
+   "message": "你想使用哪個功能？請先確認。"
+  },
+  "verdict": "PASS",
+  "note": "As expected."
+ },
+ {
+  "id": "daily_lib_fees-59",
+  "category": "combo:library.records+library.notices",
+  "language": "zh-TW",
+  "input": "我要還書然後看最近的公告",
+  "session": "dlf-58",
+  "expected": "numbered list with both needs, or open one and explain the other",
+  "observed": {
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 13234,
+   "choices": [
+    "圖書公告",
+    "我的借閱紀錄"
+   ],
+   "message": "你想使用哪個功能？請先確認。"
+  },
+  "verdict": "PASS",
+  "note": "As expected."
+ },
+ {
+  "id": "daily_lib_fees-60",
+  "category": "combo:library+fees.tuition",
+  "language": "zh-TW",
+  "input": "借書之後幫我查學費",
+  "session": "dlf-59",
+  "expected": "numbered list with both needs, or open one and explain the other",
+  "observed": {
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 13894,
+   "choices": [
+    "圖書借閱",
+    "學雜費"
+   ],
+   "message": "你想使用哪個功能？請先確認。"
+  },
+  "verdict": "PASS",
+  "note": "As expected."
+ },
+ {
+  "id": "daily_lib_fees-61",
+  "category": "combo:fees.scan",
+  "language": "zh-TW",
+  "input": "帳單拿出來掃一下然後繳",
+  "session": "dlf-60",
+  "expected": "navigate to fees.scan",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "app.bills"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 19777,
+   "choices": [],
+   "message": "請在原本的「帳務」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "CONCERN",
+  "note": "Single need really; only 帳單 matched → parent 帳務 instead of 掃描繳費 (掃一下 not a keyword)."
+ },
+ {
+  "id": "daily_lib_fees-62",
+  "category": "combo:app.bills>fees.parking",
+  "language": "zh-TW",
+  "input": "帳務裡面的停車費",
+  "session": "dlf-61",
+  "expected": "navigate to fees.parking",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "fees.parking"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 18417,
+   "choices": [],
+   "message": "請在原本的「停車費」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "As expected."
+ },
+ {
+  "id": "daily_lib_fees-63",
+  "category": "combo:library>library.ranking",
+  "language": "zh-TW",
+  "input": "圖書館的排行榜",
+  "session": "dlf-62",
+  "expected": "navigate to library.ranking",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "library.ranking"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 23499,
+   "choices": [],
+   "message": "請在原本的「圖書點閱排行榜」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "As expected."
+ },
+ {
+  "id": "daily_lib_fees-64",
+  "category": "combo:library.reservations+library.records",
+  "language": "zh-TW",
+  "input": "看一下我預約的書，還有借的書什麼時候要還",
+  "session": "dlf-63",
+  "expected": "numbered list with both needs, or open one and explain the other",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "library.records"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 17060,
+   "choices": [],
+   "message": "請在原本的「我的借閱紀錄」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "FAIL",
+  "note": "Two needs; only records matched (借的書). 「預約的書」 has no keyword so the reservation need was silently dropped."
+ },
+ {
+  "id": "daily_lib_fees-65",
+  "category": "combo:fees.hospital+fees.water",
+  "language": "zh-TW",
+  "input": "醫藥費和水費我要一起繳",
+  "session": "dlf-64",
+  "expected": "numbered list with both needs, or open one and explain the other",
+  "observed": {
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 21177,
+   "choices": [
+    "聯醫醫療費",
+    "水費"
+   ],
+   "message": "你想使用哪個功能？請先確認。"
+  },
+  "verdict": "PASS",
+  "note": "As expected."
+ },
+ {
+  "id": "daily_lib_fees-66",
+  "category": "combo:library.ranking+library.reservations",
+  "language": "zh-TW",
+  "input": "看看熱門的書，然後幫我預約一本",
+  "session": "dlf-65",
+  "expected": "numbered list with both needs, or open one and explain the other",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "library.ranking"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 18913,
+   "choices": [],
+   "message": "請在原本的「圖書點閱排行榜」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "CONCERN",
+  "note": "Opened ranking; the 'reserve one' part (done on a book page) was not mentioned. Not a separate page, but the reply says nothing about how to reserve."
+ },
+ {
+  "id": "daily_lib_fees-67",
+  "category": "combo:fees.tuition+fees.history",
+  "language": "zh-TW",
+  "input": "先繳小孩學費，再看看之前繳過的紀錄",
+  "session": "dlf-66",
+  "expected": "numbered list with both needs, or open one and explain the other",
+  "observed": {
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 19649,
+   "choices": [
+    "帳務紀錄",
+    "學雜費"
+   ],
+   "message": "你想使用哪個功能？請先確認。"
+  },
+  "verdict": "PASS",
+  "note": "As expected."
+ },
+ {
+  "id": "daily_lib_fees-68",
+  "category": "combo:fees.housing+fees.water",
+  "language": "zh-TW",
+  "input": "社宅房租跟水費",
+  "session": "dlf-67",
+  "expected": "numbered list with both needs, or open one and explain the other",
+  "observed": {
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 20504,
+   "choices": [
+    "國／社宅租金維管費",
+    "水費"
+   ],
+   "message": "你想使用哪個功能？請先確認。"
+  },
+  "verdict": "PASS",
+  "note": "As expected."
+ },
+ {
+  "id": "daily_lib_fees-69",
+  "category": "combo:library.notices+fees.parking",
+  "language": "zh-TW",
+  "input": "看圖書館公告，還有我的停車費",
+  "session": "dlf-68",
+  "expected": "numbered list with both needs, or open one and explain the other",
+  "observed": {
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 20093,
+   "choices": [
+    "圖書公告",
+    "停車費"
+   ],
+   "message": "你想使用哪個功能？請先確認。"
+  },
+  "verdict": "PASS",
+  "note": "As expected."
+ },
+ {
+  "id": "daily_lib_fees-70",
+  "category": "combo:app.bills>fees.tax",
+  "language": "zh-TW",
+  "input": "帳單那邊的房屋稅",
+  "session": "dlf-69",
+  "expected": "navigate to fees.tax",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "fees.tax"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 18899,
+   "choices": [],
+   "message": "請在原本的「地方稅」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "As expected."
+ },
+ {
+  "id": "daily_lib_fees-71",
+  "category": "combo:library>library.records",
+  "language": "zh-TW",
+  "input": "圖書館裡我的借閱紀錄",
+  "session": "dlf-70",
+  "expected": "navigate to library.records",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "library.records"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 14308,
+   "choices": [],
+   "message": "請在原本的「我的借閱紀錄」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "As expected."
+ },
+ {
+  "id": "daily_lib_fees-72",
+  "category": "combo:fees.search+fees.other",
+  "language": "zh-TW",
+  "input": "找不到我要繳的項目，是其他類的",
+  "session": "dlf-71",
+  "expected": "numbered list with both needs, or open one and explain the other",
+  "observed": {
+   "kind": "reply",
+   "action": "request_clarification",
+   "destination": null,
+   "route": "library_model",
+   "language": "zh",
+   "elapsed_ms": 24359,
+   "choices": [],
+   "message": "你想先使用哪個服務？可以描述想做的事，或問「有哪些功能」。"
+  },
+  "verdict": "FAIL",
+  "note": "Neither 其他繳費 nor 繳費查詢 matched (找不到…繳的項目); routed to library model via 「找」 → generic clarification."
+ },
+ {
+  "id": "daily_lib_fees-73",
+  "category": "combo:library.map+library.records",
+  "language": "zh-TW",
+  "input": "最近的圖書館在哪，順便看我借了什麼",
+  "session": "dlf-72",
+  "expected": "numbered list with both needs, or open one and explain the other",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_library",
+   "destination": {
+    "kind": "home"
+   },
+   "route": "library_model",
+   "language": "zh",
+   "elapsed_ms": 12175,
+   "choices": [],
+   "message": "請在圖書借閱頁搜尋想看的書。這裡使用示範資料。"
+  },
+  "verdict": "FAIL",
+  "note": "Two needs: map (off) + records. 「借了什麼」 not a keyword (借了哪些 is), 圖書 → library home. Records dropped and map never explained."
+ },
+ {
+  "id": "daily_lib_fees-74",
+  "category": "combo:fees.parking+fees.tax",
+  "language": "zh-TW",
+  "input": "停車費跟地方稅都要繳",
+  "session": "dlf2-c0",
+  "expected": "numbered list with both needs, or open one and explain the other",
+  "observed": {
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 8567,
+   "choices": [
+    "停車費",
+    "地方稅"
+   ],
+   "message": "你想使用哪個功能？請先確認。"
+  },
+  "verdict": "PASS",
+  "note": "As expected."
+ },
+ {
+  "id": "daily_lib_fees-75",
+  "category": "combo:fees.parking+fees.tax:pick",
+  "language": "zh-TW",
+  "input": "(choice 2)",
+  "session": "dlf2-c0",
+  "expected": "choice 2 navigates",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "fees.tax"
+   },
+   "route": "selection",
+   "language": "zh",
+   "elapsed_ms": 0,
+   "choices": [],
+   "message": "請在原本的「地方稅」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "As expected."
+ },
+ {
+  "id": "daily_lib_fees-76",
+  "category": "combo:library.notices+fees.parking",
+  "language": "zh-TW",
+  "input": "看圖書館公告，還有我的停車費",
+  "session": "dlf2-c1",
+  "expected": "numbered list with both needs, or open one and explain the other",
+  "observed": {
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 8443,
+   "choices": [
+    "圖書公告",
+    "停車費"
+   ],
+   "message": "你想使用哪個功能？請先確認。"
+  },
+  "verdict": "PASS",
+  "note": "As expected."
+ },
+ {
+  "id": "daily_lib_fees-77",
+  "category": "combo:library.notices+fees.parking:pick",
+  "language": "zh-TW",
+  "input": "(choice 2)",
+  "session": "dlf2-c1",
+  "expected": "choice 2 navigates",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "fees.parking"
+   },
+   "route": "selection",
+   "language": "zh",
+   "elapsed_ms": 0,
+   "choices": [],
+   "message": "請在原本的「停車費」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "As expected."
+ },
+ {
+  "id": "daily_lib_fees-78",
+  "category": "combo:fees.water+fees.history",
+  "language": "zh-TW",
+  "input": "水費繳一繳，再看一下我付過什麼",
+  "session": "dlf2-c2",
+  "expected": "numbered list with both needs, or open one and explain the other",
+  "observed": {
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 13444,
+   "choices": [
+    "帳務紀錄",
+    "水費"
+   ],
+   "message": "你想使用哪個功能？請先確認。"
+  },
+  "verdict": "PASS",
+  "note": "As expected."
+ },
+ {
+  "id": "daily_lib_fees-79",
+  "category": "combo:library.records+fees.hospital",
+  "language": "zh-TW",
+  "input": "看我借了哪些書，還有醫藥費要繳",
+  "session": "dlf2-c3",
+  "expected": "numbered list with both needs, or open one and explain the other",
+  "observed": {
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 9696,
+   "choices": [
+    "我的借閱紀錄",
+    "聯醫醫療費"
+   ],
+   "message": "你想使用哪個功能？請先確認。"
+  },
+  "verdict": "PASS",
+  "note": "As expected."
+ },
+ {
+  "id": "daily_lib_fees-80",
+  "category": "single:library.reservations",
+  "language": "zh-TW",
+  "input": "我的預約清單",
+  "session": "dlf2-s0",
+  "expected": "navigate to library.reservations",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "library.reservations"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 4456,
+   "choices": [],
+   "message": "請在原本的「圖書預約清單」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "As expected."
+ },
+ {
+  "id": "daily_lib_fees-81",
+  "category": "single:library.reservations",
+  "language": "zh-TW",
+  "input": "我預約的書到了沒",
+  "session": "dlf2-s1",
+  "expected": "navigate to library.reservations",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_library",
+   "destination": {
+    "kind": "home"
+   },
+   "route": "library_model",
+   "language": "zh",
+   "elapsed_ms": 6469,
+   "choices": [],
+   "message": "請在圖書借閱頁搜尋想看的書。這裡使用示範資料。"
+  },
+  "verdict": "CONCERN",
+  "note": "Same pattern: 「預約的書」 → library home, not reservation list."
+ },
+ {
+  "id": "daily_lib_fees-82",
+  "category": "single:library.map",
+  "language": "zh-TW",
+  "input": "圖書館地圖",
+  "session": "dlf2-s2",
+  "expected": "honest 'not connected' explanation, no navigation",
+  "observed": {
+   "kind": "unsupported",
+   "action": null,
+   "destination": null,
+   "route": "unavailable_direct",
+   "language": "zh",
+   "elapsed_ms": 4,
+   "choices": [],
+   "message": "圖書館地圖：地圖金鑰與定位尚待驗證。"
+  },
+  "verdict": "PASS",
+  "note": "As expected."
+ },
+ {
+  "id": "daily_lib_fees-83",
+  "category": "single:library.map",
+  "language": "zh-TW",
+  "input": "我家附近哪裡有圖書館",
+  "session": "dlf2-s3",
+  "expected": "honest 'not connected' explanation, no navigation",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_library",
+   "destination": {
+    "kind": "home"
+   },
+   "route": "library_model",
+   "language": "zh",
+   "elapsed_ms": 5804,
+   "choices": [],
+   "message": "請在圖書借閱頁搜尋想看的書。這裡使用示範資料。"
+  },
+  "verdict": "FAIL",
+  "note": "Off library.map: navigated to library home; no 'map not connected' explanation."
+ },
+ {
+  "id": "daily_lib_fees-84",
+  "category": "single:fees.other",
+  "language": "zh-TW",
+  "input": "其他繳費",
+  "session": "dlf2-s4",
+  "expected": "navigate to fees.other",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "fees.other"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 4489,
+   "choices": [],
+   "message": "請在原本的「其他繳費」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "As expected."
+ },
+ {
+  "id": "daily_lib_fees-85",
+  "category": "single:fees.scan",
+  "language": "zh-TW",
+  "input": "用手機掃條碼繳費",
+  "session": "dlf2-s5",
+  "expected": "navigate to fees.scan",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "app.bills"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 4566,
+   "choices": [],
+   "message": "請在原本的「帳務」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "CONCERN",
+  "note": "條碼/掃 not fees.scan keywords; 繳費 → parent 帳務 tab."
+ },
+ {
+  "id": "daily_lib_fees-86",
+  "category": "single:fees.history",
+  "language": "zh-TW",
+  "input": "繳費紀錄",
+  "session": "dlf2-s6",
+  "expected": "navigate to fees.history",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "fees.history"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 4009,
+   "choices": [],
+   "message": "請在原本的「帳務紀錄」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "As expected."
+ },
+ {
+  "id": "daily_lib_fees-87",
+  "category": "single:app.bills",
+  "language": "zh-TW",
+  "input": "我要繳費",
+  "session": "dlf2-s7",
+  "expected": "navigate to app.bills",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "app.bills"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "elapsed_ms": 10227,
+   "choices": [],
+   "message": "請在原本的「帳務」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "As expected."
+ }
+]

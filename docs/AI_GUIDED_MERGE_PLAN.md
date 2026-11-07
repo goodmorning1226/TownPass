@@ -368,3 +368,54 @@
 6. 他們的本機預寫功能（名詞解釋、老人共餐示範、案件進度候選）要保留、改成走後端，還是先隱藏？
 7. worktree 上未提交的後端修改（`translate_for_faq` 等）是否先提交，再開始合併？
 8. 隊友是否還在 `feat/guided-assistant-mock` 上繼續開發？若是，要約定合併時間點，或請他之後改在合併後的分支上做。
+
+---
+
+## 8. 引導助理的多語設計（2026-11-08，`feat/guided-i18n`）
+
+引導助理（預設介面）的固定文字、教學內容與頁面上的指引都已是 6 種語言（中、英、日、越、印尼、泰）。
+**外語翻譯都是草稿，待母語者校對**（每個檔案的 `status` 欄位寫著 DRAFT）。
+
+**語言只有一個狀態。** 顯示語言 = `AssistantTexts.pageLanguage`：對話語言（`AssistantTexts.conversation`），沒有時用頁面語言。
+- 麥克風旁的語言選單和「AI 助理設定 → 助理語言」是**同一個設定**（`speechLanguage`，`AssistantSpeechLanguage`，記住選擇）：
+  選了具體語言，對話語言立刻跟著換（不用換頁）；選「自動偵測」不改目前的文字語言。原本只有中文可選的 `AssistantLanguage` 已移除。
+- 說話或打字的語言清楚時（語音信心 ≥ 0.8；打字要有字、不是點選項），對話語言和頁面語言一起跟著換（`_followLanguage`，
+  與聊天助理相同的規則：只限這次使用，不保存；下次開 App 回到手機語言）。
+- 控制器建立時清掉對話語言，所以一開始用頁面語言（＝手機語言）。
+
+**文字怎麼查。** `lib/page/guided_assistant/model/guide_i18n.dart` 的 `gt(中文, {值})`：
+- 程式裡仍寫中文（原文與後備）；`gt` 用中文原文查 `assets/i18n/guide/<section>.json`（`ui`、`content` 與 9 個指南各一個檔，
+  格式同 `app_strings.json`：`{"strings": {中文: {en, ja, vi, id, th}}}`），查不到就顯示中文。啟動時載入一次（約 0.5 MB）。
+- 有變數的句子寫成樣板：`gt('找到 {n} 個類別。', {'n': n})`；翻譯可以調整語序。拼接的句子片段各自用 `gt` 包起來再放進整句樣板。
+- 顯示處（任務卡、企鵝卡、待辦、提示、對話泡泡、設定頁）才呼叫 `gt`，所以**切換語言立即生效**：訊息裡存的是中文原文，
+  畫面依現在的語言顯示（`ChatMessage.shown`）；`Guide` 的頁面文字（短名、按鈕、開場卡、chips）改成讀取時才產生。
+- 建議 chips 也翻：點外語 chip 時，送給後端的是外語句子，本機規則（下一步、名詞解釋…）仍用 chip 的中文原文判斷；
+  使用者自己最近成功的說法（`AssistantRecentInputs`）排在前面，後面是目前語言的預設 chips。
+- 引導介面整個包在 `PageTranslationScope(enabled: false)` 裡，不會再被 ML Kit 當頁面翻一次。
+
+**頁面上的字。**
+- 翻譯中的 `{page:館藏查詢}` = 頁面上那個字現在顯示的樣子（`PageTranslation.display`，與服務網頁、TPText 用同一份快取），
+  所以卡片寫的按鈕名稱跟畫面上一樣；頁面是中文時就顯示中文。從頁面讀到的值（書名、取書館、狀態…）用 `pg()` 同樣處理。
+- 探測器（`web_guide_probe.dart`）一律讀**原文**：`orig(e)` 是把翻譯過的文字節點換回中文的 `innerText`（沒有翻譯腳本時就是
+  `innerText`），`txt`／`byText`／`dialog`／`dialogButton`／`textBetween` 都用它；另有 `origContent`、`optText`、`ph`。
+  `[placeholder="X"]` 選擇器自動改寫成 `:is([data-tp-placeholder="X"],[placeholder="X"])`。9 個指南裡直接讀
+  `.innerText`／`.textContent`／`placeholder`／`option.text` 的地方都已改掉（有測試擋）。
+- 原生頁面的目標用 widget key（`GuideTarget`），不靠文字，TPText 翻譯不影響。
+
+**後端。** `guide` 欄位是 `{"page", "components"}`（元件 id），與語言無關；外語句子仍用該頁的預設目標（`default_plan`）。多語本身沒有改後端；與隊友 `feat/asr-ablation` 合併後，後端多了子頁起點（`capability_done`、`for_capability`，例如 `reservation.c-*`、`disasterReport.form.*`、`districtOffice.form.*` 直接從表單／單位頁開始）。
+
+**維護。** `python -X utf8 scripts/extract_guide_strings.py` 從程式抽出所有要顯示的中文（排除探測 JS、關鍵字、比對字、
+`description`），更新各 section 檔（保留既有翻譯、新句子留空、刪掉不用的）；`--check` 只報告缺漏與「有 `$` 插值、查不到」的句子。
+改了中文原文 = 新的 key：翻譯會變回中文，直到補上。測試（`test/guided_i18n_test.dart`）檢查每句 6 種語言都有、變數一致、
+`{page:X}` 的 X 在中文裡、每個指南的文字都查得到、各語言在 360×780 畫面不溢出、探測器只讀原文。
+
+**數量**：1,059 句（ui 147、content 86、指南 826），每種外語 1,059 句。
+
+**與隊友分支合併（2026-11-08）。** 翻譯機制保留這裡的設計（`gt`、`assets/i18n/guide/`、探測器 `orig` 系列、本檔的抽取腳本）；隊友平行做的 `assets/i18n/guide_texts/`、`GuideText`、`pageText`／`phOf`／`phAll` 已移除，他們新增的子頁步驟與「你離開了〇〇」提示列的文字已併入這裡的表。他們的子頁起點、動態與觸感回饋、變暗區域可操作（不再有點錯提醒，`Replies.wrongTap` 等已刪）、離開頁面提示列、圖書館迴圈修正與新手教學只在要求時開始都保留。
+
+**還要手機確認／母語校對**：
+- 英文（及其他語言）頁面下實際走一次圖書預約、繳費：光圈位置、`{page:}` 的字與畫面一致、企鵝卡（寫死的 `cardTop`）有沒有蓋住目標。
+- 翻譯子代理不確定的頁面字（例如 `{page:當事人}` 實際是「當事人Person involved」、`{page:申訴項目}` 可能是「申訴項目(可多選)」）：
+  對不上時只是改用 ML Kit 現翻那個字，不會壞，但可能和畫面不同。
+- 品牌名「臺北通」暫譯 Taipei Pass／台北通；自然人憑證、老人共餐等名詞。
+- 本機規則（`MockAssistantEngine`）仍只懂中文：外語打字的「下一步要做什麼」會交給後端；外語 chip 沒問題。

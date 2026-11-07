@@ -1,3 +1,4 @@
+import 'package:get/get.dart';
 import 'package:town_pass/service/page_translation.dart';
 
 /// An example shown before the first message and the reviewed, enabled
@@ -11,9 +12,19 @@ abstract final class AssistantTexts {
   /// Languages with a full set of texts; 'zh' is the original and fallback.
   static const languages = ['zh', 'en', 'ja', 'vi', 'id', 'th'];
 
-  /// The page language (last assistant navigation or Settings > Language).
-  /// Read inside an Obx so the panel rebuilds when it changes.
-  static String get pageLanguage => PageTranslation.instance.language.value;
+  /// The language of the current conversation: the menu choice or the last
+  /// clearly recognised language (set by AssistantViewController). The panel
+  /// follows it at once; the pages switch only on the next navigation.
+  static final conversation = RxnString();
+
+  /// The panel's language: the conversation's, else the page language (last
+  /// assistant navigation or Settings > Language). Read inside an Obx so the
+  /// panel rebuilds when either changes.
+  static String get pageLanguage {
+    final talking = conversation.value;
+    final page = PageTranslation.instance.language.value;
+    return languages.contains(talking) ? talking! : page;
+  }
 
   /// [language] when it has texts, otherwise the page language.
   static String resolve(String? language) =>

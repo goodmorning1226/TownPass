@@ -56,6 +56,9 @@ if (-not $FaqModel) {
 } elseif ((Test-Path $FaqModel) -and -not ($faqFiles | Where-Object { -not (Test-Path (Join-Path $FaqIndex $_)) })) {
     Push-Model $FaqModel "multilingual-e5-small-q8_0.gguf"
     & $adb -s $DeviceId shell mkdir -p "$target/faq_rag"
+    # A folder made by adb belongs to the shell user (drwxrws---), and the App could
+    # not enter it, so it reported "faq off" (seen on a vivo V2511, 2026-11-07).
+    & $adb -s $DeviceId shell chmod 777 "$target/faq_rag"
     foreach ($file in $faqFiles) { Push-Model (Join-Path $FaqIndex $file) "faq_rag/$file" }
 } else {
     Write-Warning "FAQ files not found ($FaqModel, $FaqIndex); the phone runs without FAQ"
