@@ -10,6 +10,8 @@ side, the HTTP contract and the decision path are unchanged:
   llama-server / whisper-server on the ports passed in (loopback only)
   whisper-server with the Taiwanese model on taiwanese_port, started by the
     App on the first Taiwanese clip (taiwanese_provider)
+  whisper-server with Whisper tiny on gate_port: the optional language gate
+    (detection only, docs/AI_LANGUAGE_GATE.md)
   llama-server --embedding on faq_port for the optional FAQ layer (faq.py)
     and the catalogue's semantic retrieval (semantic.py)
 """
@@ -130,7 +132,7 @@ def _serve(server):
 
 def start(model_port=8771, whisper_port=8772, assistant_port=8765, asr_port=8770, whisper=True,
           multi_port=None, chinese_model=True, faq_port=None, faq_dir=None, taiwanese_port=None,
-          decision_model="ministral"):
+          decision_model="ministral", gate_port=None):
     """Start both HTTP servers once; returns immediately after they listen.
 
     The native model servers may still be loading: until they answer, requests
@@ -147,6 +149,8 @@ def start(model_port=8771, whisper_port=8772, assistant_port=8765, asr_port=8770
     use (docs/AI_TAIWANESE_SPEECH_PLAN.md section 10); None: Taiwanese clips are
     heard as Chinese, with a notice.
     decision_model: "ministral" (default) or "gemma" (OnDeviceAssistant.kt, opt-in build).
+    gate_port: the language gate (Whisper tiny, detection only) that decides the
+    speech language before any decode; None (not pushed) works as before.
     """
     with _lock:
         if _started.is_set():
@@ -158,7 +162,9 @@ def start(model_port=8771, whisper_port=8772, assistant_port=8765, asr_port=8770
         multi_url = f"http://127.0.0.1:{multi_port}" if whisper and multi_port else None
         chinese_url = os.environ["TOWNPASS_WHISPER_URL"] if chinese_model or not multi_url else multi_url
         taiwanese = taiwanese_provider(taiwanese_port) if whisper and taiwanese_port else None
-        recognizer = asr_server.WhisperCppRecognizer(chinese_url, multi_url=multi_url, taiwanese=taiwanese)
+        gate_url = f"http://127.0.0.1:{gate_port}" if multi_url and gate_port else None
+        recognizer = asr_server.WhisperCppRecognizer(chinese_url, multi_url=multi_url, taiwanese=taiwanese,
+                                                     gate_url=gate_url)
         asr = ThreadingHTTPServer(("127.0.0.1", asr_port), asr_server.make_handler(recognizer, "whisper.cpp"))
         asr.daemon_threads = True
         backend = server.Assistant()
@@ -180,7 +186,8 @@ def start(model_port=8771, whisper_port=8772, assistant_port=8765, asr_port=8770
         if whisper:
             speech = (f"chinese whisper :{whisper_port}" if chinese_url != multi_url else "chinese = multilingual") + (
                 f", multilingual whisper :{multi_port}" if multi_url else "") + (
-                f", taiwanese whisper :{taiwanese_port} on first use" if taiwanese else "")
+                f", taiwanese whisper :{taiwanese_port} on first use" if taiwanese else "") + (
+                f", language gate :{gate_port}" if gate_url else "")
         faq_state = f", faq embed :{faq_port}" if faq_port and faq_dir else ", faq off"
         return (f"assistant :{assistant_port}, asr :{asr_port}, model :{model_port} ({server.MODEL}), "
                 f"{speech}{faq_state}")

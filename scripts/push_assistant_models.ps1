@@ -11,6 +11,10 @@
 #   ggml-whisper-taiwanese.bin     -Taiwanese (optional, Breeze-ASR-26 q8_0, 1.5 GB): loaded
 #                                   only when Taiwanese is chosen (docs/AI_TAIWANESE_SPEECH_PLAN.md
 #                                   section 10); -Taiwanese "" (default) removes it from the phone
+#   ggml-whisper-langid.bin        -LanguageGate (optional, default Whisper tiny q8_0, 43 MB):
+#                                   detects the speech language (~0.2 s) before the
+#                                   multilingual model decodes (docs/AI_LANGUAGE_GATE.md);
+#                                   -LanguageGate "" removes it, a missing file only warns
 #
 # FAQ layer (optional, docs/AI_FAQ_RAG.md): the multilingual-e5-small GGUF and the
 # index directory (embeddings.bin, metadata.json, model_info.json, ~22 MB) go to
@@ -29,6 +33,7 @@ param(
     [string]$Multilingual = "D:\TownPassAssistant\models\asr-ablation\ggml-small-q8_0.bin",
     [string]$Chinese = "",
     [string]$Taiwanese = "",
+    [string]$LanguageGate = "D:\TownPassAssistant\models\asr-ablation\ggml-tiny-q8_0.bin",
     [string]$FaqModel = "D:\TownPassAssistant\models\device\multilingual-e5-small-q8_0.gguf",
     [string]$FaqIndex = (Join-Path $env:LOCALAPPDATA "TownPassAssistant\faq_rag"),
     [ValidateSet("ministral", "gemma")][string]$DecisionModel = "ministral",
@@ -72,6 +77,13 @@ if ($Taiwanese) {
     Push-Model $Taiwanese "ggml-whisper-taiwanese.bin"
 } else {
     & $adb -s $DeviceId shell rm -f "$target/ggml-whisper-taiwanese.bin"
+}
+if (-not $LanguageGate) {
+    & $adb -s $DeviceId shell rm -f "$target/ggml-whisper-langid.bin"
+} elseif (Test-Path $LanguageGate) {
+    Push-Model $LanguageGate "ggml-whisper-langid.bin"
+} else {
+    Write-Warning "Language gate model not found ($LanguageGate); the phone runs without it"
 }
 $faqFiles = @("embeddings.bin", "metadata.json", "model_info.json")
 if (-not $FaqModel) {

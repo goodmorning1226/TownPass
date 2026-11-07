@@ -21,6 +21,7 @@ import kotlin.concurrent.thread
  *  - whisper.cpp whisper-server (Breeze-ASR-25)     127.0.0.1:8772
  *  - whisper.cpp whisper-server (Taiwanese, Breeze-ASR-26) 127.0.0.1:8776, started on first use
  *  - llama-server --embedding (multilingual-e5-small) 127.0.0.1:8774, optional FAQ layer
+ *  - whisper-server (Whisper tiny, language detection only) 127.0.0.1:8775, optional
  *  - Python backend via Chaquopy (device_main.py)   127.0.0.1:8765 and :8770
  *
  * so the Flutter side and the HTTP contract do not change. Model files are not
@@ -46,6 +47,11 @@ object OnDeviceAssistant {
      *  台語 is chosen and a clip arrives ([startTaiwanese]); without it Taiwanese
      *  clips are heard as Chinese and the App says so. */
     const val TAIWANESE_ASR_FILE = "ggml-whisper-taiwanese.bin"  // push_assistant_models.ps1 -Taiwanese
+    /** Optional language gate (docs/AI_LANGUAGE_GATE.md): Whisper tiny q8_0 (43 MB, ~0.2 s a
+     *  clip) only detects the speech language before the multilingual model decodes, so
+     *  speech is never decoded (translated) in a language the speaker did not use. Needs
+     *  the multilingual model; without the file the backend works as before. */
+    const val GATE_ASR_FILE = "ggml-whisper-langid.bin"  // push_assistant_models.ps1 -LanguageGate
     /** Optional FAQ layer (docs/AI_FAQ_RAG.md): Microsoft multilingual-e5-small GGUF and
      *  the pre-built index directory, both pushed by push_assistant_models.ps1 (-FaqModel, -FaqIndex).
      *  Without them the assistant runs without FAQ. */
@@ -56,6 +62,7 @@ object OnDeviceAssistant {
     private const val WHISPER_PORT = 8772
     private const val MULTI_WHISPER_PORT = 8773
     private const val TAIWANESE_WHISPER_PORT = 8776
+    private const val GATE_WHISPER_PORT = 8775
     private val processes = mutableListOf<Process>()
 
     /** Set by [start]; [startTaiwanese] launches the Taiwanese server with them. */
@@ -91,6 +98,7 @@ object OnDeviceAssistant {
                 // multilingual one, or both.
                 val chinese = whisper && File(models, ASR_FILE).isFile
                 val multilingual = whisper && File(models, MULTI_ASR_FILE).isFile
+                val gate = multilingual && File(models, GATE_ASR_FILE).isFile
                 val faqIndex = File(models, FAQ_INDEX_DIR)
                 val faq = File(models, FAQ_MODEL_FILE).isFile && File(faqIndex, "embeddings.bin").isFile
                 // The decision model this build asks for; without its file the default
@@ -108,6 +116,7 @@ object OnDeviceAssistant {
                         Kwarg("chinese_model", chinese || !multilingual),
                         Kwarg("faq_port", if (faq) FAQ_EMBED_PORT else null),
                         Kwarg("faq_dir", if (faq) faqIndex.absolutePath else null),
+                        Kwarg("gate_port", if (gate) GATE_WHISPER_PORT else null),
                         // Always offered with Whisper: the file is looked for on first use.
                         Kwarg("taiwanese_port", if (whisper) TAIWANESE_WHISPER_PORT else null),
                         Kwarg("decision_model", decisionModel)).toString()
@@ -129,6 +138,13 @@ object OnDeviceAssistant {
                         // Same binary; a second instance keeps the Chinese one just started.
                         launch(app, "libwhisper_server.so", File(models, MULTI_ASR_FILE), MULTI_WHISPER_PORT,
                             listOf("-t", threads, "-l", "auto"), stopLeftovers = !chinese)
+                    }
+                    if (gate) {
+                        // Detection only (encoder + one step, ~130 MB): 4 threads were faster
+                        // than 6 for Whisper tiny on a vivo V2511 (0.18 s vs 0.27 s a clip).
+                        launch(app, "libwhisper_server.so", File(models, GATE_ASR_FILE), GATE_WHISPER_PORT,
+                            listOf("-t", threads.toInt().coerceAtMost(4).toString(), "-l", "auto"),
+                            stopLeftovers = false)
                     }
                 } else {
                     stopStale("libwhisper_server.so")

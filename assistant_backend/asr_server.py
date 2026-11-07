@@ -64,44 +64,85 @@ SCRIPT_PROMPTS = {"ja": "こんにちは。台北市のサービスについて�
 SCRIPTS = {"ja": re.compile(r"[぀-ヿ一-鿿]"), "th": re.compile(r"[฀-๿]")}
 
 
-# Decoding in a language the speaker did not use makes Whisper translate (owner,
-# 2026-11-08: "不要再幫我亂翻成另外的語言"). So the chosen language is forced only
-# when detection is weak (below FOLLOW_DETECTION) or the chosen language is itself
-# a close second (at least CHOSEN_LANGUAGE_MIN). It used to be forced below 0.8 or
-# from 5 %, which turned Chinese spoken with English chosen into English.
-CLEAR_DETECTION = 0.8   # the App moves the speech-language menu from here
-FOLLOW_DETECTION = 0.5
-CHOSEN_LANGUAGE_MIN = 0.3
-# Chinese chosen, another language detected: switch only when detection is at least
-# this sure (or the Chinese pass already wrote Latin letters).
-UNSURE_SWITCH = 0.5
-# Chinese chosen and a short clear Chinese text: Whisper may have translated another
-# language into it ("nani ga dekiru" -> 何能做到, "konnichiwa" -> 你好). A detection-only
-# pass (encoder plus one step) checks the language; another language must be at least
-# this sure, so short Chinese commands are not turned into Japanese.
+# Language decision (docs/AI_LANGUAGE_GATE.md). The chosen language is only a
+# preference: forcing Whisper into a language the speaker did not use makes it
+# translate ("nani ga dekiru" -> 何能做到 in Chinese, Chinese speech -> English).
+# So the language is decided from detection first:
+# - one of our languages at least CLEAR_LANGUAGE likely: decode in it, whatever the menu;
+# - otherwise decode the two most likely of ours (each at least CANDIDATE_MIN) and the
+#   chosen one, and keep the transcript that fits its script and scores better (a
+#   translated decode scores lower);
+# - detection outside our languages counts for the nearest of ours (NEAREST); when even
+#   that leaves none, the chosen language is decoded (as before).
+# Tuned on FLEURS clips (1.5 s and 3 s crops; docs/AI_LANGUAGE_GATE.md).
+CLEAR_LANGUAGE = 0.6
+CANDIDATE_MIN = 0.1
+# whisper.cpp language names (and codes) outside ours -> the nearest of ours.
+NEAREST = {"lao": "th", "lo": "th", "malay": "id", "ms": "id", "javanese": "id", "jw": "id",
+           "sundanese": "id", "su": "id", "cantonese": "zh", "yue": "zh"}
+# Chinese chosen, no language gate: the Chinese pass runs first (fast path) and its text
+# is checked instead. A short clear Chinese text may be a translation of another language
+# ("konnichiwa" -> 你好), so a detection-only pass checks texts this short (characters).
 SHORT_TEXT = 6
-SHORT_SWITCH = 0.7
+# Language gate: a whisper-server with Whisper tiny used only for detection (encoder and
+# one decoder step, ~0.2 s on a vivo V2511). Its top language is the only decode when
+# it is the chosen one at CLEAR_LANGUAGE or another one at GATE_SWITCH; otherwise
+# Whisper small decides as without a gate (tiny is often unsure about 1-2 s clips,
+# and wrongly sure of another language for ~1 % of short Chinese clips).
+GATE_SWITCH = 0.8
+# whisper.cpp applies a request's audio_ctx only after detecting the language, so
+# detection uses the audio_ctx of the server's previous decode (1500, a full 30 s
+# window and 6x slower, on a server that never decoded). The gate is therefore primed
+# once with one short decode at GATE_CTX (256 frames = 5.1 s).
+GATE_CTX = 256
+STATUS_RANK = {"clear": 2, "unsure": 1, "unclear": 0}
 
 
-def detection_confidence(reply, code):
-    """Probability Whisper gave the detected language (None when not reported)."""
-    probabilities = reply.get("language_probabilities") if isinstance(reply, dict) else None
-    if not isinstance(probabilities, dict) or not code:
-        return None
-    value = probabilities.get(code)
-    return round(float(value), 3) if isinstance(value, (int, float)) else None
+def language_scores(reply):
+    """Detection as {our language: probability}, other languages folded into the
+    nearest of ours (NEAREST). Without probabilities the detected language counts
+    as certain (earlier behaviour)."""
+    if not isinstance(reply, dict):
+        return {}
+    probabilities = reply.get("language_probabilities")
+    if isinstance(probabilities, dict) and probabilities:
+        scores = {}
+        for code, value in probabilities.items():
+            ours = code if code in LANGUAGES else NEAREST.get(code)
+            if ours and isinstance(value, (int, float)):
+                scores[ours] = scores.get(ours, 0.0) + float(value)
+        return {code: round(value, 3) for code, value in scores.items()}
+    name = str(reply.get("language") or "").strip().lower()
+    detected = language_code(name, default=None) if name else None
+    detected = detected if detected in LANGUAGES else NEAREST.get(name)
+    return {detected: 1.0} if detected else {}
 
 
-def prefers_chosen(reply, chosen):
-    """True when the chosen language should win over the detected one: detection
-    is below FOLLOW_DETECTION, or the chosen language is a close second."""
-    probabilities = reply.get("language_probabilities") if isinstance(reply, dict) else None
-    if not isinstance(probabilities, dict) or not probabilities:
-        return False  # nothing to judge by: keep the detection (earlier behaviour)
-    top = max((float(v) for v in probabilities.values() if isinstance(v, (int, float))), default=0.0)
-    chosen_probability = probabilities.get(chosen)
-    chosen_probability = float(chosen_probability) if isinstance(chosen_probability, (int, float)) else 0.0
-    return top < FOLLOW_DETECTION or chosen_probability >= CHOSEN_LANGUAGE_MIN
+def candidate_languages(scores, chosen):
+    """Languages to decode, most likely first (see CLEAR_LANGUAGE). When detection
+    is unsure, the chosen language is decoded too (it was right for most short
+    clips of our own languages that tiny could not tell, docs/AI_LANGUAGE_GATE.md);
+    when none of ours is even a candidate (e.g. Korean detected), only the chosen one."""
+    fallback = chosen if chosen in LANGUAGES else "zh"
+    ranked = sorted(scores, key=lambda code: -scores[code])
+    if ranked and scores[ranked[0]] >= CLEAR_LANGUAGE:
+        return ranked[:1]
+    order = [code for code in ranked[:2] if scores[code] >= CANDIDATE_MIN]
+    return order + [fallback] if fallback not in order else order
+
+
+def script_fits(text, language):
+    """A transcript decoded in language is written in that language's script."""
+    letters = [c for c in text if c.isalnum()]
+    if not letters:
+        return False
+    if language == "zh":
+        return cjk_ratio(text) >= 0.5
+    if language in SCRIPTS:
+        return bool(SCRIPTS[language].search(text))
+    # Latin-script languages (en, vi, id): Latin letters, Vietnamese marks included.
+    latin = sum(c.isascii() or "\u00c0" <= c <= "\u024f" or "\u1e00" <= c <= "\u1eff" for c in letters)
+    return latin / len(letters) >= 0.8
 
 
 def language_code(value, default="zh"):
@@ -293,10 +334,12 @@ class WhisperCppRecognizer:
     Standard library only.
 
     Languages: url serves Chinese; multi_url, when given, serves a multilingual
-    Whisper for en/ja/vi/id/th and detects the language for "auto" (a clip
-    detected as Chinese is then transcribed by the Chinese model, unless both
-    are the same model, e.g. Whisper small for everything). Chinese results are
-    read as Traditional (script.traditional).
+    Whisper for en/ja/vi/id/th and language detection (both may be the same
+    model, e.g. Whisper small for everything). gate_url, when given, is a small
+    whisper-server (Whisper tiny) used only to detect the language before any
+    decode (docs/AI_LANGUAGE_GATE.md). The result's language is the one the
+    audio was detected in, not necessarily the chosen one (CLEAR_LANGUAGE).
+    Chinese results are read as Traditional (script.traditional).
 
     Taiwanese ("nan"): taiwanese, when given, is called on each Taiwanese clip
     and returns (url, None) for a whisper-server with a Taiwanese model (started
@@ -305,12 +348,15 @@ class WhisperCppRecognizer:
     slowed Breeze-ASR-26 by 1.4-2.5 s a clip and silenced a small Taiwanese
     model, section 9). Without it the clip is heard as Chinese and the reply
     carries "notice". Either way the result language is "zh": the turn is Chinese.
+    Taiwanese is an explicit choice: never the gate, a detection or a check.
     """
 
-    def __init__(self, url, timeout=60, multi_url=None, taiwanese=None):
+    def __init__(self, url, timeout=60, multi_url=None, taiwanese=None, gate_url=None):
         self.url = url.rstrip("/")
         self.multi_url = multi_url.rstrip("/") if multi_url else None
         self.taiwanese = taiwanese
+        self.gate_url = gate_url.rstrip("/") if gate_url and self.multi_url else None
+        self.gate_primed = False
         self.timeout = timeout
         self.prompt = vocabulary_prompt()  # conservative estimate: no tokenizer here
         self.prompt_tokens = None
@@ -335,11 +381,13 @@ class WhisperCppRecognizer:
         times faster on a phone CPU for short hold-to-talk requests."""
         return min(1500, max(minimum, int((seconds + 2) * 50)))
 
-    def _fields(self, seconds=30, language="zh", prompt=True, minimum_ctx=256):
+    def _fields(self, seconds=30, language="zh", fallback=True, prompt=True, minimum_ctx=256):
         # The catalogue vocabulary prompt is Chinese: only for Chinese decoding.
         # Japanese and Thai get a sentence in their own script, so Whisper writes
-        # kana/kanji or Thai instead of romanising ("nani ka dekiru"). "auto"
-        # never gets a prompt: it would bias the language detection.
+        # kana/kanji or Thai instead of romanising ("nani ka dekiru"). "auto" gets
+        # no prompt: a Chinese prompt would make Whisper write other languages in
+        # Chinese. (It would not bias whisper.cpp's detection itself, which reads
+        # only the start-of-transcript token: whisper_lang_auto_detect_internal.)
         # prompt=False: no prompt at all (the Taiwanese model).
         text = (self.prompt if language == "zh" else SCRIPT_PROMPTS.get(language, "")) if prompt else ""
         return {"response_format": "verbose_json", "language": language,
@@ -347,10 +395,12 @@ class WhisperCppRecognizer:
                 # temperature_inc > 0 keeps whisper.cpp's fallback: a decode stuck in a
                 # repetition loop (high entropy / low log-prob) is retried warmer.
                 # 0.4 allows two retries (0.4, 0.8); 0.2 allowed five, and an unknown
-                # book title then ran past the 40 s limit.
-                "temperature": "0", "temperature_inc": "0.4", "no_timestamps": "true",
-                # Detection reports each language's probability (used to keep the
-                # chosen language when detection is unsure, see transcribe()).
+                # book title then ran past the 40 s limit. fallback=False (passes after
+                # a clip's first decode): no retries, so a second opinion in another
+                # language cannot add several seconds.
+                "temperature": "0", "temperature_inc": "0.4" if fallback else "0", "no_timestamps": "true",
+                # Detection reports each language's probability (language_scores);
+                # whisper-server computes them with one more encoder pass.
                 "no_language_probabilities": "false" if language == "auto" else "true",
                 "suppress_nst": "true",
                 "audio_ctx": str(self.audio_context(seconds, minimum_ctx))}
@@ -377,16 +427,70 @@ class WhisperCppRecognizer:
         no_speech = max((s.get("no_speech_prob", 0.0) for s in segments), default=1.0)
         return text, round(logprob, 3), round(no_speech, 3)
 
-    def _infer(self, url, wav, seconds, language, prompt=True, detect_only=False, minimum_ctx=256):
+    def _post(self, url, fields, wav):
         import urllib.request
-        self.passes = getattr(self, "passes", 0) + 1  # decodes for this clip (timing log)
-        fields = self._fields(seconds, language, prompt, minimum_ctx)
-        if detect_only:
-            fields["detect_language"] = "true"  # whisper-server: language only, no text
         body, content_type = self.multipart(fields, wav)
         request = urllib.request.Request(url + "/inference", data=body, headers={"Content-Type": content_type})
         with urllib.request.urlopen(request, timeout=self.timeout) as response:
             return json.loads(response.read(2_000_000))
+
+    def _infer(self, url, wav, seconds, language, prompt=True, detect_only=False, minimum_ctx=256, fallback=True):
+        self.passes = getattr(self, "passes", 0) + 1  # requests to the speech models for this clip (timing log)
+        fields = self._fields(seconds, language, fallback, prompt, minimum_ctx)
+        if detect_only:
+            fields["detect_language"] = "true"  # whisper-server: language only, no text
+        return self._post(url, fields, wav)
+
+    def _decode(self, wav, seconds, language, fallback=True):
+        """One decode in language: Chinese on the Chinese model, others on the multilingual one."""
+        return self._infer(self.url if language == "zh" else self.multi_url, wav, seconds, language,
+                           fallback=fallback)
+
+    def _gate(self, wav, seconds):
+        """Detection by the language gate, or None (no gate, or it failed: the
+        recogniser then works as without one)."""
+        if not self.gate_url:
+            return None
+        try:
+            if not self.gate_primed:
+                # Fixes the gate's audio_ctx for every later detection (see GATE_CTX).
+                silence = io.BytesIO()
+                with wave.open(silence, "wb") as audio:
+                    audio.setnchannels(1), audio.setsampwidth(2), audio.setframerate(SAMPLE_RATE)
+                    audio.writeframes(bytes(SAMPLE_RATE * 2))
+                fields = {**self._fields(1, "en", fallback=False), "prompt": "", "audio_ctx": str(GATE_CTX)}
+                self._post(self.gate_url, fields, silence.getvalue())
+                self.gate_primed = True
+            started = time.monotonic()
+            reply = self._post(self.gate_url, {**self._fields(seconds, "auto"), "detect_language": "true"}, wav)
+        except (OSError, ValueError):
+            self.gate_primed = False
+            return None
+        self.gate_ms = round((time.monotonic() - started) * 1000)
+        return reply if isinstance(reply, dict) else None
+
+    def _choose(self, decodes, order):
+        """The decode to keep: a transcript in its language's script first, then
+        clear over unsure over unclear, then the better average log-prob; ties go
+        to the more likely language (order)."""
+        def key(language):
+            text, logprob, no_speech = self.summarize(decodes[language])
+            text = traditional(text) if language == "zh" else text
+            return (script_fits(text, language), STATUS_RANK[judge(text, logprob, no_speech, language)],
+                    logprob, -order.index(language))
+        return max(order, key=key)
+
+    def _decide(self, wav, seconds, chosen, scores, decodes):
+        """Decode the candidate languages for scores, reusing decodes already made,
+        and return (reply, language, confidence)."""
+        order = candidate_languages(scores, chosen)
+        for language in order:
+            if language not in decodes:
+                # Only a clip's first request keeps the temperature fallback.
+                decodes[language] = self._decode(wav, seconds, language, fallback=self.passes == 0)
+        used = self._choose(decodes, order) if len(order) > 1 else order[0]
+        self.candidates = order
+        return decodes[used], used, scores.get(used)
 
     def transcribe(self, frames, language="zh"):
         """language: one of SPEECH_LANGUAGES; the result names the language used."""
@@ -395,89 +499,99 @@ class WhisperCppRecognizer:
         language = language_code(language)
         confidence = None
         notice = None
-        self.passes = 0
+        self.passes, self.gate_ms, self.candidates = 0, None, None
         requested = language
         buffer = io.BytesIO()
         with wave.open(buffer, "wb") as audio:
             audio.setnchannels(1), audio.setsampwidth(2), audio.setframerate(SAMPLE_RATE)
             audio.writeframes(frames)
         wav, seconds = buffer.getvalue(), len(frames) / 2 / SAMPLE_RATE
+        # Only "auto" and LANGUAGES are ever detected; any other explicit choice
+        # (Taiwanese) skips the gate and the checks.
+        detectable = bool(self.multi_url) and (language == "auto" or language in LANGUAGES)
         with self.lock:
             taiwanese = None
             if language == TAIWANESE:
                 taiwanese, notice = self.taiwanese_url()
-                language = "zh"  # without the Taiwanese model: the Chinese path below
+                language = "zh"  # without the Taiwanese model: a plain Chinese decode below
+            gate = self._gate(wav, seconds) if detectable else None
+            heard = language_scores(gate) if gate is not None else {}
+            top = max(heard, key=heard.get) if heard else None
+            menu = language if language in LANGUAGES else "zh"
+            sure = top if top and heard[top] >= (CLEAR_LANGUAGE if top == menu else GATE_SWITCH) else None
             if taiwanese:
                 # Chinese characters from Taiwanese speech, no prompt, no language
                 # detection: Taiwanese is an explicit choice, never a detection.
                 reply, used = self._infer(taiwanese, wav, seconds, "zh", prompt=False,
                                           minimum_ctx=TAIWANESE_MIN_AUDIO_CTX), "zh"
-            elif language == "zh" or not self.multi_url:
-                # Without a multilingual model the Chinese model does everything.
+            elif sure:
+                # The gate is sure: one decode, in the language spoken, whatever the menu.
+                reply, used, confidence = self._decode(wav, seconds, sure), sure, heard[sure]
+                self.candidates = [sure]
+            elif not detectable or language == "zh":
+                # (Also when the gate is unsure: tiny cannot tell many 1-2 s clips, and
+                # Whisper small then decides as without a gate.)
+                # Without a multilingual model the Chinese model does everything; 台語
+                # without its model is a plain Chinese decode, with no checks.
                 used = "zh" if language == "auto" else language
                 reply = self._infer(self.url, wav, seconds, used)
-                heard, heard_logprob, heard_no_speech = self.summarize(reply)
-                # Chinese chosen but another language spoken: in Chinese mode Whisper
-                # writes "I hate you" in Latin letters, but a longer English sentence
-                # ("I want to lend a book") can come out as unsure Chinese
-                # characters. Either way let the multilingual model detect the
-                # language instead of rejecting the clip as unclear.
-                if used == "zh" and self.multi_url and heard and (
-                        cjk_ratio(heard) < 0.5 or judge(heard, heard_logprob, heard_no_speech) != "clear"):
-                    other = self._infer(self.multi_url, wav, seconds, "auto")
-                    detected = language_code(other.get("language"), default=None)
-                    sure = detection_confidence(other, detected)
-                    if detected and detected != "zh" and (sure is None or sure >= UNSURE_SWITCH):
-                        reply, used, confidence = other, detected, sure
-                    elif detected and detected != "zh" and cjk_ratio(heard) < 0.5:
-                        # Not sure which language, but the Chinese pass already wrote
-                        # Latin letters: keep them and tell the language from the text
-                        # ("what can you do" was once detected as Japanese at low
-                        # confidence and came back as Japanese, 2026-11-08).
-                        import i18n
-                        used = i18n.detect_text_language(heard)
-                        used = used if used in LANGUAGES else "en"
-                elif (used == "zh" and self.multi_url and heard and requested != TAIWANESE
-                        and len(re.sub(r"[\W_]", "", heard)) <= SHORT_TEXT):
-                    # Not for 台語 without its model: Taiwanese is never a detection.
-                    probe = self._infer(self.multi_url, wav, seconds, "auto", detect_only=True)
-                    detected = language_code(probe.get("language"), default=None)
-                    sure = detection_confidence(probe, detected)
-                    if detected in LANGUAGES and detected != "zh" and sure is not None and sure >= SHORT_SWITCH:
-                        reply, used, confidence = self._infer(self.multi_url, wav, seconds, detected), detected, sure
+                if detectable:
+                    reply, used, confidence = self._check_chinese(wav, seconds, reply)
             else:
-                # A chosen language is a preference, not a lock: the App keeps the
-                # language last used, so the next speaker may use another one (forcing
-                # English on Chinese speech makes Whisper translate it). Detect first;
-                # force the chosen language only when detection lands outside our
-                # languages (Thai heard as Lao, Indonesian as Malay).
-                reply = self._infer(self.multi_url, wav, seconds, "auto")
-                detected = language_code(reply.get("language"), default=None)
-                confidence = detection_confidence(reply, detected)
-                if language != "auto" and (detected not in LANGUAGES or (
-                        detected != language and prefers_chosen(reply, language))):
-                    # Detection outside our languages, or not clearly another
-                    # language: short Japanese is often detected as Chinese, and
-                    # Whisper then writes its meaning in Chinese ("konnichiwa" ->
-                    # 你好). Decode in the language the user chose.
-                    reply, detected = self._infer(self.multi_url, wav, seconds, language), language
-                    confidence = None
-                elif detected in SCRIPTS and not SCRIPTS[detected].search(self.summarize(reply)[0] or ""):
-                    # Japanese heard but written in Latin letters: redo with that
-                    # language and a prompt in its own script.
-                    reply = self._infer(self.multi_url, wav, seconds, detected)
-                used = detected or "zh"
-                if used == "zh" and self.url != self.multi_url:  # a separate Chinese model redoes it
-                    reply = self._infer(self.url, wav, seconds, "zh")
+                # Detect with the multilingual model; its decode in the detected
+                # language is reused, then decide as with the gate.
+                auto = self._infer(self.multi_url, wav, seconds, "auto")
+                detected = language_code(auto.get("language"), default=None)
+                decodes = {}
+                if (detected in LANGUAGES and (detected != "zh" or self.url == self.multi_url)
+                        and (detected not in SCRIPTS or SCRIPTS[detected].search(self.summarize(auto)[0] or ""))):
+                    # Not reused: Chinese when a separate Chinese model exists, and
+                    # Japanese or Thai written in Latin letters (redone with a prompt
+                    # in their own script).
+                    decodes[detected] = auto
+                reply, used, confidence = self._decide(wav, seconds, language, language_scores(auto), decodes)
         text, logprob, no_speech = self.summarize(reply)
         if used == "zh":
             text = traditional(text)  # Whisper small and others often write Simplified
-        return {"text": text, "alternatives": [], "alternative_logprobs": [], "language": used,
-                "status": judge(text, logprob, no_speech, used), "avg_logprob": logprob,
-                "no_speech_prob": no_speech, "passes": self.passes, "requested_language": requested,
-                "language_confidence": confidence,
-                **({"speech_model": "taiwanese"} if taiwanese else {}),
-                **({"notice": notice} if notice else {})}
+        result = {"text": text, "alternatives": [], "alternative_logprobs": [], "language": used,
+                  "status": judge(text, logprob, no_speech, used), "avg_logprob": logprob,
+                  "no_speech_prob": no_speech, "passes": self.passes, "requested_language": requested,
+                  "language_confidence": confidence,
+                  **({"speech_model": "taiwanese"} if taiwanese else {}),
+                  **({"notice": notice} if notice else {})}
+        if gate is not None:  # timing log: what the gate heard and how long it took
+            top = max(heard, key=heard.get) if heard else None
+            result.update(gate_language=top, gate_confidence=heard.get(top), gate_ms=self.gate_ms,
+                          candidates=self.candidates)
+        return result
+
+    def _check_chinese(self, wav, seconds, reply):
+        """Chinese chosen and no gate: the Chinese pass ran first (the fast path).
+        Check it for another language; returns (reply, language, confidence).
+
+        - Latin letters, or not a clear transcript: Whisper in Chinese mode writes
+          "I hate you" in Latin letters, and a longer English sentence ("I want to
+          lend a book") can come out as unsure characters. The multilingual model
+          detects (and decodes) the language.
+        - Short clear Chinese: possibly a translation ("nani ga dekiru" -> 何能做到),
+          checked with a detection-only pass.
+        Then the language is decided as with the gate, reusing the Chinese decode."""
+        text, logprob, no_speech = self.summarize(reply)
+        if not text:
+            return reply, "zh", None
+        decodes = {"zh": reply}
+        if cjk_ratio(text) < 0.5 or judge(text, logprob, no_speech) != "clear":
+            other = self._infer(self.multi_url, wav, seconds, "auto", fallback=False)
+            detected = language_code(other.get("language"), default=None)
+            if (detected in LANGUAGES and detected != "zh"
+                    and (detected not in SCRIPTS or SCRIPTS[detected].search(self.summarize(other)[0] or ""))):
+                decodes[detected] = other
+        elif len(re.sub(r"[\W_]", "", text)) <= SHORT_TEXT:
+            other = self._infer(self.multi_url, wav, seconds, "auto", detect_only=True)
+        else:
+            return reply, "zh", None
+        reply, used, confidence = self._decide(wav, seconds, "zh", language_scores(other), decodes)
+        return reply, used, (confidence if used != "zh" else None)
 
 
 def make_handler(recognizer, model_name):
@@ -520,7 +634,10 @@ def make_handler(recognizer, model_name):
                 print(f"diag audio={seconds:.2f}s rms={rms_of(frames):.4f} status={decoded['status']} "
                       f"language={language}->{decoded.get('language')} "
                       f"logprob={decoded.get('avg_logprob')} no_speech={decoded.get('no_speech_prob')} "
-                      f"chars={len(decoded['text'])} {elapsed}ms", flush=True)
+                      f"chars={len(decoded['text'])} passes={decoded.get('passes')} "
+                      f"gate={decoded.get('gate_language')}:{decoded.get('gate_confidence')} "
+                      f"gate_ms={decoded.get('gate_ms')} candidates={','.join(decoded.get('candidates') or [])} "
+                      f"{elapsed}ms", flush=True)
             self.reply(200, {**decoded, "audio_seconds": round(seconds, 2), "elapsed_ms": elapsed})
     return Handler
 

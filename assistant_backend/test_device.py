@@ -1,12 +1,13 @@
 """On-device adapters: llama-server (OpenAI-style) decisions and whisper-server speech."""
 import json
+import re
 import threading
 import unittest
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from unittest.mock import patch
 
 import server
-from asr_server import WhisperCppRecognizer
+from asr_server import WhisperCppRecognizer, language_code
 from server import Assistant, AssistantError
 from test_server import FakeCatalog
 from test_transcription import wav_bytes
@@ -262,15 +263,20 @@ def field(name, value):
 
 
 class MultilingualSpeechTests(unittest.TestCase):
-    """Chinese goes to the Chinese model (Breeze); other languages and "auto"
-    detection to the multilingual model (docs/AI_MULTILINGUAL_PLAN.md)."""
+    """The language is decided from detection, never forced against it
+    (docs/AI_LANGUAGE_GATE.md, docs/AI_MULTILINGUAL_PLAN.md). Fake whisper-servers
+    answer like Whisper: detection from `detected`/`probabilities`, and a decode in
+    language L writes `speech[L]` (text, avg log-prob); a decode in a language that
+    was not spoken is a translation with a lower score."""
 
     def setUp(self):
         self.calls = []
-        self.heard = {"zh": "chinese", "multi": "english"}  # the language each fake model reports
-        self.texts = {"zh": "我要借書", "multi": "multi-text"}  # and the text it writes
-        self.logprob = {"zh": -0.1, "multi": -0.1}
-        self.probabilities = {}  # language_probabilities each fake model reports
+        self.detected = {"gate": "chinese", "multi": "chinese"}  # what each fake detects
+        self.probabilities = {}  # language_probabilities each fake reports
+        self.server_speech = {}  # per-server overrides of speech (the Taiwanese model)
+        self.speech = {"zh": ("我要借這個月新到的書", -0.1), "en": ("I want to borrow a new book", -0.7),
+                       "ja": ("今月の新しい本を借りたい", -0.8), "vi": ("tôi muốn mượn sách", -0.9),
+                       "id": ("saya mau pinjam buku", -0.9), "th": ("ฉันอยากยืมหนังสือ", -0.9)}
         test = self
 
         def fake(name):
@@ -279,186 +285,308 @@ class MultilingualSpeechTests(unittest.TestCase):
                     pass
 
                 def do_POST(self):
-                    test.calls.append((name, self.rfile.read(int(self.headers["Content-Length"]))))
-                    extra = ({"language_probabilities": test.probabilities[name]}
-                             if name in test.probabilities else {})
-                    data = json.dumps({"language": test.heard[name], **extra, "segments": [
-                        {"text": test.texts[name], "tokens": [1, 2], "avg_logprob": test.logprob[name], "no_speech_prob": 0.0}]}).encode()
+                    body = self.rfile.read(int(self.headers["Content-Length"]))
+                    fields = dict(re.findall(rb'name="(\w+)"\r\n\r\n([^\r]*)\r\n', body))
+                    language = fields.get(b"language", b"").decode()
+                    test.calls.append((name, language, fields.get(b"detect_language") == b"true", body))
+                    reply = {}
+                    if language == "auto":
+                        reply["language"] = test.detected[name]
+                        if name in test.probabilities:
+                            reply["language_probabilities"] = test.probabilities[name]
+                        language = language_code(test.detected[name], default="zh")
+                    if fields.get(b"detect_language") != b"true":
+                        text, logprob = test.server_speech.get(name, {}).get(
+                            language, test.speech.get(language, ("", -9.0)))
+                        reply["segments"] = [{"text": text, "tokens": [1, 2], "avg_logprob": logprob,
+                                              "no_speech_prob": 0.0}]
+                    data = json.dumps(reply).encode()
                     self.send_response(200)
                     self.send_header("Content-Length", str(len(data)))
                     self.end_headers()
                     self.wfile.write(data)
             return Handler
         self.fake = fake
-        zh, zh_url = serve(fake("zh"))
-        multi, multi_url = serve(fake("multi"))
-        for httpd in (zh, multi):
+        self.urls = {}
+        for name in ("zh", "multi", "gate"):
+            httpd, self.urls[name] = serve(fake(name))
             self.addCleanup(httpd.server_close)
             self.addCleanup(httpd.shutdown)
-        self.recognizer = WhisperCppRecognizer(zh_url, multi_url=multi_url)
+        self.recognizer = WhisperCppRecognizer(self.urls["zh"], multi_url=self.urls["multi"])
 
-    def models(self):
-        return [name for name, _ in self.calls]
+    def with_gate(self, probabilities, one_model=True):
+        """Recogniser with the language gate (and Whisper small for every language)."""
+        self.probabilities["gate"] = probabilities
+        self.detected["gate"] = max(probabilities, key=probabilities.get)
+        url = self.urls["multi"] if one_model else self.urls["zh"]
+        self.recognizer = WhisperCppRecognizer(url, multi_url=self.urls["multi"], gate_url=self.urls["gate"])
+        return self.recognizer
+
+    def requests(self):
+        """(server, language, detect only) of each request, without the gate's priming decode."""
+        return [(name, language, detect) for name, language, detect, body in self.calls
+                if not (name == "gate" and not detect)]
+
+    # --- the language gate --------------------------------------------------
+
+    def test_gate_heard_chinese_one_decode_in_chinese(self):
+        recognizer = self.with_gate({"zh": 0.95, "en": 0.02})
+        result = recognizer.transcribe(loud_frames(), "zh")
+        self.assertEqual(self.requests(), [("gate", "auto", True), ("multi", "zh", False)])
+        self.assertEqual((result["language"], result["gate_language"], result["gate_confidence"]), ("zh", "zh", 0.95))
+        self.assertIsInstance(result["gate_ms"], int)
+        self.assertIn(field("prompt", recognizer.prompt), self.calls[-1][3])  # the Chinese vocabulary prompt
+
+    def test_gate_is_primed_once_with_a_short_audio_context(self):
+        from asr_server import GATE_CTX
+        recognizer = self.with_gate({"zh": 0.95})
+        recognizer.transcribe(loud_frames(), "zh")
+        recognizer.transcribe(loud_frames(), "zh")
+        gate = [(language, detect, body) for name, language, detect, body in self.calls if name == "gate"]
+        self.assertEqual([(language, detect) for language, detect, _ in gate],
+                         [("en", False), ("auto", True), ("auto", True)])  # one priming decode
+        self.assertIn(field("audio_ctx", str(GATE_CTX)), gate[0][2])
+        self.assertIn(field("no_language_probabilities", "false"), gate[1][2])
+
+    def test_chinese_speech_with_english_chosen_is_not_translated(self):
+        # Owner, 2026-11-08: the menu on English, Chinese speech came back in English.
+        recognizer = self.with_gate({"zh": 0.9, "en": 0.06})
+        result = recognizer.transcribe(loud_frames(), "en")
+        self.assertEqual((result["language"], result["text"]), ("zh", "我要借這個月新到的書"))
+        self.assertEqual(self.requests(), [("gate", "auto", True), ("multi", "zh", False)])
+        self.assertEqual(result["language_confidence"], 0.9)
+
+    def test_japanese_speech_with_chinese_chosen_is_not_translated(self):
+        # "nani ga dekiru" with Chinese chosen came back as the translation 何能做到.
+        self.speech["ja"], self.speech["zh"] = ("何ができる", -0.3), ("何能做到", -0.6)
+        recognizer = self.with_gate({"ja": 0.86, "zh": 0.1})
+        result = recognizer.transcribe(loud_frames(), "zh")
+        self.assertEqual((result["language"], result["text"]), ("ja", "何ができる"))
+        self.assertEqual(self.requests()[1:], [("multi", "ja", False)])
+
+    def test_gate_needs_more_certainty_to_leave_the_chosen_language(self):
+        from asr_server import CLEAR_LANGUAGE, GATE_SWITCH
+        between = round((CLEAR_LANGUAGE + GATE_SWITCH) / 2, 2)
+        recognizer = self.with_gate({"ja": between, "zh": 0.1})
+        recognizer.transcribe(loud_frames(), "ja")  # agrees with the menu: trusted
+        self.assertEqual(self.requests(), [("gate", "auto", True), ("multi", "ja", False)])
+        self.calls.clear()
+        # Another language at that level: Whisper small decides (here: clear long
+        # Chinese, kept as is), since tiny is wrongly sure for some short Chinese clips.
+        result = recognizer.transcribe(loud_frames(), "zh")
+        self.assertEqual((self.requests(), result["language"]), ([("gate", "auto", True), ("multi", "zh", False)], "zh"))
+
+    def test_unsure_gate_lets_whisper_small_decide(self):
+        # Short Japanese: tiny unsure. The Chinese pass runs first (as without a gate),
+        # small detects zh/ja unsure, Japanese is decoded too and its better score wins
+        # over the Chinese translation.
+        self.speech["ja"], self.speech["zh"] = ("こんにちは", -0.25), ("你好", -0.7)
+        self.probabilities["multi"] = {"zh": 0.5, "ja": 0.4}
+        recognizer = self.with_gate({"en": 0.45, "ja": 0.3, "zh": 0.2})
+        result = recognizer.transcribe(loud_frames(), "zh")
+        self.assertEqual(self.requests(), [("gate", "auto", True), ("multi", "zh", False),
+                                           ("multi", "auto", False), ("multi", "ja", False)])
+        self.assertEqual((result["language"], result["text"], result["candidates"]), ("ja", "こんにちは", ["zh", "ja"]))
+        self.assertEqual(result["gate_language"], "en")  # logged, not followed
+        # Short Chinese, equally unsure: the Chinese decode scores better and is kept.
+        self.speech["zh"], self.speech["ja"] = ("你好", -0.15), ("ニーハオ", -0.9)
+        self.assertEqual(recognizer.transcribe(loud_frames(), "ja")["language"], "zh")
+
+    def test_extra_passes_have_no_temperature_fallback(self):
+        self.speech["zh"] = ("你好", -0.7)  # unsure: checked further
+        self.probabilities["multi"] = {"zh": 0.5, "ja": 0.4}
+        recognizer = self.with_gate({"zh": 0.45, "ja": 0.4})
+        recognizer.transcribe(loud_frames(), "zh")
+        passes = [body for name, language, detect, body in self.calls if name == "multi"]
+        self.assertEqual(len(passes), 3)
+        self.assertIn(field("temperature_inc", "0.4"), passes[0])  # the clip's first decode
+        for body in passes[1:]:  # second opinions: no retries
+            self.assertIn(field("temperature_inc", "0") + CRLF, body)
+
+    def test_a_transcript_in_the_wrong_script_loses(self):
+        # Whisper in Chinese mode writing English letters is not a Chinese transcript.
+        self.speech["zh"], self.speech["en"] = ("what can you do", -0.1), ("what can you do", -0.3)
+        self.detected["multi"], self.probabilities["multi"] = "english", {"en": 0.5, "zh": 0.45}
+        recognizer = self.with_gate({"zh": 0.5, "en": 0.45})
+        self.assertEqual(recognizer.transcribe(loud_frames(), "zh")["language"], "en")
+
+    def test_detection_outside_our_languages(self):
+        # Lao counts for Thai, Malay for Indonesian (the nearest of ours).
+        recognizer = self.with_gate({"lo": 0.7, "th": 0.2})
+        result = recognizer.transcribe(loud_frames(), "en")
+        self.assertEqual((result["language"], self.requests()[-1]), ("th", ("multi", "th", False)))
+        self.calls.clear()
+        recognizer = self.with_gate({"ms": 0.5, "id": 0.4})
+        self.assertEqual(recognizer.transcribe(loud_frames(), "zh")["language"], "id")
+        # Korean: none of ours is a candidate, so the chosen language is decoded.
+        self.calls.clear()
+        self.detected["multi"], self.probabilities["multi"] = "korean", {"ko": 0.9}
+        recognizer = self.with_gate({"ko": 0.9, "ja": 0.05})
+        self.assertEqual((recognizer.transcribe(loud_frames(), "vi")["language"], self.requests()[-1]),
+                         ("vi", ("multi", "vi", False)))
+        self.assertEqual(recognizer.transcribe(loud_frames(), "auto")["language"], "zh")
+
+    def test_gate_also_serves_other_languages_without_an_auto_pass(self):
+        self.detected["multi"] = "english"
+        recognizer = self.with_gate({"en": 0.97})
+        result = recognizer.transcribe(loud_frames(), "en")
+        self.assertEqual(self.requests(), [("gate", "auto", True), ("multi", "en", False)])
+        self.assertEqual(result["text"], "I want to borrow a new book")
+
+    def test_gate_with_a_separate_chinese_model(self):
+        recognizer = self.with_gate({"zh": 0.95}, one_model=False)
+        self.assertEqual(recognizer.transcribe(loud_frames(), "en")["language"], "zh")
+        self.assertEqual(self.requests()[-1], ("zh", "zh", False))
+
+    def test_gate_failure_falls_back_to_the_previous_behaviour(self):
+        recognizer = self.with_gate({"zh": 0.95})
+        recognizer.gate_url = "http://127.0.0.1:9"  # nothing listens
+        result = recognizer.transcribe(loud_frames(), "zh")
+        self.assertEqual((result["language"], [r[0] for r in self.requests()]), ("zh", ["multi"]))
+        self.assertNotIn("gate_language", result)
+
+    def test_no_gate_without_a_multilingual_model(self):
+        recognizer = WhisperCppRecognizer(self.urls["zh"], gate_url=self.urls["gate"])
+        self.assertIsNone(recognizer.gate_url)
+        self.assertEqual(recognizer.transcribe(loud_frames(), "en")["language"], "en")
+        self.assertEqual(self.requests(), [("zh", "en", False)])
+
+    def test_language_choices_that_are_not_detectable_skip_the_gate(self):
+        # e.g. Taiwanese (feat/taiwanese-asr) is an explicit choice: no gate, no checks.
+        import asr_server
+        recognizer = self.with_gate({"ja": 0.99})
+        with patch.object(asr_server, "language_code", lambda value, default="zh": "nan"):
+            recognizer.transcribe(loud_frames(), "nan")
+        self.assertEqual([r[0] for r in self.requests()], ["multi"])
+
+    # --- without a gate -------------------------------------------------------
 
     def test_each_language_goes_to_its_model(self):
-        self.texts["zh"] = "我要借這個月新到的書"  # longer than the short-text check
         result = self.recognizer.transcribe(loud_frames(), "zh")
-        self.assertEqual((self.models(), result["language"]), (["zh"], "zh"))
-        self.assertIn(field("prompt", self.recognizer.prompt), self.calls[-1][1])
+        self.assertEqual((self.requests(), result["language"]), ([("zh", "zh", False)], "zh"))
+        self.assertIn(field("prompt", self.recognizer.prompt), self.calls[-1][3])
+        self.calls.clear()
+        self.detected["multi"] = "english"
         result = self.recognizer.transcribe(loud_frames(), "en")
-        self.assertEqual((self.models(), result["language"], result["text"]), (["zh", "multi"], "en", "multi-text"))
-        self.assertIn(field("language", "auto"), self.calls[-1][1])  # a preference: detected first
-        self.assertIn(field("prompt", "") + CRLF, self.calls[-1][1])  # no Chinese vocabulary prompt
-        self.assertEqual(result["status"], "clear")  # no Chinese-script check for English
+        self.assertEqual((self.requests(), result["language"]), ([("multi", "auto", False)], "en"))
+        self.assertIn(field("prompt", "") + CRLF, self.calls[-1][3])  # no Chinese vocabulary prompt
+        self.assertEqual(result["status"], "unsure")  # -0.7: no Chinese-script check for English
 
     def test_auto_detects_and_chinese_is_redone_by_the_chinese_model(self):
         result = self.recognizer.transcribe(loud_frames(), "auto")
-        self.assertEqual((self.models(), result["language"]), (["multi"], "en"))
-        self.assertIn(field("language", "auto"), self.calls[0][1])
-        self.calls.clear()
-        self.heard["multi"] = "chinese"
-        result = self.recognizer.transcribe(loud_frames(), "auto")
-        self.assertEqual((self.models(), result["language"], result["text"]), (["multi", "zh"], "zh", "我要借書"))
+        self.assertEqual((self.requests(), result["language"]), ([("multi", "auto", False), ("zh", "zh", False)], "zh"))
+
+    def test_chinese_speech_with_english_chosen_follows_detection(self):
+        # Formerly the chosen language won when it had >= 5 % (CHOSEN_LANGUAGE_MIN),
+        # and Whisper translated the Chinese into English.
+        self.probabilities["multi"] = {"zh": 0.9, "en": 0.06}
+        result = self.recognizer.transcribe(loud_frames(), "en")
+        self.assertEqual((result["language"], result["language_confidence"]), ("zh", 0.9))
+        self.assertNotIn(("multi", "en", False), self.requests())
+
+    def test_unsure_auto_pass_decodes_the_runner_up_and_keeps_the_better(self):
+        # Short Japanese detected as Chinese at 0.5: the Japanese decode scores better.
+        self.speech["ja"], self.speech["zh"] = ("こんにちは", -0.25), ("你好", -0.7)
+        self.probabilities["multi"] = {"zh": 0.5, "ja": 0.4}
+        result = self.recognizer.transcribe(loud_frames(), "ja")
+        self.assertEqual(self.requests(), [("multi", "auto", False), ("zh", "zh", False), ("multi", "ja", False)])
+        self.assertEqual((result["language"], result["text"]), ("ja", "こんにちは"))
 
     def test_another_language_in_chinese_mode_is_detected_not_rejected(self):
-        self.texts["zh"] = "I want to borrow a book"  # Breeze writes the English it heard
-        self.texts["multi"] = "I want to borrow a book"
+        self.speech["zh"] = ("I want to borrow a book", -0.2)  # Whisper writes the English it heard
+        self.detected["multi"], self.speech["en"] = "english", ("I want to borrow a book", -0.2)
         result = self.recognizer.transcribe(loud_frames(), "zh")
-        self.assertEqual((self.models(), result["language"], result["status"]), (["zh", "multi"], "en", "clear"))
-        self.assertIn(field("language", "auto"), self.calls[-1][1])
+        self.assertEqual((result["language"], result["status"]), ("en", "clear"))
+        self.assertEqual(self.requests(), [("zh", "zh", False), ("multi", "auto", False)])
 
     def test_unsure_chinese_characters_for_english_speech_are_redetected(self):
         # Whisper small in Chinese mode may write "I want to lend a book" as unsure characters.
-        self.recognizer = WhisperCppRecognizer(self.recognizer.multi_url, multi_url=self.recognizer.multi_url)
-        self.heard["multi"] = "english"
-        self.texts["multi"] = "愛旺特蘭德布克"
-        self.logprob["multi"] = -1.2
-        calls = []
-        original = self.recognizer._infer
-
-        def infer(url, wav, seconds, language):
-            calls.append(language)
-            if language == "auto":
-                self.texts["multi"], self.logprob["multi"] = "I want to lend a book", -0.2
-            return original(url, wav, seconds, language)
-        self.recognizer._infer = infer
+        self.speech["zh"], self.speech["en"] = ("愛旺特蘭德布克", -1.2), ("I want to lend a book", -0.2)
+        self.detected["multi"] = "english"
         result = self.recognizer.transcribe(loud_frames(), "zh")
-        self.assertEqual((calls, result["language"], result["text"], result["status"]),
-                         (["zh", "auto"], "en", "I want to lend a book", "clear"))
+        self.assertEqual((result["language"], result["text"], result["status"]),
+                         ("en", "I want to lend a book", "clear"))
 
-    def test_unsure_switch_from_chinese_keeps_the_latin_text(self):
+    def test_unsure_detection_after_latin_letters_keeps_the_better_decode(self):
         # "what can you do" with Chinese chosen was detected as Japanese at low
         # confidence and came back in Japanese (owner, 2026-11-08).
-        self.texts["zh"], self.logprob["zh"] = "what can you do", -0.3
-        self.heard["multi"], self.texts["multi"] = "japanese", "何ができますか"
+        self.speech["zh"] = ("what can you do", -0.3)
+        self.speech["ja"], self.speech["en"] = ("何ができますか", -0.6), ("what can you do", -0.2)
+        self.detected["multi"] = "japanese"
         self.probabilities["multi"] = {"ja": 0.41, "en": 0.38, "zh": 0.1}
         result = self.recognizer.transcribe(loud_frames(), "zh")
         self.assertEqual((result["language"], result["text"]), ("en", "what can you do"))
-        self.assertIsNone(result["language_confidence"])
-        # Unsure, and the Chinese pass wrote characters: stay Chinese.
-        self.calls.clear()
-        self.texts["zh"], self.logprob["zh"] = "我要借書", -1.5
-        result = self.recognizer.transcribe(loud_frames(), "zh")
-        self.assertEqual(result["language"], "zh")
-        # Sure enough: follow it and report how sure.
-        self.probabilities["multi"] = {"ja": 0.92}
-        result = self.recognizer.transcribe(loud_frames(), "zh")
-        self.assertEqual((result["language"], result["language_confidence"]), ("ja", 0.92))
+        self.assertEqual(result["language_confidence"], 0.38)
 
     def test_short_chinese_that_was_another_language_is_redone(self):
         # "nani ga dekiru" with Chinese chosen came back as the translation 何能做到.
-        self.texts["zh"] = "何能做到"
-        self.heard["multi"], self.texts["multi"] = "japanese", "何ができる"
+        self.speech["zh"], self.speech["ja"] = ("何能做到", -0.3), ("何ができる", -0.2)
+        self.detected["multi"] = "japanese"
         self.probabilities["multi"] = {"ja": 0.86, "zh": 0.1}
         result = self.recognizer.transcribe(loud_frames(), "zh")
         self.assertEqual((result["language"], result["text"], result["language_confidence"]), ("ja", "何ができる", 0.86))
-        self.assertIn(field("detect_language", "true"), self.calls[1][1])
-        self.assertEqual(self.models(), ["zh", "multi", "multi"])
-        # Short Chinese that detection is not sure about stays Chinese, and long
-        # clear Chinese is not checked at all.
+        self.assertEqual(self.requests(), [("zh", "zh", False), ("multi", "auto", True), ("multi", "ja", False)])
+        # Short Chinese detected as Chinese stays, and long clear Chinese is not checked.
         self.calls.clear()
-        self.probabilities["multi"] = {"ja": 0.55, "zh": 0.4}
+        self.detected["multi"], self.probabilities["multi"] = "chinese", {"zh": 0.9, "ja": 0.05}
         self.assertEqual(self.recognizer.transcribe(loud_frames(), "zh")["text"], "何能做到")
         self.calls.clear()
-        self.texts["zh"] = "我要繳這個月的水費帳單"
+        self.speech["zh"] = ("我要繳這個月的水費帳單", -0.1)
         self.recognizer.transcribe(loud_frames(), "zh")
-        self.assertEqual(self.models(), ["zh"])
+        self.assertEqual(self.requests(), [("zh", "zh", False)])
 
     def test_japanese_in_latin_letters_is_redone_with_a_japanese_prompt(self):
         from asr_server import SCRIPT_PROMPTS
-        self.heard["multi"] = "japanese"
-        self.texts["multi"] = "nani ka dekiru"
+        self.detected["multi"] = "japanese"
+        self.speech["ja"] = ("nani ka dekiru", -0.3)
         result = self.recognizer.transcribe(loud_frames(), "ja")
-        self.assertEqual((self.models(), result["language"]), (["multi", "multi"], "ja"))
-        self.assertIn(field("prompt", SCRIPT_PROMPTS["ja"]), self.calls[-1][1])
+        self.assertEqual((self.requests(), result["language"]), ([("multi", "auto", False), ("multi", "ja", False)], "ja"))
+        self.assertIn(field("prompt", SCRIPT_PROMPTS["ja"]), self.calls[-1][3])
         self.calls.clear()
-        self.texts["multi"] = "何ができる"  # already in Japanese script: once
+        self.speech["ja"] = ("何ができる", -0.3)  # already in Japanese script: once
         self.recognizer.transcribe(loud_frames(), "ja")
-        self.assertEqual(self.models(), ["multi"])
+        self.assertEqual(self.requests(), [("multi", "auto", False)])
 
-    def test_chosen_language_is_a_preference_not_a_lock(self):
-        self.heard["multi"] = "chinese"  # Chinese spoken while English is remembered
+    def test_detection_outside_our_languages_without_a_gate(self):
+        self.detected["multi"] = "lao"  # counts for Thai
         result = self.recognizer.transcribe(loud_frames(), "en")
-        self.assertEqual((self.models(), result["language"], result["text"]), (["multi", "zh"], "zh", "我要借書"))
+        self.assertEqual((self.requests(), result["language"]), ([("multi", "auto", False), ("multi", "th", False)], "th"))
         self.calls.clear()
-        self.heard["multi"] = "lao"  # detection outside our languages: the chosen one is forced
-        result = self.recognizer.transcribe(loud_frames(), "th")
-        self.assertEqual((self.models(), result["language"]), (["multi", "multi"], "th"))
-        self.assertIn(field("language", "th"), self.calls[-1][1])
-
-    def test_unsure_detection_keeps_the_chosen_language(self):
-        # Short Japanese detected as Chinese (Whisper then writes 你好): Japanese was chosen.
-        self.heard["multi"] = "chinese"
-        self.probabilities["multi"] = {"zh": 0.6, "ja": 0.35}
-        result = self.recognizer.transcribe(loud_frames(), "ja")
-        self.assertEqual((self.models(), result["language"]), (["multi", "multi"], "ja"))
-        self.assertIn(field("language", "ja"), self.calls[-1][1])
-        self.assertIsNone(result["language_confidence"])
-
-    def test_clear_detection_of_another_language_is_followed(self):
-        self.heard["multi"] = "chinese"
-        self.probabilities["multi"] = {"zh": 0.97, "yue": 0.02}
-        result = self.recognizer.transcribe(loud_frames(), "en")
-        self.assertEqual(result["language"], "zh")
-        self.assertEqual(result["language_confidence"], 0.97)
-        self.assertIn(field("no_language_probabilities", "false"), self.calls[0][1])
-
-    def test_spoken_language_is_not_translated_into_the_chosen_one(self):
-        # Chinese spoken with English chosen: forcing English made Whisper translate.
-        self.heard["multi"] = "chinese"
-        self.probabilities["multi"] = {"zh": 0.9, "en": 0.06}
-        result = self.recognizer.transcribe(loud_frames(), "en")
-        self.assertEqual((result["language"], result["text"]), ("zh", "我要借書"))
-        self.assertNotIn(field("language", "en"), b"".join(body for _, body in self.calls))
-        # Fairly sure (0.7) is followed too; only a weak or close call keeps English.
-        self.calls.clear()
-        self.probabilities["multi"] = {"zh": 0.7, "en": 0.1}
-        self.assertEqual(self.recognizer.transcribe(loud_frames(), "en")["language"], "zh")
-        self.calls.clear()
-        self.probabilities["multi"] = {"zh": 0.45, "en": 0.2}
-        self.assertEqual(self.recognizer.transcribe(loud_frames(), "en")["language"], "en")
-
-    def test_clear_chinese_is_not_run_twice(self):
-        self.texts["zh"] = "我要借這個月新到的書"  # longer than the short-text check
-        self.recognizer.transcribe(loud_frames(), "zh")
-        self.assertEqual(self.models(), ["zh"])
+        self.detected["multi"], self.probabilities["multi"] = "korean", {"ko": 0.9}
+        self.assertEqual(self.recognizer.transcribe(loud_frames(), "id")["language"], "id")
 
     def test_one_multilingual_model_for_everything_and_simplified_becomes_traditional(self):
-        self.recognizer = WhisperCppRecognizer(self.recognizer.multi_url, multi_url=self.recognizer.multi_url)
-        self.texts["multi"] = "我要缴水费"  # Whisper small writes Simplified
-        self.heard["multi"] = "chinese"
+        self.recognizer = WhisperCppRecognizer(self.urls["multi"], multi_url=self.urls["multi"])
+        self.speech["zh"] = ("我要缴水费", -0.1)  # Whisper small writes Simplified
         result = self.recognizer.transcribe(loud_frames(), "auto")
-        self.assertEqual((self.models(), result["language"], result["text"]), (["multi"], "zh", "我要繳水費"))
+        self.assertEqual((self.requests(), result["language"], result["text"]),
+                         ([("multi", "auto", False)], "zh", "我要繳水費"))
 
     def test_without_a_multilingual_model_chinese_does_everything(self):
         self.recognizer.multi_url = None
         result = self.recognizer.transcribe(loud_frames(), "auto")
-        self.assertEqual((self.models(), result["language"]), (["zh"], "zh"))
+        self.assertEqual((self.requests(), result["language"]), ([("zh", "zh", False)], "zh"))
 
     def test_language_codes(self):
         from asr_server import language_code
         self.assertEqual([language_code(v) for v in ("en-US", "ja", "english", "", None, "xx", "AUTO", "th-TH")],
                          ["en", "ja", "en", "zh", "zh", "zh", "auto", "th"])
+
+    def test_language_scores_and_candidates(self):
+        from asr_server import CLEAR_LANGUAGE, candidate_languages, language_scores
+        self.assertEqual(language_scores({"language": "lao", "language_probabilities": {"lo": 0.5, "th": 0.3}}),
+                         {"th": 0.8})
+        self.assertEqual(language_scores({"language": "korean", "language_probabilities": {"ko": 0.8, "ja": 0.05}}),
+                         {"ja": 0.05})
+        self.assertEqual(language_scores({"language": "japanese"}), {"ja": 1.0})  # no probabilities: as detected
+        self.assertEqual(candidate_languages({"zh": CLEAR_LANGUAGE, "en": 0.3}, "en"), ["zh"])
+        # Unsure: the two likeliest and the chosen language.
+        self.assertEqual(candidate_languages({"zh": 0.5, "ja": 0.3, "en": 0.1}, "en"), ["zh", "ja", "en"])
+        self.assertEqual(candidate_languages({"zh": 0.5, "ja": 0.3}, "ja"), ["zh", "ja"])
+        self.assertEqual(candidate_languages({"zh": 0.5, "ja": 0.05}, "ja"), ["zh", "ja"])
+        self.assertEqual(candidate_languages({"ja": 0.05}, "vi"), ["vi"])  # none of ours is a candidate
+        self.assertEqual(candidate_languages({}, "vi"), ["vi"])
+        self.assertEqual(candidate_languages({}, "auto"), ["zh"])
 
 
 class TaiwaneseSpeechTests(unittest.TestCase):
@@ -468,7 +596,7 @@ class TaiwaneseSpeechTests(unittest.TestCase):
 
     def setUp(self):
         MultilingualSpeechTests.setUp(self)
-        self.heard["nan"], self.texts["nan"], self.logprob["nan"] = "chinese", "我要繳水費", -0.2
+        self.detected["nan"], self.server_speech["nan"] = "chinese", {"zh": ("我要繳水費", -0.2)}
         nan, self.nan_url = serve(self.fake("nan"))
         self.addCleanup(nan.server_close)
         self.addCleanup(nan.shutdown)
@@ -482,12 +610,13 @@ class TaiwaneseSpeechTests(unittest.TestCase):
         port = int(self.nan_url.rstrip("/").rsplit(":", 1)[1])
         self.recognizer.taiwanese = taiwanese_provider(port, starter)
 
-    models = MultilingualSpeechTests.models
+    def models(self):
+        return [name for name, *_ in self.calls]
 
     def test_taiwanese_uses_its_model_without_a_prompt_and_answers_in_chinese(self):
         result = self.recognizer.transcribe(loud_frames(), "nan")
         self.assertEqual((self.models(), result["language"], result["text"]), (["nan"], "zh", "我要繳水費"))
-        body = self.calls[0][1]
+        body = self.calls[0][3]
         self.assertIn(field("prompt", "") + CRLF, body)  # no Chinese vocabulary prompt
         self.assertNotIn(self.recognizer.prompt.encode(), body)
         self.assertIn(field("language", "zh"), body)
@@ -501,7 +630,7 @@ class TaiwaneseSpeechTests(unittest.TestCase):
             self.state = state
             result = self.recognizer.transcribe(loud_frames(), "nan")
             self.assertEqual((self.models(), result["language"], result["notice"]), (["zh"], "zh", state))
-            self.assertIn(field("prompt", self.recognizer.prompt), self.calls[0][1])  # the normal Chinese request
+            self.assertIn(field("prompt", self.recognizer.prompt), self.calls[0][3])  # the normal Chinese request
             self.assertNotIn("speech_model", result)
 
     def test_unknown_states_and_errors_are_failures(self):
@@ -516,18 +645,31 @@ class TaiwaneseSpeechTests(unittest.TestCase):
         self.assertEqual(self.recognizer.transcribe(loud_frames(), "nan")["notice"], "missing")
 
     def test_model_is_started_only_for_taiwanese_clips(self):
-        self.texts["zh"] = "我要借這個月新到的書"  # longer than the short-text language check
-        self.recognizer.transcribe(loud_frames(), "zh")
+        self.recognizer.transcribe(loud_frames(), "zh")  # long clear Chinese: one pass
         self.assertEqual(self.models(), ["zh"])
-        self.assertIn(field("prompt", self.recognizer.prompt), self.calls[0][1])
+        self.assertIn(field("prompt", self.recognizer.prompt), self.calls[0][3])
         for language in ("en", "auto", "ja"):
             self.recognizer.transcribe(loud_frames(), language)
-        self.heard["multi"] = "chinese"  # detection never picks Taiwanese
+        self.detected["multi"] = "chinese"  # detection never picks Taiwanese
         result = self.recognizer.transcribe(loud_frames(), "auto")
         self.assertEqual((result["language"], self.starts), ("zh", []))
         self.assertNotIn("nan", self.models())
         self.recognizer.transcribe(loud_frames(), "nan")
         self.assertEqual(self.starts, ["ready"])
+
+    def test_taiwanese_never_uses_the_gate_or_the_checks(self):
+        self.recognizer.gate_url = self.urls["gate"]
+        self.probabilities["gate"] = {"ja": 0.99}
+        self.recognizer.transcribe(loud_frames(), "nan")
+        self.assertEqual(self.models(), ["nan"])
+        # Without its model: one plain Chinese decode, even for a short or unsure
+        # text (no short-text probe, no detection) and with the gate available.
+        self.calls.clear()
+        self.state = "missing"
+        self.speech["zh"] = ("你好", -0.8)
+        result = self.recognizer.transcribe(loud_frames(), "nan")
+        self.assertEqual((self.models(), result["language"], result["notice"]), (["zh"], "zh", "missing"))
+        self.assertNotIn("gate_language", result)
 
     def test_silence_does_not_load_the_model(self):
         result = self.recognizer.transcribe(bytes(32000), "nan")
