@@ -1,4 +1,5 @@
 import 'package:town_pass/page/guided_assistant/model/guide_content.dart';
+import 'package:town_pass/page/guided_assistant/model/guide_i18n.dart';
 import 'package:town_pass/page/guided_assistant/web/web_guide_probe.dart';
 import 'package:town_pass/page/guided_assistant/web/web_page_state.dart';
 import 'package:town_pass/util/tp_route.dart';
@@ -300,10 +301,13 @@ class GuidePage {
 
   GuideTexts defaultTexts(List<String> plan, GuideComponent last) => GuideTexts(
     shortName: last.taskTitle,
-    resumeLabel: '回到$pageName',
-    backLabel: '回到$pageName',
-    openedText: '好的！已經幫你打開「$pageName」，我會在畫面上一步一步帶你做。',
-    openedCard: '好的！「$pageName」打開了，我們一起來${last.taskTitle}。',
+    resumeLabel: gt('回到{page}', {'page': gt(pageName)}),
+    backLabel: gt('回到{page}', {'page': gt(pageName)}),
+    openedText: gt('好的！已經幫你打開「{page}」，我會在畫面上一步一步帶你做。', {'page': gt(pageName)}),
+    openedCard: gt('好的！「{page}」打開了，我們一起來{task}。', {
+      'page': gt(pageName),
+      'task': gt(last.taskTitle),
+    }),
     helpChips: const ['下一步要做什麼？'],
   );
 
@@ -335,25 +339,30 @@ class GuidePage {
       todos.add(TodoItem(part.title, self: part.self));
       for (final step in part.steps) {
         final verb = step.label;
-        steps.add(step.numbered(i + 1, (s) => '步驟 ${i + 1} / $n・${verb(s)}'));
+        steps.add(
+          step.numbered(
+            i + 1,
+            (s) => gt('步驟 {i} / {n}・{verb}', {
+              'i': i + 1,
+              'n': n,
+              'verb': gt(verb(s)),
+            }),
+          ),
+        );
       }
     }
     if (last.after != null) todos.add(last.after!);
-    final t = (texts ?? defaultTexts)(ids, last);
+    final makeTexts = texts ?? defaultTexts;
     return Guide(
       id: guideId(ids, open),
       title: last.taskTitle,
-      shortName: t.shortName,
+      // Built when read, in the language of that moment.
+      texts: () => makeTexts(ids, last),
       route: TPRoute.webView,
       destination: open,
       spec: spec,
       onPage: onPage,
       pageName: pageName,
-      resumeLabel: t.resumeLabel,
-      backLabel: t.backLabel,
-      openedText: t.openedText,
-      openedLabel: '已$openTodo',
-      openedCard: t.openedCard,
       steps: steps,
       todos: todos,
       doneTodo: n + 1,
@@ -365,7 +374,6 @@ class GuidePage {
       doneTargetOf: last.doneTarget,
       doneCardTopOf: last.doneCardTop,
       doneDetail: last.doneDetail,
-      helpChips: t.helpChips,
       components: ids,
       reuseOpenPage: reuseOpenPage,
     );

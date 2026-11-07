@@ -1,4 +1,5 @@
 import 'package:town_pass/page/guided_assistant/model/guide_content.dart';
+import 'package:town_pass/page/guided_assistant/model/guide_i18n.dart';
 import 'package:town_pass/page/guided_assistant/model/guide_page.dart';
 import 'package:town_pass/page/guided_assistant/web/web_guide_probe.dart';
 import 'package:town_pass/page/guided_assistant/web/web_page_state.dart';
@@ -49,8 +50,8 @@ const _walk = r'''((sec, kind, any) => {
     if (wrap || change) f = { kind: 'multi', el: (wrap && wrap.querySelector('input')) || wrap || change, empty: !change };
     else if (boxes.length) f = { kind: boxes[0].type === 'radio' ? 'radio' : 'check', el: labels.length ? labels : boxes, empty: !boxes.some((b) => b.checked), choices: labels.map(txt).filter((x) => x).join('|') };
     else if (sel) f = { kind: 'select', el: sel, empty: !sel.value, opts: sel.options.length };
-    else if (area) f = { kind: 'text', el: area, empty: !(area.value || '').trim() || typed(area), typing: typed(area), hint: phOf(area) };
-    else if (inp) f = { kind: inp.readOnly ? 'date' : 'text', el: inp, empty: !(inp.value || '').trim() || (!inp.readOnly && typed(inp)), typing: !inp.readOnly && typed(inp), hint: phOf(inp) };
+    else if (area) f = { kind: 'text', el: area, empty: !(area.value || '').trim() || typed(area), typing: typed(area), hint: ph(area) || '' };
+    else if (inp) f = { kind: inp.readOnly ? 'date' : 'text', el: inp, empty: !(inp.value || '').trim() || (!inp.readOnly && typed(inp)), typing: !inp.readOnly && typed(inp), hint: ph(inp) || '' };
     else continue;
     if (kind && f.kind !== kind) continue;
     if (!any && !f.empty) continue;
@@ -166,7 +167,7 @@ final districtOfficePageSpec = WebPageSpec(
         "(() => { const p = $_itemsPanel; return p ? [...p.querySelectorAll('label')].filter(shown).map(txt).filter((x) => x).join('|') : ''; })()",
     'calendar': "qa('.vc-pane-header-wrapper').some(shown)",
     'calTitle': "txt(qa('button.vc-title').find(shown) || null)",
-    'warn': r"""(() => { const m = pageText('#app').match(/([^\n]+?)不能為空/); return m ? m[1].trim() : ''; })()""",
+    'warn': r"""(() => { const m = orig(q('#app')).match(/([^\n]+?)不能為空/); return m ? m[1].trim() : ''; })()""",
     'consentChoice': "(() => { const l = qa('section.px-4.mt-4 > div.flex.flex-wrap.gap-4.mt-2 > label').find((x) => x.querySelector('input:checked')); return l ? txt(l) : ''; })()",
     'submitted': "!!dialog('案件已完成申辦')",
     // Scrolled to the end of the consent sentence (latched).
@@ -244,8 +245,8 @@ bool _lockIfVisible(WebPageState s, String? id) {
 String _scrollWord(WebPageState s, String? id) {
   final p = _pos(s, id);
   if (p == null) return '';
-  if (p.$3 == 'below') return '往下滑一點，';
-  if (p.$3 == 'above') return '往上滑一點，';
+  if (p.$3 == 'below') return gt('往下滑一點，');
+  if (p.$3 == 'above') return gt('往上滑一點，');
   return '';
 }
 
@@ -266,12 +267,16 @@ String _popupCard(WebPageState s) {
   if (s.now.flag('itemsDialog')) {
     if (s.now.number('itemsTicked') > 0) return '選好了！按最下面的「確認」。';
     final first = s.now.text('itemsChoices').split('|').first;
-    final example = first.isEmpty ? '' : '，例如「$first」';
-    return '勾選符合你情況的項目$example，可以選好幾個。選好按最下面的「確認」。';
+    final example = first.isEmpty
+        ? ''
+        : gt('，例如「{first}」', {'first': pg(first)});
+    return gt('勾選符合你情況的項目{example}，可以選好幾個。選好按最下面的「確認」。', {'example': example});
   }
   final month = s.now.text('calTitle');
-  final arrows = month.isEmpty ? '上面左右的箭頭' : '「$month」兩邊的箭頭';
-  return '在日曆上點一下那一天。要換月份，按$arrows。';
+  final arrows = month.isEmpty
+      ? gt('上面左右的箭頭')
+      : gt('「{month}」兩邊的箭頭', {'month': pg(month)});
+  return gt('在日曆上點一下那一天。要換月份，按{arrows}。', {'arrows': arrows});
 }
 
 const _sectionName = {'basic': '基本資料', 'service': '申辦服務資料'};
@@ -290,40 +295,44 @@ String _fieldCard(WebPageState s, String sec) {
   final n = s.now;
   final name = n.text('${sec}Name');
   final hint = n.text('${sec}Hint');
-  final what = name.isEmpty ? '亮起來的這一格' : '「$name」';
+  final what = name.isEmpty
+      ? gt('亮起來的這一格')
+      : gt('「{name}」', {'name': pg(name)});
   final choices = n
       .text('${sec}Choices')
       .split('|')
       .where((c) => c.isNotEmpty)
       .toList();
-  final pick = choices.isEmpty ? '' : '：點「${choices.join('」或「')}」';
+  final pick = choices.isEmpty
+      ? ''
+      : gt('：點「{choices}」', {'choices': choices.map(pg).join(gt('」或「'))});
   switch (n.text('${sec}Kind')) {
     case 'select':
       return n.number('${sec}Opts') <= 1
-          ? '$what還沒有選項，要先選好上面那一格喔。'
-          : '點一下$what，從清單選一個。';
+          ? gt('{what}還沒有選項，要先選好上面那一格喔。', {'what': what})
+          : gt('點一下{what}，從清單選一個。', {'what': what});
     case 'radio':
-      return '$what選一個$pick。';
+      return gt('{what}選一個{pick}。', {'what': what, 'pick': pick});
     case 'check':
-      return '$what要勾選$pick，可以勾好幾個。';
+      return gt('{what}要勾選{pick}，可以勾好幾個。', {'what': what, 'pick': pick});
     case 'multi':
-      return '點一下$what的框框，會跳出選單，可以選好幾個。';
+      return gt('點一下{what}的框框，會跳出選單，可以選好幾個。', {'what': what});
     case 'date':
-      return '點一下$what的框框，會跳出日曆，點那一天就好。';
+      return gt('點一下{what}的框框，會跳出日曆，點那一天就好。', {'what': what});
   }
   if (name.contains('信箱')) {
-    return '點一下$what的框框，打上你的電子信箱，例如 abc@gmail.com。';
+    return gt('點一下{what}的框框，打上你的電子信箱，例如 abc@gmail.com。', {'what': what});
   }
   if (hint.isNotEmpty && !hint.startsWith('請')) {
-    return '點一下$what的框框，把內容寫進去（$hint）。';
+    return gt('點一下{what}的框框，把內容寫進去（{hint}）。', {'what': what, 'hint': pg(hint)});
   }
-  return '點一下$what的框框，把資料打進去。';
+  return gt('點一下{what}的框框，把資料打進去。', {'what': what});
 }
 
 String _formCard(WebPageState s, String sec) {
   if (_popupTarget(s) != null) return _popupCard(s);
   if (!s.now.flag('${sec}Open')) {
-    return '「${_sectionName[sec]}」收起來了，點一下把它打開。';
+    return gt('「{section}」收起來了，點一下把它打開。', {'section': pg(_sectionName[sec]!)});
   }
   if (s.now.flag('${sec}Typing')) return '寫好了就按鍵盤上的「完成」或「✓」，收起鍵盤。';
   return _scrollWord(s, 'district.${sec}_field') + _fieldCard(s, sec);
@@ -361,8 +370,13 @@ GuideStep _fillStep(String sec) => GuideStep(
   detail: (s) {
     if (_home(s)) return _listDetail;
     final warn = s.now.text('warn');
-    final red = warn.isEmpty ? '' : '有紅字「$warn不能為空」的地方也要補好。';
-    return '「${_sectionName[sec]}」有「*」的都要填。照亮起來的那一格，一格一格填就好。$red';
+    final red = warn.isEmpty
+        ? ''
+        : gt('有紅字「{warn}不能為空」的地方也要補好。', {'warn': pg(warn)});
+    return gt('「{section}」有「*」的都要填。照亮起來的那一格，一格一格填就好。{red}', {
+      'section': pg(_sectionName[sec]!),
+      'red': red,
+    });
   },
   isDone: (s) => _sectionDone(s, sec),
   locks: (s) => _home(s) || _lockIfVisible(s, _formTarget(s, sec)),
@@ -389,13 +403,18 @@ const _applyTabCard = '這裡是「查詢」。先點上面的「申辦」，回
 /// open_service's card on the 申辦 list.
 String _listCard(WebPageState s) {
   if (_queryTab(s)) return _applyTabCard;
-  final again = s.latched('formSeen') ? '你回到申辦首頁了。' : '';
+  final again = s.latched('formSeen') ? gt('你回到申辦首頁了。') : '';
   if (s.now.number('itemCount') > 0) {
     final first = s.now.text('firstItem');
-    final example = first.isEmpty ? '' : '，例如「$first」';
-    return '$again點你要申請的那一項$example。';
+    final example = first.isEmpty
+        ? ''
+        : gt('，例如「{first}」', {'first': pg(first)});
+    return gt('{again}點你要申請的那一項{example}。', {
+      'again': again,
+      'example': example,
+    });
   }
-  return '$again你想申請什麼？先點一個大類打開來看：「申訴類」或「補助類」。';
+  return gt('{again}你想申請什麼？先點一個大類打開來看：「申訴類」或「補助類」。', {'again': again});
 }
 
 const _listDetail = '點「申訴類」或「補助類」打開清單，再點你要申請的項目。也可以在上面的框框打關鍵字找。';
@@ -408,7 +427,12 @@ String _firstCase(WebPageState s) {
   final title = s.now.text('firstCase');
   final status = s.now.text('firstStatus');
   if (title.isEmpty) return '';
-  return status.isEmpty ? '第一件是「$title」。' : '第一件「$title」現在是「$status」。';
+  return status.isEmpty
+      ? gt('第一件是「{title}」。', {'title': pg(title)})
+      : gt('第一件「{title}」現在是「{status}」。', {
+          'title': pg(title),
+          'status': pg(status),
+        });
 }
 
 String _progressText(WebPageState s) {
@@ -417,19 +441,25 @@ String _progressText(WebPageState s) {
     return '這裡是你的申辦案件。目前沒有「申辦中」的案件；辦完的可以點「已結案」看。';
   }
   final count = _hasCount(s, 'activeCount') && _hasCount(s, 'closedCount')
-      ? '「申辦中」有 ${s.now.number('activeCount')} 件，「已結案」有 ${s.now.number('closedCount')} 件。'
+      ? gt('「申辦中」有 {active} 件，「已結案」有 {closed} 件。', {
+          'active': s.now.number('activeCount'),
+          'closed': s.now.number('closedCount'),
+        })
       : '';
-  return '這裡就是你的申辦案件！$count${_firstCase(s)}卡片下面的 1 到 5 是辦理的進度。';
+  return gt('這裡就是你的申辦案件！{count}{first}卡片下面的 1 到 5 是辦理的進度。', {
+    'count': count,
+    'first': _firstCase(s),
+  });
 }
 
 String _closedText(WebPageState s) {
   final n = _hasCount(s, 'closedCount')
-      ? '共 ${s.now.number('closedCount')} 件'
+      ? gt('共 {n} 件', {'n': s.now.number('closedCount')})
       : '';
   if (_hasCount(s, 'closedCount') && s.now.number('closedCount') == 0) {
     return '目前沒有已結案的案件。';
   }
-  return '這些是已經辦完的案件$n。${_firstCase(s)}';
+  return gt('這些是已經辦完的案件{n}。{first}', {'n': n, 'first': _firstCase(s)});
 }
 
 String? _backHomeTarget(WebPageState s) {
@@ -440,7 +470,9 @@ String? _backHomeTarget(WebPageState s) {
 
 String _backHomeCard(WebPageState s) {
   if (_step1(s)) {
-    return '${_scrollWord(s, 'district.prev')}按最下面的「上一步」，先回到申辦首頁。';
+    return gt('{scroll}按最下面的「上一步」，先回到申辦首頁。', {
+      'scroll': _scrollWord(s, 'district.prev'),
+    });
   }
   if (_step2(s)) return '先按下面的「修改」回到上一頁，再按最下面的「上一步」回到申辦首頁。';
   return '先回到申辦首頁。';
@@ -561,8 +593,13 @@ final List<GuideComponent> districtOfficeComponents = [
         card: (s) {
           if (s.now.flag('itemsDialog')) return _popupCard(s);
           final name = s.now.text('multiName');
-          final what = name.isEmpty ? '亮起來的框框' : '「$name」的框框';
-          return '${_scrollWord(s, 'district.multi_field')}點一下$what，會跳出選單。';
+          final what = name.isEmpty
+              ? gt('亮起來的框框')
+              : gt('「{name}」的框框', {'name': pg(name)});
+          return gt('{scroll}點一下{what}，會跳出選單。', {
+            'scroll': _scrollWord(s, 'district.multi_field'),
+            'what': what,
+          });
         },
         detail: (_) => '點框框會跳出選單，勾選符合的項目（可以選好幾個），再按最下面的「確認」。',
         isDone: (s) =>
@@ -604,8 +641,13 @@ final List<GuideComponent> districtOfficeComponents = [
         card: (s) {
           if (s.now.flag('calendar')) return _popupCard(s);
           final name = s.now.text('dateName');
-          final what = name.isEmpty ? '日期' : '「$name」';
-          return '${_scrollWord(s, 'district.date_field')}點一下$what的框框，會跳出日曆。';
+          final what = name.isEmpty
+              ? gt('日期')
+              : gt('「{name}」', {'name': pg(name)});
+          return gt('{scroll}點一下{what}的框框，會跳出日曆。', {
+            'scroll': _scrollWord(s, 'district.date_field'),
+            'what': what,
+          });
         },
         detail: (_) => '點日期的框框會跳出日曆。點那一天就好；要換月份，按月份兩邊的箭頭。',
         isDone: (s) =>
@@ -643,14 +685,16 @@ final List<GuideComponent> districtOfficeComponents = [
         label: (_) => '點一下',
         card: (s) {
           if (_popupTarget(s) != null) return _popupCard(s);
-          final scroll = _offScreen(s, 'district.next') ? '往下滑到最下面，' : '';
-          return '都填好了！$scroll按「下一步」。下一頁還可以檢查，不會馬上送出。';
+          final scroll = _offScreen(s, 'district.next') ? gt('往下滑到最下面，') : '';
+          return gt('都填好了！{scroll}按「下一步」。下一頁還可以檢查，不會馬上送出。', {'scroll': scroll});
         },
         detail: (s) {
           final warn = s.now.text('warn');
           return warn.isEmpty
               ? '按表單最下面右邊的「下一步」。'
-              : '按表單最下面右邊的「下一步」。如果按了還停在這一頁，往上找紅字（例如「$warn不能為空」），把那一格補好。';
+              : gt('按表單最下面右邊的「下一步」。如果按了還停在這一頁，往上找紅字（例如「{warn}不能為空」），把那一格補好。', {
+                  'warn': pg(warn),
+                });
         },
         isDone: (s) => _submitted(s) || _step2(s),
         locks: (s) => _lockIfVisible(s, _popupTarget(s) ?? 'district.next'),
@@ -668,7 +712,8 @@ final List<GuideComponent> districtOfficeComponents = [
     requires: const ['next_step'],
     taskTitle: '選同意或不同意',
     doneText: '選好了！',
-    doneTextOf: (s) => '${_consentRead(s) ? '' : _readNote}選好了！',
+    doneTextOf: (s) =>
+        gt('{note}選好了！', {'note': _consentRead(s) ? '' : gt(_readNote)}),
     doneDetail: '資料沒問題，就自己按最下面的「送出」。',
     doneTarget: (s) => _step2(s) ? 'district.submit' : null,
     steps: [
@@ -693,8 +738,10 @@ final List<GuideComponent> districtOfficeComponents = [
         alsoUsable: const ['district.submit'],
         arrow: _no,
         label: (_) => '選一個',
-        card: (s) =>
-            '說明看完了！${_scrollWord(s, 'district.consent')}「個人資料是否提供給承辦員」是問：承辦員辦案需要時，可不可以申請看你的資料。選「同意」或「不同意」都可以。',
+        card: (s) => gt(
+          '說明看完了！{scroll}「個人資料是否提供給承辦員」是問：承辦員辦案需要時，可不可以申請看你的資料。選「同意」或「不同意」都可以。',
+          {'scroll': _scrollWord(s, 'district.consent')},
+        ),
         detail: (_) => '這一題不選也可以送出。選「同意」，承辦員依法辦案需要時可以申請取得你的個人資料。',
         isDone: (s) =>
             _submitted(s) ||
@@ -727,12 +774,15 @@ final List<GuideComponent> districtOfficeComponents = [
         locks: _no,
         label: (_) => '確認',
         card: (s) {
-          final scroll = _offScreen(s, 'district.submit') ? '往下滑，' : '';
+          final scroll = _offScreen(s, 'district.submit') ? gt('往下滑，') : '';
           final note =
               s.now.text('consentChoice').isNotEmpty && !_consentRead(s)
-              ? _readNote
+              ? gt(_readNote)
               : '';
-          return '$note這是你填的資料，$scroll從上到下檢查一遍。「個人資料是否提供給承辦員」選不選都可以。沒問題就自己按「送出」喔；要改就按「修改」。這是示範網站，不會真的送出。';
+          return gt(
+            '{note}這是你填的資料，{scroll}從上到下檢查一遍。「個人資料是否提供給承辦員」選不選都可以。沒問題就自己按「送出」喔；要改就按「修改」。這是示範網站，不會真的送出。',
+            {'note': note, 'scroll': scroll},
+          );
         },
         detail: (_) => '檢查一下資料對不對，沒問題就自己按最下面的「送出」；要改就按「修改」。',
         isDone: _submitted,
@@ -861,7 +911,7 @@ GuideTexts _districtTexts(List<String> plan, GuideComponent last) {
     resumeLabel: '回到申辦服務',
     backLabel: '回到申辦服務',
     openedText: '好的！已經幫你打開「申辦服務」，我會在畫面上一步一步帶你做。',
-    openedCard: '好的！申辦服務打開了，我們一起來${last.taskTitle}。',
+    openedCard: gt('好的！申辦服務打開了，我們一起來{task}。', {'task': gt(last.taskTitle)}),
     helpChips: progress
         ? const ['下一步要做什麼？', '我要申請補助']
         : const ['下一步要做什麼？', '我要查申辦進度'],

@@ -1,3 +1,5 @@
+import 'package:town_pass/page/guided_assistant/model/guide_i18n.dart';
+import 'package:town_pass/page/guided_assistant/model/guide_page.dart';
 import 'package:town_pass/page/guided_assistant/web/web_guide_probe.dart';
 import 'package:town_pass/page/guided_assistant/web/web_page_state.dart';
 
@@ -100,8 +102,13 @@ class Guide {
   /// Task name in the assistant, e.g. "預約書籍" (目前任務：…).
   final String title;
 
+  /// Page-level texts that depend on the plan (short name, buttons, opening
+  /// texts, chips). Built when read, so they follow the conversation
+  /// language (guide_i18n.dart) even for a guide built earlier.
+  final GuideTexts Function() texts;
+
   /// Short name in sentences, e.g. "借書" (暫停借書).
-  final String shortName;
+  String get shortName => texts().shortName;
 
   /// App route the guide runs on (the service WebView).
   final String route;
@@ -118,17 +125,17 @@ class Guide {
   final String pageName;
 
   /// Button that goes back to the page (回到借書).
-  final String resumeLabel;
+  String get resumeLabel => texts().resumeLabel;
 
   /// Button in the assistant's task card (回到借書畫面).
-  final String backLabel;
+  String get backLabel => texts().backLabel;
 
   /// Chat message when the page opens.
-  final String openedText;
+  String get openedText => texts().openedText;
 
-  /// Card before the steps start (with 開始).
-  final String openedLabel;
-  final String openedCard;
+  /// Card before the steps start (with 開始): 已 + the first task line.
+  String get openedLabel => gt('已{todo}', {'todo': gt(todos.first.text)});
+  String get openedCard => texts().openedCard;
 
   final List<GuideStep> steps;
   final List<TodoItem> todos;
@@ -152,7 +159,7 @@ class Guide {
   final double? Function(WebPageState s)? doneCardTopOf;
 
   /// Chips in the assistant while this guide is the current task.
-  final List<String> helpChips;
+  List<String> get helpChips => texts().helpChips;
 
   /// Teaching components this guide was built from, in order.
   final List<String> components;
@@ -163,17 +170,12 @@ class Guide {
   const Guide({
     required this.id,
     required this.title,
-    required this.shortName,
+    required this.texts,
     required this.route,
     required this.destination,
     required this.spec,
     required this.onPage,
     required this.pageName,
-    required this.resumeLabel,
-    required this.backLabel,
-    required this.openedText,
-    required this.openedLabel,
-    required this.openedCard,
     required this.steps,
     required this.todos,
     required this.doneTodo,
@@ -185,7 +187,6 @@ class Guide {
     this.doneTextOf,
     this.doneTargetOf,
     this.doneCardTopOf,
-    required this.helpChips,
     required this.components,
     this.reuseOpenPage = false,
   });
@@ -388,18 +389,32 @@ abstract class Replies {
   static const noMic = '需要麥克風權限才能用語音。可以到手機設定開啟，或按右邊的鍵盤打字。';
   static const openingPage = '正在打開服務頁面…';
   static const pageFailed = '服務頁面打不開，請檢查網路後再試一次。';
-  static String heard(String text) => '我聽到「$text」，是這句嗎？也可以選下面的說法，或再說一次。';
+  // Texts with values, in the conversation language (guide_i18n.dart). The
+  // task names passed in are the Chinese sources; they are translated here.
+  static String heard(String text) =>
+      gt('我聽到「{text}」，是這句嗎？也可以選下面的說法，或再說一次。', {'text': text});
   static String corrected(String from, String to) =>
-      '我聽到「$from」，當作「$to」處理；不對的話請再說一次。';
+      gt('我聽到「{from}」，當作「{to}」處理；不對的話請再說一次。', {'from': from, 'to': to});
 
-  static String opensPage(String title) => '已經幫你打開「$title」。這個功能還沒有逐步引導，只幫你開頁。';
-  static String followUp(String title) => '剛剛你還說要$title，要接著做嗎？';
-  static String resumeOffer(String shortName) => '要回去接著$shortName嗎？';
+  static String opensPage(String title) =>
+      gt('已經幫你打開「{title}」。這個功能還沒有逐步引導，只幫你開頁。', {'title': gt(title)});
+  static String followUp(String title) =>
+      gt('剛剛你還說要{title}，要接著做嗎？', {'title': gt(title)});
+  static String resumeOffer(String shortName) =>
+      gt('要回去接著{short}嗎？', {'short': gt(shortName)});
   static String switchAsk(String title, int step, String short, String other) =>
-      '你現在正在$title，做到第 $step 步。要先暫停$short，改去$other嗎？$short的進度我會幫你留著。';
-  static String keepGoing(String short) => '好，我們繼續$short。關掉這個畫面就能接著做。';
-  static String backTo(String short) => '好，我們回去接著$short。';
-  static String parked(String short) => '好的，$short的進度先幫你存起來，之後可以接著做。';
+      gt('你現在正在{title}，做到第 {step} 步。要先暫停{short}，改去{other}嗎？{short}的進度我會幫你留著。', {
+        'title': gt(title),
+        'step': step,
+        'short': gt(short),
+        'other': gt(other),
+      });
+  static String keepGoing(String short) =>
+      gt('好，我們繼續{short}。關掉這個畫面就能接著做。', {'short': gt(short)});
+  static String backTo(String short) =>
+      gt('好，我們回去接著{short}。', {'short': gt(short)});
+  static String parked(String short) =>
+      gt('好的，{short}的進度先幫你存起來，之後可以接著做。', {'short': gt(short)});
   static const searchEmpty = '先輸入書名，再按搜尋喔。';
   static const reserveNoBranch = '先選好取書館，才能按預約喔。';
 }

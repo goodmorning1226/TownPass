@@ -1,4 +1,5 @@
 import 'package:town_pass/page/guided_assistant/model/guide_content.dart';
+import 'package:town_pass/page/guided_assistant/model/guide_i18n.dart';
 import 'package:town_pass/page/guided_assistant/model/guide_page.dart';
 import 'package:town_pass/page/guided_assistant/web/web_guide_probe.dart';
 import 'package:town_pass/page/guided_assistant/web/web_page_state.dart';
@@ -29,10 +30,10 @@ const _maxCards = 12;
 
 const _wraps = "qa('div.subscription-wrapper')";
 const _isOn =
-    "((w) => { const b = w.querySelector('button.card-button'); return !!b && (b.classList.contains('base-button--outline') || raw(b).trim() === '取消訂閱'); })";
+    "((w) => { const b = w.querySelector('button.card-button'); return !!b && (b.classList.contains('base-button--outline') || origContent(b).trim() === '取消訂閱'); })";
 const _isOpen =
     "((w) => { const b = w.querySelector('button.card-button'); return !!b && opened(b); })";
-const _title = "((w) => raw(w.querySelector('.card-header')).trim())";
+const _title = "((w) => origContent(w.querySelector('.card-header')).trim())";
 
 /// First open card that is not subscribed / is subscribed.
 const _openOff = "($_wraps.find((w) => $_isOpen(w) && !$_isOn(w)) || null)";
@@ -68,7 +69,7 @@ final subscriptionPageSpec = WebPageSpec(
     'sub.count': r"""(() => { const m = qa('#app p, #app span, #app div, #app h5, #app h6').filter((e) => shown(e) && /^您已訂閱\s*\d+\s*項$/.test(txt(e))); return m[m.length - 1] || null; })()""",
   },
   flags: {
-    'count': r"""(() => { const m = pageText('#app').match(/您已訂閱\s*(\d+)\s*項/); return m ? Number(m[1]) : 0; })()""",
+    'count': r"""(() => { const m = orig(q('#app')).match(/您已訂閱\s*(\d+)\s*項/); return m ? Number(m[1]) : 0; })()""",
     'cards': '$_wraps.length',
     'titles': "$_wraps.map($_title).join('|')",
     'onTitles': "$_wraps.filter($_isOn).map($_title).join('、')",
@@ -144,7 +145,12 @@ String _cardTitle(WebPageState s, int i) {
   return i >= 0 && i < titles.length ? titles[i] : '';
 }
 
-String _countText(WebPageState s) => '畫面寫「您已訂閱 ${s.now.number('count')} 項」。';
+String _countText(WebPageState s) =>
+    gt('畫面寫「您已訂閱 {n} 項」。', {'n': s.now.number('count')});
+
+/// The subscribed topics (onTitles), as the page shows them.
+String _onTitles(WebPageState s) =>
+    s.now.text('onTitles').split('、').map(pg).join(gt('、'));
 
 const _notHomeCard = '這裡是訂閱的訊息。想訂閱或取消，按右上角的「設定」。';
 
@@ -171,7 +177,7 @@ final List<GuideComponent> subscriptionComponents = [
       final title = s.now.text('openOffTitle');
       return desc.isEmpty || title.isEmpty
           ? '打開了！這裡寫著這個項目會通知你什麼。'
-          : '「$title」：$desc';
+          : gt('「{title}」：{desc}', {'title': pg(title), 'desc': pg(desc)});
     },
     steps: [
       GuideStep(
@@ -187,8 +193,11 @@ final List<GuideComponent> subscriptionComponents = [
         card: (s) {
           if (_onItems(s)) return _notHomeCard;
           final on = s.now.text('openOnTitle');
-          final already = on.isEmpty ? '' : '「$on」你已經訂閱了。';
-          return '$already這些是可以訂閱的臺北市消息。點一個項目的名稱，例如「停車費通知」，打開看看它會通知什麼。下面還有，可以往下滑。';
+          final already = on.isEmpty ? '' : gt('「{on}」你已經訂閱了。', {'on': pg(on)});
+          return gt(
+            '{already}這些是可以訂閱的臺北市消息。點一個項目的名稱，例如「停車費通知」，打開看看它會通知什麼。下面還有，可以往下滑。',
+            {'already': already},
+          );
         },
         detail: (_) => '在訂閱頁點一個項目的名稱，會打開它的說明和「訂閱」按鈕。',
         isDone: (s) => (_onHome(s) && s.now.flag('openOff')) || _subscribed(s),
@@ -224,8 +233,14 @@ final List<GuideComponent> subscriptionComponents = [
     doneCardTop: _countCardTop,
     doneTextOf: (s) {
       final title = _cardTitle(s, _subscribedCard(s));
-      final what = title.isEmpty ? '' : '「$title」';
-      return '訂閱好了$what！${_countText(s)}之後有新消息，就會出現在訂閱的訊息裡。這是示範網站喔。';
+      final count = {'count': _countText(s)};
+      if (title.isEmpty) {
+        return gt('訂閱好了！{count}之後有新消息，就會出現在訂閱的訊息裡。這是示範網站喔。', count);
+      }
+      return gt('訂閱好了「{title}」！{count}之後有新消息，就會出現在訂閱的訊息裡。這是示範網站喔。', {
+        ...count,
+        'title': pg(title),
+      });
     },
     steps: [
       GuideStep(
@@ -247,8 +262,11 @@ final List<GuideComponent> subscriptionComponents = [
             return '點你想訂閱的項目名稱，把它打開。';
           }
           final title = s.now.text('openOffTitle');
-          final below = s.now.flag('subBelow') ? '按鈕在下面，可以往下滑一點。' : '';
-          return '想收到「$title」的消息，就自己按「訂閱」。之後不想收，隨時可以取消。$below';
+          final below = s.now.flag('subBelow') ? gt('按鈕在下面，可以往下滑一點。') : '';
+          return gt('想收到「{title}」的消息，就自己按「訂閱」。之後不想收，隨時可以取消。{below}', {
+            'title': pg(title),
+            'below': below,
+          });
         },
         detail: (_) => '按項目說明下面的「訂閱」。按了上面的「您已訂閱」數字會加一。',
         isDone: _subscribed,
@@ -273,8 +291,14 @@ final List<GuideComponent> subscriptionComponents = [
     doneCardTop: _countCardTop,
     doneTextOf: (s) {
       final title = _cardTitle(s, _unsubscribedCard(s));
-      final what = title.isEmpty ? '這個項目' : '「$title」';
-      return '取消好了！之後不會再收到$what的消息。${_countText(s)}這是示範網站喔。';
+      final count = {'count': _countText(s)};
+      if (title.isEmpty) {
+        return gt('取消好了！之後不會再收到這個項目的消息。{count}這是示範網站喔。', count);
+      }
+      return gt('取消好了！之後不會再收到「{title}」的消息。{count}這是示範網站喔。', {
+        ...count,
+        'title': pg(title),
+      });
     },
     steps: [
       GuideStep(
@@ -292,10 +316,9 @@ final List<GuideComponent> subscriptionComponents = [
           if (s.now.number('count') == 0) {
             return '你現在還沒有訂閱任何項目（畫面寫「您已訂閱 0 項」），不用取消喔。';
           }
-          final on = s.now.text('onTitles');
-          return on.isEmpty
+          return s.now.text('onTitles').isEmpty
               ? '點你想取消的項目名稱，把它打開。'
-              : '你現在訂閱了：$on。點想取消的那一個項目名稱，把它打開。';
+              : gt('你現在訂閱了：{on}。點想取消的那一個項目名稱，把它打開。', {'on': _onTitles(s)});
         },
         detail: (_) => '點已經訂閱的項目名稱，打開後會看到「取消訂閱」。',
         isDone: (s) => (_onHome(s) && s.now.flag('openOn')) || _unsubscribed(s),
@@ -316,8 +339,11 @@ final List<GuideComponent> subscriptionComponents = [
         card: (s) {
           if (!s.now.flag('openOn')) return '點你想取消的項目名稱，把它打開。';
           final title = s.now.text('openOnTitle');
-          final below = s.now.flag('unsubBelow') ? '按鈕在下面，可以往下滑一點。' : '';
-          return '「$title」現在是訂閱中。不想再收到它的消息，就自己按「取消訂閱」。$below';
+          final below = s.now.flag('unsubBelow') ? gt('按鈕在下面，可以往下滑一點。') : '';
+          return gt('「{title}」現在是訂閱中。不想再收到它的消息，就自己按「取消訂閱」。{below}', {
+            'title': pg(title),
+            'below': below,
+          });
         },
         detail: (_) => '按項目說明下面的「取消訂閱」。按了上面的「您已訂閱」數字會減一。',
         isDone: _unsubscribed,
@@ -355,9 +381,15 @@ final List<GuideComponent> subscriptionComponents = [
           if (n == 0) return '目前還沒有訊息。可以按右上角的「設定」，訂閱想收到的項目。';
           final first = s.now.text('firstItem').split('|');
           final latest = first.length == 2
-              ? '最上面是「${first[0]}」${first[1]} 的消息。'
+              ? gt('最上面是「{title}」{date} 的消息。', {
+                  'title': pg(first[0]),
+                  'date': pg(first[1]),
+                })
               : '';
-          return '這些是你訂閱的消息，共 $n 則。$latest點一則就能看完整內容。';
+          return gt('這些是你訂閱的消息，共 {n} 則。{latest}點一則就能看完整內容。', {
+            'n': n,
+            'latest': latest,
+          });
         },
         detail: (_) => '在訊息列表點一則，就能看完整內容。名稱旁邊的小圓點表示還沒看過。',
         isDone: (s) => s.now.pathStarts(_itemDetail),
@@ -377,10 +409,9 @@ final List<GuideComponent> subscriptionComponents = [
     doneTarget: _countTarget,
     doneCardTop: _countCardTop,
     doneTextOf: (s) {
-      final on = s.now.text('onTitles');
-      return on.isEmpty
+      return s.now.text('onTitles').isEmpty
           ? '這裡就是訂閱設定！你現在還沒訂閱任何項目，點項目名稱打開就能訂閱。'
-          : '這裡就是訂閱設定！你現在訂閱了：$on。點項目名稱打開，就能訂閱或取消。';
+          : gt('這裡就是訂閱設定！你現在訂閱了：{on}。點項目名稱打開，就能訂閱或取消。', {'on': _onTitles(s)});
     },
     steps: [
       GuideStep(
@@ -430,7 +461,7 @@ GuideTexts _subscriptionTexts(List<String> plan, GuideComponent last) =>
       resumeLabel: '回到訂閱',
       backLabel: '回到訂閱畫面',
       openedText: '好的！已經幫你打開訂閱頁面，我會在畫面上一步一步帶你做。按「訂閱」或「取消訂閱」要由你自己按喔。',
-      openedCard: '好的！訂閱頁面打開了，我們一起來${last.taskTitle}。',
+      openedCard: gt('好的！訂閱頁面打開了，我們一起來{task}。', {'task': gt(last.taskTitle)}),
       helpChips: const ['下一步要做什麼？', '訂閱是什麼？'],
     );
 

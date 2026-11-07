@@ -73,6 +73,8 @@ def offered(messages, tools):
     letter set) or every enum combination of the tools themselves ("tools")."""
     if len(tools) == 1 and tools[0]["function"]["name"] == "choose":
         options = json.loads(messages[-1]["content"]).get("options", [])
+        if isinstance(options, dict):  # library: {"A": "tool(key=value, ...): description"}
+            return [(letter, *_view_call(line)) for letter, line in options.items()]
         return [(o["choice"], o["tool"], o["arguments"]) for o in options]
     import itertools
     found = []
@@ -81,6 +83,14 @@ def offered(messages, tools):
         for values in itertools.product(*[props[k]["enum"] for k in props]):
             found.append((None, t["function"]["name"], dict(zip(props, values))))
     return found
+
+
+def _view_call(line):
+    """(name, arguments) from a library option line, decision.options_view."""
+    head = line.split(": ", 1)[0]
+    name, _, inside = head.partition("(")
+    pairs = [part.split("=", 1) for part in inside.rstrip(")").split(", ")] if inside else []
+    return name, {key: value for key, value in pairs}
 
 
 def answer(option):

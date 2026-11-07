@@ -1,0 +1,462 @@
+{
+ "version": 1,
+ "status": "DRAFT translations (machine-assisted, 2026-11-08), pending native-speaker review. Keys are the Chinese source texts in lib/page/guided_assistant/; keep {name} placeholders; {page:X} shows the page's own word X as the page shows it (translated by PageTranslation).",
+ "section": "subscription",
+ "strings": {
+  "{already}這些是可以訂閱的臺北市消息。點一個項目的名稱，例如「停車費通知」，打開看看它會通知什麼。下面還有，可以往下滑。": {
+   "en": "{already}These are Taipei City news topics you can subscribe to. Tap a topic name, for example “{page:停車費通知}”, to open it and see what it will notify you about. There are more below; you can scroll down.",
+   "ja": "{already}これは購読できる台北市のお知らせです。項目の名前、たとえば「{page:停車費通知}」を押して、どんなお知らせが届くか見てみましょう。下にもまだあるので、スクロールできます。",
+   "vi": "{already}Đây là các tin tức của Thành phố Đài Bắc mà bạn có thể đăng ký theo dõi. Bấm vào tên một mục, ví dụ “{page:停車費通知}”, để mở xem nó sẽ thông báo gì. Bên dưới còn nữa, có thể kéo xuống.",
+   "id": "{already}Ini berita Kota Taipei yang bisa Anda langgani. Ketuk nama salah satu topik, misalnya “{page:停車費通知}”, untuk membukanya dan melihat pemberitahuan apa yang akan dikirim. Masih ada lagi di bawah, Anda bisa menggulir ke bawah.",
+   "th": "{already}นี่คือข่าวสารของเมืองไทเปที่สมัครรับได้ แตะชื่อหัวข้อ เช่น “{page:停車費通知}” เพื่อเปิดดูว่าจะแจ้งเตือนเรื่องอะไร ด้านล่างยังมีอีก เลื่อนลงได้"
+  },
+  "「{on}」你已經訂閱了。": {
+   "en": "You have already subscribed to “{on}”. ",
+   "ja": "「{on}」はもう購読しています。",
+   "vi": "Bạn đã đăng ký theo dõi “{on}” rồi. ",
+   "id": "Anda sudah berlangganan “{on}”. ",
+   "th": "คุณสมัครรับ “{on}” แล้ว "
+  },
+  "「{title}」現在是訂閱中。不想再收到它的消息，就自己按「取消訂閱」。{below}": {
+   "en": "You are subscribed to “{title}” now. If you no longer want its news, tap “{page:取消訂閱}” yourself. {below}",
+   "ja": "「{title}」は今、購読中です。もうお知らせがいらなければ、自分で「{page:取消訂閱}」を押してください。{below}",
+   "vi": "Bạn đang đăng ký theo dõi “{title}”. Không muốn nhận tin nữa thì bạn tự bấm “{page:取消訂閱}”. {below}",
+   "id": "Anda sedang berlangganan “{title}”. Kalau tidak mau menerima beritanya lagi, ketuk “{page:取消訂閱}” sendiri. {below}",
+   "th": "ตอนนี้คุณสมัครรับ “{title}” อยู่ ถ้าไม่อยากได้รับข่าวอีก ให้แตะ “{page:取消訂閱}” เอง {below}"
+  },
+  "「{title}」：{desc}": {
+   "en": "“{title}”: {desc}",
+   "ja": "「{title}」：{desc}",
+   "vi": "“{title}”: {desc}",
+   "id": "“{title}”: {desc}",
+   "th": "“{title}”: {desc}"
+  },
+  "上面的「您已訂閱」寫著你訂了幾項。": {
+   "en": "“{page:您已訂閱}” at the top shows how many topics you subscribe to.",
+   "ja": "上の「{page:您已訂閱}」に、いくつ購読しているかが書いてあります。",
+   "vi": "Dòng “{page:您已訂閱}” ở trên ghi bạn đã đăng ký theo dõi bao nhiêu mục.",
+   "id": "“{page:您已訂閱}” di atas menunjukkan berapa topik yang Anda langgani.",
+   "th": "“{page:您已訂閱}” ด้านบนบอกว่าคุณสมัครรับไว้กี่หัวข้อ"
+  },
+  "你現在訂閱了：{on}。點想取消的那一個項目名稱，把它打開。": {
+   "en": "You are subscribed to: {on}. Tap the name of the one you want to cancel to open it.",
+   "ja": "今購読しているのは：{on}。やめたい項目の名前を押して開いてください。",
+   "vi": "Bạn đang đăng ký theo dõi: {on}. Bấm vào tên mục bạn muốn hủy để mở nó.",
+   "id": "Anda sedang berlangganan: {on}. Ketuk nama topik yang ingin dibatalkan untuk membukanya.",
+   "th": "ตอนนี้คุณสมัครรับ: {on} แตะชื่อหัวข้อที่อยากยกเลิกเพื่อเปิด"
+  },
+  "你現在還沒有訂閱任何項目（畫面寫「您已訂閱 0 項」），不用取消喔。": {
+   "en": "You are not subscribed to anything yet (the screen says “You have subscribed to 0 items”), so there is nothing to cancel.",
+   "ja": "まだ何も購読していません（画面に「購読中 0 件」と出ています）。やめる必要はありません。",
+   "vi": "Bạn chưa đăng ký theo dõi mục nào (màn hình ghi “Bạn đã đăng ký 0 mục”), không cần hủy.",
+   "id": "Anda belum berlangganan apa pun (layar menampilkan “Anda berlangganan 0 topik”), jadi tidak ada yang perlu dibatalkan.",
+   "th": "คุณยังไม่ได้สมัครรับหัวข้อใดเลย (หน้าจอเขียนว่า “สมัครรับแล้ว 0 รายการ”) ไม่ต้องยกเลิก"
+  },
+  "取消好了！之後不會再收到「{title}」的消息。{count}這是示範網站喔。": {
+   "en": "Cancelled! You will no longer get news from “{title}”. {count} This is a demo site.",
+   "ja": "やめました！これからは「{title}」のお知らせは届きません。{count}これはデモサイトです。",
+   "vi": "Hủy xong rồi! Từ nay bạn sẽ không nhận tin của “{title}” nữa. {count} Đây là trang web mẫu.",
+   "id": "Sudah dibatalkan! Anda tidak akan menerima berita dari “{title}” lagi. {count} Ini situs demo.",
+   "th": "ยกเลิกแล้ว! ต่อไปจะไม่ได้รับข่าวของ “{title}” อีก {count} นี่เป็นเว็บไซต์สาธิต"
+  },
+  "取消好了！之後不會再收到這個項目的消息。{count}這是示範網站喔。": {
+   "en": "Cancelled! You will no longer get news from this topic. {count} This is a demo site.",
+   "ja": "やめました！これからはこの項目のお知らせは届きません。{count}これはデモサイトです。",
+   "vi": "Hủy xong rồi! Từ nay bạn sẽ không nhận tin của mục này nữa. {count} Đây là trang web mẫu.",
+   "id": "Sudah dibatalkan! Anda tidak akan menerima berita dari topik ini lagi. {count} Ini situs demo.",
+   "th": "ยกเลิกแล้ว! ต่อไปจะไม่ได้รับข่าวของหัวข้อนี้อีก {count} นี่เป็นเว็บไซต์สาธิต"
+  },
+  "取消好了！之後不會再收到這個項目的消息。這是示範網站喔。": {
+   "en": "Cancelled! You will no longer get news from this topic. This is a demo site.",
+   "ja": "やめました！これからはこの項目のお知らせは届きません。これはデモサイトです。",
+   "vi": "Hủy xong rồi! Từ nay bạn sẽ không nhận tin của mục này nữa. Đây là trang web mẫu.",
+   "id": "Sudah dibatalkan! Anda tidak akan menerima berita dari topik ini lagi. Ini situs demo.",
+   "th": "ยกเลิกแล้ว! ต่อไปจะไม่ได้รับข่าวของหัวข้อนี้อีก นี่เป็นเว็บไซต์สาธิต"
+  },
+  "取消訂閱": {
+   "en": "Unsubscribe",
+   "ja": "購読をやめる",
+   "vi": "Hủy đăng ký theo dõi",
+   "id": "Berhenti berlangganan",
+   "th": "ยกเลิกการสมัครรับ"
+  },
+  "可以選想收到的臺北市消息，例如停車費通知、防汛資訊。打開項目按「訂閱」就會收到，按「取消訂閱」就不再收到。訂閱的消息會出現在訊息列表。": {
+   "en": "You can choose the Taipei City news you want to get, such as parking fee notices or flood information. Open a topic and tap “{page:訂閱}” to get it, or “{page:取消訂閱}” to stop. News from your subscriptions appears in the message list.",
+   "ja": "受け取りたい台北市のお知らせを選べます。たとえば駐車料金のお知らせや防災（水害）情報などです。項目を開いて「{page:訂閱}」を押すと届き、「{page:取消訂閱}」を押すと届かなくなります。購読したお知らせはメッセージ一覧に出ます。",
+   "vi": "Bạn có thể chọn các tin tức của Thành phố Đài Bắc muốn nhận, ví dụ thông báo phí đỗ xe, thông tin phòng chống lũ. Mở một mục và bấm “{page:訂閱}” là sẽ nhận được, bấm “{page:取消訂閱}” là thôi nhận. Tin đã đăng ký sẽ hiện trong danh sách tin nhắn.",
+   "id": "Anda bisa memilih berita Kota Taipei yang ingin diterima, misalnya pemberitahuan biaya parkir atau informasi banjir. Buka topik lalu ketuk “{page:訂閱}” untuk menerimanya, atau “{page:取消訂閱}” untuk berhenti. Berita langganan muncul di daftar pesan.",
+   "th": "เลือกข่าวสารของเมืองไทเปที่อยากได้รับได้ เช่น แจ้งเตือนค่าจอดรถ ข้อมูลป้องกันน้ำท่วม เปิดหัวข้อแล้วแตะ “{page:訂閱}” เพื่อรับ แตะ “{page:取消訂閱}” เพื่อเลิกรับ ข่าวที่สมัครรับจะแสดงในรายการข้อความ"
+  },
+  "回到訂閱": {
+   "en": "Back to subscriptions",
+   "ja": "購読に戻る",
+   "vi": "Quay lại đăng ký theo dõi",
+   "id": "Kembali ke langganan",
+   "th": "กลับไปที่การสมัครรับ"
+  },
+  "回到訂閱畫面": {
+   "en": "Back to the subscriptions screen",
+   "ja": "購読の画面に戻る",
+   "vi": "Quay lại màn hình đăng ký theo dõi",
+   "id": "Kembali ke layar langganan",
+   "th": "กลับไปที่หน้าการสมัครรับ"
+  },
+  "在訂閱頁點一個項目的名稱，會打開它的說明和「訂閱」按鈕。": {
+   "en": "On the subscriptions page, tap a topic name to open its description and the “{page:訂閱}” button.",
+   "ja": "購読ページで項目の名前を押すと、説明と「{page:訂閱}」ボタンが開きます。",
+   "vi": "Trên trang đăng ký theo dõi, bấm vào tên một mục sẽ mở phần mô tả và nút “{page:訂閱}”.",
+   "id": "Di halaman langganan, ketuk nama topik untuk membuka keterangannya dan tombol “{page:訂閱}”.",
+   "th": "ในหน้าการสมัครรับ แตะชื่อหัวข้อเพื่อเปิดคำอธิบายและปุ่ม “{page:訂閱}”"
+  },
+  "在訊息列表點一則，就能看完整內容。名稱旁邊的小圓點表示還沒看過。": {
+   "en": "Tap a message in the list to read it in full. A small dot next to the name means you have not read it yet.",
+   "ja": "メッセージ一覧で1件押すと、全文が読めます。名前の横の小さな点は、まだ読んでいない印です。",
+   "vi": "Bấm một tin trong danh sách để xem toàn bộ nội dung. Chấm nhỏ cạnh tên nghĩa là bạn chưa xem.",
+   "id": "Ketuk satu pesan di daftar untuk membaca isinya. Titik kecil di samping nama berarti belum dibaca.",
+   "th": "แตะข้อความหนึ่งในรายการเพื่ออ่านทั้งหมด จุดเล็ก ๆ ข้างชื่อหมายถึงยังไม่ได้อ่าน"
+  },
+  "好的！已經幫你打開訂閱頁面，我會在畫面上一步一步帶你做。按「訂閱」或「取消訂閱」要由你自己按喔。": {
+   "en": "OK! I opened the subscriptions page for you. I will guide you step by step on the screen. You tap “{page:訂閱}” or “{page:取消訂閱}” yourself.",
+   "ja": "わかりました！購読ページを開きました。画面で一歩ずつご案内します。「{page:訂閱}」や「{page:取消訂閱}」は自分で押してください。",
+   "vi": "Được rồi! Mình đã mở trang đăng ký theo dõi cho bạn, mình sẽ hướng dẫn từng bước trên màn hình. Nút “{page:訂閱}” hoặc “{page:取消訂閱}” thì bạn tự bấm nhé.",
+   "id": "Baik! Halaman langganan sudah saya buka. Saya akan memandu langkah demi langkah di layar. Tombol “{page:訂閱}” atau “{page:取消訂閱}” Anda ketuk sendiri.",
+   "th": "ได้เลย! เปิดหน้าการสมัครรับให้แล้ว จะพาทำทีละขั้นบนหน้าจอ ปุ่ม “{page:訂閱}” หรือ “{page:取消訂閱}” คุณต้องแตะเอง"
+  },
+  "好的！訂閱頁面打開了，我們一起來{task}。": {
+   "en": "OK! The subscriptions page is open. Let’s do this together: {task}.",
+   "ja": "わかりました！購読ページを開きました。一緒に「{task}」をやってみましょう。",
+   "vi": "Được rồi! Trang đăng ký theo dõi đã mở, mình cùng làm nhé: {task}.",
+   "id": "Baik! Halaman langganan sudah terbuka. Ayo kita lakukan bersama: {task}.",
+   "th": "ได้เลย! เปิดหน้าการสมัครรับแล้ว มาทำด้วยกัน: {task}"
+  },
+  "想再收到，打開那個項目按「訂閱」就好。": {
+   "en": "To get it again, just open that topic and tap “{page:訂閱}”.",
+   "ja": "また受け取りたいときは、その項目を開いて「{page:訂閱}」を押すだけです。",
+   "vi": "Muốn nhận lại thì chỉ cần mở mục đó và bấm “{page:訂閱}”.",
+   "id": "Untuk menerimanya lagi, cukup buka topik itu dan ketuk “{page:訂閱}”.",
+   "th": "ถ้าอยากรับอีก แค่เปิดหัวข้อนั้นแล้วแตะ “{page:訂閱}”"
+  },
+  "想取消，再打開那個項目按「取消訂閱」就好。": {
+   "en": "To cancel, just open that topic again and tap “{page:取消訂閱}”.",
+   "ja": "やめたいときは、その項目をもう一度開いて「{page:取消訂閱}」を押すだけです。",
+   "vi": "Muốn hủy thì chỉ cần mở lại mục đó và bấm “{page:取消訂閱}”.",
+   "id": "Untuk membatalkan, cukup buka lagi topik itu dan ketuk “{page:取消訂閱}”.",
+   "th": "ถ้าอยากยกเลิก แค่เปิดหัวข้อนั้นอีกครั้งแล้วแตะ “{page:取消訂閱}”"
+  },
+  "想收到「{title}」的消息，就自己按「訂閱」。之後不想收，隨時可以取消。{below}": {
+   "en": "To get news from “{title}”, tap “{page:訂閱}” yourself. You can cancel any time later. {below}",
+   "ja": "「{title}」のお知らせを受け取りたいなら、自分で「{page:訂閱}」を押してください。あとでいつでもやめられます。{below}",
+   "vi": "Muốn nhận tin của “{title}” thì bạn tự bấm “{page:訂閱}”. Sau này không muốn nhận nữa thì hủy lúc nào cũng được. {below}",
+   "id": "Untuk menerima berita dari “{title}”, ketuk “{page:訂閱}” sendiri. Anda bisa membatalkannya kapan saja. {below}",
+   "th": "ถ้าอยากรับข่าวของ “{title}” ให้แตะ “{page:訂閱}” เอง ภายหลังไม่อยากรับก็ยกเลิกได้ทุกเมื่อ {below}"
+  },
+  "想收到它的消息，按下面的「訂閱」。": {
+   "en": "To get its news, tap “{page:訂閱}” below.",
+   "ja": "お知らせを受け取りたいなら、下の「{page:訂閱}」を押してください。",
+   "vi": "Muốn nhận tin của mục này, bấm “{page:訂閱}” bên dưới.",
+   "id": "Untuk menerima beritanya, ketuk “{page:訂閱}” di bawah.",
+   "th": "ถ้าอยากรับข่าวของหัวข้อนี้ แตะ “{page:訂閱}” ด้านล่าง"
+  },
+  "想改要收到哪些消息，按右上角的「設定」。": {
+   "en": "To change which news you get, tap “{page:設定}” at the top right.",
+   "ja": "どのお知らせを受け取るか変えたいなら、右上の「{page:設定}」を押してください。",
+   "vi": "Muốn đổi những tin sẽ nhận, bấm “{page:設定}” ở góc trên bên phải.",
+   "id": "Untuk mengubah berita yang Anda terima, ketuk “{page:設定}” di kanan atas.",
+   "th": "ถ้าอยากเปลี่ยนข่าวที่จะได้รับ แตะ “{page:設定}” มุมบนขวา"
+  },
+  "打開一則訂閱的消息": {
+   "en": "Open a subscribed message",
+   "ja": "購読したお知らせを1件開く",
+   "vi": "Mở một tin đã đăng ký",
+   "id": "Buka satu pesan langganan",
+   "th": "เปิดข้อความที่สมัครรับหนึ่งรายการ"
+  },
+  "打開了！這裡寫著這個項目會通知你什麼。": {
+   "en": "It’s open! This tells you what this topic will notify you about.",
+   "ja": "開きました！ここに、この項目でどんなお知らせが届くかが書いてあります。",
+   "vi": "Mở rồi! Ở đây ghi mục này sẽ thông báo cho bạn những gì.",
+   "id": "Sudah terbuka! Di sini tertulis pemberitahuan apa yang akan dikirim topik ini.",
+   "th": "เปิดแล้ว! ตรงนี้บอกว่าหัวข้อนี้จะแจ้งเตือนคุณเรื่องอะไร"
+  },
+  "打開想訂閱的項目": {
+   "en": "Open a topic to subscribe to",
+   "ja": "購読したい項目を開く",
+   "vi": "Mở mục muốn đăng ký theo dõi",
+   "id": "Buka topik yang ingin dilanggani",
+   "th": "เปิดหัวข้อที่อยากสมัครรับ"
+  },
+  "打開訂閱設定": {
+   "en": "Open subscription settings",
+   "ja": "購読の設定を開く",
+   "vi": "Mở cài đặt đăng ký theo dõi",
+   "id": "Buka pengaturan langganan",
+   "th": "เปิดการตั้งค่าการสมัครรับ"
+  },
+  "按「取消訂閱」": {
+   "en": "Tap “{page:取消訂閱}”",
+   "ja": "「{page:取消訂閱}」を押す",
+   "vi": "Bấm “{page:取消訂閱}”",
+   "id": "Ketuk “{page:取消訂閱}”",
+   "th": "แตะ “{page:取消訂閱}”"
+  },
+  "按「訂閱」": {
+   "en": "Tap “{page:訂閱}”",
+   "ja": "「{page:訂閱}」を押す",
+   "vi": "Bấm “{page:訂閱}”",
+   "id": "Ketuk “{page:訂閱}”",
+   "th": "แตะ “{page:訂閱}”"
+  },
+  "按「設定」改訂閱項目": {
+   "en": "Tap “{page:設定}” to change your topics",
+   "ja": "「{page:設定}」を押して購読する項目を変える",
+   "vi": "Bấm “{page:設定}” để đổi các mục đăng ký",
+   "id": "Ketuk “{page:設定}” untuk mengubah topik langganan",
+   "th": "แตะ “{page:設定}” เพื่อเปลี่ยนหัวข้อที่สมัครรับ"
+  },
+  "按訊息頁右上角的「設定」。": {
+   "en": "Tap “{page:設定}” at the top right of the message page.",
+   "ja": "メッセージページの右上の「{page:設定}」を押してください。",
+   "vi": "Bấm “{page:設定}” ở góc trên bên phải của trang tin nhắn.",
+   "id": "Ketuk “{page:設定}” di kanan atas halaman pesan.",
+   "th": "แตะ “{page:設定}” มุมบนขวาของหน้าข้อความ"
+  },
+  "按鈕在下面，可以往下滑一點。": {
+   "en": "The button is further down, so scroll down a little.",
+   "ja": "ボタンは下にあるので、少しスクロールしてください。",
+   "vi": "Nút ở bên dưới, bạn kéo xuống một chút nhé.",
+   "id": "Tombolnya ada di bawah, gulir ke bawah sedikit.",
+   "th": "ปุ่มอยู่ด้านล่าง เลื่อนลงอีกนิด"
+  },
+  "按項目說明下面的「取消訂閱」。按了上面的「您已訂閱」數字會減一。": {
+   "en": "Tap “{page:取消訂閱}” under the topic description. The number in “{page:您已訂閱}” at the top then goes down by one.",
+   "ja": "項目の説明の下にある「{page:取消訂閱}」を押してください。押すと上の「{page:您已訂閱}」の数が1つ減ります。",
+   "vi": "Bấm “{page:取消訂閱}” bên dưới phần mô tả của mục. Bấm xong, con số ở “{page:您已訂閱}” phía trên sẽ giảm một.",
+   "id": "Ketuk “{page:取消訂閱}” di bawah keterangan topik. Setelah itu, angka di “{page:您已訂閱}” di atas berkurang satu.",
+   "th": "แตะ “{page:取消訂閱}” ใต้คำอธิบายหัวข้อ แตะแล้วตัวเลขใน “{page:您已訂閱}” ด้านบนจะลดลงหนึ่ง"
+  },
+  "按項目說明下面的「訂閱」。按了上面的「您已訂閱」數字會加一。": {
+   "en": "Tap “{page:訂閱}” under the topic description. The number in “{page:您已訂閱}” at the top then goes up by one.",
+   "ja": "項目の説明の下にある「{page:訂閱}」を押してください。押すと上の「{page:您已訂閱}」の数が1つ増えます。",
+   "vi": "Bấm “{page:訂閱}” bên dưới phần mô tả của mục. Bấm xong, con số ở “{page:您已訂閱}” phía trên sẽ tăng một.",
+   "id": "Ketuk “{page:訂閱}” di bawah keterangan topik. Setelah itu, angka di “{page:您已訂閱}” di atas bertambah satu.",
+   "th": "แตะ “{page:訂閱}” ใต้คำอธิบายหัวข้อ แตะแล้วตัวเลขใน “{page:您已訂閱}” ด้านบนจะเพิ่มขึ้นหนึ่ง"
+  },
+  "最上面是「{title}」{date} 的消息。": {
+   "en": "The top one is from “{title}”, {date}. ",
+   "ja": "いちばん上は「{title}」の {date} のお知らせです。",
+   "vi": "Tin trên cùng là của “{title}”, {date}. ",
+   "id": "Yang paling atas dari “{title}”, {date}. ",
+   "th": "ข้อความบนสุดคือของ “{title}” {date} "
+  },
+  "畫面寫「您已訂閱 {n} 項」。": {
+   "en": "The screen says “You have subscribed to {n} items”.",
+   "ja": "画面に「購読中 {n} 件」と出ています。",
+   "vi": "Màn hình ghi “Bạn đã đăng ký {n} mục”.",
+   "id": "Layar menampilkan “Anda berlangganan {n} topik”.",
+   "th": "หน้าจอเขียนว่า “สมัครรับแล้ว {n} รายการ”"
+  },
+  "目前還沒有訊息。可以按右上角的「設定」，訂閱想收到的項目。": {
+   "en": "There are no messages yet. You can tap “{page:設定}” at the top right to subscribe to the topics you want.",
+   "ja": "まだメッセージはありません。右上の「{page:設定}」を押して、受け取りたい項目を購読できます。",
+   "vi": "Hiện chưa có tin nhắn nào. Bạn có thể bấm “{page:設定}” ở góc trên bên phải để đăng ký các mục muốn nhận.",
+   "id": "Belum ada pesan. Anda bisa mengetuk “{page:設定}” di kanan atas untuk berlangganan topik yang diinginkan.",
+   "th": "ยังไม่มีข้อความ แตะ “{page:設定}” มุมบนขวาเพื่อสมัครรับหัวข้อที่อยากได้รับ"
+  },
+  "看完按畫面最上面左邊的返回鍵，回到訊息列表。內容裡的網址會打開別的網站。": {
+   "en": "When you are done, tap the back button at the top left to return to the message list. Web links in the message open other websites.",
+   "ja": "読み終わったら、画面のいちばん上の左にある戻るボタンを押して、メッセージ一覧に戻ってください。本文のリンクを押すと、別のサイトが開きます。",
+   "vi": "Xem xong, bấm nút quay lại ở góc trên cùng bên trái để về danh sách tin nhắn. Đường link trong nội dung sẽ mở trang web khác.",
+   "id": "Setelah selesai, ketuk tombol kembali di kiri atas untuk kembali ke daftar pesan. Tautan di dalam isi pesan akan membuka situs lain.",
+   "th": "อ่านเสร็จแล้ว แตะปุ่มย้อนกลับมุมบนซ้ายเพื่อกลับไปที่รายการข้อความ ลิงก์ในเนื้อหาจะเปิดเว็บไซต์อื่น"
+  },
+  "看訂閱": {
+   "en": "See subscriptions",
+   "ja": "購読を見る",
+   "vi": "Xem đăng ký theo dõi",
+   "id": "Lihat langganan",
+   "th": "ดูการสมัครรับ"
+  },
+  "看訂閱的消息": {
+   "en": "Read subscribed news",
+   "ja": "購読したお知らせを見る",
+   "vi": "Xem tin đã đăng ký",
+   "id": "Lihat berita langganan",
+   "th": "ดูข่าวที่สมัครรับ"
+  },
+  "看訂閱項目": {
+   "en": "See subscription topics",
+   "ja": "購読の項目を見る",
+   "vi": "Xem các mục đăng ký",
+   "id": "Lihat topik langganan",
+   "th": "ดูหัวข้อที่สมัครรับได้"
+  },
+  "訂閱": {
+   "en": "Subscriptions",
+   "ja": "購読",
+   "vi": "Đăng ký theo dõi",
+   "id": "Langganan",
+   "th": "การสมัครรับ"
+  },
+  "訂閱內容": {
+   "en": "Subscription content",
+   "ja": "購読の内容",
+   "vi": "Nội dung đăng ký",
+   "id": "Isi langganan",
+   "th": "เนื้อหาที่สมัครรับ"
+  },
+  "訂閱好了「{title}」！{count}之後有新消息，就會出現在訂閱的訊息裡。這是示範網站喔。": {
+   "en": "Subscribed to “{title}”! {count} New news will appear in your subscription messages. This is a demo site.",
+   "ja": "「{title}」を購読しました！{count}新しいお知らせがあると、購読のメッセージに出ます。これはデモサイトです。",
+   "vi": "Đã đăng ký theo dõi “{title}”! {count} Khi có tin mới, tin sẽ hiện trong mục tin đã đăng ký. Đây là trang web mẫu.",
+   "id": "Berhasil berlangganan “{title}”! {count} Berita baru akan muncul di pesan langganan Anda. Ini situs demo.",
+   "th": "สมัครรับ “{title}” แล้ว! {count} เมื่อมีข่าวใหม่ จะแสดงในข้อความที่สมัครรับ นี่เป็นเว็บไซต์สาธิต"
+  },
+  "訂閱好了！{count}之後有新消息，就會出現在訂閱的訊息裡。這是示範網站喔。": {
+   "en": "Subscribed! {count} New news will appear in your subscription messages. This is a demo site.",
+   "ja": "購読しました！{count}新しいお知らせがあると、購読のメッセージに出ます。これはデモサイトです。",
+   "vi": "Đăng ký xong rồi! {count} Khi có tin mới, tin sẽ hiện trong mục tin đã đăng ký. Đây là trang web mẫu.",
+   "id": "Berhasil berlangganan! {count} Berita baru akan muncul di pesan langganan Anda. Ini situs demo.",
+   "th": "สมัครรับแล้ว! {count} เมื่อมีข่าวใหม่ จะแสดงในข้อความที่สมัครรับ นี่เป็นเว็บไซต์สาธิต"
+  },
+  "訂閱好了！之後有新消息，就會出現在訂閱的訊息裡。這是示範網站喔。": {
+   "en": "Subscribed! New news will appear in your subscription messages. This is a demo site.",
+   "ja": "購読しました！新しいお知らせがあると、購読のメッセージに出ます。これはデモサイトです。",
+   "vi": "Đăng ký xong rồi! Khi có tin mới, tin sẽ hiện trong mục tin đã đăng ký. Đây là trang web mẫu.",
+   "id": "Berhasil berlangganan! Berita baru akan muncul di pesan langganan Anda. Ini situs demo.",
+   "th": "สมัครรับแล้ว! เมื่อมีข่าวใหม่ จะแสดงในข้อความที่สมัครรับ นี่เป็นเว็บไซต์สาธิต"
+  },
+  "訂閱是什麼？": {
+   "en": "What are subscriptions?",
+   "ja": "購読とは？",
+   "vi": "Đăng ký theo dõi là gì?",
+   "id": "Apa itu langganan?",
+   "th": "การสมัครรับคืออะไร"
+  },
+  "訂閱消息": {
+   "en": "Subscribe to news",
+   "ja": "お知らせを購読する",
+   "vi": "Đăng ký nhận tin",
+   "id": "Berlangganan berita",
+   "th": "สมัครรับข่าว"
+  },
+  "訂閱的消息": {
+   "en": "Subscribed news",
+   "ja": "購読したお知らせ",
+   "vi": "Tin đã đăng ký",
+   "id": "Berita langganan",
+   "th": "ข่าวที่สมัครรับ"
+  },
+  "訂閱的訊息": {
+   "en": "Subscription messages",
+   "ja": "購読のメッセージ",
+   "vi": "Tin nhắn đã đăng ký",
+   "id": "Pesan langganan",
+   "th": "ข้อความที่สมัครรับ"
+  },
+  "訂閱訊息": {
+   "en": "Subscription messages",
+   "ja": "購読のメッセージ",
+   "vi": "Tin nhắn đăng ký",
+   "id": "Pesan langganan",
+   "th": "ข้อความการสมัครรับ"
+  },
+  "訂閱項目": {
+   "en": "Subscription topics",
+   "ja": "購読の項目",
+   "vi": "Mục đăng ký",
+   "id": "Topik langganan",
+   "th": "หัวข้อที่สมัครรับ"
+  },
+  "這些是你訂閱的消息，共 {n} 則。{latest}點一則就能看完整內容。": {
+   "en": "These are the news from your subscriptions, {n} in all. {latest}Tap one to read it in full.",
+   "ja": "これは購読しているお知らせで、全部で {n} 件です。{latest}1件押すと全文が読めます。",
+   "vi": "Đây là các tin bạn đã đăng ký, tổng cộng {n} tin. {latest}Bấm một tin để xem toàn bộ nội dung.",
+   "id": "Ini berita dari langganan Anda, semuanya {n} pesan. {latest}Ketuk satu untuk membaca isinya.",
+   "th": "นี่คือข่าวที่คุณสมัครรับ ทั้งหมด {n} รายการ {latest}แตะหนึ่งรายการเพื่ออ่านทั้งหมด"
+  },
+  "這就是這則消息的完整內容。這是示範資料喔。": {
+   "en": "This is the full message. This is demo data.",
+   "ja": "これがこのお知らせの全文です。これはデモデータです。",
+   "vi": "Đây là toàn bộ nội dung của tin này. Đây là dữ liệu mẫu.",
+   "id": "Ini isi lengkap pesan ini. Ini data demo.",
+   "th": "นี่คือเนื้อหาทั้งหมดของข้อความนี้ นี่เป็นข้อมูลสาธิต"
+  },
+  "這是「訂閱」": {
+   "en": "This is “Subscriptions”",
+   "ja": "これは「購読」です",
+   "vi": "Đây là “Đăng ký theo dõi”",
+   "id": "Ini “Langganan”",
+   "th": "นี่คือ “การสมัครรับ”"
+  },
+  "這裡就是訂閱設定！你現在訂閱了：{on}。點項目名稱打開，就能訂閱或取消。": {
+   "en": "These are the subscription settings! You are subscribed to: {on}. Tap a topic name to open it, then subscribe or cancel.",
+   "ja": "ここが購読の設定です！今購読しているのは：{on}。項目の名前を押して開くと、購読したりやめたりできます。",
+   "vi": "Đây là phần cài đặt đăng ký theo dõi! Bạn đang đăng ký: {on}. Bấm vào tên mục để mở, rồi đăng ký hoặc hủy.",
+   "id": "Ini pengaturan langganan! Anda sedang berlangganan: {on}. Ketuk nama topik untuk membukanya, lalu berlangganan atau batalkan.",
+   "th": "นี่คือการตั้งค่าการสมัครรับ! ตอนนี้คุณสมัครรับ: {on} แตะชื่อหัวข้อเพื่อเปิด แล้วสมัครรับหรือยกเลิกได้"
+  },
+  "這裡就是訂閱設定！你現在還沒訂閱任何項目，點項目名稱打開就能訂閱。": {
+   "en": "These are the subscription settings! You are not subscribed to anything yet. Tap a topic name to open it and subscribe.",
+   "ja": "ここが購読の設定です！まだ何も購読していません。項目の名前を押して開くと購読できます。",
+   "vi": "Đây là phần cài đặt đăng ký theo dõi! Bạn chưa đăng ký mục nào, bấm vào tên mục để mở là đăng ký được.",
+   "id": "Ini pengaturan langganan! Anda belum berlangganan apa pun. Ketuk nama topik untuk membukanya dan berlangganan.",
+   "th": "นี่คือการตั้งค่าการสมัครรับ! คุณยังไม่ได้สมัครรับหัวข้อใดเลย แตะชื่อหัวข้อเพื่อเปิดแล้วสมัครรับได้"
+  },
+  "這裡就是訂閱設定！點項目名稱打開，就能訂閱或取消。": {
+   "en": "These are the subscription settings! Tap a topic name to open it, then subscribe or cancel.",
+   "ja": "ここが購読の設定です！項目の名前を押して開くと、購読したりやめたりできます。",
+   "vi": "Đây là phần cài đặt đăng ký theo dõi! Bấm vào tên mục để mở, rồi đăng ký hoặc hủy.",
+   "id": "Ini pengaturan langganan! Ketuk nama topik untuk membukanya, lalu berlangganan atau batalkan.",
+   "th": "นี่คือการตั้งค่าการสมัครรับ! แตะชื่อหัวข้อเพื่อเปิด แล้วสมัครรับหรือยกเลิกได้"
+  },
+  "這裡是訂閱的訊息。想訂閱或取消，按右上角的「設定」。": {
+   "en": "These are your subscription messages. To subscribe or cancel, tap “{page:設定}” at the top right.",
+   "ja": "ここは購読のメッセージです。購読したりやめたりするなら、右上の「{page:設定}」を押してください。",
+   "vi": "Đây là các tin nhắn đã đăng ký. Muốn đăng ký hoặc hủy, bấm “{page:設定}” ở góc trên bên phải.",
+   "id": "Ini pesan langganan Anda. Untuk berlangganan atau membatalkan, ketuk “{page:設定}” di kanan atas.",
+   "th": "นี่คือข้อความที่สมัครรับ ถ้าอยากสมัครรับหรือยกเลิก แตะ “{page:設定}” มุมบนขวา"
+  },
+  "這裡是訂閱的設定。訊息在上一頁，按畫面最上面左邊的返回鍵回去。": {
+   "en": "These are the subscription settings. The messages are on the previous page: tap the back button at the top left to go back.",
+   "ja": "ここは購読の設定です。メッセージは前のページにあるので、画面のいちばん上の左にある戻るボタンで戻ってください。",
+   "vi": "Đây là phần cài đặt đăng ký theo dõi. Tin nhắn ở trang trước, bấm nút quay lại ở góc trên cùng bên trái để về.",
+   "id": "Ini pengaturan langganan. Pesannya ada di halaman sebelumnya: ketuk tombol kembali di kiri atas untuk kembali.",
+   "th": "นี่คือการตั้งค่าการสมัครรับ ข้อความอยู่หน้าก่อน แตะปุ่มย้อนกลับมุมบนซ้ายเพื่อกลับไป"
+  },
+  "開啟訂閱頁面": {
+   "en": "Open the subscriptions page",
+   "ja": "購読ページを開く",
+   "vi": "Mở trang đăng ký theo dõi",
+   "id": "Buka halaman langganan",
+   "th": "เปิดหน้าการสมัครรับ"
+  },
+  "點一則": {
+   "en": "Tap one",
+   "ja": "1件押す",
+   "vi": "Bấm một tin",
+   "id": "Ketuk satu",
+   "th": "แตะหนึ่งรายการ"
+  },
+  "點你想取消的項目名稱，把它打開。": {
+   "en": "Tap the name of the topic you want to cancel to open it.",
+   "ja": "やめたい項目の名前を押して開いてください。",
+   "vi": "Bấm vào tên mục bạn muốn hủy để mở nó.",
+   "id": "Ketuk nama topik yang ingin dibatalkan untuk membukanya.",
+   "th": "แตะชื่อหัวข้อที่อยากยกเลิกเพื่อเปิด"
+  },
+  "點你想訂閱的項目名稱，把它打開。": {
+   "en": "Tap the name of the topic you want to subscribe to, to open it.",
+   "ja": "購読したい項目の名前を押して開いてください。",
+   "vi": "Bấm vào tên mục bạn muốn đăng ký để mở nó.",
+   "id": "Ketuk nama topik yang ingin dilanggani untuk membukanya.",
+   "th": "แตะชื่อหัวข้อที่อยากสมัครรับเพื่อเปิด"
+  },
+  "點已經訂閱的項目名稱，打開後會看到「取消訂閱」。": {
+   "en": "Tap the name of a topic you subscribe to; when it opens you will see “{page:取消訂閱}”.",
+   "ja": "購読している項目の名前を押すと、「{page:取消訂閱}」が出てきます。",
+   "vi": "Bấm vào tên mục đã đăng ký, mở ra sẽ thấy “{page:取消訂閱}”.",
+   "id": "Ketuk nama topik yang sudah dilanggani; setelah terbuka, Anda akan melihat “{page:取消訂閱}”.",
+   "th": "แตะชื่อหัวข้อที่สมัครรับอยู่ เปิดแล้วจะเห็น “{page:取消訂閱}”"
+  }
+ }
+}

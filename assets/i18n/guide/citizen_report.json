@@ -1,0 +1,896 @@
+{
+ "version": 1,
+ "status": "DRAFT translations (machine-assisted, 2026-11-08), pending native-speaker review. Keys are the Chinese source texts in lib/page/guided_assistant/; keep {name} placeholders; {page:X} shows the page's own word X as the page shows it (translated by PageTranslation).",
+ "section": "citizen_report",
+ "strings": {
+  "{count}右邊寫著「處理中」或「處理完成」。點你想看的那一件，看處理到哪裡。": {
+   "en": "{count}On the right it says “{page:處理中}” or “{page:處理完成}”. Tap the one you want to see how far it has got.",
+   "ja": "{count}右側に「{page:處理中}」か「{page:處理完成}」と書いてあります。見たい案件をタップすると、進み具合がわかります。",
+   "vi": "{count}Bên phải ghi “{page:處理中}” hoặc “{page:處理完成}”. Chạm vào việc bạn muốn xem để biết đã xử lý đến đâu.",
+   "id": "{count}Di sebelah kanan tertulis “{page:處理中}” atau “{page:處理完成}”. Ketuk kasus yang ingin Anda lihat untuk tahu sudah sampai mana.",
+   "th": "{count}ด้านขวาเขียนว่า “{page:處理中}” หรือ “{page:處理完成}” แตะเรื่องที่อยากดูเพื่อดูว่าดำเนินการถึงไหนแล้ว"
+  },
+  "{stale}{check}{agree}沒問題就自己按「送出」喔。這是示範網站，不會真的送出。": {
+   "en": "{stale}{check}{agree}If everything looks right, tap “{page:送出}” yourself. This is a demo site, so nothing is really sent.",
+   "ja": "{stale}{check}{agree}問題なければ、ご自身で「{page:送出}」を押してください。これはデモサイトなので、実際には送信されません。",
+   "vi": "{stale}{check}{agree}Nếu không có vấn đề gì, bạn tự bấm “{page:送出}” nhé. Đây là trang web mẫu, sẽ không gửi thật.",
+   "id": "{stale}{check}{agree}Kalau sudah benar, tekan sendiri “{page:送出}”. Ini situs demo, jadi tidak benar-benar terkirim.",
+   "th": "{stale}{check}{agree}ถ้าไม่มีปัญหา กด “{page:送出}” ด้วยตัวเองได้เลย นี่เป็นเว็บไซต์สาธิต จะไม่ส่งจริง"
+  },
+  "「{c}」": {
+   "en": "“{c}”",
+   "ja": "「{c}」",
+   "vi": "“{c}”",
+   "id": "“{c}”",
+   "th": "“{c}”"
+  },
+  "「個人資料是否提供給承辦」也選一下。": {
+   "en": "Also make a choice under “{page:個人資料是否提供給承辦}”. ",
+   "ja": "「{page:個人資料是否提供給承辦}」も選んでください。",
+   "vi": "Bạn cũng chọn ở mục “{page:個人資料是否提供給承辦}” nhé. ",
+   "id": "Pilih juga di bagian “{page:個人資料是否提供給承辦}”. ",
+   "th": "เลือกที่ “{page:個人資料是否提供給承辦}” ด้วย "
+  },
+  "「個人資料是否提供給承辦」現在選「{consent}」，想改可以點另一個。": {
+   "en": "Under “{page:個人資料是否提供給承辦}”, “{consent}” is chosen now. To change it, tap the other one. ",
+   "ja": "「{page:個人資料是否提供給承辦}」は今「{consent}」になっています。変えたいときはもう一方をタップしてください。",
+   "vi": "Ở mục “{page:個人資料是否提供給承辦}” hiện đang chọn “{consent}”. Muốn đổi thì chạm vào lựa chọn còn lại. ",
+   "id": "Di bagian “{page:個人資料是否提供給承辦}” sekarang terpilih “{consent}”. Kalau mau ganti, ketuk pilihan yang lain. ",
+   "th": "ที่ “{page:個人資料是否提供給承辦}” ตอนนี้เลือก “{consent}” อยู่ ถ้าอยากเปลี่ยนให้แตะอีกตัวเลือกหนึ่ง "
+  },
+  "「描述」要寫人、事、時、地、物，例如「11月7日晚上，〇〇路口的路燈不亮，很暗很危險」。": {
+   "en": "In “{page:描述}”, write who, what, when, where and which thing, e.g. “11月7日晚上，〇〇路口的路燈不亮，很暗很危險” (on the evening of 7 Nov the street light at the 〇〇 crossing is out; it is dark and dangerous).",
+   "ja": "「{page:描述}」には、誰が・何を・いつ・どこで・何が、を書きます。例：「11月7日晚上，〇〇路口的路燈不亮，很暗很危險」（11月7日の夜、〇〇交差点の街灯がつかず、暗くて危ない）。",
+   "vi": "Ở “{page:描述}”, hãy viết ai, việc gì, khi nào, ở đâu, vật gì, ví dụ “11月7日晚上，〇〇路口的路燈不亮，很暗很危險” (tối ngày 7/11, đèn đường ở ngã tư 〇〇 không sáng, rất tối và nguy hiểm).",
+   "id": "Di “{page:描述}”, tulis siapa, apa, kapan, di mana, dan bendanya, misalnya “11月7日晚上，〇〇路口的路燈不亮，很暗很危險” (malam 7 November, lampu jalan di persimpangan 〇〇 mati, gelap dan berbahaya).",
+   "th": "ใน “{page:描述}” ให้เขียนว่า ใคร ทำอะไร เมื่อไร ที่ไหน และสิ่งของอะไร เช่น “11月7日晚上，〇〇路口的路燈不亮，很暗很危險” (คืนวันที่ 7 พ.ย. ไฟถนนที่สี่แยก 〇〇 ไม่ติด มืดและอันตราย)"
+  },
+  "「案件主旨」是一句話的標題，例如「巷口路燈不亮」。有「*」的格子一定要寫。": {
+   "en": "“{page:案件主旨}” is a one-line title, e.g. “巷口路燈不亮” (the street light at the lane entrance is out). Boxes marked “*” must be filled in.",
+   "ja": "「{page:案件主旨}」は一文のタイトルです。例：「巷口路燈不亮」（路地の入口の街灯がつかない）。「*」がある欄は必ず書いてください。",
+   "vi": "“{page:案件主旨}” là tiêu đề một câu, ví dụ “巷口路燈不亮” (đèn đường đầu hẻm không sáng). Ô có dấu “*” bắt buộc phải điền.",
+   "id": "“{page:案件主旨}” adalah judul satu kalimat, misalnya “巷口路燈不亮” (lampu jalan di mulut gang mati). Kotak bertanda “*” wajib diisi.",
+   "th": "“{page:案件主旨}” คือหัวข้อสั้นๆ หนึ่งประโยค เช่น “巷口路燈不亮” (ไฟถนนปากซอยไม่ติด) ช่องที่มี “*” ต้องกรอก"
+  },
+  "「發生地點」寫事情在哪裡發生，例如路名和門牌。不寫也可以送出。": {
+   "en": "“{page:發生地點}” is where it happened, such as the street name and house number. You can send it without this too.",
+   "ja": "「{page:發生地點}」には、起きた場所（通りの名前と番地など）を書きます。書かなくても送信できます。",
+   "vi": "“{page:發生地點}” là nơi xảy ra, ví dụ tên đường và số nhà. Không điền cũng gửi được.",
+   "id": "“{page:發生地點}” adalah tempat kejadiannya, misalnya nama jalan dan nomor rumah. Tanpa ini juga bisa dikirim.",
+   "th": "“{page:發生地點}” คือที่ที่เกิดเรื่อง เช่น ชื่อถนนและเลขที่บ้าน ไม่กรอกก็ส่งได้"
+  },
+  "「送出」現在還不能按。往上看看有沒有紅字，把漏掉的格子補好。": {
+   "en": "“{page:送出}” can’t be tapped yet. Look above for red text and fill in the boxes you missed.",
+   "ja": "「{page:送出}」はまだ押せません。上に赤い字がないか見て、抜けている欄を埋めてください。",
+   "vi": "Chưa bấm được “{page:送出}”. Hãy xem phía trên có chữ đỏ không và điền các ô còn thiếu.",
+   "id": "“{page:送出}” belum bisa ditekan. Lihat ke atas apakah ada tulisan merah, lalu isi kotak yang terlewat.",
+   "th": "ยังกด “{page:送出}” ไม่ได้ ดูด้านบนว่ามีตัวหนังสือสีแดงไหม แล้วกรอกช่องที่ขาดให้ครบ"
+  },
+  "上面的紅字是剛剛的提醒，現在已經寫好了。": {
+   "en": "The red text above was an earlier reminder; it’s filled in now. ",
+   "ja": "上の赤い字はさっきの注意で、もう書けています。",
+   "vi": "Chữ đỏ ở trên là lời nhắc lúc nãy, giờ đã điền xong rồi. ",
+   "id": "Tulisan merah di atas hanya pengingat tadi, sekarang sudah terisi. ",
+   "th": "ตัวหนังสือสีแดงด้านบนเป็นคำเตือนเมื่อกี้ ตอนนี้กรอกเรียบร้อยแล้ว "
+  },
+  "不想打字，可以用講的。往下滑到最下面，找「撥打1999專線」。": {
+   "en": "Don’t want to type? You can talk instead. Scroll to the very bottom and find “{page:撥打1999專線}”.",
+   "ja": "入力したくないときは、話して伝えることもできます。一番下までスクロールして「{page:撥打1999專線}」を探してください。",
+   "vi": "Không muốn gõ chữ thì có thể nói. Cuộn xuống dưới cùng và tìm “{page:撥打1999專線}”.",
+   "id": "Tidak mau mengetik? Anda bisa bicara saja. Gulir ke paling bawah dan cari “{page:撥打1999專線}”.",
+   "th": "ถ้าไม่อยากพิมพ์ ก็พูดแทนได้ เลื่อนลงไปล่างสุดแล้วหา “{page:撥打1999專線}”"
+  },
+  "主旨是「{title}」": {
+   "en": "the subject is “{title}”",
+   "ja": "主旨は「{title}」",
+   "vi": "tiêu đề là “{title}”",
+   "id": "judulnya “{title}”",
+   "th": "หัวข้อคือ “{title}”"
+  },
+  "主旨要寫什麼？": {
+   "en": "What should I write as the subject?",
+   "ja": "主旨には何を書けばいい？",
+   "vi": "Tiêu đề nên viết gì?",
+   "id": "Judulnya ditulis apa?",
+   "th": "หัวข้อควรเขียนอะไร"
+  },
+  "你想反映哪一類的事？點一個最接近的，例如「停車管理及收費問題」。找不到就按下面的「更多項目」。": {
+   "en": "What kind of issue do you want to report? Tap the closest one, e.g. “{page:停車管理及收費問題}”. If you can’t find it, tap “{page:更多項目}” below.",
+   "ja": "どんなことを伝えたいですか？一番近いものをタップしてください。例：「{page:停車管理及收費問題}」。見つからなければ、下の「{page:更多項目}」を押してください。",
+   "vi": "Bạn muốn phản ánh việc thuộc loại nào? Chạm vào mục gần nhất, ví dụ “{page:停車管理及收費問題}”. Không tìm thấy thì bấm “{page:更多項目}” ở dưới.",
+   "id": "Masalah jenis apa yang ingin Anda sampaikan? Ketuk yang paling mirip, misalnya “{page:停車管理及收費問題}”. Kalau tidak ketemu, tekan “{page:更多項目}” di bawah.",
+   "th": "อยากแจ้งเรื่องประเภทไหน แตะอันที่ใกล้เคียงที่สุด เช่น “{page:停車管理及收費問題}” ถ้าหาไม่เจอ กด “{page:更多項目}” ด้านล่าง"
+  },
+  "你自己決定": {
+   "en": "You decide",
+   "ja": "ご自身で決める",
+   "vi": "Bạn tự quyết định",
+   "id": "Anda yang memutuskan",
+   "th": "คุณตัดสินใจเอง"
+  },
+  "你自己確認": {
+   "en": "You confirm",
+   "ja": "ご自身で確認",
+   "vi": "Bạn tự xác nhận",
+   "id": "Anda yang konfirmasi",
+   "th": "คุณยืนยันเอง"
+  },
+  "先按左上角的「‹」回到「有話要說」的首頁。": {
+   "en": "First tap “‹” at the top left to go back to the “Report an issue” home page.",
+   "ja": "まず左上の「‹」を押して、「ご意見・陳情」のトップに戻ってください。",
+   "vi": "Trước tiên bấm “‹” ở góc trên bên trái để về trang đầu của “Phản ánh”.",
+   "id": "Tekan dulu “‹” di kiri atas untuk kembali ke halaman utama “Sampaikan keluhan”.",
+   "th": "กด “‹” ที่มุมซ้ายบนก่อน เพื่อกลับไปหน้าแรกของ “ร้องเรียน”"
+  },
+  "先點一下上面的「{tab}」。": {
+   "en": "First tap “{tab}” at the top.",
+   "ja": "まず上の「{tab}」をタップしてください。",
+   "vi": "Trước tiên chạm vào “{tab}” ở phía trên.",
+   "id": "Ketuk dulu “{tab}” di atas.",
+   "th": "แตะ “{tab}” ด้านบนก่อน"
+  },
+  "內容寫好了！": {
+   "en": "Your report is written!",
+   "ja": "内容が書けました！",
+   "vi": "Đã viết xong nội dung!",
+   "id": "Isinya sudah ditulis!",
+   "th": "เขียนเนื้อหาเสร็จแล้ว!"
+  },
+  "再點一下「描述」的大框框，寫清楚什麼時候、在哪裡、發生了什麼事。": {
+   "en": "Now tap the big “{page:描述}” box and write clearly when, where and what happened.",
+   "ja": "次に「{page:描述}」の大きな枠をタップして、いつ・どこで・何が起きたかをはっきり書いてください。",
+   "vi": "Tiếp theo chạm vào ô lớn “{page:描述}”, viết rõ khi nào, ở đâu, đã xảy ra chuyện gì.",
+   "id": "Lalu ketuk kotak besar “{page:描述}” dan tulis dengan jelas kapan, di mana, dan apa yang terjadi.",
+   "th": "ต่อไปแตะช่องใหญ่ “{page:描述}” แล้วเขียนให้ชัดว่า เมื่อไร ที่ไหน และเกิดอะไรขึ้น"
+  },
+  "切到「災情通報」": {
+   "en": "Switch to “{page:災情通報}”",
+   "ja": "「{page:災情通報}」に切り替える",
+   "vi": "Chuyển sang “{page:災情通報}”",
+   "id": "Pindah ke “{page:災情通報}”",
+   "th": "สลับไปที่ “{page:災情通報}”"
+  },
+  "加上照片": {
+   "en": "Add photos",
+   "ja": "写真を付ける",
+   "vi": "Thêm ảnh",
+   "id": "Tambahkan foto",
+   "th": "แนบรูปภาพ"
+  },
+  "可以向市政府反映生活中遇到的問題：選一個類別，寫下主旨和描述，再自己按「送出」。也可以在上面的「查詢」看案件處理到哪裡，或打 1999 專線用講的。": {
+   "en": "You can tell the city government about problems in daily life: pick a category, write a subject and a description, then tap “{page:送出}” yourself. You can also use “{page:查詢}” at the top to see how far your cases have got, or call the 1999 hotline and just talk.",
+   "ja": "日常生活で困っていることを市政府に伝えられます。カテゴリーを選び、主旨と内容を書いて、ご自身で「{page:送出}」を押します。上の「{page:查詢}」で案件の進み具合を見たり、1999 番に電話して話して伝えたりもできます。",
+   "vi": "Bạn có thể phản ánh với chính quyền thành phố những vấn đề gặp trong cuộc sống: chọn một loại, viết tiêu đề và mô tả, rồi tự bấm “{page:送出}”. Bạn cũng có thể xem tiến độ ở “{page:查詢}” phía trên, hoặc gọi đường dây 1999 để nói trực tiếp.",
+   "id": "Anda bisa menyampaikan masalah sehari-hari kepada pemerintah kota: pilih kategori, tulis judul dan uraian, lalu tekan sendiri “{page:送出}”. Anda juga bisa melihat perkembangan kasus di “{page:查詢}” di atas, atau menelepon layanan 1999 dan bicara langsung.",
+   "th": "แจ้งปัญหาในชีวิตประจำวันกับรัฐบาลเมืองได้ที่นี่ เลือกหมวดหมู่ เขียนหัวข้อและรายละเอียด แล้วกด “{page:送出}” ด้วยตัวเอง ดูความคืบหน้าของเรื่องได้ที่ “{page:查詢}” ด้านบน หรือโทรสายด่วน 1999 เพื่อพูดแจ้งก็ได้"
+  },
+  "回到有話要說": {
+   "en": "Back to Report an issue",
+   "ja": "ご意見・陳情に戻る",
+   "vi": "Quay lại Phản ánh",
+   "id": "Kembali ke Sampaikan keluhan",
+   "th": "กลับไปที่ร้องเรียน"
+  },
+  "回到有話要說畫面": {
+   "en": "Back to the Report an issue screen",
+   "ja": "ご意見・陳情の画面に戻る",
+   "vi": "Quay lại màn hình Phản ánh",
+   "id": "Kembali ke layar Sampaikan keluhan",
+   "th": "กลับไปที่หน้าจอร้องเรียน"
+  },
+  "在「查詢」裡，點右邊的「災情通報」。": {
+   "en": "In “{page:查詢}”, tap “{page:災情通報}” on the right.",
+   "ja": "「{page:查詢}」の中で、右の「{page:災情通報}」をタップしてください。",
+   "vi": "Trong “{page:查詢}”, chạm vào “{page:災情通報}” bên phải.",
+   "id": "Di “{page:查詢}”, ketuk “{page:災情通報}” di sebelah kanan.",
+   "th": "ใน “{page:查詢}” แตะ “{page:災情通報}” ทางขวา"
+  },
+  "在「案件主旨」寫一句話，在「描述」寫清楚發生了什麼事。": {
+   "en": "Write one sentence in “{page:案件主旨}”, and in “{page:描述}” write clearly what happened.",
+   "ja": "「{page:案件主旨}」に一文を書き、「{page:描述}」に何が起きたかをはっきり書いてください。",
+   "vi": "Viết một câu ở “{page:案件主旨}”, và viết rõ chuyện đã xảy ra ở “{page:描述}”.",
+   "id": "Tulis satu kalimat di “{page:案件主旨}”, lalu tulis dengan jelas apa yang terjadi di “{page:描述}”.",
+   "th": "เขียนหนึ่งประโยคใน “{page:案件主旨}” และเขียนให้ชัดว่าเกิดอะไรขึ้นใน “{page:描述}”"
+  },
+  "在「通報」頁往下滑到最下面，「語音通報」那裡有「撥打1999專線」。": {
+   "en": "On the “{page:通報}” page, scroll to the very bottom. Under “{page:語音通報}” there is “{page:撥打1999專線}”.",
+   "ja": "「{page:通報}」のページを一番下までスクロールすると、「{page:語音通報}」のところに「{page:撥打1999專線}」があります。",
+   "vi": "Ở trang “{page:通報}”, cuộn xuống dưới cùng. Ở phần “{page:語音通報}” có “{page:撥打1999專線}”.",
+   "id": "Di halaman “{page:通報}”, gulir ke paling bawah. Di bagian “{page:語音通報}” ada “{page:撥打1999專線}”.",
+   "th": "ในหน้า “{page:通報}” เลื่อนลงไปล่างสุด ตรง “{page:語音通報}” จะมี “{page:撥打1999專線}”"
+  },
+  "在「選擇要通報項目」點一個最接近的類別。找不到可以按下面的「更多項目」，或在上面的搜尋框打字。": {
+   "en": "Under “{page:選擇要通報項目}”, tap the closest category. If you can’t find it, tap “{page:更多項目}” below, or type in the search box at the top.",
+   "ja": "「{page:選擇要通報項目}」で一番近いカテゴリーをタップしてください。見つからなければ、下の「{page:更多項目}」を押すか、上の検索欄に入力してください。",
+   "vi": "Ở “{page:選擇要通報項目}”, chạm vào loại gần nhất. Không tìm thấy thì bấm “{page:更多項目}” ở dưới, hoặc gõ vào ô tìm kiếm ở trên.",
+   "id": "Di “{page:選擇要通報項目}”, ketuk kategori yang paling mirip. Kalau tidak ketemu, tekan “{page:更多項目}” di bawah, atau ketik di kotak pencarian di atas.",
+   "th": "ที่ “{page:選擇要通報項目}” แตะหมวดหมู่ที่ใกล้เคียงที่สุด ถ้าหาไม่เจอ กด “{page:更多項目}” ด้านล่าง หรือพิมพ์ในช่องค้นหาด้านบน"
+  },
+  "在搜尋框打你遇到的問題，按右邊的放大鏡，再點最接近的類別。沒有結果就換一個詞。": {
+   "en": "Type your problem in the search box, tap the magnifying glass on the right, then tap the closest category. If nothing comes up, try another word.",
+   "ja": "検索欄に困っていることを入力し、右の虫めがねを押してから、一番近いカテゴリーをタップしてください。結果がなければ別の言葉にしてみてください。",
+   "vi": "Gõ vấn đề bạn gặp vào ô tìm kiếm, bấm kính lúp bên phải, rồi chạm vào loại gần nhất. Không có kết quả thì đổi từ khác.",
+   "id": "Ketik masalah Anda di kotak pencarian, tekan kaca pembesar di kanan, lalu ketuk kategori yang paling mirip. Kalau tidak ada hasil, coba kata lain.",
+   "th": "พิมพ์ปัญหาที่เจอในช่องค้นหา กดแว่นขยายทางขวา แล้วแตะหมวดหมู่ที่ใกล้เคียงที่สุด ถ้าไม่มีผลลัพธ์ให้ลองคำอื่น"
+  },
+  "地點寫好了！": {
+   "en": "The place is filled in!",
+   "ja": "場所が書けました！",
+   "vi": "Đã điền xong địa điểm!",
+   "id": "Tempatnya sudah diisi!",
+   "th": "กรอกสถานที่เรียบร้อยแล้ว!"
+  },
+  "好的！「有話要說」打開了，我們一起來{task}。": {
+   "en": "OK! “Report an issue” is open. Let’s do this together: {task}.",
+   "ja": "わかりました！「ご意見・陳情」を開きました。一緒に進めましょう：{task}。",
+   "vi": "Được rồi! Đã mở “Phản ánh”. Mình cùng làm nhé: {task}.",
+   "id": "Baik! “Sampaikan keluhan” sudah terbuka. Ayo kita lakukan bersama: {task}.",
+   "th": "ได้เลย! เปิด “ร้องเรียน” แล้ว มาทำด้วยกัน: {task}"
+  },
+  "好的！「有話要說」打開了，我們先選要反映哪一類的事吧。": {
+   "en": "OK! “Report an issue” is open. First, let’s pick what kind of issue you want to report.",
+   "ja": "わかりました！「ご意見・陳情」を開きました。まず、どんなことを伝えたいか選びましょう。",
+   "vi": "Được rồi! Đã mở “Phản ánh”. Trước tiên mình chọn loại việc bạn muốn phản ánh nhé.",
+   "id": "Baik! “Sampaikan keluhan” sudah terbuka. Pertama, kita pilih jenis masalah yang ingin disampaikan.",
+   "th": "ได้เลย! เปิด “ร้องเรียน” แล้ว ก่อนอื่นมาเลือกประเภทเรื่องที่อยากแจ้งกัน"
+  },
+  "好的！已經幫你打開「有話要說」。我們先選要反映的類別，再寫主旨和描述，最後由你自己按「送出」。我會在畫面上一步一步帶你做。": {
+   "en": "OK! I’ve opened “Report an issue” for you. First we pick a category, then write the subject and description, and at the end you tap “{page:送出}” yourself. I’ll guide you on the screen step by step.",
+   "ja": "わかりました！「ご意見・陳情」を開きました。まずカテゴリーを選び、主旨と内容を書いて、最後にご自身で「{page:送出}」を押します。画面上で一歩ずつご案内します。",
+   "vi": "Được rồi! Mình đã mở “Phản ánh” cho bạn. Trước tiên chọn loại, rồi viết tiêu đề và mô tả, cuối cùng bạn tự bấm “{page:送出}”. Mình sẽ hướng dẫn từng bước trên màn hình.",
+   "id": "Baik! “Sampaikan keluhan” sudah saya bukakan. Pertama pilih kategori, lalu tulis judul dan uraian, terakhir Anda sendiri yang menekan “{page:送出}”. Saya akan memandu langkah demi langkah di layar.",
+   "th": "ได้เลย! เปิด “ร้องเรียน” ให้แล้ว ก่อนอื่นเลือกหมวดหมู่ แล้วเขียนหัวข้อและรายละเอียด สุดท้ายคุณกด “{page:送出}” เอง จะช่วยแนะนำบนหน้าจอทีละขั้นตอน"
+  },
+  "好的！已經幫你打開「有話要說」，我會在畫面上一步一步帶你做。": {
+   "en": "OK! I’ve opened “Report an issue” for you. I’ll guide you on the screen step by step.",
+   "ja": "わかりました！「ご意見・陳情」を開きました。画面上で一歩ずつご案内します。",
+   "vi": "Được rồi! Mình đã mở “Phản ánh” cho bạn, mình sẽ hướng dẫn từng bước trên màn hình.",
+   "id": "Baik! “Sampaikan keluhan” sudah saya bukakan. Saya akan memandu langkah demi langkah di layar.",
+   "th": "ได้เลย! เปิด “ร้องเรียน” ให้แล้ว จะช่วยแนะนำบนหน้าจอทีละขั้นตอน"
+  },
+  "寫主旨和描述": {
+   "en": "Write the subject and description",
+   "ja": "主旨と内容を書く",
+   "vi": "Viết tiêu đề và mô tả",
+   "id": "Tulis judul dan uraian",
+   "th": "เขียนหัวข้อและรายละเอียด"
+  },
+  "寫好了就按鍵盤上的「完成」或「✓」，收起鍵盤。": {
+   "en": "When you’re done, tap “Done” or “✓” on the keyboard to close it.",
+   "ja": "書けたら、キーボードの「完了」か「✓」を押して、キーボードを閉じてください。",
+   "vi": "Viết xong thì bấm “Xong” hoặc “✓” trên bàn phím để ẩn bàn phím.",
+   "id": "Kalau sudah, tekan “Selesai” atau “✓” di keyboard untuk menutupnya.",
+   "th": "เขียนเสร็จแล้ว กด “เสร็จ” หรือ “✓” บนแป้นพิมพ์เพื่อปิดแป้นพิมพ์"
+  },
+  "寫發生地點": {
+   "en": "Write where it happened",
+   "ja": "場所を書く",
+   "vi": "Viết nơi xảy ra",
+   "id": "Tulis tempat kejadian",
+   "th": "เขียนสถานที่เกิดเหตุ"
+  },
+  "寫陳情內容": {
+   "en": "Write your complaint",
+   "ja": "陳情の内容を書く",
+   "vi": "Viết nội dung phản ánh",
+   "id": "Tulis isi keluhan",
+   "th": "เขียนเนื้อหาเรื่องร้องเรียน"
+  },
+  "就是這個！按「撥打1999專線」就會打給 1999 市民熱線，有真人聽你說。": {
+   "en": "This is it! Tap “{page:撥打1999專線}” to call the 1999 citizen hotline, where a real person will listen to you.",
+   "ja": "これです！「{page:撥打1999專線}」を押すと 1999 市民ホットラインにつながり、担当の人が話を聞いてくれます。",
+   "vi": "Đây rồi! Bấm “{page:撥打1999專線}” sẽ gọi đường dây nóng 1999, có người thật nghe bạn nói.",
+   "id": "Ini dia! Tekan “{page:撥打1999專線}” untuk menelepon layanan warga 1999, dan petugas akan mendengarkan Anda.",
+   "th": "อันนี้แหละ! กด “{page:撥打1999專線}” จะโทรไปสายด่วนประชาชน 1999 มีเจ้าหน้าที่ตัวจริงรับฟัง"
+  },
+  "往下滑": {
+   "en": "Scroll down",
+   "ja": "下にスクロール",
+   "vi": "Cuộn xuống",
+   "id": "Gulir ke bawah",
+   "th": "เลื่อนลง"
+  },
+  "往下滑一點，就會看到「送出」。": {
+   "en": "Scroll down a bit and you’ll see “{page:送出}”.",
+   "ja": "少し下にスクロールすると「{page:送出}」が見えます。",
+   "vi": "Cuộn xuống một chút sẽ thấy “{page:送出}”.",
+   "id": "Gulir ke bawah sedikit, nanti terlihat “{page:送出}”.",
+   "th": "เลื่อนลงอีกนิดจะเห็น “{page:送出}”"
+  },
+  "往下滑可以看「具體內容」。看完按左上角的「‹」回去。": {
+   "en": "Scroll down to see “{page:具體內容}”. When you’re done, tap “‹” at the top left to go back.",
+   "ja": "下にスクロールすると「{page:具體內容}」が見られます。見終わったら左上の「‹」で戻ってください。",
+   "vi": "Cuộn xuống để xem “{page:具體內容}”. Xem xong bấm “‹” ở góc trên bên trái để quay lại.",
+   "id": "Gulir ke bawah untuk melihat “{page:具體內容}”. Setelah selesai, tekan “‹” di kiri atas untuk kembali.",
+   "th": "เลื่อนลงเพื่อดู “{page:具體內容}” ดูเสร็จแล้วกด “‹” มุมซ้ายบนเพื่อกลับ"
+  },
+  "往下看「個人資料是否提供給承辦」，再按「送出」。": {
+   "en": "Look further down at “{page:個人資料是否提供給承辦}”, then tap “{page:送出}”.",
+   "ja": "下の「{page:個人資料是否提供給承辦}」を確認してから「{page:送出}」を押してください。",
+   "vi": "Xem mục “{page:個人資料是否提供給承辦}” ở dưới, rồi bấm “{page:送出}”.",
+   "id": "Lihat bagian “{page:個人資料是否提供給承辦}” di bawah, lalu tekan “{page:送出}”.",
+   "th": "ดู “{page:個人資料是否提供給承辦}” ด้านล่าง แล้วกด “{page:送出}”"
+  },
+  "想看當初寫的內容和案件資訊，點上面的「詳細內容」。": {
+   "en": "To see what you wrote and the case info, tap “{page:詳細內容}” at the top.",
+   "ja": "最初に書いた内容と案件の情報を見るには、上の「{page:詳細內容}」をタップしてください。",
+   "vi": "Muốn xem nội dung đã viết và thông tin vụ việc, chạm vào “{page:詳細內容}” ở trên.",
+   "id": "Untuk melihat isi yang Anda tulis dan info kasusnya, ketuk “{page:詳細內容}” di atas.",
+   "th": "ถ้าอยากดูสิ่งที่เขียนไว้และข้อมูลเรื่อง แตะ “{page:詳細內容}” ด้านบน"
+  },
+  "想看當初寫的內容，點上面的「詳細內容」。": {
+   "en": "To see what you wrote, tap “{page:詳細內容}” at the top.",
+   "ja": "最初に書いた内容を見るには、上の「{page:詳細內容}」をタップしてください。",
+   "vi": "Muốn xem nội dung đã viết, chạm vào “{page:詳細內容}” ở trên.",
+   "id": "Untuk melihat isi yang Anda tulis, ketuk “{page:詳細內容}” di atas.",
+   "th": "ถ้าอยากดูสิ่งที่เขียนไว้ แตะ “{page:詳細內容}” ด้านบน"
+  },
+  "想看陳情的案件，點左邊的「有話要說」。": {
+   "en": "To see your complaints, tap “{page:有話要說}” on the left.",
+   "ja": "陳情の案件を見るには、左の「{page:有話要說}」をタップしてください。",
+   "vi": "Muốn xem các vụ phản ánh, chạm vào “{page:有話要說}” bên trái.",
+   "id": "Untuk melihat kasus keluhan, ketuk “{page:有話要說}” di sebelah kiri.",
+   "th": "ถ้าอยากดูเรื่องร้องเรียน แตะ “{page:有話要說}” ทางซ้าย"
+  },
+  "想附上照片，點一下「最多上傳 10個檔案」的方框，選手機裡的照片。不加也可以。": {
+   "en": "To add photos, tap the “{page:最多上傳 10個檔案}” box and pick photos from your phone. You can skip this.",
+   "ja": "写真を付けたいときは、「{page:最多上傳 10個檔案}」の枠をタップして、スマホの写真を選んでください。付けなくても大丈夫です。",
+   "vi": "Muốn đính kèm ảnh, chạm vào ô “{page:最多上傳 10個檔案}” và chọn ảnh trong điện thoại. Không thêm cũng được.",
+   "id": "Untuk melampirkan foto, ketuk kotak “{page:最多上傳 10個檔案}” dan pilih foto di ponsel Anda. Tidak ditambah juga boleh.",
+   "th": "ถ้าอยากแนบรูป แตะกรอบ “{page:最多上傳 10個檔案}” แล้วเลือกรูปในโทรศัพท์ ไม่แนบก็ได้"
+  },
+  "我要陳情": {
+   "en": "I want to file a complaint",
+   "ja": "陳情したい",
+   "vi": "Tôi muốn phản ánh",
+   "id": "Saya mau menyampaikan keluhan",
+   "th": "ฉันต้องการร้องเรียน"
+  },
+  "打 1999 專線": {
+   "en": "Call the 1999 hotline",
+   "ja": "1999 番に電話する",
+   "vi": "Gọi đường dây 1999",
+   "id": "Telepon layanan 1999",
+   "th": "โทรสายด่วน 1999"
+  },
+  "打好了！按右邊的放大鏡找找看。": {
+   "en": "Typed! Tap the magnifying glass on the right to search.",
+   "ja": "入力できました！右の虫めがねを押して探してみましょう。",
+   "vi": "Gõ xong rồi! Bấm kính lúp bên phải để tìm thử.",
+   "id": "Sudah diketik! Tekan kaca pembesar di kanan untuk mencari.",
+   "th": "พิมพ์เสร็จแล้ว! กดแว่นขยายทางขวาเพื่อค้นหา"
+  },
+  "打好了！按右邊的放大鏡搜尋。": {
+   "en": "Typed! Tap the magnifying glass on the right to search.",
+   "ja": "入力できました！右の虫めがねを押して検索してください。",
+   "vi": "Gõ xong rồi! Bấm kính lúp bên phải để tìm kiếm.",
+   "id": "Sudah diketik! Tekan kaca pembesar di kanan untuk mencari.",
+   "th": "พิมพ์เสร็จแล้ว! กดแว่นขยายทางขวาเพื่อค้นหา"
+  },
+  "打字": {
+   "en": "Type",
+   "ja": "入力",
+   "vi": "Nhập chữ",
+   "id": "Ketik",
+   "th": "พิมพ์"
+  },
+  "打開「查詢」": {
+   "en": "Open “{page:查詢}”",
+   "ja": "「{page:查詢}」を開く",
+   "vi": "Mở “{page:查詢}”",
+   "id": "Buka “{page:查詢}”",
+   "th": "เปิด “{page:查詢}”"
+  },
+  "找「撥打1999專線」": {
+   "en": "Find “{page:撥打1999專線}”",
+   "ja": "「{page:撥打1999專線}」を探す",
+   "vi": "Tìm “{page:撥打1999專線}”",
+   "id": "Cari “{page:撥打1999專線}”",
+   "th": "หา “{page:撥打1999專線}”"
+  },
+  "找到 {n} 個類別。點最接近你問題的那一個。": {
+   "en": "Found {n} categories. Tap the one closest to your problem.",
+   "ja": "{n} 件のカテゴリーが見つかりました。困っていることに一番近いものをタップしてください。",
+   "vi": "Tìm thấy {n} loại. Chạm vào loại gần với vấn đề của bạn nhất.",
+   "id": "Ditemukan {n} kategori. Ketuk yang paling mirip dengan masalah Anda.",
+   "th": "พบ {n} หมวดหมู่ แตะอันที่ใกล้เคียงกับปัญหาของคุณที่สุด"
+  },
+  "找好了！下面就是符合的案件。": {
+   "en": "Done! The matching cases are below.",
+   "ja": "見つかりました！下に当てはまる案件があります。",
+   "vi": "Tìm xong rồi! Bên dưới là các vụ việc phù hợp.",
+   "id": "Sudah! Kasus yang cocok ada di bawah.",
+   "th": "ค้นหาเสร็จแล้ว! เรื่องที่ตรงกันอยู่ด้านล่าง"
+  },
+  "接著在「案件主旨」寫一句話說明要反映什麼。": {
+   "en": "Next, write one sentence in “{page:案件主旨}” about what you want to report.",
+   "ja": "次に「{page:案件主旨}」に、伝えたいことを一文で書いてください。",
+   "vi": "Tiếp theo, viết một câu ở “{page:案件主旨}” nói bạn muốn phản ánh gì.",
+   "id": "Lalu tulis satu kalimat di “{page:案件主旨}” tentang apa yang ingin Anda sampaikan.",
+   "th": "ต่อไป เขียนหนึ่งประโยคใน “{page:案件主旨}” ว่าอยากแจ้งเรื่องอะไร"
+  },
+  "搜尋陳情類別": {
+   "en": "Search for a complaint category",
+   "ja": "陳情のカテゴリーを検索する",
+   "vi": "Tìm loại phản ánh",
+   "id": "Cari kategori keluhan",
+   "th": "ค้นหาหมวดหมู่เรื่องร้องเรียน"
+  },
+  "最多可以加 10 個檔案。都好了就往下按「送出」。": {
+   "en": "You can add up to 10 files. When everything is ready, scroll down and tap “{page:送出}”.",
+   "ja": "ファイルは 10 個まで付けられます。準備ができたら、下の「{page:送出}」を押してください。",
+   "vi": "Có thể thêm tối đa 10 tệp. Xong hết thì cuộn xuống bấm “{page:送出}”.",
+   "id": "Anda bisa menambah hingga 10 file. Kalau semua sudah siap, gulir ke bawah dan tekan “{page:送出}”.",
+   "th": "แนบได้สูงสุด 10 ไฟล์ ถ้าเรียบร้อยแล้ว เลื่อนลงแล้วกด “{page:送出}”"
+  },
+  "最後確認一下內容。": {
+   "en": "Last, check what you wrote. ",
+   "ja": "最後に内容を確認しましょう。",
+   "vi": "Cuối cùng, hãy kiểm tra lại nội dung. ",
+   "id": "Terakhir, periksa lagi isinya. ",
+   "th": "สุดท้าย ตรวจสอบเนื้อหาอีกครั้ง "
+  },
+  "最後確認一下：{what}。": {
+   "en": "Last check: {what}. ",
+   "ja": "最後に確認しましょう：{what}。",
+   "vi": "Kiểm tra lần cuối: {what}. ",
+   "id": "Periksa sekali lagi: {what}. ",
+   "th": "ตรวจสอบครั้งสุดท้าย: {what} "
+  },
+  "有話要說": {
+   "en": "Report an issue",
+   "ja": "ご意見・陳情",
+   "vi": "Phản ánh",
+   "id": "Sampaikan keluhan",
+   "th": "ร้องเรียน"
+  },
+  "案件編號在送出後的通知或案件清單上，「A10-」開頭。打一部分也可以。": {
+   "en": "The case number is in the notice after sending or in the case list, and starts with “A10-”. You can type just part of it.",
+   "ja": "案件番号は、送信後のお知らせか案件リストにあり、「A10-」で始まります。一部だけ入力しても大丈夫です。",
+   "vi": "Mã số vụ việc có trong thông báo sau khi gửi hoặc trong danh sách vụ việc, bắt đầu bằng “A10-”. Gõ một phần cũng được.",
+   "id": "Nomor kasus ada di pemberitahuan setelah dikirim atau di daftar kasus, diawali “A10-”. Mengetik sebagian juga boleh.",
+   "th": "หมายเลขเรื่องอยู่ในการแจ้งเตือนหลังส่ง หรือในรายการเรื่อง ขึ้นต้นด้วย “A10-” พิมพ์แค่บางส่วนก็ได้"
+  },
+  "沒有找到「{keyword}」的案件。把框框裡的字清掉，再按放大鏡，就能看到全部的案件。": {
+   "en": "No case found for “{keyword}”. Clear the box and tap the magnifying glass again to see all your cases.",
+   "ja": "「{keyword}」の案件は見つかりませんでした。枠の中の字を消して、もう一度虫めがねを押すと、全部の案件が見られます。",
+   "vi": "Không tìm thấy vụ việc “{keyword}”. Xóa chữ trong ô rồi bấm kính lúp lại để xem tất cả vụ việc.",
+   "id": "Tidak ada kasus untuk “{keyword}”. Hapus tulisan di kotak, lalu tekan kaca pembesar lagi untuk melihat semua kasus.",
+   "th": "ไม่พบเรื่อง “{keyword}” ลบคำในช่องออกแล้วกดแว่นขยายอีกครั้ง จะเห็นเรื่องทั้งหมด"
+  },
+  "沒有找到「{word}」的類別。換一個簡單的詞再試試，例如「教育」；也可以按左上角的「‹」回去，點「更多項目」慢慢找。": {
+   "en": "No category found for “{word}”. Try a simpler word, e.g. “教育” (education). Or tap “‹” at the top left to go back and look through “{page:更多項目}”.",
+   "ja": "「{word}」のカテゴリーは見つかりませんでした。「教育」のような簡単な言葉でもう一度試してください。左上の「‹」で戻って、「{page:更多項目}」からゆっくり探すこともできます。",
+   "vi": "Không tìm thấy loại nào cho “{word}”. Thử lại bằng từ đơn giản hơn, ví dụ “教育” (giáo dục); hoặc bấm “‹” ở góc trên bên trái để quay lại và tìm từ từ trong “{page:更多項目}”.",
+   "id": "Tidak ada kategori untuk “{word}”. Coba kata yang lebih sederhana, misalnya “教育” (pendidikan); atau tekan “‹” di kiri atas untuk kembali dan cari pelan-pelan di “{page:更多項目}”.",
+   "th": "ไม่พบหมวดหมู่ของ “{word}” ลองคำที่ง่ายกว่านี้ เช่น “教育” (การศึกษา) หรือกด “‹” มุมซ้ายบนเพื่อกลับไป แล้วค่อยๆ หาใน “{page:更多項目}”"
+  },
+  "沒有找到的類別。換一個簡單的詞再試試，例如「教育」；也可以按左上角的「‹」回去，點「更多項目」慢慢找。": {
+   "en": "No category found. Try a simpler word, e.g. “教育” (education). Or tap “‹” at the top left to go back and look through “{page:更多項目}”.",
+   "ja": "カテゴリーは見つかりませんでした。「教育」のような簡単な言葉でもう一度試してください。左上の「‹」で戻って、「{page:更多項目}」からゆっくり探すこともできます。",
+   "vi": "Không tìm thấy loại nào. Thử lại bằng từ đơn giản hơn, ví dụ “教育” (giáo dục); hoặc bấm “‹” ở góc trên bên trái để quay lại và tìm từ từ trong “{page:更多項目}”.",
+   "id": "Tidak ada kategori yang ditemukan. Coba kata yang lebih sederhana, misalnya “教育” (pendidikan); atau tekan “‹” di kiri atas untuk kembali dan cari pelan-pelan di “{page:更多項目}”.",
+   "th": "ไม่พบหมวดหมู่ ลองคำที่ง่ายกว่านี้ เช่น “教育” (การศึกษา) หรือกด “‹” มุมซ้ายบนเพื่อกลับไป แล้วค่อยๆ หาใน “{page:更多項目}”"
+  },
+  "沒有找到這個案號的案件（共0筆）。檢查一下號碼，或把框框清空再按放大鏡，看全部的案件。": {
+   "en": "No case with this number (0 results). Check the number, or clear the box and tap the magnifying glass to see all cases.",
+   "ja": "この案件番号の案件はありません（0件）。番号を確かめるか、枠を空にして虫めがねを押すと、全部の案件が見られます。",
+   "vi": "Không có vụ việc nào với mã số này (0 kết quả). Kiểm tra lại số, hoặc xóa trống ô rồi bấm kính lúp để xem tất cả.",
+   "id": "Tidak ada kasus dengan nomor ini (0 hasil). Periksa nomornya, atau kosongkan kotak lalu tekan kaca pembesar untuk melihat semua kasus.",
+   "th": "ไม่พบเรื่องที่มีหมายเลขนี้ (0 รายการ) ตรวจสอบหมายเลขอีกครั้ง หรือลบช่องให้ว่างแล้วกดแว่นขยายเพื่อดูเรื่องทั้งหมด"
+  },
+  "照片加好了！": {
+   "en": "Photos added!",
+   "ja": "写真を付けました！",
+   "vi": "Đã thêm ảnh!",
+   "id": "Foto sudah ditambahkan!",
+   "th": "แนบรูปเรียบร้อยแล้ว!"
+  },
+  "用搜尋找類別": {
+   "en": "Search for a category",
+   "ja": "検索でカテゴリーを探す",
+   "vi": "Tìm loại bằng ô tìm kiếm",
+   "id": "Cari kategori lewat pencarian",
+   "th": "ค้นหาหมวดหมู่"
+  },
+  "用案號找案件": {
+   "en": "Find a case by its number",
+   "ja": "案件番号で探す",
+   "vi": "Tìm vụ việc theo mã số",
+   "id": "Cari kasus dengan nomornya",
+   "th": "หาเรื่องด้วยหมายเลขเรื่อง"
+  },
+  "用案號找陳情，要先點左邊的「有話要說」。": {
+   "en": "To find a complaint by its number, first tap “{page:有話要說}” on the left.",
+   "ja": "案件番号で陳情を探すには、まず左の「{page:有話要說}」をタップしてください。",
+   "vi": "Muốn tìm phản ánh theo mã số, trước tiên chạm vào “{page:有話要說}” bên trái.",
+   "id": "Untuk mencari keluhan dengan nomornya, ketuk dulu “{page:有話要說}” di sebelah kiri.",
+   "th": "ถ้าจะหาเรื่องร้องเรียนด้วยหมายเลข ให้แตะ “{page:有話要說}” ทางซ้ายก่อน"
+  },
+  "畫面上紅字寫「案件主旨不能為空」，這格一定要寫。點一下框框，用一句話寫你要反映什麼，例如「巷口路燈不亮」。": {
+   "en": "The red text on the screen says “{page:案件主旨不能為空}”: this box must be filled in. Tap the box and write in one sentence what you want to report, e.g. “巷口路燈不亮” (the street light at the lane entrance is out).",
+   "ja": "画面の赤い字に「{page:案件主旨不能為空}」とあります。この欄は必ず書いてください。枠をタップして、伝えたいことを一文で書きます。例：「巷口路燈不亮」（路地の入口の街灯がつかない）。",
+   "vi": "Chữ đỏ trên màn hình ghi “{page:案件主旨不能為空}”, ô này bắt buộc phải điền. Chạm vào ô và viết một câu về việc bạn muốn phản ánh, ví dụ “巷口路燈不亮” (đèn đường đầu hẻm không sáng).",
+   "id": "Tulisan merah di layar berbunyi “{page:案件主旨不能為空}”, kotak ini wajib diisi. Ketuk kotaknya dan tulis satu kalimat tentang apa yang ingin Anda sampaikan, misalnya “巷口路燈不亮” (lampu jalan di mulut gang mati).",
+   "th": "ตัวหนังสือสีแดงบนหน้าจอเขียนว่า “{page:案件主旨不能為空}” ช่องนี้ต้องกรอก แตะที่ช่องแล้วเขียนหนึ่งประโยคว่าอยากแจ้งเรื่องอะไร เช่น “巷口路燈不亮” (ไฟถนนปากซอยไม่ติด)"
+  },
+  "看「詳細內容」": {
+   "en": "See “{page:詳細內容}”",
+   "ja": "「{page:詳細內容}」を見る",
+   "vi": "Xem “{page:詳細內容}”",
+   "id": "Lihat “{page:詳細內容}”",
+   "th": "ดู “{page:詳細內容}”"
+  },
+  "看一下內容對不對，沒問題就自己按「送出」。不想送了，按左上角的「‹」離開就好。": {
+   "en": "Check that everything is right, then tap “{page:送出}” yourself. If you don’t want to send it, just tap “‹” at the top left to leave.",
+   "ja": "内容が正しいか確認して、問題なければご自身で「{page:送出}」を押してください。送らないときは、左上の「‹」で離れれば大丈夫です。",
+   "vi": "Xem lại nội dung có đúng không, không sao thì tự bấm “{page:送出}”. Không muốn gửi nữa thì bấm “‹” ở góc trên bên trái để thoát.",
+   "id": "Periksa apakah isinya benar, lalu tekan sendiri “{page:送出}”. Kalau tidak jadi mengirim, cukup tekan “‹” di kiri atas untuk keluar.",
+   "th": "ดูว่าเนื้อหาถูกต้องไหม ถ้าไม่มีปัญหาก็กด “{page:送出}” เอง ถ้าไม่อยากส่งแล้ว กด “‹” มุมซ้ายบนเพื่อออกได้เลย"
+  },
+  "看我的陳情": {
+   "en": "See my complaints",
+   "ja": "自分の陳情を見る",
+   "vi": "Xem phản ánh của tôi",
+   "id": "Lihat keluhan saya",
+   "th": "ดูเรื่องร้องเรียนของฉัน"
+  },
+  "看案件處理進度": {
+   "en": "Check a case’s progress",
+   "ja": "案件の進み具合を見る",
+   "vi": "Xem tiến độ xử lý vụ việc",
+   "id": "Lihat perkembangan kasus",
+   "th": "ดูความคืบหน้าของเรื่อง"
+  },
+  "看案件詳細內容": {
+   "en": "See the case details",
+   "ja": "案件の詳しい内容を見る",
+   "vi": "Xem chi tiết vụ việc",
+   "id": "Lihat rincian kasus",
+   "th": "ดูรายละเอียดของเรื่อง"
+  },
+  "看災情通報的案件": {
+   "en": "See your disaster reports",
+   "ja": "災害通報の案件を見る",
+   "vi": "Xem các báo cáo thiên tai",
+   "id": "Lihat laporan bencana Anda",
+   "th": "ดูเรื่องแจ้งภัยพิบัติ"
+  },
+  "看陳情進度": {
+   "en": "Check complaint progress",
+   "ja": "陳情の進捗を見る",
+   "vi": "Xem tiến độ phản ánh",
+   "id": "Lihat status keluhan",
+   "th": "ดูความคืบหน้าเรื่องร้องเรียน"
+  },
+  "確認": {
+   "en": "Check",
+   "ja": "確認",
+   "vi": "Kiểm tra",
+   "id": "Periksa",
+   "th": "ตรวจสอบ"
+  },
+  "確認後按「送出」": {
+   "en": "Check, then tap “{page:送出}”",
+   "ja": "確認してから「{page:送出}」を押す",
+   "vi": "Kiểm tra rồi bấm “{page:送出}”",
+   "id": "Periksa, lalu tekan “{page:送出}”",
+   "th": "ตรวจสอบแล้วกด “{page:送出}”"
+  },
+  "紅字寫「描述不能為空」，這格也要寫。點一下大框框，寫清楚什麼時候、在哪裡、發生了什麼事。": {
+   "en": "The red text says “{page:描述不能為空}”: this box must be filled in too. Tap the big box and write clearly when, where and what happened.",
+   "ja": "赤い字に「{page:描述不能為空}」とあります。この欄も書いてください。大きな枠をタップして、いつ・どこで・何が起きたかをはっきり書きます。",
+   "vi": "Chữ đỏ ghi “{page:描述不能為空}”, ô này cũng phải điền. Chạm vào ô lớn, viết rõ khi nào, ở đâu, đã xảy ra chuyện gì.",
+   "id": "Tulisan merah berbunyi “{page:描述不能為空}”, kotak ini juga wajib diisi. Ketuk kotak besar dan tulis dengan jelas kapan, di mana, dan apa yang terjadi.",
+   "th": "ตัวหนังสือสีแดงเขียนว่า “{page:描述不能為空}” ช่องนี้ก็ต้องกรอก แตะช่องใหญ่แล้วเขียนให้ชัดว่า เมื่อไร ที่ไหน และเกิดอะไรขึ้น"
+  },
+  "要不要打電話由你決定，按「撥打1999專線」就會撥號。": {
+   "en": "It’s up to you whether to call. Tap “{page:撥打1999專線}” to dial.",
+   "ja": "電話するかどうかはご自身で決めてください。「{page:撥打1999專線}」を押すと発信します。",
+   "vi": "Có gọi hay không là do bạn quyết định. Bấm “{page:撥打1999專線}” sẽ gọi đi.",
+   "id": "Mau menelepon atau tidak, Anda yang memutuskan. Tekan “{page:撥打1999專線}” untuk memanggil.",
+   "th": "จะโทรหรือไม่ คุณตัดสินใจเอง กด “{page:撥打1999專線}” จะโทรออก"
+  },
+  "送出了！畫面寫「案件已完成受理」，按「確認」就會回到首頁。這是示範網站，沒有真的送出喔。": {
+   "en": "Sent! The screen says “{page:案件已完成受理}”. Tap “{page:確認}” to go back to the home page. This is a demo site, so nothing was really sent.",
+   "ja": "送信しました！画面に「{page:案件已完成受理}」と出ています。「{page:確認}」を押すとトップに戻ります。これはデモサイトなので、実際には送信されていません。",
+   "vi": "Đã gửi! Màn hình ghi “{page:案件已完成受理}”, bấm “{page:確認}” sẽ về trang đầu. Đây là trang web mẫu, không gửi thật đâu.",
+   "id": "Terkirim! Layar menampilkan “{page:案件已完成受理}”. Tekan “{page:確認}” untuk kembali ke halaman utama. Ini situs demo, jadi tidak benar-benar terkirim.",
+   "th": "ส่งแล้ว! หน้าจอเขียนว่า “{page:案件已完成受理}” กด “{page:確認}” จะกลับไปหน้าแรก นี่เป็นเว็บไซต์สาธิต ไม่ได้ส่งจริง"
+  },
+  "這些是你通報過的災情！點一件就能看處理情形。": {
+   "en": "These are the disasters you reported! Tap one to see how it’s being handled.",
+   "ja": "これがあなたが通報した災害です！一件タップすると、対応の状況が見られます。",
+   "vi": "Đây là các thiên tai bạn đã báo! Chạm vào một việc để xem tình hình xử lý.",
+   "id": "Ini bencana yang pernah Anda laporkan! Ketuk satu untuk melihat penanganannya.",
+   "th": "นี่คือภัยพิบัติที่คุณเคยแจ้ง! แตะเรื่องหนึ่งเพื่อดูการดำเนินการ"
+  },
+  "這些是你陳情過的案件！右邊寫著「處理中」或「處理完成」。": {
+   "en": "These are your complaints! On the right it says “{page:處理中}” or “{page:處理完成}”.",
+   "ja": "これがあなたの陳情の案件です！右側に「{page:處理中}」か「{page:處理完成}」と書いてあります。",
+   "vi": "Đây là các vụ bạn đã phản ánh! Bên phải ghi “{page:處理中}” hoặc “{page:處理完成}”.",
+   "id": "Ini kasus keluhan Anda! Di sebelah kanan tertulis “{page:處理中}” atau “{page:處理完成}”.",
+   "th": "นี่คือเรื่องที่คุณเคยร้องเรียน! ด้านขวาเขียนว่า “{page:處理中}” หรือ “{page:處理完成}”"
+  },
+  "這些是你陳情過的案件！右邊寫著處理到哪裡。": {
+   "en": "These are your complaints! The right side shows how far each one has got.",
+   "ja": "これがあなたの陳情の案件です！右側に進み具合が書いてあります。",
+   "vi": "Đây là các vụ bạn đã phản ánh! Bên phải ghi đã xử lý đến đâu.",
+   "id": "Ini kasus keluhan Anda! Di sebelah kanan tertulis sudah sampai mana.",
+   "th": "นี่คือเรื่องที่คุณเคยร้องเรียน! ด้านขวาบอกว่าดำเนินการถึงไหนแล้ว"
+  },
+  "這件已經「處理完成」了！「{from}」有回覆你，往下滑可以看回覆內容。": {
+   "en": "This one is “{page:處理完成}”! “{from}” has replied to you. Scroll down to read the reply.",
+   "ja": "この案件は「{page:處理完成}」です！「{from}」から返信があります。下にスクロールすると返信の内容が見られます。",
+   "vi": "Việc này đã “{page:處理完成}”! “{from}” đã trả lời bạn, cuộn xuống để xem nội dung trả lời.",
+   "id": "Kasus ini sudah “{page:處理完成}”! “{from}” sudah membalas Anda. Gulir ke bawah untuk membaca balasannya.",
+   "th": "เรื่องนี้ “{page:處理完成}” แล้ว! “{from}” ตอบกลับคุณแล้ว เลื่อนลงเพื่ออ่านคำตอบ"
+  },
+  "這件已經「處理完成」了！往下滑可以看回覆內容。": {
+   "en": "This one is “{page:處理完成}”! Scroll down to read the reply.",
+   "ja": "この案件は「{page:處理完成}」です！下にスクロールすると返信の内容が見られます。",
+   "vi": "Việc này đã “{page:處理完成}”! Cuộn xuống để xem nội dung trả lời.",
+   "id": "Kasus ini sudah “{page:處理完成}”! Gulir ke bawah untuk membaca balasannya.",
+   "th": "เรื่องนี้ “{page:處理完成}” แล้ว! เลื่อนลงเพื่ออ่านคำตอบ"
+  },
+  "這件現在是「{status}」，還在辦理，請再等等喔。": {
+   "en": "This one is “{status}” now. It’s still being handled, so please wait a little longer.",
+   "ja": "この案件は今「{status}」で、まだ対応中です。もう少しお待ちください。",
+   "vi": "Việc này hiện đang “{status}”, vẫn đang được xử lý, bạn chờ thêm nhé.",
+   "id": "Kasus ini sekarang “{status}”, masih ditangani. Mohon tunggu sebentar lagi.",
+   "th": "เรื่องนี้ตอนนี้ “{status}” ยังอยู่ระหว่างดำเนินการ รออีกสักหน่อยนะ"
+  },
+  "這件現在是「{status}」，預計 {expect} 完成，請再等等喔。": {
+   "en": "This one is “{status}” now and should be done by {expect}. Please wait a little longer.",
+   "ja": "この案件は今「{status}」で、{expect} に完了する予定です。もう少しお待ちください。",
+   "vi": "Việc này hiện đang “{status}”, dự kiến xong vào {expect}, bạn chờ thêm nhé.",
+   "id": "Kasus ini sekarang “{status}”, diperkirakan selesai {expect}. Mohon tunggu sebentar lagi.",
+   "th": "เรื่องนี้ตอนนี้ “{status}” คาดว่าจะเสร็จ {expect} รออีกสักหน่อยนะ"
+  },
+  "這是「{subject}」的詳細內容！有案件編號、辦理機關和預計完成的日子。": {
+   "en": "These are the details of “{subject}”! They show the case number, the agency handling it and the expected finish date.",
+   "ja": "これが「{subject}」の詳しい内容です！案件番号、担当機関、完了予定日が書いてあります。",
+   "vi": "Đây là chi tiết của “{subject}”! Có mã số vụ việc, cơ quan xử lý và ngày dự kiến hoàn thành.",
+   "id": "Ini rincian “{subject}”! Ada nomor kasus, instansi yang menangani, dan perkiraan tanggal selesai.",
+   "th": "นี่คือรายละเอียดของ “{subject}”! มีหมายเลขเรื่อง หน่วยงานที่ดูแล และวันที่คาดว่าจะเสร็จ"
+  },
+  "這是「撥打1999專線」，按下去就會打給市民熱線。": {
+   "en": "This is “{page:撥打1999專線}”. Tapping it calls the citizen hotline.",
+   "ja": "これが「{page:撥打1999專線}」です。押すと市民ホットラインに電話がかかります。",
+   "vi": "Đây là “{page:撥打1999專線}”, bấm vào sẽ gọi đường dây nóng cho người dân.",
+   "id": "Ini “{page:撥打1999專線}”. Kalau ditekan, akan menelepon layanan warga.",
+   "th": "นี่คือ “{page:撥打1999專線}” กดแล้วจะโทรไปสายด่วนประชาชน"
+  },
+  "這是「有話要說」": {
+   "en": "This is “Report an issue”",
+   "ja": "これは「ご意見・陳情」です",
+   "vi": "Đây là “Phản ánh”",
+   "id": "Ini “Sampaikan keluhan”",
+   "th": "นี่คือ “ร้องเรียน”"
+  },
+  "這是案件的詳細內容！有案件編號、辦理機關和預計完成的日子。": {
+   "en": "These are the case details! They show the case number, the agency handling it and the expected finish date.",
+   "ja": "これが案件の詳しい内容です！案件番号、担当機関、完了予定日が書いてあります。",
+   "vi": "Đây là chi tiết vụ việc! Có mã số vụ việc, cơ quan xử lý và ngày dự kiến hoàn thành.",
+   "id": "Ini rincian kasusnya! Ada nomor kasus, instansi yang menangani, dan perkiraan tanggal selesai.",
+   "th": "นี่คือรายละเอียดของเรื่อง! มีหมายเลขเรื่อง หน่วยงานที่ดูแล และวันที่คาดว่าจะเสร็จ"
+  },
+  "這是示範網站，沒有真的送出。想看案件，可以在首頁點上面的「查詢」。": {
+   "en": "This is a demo site, so nothing was really sent. To see your cases, tap “{page:查詢}” at the top of the home page.",
+   "ja": "これはデモサイトなので、実際には送信されていません。案件を見るには、トップで上の「{page:查詢}」をタップしてください。",
+   "vi": "Đây là trang web mẫu, không gửi thật. Muốn xem vụ việc, ở trang đầu chạm vào “{page:查詢}” phía trên.",
+   "id": "Ini situs demo, jadi tidak benar-benar terkirim. Untuk melihat kasus, ketuk “{page:查詢}” di atas halaman utama.",
+   "th": "นี่เป็นเว็บไซต์สาธิต ไม่ได้ส่งจริง ถ้าอยากดูเรื่อง แตะ “{page:查詢}” ด้านบนของหน้าแรก"
+  },
+  "這是這件案件的處理情形！往下滑可以看回覆內容。": {
+   "en": "This is how the case is being handled! Scroll down to read the reply.",
+   "ja": "これがこの案件の対応状況です！下にスクロールすると返信の内容が見られます。",
+   "vi": "Đây là tình hình xử lý của vụ việc này! Cuộn xuống để xem nội dung trả lời.",
+   "id": "Ini status penanganan kasus ini! Gulir ke bawah untuk membaca balasannya.",
+   "th": "นี่คือการดำเนินการของเรื่องนี้! เลื่อนลงเพื่ออ่านคำตอบ"
+  },
+  "這裡是所有的類別。先點一個大類打開來看，例如「垃圾、噪音、汙染及資源回收」。": {
+   "en": "Here are all the categories. First tap a main group to open it, e.g. “{page:垃圾、噪音、汙染及資源回收}”.",
+   "ja": "ここにすべてのカテゴリーがあります。まず大きな分類を一つタップして開いてみてください。例：「{page:垃圾、噪音、汙染及資源回收}」。",
+   "vi": "Đây là tất cả các loại. Trước tiên chạm vào một nhóm lớn để mở ra xem, ví dụ “{page:垃圾、噪音、汙染及資源回收}”.",
+   "id": "Ini semua kategorinya. Ketuk dulu satu kelompok besar untuk membukanya, misalnya “{page:垃圾、噪音、汙染及資源回收}”.",
+   "th": "นี่คือหมวดหมู่ทั้งหมด แตะหมวดใหญ่ก่อนเพื่อเปิดดู เช่น “{page:垃圾、噪音、汙染及資源回收}”"
+  },
+  "這裡有 {n} 件案件。": {
+   "en": "There are {n} cases here. ",
+   "ja": "ここに {n} 件の案件があります。",
+   "vi": "Ở đây có {n} vụ việc. ",
+   "id": "Ada {n} kasus di sini. ",
+   "th": "ที่นี่มี {n} เรื่อง "
+  },
+  "這裡還沒有案件紀錄（無紀錄）。": {
+   "en": "There are no cases here yet (“{page:無紀錄}”).",
+   "ja": "ここにはまだ案件の記録がありません（「{page:無紀錄}」）。",
+   "vi": "Ở đây chưa có vụ việc nào (“{page:無紀錄}”).",
+   "id": "Belum ada catatan kasus di sini (“{page:無紀錄}”).",
+   "th": "ที่นี่ยังไม่มีบันทึกเรื่อง (“{page:無紀錄}”)"
+  },
+  "選照片": {
+   "en": "Pick photos",
+   "ja": "写真を選ぶ",
+   "vi": "Chọn ảnh",
+   "id": "Pilih foto",
+   "th": "เลือกรูป"
+  },
+  "選要反映的類別": {
+   "en": "Pick a category to report",
+   "ja": "伝えたいカテゴリーを選ぶ",
+   "vi": "Chọn loại muốn phản ánh",
+   "id": "Pilih kategori keluhan",
+   "th": "เลือกหมวดหมู่ที่จะแจ้ง"
+  },
+  "選陳情類別": {
+   "en": "Pick a complaint category",
+   "ja": "陳情のカテゴリーを選ぶ",
+   "vi": "Chọn loại phản ánh",
+   "id": "Pilih kategori pengaduan",
+   "th": "เลือกหมวดหมู่เรื่องร้องเรียน"
+  },
+  "開啟有話要說": {
+   "en": "Open Report an issue",
+   "ja": "ご意見・陳情を開く",
+   "vi": "Mở Phản ánh",
+   "id": "Buka Sampaikan keluhan",
+   "th": "เปิดร้องเรียน"
+  },
+  "陳情": {
+   "en": "Complaint",
+   "ja": "陳情",
+   "vi": "Phản ánh",
+   "id": "Keluhan",
+   "th": "ร้องเรียน"
+  },
+  "類別找到了！接下來寫下你要反映的事。": {
+   "en": "Category found! Next, write down what you want to report.",
+   "ja": "カテゴリーが見つかりました！次に、伝えたいことを書きましょう。",
+   "vi": "Đã tìm được loại! Tiếp theo, viết điều bạn muốn phản ánh.",
+   "id": "Kategori ditemukan! Selanjutnya, tulis apa yang ingin Anda sampaikan.",
+   "th": "เจอหมวดหมู่แล้ว! ต่อไป เขียนเรื่องที่อยากแจ้ง"
+  },
+  "類別是{cat}": {
+   "en": "the category is {cat}",
+   "ja": "カテゴリーは{cat}",
+   "vi": "loại là {cat}",
+   "id": "kategorinya {cat}",
+   "th": "หมวดหมู่คือ {cat}"
+  },
+  "類別選好了！接下來寫下你要反映的事。": {
+   "en": "Category picked! Next, write down what you want to report.",
+   "ja": "カテゴリーを選びました！次に、伝えたいことを書きましょう。",
+   "vi": "Đã chọn xong loại! Tiếp theo, viết điều bạn muốn phản ánh.",
+   "id": "Kategori sudah dipilih! Selanjutnya, tulis apa yang ingin Anda sampaikan.",
+   "th": "เลือกหมวดหมู่แล้ว! ต่อไป เขียนเรื่องที่อยากแจ้ง"
+  },
+  "點「新增附件」下面的方框，可以選照片、錄影或錄音，最多 10 個檔案。不加也可以送出。": {
+   "en": "Tap the box under “{page:新增附件}” to pick photos, videos or audio recordings, up to 10 files. You can send without them too.",
+   "ja": "「{page:新增附件}」の下の枠をタップすると、写真・動画・録音を選べます。最大 10 個までです。付けなくても送信できます。",
+   "vi": "Chạm vào ô dưới “{page:新增附件}” để chọn ảnh, video hoặc ghi âm, tối đa 10 tệp. Không thêm cũng gửi được.",
+   "id": "Ketuk kotak di bawah “{page:新增附件}” untuk memilih foto, video, atau rekaman suara, hingga 10 file. Tanpa lampiran juga bisa dikirim.",
+   "th": "แตะกรอบใต้ “{page:新增附件}” เพื่อเลือกรูป วิดีโอ หรือเสียงบันทึก ได้สูงสุด 10 ไฟล์ ไม่แนบก็ส่งได้"
+  },
+  "點一下": {
+   "en": "Tap",
+   "ja": "タップ",
+   "vi": "Chạm",
+   "id": "Ketuk",
+   "th": "แตะ"
+  },
+  "點一下「搜尋案號關鍵字」的框框，打案件編號（例如「A10-」開頭那串），再按右邊的放大鏡。": {
+   "en": "Tap the “{page:搜尋案號關鍵字}” box, type the case number (the one starting with “A10-”), then tap the magnifying glass on the right.",
+   "ja": "「{page:搜尋案號關鍵字}」の枠をタップして、案件番号（「A10-」で始まる番号）を入力し、右の虫めがねを押してください。",
+   "vi": "Chạm vào ô “{page:搜尋案號關鍵字}”, gõ mã số vụ việc (dãy bắt đầu bằng “A10-”), rồi bấm kính lúp bên phải.",
+   "id": "Ketuk kotak “{page:搜尋案號關鍵字}”, ketik nomor kasus (yang diawali “A10-”), lalu tekan kaca pembesar di kanan.",
+   "th": "แตะช่อง “{page:搜尋案號關鍵字}” พิมพ์หมายเลขเรื่อง (ที่ขึ้นต้นด้วย “A10-”) แล้วกดแว่นขยายทางขวา"
+  },
+  "點一下「案件主旨」的框框，用一句話寫你要反映什麼，例如「巷口路燈不亮」。": {
+   "en": "Tap the “{page:案件主旨}” box and write in one sentence what you want to report, e.g. “巷口路燈不亮” (the street light at the lane entrance is out).",
+   "ja": "「{page:案件主旨}」の枠をタップして、伝えたいことを一文で書いてください。例：「巷口路燈不亮」（路地の入口の街灯がつかない）。",
+   "vi": "Chạm vào ô “{page:案件主旨}”, viết một câu về việc bạn muốn phản ánh, ví dụ “巷口路燈不亮” (đèn đường đầu hẻm không sáng).",
+   "id": "Ketuk kotak “{page:案件主旨}” dan tulis satu kalimat tentang apa yang ingin Anda sampaikan, misalnya “巷口路燈不亮” (lampu jalan di mulut gang mati).",
+   "th": "แตะช่อง “{page:案件主旨}” แล้วเขียนหนึ่งประโยคว่าอยากแจ้งเรื่องอะไร เช่น “巷口路燈不亮” (ไฟถนนปากซอยไม่ติด)"
+  },
+  "點一下「災情通報」，看你通報過的災情。": {
+   "en": "Tap “{page:災情通報}” to see the disasters you reported.",
+   "ja": "「{page:災情通報}」をタップすると、通報した災害が見られます。",
+   "vi": "Chạm vào “{page:災情通報}” để xem các thiên tai bạn đã báo.",
+   "id": "Ketuk “{page:災情通報}” untuk melihat bencana yang pernah Anda laporkan.",
+   "th": "แตะ “{page:災情通報}” เพื่อดูภัยพิบัติที่คุณเคยแจ้ง"
+  },
+  "點一下「發生地點」的框框，打事情發生的完整地址，例如「〇〇路〇號」。這格不寫也可以。": {
+   "en": "Tap the “{page:發生地點}” box and type the full address where it happened, e.g. “〇〇路〇號” (No. 〇, 〇〇 Road). You can leave this box empty.",
+   "ja": "「{page:發生地點}」の枠をタップして、起きた場所の住所を全部入力してください。例：「〇〇路〇號」。この欄は書かなくても大丈夫です。",
+   "vi": "Chạm vào ô “{page:發生地點}”, gõ địa chỉ đầy đủ nơi xảy ra, ví dụ “〇〇路〇號” (số 〇, đường 〇〇). Ô này không điền cũng được.",
+   "id": "Ketuk kotak “{page:發生地點}” dan ketik alamat lengkap tempat kejadian, misalnya “〇〇路〇號” (Jalan 〇〇 No. 〇). Kotak ini boleh dikosongkan.",
+   "th": "แตะช่อง “{page:發生地點}” แล้วพิมพ์ที่อยู่เต็มของที่เกิดเหตุ เช่น “〇〇路〇號” (ถนน〇〇 เลขที่〇) ช่องนี้ไม่กรอกก็ได้"
+  },
+  "點一下上面的「查詢」。": {
+   "en": "Tap “{page:查詢}” at the top.",
+   "ja": "上の「{page:查詢}」をタップしてください。",
+   "vi": "Chạm vào “{page:查詢}” ở trên.",
+   "id": "Ketuk “{page:查詢}” di atas.",
+   "th": "แตะ “{page:查詢}” ด้านบน"
+  },
+  "點一下上面的搜尋框「您遇到哪些問題?」。": {
+   "en": "Tap the search box “{page:您遇到哪些問題?}” at the top.",
+   "ja": "上の検索欄「{page:您遇到哪些問題?}」をタップしてください。",
+   "vi": "Chạm vào ô tìm kiếm “{page:您遇到哪些問題?}” ở trên.",
+   "id": "Ketuk kotak pencarian “{page:您遇到哪些問題?}” di atas.",
+   "th": "แตะช่องค้นหา “{page:您遇到哪些問題?}” ด้านบน"
+  },
+  "點一下上面的搜尋框「您遇到哪些問題?」，用打字的找類別。": {
+   "en": "Tap the search box “{page:您遇到哪些問題?}” at the top and type to find a category.",
+   "ja": "上の検索欄「{page:您遇到哪些問題?}」をタップして、入力でカテゴリーを探しましょう。",
+   "vi": "Chạm vào ô tìm kiếm “{page:您遇到哪些問題?}” ở trên, gõ chữ để tìm loại.",
+   "id": "Ketuk kotak pencarian “{page:您遇到哪些問題?}” di atas, lalu ketik untuk mencari kategori.",
+   "th": "แตะช่องค้นหา “{page:您遇到哪些問題?}” ด้านบน แล้วพิมพ์เพื่อหาหมวดหมู่"
+  },
+  "點一下框框，用簡單的詞打你遇到的問題，例如「教育」，再按右邊的放大鏡。": {
+   "en": "Tap the box and type your problem in a simple word, e.g. “教育” (education), then tap the magnifying glass on the right.",
+   "ja": "枠をタップして、困っていることを簡単な言葉で入力し（例：「教育」）、右の虫めがねを押してください。",
+   "vi": "Chạm vào ô, gõ vấn đề bạn gặp bằng từ đơn giản, ví dụ “教育” (giáo dục), rồi bấm kính lúp bên phải.",
+   "id": "Ketuk kotaknya, ketik masalah Anda dengan kata sederhana, misalnya “教育” (pendidikan), lalu tekan kaca pembesar di kanan.",
+   "th": "แตะที่ช่อง พิมพ์ปัญหาที่เจอเป็นคำง่ายๆ เช่น “教育” (การศึกษา) แล้วกดแว่นขยายทางขวา"
+  },
+  "點一件案件，就能看處理情形、辦理機關和回覆。": {
+   "en": "Tap a case to see how it’s being handled, the agency handling it and the reply.",
+   "ja": "案件をタップすると、対応の状況、担当機関、返信が見られます。",
+   "vi": "Chạm vào một vụ việc để xem tình hình xử lý, cơ quan xử lý và câu trả lời.",
+   "id": "Ketuk satu kasus untuk melihat penanganannya, instansi yang menangani, dan balasannya.",
+   "th": "แตะเรื่องหนึ่งเพื่อดูการดำเนินการ หน่วยงานที่ดูแล และคำตอบ"
+  },
+  "點一件案件，就能看處理情形。": {
+   "en": "Tap a case to see how it’s being handled.",
+   "ja": "案件をタップすると、対応の状況が見られます。",
+   "vi": "Chạm vào một vụ việc để xem tình hình xử lý.",
+   "id": "Ketuk satu kasus untuk melihat penanganannya.",
+   "th": "แตะเรื่องหนึ่งเพื่อดูการดำเนินการ"
+  },
+  "點一件案件，就能看處理情形和回覆。": {
+   "en": "Tap a case to see how it’s being handled and the reply.",
+   "ja": "案件をタップすると、対応の状況と返信が見られます。",
+   "vi": "Chạm vào một vụ việc để xem tình hình xử lý và câu trả lời.",
+   "id": "Ketuk satu kasus untuk melihat penanganan dan balasannya.",
+   "th": "แตะเรื่องหนึ่งเพื่อดูการดำเนินการและคำตอบ"
+  },
+  "點最接近你問題的那一項。看不懂要選哪個，可以打開最下面的「自動選擇案件類別」。": {
+   "en": "Tap the item closest to your problem. If you’re not sure which to pick, open “{page:自動選擇案件類別}” at the very bottom.",
+   "ja": "困っていることに一番近い項目をタップしてください。どれを選べばいいかわからないときは、一番下の「{page:自動選擇案件類別}」を開いてください。",
+   "vi": "Chạm vào mục gần với vấn đề của bạn nhất. Không biết chọn cái nào thì mở “{page:自動選擇案件類別}” ở dưới cùng.",
+   "id": "Ketuk item yang paling mirip dengan masalah Anda. Kalau bingung memilih, buka “{page:自動選擇案件類別}” di paling bawah.",
+   "th": "แตะรายการที่ใกล้เคียงกับปัญหาของคุณที่สุด ถ้าไม่แน่ใจว่าจะเลือกอันไหน เปิด “{page:自動選擇案件類別}” ที่ล่างสุด"
+  },
+  "點畫面上方寫著「您遇到哪些問題?」的搜尋框。": {
+   "en": "Tap the search box at the top that says “{page:您遇到哪些問題?}”.",
+   "ja": "画面上の「{page:您遇到哪些問題?}」と書いてある検索欄をタップしてください。",
+   "vi": "Chạm vào ô tìm kiếm ở phía trên có ghi “{page:您遇到哪些問題?}”.",
+   "id": "Ketuk kotak pencarian di bagian atas yang bertuliskan “{page:您遇到哪些問題?}”.",
+   "th": "แตะช่องค้นหาด้านบนที่เขียนว่า “{page:您遇到哪些問題?}”"
+  },
+  "點畫面上方的「詳細內容」。左邊的「回覆」是機關給你的答覆。": {
+   "en": "Tap “{page:詳細內容}” at the top of the screen. “{page:回覆}” on the left is the agency’s answer to you.",
+   "ja": "画面上の「{page:詳細內容}」をタップしてください。左の「{page:回覆}」は、機関からあなたへの返事です。",
+   "vi": "Chạm vào “{page:詳細內容}” ở phía trên màn hình. “{page:回覆}” bên trái là câu trả lời của cơ quan cho bạn.",
+   "id": "Ketuk “{page:詳細內容}” di bagian atas layar. “{page:回覆}” di kiri adalah jawaban instansi untuk Anda.",
+   "th": "แตะ “{page:詳細內容}” ด้านบนของหน้าจอ “{page:回覆}” ทางซ้ายคือคำตอบจากหน่วยงานถึงคุณ"
+  },
+  "點畫面最上面的「查詢」。": {
+   "en": "Tap “{page:查詢}” at the very top of the screen.",
+   "ja": "画面の一番上の「{page:查詢}」をタップしてください。",
+   "vi": "Chạm vào “{page:查詢}” ở trên cùng màn hình.",
+   "id": "Ketuk “{page:查詢}” di paling atas layar.",
+   "th": "แตะ “{page:查詢}” ที่บนสุดของหน้าจอ"
+  },
+  "，": {
+   "en": ", ",
+   "ja": "、",
+   "vi": ", ",
+   "id": ", ",
+   "th": " และ "
+  }
+ }
+}

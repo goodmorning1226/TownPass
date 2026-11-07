@@ -16,10 +16,12 @@ class WebPageSpec {
   ///
   /// Every spec also gets `__bottomBar` (height of the page's fixed bottom
   /// bar, for the 助理 button) and `__dialog` (a headlessui dialog is open).
-  /// Helpers usable in expressions: q, qa, shown, byText, txt, inView (in
-  /// the viewport horizontally, for tab views), and for text that the page
-  /// translation may have rewritten: orig(el), raw(el), pageText(sel or el),
-  /// ph(text, sel), phAll(text, sel), phOf(el), optText(select); opened (not inside a
+  /// Helpers usable in expressions: q, qa, shown, byText, txt, orig (the
+  /// element's innerText in the page's original Chinese, also on a page the
+  /// App translated; use it instead of `.innerText`), origContent (the same
+  /// for `.textContent`), optText (an option's original text, for `.text`),
+  /// ph (an input's original placeholder), inView (in
+  /// the viewport horizontally, for tab views), opened (not inside a
   /// collapsed `grid-rows-[0fr]` group), dialog(title),
   /// dialogButton(title, label), textBetween(scope, head, stop) (the shown
   /// text pieces from [head] up to the [stop] text or a control, e.g. a
@@ -40,12 +42,10 @@ class WebPageSpec {
   });
 
   String get script {
-    final t = targets.entries
-        .map((e) => '${jsonEncode(e.key)}: () => (${e.value})')
-        .join(',\n');
-    final f = flags.entries
-        .map((e) => '${jsonEncode(e.key)}: () => (${e.value})')
-        .join(',\n');
+    String entry(MapEntry<String, String> e) =>
+        '${jsonEncode(e.key)}: () => (${originalPlaceholders(e.value)})';
+    final t = targets.entries.map(entry).join(',\n');
+    final f = flags.entries.map(entry).join(',\n');
     return '''
 (() => {
   const $_helpers
@@ -61,63 +61,52 @@ class WebPageSpec {
 ''';
   }
 
+  static final _placeholder = RegExp(
+    r'''\[placeholder([~|^$*]?=)("[^"]*"|'[^']*')\]''',
+  );
+
+  /// [expression] with each `[placeholder="X"]` selector also matching a
+  /// field whose placeholder the App translated: the original stays in
+  /// `data-tp-placeholder` (tp_web_view.dart), so guides keep using the
+  /// Chinese placeholder. On an untranslated page it matches as before.
+  @visibleForTesting
+  static String originalPlaceholders(String expression) =>
+      expression.replaceAllMapped(
+        _placeholder,
+        (m) =>
+            ':is([data-tp-placeholder${m[1]}${m[2]}],'
+            '[placeholder${m[1]}${m[2]}])',
+      );
+
+  /// The page-reading helpers, for tests.
+  @visibleForTesting
+  static String get helpersForTest => _helpers;
+
   static const _helpers = r'''
     q = (s) => document.querySelector(s),
     qa = (s) => [...document.querySelectorAll(s)],
     shown = (e) => { if (!e) return false; const r = e.getBoundingClientRect(); if (r.width < 1 || r.height < 1) return false; const st = getComputedStyle(e); return st.visibility !== 'hidden' && st.display !== 'none' && st.opacity !== '0'; },
-    // Page translation (tp_web_view.dart _translationScript) rewrites text
-    // nodes and placeholders but keeps the Chinese original readable. Every
-    // text read below goes through orig / phOf, so guides keep matching the
-    // Chinese labels on a translated page. On a Chinese page the script is
-    // not injected and these fall back to innerText / the placeholder.
-    _O = typeof window.__townpassOriginal === 'function' ? window.__townpassOriginal : null,
-    _OP = typeof window.__townpassOriginalPlaceholder === 'function' ? window.__townpassOriginalPlaceholder : null,
-    _memo = new Map(), _seenEl = new Map(), _blockEl = new Map(),
-    _seen = (e) => { if (!_seenEl.has(e)) { const st = getComputedStyle(e); _seenEl.set(e, st.visibility !== 'hidden' && (e.getClientRects().length > 0 || (st.display === 'contents' && !!e.parentElement && _seen(e.parentElement)))); } return _seenEl.get(e); },
-    _block = (e) => { if (!_blockEl.has(e)) _blockEl.set(e, e.tagName === 'BR' || !/^(inline|contents)/.test(getComputedStyle(e).display)); return _blockEl.get(e); },
-    _split = (a, b) => { let c = a.parentElement; while (c && !c.contains(b)) c = c.parentElement; for (const n of [a, b]) for (let x = n.parentElement; x && x !== c; x = x.parentElement) if (_block(x)) return true; return false; },
-    // orig(e): e's innerText with the original (Chinese) text; on a
-    // translated page an approximation: shown text nodes only, a line break
-    // between block boxes, whitespace collapsed, empty lines dropped.
     orig = (e) => {
+      // The element's innerText with the original (Chinese) words: on a page
+      // the App translated (tp_web_view.dart), each translated text node is
+      // put back, so guides keep matching the Chinese page text.
       if (!e) return '';
-      if (!_O) return e.innerText || '';
-      if (_memo.has(e)) return _memo.get(e);
-      const lines = []; let line = '', prev = null;
-      const w = document.createTreeWalker(e, NodeFilter.SHOW_TEXT);
-      for (let n = w.nextNode(); n; n = w.nextNode()) {
-        const p = n.parentElement;
-        if (!p || /^(SCRIPT|STYLE|NOSCRIPT)$/.test(p.tagName) || !_seen(p)) continue;
-        const t = String(_O(n) || '').replace(/\s+/g, ' ');
-        if (!t.trim()) { line += ' '; continue; }
-        if (prev && _split(prev, n)) { lines.push(line); line = ''; }
-        line += t; prev = n;
+      let t = e.innerText || '';
+      const o = window.__townpassOriginal;
+      if (typeof o !== 'function' || !t) return t;
+      const w = document.createTreeWalker(e, NodeFilter.SHOW_TEXT, null);
+      let n;
+      while ((n = w.nextNode())) {
+        const v = (n.nodeValue || '').trim(), was = (o(n) || '').trim();
+        if (v && was && v !== was) t = t.split(v).join(was);
       }
-      lines.push(line);
-      const out = lines.map((l) => l.replace(/ +/g, ' ').trim()).filter((l) => l).join('\n');
-      _memo.set(e, out);
-      return out;
+      return t;
     },
-    // txt(e): e's original text (see orig), trimmed; '' for null.
+    origContent = (e) => !e ? '' : typeof window.__townpassOriginal === 'function' ? window.__townpassOriginal(e) : (e.textContent || ''),
+    optText = (o) => !o ? '' : typeof window.__townpassOriginal === 'function' ? window.__townpassOriginal(o) : (o.text || ''),
+    ph = (e) => !e || !e.getAttribute ? null : typeof window.__townpassOriginalPlaceholder === 'function' ? window.__townpassOriginalPlaceholder(e) : e.getAttribute('placeholder'),
+    byText = (s, text) => qa(s).filter(shown).find((e) => orig(e).trim().startsWith(text)) || null,
     txt = (e) => orig(e).trim(),
-    // raw(e): e's original textContent (hidden parts included); '' for null.
-    raw = (e) => (e ? (_O ? _O(e) : e.textContent) || '' : ''),
-    // pageText(s): original text of a selector's first match or an element
-    // ('' when missing); no argument = document.body. Guides use this, never
-    // document.body.innerText / #app.innerText.
-    pageText = (s) => orig(s === undefined ? document.body : typeof s === 'string' ? q(s) : s),
-    // byText(s, text): first shown match of selector s whose original text
-    // starts with text.
-    byText = (s, text) => qa(s).filter(shown).find((e) => txt(e).startsWith(text)) || null,
-    // phOf(e): e's original placeholder ('' when none).
-    phOf = (e) => (e ? (_OP ? _OP(e) : e.getAttribute('placeholder')) || '' : ''),
-    // phAll(text, s): elements of selector s (default any) whose original
-    // placeholder is exactly text; ph(text, s): the first one or null. Use
-    // instead of [placeholder="..."] (the translation rewrites it).
-    phAll = (text, s) => qa((s || '') + '[placeholder]').filter((e) => phOf(e) === text),
-    ph = (text, s) => phAll(text, s)[0] || null,
-    // optText(sel): original text of a <select>'s chosen option ('' if none).
-    optText = (sel) => { const o = sel && sel.selectedIndex >= 0 ? sel.options[sel.selectedIndex] : null; return o ? (_O ? String(_O(o) || '').replace(/\s+/g, ' ').trim() : o.text) || '' : ''; },
     inView = (e) => { if (!shown(e)) return false; const r = e.getBoundingClientRect(); return r.right > 1 && r.left < innerWidth - 1; },
     opened = (e) => { const g = e && e.closest('[class*="grid-rows-"]'); return !g || g.className.includes('grid-rows-[1fr]'); },
     dialog = (title) => { const t = byText('[id^="headlessui-dialog-title"]', title); return t ? t.closest('[id^="headlessui-dialog-panel"]') : null; },

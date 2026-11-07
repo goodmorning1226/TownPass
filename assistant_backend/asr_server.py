@@ -55,6 +55,9 @@ SCRIPTS = {"ja": re.compile(r"[぀-ヿ一-鿿]"), "th": re.compile(r"[฀-๿]")
 # Keep the chosen language unless detection is clearly sure of another one.
 CLEAR_DETECTION = 0.8
 CHOSEN_LANGUAGE_MIN = 0.05
+# Chinese chosen, another language detected: switch only when detection is at least
+# this sure (or the Chinese pass already wrote Latin letters).
+UNSURE_SWITCH = 0.5
 
 
 def detection_confidence(reply, code):
@@ -362,8 +365,17 @@ class WhisperCppRecognizer:
                         cjk_ratio(heard) < 0.5 or judge(heard, heard_logprob, heard_no_speech) != "clear"):
                     other = self._infer(self.multi_url, wav, seconds, "auto")
                     detected = language_code(other.get("language"), default=None)
-                    if detected and detected != "zh":
-                        reply, used = other, detected
+                    sure = detection_confidence(other, detected)
+                    if detected and detected != "zh" and (sure is None or sure >= UNSURE_SWITCH):
+                        reply, used, confidence = other, detected, sure
+                    elif detected and detected != "zh" and cjk_ratio(heard) < 0.5:
+                        # Not sure which language, but the Chinese pass already wrote
+                        # Latin letters: keep them and tell the language from the text
+                        # ("what can you do" was once detected as Japanese at low
+                        # confidence and came back as Japanese, 2026-11-08).
+                        import i18n
+                        used = i18n.detect_text_language(heard)
+                        used = used if used in LANGUAGES else "en"
             else:
                 # A chosen language is a preference, not a lock: the App keeps the
                 # language last used, so the next speaker may use another one (forcing
@@ -394,7 +406,7 @@ class WhisperCppRecognizer:
         return {"text": text, "alternatives": [], "alternative_logprobs": [], "language": used,
                 "status": judge(text, logprob, no_speech, used), "avg_logprob": logprob,
                 "no_speech_prob": no_speech, "passes": self.passes, "requested_language": requested,
-                "language_confidence": confidence if language != "zh" else None}
+                "language_confidence": confidence}
 
 
 def make_handler(recognizer, model_name):

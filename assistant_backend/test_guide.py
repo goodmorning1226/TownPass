@@ -76,6 +76,9 @@ class GuideWorkflowTests(unittest.TestCase):
         def model(messages, tools):
             # Lettered choices: the offered tool calls are the options in the last message.
             options = json.loads(messages[-1]['content']).get('options', [])
+            if isinstance(options, dict):  # library: {"A": "tool(args): description"}
+                options = [{'choice': letter, 'tool': line.split(':')[0].split('(')[0]}
+                           for letter, line in options.items()]
             self.calls.append(list(dict.fromkeys(o['tool'] for o in options)))
             names = [o['tool'] for o in options]
             if 'select_goal' in names:

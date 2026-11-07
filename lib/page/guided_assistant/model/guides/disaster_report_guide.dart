@@ -1,4 +1,5 @@
 import 'package:town_pass/page/guided_assistant/model/guide_content.dart';
+import 'package:town_pass/page/guided_assistant/model/guide_i18n.dart';
 import 'package:town_pass/page/guided_assistant/model/guide_page.dart';
 import 'package:town_pass/page/guided_assistant/web/web_guide_probe.dart';
 import 'package:town_pass/page/guided_assistant/web/web_page_state.dart';
@@ -56,11 +57,11 @@ const disasterReportPageSpec = WebPageSpec(
     'disaster.ok': "dialogButton('通報成功', '確認')",
   },
   flags: {
-    'noResults': "pageText(q('#app') || document.body).includes('無搜尋結果')",
+    'noResults': "orig(q('#app') || document.body).includes('無搜尋結果')",
     'query': "(q('div.flex.mb-2.px-4 > input.base-input') || {}).value || ''",
     'groupOpen':
         "qa('a[href^=\"/disaster-report/form/\"]').filter(shown).some(opened)",
-    'category': r"""(() => { const m = pageText(q('#app') || document.body).match(/災情分類\s*\n+\s*([^\n]+)/); return m && !m[1].trim().startsWith('*') ? m[1].trim() : ''; })()""",
+    'category': r"""(() => { const m = orig(q('#app') || document.body).match(/災情分類\s*\n+\s*([^\n]+)/); return m && !m[1].trim().startsWith('*') ? m[1].trim() : ''; })()""",
     'location': "(q('#location') || {}).value || ''",
     // The address box still has the keyboard (the user is typing).
     'locationFocus':
@@ -97,16 +98,14 @@ bool _fire(WebPageState s) => s.now.pathStarts('${_form}D-4-');
 
 String _category(WebPageState s) {
   final c = s.now.text('category');
-  return c.isEmpty ? '' : '「$c」';
+  return c.isEmpty ? '' : gt('「{c}」', {'c': pg(c)});
 }
 
 String _scroll(String off) => switch (off) {
-  'below' => '它在下面，先往下滑。',
-  'above' => '它在上面，先往上滑。',
+  'below' => gt('它在下面，先往下滑。'),
+  'above' => gt('它在上面，先往上滑。'),
   _ => '',
 };
-
-const _demo = '這是示範網站，沒有真的通報喔。';
 
 /// 選災情類別 on the category list. Also the first form step's fallback when
 /// a guide opened straight on a form (no pick_category step) and the list is
@@ -178,9 +177,14 @@ final List<GuideComponent> disasterReportComponents = [
           if (s.now.text('location').isNotEmpty) {
             return '地址打完後，按鍵盤上的「完成」或「✓」收起鍵盤，就到下一步。';
           }
-          final fire = _fire(s) ? '失火了請先打 119！' : '';
-          final what = _category(s).isEmpty ? '' : '你選的是${_category(s)}。';
-          return '$fire$what點一下框框，打災情發生的地址，例如「臺北市信義區市府路1號」；也可以按框框右邊的定位圖示，直接用你現在的位置。';
+          final fire = _fire(s) ? gt('失火了請先打 119！') : '';
+          final what = _category(s).isEmpty
+              ? ''
+              : gt('你選的是{cat}。', {'cat': _category(s)});
+          return gt(
+            '{fire}{what}點一下框框，打災情發生的地址，例如「臺北市信義區市府路1號」；也可以按框框右邊的定位圖示，直接用你現在的位置。',
+            {'fire': fire, 'what': what},
+          );
         },
         detail: (_) => '在「標注災情發生地點」打完整地址。按右邊的定位圖示會問你能不能用位置，按「允許」就會自動填。',
         // Done once the address is typed and the keyboard is put away, so
@@ -217,7 +221,10 @@ final List<GuideComponent> disasterReportComponents = [
         label: (_) => '勾選',
         card: (s) {
           final scroll = _scroll(s.now.text('checksOff'));
-          return '$scroll在「災情描述」勾你看到的狀況，至少勾一個，例如「道路」表示影響到馬路。有人受傷、受困，請直接打 119。';
+          return gt(
+            '{scroll}在「災情描述」勾你看到的狀況，至少勾一個，例如「道路」表示影響到馬路。有人受傷、受困，請直接打 119。',
+            {'scroll': scroll},
+          );
         },
         detail: (_) => '「人員傷亡」和「影響交通」下面的小方框，點一下就是勾選。下面還可以寫「補充描述」或附照片。',
         // Forms without checkboxes (e.g. 建築物火災) skip this step.
@@ -239,7 +246,9 @@ final List<GuideComponent> disasterReportComponents = [
     requires: const ['describe_disaster'],
     taskTitle: '同意提供聯絡資料',
     doneText: '勾好了！「送出」現在可以按了。',
-    doneTextOf: (s) => '${_noteRead(s) ? '' : _readNote}勾好了！「送出」現在可以按了。',
+    doneTextOf: (s) => gt('{note}勾好了！「送出」現在可以按了。', {
+      'note': _noteRead(s) ? '' : gt(_readNote),
+    }),
     doneDetail: '看一下填的內容對不對，再自己按「送出」。',
     doneTarget: (s) => _onForm(s) ? 'disaster.send' : null,
     steps: [
@@ -265,7 +274,10 @@ final List<GuideComponent> disasterReportComponents = [
         label: (_) => '勾選',
         card: (s) {
           final scroll = _scroll(s.now.text('consentOff'));
-          return '注意事項看完了！$scroll勾一下最下面的「提供個人資料給承辦人員」，承辦人員才能跟你聯絡。勾了以後，灰色的「送出」才會變成可以按。';
+          return gt(
+            '注意事項看完了！{scroll}勾一下最下面的「提供個人資料給承辦人員」，承辦人員才能跟你聯絡。勾了以後，灰色的「送出」才會變成可以按。',
+            {'scroll': scroll},
+          );
         },
         detail: (_) => '往下滑到最下面，點「提供個人資料給承辦人員」前面的小方框。沒勾的話「送出」是灰色的，按不下去。',
         isDone: (s) =>
@@ -282,8 +294,8 @@ final List<GuideComponent> disasterReportComponents = [
     requires: const ['give_consent'],
     self: '你自己確認',
     taskTitle: '通報災情',
-    doneText: '通報好了！畫面寫「通報成功」。$_demo真的有災情又很緊急，請打 119。',
-    doneDetail: '按「確認」會回到災情類別清單。$_demo',
+    doneText: '通報好了！畫面寫「通報成功」。這是示範網站，沒有真的通報喔。真的有災情又很緊急，請打 119。',
+    doneDetail: '按「確認」會回到災情類別清單。這是示範網站，沒有真的通報喔。',
     // The 通報成功 dialog's 確認 (gone once it is closed).
     doneTarget: (_) => 'disaster.ok',
     steps: [
@@ -298,9 +310,20 @@ final List<GuideComponent> disasterReportComponents = [
             return '「送出」還是灰色的。先勾「提供個人資料給承辦人員」，它才會變成可以按。';
           }
           final where = s.now.text('location');
-          final at = where.isEmpty ? '' : '地點是「$where」，';
-          final note = _noteRead(s) ? '' : _readNote;
-          return '$note${_scroll(s.now.text('sendOff'))}最後確認一下：$at${_category(s).isEmpty ? '' : '災情是${_category(s)}。'}沒問題就自己按「送出」喔。這是示範網站，不會真的通報。';
+          final at = where.isEmpty ? '' : gt('地點是「{where}」，', {'where': where});
+          final note = _noteRead(s) ? '' : gt(_readNote);
+          final cat = _category(s).isEmpty
+              ? ''
+              : gt('災情是{cat}。', {'cat': _category(s)});
+          return gt(
+            '{note}{scroll}最後確認一下：{at}{cat}沒問題就自己按「送出」喔。這是示範網站，不會真的通報。',
+            {
+              'note': note,
+              'scroll': _scroll(s.now.text('sendOff')),
+              'at': at,
+              'cat': cat,
+            },
+          );
         },
         detail: (_) => '看一下地點和狀況對不對，沒問題就自己按最下面的「送出」。',
         isDone: _reported,
@@ -352,7 +375,7 @@ GuideTexts _disasterTexts(List<String> plan, GuideComponent last) {
       resumeLabel: '回到災情通報',
       backLabel: '回到災情通報',
       openedText: '好的！已經幫你打開「災情通報」，我會在畫面上一步一步帶你做。緊急狀況請直接打 119。',
-      openedCard: '好的！災情通報打開了，我們一起來${last.taskTitle}。',
+      openedCard: gt('好的！災情通報打開了，我們一起來{task}。', {'task': gt(last.taskTitle)}),
       helpChips: const ['下一步要做什麼？'],
     );
   }

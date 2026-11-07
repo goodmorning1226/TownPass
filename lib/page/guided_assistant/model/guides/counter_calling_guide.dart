@@ -1,4 +1,5 @@
 import 'package:town_pass/page/guided_assistant/model/guide_content.dart';
+import 'package:town_pass/page/guided_assistant/model/guide_i18n.dart';
 import 'package:town_pass/page/guided_assistant/model/guide_page.dart';
 import 'package:town_pass/page/guided_assistant/web/web_guide_probe.dart';
 import 'package:town_pass/page/guided_assistant/web/web_page_state.dart';
@@ -58,9 +59,9 @@ const counterCallingPageSpec = WebPageSpec(
         "txt(q('div.mb-8 > div.flex.justify-between.mb-4 > h5.font-bold'))",
     'location': "(($_select) || {}).value || ''",
     'locationName':
-        "(() => { const s = $_select; return s && s.value ? optText(s).trim() : ''; })()",
+        "(() => { const s = $_select; return s && s.value && s.selectedIndex >= 0 ? optText(s.options[s.selectedIndex]).trim() : ''; })()",
     'firstLocation':
-        "(() => { const s = $_select; return s ? [...s.options].filter((o) => o.value).map((o) => raw(o).trim())[0] || '' : ''; })()",
+        "(() => { const s = $_select; return s ? [...s.options].filter((o) => o.value).map((o) => optText(o).trim())[0] || '' : ''; })()",
     'locationCount':
         "(() => { const s = $_select; return s ? [...s.options].filter((o) => o.value).length : 0; })()",
     // The place picker is open now (the select has the focus).
@@ -110,12 +111,12 @@ bool _located(WebPageState s) =>
 
 String _unit(WebPageState s) {
   final name = s.now.text('unitName');
-  return name.isEmpty ? '這個單位' : '「$name」';
+  return name.isEmpty ? gt('這個單位') : gt('「{name}」', {'name': pg(name)});
 }
 
 String _place(WebPageState s) {
   final name = s.now.text('locationName');
-  if (name.isNotEmpty) return '「$name」';
+  if (name.isNotEmpty) return gt('「{name}」', {'name': pg(name)});
   return _unit(s);
 }
 
@@ -134,32 +135,45 @@ List<_Counter> _counters(WebPageState s) => [
 
 /// 「謄本櫃檯」叫到 0328 號，等候 0 人；…
 String _counterLines(List<_Counter> list) => list
-    .map((c) => '「${c.name}」叫到 ${c.number} 號，還有 ${c.waiting} 人在等')
-    .join('；');
+    .map(
+      (c) => gt('「{name}」叫到 {number} 號，還有 {waiting} 人在等', {
+        'name': pg(c.name),
+        'number': c.number,
+        'waiting': c.waiting,
+      }),
+    )
+    .join(gt('；'));
 
 const _unitDetail = '在「櫃檯等待人數查詢」下面，點你要去的單位。';
 
 String _readCard(WebPageState s) {
   final list = _counters(s);
   if (list.isEmpty) {
-    return '這是${_place(s)}的「櫃檯等候狀況」，看每個櫃檯現在叫到幾號、還有幾個人在等。';
+    return gt('這是{place}的「櫃檯等候狀況」，看每個櫃檯現在叫到幾號、還有幾個人在等。', {'place': _place(s)});
   }
-  return '${_place(s)}現在：${_counterLines(list)}。';
+  return gt('{place}現在：{lines}。', {
+    'place': _place(s),
+    'lines': _counterLines(list),
+  });
 }
 
 String _readDone(WebPageState s) {
   final list = _counters(s);
   if (list.isEmpty) {
-    return '這就是${_place(s)}的櫃檯等候狀況！號碼牌要到現場抽喔。這是示範資料。';
+    return gt('這就是{place}的櫃檯等候狀況！號碼牌要到現場抽喔。這是示範資料。', {'place': _place(s)});
   }
   final most = list.reduce(
     (a, b) =>
         (int.tryParse(b.waiting) ?? 0) > (int.tryParse(a.waiting) ?? 0) ? b : a,
   );
   final busy = (int.tryParse(most.waiting) ?? 0) > 0
-      ? '「${most.name}」等的人最多。'
-      : '現在都不用等。';
-  return '${_place(s)}現在：${_counterLines(list)}。$busy號碼牌要到現場抽喔。這是示範資料。';
+      ? gt('「{name}」等的人最多。', {'name': pg(most.name)})
+      : gt('現在都不用等。');
+  return gt('{place}現在：{lines}。{busy}號碼牌要到現場抽喔。這是示範資料。', {
+    'place': _place(s),
+    'lines': _counterLines(list),
+    'busy': busy,
+  });
 }
 
 /// pick_unit on the home list. Also the fallback of the unit-page steps when a
@@ -213,8 +227,8 @@ final List<GuideComponent> counterCallingComponents = [
     doneDetail: '下面可以看每個櫃檯現在叫到幾號、還有幾個人在等。',
     doneTarget: _countersTarget,
     doneTextOf: (s) => s.now.query['subId'] != null
-        ? '常用地點${_place(s)}打開了！下面就是它的櫃檯等候狀況。'
-        : '${_unit(s)}打開了！下面就是櫃檯等候狀況。',
+        ? gt('常用地點{place}打開了！下面就是它的櫃檯等候狀況。', {'place': _place(s)})
+        : gt('{unit}打開了！下面就是櫃檯等候狀況。', {'unit': _unit(s)}),
     steps: [
       GuideStep(
         target: (s) {
@@ -229,8 +243,10 @@ final List<GuideComponent> counterCallingComponents = [
             return '目前還沒有常用地點。先點你要去的單位；選好地點後，按「加入常用」就能存起來。';
           }
           final names = s.now.text('favNames').split('|');
-          if (n == 1) return '點一下最上面的常用地點「${names.first}」。';
-          return '你有 $n 個常用地點。點你要去的那一個。';
+          if (n == 1) {
+            return gt('點一下最上面的常用地點「{name}」。', {'name': pg(names.first)});
+          }
+          return gt('你有 {n} 個常用地點。點你要去的那一個。', {'n': n});
         },
         detail: (s) => _favorites(s) == 0
             ? '常用地點是你存起來的地點。打開頁面重新進來後會不見，要再加一次。'
@@ -254,7 +270,7 @@ final List<GuideComponent> counterCallingComponents = [
     doneText: '地點選好了！',
     doneDetail: '下面的「櫃檯等候狀況」就是這個地點的叫號情形。',
     doneTarget: _countersTarget,
-    doneTextOf: (s) => '選好了${_place(s)}！下面就是它的櫃檯等候狀況。',
+    doneTextOf: (s) => gt('選好了{place}！下面就是它的櫃檯等候狀況。', {'place': _place(s)}),
     steps: [
       GuideStep(
         target: (s) => _onUnit(s) ? 'counter.location' : _unitTarget(s),
@@ -268,15 +284,17 @@ final List<GuideComponent> counterCallingComponents = [
           final n = s.now.number('locationCount');
           if (name.isEmpty) return '點一下「選擇地點」的框框，選你要去的那一間。';
           return n > 1
-              ? '現在看的是「$name」。點一下框框，選你要去的地點（就是這間的話，也點開選一下）。'
-              : '現在看的是「$name」。點一下框框確認是你要去的地點。';
+              ? gt('現在看的是「{name}」。點一下框框，選你要去的地點（就是這間的話，也點開選一下）。', {
+                  'name': pg(name),
+                })
+              : gt('現在看的是「{name}」。點一下框框確認是你要去的地點。', {'name': pg(name)});
         },
         detail: (s) {
           if (_onHome(s)) return _unitDetail;
           final first = s.now.text('firstLocation');
           return first.isEmpty
               ? '點最上面的「選擇地點」框框，選你要去的那一間。'
-              : '點最上面的「選擇地點」框框，例如「$first」，選你要去的那一間。';
+              : gt('點最上面的「選擇地點」框框，例如「{first}」，選你要去的那一間。', {'first': pg(first)});
         },
         isDone: (s) => _located(s) || s.latched('favOn'),
         // The iOS place menu opens under the select: keep the card below it.
@@ -344,12 +362,16 @@ final List<GuideComponent> counterCallingComponents = [
     doneCardTop: (s) => _homeReady(s) ? 300 : null,
     doneTextOf: (s) => _onHome(s)
         ? '加好了！最上面亮起來的「常用地點」就是剛加的地點，點一下就能直接打開。這是示範網站，頁面重新打開後會不見喔。'
-        : '${_place(s)}加進常用地點了！回到臨櫃叫號首頁，最上面就看得到。這是示範網站，頁面重新打開後會不見喔。',
+        : gt('{place}加進常用地點了！回到臨櫃叫號首頁，最上面就看得到。這是示範網站，頁面重新打開後會不見喔。', {
+            'place': _place(s),
+          }),
     steps: [
       GuideStep(
         target: (s) => _onUnit(s) ? 'counter.favorite' : null,
         label: (_) => '點一下',
-        card: (s) => '常去${_place(s)}嗎？點右邊的「加入常用」，下次從首頁就能直接打開。要不要加，由你自己按喔。',
+        card: (s) => gt('常去{place}嗎？點右邊的「加入常用」，下次從首頁就能直接打開。要不要加，由你自己按喔。', {
+          'place': _place(s),
+        }),
         detail: (_) => '按「櫃檯等候狀況」上面右邊的「加入常用」。',
         isDone: (s) =>
             s.latched('favOn') || (_onUnit(s) && s.now.flag('favOn')),
@@ -376,11 +398,11 @@ final List<GuideComponent> counterCallingComponents = [
         return '目前沒有常用地點，不用移除喔。';
       }
       if (_onUnit(s)) {
-        return '${_place(s)}從常用地點移除了！這是示範網站，沒有真的改到你的資料喔。';
+        return gt('{place}從常用地點移除了！這是示範網站，沒有真的改到你的資料喔。', {'place': _place(s)});
       }
       final n = _favorites(s);
-      final left = n == 0 ? '常用地點都清空了。' : '還有 $n 個常用地點。';
-      return '移除好了！$left這是示範網站，沒有真的改到你的資料喔。';
+      final left = n == 0 ? gt('常用地點都清空了。') : gt('還有 {n} 個常用地點。', {'n': n});
+      return gt('移除好了！{left}這是示範網站，沒有真的改到你的資料喔。', {'left': left});
     },
     steps: [
       GuideStep(
@@ -411,7 +433,7 @@ final List<GuideComponent> counterCallingComponents = [
           }
           if (_onUnit(s)) {
             return s.now.flag('favOn')
-                ? '${_place(s)}是你的常用地點。不要了的話，自己按右邊的「移除常用」。'
+                ? gt('{place}是你的常用地點。不要了的話，自己按右邊的「移除常用」。', {'place': _place(s)})
                 : '常用地點在臨櫃叫號首頁。按左上角的「‹」回上一頁。';
           }
           return '點一下「常用地點」右邊的「變更」。';
@@ -486,7 +508,7 @@ GuideTexts _counterTexts(List<String> plan, GuideComponent last) {
     resumeLabel: '回到臨櫃叫號',
     backLabel: '回到臨櫃叫號',
     openedText: '好的！已經幫你打開「臨櫃叫號」，我會在畫面上一步一步帶你做。',
-    openedCard: '好的！「臨櫃叫號」打開了，我們一起來${last.taskTitle}。',
+    openedCard: gt('好的！「臨櫃叫號」打開了，我們一起來{task}。', {'task': gt(last.taskTitle)}),
     helpChips: last.id == 'read_counters'
         ? const ['下一步要做什麼？', '號碼牌在哪裡拿？']
         : const ['下一步要做什麼？'],

@@ -1,0 +1,1036 @@
+{
+ "version": 1,
+ "status": "DRAFT translations (machine-assisted, 2026-11-08), pending native-speaker review. Keys are the Chinese source texts in lib/page/guided_assistant/; keep {name} placeholders; {page:X} shows the page's own word X as the page shows it (translated by PageTranslation).",
+ "section": "ui",
+ "strings": {
+  "AI 助理設定": {
+   "en": "AI assistant settings",
+   "ja": "AIアシスタント設定",
+   "vi": "Cài đặt trợ lý AI",
+   "id": "Pengaturan asisten AI",
+   "th": "ตั้งค่าผู้ช่วย AI"
+  },
+  "{mode}　＋　{language}": {
+   "en": "{mode} + {language}",
+   "ja": "{mode}　＋　{language}",
+   "vi": "{mode} + {language}",
+   "id": "{mode} + {language}",
+   "th": "{mode} + {language}"
+  },
+  "{name}　{distance}": {
+   "en": "{name} · {distance}",
+   "ja": "{name}　{distance}",
+   "vi": "{name} · {distance}",
+   "id": "{name} · {distance}",
+   "th": "{name} · {distance}"
+  },
+  "{n}. {label}（還不能用）": {
+   "en": "{n}. {label} (not available yet)",
+   "ja": "{n}. {label}（まだ使えません）",
+   "vi": "{n}. {label} (chưa dùng được)",
+   "id": "{n}. {label} (belum bisa dipakai)",
+   "th": "{n}. {label} (ยังใช้ไม่ได้)"
+  },
+  "{n}. 都不是，我再說一次": {
+   "en": "{n}. None of these, I’ll say it again",
+   "ja": "{n}. どれも違うので、もう一度話す",
+   "vi": "{n}. Không phải, tôi sẽ nói lại",
+   "id": "{n}. Bukan semuanya, saya ulangi",
+   "th": "{n}. ไม่ใช่สักอัน ขอพูดใหม่"
+  },
+  "{title}。{summary}": {
+   "en": "{title}. {summary}",
+   "ja": "{title}。{summary}",
+   "vi": "{title}. {summary}",
+   "id": "{title}. {summary}",
+   "th": "{title} {summary}"
+  },
+  "{title}（{subtitle}）": {
+   "en": "{title} ({subtitle})",
+   "ja": "{title}（{subtitle}）",
+   "vi": "{title} ({subtitle})",
+   "id": "{title} ({subtitle})",
+   "th": "{title} ({subtitle})"
+  },
+  "↓ 在這裡打字": {
+   "en": "↓ Type here",
+   "ja": "↓ ここに入力",
+   "vi": "↓ Gõ ở đây",
+   "id": "↓ Ketik di sini",
+   "th": "↓ พิมพ์ที่นี่"
+  },
+  "↓ 按住說「你好」": {
+   "en": "↓ Hold and say “Hello”",
+   "ja": "↓ 押したまま「こんにちは」と話す",
+   "vi": "↓ Nhấn giữ và nói “Xin chào”",
+   "id": "↓ Tekan tahan dan ucapkan “Halo”",
+   "th": "↓ กดค้างแล้วพูดว่า “สวัสดี”"
+  },
+  "。\n你正在自己操作，想要我帶你做，按「繼續引導」。": {
+   "en": ".\nYou’re doing it on your own. If you want me to guide you, tap “Resume guide”.",
+   "ja": "。\nいまはご自分で操作しています。案内してほしいときは「ガイドを再開」を押してください。",
+   "vi": ".\nBạn đang tự thao tác. Muốn mình hướng dẫn thì chạm “Tiếp tục hướng dẫn”.",
+   "id": ".\nAnda sedang melakukannya sendiri. Kalau mau saya pandu, ketuk “Lanjutkan panduan”.",
+   "th": "\nตอนนี้คุณกำลังทำเอง ถ้าอยากให้พาทำ กด “ทำตามคำแนะนำต่อ”"
+  },
+  "。\n步驟都做好了，有問題隨時問我！": {
+   "en": ".\nAll the steps are done. Ask me anytime if you have a question!",
+   "ja": "。\n手順はすべて終わりました。わからないことがあれば、いつでも聞いてください！",
+   "vi": ".\nCác bước đã xong hết. Có thắc mắc gì cứ hỏi mình nhé!",
+   "id": ".\nSemua langkah sudah selesai. Kalau ada pertanyaan, tanya saya kapan saja!",
+   "th": "\nทำครบทุกขั้นตอนแล้ว มีคำถามถามได้ตลอดเลย!"
+  },
+  "。\n照著畫面上方的提示做就可以，有問題隨時問我！": {
+   "en": ".\nJust follow the hints at the top of the screen. Ask me anytime if you have a question!",
+   "ja": "。\n画面の上のヒントに沿って進めれば大丈夫です。わからないことがあれば、いつでも聞いてください！",
+   "vi": ".\nBạn chỉ cần làm theo gợi ý ở phía trên màn hình. Có thắc mắc gì cứ hỏi mình nhé!",
+   "id": ".\nCukup ikuti petunjuk di bagian atas layar. Kalau ada pertanyaan, tanya saya kapan saja!",
+   "th": "\nทำตามคำแนะนำด้านบนของหน้าจอได้เลย มีคำถามถามได้ตลอดเลย!"
+  },
+  "「{example}」": {
+   "en": "“{example}”",
+   "ja": "「{example}」",
+   "vi": "“{example}”",
+   "id": "“{example}”",
+   "th": "“{example}”"
+  },
+  "「{label}」：{reason}": {
+   "en": "“{label}”: {reason}",
+   "ja": "「{label}」：{reason}",
+   "vi": "“{label}”: {reason}",
+   "id": "“{label}”: {reason}",
+   "th": "“{label}”: {reason}"
+  },
+  "・你用這個語言說話或打字時，服務網頁也會跟著翻譯；下次打開 App 會回到手機的語言。": {
+   "en": "・When you speak or type in this language, the service pages are translated too. The next time you open the App, it goes back to your phone’s language.",
+   "ja": "・この言語で話したり入力したりすると、サービスのページも翻訳されます。次にアプリを開くと、スマートフォンの言語に戻ります。",
+   "vi": "・Khi bạn nói hoặc gõ bằng ngôn ngữ này, trang dịch vụ cũng được dịch theo; lần sau mở App sẽ trở về ngôn ngữ của điện thoại.",
+   "id": "・Saat Anda bicara atau mengetik dalam bahasa ini, halaman layanan juga ikut diterjemahkan; saat App dibuka lagi, bahasanya kembali ke bahasa ponsel.",
+   "th": "・เมื่อคุณพูดหรือพิมพ์ด้วยภาษานี้ หน้าบริการก็จะแปลตามด้วย เปิดแอปครั้งหน้าจะกลับไปใช้ภาษาของโทรศัพท์"
+  },
+  "・助理說的話和操作提示。": {
+   "en": "・What the Assistant says, and the step hints.",
+   "ja": "・アシスタントが話す言葉と操作のヒント。",
+   "vi": "・Lời trợ lý nói và gợi ý thao tác.",
+   "id": "・Ucapan asisten dan petunjuk langkah.",
+   "th": "・คำพูดของผู้ช่วยและคำแนะนำการใช้งาน"
+  },
+  "・按住說話時，用這個語言聽你說。": {
+   "en": "・When you hold to talk, it listens to you in this language.",
+   "ja": "・押したまま話すとき、この言語で聞き取ります。",
+   "vi": "・Khi nhấn giữ để nói, trợ lý nghe bạn bằng ngôn ngữ này.",
+   "id": "・Saat tekan tahan untuk bicara, asisten mendengarkan Anda dalam bahasa ini.",
+   "th": "・เมื่อกดค้างเพื่อพูด จะฟังคุณด้วยภาษานี้"
+  },
+  "一般模式": {
+   "en": "Standard mode",
+   "ja": "通常モード",
+   "vi": "Chế độ thường",
+   "id": "Mode biasa",
+   "th": "โหมดปกติ"
+  },
+  "不會改變設定，也不會清除對話。": {
+   "en": "Your settings stay the same, and the conversation is not cleared.",
+   "ja": "設定は変わらず、会話も消えません。",
+   "vi": "Không thay đổi cài đặt, cũng không xóa cuộc trò chuyện.",
+   "id": "Pengaturan tidak berubah dan percakapan tidak dihapus.",
+   "th": "ไม่เปลี่ยนการตั้งค่า และไม่ลบบทสนทนา"
+  },
+  "不會用、找不到？\n點右下角的企鵝，它會帶你一步步做。": {
+   "en": "Not sure how, or can’t find something?\nTap the penguin at the bottom right. It will guide you step by step.",
+   "ja": "使い方がわからない、見つからない？\n右下のペンギンをタップすると、一歩ずつ案内してくれます。",
+   "vi": "Không biết dùng, không tìm thấy?\nChạm vào chú chim cánh cụt ở góc dưới bên phải, nó sẽ hướng dẫn bạn từng bước.",
+   "id": "Bingung atau tidak ketemu?\nKetuk penguin di kanan bawah, ia akan memandu Anda langkah demi langkah.",
+   "th": "ใช้ไม่เป็น หาไม่เจอ?\nแตะเพนกวินที่มุมขวาล่าง จะพาคุณทำทีละขั้น"
+  },
+  "企鵝的回答": {
+   "en": "The penguin’s answer",
+   "ja": "ペンギンの答え",
+   "vi": "Câu trả lời của chim cánh cụt",
+   "id": "Jawaban penguin",
+   "th": "คำตอบของเพนกวิน"
+  },
+  "你可以先自己操作，想繼續再按「繼續」。": {
+   "en": "You can do it yourself for now. When you want to go on, tap “Continue”.",
+   "ja": "まずはご自分で操作できます。続けるときは「続ける」を押してください。",
+   "vi": "Bạn có thể tự thao tác trước, muốn tiếp tục thì chạm “Tiếp tục”.",
+   "id": "Anda bisa melakukannya sendiri dulu. Kalau mau lanjut, ketuk “Lanjutkan”.",
+   "th": "คุณทำเองไปก่อนได้ ถ้าอยากทำต่อ กด “ทำต่อ”"
+  },
+  "你好呀！我是臺北通助理。\n有想問的問題，或是想找的功能，都可以直接告訴我。我也可以一步一步帶你操作喔！": {
+   "en": "Hi there! I’m the Taipei Pass Assistant.\nIf you have a question or are looking for a feature, just tell me. I can also guide you step by step!",
+   "ja": "こんにちは！台北通のアシスタントです。\n聞きたいことや探している機能があれば、そのまま話しかけてください。一歩ずつ操作をご案内することもできます！",
+   "vi": "Xin chào! Mình là trợ lý Taipei Pass.\nBạn có câu hỏi hoặc muốn tìm chức năng nào, cứ nói với mình. Mình cũng có thể hướng dẫn bạn từng bước!",
+   "id": "Halo! Saya Asisten Taipei Pass.\nKalau ada pertanyaan atau fitur yang ingin dicari, langsung saja beri tahu saya. Saya juga bisa memandu Anda langkah demi langkah!",
+   "th": "สวัสดี! นี่คือผู้ช่วยของ Taipei Pass\nมีคำถามหรืออยากหาฟังก์ชันไหน บอกได้เลย ช่วยพาทำทีละขั้นก็ได้นะ!"
+  },
+  "你離開了{page}": {
+   "en": "You left “{page}”",
+   "ja": "「{page}」から離れました",
+   "vi": "Bạn đã rời “{page}”",
+   "id": "Anda keluar dari “{page}”",
+   "th": "คุณออกจาก “{page}” แล้ว"
+  },
+  "你離開了{page}，回去後可以接著做。": {
+   "en": "You left “{page}”. Go back to carry on where you stopped.",
+   "ja": "「{page}」から離れました。戻れば続きから進められます。",
+   "vi": "Bạn đã rời “{page}”, quay lại là làm tiếp được.",
+   "id": "Anda keluar dari “{page}”. Kembali ke sana untuk melanjutkan.",
+   "th": "คุณออกจาก “{page}” แล้ว กลับไปแล้วทำต่อได้"
+  },
+  "例如：": {
+   "en": "For example:",
+   "ja": "例：",
+   "vi": "Ví dụ:",
+   "id": "Misalnya:",
+   "th": "เช่น"
+  },
+  "例如：{example}": {
+   "en": "For example: {example}",
+   "ja": "例：{example}",
+   "vi": "Ví dụ: {example}",
+   "id": "Misalnya: {example}",
+   "th": "เช่น {example}"
+  },
+  "個人設定 › AI 助理設定": {
+   "en": "Profile settings › AI assistant settings",
+   "ja": "個人設定 › AIアシスタント設定",
+   "vi": "Cài đặt cá nhân › Cài đặt trợ lý AI",
+   "id": "Pengaturan pribadi › Pengaturan asisten AI",
+   "th": "ตั้งค่าส่วนตัว › ตั้งค่าผู้ช่วย AI"
+  },
+  "先不用": {
+   "en": "Not now",
+   "ja": "今はいいです",
+   "vi": "Thôi, không cần",
+   "id": "Tidak usah dulu",
+   "th": "ยังไม่ต้อง"
+  },
+  "先不要": {
+   "en": "Not yet",
+   "ja": "まだ押しません",
+   "vi": "Khoan đã",
+   "id": "Jangan dulu",
+   "th": "ยังก่อน"
+  },
+  "先完成教學": {
+   "en": "Finish the tutorial first",
+   "ja": "先にチュートリアルを終える",
+   "vi": "Làm xong bài hướng dẫn trước",
+   "id": "Selesaikan tutorial dulu",
+   "th": "ทำบทแนะนำให้จบก่อน"
+  },
+  "先繼續{task}": {
+   "en": "Keep going with “{task}”",
+   "ja": "「{task}」を先に続ける",
+   "vi": "Tiếp tục “{task}” trước",
+   "id": "Lanjutkan “{task}” dulu",
+   "th": "ทำ “{task}” ต่อก่อน"
+  },
+  "全部完成": {
+   "en": "All done",
+   "ja": "すべて完了",
+   "vi": "Đã xong tất cả",
+   "id": "Semua selesai",
+   "th": "เสร็จทั้งหมดแล้ว"
+  },
+  "再唸一次": {
+   "en": "Read it again",
+   "ja": "もう一度読み上げる",
+   "vi": "Đọc lại",
+   "id": "Bacakan lagi",
+   "th": "อ่านอีกครั้ง"
+  },
+  "助理": {
+   "en": "Assistant",
+   "ja": "アシスタント",
+   "vi": "Trợ lý",
+   "id": "Asisten",
+   "th": "ผู้ช่วย"
+  },
+  "助理模式": {
+   "en": "Assistant mode",
+   "ja": "アシスタントのモード",
+   "vi": "Chế độ trợ lý",
+   "id": "Mode asisten",
+   "th": "โหมดผู้ช่วย"
+  },
+  "助理語言": {
+   "en": "Assistant language",
+   "ja": "アシスタントの言語",
+   "vi": "Ngôn ngữ trợ lý",
+   "id": "Bahasa asisten",
+   "th": "ภาษาของผู้ช่วย"
+  },
+  "助理說": {
+   "en": "Assistant says",
+   "ja": "アシスタントの言葉",
+   "vi": "Trợ lý nói",
+   "id": "Asisten bilang",
+   "th": "ผู้ช่วยพูด"
+  },
+  "印尼文": {
+   "en": "Indonesian",
+   "ja": "インドネシア語",
+   "vi": "Tiếng Indonesia",
+   "id": "Bahasa Indonesia",
+   "th": "ภาษาอินโดนีเซีย"
+  },
+  "取消": {
+   "en": "Cancel",
+   "ja": "キャンセル",
+   "vi": "Hủy",
+   "id": "Batal",
+   "th": "ยกเลิก"
+  },
+  "好": {
+   "en": "OK",
+   "ja": "はい",
+   "vi": "Được",
+   "id": "Oke",
+   "th": "ตกลง"
+  },
+  "好，先做完教學！": {
+   "en": "OK, let’s finish the tutorial first!",
+   "ja": "はい、先にチュートリアルを終えましょう！",
+   "vi": "Được, mình làm xong bài hướng dẫn trước nhé!",
+   "id": "Oke, selesaikan tutorial dulu!",
+   "th": "ได้เลย ทำบทแนะนำให้จบก่อน!"
+  },
+  "好，先跳過教學。想再看，可到「個人設定」。": {
+   "en": "OK, skipping the tutorial for now. To see it again, go to “Profile settings”.",
+   "ja": "はい、チュートリアルはスキップします。もう一度見たいときは「個人設定」へどうぞ。",
+   "vi": "Được, tạm bỏ qua bài hướng dẫn. Muốn xem lại thì vào “Cài đặt cá nhân”.",
+   "id": "Oke, tutorial dilewati dulu. Kalau mau lihat lagi, buka “Pengaturan pribadi”.",
+   "th": "ได้เลย ข้ามบทแนะนำไปก่อน ถ้าอยากดูอีก ไปที่ “ตั้งค่าส่วนตัว”"
+  },
+  "好，我自己按": {
+   "en": "OK, I’ll tap it myself",
+   "ja": "はい、自分で押します",
+   "vi": "Được, tôi tự bấm",
+   "id": "Oke, saya tekan sendiri",
+   "th": "ได้ กดเอง"
+  },
+  "好，直接開始！": {
+   "en": "OK, let’s start right away!",
+   "ja": "はい、すぐに始めましょう！",
+   "vi": "Được, bắt đầu luôn nhé!",
+   "id": "Oke, langsung mulai!",
+   "th": "ได้เลย เริ่มกันเลย!"
+  },
+  "完成": {
+   "en": "Done",
+   "ja": "完了",
+   "vi": "Xong",
+   "id": "Selesai",
+   "th": "เสร็จแล้ว"
+  },
+  "完成教學": {
+   "en": "Finish tutorial",
+   "ja": "チュートリアルを終える",
+   "vi": "Hoàn thành bài hướng dẫn",
+   "id": "Selesaikan tutorial",
+   "th": "จบบทแนะนำ"
+  },
+  "已改成「{language}」，模式不變": {
+   "en": "Changed to “{language}”. The mode stays the same.",
+   "ja": "「{language}」に変更しました。モードはそのままです。",
+   "vi": "Đã đổi sang “{language}”, chế độ giữ nguyên.",
+   "id": "Diubah ke “{language}”, mode tetap sama.",
+   "th": "เปลี่ยนเป็น “{language}” แล้ว โหมดยังเหมือนเดิม"
+  },
+  "已改成「{mode}」，語言不變": {
+   "en": "Changed to “{mode}”. The language stays the same.",
+   "ja": "「{mode}」に変更しました。言語はそのままです。",
+   "vi": "Đã đổi sang “{mode}”, ngôn ngữ giữ nguyên.",
+   "id": "Diubah ke “{mode}”, bahasa tetap sama.",
+   "th": "เปลี่ยนเป็น “{mode}” แล้ว ภาษายังเหมือนเดิม"
+  },
+  "已暫停": {
+   "en": "Paused",
+   "ja": "一時停止中",
+   "vi": "Đã tạm dừng",
+   "id": "Dijeda",
+   "th": "หยุดชั่วคราวแล้ว"
+  },
+  "已結束引導": {
+   "en": "Guide ended",
+   "ja": "ガイド終了",
+   "vi": "Đã kết thúc hướng dẫn",
+   "id": "Panduan berakhir",
+   "th": "จบการแนะนำแล้ว"
+  },
+  "已結束教學，可到「個人設定」重看。": {
+   "en": "Tutorial ended. You can watch it again in “Profile settings”.",
+   "ja": "チュートリアルを終了しました。「個人設定」でもう一度見られます。",
+   "vi": "Đã kết thúc bài hướng dẫn, có thể xem lại ở “Cài đặt cá nhân”.",
+   "id": "Tutorial selesai. Anda bisa melihatnya lagi di “Pengaturan pribadi”.",
+   "th": "จบบทแนะนำแล้ว ดูอีกครั้งได้ที่ “ตั้งค่าส่วนตัว”"
+  },
+  "已經幫你打開「{page}」。我幫你找到功能，之後你自己操作。\n想要我帶著做，可到「個人設定」改成「教學模式」。": {
+   "en": "I opened “{page}” for you. I found the feature; you take it from here.\nIf you want me to guide you, go to “Profile settings” and switch to “Guide mode”.",
+   "ja": "「{page}」を開きました。機能を見つけたので、ここからはご自分で操作してください。\n案内してほしいときは、「個人設定」で「ガイドモード」に変更してください。",
+   "vi": "Mình đã mở “{page}” cho bạn. Mình đã tìm được chức năng, tiếp theo bạn tự thao tác nhé.\nMuốn mình hướng dẫn thì vào “Cài đặt cá nhân” và đổi sang “Chế độ hướng dẫn”.",
+   "id": "“{page}” sudah saya bukakan. Fiturnya sudah saya temukan, selanjutnya Anda lanjutkan sendiri.\nKalau mau saya pandu, buka “Pengaturan pribadi” dan ganti ke “Mode panduan”.",
+   "th": "เปิด “{page}” ให้แล้ว หาฟังก์ชันให้แล้ว ต่อจากนี้คุณทำเองนะ\nถ้าอยากให้พาทำ ไปที่ “ตั้งค่าส่วนตัว” แล้วเปลี่ยนเป็น “โหมดสอนใช้งาน”"
+  },
+  "幫你找到功能，後續由你自行操作。": {
+   "en": "Finds the feature for you; then you carry on by yourself.",
+   "ja": "機能を見つけたら、その後はご自分で操作します。",
+   "vi": "Tìm giúp chức năng, sau đó bạn tự thao tác.",
+   "id": "Menemukan fiturnya, lalu Anda lanjutkan sendiri.",
+   "th": "ช่วยหาฟังก์ชันให้ แล้วคุณทำต่อเอง"
+  },
+  "引導完成": {
+   "en": "Guide complete",
+   "ja": "ガイド完了",
+   "vi": "Hướng dẫn xong",
+   "id": "Panduan selesai",
+   "th": "แนะนำเสร็จแล้ว"
+  },
+  "引導已暫停": {
+   "en": "Guide paused",
+   "ja": "ガイドを一時停止しました",
+   "vi": "Đã tạm dừng hướng dẫn",
+   "id": "Panduan dijeda",
+   "th": "หยุดการแนะนำชั่วคราวแล้ว"
+  },
+  "想打字？點這裡 ↓": {
+   "en": "Want to type? Tap here ↓",
+   "ja": "入力したいときは、ここをタップ ↓",
+   "vi": "Muốn gõ chữ? Chạm vào đây ↓",
+   "id": "Mau mengetik? Ketuk di sini ↓",
+   "th": "อยากพิมพ์? แตะตรงนี้ ↓"
+  },
+  "我可以幫你「{task}」。\n要先做完教學（剩 1 步），還是直接開始？": {
+   "en": "I can help you with “{task}”.\nFinish the tutorial first (1 step left), or start right away?",
+   "ja": "「{task}」をお手伝いできます。\n先にチュートリアルを終えますか（残り 1 ステップ）、それともすぐに始めますか？",
+   "vi": "Mình có thể giúp bạn “{task}”.\nBạn muốn làm xong bài hướng dẫn trước (còn 1 bước), hay bắt đầu luôn?",
+   "id": "Saya bisa membantu Anda: “{task}”.\nSelesaikan tutorial dulu (tinggal 1 langkah), atau langsung mulai?",
+   "th": "ช่วยเรื่อง “{task}” ได้\nจะทำบทแนะนำให้จบก่อน (เหลือ 1 ขั้น) หรือเริ่มเลย?"
+  },
+  "我幫你找到功能，之後你自己操作。": {
+   "en": "I found the feature; you take it from here.",
+   "ja": "機能を見つけました。ここからはご自分で操作してください。",
+   "vi": "Mình đã tìm được chức năng, tiếp theo bạn tự thao tác nhé.",
+   "id": "Fiturnya sudah saya temukan, selanjutnya Anda lanjutkan sendiri.",
+   "th": "หาฟังก์ชันให้แล้ว ต่อจากนี้คุณทำเองนะ"
+  },
+  "我幫你找到功能，之後你自己操作。\n想要我帶著做，可到「個人設定」改成「教學模式」。": {
+   "en": "I found the feature; you take it from here.\nIf you want me to guide you, go to “Profile settings” and switch to “Guide mode”.",
+   "ja": "機能を見つけました。ここからはご自分で操作してください。\n案内してほしいときは、「個人設定」で「ガイドモード」に変更してください。",
+   "vi": "Mình đã tìm được chức năng, tiếp theo bạn tự thao tác nhé.\nMuốn mình hướng dẫn thì vào “Cài đặt cá nhân” và đổi sang “Chế độ hướng dẫn”.",
+   "id": "Fiturnya sudah saya temukan, selanjutnya Anda lanjutkan sendiri.\nKalau mau saya pandu, buka “Pengaturan pribadi” dan ganti ke “Mode panduan”.",
+   "th": "หาฟังก์ชันให้แล้ว ต่อจากนี้คุณทำเองนะ\nถ้าอยากให้พาทำ ไปที่ “ตั้งค่าส่วนตัว” แล้วเปลี่ยนเป็น “โหมดสอนใช้งาน”"
+  },
+  "我自己來": {
+   "en": "I’ll do it myself",
+   "ja": "自分でやります",
+   "vi": "Tôi tự làm",
+   "id": "Saya sendiri saja",
+   "th": "ทำเอง"
+  },
+  "打字告訴我你想做什麼": {
+   "en": "Type what you want to do",
+   "ja": "やりたいことを入力してください",
+   "vi": "Gõ việc bạn muốn làm",
+   "id": "Ketik yang ingin Anda lakukan",
+   "th": "พิมพ์บอกว่าอยากทำอะไร"
+  },
+  "打開助理看選項": {
+   "en": "Open the Assistant to see the options",
+   "ja": "アシスタントを開いて選択肢を見る",
+   "vi": "Mở trợ lý để xem lựa chọn",
+   "id": "Buka asisten untuk melihat pilihan",
+   "th": "เปิดผู้ช่วยเพื่อดูตัวเลือก"
+  },
+  "找到功能後，一步一步帶你操作。": {
+   "en": "Finds the feature, then guides you step by step.",
+   "ja": "機能を見つけたら、一歩ずつ操作をご案内します。",
+   "vi": "Tìm được chức năng rồi hướng dẫn bạn từng bước.",
+   "id": "Menemukan fiturnya, lalu memandu Anda langkah demi langkah.",
+   "th": "หาฟังก์ชันให้ แล้วพาทำทีละขั้น"
+  },
+  "找到功能後，我會一步步帶你做。\n不需要時，可到「個人設定」改成「一般模式」。": {
+   "en": "When I find the feature, I’ll guide you step by step.\nIf you don’t need that, go to “Profile settings” and switch to “Standard mode”.",
+   "ja": "機能を見つけたら、一歩ずつご案内します。\n不要なときは、「個人設定」で「通常モード」に変更してください。",
+   "vi": "Tìm được chức năng rồi, mình sẽ hướng dẫn bạn từng bước.\nKhông cần thì vào “Cài đặt cá nhân” và đổi sang “Chế độ thường”.",
+   "id": "Setelah fiturnya ketemu, saya akan memandu Anda langkah demi langkah.\nKalau tidak perlu, buka “Pengaturan pribadi” dan ganti ke “Mode biasa”.",
+   "th": "หาฟังก์ชันเจอแล้ว จะพาคุณทำทีละขั้น\nถ้าไม่ต้องการ ไปที่ “ตั้งค่าส่วนตัว” แล้วเปลี่ยนเป็น “โหมดปกติ”"
+  },
+  "按住提問": {
+   "en": "Hold to ask",
+   "ja": "押したまま質問",
+   "vi": "Nhấn giữ để hỏi",
+   "id": "Tekan tahan untuk bertanya",
+   "th": "กดค้างเพื่อถาม"
+  },
+  "按住提問，說完放開": {
+   "en": "Hold to ask, release when you’re done",
+   "ja": "押したまま質問し、話し終えたら離す",
+   "vi": "Nhấn giữ để hỏi, nói xong thì thả ra",
+   "id": "Tekan tahan untuk bertanya, lepaskan setelah selesai",
+   "th": "กดค้างเพื่อถาม พูดจบแล้วปล่อย"
+  },
+  "按住說話": {
+   "en": "Hold to talk",
+   "ja": "押したまま話す",
+   "vi": "Nhấn giữ để nói",
+   "id": "Tekan tahan untuk bicara",
+   "th": "กดค้างเพื่อพูด"
+  },
+  "按住說話（示範）": {
+   "en": "Hold to talk (demo)",
+   "ja": "押したまま話す（デモ）",
+   "vi": "Nhấn giữ để nói (mẫu)",
+   "id": "Tekan tahan untuk bicara (demo)",
+   "th": "กดค้างเพื่อพูด (สาธิต)"
+  },
+  "按住說話，或點上面的選項": {
+   "en": "Hold to talk, or tap an option above",
+   "ja": "押したまま話すか、上の選択肢をタップ",
+   "vi": "Nhấn giữ để nói, hoặc chạm lựa chọn ở trên",
+   "id": "Tekan tahan untuk bicara, atau ketuk pilihan di atas",
+   "th": "กดค้างเพื่อพูด หรือแตะตัวเลือกด้านบน"
+  },
+  "按住麥克風說「你好」，或點「改用打字」。": {
+   "en": "Hold the microphone and say “Hello”, or tap “Type instead”.",
+   "ja": "マイクを押したまま「こんにちは」と話すか、「文字で入力」をタップしてください。",
+   "vi": "Nhấn giữ micrô và nói “Xin chào”, hoặc chạm “Gõ chữ”.",
+   "id": "Tekan tahan mikrofon dan ucapkan “Halo”, atau ketuk “Ketik saja”.",
+   "th": "กดไมโครโฟนค้างไว้แล้วพูดว่า “สวัสดี” หรือแตะ “พิมพ์แทน”"
+  },
+  "收起": {
+   "en": "Show less",
+   "ja": "閉じる",
+   "vi": "Thu gọn",
+   "id": "Ciutkan",
+   "th": "ย่อ"
+  },
+  "改用打字": {
+   "en": "Type instead",
+   "ja": "文字で入力",
+   "vi": "Gõ chữ",
+   "id": "Ketik saja",
+   "th": "พิมพ์แทน"
+  },
+  "改用語音": {
+   "en": "Use voice",
+   "ja": "音声入力に切り替え",
+   "vi": "Dùng giọng nói",
+   "id": "Pakai suara",
+   "th": "ใช้เสียง"
+  },
+  "改用鍵盤輸入": {
+   "en": "Use keyboard",
+   "ja": "キーボードに切り替え",
+   "vi": "Dùng bàn phím",
+   "id": "Pakai keyboard",
+   "th": "ใช้แป้นพิมพ์"
+  },
+  "放開送出": {
+   "en": "Release to send",
+   "ja": "離すと送信",
+   "vi": "Thả ra để gửi",
+   "id": "Lepaskan untuk kirim",
+   "th": "ปล่อยเพื่อส่ง"
+  },
+  "教學完成！有問題隨時點右下角找我。": {
+   "en": "Tutorial done! If you have a question, tap the bottom right to find me anytime.",
+   "ja": "チュートリアル完了！困ったときは、いつでも右下をタップして呼んでください。",
+   "vi": "Hoàn thành bài hướng dẫn! Có thắc mắc cứ chạm góc dưới bên phải để tìm mình nhé.",
+   "id": "Tutorial selesai! Kalau ada pertanyaan, ketuk kanan bawah untuk memanggil saya kapan saja.",
+   "th": "จบบทแนะนำแล้ว! มีคำถามแตะที่มุมขวาล่างเรียกได้ตลอด"
+  },
+  "教學模式": {
+   "en": "Guide mode",
+   "ja": "ガイドモード",
+   "vi": "Chế độ hướng dẫn",
+   "id": "Mode panduan",
+   "th": "โหมดสอนใช้งาน"
+  },
+  "教我": {
+   "en": "Teach me",
+   "ja": "教えて",
+   "vi": "Chỉ tôi",
+   "id": "Ajari saya",
+   "th": "สอนหน่อย"
+  },
+  "新增": {
+   "en": "New",
+   "ja": "新機能",
+   "vi": "Mới",
+   "id": "Baru",
+   "th": "ใหม่"
+  },
+  "新手教學 1/2": {
+   "en": "Tutorial 1/2",
+   "ja": "チュートリアル 1/2",
+   "vi": "Hướng dẫn người mới 1/2",
+   "id": "Tutorial 1/2",
+   "th": "บทแนะนำ 1/2"
+  },
+  "新手教學 2/2": {
+   "en": "Tutorial 2/2",
+   "ja": "チュートリアル 2/2",
+   "vi": "Hướng dẫn người mới 2/2",
+   "id": "Tutorial 2/2",
+   "th": "บทแนะนำ 2/2"
+  },
+  "日文": {
+   "en": "Japanese",
+   "ja": "日本語",
+   "vi": "Tiếng Nhật",
+   "id": "Bahasa Jepang",
+   "th": "ภาษาญี่ปุ่น"
+  },
+  "暫停": {
+   "en": "Pause",
+   "ja": "一時停止",
+   "vi": "Tạm dừng",
+   "id": "Jeda",
+   "th": "หยุดชั่วคราว"
+  },
+  "暫停{task}，改去{other}": {
+   "en": "Pause “{task}” and go to “{other}”",
+   "ja": "「{task}」を一時停止して「{other}」へ",
+   "vi": "Tạm dừng “{task}”, chuyển sang “{other}”",
+   "id": "Jeda “{task}”, pindah ke “{other}”",
+   "th": "หยุด “{task}” ชั่วคราว ไปที่ “{other}”"
+  },
+  "暫停引導": {
+   "en": "Pause guide",
+   "ja": "ガイドを一時停止",
+   "vi": "Tạm dừng hướng dẫn",
+   "id": "Jeda panduan",
+   "th": "หยุดการแนะนำชั่วคราว"
+  },
+  "會改變什麼？": {
+   "en": "What changes?",
+   "ja": "何が変わりますか？",
+   "vi": "Điều gì sẽ thay đổi?",
+   "id": "Apa yang berubah?",
+   "th": "อะไรจะเปลี่ยนบ้าง"
+  },
+  "朗讀已開啟": {
+   "en": "Read aloud is on",
+   "ja": "読み上げ：オン",
+   "vi": "Đã bật đọc to",
+   "id": "Bacakan: aktif",
+   "th": "เปิดการอ่านออกเสียงแล้ว"
+  },
+  "朗讀已關閉": {
+   "en": "Read aloud is off",
+   "ja": "読み上げ：オフ",
+   "vi": "Đã tắt đọc to",
+   "id": "Bacakan: nonaktif",
+   "th": "ปิดการอ่านออกเสียงแล้ว"
+  },
+  "正在幫你找…": {
+   "en": "Looking for it…",
+   "ja": "探しています…",
+   "vi": "Đang tìm giúp bạn…",
+   "id": "Sedang mencarikan…",
+   "th": "กำลังหาให้…"
+  },
+  "正在聽…": {
+   "en": "Listening…",
+   "ja": "聞いています…",
+   "vi": "Đang nghe…",
+   "id": "Mendengarkan…",
+   "th": "กำลังฟัง…"
+  },
+  "正在聽…說完放開": {
+   "en": "Listening… release when you’re done",
+   "ja": "聞いています…話し終えたら離してください",
+   "vi": "Đang nghe… nói xong thì thả ra",
+   "id": "Mendengarkan… lepaskan setelah selesai",
+   "th": "กำลังฟัง… พูดจบแล้วปล่อย"
+  },
+  "步驟 {i} / {n}": {
+   "en": "Step {i} / {n}",
+   "ja": "ステップ {i} / {n}",
+   "vi": "Bước {i} / {n}",
+   "id": "Langkah {i} / {n}",
+   "th": "ขั้นตอน {i} / {n}"
+  },
+  "水號": {
+   "en": "Water account no.",
+   "ja": "水道番号",
+   "vi": "Số danh bộ nước",
+   "id": "Nomor pelanggan air",
+   "th": "หมายเลขผู้ใช้น้ำ"
+  },
+  "水費帳單示意圖，水號印在帳單上方": {
+   "en": "Sample water bill; the water account number is printed at the top",
+   "ja": "水道料金の請求書の見本。水道番号は請求書の上の方に印刷されています",
+   "vi": "Hình minh họa hóa đơn tiền nước, số danh bộ nước in ở phía trên hóa đơn",
+   "id": "Contoh tagihan air; nomor pelanggan air tercetak di bagian atas tagihan",
+   "th": "ภาพตัวอย่างบิลค่าน้ำ หมายเลขผู้ใช้น้ำพิมพ์อยู่ด้านบนของบิล"
+  },
+  "水費帳單（示意）": {
+   "en": "Water bill (sample)",
+   "ja": "水道料金の請求書（見本）",
+   "vi": "Hóa đơn tiền nước (minh họa)",
+   "id": "Tagihan air (contoh)",
+   "th": "บิลค่าน้ำ (ตัวอย่าง)"
+  },
+  "泰文": {
+   "en": "Thai",
+   "ja": "タイ語",
+   "vi": "Tiếng Thái",
+   "id": "Bahasa Thai",
+   "th": "ภาษาไทย"
+  },
+  "滑動": {
+   "en": "Scroll",
+   "ja": "スクロール",
+   "vi": "Vuốt",
+   "id": "Geser",
+   "th": "เลื่อน"
+  },
+  "現在我們要：": {
+   "en": "Now we’re on: ",
+   "ja": "いまやること：",
+   "vi": "Bây giờ mình sẽ: ",
+   "id": "Sekarang kita akan: ",
+   "th": "ตอนนี้เราจะ: "
+  },
+  "現在是「{mode}」": {
+   "en": "You’re in “{mode}” now",
+   "ja": "いまは「{mode}」です",
+   "vi": "Hiện đang ở “{mode}”",
+   "id": "Sekarang dalam “{mode}”",
+   "th": "ตอนนี้เป็น “{mode}”"
+  },
+  "用語音說的": {
+   "en": "Said by voice",
+   "ja": "音声で入力",
+   "vi": "Nói bằng giọng nói",
+   "id": "Diucapkan lewat suara",
+   "th": "พูดด้วยเสียง"
+  },
+  "目前任務：{task}": {
+   "en": "Current task: {task}",
+   "ja": "いまのタスク：{task}",
+   "vi": "Việc đang làm: {task}",
+   "id": "Tugas saat ini: {task}",
+   "th": "งานตอนนี้: {task}"
+  },
+  "目前設定（兩項各自獨立）": {
+   "en": "Current settings (the two are separate)",
+   "ja": "現在の設定（2つは別々に設定できます）",
+   "vi": "Cài đặt hiện tại (hai mục độc lập với nhau)",
+   "id": "Pengaturan saat ini (keduanya terpisah)",
+   "th": "การตั้งค่าปัจจุบัน (สองรายการแยกกัน)"
+  },
+  "直接開始": {
+   "en": "Start now",
+   "ja": "すぐに始める",
+   "vi": "Bắt đầu luôn",
+   "id": "Langsung mulai",
+   "th": "เริ่มเลย"
+  },
+  "看全部": {
+   "en": "Show all",
+   "ja": "すべて表示",
+   "vi": "Xem tất cả",
+   "id": "Lihat semua",
+   "th": "ดูทั้งหมด"
+  },
+  "看設定": {
+   "en": "See settings",
+   "ja": "設定を見る",
+   "vi": "Xem cài đặt",
+   "id": "Lihat pengaturan",
+   "th": "ดูการตั้งค่า"
+  },
+  "知道了": {
+   "en": "Got it",
+   "ja": "わかりました",
+   "vi": "Đã hiểu",
+   "id": "Mengerti",
+   "th": "เข้าใจแล้ว"
+  },
+  "稍後再說": {
+   "en": "Maybe later",
+   "ja": "あとで",
+   "vi": "Để sau",
+   "id": "Nanti saja",
+   "th": "ไว้ทีหลัง"
+  },
+  "第一次使用臺北通嗎？": {
+   "en": "First time using Taipei Pass?",
+   "ja": "台北通を使うのは初めてですか？",
+   "vi": "Lần đầu dùng Taipei Pass?",
+   "id": "Pertama kali memakai Taipei Pass?",
+   "th": "ใช้ Taipei Pass ครั้งแรกใช่ไหม"
+  },
+  "結束引導": {
+   "en": "End guide",
+   "ja": "ガイドを終了",
+   "vi": "Kết thúc hướng dẫn",
+   "id": "Akhiri panduan",
+   "th": "จบการแนะนำ"
+  },
+  "結束引導，自己操作": {
+   "en": "End guide and do it myself",
+   "ja": "ガイドを終了して自分で操作",
+   "vi": "Kết thúc hướng dẫn, tự thao tác",
+   "id": "Akhiri panduan, lakukan sendiri",
+   "th": "จบการแนะนำ ทำเอง"
+  },
+  "繁體中文": {
+   "en": "Traditional Chinese",
+   "ja": "繁体字中国語",
+   "vi": "Tiếng Trung phồn thể",
+   "id": "Bahasa Mandarin (Tradisional)",
+   "th": "ภาษาจีนตัวเต็ม"
+  },
+  "繼續": {
+   "en": "Continue",
+   "ja": "続ける",
+   "vi": "Tiếp tục",
+   "id": "Lanjutkan",
+   "th": "ทำต่อ"
+  },
+  "繼續引導": {
+   "en": "Resume guide",
+   "ja": "ガイドを再開",
+   "vi": "Tiếp tục hướng dẫn",
+   "id": "Lanjutkan panduan",
+   "th": "ทำตามคำแนะนำต่อ"
+  },
+  "聽你說的話，自動判斷是哪一種語言": {
+   "en": "Listens and works out which language you are speaking",
+   "ja": "話した言葉から、どの言語かを自動で判断します",
+   "vi": "Nghe bạn nói và tự nhận biết ngôn ngữ",
+   "id": "Mendengarkan ucapan Anda dan otomatis mengenali bahasanya",
+   "th": "ฟังสิ่งที่คุณพูด แล้วระบุภาษาให้อัตโนมัติ"
+  },
+  "自動": {
+   "en": "Auto",
+   "ja": "自動",
+   "vi": "Tự động",
+   "id": "Otomatis",
+   "th": "อัตโนมัติ"
+  },
+  "自動偵測": {
+   "en": "Auto-detect",
+   "ja": "自動検出",
+   "vi": "Tự động nhận biết",
+   "id": "Deteksi otomatis",
+   "th": "ตรวจจับอัตโนมัติ"
+  },
+  "英文": {
+   "en": "English",
+   "ja": "英語",
+   "vi": "Tiếng Anh",
+   "id": "Bahasa Inggris",
+   "th": "ภาษาอังกฤษ"
+  },
+  "要按住不放才會開始聽喔": {
+   "en": "Keep holding the button so I can start listening",
+   "ja": "押したままにすると聞き取りが始まります",
+   "vi": "Phải nhấn giữ thì mới bắt đầu nghe nhé",
+   "id": "Tekan dan tahan agar mulai mendengarkan",
+   "th": "ต้องกดค้างไว้จึงจะเริ่มฟังนะ"
+  },
+  "試著跟我打聲招呼吧！": {
+   "en": "Try saying hello to me!",
+   "ja": "あいさつしてみましょう！",
+   "vi": "Thử chào mình đi!",
+   "id": "Coba sapa saya!",
+   "th": "ลองทักทายกันหน่อย!"
+  },
+  "試試看": {
+   "en": "Try it",
+   "ja": "試してみる",
+   "vi": "Thử xem",
+   "id": "Coba",
+   "th": "ลองดู"
+  },
+  "說話的語言：{language}": {
+   "en": "Speech language: {language}",
+   "ja": "話す言語：{language}",
+   "vi": "Ngôn ngữ nói: {language}",
+   "id": "Bahasa bicara: {language}",
+   "th": "ภาษาที่พูด: {language}"
+  },
+  "請先操作亮起來的地方": {
+   "en": "Please use the highlighted spot first",
+   "ja": "先に光っている所を操作してください",
+   "vi": "Hãy thao tác ở chỗ đang sáng trước",
+   "id": "Silakan gunakan bagian yang menyala dulu",
+   "th": "โปรดทำที่จุดที่สว่างอยู่ก่อน"
+  },
+  "請按亮起來的「預約」，按了就會送出。": {
+   "en": "Tap the highlighted “{page:預約}”. Tapping it sends the reservation.",
+   "ja": "光っている「{page:預約}」を押してください。押すと送信されます。",
+   "vi": "Hãy chạm “{page:預約}” đang sáng, chạm vào là sẽ gửi đi.",
+   "id": "Ketuk “{page:預約}” yang menyala. Begitu diketuk, langsung terkirim.",
+   "th": "กด “{page:預約}” ที่สว่างอยู่ กดแล้วจะส่งทันที"
+  },
+  "越南文": {
+   "en": "Vietnamese",
+   "ja": "ベトナム語",
+   "vi": "Tiếng Việt",
+   "id": "Bahasa Vietnam",
+   "th": "ภาษาเวียดนาม"
+  },
+  "跳過教學": {
+   "en": "Skip tutorial",
+   "ja": "チュートリアルをスキップ",
+   "vi": "Bỏ qua bài hướng dẫn",
+   "id": "Lewati tutorial",
+   "th": "ข้ามบทแนะนำ"
+  },
+  "退出提示": {
+   "en": "Dismiss tip",
+   "ja": "ヒントを閉じる",
+   "vi": "Tắt gợi ý",
+   "id": "Tutup petunjuk",
+   "th": "ปิดคำแนะนำ"
+  },
+  "送出": {
+   "en": "Send",
+   "ja": "送信",
+   "vi": "Gửi",
+   "id": "Kirim",
+   "th": "ส่ง"
+  },
+  "這些是我們要一起完成的事，打勾的已經做好了：": {
+   "en": "Here’s what we’ll do together. The ticked ones are done:",
+   "ja": "一緒にやることの一覧です。チェックが付いたものは完了しています：",
+   "vi": "Đây là những việc mình sẽ cùng làm, mục có dấu tích là đã xong:",
+   "id": "Ini hal-hal yang akan kita kerjakan bersama, yang dicentang sudah selesai:",
+   "th": "นี่คือสิ่งที่เราจะทำด้วยกัน อันที่ติ๊กแล้วคือเสร็จแล้ว:"
+  },
+  "這段問答也會存在助理的對話紀錄。": {
+   "en": "This question and answer are also saved in the Assistant’s conversation history.",
+   "ja": "この質問と答えは、アシスタントの会話履歴にも残ります。",
+   "vi": "Phần hỏi đáp này cũng được lưu trong lịch sử trò chuyện của trợ lý.",
+   "id": "Tanya jawab ini juga disimpan di riwayat percakapan asisten.",
+   "th": "คำถามและคำตอบนี้จะเก็บไว้ในประวัติการสนทนาของผู้ช่วยด้วย"
+  },
+  "進行中": {
+   "en": "In progress",
+   "ja": "進行中",
+   "vi": "Đang làm",
+   "id": "Sedang berjalan",
+   "th": "กำลังทำ"
+  },
+  "選擇助理聽你說話、回答問題和操作提示時使用的語言。和對話畫面麥克風旁的語言選單是同一個設定。": {
+   "en": "Choose the language the Assistant uses to listen to you, answer questions and give step hints. It’s the same setting as the language menu next to the microphone in the chat.",
+   "ja": "アシスタントが話を聞き取り、質問に答え、操作のヒントを出すときの言語を選びます。会話画面のマイクの横にある言語メニューと同じ設定です。",
+   "vi": "Chọn ngôn ngữ trợ lý dùng để nghe bạn nói, trả lời câu hỏi và gợi ý thao tác. Đây cũng là cài đặt của menu ngôn ngữ cạnh micrô trong màn hình trò chuyện.",
+   "id": "Pilih bahasa yang dipakai asisten untuk mendengarkan Anda, menjawab pertanyaan, dan memberi petunjuk langkah. Ini sama dengan menu bahasa di samping mikrofon pada layar percakapan.",
+   "th": "เลือกภาษาที่ผู้ช่วยใช้ฟังคุณพูด ตอบคำถาม และให้คำแนะนำการใช้งาน เป็นการตั้งค่าเดียวกับเมนูภาษาข้างไมโครโฟนในหน้าสนทนา"
+  },
+  "都不是": {
+   "en": "None of these",
+   "ja": "どれも違います",
+   "vi": "Không phải cái nào cả",
+   "id": "Bukan semuanya",
+   "th": "ไม่ใช่สักอัน"
+  },
+  "都在畫面下方 ↓": {
+   "en": "Both are at the bottom of the screen ↓",
+   "ja": "どちらも画面の下にあります ↓",
+   "vi": "Cả hai đều ở cuối màn hình ↓",
+   "id": "Keduanya ada di bawah layar ↓",
+   "th": "ทั้งสองอยู่ด้านล่างของหน้าจอ ↓"
+  },
+  "重新示範": {
+   "en": "Show me again",
+   "ja": "もう一度案内する",
+   "vi": "Hướng dẫn lại",
+   "id": "Tunjukkan lagi",
+   "th": "แนะนำอีกครั้ง"
+  },
+  "重看助理新手教學": {
+   "en": "Watch the Assistant tutorial again",
+   "ja": "アシスタントのチュートリアルをもう一度見る",
+   "vi": "Xem lại bài hướng dẫn trợ lý",
+   "id": "Lihat lagi tutorial asisten",
+   "th": "ดูบทแนะนำผู้ช่วยอีกครั้ง"
+  },
+  "重看新手提示": {
+   "en": "See the welcome tips again",
+   "ja": "はじめのヒントをもう一度見る",
+   "vi": "Xem lại gợi ý cho người mới",
+   "id": "Lihat lagi petunjuk awal",
+   "th": "ดูคำแนะนำเริ่มต้นอีกครั้ง"
+  },
+  "開啟助理": {
+   "en": "Open the Assistant",
+   "ja": "アシスタントを開く",
+   "vi": "Mở trợ lý",
+   "id": "Buka asisten",
+   "th": "เปิดผู้ช่วย"
+  },
+  "開始": {
+   "en": "Start",
+   "ja": "始める",
+   "vi": "Bắt đầu",
+   "id": "Mulai",
+   "th": "เริ่ม"
+  },
+  "關閉": {
+   "en": "Close",
+   "ja": "閉じる",
+   "vi": "Đóng",
+   "id": "Tutup",
+   "th": "ปิด"
+  },
+  "關閉助理": {
+   "en": "Close the assistant",
+   "ja": "アシスタントを閉じる",
+   "vi": "Đóng trợ lý",
+   "id": "Tutup asisten",
+   "th": "ปิดผู้ช่วย"
+  },
+  "電話 {phone}": {
+   "en": "Tel. {phone}",
+   "ja": "電話 {phone}",
+   "vi": "Điện thoại {phone}",
+   "id": "Telepon {phone}",
+   "th": "โทร {phone}"
+  },
+  "需要麥克風權限才能用語音。可以到手機設定開啟，或點右下角的企鵝用打字問我。": {
+   "en": "Voice input needs microphone permission. Turn it on in the phone settings, or tap the penguin at the bottom right and type your question.",
+   "ja": "音声入力にはマイクの許可が必要です。スマートフォンの設定で許可するか、右下のペンギンをタップして文字で質問してください。",
+   "vi": "Cần quyền micrô để dùng giọng nói. Hãy bật trong cài đặt điện thoại, hoặc chạm chú chim cánh cụt ở góc dưới bên phải để gõ câu hỏi.",
+   "id": "Input suara memerlukan izin mikrofon. Aktifkan di pengaturan ponsel, atau ketuk penguin di kanan bawah untuk bertanya dengan mengetik.",
+   "th": "ต้องอนุญาตไมโครโฟนจึงจะใช้เสียงได้ เปิดได้ในการตั้งค่าโทรศัพท์ หรือแตะเพนกวินที่มุมขวาล่างเพื่อพิมพ์ถาม"
+  },
+  "預設": {
+   "en": "Default",
+   "ja": "標準",
+   "vi": "Mặc định",
+   "id": "Default",
+   "th": "ค่าเริ่มต้น"
+  },
+  "點企鵝\n開始問助理": {
+   "en": "Tap the penguin\nto ask the Assistant",
+   "ja": "ペンギンをタップして\nアシスタントに質問",
+   "vi": "Chạm chim cánh cụt\nđể hỏi trợ lý",
+   "id": "Ketuk penguin\nuntuk bertanya ke asisten",
+   "th": "แตะเพนกวิน\nเพื่อถามผู้ช่วย"
+  },
+  "點這裡切回語音 ↓": {
+   "en": "Tap here to switch back to voice ↓",
+   "ja": "ここをタップして音声に戻す ↓",
+   "vi": "Chạm vào đây để quay lại giọng nói ↓",
+   "id": "Ketuk di sini untuk kembali ke suara ↓",
+   "th": "แตะตรงนี้เพื่อกลับไปใช้เสียง ↓"
+  },
+  "（示範版）語音辨識還沒接上，請點右下角的企鵝，用打字問我。": {
+   "en": "(Demo version) Speech recognition isn’t connected yet. Tap the penguin at the bottom right and type your question.",
+   "ja": "（デモ版）音声認識はまだつながっていません。右下のペンギンをタップして、文字で質問してください。",
+   "vi": "(Bản mẫu) Nhận dạng giọng nói chưa được kết nối, hãy chạm chú chim cánh cụt ở góc dưới bên phải và gõ câu hỏi.",
+   "id": "(Versi demo) Pengenalan suara belum terhubung. Ketuk penguin di kanan bawah dan ketik pertanyaan Anda.",
+   "th": "(เวอร์ชันสาธิต) ยังไม่ได้เชื่อมต่อการจดจำเสียง แตะเพนกวินที่มุมขวาล่างแล้วพิมพ์ถาม"
+  }
+ }
+}

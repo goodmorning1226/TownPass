@@ -81,6 +81,15 @@ class RetrievalTests(unittest.TestCase):
             context = retrieve(text, BOOKS)
             self.assertNotIn("open_library", [t["function"]["name"] for t in tools_for(context)])
 
+    def test_borrowed_sound_alike_book_outweighs_a_service_word(self):
+        # "借原親子館" was 借原子習慣 misheard (owner, 2026-11-08): the object stops at
+        # the comma and sounds like a book, so the library flow is not skipped.
+        books = [{"id": "b1", "book_name": "原子習慣 : 細微改變帶來巨大成就的實證法則", "author": "克利爾", "isbn": ""}]
+        context = retrieve("我今天想要借原親子館，你能幫我借到嗎", books)
+        self.assertEqual((context["query"], context["other"], context["library_candidate"]), ("原親子館", [], True))
+        for text in ("我想借親子館的場地", "我要預約親子館", "我想借錢買原子習慣"):
+            self.assertTrue(retrieve(text, books)["other"], text)
+
     def test_unresolved_books_only_offer_library_home(self):
         for text in ("借幾本沒讀過的書", "我要找《未知書目甲》", "ISBN 9780000000002", "有沒有適合閱讀的書"):
             context = retrieve(text, BOOKS)

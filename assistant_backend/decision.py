@@ -116,6 +116,17 @@ def choice_options(tools):
     return options
 
 
+def options_view(task, options):
+    """The options as the model sees them. Library: one line per letter,
+    {"A": "tool(key=value): description"}, ~25% fewer option tokens than the
+    list of objects (docs/SPEED_LIBRARY_EXPERIMENT.md). The full descriptions
+    stay: without them, or shortened, the model opened the library for "借XYZ"."""
+    if task != "library":
+        return options
+    return {o["choice"]: o["tool"] + ("(" + ", ".join(f"{k}={v}" for k, v in o["arguments"].items()) + ")"
+                                      if o["arguments"] else "") + ": " + o["description"] for o in options}
+
+
 def choice_tool(options):
     """The one pseudo-tool the model answers with (proposal_schema makes it {"choice": letter})."""
     return {"type": "function", "function": {"name": "choose", "description": "Pick one option by its letter.",
@@ -159,8 +170,8 @@ def decide(owner, task, context, tools, validate, error):
         # its arguments, so the policy text applies unchanged.
         options = choice_options(tools)
         model_tools = [choice_tool(options)]
-        last = {"options": options, "answer": "Choose exactly one option and reply with its letter. "
-                "If the request is unclear, choose the option that asks for clarification."}
+        last = {"options": options_view(task, options), "answer": "Choose exactly one option and reply with its "
+                "letter. If the request is unclear, choose the option that asks for clarification."}
     else:
         options, model_tools, last = [], tools, {"allowed_tools": tools}
     messages = [{"role": "system", "content": system_prompt(task)},

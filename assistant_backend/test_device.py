@@ -206,6 +206,23 @@ class PromptLayoutTests(unittest.TestCase):
         self.assertEqual([(o["choice"], o["tool"], o["arguments"]) for o in offered["options"]],
                          [("A", "select_capability", {"capability_id": "fees.water"}), ("B", "request_clarification", {})])
 
+    def test_library_prompt_leaves_out_repeated_evidence_and_keeps_descriptions(self):
+        seen = []
+
+        def model(messages, tools):
+            seen.append(messages)
+            return {"message": {"tool_calls": [{"function": {"choice": "C"}}]}}
+        result = Assistant(catalog=FakeCatalog(), model_call=model).turn({"request_id": "layout-2", "text": "我想看底層邏輯"})
+        self.assertEqual(result["destination"], {"kind": "detail", "book_id": "lib-book-3"})
+        evidence = json.loads(seen[0][1]["content"])["retrieval"]
+        self.assertEqual(evidence, {"service_evidence": "domain_or_catalog", "query": "底層邏輯", "search_type": "book_name",
+                                    "book_candidates": [{"title": "底層邏輯", "author": "劉潤著"}],
+                                    "unique_exact_id": "lib-book-3"})
+        options = json.loads(seen[0][2]["content"])["options"]
+        self.assertEqual(list(options), ["A", "B", "C"])
+        self.assertTrue(options["B"].startswith("locate_library_book(query=底層邏輯, search_type=book_name): Search "))
+        self.assertTrue(options["C"].startswith("open_library_book(book_id=lib-book-3): Open the verified"))
+
     def test_lettered_choice_maps_back_and_validation_is_unchanged(self):
         from decision import choice_options, choice_tool, from_choice, with_arguments
         tools = [server.tool("select_capability", "x", {"capability_id": {"type": "string",
@@ -326,6 +343,25 @@ class MultilingualSpeechTests(unittest.TestCase):
         result = self.recognizer.transcribe(loud_frames(), "zh")
         self.assertEqual((calls, result["language"], result["text"], result["status"]),
                          (["zh", "auto"], "en", "I want to lend a book", "clear"))
+
+    def test_unsure_switch_from_chinese_keeps_the_latin_text(self):
+        # "what can you do" with Chinese chosen was detected as Japanese at low
+        # confidence and came back in Japanese (owner, 2026-11-08).
+        self.texts["zh"], self.logprob["zh"] = "what can you do", -0.3
+        self.heard["multi"], self.texts["multi"] = "japanese", "何ができますか"
+        self.probabilities["multi"] = {"ja": 0.41, "en": 0.38, "zh": 0.1}
+        result = self.recognizer.transcribe(loud_frames(), "zh")
+        self.assertEqual((result["language"], result["text"]), ("en", "what can you do"))
+        self.assertIsNone(result["language_confidence"])
+        # Unsure, and the Chinese pass wrote characters: stay Chinese.
+        self.calls.clear()
+        self.texts["zh"], self.logprob["zh"] = "我要借書", -1.5
+        result = self.recognizer.transcribe(loud_frames(), "zh")
+        self.assertEqual(result["language"], "zh")
+        # Sure enough: follow it and report how sure.
+        self.probabilities["multi"] = {"ja": 0.92}
+        result = self.recognizer.transcribe(loud_frames(), "zh")
+        self.assertEqual((result["language"], result["language_confidence"]), ("ja", 0.92))
 
     def test_japanese_in_latin_letters_is_redone_with_a_japanese_prompt(self):
         from asr_server import SCRIPT_PROMPTS

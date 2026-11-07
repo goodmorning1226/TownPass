@@ -16,6 +16,7 @@ import 'package:town_pass/util/tp_route.dart';
 import 'package:town_pass/page/assistant/assistant_view_controller.dart';
 import 'package:town_pass/page/assistant/widget/assistant_host.dart';
 import 'package:town_pass/page/guided_assistant/guided_assistant_controller.dart';
+import 'package:town_pass/page/guided_assistant/model/guide_i18n.dart';
 import 'package:town_pass/service/assistant_recorder.dart';
 import 'package:town_pass/service/assistant_service.dart';
 import 'package:town_pass/page/guided_assistant/web/web_page_state.dart';
@@ -75,6 +76,8 @@ Future<void> initServices() async {
   Get.put<SubscriptionService>(SubscriptionService());
   // Pages keep the language of the last assistant navigation (or Settings).
   await PageTranslation.instance.load();
+  // The guided assistant's pre-translated texts (assets/i18n/guide/).
+  if (_useMock) await GuideI18n.load();
   if (_useMock) {
     Get.put<WebPageState>(WebPageState(), permanent: true);
     Get.put<GuidedAssistantController>(

@@ -6,6 +6,7 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:town_pass/page/guided_assistant/model/assistant_settings.dart';
+import 'package:town_pass/page/assistant/assistant_texts.dart';
 import 'package:town_pass/page/guided_assistant/model/guide_content.dart';
 import 'package:town_pass/page/guided_assistant/model/guide_i18n.dart';
 import 'package:town_pass/page/guided_assistant/model/mock_assistant_engine.dart';
@@ -28,6 +29,10 @@ import 'package:town_pass/service/page_translation.dart';
 class ChatMessage {
   final int id;
   final bool user;
+
+  /// The user's words as said, or the assistant's text: a backend reply (in
+  /// its language) or a pre-written Chinese source / translated template.
+  /// Shown with [shown].
   final String text;
   final GlossaryEntry? term;
   final CandidateGroup? options;
@@ -57,6 +62,10 @@ class ChatMessage {
     this.voice = false,
     this.tutorialChoice = false,
   });
+
+  /// The text on screen: the assistant's pre-written Chinese texts follow
+  /// the conversation language (gt); the user's words stay as they were.
+  String get shown => user ? text : gt(text);
 }
 
 enum TaskStatus { opened, on, paused, ended, finished }
@@ -184,6 +193,9 @@ class GuidedAssistantController extends GetxController {
        executor = executor ?? AssistantActionExecutor(),
        pageTracker = pageTracker ?? AssistantPageTracker.instance {
     recorder?.onLevel = _onLevel;
+    // A new assistant starts without a conversation language: its texts use
+    // the page language (the phone's) until the user picks one or speaks.
+    AssistantTexts.conversation.value = null;
     AssistantRecentInputs.instance.load();
     AssistantSpeechLanguage.load().then((code) {
       if (!isClosed) speechLanguage.value = code;
@@ -206,10 +218,24 @@ class GuidedAssistantController extends GetxController {
   /// The last typed or spoken request (a tapped option opens a page for it).
   String? _lastRequest;
 
+  /// The speech-language menu (under the microphone, and 助理語言 in AI
+  /// 助理設定: one choice). The choice is kept for listening; the assistant's
+  /// texts and guides follow it at once (AssistantTexts.conversation, this
+  /// launch only). "auto" keeps the current texts.
   void setSpeechLanguage(String code) {
     speechLanguage.value = AssistantSpeechLanguage.of(code).code;
     heardLanguage.value = null;
     AssistantSpeechLanguage.save(speechLanguage.value);
+    if (AssistantTexts.languages.contains(speechLanguage.value)) {
+      AssistantTexts.conversation.value = speechLanguage.value;
+    }
+  }
+
+  /// 助理語言 in AI 助理設定: the same choice as the menu, with a toast.
+  void chooseLanguage(String code) {
+    if (speechLanguage.value == code) return;
+    setSpeechLanguage(code);
+    _showToast(SettingsTexts.languageChanged(AssistantSpeechLanguage.of(code)));
   }
 
   /// A clearly recognised language switches the pages for this launch (the
@@ -217,10 +243,22 @@ class GuidedAssistantController extends GetxController {
   void _followSpokenLanguage(AssistantTranscript heard) {
     final sure = heard.languageConfidence;
     if (sure != null && sure < 0.8) return;
-    if (PageTranslation.languages.containsKey(heard.language)) {
-      PageTranslation.instance.setLanguage(heard.language);
+    _followLanguage(heard.language);
+  }
+
+  /// The assistant's texts and the pages follow [code], the language the
+  /// user clearly spoke or typed (not saved; see PageTranslation.load).
+  void _followLanguage(String? code) {
+    if (code == null) return;
+    if (AssistantTexts.languages.contains(code)) {
+      AssistantTexts.conversation.value = code;
+    }
+    if (PageTranslation.languages.containsKey(code)) {
+      PageTranslation.instance.setLanguage(code);
     }
   }
+
+  static final _hasWords = RegExp(r'[^\d\s\p{P}\p{S}]{2,}', unicode: true);
 
   void _onLevel(double rms) {
     if (listening.value || homeAsk.value == HomeAsk.listening) {
@@ -280,9 +318,8 @@ class GuidedAssistantController extends GetxController {
   final onboarding = OnboardingStage.hidden.obs;
   final toast = ''.obs;
 
-  /// AI 助理設定 (saved on the phone).
+  /// AI 助理設定 (saved on the phone). Its 助理語言 is [speechLanguage].
   final mode = AssistantMode.teach.obs;
-  final language = AssistantLanguage.zh.obs;
   bool _settingsChanged = false;
 
   final homeAsk = HomeAsk.idle.obs;
@@ -374,8 +411,16 @@ class GuidedAssistantController extends GetxController {
 
   void _say(ChatMessage message) {
     messages.add(message);
-    if (readAloud.value) speaker.speak(message.text);
+    _speak(message.shown);
   }
+
+  void _speak(String text) {
+    if (readAloud.value) speaker.speak(text, language: GuideI18n.language);
+  }
+
+  /// Displayed chip -> its Chinese source, so a tapped chip in another
+  /// language is still understood by the pre-written rules.
+  final _chipSources = <String, String>{};
 
   /// Chips under the chat.
   List<String> get chips {
@@ -385,10 +430,21 @@ class GuidedAssistantController extends GetxController {
         (t.status == TaskStatus.on ||
             t.status == TaskStatus.opened ||
             t.status == TaskStatus.paused)) {
-      return t.guide.helpChips;
+      return _localChips(t.guide.helpChips);
     }
-    // The user's own recent requests that worked, then the defaults.
-    return AssistantRecentInputs.instance.merged(starterChips);
+    // The user's own recent requests that worked, then the defaults (in the
+    // conversation language).
+    return AssistantRecentInputs.instance.merged(_localChips(starterChips));
+  }
+
+  List<String> _localChips(List<String> sources) => [
+    for (final source in sources) _chip(source),
+  ];
+
+  String _chip(String source) {
+    final shown = gt(source);
+    _chipSources[shown] = source;
+    return shown;
   }
 
   /// Replies that are always pre-written and answered on the phone; only
@@ -410,8 +466,14 @@ class GuidedAssistantController extends GetxController {
     bool voice = false,
   }) {
     // Typed text: the backend detects its language; a tapped option keeps
-    // the language of the exchange.
-    if (!voice && choiceId == null) _turnLanguage = null;
+    // the language of the exchange. A chip is in the assistant's language.
+    final chipSource = choiceId == null ? _chipSources[raw.trim()] : null;
+    if (!voice && choiceId == null) {
+      _turnLanguage = chipSource != null && GuideI18n.language != 'zh'
+          ? GuideI18n.language
+          : null;
+    }
+    _voiceTurn = voice;
     if (choiceId == null && raw.trim().isNotEmpty) _lastRequest = raw.trim();
     final text = raw.trim();
     if ((text.isEmpty && choiceId == null) || loading.value) return;
@@ -424,12 +486,21 @@ class GuidedAssistantController extends GetxController {
       ),
     );
     if (note != null) _say(_bot(note));
-    if (choiceId == null && _tutorialReply(text)) return;
-    _answer(text, choiceId: choiceId);
+    if (choiceId == null && _tutorialReply(chipSource ?? text)) return;
+    _answer(text, choiceId: choiceId, understood: chipSource);
   }
 
-  void _answer(String text, {String? choiceId}) {
-    final local = engine.interpret(text, hasTask: _activeTask != null);
+  /// The current turn was spoken (its language is followed from the
+  /// recognition, see _followSpokenLanguage).
+  bool _voiceTurn = false;
+
+  /// [understood] is the Chinese source of a tapped chip, for the
+  /// pre-written rules (they read Chinese); the backend gets [text].
+  void _answer(String text, {String? choiceId, String? understood}) {
+    final local = engine.interpret(
+      understood ?? text,
+      hasTask: _activeTask != null,
+    );
     final generation = ++_generation;
     loading.value = true;
     if (service == null ||
@@ -484,6 +555,11 @@ class GuidedAssistantController extends GetxController {
     loading.value = false;
     _session = result.sessionId;
     _resolutionId = result.resolutionId;
+    // Typed words in another language switch the texts and pages, as speech
+    // does (a tapped option or a bare number says nothing about it).
+    if (!_voiceTurn && choiceId == null && _hasWords.hasMatch(text)) {
+      _followLanguage(result.language);
+    }
     final destination = result.destination;
     if (destination != null) {
       // A request that opened a page becomes a suggestion next time.
@@ -509,7 +585,10 @@ class GuidedAssistantController extends GetxController {
                 // reason; "（還不能用）" already says it.
                 c.subtitle.isEmpty || !c.enabled
                     ? c.title
-                    : '${c.title}（${c.subtitle}）',
+                    : gt('{title}（{subtitle}）', {
+                        'title': c.title,
+                        'subtitle': c.subtitle,
+                      }),
                 choiceId: c.id,
                 available: c.enabled,
               ),
@@ -669,7 +748,13 @@ class GuidedAssistantController extends GetxController {
           _say(_bot(Replies.unknownPage));
         } else {
           _say(
-            _bot('${help.title}。${help.summary}', teachGuideId: help.guideId),
+            _bot(
+              gt('{title}。{summary}', {
+                'title': gt(help.title),
+                'summary': gt(help.summary),
+              }),
+              teachGuideId: help.guideId,
+            ),
           );
         }
       case MockReplyKind.stepHelp:
@@ -692,16 +777,25 @@ class GuidedAssistantController extends GetxController {
   void choose(ChatMessage message, CandidateOption? option) {
     if (!optionsLive(message) || loading.value) return;
     if (option == null) {
-      messages.add(ChatMessage(id: _nextId++, user: true, text: '都不是'));
+      messages.add(ChatMessage(id: _nextId++, user: true, text: gt('都不是')));
       _say(_bot(Replies.noneOfThem));
       return;
     }
     if (!option.enabled) {
-      _say(_bot('「${option.label}」：${Replies.notConnected}'));
+      _say(
+        _bot(
+          gt('「{label}」：{reason}', {
+            'label': gt(option.label),
+            'reason': gt(Replies.notConnected),
+          }),
+        ),
+      );
       return;
     }
     if (option.action != null) {
-      messages.add(ChatMessage(id: _nextId++, user: true, text: option.label));
+      messages.add(
+        ChatMessage(id: _nextId++, user: true, text: gt(option.label)),
+      );
       final active = _activeTask;
       if (option.action == 'keep' || active == null) {
         _say(_bot(Replies.keepGoing(active?.guide.shortName ?? '')));
@@ -720,7 +814,9 @@ class GuidedAssistantController extends GetxController {
       submit(option.say!);
       return;
     }
-    messages.add(ChatMessage(id: _nextId++, user: true, text: option.label));
+    messages.add(
+      ChatMessage(id: _nextId++, user: true, text: gt(option.label)),
+    );
     if (option.guideId != null) {
       String? followUp;
       final pair = message.followUpOf?.split('|');
@@ -748,9 +844,15 @@ class GuidedAssistantController extends GetxController {
       _bot(
         ask,
         options: CandidateGroup(ask, [
-          CandidateOption('先繼續${g.shortName}', action: 'keep'),
           CandidateOption(
-            '暫停${g.shortName}，改去${other.shortName}',
+            gt('先繼續{task}', {'task': gt(g.shortName)}),
+            action: 'keep',
+          ),
+          CandidateOption(
+            gt('暫停{task}，改去{other}', {
+              'task': gt(g.shortName),
+              'other': gt(other.shortName),
+            }),
             action: 'switch:$guideId',
           ),
         ]),
@@ -856,8 +958,9 @@ class GuidedAssistantController extends GetxController {
   String? get stepDetail {
     final t = _activeTask;
     if (t == null) return null;
-    if (allStepsDone) return t.guide.doneDetail;
-    return currentStep?.detail(web);
+    if (allStepsDone) return gt(t.guide.doneDetail);
+    final detail = currentStep?.detail(web);
+    return detail == null ? null : gt(detail);
   }
 
   /// A guide is under way: waiting at its 要不要開始引導 card, running a
@@ -947,17 +1050,29 @@ class GuidedAssistantController extends GetxController {
           ? (item.selfCurrent ?? item.self)
           : item.self;
     }
-    return TodoLine(item.text, state, tag, self: item.self != null);
+    return TodoLine(
+      gt(item.text),
+      state,
+      tag == null ? null : gt(tag),
+      self: item.self != null,
+    );
   }
 
   String get currentTodoText {
     final t = task.value;
     if (t == null) return '';
     final p = t.currentTodo(web);
-    return p < t.guide.todos.length ? t.guide.todos[p].text : '全部完成';
+    return gt(p < t.guide.todos.length ? t.guide.todos[p].text : '全部完成');
   }
 
+  /// The card in the conversation language (texts from the guide are
+  /// Chinese sources or already translated templates).
   GuideCard? get card {
+    final c = _card;
+    return c == null ? null : GuideCard(c.variant, gt(c.label), gt(c.text));
+  }
+
+  GuideCard? get _card {
     final t = task.value;
     if (!guideVisible) return null;
     final g = t!.guide;
@@ -977,7 +1092,12 @@ class GuidedAssistantController extends GetxController {
       return GuideCard(
         CardVariant.done,
         g.doneLabelOf?.call(web) ?? g.doneLabel,
-        '${g.doneTextOf?.call(web) ?? g.doneText}$offer',
+        offer.isEmpty
+            ? g.doneTextOf?.call(web) ?? g.doneText
+            : gt('{done}{offer}', {
+                'done': gt(g.doneTextOf?.call(web) ?? g.doneText),
+                'offer': offer,
+              }),
       );
     }
     final step = g.steps[i];
@@ -1050,7 +1170,7 @@ class GuidedAssistantController extends GetxController {
     final key = '${task.value?.guide.id}:${c.variant}:${c.label}:${c.text}';
     if (key == _lastSpokenKey || nudge.value.isNotEmpty) return;
     _lastSpokenKey = key;
-    if (readAloud.value) _speakGuide(c.text);
+    _speak(c.text);
   }
 
   // ------------------------------------------------------- leaving the page
@@ -1190,13 +1310,6 @@ class GuidedAssistantController extends GetxController {
     );
   }
 
-  /// Reads a card aloud in the language it is shown in (its pre-written
-  /// translation, else the Chinese original).
-  void _speakGuide(String text) {
-    final spoken = GuideI18n.instance.speakable(text);
-    speaker.speak(spoken.text, language: spoken.language);
-  }
-
   /// A short reminder on the guide card (e.g. from the keypad's 完成 key).
   void showNudge(String text) {
     nudge.value = text;
@@ -1211,7 +1324,7 @@ class GuidedAssistantController extends GetxController {
     final c = card;
     if (c == null) return;
     speaking.value = true;
-    _speakGuide(c.text);
+    speaker.speak(c.text, language: GuideI18n.language);
     _speakTimer?.cancel();
     _speakTimer = Timer(
       const Duration(milliseconds: 2400),
@@ -1272,9 +1385,9 @@ class GuidedAssistantController extends GetxController {
   /// Secondary button on the task card in the sheet.
   String get taskSecondaryLabel {
     final s = task.value?.status;
-    if (s == TaskStatus.on || s == TaskStatus.opened) return '暫停引導';
-    if (s == TaskStatus.paused || s == TaskStatus.ended) return '繼續引導';
-    return '重新示範';
+    if (s == TaskStatus.on || s == TaskStatus.opened) return gt('暫停引導');
+    if (s == TaskStatus.paused || s == TaskStatus.ended) return gt('繼續引導');
+    return gt('重新示範');
   }
 
   void taskSecondary() {
@@ -1306,15 +1419,18 @@ class GuidedAssistantController extends GetxController {
     if (t == null) return '';
     switch (t.status) {
       case TaskStatus.paused:
-        return '已暫停';
+        return gt('已暫停');
       case TaskStatus.ended:
-        return '已結束引導';
+        return gt('已結束引導');
       case TaskStatus.finished:
-        return '引導完成';
+        return gt('引導完成');
       default:
-        if (allStepsDone) return '引導完成';
+        if (allStepsDone) return gt('引導完成');
         final n = t.guide.stepCount;
-        return '步驟 ${t.currentTodo(web).clamp(1, n)} / $n';
+        return gt('步驟 {i} / {n}', {
+          'i': t.currentTodo(web).clamp(1, n),
+          'n': n,
+        });
     }
   }
 
@@ -1567,18 +1683,12 @@ class GuidedAssistantController extends GetxController {
   // ---------------------------------------------------------------- settings
 
   static const _kMode = 'guided_assistant_mode';
-  static const _kLanguage = 'guided_assistant_language';
 
   Future<void> _loadSettings() async {
     try {
       final prefs = await SharedPreferences.getInstance();
       if (_settingsChanged || isClosed) return;
       mode.value = AssistantModeText.parse(prefs.getString(_kMode));
-      final lang = AssistantLanguage.values.firstWhere(
-        (l) => l.name == prefs.getString(_kLanguage),
-        orElse: () => AssistantLanguage.zh,
-      );
-      if (lang.available) language.value = lang;
     } catch (_) {}
   }
 
@@ -1590,21 +1700,10 @@ class GuidedAssistantController extends GetxController {
     _showToast(SettingsTexts.modeChanged(value));
   }
 
-  /// Only the languages that are ready can be chosen; false otherwise.
-  bool setLanguage(AssistantLanguage value) {
-    if (!value.available) {
-      _showToast(SettingsTexts.langComingSoon(value));
-      return false;
-    }
-    if (language.value == value) return true;
-    _settingsChanged = true;
-    language.value = value;
-    _save(_kLanguage, value.name);
-    return true;
-  }
-
-  /// 目前設定 summary, e.g. 「教學模式・繁體中文」.
-  String get settingsSummary => '${mode.value.title}・${language.value.title}';
+  /// 目前設定 summary, e.g. 「教學模式・中文（台灣）」.
+  String get settingsSummary =>
+      '${gt(mode.value.title)}・'
+      '${AssistantSpeechLanguage.of(speechLanguage.value).title}';
 
   /// Opens AI 助理設定; from the tutorial, coming back reopens the assistant.
   void openSettingsPage({bool backToAssistant = false}) {
@@ -1678,7 +1777,7 @@ class GuidedAssistantController extends GetxController {
   void keepTutorial() {
     if (onboarding.value != OnboardingStage.branch) return;
     onboarding.value = OnboardingStage.mode;
-    _say(_bot('${TutorialTexts.keepTutReply}\n${TutorialTexts.reply}'));
+    _say(_bot('${gt(TutorialTexts.keepTutReply)}\n${gt(TutorialTexts.reply)}'));
   }
 
   /// 直接開始: the tutorial ends and the task asked for is done.
