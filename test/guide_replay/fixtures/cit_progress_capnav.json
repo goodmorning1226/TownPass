@@ -1,6 +1,6 @@
 {
  "name": "cit_progress_capnav",
- "description": "reportIssue.progress opened by its capabilities.json navigation (/citizen-report/ then in-page /citizen-report/search), as the non-guided assistant / executor would. That path is the category search (您遇到哪些問題?), not the case list. Follow the cards.",
+ "description": "reportIssue.progress opened by its capabilities.json navigation (/citizen-report/, fixed in 71cc188; it used to open the category search). Follow the cards: 查詢, then a case.",
  "page": "citizen_report",
  "start": null,
  "capability": "reportIssue.progress",
@@ -8,8 +8,8 @@
  "expect": {
   "done": true
  },
- "recordedAt": "2026-11-07T18:19:31.263Z",
- "durationMs": 6549,
+ "recordedAt": "2026-11-07T20:31:46.051Z",
+ "durationMs": 4483,
  "viewport": {
   "width": 390,
   "height": 844,
@@ -22,205 +22,6 @@
   {
    "action": null,
    "before": null,
-   "after": {
-    "path": "/citizen-report/search",
-    "query": {},
-    "flags": {
-     "vh": 844,
-     "topTab": "",
-     "subTab": "",
-     "groupOpen": false,
-     "searchInput": "",
-     "searchResults": 0,
-     "noResults": false,
-     "category": "",
-     "location": "",
-     "title": "",
-     "description": "",
-     "focus": "",
-     "titleWarn": false,
-     "descWarn": false,
-     "photos": 0,
-     "consent": "",
-     "sendEnabled": false,
-     "accepted": false,
-     "caseKeyword": "",
-     "caseCount": 0,
-     "noCases": false,
-     "casesFiltered": false,
-     "detailTab": "",
-     "caseStatus": "",
-     "caseSubject": "",
-     "replyFrom": "",
-     "expectDone": "",
-     "gridTop": -9999,
-     "gridBot": -9999,
-     "listTop": -9999,
-     "listBot": -9999,
-     "rowTop": 56,
-     "rowBot": 100,
-     "resultsTop": -9999,
-     "resultsBot": -9999,
-     "locTop": -9999,
-     "locBot": -9999,
-     "titleTop": -9999,
-     "titleBot": -9999,
-     "descTop": -9999,
-     "descBot": -9999,
-     "photoTop": -9999,
-     "photoBot": -9999,
-     "consentTop": -9999,
-     "consentBot": -9999,
-     "sendTop": -9999,
-     "sendBot": -9999,
-     "callTop": -9999,
-     "callBot": -9999,
-     "casesTop": -9999,
-     "casesBot": -9999,
-     "__bottomBar": 0,
-     "__dialog": false
-    },
-    "visible": [
-     "report.back",
-     "report.search_row"
-    ],
-    "rects": {
-     "report.search_row": [
-      16,
-      56,
-      358,
-      44
-     ],
-     "report.back": [
-      10,
-      16,
-      24,
-      24
-     ]
-    }
-   },
-   "facts": {
-    "url": "/citizen-report/search",
-    "title": "有話要說",
-    "fields": [
-     {
-      "tag": "input",
-      "type": "text",
-      "id": "",
-      "name": "",
-      "label": "有話要說",
-      "placeholder": "您遇到哪些問題?",
-      "value": "",
-      "required": false,
-      "invalid": false,
-      "disabled": false,
-      "rect": [
-       16,
-       56,
-       314,
-       44
-      ]
-     }
-    ],
-    "starred": [],
-    "errors": [],
-    "buttons": [],
-    "disabledButtons": [],
-    "dialogs": [],
-    "scrollY": 0,
-    "scrollHeight": 844
-   }
-  },
-  {
-   "action": {
-    "step": "open_cases",
-    "do": "click",
-    "selector": "section.fixed.top-0 button.absolute",
-    "hit": {
-     "x": 22,
-     "y": 28,
-     "targets": [
-      "report.back"
-     ]
-    }
-   },
-   "before": {
-    "path": "/citizen-report/search",
-    "query": {},
-    "flags": {
-     "vh": 844,
-     "topTab": "",
-     "subTab": "",
-     "groupOpen": false,
-     "searchInput": "",
-     "searchResults": 0,
-     "noResults": false,
-     "category": "",
-     "location": "",
-     "title": "",
-     "description": "",
-     "focus": "",
-     "titleWarn": false,
-     "descWarn": false,
-     "photos": 0,
-     "consent": "",
-     "sendEnabled": false,
-     "accepted": false,
-     "caseKeyword": "",
-     "caseCount": 0,
-     "noCases": false,
-     "casesFiltered": false,
-     "detailTab": "",
-     "caseStatus": "",
-     "caseSubject": "",
-     "replyFrom": "",
-     "expectDone": "",
-     "gridTop": -9999,
-     "gridBot": -9999,
-     "listTop": -9999,
-     "listBot": -9999,
-     "rowTop": 56,
-     "rowBot": 100,
-     "resultsTop": -9999,
-     "resultsBot": -9999,
-     "locTop": -9999,
-     "locBot": -9999,
-     "titleTop": -9999,
-     "titleBot": -9999,
-     "descTop": -9999,
-     "descBot": -9999,
-     "photoTop": -9999,
-     "photoBot": -9999,
-     "consentTop": -9999,
-     "consentBot": -9999,
-     "sendTop": -9999,
-     "sendBot": -9999,
-     "callTop": -9999,
-     "callBot": -9999,
-     "casesTop": -9999,
-     "casesBot": -9999,
-     "__bottomBar": 0,
-     "__dialog": false
-    },
-    "visible": [
-     "report.back",
-     "report.search_row"
-    ],
-    "rects": {
-     "report.search_row": [
-      16,
-      56,
-      358,
-      44
-     ],
-     "report.back": [
-      10,
-      16,
-      24,
-      24
-     ]
-    }
-   },
    "after": {
     "path": "/citizen-report/",
     "query": {},

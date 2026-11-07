@@ -19,7 +19,7 @@ void main() {
     'cit_progress_search_prefix': '只打案號前段（還沒按放大鏡）',
     'cit_progress_disaster': '查詢 -> 災情通報',
     'cit_progress_open_cases': '查詢',
-    'cit_progress_capnav': 'reportIssue.progress 由 capabilities.json 開到類別搜尋頁',
+    'cit_progress_capnav': 'reportIssue.progress 由 capabilities.json 開到有話要說首頁',
   };
   for (final e in ok.entries) {
     test('${e.value} (${e.key})', () {
@@ -67,18 +67,14 @@ void main() {
     });
   });
 
-  test(
-    'CIT-3 page facts: reportIssue.progress navigation is the category search',
-    () {
-      // capabilities.json sends 陳情案件進度 to /citizen-report/search, the
-      // 「您遇到哪些問題?」 category search, not the 查詢 case list. The guide
-      // copes (openFor + 「‹」 card), the non-guided executor does not.
-      final fx = loadFixture('cit_progress_capnav');
-      final first = (fx['steps'] as List).first as Map<String, dynamic>;
-      final after = first['after'] as Map<String, dynamic>;
-      expect(after['path'], '/citizen-report/search');
-      expect(after['visible'], isNot(contains('report.case_search')));
-      expect(after['visible'], contains('report.search_row'));
-    },
-  );
+  test('CIT-3 page facts: reportIssue.progress opens the 有話要說 home with the 查詢 tab', () {
+    // Fixed in capabilities.json (71cc188): 陳情案件進度 used to open
+    // /citizen-report/search, the 「您遇到哪些問題?」 category search.
+    final fx = loadFixture('cit_progress_capnav');
+    final first = (fx['steps'] as List).first as Map<String, dynamic>;
+    // The first step is the opening (no action): its snapshot is `after`.
+    final opened = first['after'] as Map<String, dynamic>;
+    expect(opened['path'], '/citizen-report/');
+    expect(opened['visible'], contains('report.tab_query'));
+  });
 }

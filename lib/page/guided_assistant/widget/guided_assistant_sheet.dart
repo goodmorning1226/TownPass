@@ -189,170 +189,186 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
         border: Border.all(color: TPColors.secondary400),
         borderRadius: BorderRadius.circular(14),
       ),
-      child: SingleChildScrollView(
-        // 看全部 / 收起 unfolds smoothly instead of jumping.
-        child: GuideAnimatedSize(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Semantics(
-                button: true,
-                expanded: open,
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(14),
-                  onTap: () {
-                    GuideMotion.tap();
-                    c.todoOpen.value = !open;
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 8,
-                    ),
-                    child: Row(
-                      children: [
-                        const PenguinAvatar(),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Flexible(
+            child: SingleChildScrollView(
+              // 看全部 / 收起 unfolds smoothly instead of jumping.
+              child: GuideAnimatedSize(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Semantics(
+                      button: true,
+                      expanded: open,
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(14),
+                        onTap: () {
+                          GuideMotion.tap();
+                          c.todoOpen.value = !open;
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 8,
+                          ),
+                          child: Row(
                             children: [
-                              TPText(
-                                gt('目前任務：{task}', {'task': gt(t.guide.title)}),
-                                style: TPTextStyles.h3SemiBold,
-                                color: TPColors.grayscale950,
+                              const PenguinAvatar(),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    TPText(
+                                      gt('目前任務：{task}', {
+                                        'task': gt(t.guide.title),
+                                      }),
+                                      style: TPTextStyles.h3SemiBold,
+                                      color: TPColors.grayscale950,
+                                    ),
+                                    TPText(
+                                      c.taskTag,
+                                      style: TPTextStyles.bodySemiBold,
+                                      color: TPColors.secondary800,
+                                    ),
+                                  ],
+                                ),
                               ),
                               TPText(
-                                c.taskTag,
-                                style: TPTextStyles.bodySemiBold,
-                                color: TPColors.secondary800,
+                                gt(open ? '收起' : '看全部'),
+                                style: TPTextStyles.bodyRegular.copyWith(
+                                  fontSize: 15,
+                                ),
+                                color: TPColors.primary700,
+                              ),
+                              Icon(
+                                open
+                                    ? Icons.expand_less_rounded
+                                    : Icons.expand_more_rounded,
+                                color: TPColors.grayscale700,
+                                size: 20,
                               ),
                             ],
                           ),
                         ),
-                        TPText(
-                          gt(open ? '收起' : '看全部'),
-                          style: TPTextStyles.bodyRegular.copyWith(
-                            fontSize: 15,
-                          ),
-                          color: TPColors.primary700,
-                        ),
-                        Icon(
-                          open
-                              ? Icons.expand_less_rounded
-                              : Icons.expand_more_rounded,
-                          color: TPColors.grayscale700,
-                          size: 20,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              if (!open) ...[
-                Container(
-                  margin: const EdgeInsets.fromLTRB(12, 0, 12, 8),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 10,
-                  ),
-                  decoration: whiteBox,
-                  child: TPText.rich(
-                    TextSpan(
-                      children: [
-                        TextSpan(text: gt('現在我們要：')),
-                        TextSpan(
-                          text: c.currentTodoText,
-                          style: const TextStyle(fontWeight: FontWeight.w600),
-                        ),
-                        TextSpan(
-                          text: gt(
-                            ended
-                                ? '。\n你正在自己操作，想要我帶你做，按「繼續引導」。'
-                                : c.allStepsDone
-                                ? '。\n步驟都做好了，有問題隨時問我！'
-                                : '。\n照著畫面上方的提示做就可以，有問題隨時問我！',
-                          ),
-                        ),
-                      ],
-                    ),
-                    style: TPTextStyles.h3Regular.copyWith(height: 24 / 16),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(12, 0, 12, 10),
-                  child: Align(
-                    alignment: Alignment.centerRight,
-                    child: ended
-                        ? _outline(c.taskSecondaryLabel, c.taskSecondary)
-                        : _outline(gt('結束引導，自己操作'), c.endGuide),
-                  ),
-                ),
-              ] else ...[
-                Container(
-                  margin: const EdgeInsets.fromLTRB(12, 0, 12, 6),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 8,
-                  ),
-                  decoration: whiteBox,
-                  child: TPText(
-                    gt('這些是我們要一起完成的事，打勾的已經做好了：'),
-                    style: TPTextStyles.h3Regular,
-                    color: TPColors.grayscale950,
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(12, 0, 12, 4),
-                  child: Column(
-                    children: [for (final line in c.todoLines) _todoRow(line)],
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(12, 4, 12, 12),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Row(
-                        children: [
-                          Expanded(
-                            child: _outline(
-                              c.taskSecondaryLabel,
-                              c.taskSecondary,
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Expanded(child: _outline(gt('結束引導'), c.endGuide)),
-                        ],
                       ),
-                      const SizedBox(height: 8),
-                      SizedBox(
-                        height: 44,
-                        child: FilledButton(
-                          style: FilledButton.styleFrom(
-                            backgroundColor: TPColors.primary500,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
+                    ),
+                    if (!open) ...[
+                      Container(
+                        margin: const EdgeInsets.fromLTRB(12, 0, 12, 8),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 10,
+                        ),
+                        decoration: whiteBox,
+                        child: TPText.rich(
+                          TextSpan(
+                            children: [
+                              TextSpan(text: gt('現在我們要：')),
+                              TextSpan(
+                                text: c.currentTodoText,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              TextSpan(
+                                text: gt(
+                                  ended
+                                      ? '。\n你正在自己操作，想要我帶你做，按「繼續引導」。'
+                                      : c.allStepsDone
+                                      ? '。\n步驟都做好了，有問題隨時問我！'
+                                      : '。\n照著畫面上方的提示做就可以，有問題隨時問我！',
+                                ),
+                              ),
+                            ],
                           ),
-                          onPressed: () {
-                            GuideMotion.confirm();
-                            c.backToPage();
-                          },
-                          child: TPText(
-                            gt(t.guide.backLabel),
-                            style: TPTextStyles.h3Regular,
-                            color: TPColors.white,
+                          style: TPTextStyles.h3Regular.copyWith(
+                            height: 24 / 16,
                           ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(12, 0, 12, 10),
+                        child: Align(
+                          alignment: Alignment.centerRight,
+                          child: ended
+                              ? _outline(c.taskSecondaryLabel, c.taskSecondary)
+                              : _outline(gt('結束引導，自己操作'), c.endGuide),
+                        ),
+                      ),
+                    ] else ...[
+                      Container(
+                        margin: const EdgeInsets.fromLTRB(12, 0, 12, 6),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 8,
+                        ),
+                        decoration: whiteBox,
+                        child: TPText(
+                          gt('這些是我們要一起完成的事，打勾的已經做好了：'),
+                          style: TPTextStyles.h3Regular,
+                          color: TPColors.grayscale950,
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(12, 0, 12, 4),
+                        child: Column(
+                          children: [
+                            for (final line in c.todoLines) _todoRow(line),
+                          ],
                         ),
                       ),
                     ],
-                  ),
+                  ],
                 ),
-              ],
-            ],
+              ),
+            ),
           ),
-        ),
+          // The task's buttons stay under the list instead of scrolling
+          // away with it, so 結束引導 is always in reach.
+          if (open)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 4, 12, 12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _outline(c.taskSecondaryLabel, c.taskSecondary),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(child: _outline(gt('結束引導'), c.endGuide)),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  SizedBox(
+                    height: 44,
+                    child: FilledButton(
+                      style: FilledButton.styleFrom(
+                        backgroundColor: TPColors.primary500,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      onPressed: () {
+                        GuideMotion.confirm();
+                        c.backToPage();
+                      },
+                      child: TPText(
+                        gt(t.guide.backLabel),
+                        style: TPTextStyles.h3Regular,
+                        color: TPColors.white,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+        ],
       ),
     );
   }

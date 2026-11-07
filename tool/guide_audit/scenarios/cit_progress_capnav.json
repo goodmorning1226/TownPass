@@ -1,6 +1,6 @@
 {
   "name": "cit_progress_capnav",
-  "description": "reportIssue.progress opened by its capabilities.json navigation (/citizen-report/ then in-page /citizen-report/search), as the non-guided assistant / executor would. That path is the category search (您遇到哪些問題?), not the case list. Follow the cards.",
+  "description": "reportIssue.progress opened by its capabilities.json navigation (/citizen-report/, fixed in 71cc188; it used to open the category search). Follow the cards: 查詢, then a case.",
   "page": "citizen_report",
   "capability": "reportIssue.progress",
   "goals": [],
@@ -8,11 +8,6 @@
     "done": true
   },
   "actions": [
-    {
-      "step": "open_cases",
-      "do": "click",
-      "selector": "section.fixed.top-0 button.absolute"
-    },
     {
       "step": "open_cases",
       "do": "click",

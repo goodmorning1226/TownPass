@@ -9,6 +9,7 @@ import 'package:town_pass/page/guided_assistant/model/assistant_settings.dart';
 import 'package:town_pass/page/guided_assistant/model/guide_content.dart';
 import 'package:town_pass/page/guided_assistant/model/guide_i18n.dart';
 import 'package:town_pass/page/guided_assistant/model/guides/guide_registry.dart';
+import 'package:town_pass/page/guided_assistant/web/web_page_state.dart';
 import 'package:town_pass/page/guided_assistant/widget/guide_highlight.dart';
 import 'package:town_pass/page/guided_assistant/widget/ask_button.dart';
 import 'package:town_pass/page/guided_assistant/widget/guide_motion.dart';
@@ -70,6 +71,7 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
               c.nudge.value;
               c.offScope.value;
               c.currentRoute.value;
+              c.currentTab.value;
               c.sheetOpen.value;
               c.homeAsk.value;
               for (final v in c.web.watched) {
@@ -225,20 +227,29 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
     final base = keyboard > 0 ? keyboard : media.padding.bottom;
     switch (c.currentRoute.value) {
       case TPRoute.webView:
-        // Above the service page's fixed bottom buttons (預約, 查詢, 前往繳費…):
-        // measured by the probe while a guide runs, otherwise the page's
-        // known lift for this path. A dialog covers the bar.
-        final page = c.pageNow;
-        if (page.flag('__dialog') || page.flag('dialogOpen')) return base + 24;
-        final bar = page.number('__bottomBar');
-        final lift = guidePageForPath(page.path)?.bottomBar?.call(page.path!);
-        final known = base + 24 + (lift ?? 0);
-        return bar > 0 ? math.max(known, bar + 12.0) : known;
+        return _abovePage(c.pageNow, base, 0);
       case '/':
-        return base + 80;
+        // Above the bottom navigation; on the 優惠 tab, whose WebView ends
+        // there, also above that page's own fixed buttons (as in a WebView).
+        final page = c.pageNow;
+        if (page.path == null || keyboard > 0) return base + 80;
+        return _abovePage(page, base, base + kBottomNavigationBarHeight);
       default:
         return base + 24;
     }
+  }
+
+  /// Above a service page's fixed bottom buttons (預約, 查詢, 前往繳費…):
+  /// measured by the probe while a guide runs, otherwise the page's known
+  /// lift for this path. A dialog covers the bar. [webBottom] is how far the
+  /// WebView ends above the screen's bottom (the bar is measured from there).
+  static double _abovePage(WebSnapshot page, double base, double webBottom) {
+    final floor = math.max(base, webBottom);
+    if (page.flag('__dialog') || page.flag('dialogOpen')) return floor + 24;
+    final bar = page.number('__bottomBar');
+    final lift = guidePageForPath(page.path)?.bottomBar?.call(page.path!);
+    final known = floor + 24 + (lift ?? 0);
+    return bar > 0 ? math.max(known, webBottom + bar + 12.0) : known;
   }
 
   Widget _fab(
