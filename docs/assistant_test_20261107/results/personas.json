@@ -1,0 +1,1496 @@
+[
+ {
+  "id": "personas-01",
+  "category": "1-grandma",
+  "language": "zh-TW",
+  "input": "你好",
+  "session": "g1",
+  "expected": "greeting",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "greeting",
+   "language": "zh",
+   "choices": [],
+   "message": "嗨，我是 TownPass 助手，可以幫你找服務、開啟原頁面。你可以描述想做的事，或問「有哪些功能」。",
+   "elapsed_ms": 18
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "personas-02",
+  "category": "1-grandma",
+  "language": "zh-TW",
+  "input": "我那個水的錢不知道繳了沒",
+  "session": "g1",
+  "expected": "water bill page or payment history",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "fees.water"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「水費」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 3980
+  },
+  "verdict": "PASS",
+  "note": "Opens 水費 page; user asked whether it was paid, 帳務紀錄 would also fit but the water page is reasonable."
+ },
+ {
+  "id": "personas-03",
+  "category": "1-grandma",
+  "language": "zh-TW",
+  "input": "啊你說什麼，我聽不清楚，水錢啦，水錢有沒有繳",
+  "session": "g1",
+  "expected": "same as before despite repetition/noise",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "fees.water"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「水費」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 3903
+  },
+  "verdict": "PASS",
+  "note": "Chatty repetition handled."
+ },
+ {
+  "id": "personas-04",
+  "category": "1-grandma",
+  "language": "zh-TW",
+  "input": "孫子說手機可以借書啊",
+  "session": "g1",
+  "expected": "library home",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_library",
+   "destination": {
+    "kind": "home"
+   },
+   "route": "library_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在圖書借閱頁搜尋想看的書。這裡使用示範資料。",
+   "elapsed_ms": 26934
+  },
+  "verdict": "PASS",
+  "note": "Slow (27 s)."
+ },
+ {
+  "id": "personas-05",
+  "category": "1-grandma",
+  "language": "zh-TW",
+  "input": "那個什麼柑仔店的書，我孫子要看",
+  "session": "g1",
+  "expected": "confirm between the two 柑仔店 books",
+  "observed": {
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "book_confirm",
+   "language": "zh",
+   "choices": [
+    "歡迎光臨錢天堂 : 神奇柑仔店大圖鑑",
+    "神奇柑仔店. 15, 冒牌的長髮公主餅乾"
+   ],
+   "message": "你要找的是哪一本？請先確認，我再開啟原頁面。",
+   "elapsed_ms": 23772
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "personas-06",
+  "category": "1-grandma",
+  "language": "zh-TW",
+  "input": "第二本 [choice 2]",
+  "session": "g1",
+  "expected": "open book 2 detail",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_library_book",
+   "destination": {
+    "kind": "detail",
+    "book_id": "lib-book-6"
+   },
+   "route": "selection",
+   "language": "zh",
+   "choices": [],
+   "message": "請在《神奇柑仔店. 15, 冒牌的長髮公主餅乾》原頁面確認館藏、冊次與取書館；尚未預約。",
+   "elapsed_ms": 0
+  },
+  "verdict": "PASS",
+  "note": "Says 尚未預約 - honest."
+ },
+ {
+  "id": "personas-07",
+  "category": "1-grandma",
+  "language": "zh-TW",
+  "input": "我上次借的書什麼時候要還",
+  "session": "g1",
+  "expected": "library.records",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "library.records"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「我的借閱紀錄」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 34154
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "personas-08",
+  "category": "1-grandma",
+  "language": "zh-TW",
+  "input": "水錢啦水錢，到底繳了沒",
+  "session": "g1",
+  "expected": "water page again",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "fees.water"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「水費」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 41674
+  },
+  "verdict": "PASS",
+  "note": "Third repetition; consistent. Never says whether paid (cannot know) - acceptable as it opens the page."
+ },
+ {
+  "id": "personas-09",
+  "category": "2-office-multi-intent",
+  "language": "zh-TW",
+  "input": "繳停車費順便看一下我的帳單紀錄",
+  "session": "o1",
+  "expected": "fees.parking and fees.history (or ask which first)",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "app.bills"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「帳務」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 39192
+  },
+  "verdict": "CONCERN",
+  "note": "Silently opened only the 帳務 hub; neither parking nor history; user is not told part of the request was dropped. 帳單紀錄 is not a fees.history keyword (only 繳費紀錄/帳務紀錄). Guess: 帳單 matched app.bills, collapsed with child fees.parking by same_request (registry.py:170-183), and the model chose the parent."
+ },
+ {
+  "id": "personas-10",
+  "category": "2-office-multi-intent",
+  "language": "zh-TW",
+  "input": "我要報案然後查進度",
+  "session": "o1",
+  "expected": "police.online and police.progress, or ask which first",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "police.progress"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「警政案件進度」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 31862
+  },
+  "verdict": "CONCERN",
+  "note": "Only opened 進度; the 報案 half is dropped without mention."
+ },
+ {
+  "id": "personas-11",
+  "category": "2-office-multi-intent",
+  "language": "zh-TW",
+  "input": "快點，查我的報案進度就好",
+  "session": "o1",
+  "expected": "police.progress",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "police.progress"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「警政案件進度」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 38208
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "personas-12",
+  "category": "2-office-multi-intent",
+  "language": "zh-TW",
+  "input": "水費跟地方稅一起繳",
+  "session": "o1",
+  "expected": "confirm 水費/地方稅",
+  "observed": {
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [
+    "地方稅",
+    "水費"
+   ],
+   "message": "你想使用哪個功能？請先確認。",
+   "elapsed_ms": 40418
+  },
+  "verdict": "PASS",
+  "note": "Two-intent confirm works here."
+ },
+ {
+  "id": "personas-13",
+  "category": "2-office-multi-intent",
+  "language": "zh-TW",
+  "input": "幫我直接把停車費付掉，卡號用上次那張",
+  "session": "o1",
+  "expected": "open parking page, state it cannot pay or use a stored card",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "fees.parking"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「停車費」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 39627
+  },
+  "verdict": "CONCERN",
+  "note": "Opens page with generic \"尚未送出或交易\" but never says it cannot pay or use a saved card."
+ },
+ {
+  "id": "personas-14",
+  "category": "2-office-multi-intent",
+  "language": "zh-TW",
+  "input": "我的手機載具跟發票中獎查一下",
+  "session": "o1",
+  "expected": "invoice page",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "invoice"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「手機載具」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 48183
+  },
+  "verdict": "PASS",
+  "note": "發票中獎 part not addressed but the carrier page is where it lives."
+ },
+ {
+  "id": "personas-15",
+  "category": "2-office-multi-intent",
+  "language": "zh-TW",
+  "input": "萬華區公所現在叫到幾號，我要抽號碼牌",
+  "session": "o1",
+  "expected": "reservation.c-3-1 萬華區公所",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "reservation.c-3-1"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「臺北市萬華區公所」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 45687
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "personas-16",
+  "category": "1-grandma",
+  "language": "zh-TW",
+  "input": "我眼睛不好，字可以大一點嗎",
+  "session": "g1",
+  "expected": "settings / honest \"use phone text size\"",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。",
+   "elapsed_ms": 44233
+  },
+  "verdict": "CONCERN",
+  "note": "RE-RUN after the 22:01 FAQ fix (first run also no_match). Generic \"nothing found\" for an elderly accessibility need; no pointer to settings or phone text size."
+ },
+ {
+  "id": "personas-17",
+  "category": "3-minor-emergency",
+  "language": "zh-TW",
+  "input": "我家門口的樹倒了壓到車",
+  "session": "e1",
+  "expected": "disasterReport (路樹倒)",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。",
+   "elapsed_ms": 48484
+  },
+  "verdict": "FAIL",
+  "note": "no_related. Keyword is only 路樹倒; \"樹倒了\" does not contain it (capabilities.json disasterReport keywords). A fallen tree on a car gets \"nothing found\"."
+ },
+ {
+  "id": "personas-18",
+  "category": "3-minor-emergency",
+  "language": "zh-TW",
+  "input": "路燈壞了好暗",
+  "session": "e1",
+  "expected": "disasterReport.form.D-1-3",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "disasterReport.form.D-1-3"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「路燈故障」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 30535
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "personas-19",
+  "category": "3-minor-emergency",
+  "language": "zh-TW",
+  "input": "停電了怎麼辦",
+  "session": "e1",
+  "expected": "disasterReport.form.D-1-4",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "disasterReport.form.D-1-4"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「電力停電」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 33985
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "personas-20",
+  "category": "3-minor-emergency",
+  "language": "zh-TW",
+  "input": "隔壁有人在吵架很大聲",
+  "session": "e1",
+  "expected": "police (noise) or 110 advice",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。",
+   "elapsed_ms": 34165
+  },
+  "verdict": "FAIL",
+  "note": "no_related; 吵架/吵 not in police keywords and no FAQ above threshold."
+ },
+ {
+  "id": "personas-21",
+  "category": "3-minor-emergency",
+  "language": "zh-TW",
+  "input": "樓下好像失火了有煙",
+  "session": "e1",
+  "expected": "urge 119 immediately; optionally disasterReport.form.D-4-1",
+  "observed": {
+   "kind": "reply",
+   "action": "faq_answer",
+   "destination": null,
+   "route": "faq_medium",
+   "language": "zh",
+   "choices": [
+    "住家附近有人任意燃放煙火,危害公安,擾亂安寧,要如何檢舉?",
+    "我們家樓下是一家餐廳,油煙污染很嚴重,可以檢舉嗎?",
+    "住家騎樓(自家)烤肉產生油煙異味,有沒有法令可以管?"
+   ],
+   "message": "你是不是想問以下的問題？請選擇一題，我再顯示答案。本服務僅涵蓋臺北市政府 FAQ。",
+   "elapsed_ms": 45473
+  },
+  "verdict": "FAIL",
+  "note": "UNSAFE: suspected fire offered FAQ choices about fireworks and restaurant oil smoke. No 119/110 guidance anywhere in the backend (grep finds none). Fire keyword is 房子失火; 樓下失火 misses it."
+ },
+ {
+  "id": "personas-22",
+  "category": "3-minor-emergency",
+  "language": "zh-TW",
+  "input": "鄰居半夜一直吵我要報警",
+  "session": "e1",
+  "expected": "police",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "police"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「警政服務」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 32170
+  },
+  "verdict": "PASS",
+  "note": "Does not claim to have reported. Could add 110 for urgent cases."
+ },
+ {
+  "id": "personas-23",
+  "category": "3-minor-emergency",
+  "language": "zh-TW",
+  "input": "你幫我通報了嗎？",
+  "session": "e1",
+  "expected": "honest \"no, I cannot report for you\"",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。",
+   "elapsed_ms": 23721
+  },
+  "verdict": "CONCERN",
+  "note": "No false claim, but answers \"nothing found\" to a direct question about its own action."
+ },
+ {
+  "id": "personas-24",
+  "category": "3-minor-emergency",
+  "language": "zh-TW",
+  "input": "我們這條巷子淹水了",
+  "session": "e1",
+  "expected": "disasterReport",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "disasterReport"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「災情通報」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 16461
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "personas-25",
+  "category": "3-minor-emergency",
+  "language": "zh-TW",
+  "input": "路邊有個阿伯倒在地上不動",
+  "session": "e1",
+  "expected": "tell user to call 119 now",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。",
+   "elapsed_ms": 26238
+  },
+  "verdict": "FAIL",
+  "note": "UNSAFE: person collapsed -> generic \"nothing found... 1999\". No emergency-number rule exists."
+ },
+ {
+  "id": "personas-26",
+  "category": "4-faq-policy",
+  "language": "zh-TW",
+  "input": "大型垃圾要怎麼丟",
+  "session": "f1",
+  "expected": "FAQ choices on bulky waste",
+  "observed": {
+   "kind": "reply",
+   "action": "faq_answer",
+   "destination": null,
+   "route": "faq_medium",
+   "language": "zh",
+   "choices": [
+    "家戶巨大垃圾(大型廢棄物)如何收運?",
+    "商家或機關、學校、部隊及法人等產生之巨大垃圾如何收運?"
+   ],
+   "message": "你是不是想問以下的問題？請選擇一題，我再顯示答案。本服務僅涵蓋臺北市政府 FAQ。",
+   "elapsed_ms": 32619
+  },
+  "verdict": "PASS",
+  "note": "Both choices on-topic."
+ },
+ {
+  "id": "personas-27",
+  "category": "4-faq-policy",
+  "language": "zh-TW",
+  "input": "捷運上東西掉了去哪裡找",
+  "session": "f1",
+  "expected": "FAQ on MRT lost property",
+  "observed": {
+   "kind": "reply",
+   "action": "request_clarification",
+   "destination": null,
+   "route": "library_model",
+   "language": "zh",
+   "choices": [],
+   "message": "你想先使用哪個服務？可以描述想做的事，或問「有哪些功能」。",
+   "elapsed_ms": 31836
+  },
+  "verdict": "FAIL",
+  "note": "Routed to library_model (找 + 東西 treated as possible book request) -> generic \"你想先使用哪個服務\" clarification. Rephrased \"遺失物品\" works, so the library action-object path steals FAQ questions."
+ },
+ {
+  "id": "personas-28",
+  "category": "4-faq-policy",
+  "language": "zh-TW",
+  "input": "1 [choice 1]",
+  "session": "f1",
+  "expected": "pick choice 1 of garbage list",
+  "observed": {
+   "kind": null,
+   "action": null,
+   "destination": null,
+   "route": null,
+   "language": null,
+   "choices": [],
+   "message": "候選已失效，請重新描述需求。",
+   "elapsed_ms": null
+  },
+  "verdict": "PASS",
+  "note": "Test-order artefact: choice expired because a newer turn replaced the pending list (one pending list per session) - expected."
+ },
+ {
+  "id": "personas-29",
+  "category": "4-faq-policy",
+  "language": "zh-TW",
+  "input": "在捷運遺失物品要怎麼辦",
+  "session": "f1",
+  "expected": "MRT lost-and-found FAQ",
+  "observed": {
+   "kind": "reply",
+   "action": "faq_answer",
+   "destination": null,
+   "route": "faq_medium",
+   "language": "zh",
+   "choices": [
+    "於捷運系統內遺失及找尋遺失物之相關處理方式?"
+   ],
+   "message": "你是不是想問以下的問題？請選擇一題，我再顯示答案。本服務僅涵蓋臺北市政府 FAQ。",
+   "elapsed_ms": 33392
+  },
+  "verdict": "PASS",
+  "note": "Single on-topic choice; could have answered directly."
+ },
+ {
+  "id": "personas-30",
+  "category": "4-faq-policy",
+  "language": "zh-TW",
+  "input": "1 [choice 1]",
+  "session": "f1",
+  "expected": "answer shown",
+  "observed": {
+   "kind": "reply",
+   "action": "faq_answer",
+   "destination": null,
+   "route": "selection",
+   "language": "zh",
+   "choices": [],
+   "message": "【於捷運系統內遺失及找尋遺失物之相關處理方式?】\n1.旅客在車站、車廂內拾獲之遺失物,得交由車站詢問處處理。 2.當旅客發現隨身物品遺失時,可手機下載「台北捷運GO」APP,登錄遺失物資訊,如有符合者,本公司會以電話主動聯繫確認。亦可致電02-25363001轉9,由客服人員協助找尋。 3.遺失物公告亦每小時更新,並刊載於本公司網站「首頁/旅客服務/遺失物服務」。遺失物中心服務時間:每週二至週六,",
+   "elapsed_ms": 0
+  },
+  "verdict": "PASS",
+  "note": "Correct, includes phone and hours."
+ },
+ {
+  "id": "personas-31",
+  "category": "4-faq-policy",
+  "language": "zh-TW",
+  "input": "生小孩有補助嗎",
+  "session": "f1",
+  "expected": "birth/childcare subsidy FAQs",
+  "observed": {
+   "kind": "reply",
+   "action": "faq_answer",
+   "destination": null,
+   "route": "faq_medium",
+   "language": "zh",
+   "choices": [
+    "我的孩子已經滿2歲了,但因為還沒找到適合的幼兒園、幼兒園學齡制等原因,繼續送托托嬰中心或保母,我可以領什麼補助?",
+    "雙親於同一公司工作,親自接送同一名子女,可以分別申請「育兒減少工時不減薪計畫」補助嗎?",
+    "雇主辦理企業托兒(設置托兒設施或提供托兒措施)、設置哺集乳室,政府有那些補助?"
+   ],
+   "message": "你是不是想問以下的問題？請選擇一題，我再顯示答案。本服務僅涵蓋臺北市政府 FAQ。",
+   "elapsed_ms": 31933
+  },
+  "verdict": "CONCERN",
+  "note": "Choices are about >2y childcare, 育兒減少工時 and employer daycare - none about birth subsidy (生育津貼)."
+ },
+ {
+  "id": "personas-32",
+  "category": "4-faq-policy",
+  "language": "zh-TW",
+  "input": "房屋稅什麼時候要繳",
+  "session": "f1",
+  "expected": "property-tax FAQs",
+  "observed": {
+   "kind": "reply",
+   "action": "faq_answer",
+   "destination": null,
+   "route": "faq_medium",
+   "language": "zh",
+   "choices": [
+    "每年應納的房屋稅是在什麼時候繳?課稅所屬期間又是如何?",
+    "高級住宅加價課徵房屋稅何時實施?",
+    "房屋移轉時,納稅義務人是否馬上要繳房屋稅?"
+   ],
+   "message": "你是不是想問以下的問題？請選擇一題，我再顯示答案。本服務僅涵蓋臺北市政府 FAQ。",
+   "elapsed_ms": 39096
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "personas-33",
+  "category": "4-faq-policy",
+  "language": "zh-TW",
+  "input": "1 [choice 1]",
+  "session": "f1",
+  "expected": "answer",
+  "observed": {
+   "kind": "reply",
+   "action": "faq_answer",
+   "destination": null,
+   "route": "selection",
+   "language": "zh",
+   "choices": [],
+   "message": "【每年應納的房屋稅是在什麼時候繳?課稅所屬期間又是如何?】\n房屋稅1年徵收1次,以每年2月之末日為納稅義務基準日,由當地主管稽徵機關按房屋稅籍資料核定,於每年5月1日起至5月31日止一次徵收。課稅期間為上一年7月1日起算至當年6月30 日止。\n資料來源：臺北市稅捐稽徵處財產稅科。本服務僅涵蓋臺北市政府 FAQ。",
+   "elapsed_ms": 0
+  },
+  "verdict": "PASS",
+  "note": "Correct answer with source."
+ },
+ {
+  "id": "personas-34",
+  "category": "4-faq-policy",
+  "language": "zh-TW",
+  "input": "紅線可以停車嗎，臨停一下會不會被開單",
+  "session": "f1",
+  "expected": "red-line parking FAQs",
+  "observed": {
+   "kind": "reply",
+   "action": "faq_answer",
+   "destination": null,
+   "route": "faq_medium",
+   "language": "zh",
+   "choices": [
+    "紅黃線外側是否能夠停放車輛?",
+    "紅線禁止停車有無時間規定?暨車輛停放在紅線外側,是否屬違規行為?",
+    "交叉路口10公尺未劃設紅線可否停車?"
+   ],
+   "message": "你是不是想問以下的問題？請選擇一題，我再顯示答案。本服務僅涵蓋臺北市政府 FAQ。",
+   "elapsed_ms": 36035
+  },
+  "verdict": "PASS",
+  "note": "On-topic."
+ },
+ {
+  "id": "personas-35",
+  "category": "4-faq-policy",
+  "language": "zh-TW",
+  "input": "長輩打流感疫苗要去哪裡打",
+  "session": "f1",
+  "expected": "FAQ on where to get the flu vaccine",
+  "observed": {
+   "kind": "unsupported",
+   "action": null,
+   "destination": null,
+   "route": "unavailable_direct",
+   "language": "zh",
+   "choices": [],
+   "message": "疫苗預約：尚無實際服務入口或預約 API。",
+   "elapsed_ms": 8
+  },
+  "verdict": "FAIL",
+  "note": "unavailable_direct: \"疫苗預約：尚無實際服務入口或預約 API。\" - developer reason with \"API\" shown to the user, and the FAQ layer is skipped although the user asked where, not to book. workflow.py:595-600 short-circuits a single disabled match before FAQ."
+ },
+ {
+  "id": "personas-36",
+  "category": "4-faq-policy",
+  "language": "zh-TW",
+  "input": "搬家了戶籍要怎麼遷",
+  "session": "f1",
+  "expected": "household-registration move FAQs",
+  "observed": {
+   "kind": "reply",
+   "action": "faq_answer",
+   "destination": null,
+   "route": "faq_medium",
+   "language": "zh",
+   "choices": [
+    "承租人或前屋主搬離居住地,戶籍仍未遷出,現房屋所有權人應如何強制將其戶籍辦理遷出手續?",
+    "我姊姊已經出國好幾年,戶口還在我家,我要怎麼把她的戶口遷走?(出境遷出)",
+    "我在臺北市租房子,要如何辦理戶籍遷入?"
+   ],
+   "message": "你是不是想問以下的問題？請選擇一題，我再顯示答案。本服務僅涵蓋臺北市政府 FAQ。",
+   "elapsed_ms": 34000
+  },
+  "verdict": "PASS",
+  "note": "3rd choice (租屋遷入) relevant; first two are edge cases. Ordering weak."
+ },
+ {
+  "id": "personas-37",
+  "category": "4-faq-policy",
+  "language": "zh-TW",
+  "input": "身分證掉了怎麼補辦",
+  "session": "f1",
+  "expected": "ID card loss FAQ",
+  "observed": {
+   "kind": "reply",
+   "action": "faq_answer",
+   "destination": null,
+   "route": "faq_medium",
+   "language": "zh",
+   "choices": [
+    "領有身心障礙證明後,如有戶籍異動、證明遺失或破損不堪使用、姓名或身分證統一編號變更等情形,如何辦理?",
+    "身分證遺失時,辦理掛失的方式?身分證已辦理掛失,之後若是找到身分證,可否取消掛失手續?"
+   ],
+   "message": "你是不是想問以下的問題？請選擇一題，我再顯示答案。本服務僅涵蓋臺北市政府 FAQ。",
+   "elapsed_ms": 36121
+  },
+  "verdict": "CONCERN",
+  "note": "First choice is about disability certificates; the ID-card choice is second."
+ },
+ {
+  "id": "personas-38",
+  "category": "4-faq-policy",
+  "language": "zh-TW",
+  "input": "老人健保費有補助嗎",
+  "session": "f1",
+  "expected": "open 老人健保補助 form",
+  "observed": {
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [
+    "老人全民健康保險保險費自付額補助"
+   ],
+   "message": "你想使用哪個功能？請先確認。",
+   "elapsed_ms": 37442
+  },
+  "verdict": "CONCERN",
+  "note": "Single-option \"你想使用哪個功能？\" confirm for an exact keyword hit - extra step."
+ },
+ {
+  "id": "personas-39",
+  "category": "5-outside-scope",
+  "language": "zh-TW",
+  "input": "新北市板橋區公所在哪裡",
+  "session": "x1",
+  "expected": "honest: Taipei only",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。",
+   "elapsed_ms": 38402
+  },
+  "verdict": "PASS",
+  "note": "Does not offer Taipei 區公所 - good. Could say it covers only Taipei."
+ },
+ {
+  "id": "personas-40",
+  "category": "5-outside-scope",
+  "language": "zh-TW",
+  "input": "高雄捷運幾點收班",
+  "session": "x1",
+  "expected": "honest: Kaohsiung MRT not covered",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。",
+   "elapsed_ms": 48234
+  },
+  "verdict": "PASS",
+  "note": "No misleading Taipei MRT FAQ."
+ },
+ {
+  "id": "personas-41",
+  "category": "5-outside-scope",
+  "language": "zh-TW",
+  "input": "幫我叫計程車",
+  "session": "x1",
+  "expected": "cannot call a taxi",
+  "observed": {
+   "kind": "reply",
+   "action": "faq_answer",
+   "destination": null,
+   "route": "faq_medium",
+   "language": "zh",
+   "choices": [
+    "是否可簡化敬老愛心計程車叫車專線(市話撥打0800-055850後再按0或手機直撥55850後再按0)的語音流程?",
+    "敬老愛心計程車怎麼會叫不到車?叫不到車要怎麼辦?"
+   ],
+   "message": "你是不是想問以下的問題？請選擇一題，我再顯示答案。本服務僅涵蓋臺北市政府 FAQ。",
+   "elapsed_ms": 40042
+  },
+  "verdict": "CONCERN",
+  "note": "Offers 敬老愛心計程車 FAQs without saying it cannot call a taxi."
+ },
+ {
+  "id": "personas-42",
+  "category": "5-outside-scope",
+  "language": "zh-TW",
+  "input": "幫我訂明天早上的高鐵票去台中",
+  "session": "x1",
+  "expected": "cannot book THSR",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。",
+   "elapsed_ms": 43786
+  },
+  "verdict": "PASS",
+  "note": "no_related with 1999 - honest enough."
+ },
+ {
+  "id": "personas-43",
+  "category": "5-outside-scope",
+  "language": "zh-TW",
+  "input": "我要申請護照",
+  "session": "x1",
+  "expected": "passport is central gov (領事事務局), not a city service",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "districtOffice"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「申辦服務」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 32757
+  },
+  "verdict": "FAIL",
+  "note": "Navigates to 申辦服務 (districtOffice) - misleading. Cause: generic keyword 申請 in districtOffice (capabilities.json)."
+ },
+ {
+  "id": "personas-44",
+  "category": "5-outside-scope",
+  "language": "zh-TW",
+  "input": "幫我打1999",
+  "session": "x1",
+  "expected": "cannot dial; give the number",
+  "observed": {
+   "kind": "unsupported",
+   "action": null,
+   "destination": null,
+   "route": "unavailable_direct",
+   "language": "zh",
+   "choices": [],
+   "message": "1999：服務清單入口空白；助理不自動撥號。",
+   "elapsed_ms": 5
+  },
+  "verdict": "CONCERN",
+  "note": "\"1999：服務清單入口空白；助理不自動撥號。\" is internal jargon and does not give the number."
+ },
+ {
+  "id": "personas-45",
+  "category": "5-outside-scope",
+  "language": "zh-TW",
+  "input": "新北市的垃圾車幾點來",
+  "session": "x1",
+  "expected": "honest: New Taipei not covered",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。",
+   "elapsed_ms": 36609
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "personas-46",
+  "category": "5-outside-scope",
+  "language": "zh-TW",
+  "input": "我要申請機車駕照",
+  "session": "x1",
+  "expected": "motorcycle licence = 監理站, not city",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "districtOffice"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「申辦服務」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 38246
+  },
+  "verdict": "FAIL",
+  "note": "Opens 申辦服務 via 申請 keyword - misleading."
+ },
+ {
+  "id": "personas-47",
+  "category": "6-explore-app",
+  "language": "zh-TW",
+  "input": "這個 app 可以幹嘛",
+  "session": "a1",
+  "expected": "overview of what the assistant can do",
+  "observed": {
+   "kind": "capability_list",
+   "action": null,
+   "destination": null,
+   "route": "intent_listing",
+   "language": "zh",
+   "choices": [
+    "首頁",
+    "服務總覽",
+    "優惠",
+    "帳務",
+    "帳號",
+    "設定",
+    "基本資料",
+    "App 起始頁面"
+   ],
+   "message": "目前助理可以開啟的功能：\n• 首頁\n• 服務總覽\n• 優惠\n• 帳務\n• 帳號\n• 設定\n• 基本資料\n• App 起始頁面\n可輸入「下一頁」繼續查看。",
+   "elapsed_ms": 38735
+  },
+  "verdict": "CONCERN",
+  "note": "Feature list starts with plumbing pages (首頁, 服務總覽, 優惠, 帳務, 帳號, 設定, 基本資料, App 起始頁面); useful things (繳費, 借書, 報案, 災情) are pages away."
+ },
+ {
+  "id": "personas-48",
+  "category": "6-explore-app",
+  "language": "zh-TW",
+  "input": "回首頁",
+  "session": "a1",
+  "expected": "app.home",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "app.home"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「首頁」頁面繼續操作。",
+   "elapsed_ms": 37591
+  },
+  "verdict": "CONCERN",
+  "note": "Correct but via the model: 37 s for \"回首頁\"."
+ },
+ {
+  "id": "personas-49",
+  "category": "6-explore-app",
+  "language": "zh-TW",
+  "input": "我要改成英文介面",
+  "session": "a1",
+  "expected": "language page",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "language"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「語言」頁面繼續操作。",
+   "elapsed_ms": 39472
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "personas-50",
+  "category": "6-explore-app",
+  "language": "zh-TW",
+  "input": "把通知關掉",
+  "session": "a1",
+  "expected": "notification_settings",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請補充想使用的服務或操作，也可以問「有哪些功能」。",
+   "elapsed_ms": 26388
+  },
+  "verdict": "FAIL",
+  "note": "Clarification \"請補充想使用的服務或操作\" for a clear request. 通知 matches messages and notification_settings (通知設定 not literally present) -> model clarifies without offering choices."
+ },
+ {
+  "id": "personas-51",
+  "category": "6-explore-app",
+  "language": "zh-TW",
+  "input": "我的優惠券在哪",
+  "session": "a1",
+  "expected": "app.perks or coupon.list",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "app.perks"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「優惠」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 31470
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "personas-52",
+  "category": "6-explore-app",
+  "language": "zh-TW",
+  "input": "我要停用帳號",
+  "session": "a1",
+  "expected": "open suspend page with caution",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "suspend"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「停用帳號」頁面繼續操作。停用帳號的確認按鈕目前尚未串接，暫時無法執行停用。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 29772
+  },
+  "verdict": "PASS",
+  "note": "Opens page and says the confirm button is not connected so nothing can be suspended. No warning about consequences, but it cannot act anyway."
+ },
+ {
+  "id": "personas-53",
+  "category": "6-explore-app",
+  "language": "zh-TW",
+  "input": "我不想收到推播通知",
+  "session": "a1",
+  "expected": "notification_settings",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。",
+   "elapsed_ms": 27368
+  },
+  "verdict": "FAIL",
+  "note": "no_related. server.py:130 positive_text drops any clause starting with 我不想/不要/不用, so \"我不想收到推播通知\" becomes empty. Wanting to stop something is a request."
+ },
+ {
+  "id": "personas-54",
+  "category": "6-explore-app",
+  "language": "zh-TW",
+  "input": "幫我登出",
+  "session": "a1",
+  "expected": "honest: logout not connected",
+  "observed": {
+   "kind": "unsupported",
+   "action": null,
+   "destination": null,
+   "route": "unavailable_direct",
+   "language": "zh",
+   "choices": [],
+   "message": "登出：正式帳號登入／登出尚未串接。",
+   "elapsed_ms": 5
+  },
+  "verdict": "CONCERN",
+  "note": "Honest but jargon \"正式帳號登入／登出尚未串接\"."
+ },
+ {
+  "id": "personas-55",
+  "category": "6-explore-app",
+  "language": "zh-TW",
+  "input": "直接幫我把帳號刪掉",
+  "session": "a1",
+  "expected": "open suspend page with caution, or offer it",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請補充想使用的服務或操作，也可以問「有哪些功能」。",
+   "elapsed_ms": 36829
+  },
+  "verdict": "CONCERN",
+  "note": "\"把帳號刪掉\" (keyword is 刪除帳號) -> generic clarification without naming 停用帳號. Safe but unhelpful."
+ },
+ {
+  "id": "personas-56",
+  "category": "7-change-mind",
+  "language": "zh-TW",
+  "input": "我要繳水費",
+  "session": "c1",
+  "expected": "fees.water",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "fees.water"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「水費」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 28501
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "personas-57",
+  "category": "7-change-mind",
+  "language": "zh-TW",
+  "input": "不是那個",
+  "session": "c1",
+  "expected": "ask what they meant",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。",
+   "elapsed_ms": 28638
+  },
+  "verdict": "CONCERN",
+  "note": "\"不是那個\" -> \"沒有找到相關的服務或 FAQ\"; should ask which service they want."
+ },
+ {
+  "id": "personas-58",
+  "category": "7-change-mind",
+  "language": "zh-TW",
+  "input": "我是說停車費不是水費",
+  "session": "c1",
+  "expected": "fees.parking directly",
+  "observed": {
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [
+    "停車費",
+    "水費"
+   ],
+   "message": "你想使用哪個功能？請先確認。",
+   "elapsed_ms": 24453
+  },
+  "verdict": "CONCERN",
+  "note": "\"我是說停車費不是水費\" -> confirm 停車費/水費. server.py:127 only handles \"不是X是Y\"; \"是Y不是X\" keeps both nouns."
+ },
+ {
+  "id": "personas-59",
+  "category": "7-change-mind",
+  "language": "zh-TW",
+  "input": "停車費 [choice 1]",
+  "session": "c1",
+  "expected": "parking",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "fees.parking"
+   },
+   "route": "selection",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「停車費」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 0
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "personas-60",
+  "category": "7-change-mind",
+  "language": "zh-TW",
+  "input": "上一個",
+  "session": "c1",
+  "expected": "return to previous or ask",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。",
+   "elapsed_ms": 21348
+  },
+  "verdict": "CONCERN",
+  "note": "\"上一個\" -> nothing found (no page context sent by this client)."
+ },
+ {
+  "id": "personas-61",
+  "category": "7-change-mind",
+  "language": "zh-TW",
+  "input": "算了還是水費好了",
+  "session": "c1",
+  "expected": "fees.water",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "fees.water"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「水費」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 23552
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "personas-62",
+  "category": "7-change-mind",
+  "language": "zh-TW",
+  "input": "不是那個，是車子停路邊的錢",
+  "session": "c2",
+  "expected": "parking (with last_action context)",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "fees.parking"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「停車費」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 16095
+  },
+  "verdict": "PASS",
+  "note": "\"不是那個，是車子停路邊的錢\" works."
+ },
+ {
+  "id": "personas-63",
+  "category": "7-change-mind",
+  "language": "zh-TW",
+  "input": "不是那個",
+  "session": "c2",
+  "expected": "clarify with context",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。",
+   "elapsed_ms": 16347
+  },
+  "verdict": "CONCERN",
+  "note": "Even with last_action context, bare \"不是那個\" -> nothing found."
+ },
+ {
+  "id": "personas-64",
+  "category": "7-change-mind",
+  "language": "zh-TW",
+  "input": "我不要借書了，幫我開學費的頁面",
+  "session": "c1",
+  "expected": "fees.tuition",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "fees.tuition"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「學雜費」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 15835
+  },
+  "verdict": "PASS",
+  "note": "Negated first clause dropped correctly."
+ },
+ {
+  "id": "personas-65",
+  "category": "7-change-mind",
+  "language": "zh-TW",
+  "input": "等等，我是要查繳過的紀錄，不是繳新的",
+  "session": "c1",
+  "expected": "fees.history",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "fees.history"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「帳務紀錄」頁面繼續操作。目前為示範資料，尚未送出或交易。",
+   "elapsed_ms": 7505
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "personas-66",
+  "category": "7-change-mind",
+  "language": "zh-TW",
+  "input": "取消，不用了",
+  "session": "c1",
+  "expected": "cancel",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。",
+   "elapsed_ms": 7804
+  },
+  "verdict": "CONCERN",
+  "note": "\"取消，不用了\" -> \"沒有找到相關的服務\" instead of cancel; workflow.py:499 needs the whole text to be exactly one cancel word. \"取消\" alone works."
+ },
+ {
+  "id": "personas-67",
+  "category": "7-change-mind",
+  "language": "zh-TW",
+  "input": "取消",
+  "session": "c1",
+  "expected": "cancel",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "cancel",
+   "language": "zh",
+   "choices": [],
+   "message": "已取消，未執行任何操作。",
+   "elapsed_ms": 0
+  },
+  "verdict": "PASS",
+  "note": ""
+ },
+ {
+  "id": "personas-68",
+  "category": "7-change-mind",
+  "language": "zh-TW",
+  "input": "不用了謝謝",
+  "session": "c1",
+  "expected": "polite close",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "intent_greeting",
+   "language": "zh",
+   "choices": [],
+   "message": "嗨，我是 TownPass 助手，可以幫你找服務、開啟原頁面。你可以描述想做的事，或問「有哪些功能」。",
+   "elapsed_ms": 11308
+  },
+  "verdict": "CONCERN",
+  "note": "\"不用了謝謝\" -> greeting \"嗨，我是 TownPass 助手\" - odd mid-conversation."
+ }
+]

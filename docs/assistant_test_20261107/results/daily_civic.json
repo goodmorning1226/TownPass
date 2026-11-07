@@ -1,0 +1,1846 @@
+[
+ {
+  "id": "daily_civic-01",
+  "category": "single:districtOffice",
+  "language": "zh-TW",
+  "input": "我要去區公所辦東西",
+  "session": "dc-01",
+  "expected": "navigate to / offer: districtOffice",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。"
+  },
+  "verdict": "FAIL",
+  "note": "no_match → 'nothing found'. 區公所 is not a keyword of districtOffice (keywords 申辦/申請/市政府服務) and only 萬華區公所/中正區公所 exist for reservation; 辦東西 not a cue. Should at least offer 申辦服務 / 區公所叫號."
+ },
+ {
+  "id": "daily_civic-02",
+  "category": "single:districtOffice",
+  "language": "zh-TW",
+  "input": "有沒有那種線上申請補助、申訴的地方",
+  "session": "dc-02",
+  "expected": "navigate to / offer: districtOffice",
+  "observed": {
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [
+    "申辦服務",
+    "有話要說"
+   ],
+   "message": "你想使用哪個功能？請先確認。"
+  },
+  "verdict": "PASS",
+  "note": "Both needs (補助 via 申請 → 申辦服務, 申訴 → 有話要說) offered as choices."
+ },
+ {
+  "id": "daily_civic-03",
+  "category": "single:districtOffice.progress",
+  "language": "zh-TW",
+  "input": "我上禮拜申請的補助辦好了沒",
+  "session": "dc-03",
+  "expected": "navigate to / offer: districtOffice.progress",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "districtOffice.progress"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「申辦案件進度」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "辦好了 keyword → districtOffice.progress."
+ },
+ {
+  "id": "daily_civic-04",
+  "category": "single:districtOffice.progress",
+  "language": "zh-TW",
+  "input": "之前在網路上送的申請不知道審到哪裡了",
+  "session": "dc-04",
+  "expected": "navigate to / offer: districtOffice.progress",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請補充想使用的服務或操作，也可以問「有哪些功能」。"
+  },
+  "verdict": "FAIL",
+  "note": "申請 matched districtOffice; 審到哪裡 is not a progress keyword (only 辦到哪/處理到哪/進度/辦好了); model clarified with generic reply."
+ },
+ {
+  "id": "daily_civic-05",
+  "category": "single:districtOffice.form.a-1",
+  "language": "zh-TW",
+  "input": "我收到紅單覺得被冤枉想申訴",
+  "session": "dc-05",
+  "expected": "navigate to / offer: districtOffice.form.a-1",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請補充想使用的服務或操作，也可以問「有哪些功能」。"
+  },
+  "verdict": "FAIL",
+  "note": "申訴 matched reportIssue only; 紅單 is not a synonym of 罰單 in a-1 keywords; model clarified generically."
+ },
+ {
+  "id": "daily_civic-06",
+  "category": "single:districtOffice.form.a-1",
+  "language": "zh-TW",
+  "input": "罰單寄來說我闖紅燈，可是我根本沒有，要怎麼申訴",
+  "session": "dc-06",
+  "expected": "navigate to / offer: districtOffice.form.a-1",
+  "observed": {
+   "kind": "reply",
+   "action": "faq_answer",
+   "destination": null,
+   "route": "faq_medium",
+   "language": "zh",
+   "choices": [
+    "收到逕行舉發闖紅燈的違規通知單但沒有採證照片,這樣的舉發成立嗎?"
+   ],
+   "message": "你是不是想問以下的問題？請選擇一題，我再顯示答案。本服務僅涵蓋臺北市政府 FAQ。"
+  },
+  "verdict": "CONCERN",
+  "note": "No form; FAQ 'did you mean' about 闖紅燈 photo evidence — on topic but the a-1 appeal form is never offered. Keyword 罰單申訴 needs that exact contiguous string."
+ },
+ {
+  "id": "daily_civic-07",
+  "category": "single:districtOffice.form.a-2",
+  "language": "zh-TW",
+  "input": "外縣市開的罰單要申訴",
+  "session": "dc-07",
+  "expected": "navigate to / offer: districtOffice.form.a-2",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請補充想使用的服務或操作，也可以問「有哪些功能」。"
+  },
+  "verdict": "FAIL",
+  "note": "外縣市開的罰單要申訴 — keyword is 外縣市罰單申訴 (contiguous), 的/要 break substring match; generic clarification."
+ },
+ {
+  "id": "daily_civic-08",
+  "category": "single:districtOffice.form.a-2",
+  "language": "zh-TW",
+  "input": "我在台中被拍到超速，但我住台北，罰單要怎麼申訴",
+  "session": "dc-08",
+  "expected": "navigate to / offer: districtOffice.form.a-2",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "reportIssue"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「有話要說」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "FAIL",
+  "note": "Wrong service: opened 有話要說 (via 申訴) instead of a-2 form (or a-1)."
+ },
+ {
+  "id": "daily_civic-09",
+  "category": "single:districtOffice.form.a-3",
+  "language": "zh-TW",
+  "input": "停車費單子有問題想申訴",
+  "session": "dc-09",
+  "expected": "navigate to / offer: districtOffice.form.a-3",
+  "observed": {
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [
+    "停車費",
+    "有話要說"
+   ],
+   "message": "你想使用哪個功能？請先確認。"
+  },
+  "verdict": "FAIL",
+  "note": "Offered 停車費 (fees.parking bill payment) and 有話要說; the a-3 appeal form (keyword 停車費申訴 needs contiguous) is not offered."
+ },
+ {
+  "id": "daily_civic-10",
+  "category": "single:districtOffice.form.a-3",
+  "language": "zh-TW",
+  "input": "路邊停車明明繳過了還收到催繳，我要申訴",
+  "session": "dc-10",
+  "expected": "navigate to / offer: districtOffice.form.a-3",
+  "observed": {
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [
+    "停車費",
+    "有話要說",
+    "帳務紀錄"
+   ],
+   "message": "你想使用哪個功能？請先確認。"
+  },
+  "verdict": "FAIL",
+  "note": "Offered 停車費 / 有話要說 / 帳務紀錄 (繳過 keyword) — none is a-3 appeal form."
+ },
+ {
+  "id": "daily_civic-11",
+  "category": "single:districtOffice.form.b-1",
+  "language": "zh-TW",
+  "input": "警察開我罰單我不服",
+  "session": "dc-11",
+  "expected": "navigate to / offer: districtOffice.form.b-1",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "police"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「警政服務」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "FAIL",
+  "note": "Wrong service: opened 警政服務 (police) for a ticket appeal; b-1 missed (keyword 警察開的罰單申訴 contiguous only)."
+ },
+ {
+  "id": "daily_civic-12",
+  "category": "single:districtOffice.form.b-1",
+  "language": "zh-TW",
+  "input": "昨天被警察攔下來開單，說我違規左轉，我覺得不合理想申訴",
+  "session": "dc-12",
+  "expected": "navigate to / offer: districtOffice.form.b-1",
+  "observed": {
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [
+    "有話要說",
+    "警政服務"
+   ],
+   "message": "你想使用哪個功能？請先確認。"
+  },
+  "verdict": "FAIL",
+  "note": "Offered 有話要說 / 警政服務; b-1 not among them."
+ },
+ {
+  "id": "daily_civic-13",
+  "category": "single:districtOffice.form.c-1",
+  "language": "zh-TW",
+  "input": "我七十歲健保費可以補助嗎",
+  "session": "dc-13",
+  "expected": "navigate to / offer: districtOffice.form.c-1",
+  "observed": {
+   "kind": "reply",
+   "action": "faq_answer",
+   "destination": null,
+   "route": "faq_medium",
+   "language": "zh",
+   "choices": [
+    "我已經超過65歲,怎麼沒老人健保補助(還在繳健保費)?",
+    "我知道有老人健保補助,退休後如果依附子女加保還會被補助嗎?",
+    "我原本設籍臺北市二三十年,有事暫時遷出沒過幾天就再遷回來,這樣就沒老人健保補助嗎?"
+   ],
+   "message": "你是不是想問以下的問題？請選擇一題，我再顯示答案。本服務僅涵蓋臺北市政府 FAQ。"
+  },
+  "verdict": "CONCERN",
+  "note": "FAQ choices about 老人健保補助 (on topic) but the c-1 form never offered; 老人健保補助 keyword not in '七十歲健保費可以補助'."
+ },
+ {
+  "id": "daily_civic-14",
+  "category": "single:districtOffice.form.c-1",
+  "language": "zh-TW",
+  "input": "我媽八十幾歲了，每個月健保費好重，政府有沒有幫忙出",
+  "session": "dc-14",
+  "expected": "navigate to / offer: districtOffice.form.c-1",
+  "observed": {
+   "kind": "reply",
+   "action": "faq_answer",
+   "destination": null,
+   "route": "faq_medium",
+   "language": "zh",
+   "choices": [
+    "我已經超過65歲,怎麼沒老人健保補助(還在繳健保費)?",
+    "我原本設籍臺北市二三十年,有事暫時遷出沒過幾天就再遷回來,這樣就沒老人健保補助嗎?",
+    "說我沒有老人健保補助是因為稅率20%,但我沒有報稅(收入)!怎會有稅率20%? 我怎麼會稅率20%?"
+   ],
+   "message": "你是不是想問以下的問題？請選擇一題，我再顯示答案。本服務僅涵蓋臺北市政府 FAQ。"
+  },
+  "verdict": "CONCERN",
+  "note": "Same as 13: on-topic FAQ choices, no c-1 form. No keyword for 健保費/長輩/幫忙出."
+ },
+ {
+  "id": "daily_civic-15",
+  "category": "single:districtOffice.form.c-2",
+  "language": "zh-TW",
+  "input": "性侵被害人有補助嗎",
+  "session": "dc-15",
+  "expected": "navigate to / offer: districtOffice.form.c-2",
+  "observed": {
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [
+    "臺北市性侵害被害人補助"
+   ],
+   "message": "你想使用哪個功能？請先確認。"
+  },
+  "verdict": "CONCERN",
+  "note": "Single candidate confirm (fuzzy: 性侵被害人有補助 vs keyword 性侵被害補助) — correct target but an extra tap for a clear intent."
+ },
+ {
+  "id": "daily_civic-16",
+  "category": "single:districtOffice.form.c-2",
+  "language": "zh-TW",
+  "input": "我朋友之前被性侵，看醫生跟請律師花很多錢，有沒有補助可以申請",
+  "session": "dc-16",
+  "expected": "navigate to / offer: districtOffice.form.c-2",
+  "observed": {
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [
+    "聯醫醫療費",
+    "申辦服務"
+   ],
+   "message": "你想使用哪個功能？請先確認。"
+  },
+  "verdict": "FAIL",
+  "note": "Sexual-assault victim's friend asking for subsidy → offered 聯醫醫療費 (hospital bill payment; pay_words 看醫生 + PAY_CUE 錢) and the 申辦服務 parent. Insensitive and wrong; c-2 not offered; no support info (113)."
+ },
+ {
+  "id": "daily_civic-17",
+  "category": "single:districtOffice.form.c-3",
+  "language": "zh-TW",
+  "input": "家暴補助怎麼申請",
+  "session": "dc-17",
+  "expected": "navigate to / offer: districtOffice.form.c-3",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "districtOffice.form.c-3"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「臺北市家庭暴力被害人補助」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "家暴補助 keyword → c-3."
+ },
+ {
+  "id": "daily_civic-18",
+  "category": "single:districtOffice.form.c-3",
+  "language": "zh-TW",
+  "input": "我被老公打，搬出來住沒錢，政府有沒有補助",
+  "session": "dc-18",
+  "expected": "navigate to / offer: districtOffice.form.c-3",
+  "observed": {
+   "kind": "reply",
+   "action": "faq_answer",
+   "destination": null,
+   "route": "faq_medium",
+   "language": "zh",
+   "choices": [
+    "我本來有老人健保補助,戶籍遷到臺北市就沒補助,為什麼?",
+    "貧困家庭家人往生,沒有錢可以安葬"
+   ],
+   "message": "你是不是想問以下的問題？請選擇一題，我再顯示答案。本服務僅涵蓋臺北市政府 FAQ。"
+  },
+  "verdict": "FAIL",
+  "note": "Domestic-violence victim ('我被老公打') → FAQ about 老人健保補助 and 貧困家庭安葬. Insensitive, misleading; c-3 not offered; no 113 / 110 safety info."
+ },
+ {
+  "id": "daily_civic-19",
+  "category": "single:districtOffice.form.c-4",
+  "language": "zh-TW",
+  "input": "特殊境遇家庭補助",
+  "session": "dc-19",
+  "expected": "navigate to / offer: districtOffice.form.c-4",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "districtOffice.form.c-4"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「特殊境遇家庭扶助之家庭暴力被害人補助」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "Exact keyword → c-4."
+ },
+ {
+  "id": "daily_civic-20",
+  "category": "single:districtOffice.form.c-4",
+  "language": "zh-TW",
+  "input": "我離婚後一個人帶小孩，之前又被家暴，有沒有特殊家庭的扶助",
+  "session": "dc-20",
+  "expected": "navigate to / offer: districtOffice.form.c-4",
+  "observed": {
+   "kind": "reply",
+   "action": "faq_answer",
+   "destination": null,
+   "route": "faq_medium",
+   "language": "zh",
+   "choices": [
+    "已有低收入戶資格,可否申請特殊境遇家庭扶助?",
+    "特殊境遇家庭扶助之扶助項目有哪些?",
+    "申請特殊境遇家庭扶助應具備什麼條件?"
+   ],
+   "message": "你是不是想問以下的問題？請選擇一題，我再顯示答案。本服務僅涵蓋臺北市政府 FAQ。"
+  },
+  "verdict": "CONCERN",
+  "note": "On-topic FAQ choices about 特殊境遇家庭扶助; c-4 form not offered (keyword 特殊境遇家庭扶助 absent, user said 特殊家庭的扶助). No care message for DV mention."
+ },
+ {
+  "id": "daily_civic-21",
+  "category": "single:districtOffice.form.c-5",
+  "language": "zh-TW",
+  "input": "身障保險費補助要改方式",
+  "session": "dc-21",
+  "expected": "navigate to / offer: districtOffice.form.c-5",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "districtOffice.form.c-5"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「臺北市身心障礙者參加社會保險保險費補助方式變更」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "→ c-5."
+ },
+ {
+  "id": "daily_civic-22",
+  "category": "single:districtOffice.form.c-5",
+  "language": "zh-TW",
+  "input": "我兒子有身心障礙手冊，他的勞保費補助想改成別的方式",
+  "session": "dc-22",
+  "expected": "navigate to / offer: districtOffice.form.c-5",
+  "observed": {
+   "kind": "reply",
+   "action": "faq_answer",
+   "destination": null,
+   "route": "faq_medium",
+   "language": "zh",
+   "choices": [
+    "身心障礙者其子女就讀幼兒園是否有補助"
+   ],
+   "message": "你是不是想問以下的問題？請選擇一題，我再顯示答案。本服務僅涵蓋臺北市政府 FAQ。"
+  },
+  "verdict": "FAIL",
+  "note": "FAQ about 身障者子女就讀幼兒園補助 — off topic; c-5 not offered (勞保費/身心障礙手冊 not keywords)."
+ },
+ {
+  "id": "daily_civic-23",
+  "category": "single:districtOffice.form.d-1",
+  "language": "zh-TW",
+  "input": "原住民急難救助",
+  "session": "dc-23",
+  "expected": "navigate to / offer: districtOffice.form.d-1",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "districtOffice.form.d-1"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「原住民急難關懷慰問金」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "→ d-1."
+ },
+ {
+  "id": "daily_civic-24",
+  "category": "single:districtOffice.form.d-1",
+  "language": "zh-TW",
+  "input": "我是阿美族，家裡突然出事沒錢，有急難慰問金可以申請嗎",
+  "session": "dc-24",
+  "expected": "navigate to / offer: districtOffice.form.d-1",
+  "observed": {
+   "kind": "reply",
+   "action": "faq_answer",
+   "destination": null,
+   "route": "faq_medium",
+   "language": "zh",
+   "choices": [
+    "請問家裡若突然發生變故(例如家人生重病、過世...等),可以申請急難救助嗎?",
+    "已有低收入戶資格,可否申請特殊境遇家庭扶助?",
+    "「強化社會安全網-急難紓困方案(原馬上關懷)」向居住所在地或戶籍所在地申請?"
+   ],
+   "message": "你是不是想問以下的問題？請選擇一題，我再顯示答案。本服務僅涵蓋臺北市政府 FAQ。"
+  },
+  "verdict": "CONCERN",
+  "note": "FAQ choices on 急難救助 (generally relevant) but the indigenous d-1 form not offered (原住民 not said; 阿美族 not a keyword; keyword 原住民急難慰問金 contiguous)."
+ },
+ {
+  "id": "daily_civic-25",
+  "category": "single:districtOffice.form.d-2",
+  "language": "zh-TW",
+  "input": "原住民考證照有獎金嗎",
+  "session": "dc-25",
+  "expected": "navigate to / offer: districtOffice.form.d-2",
+  "observed": {
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [
+    "原住民參加技術士技能檢定獎勵金申請"
+   ],
+   "message": "你想使用哪個功能？請先確認。"
+  },
+  "verdict": "CONCERN",
+  "note": "Single-candidate confirm for d-2 (fuzzy) — right but extra tap."
+ },
+ {
+  "id": "daily_civic-26",
+  "category": "single:districtOffice.form.d-2",
+  "language": "zh-TW",
+  "input": "我是原住民，剛考到丙級廚師證照，聽說可以領獎勵金",
+  "session": "dc-26",
+  "expected": "navigate to / offer: districtOffice.form.d-2",
+  "observed": {
+   "kind": "reply",
+   "action": "faq_answer",
+   "destination": null,
+   "route": "faq_medium",
+   "language": "zh",
+   "choices": [
+    "原住民學生營養午餐補助,如何申請?",
+    "原住民學生營養午餐補助,如何申請?"
+   ],
+   "message": "你是不是想問以下的問題？請選擇一題，我再顯示答案。本服務僅涵蓋臺北市政府 FAQ。"
+  },
+  "verdict": "FAIL",
+  "note": "FAQ about 原住民學生營養午餐補助 (twice, duplicate) — off topic; d-2 not offered."
+ },
+ {
+  "id": "daily_civic-27",
+  "category": "single:reportIssue",
+  "language": "zh-TW",
+  "input": "我要陳情",
+  "session": "dc-27",
+  "expected": "navigate to / offer: reportIssue",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "reportIssue"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「有話要說」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "→ reportIssue."
+ },
+ {
+  "id": "daily_civic-28",
+  "category": "single:reportIssue",
+  "language": "zh-TW",
+  "input": "我家巷口一直有人亂丟垃圾，要跟市政府反映",
+  "session": "dc-28",
+  "expected": "navigate to / offer: reportIssue",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "reportIssue"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「有話要說」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "反映 → reportIssue."
+ },
+ {
+  "id": "daily_civic-29",
+  "category": "single:reportIssue.progress",
+  "language": "zh-TW",
+  "input": "我陳情的案子處理了沒",
+  "session": "dc-29",
+  "expected": "navigate to / offer: reportIssue.progress",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "reportIssue.progress"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「陳情案件進度」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "→ reportIssue.progress."
+ },
+ {
+  "id": "daily_civic-30",
+  "category": "single:reportIssue.progress",
+  "language": "zh-TW",
+  "input": "上個月跟市政府反映的事情到現在都沒人理，想看處理到哪",
+  "session": "dc-30",
+  "expected": "navigate to / offer: reportIssue.progress",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "reportIssue.progress"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「陳情案件進度」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "反映 + 處理到哪 → reportIssue.progress (child preferred)."
+ },
+ {
+  "id": "daily_civic-31",
+  "category": "single:reportIssue.list",
+  "language": "zh-TW",
+  "input": "陳情可以反映哪些事情",
+  "session": "dc-31",
+  "expected": "navigate to / offer: reportIssue.list",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "reportIssue"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「有話要說」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "CONCERN",
+  "note": "Opened parent 有話要說, not reportIssue.list (no keyword for 反映哪些事情). Parent only."
+ },
+ {
+  "id": "daily_civic-32",
+  "category": "single:reportIssue.list",
+  "language": "zh-TW",
+  "input": "我不知道我的問題要選哪一類陳情，有哪些類別",
+  "session": "dc-32",
+  "expected": "navigate to / offer: reportIssue.list",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請補充想使用的服務或操作，也可以問「有哪些功能」。"
+  },
+  "verdict": "FAIL",
+  "note": "陳情 matched reportIssue, but model returned generic clarification; list (keyword 所有陳情類別/陳情分類 contiguous) missed."
+ },
+ {
+  "id": "daily_civic-33",
+  "category": "single:reportIssue.prefill",
+  "language": "zh-TW",
+  "input": "路燈壞了幫我填好陳情單",
+  "session": "dc-33",
+  "expected": "honest explanation, no navigation",
+  "observed": {
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [
+    "陳情表單預填",
+    "路燈故障"
+   ],
+   "message": "你想使用哪個功能？請先確認。"
+  },
+  "verdict": "CONCERN",
+  "note": "Offered disabled 陳情表單預填 (enabled:false) and 路燈故障 (disasterReport.form.D-1-3, a real ON service). Honest in subtitle, but 有話要說 itself (which the reason text recommends) is dropped because parent+child collapse; better would be a direct unsupported reply + 路燈故障/有話要說."
+ },
+ {
+  "id": "daily_civic-34",
+  "category": "single:police",
+  "language": "zh-TW",
+  "input": "我要找警察",
+  "session": "dc-34",
+  "expected": "navigate to / offer: police",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "police"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「警政服務」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "→ police."
+ },
+ {
+  "id": "daily_civic-35",
+  "category": "single:police",
+  "language": "zh-TW",
+  "input": "警察局的服務在哪裡",
+  "session": "dc-35",
+  "expected": "navigate to / offer: police",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "police"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「警政服務」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "→ police."
+ },
+ {
+  "id": "daily_civic-36",
+  "category": "single:police.online",
+  "language": "zh-TW",
+  "input": "我要在網路上報案",
+  "session": "dc-36",
+  "expected": "navigate to / offer: police.online",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "police"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「警政服務」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "CONCERN",
+  "note": "Parent 警政服務 instead of police.online: '網路上報案' does not contain keyword 網路報案/線上報案."
+ },
+ {
+  "id": "daily_civic-37",
+  "category": "single:police.online",
+  "language": "zh-TW",
+  "input": "我的機車被偷了，可以不用跑警察局直接在手機上報案嗎",
+  "session": "dc-37",
+  "expected": "navigate to / offer: police.online",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "police"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「警政服務」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "CONCERN",
+  "note": "Parent instead of police.online (手機上報案 not a keyword)."
+ },
+ {
+  "id": "daily_civic-38",
+  "category": "single:police.records",
+  "language": "zh-TW",
+  "input": "我以前報過的案子紀錄",
+  "session": "dc-38",
+  "expected": "navigate to / offer: police.records",
+  "observed": {
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [
+    "申辦案件進度",
+    "陳情案件進度",
+    "災情案件進度",
+    "警政案件進度"
+   ],
+   "message": "你想使用哪個功能？請先確認。"
+  },
+  "verdict": "CONCERN",
+  "note": "'以前報過的案子紀錄' → 4 progress choices incl. disabled-root 災情案件進度; police.progress shares the records page path, so OK, but police.records itself not offered (案子 matches progress keywords)."
+ },
+ {
+  "id": "daily_civic-39",
+  "category": "single:police.records",
+  "language": "zh-TW",
+  "input": "我想看我之前跟警察報案的紀錄",
+  "session": "dc-39",
+  "expected": "navigate to / offer: police.records",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "police"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「警政服務」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "CONCERN",
+  "note": "Parent 警政服務, not police.records ('報案的紀錄' breaks contiguous 報案紀錄)."
+ },
+ {
+  "id": "daily_civic-40",
+  "category": "single:police.progress",
+  "language": "zh-TW",
+  "input": "報案的進度查詢",
+  "session": "dc-40",
+  "expected": "navigate to / offer: police.progress",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "police.progress"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「警政案件進度」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "→ police.progress."
+ },
+ {
+  "id": "daily_civic-41",
+  "category": "single:police.progress",
+  "language": "zh-TW",
+  "input": "我上次去派出所報詐騙，想知道警察查得怎麼樣了",
+  "session": "dc-41",
+  "expected": "navigate to / offer: police.progress",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "police"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「警政服務」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "CONCERN",
+  "note": "Parent 警政服務 instead of police.progress ('查得怎麼樣' not a progress keyword)."
+ },
+ {
+  "id": "daily_civic-42",
+  "category": "single:reservation",
+  "language": "zh-TW",
+  "input": "我要抽號碼牌",
+  "session": "dc-42",
+  "expected": "navigate to / offer: reservation",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "reservation"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「臨櫃叫號」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "→ reservation."
+ },
+ {
+  "id": "daily_civic-43",
+  "category": "single:reservation",
+  "language": "zh-TW",
+  "input": "去公家機關辦事不想排隊，可以先線上拿號碼嗎",
+  "session": "dc-43",
+  "expected": "navigate to / offer: reservation",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "reservation"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「臨櫃叫號」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "→ reservation."
+ },
+ {
+  "id": "daily_civic-44",
+  "category": "single:reservation.c-1-1",
+  "language": "zh-TW",
+  "input": "古亭地政抽號",
+  "session": "dc-44",
+  "expected": "navigate to / offer: reservation.c-1-1",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "reservation.c-1-1"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「古亭地政事務所」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "→ c-1-1."
+ },
+ {
+  "id": "daily_civic-45",
+  "category": "single:reservation.c-1-1",
+  "language": "zh-TW",
+  "input": "我要去古亭那邊的地政事務所辦過戶，先拿號碼",
+  "session": "dc-45",
+  "expected": "navigate to / offer: reservation.c-1-1",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。"
+  },
+  "verdict": "FAIL",
+  "note": "no_related: '古亭那邊的地政事務所' — keyword 古亭地政 contiguous only; 拿號碼 not a reservation keyword (only 抽號碼/號碼牌). Nothing found."
+ },
+ {
+  "id": "daily_civic-46",
+  "category": "single:reservation.c-1-2",
+  "language": "zh-TW",
+  "input": "中山地政事務所叫號",
+  "session": "dc-46",
+  "expected": "navigate to / offer: reservation.c-1-2",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "reservation.c-1-2"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「中山地政事務所」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "→ c-1-2."
+ },
+ {
+  "id": "daily_civic-47",
+  "category": "single:reservation.c-1-2",
+  "language": "zh-TW",
+  "input": "我要去中山地政辦土地登記，現在叫到幾號",
+  "session": "dc-47",
+  "expected": "navigate to / offer: reservation.c-1-2",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "reservation.c-1-2"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「中山地政事務所」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "→ c-1-2."
+ },
+ {
+  "id": "daily_civic-48",
+  "category": "single:reservation.c-2-1",
+  "language": "zh-TW",
+  "input": "萬華戶政叫到幾號",
+  "session": "dc-48",
+  "expected": "navigate to / offer: reservation.c-2-1",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "reservation.c-2-1"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「萬華區戶政事務所」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "→ c-2-1."
+ },
+ {
+  "id": "daily_civic-49",
+  "category": "single:reservation.c-2-1",
+  "language": "zh-TW",
+  "input": "我要去萬華的戶政事務所換身分證，想先抽號碼",
+  "session": "dc-49",
+  "expected": "navigate to / offer: reservation.c-2-1",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "reservation"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「臨櫃叫號」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "CONCERN",
+  "note": "Parent 臨櫃叫號 instead of c-2-1 ('萬華的戶政事務所' breaks 萬華戶政)."
+ },
+ {
+  "id": "daily_civic-50",
+  "category": "single:reservation.c-2-2",
+  "language": "zh-TW",
+  "input": "中正戶政抽號碼",
+  "session": "dc-50",
+  "expected": "navigate to / offer: reservation.c-2-2",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "reservation.c-2-2"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「中正區戶政事務所」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "→ c-2-2."
+ },
+ {
+  "id": "daily_civic-51",
+  "category": "single:reservation.c-2-2",
+  "language": "zh-TW",
+  "input": "要帶小孩去中正區戶政報戶口，現在人多不多",
+  "session": "dc-51",
+  "expected": "navigate to / offer: reservation.c-2-2",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。"
+  },
+  "verdict": "FAIL",
+  "note": "no_related for '中正區戶政' (keywords 中正戶政 / 中正區戶政事務所; 中正區戶政 matches neither)."
+ },
+ {
+  "id": "daily_civic-52",
+  "category": "single:reservation.c-3-1",
+  "language": "zh-TW",
+  "input": "萬華區公所抽號碼牌",
+  "session": "dc-52",
+  "expected": "navigate to / offer: reservation.c-3-1",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "reservation.c-3-1"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「臺北市萬華區公所」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "→ c-3-1."
+ },
+ {
+  "id": "daily_civic-53",
+  "category": "single:reservation.c-3-1",
+  "language": "zh-TW",
+  "input": "我要去萬華區公所辦老人補助，先幫我拿號碼",
+  "session": "dc-53",
+  "expected": "navigate to / offer: reservation.c-3-1",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "reservation.c-3-1"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「臺北市萬華區公所」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "→ c-3-1 (did not get distracted by 老人補助)."
+ },
+ {
+  "id": "daily_civic-54",
+  "category": "single:reservation.c-3-2",
+  "language": "zh-TW",
+  "input": "中正區公所叫號",
+  "session": "dc-54",
+  "expected": "navigate to / offer: reservation.c-3-2",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "reservation.c-3-2"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「臺北市中正區公所」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "→ c-3-2."
+ },
+ {
+  "id": "daily_civic-55",
+  "category": "single:reservation.c-3-2",
+  "language": "zh-TW",
+  "input": "要去中正區公所問事情，看現在排到幾號",
+  "session": "dc-55",
+  "expected": "navigate to / offer: reservation.c-3-2",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "reservation.c-3-2"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「臺北市中正區公所」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "→ c-3-2."
+ },
+ {
+  "id": "daily_civic-56",
+  "category": "single:reservation.c-4-1",
+  "language": "zh-TW",
+  "input": "萬華稅捐處抽號",
+  "session": "dc-56",
+  "expected": "navigate to / offer: reservation.c-4-1",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "reservation.c-4-1"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「稅捐處萬華分處」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "→ c-4-1 (萬華稅捐)."
+ },
+ {
+  "id": "daily_civic-57",
+  "category": "single:reservation.c-4-1",
+  "language": "zh-TW",
+  "input": "我要去萬華那邊繳房屋稅問題，稅捐處要排隊嗎",
+  "session": "dc-57",
+  "expected": "navigate to / offer: reservation.c-4-1",
+  "observed": {
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [
+    "臨櫃叫號",
+    "地方稅"
+   ],
+   "message": "你想使用哪個功能？請先確認。"
+  },
+  "verdict": "CONCERN",
+  "note": "Choices 臨櫃叫號 / 地方稅 (tax payment) — reasonable, but c-4-1 not offered ('萬華那邊...稅捐處')."
+ },
+ {
+  "id": "daily_civic-58",
+  "category": "single:reservation.c-4-2",
+  "language": "zh-TW",
+  "input": "大同稅捐抽號碼",
+  "session": "dc-58",
+  "expected": "navigate to / offer: reservation.c-4-2",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "reservation.c-4-2"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「稅捐處大同分處」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "→ c-4-2."
+ },
+ {
+  "id": "daily_civic-59",
+  "category": "single:reservation.c-4-2",
+  "language": "zh-TW",
+  "input": "要去大同的稅捐分處辦地價稅，先拿號碼",
+  "session": "dc-59",
+  "expected": "navigate to / offer: reservation.c-4-2",
+  "observed": {
+   "kind": "reply",
+   "action": "faq_answer",
+   "destination": null,
+   "route": "faq_medium",
+   "language": "zh",
+   "choices": [
+    "請問臺北市稅捐處大同分處的電話和地址?",
+    "請問臺北市稅捐處大安分處的電話和地址?"
+   ],
+   "message": "你是不是想問以下的問題？請選擇一題，我再顯示答案。本服務僅涵蓋臺北市政府 FAQ。"
+  },
+  "verdict": "FAIL",
+  "note": "FAQ about 大同分處 phone/address; reservation c-4-2 not offered ('大同的稅捐分處' breaks 大同稅捐; 拿號碼 not keyword)."
+ },
+ {
+  "id": "daily_civic-60",
+  "category": "single:reservation.c-5-1",
+  "language": "zh-TW",
+  "input": "艋舺就業服務站抽號",
+  "session": "dc-60",
+  "expected": "navigate to / offer: reservation.c-5-1",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "reservation.c-5-1"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「艋舺就業服務站」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "→ c-5-1."
+ },
+ {
+  "id": "daily_civic-61",
+  "category": "single:reservation.c-5-1",
+  "language": "zh-TW",
+  "input": "我失業了想去艋舺那邊的就業服務站找工作，要先抽號嗎",
+  "session": "dc-61",
+  "expected": "navigate to / offer: reservation.c-5-1",
+  "observed": {
+   "kind": "reply",
+   "action": "faq_answer",
+   "destination": null,
+   "route": "faq_medium",
+   "language": "zh",
+   "choices": [
+    "我想檢舉不實招募廣告的公司,要如何辦理?",
+    "請問我只是公司的職員,公司希望我擔任公司產品的經銷商,才可以抽佣金,合理嗎?",
+    "我要加入工會參加勞保,要如何查詢臺北市職業工會資料?"
+   ],
+   "message": "你是不是想問以下的問題？請選擇一題，我再顯示答案。本服務僅涵蓋臺北市政府 FAQ。"
+  },
+  "verdict": "FAIL",
+  "note": "Off-topic FAQ (不實招募廣告/經銷商/工會) for a jobseeker wanting a number at 艋舺就業服務站 ('艋舺那邊的就業服務站' breaks keyword)."
+ },
+ {
+  "id": "daily_civic-62",
+  "category": "single:reservation.c-5-2",
+  "language": "zh-TW",
+  "input": "西門就服站叫號",
+  "session": "dc-62",
+  "expected": "navigate to / offer: reservation.c-5-2",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "reservation.c-5-2"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「西門就業服務站」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "→ c-5-2."
+ },
+ {
+  "id": "daily_civic-63",
+  "category": "single:reservation.c-5-2",
+  "language": "zh-TW",
+  "input": "我要去西門町那個就業服務站問職訓，現在叫到幾號",
+  "session": "dc-63",
+  "expected": "navigate to / offer: reservation.c-5-2",
+  "observed": {
+   "kind": "reply",
+   "action": "no_related",
+   "destination": null,
+   "route": "no_match",
+   "language": "zh",
+   "choices": [],
+   "message": "抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；也可以撥打市民熱線 1999（外縣市 02-27208889）。"
+  },
+  "verdict": "FAIL",
+  "note": "no_related for '西門町那個就業服務站'."
+ },
+ {
+  "id": "daily_civic-64",
+  "category": "combo:police.online+police.progress",
+  "language": "zh-TW",
+  "input": "我要報案順便查之前報的進度",
+  "session": "dc-64",
+  "expected": "navigate to / offer: police.online + police.progress",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "police.progress"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「警政案件進度」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "FAIL",
+  "note": "Silently dropped 報案: police (報案) is the ancestor of police.progress, so registry.search treats them as one request and keeps only the child → opened 警政案件進度 only."
+ },
+ {
+  "id": "daily_civic-65",
+  "category": "combo:districtOffice.form.a-1+districtOffice.progress",
+  "language": "zh-TW",
+  "input": "申訴罰單然後看案件辦到哪",
+  "session": "dc-65",
+  "expected": "navigate to / offer: districtOffice.form.a-1 + districtOffice.progress",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "reportIssue.progress"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「陳情案件進度」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "FAIL",
+  "note": "Wrong + dropped: '申訴罰單' (reversed word order) matches only reportIssue 申訴; with 辦到哪 the parent collapses into reportIssue.progress → opened 陳情案件進度; ticket appeal and districtOffice.progress lost."
+ },
+ {
+  "id": "daily_civic-66",
+  "category": "combo:reservation+?",
+  "language": "zh-TW",
+  "input": "抽號碼牌之前先看要帶什麼",
+  "session": "dc-66",
+  "expected": "navigate to / offer: reservation",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "reservation"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「臨櫃叫號」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "CONCERN",
+  "note": "Opened 臨櫃叫號; '先看要帶什麼' (documents to bring) silently ignored — no statement that the app cannot list required documents (FAQ/1999 would help)."
+ },
+ {
+  "id": "daily_civic-67",
+  "category": "combo:reportIssue+reportIssue.progress",
+  "language": "zh-TW",
+  "input": "我要陳情路燈的事還有查陳情進度",
+  "session": "dc-67",
+  "expected": "navigate to / offer: reportIssue + reportIssue.progress",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "reportIssue.progress"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「陳情案件進度」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "FAIL",
+  "note": "Opened only 陳情案件進度; the request to file a 路燈 陳情 was dropped (parent+child collapse; prefill/路燈 also collapsed under reportIssue)."
+ },
+ {
+  "id": "daily_civic-68",
+  "category": "combo:districtOffice.form.c-3+police.online",
+  "language": "zh-TW",
+  "input": "家暴的補助跟報警",
+  "session": "dc-68",
+  "expected": "navigate to / offer: districtOffice.form.c-3 + police.online + police",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "police"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「警政服務」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "FAIL",
+  "note": "Sensitive: '家暴的補助跟報警' → opened 警政服務 only; DV subsidy dropped ('家暴的補助' breaks keyword 家暴補助). No 113/110 care info."
+ },
+ {
+  "id": "daily_civic-69",
+  "category": "combo:police.records+police.progress",
+  "language": "zh-TW",
+  "input": "我想看報案紀錄跟案件進度",
+  "session": "dc-69",
+  "expected": "navigate to / offer: police.records + police.progress",
+  "observed": {
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [
+    "報案紀錄",
+    "申辦案件進度"
+   ],
+   "message": "你想使用哪個功能？請先確認。"
+  },
+  "verdict": "FAIL",
+  "note": "Choices 報案紀錄 + 申辦案件進度 — the second is the wrong service's progress. police.progress excluded because same_request() treats it as the same service as police.records, so the next 案件進度 holder (districtOffice.progress, catalogue order) was taken."
+ },
+ {
+  "id": "daily_civic-70",
+  "category": "combo:districtOffice.form.c-1+reservation.c-3-1",
+  "language": "zh-TW",
+  "input": "老人健保補助我想申請，還要去萬華區公所抽號碼",
+  "session": "dc-70",
+  "expected": "navigate to / offer: districtOffice.form.c-1 + reservation.c-3-1",
+  "observed": {
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [
+    "老人全民健康保險保險費自付額補助",
+    "臺北市萬華區公所"
+   ],
+   "message": "你想使用哪個功能？請先確認。"
+  },
+  "verdict": "PASS",
+  "note": "Both: c-1 and 萬華區公所 as choices."
+ },
+ {
+  "id": "daily_civic-71",
+  "category": "combo:police.online+districtOffice.form.b-1",
+  "language": "zh-TW",
+  "input": "我被警察開罰單想申訴，另外我腳踏車被偷要報案",
+  "session": "dc-71",
+  "expected": "navigate to / offer: districtOffice.form.b-1 + police.online",
+  "observed": {
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [
+    "有話要說",
+    "警政服務"
+   ],
+   "message": "你想使用哪個功能？請先確認。"
+  },
+  "verdict": "CONCERN",
+  "note": "Both needs represented but by generic pages (有話要說 for a police-ticket appeal, 警政服務 parent for reporting theft); b-1 and police.online missed."
+ },
+ {
+  "id": "daily_civic-72",
+  "category": "combo:reservation.c-2-1+reservation.c-4-1",
+  "language": "zh-TW",
+  "input": "萬華戶政跟萬華稅捐處都要抽號",
+  "session": "dc-72",
+  "expected": "navigate to / offer: reservation.c-2-1 + reservation.c-4-1",
+  "observed": {
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [
+    "萬華區戶政事務所",
+    "稅捐處萬華分處"
+   ],
+   "message": "你想使用哪個功能？請先確認。"
+  },
+  "verdict": "PASS",
+  "note": "Both counters offered."
+ },
+ {
+  "id": "daily_civic-73",
+  "category": "combo:reportIssue.list+reportIssue",
+  "language": "zh-TW",
+  "input": "先看陳情有哪些分類再寫陳情",
+  "session": "dc-73",
+  "expected": "navigate to / offer: reportIssue.list + reportIssue",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "reportIssue"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「有話要說」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "CONCERN",
+  "note": "Opened 有話要說 only; the 'see categories first' need (reportIssue.list, in-page) not offered — though the parent page contains it."
+ },
+ {
+  "id": "daily_civic-74",
+  "category": "combo:districtOffice.form.c-2+police.online",
+  "language": "zh-TW",
+  "input": "我被性侵了想報警，也想知道有沒有補助",
+  "session": "dc-74",
+  "expected": "navigate to / offer: districtOffice.form.c-2 + police.online + police",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "police"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「警政服務」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "FAIL",
+  "note": "Sensitive: '我被性侵了想報警，也想知道有沒有補助' → navigated straight to 警政服務; the subsidy need (c-2) silently dropped; no 113 / 110 / support message. Should list both or say how to get the subsidy."
+ },
+ {
+  "id": "daily_civic-75",
+  "category": "combo:districtOffice.progress+reportIssue.progress",
+  "language": "zh-TW",
+  "input": "我申辦的案件跟陳情的案件都想查進度",
+  "session": "dc-75",
+  "expected": "navigate to / offer: districtOffice.progress + reportIssue.progress",
+  "observed": {
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [
+    "申辦案件進度",
+    "有話要說"
+   ],
+   "message": "你想使用哪個功能？請先確認。"
+  },
+  "verdict": "CONCERN",
+  "note": "Choices 申辦案件進度 + 有話要說 (parent) instead of 陳情案件進度; both needs reachable but the second needs another step."
+ },
+ {
+  "id": "daily_civic-76",
+  "category": "combo:police+police.online",
+  "language": "zh-TW",
+  "input": "警政服務裡面的線上報案",
+  "session": "dc-76",
+  "expected": "navigate to / offer: police.online",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "police.online"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「線上報案」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "parent+child phrasing → police.online."
+ },
+ {
+  "id": "daily_civic-77",
+  "category": "combo:districtOffice+districtOffice.form.a-3",
+  "language": "zh-TW",
+  "input": "申辦服務的停車費申訴",
+  "session": "dc-77",
+  "expected": "navigate to / offer: districtOffice.form.a-3",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "districtOffice.form.a-3"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「停管處受理之申訴案件」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "→ a-3."
+ },
+ {
+  "id": "daily_civic-78",
+  "category": "combo:reservation+reservation.c-5-2",
+  "language": "zh-TW",
+  "input": "臨櫃叫號的西門就業服務站",
+  "session": "dc-78",
+  "expected": "navigate to / offer: reservation.c-5-2",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "reservation.c-5-2"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「西門就業服務站」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "→ c-5-2."
+ },
+ {
+  "id": "daily_civic-79",
+  "category": "combo:reportIssue.prefill+reportIssue.progress",
+  "language": "zh-TW",
+  "input": "路燈壞了幫我填陳情，順便看我上次陳情的進度",
+  "session": "dc-79",
+  "expected": "navigate to / offer: reportIssue.progress + reportIssue",
+  "observed": {
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [
+    "陳情案件進度",
+    "路燈故障"
+   ],
+   "message": "你想使用哪個功能？請先確認。"
+  },
+  "verdict": "CONCERN",
+  "note": "Choices 陳情案件進度 + 路燈故障 (disaster report form, a real ON service) — both needs covered; prefill (off) not mentioned, which is fine. Acceptable."
+ },
+ {
+  "id": "daily_civic-80",
+  "category": "combo:districtOffice.form.a-1+districtOffice.form.a-2",
+  "language": "zh-TW",
+  "input": "我有兩張罰單要申訴，一張台北一張外縣市的",
+  "session": "dc-80",
+  "expected": "navigate to / offer: districtOffice.form.a-1 + districtOffice.form.a-2",
+  "observed": {
+   "kind": "reply",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請補充想使用的服務或操作，也可以問「有哪些功能」。"
+  },
+  "verdict": "FAIL",
+  "note": "Two tickets (台北 + 外縣市) → generic 'please add details'. Neither a-1 nor a-2 offered (罰單要申訴 is not contiguous 罰單申訴)."
+ },
+ {
+  "id": "daily_civic-81",
+  "category": "single:reportIssue.prefill (choice 1 after offer)",
+  "language": "zh-TW",
+  "input": "路燈壞了幫我填好陳情單 → 選 1",
+  "session": "dc-81",
+  "expected": "honest explanation, no navigation",
+  "observed": {
+   "kind": "unsupported",
+   "action": null,
+   "destination": null,
+   "route": "selection",
+   "language": "zh",
+   "choices": [],
+   "message": "陳情表單預填：原表單尚未提供受控預填與回讀 Adapter；可先開有話要說。"
+  },
+  "verdict": "PASS",
+  "note": "Selecting the disabled prefill option gives honest unsupported reason (but the reason text is jargon: '受控預填與回讀 Adapter')."
+ },
+ {
+  "id": "daily_civic-82",
+  "category": "combo:police.online+police.records",
+  "language": "zh-TW",
+  "input": "我要報案也想看以前的報案紀錄",
+  "session": "dc-82",
+  "expected": "navigate to / offer: police.online + police.records",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "police.records"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「報案紀錄」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "FAIL",
+  "note": "Dropped 報案: police (報案) collapsed into child police.records; only 報案紀錄 opened."
+ },
+ {
+  "id": "daily_civic-83",
+  "category": "combo:districtOffice.form.c-3+police",
+  "language": "zh-TW",
+  "input": "我被家暴想報警，也想申請家暴補助",
+  "session": "dc-83",
+  "expected": "navigate to / offer: districtOffice.form.c-3 + police",
+  "observed": {
+   "kind": "confirm_candidates",
+   "action": null,
+   "destination": null,
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [
+    "臺北市家庭暴力被害人補助",
+    "警政服務"
+   ],
+   "message": "你想使用哪個功能？請先確認。"
+  },
+  "verdict": "CONCERN",
+  "note": "Both needs offered (c-3 + 警政服務); no 113/110 safety line for a DV victim."
+ },
+ {
+  "id": "daily_civic-84",
+  "category": "single:districtOffice.form.b-1 (catalogue-like wording)",
+  "language": "zh-TW",
+  "input": "警察開的罰單申訴",
+  "session": "dc-84",
+  "expected": "navigate to / offer: districtOffice.form.b-1",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "districtOffice.form.b-1"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「本市警察局受理之違規申訴案件」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "PASS",
+  "note": "Catalogue-like wording → b-1 (contrast with 11/12)."
+ },
+ {
+  "id": "daily_civic-85",
+  "category": "single:police.online (extra)",
+  "language": "zh-TW",
+  "input": "我想報案",
+  "session": "dc-85",
+  "expected": "navigate to / offer: police.online",
+  "observed": {
+   "kind": "navigate",
+   "action": "open_capability",
+   "destination": {
+    "kind": "capability",
+    "id": "police"
+   },
+   "route": "capability_model",
+   "language": "zh",
+   "choices": [],
+   "message": "請在原本的「警政服務」頁面繼續操作。目前為示範資料，尚未送出或交易。"
+  },
+  "verdict": "CONCERN",
+  "note": "'我想報案' → parent 警政服務 instead of 線上報案."
+ }
+]
