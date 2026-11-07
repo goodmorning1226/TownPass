@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:town_pass/service/page_translation.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -52,6 +53,8 @@ Future<void> initServices() async {
   );
 
   Get.put<SubscriptionService>(SubscriptionService());
+  // Pages keep the language of the last assistant navigation (or Settings).
+  await PageTranslation.instance.load();
   if (assistantEnabled) {
     Get.put<AssistantViewController>(
       AssistantViewController(),

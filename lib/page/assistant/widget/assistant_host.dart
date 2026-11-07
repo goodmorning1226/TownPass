@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:town_pass/page/assistant/assistant_view_controller.dart';
 import 'package:town_pass/service/assistant_speech_language.dart';
+import 'package:town_pass/service/page_translation.dart';
 import 'package:town_pass/util/tp_colors.dart';
 import 'package:town_pass/util/tp_text.dart';
 
@@ -42,15 +43,19 @@ class _AssistantHostState extends State<AssistantHost> {
     return Stack(
       children: [
         widget.child,
-        Obx(() {
-          if (controller.hidden.value) return const SizedBox.shrink();
-          if (controller.expanded.value) {
-            return Positioned.fill(
-              child: AssistantSheet(controller: controller),
-            );
-          }
-          return _corner(context, controller);
-        }),
+        // The assistant's own texts are not page content (PageTranslation).
+        PageTranslationScope(
+          enabled: false,
+          child: Obx(() {
+            if (controller.hidden.value) return const SizedBox.shrink();
+            if (controller.expanded.value) {
+              return Positioned.fill(
+                child: AssistantSheet(controller: controller),
+              );
+            }
+            return _corner(context, controller);
+          }),
+        ),
       ],
     );
   }

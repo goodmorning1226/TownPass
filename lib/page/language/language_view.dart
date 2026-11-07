@@ -1,18 +1,10 @@
 import 'package:town_pass/page/language/language_view_controller.dart';
+import 'package:town_pass/service/page_translation.dart';
 import 'package:town_pass/util/tp_setting_list.dart';
 import 'package:town_pass/util/tp_app_bar.dart';
 import 'package:town_pass/util/tp_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
-extension on Language {
-  String get string {
-    return switch (this) {
-      Language.traditionalChinese => '繁體中文',
-      Language.english => 'English',
-    };
-  }
-}
 
 class LanguageView extends GetView<LanguageViewController> {
   const LanguageView({super.key});
@@ -25,6 +17,7 @@ class LanguageView extends GetView<LanguageViewController> {
       body: TPSettingList(
         children: [
           TPSettingListTile.selectionList(
+            initialIndex: controller.currentIndex,
             onIndexChange: (index) => controller.onIndexChange(index),
             selections: _buildLanguageSelections(),
           ),
@@ -33,12 +26,12 @@ class LanguageView extends GetView<LanguageViewController> {
     );
   }
 
-  /// Builds a list of [SettingSelectionListItem] from all available [Language] values.
-  /// Each item displays the localized string for the language.
+  /// Each language named in its own script (PageTranslation.languages).
   List<SettingSelectionListItem> _buildLanguageSelections() {
-    return Language.values
+    return controller.languageList
         .map<SettingSelectionListItem>(
-          (language) => SettingSelectionListItem(title: language.string),
+          (code) =>
+              SettingSelectionListItem(title: PageTranslation.languages[code]!),
         )
         .toList();
   }

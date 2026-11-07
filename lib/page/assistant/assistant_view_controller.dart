@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:town_pass/bean/assistant_result.dart';
 import 'package:town_pass/page/main/main_view_controller.dart';
 import 'package:town_pass/service/assistant_action_executor.dart';
+import 'package:town_pass/service/page_translation.dart';
 import 'package:town_pass/service/assistant_page_tracker.dart';
 import 'package:town_pass/service/assistant_recorder.dart';
 import 'package:town_pass/service/assistant_speaker.dart';
@@ -24,12 +25,17 @@ class AssistantChatMessage {
   /// Speech readings to choose from; tapping one sends it as the user's words.
   final List<String> suggestions;
 
+  /// The language of [text] ('zh', 'en', ...). A choice tapped in this message
+  /// continues in it, and so do the page and the assistant after navigating.
+  final String language;
+
   const AssistantChatMessage({
     required this.id,
     required this.fromUser,
     required this.text,
     this.choices = const [],
     this.suggestions = const [],
+    this.language = 'zh',
   });
 }
 
@@ -120,6 +126,30 @@ class AssistantViewController extends GetxController {
   /// only the user's own choice in the menu is kept for the next launch. The
   /// backend treats the language as a preference, so another one is still
   /// detected.
+  /// The App's own short status lines in the reply language.
+  static String _status(String key, String language) =>
+      (_statusTexts[key]?[language] ?? _statusTexts[key]!['zh'])!;
+
+  static const _statusTexts = {
+    'opening': {
+      'zh': '正在開啟服務頁面…',
+      'en': 'Opening the service page…',
+      'ja': 'サービスページを開いています…',
+      'vi': 'Đang mở trang dịch vụ…',
+      'id': 'Membuka halaman layanan…',
+      'th': 'กำลังเปิดหน้าบริการ…',
+    },
+    'failed': {
+      'zh': '服務頁面載入失敗，請檢查網路或重新開啟。',
+      'en':
+          'The service page did not load. Check the network or open it again.',
+      'ja': 'サービスページを読み込めませんでした。ネットワークを確認するか、もう一度開いてください。',
+      'vi': 'Không tải được trang dịch vụ. Hãy kiểm tra mạng hoặc mở lại.',
+      'id': 'Halaman layanan gagal dimuat. Periksa jaringan atau buka lagi.',
+      'th': 'โหลดหน้าบริการไม่สำเร็จ โปรดตรวจสอบเครือข่ายหรือเปิดใหม่อีกครั้ง',
+    },
+  };
+
   static final _hasWords = RegExp(r'[^\d\s\p{P}\p{S}]{2,}', unicode: true);
 
   void _rememberLanguage(String? code) {
@@ -294,6 +324,7 @@ class AssistantViewController extends GetxController {
       text: text,
       choices: List.unmodifiable(choices),
       suggestions: List.unmodifiable(suggestions),
+      language: language,
     );
     messages.add(item);
     if (!fromUser && readAloud.value) speaker.speak(text, language: language);
@@ -558,10 +589,20 @@ class AssistantViewController extends GetxController {
   /// [number] is set when the option was chosen by saying or typing it.
   Future<void> choose(AssistantBookChoice choice, {int? number}) async {
     if (!choice.enabled || _resolutionId == null) return;
+    // The options' own message says which language the user is using.
+    final offered = messages.firstWhereOrNull(
+      (m) => m.id == choicesMessageId.value,
+    );
+    final language = offered?.language ?? 'zh';
     await submit(
       '',
       choiceId: choice.id,
-      shownAs: number == null ? choice.title : '第 $number 項：${choice.title}',
+      shownAs: number == null
+          ? choice.title
+          : (language == 'zh'
+                ? '第 $number 項：${choice.title}'
+                : '$number. ${choice.title}'),
+      language: language,
     );
   }
 
@@ -587,7 +628,7 @@ class AssistantViewController extends GetxController {
     }
     final generation = ++_generation;
     final requestId = '${DateTime.now().microsecondsSinceEpoch}-$generation';
-    _add(shownAs ?? text.trim(), fromUser: true);
+    _add(shownAs ?? text.trim(), fromUser: true, language: language ?? 'zh');
     if (note != null) _add(note);
     busy.value = true;
     choices.clear();
@@ -622,7 +663,10 @@ class AssistantViewController extends GetxController {
         busy.value = false;
         _panelHistory?.remove();
         expanded.value = false;
-        _showCorner(reply.id, '正在開啟服務頁面…');
+        // The page and its guidance follow the language of this navigation
+        // until another one (or Settings > Language) changes it.
+        PageTranslation.instance.setLanguage(result.language);
+        _showCorner(reply.id, _status('opening', result.language));
         // Stays "cancelled" unless this navigation reports back while current.
         final action = _AssistantAction(destination, clock());
         _lastAction = action;
@@ -634,7 +678,10 @@ class AssistantViewController extends GetxController {
             if (error == null) {
               _showCorner(reply.id, reply.text);
             } else {
-              final failed = _add('服務頁面載入失敗，請檢查網路或重新開啟。');
+              final failed = _add(
+                _status('failed', result.language),
+                language: result.language,
+              );
               _showCorner(failed.id, failed.text);
             }
           },

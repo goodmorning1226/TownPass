@@ -6,6 +6,8 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:town_pass/service/assistant_speech_language.dart';
+import 'package:town_pass/service/page_translation.dart';
+import 'package:town_pass/util/tp_text.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:get/get.dart';
 import 'package:town_pass/util/tp_route.dart';
@@ -755,6 +757,81 @@ void main() {
     ); // still the user's choice
     controller.setSpeechLanguage('auto');
     expect(controller.speechLanguage.value, 'auto');
+  });
+
+  group('Page language', () {
+    // Called inside each test: futures made in setUp belong to another zone
+    // than testWidgets' fake-async one and would never complete there.
+    void start() {
+      SharedPreferences.setMockInitialValues({});
+      PageTranslation.instance.reset();
+      PageTranslation.instance.translator = (text, language) async =>
+          '[$language] $text';
+    }
+
+    tearDown(PageTranslation.instance.reset);
+
+    testWidgets('Pages follow the page language; the assistant does not', (
+      tester,
+    ) async {
+      start();
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Column(
+            children: [
+              TPText('首頁'),
+              PageTranslationScope(enabled: false, child: TPText('我要借書')),
+              TPText('ISBN 123'),
+            ],
+          ),
+        ),
+      );
+      expect(find.text('首頁'), findsOneWidget);
+      await tester.runAsync(() => PageTranslation.instance.setLanguage('en'));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 60)); // batch timer
+      await tester.pump();
+      expect(find.text('[en] 首頁'), findsOneWidget);
+      expect(find.text('我要借書'), findsOneWidget); // assistant text untouched
+      expect(find.text('ISBN 123'), findsOneWidget); // nothing to translate
+      expect(
+        (await SharedPreferences.getInstance()).getString('page_language'),
+        'en',
+      );
+      await tester.runAsync(() => PageTranslation.instance.setLanguage('zh'));
+      await tester.pump();
+      expect(find.text('首頁'), findsOneWidget);
+    });
+
+    test('A navigation sets the page language; options keep theirs', () async {
+      start();
+      final service = QueueService([
+        const AssistantResult(
+          sessionId: 's',
+          message: 'Which one?',
+          language: 'en',
+          resolutionId: 'r',
+          choices: [AssistantBookChoice('1', 'Home')],
+        ),
+        const AssistantResult(
+          sessionId: 's',
+          message: 'Please continue on the "Home" page.',
+          language: 'en',
+          destination: {'kind': 'home'},
+        ),
+      ]);
+      final controller = AssistantViewController(
+        service: service,
+        executor: RecordingExecutor(),
+        recorder: FakeRecorder(),
+      );
+      await controller.submit('what can you do');
+      await controller.choose(controller.choices.first);
+      expect(service.turnLanguages.last, 'en'); // the options' language
+      expect(controller.messages.last.language, 'en');
+      expect(PageTranslation.instance.language.value, 'en');
+      controller.cancel();
+    });
   });
 
   test('Suggestions lead only to enabled catalog capabilities', () {

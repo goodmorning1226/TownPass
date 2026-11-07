@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:collection';
 
 import 'package:flutter/foundation.dart';
@@ -7,6 +8,7 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:get/get.dart';
 import 'package:town_pass/gen/assets.gen.dart';
 import 'package:town_pass/service/assistant_page_tracker.dart';
+import 'package:town_pass/service/page_translation.dart';
 import 'package:town_pass/util/tp_app_bar.dart';
 import 'package:town_pass/util/tp_colors.dart';
 import 'package:town_pass/util/web_message_handler/tp_web_message_listener.dart';
@@ -74,8 +76,58 @@ class _TPWebViewState extends State<TPWebView> {
   void _track(WebUri? url) =>
       trackedPage.url = url == null ? null : Uri.tryParse(url.toString());
 
+  /// Service pages shown in the page language (PageTranslation): Chinese text
+  /// nodes and placeholders are sent to the App, translated on the phone, and
+  /// written back; new content (route changes, lists) is caught by a
+  /// MutationObserver. Typed values are never touched. Only the TownPass
+  /// service host may call the handler.
+  late final Worker _languageWorker = ever<String>(
+    PageTranslation.instance.language,
+    (language) async {
+      final controller = webViewController.value;
+      if (controller == null) return;
+      if (language == PageTranslation.original) {
+        await controller.reload(); // back to the page's own Chinese
+      } else {
+        await _translatePage(controller);
+      }
+    },
+  );
+
+  static bool _translatable(Uri? url) =>
+      url != null &&
+      url.scheme == 'https' &&
+      url.host == AssistantPageTracker.serviceHost;
+
+  void _addTranslationHandler(InAppWebViewController controller) {
+    _languageWorker; // start listening for language changes
+    controller.addJavaScriptHandler(
+      handlerName: 'townpassTranslate',
+      callback: (arguments) async {
+        final current = await controller.getUrl();
+        if (!_translatable(Uri.tryParse(current?.toString() ?? ''))) {
+          return null;
+        }
+        final texts = arguments.isNotEmpty && arguments.first is List
+            ? (arguments.first as List).whereType<String>().take(400).toList()
+            : <String>[];
+        return PageTranslation.instance.translateAll(texts);
+      },
+    );
+  }
+
+  Future<void> _translatePage(InAppWebViewController controller) async {
+    if (!PageTranslation.instance.active) return;
+    final current = await controller.getUrl();
+    if (!_translatable(Uri.tryParse(current?.toString() ?? ''))) return;
+    try {
+      await controller.evaluateJavascript(source: _translationScript);
+    } catch (_) {}
+  }
+
   @override
   void dispose() {
+    _languageWorker.dispose();
     trackedPage.detach();
     super.dispose();
   }
@@ -128,6 +180,7 @@ class _TPWebViewState extends State<TPWebView> {
           onLoadStop: (controller, loadedUrl) async {
             if (!mounted) return;
             _track(loadedUrl);
+            unawaited(_translatePage(controller));
             if (navigationCompleted) return;
             if (pageArgument?.isAssistantActionCurrent?.call() == false) return;
             if (loadedUrl.toString() != navigation[navigationIndex]) return;
@@ -163,6 +216,7 @@ class _TPWebViewState extends State<TPWebView> {
           },
           onWebViewCreated: (controller) {
             webViewController.value = controller;
+            _addTranslationHandler(controller);
             try {
               controller.loadUrl(
                 urlRequest: URLRequest(url: WebUri(navigation.first)),
@@ -214,60 +268,168 @@ class TPInAppWebView extends StatelessWidget {
   final ContextMenu? contextMenu;
   final Function(InAppWebViewController, WebUri?)? onPageCommitVisible;
   final Function(InAppWebViewController, String?)? onTitleChanged;
-  final Future<AjaxRequestAction> Function(InAppWebViewController, AjaxRequest)? onAjaxProgress;
-  final Future<AjaxRequestAction?> Function(InAppWebViewController, AjaxRequest)? onAjaxReadyStateChange;
+  final Future<AjaxRequestAction> Function(InAppWebViewController, AjaxRequest)?
+  onAjaxProgress;
+  final Future<AjaxRequestAction?> Function(
+    InAppWebViewController,
+    AjaxRequest,
+  )?
+  onAjaxReadyStateChange;
   final Function(InAppWebViewController, ConsoleMessage)? onConsoleMessage;
-  final Future<bool?> Function(InAppWebViewController, CreateWindowAction)? onCreateWindow;
+  final Future<bool?> Function(InAppWebViewController, CreateWindowAction)?
+  onCreateWindow;
   final Function(InAppWebViewController)? onCloseWindow;
   final Function(InAppWebViewController)? onWindowFocus;
   final Function(InAppWebViewController)? onWindowBlur;
-  final Function(InAppWebViewController, DownloadStartRequest)? onDownloadStartRequest;
-  final Future<JsAlertResponse?> Function(InAppWebViewController, JsAlertRequest)? onJsAlert;
-  final Future<JsConfirmResponse?> Function(InAppWebViewController, JsConfirmRequest)? onJsConfirm;
-  final Future<JsPromptResponse?> Function(InAppWebViewController, JsPromptRequest)? onJsPrompt;
-  final Function(InAppWebViewController, WebResourceRequest, WebResourceError)? onReceivedError;
-  final Function(InAppWebViewController, WebResourceRequest, WebResourceResponse)? onReceivedHttpError;
+  final Function(InAppWebViewController, DownloadStartRequest)?
+  onDownloadStartRequest;
+  final Future<JsAlertResponse?> Function(
+    InAppWebViewController,
+    JsAlertRequest,
+  )?
+  onJsAlert;
+  final Future<JsConfirmResponse?> Function(
+    InAppWebViewController,
+    JsConfirmRequest,
+  )?
+  onJsConfirm;
+  final Future<JsPromptResponse?> Function(
+    InAppWebViewController,
+    JsPromptRequest,
+  )?
+  onJsPrompt;
+  final Function(InAppWebViewController, WebResourceRequest, WebResourceError)?
+  onReceivedError;
+  final Function(
+    InAppWebViewController,
+    WebResourceRequest,
+    WebResourceResponse,
+  )?
+  onReceivedHttpError;
   final Function(InAppWebViewController, LoadedResource)? onLoadResource;
-  final Future<CustomSchemeResponse?> Function(InAppWebViewController, WebResourceRequest)? onLoadResourceWithCustomScheme;
+  final Future<CustomSchemeResponse?> Function(
+    InAppWebViewController,
+    WebResourceRequest,
+  )?
+  onLoadResourceWithCustomScheme;
   final Function(InAppWebViewController, WebUri?)? onLoadStart;
   final Function(InAppWebViewController, WebUri?)? onLoadStop;
-  final Function(InAppWebViewController, InAppWebViewHitTestResult)? onLongPressHitTestResult;
-  final Future<bool?> Function(InAppWebViewController, WebUri?, PlatformPrintJobController?)? onPrintRequest;
+  final Function(InAppWebViewController, InAppWebViewHitTestResult)?
+  onLongPressHitTestResult;
+  final Future<bool?> Function(
+    InAppWebViewController,
+    WebUri?,
+    PlatformPrintJobController?,
+  )?
+  onPrintRequest;
   final Function(InAppWebViewController, int)? onProgressChanged;
-  final Future<ClientCertResponse?> Function(InAppWebViewController, URLAuthenticationChallenge)? onReceivedClientCertRequest;
-  final Future<HttpAuthResponse?> Function(InAppWebViewController, URLAuthenticationChallenge)? onReceivedHttpAuthRequest;
-  final Future<ServerTrustAuthResponse?> Function(InAppWebViewController, URLAuthenticationChallenge)? onReceivedServerTrustAuthRequest;
+  final Future<ClientCertResponse?> Function(
+    InAppWebViewController,
+    URLAuthenticationChallenge,
+  )?
+  onReceivedClientCertRequest;
+  final Future<HttpAuthResponse?> Function(
+    InAppWebViewController,
+    URLAuthenticationChallenge,
+  )?
+  onReceivedHttpAuthRequest;
+  final Future<ServerTrustAuthResponse?> Function(
+    InAppWebViewController,
+    URLAuthenticationChallenge,
+  )?
+  onReceivedServerTrustAuthRequest;
   final Function(InAppWebViewController, int, int)? onScrollChanged;
-  final Function(InAppWebViewController, WebUri?, bool?)? onUpdateVisitedHistory;
+  final Function(InAppWebViewController, WebUri?, bool?)?
+  onUpdateVisitedHistory;
   final Function(InAppWebViewController)? onWebViewCreated;
-  final Future<AjaxRequest?> Function(InAppWebViewController, AjaxRequest)? shouldInterceptAjaxRequest;
-  final Future<FetchRequest?> Function(InAppWebViewController, FetchRequest)? shouldInterceptFetchRequest;
-  final Future<NavigationActionPolicy?> Function(InAppWebViewController, NavigationAction)? shouldOverrideUrlLoading;
+  final Future<AjaxRequest?> Function(InAppWebViewController, AjaxRequest)?
+  shouldInterceptAjaxRequest;
+  final Future<FetchRequest?> Function(InAppWebViewController, FetchRequest)?
+  shouldInterceptFetchRequest;
+  final Future<NavigationActionPolicy?> Function(
+    InAppWebViewController,
+    NavigationAction,
+  )?
+  shouldOverrideUrlLoading;
   final Function(InAppWebViewController)? onEnterFullscreen;
   final Function(InAppWebViewController)? onExitFullscreen;
   final Function(InAppWebViewController, int, int, bool, bool)? onOverScrolled;
   final Function(InAppWebViewController, double, double)? onZoomScaleChanged;
-  final Function(InAppWebViewController)? onDidReceiveServerRedirectForProvisionalNavigation;
-  final Future<FormResubmissionAction?> Function(InAppWebViewController, WebUri?)? onFormResubmission;
+  final Function(InAppWebViewController)?
+  onDidReceiveServerRedirectForProvisionalNavigation;
+  final Future<FormResubmissionAction?> Function(
+    InAppWebViewController,
+    WebUri?,
+  )?
+  onFormResubmission;
   final Function(InAppWebViewController)? onGeolocationPermissionsHidePrompt;
-  final Future<GeolocationPermissionShowPromptResponse?> Function(InAppWebViewController, String)? onGeolocationPermissionsShowPrompt;
-  final Future<JsBeforeUnloadResponse?> Function(InAppWebViewController, JsBeforeUnloadRequest)? onJsBeforeUnload;
-  final Future<NavigationResponseAction?> Function(InAppWebViewController, NavigationResponse)? onNavigationResponse;
-  final Future<PermissionResponse?> Function(InAppWebViewController, PermissionRequest)? onPermissionRequest;
+  final Future<GeolocationPermissionShowPromptResponse?> Function(
+    InAppWebViewController,
+    String,
+  )?
+  onGeolocationPermissionsShowPrompt;
+  final Future<JsBeforeUnloadResponse?> Function(
+    InAppWebViewController,
+    JsBeforeUnloadRequest,
+  )?
+  onJsBeforeUnload;
+  final Future<NavigationResponseAction?> Function(
+    InAppWebViewController,
+    NavigationResponse,
+  )?
+  onNavigationResponse;
+  final Future<PermissionResponse?> Function(
+    InAppWebViewController,
+    PermissionRequest,
+  )?
+  onPermissionRequest;
   final Function(InAppWebViewController, Uint8List)? onReceivedIcon;
   final Function(InAppWebViewController, LoginRequest)? onReceivedLoginRequest;
-  final Function(InAppWebViewController, PermissionRequest)? onPermissionRequestCanceled;
+  final Function(InAppWebViewController, PermissionRequest)?
+  onPermissionRequestCanceled;
   final Function(InAppWebViewController)? onRequestFocus;
   final Function(InAppWebViewController, WebUri, bool)? onReceivedTouchIconUrl;
-  final Function(InAppWebViewController, RenderProcessGoneDetail)? onRenderProcessGone;
-  final Future<WebViewRenderProcessAction?> Function(InAppWebViewController, WebUri?)? onRenderProcessResponsive;
-  final Future<WebViewRenderProcessAction?> Function(InAppWebViewController, WebUri?)? onRenderProcessUnresponsive;
-  final Future<SafeBrowsingResponse?> Function(InAppWebViewController, WebUri, SafeBrowsingThreat?)? onSafeBrowsingHit;
+  final Function(InAppWebViewController, RenderProcessGoneDetail)?
+  onRenderProcessGone;
+  final Future<WebViewRenderProcessAction?> Function(
+    InAppWebViewController,
+    WebUri?,
+  )?
+  onRenderProcessResponsive;
+  final Future<WebViewRenderProcessAction?> Function(
+    InAppWebViewController,
+    WebUri?,
+  )?
+  onRenderProcessUnresponsive;
+  final Future<SafeBrowsingResponse?> Function(
+    InAppWebViewController,
+    WebUri,
+    SafeBrowsingThreat?,
+  )?
+  onSafeBrowsingHit;
   final Function(InAppWebViewController)? onWebContentProcessDidTerminate;
-  final Future<ShouldAllowDeprecatedTLSAction?> Function(InAppWebViewController, URLAuthenticationChallenge)? shouldAllowDeprecatedTLS;
-  final Future<WebResourceResponse?> Function(InAppWebViewController, WebResourceRequest)? shouldInterceptRequest;
-  final Future<void> Function(InAppWebViewController, MediaCaptureState?, MediaCaptureState?)? onCameraCaptureStateChanged;
-  final Future<void> Function(InAppWebViewController, MediaCaptureState?, MediaCaptureState?)? onMicrophoneCaptureStateChanged;
+  final Future<ShouldAllowDeprecatedTLSAction?> Function(
+    InAppWebViewController,
+    URLAuthenticationChallenge,
+  )?
+  shouldAllowDeprecatedTLS;
+  final Future<WebResourceResponse?> Function(
+    InAppWebViewController,
+    WebResourceRequest,
+  )?
+  shouldInterceptRequest;
+  final Future<void> Function(
+    InAppWebViewController,
+    MediaCaptureState?,
+    MediaCaptureState?,
+  )?
+  onCameraCaptureStateChanged;
+  final Future<void> Function(
+    InAppWebViewController,
+    MediaCaptureState?,
+    MediaCaptureState?,
+  )?
+  onMicrophoneCaptureStateChanged;
 
   const TPInAppWebView({
     super.key,
@@ -347,7 +509,9 @@ class TPInAppWebView extends StatelessWidget {
   Widget build(BuildContext context) {
     return InAppWebView(
       onWebViewCreated: (controller) async {
-        await controller.addWebMessageListener(TPWebMessageListener.webMessageListener());
+        await controller.addWebMessageListener(
+          TPWebMessageListener.webMessageListener(),
+        );
         onWebViewCreated?.call(controller);
       },
       gestureRecognizers: gestureRecognizers,
@@ -398,7 +562,8 @@ class TPInAppWebView extends StatelessWidget {
       onExitFullscreen: onExitFullscreen,
       onOverScrolled: onOverScrolled,
       onZoomScaleChanged: onZoomScaleChanged,
-      onDidReceiveServerRedirectForProvisionalNavigation: onDidReceiveServerRedirectForProvisionalNavigation,
+      onDidReceiveServerRedirectForProvisionalNavigation:
+          onDidReceiveServerRedirectForProvisionalNavigation,
       onFormResubmission: onFormResubmission,
       onGeolocationPermissionsHidePrompt: onGeolocationPermissionsHidePrompt,
       onGeolocationPermissionsShowPrompt: onGeolocationPermissionsShowPrompt,
@@ -444,3 +609,69 @@ String _failedToLoadUrlData({String? url}) {
   </html>
   ''';
 }
+
+/// Injected into a service page (see _TPWebViewState._translatePage). Runs
+/// once per document; later calls rescan. Each Chinese text node (and input
+/// placeholder) is replaced by its translation, remembering what was written
+/// so Vue re-rendering the Chinese text gets translated again.
+const _translationScript = r'''
+(function () {
+  if (window.__townpassTranslate) { window.__townpassTranslate.scan(); return; }
+  var chinese = /[㐀-鿿]/;
+  var skip = { SCRIPT: 1, STYLE: 1, NOSCRIPT: 1, TEXTAREA: 1, CODE: 1 };
+  var written = new WeakMap();
+  var timer = null;
+  var busy = false;
+  function wanted(value, target) {
+    return value && chinese.test(value) && written.get(target) !== value;
+  }
+  function collect() {
+    var items = [];
+    var walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null);
+    var node;
+    while ((node = walker.nextNode())) {
+      var parent = node.parentElement;
+      if (!parent || skip[parent.tagName] || parent.isContentEditable) continue;
+      if (wanted(node.nodeValue, node)) items.push({ node: node, text: node.nodeValue });
+    }
+    var fields = document.querySelectorAll('input[placeholder], textarea[placeholder]');
+    for (var i = 0; i < fields.length; i++) {
+      var value = fields[i].getAttribute('placeholder');
+      if (wanted(value, fields[i])) items.push({ field: fields[i], text: value });
+    }
+    return items.slice(0, 400);
+  }
+  function scan() {
+    if (busy) { schedule(); return; }
+    var items = collect();
+    if (!items.length) return;
+    busy = true;
+    var texts = items.map(function (item) { return item.text.trim(); });
+    window.flutter_inappwebview.callHandler('townpassTranslate', texts).then(function (out) {
+      if (!Array.isArray(out)) return;
+      items.forEach(function (item, i) {
+        var translated = out[i];
+        if (typeof translated !== 'string' || !translated || translated === texts[i]) return;
+        if (item.node) {
+          if (item.node.nodeValue !== item.text) return; // changed meanwhile
+          var lead = item.text.match(/^\s*/)[0];
+          var tail = item.text.match(/\s*$/)[0];
+          var value = lead + translated + tail;
+          written.set(item.node, value);
+          item.node.nodeValue = value;
+        } else {
+          written.set(item.field, translated);
+          item.field.setAttribute('placeholder', translated);
+        }
+      });
+    }).finally(function () { busy = false; });
+  }
+  function schedule() { clearTimeout(timer); timer = setTimeout(scan, 300); }
+  new MutationObserver(schedule).observe(document.body, {
+    childList: true, subtree: true, characterData: true,
+    attributes: true, attributeFilter: ['placeholder']
+  });
+  window.__townpassTranslate = { scan: scan };
+  scan();
+})();
+''';

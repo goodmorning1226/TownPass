@@ -335,7 +335,8 @@ class Workflow:
             if len(self.pending) >= 128:
                 self.pending.pop(next(iter(self.pending)))
             self.pending[payload["session_id"]] = {"id": resolution, "created": now, "items": items,
-                "registry_version": self.registry.version, "page": page}
+                "registry_version": self.registry.version, "page": page,
+                "language": payload.get("language", "zh")}
         return self.reply(payload, message, kind=kind, resolution_id=resolution, choices=public, **extra)
 
     def _cap_items(self, entries, language="zh"):
@@ -459,6 +460,8 @@ class Workflow:
             if not pending or pending["id"] != resolution:
                 raise self.error("候選已失效，請重新描述需求。")
             self._trace("selection")
+            # A tapped option continues in the language the options were offered in.
+            payload = {**payload, "language": pending.get("language", payload.get("language", "zh"))}
             return self._select(payload, pending, payload["choice_id"])
         if payload.get("language", "zh") != "zh":
             return self._handle_language(payload, text, pending, resolution)

@@ -137,3 +137,14 @@ class SimilarWordingTests(unittest.TestCase):
         found = registry.search_language("pey water bil", "en")
         self.assertTrue(found and all(item["fuzzy"] for item in found))
         self.assertEqual(found[0]["entry"]["id"], "fees.water")
+
+
+class OfferedLanguageTests(unittest.TestCase):
+    def test_a_tapped_option_continues_in_the_language_it_was_offered_in(self):
+        from test_server import first
+        app = Assistant(FakeCatalog(), lambda messages, tools: first(tools))
+        listing = app.turn({"text": "what can you do", "request_id": "1", "session_id": "s", "language": "en"})
+        picked = app.turn({"text": "", "choice_id": "1", "resolution_id": listing["resolution_id"],
+                           "request_id": "2", "session_id": "s"})
+        self.assertEqual((picked["kind"], picked["language"]), ("navigate", "en"))
+        self.assertNotRegex(picked["message"], r"[一-鿿]")
