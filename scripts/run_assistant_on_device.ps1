@@ -3,7 +3,10 @@
 # Prerequisites: build_assistant_native.ps1, prepare_assistant_models.ps1, push_assistant_models.ps1.
 # -Speech system: the phone's own on-device speech recogniser instead of Whisper
 # (docs/AI_ASR_ABLATION.md); the Whisper model is then not used.
-param([string]$DeviceId, [switch]$Release, [ValidateSet("whisper", "system")][string]$Speech = "whisper")
+# -Chat: the chat-only assistant instead of the guided one (penguin, task card,
+#   highlights), which is the default (ASSISTANT_GUIDED; docs/AI_GUIDED_MERGE_PLAN.md)
+param([string]$DeviceId, [switch]$Release, [ValidateSet("whisper", "system")][string]$Speech = "whisper",
+      [switch]$Chat)
 # Native tools write progress to stderr; Windows PowerShell 5.1 would treat that as
 # an error when output is redirected, so failures are detected by exit codes instead.
 $ErrorActionPreference = "Continue"
@@ -37,7 +40,7 @@ try {
     # its default ABI list (with armeabi-v7a).
     fvm flutter build apk "--$mode" --target-platform $platform --android-project-arg=disable-abi-filtering=true `
         --dart-define=ASSISTANT_ENABLED=true --dart-define=ASSISTANT_BASE_URL=http://127.0.0.1:8765 `
-        "--dart-define=ASSISTANT_SPEECH=$Speech"
+        "--dart-define=ASSISTANT_SPEECH=$Speech" "--dart-define=ASSISTANT_GUIDED=$(if ($Chat) { 'false' } else { 'true' })"
     # fvm does not always pass Flutter's exit code on: also require a fresh APK,
     # so a failed build never installs the previous one.
     if ($LASTEXITCODE -or -not (Test-Path $apk) -or (Get-Item $apk).LastWriteTime -lt $buildStarted) {

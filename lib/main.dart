@@ -26,15 +26,16 @@ const assistantEnabled = bool.fromEnvironment(
   defaultValue: kDebugMode,
 );
 
-/// The chat assistant is the default. `--dart-define=ASSISTANT_GUIDED=true`
-/// switches to the guided assistant instead (step-by-step guides, pre-written
-/// content): it asks the model for service requests and falls back to the
-/// pre-written rules when the backend cannot be reached.
+/// The guided assistant is the default (owner, 2026-11-08): step-by-step guides
+/// on the real service pages; it asks the model for service requests and falls
+/// back to the pre-written rules when the backend cannot be reached.
+/// `--dart-define=ASSISTANT_GUIDED=false` brings back the chat-only assistant
+/// (docs/TEAM_TASKS_AFTER_MERGE.md T3-T5 list what it still lacks there).
 /// `--dart-define=ASSISTANT_OFFLINE=true` makes the guided assistant never
 /// call the backend.
 const assistantGuided = bool.fromEnvironment(
   'ASSISTANT_GUIDED',
-  defaultValue: false,
+  defaultValue: true,
 );
 const assistantOffline = bool.fromEnvironment('ASSISTANT_OFFLINE');
 const _useMock = assistantEnabled && assistantGuided;

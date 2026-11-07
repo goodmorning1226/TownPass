@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -24,6 +25,7 @@ import 'package:town_pass/page/guided_assistant/web/web_page_state.dart';
 import 'package:town_pass/page/guided_assistant/widget/guided_assistant_host.dart';
 import 'package:town_pass/page/guided_assistant/widget/guided_assistant_sheet.dart';
 import 'package:town_pass/service/assistant_action_executor.dart';
+import 'package:town_pass/service/assistant_recorder.dart';
 import 'package:town_pass/service/assistant_service.dart';
 import 'package:town_pass/service/account_service.dart';
 import 'package:town_pass/service/assistant_speaker.dart';
@@ -126,6 +128,52 @@ const home = '/library-service/';
 const search = '/library-service/keyword-search';
 const detail = '/library-service/book-detail/lib-book-5';
 
+/// Records the speech and turn languages the guided assistant sends.
+class SpeechService extends AssistantService {
+  final transcribeLanguages = <String>[];
+  final turnLanguages = <String?>[];
+  @override
+  Future<AssistantTranscript> transcribe(
+    Uint8List wav, {
+    required String requestId,
+    String language = 'zh',
+  }) async {
+    transcribeLanguages.add(language);
+    return const AssistantTranscript(
+      'I want to borrow a book',
+      language: 'en',
+      languageConfidence: 0.99,
+    );
+  }
+
+  @override
+  Future<AssistantResult> decide({
+    required String text,
+    required String requestId,
+    String? sessionId,
+    String? resolutionId,
+    String? choiceId,
+    Map<String, dynamic>? context,
+    String? language,
+    String? faqText,
+  }) async {
+    turnLanguages.add(language);
+    return const AssistantResult(sessionId: 's', message: 'Which one?');
+  }
+}
+
+/// One second of loud audio, reporting its loudness like the real recorder.
+class LoudRecorder extends AssistantRecorder {
+  @override
+  Future<bool> start() async {
+    onLevel?.call(0.3);
+    return true;
+  }
+
+  @override
+  Future<Uint8List?> stop() async => Uint8List(32000);
+}
+
 GuidedAssistantController makeController({
   FakeService? service,
   FakeExecutor? executor,
@@ -145,6 +193,40 @@ GuidedAssistantController makeController({
 
 void main() {
   const engine = MockAssistantEngine();
+
+  group('speech language and level', () {
+    tearDown(Get.reset);
+
+    test('the chosen language goes with speech and the turn', () async {
+      SharedPreferences.setMockInitialValues({
+        'assistant_speech_language': 'en',
+      });
+      final service = SpeechService();
+      final web = Get.put<WebPageState>(WebPageState());
+      final c = Get.put(
+        GuidedAssistantController(
+          thinkDelay: Duration.zero,
+          runOnboarding: false,
+          speaker: SilentSpeaker(),
+          service: service,
+          recorder: LoudRecorder(),
+          executor: FakeExecutor(),
+          probeOverride: FakeProbe(web),
+        ),
+      );
+      await Future<void>.delayed(Duration.zero);
+      expect(c.speechLanguage.value, 'en');
+      await c.micDown();
+      expect(c.level.value, greaterThan(0)); // live loudness while recording
+      await c.micUp();
+      await Future<void>.delayed(Duration.zero);
+      expect(service.transcribeLanguages, ['en']);
+      expect(service.turnLanguages, ['en']);
+      expect(c.heardLanguage.value, 'en');
+      c.setSpeechLanguage('ja');
+      expect(c.speechLanguage.value, 'ja');
+    });
+  });
 
   group('teaching components', () {
     test('prerequisites are added in page order', () {

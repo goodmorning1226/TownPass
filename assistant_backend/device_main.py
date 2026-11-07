@@ -72,7 +72,8 @@ def warm_up(recognizer, model_url, limit_s=900):
     # The same fixed system messages decision.decide sends, one per task, so each
     # of llama-server's two slots keeps one of them in its prompt cache.
     decision = True
-    for task in ("library", "capability"):
+    from decision import POLICIES
+    for task in POLICIES:  # library, capability, guide: one llama-server slot each
         messages = [{"role": "system", "content": system_prompt(task)}, {"role": "user", "content": "{}"}]
         decision = _retry(lambda: fetch_json(model_url + "/v1/chat/completions", {
             "messages": messages, "temperature": 0, "max_tokens": 1}, timeout=300), deadline) and decision

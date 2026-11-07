@@ -19,6 +19,7 @@ import 'package:town_pass/service/assistant_page_tracker.dart';
 import 'package:town_pass/service/assistant_recorder.dart';
 import 'package:town_pass/service/assistant_service.dart';
 import 'package:town_pass/service/assistant_speaker.dart';
+import 'package:town_pass/service/assistant_speech_language.dart';
 
 /// One chat bubble.
 class ChatMessage {
@@ -174,7 +175,37 @@ class GuidedAssistantController extends GetxController {
     this.probeOverride,
   }) : speaker = speaker ?? AssistantSpeaker(),
        executor = executor ?? AssistantActionExecutor(),
-       pageTracker = pageTracker ?? AssistantPageTracker.instance;
+       pageTracker = pageTracker ?? AssistantPageTracker.instance {
+    recorder?.onLevel = _onLevel;
+    AssistantSpeechLanguage.load().then((code) {
+      if (!isClosed) speechLanguage.value = code;
+    });
+  }
+
+  /// Speech language (same menu as the chat assistant: 'auto', 'zh', 'en',
+  /// ...): the phone's language until the user picks one, which is kept.
+  final speechLanguage = AssistantSpeechLanguage.systemDefault().obs;
+
+  /// The language the last utterance was recognised in (shown with 'auto').
+  final heardLanguage = RxnString();
+
+  /// Live loudness while recording (0-1), so a quiet voice is noticed.
+  final level = 0.0.obs;
+
+  /// The language of the current exchange, sent with typed and spoken turns.
+  String? _turnLanguage;
+
+  void setSpeechLanguage(String code) {
+    speechLanguage.value = AssistantSpeechLanguage.of(code).code;
+    heardLanguage.value = null;
+    AssistantSpeechLanguage.save(speechLanguage.value);
+  }
+
+  void _onLevel(double rms) {
+    if (listening.value || homeAsk.value == HomeAsk.listening) {
+      level.value = (rms / 0.15).clamp(0.0, 1.0);
+    }
+  }
 
   WebPageState get web => Get.find<WebPageState>();
 
@@ -330,6 +361,9 @@ class GuidedAssistantController extends GetxController {
     String? note,
     bool voice = false,
   }) {
+    // Typed text: the backend detects its language; a tapped option keeps
+    // the language of the exchange.
+    if (!voice && choiceId == null) _turnLanguage = null;
     final text = raw.trim();
     if ((text.isEmpty && choiceId == null) || loading.value) return;
     messages.add(
@@ -377,6 +411,7 @@ class GuidedAssistantController extends GetxController {
         resolutionId: choiceId == null ? null : _resolutionId,
         choiceId: choiceId,
         context: requestContext(),
+        language: _turnLanguage,
       );
     } catch (error) {
       if (generation != _generation || isClosed) return;
@@ -1185,6 +1220,7 @@ class GuidedAssistantController extends GetxController {
       heard = await svc.transcribe(
         audio,
         requestId: '${DateTime.now().microsecondsSinceEpoch}-$generation',
+        language: speechLanguage.value,
       );
     } catch (error) {
       if (generation != _generation || isClosed) return;
@@ -1198,26 +1234,34 @@ class GuidedAssistantController extends GetxController {
     }
     if (generation != _generation || isClosed) return;
     loading.value = false;
-    if (heard.confirm) {
-      // Unsure speech is never sent until the user picks a reading.
-      _say(
-        _bot(
-          Replies.heard(heard.text),
-          options: CandidateGroup(Replies.heard(heard.text), [
-            for (final reading in {heard.text, ...heard.options})
-              CandidateOption(reading, say: reading),
-          ]),
-        ),
-      );
-      return;
-    }
+    heardLanguage.value = heard.language;
+    // No "is this what you said?" question (owner, 2026-11-08): the backend's
+    // best other reading is used and stated; candidate confirmation still
+    // guards navigation. The turn is answered in the language heard.
+    final reading = _bestReading(heard);
+    _turnLanguage = heard.language;
     submit(
-      heard.text,
+      reading.text,
       voice: true,
-      note: heard.correctedFrom == null
+      note: reading.correctedFrom == null
           ? null
-          : Replies.corrected(heard.correctedFrom!, heard.text),
+          : Replies.corrected(reading.correctedFrom!, reading.text),
     );
+  }
+
+  /// The text to send for [heard]: an unsure transcript uses the backend's
+  /// best other reading (a sound-alike that names a service), else as heard.
+  static ({String text, String? correctedFrom}) _bestReading(
+    AssistantTranscript heard,
+  ) {
+    if (heard.confirm) {
+      for (final option in heard.options) {
+        if (option.trim().isNotEmpty && option != heard.text) {
+          return (text: option, correctedFrom: heard.text);
+        }
+      }
+    }
+    return (text: heard.text, correctedFrom: heard.correctedFrom);
   }
 
   // ---------------------------------------------------------------- home ask
@@ -1283,6 +1327,7 @@ class GuidedAssistantController extends GetxController {
       heard = await svc.transcribe(
         audio,
         requestId: '${DateTime.now().microsecondsSinceEpoch}-$generation',
+        language: speechLanguage.value,
       );
     } catch (error) {
       if (generation != _generation || isClosed) return;
@@ -1301,26 +1346,17 @@ class GuidedAssistantController extends GetxController {
   /// Puts what was heard on the home card and answers it as in the chat.
   void askFromHome(AssistantTranscript heard) {
     _homeFrom = _nextId;
-    homeQuestion.value = heard.text;
+    final reading = _bestReading(heard);
+    homeQuestion.value = reading.text;
     homeAsk.value = HomeAsk.asked;
-    if (heard.confirm) {
-      _say(
-        _bot(
-          Replies.heard(heard.text),
-          options: CandidateGroup(Replies.heard(heard.text), [
-            for (final reading in {heard.text, ...heard.options})
-              CandidateOption(reading, say: reading),
-          ]),
-        ),
-      );
-      return;
-    }
+    heardLanguage.value = heard.language;
+    _turnLanguage = heard.language;
     submit(
-      heard.text,
+      reading.text,
       voice: true,
-      note: heard.correctedFrom == null
+      note: reading.correctedFrom == null
           ? null
-          : Replies.corrected(heard.correctedFrom!, heard.text),
+          : Replies.corrected(reading.correctedFrom!, reading.text),
     );
   }
 
