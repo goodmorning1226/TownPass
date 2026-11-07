@@ -8,6 +8,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:town_pass/bean/assistant_result.dart';
 import 'package:town_pass/page/guided_assistant/guide_target.dart';
 import 'package:town_pass/page/guided_assistant/guided_assistant_controller.dart';
+import 'package:town_pass/page/account/account_view.dart';
+import 'package:town_pass/page/account/account_view_controller.dart';
+import 'package:town_pass/page/guided_assistant/assistant_settings_view.dart';
+import 'package:town_pass/page/guided_assistant/model/assistant_settings.dart';
 import 'package:town_pass/page/guided_assistant/model/guide_content.dart';
 import 'package:town_pass/page/guided_assistant/model/guide_page.dart';
 import 'package:town_pass/page/guided_assistant/model/guides/fees_guide.dart';
@@ -15,12 +19,17 @@ import 'package:town_pass/page/guided_assistant/model/guides/guide_registry.dart
 import 'package:town_pass/page/guided_assistant/model/guides/library_guide.dart';
 import 'package:town_pass/page/guided_assistant/model/mock_assistant_engine.dart';
 import 'package:town_pass/page/guided_assistant/web/web_guide_probe.dart';
+import 'package:town_pass/page/main/main_view_controller.dart';
 import 'package:town_pass/page/guided_assistant/web/web_page_state.dart';
 import 'package:town_pass/page/guided_assistant/widget/guided_assistant_host.dart';
 import 'package:town_pass/page/guided_assistant/widget/guided_assistant_sheet.dart';
 import 'package:town_pass/service/assistant_action_executor.dart';
 import 'package:town_pass/service/assistant_service.dart';
+import 'package:town_pass/service/account_service.dart';
 import 'package:town_pass/service/assistant_speaker.dart';
+import 'package:town_pass/service/device_service.dart';
+import 'package:town_pass/service/shared_preferences_service.dart';
+import 'package:town_pass/service/package_service.dart';
 import 'package:town_pass/util/tp_route.dart';
 
 class SilentSpeaker extends AssistantSpeaker {
@@ -929,6 +938,274 @@ void main() {
       expect(targetTaps, 1, reason: 'the lit spot reaches the page');
       c.task.value = null;
       await tester.pump(const Duration(seconds: 4));
+    });
+  });
+
+  group('assistant settings', () {
+    late FakeExecutor executor;
+    late GuidedAssistantController c;
+
+    setUp(() {
+      SharedPreferences.setMockInitialValues({});
+      Get.testMode = true;
+      executor = FakeExecutor();
+      c = makeController(executor: executor);
+    });
+    tearDown(Get.reset);
+
+    test('the mode is saved and read back on the next start', () async {
+      await pumpEventQueue();
+      expect(c.mode.value, AssistantMode.teach, reason: 'default');
+      c.setMode(AssistantMode.normal);
+      await pumpEventQueue();
+      final prefs = await SharedPreferences.getInstance();
+      expect(prefs.getString('guided_assistant_mode'), 'normal');
+      expect(c.toast.value, '已改成「一般模式」，語言不變');
+      Get.reset();
+      SharedPreferences.setMockInitialValues({
+        'guided_assistant_mode': 'normal',
+      });
+      final again = makeController();
+      await pumpEventQueue();
+      expect(again.mode.value, AssistantMode.normal);
+      expect(again.settingsSummary, '一般模式・繁體中文');
+    });
+
+    test('一般模式 opens the page but does not start the steps', () async {
+      await pumpEventQueue();
+      c.setMode(AssistantMode.normal);
+      c.openSheet();
+      c.submit('我要借書');
+      await settle();
+      expect(executor.opened.single, {'kind': 'home'});
+      expect(c.sheetOpen.value, isFalse);
+      expect(c.task.value?.status, TaskStatus.ended);
+      expect(c.messages.last.text, contains('之後你自己操作'));
+      expect(c.toast.value, SettingsTexts.normalToast);
+      c.routeChanged(TPRoute.webView);
+      show(c.web, home);
+      expect(c.card, isNull, reason: 'no opened card, no steps');
+      expect(c.locked, isFalse);
+      expect(c.highlightTarget, isNull);
+      // 教學模式 again: the same request starts the guide.
+      c.setMode(AssistantMode.teach);
+      c.startGuide('library');
+      show(c.web, home);
+      expect(c.card?.variant, CardVariant.opened);
+    });
+
+    test('教我 still teaches in 一般模式', () async {
+      await pumpEventQueue();
+      c.setMode(AssistantMode.normal);
+      c.startGuide('library', guided: true);
+      expect(c.task.value?.status, TaskStatus.opened);
+    });
+
+    test('only 繁體中文 can be chosen', () async {
+      expect(AssistantLanguage.values.where((l) => l.available), [
+        AssistantLanguage.zh,
+      ]);
+      expect(c.setLanguage(AssistantLanguage.en), isFalse);
+      expect(c.setLanguage(AssistantLanguage.ja), isFalse);
+      expect(c.language.value, AssistantLanguage.zh);
+      expect(c.toast.value, contains('準備中'));
+      expect(c.setLanguage(AssistantLanguage.zh), isTrue);
+    });
+
+    testWidgets('the settings page shows the options; others are 準備中', (
+      tester,
+    ) async {
+      tester.view.physicalSize = const Size(402, 1400);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      await tester.pumpWidget(const MaterialApp(home: AssistantSettingsView()));
+      expect(find.text('教學模式　＋　繁體中文'), findsOneWidget);
+      expect(find.text('預設'), findsNWidgets(2));
+      expect(find.text('準備中'), findsNWidgets(2));
+      expect(find.text('會改變什麼？'), findsOneWidget);
+      expect(find.text('重看助理新手教學'), findsOneWidget);
+      expect(find.textContaining('原型說明'), findsNothing);
+      await tester.tap(find.text('English'));
+      await tester.pump();
+      expect(c.language.value, AssistantLanguage.zh);
+      await tester.tap(find.text('一般模式'));
+      await tester.pump();
+      expect(c.mode.value, AssistantMode.normal);
+      expect(find.text('一般模式　＋　繁體中文'), findsOneWidget);
+      await tester.pump(const Duration(seconds: 4));
+    });
+
+    testWidgets('the account page has the AI 助理設定 row', (tester) async {
+      Get.put(AccountService());
+      Get.put(DeviceService());
+      Get.put(PackageService());
+      Get.put(AccountViewController());
+      tester.view.physicalSize = const Size(402, 1400);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      await tester.pumpWidget(const MaterialApp(home: AccountView()));
+      expect(find.text('AI 助理設定'), findsOneWidget);
+      expect(find.text('新增'), findsOneWidget);
+      expect(find.text('教學模式・繁體中文'), findsOneWidget);
+      // Between 訂閱 and 功能教學.
+      final y = tester.getCenter(find.text('AI 助理設定')).dy;
+      expect(y, greaterThan(tester.getCenter(find.text('訂閱')).dy));
+      expect(y, lessThan(tester.getCenter(find.text('功能教學')).dy));
+    });
+  });
+
+  group('tutorial in the assistant', () {
+    late FakeExecutor executor;
+    late GuidedAssistantController c;
+
+    setUp(() {
+      SharedPreferences.setMockInitialValues({});
+      Get.testMode = true;
+      executor = FakeExecutor();
+      c = makeController(executor: executor);
+    });
+    tearDown(Get.reset);
+
+    void openFromHint() {
+      c.startOnboarding();
+      c.onboardingTry();
+      c.fabPressed();
+    }
+
+    test('only 試試看 then the penguin starts the tutorial', () {
+      c.startOnboarding();
+      c.fabPressed();
+      expect(c.onboarding.value, OnboardingStage.hidden);
+      c.closeSheet();
+      openFromHint();
+      expect(c.sheetOpen.value, isTrue);
+      expect(c.onboarding.value, OnboardingStage.hello);
+    });
+
+    test('hello, then the mode, then done', () async {
+      openFromHint();
+      c.submit('你好');
+      await settle();
+      expect(c.onboarding.value, OnboardingStage.mode);
+      expect(c.messages.last.text, TutorialTexts.reply);
+      expect(executor.opened, isEmpty);
+      c.finishTutorial();
+      expect(c.onboarding.value, OnboardingStage.hidden);
+      expect(c.sheetOpen.value, isFalse);
+      expect(c.toast.value, TutorialTexts.doneToast);
+    });
+
+    test('a task during the tutorial asks first', () async {
+      openFromHint();
+      c.submit('我要借書');
+      await settle();
+      expect(c.onboarding.value, OnboardingStage.branch);
+      final ask = c.messages.last;
+      expect(ask.tutorialChoice, isTrue);
+      expect(ask.text, '我可以幫你「借書」。\n要先做完教學（剩 1 步），還是直接開始？');
+      expect(executor.opened, isEmpty, reason: 'nothing opens yet');
+      c.keepTutorial();
+      expect(c.onboarding.value, OnboardingStage.mode);
+      expect(c.messages.last.text, startsWith(TutorialTexts.keepTutReply));
+    });
+
+    test('直接開始 ends the tutorial and does the task', () async {
+      openFromHint();
+      c.submit('我要借書');
+      await settle();
+      c.startTaskNow();
+      await settle();
+      expect(c.onboarding.value, OnboardingStage.hidden);
+      expect(executor.opened.single, {'kind': 'home'});
+      expect(c.task.value?.status, TaskStatus.opened);
+      expect(c.toast.value, isNot(TutorialTexts.endToast));
+    });
+
+    test('skipping or closing ends the tutorial', () {
+      openFromHint();
+      c.skipTutorial();
+      expect(c.onboarding.value, OnboardingStage.hidden);
+      expect(c.messages.last.text, TutorialTexts.skipReply);
+      expect(c.sheetOpen.value, isTrue);
+      c.closeSheet();
+      expect(c.toast.value, isEmpty, reason: 'already ended');
+      openFromHint();
+      c.closeSheet();
+      expect(c.onboarding.value, OnboardingStage.hidden);
+      expect(c.toast.value, TutorialTexts.endToast);
+    });
+
+    testWidgets('the sheet shows the tutorial cards and labels', (
+      tester,
+    ) async {
+      tester.view.physicalSize = const Size(402, 874);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      openFromHint();
+      await tester.pumpWidget(
+        MaterialApp(home: GuidedAssistantSheet(controller: c)),
+      );
+      expect(find.text(TutorialTexts.hello1), findsOneWidget);
+      expect(find.text(TutorialTexts.tagMic), findsOneWidget);
+      expect(find.text(TutorialTexts.tagKb), findsOneWidget);
+      expect(find.text(TutorialTexts.skip), findsOneWidget);
+      c.submit('你好');
+      await tester.pump(const Duration(milliseconds: 1));
+      await tester.pumpAndSettle();
+      expect(find.text('現在是「教學模式」'), findsOneWidget);
+      expect(find.text(TutorialTexts.finish), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+  });
+
+  group('home ask', () {
+    setUp(() {
+      SharedPreferences.setMockInitialValues({});
+      Get.testMode = true;
+    });
+    tearDown(Get.reset);
+
+    test('a short press only says to hold', () async {
+      final c = makeController();
+      await c.homeMicDown();
+      expect(c.homeAsk.value, HomeAsk.listening);
+      await c.homeMicUp();
+      expect(c.homeAsk.value, HomeAsk.tooShort);
+      expect(c.messages.length, 1, reason: 'nothing sent');
+      c.dismissHomeAsk();
+      expect(c.homeAsk.value, HomeAsk.idle);
+    });
+
+    test('the question and answer go into the chat history', () async {
+      final c = makeController();
+      c.askFromHome(const AssistantTranscript('什麼是身分驗證'));
+      expect(c.homeQuestion.value, '什麼是身分驗證');
+      await settle();
+      expect(c.homeAsk.value, HomeAsk.asked);
+      expect(c.homeReplies, isNotEmpty);
+      final user = c.messages.firstWhere((m) => m.user);
+      expect(user.text, '什麼是身分驗證');
+      expect(user.voice, isTrue);
+      expect(c.messages.last, c.homeReplies.last);
+      c.openSheet();
+      expect(c.homeAsk.value, HomeAsk.idle);
+    });
+
+    testWidgets('the button shows on the home tab only', (tester) async {
+      final c = makeController();
+      await SharedPreferencesService().init();
+      Get.put(MainViewController());
+      await tester.pumpWidget(
+        MaterialApp(
+          home: GuidedAssistantHost(controller: c, child: const Scaffold()),
+        ),
+      );
+      await tester.pump();
+      expect(find.text(HomeAskTexts.label), findsOneWidget);
+      expect(find.bySemanticsLabel('開啟助理'), findsOneWidget);
+      c.routeChanged(TPRoute.webView);
+      await tester.pump();
+      expect(find.text(HomeAskTexts.label), findsNothing);
     });
   });
 }

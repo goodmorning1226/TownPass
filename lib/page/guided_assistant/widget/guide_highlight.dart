@@ -261,7 +261,8 @@ class _ArrowPainter extends CustomPainter {
 /// The penguin avatar on the guide card, in a round frame (as in the design).
 class PenguinAvatar extends StatelessWidget {
   final double size;
-  const PenguinAvatar({super.key, this.size = 44});
+  final double borderWidth;
+  const PenguinAvatar({super.key, this.size = 44, this.borderWidth = 3});
 
   @override
   Widget build(BuildContext context) {
@@ -272,7 +273,7 @@ class PenguinAvatar extends StatelessWidget {
         decoration: BoxDecoration(
           color: TPColors.white,
           shape: BoxShape.circle,
-          border: Border.all(color: TPColors.secondary500, width: 3),
+          border: Border.all(color: TPColors.secondary500, width: borderWidth),
         ),
         child: ClipOval(
           child: Transform.scale(
