@@ -2,12 +2,13 @@
 #  1. ministral-3:3b as GGUF: Mistral AI's official Ministral-3-3B-Instruct-2512 Q4_K_M
 #     (the same model Ollama runs on the computer; Apache-2.0).
 #  2. Breeze-ASR-25 for whisper.cpp: converted from the official MediaTek Research
-#     weights already used for the computer setup, then quantised to q5_0.
+#     weights already used for the computer setup, then quantised to q8_0 (whisper.cpp has
+#     ARM i8mm kernels for q8_0/q5_k/q4_k but not q5_0: 5.4 s vs 13.4 s a clip on the phone).
 # Output: <Root>\models\device\  (outside the repository). Push with push_assistant_models.ps1.
 param(
     [string]$Root = "D:\TownPassAssistant",
     [string]$Source = "D:\TownPassAssistant\native-src",
-    [ValidateSet("q5_0", "q8_0", "q4_0")][string]$AsrQuant = "q5_0"
+    [ValidateSet("q8_0", "q5_k", "q4_k", "q5_0")][string]$AsrQuant = "q8_0"
 )
 # Native tools write progress to stderr; Windows PowerShell 5.1 would treat that as
 # an error when output is redirected, so failures are detected by exit codes instead.

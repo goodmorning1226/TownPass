@@ -10,6 +10,9 @@ class AssistantResult {
   final String kind;
   final String? resolutionId;
 
+  /// The language of [message] ('zh', 'en', ...), for reading it aloud.
+  final String language;
+
   const AssistantResult({
     required this.sessionId,
     required this.message,
@@ -17,6 +20,7 @@ class AssistantResult {
     this.choices = const [],
     this.kind = 'reply',
     this.resolutionId,
+    this.language = 'zh',
   });
 
   factory AssistantResult.fromJson(Map<String, dynamic> json) {
@@ -50,6 +54,10 @@ class AssistantResult {
       destination: destination,
       kind: kind,
       resolutionId: json['resolution_id'] as String?,
+      language:
+          json['language'] is String && (json['language'] as String).length <= 8
+          ? json['language']
+          : 'zh',
       choices: (json['choices'] as List? ?? [])
           .map((value) => AssistantBookChoice.fromJson(value))
           .toList(),

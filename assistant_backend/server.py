@@ -247,11 +247,18 @@ def tools_for(context):
 
 
 def proposal_schema(tools):
-    """One branch per tool, so each name can only carry its own arguments."""
-    return {"anyOf": [{"type": "object", "properties": {
-        "name": {"type": "string", "enum": [t["function"]["name"]]},
-        "arguments": t["function"]["parameters"]},
-        "required": ["name", "arguments"], "additionalProperties": False} for t in tools]}
+    """One branch per tool, so each name can only carry its own arguments. A tool
+    without arguments is just its name (no "arguments":{} for the model to write)."""
+    branches = []
+    for t in tools:
+        name = {"type": "string", "enum": [t["function"]["name"]]}
+        if t["function"]["parameters"]["properties"]:
+            branches.append({"type": "object", "properties": {"name": name, "arguments": t["function"]["parameters"]},
+                             "required": ["name", "arguments"], "additionalProperties": False})
+        else:
+            branches.append({"type": "object", "properties": {"name": name},
+                             "required": ["name"], "additionalProperties": False})
+    return {"anyOf": branches}
 
 
 def validate_call(call, tools):
@@ -327,7 +334,14 @@ class Assistant:
             raise AssistantError("請輸入最多 500 字的需求。")
         from page_context import parse
         context = parse(payload.get("context"), self.workflow.registry)
-        payload = {**payload, "session_id": session, "text": text, "page_context": context}
+        # Optional "language" (docs/AI_MULTILINGUAL_PLAN.md): the speech language, or
+        # "auto"/absent to tell it from the typed text; Chinese otherwise.
+        import i18n
+        requested = payload.get("language")
+        if requested is not None and requested not in (*i18n.LANGUAGES, "auto"):
+            raise AssistantError("語言欄位不正確。")
+        language = requested if requested in i18n.LANGUAGES else i18n.detect_text_language(text)
+        payload = {**payload, "session_id": session, "text": text, "page_context": context, "language": language}
         started = time.monotonic()
         self.usage.calls, self.usage.timings = [], []
         self.usage.route, self.usage.candidates = None, []
@@ -538,7 +552,8 @@ def make_handler(assistant, token=""):
                 if not 0 < length <= 8192:
                     return self.reply(413, {"error": "請求內容過長或空白。"})
                 payload = json.loads(self.rfile.read(length))
-                if not isinstance(payload, dict) or set(payload) - {"text", "session_id", "request_id", "resolution_id", "choice_id", "context"}:
+                if not isinstance(payload, dict) or set(payload) - {"text", "session_id", "request_id", "resolution_id",
+                                                                    "choice_id", "context", "language"}:
                     raise AssistantError("請求欄位不正確。")
                 response = assistant.turn(payload)
                 self.reply(200, response)

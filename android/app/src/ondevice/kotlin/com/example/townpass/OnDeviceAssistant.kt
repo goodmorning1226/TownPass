@@ -26,11 +26,14 @@ import kotlin.concurrent.thread
 object OnDeviceAssistant {
     private const val TAG = "TownPassAssistant"
     const val MODEL_FILE = "Ministral-3-3B-Instruct-2512-Q4_K_M.gguf"
-    const val ASR_FILE = "ggml-breeze-asr-25-q5_0.bin"
+    // q8_0, not q5_0: whisper.cpp has ARM i8mm kernels for q8_0 (5.4 s per
+    // clip on a Snapdragon 7 Gen 4 instead of 13.4 s, same accuracy;
+    // docs/AI_ASR_ABLATION.md).
+    const val ASR_FILE = "ggml-breeze-asr-25-q8_0.bin"
 
     /** Multilingual Whisper for en/ja/vi/id/th and language detection (optional;
      *  the model choice follows docs/AI_ASR_ABLATION.md). */
-    const val MULTI_ASR_FILE = "ggml-large-v3-turbo-q5_0.bin"
+    const val MULTI_ASR_FILE = "ggml-whisper-multilingual.bin"  // push_assistant_models.ps1 -Multilingual
     private const val MODEL_PORT = 8771
     private const val WHISPER_PORT = 8772
     private const val MULTI_WHISPER_PORT = 8773

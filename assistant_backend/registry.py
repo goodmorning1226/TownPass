@@ -38,6 +38,40 @@ class Registry:
         self.by_id = {entry["id"]: entry for entry in self.entries}
         if len(self.by_id) != len(self.entries):
             raise ValueError("Duplicate capability IDs")
+        # Names and keywords in other languages (docs/AI_MULTILINGUAL_PLAN.md), next to the catalogue.
+        names = path.with_name("capabilities_i18n.json")
+        self.i18n = json.loads(names.read_text(encoding="utf-8"))["capabilities"] if names.exists() else {}
+        unknown = set(self.i18n) - set(self.by_id)
+        if unknown:
+            raise ValueError(f"capabilities_i18n.json names unknown capabilities: {sorted(unknown)}")
+
+    def title(self, entry, language="zh"):
+        """The entry's name in a language; the Chinese title when there is none."""
+        return (self.i18n.get(entry["id"], {}).get(language) or {}).get("title") or entry["title"]
+
+    def search_language(self, text, language):
+        """Retrieval for a non-Chinese request: the entry's names and keywords in that
+        language (and English, often mixed in), whole words; Chinese terms still count.
+        Same result shape as search(); the more specific page wins over its parent."""
+        from i18n import contains
+        matches = []
+        for entry in self.entries:
+            local = self.i18n.get(entry["id"], {})
+            terms = [term for lang in dict.fromkeys((language, "en"))
+                     for term in [(local.get(lang) or {}).get("title", ""), *(local.get(lang) or {}).get("keywords", [])]
+                     if term]
+            hits = [term for term in terms if contains(text, term, language)]
+            hits += [term for term in [entry["title"], *entry["keywords"]] if normalized(term) and normalized(term) in normalized(text)]
+            if hits:
+                matches.append({"entry": entry, "score": max(len(term) for term in hits), "fuzzy": False,
+                                "evidence": hits, "span": None})
+        if not matches:
+            return []
+        best = max(item["score"] for item in matches)
+        kept = [item for item in matches if item["score"] >= best * .8]
+        ids = {item["entry"]["id"] for item in kept}
+        kept = [item for item in kept if not any(item["entry"]["id"] in self.ancestors(self.by_id[other]) for other in ids)]
+        return sorted(kept, key=lambda item: -item["score"])[:5]
 
     def ancestors(self, entry):
         """Entries a user passes through to reach this one, from the catalogue:

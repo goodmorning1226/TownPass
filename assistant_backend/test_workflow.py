@@ -12,9 +12,7 @@ class WorkflowTests(unittest.TestCase):
         def model(messages, tools):
             self.calls.append(tools)
             first = tools[0]['function']
-            if first['name'] == 'select_capability':
-                return response(first['name'], {'capability_id': first['parameters']['properties']['capability_id']['enum'][0]})
-            return response(first['name'])
+            return response(first['name'], {key: spec['enum'][0] for key, spec in first['parameters']['properties'].items()})
         self.app = Assistant(FakeCatalog(), model)
 
     def turn(self, text='', session='test', **kwargs):

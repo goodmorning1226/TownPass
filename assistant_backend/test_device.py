@@ -81,10 +81,9 @@ class LlamaServerModelTests(unittest.TestCase):
                 return {"text": ""}
         device_main.warm_up(Recognizer(), server.MODEL_URL, limit_s=5)
         self.assertEqual(heard, [32000])  # one second of 16 kHz PCM16
-        from decision import LIBRARY_POLICY
+        from decision import system_prompt
         systems = [body["messages"][0]["content"] for _, body in FakeLlamaServer.requests[-2:]]
-        self.assertEqual(systems, [LIBRARY_POLICY + chr(10) + INSTRUCTIONS["library"],
-                                   CAPABILITY_POLICY + chr(10) + INSTRUCTIONS["capability"]])  # both prompt caches
+        self.assertEqual(systems, [system_prompt("library"), system_prompt("capability")])  # both prompt caches
         self.assertEqual(FakeLlamaServer.requests[-1][1]["max_tokens"], 1)
         heard.clear()
         device_main.warm_up(None, server.MODEL_URL, limit_s=5)  # phone recogniser: no Whisper
@@ -201,6 +200,20 @@ class PromptLayoutTests(unittest.TestCase):
             self.assertNotIn(", ", message["content"])
         self.assertEqual(json.loads(evidence["content"])["original_text"], "我要繳水費")
         self.assertEqual(list(json.loads(tools["content"])), ["allowed_tools"])
+
+    def test_a_tool_without_arguments_is_just_its_name_and_validation_is_unchanged(self):
+        from decision import with_arguments
+        tools = [server.tool("select_capability", "x", {"capability_id": {"type": "string", "enum": ["fees.water"]}},
+                             ["capability_id"]), server.tool("request_clarification", "y")]
+        branches = server.proposal_schema(tools)["anyOf"]
+        self.assertEqual([sorted(b["properties"]) for b in branches], [["arguments", "name"], ["name"]])
+        bare = with_arguments({"function": {"name": "request_clarification"}})
+        self.assertEqual(server.validate_call(bare, tools), ("request_clarification", {}))
+        for forged in ({"name": "select_capability"},  # its argument is required
+                       {"name": "select_capability", "arguments": {"capability_id": "fees.tax"}},
+                       {"name": "submit_payment"}):
+            with self.assertRaises(AssistantError):
+                server.validate_call(with_arguments({"function": forged}), tools)
 
 
 CRLF = bytes([13, 10])

@@ -11,6 +11,7 @@ import threading
 import time
 import uuid
 
+import i18n
 from decision import decide
 from page_context import current_root, model_view
 from phonetic import exact_homophone, rank_books, term_matches
@@ -52,7 +53,8 @@ class Workflow:
         return {"contract_version": CONTRACT, "registry_version": self.registry.version,
                 "catalog_version": CATALOG_VERSION, "request_id": payload["request_id"],
                 "session_id": payload["session_id"], "kind": "reply", "action": None,
-                "message": message, "destination": None, "choices": [], "data_mode": "demo", **extra}
+                "message": message, "destination": None, "choices": [], "data_mode": "demo",
+                "language": payload.get("language", "zh"), **extra}
 
     def _decide(self, text, entries, confirmation=False, context=None):
         """Capability (or candidate-confirmation) decision among retrieved entries."""
@@ -206,6 +208,13 @@ class Workflow:
         return auto, options
 
     def _navigate(self, payload, entry):
+        language = payload.get("language", "zh")
+        if language != "zh":
+            title = self.registry.title(entry, language)
+            if not entry["enabled"]:
+                return self.reply(payload, i18n.t("unsupported", language, title=title), kind="unsupported")
+            return self.reply(payload, i18n.t("navigate", language, title=title) + " " + i18n.t("page_language", language),
+                              kind="navigate", action="open_capability", destination={"kind": "capability", "id": entry["id"]})
         if not entry["enabled"]:
             return self.reply(payload, f"{entry['title']}：{entry['reason']}", kind="unsupported")
         return self.reply(payload, f"請在原本的「{entry['title']}」頁面繼續操作。"
@@ -226,7 +235,12 @@ class Workflow:
                 "registry_version": self.registry.version, "page": page}
         return self.reply(payload, message, kind=kind, resolution_id=resolution, choices=public)
 
-    def _cap_items(self, entries):
+    def _cap_items(self, entries, language="zh"):
+        if language != "zh":
+            return [{"title": self.registry.title(e, language),
+                     "subtitle": (i18n.t("demo_page", language) if e["mode"] == "demo" else i18n.t("opens", language))
+                     if e["enabled"] else i18n.t("not_connected", language),
+                     "enabled": e["enabled"], "entry_id": e["id"]} for e in entries]
         return [{"title": e["title"], "subtitle": ("示範頁面" if e["mode"] == "demo" else "可開啟")
                  if e["enabled"] else "尚未串接：" + e["reason"],
                  "enabled": e["enabled"], "entry_id": e["id"]} for e in entries]
@@ -238,11 +252,20 @@ class Workflow:
         if not all_entries:
             entries = [e for e in entries if e["enabled"]]
         page = entries[offset:offset + 8]
-        title = "App 功能（未串接項目會標示）" if all_entries else "目前助理可以開啟的功能"
-        message = title + "：\n" + "\n".join(f"• {e['title']}" + ("【未串接】" if not e["enabled"] else "") for e in page)
-        if offset + 8 < len(entries):
-            message += "\n可輸入「下一頁」繼續查看。"
-        return self._offer(payload, self._cap_items(page), message, kind="capability_list",
+        language = payload.get("language", "zh")
+        if language != "zh":
+            title = i18n.t("list_all" if all_entries else "list_enabled", language)
+            mark = f" ({i18n.t('not_connected', language)})"
+            message = title + ":\n" + "\n".join(f"• {self.registry.title(e, language)}" + ("" if e["enabled"] else mark)
+                                                for e in page)
+            if offset + 8 < len(entries):
+                message += "\n" + i18n.t("list_more", language)
+        else:
+            title = "App 功能（未串接項目會標示）" if all_entries else "目前助理可以開啟的功能"
+            message = title + "：\n" + "\n".join(f"• {e['title']}" + ("【未串接】" if not e["enabled"] else "") for e in page)
+            if offset + 8 < len(entries):
+                message += "\n可輸入「下一頁」繼續查看。"
+        return self._offer(payload, self._cap_items(page, language), message, kind="capability_list",
                            page={"all_entries": all_entries, "root": root, "offset": offset, "total": len(entries)})
 
     def _select(self, payload, pending, choice):
@@ -263,6 +286,61 @@ class Workflow:
         return self.reply(payload, f"請在《{item['title']}》原頁面確認館藏、冊次與取書館；尚未預約。",
                           kind="navigate", action="open_library_book", destination={"kind": "detail", "book_id": item["book_id"]})
 
+    def _handle_language(self, payload, text, pending, resolution):
+        """A request in English, Japanese, Vietnamese, Indonesian or Thai: the same
+        steps as the Chinese path with that language's rules, names and replies
+        (i18n.py, capabilities_i18n.json). The decision model, its tools and the
+        validation are the same; book titles are Chinese, so a library request
+        opens the library itself."""
+        language = payload["language"]
+        session = payload["session_id"]
+        if i18n.matches(i18n.CANCEL, text, language):
+            with self.lock:
+                self.pending.pop(session, None)
+            self._trace("cancel")
+            return self.reply(payload, i18n.t("cancelled", language), action="cancel")
+        if pending and resolution == pending["id"]:
+            self._trace("pending")
+            if i18n.matches(i18n.NEXT_PAGE, text, language) and pending.get("page"):
+                state = pending["page"]
+                return self._list(payload, state["all_entries"], state["root"], (state["offset"] + 8) % max(1, state["total"]))
+            number = i18n.choice_number(text, language)
+            if number:
+                return self._select(payload, pending, str(number))
+            if i18n.matches(i18n.YES, text, language):
+                if len(pending["items"]) == 1:
+                    return self._select(payload, pending, "1")
+                return self.reply(payload, i18n.t("choose_one", language), kind="confirm_candidates", resolution_id=resolution,
+                                  choices=[{"id": str(i), "title": item["title"], "enabled": item.get("enabled", True)}
+                                           for i, item in enumerate(pending["items"], 1)])
+        with self.lock:
+            self.pending.pop(session, None)
+        if i18n.matches(i18n.GREETING, text, language):
+            self._trace("greeting")
+            return self.reply(payload, i18n.t("greeting", language))
+        if not re.search(r"\w", text):
+            self._trace("empty")
+            return self.reply(payload, i18n.t("empty", language))
+        if i18n.searches(i18n.LISTING, text, language):
+            self._trace("listing")
+            return self._list(payload)
+        matches = self.registry.search_language(i18n.positive_text(text, language), language)
+        if not matches:
+            self._trace("no_match")
+            return self.reply(payload, i18n.t("no_match", language))
+        entries = [m["entry"] for m in matches]
+        if len(matches) == 1 and not entries[0]["enabled"]:
+            self._trace("unavailable_direct", [entries[0]["id"]])
+            return self._navigate(payload, entries[0])
+        ambiguous = len(entries) > 1
+        self._trace("capability_model", [e["id"] for e in entries])
+        name, args = self._decide(text, entries, ambiguous, payload.get("page_context"))
+        if name == "confirm_candidates":
+            return self._offer(payload, self._cap_items(entries, language), i18n.t("confirm_capability", language))
+        if name == "select_capability":
+            return self._navigate(payload, self.registry.by_id[args["capability_id"]])
+        return self.reply(payload, i18n.t("clarify", language))
+
     def handle(self, payload):
         text = payload.get("text", "").strip()
         session = payload["session_id"]
@@ -274,6 +352,8 @@ class Workflow:
                 raise self.error("候選已失效，請重新描述需求。")
             self._trace("selection")
             return self._select(payload, pending, payload["choice_id"])
+        if payload.get("language", "zh") != "zh":
+            return self._handle_language(payload, text, pending, resolution)
         if re.fullmatch(r"(?:請)?(?:取消|返回|算了|不用了|不要了)", text):
             with self.lock:
                 self.pending.pop(session, None)

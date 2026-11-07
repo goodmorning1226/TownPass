@@ -5,7 +5,8 @@ param(
     [string]$DeviceId,
     [string]$Models = "D:\TownPassAssistant\models\device",
     [string]$Package = "com.example.townpass",
-    [string]$Multilingual = "D:\TownPassAssistant\models\asr-ablation\ggml-large-v3-turbo-q5_0.bin"
+    # Whisper small q8_0: multilingual and fast on ARM (large-v3-turbo q5_0 took 19 s a clip).
+    [string]$Multilingual = "D:\TownPassAssistant\models\asr-ablation\ggml-small-q8_0.bin"
 )
 # Native tools write progress to stderr; Windows PowerShell 5.1 would treat that as
 # an error when output is redirected, so failures are detected by exit codes instead.
@@ -19,7 +20,7 @@ if (-not $DeviceId) {
 }
 $target = "/sdcard/Android/data/$Package/files/models"
 & $adb -s $DeviceId shell mkdir -p $target
-foreach ($name in @("Ministral-3-3B-Instruct-2512-Q4_K_M.gguf", "ggml-breeze-asr-25-q5_0.bin")) {
+foreach ($name in @("Ministral-3-3B-Instruct-2512-Q4_K_M.gguf", "ggml-breeze-asr-25-q8_0.bin")) {
     $file = Join-Path $Models $name
     if (-not (Test-Path $file)) { throw "Missing $file; run scripts/prepare_assistant_models.ps1" }
     $remote = (& $adb -s $DeviceId shell stat -c %s "$target/$name" 2>$null) -as [long]
@@ -30,7 +31,8 @@ foreach ($name in @("Ministral-3-3B-Instruct-2512-Q4_K_M.gguf", "ggml-breeze-asr
 # Optional multilingual Whisper (en/ja/vi/id/th and language detection); the App
 # uses it only when present. -Multilingual "" skips it.
 if ($Multilingual -and (Test-Path $Multilingual)) {
-    $name = "ggml-large-v3-turbo-q5_0.bin"  # OnDeviceAssistant.MULTI_ASR_FILE
+    # A fixed name (OnDeviceAssistant.MULTI_ASR_FILE): a different model is just pushed.
+    $name = "ggml-whisper-multilingual.bin"
     $remote = (& $adb -s $DeviceId shell stat -c %s "$target/$name" 2>$null) -as [long]
     if ($remote -eq (Get-Item $Multilingual).Length) { Write-Host "$name already on the device" }
     else {

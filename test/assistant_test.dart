@@ -28,6 +28,7 @@ class PendingService extends AssistantService {
     String? resolutionId,
     String? choiceId,
     Map<String, dynamic>? context,
+    String? language,
   }) {
     contexts.add(context);
     return response.future;
@@ -81,6 +82,7 @@ class QueueService extends AssistantService {
   final choiceIds = <String?>[];
   final audio = <Uint8List>[];
   Completer<void>? transcriptGate;
+  final turnLanguages = <String?>[];
   QueueService(this.results, {this.transcripts = const []});
   @override
   Future<AssistantResult> decide({
@@ -90,10 +92,12 @@ class QueueService extends AssistantService {
     String? resolutionId,
     String? choiceId,
     Map<String, dynamic>? context,
+    String? language,
   }) async {
     contexts.add(context);
     texts.add(text);
     choiceIds.add(choiceId);
+    turnLanguages.add(language);
     return results.removeAt(0);
   }
 
@@ -160,8 +164,13 @@ class FakeSpeaker extends AssistantSpeaker {
   @override
   Future<void> saveEnabled(bool enabled) async => saved.add(enabled);
 
+  final spokenLanguages = <String>[];
+
   @override
-  Future<void> speak(String text) async => spoken.add(text);
+  Future<void> speak(String text, {String language = 'zh'}) async {
+    spoken.add(text);
+    spokenLanguages.add(language);
+  }
 
   @override
   Future<void> stop() async => stops++;
@@ -854,22 +863,35 @@ void main() {
     'The chosen speech language is sent and the detected one shown',
     () async {
       final service = QueueService(
-        [const AssistantResult(sessionId: 's', message: 'ok')],
+        [
+          const AssistantResult(
+            sessionId: 's',
+            message: 'Please continue on the "Library" page.',
+            language: 'en',
+          ),
+        ],
         transcripts: [
           const AssistantTranscript('I want to borrow a book', language: 'en'),
         ],
       );
+      // Read-aloud on as remembered (the saved choice loads asynchronously).
+      final speaker = FakeSpeaker(stored: true);
       final controller = AssistantViewController(
         service: service,
         executor: RecordingExecutor(),
         recorder: FakeRecorder(),
+        speaker: speaker,
       );
+      await Future<void>.delayed(Duration.zero);
       expect(controller.speechLanguage.value, 'zh'); // Chinese until chosen
       controller.setSpeechLanguage('auto');
       expect(await controller.startListening(), isTrue);
       await controller.stopListening();
       expect(service.languages, ['auto']);
       expect(controller.heardLanguage.value, 'en');
+      // The turn carries the speech language and the reply is read in it.
+      expect(service.turnLanguages, ['en']);
+      expect(speaker.spokenLanguages, ['en']);
       controller.setSpeechLanguage('xx'); // unknown codes fall back to Chinese
       expect(controller.speechLanguage.value, 'zh');
       expect(controller.heardLanguage.value, isNull);

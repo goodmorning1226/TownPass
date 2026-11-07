@@ -55,7 +55,7 @@ def warm_up(recognizer, model_url, limit_s=900):
     import array
     import math
     import time
-    from decision import INSTRUCTIONS, POLICIES
+    from decision import system_prompt
     from server import fetch_json
     started = time.monotonic()
     deadline = started + limit_s
@@ -68,8 +68,7 @@ def warm_up(recognizer, model_url, limit_s=900):
     # of llama-server's two slots keeps one of them in its prompt cache.
     decision = True
     for task in ("library", "capability"):
-        system = POLICIES[task] + "\n" + INSTRUCTIONS[task]
-        messages = [{"role": "system", "content": system}, {"role": "user", "content": "{}"}]
+        messages = [{"role": "system", "content": system_prompt(task)}, {"role": "user", "content": "{}"}]
         decision = _retry(lambda: fetch_json(model_url + "/v1/chat/completions", {
             "messages": messages, "temperature": 0, "max_tokens": 1}, timeout=300), deadline) and decision
     state = "skipped" if recognizer is None else "ok" if speech else "failed"

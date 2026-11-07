@@ -109,7 +109,10 @@ class RetrievalTests(unittest.TestCase):
         self.assertEqual(len(branches), len(tools))
         for branch, item in zip(branches, tools):
             self.assertEqual(branch["properties"]["name"]["enum"], [item["function"]["name"]])
-            self.assertIs(branch["properties"]["arguments"], item["function"]["parameters"])
+            if item["function"]["parameters"]["properties"]:
+                self.assertIs(branch["properties"]["arguments"], item["function"]["parameters"])
+            else:  # nothing for the model to write after the name
+                self.assertNotIn("arguments", branch["properties"])
             self.assertFalse(branch["additionalProperties"])
 
     def test_changed_catalog_fails_closed(self):

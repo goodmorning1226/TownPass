@@ -10,13 +10,24 @@ param(
     [string[]]$Models = @("breeze-q5_0"),
     [string[]]$Conditions = @("clean", "noisy"),
     [string]$Bench = "D:\TownPassAssistant\asr-bench",
-    [int]$Threads = 6
+    [int]$Threads = 6,
+    # Vocabulary prompt budget in tokens (App: 200; 0 = no prompt) and a fixed
+    # encoder context (0 = from the longest clip, as the App does per clip).
+    [int]$PromptTokens = 200,
+    [int]$AudioCtx = 0,
+    # Name suffix for the results folder, e.g. "-p60" (runs\<model><tag>\<condition>).
+    [string]$Tag = ""
 )
 $ErrorActionPreference = "Continue"
 $root = Split-Path -Parent $PSScriptRoot
 $adb = "D:\Android\Sdk\platform-tools\adb.exe"
 $files = @{
     "breeze-q5_0"          = "D:\TownPassAssistant\models\device\ggml-breeze-asr-25-q5_0.bin"
+    # Formats with ARM i8mm repacked kernels in whisper.cpp (q5_0 has none).
+    "breeze-q8_0"          = "D:\TownPassAssistant\models\device\ggml-breeze-asr-25-q8_0.bin"
+    "breeze-q5_k"          = "D:\TownPassAssistant\models\device\ggml-breeze-asr-25-q5_k.bin"
+    "breeze-q4_k"          = "D:\TownPassAssistant\models\device\ggml-breeze-asr-25-q4_k.bin"
+    "small-q8_0"           = "D:\TownPassAssistant\models\asr-ablation\ggml-small-q8_0.bin"
     "large-v3-turbo-q5_0"  = "D:\TownPassAssistant\models\asr-ablation\ggml-large-v3-turbo-q5_0.bin"
     "medium-q5_0"          = "D:\TownPassAssistant\models\asr-ablation\ggml-medium-q5_0.bin"
     "small-q5_1"           = "D:\TownPassAssistant\models\asr-ablation\ggml-small-q5_1.bin"
@@ -38,7 +49,7 @@ Copy-Item "D:\TownPassAssistant\native-src\whisper.cpp\build-android-arm64-v8a\b
 & $adb -s $DeviceId shell "chmod 755 $remote/whisper-cli"
 $env:PYTHONIOENCODING = "utf-8"
 $promptFile = Join-Path $Bench "prompt.txt"
-python -c "import sys; sys.path.insert(0, r'$root\assistant_backend'); from asr_server import vocabulary_prompt; open(r'$promptFile', 'w', encoding='utf-8', newline='').write(vocabulary_prompt())"
+python -c "import sys; sys.path.insert(0, r'$root\assistant_backend'); from asr_server import vocabulary_prompt, STYLE_PROMPT; open(r'$promptFile', 'w', encoding='utf-8', newline='').write(vocabulary_prompt(budget=$PromptTokens) if $PromptTokens > 0 else '')"
 & $adb -s $DeviceId push $promptFile "$remote/prompt.txt" | Out-Null
 
 # Clips, and an encoder context that covers the longest one (as the App does per clip).
@@ -51,6 +62,7 @@ foreach ($condition in $Conditions) {
     }
 }
 $audioCtx = [math]::Min(1500, [math]::Max(256, [int](($longest + 2) * 50)))
+if ($AudioCtx -gt 0) { $audioCtx = $AudioCtx }
 Write-Host ("longest clip {0:N1} s -> audio_ctx {1}" -f $longest, $audioCtx)
 
 foreach ($model in $Models) {
@@ -81,7 +93,7 @@ echo `$PEAK > peak.txt
         $started = Get-Date
         & $adb -s $DeviceId shell "sh $remote/run.sh"
         $wall = ((Get-Date) - $started).TotalSeconds
-        $out = Join-Path $Bench "runs\$model\$condition"
+        $out = Join-Path $Bench "runs\$model$Tag\$condition"
         if (Test-Path $out) { Remove-Item $out -Recurse -Force }
         New-Item -ItemType Directory -Force $out | Out-Null
         # Copy on the phone, then adb pull (piping binary output through PowerShell corrupts it).
@@ -95,7 +107,7 @@ echo `$PEAK > peak.txt
         $timing = [ordered]@{
             clips = $count; threads = $Threads; audio_ctx = $audioCtx
             load_ms = $load; total_ms = $total
-            ms_per_clip = if ($total -and $load -ne $null) { [math]::Round(($total - $load) / $count) } else { $null }
+            ms_per_clip = if ($total -and $null -ne $load) { [math]::Round(($total - $load) / $count) } else { $null }
             encode_ms = & $ms "encode time"; decode_ms = & $ms "decode time"
             peak_rss_mb = [math]::Round($peak / 1024); wall_s = [math]::Round($wall, 1)
         }

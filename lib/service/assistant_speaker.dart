@@ -27,12 +27,30 @@ class AssistantSpeaker {
     } catch (_) {}
   }
 
-  Future<void> speak(String text) async {
+  /// Voice locale per reply language (docs/AI_MULTILINGUAL_PLAN.md).
+  static const locales = {
+    'zh': 'zh-TW',
+    'en': 'en-US',
+    'ja': 'ja-JP',
+    'vi': 'vi-VN',
+    'id': 'id-ID',
+    'th': 'th-TH',
+  };
+  String? _locale;
+
+  /// [language] is the reply's language ('zh', 'en', ...); a phone without a
+  /// voice for it keeps the previous one (the text is always shown).
+  Future<void> speak(String text, {String language = 'zh'}) async {
     final spoken = speakable(text);
     if (spoken.isEmpty) return;
     try {
       final tts = _tts ??= await _create();
       await tts.stop();
+      final locale = locales[language] ?? AssistantSpeaker.language;
+      if (locale != _locale) {
+        await tts.setLanguage(locale);
+        _locale = locale;
+      }
       await tts.speak(spoken);
     } catch (_) {
       // No TTS engine or voice: replies are still shown as text.
@@ -48,6 +66,7 @@ class AssistantSpeaker {
   Future<FlutterTts> _create() async {
     final tts = FlutterTts();
     await tts.setLanguage(language);
+    _locale = language;
     await tts.setSpeechRate(rate);
     return tts;
   }

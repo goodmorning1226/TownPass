@@ -271,6 +271,7 @@ class AssistantViewController extends GetxController {
     bool fromUser = false,
     List<AssistantBookChoice> choices = const [],
     List<String> suggestions = const [],
+    String language = 'zh',
   }) {
     final item = AssistantChatMessage(
       id: _nextMessageId++,
@@ -280,7 +281,7 @@ class AssistantViewController extends GetxController {
       suggestions: List.unmodifiable(suggestions),
     );
     messages.add(item);
-    if (!fromUser && readAloud.value) speaker.speak(text);
+    if (!fromUser && readAloud.value) speaker.speak(text, language: language);
     if (messages.length > historyLimit) {
       messages.removeRange(0, messages.length - historyLimit);
     }
@@ -531,6 +532,8 @@ class AssistantViewController extends GetxController {
       note: heard.correctedFrom == null
           ? null
           : '我聽到「${heard.correctedFrom}」，當作「${heard.text}」處理；不對的話請再說一次。',
+      // The backend answers in the language the speech was recognised in.
+      language: heard.language,
     );
   }
 
@@ -554,6 +557,7 @@ class AssistantViewController extends GetxController {
     String? choiceId,
     String? shownAs,
     String? note,
+    String? language,
   }) async {
     if (busy.value || (text.trim().isEmpty && choiceId == null)) return;
     speaker.stop();
@@ -582,11 +586,16 @@ class AssistantViewController extends GetxController {
         resolutionId: _resolutionId,
         choiceId: choiceId,
         context: requestContext(),
+        language: language,
       );
       if (generation != _generation || isClosed) return;
       _session = result.sessionId;
       _resolutionId = result.resolutionId;
-      final reply = _add(result.message, choices: result.choices);
+      final reply = _add(
+        result.message,
+        choices: result.choices,
+        language: result.language,
+      );
       choices.assignAll(result.choices);
       if (result.choices.isNotEmpty) choicesMessageId.value = reply.id;
       message.value = result.message;

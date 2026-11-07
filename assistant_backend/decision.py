@@ -64,6 +64,27 @@ def compact(value):
     return json.dumps(value, ensure_ascii=False, separators=(",", ":"))
 
 
+# Output length (2026-11-07, each generated token costs ~0.17 s on a phone):
+# a tool without arguments is proposed as just its name (proposal_schema), which
+# cut the average proposal from 17.1 to 14.9 tokens with dev 184/184 and
+# held-out 94/102 unchanged. Shorter tool names ("ask" for request_clarification)
+# saved 4 tokens but lost 2 dev and 3 held-out cases, so names stay descriptive.
+
+
+def with_arguments(call):
+    """A proposal for a tool without arguments may omit them; validate_call
+    still checks the name and that no argument is given."""
+    function = call.get("function") if isinstance(call, dict) else None
+    if not isinstance(function, dict) or "arguments" in function:
+        return call
+    return {**call, "function": {**function, "arguments": {}}}
+
+
+def system_prompt(task):
+    """The fixed system message of a task (also sent by the phone's warm-up)."""
+    return POLICIES[task] + "\n" + INSTRUCTIONS[task]
+
+
 def decide(owner, task, context, tools, validate, error):
     """Ask the model for one tool proposal and return the validated (name, args).
 
@@ -80,7 +101,7 @@ def decide(owner, task, context, tools, validate, error):
     # - Compact JSON, Chinese unescaped.
     # Evidence and tools stay separate messages: merging them into one JSON
     # object lost 16 dev cases.
-    messages = [{"role": "system", "content": POLICIES[task] + "\n" + INSTRUCTIONS[task]},
+    messages = [{"role": "system", "content": system_prompt(task)},
                 {"role": "user", "content": compact(context)},
                 {"role": "user", "content": compact({"allowed_tools": tools})}]
     if not owner.model_lock.acquire(timeout=.1):
@@ -99,7 +120,7 @@ def decide(owner, task, context, tools, validate, error):
                 calls = result.get("message", {}).get("tool_calls", [])
                 if len(calls) != 1:
                     raise error("模型沒有提供有效決策，請重試或查看功能列表。")
-                return validate(calls[0], tools)
+                return validate(with_arguments(calls[0]), tools)
             except error:
                 if attempt:
                     raise
