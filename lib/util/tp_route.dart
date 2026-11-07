@@ -14,6 +14,10 @@ import 'package:town_pass/page/city_service_edit/city_service_edit_view.dart';
 import 'package:town_pass/page/city_service_edit/city_service_edit_view_controller.dart';
 import 'package:town_pass/page/feedback/feedback_view.dart';
 import 'package:town_pass/page/feedback/feedback_view_controller.dart';
+import 'package:town_pass/page/guided_assistant/mock_pages/mock_library_book_view.dart';
+import 'package:town_pass/page/guided_assistant/mock_pages/mock_service_view.dart';
+import 'package:town_pass/page/guided_assistant/mock_pages/mock_water_fee_view.dart';
+import 'package:town_pass/page/guided_assistant/model/guide_content.dart';
 import 'package:town_pass/page/invoice_receipt/invoice_receipt_view.dart';
 import 'package:town_pass/page/language/language_view.dart';
 import 'package:town_pass/page/language/language_view_controller.dart';
@@ -184,6 +188,19 @@ abstract class TPRoute {
     GetPage(
       name: activityDetail,
       page: () => const ActivityDetailView(),
+    ),
+    // Mock service pages for the guided assistant demo (no real service).
+    GetPage(
+      name: MockRoutes.waterFee,
+      page: () => const MockWaterFeeView(),
+    ),
+    GetPage(
+      name: MockRoutes.libraryBook,
+      page: () => const MockLibraryBookView(),
+    ),
+    GetPage(
+      name: MockRoutes.service,
+      page: () => const MockServiceView(),
     ),
   ];
 

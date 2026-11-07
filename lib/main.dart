@@ -14,11 +14,21 @@ import 'package:town_pass/util/tp_colors.dart';
 import 'package:town_pass/util/tp_route.dart';
 import 'package:town_pass/page/assistant/assistant_view_controller.dart';
 import 'package:town_pass/page/assistant/widget/assistant_host.dart';
+import 'package:town_pass/page/guided_assistant/guided_assistant_controller.dart';
+import 'package:town_pass/page/guided_assistant/model/mock_service_state.dart';
+import 'package:town_pass/page/guided_assistant/widget/guided_assistant_host.dart';
 
 const assistantEnabled = bool.fromEnvironment(
   'ASSISTANT_ENABLED',
   defaultValue: kDebugMode,
 );
+
+/// Guided assistant with pre-written content and keyword rules instead of the
+/// model (UI prototype). `--dart-define=ASSISTANT_MOCK=false` brings back the
+/// model-backed assistant.
+const assistantMock = bool.fromEnvironment('ASSISTANT_MOCK', defaultValue: true);
+const _useMock = assistantEnabled && assistantMock;
+const _useModel = assistantEnabled && !assistantMock;
 
 const _transparentStatusBar = SystemUiOverlayStyle(
   statusBarColor: Colors.transparent,
@@ -52,7 +62,14 @@ Future<void> initServices() async {
   );
 
   Get.put<SubscriptionService>(SubscriptionService());
-  if (assistantEnabled) {
+  if (_useMock) {
+    Get.put<MockServiceState>(MockServiceState(), permanent: true);
+    Get.put<GuidedAssistantController>(
+      GuidedAssistantController(),
+      permanent: true,
+    );
+  }
+  if (_useModel) {
     Get.put<AssistantViewController>(
       AssistantViewController(),
       permanent: true,
@@ -94,22 +111,39 @@ class MyApp extends StatelessWidget {
       },
       getPages: TPRoute.page,
       navigatorObservers: [
-        if (assistantEnabled)
+        if (_useModel)
           AssistantNavigationObserver(Get.find<AssistantViewController>()),
+        if (_useMock)
+          GuidedNavigationObserver(Get.find<GuidedAssistantController>()),
       ],
       routingCallback: (routing) {
-        if (assistantEnabled && Get.isRegistered<AssistantViewController>()) {
+        if (_useModel && Get.isRegistered<AssistantViewController>()) {
           Get.find<AssistantViewController>().routeChanged(
             routing?.current ?? '',
           );
         }
+        if (_useMock && Get.isRegistered<GuidedAssistantController>()) {
+          Get.find<GuidedAssistantController>().routeChanged(
+            routing?.current ?? '',
+          );
+        }
       },
-      builder: (context, child) => assistantEnabled
-          ? AssistantHost(
-              controller: Get.find<AssistantViewController>(),
-              child: child ?? const SizedBox.shrink(),
-            )
-          : child ?? const SizedBox.shrink(),
+      builder: (context, child) {
+        final page = child ?? const SizedBox.shrink();
+        if (_useMock) {
+          return GuidedAssistantHost(
+            controller: Get.find<GuidedAssistantController>(),
+            child: page,
+          );
+        }
+        if (_useModel) {
+          return AssistantHost(
+            controller: Get.find<AssistantViewController>(),
+            child: page,
+          );
+        }
+        return page;
+      },
     );
   }
 }
