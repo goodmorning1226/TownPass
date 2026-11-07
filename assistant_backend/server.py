@@ -675,7 +675,8 @@ def main():
     if args.host not in ("127.0.0.1", "localhost") and len(token) < 24:
         parser.error("LAN binding requires TOWNPASS_ASSISTANT_TOKEN with at least 24 characters.")
     from faq import load_default
-    faq = load_default()
+    from qna import with_qna
+    faq = with_qna(load_default())  # App Q&A loads in the background
     server = ThreadingHTTPServer((args.host, args.port), make_handler(Assistant(faq=faq), token))
     server.daemon_threads = True
     server.timeout = 80

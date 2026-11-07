@@ -5,7 +5,7 @@ shared capability catalogue and the book catalogue, then one model decision
 (decision.decide) among the retrieved candidates, then session-bound
 candidate confirmation. When that tool-calling layer finds no service (no
 retrieval match, or the model asks for clarification / rejects the request),
-the Taipei FAQ index (faq.py) is the second layer; when it has no confident
+the Taipei FAQ index (faq.py, with the App's own Q&A from qna.py) is the second layer; when it has no confident
 answer either, the turn says that nothing related was found. Every turn
 returns exactly one reply.
 """
@@ -17,6 +17,7 @@ import time
 import uuid
 
 import i18n
+import qna
 from decision import decide
 from faq import SCOPE_NOTE
 from page_context import current_root, model_view
@@ -105,6 +106,7 @@ def sound_ordinal(text):
 # retrieval (rag_handoff/HANDOFF.md section 7), so they skip it.
 FAQ_MIN_CHARS = 4
 FAQ_ANSWER_LIMIT = 600
+QNA_PAGE_NOTE = "更多說明可開啟 App 的「常見問答」頁面。"
 NO_RELATED = ("抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；"
               "也可以撥打市民熱線 1999（外縣市 02-27208889）。")
 
@@ -187,7 +189,18 @@ class Workflow:
         answer = entry["answer"].strip()
         if len(answer) > FAQ_ANSWER_LIMIT:
             answer = answer[:FAQ_ANSWER_LIMIT].rstrip() + "…（內容較長，完整說明請洽 1999 或該機關網站）"
+        if qna.is_qna(entry):
+            return f"【{entry['question'].strip()}】\n{answer}\n{qna.SOURCE_NOTE}{QNA_PAGE_NOTE}"
         return f"【{entry['question'].strip()}】\n{answer}\n資料來源：{entry['department']}。{SCOPE_NOTE}"
+
+    def _qna_page(self, payload, entry):
+        """An answer from the App's own Q&A also offers its 常見問答 page, as a choice."""
+        page = self.registry.by_id.get("qna")
+        if not qna.is_qna(entry) or not page or not page["enabled"]:
+            return []
+        if payload.get("language", "zh") != "zh":
+            return self._cap_items([page], payload["language"])
+        return [{"title": f"開啟「{page['title']}」頁面", "subtitle": qna.DEPARTMENT, "entry_id": page["id"]}]
 
     def _faq(self, payload, text):
         """Second layer: Taipei FAQ when tool calling found no service.
@@ -209,11 +222,14 @@ class Workflow:
                    for hit in (hits[1:] if confidence == "high" else hits)]
         if confidence == "high":
             message = self._faq_text(hits[0])
+            if choices:
+                message += "\n\n也可以查看以下相關問答："
+            choices += self._qna_page(payload, hits[0])
             if not choices:
                 return self.reply(payload, message, action="faq_answer")
-            message += "\n\n也可以查看以下相關問答："
         else:
-            message = f"你是不是想問以下的問題？請選擇一題，我再顯示答案。{SCOPE_NOTE}"
+            scope = qna.SCOPE_NOTE if any(qna.is_qna(hit) for hit in hits) else SCOPE_NOTE
+            message = f"你是不是想問以下的問題？請選擇一題，我再顯示答案。{scope}"
         return self._offer(payload, choices, message, kind="reply", action="faq_answer")
 
     def _foreign_faq(self, payload):
@@ -433,8 +449,11 @@ class Workflow:
             entry = self.owner.faq.by_id.get(item["faq_id"]) if self.owner.faq else None
             if entry is None:
                 raise self.error("FAQ 資料已變更，請重新提問。")
-            return self.reply(payload, self._faq_text(entry), action="faq_answer",
-                              **({"content_language": "zh"} if payload.get("language", "zh") != "zh" else {}))
+            foreign = {"content_language": "zh"} if payload.get("language", "zh") != "zh" else {}
+            page = self._qna_page(payload, entry)
+            if page:
+                return self._offer(payload, page, self._faq_text(entry), kind="reply", action="faq_answer", **foreign)
+            return self.reply(payload, self._faq_text(entry), action="faq_answer", **foreign)
         books = self.owner.catalog.books()
         if not any(b["id"] == item["book_id"] for b in books):
             raise self.error("書目已變更，請重新搜尋。")
