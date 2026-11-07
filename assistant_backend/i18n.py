@@ -107,7 +107,7 @@ _CHOICE_FILLER = {
 # Negation markers: the clause after one is not a request.
 NEGATION = {
     "en": r"\b(?:don't|do not|not|no|never|without)\b",
-    "ja": r"(?:じゃなくて|ではなく|ない|いらない|しない)",
+    "ja": r"(?:じゃなくて|ではなく|ない|いらない|しない|なくて(?:も)?いい|結構です|やめ)",
     "vi": r"\b(?:không|chẳng|đừng|chưa)\b",
     "id": r"\b(?:tidak|tak|bukan|jangan|nggak|gak)\b",
     "th": r"(?:ไม่|อย่า)",

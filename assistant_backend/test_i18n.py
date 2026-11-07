@@ -207,3 +207,12 @@ class PanelExampleTests(unittest.TestCase):
             self.assertIn((turn(library)["destination"] or {}).get("id"), ("library",), library)
             self.assertEqual(turn(water)["destination"], {"kind": "capability", "id": "fees.water"}, water)
             self.assertEqual(turn(counter)["destination"], {"kind": "capability", "id": "reservation"}, counter)
+
+
+class JapaneseNegationTests(unittest.TestCase):
+    def test_no_longer_needed_opens_nothing(self):
+        from test_server import first
+        app = Assistant(FakeCatalog(), lambda messages, tools: first(tools))
+        for text in ("やっぱり水道代は払わなくていいです", "水道代はもう結構です"):
+            result = app.turn({"text": text, "request_id": "r", "session_id": "s", "language": "ja"})
+            self.assertIsNone(result["destination"], text)

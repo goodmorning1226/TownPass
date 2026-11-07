@@ -216,6 +216,24 @@ class Workflow:
             message = f"你是不是想問以下的問題？請選擇一題，我再顯示答案。{SCOPE_NOTE}"
         return self._offer(payload, choices, message, kind="reply", action="faq_answer")
 
+    def _foreign_faq(self, payload):
+        """FAQ for a request in another language. The FAQ is Chinese, so the App
+        translates the request on the phone and asks again with faq_text; the
+        reply's Chinese content is marked content_language "zh" for the App to
+        translate back. An App that does not know action "translate_for_faq"
+        simply shows the usual "nothing found" message sent with it."""
+        if self.owner.faq is None:
+            return None
+        language = payload.get("language", "zh")
+        chinese = payload.get("faq_text")
+        if not chinese:
+            self._trace("faq_translate")
+            return self.reply(payload, i18n.t("no_match", language), action="translate_for_faq")
+        found = self._faq(payload, chinese)
+        if found:
+            found["content_language"] = "zh"
+        return found
+
     def _trace(self, route, candidates=()):
         """Record how a turn was decided, for metrics and evaluation only."""
         self.owner.usage.route = route
@@ -415,7 +433,8 @@ class Workflow:
             entry = self.owner.faq.by_id.get(item["faq_id"]) if self.owner.faq else None
             if entry is None:
                 raise self.error("FAQ 資料已變更，請重新提問。")
-            return self.reply(payload, self._faq_text(entry), action="faq_answer")
+            return self.reply(payload, self._faq_text(entry), action="faq_answer",
+                              **({"content_language": "zh"} if payload.get("language", "zh") != "zh" else {}))
         books = self.owner.catalog.books()
         if not any(b["id"] == item["book_id"] for b in books):
             raise self.error("書目已變更，請重新搜尋。")
@@ -465,6 +484,9 @@ class Workflow:
             decided = self._intent_fallback(payload, text)
             if decided:
                 return decided
+            faq = self._foreign_faq(payload)
+            if faq:
+                return faq
             self._trace("no_match")
             return self.reply(payload, i18n.t("no_match", language))
         entries = [m["entry"] for m in matches]
@@ -652,8 +674,8 @@ class Workflow:
             self._trace("intent_greeting")
             return self.reply(payload, i18n.t("greeting", language) if language != "zh" else
                               "嗨，我是 TownPass 助手，可以幫你找服務、開啟原頁面。你可以描述想做的事，或問「有哪些功能」。")
-        if name == "city_question" and language == "zh":
-            return self._faq(payload, text)
+        if name == "city_question":
+            return self._faq(payload, text) if language == "zh" else self._foreign_faq(payload)
         return None
 
     def _sound_candidates(self, text):

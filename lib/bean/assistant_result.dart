@@ -13,6 +13,14 @@ class AssistantResult {
   /// The language of [message] ('zh', 'en', ...), for reading it aloud.
   final String language;
 
+  /// The backend's action label, e.g. 'translate_for_faq' (asks the App to
+  /// send a Chinese translation of a foreign request for the FAQ).
+  final String? action;
+
+  /// 'zh' when [message] and the choice titles are Chinese content (FAQ text)
+  /// in a reply to another [language]: the App translates them for display.
+  final String? contentLanguage;
+
   const AssistantResult({
     required this.sessionId,
     required this.message,
@@ -21,7 +29,31 @@ class AssistantResult {
     this.kind = 'reply',
     this.resolutionId,
     this.language = 'zh',
+    this.action,
+    this.contentLanguage,
   });
+
+  /// The same reply with [message] and choice titles replaced (translation).
+  AssistantResult withTexts(String message, List<String> titles) =>
+      AssistantResult(
+        sessionId: sessionId,
+        message: message,
+        destination: destination,
+        kind: kind,
+        resolutionId: resolutionId,
+        language: language,
+        action: action,
+        contentLanguage: null,
+        choices: [
+          for (var i = 0; i < choices.length; i++)
+            AssistantBookChoice(
+              choices[i].id,
+              i < titles.length ? titles[i] : choices[i].title,
+              subtitle: choices[i].subtitle,
+              enabled: choices[i].enabled,
+            ),
+        ],
+      );
 
   factory AssistantResult.fromJson(Map<String, dynamic> json) {
     if (!const {1, 2, 3}.contains(json['contract_version']) ||
@@ -58,6 +90,8 @@ class AssistantResult {
           json['language'] is String && (json['language'] as String).length <= 8
           ? json['language']
           : 'zh',
+      action: json['action'] is String ? json['action'] as String : null,
+      contentLanguage: json['content_language'] == 'zh' ? 'zh' : null,
       choices: (json['choices'] as List? ?? [])
           .map((value) => AssistantBookChoice.fromJson(value))
           .toList(),

@@ -286,3 +286,36 @@ class RealIndexSmokeTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class ForeignFaqTests(unittest.TestCase):
+    """Foreign requests reach the Chinese FAQ through the App's translation."""
+
+    def app(self, hits):
+        self.faq = FakeFaq(hits)
+        return Assistant(FakeCatalog(), lambda messages, tools: first(tools), faq=self.faq)
+
+    def turn(self, app, **extra):
+        return app.turn({"text": "is the vision check for preschool kids free", "request_id": "r",
+                         "session_id": "s", "language": "en", **extra})
+
+    def test_first_asks_the_app_to_translate_then_answers_in_chinese_marked_for_translation(self):
+        app = self.app([hit("1", faq.HIGH_CONF + 0.02, "學齡前視力檢查要錢嗎", "免費。", "衛生局")])
+        first_reply = self.turn(app)
+        self.assertEqual((first_reply["action"], first_reply["kind"]), ("translate_for_faq", "reply"))
+        self.assertNotRegex(first_reply["message"], r"[一-鿿]")  # an old App shows this
+        self.assertEqual(self.faq.queries, [])
+        answer = self.turn(app, faq_text="學齡前兒童視力檢查要收費嗎")
+        self.assertEqual((answer["action"], answer["content_language"], answer["language"]),
+                         ("faq_answer", "zh", "en"))
+        self.assertEqual(self.faq.queries, ["學齡前兒童視力檢查要收費嗎"])
+
+    def test_no_faq_hit_after_translation_says_nothing_found_once(self):
+        app = self.app([hit("1", faq.MEDIUM_CONF - 0.05)])
+        reply = self.turn(app, faq_text="鳳梨披薩好吃嗎")
+        self.assertNotEqual(reply["action"], "translate_for_faq")
+        self.assertIsNone(reply["destination"])
+
+    def test_without_an_index_nothing_is_asked(self):
+        app = Assistant(FakeCatalog(), lambda messages, tools: first(tools))
+        self.assertNotEqual(self.turn(app)["action"], "translate_for_faq")
