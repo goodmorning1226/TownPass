@@ -23,7 +23,19 @@ class GuideStep {
 
   final bool Function(MockServiceState s) isDone;
 
+  /// When the highlight moves within the step (e.g. to 完成 once all digits
+  /// are typed).
+  final String Function(MockServiceState s)? targetOf;
+
+  String targetFor(MockServiceState s) => targetOf?.call(s) ?? target;
+
+  /// Other widgets that stay usable while the screen is locked (e.g. the
+  /// in-page keypad while typing the water number).
+  final List<String> alsoUsable;
+
   const GuideStep({
+    this.targetOf,
+    this.alsoUsable = const [],
     required this.target,
     required this.label,
     required this.card,
@@ -116,6 +128,7 @@ final Map<String, Guide> guides = {
       ),
       GuideStep(
         target: 'water.field',
+        alsoUsable: const ['water.keypad'],
         label: '輸入水號（10 碼）',
         card: (s) =>
             s.waterDigits.value.length == MockServiceState.waterDigitCount
@@ -251,9 +264,30 @@ class CandidateOption {
   final String? opensTitle;
   final String? guideId;
 
-  const CandidateOption(this.label, {this.opensTitle, this.guideId});
+  /// Option id from the assistant backend (this turn's number).
+  final String? choiceId;
 
-  bool get enabled => opensTitle != null || guideId != null;
+  /// A speech reading to send as the user's words.
+  final String? say;
+
+  /// Backend's own enabled flag for [choiceId] options.
+  final bool? available;
+
+  const CandidateOption(
+    this.label, {
+    this.opensTitle,
+    this.guideId,
+    this.choiceId,
+    this.say,
+    this.available,
+  });
+
+  bool get enabled =>
+      available ??
+      (opensTitle != null ||
+          guideId != null ||
+          choiceId != null ||
+          say != null);
 }
 
 class CandidateGroup {
@@ -341,7 +375,16 @@ abstract class Replies {
   static const onboardingAgain = '好，我再帶你看一次怎麼用。';
   static const wrongTap = '我們先點亮起來的地方就好。';
   static const wrongTapMany = '要按亮起來的地方喔。想先自己操作，可以按「暫停」。';
-  static const later = '之後可以對助理說「教我用」，再看一次。';
+
+  static const offline = '（目前連不到助理的模型，先用示範內容回答。）';
+  static const listeningFailed = '語音辨識沒有成功，請再說一次，或按右邊的鍵盤打字。';
+  static const tooShort = '沒有錄到聲音，請按住麥克風再說話，說完放開。';
+  static const noMic = '需要麥克風權限才能用語音。可以到手機設定開啟，或按右邊的鍵盤打字。';
+  static const openingPage = '正在打開服務頁面…';
+  static const pageFailed = '服務頁面打不開，請檢查網路後再試一次。';
+  static String heard(String text) => '我聽到「$text」，是這句嗎？也可以選下面的說法，或再說一次。';
+  static String corrected(String from, String to) =>
+      '我聽到「$from」，當作「$to」處理；不對的話請再說一次。';
 
   static String opensPage(String title) => '已經幫你打開「$title」。這個功能還沒有逐步引導，只幫你開頁。';
   static String followUp(String title) => '剛剛你還說要$title，要接著做嗎？';

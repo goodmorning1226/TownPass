@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:town_pass/page/guided_assistant/guide_target.dart';
 import 'package:town_pass/page/guided_assistant/guided_assistant_controller.dart';
+import 'package:town_pass/page/guided_assistant/mock_pages/mock_water_fee_view.dart';
 import 'package:town_pass/page/guided_assistant/model/guide_content.dart';
 import 'package:town_pass/page/guided_assistant/widget/guide_highlight.dart';
 import 'package:town_pass/page/guided_assistant/widget/guided_assistant_sheet.dart';
@@ -67,6 +68,7 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
                   child: GuideHighlight(
                     key: ValueKey('guide:$target'),
                     targetId: target,
+                    alsoUsable: c.currentStep?.alsoUsable ?? const [],
                     blocking: c.locked,
                     topClear: media.padding.top + 56,
                     onBlockedTap: c.wrongTap,
@@ -134,7 +136,12 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
     final base = keyboard > 0 ? keyboard : media.padding.bottom;
     switch (c.currentRoute.value) {
       case MockRoutes.waterFee:
-        return base + (c.pages.waterQueried.value ? 24 : 150);
+        if (c.pages.waterQueried.value) return base + 24;
+        // Above the in-page keypad while it is open (as in the design).
+        if (c.pages.waterFocused.value) {
+          return media.padding.bottom + waterKeypadHeight + 16;
+        }
+        return base + 150;
       case '/':
         return base + 80;
       default:

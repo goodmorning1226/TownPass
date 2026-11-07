@@ -25,6 +25,9 @@ class GuideHighlight extends StatefulWidget {
   final VoidCallback? onBlockedTap;
   final bool showArrow;
   final HighlightRing ring;
+
+  /// Other targets that are not dimmed and stay usable (no ring).
+  final List<String> alsoUsable;
   final double radius;
 
   const GuideHighlight({
@@ -37,6 +40,7 @@ class GuideHighlight extends StatefulWidget {
     this.showArrow = true,
     this.ring = HighlightRing.yellow,
     this.radius = 14,
+    this.alsoUsable = const [],
   });
 
   @override
@@ -47,6 +51,7 @@ class _GuideHighlightState extends State<GuideHighlight>
     with SingleTickerProviderStateMixin {
   late final Ticker _ticker;
   Rect? _rect;
+  List<Rect> _extra = const [];
 
   @override
   void initState() {
@@ -62,7 +67,27 @@ class _GuideHighlightState extends State<GuideHighlight>
     if (rect != null && host is RenderBox && host.attached) {
       rect = rect.shift(-host.localToGlobal(Offset.zero));
     }
-    if (rect != _rect) setState(() => _rect = rect);
+    final offset = host is RenderBox && host.attached
+        ? host.localToGlobal(Offset.zero)
+        : Offset.zero;
+    final extra = [
+      for (final id in widget.alsoUsable)
+        if (GuideTargets.rectOf(id) case final r?) r.shift(-offset),
+    ];
+    if (rect != _rect || !_sameRects(extra, _extra)) {
+      setState(() {
+        _rect = rect;
+        _extra = extra;
+      });
+    }
+  }
+
+  static bool _sameRects(List<Rect> a, List<Rect> b) {
+    if (a.length != b.length) return false;
+    for (var i = 0; i < a.length; i++) {
+      if (a[i] != b[i]) return false;
+    }
+    return true;
   }
 
   @override
@@ -96,48 +121,31 @@ class _GuideHighlightState extends State<GuideHighlight>
         final r = widget.radius;
         final children = <Widget>[];
         if (widget.blocking) {
+          // One layer dims everything but the holes and takes the taps
+          // outside them; inside a hole (and above [topClear]) taps reach the
+          // page.
           children.add(
             Positioned.fill(
-              child: IgnorePointer(
-                child: CustomPaint(
-                  painter: _ScrimPainter(
-                    hole,
-                    r,
-                    Colors.black.withValues(alpha: widget.scrimOpacity),
+              child: Semantics(
+                label: '請先操作亮起來的地方',
+                child: GestureDetector(
+                  behavior: HitTestBehavior.deferToChild,
+                  onTap: widget.onBlockedTap,
+                  onVerticalDragStart: (_) {},
+                  onHorizontalDragStart: (_) {},
+                  child: CustomPaint(
+                    size: Size.infinite,
+                    painter: _ScrimPainter(
+                      [hole, ..._extra],
+                      r,
+                      Colors.black.withValues(alpha: widget.scrimOpacity),
+                      widget.topClear,
+                    ),
                   ),
                 ),
               ),
             ),
           );
-          final top = widget.topClear;
-          void block(double l, double t, double right, double b) {
-            if (right <= l || b <= t) return;
-            children.add(
-              Positioned(
-                left: l,
-                top: t,
-                width: right - l,
-                height: b - t,
-                child: Semantics(
-                  label: '請先操作亮起來的地方',
-                  button: true,
-                  child: GestureDetector(
-                    behavior: HitTestBehavior.opaque,
-                    onTap: widget.onBlockedTap,
-                    onVerticalDragStart: (_) {},
-                    onHorizontalDragStart: (_) {},
-                  ),
-                ),
-              ),
-            );
-          }
-
-          final ht = hole.top.clamp(top, size.height);
-          final hb = hole.bottom.clamp(top, size.height);
-          block(0, top, size.width, ht);
-          block(0, hb, size.width, size.height);
-          block(0, ht, hole.left.clamp(0, size.width), hb);
-          block(hole.right.clamp(0, size.width), ht, size.width, hb);
         }
         if (focus) {
           // White ring with a soft outer glow.
@@ -179,24 +187,38 @@ class _GuideHighlightState extends State<GuideHighlight>
 }
 
 class _ScrimPainter extends CustomPainter {
-  final Rect hole;
+  final List<Rect> holes;
   final double radius;
   final Color color;
-  _ScrimPainter(this.hole, this.radius, this.color);
+  final double topClear;
+  _ScrimPainter(this.holes, this.radius, this.color, this.topClear);
 
   @override
   void paint(Canvas canvas, Size size) {
-    final path = Path.combine(
-      PathOperation.difference,
-      Path()..addRect(Offset.zero & size),
-      Path()..addRRect(RRect.fromRectAndRadius(hole, Radius.circular(radius))),
-    );
+    var path = Path()..addRect(Offset.zero & size);
+    for (final hole in holes) {
+      path = Path.combine(
+        PathOperation.difference,
+        path,
+        Path()
+          ..addRRect(RRect.fromRectAndRadius(hole, Radius.circular(radius))),
+      );
+    }
     canvas.drawPath(path, Paint()..color = color);
   }
 
+  /// Taps outside the holes are blocked; inside them, or above [topClear]
+  /// (the page's title bar), they go through.
+  @override
+  bool? hitTest(Offset position) =>
+      position.dy >= topClear && !holes.any((h) => h.contains(position));
+
   @override
   bool shouldRepaint(_ScrimPainter old) =>
-      old.hole != hole || old.radius != radius || old.color != color;
+      old.radius != radius ||
+      old.color != color ||
+      old.topClear != topClear ||
+      !_GuideHighlightState._sameRects(old.holes, holes);
 }
 
 /// Yellow down-pointing block arrow (rotate it for other directions).

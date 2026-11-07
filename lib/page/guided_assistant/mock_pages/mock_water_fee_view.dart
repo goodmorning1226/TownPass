@@ -1,14 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:town_pass/page/guided_assistant/guide_target.dart';
+import 'package:town_pass/page/guided_assistant/guided_assistant_controller.dart';
 import 'package:town_pass/page/guided_assistant/mock_pages/mock_page_scaffold.dart';
 import 'package:town_pass/page/guided_assistant/model/mock_service_state.dart';
+import 'package:town_pass/page/guided_assistant/widget/guide_highlight.dart';
 import 'package:town_pass/util/tp_colors.dart';
 import 'package:town_pass/util/tp_text.dart';
 
+/// Height of the in-page number keypad, above the safe area.
+const waterKeypadHeight = 286.0;
+
 /// Stand-in for the TownPass-Services water fee page, so the guide can be
 /// tried without the WebView. Queries nothing; the result is a placeholder.
+///
+/// The water number is typed on an in-page keypad (as in the design) rather
+/// than the system keyboard, so every phone has the same 完成 key.
 class MockWaterFeeView extends StatefulWidget {
   const MockWaterFeeView({super.key});
 
@@ -21,30 +28,52 @@ class _MockWaterFeeViewState extends State<MockWaterFeeView> {
   static const _tealText = Color(0xFF2E9AAA);
 
   final _state = Get.find<MockServiceState>();
-  late final _text = TextEditingController(text: _state.waterDigits.value);
-  final _focus = FocusNode();
   bool _dialog = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _focus.addListener(() {
-      _state.waterFocused.value = _focus.hasFocus;
-      if (_focus.hasFocus) _state.waterFieldTapped.value = true;
-      setState(() {});
-    });
-  }
 
   @override
   void dispose() {
     _state.waterFocused.value = false;
-    _text.dispose();
-    _focus.dispose();
     super.dispose();
   }
 
+  GuidedAssistantController? get _guide =>
+      Get.isRegistered<GuidedAssistantController>()
+      ? Get.find<GuidedAssistantController>()
+      : null;
+
+  void _openKeypad() {
+    if (_state.waterQueried.value) return;
+    _state.waterFieldTapped.value = true;
+    _state.waterFocused.value = true;
+  }
+
+  void _press(String key) {
+    final digits = _state.waterDigits.value;
+    if (digits.length < MockServiceState.waterDigitCount) {
+      _state.waterDigits.value = digits + key;
+    }
+  }
+
+  void _delete() {
+    final digits = _state.waterDigits.value;
+    if (digits.isNotEmpty) {
+      _state.waterDigits.value = digits.substring(0, digits.length - 1);
+    }
+  }
+
+  void _done() {
+    final missing =
+        MockServiceState.waterDigitCount - _state.waterDigits.value.length;
+    final guide = _guide;
+    if (missing > 0 && guide != null && guide.locked) {
+      guide.showNudge('水號有 10 碼，還差 $missing 碼喔。');
+      return;
+    }
+    _state.waterFocused.value = false;
+  }
+
   void _query() {
-    _focus.unfocus();
+    _state.waterFocused.value = false;
     if (_state.waterDigits.value.length < MockServiceState.waterDigitCount) {
       setState(() => _dialog = true);
       return;
@@ -76,8 +105,139 @@ class _MockWaterFeeViewState extends State<MockWaterFeeView> {
                 : _bottomBar(),
           ),
         ),
+        Obx(
+          () => _state.waterFocused.value && !_state.waterQueried.value
+              ? Positioned(left: 0, right: 0, bottom: 0, child: _keypad())
+              : const SizedBox.shrink(),
+        ),
         if (_dialog) _alert(),
       ],
+    );
+  }
+
+  Widget _keypad() {
+    final ready =
+        _state.waterDigits.value.length == MockServiceState.waterDigitCount;
+    final guiding = _guide?.locked ?? false;
+    const keyStyle = TextStyle(
+      fontSize: 22,
+      height: 28 / 22,
+      color: TPColors.grayscale950,
+    );
+    Widget key(
+      Widget child, {
+      required VoidCallback onTap,
+      required String label,
+      Color color = TPColors.white,
+      BoxBorder? border,
+    }) => Semantics(
+      button: true,
+      label: label,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: BorderRadius.circular(8),
+          border: border,
+          boxShadow: color == TPColors.white
+              ? const [
+                  BoxShadow(color: TPColors.grayscale300, offset: Offset(0, 1)),
+                ]
+              : null,
+        ),
+        child: Material(
+          type: MaterialType.transparency,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(8),
+            onTap: onTap,
+            child: Center(child: child),
+          ),
+        ),
+      ),
+    );
+
+    final keys = <Widget>[
+      for (final d in ['1', '2', '3', '4', '5', '6', '7', '8', '9'])
+        key(
+          Text(d, style: keyStyle),
+          onTap: () => _press(d),
+          label: d,
+        ),
+      key(
+        const Icon(Icons.backspace_outlined, color: TPColors.grayscale950),
+        onTap: _delete,
+        label: '刪除',
+        color: TPColors.grayscale200,
+      ),
+      key(
+        Text('0', style: keyStyle),
+        onTap: () => _press('0'),
+        label: '0',
+      ),
+      GuideTarget(
+        id: 'water.done',
+        child: key(
+          const TPText(
+            '完成',
+            style: TPTextStyles.titleSemiBold,
+            color: TPColors.white,
+          ),
+          onTap: _done,
+          label: '完成',
+          color: TPColors.primary700,
+          border: ready && guiding
+              ? Border.all(color: guideYellow, width: 3)
+              : null,
+        ),
+      ),
+    ];
+
+    return GuideTarget(
+      id: 'water.keypad',
+      child: Material(
+        color: TPColors.grayscale100,
+        child: Container(
+          height: waterKeypadHeight + MediaQuery.of(context).padding.bottom,
+          color: TPColors.grayscale100,
+          padding: EdgeInsets.fromLTRB(
+            8,
+            8,
+            8,
+            8 + MediaQuery.of(context).padding.bottom,
+          ),
+          child: Column(
+            children: [
+              SizedBox(
+                height: 32,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Row(
+                    children: [
+                      TPText(
+                        '已輸入 ${_state.waterDigits.value.length} / '
+                        '${MockServiceState.waterDigitCount} 碼',
+                        style: TPTextStyles.h3Regular,
+                        color: TPColors.grayscale800,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 6),
+              Expanded(
+                child: GridView.count(
+                  crossAxisCount: 3,
+                  mainAxisSpacing: 6,
+                  crossAxisSpacing: 6,
+                  padding: EdgeInsets.zero,
+                  physics: const NeverScrollableScrollPhysics(),
+                  childAspectRatio: 2.4,
+                  children: keys,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
@@ -133,89 +293,87 @@ class _MockWaterFeeViewState extends State<MockWaterFeeView> {
     ),
   );
 
-  Widget _form() => ListView(
-    padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
-    children: [
-      const TPText(
-        '水號',
-        style: TPTextStyles.titleSemiBold,
-        color: TPColors.grayscale950,
-      ),
-      const SizedBox(height: 4),
-      const TPText(
-        '大區為1碼，中區為2碼，戶號為6碼，檢核號為1碼',
-        style: TPTextStyles.bodyRegular,
-        color: TPColors.grayscale400,
-      ),
-      const SizedBox(height: 12),
-      GuideTarget(
-        id: 'water.field',
-        child: Semantics(
-          label: '水號輸入框',
-          child: TextField(
-            controller: _text,
-            focusNode: _focus,
-            keyboardType: TextInputType.number,
-            textInputAction: TextInputAction.done,
-            inputFormatters: [
-              FilteringTextInputFormatter.digitsOnly,
-              LengthLimitingTextInputFormatter(
-                MockServiceState.waterDigitCount,
-              ),
-            ],
-            onChanged: (v) => _state.waterDigits.value = v,
-            onTap: () => _state.waterFieldTapped.value = true,
-            onSubmitted: (_) => _focus.unfocus(),
-            style: TPTextStyles.h3Regular.copyWith(
-              color: TPColors.grayscale950,
-              letterSpacing: 1,
-            ),
-            decoration: InputDecoration(
-              hintText: '請輸入水號',
-              hintStyle: TPTextStyles.h3Regular.copyWith(
-                color: TPColors.grayscale400,
-              ),
-              filled: true,
-              fillColor: TPColors.grayscale50,
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 13,
-              ),
-              counterText: '',
-              enabledBorder: OutlineInputBorder(
+  Widget _form() {
+    final digits = _state.waterDigits.value;
+    final open = _state.waterFocused.value;
+    return ListView(
+      padding: EdgeInsets.fromLTRB(16, 16, 16, open ? waterKeypadHeight : 24),
+      children: [
+        const TPText(
+          '水號',
+          style: TPTextStyles.titleSemiBold,
+          color: TPColors.grayscale950,
+        ),
+        const SizedBox(height: 4),
+        const TPText(
+          '大區為1碼，中區為2碼，戶號為6碼，檢核號為1碼',
+          style: TPTextStyles.bodyRegular,
+          color: TPColors.grayscale400,
+        ),
+        const SizedBox(height: 12),
+        GuideTarget(
+          id: 'water.field',
+          child: Semantics(
+            button: true,
+            label: '水號輸入框',
+            value: digits,
+            child: Material(
+              color: TPColors.grayscale50,
+              shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide.none,
+                side: open
+                    ? const BorderSide(color: _teal, width: 2)
+                    : BorderSide.none,
               ),
-              focusedBorder: OutlineInputBorder(
+              child: InkWell(
                 borderRadius: BorderRadius.circular(8),
-                borderSide: const BorderSide(color: _teal, width: 2),
+                onTap: _openKeypad,
+                child: Container(
+                  height: 48,
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  alignment: Alignment.centerLeft,
+                  child: Row(
+                    children: [
+                      if (digits.isEmpty)
+                        const TPText(
+                          '請輸入水號',
+                          style: TPTextStyles.h3Regular,
+                          color: TPColors.grayscale400,
+                        )
+                      else
+                        TPText(
+                          digits,
+                          style: TPTextStyles.h3Regular.copyWith(
+                            letterSpacing: 1,
+                          ),
+                          color: TPColors.grayscale950,
+                        ),
+                      if (open)
+                        Container(
+                          width: 2,
+                          height: 22,
+                          margin: const EdgeInsets.only(left: 2),
+                          color: _teal,
+                        ),
+                    ],
+                  ),
+                ),
               ),
             ),
           ),
         ),
-      ),
-      if (_focus.hasFocus)
-        Padding(
-          padding: const EdgeInsets.only(top: 8),
-          child: Obx(
-            () => TPText(
-              '已輸入 ${_state.waterDigits.value.length} / ${MockServiceState.waterDigitCount} 碼',
-              style: TPTextStyles.bodyRegular,
-              color: TPColors.grayscale800,
-            ),
-          ),
+        const SizedBox(height: 20),
+        const TPText(
+          '注意事項',
+          style: TPTextStyles.h3Regular,
+          color: TPColors.grayscale950,
         ),
-      const SizedBox(height: 20),
-      const TPText(
-        '注意事項',
-        style: TPTextStyles.h3Regular,
-        color: TPColors.grayscale950,
-      ),
-      const SizedBox(height: 8),
-      _bullet('若已在超商繳費、其他繳費平台或與銀行約定自動扣繳，請勿重複繳費。'),
-      _bullet('即日起電子帳單用戶，以行動支付繳費（含本網站信用卡支付），下期水費減收10元（不限次數）。'),
-    ],
-  );
+        const SizedBox(height: 8),
+        _bullet('若已在超商繳費、其他繳費平台或與銀行約定自動扣繳，請勿重複繳費。'),
+        _bullet('即日起電子帳單用戶，以行動支付繳費（含本網站信用卡支付），下期水費減收10元（不限次數）。'),
+      ],
+    );
+  }
 
   Widget _bullet(String text) => Padding(
     padding: const EdgeInsets.only(bottom: 6),

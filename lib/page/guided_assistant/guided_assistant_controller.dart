@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
@@ -6,6 +7,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:town_pass/page/guided_assistant/model/guide_content.dart';
 import 'package:town_pass/page/guided_assistant/model/mock_assistant_engine.dart';
 import 'package:town_pass/page/guided_assistant/model/mock_service_state.dart';
+import 'package:town_pass/bean/assistant_result.dart';
+import 'package:town_pass/page/main/main_view_controller.dart';
+import 'package:town_pass/service/assistant_action_executor.dart';
+import 'package:town_pass/service/assistant_page_tracker.dart';
+import 'package:town_pass/service/assistant_recorder.dart';
+import 'package:town_pass/service/assistant_service.dart';
 import 'package:town_pass/service/assistant_speaker.dart';
 
 /// One chat bubble.
@@ -96,14 +103,27 @@ class GuidedAssistantController extends GetxController {
   final AssistantSpeaker speaker;
   final void Function(String route, {Object? arguments}) _navigate;
 
+  /// Backend with the on-device (or desktop) model; null = pre-written
+  /// rules only.
+  final AssistantService? service;
+  final AssistantActionExecutor executor;
+  final AssistantRecorder? recorder;
+  final AssistantPageTracker pageTracker;
+
   GuidedAssistantController({
     this.engine = const MockAssistantEngine(),
     this.thinkDelay = const Duration(milliseconds: 1200),
     this.autoStartDelay = const Duration(seconds: 3),
     this.runOnboarding = true,
+    this.service,
+    this.recorder,
+    AssistantActionExecutor? executor,
+    AssistantPageTracker? pageTracker,
     AssistantSpeaker? speaker,
     void Function(String route, {Object? arguments})? navigate,
   }) : speaker = speaker ?? AssistantSpeaker(),
+       executor = executor ?? AssistantActionExecutor(),
+       pageTracker = pageTracker ?? AssistantPageTracker.instance,
        _navigate = navigate ?? _defaultNavigate;
 
   static void _defaultNavigate(String route, {Object? arguments}) {
@@ -143,6 +163,13 @@ class GuidedAssistantController extends GetxController {
   ModalRoute<dynamic>? activeRoute;
   LocalHistoryEntry? _backEntry;
 
+  // Model turns: session and pending candidate set from the backend, and a
+  // generation counter so a late reply after 取消 is ignored.
+  String? _session;
+  String? _resolutionId;
+  int _generation = 0;
+  bool _offlineNoted = false;
+
   @override
   void onInit() {
     super.onInit();
@@ -175,6 +202,8 @@ class GuidedAssistantController extends GetxController {
     }
     _stepWorker?.dispose();
     speaker.stop();
+    service?.cancel();
+    recorder?.dispose();
     super.onClose();
   }
 
@@ -216,22 +245,168 @@ class GuidedAssistantController extends GetxController {
     return starterChips;
   }
 
-  void submit(String raw) {
+  /// Replies that are always pre-written and answered on the phone; only
+  /// service requests go to the model.
+  static const _localKinds = {
+    MockReplyKind.explain,
+    MockReplyKind.unknownTerm,
+    MockReplyKind.pageHelp,
+    MockReplyKind.stepHelp,
+    MockReplyKind.onboarding,
+    MockReplyKind.greet,
+    MockReplyKind.multi,
+  };
+
+  void submit(String raw, {String? choiceId, String? shownAs, String? note}) {
     final text = raw.trim();
-    if (text.isEmpty || loading.value) return;
-    messages.add(ChatMessage(id: _nextId++, user: true, text: text));
+    if ((text.isEmpty && choiceId == null) || loading.value) return;
+    messages.add(ChatMessage(id: _nextId++, user: true, text: shownAs ?? text));
+    if (note != null) _say(_bot(note));
+    final local = engine.interpret(text, hasTask: _activeTask != null);
+    final generation = ++_generation;
     loading.value = true;
-    _think?.cancel();
-    _think = Timer(thinkDelay, () {
+    if (service == null ||
+        (choiceId == null && _localKinds.contains(local.kind))) {
+      _think?.cancel();
+      _think = Timer(thinkDelay, () {
+        if (generation != _generation) return;
+        loading.value = false;
+        _handle(local);
+      });
+      return;
+    }
+    _askModel(text, local, generation, choiceId: choiceId);
+  }
+
+  Future<void> _askModel(
+    String text,
+    MockReply local,
+    int generation, {
+    String? choiceId,
+  }) async {
+    AssistantResult result;
+    try {
+      result = await service!.decide(
+        text: text,
+        requestId: '${DateTime.now().microsecondsSinceEpoch}-$generation',
+        sessionId: _session,
+        resolutionId: choiceId == null ? null : _resolutionId,
+        choiceId: choiceId,
+        context: requestContext(),
+      );
+    } catch (error) {
+      if (generation != _generation || isClosed) return;
       loading.value = false;
-      _handle(engine.interpret(text, hasTask: _activeTask != null));
-    });
+      if (choiceId != null) {
+        _say(
+          _bot(error is FormatException ? error.message : Replies.pageFailed),
+        );
+        return;
+      }
+      // No backend (e.g. on an iPhone without the desktop server): fall back
+      // to the pre-written replies so the demo keeps working.
+      if (!_offlineNoted) {
+        _offlineNoted = true;
+        _say(_bot(Replies.offline));
+      }
+      _handle(local);
+      return;
+    }
+    if (generation != _generation || isClosed) return;
+    loading.value = false;
+    _session = result.sessionId;
+    _resolutionId = result.resolutionId;
+    final destination = result.destination;
+    if (destination != null) {
+      final guideId = guideFor(destination, local);
+      if (guideId != null) {
+        startGuide(guideId);
+      } else {
+        _openReal(destination, result.message);
+      }
+      return;
+    }
+    if (result.choices.isNotEmpty) {
+      _say(
+        _bot(
+          result.message,
+          options: CandidateGroup(result.message, [
+            for (final c in result.choices)
+              CandidateOption(
+                // A disabled option's subtitle is the long "not connected"
+                // reason; "（還不能用）" already says it.
+                c.subtitle.isEmpty || !c.enabled
+                    ? c.title
+                    : '${c.title}（${c.subtitle}）',
+                choiceId: c.id,
+                available: c.enabled,
+              ),
+          ]),
+        ),
+      );
+      return;
+    }
+    _say(_bot(result.message));
+  }
+
+  /// A pre-written guide for this backend destination, if there is one.
+  static String? guideFor(Map<String, dynamic> destination, MockReply local) {
+    if (destination['kind'] == 'capability' &&
+        destination['id'] == 'fees.water') {
+      return GuideIds.water;
+    }
+    const libraryKinds = {'home', 'search', 'detail'};
+    if (libraryKinds.contains(destination['kind']) &&
+        local.guideId == GuideIds.library) {
+      return GuideIds.library;
+    }
+    return null;
+  }
+
+  void _openReal(Map<String, dynamic> destination, String message) {
+    final generation = _generation;
+    final reply = _bot(message);
+    _say(reply);
+    closeSheet();
+    _showToast(Replies.openingPage);
+    executor.open(
+      destination,
+      (error) {
+        if (generation != _generation || isClosed) return;
+        if (error == null) {
+          _showToast(message);
+        } else {
+          _say(_bot(Replies.pageFailed));
+          _showToast(Replies.pageFailed);
+        }
+      },
+      beforeBack: () {
+        if (!sheetOpen.value) return false;
+        closeSheet();
+        return true;
+      },
+      isCurrent: () => generation == _generation && !isClosed,
+    );
+  }
+
+  /// Page hint for the backend (no page content or conversation).
+  Map<String, dynamic>? requestContext() {
+    final page = pageTracker.page(
+      route: activeRoute?.settings.name,
+      tabIndex: Get.isRegistered<MainViewController>()
+          ? Get.find<MainViewController>().currentIndex.value
+          : null,
+    );
+    return page == null ? null : {'page': page};
   }
 
   void cancelLoading() {
     if (!loading.value) return;
     _think?.cancel();
+    _generation++;
+    service?.cancel();
     loading.value = false;
+    _resolutionId = null;
     _say(_bot(Replies.cancelled));
   }
 
@@ -310,6 +485,14 @@ class GuidedAssistantController extends GetxController {
     }
     if (!option.enabled) {
       _say(_bot('「${option.label}」：${Replies.notConnected}'));
+      return;
+    }
+    if (option.choiceId != null) {
+      submit('', choiceId: option.choiceId, shownAs: option.label);
+      return;
+    }
+    if (option.say != null) {
+      submit(option.say!);
       return;
     }
     messages.add(ChatMessage(id: _nextId++, user: true, text: option.label));
@@ -402,7 +585,7 @@ class GuidedAssistantController extends GetxController {
   }
 
   String? get highlightTarget =>
-      (locked || pointingOnly) ? currentStep?.target : null;
+      (locked || pointingOnly) ? currentStep?.targetFor(pages) : null;
 
   GuideCard? get card {
     final t = task.value;
@@ -457,6 +640,16 @@ class GuidedAssistantController extends GetxController {
     if (key == _lastSpokenKey || nudge.value.isNotEmpty) return;
     _lastSpokenKey = key;
     if (readAloud.value) speaker.speak(c.text);
+  }
+
+  /// A short reminder on the guide card (e.g. from the keypad's 完成 key).
+  void showNudge(String text) {
+    nudge.value = text;
+    _nudgeTimer?.cancel();
+    _nudgeTimer = Timer(
+      const Duration(milliseconds: 2600),
+      () => nudge.value = '',
+    );
   }
 
   void wrongTap() {
@@ -632,15 +825,76 @@ class GuidedAssistantController extends GetxController {
     if (!readAloud.value) speaker.stop();
   }
 
-  void micDown() {
-    if (loading.value) return;
+  Future<void> micDown() async {
+    if (loading.value || listening.value) return;
+    final rec = recorder;
+    if (rec == null || service == null) {
+      listening.value = true;
+      return;
+    }
+    speaker.stop(); // never record the assistant's own voice
     listening.value = true;
+    final started = await rec.start();
+    if (!started && !isClosed) {
+      listening.value = false;
+      _say(_bot(Replies.noMic));
+    }
   }
 
-  void micUp() {
+  Future<void> micUp() async {
     if (!listening.value) return;
     listening.value = false;
-    _say(_bot(Replies.micDemo));
+    final rec = recorder;
+    final svc = service;
+    if (rec == null || svc == null) {
+      _say(_bot(Replies.micDemo));
+      return;
+    }
+    final Uint8List? audio = await rec.stop();
+    if (isClosed) return;
+    if (audio == null || AssistantRecorder.seconds(audio) < 0.5) {
+      _say(_bot(Replies.tooShort));
+      return;
+    }
+    final generation = ++_generation;
+    loading.value = true;
+    AssistantTranscript heard;
+    try {
+      heard = await svc.transcribe(
+        audio,
+        requestId: '${DateTime.now().microsecondsSinceEpoch}-$generation',
+      );
+    } catch (error) {
+      if (generation != _generation || isClosed) return;
+      loading.value = false;
+      _say(
+        _bot(
+          error is FormatException ? error.message : Replies.listeningFailed,
+        ),
+      );
+      return;
+    }
+    if (generation != _generation || isClosed) return;
+    loading.value = false;
+    if (heard.confirm) {
+      // Unsure speech is never sent until the user picks a reading.
+      _say(
+        _bot(
+          Replies.heard(heard.text),
+          options: CandidateGroup(Replies.heard(heard.text), [
+            for (final reading in {heard.text, ...heard.options})
+              CandidateOption(reading, say: reading),
+          ]),
+        ),
+      );
+      return;
+    }
+    submit(
+      heard.text,
+      note: heard.correctedFrom == null
+          ? null
+          : Replies.corrected(heard.correctedFrom!, heard.text),
+    );
   }
 
   void _addBackEntry(VoidCallback onBack) {
@@ -727,7 +981,6 @@ class GuidedAssistantController extends GetxController {
     onboarding.value = OnboardingStage.hidden;
     _removeBackEntry();
     _save(_kStatus, 'later');
-    _showToast(Replies.later);
   }
 
   void finishOnboarding() {

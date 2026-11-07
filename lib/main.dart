@@ -15,6 +15,8 @@ import 'package:town_pass/util/tp_route.dart';
 import 'package:town_pass/page/assistant/assistant_view_controller.dart';
 import 'package:town_pass/page/assistant/widget/assistant_host.dart';
 import 'package:town_pass/page/guided_assistant/guided_assistant_controller.dart';
+import 'package:town_pass/service/assistant_recorder.dart';
+import 'package:town_pass/service/assistant_service.dart';
 import 'package:town_pass/page/guided_assistant/model/mock_service_state.dart';
 import 'package:town_pass/page/guided_assistant/widget/guided_assistant_host.dart';
 
@@ -23,12 +25,18 @@ const assistantEnabled = bool.fromEnvironment(
   defaultValue: kDebugMode,
 );
 
-/// Guided assistant with pre-written content and keyword rules instead of the
-/// model (UI prototype). `--dart-define=ASSISTANT_MOCK=false` brings back the
-/// model-backed assistant.
-const assistantMock = bool.fromEnvironment('ASSISTANT_MOCK', defaultValue: true);
-const _useMock = assistantEnabled && assistantMock;
-const _useModel = assistantEnabled && !assistantMock;
+/// Guided assistant (step-by-step guides, pre-written content). It asks the
+/// model for service requests and falls back to the pre-written rules when the
+/// backend cannot be reached. `--dart-define=ASSISTANT_OFFLINE=true` never
+/// calls the backend; `--dart-define=ASSISTANT_GUIDED=false` brings back the
+/// earlier chat-only assistant.
+const assistantGuided = bool.fromEnvironment(
+  'ASSISTANT_GUIDED',
+  defaultValue: true,
+);
+const assistantOffline = bool.fromEnvironment('ASSISTANT_OFFLINE');
+const _useMock = assistantEnabled && assistantGuided;
+const _useModel = assistantEnabled && !assistantGuided;
 
 const _transparentStatusBar = SystemUiOverlayStyle(
   statusBarColor: Colors.transparent,
@@ -65,7 +73,12 @@ Future<void> initServices() async {
   if (_useMock) {
     Get.put<MockServiceState>(MockServiceState(), permanent: true);
     Get.put<GuidedAssistantController>(
-      GuidedAssistantController(),
+      assistantOffline
+          ? GuidedAssistantController()
+          : GuidedAssistantController(
+              service: AssistantService(),
+              recorder: AssistantRecorder(),
+            ),
       permanent: true,
     );
   }

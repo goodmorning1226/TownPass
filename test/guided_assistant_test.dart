@@ -8,6 +8,9 @@ import 'package:town_pass/page/guided_assistant/model/guide_content.dart';
 import 'package:town_pass/page/guided_assistant/model/mock_assistant_engine.dart';
 import 'package:town_pass/page/guided_assistant/model/mock_service_state.dart';
 import 'package:town_pass/page/guided_assistant/widget/guided_assistant_host.dart';
+import 'package:town_pass/bean/assistant_result.dart';
+import 'package:town_pass/service/assistant_action_executor.dart';
+import 'package:town_pass/service/assistant_service.dart';
 import 'package:town_pass/service/assistant_speaker.dart';
 
 class SilentSpeaker extends AssistantSpeaker {
@@ -30,6 +33,69 @@ GuidedAssistantController makeController(List<String> routes) {
       autoStartDelay: const Duration(seconds: 3),
       runOnboarding: false,
       speaker: SilentSpeaker(),
+      navigate: (route, {arguments}) => routes.add(route),
+    ),
+  );
+}
+
+class FakeService extends AssistantService {
+  final List<AssistantResult Function(String text, String? choiceId)> replies;
+  final calls = <(String, String?)>[];
+  bool fail;
+  FakeService(this.replies, {this.fail = false});
+
+  @override
+  Future<AssistantResult> decide({
+    required String text,
+    required String requestId,
+    String? sessionId,
+    String? resolutionId,
+    String? choiceId,
+    Map<String, dynamic>? context,
+  }) async {
+    calls.add((text, choiceId));
+    if (fail) throw const FormatException('連不到電腦上的助理，請確認後端與裝置連線。');
+    return replies.removeAt(0)(text, choiceId);
+  }
+
+  @override
+  void cancel() {}
+}
+
+class FakeExecutor extends AssistantActionExecutor {
+  final opened = <Map<String, dynamic>>[];
+  @override
+  void open(
+    Map<String, dynamic> destination,
+    void Function(String? error) onLoaded, {
+    bool Function()? beforeBack,
+    bool Function()? isCurrent,
+  }) {
+    opened.add(destination);
+    onLoaded(null);
+  }
+}
+
+AssistantResult navigateTo(Map<String, dynamic> d) => AssistantResult(
+  sessionId: 's',
+  message: '好的，已經打開。',
+  destination: d,
+  kind: 'navigate',
+);
+
+GuidedAssistantController makeModelController(
+  List<String> routes,
+  FakeService service,
+  FakeExecutor executor,
+) {
+  Get.put<MockServiceState>(MockServiceState());
+  return Get.put(
+    GuidedAssistantController(
+      thinkDelay: Duration.zero,
+      runOnboarding: false,
+      speaker: SilentSpeaker(),
+      service: service,
+      executor: executor,
       navigate: (route, {arguments}) => routes.add(route),
     ),
   );
@@ -122,6 +188,33 @@ void main() {
         expect(c.highlightTarget, 'water.field');
         expect(c.card?.label, '步驟 1 / 3');
       }
+    });
+
+    test('typing step: the field stays lit and the keypad stays usable', () {
+      c.startGuide(GuideIds.water);
+      c.beginSteps();
+      c.pages
+        ..waterFieldTapped.value = true
+        ..waterFocused.value = true
+        ..waterDigits.value = '12345';
+      expect(c.highlightTarget, 'water.field');
+      expect(c.currentStep?.alsoUsable, ['water.keypad']);
+      expect(c.card?.text, '請輸入水號，一共 10 碼。');
+      c.pages.waterDigits.value = '1234567890';
+      expect(c.card?.text, '輸入好了！請按鍵盤的「完成」。');
+      c.pages.waterFocused.value = false;
+      expect(c.highlightTarget, 'water.query');
+    });
+
+    test('a nudge from the keypad shows on the card', () {
+      c.startGuide(GuideIds.water);
+      c.beginSteps();
+      c.pages
+        ..waterFieldTapped.value = true
+        ..waterFocused.value = true
+        ..waterDigits.value = '123';
+      c.showNudge('水號有 10 碼，還差 7 碼喔。');
+      expect(c.card?.text, '水號有 10 碼，還差 7 碼喔。');
     });
 
     test('tapping outside the target nudges, three times mentions pause', () {
@@ -229,6 +322,87 @@ void main() {
     });
   });
 
+  group('with the model', () {
+    late List<String> routes;
+    late FakeExecutor executor;
+
+    setUp(() {
+      SharedPreferences.setMockInitialValues({});
+      Get.testMode = true;
+      routes = [];
+      executor = FakeExecutor();
+    });
+    tearDown(Get.reset);
+
+    test('water fee from the model starts the pre-written guide', () async {
+      final service = FakeService([
+        (_, _) => navigateTo({'kind': 'capability', 'id': 'fees.water'}),
+      ]);
+      final c = makeModelController(routes, service, executor);
+      c.submit('幫我付自來水的錢');
+      await settle();
+      expect(service.calls.single.$1, '幫我付自來水的錢');
+      expect(c.task.value?.guide.id, GuideIds.water);
+      expect(routes, [MockRoutes.waterFee]);
+      expect(executor.opened, isEmpty);
+    });
+
+    test('a service without a guide opens the real page', () async {
+      final service = FakeService([
+        (_, _) => navigateTo({'kind': 'capability', 'id': 'fees.parking'}),
+      ]);
+      final c = makeModelController(routes, service, executor);
+      c.submit(onboardingExample);
+      await settle();
+      expect(executor.opened.single['id'], 'fees.parking');
+      expect(c.task.value, isNull);
+    });
+
+    test('backend options are chosen with the backend choice id', () async {
+      final service = FakeService([
+        (_, _) => const AssistantResult(
+          sessionId: 's',
+          message: '你想查哪一種？',
+          kind: 'confirm_candidates',
+          resolutionId: 'r1',
+          choices: [
+            AssistantBookChoice('1', '申辦案件進度'),
+            AssistantBookChoice('2', '陳情案件進度', enabled: false),
+          ],
+        ),
+        (_, choice) =>
+            navigateTo({'kind': 'capability', 'id': 'districtOffice.progress'}),
+      ]);
+      final c = makeModelController(routes, service, executor);
+      c.submit('我想知道案子辦到哪');
+      await settle();
+      final ask = c.messages.last;
+      expect(ask.options!.options.map((o) => o.enabled), [true, false]);
+      c.choose(ask, ask.options!.options.first);
+      await settle();
+      expect(service.calls.last.$2, '1');
+      expect(executor.opened.single['id'], 'districtOffice.progress');
+    });
+
+    test('pre-written replies never call the model', () async {
+      final service = FakeService([]);
+      final c = makeModelController(routes, service, executor);
+      c.submit('什麼是身分驗證');
+      await settle();
+      expect(service.calls, isEmpty);
+      expect(c.messages.last.term, isNotNull);
+    });
+
+    test('without a backend it falls back to the pre-written rules', () async {
+      final service = FakeService([], fail: true);
+      final c = makeModelController(routes, service, executor);
+      c.submit('我要繳水費');
+      await settle();
+      expect(c.messages.any((m) => m.text == Replies.offline), isTrue);
+      expect(c.task.value?.guide.id, GuideIds.water);
+    });
+  });
+
   group('host', () {
     setUp(() {
       SharedPreferences.setMockInitialValues({});
@@ -276,6 +450,9 @@ void main() {
       await tester.pump();
       expect(c.pages.waterFieldTapped.value, isTrue);
       expect(find.text('請輸入水號，一共 10 碼。'), findsOneWidget);
+      c.showNudge('水號有 10 碼，還差 7 碼喔。');
+      await tester.pump();
+      expect(find.text('水號有 10 碼，還差 7 碼喔。'), findsOneWidget);
       c.task.value = null;
       await tester.pump(const Duration(seconds: 4));
     });
