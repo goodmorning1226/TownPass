@@ -46,7 +46,7 @@ class MockAssistantEngine {
   const MockAssistantEngine();
 
   static final _punct = RegExp(r'[\s，。、！？?!,.：:「」『』（）()]');
-  static final _askMeaning = RegExp(r'什麼是|是什麼|什麼意思|看不懂|甚麼是|是甚麼');
+  static final _askMeaning = RegExp(r'什麼是|是什麼|什麼意思|看不懂|甚麼是|是甚麼|一樣嗎');
 
   static String normalize(String text) =>
       text.toLowerCase().replaceAll(_punct, '');

@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:town_pass/page/guided_assistant/guide_target.dart';
 import 'package:town_pass/page/guided_assistant/guided_assistant_controller.dart';
+import 'package:town_pass/page/guided_assistant/mock_pages/mock_library_view.dart';
 import 'package:town_pass/page/guided_assistant/mock_pages/mock_water_fee_view.dart';
+import 'package:town_pass/page/guided_assistant/model/mock_service_state.dart';
 import 'package:town_pass/page/guided_assistant/model/guide_content.dart';
 import 'package:town_pass/page/guided_assistant/widget/guide_highlight.dart';
 import 'package:town_pass/page/guided_assistant/widget/guided_assistant_sheet.dart';
@@ -52,13 +54,9 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
             c.nudge.value;
             c.currentRoute.value;
             c.sheetOpen.value;
-            c.pages.waterDigits.value;
-            c.pages.waterFocused.value;
-            c.pages.waterFieldTapped.value;
-            c.pages.waterQueried.value;
-            c.pages.libraryVolume.value;
-            c.pages.libraryBranch.value;
-            c.pages.libraryReserved.value;
+            for (final v in c.pages.watched) {
+              v.value;
+            }
             final media = MediaQuery.of(context);
             final layers = <Widget>[];
             final target = c.highlightTarget;
@@ -70,6 +68,7 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
                     targetId: target,
                     alsoUsable: c.currentStep?.alsoUsable ?? const [],
                     blocking: c.locked,
+                    showArrow: c.showArrow,
                     topClear: media.padding.top + 56,
                     onBlockedTap: c.wrongTap,
                   ),
@@ -105,6 +104,7 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
             if (hinting && stage == OnboardingStage.pointer) {
               layers.addAll(_onboardingPointer(context, c));
             }
+            if (c.scrollHintVisible) layers.add(_scrollHint(context));
             final card = c.card;
             if (card != null) layers.add(_guideCard(context, c, card));
             final t = c.task.value;
@@ -140,6 +140,15 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
         // Above the in-page keypad while it is open (as in the design).
         if (c.pages.waterFocused.value) {
           return media.padding.bottom + waterKeypadHeight + 16;
+        }
+        return base + 150;
+      case MockRoutes.library:
+        if (c.pages.libraryKeyboard.value &&
+            c.pages.libraryPage.value == LibraryPage.search) {
+          return media.padding.bottom + libraryKeyboardHeight + 12;
+        }
+        if (c.pages.libraryPage.value == LibraryPage.detail) {
+          return base + 182;
         }
         return base + 150;
       case '/':
@@ -354,54 +363,62 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
     ];
   }
 
+  /// Warm card shared by the guide and the paused bar (design colours).
+  static BoxDecoration get _warm => BoxDecoration(
+    color: TPColors.secondary50,
+    border: Border.all(color: TPColors.secondary400, width: 2),
+    borderRadius: BorderRadius.circular(14),
+    boxShadow: const [
+      BoxShadow(color: Color(0x29000000), blurRadius: 16, offset: Offset(0, 4)),
+    ],
+  );
+
   Widget _guideCard(
     BuildContext context,
     GuidedAssistantController c,
     GuideCard card,
   ) {
-    final top = MediaQuery.of(context).padding.top + 62;
+    final top = MediaQuery.of(context).padding.top + (c.cardTop ?? 62);
     final commit = card.variant == CardVariant.commit;
     final followUp =
         card.variant == CardVariant.done &&
         c.task.value?.followUpGuideId != null;
-    Widget? trailing;
+    final tools = <Widget>[];
     switch (card.variant) {
       case CardVariant.step:
-        trailing = Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Semantics(
-              button: true,
-              label: '再唸一次',
-              child: Material(
-                color: c.speaking.value
-                    ? TPColors.primary200
-                    : TPColors.primary50,
+        tools.addAll([
+          Semantics(
+            button: true,
+            label: '再唸一次',
+            child: Material(
+              color: c.speaking.value ? TPColors.secondary200 : TPColors.white,
+              shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10),
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(10),
-                  onTap: c.speakCard,
-                  child: const SizedBox(
-                    width: 44,
-                    height: 44,
-                    child: Icon(
-                      Icons.volume_up_outlined,
-                      color: TPColors.primary700,
-                    ),
+                side: const BorderSide(color: TPColors.secondary400),
+              ),
+              child: InkWell(
+                borderRadius: BorderRadius.circular(10),
+                onTap: c.speakCard,
+                child: const SizedBox(
+                  width: 44,
+                  height: 44,
+                  child: Icon(
+                    Icons.volume_up_outlined,
+                    color: TPColors.primary700,
                   ),
                 ),
               ),
             ),
-            const SizedBox(width: 6),
-            _SmallButton('暫停', c.pause, filled: false),
-          ],
-        );
+          ),
+          const SizedBox(width: 8),
+          _WarmButton('暫停', c.pause),
+        ]);
       case CardVariant.opened:
-        trailing = _SmallButton('開始', c.beginSteps);
+        tools.add(_SmallButton('開始', c.beginSteps));
       case CardVariant.done:
-        trailing = followUp ? null : _SmallButton('知道了', c.ackDone);
+        if (!followUp) tools.add(_SmallButton('知道了', c.ackDone));
       case CardVariant.commit:
-        trailing = null;
+        break;
     }
     return Positioned(
       left: 12,
@@ -409,68 +426,72 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
       top: top,
       child: Semantics(
         liveRegion: true,
-        label: '助理提示',
-        child: _Card(
-          border: commit
-              ? Border.all(color: TPColors.orange500, width: 2)
-              : null,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Row(
-                children: [
-                  const PenguinAvatar(),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        TPText(
-                          card.label,
-                          style: TPTextStyles.bodySemiBold,
-                          color: commit
-                              ? TPColors.orange700
-                              : TPColors.primary700,
-                        ),
-                        const SizedBox(height: 2),
-                        TPText(
-                          card.text,
-                          style: TPTextStyles.h3SemiBold,
-                          color: TPColors.grayscale950,
-                        ),
-                      ],
-                    ),
-                  ),
-                  if (trailing != null) ...[const SizedBox(width: 8), trailing],
-                ],
-              ),
-              if (commit) ...[
-                const SizedBox(height: 12),
+        label: '助理說',
+        child: Material(
+          type: MaterialType.transparency,
+          child: Container(
+            padding: const EdgeInsets.fromLTRB(12, 8, 12, 10),
+            decoration: commit
+                ? _warm.copyWith(
+                    border: Border.all(color: TPColors.orange500, width: 2),
+                  )
+                : _warm,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
                 Row(
                   children: [
-                    Expanded(child: _SecondaryButton('先不要', c.commitLater)),
+                    const PenguinAvatar(size: 48),
                     const SizedBox(width: 10),
                     Expanded(
-                      child: _PrimaryButton(
-                        '好，我自己按',
-                        c.acceptCommit,
-                        color: TPColors.orange500,
+                      child: TPText(
+                        card.label,
+                        style: TPTextStyles.bodySemiBold,
+                        color: commit
+                            ? TPColors.orange700
+                            : TPColors.secondary800,
                       ),
                     ),
+                    ...tools,
                   ],
                 ),
-              ],
-              if (followUp) ...[
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Expanded(child: _SecondaryButton('先不用', c.ackDone)),
-                    const SizedBox(width: 10),
-                    Expanded(child: _PrimaryButton('好', c.acceptFollowUp)),
-                  ],
+                const SizedBox(height: 6),
+                TPText(
+                  card.text,
+                  style: TPTextStyles.h3SemiBold.copyWith(
+                    fontSize: 17,
+                    height: 25 / 17,
+                  ),
+                  color: TPColors.grayscale950,
                 ),
+                if (commit) ...[
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Expanded(child: _SecondaryButton('先不要', c.commitLater)),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: _PrimaryButton(
+                          '好，我自己按',
+                          c.acceptCommit,
+                          color: TPColors.orange500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+                if (followUp) ...[
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Expanded(child: _SecondaryButton('先不用', c.ackDone)),
+                      const SizedBox(width: 10),
+                      Expanded(child: _PrimaryButton('好', c.acceptFollowUp)),
+                    ],
+                  ),
+                ],
               ],
-            ],
+            ),
           ),
         ),
       ),
@@ -487,38 +508,72 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
       left: 12,
       right: 12,
       top: top,
-      child: _Card(
-        padding: const EdgeInsets.fromLTRB(14, 10, 10, 10),
-        child: Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const TPText(
-                    '引導已暫停',
-                    style: TPTextStyles.h3SemiBold,
-                    color: TPColors.grayscale950,
-                  ),
-                  TPText(
-                    t.left
-                        ? '你離開了${t.guide.pageName}，回去後可以接著做。'
-                        : '你可以先自己操作，想繼續再按「繼續」。',
-                    style: TPTextStyles.bodyRegular,
-                    color: TPColors.grayscale700,
-                  ),
-                ],
-              ),
+      child: Semantics(
+        label: '引導已暫停',
+        child: Material(
+          type: MaterialType.transparency,
+          child: Container(
+            padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
+            decoration: _warm,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Row(
+                  children: [
+                    const PenguinAvatar(),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const TPText(
+                            '引導已暫停',
+                            style: TPTextStyles.h3SemiBold,
+                            color: TPColors.grayscale950,
+                          ),
+                          TPText(
+                            t.left
+                                ? '你離開了${t.guide.pageName}，回去後可以接著做。'
+                                : '你可以先自己操作，想繼續再按「繼續」。',
+                            style: TPTextStyles.h3Regular.copyWith(
+                              fontSize: 15,
+                            ),
+                            color: TPColors.grayscale800,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                Row(
+                  children: [
+                    Expanded(child: _SecondaryButton('結束引導', c.endGuide)),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: _PrimaryButton(
+                        t.left ? t.guide.resumeLabel : '繼續',
+                        c.resume,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
-            const SizedBox(width: 8),
-            _SmallButton('結束', c.endGuide, filled: false),
-            const SizedBox(width: 8),
-            _SmallButton(t.left ? '回到${t.guide.pageName}' : '繼續', c.resume),
-          ],
+          ),
         ),
       ),
     );
   }
+
+  /// 「滑動」 hint while the user browses a result list (does not block).
+  Widget _scrollHint(BuildContext context) => Positioned(
+    right: 10,
+    top: MediaQuery.of(context).padding.top + 380,
+    child: const IgnorePointer(
+      child: Material(type: MaterialType.transparency, child: _ScrollHint()),
+    ),
+  );
 
   Widget _toast(BuildContext context, String text) {
     return Positioned(
@@ -547,12 +602,7 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
 class _Card extends StatelessWidget {
   final Widget child;
   final EdgeInsets padding;
-  final BoxBorder? border;
-  const _Card({
-    required this.child,
-    this.padding = const EdgeInsets.all(12),
-    this.border,
-  });
+  const _Card({required this.child, this.padding = const EdgeInsets.all(12)});
 
   @override
   Widget build(BuildContext context) {
@@ -563,7 +613,6 @@ class _Card extends StatelessWidget {
         decoration: BoxDecoration(
           color: TPColors.white,
           borderRadius: BorderRadius.circular(10),
-          border: border,
           boxShadow: const [
             BoxShadow(
               color: Color(0x2E000000),
@@ -581,13 +630,12 @@ class _Card extends StatelessWidget {
 class _SmallButton extends StatelessWidget {
   final String label;
   final VoidCallback onTap;
-  final bool filled;
-  const _SmallButton(this.label, this.onTap, {this.filled = true});
+  const _SmallButton(this.label, this.onTap);
 
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: filled ? TPColors.primary500 : TPColors.primary50,
+      color: TPColors.primary500,
       borderRadius: BorderRadius.circular(10),
       child: InkWell(
         borderRadius: BorderRadius.circular(10),
@@ -599,7 +647,7 @@ class _SmallButton extends StatelessWidget {
           child: TPText(
             label,
             style: TPTextStyles.bodySemiBold,
-            color: filled ? TPColors.white : TPColors.primary700,
+            color: TPColors.white,
           ),
         ),
       ),
@@ -660,6 +708,104 @@ class _SecondaryButton extends StatelessWidget {
           label,
           style: TPTextStyles.h3Regular,
           color: TPColors.primary700,
+        ),
+      ),
+    );
+  }
+}
+
+class _WarmButton extends StatelessWidget {
+  final String label;
+  final VoidCallback onTap;
+  const _WarmButton(this.label, this.onTap);
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: TPColors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+        side: const BorderSide(color: TPColors.secondary400),
+      ),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(10),
+        onTap: onTap,
+        child: Container(
+          constraints: const BoxConstraints(minWidth: 56, minHeight: 44),
+          alignment: Alignment.center,
+          child: TPText(
+            label,
+            style: TPTextStyles.bodySemiBold.copyWith(fontSize: 15),
+            color: TPColors.primary700,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ScrollHint extends StatefulWidget {
+  const _ScrollHint();
+
+  @override
+  State<_ScrollHint> createState() => _ScrollHintState();
+}
+
+class _ScrollHintState extends State<_ScrollHint>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _bob = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 800),
+  )..repeat(reverse: true);
+
+  @override
+  void dispose() {
+    _bob.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 56,
+      height: 112,
+      decoration: BoxDecoration(
+        color: TPColors.white.withValues(alpha: 0.94),
+        borderRadius: BorderRadius.circular(28),
+        border: Border.all(color: guideYellow, width: 3),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x26000000),
+            blurRadius: 8,
+            offset: Offset(0, 2),
+          ),
+        ],
+      ),
+      child: AnimatedBuilder(
+        animation: _bob,
+        builder: (context, child) => Transform.translate(
+          offset: Offset(0, -6 + 12 * _bob.value),
+          child: child,
+        ),
+        child: const Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.keyboard_arrow_up_rounded,
+              color: TPColors.primary700,
+              size: 28,
+            ),
+            TPText(
+              '滑動',
+              style: TPTextStyles.bodySemiBold,
+              color: TPColors.primary700,
+            ),
+            Icon(
+              Icons.keyboard_arrow_down_rounded,
+              color: TPColors.primary700,
+              size: 28,
+            ),
+          ],
         ),
       ),
     );

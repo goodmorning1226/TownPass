@@ -108,6 +108,8 @@ void main() {
     test('picks the pre-written entry for each scenario', () {
       expect(engine.interpret('我要繳水費').guideId, GuideIds.water);
       expect(engine.interpret('我要借底層邏輯').guideId, GuideIds.library);
+      expect(engine.interpret('什麼是館藏？').term?.title, '館藏');
+      expect(engine.interpret('預約和借書一樣嗎？').term?.title, '預約');
       expect(engine.interpret('查案件進度').kind, MockReplyKind.candidates);
       expect(engine.interpret('什麼是身分驗證').term?.title, contains('身分驗證'));
       expect(engine.interpret('水號是什麼？').term?.showsBill, isTrue);
@@ -134,29 +136,45 @@ void main() {
   });
 
   group('guide steps follow the page state', () {
-    test('water fee', () {
+    test('water fee: tap and type are one step, then 查詢', () {
       final s = MockServiceState();
       final g = guides[GuideIds.water]!;
+      expect(g.steps, hasLength(2));
       expect(g.currentStep(s), 0);
       s.waterFieldTapped.value = true;
       s.waterFocused.value = true;
-      expect(g.currentStep(s), 1);
       s.waterDigits.value = '1234567890';
-      expect(
-        g.currentStep(s),
-        1,
-        reason: 'still typing until the keyboard closes',
-      );
+      expect(g.currentStep(s), 0, reason: 'typing until 完成 is pressed');
       s.waterFocused.value = false;
-      expect(g.currentStep(s), 2);
+      expect(g.currentStep(s), 1);
       s.waterQueried.value = true;
       expect(g.currentStep(s), g.steps.length);
+      expect(g.currentTodo(s), g.doneTodo);
     });
 
-    test('library reservation ends on a submit step', () {
+    test('library: search, scroll, pick, branch, reserve', () {
+      final s = MockServiceState();
       final g = guides[GuideIds.library]!;
-      expect(g.steps.last.commit, isTrue);
-      expect(g.steps.where((st) => st.commit), hasLength(1));
+      expect(g.currentStep(s), 0);
+      s.libraryPage.value = LibraryPage.search;
+      expect(g.currentStep(s), 1);
+      s.librarySearched.value = true;
+      expect(g.currentStep(s), 2);
+      expect(g.steps[2].scrollHint(s), isTrue);
+      s.libraryScrolled.value = true;
+      expect(g.currentStep(s), 3);
+      s
+        ..libraryPage.value = LibraryPage.detail
+        ..libraryBook.value = 0;
+      expect(g.currentStep(s), 4);
+      expect(g.currentTodo(s), 3);
+      s.libraryBranch.value = 3;
+      expect(g.currentStep(s), 5);
+      expect(g.steps[5].card(s), contains('《小王子》'));
+      expect(g.steps[5].card(s), contains('CFB 信義安和借書站'));
+      s.libraryReserved.value = true;
+      expect(g.currentStep(s), g.steps.length);
+      expect(g.currentTodo(s), 5);
     });
   });
 
@@ -186,7 +204,8 @@ void main() {
         c.beginSteps();
         expect(c.locked, isTrue);
         expect(c.highlightTarget, 'water.field');
-        expect(c.card?.label, '步驟 1 / 3');
+        expect(c.card?.label, '步驟 1 / 2');
+        expect(c.card?.text, '先點一下亮起來的框，把水號輸進去喔。');
       }
     });
 
@@ -199,9 +218,9 @@ void main() {
         ..waterDigits.value = '12345';
       expect(c.highlightTarget, 'water.field');
       expect(c.currentStep?.alsoUsable, ['water.keypad']);
-      expect(c.card?.text, '請輸入水號，一共 10 碼。');
+      expect(c.card?.text, '水號一共 10 碼，慢慢輸入就好。');
       c.pages.waterDigits.value = '1234567890';
-      expect(c.card?.text, '輸入好了！請按鍵盤的「完成」。');
+      expect(c.card?.text, '輸入好了！按一下鍵盤的「完成」。');
       c.pages.waterFocused.value = false;
       expect(c.highlightTarget, 'water.query');
     });
@@ -241,30 +260,94 @@ void main() {
       expect(c.locked, isTrue);
     });
 
-    test('the submit step is not locked and waits for the user', () {
+    test('library: scrolling is free, the branch window is lit not locked', () {
       c.startGuide(GuideIds.library);
       c.beginSteps();
-      c.pages.libraryVolume.value = '第 1 冊';
-      c.pages.libraryBranch.value = '總館';
-      expect(c.card?.variant, CardVariant.commit);
+      expect(c.locked, isTrue);
+      expect(c.highlightTarget, 'library.search_entry');
+      expect(c.cardTop, 230);
+      expect(c.showArrow, isTrue);
+      c.pages.libraryPage.value = LibraryPage.search;
+      expect(c.highlightTarget, 'library.search_row');
+      expect(c.currentStep?.alsoUsable, ['library.keyboard']);
+      expect(c.showArrow, isFalse);
+      c.pages.librarySearched.value = true;
       expect(c.locked, isFalse);
       expect(c.highlightTarget, isNull);
-      c.acceptCommit();
+      expect(c.scrollHintVisible, isTrue);
+      expect(c.cardTop, isNull);
+      c.pages
+        ..libraryPage.value = LibraryPage.detail
+        ..libraryBook.value = 0;
+      expect(c.locked, isTrue);
+      expect(c.highlightTarget, 'library.branch_field');
+      c.pages.libraryBranchList.value = true;
       expect(c.locked, isFalse);
       expect(c.pointingOnly, isTrue);
+      expect(c.highlightTarget, 'library.branch_list');
+      c.pages
+        ..libraryBranch.value = 2
+        ..libraryBranchList.value = false;
+      expect(c.locked, isTrue);
       expect(c.highlightTarget, 'library.reserve');
+      expect(c.taskTag, '步驟 4 / 4');
       c.pages.libraryReserved.value = true;
       expect(c.card?.variant, CardVariant.done);
+      expect(c.card?.label, '完成了');
     });
 
-    test('"先不要" on the submit step ends the guide', () {
+    test('task list lines and the collapsed summary', () {
       c.startGuide(GuideIds.library);
       c.beginSteps();
-      c.pages.libraryVolume.value = '第 1 冊';
-      c.pages.libraryBranch.value = '總館';
-      c.commitLater();
-      expect(c.task.value?.status, TaskStatus.ended);
+      expect(c.todoOpen.value, isFalse);
+      expect(c.currentTodoText, '搜尋書名');
+      final lines = c.todoLines;
+      expect(lines.first.tag, '完成');
+      expect(lines[1].tag, '進行中');
+      expect(lines[4].tag, '你自己確認');
+      expect(lines[5].tag, '之後你自己去');
+    });
+
+    test(
+      'a different task mid-guide asks first and keeps the progress',
+      () async {
+        c.startGuide(GuideIds.library);
+        c.beginSteps();
+        c.pages
+          ..libraryPage.value = LibraryPage.search
+          ..libraryQuery.value = '小王子'
+          ..librarySearched.value = true;
+        c.submit('我要繳水費');
+        await settle();
+        final ask = c.messages.last;
+        expect(ask.text, startsWith('你現在正在預約書籍，做到第 2 步。'));
+        expect(ask.options!.options.map((o) => o.label), [
+          '先繼續借書',
+          '暫停借書，改去繳水費',
+        ]);
+        c.choose(ask, ask.options!.options.last);
+        expect(c.task.value?.guide.id, GuideIds.water);
+        expect(c.task.value?.followUpGuideId, GuideIds.library);
+        c.beginSteps();
+        c.pages
+          ..waterDigits.value = '1234567890'
+          ..waterQueried.value = true;
+        expect(c.card?.text, contains('要回去接著借書嗎？'));
+        c.acceptFollowUp();
+        expect(c.task.value?.guide.id, GuideIds.library);
+        expect(c.task.value?.status, TaskStatus.on);
+        expect(c.pages.libraryQuery.value, '小王子', reason: 'progress kept');
+      },
+    );
+
+    test('ending the guide says so and hides the card', () {
+      c.startGuide(GuideIds.water);
+      c.beginSteps();
+      c.pages.waterFocused.value = true;
+      c.endGuide();
       expect(c.card, isNull);
+      expect(c.pages.waterFocused.value, isFalse);
+      expect(c.messages.last.text, Replies.ended);
     });
 
     test('two things: the second is offered when the first is done', () async {
@@ -281,8 +364,9 @@ void main() {
         expect(c.task.value?.followUpGuideId, GuideIds.water);
         c.beginSteps();
         c.pages
-          ..libraryVolume.value = '第 1 冊'
-          ..libraryBranch.value = '總館'
+          ..libraryPage.value = LibraryPage.detail
+          ..libraryBook.value = 0
+          ..libraryBranch.value = 1
           ..libraryReserved.value = true;
         expect(c.card?.text, contains('繳水費'));
         c.acceptFollowUp();
@@ -316,7 +400,7 @@ void main() {
         await settle();
         expect(
           c.messages.last.text,
-          guides[GuideIds.water]!.steps.first.detail,
+          guides[GuideIds.water]!.steps.first.detail(c.pages),
         );
       }
     });
@@ -441,7 +525,7 @@ void main() {
       c.beginSteps();
       await tester.pump();
       await tester.pump();
-      expect(find.text('請點一下下面亮起來的水號框。'), findsOneWidget);
+      expect(find.text('先點一下亮起來的框，把水號輸進去喔。'), findsOneWidget);
       await tester.tap(find.text('other'), warnIfMissed: false);
       await tester.pump();
       expect(pageTaps, 0);
@@ -449,7 +533,7 @@ void main() {
       await tester.tap(find.text('target'));
       await tester.pump();
       expect(c.pages.waterFieldTapped.value, isTrue);
-      expect(find.text('請輸入水號，一共 10 碼。'), findsOneWidget);
+      expect(find.text('水號一共 10 碼，慢慢輸入就好。'), findsOneWidget);
       c.showNudge('水號有 10 碼，還差 7 碼喔。');
       await tester.pump();
       expect(find.text('水號有 10 碼，還差 7 碼喔。'), findsOneWidget);

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:town_pass/gen/assets.gen.dart';
 import 'package:town_pass/page/guided_assistant/guide_target.dart';
 import 'package:town_pass/util/tp_colors.dart';
 
@@ -254,54 +255,35 @@ class _ArrowPainter extends CustomPainter {
   bool shouldRepaint(_ArrowPainter old) => false;
 }
 
-/// The penguin avatar on the guide card.
+/// The penguin avatar on the guide card, in a round frame (as in the design).
 class PenguinAvatar extends StatelessWidget {
   final double size;
   const PenguinAvatar({super.key, this.size = 44});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        color: TPColors.secondary100,
-        shape: BoxShape.circle,
-        border: Border.all(color: TPColors.secondary500, width: 2),
+    return ExcludeSemantics(
+      child: Container(
+        width: size,
+        height: size,
+        decoration: BoxDecoration(
+          color: TPColors.white,
+          shape: BoxShape.circle,
+          border: Border.all(color: TPColors.secondary500, width: 3),
+        ),
+        child: ClipOval(
+          child: Transform.scale(
+            scale: 1.35,
+            alignment: const Alignment(0.22, 0),
+            child: Assets.image.assistantPenguin.image(
+              fit: BoxFit.cover,
+              alignment: const Alignment(0.2, 0),
+              width: size,
+              height: size,
+            ),
+          ),
+        ),
       ),
-      child: CustomPaint(painter: _PenguinPainter()),
     );
   }
-}
-
-class _PenguinPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final w = size.width, h = size.height;
-    final c = Offset(w / 2, h / 2 + h * 0.06);
-    canvas.drawOval(
-      Rect.fromCenter(center: c, width: w * 0.56, height: h * 0.66),
-      Paint()..color = const Color(0xFF22313A),
-    );
-    canvas.drawOval(
-      Rect.fromCenter(
-        center: c.translate(0, h * 0.06),
-        width: w * 0.38,
-        height: h * 0.46,
-      ),
-      Paint()..color = TPColors.white,
-    );
-    final eye = Paint()..color = const Color(0xFF22313A);
-    canvas.drawCircle(c.translate(-w * 0.08, -h * 0.1), w * 0.035, eye);
-    canvas.drawCircle(c.translate(w * 0.08, -h * 0.1), w * 0.035, eye);
-    final beak = Path()
-      ..moveTo(c.dx - w * 0.06, c.dy - h * 0.03)
-      ..lineTo(c.dx + w * 0.06, c.dy - h * 0.03)
-      ..lineTo(c.dx, c.dy + h * 0.04)
-      ..close();
-    canvas.drawPath(beak, Paint()..color = TPColors.secondary600);
-  }
-
-  @override
-  bool shouldRepaint(_PenguinPainter old) => false;
 }

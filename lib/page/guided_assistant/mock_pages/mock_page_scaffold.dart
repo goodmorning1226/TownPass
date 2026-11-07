@@ -10,11 +10,15 @@ class MockServiceScaffold extends StatelessWidget {
   final Widget body;
   final Widget? bottom;
 
+  /// Shows a back button on the left (pages inside the service).
+  final VoidCallback? onBack;
+
   const MockServiceScaffold({
     super.key,
     required this.title,
     required this.body,
     this.bottom,
+    this.onBack,
   });
 
   @override
@@ -24,6 +28,17 @@ class MockServiceScaffold extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: TPColors.primary500,
         automaticallyImplyLeading: false,
+        leading: onBack == null
+            ? null
+            : IconButton(
+                tooltip: '返回上一頁',
+                onPressed: onBack,
+                icon: const Icon(
+                  Icons.chevron_left_rounded,
+                  color: TPColors.white,
+                  size: 32,
+                ),
+              ),
         toolbarHeight: 56,
         title: TPText(
           title,

@@ -14,7 +14,7 @@ import 'package:town_pass/page/city_service_edit/city_service_edit_view.dart';
 import 'package:town_pass/page/city_service_edit/city_service_edit_view_controller.dart';
 import 'package:town_pass/page/feedback/feedback_view.dart';
 import 'package:town_pass/page/feedback/feedback_view_controller.dart';
-import 'package:town_pass/page/guided_assistant/mock_pages/mock_library_book_view.dart';
+import 'package:town_pass/page/guided_assistant/mock_pages/mock_library_view.dart';
 import 'package:town_pass/page/guided_assistant/mock_pages/mock_service_view.dart';
 import 'package:town_pass/page/guided_assistant/mock_pages/mock_water_fee_view.dart';
 import 'package:town_pass/page/guided_assistant/model/guide_content.dart';
@@ -195,8 +195,8 @@ abstract class TPRoute {
       page: () => const MockWaterFeeView(),
     ),
     GetPage(
-      name: MockRoutes.libraryBook,
-      page: () => const MockLibraryBookView(),
+      name: MockRoutes.library,
+      page: () => const MockLibraryView(),
     ),
     GetPage(
       name: MockRoutes.service,

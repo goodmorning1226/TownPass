@@ -57,12 +57,17 @@ class GuideTask {
   /// Guide to offer once this one is done ("一句話兩件事").
   final String? followUpGuideId;
 
+  /// The follow-up is a task the user paused for this one: going back keeps
+  /// its progress.
+  final bool followUpResumes;
+
   const GuideTask(
     this.guide, {
     this.status = TaskStatus.opened,
     this.left = false,
     this.commitAccepted = false,
     this.followUpGuideId,
+    this.followUpResumes = false,
   });
 
   GuideTask copyWith({
@@ -73,6 +78,7 @@ class GuideTask {
     bool clearFollowUp = false,
   }) => GuideTask(
     guide,
+    followUpResumes: clearFollowUp ? false : followUpResumes,
     status: status ?? this.status,
     left: left ?? this.left,
     commitAccepted: commitAccepted ?? this.commitAccepted,
@@ -90,6 +96,17 @@ class GuideCard {
   final String label;
   final String text;
   const GuideCard(this.variant, this.label, this.text);
+}
+
+enum TodoState { done, current, todo }
+
+/// One line of the task list in the assistant.
+class TodoLine {
+  final String text;
+  final TodoState state;
+  final String? tag;
+  final bool self;
+  const TodoLine(this.text, this.state, this.tag, {this.self = false});
 }
 
 /// First-run hint on the assistant button: the card, then the arrow step.
@@ -138,7 +155,7 @@ class GuidedAssistantController extends GetxController {
   final loading = false.obs;
   final task = Rxn<GuideTask>();
   final nudge = ''.obs;
-  final todoOpen = true.obs;
+  final todoOpen = false.obs;
   final currentRoute = '/'.obs;
   final readAloud = false.obs;
   final speaking = false.obs;
@@ -175,16 +192,7 @@ class GuidedAssistantController extends GetxController {
     super.onInit();
     messages.add(_bot(Replies.greet));
     final p = pages;
-    _stepWorker = everAll([
-      task,
-      p.waterFieldTapped,
-      p.waterFocused,
-      p.waterDigits,
-      p.waterQueried,
-      p.libraryVolume,
-      p.libraryBranch,
-      p.libraryReserved,
-    ], (_) => _onProgress());
+    _stepWorker = everAll([task, ...p.watched], (_) => _onProgress());
     speaker.loadEnabled().then((v) => readAloud.value = v);
     if (runOnboarding) _loadOnboarding();
   }
@@ -320,7 +328,7 @@ class GuidedAssistantController extends GetxController {
     if (destination != null) {
       final guideId = guideFor(destination, local);
       if (guideId != null) {
-        startGuide(guideId);
+        _requestGuide(guideId);
       } else {
         _openReal(destination, result.message);
       }
@@ -356,8 +364,9 @@ class GuidedAssistantController extends GetxController {
       return GuideIds.water;
     }
     const libraryKinds = {'home', 'search', 'detail'};
-    if (libraryKinds.contains(destination['kind']) &&
-        local.guideId == GuideIds.library) {
+    if (libraryKinds.contains(destination['kind']) ||
+        (destination['kind'] == 'capability' &&
+            destination['id'] == 'library')) {
       return GuideIds.library;
     }
     return null;
@@ -421,7 +430,7 @@ class GuidedAssistantController extends GetxController {
   void _handle(MockReply reply) {
     switch (reply.kind) {
       case MockReplyKind.guide:
-        startGuide(reply.guideId!);
+        _requestGuide(reply.guideId!);
       case MockReplyKind.openService:
         final title = reply.serviceTitle!;
         _say(_bot(Replies.opensPage(title)));
@@ -487,6 +496,18 @@ class GuidedAssistantController extends GetxController {
       _say(_bot('「${option.label}」：${Replies.notConnected}'));
       return;
     }
+    if (option.action != null) {
+      messages.add(ChatMessage(id: _nextId++, user: true, text: option.label));
+      final active = _activeTask;
+      if (option.action == 'keep' || active == null) {
+        _say(_bot(Replies.keepGoing(active?.guide.shortName ?? '')));
+        return;
+      }
+      final next = option.action!.substring('switch:'.length);
+      _say(_bot(Replies.parked(active.guide.shortName)));
+      startGuide(next, followUpGuideId: active.guide.id, followUpResumes: true);
+      return;
+    }
     if (option.choiceId != null) {
       submit('', choiceId: option.choiceId, shownAs: option.label);
       return;
@@ -512,19 +533,58 @@ class GuidedAssistantController extends GetxController {
 
   // ---------------------------------------------------------------- guide
 
-  void startGuide(String guideId, {String? followUpGuideId}) {
+  /// Starts [guideId], or asks first when another guide is in progress.
+  void _requestGuide(String guideId) {
+    final active = _activeTask;
+    final other = guides[guideId];
+    if (active == null || other == null || active.guide.id == guideId) {
+      startGuide(guideId);
+      return;
+    }
+    final g = active.guide;
+    final n = g.currentTodo(pages).clamp(1, g.stepCount);
+    final ask = Replies.switchAsk(g.title, n, g.shortName, other.shortName);
+    _say(
+      _bot(
+        ask,
+        options: CandidateGroup(ask, [
+          CandidateOption('先繼續${g.shortName}', action: 'keep'),
+          CandidateOption(
+            '暫停${g.shortName}，改去${other.shortName}',
+            action: 'switch:$guideId',
+          ),
+        ]),
+        followUpOf: 'switch',
+      ),
+    );
+  }
+
+  /// [resuming] goes back to a paused task without resetting its page.
+  void startGuide(
+    String guideId, {
+    String? followUpGuideId,
+    bool followUpResumes = false,
+    bool resuming = false,
+  }) {
     final guide = guides[guideId];
     if (guide == null) return;
     _autoStart?.cancel();
-    guide.reset(pages);
+    if (!resuming) guide.reset(pages);
     _wrongTaps = 0;
     nudge.value = '';
     _lastSpokenKey = null;
-    task.value = GuideTask(guide, followUpGuideId: followUpGuideId);
-    _say(_bot(guide.openedText));
+    todoOpen.value = false;
+    task.value = GuideTask(
+      guide,
+      status: resuming ? TaskStatus.on : TaskStatus.opened,
+      followUpGuideId: followUpGuideId,
+      followUpResumes: followUpResumes,
+    );
+    _say(_bot(resuming ? Replies.backTo(guide.shortName) : guide.openedText));
     closeSheet();
     _navigate(guide.route);
     currentRoute.value = guide.route;
+    if (resuming) return;
     _autoStart = Timer(autoStartDelay, () {
       if (task.value?.status == TaskStatus.opened) beginSteps();
     });
@@ -559,7 +619,7 @@ class GuidedAssistantController extends GetxController {
     final t = _activeTask;
     if (t == null) return null;
     if (allStepsDone) return t.guide.doneDetail;
-    return currentStep?.detail;
+    return currentStep?.detail(pages);
   }
 
   /// The guide is showing on its page (card, highlight).
@@ -570,49 +630,96 @@ class GuidedAssistantController extends GetxController {
     return t.status == TaskStatus.opened || t.status == TaskStatus.on;
   }
 
+  bool get _stepRunning => guideVisible && task.value!.status == TaskStatus.on;
+
   /// The rest of the screen is dimmed and blocked.
   bool get locked {
-    if (!guideVisible || task.value!.status != TaskStatus.on) return false;
+    if (!_stepRunning) return false;
     final step = currentStep;
-    return step != null && !step.commit;
+    if (step == null || step.commit) return false;
+    return step.targetFor(pages) != null && step.locks(pages);
   }
 
-  /// Highlight ring without blocking (submit step after "好，我自己按").
+  /// Ring without blocking: a step that leaves the screen free, or a submit
+  /// step after "好，我自己按".
   bool get pointingOnly {
-    if (!guideVisible || task.value!.status != TaskStatus.on) return false;
+    if (!_stepRunning) return false;
     final step = currentStep;
-    return step != null && step.commit && task.value!.commitAccepted;
+    if (step == null || step.targetFor(pages) == null) return false;
+    if (step.commit) return task.value!.commitAccepted;
+    return !step.locks(pages);
   }
 
   String? get highlightTarget =>
       (locked || pointingOnly) ? currentStep?.targetFor(pages) : null;
+
+  bool get showArrow => _stepRunning && (currentStep?.arrow(pages) ?? false);
+
+  /// Card distance from the top for this step (null: under the title bar).
+  double? get cardTop => _stepRunning ? currentStep?.cardTop : null;
+
+  bool get scrollHintVisible =>
+      _stepRunning && (currentStep?.scrollHint(pages) ?? false);
+
+  /// Lines of the task list in the assistant.
+  List<TodoLine> get todoLines {
+    final t = task.value;
+    if (t == null) return const [];
+    final g = t.guide;
+    final p = g.currentTodo(pages);
+    return [
+      for (var i = 0; i < g.todos.length; i++)
+        _line(
+          g.todos[i],
+          i < p
+              ? TodoState.done
+              : i == p
+              ? TodoState.current
+              : TodoState.todo,
+        ),
+    ];
+  }
+
+  static TodoLine _line(TodoItem item, TodoState state) {
+    String? tag;
+    if (state == TodoState.done) tag = '完成';
+    if (state == TodoState.current && item.self == null) tag = '進行中';
+    if (item.self != null && state != TodoState.done) {
+      tag = state == TodoState.current
+          ? (item.selfCurrent ?? item.self)
+          : item.self;
+    }
+    return TodoLine(item.text, state, tag, self: item.self != null);
+  }
+
+  String get currentTodoText {
+    final t = task.value;
+    if (t == null) return '';
+    final p = t.guide.currentTodo(pages);
+    return p < t.guide.todos.length ? t.guide.todos[p].text : '全部完成';
+  }
 
   GuideCard? get card {
     final t = task.value;
     if (!guideVisible) return null;
     final g = t!.guide;
     if (t.status == TaskStatus.opened) {
-      return GuideCard(
-        CardVariant.opened,
-        '已開啟${g.pageName}',
-        '好的！已經幫你打開${g.pageName}了。',
-      );
+      return GuideCard(CardVariant.opened, g.openedLabel, g.openedCard);
     }
     final i = g.currentStep(pages);
     if (i >= g.steps.length) {
       final follow = t.followUpGuideId == null
           ? null
           : guides[t.followUpGuideId];
-      return GuideCard(
-        CardVariant.done,
-        '引導完成',
-        follow == null
-            ? g.doneText
-            : '${g.doneText}${Replies.followUp(follow.title)}',
-      );
+      final offer = follow == null
+          ? ''
+          : t.followUpResumes
+          ? Replies.resumeOffer(follow.shortName)
+          : Replies.followUp(follow.title);
+      return GuideCard(CardVariant.done, g.doneLabel, '${g.doneText}$offer');
     }
     final step = g.steps[i];
-    final label = '步驟 ${i + 1} / ${g.steps.length}';
+    final label = step.label(pages);
     if (nudge.value.isNotEmpty) {
       return GuideCard(CardVariant.step, label, nudge.value);
     }
@@ -627,7 +734,9 @@ class GuidedAssistantController extends GetxController {
 
   void _onProgress() {
     // A new step replaces any "tap the highlighted spot" reminder at once.
-    final stepKey = '${task.value?.guide.id}:$stepIndex';
+    // The step's own text counts too (tapping the field within one step).
+    final stepKey =
+        '${task.value?.guide.id}:$stepIndex:${currentStep?.card(pages)}';
     if (stepKey != _lastStepKey) {
       _lastStepKey = stepKey;
       _wrongTaps = 0;
@@ -697,6 +806,9 @@ class GuidedAssistantController extends GetxController {
     if (t == null) return;
     _autoStart?.cancel();
     task.value = t.copyWith(status: TaskStatus.ended, left: false);
+    pages.waterFocused.value = false;
+    pages.libraryKeyboard.value = false;
+    todoOpen.value = false;
     _say(_bot(Replies.ended));
   }
 
@@ -720,9 +832,11 @@ class GuidedAssistantController extends GetxController {
   }
 
   void acceptFollowUp() {
-    final next = task.value?.followUpGuideId;
+    final t = task.value;
+    final next = t?.followUpGuideId;
+    final resume = t?.followUpResumes ?? false;
     ackDone();
-    if (next != null) startGuide(next);
+    if (next != null) startGuide(next, resuming: resume);
   }
 
   /// Secondary button on the task card in the sheet.
@@ -770,8 +884,8 @@ class GuidedAssistantController extends GetxController {
         return '引導完成';
       default:
         if (allStepsDone) return '引導完成';
-        final n = t.guide.steps.length;
-        return '步驟 ${(stepIndex + 1).clamp(1, n)} / $n';
+        final n = t.guide.stepCount;
+        return '步驟 ${t.guide.currentTodo(pages).clamp(1, n)} / $n';
     }
   }
 

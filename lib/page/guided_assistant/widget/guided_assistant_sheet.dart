@@ -66,7 +66,10 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               _header(),
-              if (c.task.value != null) _taskCard(c.task.value!),
+              if (c.task.value != null &&
+                  c.task.value!.status != TaskStatus.ended &&
+                  c.task.value!.status != TaskStatus.finished)
+                _taskCard(c.task.value!),
               Expanded(child: _chat()),
               _bottom(context),
             ],
@@ -116,111 +119,142 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
     ),
   );
 
+  /// Current task (design: warm card, collapsed by default).
   Widget _taskCard(GuideTask t) {
-    final step = c.stepIndex;
-    final rows = <Widget>[];
-    rows.add(_todoRow(t.guide.openedLabel, _TodoState.done, tag: '完成'));
-    for (var i = 0; i < t.guide.steps.length; i++) {
-      final s = i < step
-          ? _TodoState.done
-          : i == step
-          ? _TodoState.current
-          : _TodoState.todo;
-      rows.add(
-        _todoRow(
-          t.guide.steps[i].label,
-          s,
-          tag: s == _TodoState.done
-              ? '完成'
-              : s == _TodoState.current
-              ? '進行中'
-              : null,
-          commit: t.guide.steps[i].commit,
-        ),
-      );
-    }
-    final allDone = step >= t.guide.steps.length;
-    for (var i = 0; i < t.guide.selfItems.length; i++) {
-      rows.add(
-        _todoRow(
-          t.guide.selfItems[i],
-          allDone && i == 0 ? _TodoState.current : _TodoState.todo,
-          self: true,
-          tag: allDone && i == 0 ? '輪到你確認' : '你自己確認',
-        ),
-      );
-    }
+    final open = c.todoOpen.value;
+    final whiteBox = BoxDecoration(
+      color: TPColors.white,
+      borderRadius: BorderRadius.circular(12),
+    );
     return Container(
       margin: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+      constraints: const BoxConstraints(maxHeight: 440),
       decoration: BoxDecoration(
-        border: Border.all(color: TPColors.grayscale200),
-        borderRadius: BorderRadius.circular(10),
+        color: TPColors.secondary50,
+        border: Border.all(color: TPColors.secondary400),
+        borderRadius: BorderRadius.circular(14),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          InkWell(
-            borderRadius: BorderRadius.circular(10),
-            onTap: () => c.todoOpen.value = !c.todoOpen.value,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-              child: Row(
-                children: [
-                  const Icon(
-                    Icons.assignment_turned_in_outlined,
-                    color: TPColors.primary700,
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Semantics(
+              button: true,
+              expanded: open,
+              child: InkWell(
+                borderRadius: BorderRadius.circular(14),
+                onTap: () => c.todoOpen.value = !open,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
                   ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: TPText(
-                      '目前任務：${t.guide.title}',
-                      style: TPTextStyles.h3SemiBold,
-                      color: TPColors.grayscale950,
-                    ),
-                  ),
-                  _Tag(c.taskTag),
-                  const SizedBox(width: 4),
-                  Icon(
-                    c.todoOpen.value
-                        ? Icons.expand_less_rounded
-                        : Icons.expand_more_rounded,
-                    color: TPColors.grayscale700,
-                  ),
-                ],
-              ),
-            ),
-          ),
-          if (c.todoOpen.value) ...[
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              child: Column(children: rows),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(12, 4, 12, 12),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: SizedBox(
-                      height: 44,
-                      child: OutlinedButton(
-                        style: OutlinedButton.styleFrom(
-                          side: const BorderSide(color: TPColors.primary500),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                        onPressed: c.taskSecondary,
-                        child: TPText(
-                          c.taskSecondaryLabel,
-                          style: TPTextStyles.h3Regular,
-                          color: TPColors.primary700,
+                  child: Row(
+                    children: [
+                      const PenguinAvatar(),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            TPText(
+                              '目前任務：${t.guide.title}',
+                              style: TPTextStyles.h3SemiBold,
+                              color: TPColors.grayscale950,
+                            ),
+                            TPText(
+                              c.taskTag,
+                              style: TPTextStyles.bodySemiBold,
+                              color: TPColors.secondary800,
+                            ),
+                          ],
                         ),
                       ),
-                    ),
+                      TPText(
+                        open ? '收起' : '看全部',
+                        style: TPTextStyles.bodyRegular.copyWith(fontSize: 15),
+                        color: TPColors.primary700,
+                      ),
+                      Icon(
+                        open
+                            ? Icons.expand_less_rounded
+                            : Icons.expand_more_rounded,
+                        color: TPColors.grayscale700,
+                        size: 20,
+                      ),
+                    ],
                   ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: SizedBox(
+                ),
+              ),
+            ),
+            if (!open) ...[
+              Container(
+                margin: const EdgeInsets.fromLTRB(12, 0, 12, 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 10,
+                ),
+                decoration: whiteBox,
+                child: TPText.rich(
+                  TextSpan(
+                    children: [
+                      const TextSpan(text: '現在我們要：'),
+                      TextSpan(
+                        text: c.currentTodoText,
+                        style: const TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                      const TextSpan(text: '。\n照著畫面上方的提示做就可以，有問題隨時問我！'),
+                    ],
+                  ),
+                  style: TPTextStyles.h3Regular.copyWith(height: 24 / 16),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(12, 0, 12, 10),
+                child: Align(
+                  alignment: Alignment.centerRight,
+                  child: _outline('結束引導，自己操作', c.endGuide),
+                ),
+              ),
+            ] else ...[
+              Container(
+                margin: const EdgeInsets.fromLTRB(12, 0, 12, 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
+                decoration: whiteBox,
+                child: const TPText(
+                  '這些是我們要一起完成的事，打勾的已經做好了：',
+                  style: TPTextStyles.h3Regular,
+                  color: TPColors.grayscale950,
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(12, 0, 12, 4),
+                child: Column(
+                  children: [for (final line in c.todoLines) _todoRow(line)],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(12, 4, 12, 12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _outline(
+                            c.taskSecondaryLabel,
+                            c.taskSecondary,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(child: _outline('結束引導', c.endGuide)),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    SizedBox(
                       height: 44,
                       child: FilledButton(
                         style: FilledButton.styleFrom(
@@ -231,44 +265,56 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
                         ),
                         onPressed: c.backToPage,
                         child: TPText(
-                          '回到${t.guide.pageName}',
+                          t.guide.backLabel,
                           style: TPTextStyles.h3Regular,
                           color: TPColors.white,
                         ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
+            ],
           ],
-        ],
+        ),
       ),
     );
   }
 
-  Widget _todoRow(
-    String text,
-    _TodoState s, {
-    String? tag,
-    bool self = false,
-    bool commit = false,
-  }) {
+  Widget _outline(String label, VoidCallback onTap) => SizedBox(
+    height: 44,
+    child: OutlinedButton(
+      style: OutlinedButton.styleFrom(
+        backgroundColor: TPColors.white,
+        side: const BorderSide(color: TPColors.primary500),
+        padding: const EdgeInsets.symmetric(horizontal: 14),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+      onPressed: onTap,
+      child: TPText(
+        label,
+        style: TPTextStyles.h3Regular.copyWith(fontSize: 15),
+        color: TPColors.primary700,
+      ),
+    ),
+  );
+
+  Widget _todoRow(TodoLine line) {
     Widget icon;
-    switch (s) {
-      case _TodoState.done:
+    switch (line.state) {
+      case TodoState.done:
         icon = const Icon(
           Icons.check_circle,
           color: TPColors.primary600,
           size: 22,
         );
-      case _TodoState.current:
+      case TodoState.current:
         icon = const Icon(
           Icons.radio_button_checked,
           color: TPColors.primary700,
           size: 22,
         );
-      case _TodoState.todo:
+      case TodoState.todo:
         icon = const Icon(
           Icons.radio_button_unchecked,
           color: TPColors.grayscale400,
@@ -276,23 +322,32 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
         );
     }
     return ConstrainedBox(
-      constraints: const BoxConstraints(minHeight: 36),
+      constraints: const BoxConstraints(minHeight: 34),
       child: Row(
         children: [
           icon,
           const SizedBox(width: 10),
           Expanded(
-            child: TPText(
-              commit ? '$text（會真的送出）' : text,
-              style: s == _TodoState.current
-                  ? TPTextStyles.h3SemiBold
-                  : TPTextStyles.h3Regular,
-              color: s == _TodoState.done
-                  ? TPColors.grayscale700
-                  : TPColors.grayscale950,
+            child: Wrap(
+              spacing: 8,
+              runSpacing: 2,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                TPText(
+                  line.text,
+                  style:
+                      (line.state == TodoState.current
+                              ? TPTextStyles.h3SemiBold
+                              : TPTextStyles.h3Regular)
+                          .copyWith(fontSize: 15),
+                  color: line.state == TodoState.done
+                      ? TPColors.grayscale700
+                      : TPColors.grayscale950,
+                ),
+                if (line.tag != null) _Tag(line.tag!, self: line.self),
+              ],
             ),
           ),
-          if (tag != null) _Tag(tag, self: self),
         ],
       ),
     );
@@ -589,8 +644,6 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
     ],
   );
 }
-
-enum _TodoState { done, current, todo }
 
 class _Tag extends StatelessWidget {
   final String text;
