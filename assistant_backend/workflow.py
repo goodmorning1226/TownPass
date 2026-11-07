@@ -328,6 +328,46 @@ class Workflow:
             return True
         return bool(re.search(r"借.{0,6}書|找.{0,6}書|ISBN|圖書|館藏", text, re.I))
 
+    def known_text(self, text):
+        """Whether an unsure Chinese transcript matches anything the App knows, by word
+        or by sound: a cancel / greeting / listing phrase, a catalogue service or
+        keyword, an option number (第二個), a catalogue book (title or author, by sound
+        too), a service word by sound, or a request opening (我想借…). False means the
+        sentence is strange to the App: asr_server then lets the Taiwanese model try it
+        (docs/AI_TAIWANESE_SPEECH_PLAN.md section 13). Fast: no model, no network; the
+        book list is used only when already loaded."""
+        text = (text or "").strip()
+        if not text:
+            return False
+        if self.recognizes(text) or listing_by_sound(text) or sound_ordinal(text) is not None:
+            return True
+        if re.fullmatch(r"(?:我要|我選|選擇?|就|要)?第?(?:[1-9]|[一二兩三四五六七八九])(?:個|項|本|筆|號|種|位)?(?:吧|了|就好|好了)?[。！!]*", text):
+            return True
+        if re.fullmatch(r"(?:好|好的|對|是|不是|不對|不用|不要|可以|沒有|有|下一頁|上一頁|回首頁|回上一頁|再說一次|再一次|重來|"
+                        r"繼續|停|等一下|結束|關閉|打開|開始|知道了|了解|OK|ok)[啊呀喔吧嗎。！!？?\s]*", text):
+            return True
+        # Small talk the App answers (greetings, thanks, who are you, what can you do).
+        if re.search(r"^(?:早安|午安|晚安|你好|您好|哈囉|嗨|嘿|謝謝|感謝|多謝|(?:哈){2,}|(?:嗯){1,})|你是誰|介紹.{0,4}功能|幫我什麼|"
+                     r"能做的事|拿來幹嘛|辦哪些事|可以幹嘛|怎麼用", text):
+            return True
+        books = getattr(self.owner.catalog, "_data", None) or []  # no fetch: only what is cached
+        if books and (rank_books(text, books)[0][0] >= SOUND_CONFIRM or any(
+                name and name in text for book in books
+                for name in (primary_title(book), re.sub(r"著$", "", book.get("author") or "")))):
+            return True
+        # A service word by sound: a two-character term only as a near-homophone (sound
+        # alone matches 溫刀 to 問答 at 0.71), longer terms at the confirm level.
+        for score, start, end, term in term_matches(text, self.registry.sound_terms()):
+            if score < SERVICE_SOUND_CONFIRM:
+                break
+            if (len(term) >= 3 or score >= SERVICE_SOUND_AUTO
+                    or REQUEST_ONLY.fullmatch(text[:start] + "□" + text[end:])):  # 我要解釋 -> 我要借書
+                return True
+        # A request shape the App handles even with an unknown object (借龜兔賽跑).
+        if re.match(r"^(?:請|幫我|幫忙|我要|我想|我想要|我需要|想要|想)?(?:借|找|查|搜尋|預約|申請|繳|看|開|打開|查詢|搜|訂)", text):
+            return True
+        return bool(self._opening_suggestions(text))
+
     def sound_corrections(self, text):
         """Sentences where one catalogue word replaces a sound-alike stretch of a
         transcript the assistant does not understand.

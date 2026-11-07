@@ -238,6 +238,8 @@ def decode(args):
     scores = {i: taiwanese_gate.score(model, r["probabilities"], r["seconds"]) for i, r in test.items()}
     wanted = {i for i, r in test.items() if (scores[i] >= 0.5 if args.model == "breeze"
                                              else r["language"] in ("nan", "zh") or scores[i] >= 0.5)}
+    if args.whole:  # every whole Taiwanese / Mandarin clip too (the text rules of section 13)
+        wanted |= {i for i, r in test.items() if r["crop"] == "full" and r["language"] in ("nan", "zh")}
     out = OUT / f"decode-{args.model}.jsonl"
     done = {json.loads(l)["id"] for l in out.read_text(encoding="utf-8").splitlines() if l.strip()} if out.exists() else set()
     wanted -= done
@@ -380,8 +382,10 @@ def simulate(args):
     from asr_server import STATUS_RANK, script_fits, language_scores
     from server import clean_transcript
     from script import traditional
+    import server
     model = taiwanese_gate.load(COEFFICIENTS)
     mandarin = plausibility.load()
+    known_text = server.Assistant().workflow.known_text  # the catalogue rules (no FAQ on this computer)
     threshold = args.threshold
     test = {r["id"]: r for r in rows() if r["split"] == "test"}
     load = lambda name: {d["id"]: d for d in map(json.loads, (OUT / f"decode-{name}.jsonl").read_text(
@@ -393,21 +397,37 @@ def simulate(args):
         value = plausibility.score(mandarin, d["text"])
         return -99.0 if value is None else value
 
-    def key(d):
-        return script_fits(d["text"], "zh"), read(d), STATUS_RANK[d["status"]], d["avg_logprob"]
+    known_cache = {}
 
-    def implausible(d, low, unsure):
+    def known(d):
+        text = clean_transcript(d["text"])
+        if text not in known_cache:
+            known_cache[text] = bool(known_text(text))
+        return known_cache[text]
+
+    def key(d, with_known):
+        return (script_fits(d["text"], "zh"), known(d) if with_known else False, read(d),
+                STATUS_RANK[d["status"]], d["avg_logprob"])
+
+    def implausible(d, low, unsure, with_known):
         if not script_fits(d["text"], "zh") or read(d) <= -99.0:
             return False
-        return (low is not None and read(d) < low) or (unsure is not None and d["status"] != "clear" and read(d) < unsure)
+        strange = (low is not None and read(d) < low) or (unsure is not None and d["status"] != "clear" and read(d) < unsure)
+        return strange and not (with_known and known(d))
+
+    def unknown(d, mode):
+        if mode is None or not script_fits(d["text"], "zh") or read(d) <= -99.0 or known(d):
+            return False
+        return mode == "any" or d["status"] != "clear"
 
     def gate_other(i):  # the gate is sure of another of our languages: that language is decoded
         s = language_scores({"language_probabilities": test[i]["probabilities"]})
         top = max(s, key=s.get) if s else None
         return top not in (None, "zh") and s[top] >= 0.8
 
-    def step(i, recheck, sticky_on, sticky, low=None, unsure=None):
+    def step(i, recheck, sticky_on, sticky, low=None, unsure=None, mode=None):
         """(model used, text, phone seconds, sticky after) for one clip."""
+        with_known = mode is not None
         limit = min(threshold, sticky) if (sticky is not None and sticky_on) else threshold
         r, seconds = test[i], PHONE["gate"]
         if gate_other(i):
@@ -418,10 +438,11 @@ def simulate(args):
         if first is None:
             return "other", "", seconds + PHONE["small"], False
         seconds += PHONE["small"]
-        again = (recheck is not None and score[i] >= recheck and first["status"] != "clear") or implausible(first, low, unsure)
+        again = ((recheck is not None and score[i] >= recheck and first["status"] != "clear")
+                 or implausible(first, low, unsure, with_known) or unknown(first, mode))
         if again:
             seconds += PHONE["breeze"]
-            if i in breeze and key(breeze[i]) > key(first):
+            if i in breeze and key(breeze[i], with_known) > key(first, with_known):
                 return "breeze", breeze[i]["text"], seconds, True
         return "small", first["text"], seconds, sticky_on and first["status"] != "clear"
 
@@ -444,9 +465,10 @@ def simulate(args):
     groups = {"台語": lambda r: r["language"] == "nan", "華語 zh-TW": lambda r: r["source"] == "cv-zh-TW",
               "華語 FLEURS": lambda r: r["source"] == "fleurs" and r["language"] == "zh",
               "其他語言": lambda r: r["source"] == "fleurs" and r["language"] != "zh"}
-    configs = {f"{threshold:g}": (None, None, None, None), "+a": (args.recheck, None, None, None),
-               "+b": (None, args.sticky, None, None), "+a+b": (args.recheck, args.sticky, None, None),
-               "+c": (None, None, args.low, args.unsure), "+a+b+c": (args.recheck, args.sticky, args.low, args.unsure)}
+    configs = {f"{threshold:g}": (None, None, None, None, None), "+a": (args.recheck, None, None, None, None),
+               "+b": (None, args.sticky, None, None, None), "+a+b": (args.recheck, args.sticky, None, None, None),
+               "+c": (None, None, args.low, args.unsure, None), "+a+b+c": (args.recheck, args.sticky, args.low, args.unsure, None),
+               "+d": (None, None, None, None, "any"), "+a+b+c+d (App)": (args.recheck, args.sticky, args.low, args.unsure, "any")}
     # Sequences: speakers' whole clips in order, up to 5 each; FLEURS/other clips one by one.
     sequences = {}
     for i, r in test.items():
@@ -456,7 +478,7 @@ def simulate(args):
         sequences.setdefault((r["language"], r["source"], client), []).append(i)
     sequences = {k: sorted(v)[:5] for k, v in sequences.items()}
     table = {}
-    for name, (recheck, sticky, low, unsure) in configs.items():
+    for name, (recheck, sticky, low, unsure, mode) in configs.items():
         line = {}
         for group, test_of in groups.items():
             outcome = []
@@ -465,7 +487,7 @@ def simulate(args):
                     continue
                 on = False
                 for i in ids:
-                    used, text, seconds, on = step(i, recheck, on, sticky, low, unsure)
+                    used, text, seconds, on = step(i, recheck, on, sticky, low, unsure, mode)
                     outcome.append((i, used, text, seconds))
             if not outcome:
                 continue
@@ -493,6 +515,7 @@ def main():
     d = sub.add_parser("decode")
     d.add_argument("--model", choices=("small", "breeze"), required=True)
     d.add_argument("--threads", type=int, default=8)
+    d.add_argument("--whole", action="store_true", help="also every whole Taiwanese and Mandarin clip")
     s = sub.add_parser("simulate")
     s.add_argument("--threshold", type=float, default=0.5)
     s.add_argument("--recheck", type=float, default=0.3)

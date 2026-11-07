@@ -756,11 +756,35 @@ class AutoTaiwaneseTests(unittest.TestCase):
         result = self.heard("auto")
         self.assertEqual((self.decodes(), result["language"], result["taiwanese_route"]), (["multi"], "vi", None))
 
-    def test_other_menus_and_the_explicit_choice_are_unchanged(self):
-        for menu in ("en", "ja"):
-            result = self.heard(menu)
-            self.assertNotIn("nan", self.decodes(), menu)
-            self.assertNotIn("taiwanese_route", result)
+    def test_every_menu_hears_taiwanese_unless_another_language_was_picked(self):
+        # The owner's clips were taken with the menu on vi / en: the rules still apply.
+        from server import Assistant
+        self.recognizer.known_text = Assistant(FakeCatalog(), lambda *_: None).workflow.known_text
+        for menu in ("vi", "en", "ja"):
+            self.recognizer.taiwanese_until = 0.0
+            result = self.heard(menu)  # gate zh 0.7 (unsure of another language), score 0.9
+            self.assertEqual((self.decodes(), result["taiwanese_route"], result["language"]), (["nan"], "gate", "zh"), menu)
+        # Menu vi, the gate unsure, Whisper small decodes Chinese that the App does not know: Breeze.
+        self.score = 0.1
+        self.detected["multi"] = "chinese"
+        self.speech["zh"] = ("竟然放第一是從事進來", -0.6)
+        self.server_speech["nan"] = {"zh": ("你在做什麼", -0.2)}
+        self.recognizer.taiwanese_until = 0.0
+        result = self.heard("vi")
+        self.assertEqual((result["language"], result["text"], result["taiwanese_route"]), ("zh", "你在做什麼", "unknown"))
+        self.assertIn("nan", self.decodes())
+        # Menu vi and the gate sure of Vietnamese: Vietnamese, nothing Taiwanese.
+        self.probabilities["gate"], self.detected["gate"] = {"vi": 0.9}, "vietnamese"
+        self.score = 0.9
+        result = self.heard("vi")
+        self.assertEqual((self.decodes(), result["language"], result["taiwanese_route"]), (["multi"], "vi", None))
+        # A tuple restricts the menus; () turns the automatic part off.
+        self.probabilities["gate"], self.detected["gate"] = {"zh": 0.7, "ko": 0.2}, "chinese"
+        with patch("asr_server.AUTO_TAIWANESE_MENUS", ("zh", "auto")):
+            self.recognizer.taiwanese_until = 0.0
+            self.assertNotIn("taiwanese_route", self.heard("en"))
+            self.recognizer.taiwanese_until = 0.0
+            self.assertEqual(self.heard("zh")["taiwanese_route"], "gate")
         result = self.heard("nan")  # 台語 chosen: no gate, its model
         self.assertEqual((self.models(), result["taiwanese_route"]), (["nan"], "chosen"))
 
@@ -887,6 +911,73 @@ class AutoTaiwaneseTests(unittest.TestCase):
         result = self.heard()
         self.assertNotIn("nan", self.decodes())
         self.assertEqual((result["language"], result["plausibility"]), ("en", None))
+
+    def test_text_the_app_does_not_know_goes_to_the_taiwanese_model(self):
+        # The owner's clip: 哩欸賽藂薩 heard as 「竟然放第一是從事進來」 (common bigrams).
+        from server import Assistant
+        self.recognizer.known_text = Assistant(FakeCatalog(), lambda *_: None).workflow.known_text
+        self.score = 0.1
+        for logprob in (-0.6, -0.1):  # unsure, and clear: the App knows neither
+            self.speech["zh"] = ("竟然放第一是從事進來", logprob)
+            self.server_speech["nan"] = {"zh": ("你在做什麼", -0.2)}
+            self.recognizer.taiwanese_until = 0.0
+            result = self.heard()
+            self.assertEqual(self.decodes(), ["multi", "nan"], logprob)
+            self.assertEqual((result["text"], result["taiwanese_route"]), ("你在做什麼", "unknown"))
+        for text in ("我要解釋", "借龜兔賽跑", "第二個", "下一頁", "取消", "我要繳水費", "繳水廢", "你好", "謝謝你喔"):  # known
+            self.speech["zh"] = (text, -0.6)
+            self.recognizer.taiwanese_until = 0.0
+            self.assertEqual((self.heard()["taiwanese_route"], self.decodes()), (None, ["multi"]), text)
+        with patch("asr_server.UNKNOWN_TO_TAIWANESE", "unsure"):
+            self.speech["zh"] = ("竟然放第一是從事進來", -0.1)  # clear: only unsure text would go
+            self.assertEqual((self.heard()["taiwanese_route"], self.decodes()), (None, ["multi"]))
+            self.speech["zh"] = ("竟然放第一是從事進來", -0.6)
+            self.assertEqual(self.heard()["taiwanese_route"], "unknown")
+        with patch("asr_server.UNKNOWN_TO_TAIWANESE", None):
+            self.recognizer.taiwanese_until = 0.0
+            self.assertEqual((self.heard()["taiwanese_route"], self.decodes()), (None, ["multi"]))
+        self.recognizer.known_text = None  # no callback (computer backend): off
+        self.assertEqual((self.heard()["taiwanese_route"], self.decodes()), (None, ["multi"]))
+
+    def test_the_transcript_the_app_knows_wins(self):
+        from server import Assistant
+        self.recognizer.known_text = Assistant(FakeCatalog(), lambda *_: None).workflow.known_text
+        self.score = 0.1
+        # Whisper small: a clear, well-formed Mandarin sentence the App does not know;
+        # the Taiwanese model: an unsure service request. The known one wins.
+        self.speech["zh"] = ("我問過律師跟法律人", -0.1)
+        self.server_speech["nan"] = {"zh": ("我要繳水費", -0.6)}
+        result = self.heard()
+        self.assertEqual((self.decodes(), result["text"], result["taiwanese_route"]), (["multi", "nan"], "我要繳水費", "unknown"))
+        # Neither known: plausibility, then status decide (Mandarin small talk stays).
+        self.server_speech["nan"] = {"zh": ("溫刀揮袖促", -0.1)}
+        self.recognizer.taiwanese_until = 0.0
+        result = self.heard()
+        self.assertEqual((result["text"], result["taiwanese_route"]), ("我問過律師跟法律人", None))
+
+    def test_device_known_text_adds_the_faq(self):
+        import device_main
+
+        class Faq:
+            def __init__(self, confidence):
+                self.confidence = confidence
+
+            def search(self, text, k=3):
+                return self.confidence, []
+
+        class Backend:
+            def __init__(self, faq):
+                self.faq = faq
+                from server import Assistant
+                self.workflow = Assistant(FakeCatalog(), lambda *_: None).workflow
+        self.assertTrue(device_main.known_text(Backend(Faq("medium")))("垃圾車幾點會來"))
+        self.assertFalse(device_main.known_text(Backend(Faq("none")))("垃圾車幾點會來"))
+        self.assertFalse(device_main.known_text(Backend(None))("垃圾車幾點會來"))  # FAQ not loaded yet
+        self.assertTrue(device_main.known_text(Backend(None))("借書"))
+        with patch("device_main.KNOWN_FAQ_CONFIDENCE", None):
+            self.assertFalse(device_main.known_text(Backend(Faq("high")))("垃圾車幾點會來"))
+        with patch("device_main.KNOWN_FAQ_CONFIDENCE", "high"):
+            self.assertFalse(device_main.known_text(Backend(Faq("medium")))("垃圾車幾點會來"))
 
     def test_plausibility_rules_can_be_turned_off(self):
         self.score = 0.1
