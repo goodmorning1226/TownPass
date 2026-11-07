@@ -199,7 +199,12 @@ class GuidedAssistantController extends GetxController {
   void onInit() {
     super.onInit();
     messages.add(_bot(Replies.greet));
-    _stepWorker = everAll([task, ...web.watched], (_) => _onProgress());
+    _stepWorker = everAll([
+      task,
+      sheetOpen,
+      currentRoute,
+      ...web.watched,
+    ], (_) => _onProgress());
     speaker.loadEnabled().then((v) => readAloud.value = v);
     if (runOnboarding) _loadOnboarding();
   }
@@ -790,12 +795,25 @@ class GuidedAssistantController extends GetxController {
     return GuideCard(CardVariant.step, label, step.card(web));
   }
 
+  /// The page is read only while the guide can show on it: a task that is
+  /// opened or running, on its screen, with the assistant panel closed.
+  /// Paused, 我自己來, left, panel open or finished: no reading (it would
+  /// only cost battery). The page may still be loading; the reader waits.
+  bool get _shouldRead {
+    final t = task.value;
+    if (t == null || t.left || sheetOpen.value) return false;
+    if (t.status != TaskStatus.opened && t.status != TaskStatus.on) {
+      return false;
+    }
+    return currentRoute.value == t.guide.route;
+  }
+
   void _onProgress() {
     final active = _activeTask;
-    if (active == null) {
-      if (probe.running) probe.stop();
-    } else {
+    if (active != null && _shouldRead) {
       probe.start(active.guide.spec);
+    } else if (probe.running) {
+      probe.stop();
     }
     // A new step replaces any "tap the highlighted spot" reminder at once.
     // The step's own text counts too (tapping the field within one step).

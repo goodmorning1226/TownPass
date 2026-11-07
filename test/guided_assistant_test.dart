@@ -642,6 +642,36 @@ void main() {
       expect(lines[6].tag, '之後你自己去');
     });
 
+    test('the page is read only while the guide shows on it', () async {
+      c.startGuide('library');
+      onPage(home);
+      await settle();
+      expect(c.probe.running, isTrue, reason: 'opened card shows');
+      c.beginSteps();
+      c.pause();
+      await settle();
+      expect(c.probe.running, isFalse, reason: 'paused');
+      c.resume();
+      await settle();
+      expect(c.probe.running, isTrue);
+      c.openSheet();
+      await settle();
+      expect(c.probe.running, isFalse, reason: 'assistant panel covers it');
+      c.closeSheet();
+      await settle();
+      expect(c.probe.running, isTrue);
+      c.routeChanged('/');
+      await settle();
+      expect(c.probe.running, isFalse, reason: 'left the page');
+      c.resume();
+      c.routeChanged(TPRoute.webView);
+      await settle();
+      expect(c.probe.running, isTrue);
+      c.goAlone();
+      await settle();
+      expect(c.probe.running, isFalse, reason: '我自己來');
+    });
+
     test('ending the guide says so, hides the card and stops reading', () {
       c.startGuide('library');
       onPage(home);
