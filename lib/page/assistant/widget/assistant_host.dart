@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:town_pass/page/assistant/assistant_texts.dart';
 import 'package:town_pass/page/assistant/assistant_view_controller.dart';
+import 'package:town_pass/service/assistant_recent_inputs.dart';
 import 'package:town_pass/service/assistant_speech_language.dart';
 import 'package:town_pass/service/page_translation.dart';
 import 'package:town_pass/util/tp_colors.dart';
@@ -305,14 +306,18 @@ class _AssistantSheetState extends State<AssistantSheet> {
         color: TPColors.grayscale800,
       ),
       const SizedBox(height: 12),
-      for (final suggestion in AssistantViewController.suggestionsFor(
-        AssistantTexts.pageLanguage,
-      ))
+      // The user's own recent requests that worked, then the defaults.
+      for (final text in AssistantRecentInputs.instance.merged([
+        for (final suggestion in AssistantViewController.suggestionsFor(
+          AssistantTexts.pageLanguage,
+        ))
+          suggestion.text,
+      ]))
         Padding(
           padding: const EdgeInsets.only(bottom: 10),
           child: _OutlinedChoice(
-            title: _t('quoted', {'text': suggestion.text}),
-            onTap: () => _send(suggestion.text),
+            title: _t('quoted', {'text': text}),
+            onTap: () => _send(text),
           ),
         ),
       const SizedBox(height: 8),

@@ -15,6 +15,7 @@ import 'package:town_pass/bean/assistant_result.dart';
 import 'package:town_pass/page/main/main_view_controller.dart';
 import 'package:town_pass/service/assistant_action_executor.dart';
 import 'package:town_pass/service/assistant_page_tracker.dart';
+import 'package:town_pass/service/assistant_recent_inputs.dart';
 import 'package:town_pass/service/assistant_recorder.dart';
 import 'package:town_pass/service/assistant_service.dart';
 import 'package:town_pass/service/assistant_speaker.dart';
@@ -158,6 +159,7 @@ class GuidedAssistantController extends GetxController {
        executor = executor ?? AssistantActionExecutor(),
        pageTracker = pageTracker ?? AssistantPageTracker.instance {
     recorder?.onLevel = _onLevel;
+    AssistantRecentInputs.instance.load();
     AssistantSpeechLanguage.load().then((code) {
       if (!isClosed) speechLanguage.value = code;
     });
@@ -175,6 +177,9 @@ class GuidedAssistantController extends GetxController {
 
   /// The language of the current exchange, sent with typed and spoken turns.
   String? _turnLanguage;
+
+  /// The last typed or spoken request (a tapped option opens a page for it).
+  String? _lastRequest;
 
   void setSpeechLanguage(String code) {
     speechLanguage.value = AssistantSpeechLanguage.of(code).code;
@@ -331,7 +336,8 @@ class GuidedAssistantController extends GetxController {
             t.status == TaskStatus.paused)) {
       return t.guide.helpChips;
     }
-    return starterChips;
+    // The user's own recent requests that worked, then the defaults.
+    return AssistantRecentInputs.instance.merged(starterChips);
   }
 
   /// Replies that are always pre-written and answered on the phone; only
@@ -355,6 +361,7 @@ class GuidedAssistantController extends GetxController {
     // Typed text: the backend detects its language; a tapped option keeps
     // the language of the exchange.
     if (!voice && choiceId == null) _turnLanguage = null;
+    if (choiceId == null && raw.trim().isNotEmpty) _lastRequest = raw.trim();
     final text = raw.trim();
     if ((text.isEmpty && choiceId == null) || loading.value) return;
     messages.add(
@@ -428,6 +435,9 @@ class GuidedAssistantController extends GetxController {
     _resolutionId = result.resolutionId;
     final destination = result.destination;
     if (destination != null) {
+      // A request that opened a page becomes a suggestion next time.
+      final asked = choiceId == null ? text : _lastRequest;
+      if (asked != null) AssistantRecentInputs.instance.remember(asked);
       final guide = guideFor(destination, result.guide, text);
       if (guide != null) {
         _guides[guide.id] = guide;
@@ -1208,13 +1218,7 @@ class GuidedAssistantController extends GetxController {
     final reading = _bestReading(heard);
     _turnLanguage = heard.language;
     _followSpokenLanguage(heard);
-    submit(
-      reading.text,
-      voice: true,
-      note: reading.correctedFrom == null
-          ? null
-          : Replies.corrected(reading.correctedFrom!, reading.text),
-    );
+    submit(reading.text, voice: true);
   }
 
   /// The text to send for [heard]: an unsure transcript uses the backend's
@@ -1320,13 +1324,7 @@ class GuidedAssistantController extends GetxController {
     heardLanguage.value = heard.language;
     _turnLanguage = heard.language;
     _followSpokenLanguage(heard);
-    submit(
-      reading.text,
-      voice: true,
-      note: reading.correctedFrom == null
-          ? null
-          : Replies.corrected(reading.correctedFrom!, reading.text),
-    );
+    submit(reading.text, voice: true);
   }
 
   void _showHomeNotice(String text) {

@@ -7,6 +7,7 @@ import 'package:town_pass/bean/assistant_result.dart';
 import 'package:town_pass/page/assistant/assistant_texts.dart';
 import 'package:town_pass/page/main/main_view_controller.dart';
 import 'package:town_pass/service/assistant_action_executor.dart';
+import 'package:town_pass/service/assistant_recent_inputs.dart';
 import 'package:town_pass/service/page_translation.dart';
 import 'package:town_pass/service/assistant_page_tracker.dart';
 import 'package:town_pass/service/assistant_recorder.dart';
@@ -104,6 +105,7 @@ class AssistantViewController extends GetxController {
     AssistantSpeechLanguage.load().then((code) {
       if (!isClosed) speechLanguage.value = code;
     });
+    AssistantRecentInputs.instance.load();
   }
 
   /// Read replies aloud (phone text-to-speech). Off by default; remembered.
@@ -352,6 +354,9 @@ class AssistantViewController extends GetxController {
   /// The language of the exchange in progress when known (speech heard in it,
   /// a tapped option's, or the last reply's); null means the page language.
   String? _turnLanguage;
+
+  /// The last typed or spoken request (a tapped option opens a page for it).
+  String? _lastRequest;
   String? _resolutionId;
   int _generation = 0;
   int _nextMessageId = 0;
@@ -643,32 +648,21 @@ class AssistantViewController extends GetxController {
         return;
       }
     }
+    // Unsure speech is never put back to the user (owner, 2026-11-07/08): the
+    // backend's best other reading (a sound-alike that names a service) is
+    // used as it is, without a note; otherwise what was heard. The turn's own
+    // candidate confirmation still guards every navigation.
     var text = heard.text;
-    var correctedFrom = heard.correctedFrom;
     if (heard.confirm) {
-      // No "is this what you said?" question any more (owner, 2026-11-07: it
-      // interrupted the flow and usually listed one or two near-identical
-      // readings). The backend's best other reading (a sound-alike that names
-      // a service) is used and stated; otherwise what was heard. The turn's
-      // own candidate confirmation still guards every navigation.
       final better = heard.options.firstWhereOrNull(
         (option) => option.trim().isNotEmpty && option != heard.text,
       );
-      if (better != null) {
-        correctedFrom = heard.text;
-        text = better;
-      }
+      if (better != null) text = better;
     }
-    // The recognised text becomes the user's bubble and a normal turn. A close
-    // reading that replaced the heard text is stated, so the user can redo it.
+    // The recognised (or corrected) text becomes the user's bubble and a
+    // normal turn.
     await submit(
       text,
-      note: correctedFrom == null
-          ? null
-          : _status('corrected', heard.language, {
-              'heard': correctedFrom,
-              'text': text,
-            }),
       // The backend answers in the language the speech was recognised in.
       language: heard.language,
       // An unsure language detection (short clips) answers in that language
@@ -734,6 +728,9 @@ class AssistantViewController extends GetxController {
     choicesMessageId.value = null;
     message.value = _status('searching', language);
     try {
+      if (choiceId == null && text.trim().isNotEmpty) {
+        _lastRequest = text.trim();
+      }
       var result = await service.decide(
         text: text.trim(),
         requestId: requestId,
@@ -762,6 +759,9 @@ class AssistantViewController extends GetxController {
       if (result.choices.isNotEmpty) choicesMessageId.value = reply.id;
       message.value = result.message;
       if (result.destination case final destination?) {
+        // A request that opened a page becomes a suggestion next time.
+        final asked = choiceId == null ? text.trim() : _lastRequest;
+        if (asked != null) AssistantRecentInputs.instance.remember(asked);
         busy.value = false;
         _panelHistory?.remove();
         expanded.value = false;
