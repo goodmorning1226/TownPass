@@ -10,6 +10,8 @@ Service names and keywords per language are in assets/assistant/capabilities_i18
 import re
 import unicodedata
 
+import vietnamese
+
 LANGUAGES = ("zh", "en", "ja", "vi", "id", "th")
 
 # Vietnamese letters with tone or vowel marks that English and Indonesian do not use.
@@ -35,6 +37,10 @@ def detect_text_language(text, fallback="zh"):
         return "vi"
     if re.search(r"[A-Za-z]", text):
         indonesian, english = len(_ID_WORDS.findall(text)), len(_EN_WORDS.findall(text))
+        # Vietnamese typed without marks ("toi muon dong tien nuoc").
+        bare_vi = vietnamese.bare_word_count(text)
+        if bare_vi >= 2 and bare_vi > max(indonesian, english):
+            return "vi"
         return "id" if indonesian > english else "en"
     return fallback
 
@@ -61,28 +67,33 @@ def contains(text, term, language):
 CANCEL = {
     "en": r"(?:please\s+)?(?:cancel|stop|never ?mind|forget it|go back|no thanks?)[.!]*",
     "ja": r"(?:キャンセル|やめて|やっぱりいい|もういい|戻って|取り消し)[。！!]*",
-    "vi": r"(?:hủy|thôi|không cần nữa|quay lại|dừng lại)[.!]*",
+    "vi": r"(?:thôi\s*)?(?:hủy|huỷ|hủy bỏ|huỷ bỏ|thôi|không cần(?: nữa)?|khỏi(?: cần)?|quay lại|quay về|trở lại|"
+          r"dừng(?: lại)?|ngừng(?: lại)?|bỏ qua|bỏ đi|không (?:muốn|làm) nữa)(?:\s+(?:nữa|đi|ạ|nhé|nha|đâu|rồi|luôn))*[.!]*",
     "id": r"(?:batal|batalkan|tidak jadi|ga jadi|kembali|sudahlah)[.!]*",
     "th": r"(?:ยกเลิก|ไม่เอาแล้ว|ช่างมัน|กลับ)[。!]*",
 }
 GREETING = {
     "en": r"(?:hi|hello|hey|thanks?|thank you|good (?:morning|afternoon|evening))[!.\s]*",
     "ja": r"(?:こんにちは|こんばんは|おはよう(?:ございます)?|ありがとう(?:ございます)?)[！!。\s]*",
-    "vi": r"(?:xin chào|chào(?: bạn)?|cảm ơn(?: bạn)?)[!.\s]*",
+    "vi": r"(?:xin chào|chào|alo|a lô|cảm ơn|cám ơn)(?:\s+(?:bạn|anh|chị|em|ạ|nhé|nhiều|nha))*[!.\s]*",
     "id": r"(?:halo|hai|selamat (?:pagi|siang|sore|malam)|terima kasih|makasih)[!.\s]*",
     "th": r"(?:สวัสดี(?:ครับ|ค่ะ)?|ขอบคุณ(?:ครับ|ค่ะ)?)[!\s]*",
 }
 LISTING = {
     "en": r"what can you do|what (?:services|features)|list (?:of )?(?:services|features)|all (?:services|features)|help me with what",
     "ja": r"何ができ|どんなサービス|どんな機能|機能一覧|サービス一覧|できること",
-    "vi": r"bạn làm được gì|có những dịch vụ gì|danh sách dịch vụ|(?:có|những) chức năng gì",
+    # Whole words at the end: unmarked "co gi" must not match "co giup".
+    "vi": r"(?:bạn làm được gì|có những dịch vụ gì|danh sách dịch vụ|(?:có|những) chức năng gì"
+          r"|(?:bạn|ứng dụng|app|trợ lý)(?: này)? (?:có thể )?(?:làm|giúp)(?: được)?(?: (?:cho )?(?:tôi|mình|em|anh|chị))?"
+          r"(?: được)? (?:những )?(?:gì|việc gì)|(?:làm|giúp) được (?:những )?gì"
+          r"|có (?:những )?(?:dịch vụ|chức năng|tính năng) (?:gì|nào)|(?:ứng dụng|app) (?:này )?có (?:gì|những gì))(?!\w)",
     "id": r"bisa apa saja|layanan apa saja|daftar layanan|fitur apa",
     "th": r"ทำอะไรได้บ้าง|มีบริการอะไรบ้าง|มีฟังก์ชันอะไรบ้าง|รายการบริการ",
 }
 YES = {
     "en": r"(?:yes|yeah|ok(?:ay)?|sure|that one|confirm)[.!]*",
     "ja": r"(?:はい|うん|それ|それで|お願いします)[。！!]*",
-    "vi": r"(?:có|vâng|ừ|đúng rồi|được|ok)[.!]*",
+    "vi": r"(?:có|vâng|dạ|ừ|ừm|đúng(?: rồi)?|được(?: rồi)?|ok(?:e)?|đồng ý|chính nó|cái đó|phải)(?:\s+(?:ạ|rồi|đó|nhé))*[.!]*",
     "id": r"(?:ya|iya|oke|ok|betul|itu)[.!]*",
     "th": r"(?:ใช่|ครับ|ค่ะ|โอเค|อันนั้น)[!]*",
 }
@@ -91,7 +102,7 @@ NUMBER_WORDS = {
            "five": 5, "fifth": 5, "six": 6, "sixth": 6, "seven": 7, "seventh": 7, "eight": 8, "eighth": 8},
     "ja": {"一": 1, "ひとつ": 1, "1つ": 1, "二": 2, "ふたつ": 2, "三": 3, "みっつ": 3, "四": 4, "五": 5,
            "六": 6, "七": 7, "八": 8},
-    "vi": {"một": 1, "nhất": 1, "hai": 2, "ba": 3, "bốn": 4, "tư": 4, "năm": 5, "sáu": 6, "bảy": 7, "tám": 8},
+    "vi": {"một": 1, "nhất": 1, "đầu tiên": 1, "hai": 2, "ba": 3, "bốn": 4, "tư": 4, "năm": 5, "sáu": 6, "bảy": 7, "tám": 8},
     "id": {"satu": 1, "pertama": 1, "dua": 2, "kedua": 2, "tiga": 3, "ketiga": 3, "empat": 4, "keempat": 4,
            "lima": 5, "enam": 6, "tujuh": 7, "delapan": 8},
     "th": {"หนึ่ง": 1, "แรก": 1, "สอง": 2, "สาม": 3, "สี่": 4, "ห้า": 5, "หก": 6, "เจ็ด": 7, "แปด": 8},
@@ -108,21 +119,35 @@ _CHOICE_FILLER = {
 NEGATION = {
     "en": r"\b(?:don't|do not|not|no|never|without)\b",
     "ja": r"(?:じゃなくて|ではなく|ない|いらない|しない|なくて(?:も)?いい|結構です|やめ)",
-    "vi": r"\b(?:không|chẳng|đừng|chưa)\b",
+    # A refusal is "không" before wanting or doing ("không muốn", "không cần", "không phải"),
+    # also typed without marks. "không" / "chưa" describing a state is not one:
+    # "tiền nước chưa trả" (unpaid water bill), "đèn đường không sáng" (street light out).
+    "vi": r"\b(?:đừng|khỏi cần|khoi can)\b|\b(?:thì|thi|là|la)\s+(?:không|khong|ko)\s*$|\b(?:không|khong|ko|hok|hông|chẳng|chang)\s+(?:(?:hề|he|có|co|còn|con)\s+)?"
+          r"(?:muốn|muon|cần|can|phải|phai|định|dinh|thích|thich|mở|mo|dùng|dung|đóng|dong|mượn|trả|tra|xem|"
+          r"làm|lam|đi|di|nộp|nop|đặt|dat|lấy|lay|báo|bao)\b",
     "id": r"\b(?:tidak|tak|bukan|jangan|nggak|gak)\b",
     "th": r"(?:ไม่|อย่า)",
 }
-_CLAUSE = re.compile(r"[,，;；.。!！?？、]|\b(?:but|instead|rather|tapi|nhưng|mà)\b|แต่|けど|が、")
+_CLAUSE = re.compile(r"[,，;；.。!！?？、]|\b(?:but|instead|rather|tapi|nhưng|nhung|mà)\b|แต่|けど|が、")
 
 
 def matches(table, text, language):
     pattern = table.get(language)
-    return bool(pattern and re.fullmatch(pattern, fold(text), re.I))
+    if not pattern:
+        return False
+    if re.fullmatch(pattern, fold(text), re.I):
+        return True
+    # Vietnamese typed without marks, or heard with a wrong tone: compare unmarked.
+    return language == "vi" and bool(re.fullmatch(vietnamese.unmark(pattern), vietnamese.unmark(fold(text)), re.I))
 
 
 def searches(table, text, language):
     pattern = table.get(language)
-    return bool(pattern and re.search(pattern, fold(text), re.I))
+    if not pattern:
+        return False
+    if re.search(pattern, fold(text), re.I):
+        return True
+    return language == "vi" and bool(re.search(vietnamese.unmark(pattern), vietnamese.unmark(fold(text)), re.I))
 
 
 # --- Similar wording and sound (every foreign language) ---------------------
@@ -190,9 +215,10 @@ def sound_key(text, language):
         key = re.sub(r"([a-z])\1+", r"\1", key)  # doubled consonants, long vowels
         return re.sub(r"ou", "o", key)
     if language == "vi":
-        stripped = "".join(c for c in unicodedata.normalize("NFD", text.replace("đ", "d"))
-                           if not unicodedata.combining(c))
-        return " ".join(re.findall(r"\w+", stripped))
+        # No marks. The regional merges (vietnamese.sound) are compared whole-syllable in
+        # registry._vietnamese_sound; by characters they made different words close
+        # ("mấy khoản" ~ "tài khoản" 0.89).
+        return vietnamese.bare(text)
     if language == "th":
         return re.sub(r"[็-๎\s]", "", text)
     return " ".join(re.findall(r"\w+", text))
@@ -230,7 +256,9 @@ def similar(phrases, text, language, threshold=None):
 
 LISTING_PHRASES = {
     "en": ("what can you do", "what services do you have", "what can you help me with", "show all services"),
-    "vi": ("bạn làm được gì", "có những dịch vụ gì"),
+    # Short endings ("... giúp gì", "... có gì") are left to LISTING: by sound they are
+    # close to requests ("bạn có thể giúp tôi đóng tiền nước" 0.91).
+    "vi": ("bạn làm được gì", "có những dịch vụ gì", "có những chức năng gì"),
     "id": ("bisa apa saja", "layanan apa saja"),
     # Kana: compared by sound with romaji or kana transcripts.
     "ja": ("なにができる", "どんなことができる", "どんなサービスがある", "できることをおしえて"),
@@ -243,6 +271,9 @@ def choice_number(text, language):
     folded = fold(text)
     filler = _CHOICE_FILLER.get(language, r"\s*")
     words = NUMBER_WORDS.get(language, {})
+    if language == "vi":  # "so 2", "cai thu hai": marks are optional
+        folded, filler = vietnamese.unmark(folded), vietnamese.unmark(filler)
+        words = {vietnamese.unmark(word): number for word, number in words.items()}
     alternatives = "|".join(sorted(map(re.escape, words), key=len, reverse=True))
     match = re.fullmatch(filler + r"(?:(\d)" + (r"|(" + alternatives + ")" if alternatives else "") + r")" + filler,
                          folded)
@@ -258,6 +289,8 @@ def positive_text(text, language):
     if not pattern:
         return text
     clauses = [c for c in _CLAUSE.split(text) if c and c.strip()]
+    if language == "vi":  # "... được không?" asks; it does not refuse
+        clauses = [vietnamese.drop_question_tail(c) for c in clauses]
     kept = [c for c in clauses if not re.search(pattern, fold(c), re.I)]
     return " ".join(kept).strip()
 
@@ -415,10 +448,10 @@ MESSAGES = {
 }
 PREV_PAGE = {
     "en": r"previous(?: page)?|back a page", "ja": r"前(?:のページ)?",
-    "vi": r"trang trước", "id": r"halaman sebelumnya|sebelumnya", "th": r"หน้าก่อนหน้า|ก่อนหน้า",
+    "vi": r"trang trước|lùi lại", "id": r"halaman sebelumnya|sebelumnya", "th": r"หน้าก่อนหน้า|ก่อนหน้า",
 }
 NEXT_PAGE = {
-    "en": r"next(?: page)?|more", "ja": r"次(?:のページ)?|もっと", "vi": r"trang (?:tiếp|sau)|thêm",
+    "en": r"next(?: page)?|more", "ja": r"次(?:のページ)?|もっと", "vi": r"trang (?:tiếp|sau|kế)(?: theo)?|tiếp theo|xem thêm|thêm",
     "id": r"halaman (?:berikutnya|selanjutnya)|lagi", "th": r"หน้าถัดไป|ถัดไป",
 }
 

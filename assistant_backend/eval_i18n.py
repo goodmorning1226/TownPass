@@ -15,6 +15,12 @@ from evaluate import LISTING, NONE, REPLY, UNSUPPORTED, call, cap, judge, outcom
 
 HOME = want("navigate", [{"kind": "home"}, {"kind": "capability", "id": "library"}])
 
+
+def offer(capability_id):
+    """Open this page, or offer it for confirmation (a sound-alike match)."""
+    return want(("navigate", "confirm_candidates"), [{"kind": "capability", "id": capability_id}, None],
+                target=(capability_id,))
+
 CASES = {
     "en": [("I want to pay my water bill", cap("fees.water")), ("pay for parking", cap("fees.parking")),
            ("I want to borrow a book", HOME), ("show my borrowing records", cap("library.records")),
@@ -29,6 +35,20 @@ CASES = {
            ("Tôi muốn mượn sách", HOME), ("Xem lịch sử mượn sách", cap("library.records")),
            ("Tôi muốn trình báo trực tuyến", cap("police.online")), ("Tôi muốn đặt lịch tiêm vắc-xin", UNSUPPORTED),
            ("Xin chào", REPLY), ("Bạn làm được gì", LISTING), ("Tôi không muốn mượn sách", NONE)],
+    # Vietnamese as typed without marks, as heard with regional sounds, and as spoken
+    # (docs/AI_VIETNAMESE.md); written for this set, a dev set like the lines above.
+    "vi_variants": [
+        ("toi muon dong tien nuoc", cap("fees.water")), ("cho tôi trả tiền đậu xe", cap("fees.parking")),
+        ("tôi muốn trả tiềng nướt", offer("fees.water")), ("em muốn mượn sách ở thư viện", HOME),
+        ("muon sach thu vien", HOME), ("tôi muốn sem lịt sử mượn sách", offer("library.records")),
+        ("cho tôi xem sách phổ biến", cap("library.ranking")),
+        ("Bạn có thể giúp tôi đóng tiền nước được không?", cap("fees.water")),
+        ("tôi không cần mượn sách nữa", NONE), ("thôi khỏi", NONE), ("ban lam duoc gi", LISTING),
+        ("app này giúp được gì vậy", LISTING), ("tôi muốn trình báo online", cap("police.online")),
+        ("tôi muốn đổi sang tiếng việt", cap("language")), ("chào bạn", REPLY),
+        ("tôi muốn trả tiền thuế", cap("fees.tax")), ("phí rỗ xe", offer("fees.parking")),
+        ("tôi muốn lấy số thứ tự", cap("reservation")), ("tra cứu tiến độ hồ sơ", cap("districtOffice.progress")),
+        ("tôi muốn đóng tiền nước, không phải tiền học", cap("fees.water"))],
     "id": [("Saya mau bayar tagihan air", cap("fees.water")), ("Saya mau bayar parkir", cap("fees.parking")),
            ("Saya mau pinjam buku", HOME), ("Lihat riwayat peminjaman", cap("library.records")),
            ("Saya mau lapor polisi online", cap("police.online")), ("Saya mau janji vaksin", UNSUPPORTED),
@@ -58,16 +78,16 @@ def main():
     for language in args.language or sorted(CASES):
         counts = Counter()
         for number, (text, expect) in enumerate(CASES[language], 1):
-            payload = {"text": text, "request_id": f"i18n-{language}-{number}-{time.time_ns()}",
-                       "session_id": f"i18n-{language}-{number}"}
+            payload = {"text": text, "request_id": f"i18n-{language.replace('_', '-')}-{number}-{time.time_ns()}",
+                       "session_id": f"i18n-{language.replace('_', '-')}-{number}"}
             if args.send_language:
-                payload["language"] = language
+                payload["language"] = language.split("_")[0]
             status, data = call(base, "", payload)
             reasons = judge(expect, status, data, payload, enabled)
             result = outcome({"passed": not reasons, "destination": data.get("destination"), "expected": expect})
             counts[result] += 1
             replied_in = data.get("language")
-            if result != "correct" or replied_in != language:
+            if result != "correct" or replied_in != language.split("_")[0]:
                 print(f"  {language} {result:22} reply={replied_in} {text} -> {data.get('kind')} "
                       f"{json.dumps(data.get('destination'), ensure_ascii=False)} {'; '.join(reasons)}")
         totals[language] = dict(counts)

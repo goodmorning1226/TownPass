@@ -72,9 +72,15 @@ class Registry:
                      if term]
             hits = [term for term in terms if contains(text, term, language)]
             hits += [term for term in [entry["title"], *entry["keywords"]] if normalized(term) and normalized(term) in normalized(text)]
+            if not hits and language == "vi":
+                hits = self._vietnamese_bare(entry, text)
             if hits:
                 matches.append({"entry": entry, "score": max(len(term) for term in hits), "fuzzy": False,
                                 "evidence": hits, "span": None})
+        if matches and language == "vi":
+            matches += self._vietnamese_longer(text, matches)
+        if not matches and language == "vi":
+            matches = self._vietnamese_sound(text)
         if not matches:
             matches = self._similar_language(text, language)
         if not matches:
@@ -84,6 +90,75 @@ class Registry:
         ids = {item["entry"]["id"] for item in kept}
         kept = [item for item in kept if not any(item["entry"]["id"] in self.ancestors(self.by_id[other]) for other in ids)]
         return sorted(kept, key=lambda item: -item["score"])[:5]
+
+    def _vietnamese_terms(self, entry):
+        local = self.i18n.get(entry["id"], {}).get("vi") or {}
+        return [term for term in [local.get("title", ""), *local.get("keywords", [])] if term]
+
+    def _bare_owners(self):
+        """Unmarked Vietnamese term -> entry ids using it (cached): thuế (tax) and thuê
+        (rent) are the same without marks, so such a term is not taken as the word."""
+        if not hasattr(self, "_bare_owner_cache"):
+            from vietnamese import bare
+            owners = {}
+            for entry in self.entries:
+                for term in self._vietnamese_terms(entry):
+                    owners.setdefault(bare(term), set()).add(entry["id"])
+            self._bare_owner_cache = owners
+        return self._bare_owner_cache
+
+    def _vietnamese_bare(self, entry, text):
+        """Vietnamese terms of two or more syllables found once marks are ignored
+        ("dong tien nuoc", Whisper's "tiến nước"): the word itself, not a guess, unless
+        the unmarked spelling also belongs to an unrelated page."""
+        from vietnamese import bare, contains_bare, syllables
+        owners = self._bare_owners()
+        found = []
+        for term in self._vietnamese_terms(entry):
+            if syllables(term) < 2 or not contains_bare(text, term):
+                continue
+            others = owners.get(bare(term), set()) - {entry["id"]}
+            if any(not self.same_request(entry, self.by_id[other], None) for other in others):
+                continue
+            found.append(term)
+        return found
+
+    def _vietnamese_sound(self, text):
+        """No Vietnamese term even without marks: terms that sound the same once regional
+        and spelling merges are applied (d/gi/r/v, ch/tr, s/x, final n/ng/nh and c/t,
+        l/n, i/y, c/k/q), or a single-syllable term without marks ("thue" for thuế).
+        Marked fuzzy, so the user confirms before anything opens."""
+        from vietnamese import contains_bare, contains_sound, syllables
+        found = []
+        for entry in self.entries:
+            terms = [term for term in self._vietnamese_terms(entry)
+                     if (syllables(term) >= 2 and contains_sound(text, term))
+                     or (syllables(term) == 1 and len(term) >= 3 and contains_bare(text, term))]
+            if terms:
+                found.append({"entry": entry, "score": max(len(term) for term in terms), "fuzzy": True,
+                              "evidence": terms, "span": None})
+        return found
+
+    def _vietnamese_longer(self, text, exact):
+        """A longer term that sounds like the request and includes a matched word
+        ("sem lịt sử mượn sách": mượn sách matched the library, lịch sử mượn sách the
+        borrowing records): the more specific page heard slightly wrong. Fuzzy, so with
+        it the user chooses; a parent page then gives way to its child as usual."""
+        from vietnamese import contains_sound, sound, syllables, _windows
+        have = {m["entry"]["id"] for m in exact}
+        words = [term for m in exact for term in m["evidence"] if syllables(term) >= 1]
+        found = []
+        for item in self._vietnamese_sound(text):
+            if item["entry"]["id"] in have:
+                continue
+            longer = [term for term in item["evidence"] if syllables(term) >= 2 and contains_sound(text, term)
+                      and any(syllables(term) > syllables(word) and _windows(sound(term), sound(word)) for word in words)]
+            if longer:
+                found.append({**item, "score": max(len(term) for term in longer), "evidence": longer})
+        if found:
+            for item in exact:
+                item["fuzzy"] = True
+        return found
 
     def _similar_language(self, text, language):
         """No exact keyword: multi-word keywords worded almost the same ("learn a book"

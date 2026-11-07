@@ -613,7 +613,13 @@ class Workflow:
                 return offered
             self._trace("unavailable_direct", [entries[0]["id"]])
             return self._navigate(payload, entries[0])
-        ambiguous = len(entries) > 1
+        if language == "vi" and all(m["fuzzy"] for m in matches):
+            # Vietnamese heard with regional sounds or a one-syllable word without marks
+            # (registry._vietnamese_sound): only offered, without a model call; the
+            # model could open it, or ask again although the page is named.
+            self._trace("vietnamese_sound", [e["id"] for e in entries])
+            return self._offer(payload, self._cap_items(entries, language), i18n.t("confirm_capability", language))
+        ambiguous = len(entries) > 1 or (language == "vi" and any(m["fuzzy"] for m in matches))
         self._trace("capability_model", [e["id"] for e in entries])
         name, args = self._decide(text, entries, ambiguous, payload.get("page_context"))
         if name == "confirm_candidates":
