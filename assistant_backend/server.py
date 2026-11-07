@@ -639,6 +639,8 @@ def make_handler(assistant, token=""):
             status = result.get("status", "clear") if isinstance(result, dict) else None
             if TIMING_LOG:  # numbers only, never the words
                 print(f"timing speech recognizer={result.get('recognizer', 'whisper')} status={status} "
+                      f"ms={result.get('elapsed_ms')} passes={result.get('passes')} "
+                      f"asked={result.get('requested_language')} heard={result.get('language')} "
                       f"chars={len(text) if isinstance(text, str) else None} "
                       f"alternatives={len(result.get('alternatives') or [])} "
                       f"confidence={result.get('confidence')}", flush=True)
