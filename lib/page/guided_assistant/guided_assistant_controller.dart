@@ -1465,10 +1465,12 @@ class GuidedAssistantController extends GetxController {
     _say(_bot(Replies.commitLater));
   }
 
+  /// 知道了 / 先不用 on the done card: the guide is over, so the task and
+  /// its to-do leave the chat (a plain chat again, like 結束引導).
   void ackDone() {
-    final t = task.value;
-    if (t == null) return;
-    task.value = t.copyWith(status: TaskStatus.finished, clearFollowUp: true);
+    if (task.value == null) return;
+    task.value = null;
+    todoOpen.value = false;
   }
 
   void acceptFollowUp() {
@@ -1619,6 +1621,14 @@ class GuidedAssistantController extends GetxController {
   void openSheet() {
     if (sheetOpen.value) return;
     dismissHomeAsk();
+    // Every step is done: opening the chat ends the guide instead of
+    // leaving its card and to-do behind in the chat.
+    final t = task.value;
+    if (t != null &&
+        t.status == TaskStatus.on &&
+        (t.stepsDone || allStepsDone)) {
+      ackDone();
+    }
     sheetOpen.value = true;
     _addBackEntry(closeSheet);
   }
