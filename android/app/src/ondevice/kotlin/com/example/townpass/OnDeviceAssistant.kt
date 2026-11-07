@@ -51,6 +51,10 @@ object OnDeviceAssistant {
                 val models = app.getExternalFilesDir("models") ?: File(app.filesDir, "models")
                 models.mkdirs()
                 val threads = (Runtime.getRuntime().availableProcessors() / 2).coerceIn(2, 4).toString()
+                // Child processes keep the CPU group they are forked in, and Android
+                // only re-groups the App's own process later. Forked during start-up
+                // they would stay in "background" (little cores only) for good.
+                waitForForeground()
                 launch(app, "libwhisper_server.so", File(models, ASR_FILE), WHISPER_PORT,
                     listOf("-t", threads, "-l", "zh"))
                 launch(app, "libllama_server.so", File(models, MODEL_FILE), MODEL_PORT,
@@ -80,6 +84,27 @@ object OnDeviceAssistant {
         builder.redirectOutput(File(if (debuggable) "${app.cacheDir}/$binary.log" else "/dev/null"))
         synchronized(processes) { processes += builder.start() }
         Log.i(TAG, "started $binary on $port")
+    }
+
+    /** Waits (up to 30 s) until this thread is in the foreground CPU group ("top-app"). */
+    private fun waitForForeground() {
+        val deadline = System.currentTimeMillis() + 30_000
+        while (System.currentTimeMillis() < deadline) {
+            val group = cpuGroup()
+            if (group == null || group == "/top-app") {
+                Log.i(TAG, "cpu group: ${group ?: "unknown"}")
+                return
+            }
+            Thread.sleep(200)
+        }
+        Log.w(TAG, "still in cpu group ${cpuGroup()}; model servers may run on little cores only")
+    }
+
+    private fun cpuGroup(): String? = try {
+        File("/proc/thread-self/cgroup").readLines()
+            .firstOrNull { it.contains(":cpuset:") }?.substringAfter(":cpuset:")
+    } catch (_: Exception) {
+        null
     }
 
     private fun listening(port: Int) = try {
