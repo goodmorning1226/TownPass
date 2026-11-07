@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:town_pass/page/guided_assistant/model/assistant_settings.dart';
 import 'package:town_pass/page/guided_assistant/model/guide_content.dart';
 import 'package:town_pass/page/guided_assistant/model/mock_assistant_engine.dart';
 import 'package:town_pass/page/guided_assistant/model/guides/guide_registry.dart';
@@ -33,6 +34,12 @@ class ChatMessage {
   /// For the "two things" question: the guide to offer when the first is done.
   final String? followUpOf;
 
+  /// The user said it by voice (shown as 「用語音說的」).
+  final bool voice;
+
+  /// Tutorial question with 先完成教學 / 直接開始.
+  final bool tutorialChoice;
+
   const ChatMessage({
     required this.id,
     required this.user,
@@ -42,6 +49,8 @@ class ChatMessage {
     this.answer,
     this.teachGuideId,
     this.followUpOf,
+    this.voice = false,
+    this.tutorialChoice = false,
   });
 }
 
@@ -112,8 +121,13 @@ class TodoLine {
   const TodoLine(this.text, this.state, this.tag, {this.self = false});
 }
 
-/// First-run hint on the assistant button: the card, then the arrow step.
-enum OnboardingStage { hidden, card, pointer }
+/// First-run hint on the assistant button (the card, then the arrow step),
+/// then the tutorial inside the assistant: say hello ([hello]; [branch] when
+/// a task was asked instead), then the current mode ([mode]).
+enum OnboardingStage { hidden, card, pointer, hello, branch, mode }
+
+/// The home 「按住提問」 button and its answer card.
+enum HomeAsk { idle, listening, tooShort, working, notice, asked }
 
 class GuidedAssistantController extends GetxController {
   final MockAssistantEngine engine;
@@ -173,6 +187,21 @@ class GuidedAssistantController extends GetxController {
   final onboarding = OnboardingStage.hidden.obs;
   final toast = ''.obs;
 
+  /// AI 助理設定 (saved on the phone).
+  final mode = AssistantMode.teach.obs;
+  final language = AssistantLanguage.zh.obs;
+  bool _settingsChanged = false;
+
+  final homeAsk = HomeAsk.idle.obs;
+  final homeQuestion = ''.obs;
+  final homeNotice = ''.obs;
+  int _homeFrom = 0;
+  DateTime? _homeHeldAt;
+  Future<bool>? _homeStart;
+
+  /// The tutorial's task question: what the user asked for.
+  String? _tutorialTask;
+
   /// Id of the chat message to scroll to when the sheet opens.
   final focusMessageId = RxnInt();
 
@@ -199,8 +228,14 @@ class GuidedAssistantController extends GetxController {
   void onInit() {
     super.onInit();
     messages.add(_bot(Replies.greet));
-    _stepWorker = everAll([task, ...web.watched], (_) => _onProgress());
+    _stepWorker = everAll([
+      task,
+      sheetOpen,
+      currentRoute,
+      ...web.watched,
+    ], (_) => _onProgress());
     speaker.loadEnabled().then((v) => readAloud.value = v);
+    _loadSettings();
     if (runOnboarding) _loadOnboarding();
   }
 
@@ -226,6 +261,7 @@ class GuidedAssistantController extends GetxController {
     AnswerCardContent? answer,
     String? teachGuideId,
     String? followUpOf,
+    bool tutorialChoice = false,
   }) => ChatMessage(
     id: _nextId++,
     user: false,
@@ -235,6 +271,7 @@ class GuidedAssistantController extends GetxController {
     answer: answer,
     teachGuideId: teachGuideId,
     followUpOf: followUpOf,
+    tutorialChoice: tutorialChoice,
   );
 
   void _say(ChatMessage message) {
@@ -266,11 +303,29 @@ class GuidedAssistantController extends GetxController {
     MockReplyKind.greet,
   };
 
-  void submit(String raw, {String? choiceId, String? shownAs, String? note}) {
+  void submit(
+    String raw, {
+    String? choiceId,
+    String? shownAs,
+    String? note,
+    bool voice = false,
+  }) {
     final text = raw.trim();
     if ((text.isEmpty && choiceId == null) || loading.value) return;
-    messages.add(ChatMessage(id: _nextId++, user: true, text: shownAs ?? text));
+    messages.add(
+      ChatMessage(
+        id: _nextId++,
+        user: true,
+        text: shownAs ?? text,
+        voice: voice,
+      ),
+    );
     if (note != null) _say(_bot(note));
+    if (choiceId == null && _tutorialReply(text)) return;
+    _answer(text, choiceId: choiceId);
+  }
+
+  void _answer(String text, {String? choiceId}) {
     final local = engine.interpret(text, hasTask: _activeTask != null);
     final generation = ++_generation;
     loading.value = true;
@@ -603,9 +658,16 @@ class GuidedAssistantController extends GetxController {
     String? followUpGuideId,
     bool followUpResumes = false,
     bool resuming = false,
+    bool? guided,
   }) {
     final guide = _guide(guideId);
     if (guide == null) return;
+    // 一般模式: the page opens, the steps do not start (as after 我自己來).
+    // [guided] overrides the mode (教我 asks for the steps).
+    final alone = !resuming && !(guided ?? mode.value == AssistantMode.teach);
+    // A task asked during the tutorial ends it (no "tutorial ended" toast).
+    if (inTutorial) onboarding.value = OnboardingStage.hidden;
+    _measureOnly = alone;
     if (!resuming) web.resetLatches();
     _wrongTaps = 0;
     nudge.value = '';
@@ -613,12 +675,25 @@ class GuidedAssistantController extends GetxController {
     todoOpen.value = false;
     task.value = GuideTask(
       guide,
-      status: resuming ? TaskStatus.on : TaskStatus.opened,
+      status: alone
+          ? TaskStatus.ended
+          : resuming
+          ? TaskStatus.on
+          : TaskStatus.opened,
       followUpGuideId: followUpGuideId,
       followUpResumes: followUpResumes,
     );
-    _say(_bot(resuming ? Replies.backTo(guide.shortName) : guide.openedText));
+    _say(
+      _bot(
+        resuming
+            ? Replies.backTo(guide.shortName)
+            : alone
+            ? SettingsTexts.normalOpened(guide.pageName)
+            : guide.openedText,
+      ),
+    );
     closeSheet();
+    if (alone) _showToast(SettingsTexts.normalToast);
     // The steps start only when the user presses 開始 (or 我自己來 to go
     // alone); nothing moves on by itself.
     _openGuidePage(guide, fresh: !resuming && !guide.reuseOpenPage);
@@ -790,12 +865,37 @@ class GuidedAssistantController extends GetxController {
     return GuideCard(CardVariant.step, label, step.card(web));
   }
 
+  /// The page is read only while the guide can show on it: a task that is
+  /// opened or running, on its screen, with the assistant panel closed.
+  /// Paused, 我自己來, left, panel open or finished: no reading (it would
+  /// only cost battery). The page may still be loading; the reader waits.
+  bool get _shouldRead {
+    final t = task.value;
+    if (t == null || t.left || sheetOpen.value) return false;
+    if (t.status != TaskStatus.opened && t.status != TaskStatus.on) {
+      return _measureOnly && t.status == TaskStatus.ended
+          ? currentRoute.value == t.guide.route
+          : false;
+    }
+    return currentRoute.value == t.guide.route;
+  }
+
+  /// 一般模式 opened the page without steps: the page is read only until its
+  /// fixed bottom bar is measured once, so the assistant button sits above it.
+  bool _measureOnly = false;
+
   void _onProgress() {
-    final active = _activeTask;
-    if (active == null) {
-      if (probe.running) probe.stop();
-    } else {
-      probe.start(active.guide.spec);
+    final t = task.value;
+    if (_measureOnly &&
+        t != null &&
+        t.guide.onPage(web.now) &&
+        web.now.flags['__bottomBar'] != null) {
+      _measureOnly = false;
+    }
+    if (t != null && _shouldRead) {
+      probe.start(t.guide.spec);
+    } else if (probe.running) {
+      probe.stop();
     }
     // A new step replaces any "tap the highlighted spot" reminder at once.
     // The step's own text counts too (tapping the field within one step).
@@ -915,7 +1015,7 @@ class GuidedAssistantController extends GetxController {
       case TaskStatus.ended:
         resume();
       case TaskStatus.finished:
-        startGuide(t.guide.id);
+        startGuide(t.guide.id, guided: true);
     }
   }
 
@@ -948,6 +1048,7 @@ class GuidedAssistantController extends GetxController {
   void routeChanged(String route) {
     if (route.isEmpty) return;
     currentRoute.value = route;
+    if (route != TPRoute.main) dismissHomeAsk();
     final t = task.value;
     if (t == null) return;
     if (route == t.guide.route) _opening = false;
@@ -965,24 +1066,31 @@ class GuidedAssistantController extends GetxController {
   // ---------------------------------------------------------------- sheet
 
   void fabPressed() {
-    if (onboarding.value == OnboardingStage.card ||
-        onboarding.value == OnboardingStage.pointer) {
+    final stage = onboarding.value;
+    if (stage == OnboardingStage.card || stage == OnboardingStage.pointer) {
       // Opening the assistant completes the hint; its back entry gives way
-      // to the sheet's.
+      // to the sheet's. After 試試看 the tutorial goes on in the assistant.
       _removeBackEntry();
       finishOnboarding();
+      if (stage == OnboardingStage.pointer) startTutorial();
     }
     openSheet();
   }
 
   void openSheet() {
     if (sheetOpen.value) return;
+    dismissHomeAsk();
     sheetOpen.value = true;
     _addBackEntry(closeSheet);
   }
 
   void closeSheet() {
     if (!sheetOpen.value) return;
+    if (inTutorial) {
+      onboarding.value = OnboardingStage.hidden;
+      _tutorialTask = null;
+      _showToast(TutorialTexts.endToast);
+    }
     sheetOpen.value = false;
     typing.value = false;
     listening.value = false;
@@ -1061,10 +1169,285 @@ class GuidedAssistantController extends GetxController {
     }
     submit(
       heard.text,
+      voice: true,
       note: heard.correctedFrom == null
           ? null
           : Replies.corrected(heard.correctedFrom!, heard.text),
     );
+  }
+
+  // ---------------------------------------------------------------- home ask
+
+  /// Bot replies to the home question (they are in the chat history too).
+  List<ChatMessage> get homeReplies => homeAsk.value == HomeAsk.asked
+      ? [
+          for (final m in messages)
+            if (!m.user && m.id >= _homeFrom) m,
+        ]
+      : const [];
+
+  /// The answer offers choices that can only be made in the assistant.
+  bool get homeNeedsAssistant => homeReplies.any(
+    (m) =>
+        optionsLive(m) &&
+        (m.options != null || m.teachGuideId != null || m.tutorialChoice),
+  );
+
+  Future<void> homeMicDown() async {
+    if (loading.value || homeAsk.value == HomeAsk.listening) return;
+    _homeHeldAt = DateTime.now();
+    homeAsk.value = HomeAsk.listening;
+    final rec = recorder;
+    if (rec == null || service == null) return;
+    speaker.stop(); // never record the assistant's own voice
+    final start = _homeStart = rec.start();
+    final started = await start;
+    if (!started && !isClosed && homeAsk.value == HomeAsk.listening) {
+      _homeStart = null;
+      _showHomeNotice(HomeAskTexts.noMic);
+    }
+  }
+
+  Future<void> homeMicUp() async {
+    if (homeAsk.value != HomeAsk.listening) return;
+    final held = DateTime.now().difference(_homeHeldAt ?? DateTime.now());
+    final rec = recorder;
+    final svc = service;
+    final starting = _homeStart;
+    _homeStart = null;
+    if (held < const Duration(milliseconds: 400)) {
+      homeAsk.value = HomeAsk.tooShort;
+      if (starting != null && await starting) await rec?.cancel();
+      return;
+    }
+    if (rec == null || svc == null) {
+      _showHomeNotice(HomeAskTexts.demo);
+      return;
+    }
+    homeAsk.value = HomeAsk.working;
+    if (starting != null && !await starting) return; // no permission
+    final Uint8List? audio = await rec.stop();
+    if (isClosed || homeAsk.value != HomeAsk.working) return;
+    if (audio == null || AssistantRecorder.seconds(audio) < 0.5) {
+      _showHomeNotice(Replies.tooShort);
+      return;
+    }
+    final generation = ++_generation;
+    loading.value = true;
+    AssistantTranscript heard;
+    try {
+      heard = await svc.transcribe(
+        audio,
+        requestId: '${DateTime.now().microsecondsSinceEpoch}-$generation',
+      );
+    } catch (error) {
+      if (generation != _generation || isClosed) return;
+      loading.value = false;
+      _showHomeNotice(
+        error is FormatException ? error.message : Replies.listeningFailed,
+      );
+      return;
+    }
+    if (generation != _generation || isClosed) return;
+    loading.value = false;
+    if (homeAsk.value != HomeAsk.working) return;
+    askFromHome(heard);
+  }
+
+  /// Puts what was heard on the home card and answers it as in the chat.
+  void askFromHome(AssistantTranscript heard) {
+    _homeFrom = _nextId;
+    homeQuestion.value = heard.text;
+    homeAsk.value = HomeAsk.asked;
+    if (heard.confirm) {
+      _say(
+        _bot(
+          Replies.heard(heard.text),
+          options: CandidateGroup(Replies.heard(heard.text), [
+            for (final reading in {heard.text, ...heard.options})
+              CandidateOption(reading, say: reading),
+          ]),
+        ),
+      );
+      return;
+    }
+    submit(
+      heard.text,
+      voice: true,
+      note: heard.correctedFrom == null
+          ? null
+          : Replies.corrected(heard.correctedFrom!, heard.text),
+    );
+  }
+
+  void _showHomeNotice(String text) {
+    homeNotice.value = text;
+    homeAsk.value = HomeAsk.notice;
+  }
+
+  void dismissHomeAsk() {
+    if (homeAsk.value == HomeAsk.idle) return;
+    if (homeAsk.value == HomeAsk.listening) {
+      final starting = _homeStart;
+      _homeStart = null;
+      starting?.then((ok) {
+        if (ok) recorder?.cancel();
+      });
+    }
+    homeAsk.value = HomeAsk.idle;
+  }
+
+  /// 打開助理看選項 on the home card.
+  void openFromHome() => openSheet();
+
+  // ---------------------------------------------------------------- settings
+
+  static const _kMode = 'guided_assistant_mode';
+  static const _kLanguage = 'guided_assistant_language';
+
+  Future<void> _loadSettings() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      if (_settingsChanged || isClosed) return;
+      mode.value = AssistantModeText.parse(prefs.getString(_kMode));
+      final lang = AssistantLanguage.values.firstWhere(
+        (l) => l.name == prefs.getString(_kLanguage),
+        orElse: () => AssistantLanguage.zh,
+      );
+      if (lang.available) language.value = lang;
+    } catch (_) {}
+  }
+
+  void setMode(AssistantMode value) {
+    if (mode.value == value) return;
+    _settingsChanged = true;
+    mode.value = value;
+    _save(_kMode, value.name);
+    _showToast(SettingsTexts.modeChanged(value));
+  }
+
+  /// Only the languages that are ready can be chosen; false otherwise.
+  bool setLanguage(AssistantLanguage value) {
+    if (!value.available) {
+      _showToast(SettingsTexts.langComingSoon(value));
+      return false;
+    }
+    if (language.value == value) return true;
+    _settingsChanged = true;
+    language.value = value;
+    _save(_kLanguage, value.name);
+    return true;
+  }
+
+  /// 目前設定 summary, e.g. 「教學模式・繁體中文」.
+  String get settingsSummary => '${mode.value.title}・${language.value.title}';
+
+  /// Opens AI 助理設定; from the tutorial, coming back reopens the assistant.
+  void openSettingsPage({bool backToAssistant = false}) {
+    closeSheet();
+    final opened = Get.toNamed(TPRoute.assistantSettings);
+    if (backToAssistant) {
+      opened?.then((_) {
+        if (!isClosed) openSheet();
+      });
+    }
+  }
+
+  /// 重看助理新手教學 in the settings: back to the App's first page, then
+  /// the first-run hint and the tutorial again. Settings and chat stay.
+  void replayTutorial() {
+    closeSheet();
+    Get.until((route) => route.isFirst);
+    startOnboarding();
+  }
+
+  // ---------------------------------------------------------------- tutorial
+
+  bool get inTutorial =>
+      onboarding.value == OnboardingStage.hello ||
+      onboarding.value == OnboardingStage.branch ||
+      onboarding.value == OnboardingStage.mode;
+
+  void startTutorial() {
+    _tutorialTask = null;
+    typing.value = false;
+    onboarding.value = OnboardingStage.hello;
+  }
+
+  /// Hello / branch steps: the tutorial answers instead of the assistant.
+  bool _tutorialReply(String text) {
+    final stage = onboarding.value;
+    if (stage != OnboardingStage.hello && stage != OnboardingStage.branch) {
+      return false;
+    }
+    final greet = TutorialTexts.greeting.hasMatch(text);
+    final isTask = !greet && TutorialTexts.taskLike.hasMatch(text);
+    final generation = ++_generation;
+    loading.value = true;
+    _think?.cancel();
+    _think = Timer(thinkDelay, () {
+      if (generation != _generation) return;
+      loading.value = false;
+      if (onboarding.value != stage) {
+        // The tutorial was closed meanwhile: answer as usual.
+        _say(_bot(greet ? TutorialTexts.reply : Replies.hello));
+        return;
+      }
+      if (isTask && stage == OnboardingStage.hello) {
+        _tutorialTask = text;
+        onboarding.value = OnboardingStage.branch;
+        _say(
+          _bot(
+            TutorialTexts.branch(TutorialTexts.taskOf(text)),
+            tutorialChoice: true,
+          ),
+        );
+      } else {
+        onboarding.value = OnboardingStage.mode;
+        _say(_bot(TutorialTexts.reply));
+      }
+    });
+    return true;
+  }
+
+  /// 先完成教學.
+  void keepTutorial() {
+    if (onboarding.value != OnboardingStage.branch) return;
+    onboarding.value = OnboardingStage.mode;
+    _say(_bot('${TutorialTexts.keepTutReply}\n${TutorialTexts.reply}'));
+  }
+
+  /// 直接開始: the tutorial ends and the task asked for is done.
+  void startTaskNow() {
+    if (onboarding.value != OnboardingStage.branch) return;
+    final text = _tutorialTask;
+    onboarding.value = OnboardingStage.hidden;
+    _tutorialTask = null;
+    _say(_bot(TutorialTexts.goNowReply));
+    if (text != null) _answer(text);
+  }
+
+  /// 跳過教學.
+  void skipTutorial() {
+    if (!inTutorial) return;
+    onboarding.value = OnboardingStage.hidden;
+    _tutorialTask = null;
+    _say(_bot(TutorialTexts.skipReply));
+  }
+
+  /// 完成教學.
+  void finishTutorial() {
+    onboarding.value = OnboardingStage.hidden;
+    _tutorialTask = null;
+    closeSheet();
+    _showToast(TutorialTexts.doneToast);
+  }
+
+  /// 看設定.
+  void tutorialSettings() {
+    onboarding.value = OnboardingStage.hidden;
+    _tutorialTask = null;
+    openSettingsPage(backToAssistant: true);
   }
 
   void _addBackEntry(VoidCallback onBack) {
@@ -1123,6 +1506,7 @@ class GuidedAssistantController extends GetxController {
   }
 
   void startOnboarding() {
+    dismissHomeAsk();
     onboarding.value = OnboardingStage.card;
     _addBackEntry(onboardingLater);
   }
@@ -1135,26 +1519,31 @@ class GuidedAssistantController extends GetxController {
 
   /// 退出提示: the user does not want the hint; it is not shown again.
   void onboardingExit() {
-    if (onboarding.value == OnboardingStage.hidden) return;
+    if (!_hinting) return;
     _removeBackEntry();
     finishOnboarding();
   }
 
   /// 重看新手提示 from the assistant.
   void replayOnboarding() {
+    if (inTutorial) onboarding.value = OnboardingStage.hidden;
     closeSheet();
     startOnboarding();
   }
 
   void onboardingLater() {
-    if (onboarding.value == OnboardingStage.hidden) return;
+    if (!_hinting) return;
     onboarding.value = OnboardingStage.hidden;
     _removeBackEntry();
     _save(_kStatus, 'later');
   }
 
+  bool get _hinting =>
+      onboarding.value == OnboardingStage.card ||
+      onboarding.value == OnboardingStage.pointer;
+
   void finishOnboarding() {
-    if (onboarding.value == OnboardingStage.hidden) return;
+    if (!_hinting) return;
     onboarding.value = OnboardingStage.hidden;
     _save(_kStatus, 'done');
   }

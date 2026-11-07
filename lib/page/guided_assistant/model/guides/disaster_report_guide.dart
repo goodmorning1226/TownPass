@@ -29,6 +29,9 @@ const _checks = '''qa('div[class~="gap-1.5"] > label').filter(shown)''';
 const _consent = "byText('label', '提供個人資料給承辦人員')";
 const _send = "byText('form > button.base-button', '送出')";
 
+/// The 注意事項 text right above the 提供個人資料給承辦人員 box.
+const _note = "textBetween('form', '注意事項', '提供個人資料給承辦人員')";
+
 /// JS function: 'below' / 'above' when an element is outside the viewport
 /// vertically, else ''.
 const _offFn =
@@ -46,6 +49,7 @@ const disasterReportPageSpec = WebPageSpec(
     'disaster.locate': "(() => { const i = q('#location'); return i && i.parentElement ? i.parentElement.querySelector('button') : null; })()",
     'disaster.checks': _checks,
     'disaster.extra': "q('#additional_disc')",
+    'disaster.note': 'readArea($_note)',
     'disaster.consent': _consent,
     'disaster.send': _send,
     // Dialog after 送出.
@@ -67,12 +71,15 @@ const disasterReportPageSpec = WebPageSpec(
         '''qa('div[class~="gap-1.5"] input').filter((i) => i.checked).length''',
     'checksOff': '$_offFn($_checks[0])',
     'consentOff': '$_offFn($_consent)',
+    // Scrolled to the end of the 注意事項 (latched).
+    'noteRead':
+        "location.pathname.startsWith('/disaster-report/form/') && readToEnd($_note)",
     'sendOff': '$_offFn($_send)',
     'sendEnabled':
         "(() => { const b = $_send; return !!b && !b.classList.contains('base-button--disabled'); })()",
     'reported': "!!dialog('通報成功')",
   },
-  latchFlags: {'reported'},
+  latchFlags: {'reported', 'noteRead'},
 );
 
 bool onDisasterReport(WebSnapshot s) => s.pathStarts(_home);
@@ -81,6 +88,10 @@ bool _onHome(WebPageState s) => s.now.pathIs(_home);
 bool _onForm(WebPageState s) => s.now.pathStarts(_form);
 bool _reported(WebPageState s) => s.latched('reported');
 bool _no(WebPageState s) => false;
+bool _noteRead(WebPageState s) => s.latched('noteRead');
+
+/// Said when the box was ticked before the 注意事項 was read.
+const _readNote = '建議還是把注意事項看完喔。';
 
 /// A fire form (D-4-x): remind them to call 119 first.
 bool _fire(WebPageState s) => s.now.pathStarts('${_form}D-4-');
@@ -214,9 +225,24 @@ final List<GuideComponent> disasterReportComponents = [
     requires: const ['describe_disaster'],
     taskTitle: '同意提供聯絡資料',
     doneText: '勾好了！「送出」現在可以按了。',
+    doneTextOf: (s) => '${_noteRead(s) ? '' : _readNote}勾好了！「送出」現在可以按了。',
     doneDetail: '看一下填的內容對不對，再自己按「送出」。',
     doneTarget: (s) => _onForm(s) ? 'disaster.send' : null,
     steps: [
+      // Read first: outline only, so the form can be scrolled.
+      GuideStep(
+        target: (s) => _onForm(s) ? 'disaster.note' : null,
+        locks: _no,
+        arrow: _no,
+        scrollHint: _onForm,
+        label: (_) => '往下滑',
+        card: (_) => '最下面有一段「注意事項」。先往下滑，把它看完喔。看到了，我再告訴你要按哪裡。',
+        detail: (_) => '注意事項是說：承辦人員依法辦案需要時，可以經過申請和主管同意，取得你的個人資料。',
+        isDone: (s) =>
+            _reported(s) ||
+            (_onForm(s) && (_noteRead(s) || s.now.flag('sendEnabled'))),
+        cardTop: (_) => 70,
+      ),
       GuideStep(
         target: (s) => _onForm(s) ? 'disaster.consent' : null,
         locks: (s) => s.now.text('consentOff').isEmpty,
@@ -225,7 +251,7 @@ final List<GuideComponent> disasterReportComponents = [
         label: (_) => '勾選',
         card: (s) {
           final scroll = _scroll(s.now.text('consentOff'));
-          return '$scroll勾一下最下面的「提供個人資料給承辦人員」，承辦人員才能跟你聯絡。勾了以後，灰色的「送出」才會變成可以按。';
+          return '注意事項看完了！$scroll勾一下最下面的「提供個人資料給承辦人員」，承辦人員才能跟你聯絡。勾了以後，灰色的「送出」才會變成可以按。';
         },
         detail: (_) => '往下滑到最下面，點「提供個人資料給承辦人員」前面的小方框。沒勾的話「送出」是灰色的，按不下去。',
         isDone: (s) =>
@@ -259,7 +285,8 @@ final List<GuideComponent> disasterReportComponents = [
           }
           final where = s.now.text('location');
           final at = where.isEmpty ? '' : '地點是「$where」，';
-          return '${_scroll(s.now.text('sendOff'))}最後確認一下：$at${_category(s).isEmpty ? '' : '災情是${_category(s)}。'}沒問題就自己按「送出」喔。這是示範網站，不會真的通報。';
+          final note = _noteRead(s) ? '' : _readNote;
+          return '$note${_scroll(s.now.text('sendOff'))}最後確認一下：$at${_category(s).isEmpty ? '' : '災情是${_category(s)}。'}沒問題就自己按「送出」喔。這是示範網站，不會真的通報。';
         },
         detail: (_) => '看一下地點和狀況對不對，沒問題就自己按最下面的「送出」。',
         isDone: _reported,

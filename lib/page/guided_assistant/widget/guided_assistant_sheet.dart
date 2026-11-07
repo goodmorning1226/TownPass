@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:town_pass/page/guided_assistant/guided_assistant_controller.dart';
+import 'package:town_pass/page/guided_assistant/model/assistant_settings.dart';
 import 'package:town_pass/page/guided_assistant/model/guide_content.dart';
 import 'package:town_pass/page/guided_assistant/widget/guide_highlight.dart';
 import 'package:town_pass/util/tp_colors.dart';
@@ -26,7 +27,11 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
   @override
   void initState() {
     super.initState();
-    _worker = everAll([c.messages, c.loading], (_) => _toBottom());
+    _worker = everAll([
+      c.messages,
+      c.loading,
+      c.onboarding,
+    ], (_) => _toBottom());
     _toBottom();
   }
 
@@ -58,22 +63,32 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
 
   @override
   Widget build(BuildContext context) {
+    // The sheet lives in an overlay, not a Scaffold, so nothing lifts it for
+    // the keyboard: keep the text box above it ourselves.
+    final keyboard = MediaQuery.viewInsetsOf(context).bottom;
+    final typingOpen = keyboard > 0;
     return Material(
       color: TPColors.white,
-      child: SafeArea(
-        child: Obx(
-          () => Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              _header(),
-              // An ended task (我自己來, 結束引導) keeps its card so 繼續引導
-              // can pick it up again.
-              if (c.task.value != null &&
-                  c.task.value!.status != TaskStatus.finished)
-                _taskCard(c.task.value!),
-              Expanded(child: _chat()),
-              _bottom(context),
-            ],
+      child: Padding(
+        padding: EdgeInsets.only(bottom: keyboard),
+        child: SafeArea(
+          bottom: !typingOpen,
+          child: Obx(
+            () => Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _header(),
+                // An ended task (我自己來, 結束引導) keeps its card so 繼續引導
+                // can pick it up again. While typing it folds away so the chat
+                // and the text box keep their room.
+                if (!typingOpen &&
+                    c.task.value != null &&
+                    c.task.value!.status != TaskStatus.finished)
+                  _taskCard(c.task.value!),
+                Expanded(child: _chat()),
+                _bottom(context, typingOpen: typingOpen),
+              ],
+            ),
           ),
         ),
       ),
@@ -369,7 +384,12 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
       controller: _scroll,
       padding: const EdgeInsets.all(16),
       children: [
-        for (final m in c.messages) _bubble(m),
+        for (var i = 0; i < c.messages.length; i++)
+          _bubble(
+            c.messages[i],
+            // The penguin heads the first of consecutive bot messages.
+            avatar: i == 0 || c.messages[i - 1].user,
+          ),
         if (c.loading.value)
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 4),
@@ -402,36 +422,63 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
               ],
             ),
           ),
+        if (c.onboarding.value == OnboardingStage.hello) _tutorialHello(),
+        if (c.onboarding.value == OnboardingStage.mode) _tutorialMode(),
       ],
     ),
   );
 
-  Widget _bubble(ChatMessage m) {
+  static final _userText = TPTextStyles.h3Regular.copyWith(
+    fontSize: 18,
+    height: 26 / 18,
+  );
+  static final _botText = TPTextStyles.h3Regular.copyWith(
+    fontSize: 18,
+    height: 27 / 18,
+  );
+
+  Widget _bubble(ChatMessage m, {bool avatar = true}) {
     if (m.user) {
       return Align(
         alignment: Alignment.centerRight,
-        child: Container(
-          margin: const EdgeInsets.only(bottom: 10, left: 60),
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-          decoration: BoxDecoration(
-            color: TPColors.primary500,
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: TPText(
-            m.text,
-            style: TPTextStyles.h3Regular,
-            color: TPColors.white,
+        child: Padding(
+          padding: const EdgeInsets.only(bottom: 10, left: 60),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              if (m.voice) ...[
+                TPText(
+                  HomeAskTexts.voiceTag,
+                  style: TPTextStyles.bodyRegular.copyWith(fontSize: 12),
+                  color: TPColors.grayscale700,
+                ),
+                const SizedBox(height: 2),
+              ],
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 10,
+                ),
+                decoration: BoxDecoration(
+                  color: TPColors.primary500,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: TPText(m.text, style: _userText, color: TPColors.white),
+              ),
+            ],
           ),
         ),
       );
     }
     final parts = <Widget>[
-      TPText(
-        m.text,
-        style: TPTextStyles.h3Regular,
-        color: TPColors.grayscale950,
-      ),
+      TPText(m.text, style: _botText, color: TPColors.grayscale950),
     ];
+    if (m.tutorialChoice &&
+        c.onboarding.value == OnboardingStage.branch &&
+        c.optionsLive(m)) {
+      parts.add(_filled(TutorialTexts.keepTut, c.keepTutorial));
+      parts.add(_outlineWide(TutorialTexts.goNow, c.startTaskNow));
+    }
     final term = m.term;
     if (term != null) {
       parts.add(
@@ -483,35 +530,286 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
         _OptionButton(
           label: '教我',
           enabled: true,
-          onTap: () => c.startGuide(teach),
+          onTap: () => c.startGuide(teach, guided: true),
         ),
       );
     }
-    return Align(
-      alignment: Alignment.centerLeft,
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 10, right: 40),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-        decoration: BoxDecoration(
-          color: TPColors.white,
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            for (var i = 0; i < parts.length; i++) ...[
-              if (i > 0) const SizedBox(height: 10),
-              parts[i],
-            ],
-          ],
-        ),
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10, right: 12),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (avatar)
+            const PenguinAvatar(size: 40, borderWidth: 2)
+          else
+            const SizedBox(width: 40),
+          const SizedBox(width: 8),
+          Flexible(
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              decoration: BoxDecoration(
+                color: TPColors.white,
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  for (var i = 0; i < parts.length; i++) ...[
+                    if (i > 0) const SizedBox(height: 10),
+                    parts[i],
+                  ],
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _bottom(BuildContext context) {
-    final chips = c.chips;
+  Widget _filled(
+    String label,
+    VoidCallback onTap, {
+    double fontSize = 16,
+  }) => SizedBox(
+    height: 48,
+    child: FilledButton(
+      style: FilledButton.styleFrom(
+        backgroundColor: TPColors.primary500,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+      onPressed: onTap,
+      child: TPText(
+        label,
+        style:
+            (fontSize > 16 ? TPTextStyles.h3SemiBold : TPTextStyles.h3Regular)
+                .copyWith(fontSize: fontSize),
+        color: TPColors.white,
+      ),
+    ),
+  );
+
+  Widget _outlineWide(String label, VoidCallback onTap) => SizedBox(
+    height: 48,
+    child: OutlinedButton(
+      style: OutlinedButton.styleFrom(
+        backgroundColor: TPColors.white,
+        side: const BorderSide(color: TPColors.primary500),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+      onPressed: onTap,
+      child: TPText(
+        label,
+        style: TPTextStyles.h3Regular,
+        color: TPColors.primary700,
+      ),
+    ),
+  );
+
+  Widget _link(String label, VoidCallback onTap) => SizedBox(
+    height: 44,
+    child: TextButton(
+      onPressed: onTap,
+      child: TPText(
+        label,
+        style: TPTextStyles.h3Regular.copyWith(
+          fontSize: 15,
+          decoration: TextDecoration.underline,
+          decorationColor: TPColors.primary700,
+        ),
+        color: TPColors.primary700,
+      ),
+    ),
+  );
+
+  /// Warm tutorial card in the chat (design 「新手教學」).
+  Widget _tutorialCard({
+    required String step,
+    required String title,
+    required List<Widget> children,
+  }) => Semantics(
+    container: true,
+    liveRegion: true,
+    child: Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: TPColors.secondary50,
+        border: Border.all(color: TPColors.secondary400, width: 2),
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              const PenguinAvatar(size: 48),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    TPText(
+                      step,
+                      style: TPTextStyles.bodyRegular.copyWith(fontSize: 13),
+                      color: TPColors.secondary800,
+                    ),
+                    Semantics(
+                      header: true,
+                      child: TPText(
+                        title,
+                        style: TPTextStyles.h3SemiBold.copyWith(
+                          fontSize: 20,
+                          height: 28 / 20,
+                        ),
+                        color: TPColors.grayscale950,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          for (final w in children) ...[const SizedBox(height: 10), w],
+        ],
+      ),
+    ),
+  );
+
+  static final _tutorialBody = TPTextStyles.h3Regular.copyWith(
+    fontSize: 17,
+    height: 26 / 17,
+  );
+
+  Widget _way(IconData icon, String label) => Container(
+    height: 36,
+    padding: const EdgeInsets.symmetric(horizontal: 12),
+    decoration: BoxDecoration(
+      color: TPColors.white,
+      border: Border.all(color: TPColors.secondary400),
+      borderRadius: BorderRadius.circular(18),
+    ),
+    child: Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, color: TPColors.primary700, size: 18),
+        const SizedBox(width: 6),
+        TPText(
+          label,
+          style: TPTextStyles.h3Regular.copyWith(fontSize: 15),
+          color: TPColors.grayscale950,
+        ),
+      ],
+    ),
+  );
+
+  Widget _tutorialHello() => _tutorialCard(
+    step: TutorialTexts.step1,
+    title: TutorialTexts.hello1,
+    children: [
+      TPText(
+        TutorialTexts.hello2,
+        style: _tutorialBody,
+        color: TPColors.grayscale800,
+      ),
+      Wrap(
+        spacing: 8,
+        runSpacing: 8,
+        children: [
+          _way(Icons.mic_none_rounded, TutorialTexts.wayVoice),
+          _way(Icons.keyboard_outlined, TutorialTexts.wayType),
+        ],
+      ),
+      Row(
+        children: [
+          Expanded(
+            child: TPText(
+              TutorialTexts.bothBelow,
+              style: TPTextStyles.bodyRegular,
+              color: TPColors.secondary800,
+            ),
+          ),
+          _link(TutorialTexts.skip, c.skipTutorial),
+        ],
+      ),
+    ],
+  );
+
+  Widget _tutorialMode() => _tutorialCard(
+    step: TutorialTexts.step2,
+    title: TutorialTexts.modeTitle(c.mode.value),
+    children: [
+      TPText(
+        TutorialTexts.modeBody(c.mode.value),
+        style: _tutorialBody,
+        color: TPColors.grayscale800,
+      ),
+      Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          color: TPColors.white,
+          border: Border.all(color: TPColors.secondary400),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Row(
+          children: [
+            const Icon(
+              Icons.settings_outlined,
+              color: TPColors.primary700,
+              size: 22,
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: TPText(
+                TutorialTexts.wherePath,
+                style: TPTextStyles.h3Regular.copyWith(fontSize: 15),
+                color: TPColors.grayscale800,
+              ),
+            ),
+          ],
+        ),
+      ),
+      _filled(TutorialTexts.finish, c.finishTutorial, fontSize: 17),
+      _link(TutorialTexts.seeSettings, c.tutorialSettings),
+    ],
+  );
+
+  bool get _hello => c.onboarding.value == OnboardingStage.hello;
+
+  /// Yellow ring on the controls the tutorial points at.
+  static const _ring = [
+    BoxShadow(color: guideYellow, spreadRadius: 6),
+    BoxShadow(color: TPColors.white, spreadRadius: 3),
+  ];
+
+  /// Yellow label pointing at a control.
+  Widget _tag(String text) => IgnorePointer(
+    child: Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+      decoration: BoxDecoration(
+        color: guideYellow,
+        borderRadius: BorderRadius.circular(15),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x26000000),
+            blurRadius: 6,
+            offset: Offset(0, 2),
+          ),
+        ],
+      ),
+      child: TPText(
+        text,
+        style: TPTextStyles.bodySemiBold,
+        color: TPColors.grayscale950,
+      ),
+    ),
+  );
+
+  Widget _bottom(BuildContext context, {bool typingOpen = false}) {
+    // Chips hide while the keyboard is up (the text box is in use).
+    final tutorialAsk = _hello || c.onboarding.value == OnboardingStage.branch;
+    final chips = typingOpen || tutorialAsk ? const <String>[] : c.chips;
     return Container(
       color: TPColors.white,
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
@@ -544,6 +842,34 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
               ],
             ),
           const SizedBox(height: 12),
+          if (_hello && c.typing.value)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  _tag(TutorialTexts.tagType),
+                  _tag(TutorialTexts.tagBackVoice),
+                ],
+              ),
+            ),
+          if (_hello && !c.typing.value)
+            SizedBox(
+              height: 72,
+              child: Stack(
+                children: [
+                  Align(
+                    alignment: Alignment.topCenter,
+                    child: _tag(TutorialTexts.tagMic),
+                  ),
+                  Positioned(
+                    right: 0,
+                    bottom: 4,
+                    child: _tag(TutorialTexts.tagKb),
+                  ),
+                ],
+              ),
+            ),
           if (c.typing.value) _typingRow() else _micRow(),
         ],
       ),
@@ -575,13 +901,15 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
                         ? TPColors.primary700
                         : TPColors.primary500,
                     shape: BoxShape.circle,
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Color(0x33000000),
-                        blurRadius: 8,
-                        offset: Offset(0, 2),
-                      ),
-                    ],
+                    boxShadow: _hello && !c.listening.value
+                        ? _ring
+                        : const [
+                            BoxShadow(
+                              color: Color(0x33000000),
+                              blurRadius: 8,
+                              offset: Offset(0, 2),
+                            ),
+                          ],
                   ),
                   child: const Icon(
                     Icons.mic_none_rounded,
@@ -593,13 +921,35 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
             ),
             Positioned(
               right: 0,
-              child: IconButton(
-                tooltip: '改用鍵盤輸入',
-                iconSize: 28,
-                onPressed: () => c.typing.value = true,
-                icon: const Icon(
-                  Icons.keyboard_outlined,
-                  color: TPColors.grayscale800,
+              child: Tooltip(
+                message: '改用鍵盤輸入',
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(22),
+                    boxShadow: _hello ? _ring : null,
+                  ),
+                  child: SizedBox(
+                    height: 44,
+                    child: OutlinedButton.icon(
+                      style: OutlinedButton.styleFrom(
+                        backgroundColor: TPColors.white,
+                        side: const BorderSide(color: TPColors.primary500),
+                        shape: const StadiumBorder(),
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                      ),
+                      onPressed: () => c.typing.value = true,
+                      icon: const Icon(
+                        Icons.keyboard_outlined,
+                        color: TPColors.primary700,
+                        size: 22,
+                      ),
+                      label: TPText(
+                        TutorialTexts.wayType,
+                        style: TPTextStyles.h3SemiBold.copyWith(fontSize: 15),
+                        color: TPColors.primary700,
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -616,32 +966,35 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
 
   Widget _typingRow() => Row(
     children: [
-      IconButton(
-        tooltip: '改用語音',
-        onPressed: () => c.typing.value = false,
-        icon: const Icon(Icons.mic_none_rounded, color: TPColors.grayscale800),
-      ),
       Expanded(
-        child: TextField(
-          controller: _input,
-          autofocus: true,
-          textInputAction: TextInputAction.send,
-          onSubmitted: (_) => _send(),
-          style: TPTextStyles.h3Regular.copyWith(color: TPColors.grayscale950),
-          decoration: InputDecoration(
-            hintText: '打字告訴我你想做什麼',
-            hintStyle: TPTextStyles.h3Regular.copyWith(
-              color: TPColors.grayscale400,
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10),
+            boxShadow: _hello ? _ring : null,
+          ),
+          child: TextField(
+            controller: _input,
+            autofocus: true,
+            textInputAction: TextInputAction.send,
+            onSubmitted: (_) => _send(),
+            style: TPTextStyles.h3Regular.copyWith(
+              color: TPColors.grayscale950,
             ),
-            filled: true,
-            fillColor: TPColors.grayscale50,
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 16,
-              vertical: 13,
-            ),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide.none,
+            decoration: InputDecoration(
+              hintText: '打字告訴我你想做什麼',
+              hintStyle: TPTextStyles.h3Regular.copyWith(
+                color: TPColors.grayscale400,
+              ),
+              filled: true,
+              fillColor: TPColors.grayscale50,
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 13,
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide.none,
+              ),
             ),
           ),
         ),
@@ -650,6 +1003,18 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
         tooltip: '送出',
         onPressed: _send,
         icon: const Icon(Icons.send_rounded, color: TPColors.primary600),
+      ),
+      Container(
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: _hello ? TPColors.white : null,
+          boxShadow: _hello ? _ring : null,
+        ),
+        child: IconButton(
+          tooltip: '改用語音',
+          onPressed: () => c.typing.value = false,
+          icon: const Icon(Icons.mic_none_rounded, color: TPColors.primary700),
+        ),
       ),
     ],
   );

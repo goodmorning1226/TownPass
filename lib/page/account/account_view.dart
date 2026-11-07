@@ -4,6 +4,9 @@ import 'package:town_pass/gen/assets.gen.dart';
 import 'package:town_pass/page/account/account_view_controller.dart';
 import 'package:town_pass/page/account/widget/account_app_bar.dart';
 import 'package:town_pass/page/account/widget/account_view_footer.dart';
+import 'package:town_pass/page/guided_assistant/assistant_settings_view.dart';
+import 'package:town_pass/page/guided_assistant/guided_assistant_controller.dart';
+import 'package:town_pass/page/guided_assistant/model/assistant_settings.dart';
 import 'package:town_pass/util/tp_colors.dart';
 import 'package:town_pass/util/tp_route.dart';
 import 'package:town_pass/util/tp_setting_list.dart';
@@ -79,6 +82,10 @@ class AccountView extends GetView<AccountViewController> {
                       onTap: () {},
                     ),
                     TPSettingListTile.space(),
+                    if (Get.isRegistered<GuidedAssistantController>()) ...[
+                      _assistantSettingsTile(),
+                      TPSettingListTile.space(),
+                    ],
                     TPSettingListTile.navigate(
                       title: '功能教學',
                       onTap: () async => await TPRoute.openUri(
@@ -106,6 +113,33 @@ class AccountView extends GetView<AccountViewController> {
           ],
         ),
       ),
+    );
+  }
+
+  /// AI 助理設定 (new): the guided assistant's mode and language.
+  TPSettingListTile _assistantSettingsTile() {
+    final assistant = Get.find<GuidedAssistantController>();
+    return TPSettingListTile.listTile(
+      onTap: () => assistant.openSettingsPage(),
+      title: const Row(
+        children: [
+          Flexible(
+            child: TPText(
+              SettingsTexts.title,
+              style: TPTextStyles.h3Regular,
+              color: TPColors.grayscale700,
+            ),
+          ),
+          SizedBox(width: 8),
+          SettingsTag(SettingsTexts.newTag),
+        ],
+      ),
+      content: TPText(
+        assistant.settingsSummary,
+        style: TPTextStyles.bodyRegular,
+        color: TPColors.grayscale500,
+      ),
+      trailing: Assets.svg.iconExpand.svg(),
     );
   }
 }

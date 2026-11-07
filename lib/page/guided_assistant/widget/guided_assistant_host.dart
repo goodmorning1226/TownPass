@@ -5,10 +5,13 @@ import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
 import 'package:town_pass/page/guided_assistant/guide_target.dart';
 import 'package:town_pass/page/guided_assistant/guided_assistant_controller.dart';
+import 'package:town_pass/page/guided_assistant/model/assistant_settings.dart';
 import 'package:town_pass/page/guided_assistant/model/guide_content.dart';
 import 'package:town_pass/page/guided_assistant/model/guides/guide_registry.dart';
 import 'package:town_pass/page/guided_assistant/widget/guide_highlight.dart';
 import 'package:town_pass/page/guided_assistant/widget/guided_assistant_sheet.dart';
+import 'package:town_pass/page/main/main_view_controller.dart';
+import 'package:town_pass/util/tp_bottom_navigation_factory.dart';
 import 'package:town_pass/util/tp_colors.dart';
 import 'package:town_pass/util/tp_route.dart';
 import 'package:town_pass/util/tp_text.dart';
@@ -56,10 +59,16 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
             c.nudge.value;
             c.currentRoute.value;
             c.sheetOpen.value;
+            c.homeAsk.value;
             for (final v in c.web.watched) {
               v.value;
             }
             final media = MediaQuery.of(context);
+            // Typing in a page field: the 助理 button and the arrow would sit
+            // on the field the user is filling in, so they step aside until
+            // the keyboard closes (the ring and the card stay).
+            final typingInPage =
+                media.viewInsets.bottom > 0 && !c.sheetOpen.value;
             final layers = <Widget>[];
             final target = c.highlightTarget;
             if (target != null) {
@@ -70,7 +79,7 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
                     targetId: target,
                     alsoUsable: c.currentStep?.alsoUsable ?? const [],
                     blocking: c.locked,
-                    showArrow: c.showArrow,
+                    showArrow: c.showArrow && !typingInPage,
                     topClear: media.padding.top + 56,
                     onBlockedTap: c.wrongTap,
                   ),
@@ -93,12 +102,17 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
                     scrimOpacity: 0.6,
                     showArrow: false,
                     ring: HighlightRing.focus,
-                    radius: 24,
+                    radius: 36,
                   ),
                 ),
               );
             }
-            if (!c.sheetOpen.value) layers.add(_fab(context, c));
+            final homeAsk =
+                !c.sheetOpen.value && !typingInPage && !hinting && _onHome(c);
+            if (homeAsk) layers.add(_homeAskButton(context, c));
+            if (!c.sheetOpen.value && !typingInPage) {
+              layers.add(_fab(context, c));
+            }
             if (hinting) layers.add(_onboardingArrow(context, c));
             if (hinting && stage == OnboardingStage.card) {
               layers.add(_onboardingCard(context, c));
@@ -106,7 +120,9 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
             if (hinting && stage == OnboardingStage.pointer) {
               layers.addAll(_onboardingPointer(context, c));
             }
-            if (c.scrollHintVisible) layers.add(_scrollHint(context));
+            if (c.scrollHintVisible && !typingInPage) {
+              layers.add(_scrollHint(context));
+            }
             final card = c.card;
             if (card != null) layers.add(_guideCard(context, c, card));
             final t = c.task.value;
@@ -114,6 +130,9 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
                 t.status == TaskStatus.paused &&
                 !c.sheetOpen.value) {
               layers.add(_pausedBar(context, c, t));
+            }
+            if (homeAsk && c.homeAsk.value != HomeAsk.idle) {
+              layers.add(_homeAskCard(context, c));
             }
             if (c.toast.value.isNotEmpty && !c.sheetOpen.value) {
               layers.add(_toast(context, c.toast.value));
@@ -160,38 +179,230 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
       bottom: _fabBottom(context, c),
       child: GuideTarget(
         id: assistantFabTarget,
-        child: Semantics(
-          button: true,
-          label: '開啟助理',
-          child: Material(
-            color: TPColors.primary500,
-            elevation: 3,
-            borderRadius: BorderRadius.circular(16),
-            child: InkWell(
-              borderRadius: BorderRadius.circular(16),
-              onTap: c.fabPressed,
-              child: const SizedBox(
-                height: 56,
-                child: Padding(
-                  padding: EdgeInsets.fromLTRB(16, 0, 20, 0),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.chat_bubble_outline_rounded,
-                        color: TPColors.white,
-                        size: 24,
-                      ),
-                      SizedBox(width: 8),
-                      TPText(
-                        '助理',
-                        style: TPTextStyles.h3Regular,
-                        color: TPColors.white,
-                      ),
-                    ],
+        child: _PenguinFab(onTap: c.fabPressed),
+      ),
+    );
+  }
+
+  /// The App's first page with the 首頁 tab showing.
+  static bool _onHome(GuidedAssistantController c) {
+    if (c.currentRoute.value != TPRoute.main) return false;
+    if (!Get.isRegistered<MainViewController>()) return false;
+    return Get.find<MainViewController>().currentIndex.value ==
+        TPBottomNavigationFactory.defaultIndex;
+  }
+
+  /// 「按住提問」 left of the penguin on the home tab.
+  Widget _homeAskButton(BuildContext context, GuidedAssistantController c) {
+    return Positioned(
+      right: 80,
+      bottom: _fabBottom(context, c),
+      child: Material(
+        type: MaterialType.transparency,
+        child: _HomeAskButton(
+          listening: c.homeAsk.value == HomeAsk.listening,
+          onDown: c.homeMicDown,
+          onUp: c.homeMicUp,
+        ),
+      ),
+    );
+  }
+
+  /// Answer card of the home question (the penguin card's look).
+  Widget _homeAskCard(BuildContext context, GuidedAssistantController c) {
+    final state = c.homeAsk.value;
+    final body = <Widget>[];
+    final note = TPTextStyles.h3Regular.copyWith(fontSize: 17, height: 24 / 17);
+    switch (state) {
+      case HomeAsk.listening:
+        body.add(
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 4),
+            child: Row(
+              children: [
+                const _LevelBars(),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: TPText(
+                    HomeAskTexts.listening,
+                    style: note,
+                    color: TPColors.grayscale800,
                   ),
                 ),
+              ],
+            ),
+          ),
+        );
+      case HomeAsk.tooShort:
+      case HomeAsk.notice:
+        body.add(
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 4),
+            child: TPText(
+              state == HomeAsk.tooShort
+                  ? HomeAskTexts.tooShort
+                  : c.homeNotice.value,
+              style: note,
+              color: TPColors.grayscale800,
+            ),
+          ),
+        );
+      case HomeAsk.working:
+      case HomeAsk.asked:
+        final replies = c.homeReplies;
+        if (state == HomeAsk.asked) {
+          body.add(
+            Align(
+              alignment: Alignment.centerRight,
+              child: Padding(
+                padding: const EdgeInsets.only(left: 40),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    TPText(
+                      HomeAskTexts.voiceTag,
+                      style: TPTextStyles.bodyRegular.copyWith(fontSize: 12),
+                      color: TPColors.grayscale700,
+                    ),
+                    const SizedBox(height: 2),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
+                      decoration: const BoxDecoration(
+                        color: TPColors.primary500,
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(12),
+                          topRight: Radius.circular(12),
+                          bottomLeft: Radius.circular(12),
+                          bottomRight: Radius.circular(4),
+                        ),
+                      ),
+                      child: TPText(
+                        c.homeQuestion.value,
+                        style: note,
+                        color: TPColors.white,
+                      ),
+                    ),
+                  ],
+                ),
               ),
+            ),
+          );
+        }
+        if (replies.isEmpty || c.loading.value) {
+          body.add(
+            Row(
+              children: [
+                const SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 3,
+                    color: TPColors.primary700,
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: TPText(
+                    HomeAskTexts.thinking,
+                    style: note,
+                    color: TPColors.grayscale800,
+                  ),
+                ),
+              ],
+            ),
+          );
+        } else {
+          body.add(
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              decoration: const BoxDecoration(
+                color: TPColors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(12),
+                  topRight: Radius.circular(12),
+                  bottomLeft: Radius.circular(4),
+                  bottomRight: Radius.circular(12),
+                ),
+              ),
+              child: TPText(
+                replies.map((m) => m.text).join('\n'),
+                style: note.copyWith(height: 25 / 17),
+                color: TPColors.grayscale950,
+              ),
+            ),
+          );
+          if (c.homeNeedsAssistant) {
+            body.add(
+              _SecondaryButton(HomeAskTexts.openAssistant, c.openFromHome),
+            );
+          }
+          body.add(
+            TPText(
+              HomeAskTexts.keptInHistory,
+              style: TPTextStyles.bodyRegular.copyWith(fontSize: 13),
+              color: TPColors.grayscale700,
+            ),
+          );
+        }
+      case HomeAsk.idle:
+        break;
+    }
+    return Positioned(
+      left: 12,
+      right: 12,
+      top: MediaQuery.of(context).padding.top + 64,
+      child: Semantics(
+        liveRegion: true,
+        child: Material(
+          type: MaterialType.transparency,
+          child: Container(
+            padding: const EdgeInsets.fromLTRB(12, 8, 12, 12),
+            decoration: _warm,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Row(
+                  children: [
+                    const PenguinAvatar(),
+                    const SizedBox(width: 10),
+                    const Expanded(
+                      child: TPText(
+                        HomeAskTexts.title,
+                        style: TPTextStyles.h3SemiBold,
+                        color: TPColors.grayscale950,
+                      ),
+                    ),
+                    Semantics(
+                      button: true,
+                      label: '關閉',
+                      child: Material(
+                        color: TPColors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          side: const BorderSide(color: TPColors.secondary400),
+                        ),
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(10),
+                          onTap: c.dismissHomeAsk,
+                          child: const SizedBox(
+                            width: 44,
+                            height: 44,
+                            child: Icon(
+                              Icons.close_rounded,
+                              color: TPColors.grayscale700,
+                              size: 22,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                for (final w in body) ...[const SizedBox(height: 8), w],
+              ],
             ),
           ),
         ),
@@ -202,7 +413,7 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
   /// Tilted yellow arrow just above the assistant button.
   Widget _onboardingArrow(BuildContext context, GuidedAssistantController c) {
     return Positioned(
-      right: 16 + 28,
+      right: 22,
       bottom: _fabBottom(context, c) + 56 + 18,
       child: const IgnorePointer(
         child: RotationTransition(
@@ -228,18 +439,7 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
             children: [
               Row(
                 children: [
-                  Container(
-                    width: 44,
-                    height: 44,
-                    decoration: const BoxDecoration(
-                      color: TPColors.primary100,
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.sms_outlined,
-                      color: TPColors.primary700,
-                    ),
-                  ),
+                  const PenguinAvatar(size: 48),
                   const SizedBox(width: 12),
                   const Expanded(
                     child: TPText(
@@ -252,7 +452,7 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
               ),
               const SizedBox(height: 16),
               TPText(
-                '不會用、找不到？\n跟「助理」說，它會帶你一步步做。',
+                '不會用、找不到？\n點右下角的企鵝，它會帶你一步步做。',
                 style: TPTextStyles.titleSemiBold.copyWith(
                   fontWeight: FontWeight.w400,
                   height: 28 / 18,
@@ -342,17 +542,20 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
         ),
       ),
       Positioned(
-        right: 16 + 28 + 56 + 6,
+        right: 84,
         bottom: _fabBottom(context, c) + 56 + 44,
         child: IgnorePointer(
-          child: TPText(
-            '點這裡\n開始問助理',
-            style: TPTextStyles.h2SemiBold.copyWith(
-              fontSize: 20,
-              height: 28 / 20,
+          child: Material(
+            type: MaterialType.transparency,
+            child: TPText(
+              '點企鵝\n開始問助理',
+              style: TPTextStyles.h2SemiBold.copyWith(
+                fontSize: 20,
+                height: 28 / 20,
+              ),
+              color: TPColors.white,
+              textAlign: TextAlign.right,
             ),
-            color: TPColors.white,
-            textAlign: TextAlign.right,
           ),
         ),
       ),
@@ -587,17 +790,20 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
       right: 24,
       bottom: MediaQuery.of(context).padding.bottom + 150,
       child: IgnorePointer(
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          decoration: BoxDecoration(
-            color: TPColors.grayscale800,
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: TPText(
-            text,
-            style: TPTextStyles.h3Regular,
-            color: TPColors.white,
-            textAlign: TextAlign.center,
+        child: Material(
+          type: MaterialType.transparency,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              color: TPColors.grayscale800,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: TPText(
+              text,
+              style: TPTextStyles.h3Regular,
+              color: TPColors.white,
+              textAlign: TextAlign.center,
+            ),
           ),
         ),
       ),
@@ -893,5 +1099,167 @@ class _ScrollHintState extends State<_ScrollHint>
         ),
       ),
     );
+  }
+}
+
+/// Round teal button with the penguin (design Variant D); it shrinks a
+/// little while pressed.
+class _PenguinFab extends StatefulWidget {
+  final VoidCallback onTap;
+  const _PenguinFab({required this.onTap});
+
+  @override
+  State<_PenguinFab> createState() => _PenguinFabState();
+}
+
+class _PenguinFabState extends State<_PenguinFab> {
+  bool _down = false;
+
+  void _press(bool down) {
+    if (_down != down) setState(() => _down = down);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      label: '開啟助理',
+      excludeSemantics: true,
+      child: Listener(
+        onPointerDown: (_) => _press(true),
+        onPointerUp: (_) => _press(false),
+        onPointerCancel: (_) => _press(false),
+        child: AnimatedScale(
+          scale: _down ? 0.92 : 1,
+          duration: const Duration(milliseconds: 100),
+          child: Material(
+            color: TPColors.primary500,
+            elevation: 3,
+            shape: const CircleBorder(),
+            child: InkWell(
+              customBorder: const CircleBorder(),
+              onTap: widget.onTap,
+              child: const SizedBox(
+                width: 56,
+                height: 56,
+                child: Center(child: PenguinAvatar(size: 46, borderWidth: 2)),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// 「按住提問」: hold to talk, release to ask.
+class _HomeAskButton extends StatelessWidget {
+  final bool listening;
+  final VoidCallback onDown;
+  final VoidCallback onUp;
+  const _HomeAskButton({
+    required this.listening,
+    required this.onDown,
+    required this.onUp,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final fg = listening ? TPColors.white : TPColors.primary700;
+    return Semantics(
+      button: true,
+      label: HomeAskTexts.aria,
+      excludeSemantics: true,
+      child: Listener(
+        onPointerDown: (_) => onDown(),
+        onPointerUp: (_) => onUp(),
+        onPointerCancel: (_) => onUp(),
+        child: Container(
+          height: 56,
+          padding: const EdgeInsets.symmetric(horizontal: 14),
+          decoration: BoxDecoration(
+            color: listening ? TPColors.primary700 : TPColors.white,
+            border: Border.all(color: TPColors.primary700, width: 2),
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: const [
+              BoxShadow(
+                color: Color(0x33000000),
+                blurRadius: 6,
+                offset: Offset(0, 3),
+              ),
+            ],
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.mic_none_rounded, color: fg, size: 22),
+              const SizedBox(width: 6),
+              TPText(
+                listening ? HomeAskTexts.listeningLabel : HomeAskTexts.label,
+                style: TPTextStyles.h3SemiBold,
+                color: fg,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Three bars going up and down while listening.
+class _LevelBars extends StatefulWidget {
+  const _LevelBars();
+
+  @override
+  State<_LevelBars> createState() => _LevelBarsState();
+}
+
+class _LevelBarsState extends State<_LevelBars>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _beat = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 900),
+  )..repeat();
+
+  @override
+  void dispose() {
+    _beat.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ExcludeSemantics(
+      child: AnimatedBuilder(
+        animation: _beat,
+        builder: (context, _) => SizedBox(
+          height: 22,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              for (var i = 0; i < 3; i++) ...[
+                if (i > 0) const SizedBox(width: 3),
+                Container(
+                  width: 4,
+                  height: 20 * _scale(i),
+                  decoration: BoxDecoration(
+                    color: TPColors.primary700,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// 0.35 → 1 → 0.35, each bar a little later (as the design's animation).
+  double _scale(int i) {
+    final t = (_beat.value - i * 0.15 / 0.9) % 1.0;
+    final wave = 0.5 - 0.5 * math.cos(2 * math.pi * t);
+    return 0.35 + 0.65 * wave;
   }
 }

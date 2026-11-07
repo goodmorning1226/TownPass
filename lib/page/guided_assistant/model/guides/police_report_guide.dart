@@ -64,6 +64,12 @@ const _nextButton = "byText('form > button.base-button', '下一步')";
 const _send = "byText('form > button.base-button', '送出')";
 const _noticeOk = "byText('div.fixed.bottom-0 button.base-button', '同意')";
 
+/// The white card with the 使用須知 text (the page scrolls, not the card).
+const _noticeText = "q('div.pt-6.px-6.pb-36 > div.shadow-card')";
+
+/// The 個人資料收集聲明及服務條款 text in step 2, above its agree box.
+const _statement = "textBetween('form', '個人資料收集聲明及服務條款', '本人已詳閱並同意以上內容')";
+
 /// JS function: 'below' / 'above' when an element is outside the viewport
 /// vertically, else ''.
 const _offFn =
@@ -78,11 +84,13 @@ const policeReportPageSpec = WebPageSpec(
     // Notice page (fixed bottom bar).
     'police.notice_agree': "byText('div.fixed.bottom-0 label', '本人已詳閱須知並同意繼續')",
     'police.notice_ok': _noticeOk,
+    'police.notice_text': _noticeText,
     // Form, steps 1 and 2.
     'police.field': "(() => { const n = $_next; return n ? n[1] : null; })()",
     'police.same_addr': "byText('label', '同通訊地址')",
     'police.locate': "(() => { const i = q('#location'); return i && i.parentElement ? i.parentElement.querySelector('button') : null; })()",
     'police.agree': _agree,
+    'police.statement': 'readArea($_statement)',
     'police.next': _nextButton,
     'police.send': _send,
     'police.ok': "dialogButton('通報成功', '確認')",
@@ -97,6 +105,13 @@ const policeReportPageSpec = WebPageSpec(
   },
   flags: {
     'noticeEnabled': '$_enabledFn($_noticeOk)',
+    // Scrolled to the end of the notice / the step 2 statement (latched).
+    'noticeRead':
+        "location.pathname.replace(/\\/\$/, '') === '/police-report' && readToEnd($_noticeText)",
+    'statementRead': "!!q('#your_role') && readToEnd($_statement)",
+    // The statement scrolls inside its own grey box.
+    'statementBox':
+        "(() => { const a = $_statement; return !!a && a.some((e) => !!scrollBox(e)); })()",
     'formStep': "q('#your_role') ? 2 : (q('#mobile_number') ? 1 : 0)",
     'fieldKey': "(() => { const n = $_next; return n ? n[0] : ''; })()",
     // The user is typing in the field the card is about.
@@ -125,7 +140,7 @@ const policeReportPageSpec = WebPageSpec(
     'status': r"""(() => { const m = ((q('#app') || document.body).innerText || '').match(/處理中|已結案|已受理/); return m ? m[0] : ''; })()""",
     'caseNo': r"""(() => { const m = ((q('#app') || document.body).innerText || '').match(/編號\s*\n+\s*([^\n]+)/); return m ? m[1].trim() : ''; })()""",
   },
-  latchFlags: {'reported'},
+  latchFlags: {'reported', 'noticeRead', 'statementRead'},
 );
 
 bool onPoliceReport(WebSnapshot s) => s.pathStarts(_notice);
@@ -142,6 +157,11 @@ int _stage(WebPageState s) {
 
 bool _reported(WebPageState s) => s.latched('reported');
 bool _no(WebPageState s) => false;
+bool _noticeRead(WebPageState s) => s.latched('noticeRead');
+bool _statementRead(WebPageState s) => s.latched('statementRead');
+
+/// Said when the user agreed before scrolling to the end of the text.
+const _readNote = '建議還是把內容看完喔。';
 bool _onScreen(WebPageState s, String flag) => s.now.text(flag).isEmpty;
 
 String _scroll(String off) => switch (off) {
@@ -215,15 +235,29 @@ final List<GuideComponent> policeReportComponents = [
     doneDetail: '照畫面填手機號碼、電子信箱和地址。',
     doneTarget: (s) => _stage(s) == 2 ? 'police.field' : null,
     steps: [
+      // Read first: outline only, so the whole page can be scrolled.
+      GuideStep(
+        target: (s) => _stage(s) == 1 ? 'police.notice_text' : null,
+        locks: _no,
+        arrow: _no,
+        scrollHint: (s) => _stage(s) == 1,
+        label: (_) => '往下滑',
+        card: (_) =>
+            '這是網路報案的須知。網路報案不是緊急報案，現在有危險請馬上打 110！先往下滑，把須知看完喔。看到最下面，我再告訴你要按哪裡。',
+        detail: (_) =>
+            '須知重點：緊急事件請打 110；網路報案大約 5 天內回覆；像竊盜、詐騙這類案件，之後還要到派出所做筆錄。往下滑到最下面就看完了。',
+        isDone: (s) =>
+            _reported(s) ||
+            _stage(s) == 2 ||
+            _stage(s) == 3 ||
+            (_stage(s) == 1 && (_noticeRead(s) || s.now.flag('noticeEnabled'))),
+        cardTop: (_) => 250,
+      ),
       GuideStep(
         target: (s) => _stage(s) == 1 ? 'police.notice_agree' : null,
-        // Ring only: the user scrolls the notice to read it first.
-        locks: _no,
         label: (_) => '勾選',
-        card: (_) =>
-            '這是網路報案的須知。網路報案不是緊急報案，現在有危險請馬上打 110！看完後，勾下面的「本人已詳閱須知並同意繼續」。',
-        detail: (_) =>
-            '須知重點：緊急事件請打 110；網路報案大約 5 天內回覆；像竊盜、詐騙這類案件，之後還要到派出所做筆錄。看完勾最下面的方框。',
+        card: (_) => '須知看完了！勾下面的「本人已詳閱須知並同意繼續」。',
+        detail: (_) => '點畫面最下面「本人已詳閱須知並同意繼續」前面的小方框。',
         isDone: (s) =>
             _reported(s) ||
             _stage(s) == 2 ||
@@ -234,7 +268,7 @@ final List<GuideComponent> policeReportComponents = [
       GuideStep(
         target: (s) => _stage(s) == 1 ? 'police.notice_ok' : null,
         label: (_) => '點一下',
-        card: (_) => '勾好了！按下面的「同意」，開始填報案資料。',
+        card: (s) => '${_noticeRead(s) ? '' : _readNote}勾好了！按下面的「同意」，開始填報案資料。',
         detail: (_) => '按畫面最下面的「同意」。',
         isDone: (s) => _reported(s) || _stage(s) == 2 || _stage(s) == 3,
         cardTop: (_) => 250,
@@ -352,19 +386,37 @@ final List<GuideComponent> policeReportComponents = [
     requires: const ['fill_case'],
     taskTitle: '同意個資聲明',
     doneText: '勾好了！「送出」現在可以按了。',
+    doneTextOf: (s) => '${_statementRead(s) ? '' : _readNote}勾好了！「送出」現在可以按了。',
     doneDetail: '看一下填的內容對不對，再自己按「送出」。',
     doneTarget: (s) => _stage(s) == 3 ? 'police.send' : null,
     steps: [
+      // Read first: outline only, so the whole form can be scrolled.
+      GuideStep(
+        target: (s) => _stage(s) == 3 ? 'police.statement' : null,
+        locks: _no,
+        arrow: _no,
+        scrollHint: (s) => _stage(s) == 3,
+        label: (_) => '往下滑',
+        card: (s) => s.now.flag('statementBox')
+            ? '下面是「個人資料收集聲明」。先往下滑，灰色框裡的字也要用手指在框裡往上推，把聲明看完喔。看到最下面，我再告訴你要按哪裡。'
+            : '下面是「個人資料收集聲明」。先往下滑，把聲明看完喔。看到最下面，我再告訴你要按哪裡。',
+        detail: (_) =>
+            '聲明是說：警察局會用你填的資料確認你的身分、跟你聯絡；你也可以要求查詢、更正或刪除自己的資料。往下滑到最下面就看完了。',
+        isDone: (s) =>
+            _reported(s) ||
+            (_stage(s) == 3 &&
+                (_statementRead(s) || s.now.flag('sendEnabled'))),
+        cardTop: (_) => 60,
+      ),
       GuideStep(
         target: (s) =>
             _stage(s) == 3 && _onScreen(s, 'agreeOff') ? 'police.agree' : null,
-        // Ring only: the user may scroll up to read the 個人資料收集聲明.
-        locks: _no,
+        locks: (s) => _onScreen(s, 'agreeOff'),
         arrow: (s) => _onScreen(s, 'agreeOff'),
         scrollHint: (s) => !_onScreen(s, 'agreeOff'),
         label: (_) => '勾選',
         card: (s) =>
-            '${_scroll(s.now.text('agreeOff'))}下面是「個人資料收集聲明」。看完勾「本人已詳閱並同意以上內容」，灰色的「送出」才會變成可以按。',
+            '聲明看完了！${_scroll(s.now.text('agreeOff'))}勾「本人已詳閱並同意以上內容」，灰色的「送出」才會變成可以按。',
         detail: (_) => '往下滑到最下面，點「本人已詳閱並同意以上內容」前面的小方框。',
         isDone: (s) =>
             _reported(s) || (_stage(s) == 3 && s.now.flag('sendEnabled')),
@@ -406,7 +458,8 @@ final List<GuideComponent> policeReportComponents = [
             if (date.isNotEmpty) '發生日期 $date',
           ].join('、');
           final check = what.isEmpty ? '' : '：$what';
-          return '${_scroll(s.now.text('sendOff'))}最後確認一下$check。沒問題就自己按「送出」喔。這是示範網站，不會真的報案。';
+          final note = _statementRead(s) ? '' : _readNote;
+          return '$note${_scroll(s.now.text('sendOff'))}最後確認一下$check。沒問題就自己按「送出」喔。這是示範網站，不會真的報案。';
         },
         detail: (_) => '看一下填的資料對不對，沒問題就自己按最下面的「送出」。不想報了，按左上角的「‹」離開就好。',
         isDone: _reported,
