@@ -15,11 +15,30 @@ import 'package:town_pass/util/tp_colors.dart';
 import 'package:town_pass/util/tp_route.dart';
 import 'package:town_pass/page/assistant/assistant_view_controller.dart';
 import 'package:town_pass/page/assistant/widget/assistant_host.dart';
+import 'package:town_pass/page/guided_assistant/guided_assistant_controller.dart';
+import 'package:town_pass/service/assistant_recorder.dart';
+import 'package:town_pass/service/assistant_service.dart';
+import 'package:town_pass/page/guided_assistant/web/web_page_state.dart';
+import 'package:town_pass/page/guided_assistant/widget/guided_assistant_host.dart';
 
 const assistantEnabled = bool.fromEnvironment(
   'ASSISTANT_ENABLED',
   defaultValue: kDebugMode,
 );
+
+/// The chat assistant is the default. `--dart-define=ASSISTANT_GUIDED=true`
+/// switches to the guided assistant instead (step-by-step guides, pre-written
+/// content): it asks the model for service requests and falls back to the
+/// pre-written rules when the backend cannot be reached.
+/// `--dart-define=ASSISTANT_OFFLINE=true` makes the guided assistant never
+/// call the backend.
+const assistantGuided = bool.fromEnvironment(
+  'ASSISTANT_GUIDED',
+  defaultValue: false,
+);
+const assistantOffline = bool.fromEnvironment('ASSISTANT_OFFLINE');
+const _useMock = assistantEnabled && assistantGuided;
+const _useModel = assistantEnabled && !assistantGuided;
 
 const _transparentStatusBar = SystemUiOverlayStyle(
   statusBarColor: Colors.transparent,
@@ -55,7 +74,19 @@ Future<void> initServices() async {
   Get.put<SubscriptionService>(SubscriptionService());
   // Pages keep the language of the last assistant navigation (or Settings).
   await PageTranslation.instance.load();
-  if (assistantEnabled) {
+  if (_useMock) {
+    Get.put<WebPageState>(WebPageState(), permanent: true);
+    Get.put<GuidedAssistantController>(
+      assistantOffline
+          ? GuidedAssistantController()
+          : GuidedAssistantController(
+              service: AssistantService(),
+              recorder: AssistantRecorder(),
+            ),
+      permanent: true,
+    );
+  }
+  if (_useModel) {
     Get.put<AssistantViewController>(
       AssistantViewController(),
       permanent: true,
@@ -97,22 +128,39 @@ class MyApp extends StatelessWidget {
       },
       getPages: TPRoute.page,
       navigatorObservers: [
-        if (assistantEnabled)
+        if (_useModel)
           AssistantNavigationObserver(Get.find<AssistantViewController>()),
+        if (_useMock)
+          GuidedNavigationObserver(Get.find<GuidedAssistantController>()),
       ],
       routingCallback: (routing) {
-        if (assistantEnabled && Get.isRegistered<AssistantViewController>()) {
+        if (_useModel && Get.isRegistered<AssistantViewController>()) {
           Get.find<AssistantViewController>().routeChanged(
             routing?.current ?? '',
           );
         }
+        if (_useMock && Get.isRegistered<GuidedAssistantController>()) {
+          Get.find<GuidedAssistantController>().routeChanged(
+            routing?.current ?? '',
+          );
+        }
       },
-      builder: (context, child) => assistantEnabled
-          ? AssistantHost(
-              controller: Get.find<AssistantViewController>(),
-              child: child ?? const SizedBox.shrink(),
-            )
-          : child ?? const SizedBox.shrink(),
+      builder: (context, child) {
+        final page = child ?? const SizedBox.shrink();
+        if (_useMock) {
+          return GuidedAssistantHost(
+            controller: Get.find<GuidedAssistantController>(),
+            child: page,
+          );
+        }
+        if (_useModel) {
+          return AssistantHost(
+            controller: Get.find<AssistantViewController>(),
+            child: page,
+          );
+        }
+        return page;
+      },
     );
   }
 }

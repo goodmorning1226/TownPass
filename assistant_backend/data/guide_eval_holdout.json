@@ -1,0 +1,1958 @@
+{
+ "version": 1,
+ "_comment": "Held-out evaluation set (written 2026-11-07 after the decision code was tuned on guide_eval.json). Written from component titles/descriptions/requires and service purpose only; do NOT tune keywords on it. Same format as guide_eval.json; capability null = out of scope: no guide may be attached.",
+ "cases": [
+  {
+   "id": "h-lib-grandkid",
+   "text": "想跟圖書館借幾本給孫女看的繪本",
+   "page": "library",
+   "capability": "library",
+   "components": [
+    "open_search",
+    "search_keyword",
+    "pick_book",
+    "choose_branch",
+    "reserve"
+   ],
+   "note": "借繪本：預約流程。",
+   "tags": [
+    "reserve",
+    "colloquial"
+   ]
+  },
+  {
+   "id": "h-lib-overdue",
+   "text": "我那本書是不是過期沒還了",
+   "page": "library",
+   "capability": "library",
+   "components": [
+    "open_records"
+   ],
+   "note": "逾期＝看我的紀錄。",
+   "tags": [
+    "records",
+    "colloquial"
+   ]
+  },
+  {
+   "id": "h-lib-heard-pickup",
+   "text": "有人跟我說我預約的書已經可以去領了是真的嗎",
+   "page": "library",
+   "capability": "library",
+   "components": [
+    "open_records",
+    "check_pickup"
+   ],
+   "note": "長句語音問可取書。",
+   "tags": [
+    "pickup",
+    "voice"
+   ]
+  },
+  {
+   "id": "h-lib-saturday",
+   "text": "圖書館這禮拜六有沒有開放",
+   "page": "library",
+   "capability": "library",
+   "components": [
+    "open_notices"
+   ],
+   "note": "開放時間＝公告。",
+   "tags": [
+    "notices"
+   ]
+  },
+  {
+   "id": "h-lib-district",
+   "text": "信義區那邊有沒有圖書館",
+   "page": "library",
+   "capability": "library",
+   "components": [
+    "open_map"
+   ],
+   "note": "某區有沒有圖書館＝分館地圖。",
+   "tags": [
+    "map"
+   ]
+  },
+  {
+   "id": "h-lib-popular",
+   "text": "最受歡迎的書有哪幾本",
+   "page": "library",
+   "capability": "library",
+   "components": [
+    "open_ranking"
+   ],
+   "note": "最受歡迎＝點閱排行。",
+   "tags": [
+    "ranking"
+   ]
+  },
+  {
+   "id": "h-lib-find-title",
+   "text": "幫我找一本叫底層邏輯的書",
+   "page": "library",
+   "capability": "library",
+   "components": [
+    "open_search",
+    "search_keyword",
+    "pick_book"
+   ],
+   "note": "找特定書（不是借）：開詳細頁。",
+   "tags": [
+    "search",
+    "title"
+   ],
+   "destination": {
+    "kind": "detail",
+    "book_id": "lib-book-3"
+   }
+  },
+  {
+   "id": "h-lib-rank-reserve",
+   "text": "我想看點閱最高的書然後預約一本",
+   "page": "library",
+   "capability": "library",
+   "components": [
+    "open_ranking",
+    "pick_book",
+    "choose_branch",
+    "reserve"
+   ],
+   "note": "先排行、從排行點書、選取書館、預約（使用者順序）。",
+   "tags": [
+    "ranking",
+    "reserve",
+    "two_goals",
+    "order"
+   ]
+  },
+  {
+   "id": "h-lib-news-and-mine",
+   "text": "圖書館的最新消息跟我借的書 一起看一下",
+   "page": "library",
+   "capability": "library",
+   "components": [
+    "open_notices",
+    "open_records"
+   ],
+   "note": "兩件事：公告＋紀錄。",
+   "tags": [
+    "two_goals",
+    "voice"
+   ]
+  },
+  {
+   "id": "h-lib-only-map",
+   "text": "不用幫我借 我只是要知道分館在哪",
+   "page": "library",
+   "capability": "library",
+   "components": [
+    "open_map"
+   ],
+   "note": "否定借書，只要地圖。",
+   "tags": [
+    "map",
+    "negation",
+    "voice"
+   ]
+  },
+  {
+   "id": "h-lib-homophone",
+   "text": "我要結書",
+   "page": "library",
+   "capability": "library",
+   "components": [
+    "open_search",
+    "search_keyword",
+    "pick_book",
+    "choose_branch",
+    "reserve"
+   ],
+   "note": "語音把「借」聽成「結」。",
+   "tags": [
+    "reserve",
+    "homophone",
+    "voice"
+   ]
+  },
+  {
+   "id": "h-lib-suggest",
+   "text": "圖書館有什麼好書可以介紹",
+   "page": "library",
+   "capability": "library",
+   "components": [
+    "open_search",
+    "hot_keyword",
+    "pick_book"
+   ],
+   "note": "請推薦：熱門關鍵字再選一本（打字搜尋也可以）。",
+   "tags": [
+    "hot"
+   ],
+   "also_ok": [
+    [
+     "open_search",
+     "search_keyword",
+     "pick_book"
+    ]
+   ]
+  },
+  {
+   "id": "h-fee-water-jiao",
+   "text": "幫我交水費",
+   "page": "fees",
+   "capability": "fees.water",
+   "components": [
+    "enter_number",
+    "query_bill",
+    "pick_bill",
+    "to_payment",
+    "choose_method",
+    "confirm_pay"
+   ],
+   "note": "「交」水費。",
+   "tags": [
+    "pay",
+    "colloquial"
+   ],
+   "destination": {
+    "kind": "capability",
+    "id": "fees.water"
+   }
+  },
+  {
+   "id": "h-fee-ticket",
+   "text": "停車單要怎麼付錢",
+   "page": "fees",
+   "capability": "fees.parking",
+   "components": [
+    "enter_number",
+    "query_bill",
+    "pick_bill",
+    "to_payment",
+    "choose_method",
+    "confirm_pay"
+   ],
+   "note": "停車單＝停車費。",
+   "tags": [
+    "pay",
+    "colloquial"
+   ],
+   "destination": {
+    "kind": "capability",
+    "id": "fees.parking"
+   }
+  },
+  {
+   "id": "h-fee-rent",
+   "text": "國宅的租金要繳了",
+   "page": "fees",
+   "capability": "fees.housing",
+   "components": [
+    "enter_number",
+    "query_bill",
+    "pick_bill",
+    "to_payment",
+    "choose_method",
+    "confirm_pay"
+   ],
+   "note": "國宅租金。",
+   "tags": [
+    "pay"
+   ],
+   "destination": {
+    "kind": "capability",
+    "id": "fees.housing"
+   }
+  },
+  {
+   "id": "h-fee-hospital-paid",
+   "text": "上個月醫院的費用我付了沒有",
+   "page": "fees",
+   "capability": "fees.history",
+   "components": [
+    "filter_history"
+   ],
+   "note": "付了沒＝繳費紀錄，不是再付一次。",
+   "tags": [
+    "history",
+    "cross_item"
+   ],
+   "destination": {
+    "kind": "capability",
+    "id": "fees.history"
+   }
+  },
+  {
+   "id": "h-fee-number",
+   "text": "水費帳單上的號碼要輸入在哪",
+   "page": "fees",
+   "capability": "fees.water",
+   "components": [
+    "enter_number"
+   ],
+   "note": "只問號碼輸入。",
+   "tags": [
+    "view"
+   ],
+   "destination": {
+    "kind": "capability",
+    "id": "fees.water"
+   }
+  },
+  {
+   "id": "h-fee-tuition-amount",
+   "text": "我想知道學費要繳多少",
+   "page": "fees",
+   "capability": "fees.tuition",
+   "components": [
+    "enter_number",
+    "query_bill"
+   ],
+   "note": "只問金額。",
+   "tags": [
+    "view"
+   ],
+   "destination": {
+    "kind": "capability",
+    "id": "fees.tuition"
+   }
+  },
+  {
+   "id": "h-fee-course",
+   "text": "公訓處的課程費用 我要付款",
+   "page": "fees",
+   "capability": "fees.course",
+   "components": [
+    "enter_number",
+    "query_bill",
+    "pick_bill",
+    "to_payment",
+    "choose_method",
+    "confirm_pay"
+   ],
+   "note": "公訓處課程。",
+   "tags": [
+    "pay",
+    "voice"
+   ],
+   "destination": {
+    "kind": "capability",
+    "id": "fees.course"
+   }
+  },
+  {
+   "id": "h-fee-method",
+   "text": "平價住宅維護費用悠遊付付得了嗎",
+   "page": "fees",
+   "capability": "fees.maintenance",
+   "components": [
+    "enter_number",
+    "query_bill",
+    "pick_bill",
+    "to_payment",
+    "choose_method"
+   ],
+   "note": "問付款方式；整個付款也可以。",
+   "tags": [
+    "pay"
+   ],
+   "also_ok": [
+    [
+     "enter_number",
+     "query_bill",
+     "pick_bill",
+     "to_payment",
+     "choose_method",
+     "confirm_pay"
+    ]
+   ],
+   "destination": {
+    "kind": "capability",
+    "id": "fees.maintenance"
+   }
+  },
+  {
+   "id": "h-fee-correction",
+   "text": "不是學費 是要繳醫藥費",
+   "page": "fees",
+   "capability": "fees.hospital",
+   "components": [
+    "enter_number",
+    "query_bill",
+    "pick_bill",
+    "to_payment",
+    "choose_method",
+    "confirm_pay"
+   ],
+   "note": "更正：醫藥費。",
+   "tags": [
+    "pay",
+    "negation"
+   ],
+   "destination": {
+    "kind": "capability",
+    "id": "fees.hospital"
+   }
+  },
+  {
+   "id": "h-fee-unknown",
+   "text": "我要繳費 但不知道是哪一種",
+   "page": "fees",
+   "capability": "fees.other",
+   "components": [
+    "pick_fee",
+    "enter_number",
+    "query_bill",
+    "pick_bill",
+    "to_payment",
+    "choose_method",
+    "confirm_pay"
+   ],
+   "note": "不知道哪一種：其他繳費頁先選費用。",
+   "tags": [
+    "pay",
+    "vague"
+   ],
+   "destination": {
+    "kind": "capability",
+    "id": "fees.other"
+   }
+  },
+  {
+   "id": "h-ctr-queue",
+   "text": "我想知道戶政那邊現在排到第幾號",
+   "page": "counter_calling",
+   "capability": "reservation",
+   "components": [
+    "pick_unit",
+    "pick_location",
+    "read_counters"
+   ],
+   "note": "排到第幾號。",
+   "tags": [
+    "view",
+    "voice"
+   ],
+   "destination": {
+    "kind": "capability",
+    "id": "reservation"
+   }
+  },
+  {
+   "id": "h-ctr-crowd",
+   "text": "中正區的地政現在人多嗎",
+   "page": "counter_calling",
+   "capability": "reservation",
+   "components": [
+    "pick_unit",
+    "pick_location",
+    "read_counters"
+   ],
+   "note": "人多嗎＝等候人數。",
+   "tags": [
+    "view",
+    "colloquial"
+   ],
+   "destination": {
+    "kind": "capability",
+    "id": "reservation"
+   }
+  },
+  {
+   "id": "h-ctr-id-card",
+   "text": "去辦身分證要等幾個人",
+   "page": "counter_calling",
+   "capability": "reservation",
+   "components": [
+    "pick_unit",
+    "pick_location",
+    "read_counters"
+   ],
+   "note": "辦身分證（戶政）要等多久，沒有單位名稱。",
+   "tags": [
+    "view",
+    "vague"
+   ],
+   "destination": {
+    "kind": "capability",
+    "id": "reservation"
+   }
+  },
+  {
+   "id": "h-ctr-tai",
+   "text": "稅務的櫃台現在叫到哪",
+   "page": "counter_calling",
+   "capability": "reservation",
+   "components": [
+    "pick_unit",
+    "pick_location",
+    "read_counters"
+   ],
+   "note": "櫃台（台/檯）。",
+   "tags": [
+    "view",
+    "typo"
+   ],
+   "destination": {
+    "kind": "capability",
+    "id": "reservation"
+   }
+  },
+  {
+   "id": "h-ctr-remember",
+   "text": "每次都要重新選單位好麻煩 幫我記起來",
+   "page": "counter_calling",
+   "capability": "reservation",
+   "components": [
+    "pick_unit",
+    "pick_location",
+    "add_favorite"
+   ],
+   "note": "記起來＝加入常用。",
+   "tags": [
+    "favorite",
+    "voice"
+   ],
+   "destination": {
+    "kind": "capability",
+    "id": "reservation"
+   }
+  },
+  {
+   "id": "h-ctr-saved",
+   "text": "用我存的那個地點看等多久",
+   "page": "counter_calling",
+   "capability": "reservation",
+   "components": [
+    "open_favorite",
+    "read_counters"
+   ],
+   "note": "從常用地點看叫號。",
+   "tags": [
+    "favorite",
+    "view",
+    "two_goals"
+   ],
+   "destination": {
+    "kind": "capability",
+    "id": "reservation"
+   }
+  },
+  {
+   "id": "h-ctr-remove",
+   "text": "常用地點那個舊的不要了",
+   "page": "counter_calling",
+   "capability": "reservation",
+   "components": [
+    "remove_favorite"
+   ],
+   "note": "移除常用。",
+   "tags": [
+    "favorite",
+    "colloquial"
+   ],
+   "destination": {
+    "kind": "capability",
+    "id": "reservation"
+   }
+  },
+  {
+   "id": "h-ctr-job",
+   "text": "我要去就業服務處 看現在叫號到哪",
+   "page": "counter_calling",
+   "capability": "reservation",
+   "components": [
+    "pick_unit",
+    "pick_location",
+    "read_counters"
+   ],
+   "note": "就業服務處（不是站）。",
+   "tags": [
+    "view"
+   ],
+   "destination": {
+    "kind": "capability",
+    "id": "reservation"
+   }
+  },
+  {
+   "id": "h-ctr-two",
+   "text": "看完叫號幫我加進常用",
+   "page": "counter_calling",
+   "capability": "reservation",
+   "components": [
+    "pick_unit",
+    "pick_location",
+    "read_counters",
+    "add_favorite"
+   ],
+   "note": "兩件事：看叫號＋加入常用。",
+   "tags": [
+    "view",
+    "favorite",
+    "two_goals"
+   ],
+   "destination": {
+    "kind": "capability",
+    "id": "reservation"
+   }
+  },
+  {
+   "id": "h-ctr-correction",
+   "text": "不是地政 是戶政 現在等幾個",
+   "page": "counter_calling",
+   "capability": "reservation",
+   "components": [
+    "pick_unit",
+    "pick_location",
+    "read_counters"
+   ],
+   "note": "更正單位。",
+   "tags": [
+    "view",
+    "negation"
+   ],
+   "destination": {
+    "kind": "capability",
+    "id": "reservation"
+   }
+  },
+  {
+   "id": "h-dis-outage-flood",
+   "text": "我們這邊停電又淹水 要通報",
+   "page": "disaster_report",
+   "capability": "disasterReport",
+   "components": [
+    "pick_category",
+    "enter_location",
+    "describe_disaster",
+    "give_consent",
+    "send_report"
+   ],
+   "note": "停電＋淹水通報。",
+   "tags": [
+    "report"
+   ],
+   "destination": {
+    "kind": "capability",
+    "id": "disasterReport"
+   }
+  },
+  {
+   "id": "h-dis-pole",
+   "text": "路邊的電線桿倒了",
+   "page": "disaster_report",
+   "capability": "disasterReport",
+   "components": [
+    "pick_category",
+    "enter_location",
+    "describe_disaster",
+    "give_consent",
+    "send_report"
+   ],
+   "note": "電線桿倒。",
+   "tags": [
+    "report"
+   ],
+   "destination": {
+    "kind": "capability",
+    "id": "disasterReport"
+   }
+  },
+  {
+   "id": "h-dis-collapse",
+   "text": "山上的路坍方了",
+   "page": "disaster_report",
+   "capability": "disasterReport",
+   "components": [
+    "pick_category",
+    "enter_location",
+    "describe_disaster",
+    "give_consent",
+    "send_report"
+   ],
+   "note": "坍方。",
+   "tags": [
+    "report"
+   ],
+   "destination": {
+    "kind": "capability",
+    "id": "disasterReport"
+   }
+  },
+  {
+   "id": "h-dis-typhoon-tree",
+   "text": "颱風把樹吹倒壓到車子",
+   "page": "disaster_report",
+   "capability": "disasterReport",
+   "components": [
+    "pick_category",
+    "enter_location",
+    "describe_disaster",
+    "give_consent",
+    "send_report"
+   ],
+   "note": "颱風吹倒樹。",
+   "tags": [
+    "report",
+    "colloquial"
+   ],
+   "destination": {
+    "kind": "capability",
+    "id": "disasterReport"
+   }
+  },
+  {
+   "id": "h-dis-underpass",
+   "text": "地下道積水很深車子過不去",
+   "page": "disaster_report",
+   "capability": "disasterReport",
+   "components": [
+    "pick_category",
+    "enter_location",
+    "describe_disaster",
+    "give_consent",
+    "send_report"
+   ],
+   "note": "積水。",
+   "tags": [
+    "report"
+   ],
+   "destination": {
+    "kind": "capability",
+    "id": "disasterReport"
+   }
+  },
+  {
+   "id": "h-dis-address",
+   "text": "通報災害的地址那格要怎麼填",
+   "page": "disaster_report",
+   "capability": "disasterReport",
+   "components": [
+    "pick_category",
+    "enter_location"
+   ],
+   "note": "只問地點；整個流程也可以。",
+   "tags": [
+    "report"
+   ],
+   "also_ok": [
+    [
+     "pick_category",
+     "enter_location",
+     "describe_disaster",
+     "give_consent",
+     "send_report"
+    ]
+   ],
+   "destination": {
+    "kind": "capability",
+    "id": "disasterReport"
+   }
+  },
+  {
+   "id": "h-dis-status",
+   "text": "災情的狀況要勾哪個",
+   "page": "disaster_report",
+   "capability": "disasterReport",
+   "components": [
+    "pick_category",
+    "enter_location",
+    "describe_disaster"
+   ],
+   "note": "只問狀況；整個流程也可以。",
+   "tags": [
+    "report"
+   ],
+   "also_ok": [
+    [
+     "pick_category",
+     "enter_location",
+     "describe_disaster",
+     "give_consent",
+     "send_report"
+    ]
+   ],
+   "destination": {
+    "kind": "capability",
+    "id": "disasterReport"
+   }
+  },
+  {
+   "id": "h-dis-grey",
+   "text": "災害通報最後那個送出鍵是灰的",
+   "page": "disaster_report",
+   "capability": "disasterReport",
+   "components": [
+    "pick_category",
+    "enter_location",
+    "describe_disaster",
+    "give_consent"
+   ],
+   "note": "送出是灰的＝還沒勾同意；整個流程也可以。",
+   "tags": [
+    "report"
+   ],
+   "also_ok": [
+    [
+     "pick_category",
+     "enter_location",
+     "describe_disaster",
+     "give_consent",
+     "send_report"
+    ]
+   ],
+   "destination": {
+    "kind": "capability",
+    "id": "disasterReport"
+   }
+  },
+  {
+   "id": "h-dis-drain",
+   "text": "我要回報災情 是水溝堵住淹起來了",
+   "page": "disaster_report",
+   "capability": "disasterReport",
+   "components": [
+    "pick_category",
+    "enter_location",
+    "describe_disaster",
+    "give_consent",
+    "send_report"
+   ],
+   "note": "水溝堵塞淹水（「水」不是水費）。",
+   "tags": [
+    "report",
+    "cross_item"
+   ],
+   "destination": {
+    "kind": "capability",
+    "id": "disasterReport"
+   }
+  },
+  {
+   "id": "h-dis-correction",
+   "text": "不是要陳情 是要報災害",
+   "page": "disaster_report",
+   "capability": "disasterReport",
+   "components": [
+    "pick_category",
+    "enter_location",
+    "describe_disaster",
+    "give_consent",
+    "send_report"
+   ],
+   "note": "更正：災害通報。",
+   "tags": [
+    "report",
+    "negation"
+   ],
+   "destination": {
+    "kind": "capability",
+    "id": "disasterReport"
+   }
+  },
+  {
+   "id": "h-cit-slide",
+   "text": "公園的溜滑梯壞掉了想跟市府說",
+   "page": "citizen_report",
+   "capability": "reportIssue",
+   "components": [
+    "pick_category",
+    "fill_form",
+    "submit_report"
+   ],
+   "note": "公共設施損壞：陳情。",
+   "tags": [
+    "report",
+    "colloquial"
+   ],
+   "destination": {
+    "kind": "capability",
+    "id": "reportIssue"
+   }
+  },
+  {
+   "id": "h-cit-construction",
+   "text": "對面工地半夜還在施工很吵 我要申訴",
+   "page": "citizen_report",
+   "capability": "reportIssue",
+   "components": [
+    "pick_category",
+    "fill_form",
+    "submit_report"
+   ],
+   "note": "噪音申訴。",
+   "tags": [
+    "report",
+    "voice"
+   ],
+   "destination": {
+    "kind": "capability",
+    "id": "reportIssue"
+   }
+  },
+  {
+   "id": "h-cit-sidewalk",
+   "text": "人行道被機車停滿 我要檢舉",
+   "page": "citizen_report",
+   "capability": "reportIssue",
+   "components": [
+    "pick_category",
+    "fill_form",
+    "submit_report"
+   ],
+   "note": "檢舉違停（「機車」不是報案）。",
+   "tags": [
+    "report"
+   ],
+   "destination": {
+    "kind": "capability",
+    "id": "reportIssue"
+   }
+  },
+  {
+   "id": "h-cit-address",
+   "text": "我要陳情 地址要寫哪裡",
+   "page": "citizen_report",
+   "capability": "reportIssue",
+   "components": [
+    "pick_category",
+    "fill_location"
+   ],
+   "note": "問地點；寫完送出也可以。",
+   "tags": [
+    "report"
+   ],
+   "also_ok": [
+    [
+     "pick_category",
+     "fill_location",
+     "fill_form",
+     "submit_report"
+    ]
+   ],
+   "destination": {
+    "kind": "capability",
+    "id": "reportIssue"
+   }
+  },
+  {
+   "id": "h-cit-photo",
+   "text": "反映的時候可以拍照上傳嗎",
+   "page": "citizen_report",
+   "capability": "reportIssue",
+   "components": [
+    "pick_category",
+    "add_photo"
+   ],
+   "note": "附照片。",
+   "tags": [
+    "report"
+   ],
+   "destination": {
+    "kind": "capability",
+    "id": "reportIssue"
+   }
+  },
+  {
+   "id": "h-cit-reply",
+   "text": "我上禮拜反映的事情市府回了沒",
+   "page": "citizen_report",
+   "capability": "reportIssue",
+   "components": [
+    "open_cases",
+    "open_case"
+   ],
+   "note": "陳情進度（停用的 reportIssue.progress 也開有話要說）。",
+   "tags": [
+    "progress"
+   ],
+   "destination": {
+    "kind": "capability",
+    "id": [
+     "reportIssue",
+     "reportIssue.progress"
+    ]
+   }
+  },
+  {
+   "id": "h-cit-case-no",
+   "text": "我有案號 想查陳情",
+   "page": "citizen_report",
+   "capability": "reportIssue",
+   "components": [
+    "open_cases",
+    "search_case"
+   ],
+   "note": "用案號找。",
+   "tags": [
+    "progress"
+   ],
+   "destination": {
+    "kind": "capability",
+    "id": [
+     "reportIssue",
+     "reportIssue.progress"
+    ]
+   }
+  },
+  {
+   "id": "h-cit-what-wrote",
+   "text": "我想看我當初陳情寫了什麼",
+   "page": "citizen_report",
+   "capability": "reportIssue",
+   "components": [
+    "open_cases",
+    "open_case",
+    "case_detail"
+   ],
+   "note": "看詳細內容。",
+   "tags": [
+    "progress"
+   ],
+   "destination": {
+    "kind": "capability",
+    "id": [
+     "reportIssue",
+     "reportIssue.progress"
+    ]
+   }
+  },
+  {
+   "id": "h-cit-speak",
+   "text": "我不會打字 可以用講的反映嗎",
+   "page": "citizen_report",
+   "capability": "reportIssue",
+   "components": [
+    "call_1999"
+   ],
+   "note": "用講的＝撥打 1999。",
+   "tags": [
+    "report",
+    "voice"
+   ],
+   "destination": {
+    "kind": "capability",
+    "id": "reportIssue"
+   }
+  },
+  {
+   "id": "h-cit-two",
+   "text": "先查我之前陳情的進度 再反映新的問題",
+   "page": "citizen_report",
+   "capability": "reportIssue",
+   "components": [
+    "open_cases",
+    "open_case",
+    "pick_category",
+    "fill_form",
+    "submit_report"
+   ],
+   "note": "兩件事，使用者順序：先查進度，再陳情。",
+   "tags": [
+    "two_goals",
+    "order"
+   ],
+   "destination": {
+    "kind": "capability",
+    "id": [
+     "reportIssue",
+     "reportIssue.progress"
+    ]
+   }
+  },
+  {
+   "id": "h-do-allowance",
+   "text": "我想申請中低收入老人生活津貼",
+   "page": "district_office",
+   "capability": "districtOffice",
+   "components": [
+    "open_service",
+    "fill_basic",
+    "fill_details",
+    "next_step",
+    "submit"
+   ],
+   "note": "津貼申請。",
+   "tags": [
+    "apply"
+   ],
+   "destination": {
+    "kind": "capability",
+    "id": "districtOffice"
+   }
+  },
+  {
+   "id": "h-do-relief",
+   "text": "我要辦急難救助",
+   "page": "district_office",
+   "capability": "districtOffice",
+   "components": [
+    "open_service",
+    "fill_basic",
+    "fill_details",
+    "next_step",
+    "submit"
+   ],
+   "note": "急難救助。",
+   "tags": [
+    "apply"
+   ],
+   "destination": {
+    "kind": "capability",
+    "id": "districtOffice"
+   }
+  },
+  {
+   "id": "h-do-email",
+   "text": "申辦的表單電子信箱那邊要填什麼",
+   "page": "district_office",
+   "capability": "districtOffice",
+   "components": [
+    "open_service",
+    "fill_basic"
+   ],
+   "note": "基本資料。",
+   "tags": [
+    "apply"
+   ],
+   "destination": {
+    "kind": "capability",
+    "id": "districtOffice"
+   }
+  },
+  {
+   "id": "h-do-where-submit",
+   "text": "申請書最後的送出在哪",
+   "page": "district_office",
+   "capability": "districtOffice",
+   "components": [
+    "open_service",
+    "fill_basic",
+    "fill_details",
+    "next_step",
+    "submit"
+   ],
+   "note": "送出在哪：整個流程。",
+   "tags": [
+    "apply"
+   ],
+   "destination": {
+    "kind": "capability",
+    "id": "districtOffice"
+   }
+  },
+  {
+   "id": "h-do-items",
+   "text": "申辦時要選很多項目怎麼勾",
+   "page": "district_office",
+   "capability": "districtOffice",
+   "components": [
+    "open_service",
+    "pick_items"
+   ],
+   "note": "可多選。",
+   "tags": [
+    "apply"
+   ],
+   "destination": {
+    "kind": "capability",
+    "id": "districtOffice"
+   }
+  },
+  {
+   "id": "h-do-calendar",
+   "text": "申辦表單要填哪一天 月曆怎麼用",
+   "page": "district_office",
+   "capability": "districtOffice",
+   "components": [
+    "open_service",
+    "pick_date"
+   ],
+   "note": "日曆。",
+   "tags": [
+    "apply",
+    "voice"
+   ],
+   "destination": {
+    "kind": "capability",
+    "id": "districtOffice"
+   }
+  },
+  {
+   "id": "h-do-subsidy-progress",
+   "text": "我上個月申請的補助審核到哪了",
+   "page": "district_office",
+   "capability": "districtOffice.progress",
+   "components": [
+    "check_progress"
+   ],
+   "note": "審核進度。",
+   "tags": [
+    "progress"
+   ],
+   "destination": {
+    "kind": "capability",
+    "id": "districtOffice.progress"
+   }
+  },
+  {
+   "id": "h-do-closed",
+   "text": "已經辦完的申請案件在哪看",
+   "page": "district_office",
+   "capability": "districtOffice.progress",
+   "components": [
+    "check_progress",
+    "view_closed"
+   ],
+   "note": "已結案。",
+   "tags": [
+    "progress"
+   ],
+   "destination": {
+    "kind": "capability",
+    "id": "districtOffice.progress"
+   }
+  },
+  {
+   "id": "h-do-no-name",
+   "text": "我要申請東西 但是不知道叫什麼名字",
+   "page": "district_office",
+   "capability": "districtOffice",
+   "components": [
+    "search_service"
+   ],
+   "note": "不知道名稱＝搜尋。",
+   "tags": [
+    "apply",
+    "vague"
+   ],
+   "destination": {
+    "kind": "capability",
+    "id": "districtOffice"
+   }
+  },
+  {
+   "id": "h-do-correction",
+   "text": "不是要查進度 我要提出新的申請",
+   "page": "district_office",
+   "capability": "districtOffice",
+   "components": [
+    "open_service",
+    "fill_basic",
+    "fill_details",
+    "next_step",
+    "submit"
+   ],
+   "note": "更正：新申請。",
+   "tags": [
+    "apply",
+    "negation"
+   ],
+   "destination": {
+    "kind": "capability",
+    "id": "districtOffice"
+   }
+  },
+  {
+   "id": "h-pol-wallet",
+   "text": "我的錢包被扒了想在網路上報案",
+   "page": "police_report",
+   "capability": "police.online",
+   "components": [
+    "read_notice",
+    "fill_contact",
+    "next_step",
+    "fill_case",
+    "agree_case",
+    "submit_report"
+   ],
+   "note": "扒竊，網路上報案。",
+   "tags": [
+    "report",
+    "colloquial"
+   ],
+   "destination": {
+    "kind": "capability",
+    "id": "police.online"
+   }
+  },
+  {
+   "id": "h-pol-scam",
+   "text": "有人騙我匯款 我要上網報案",
+   "page": "police_report",
+   "capability": "police.online",
+   "components": [
+    "read_notice",
+    "fill_contact",
+    "next_step",
+    "fill_case",
+    "agree_case",
+    "submit_report"
+   ],
+   "note": "詐騙匯款。",
+   "tags": [
+    "report",
+    "voice"
+   ],
+   "destination": {
+    "kind": "capability",
+    "id": "police.online"
+   }
+  },
+  {
+   "id": "h-pol-contact",
+   "text": "線上報案第一頁的聯絡資料怎麼填",
+   "page": "police_report",
+   "capability": "police.online",
+   "components": [
+    "read_notice",
+    "fill_contact"
+   ],
+   "note": "聯絡資料。",
+   "tags": [
+    "report"
+   ],
+   "destination": {
+    "kind": "capability",
+    "id": "police.online"
+   }
+  },
+  {
+   "id": "h-pol-case",
+   "text": "網路報案的案情要寫在哪",
+   "page": "police_report",
+   "capability": "police.online",
+   "components": [
+    "read_notice",
+    "fill_contact",
+    "next_step",
+    "fill_case"
+   ],
+   "note": "案件資料。",
+   "tags": [
+    "report"
+   ],
+   "destination": {
+    "kind": "capability",
+    "id": "police.online"
+   }
+  },
+  {
+   "id": "h-pol-notice",
+   "text": "網路報案要先看的注意事項",
+   "page": "police_report",
+   "capability": "police.online",
+   "components": [
+    "read_notice"
+   ],
+   "note": "須知。",
+   "tags": [
+    "report"
+   ],
+   "destination": {
+    "kind": "capability",
+    "id": "police.online"
+   }
+  },
+  {
+   "id": "h-pol-handled",
+   "text": "我在網路上報的案子警察處理了沒",
+   "page": "police_report",
+   "capability": "police.progress",
+   "components": [
+    "open_record",
+    "record_detail"
+   ],
+   "note": "處理狀態與回覆。",
+   "tags": [
+    "records",
+    "voice"
+   ],
+   "destination": {
+    "kind": "capability",
+    "id": [
+     "police.progress",
+     "police.records"
+    ]
+   }
+  },
+  {
+   "id": "h-pol-records",
+   "text": "打開我的報案紀錄",
+   "page": "police_report",
+   "capability": "police.records",
+   "components": [
+    "open_record"
+   ],
+   "note": "報案紀錄。",
+   "tags": [
+    "records"
+   ],
+   "destination": {
+    "kind": "capability",
+    "id": [
+     "police.records",
+     "police.progress"
+    ]
+   }
+  },
+  {
+   "id": "h-pol-detail",
+   "text": "我要看那筆報案的詳細內容",
+   "page": "police_report",
+   "capability": "police.records",
+   "components": [
+    "open_record",
+    "record_detail"
+   ],
+   "note": "詳細內容。",
+   "tags": [
+    "records"
+   ],
+   "destination": {
+    "kind": "capability",
+    "id": [
+     "police.records",
+     "police.progress"
+    ]
+   }
+  },
+  {
+   "id": "h-pol-correction",
+   "text": "不是要報新的案 是要看之前報的",
+   "page": "police_report",
+   "capability": "police.records",
+   "components": [
+    "open_record"
+   ],
+   "note": "更正：看紀錄。",
+   "tags": [
+    "records",
+    "negation"
+   ],
+   "destination": {
+    "kind": "capability",
+    "id": [
+     "police.records",
+     "police.progress"
+    ]
+   }
+  },
+  {
+   "id": "h-pol-send",
+   "text": "我被詐騙了 網路報案要怎麼送出",
+   "page": "police_report",
+   "capability": "police.online",
+   "components": [
+    "read_notice",
+    "fill_contact",
+    "next_step",
+    "fill_case",
+    "agree_case",
+    "submit_report"
+   ],
+   "note": "送出報案。",
+   "tags": [
+    "report"
+   ],
+   "destination": {
+    "kind": "capability",
+    "id": "police.online"
+   }
+  },
+  {
+   "id": "h-cw-discount",
+   "text": "有沒有什麼店家折價的券可以拿",
+   "page": "coupon_wallet",
+   "capability": "coupon.list",
+   "components": [
+    "coupon_home",
+    "coupon_tab",
+    "pick_coupon"
+   ],
+   "note": "店家折價券＝優惠券列表。",
+   "tags": [
+    "perks",
+    "colloquial"
+   ],
+   "destination": {
+    "kind": "capability",
+    "id": "coupon.list"
+   }
+  },
+  {
+   "id": "h-cw-events",
+   "text": "我想看最近有哪些優惠可以用",
+   "page": "coupon_wallet",
+   "capability": "coupon.list",
+   "components": [
+    "coupon_home",
+    "coupon_tab",
+    "pick_coupon"
+   ],
+   "note": "看優惠。",
+   "tags": [
+    "perks"
+   ],
+   "destination": {
+    "kind": "capability",
+    "id": "coupon.list"
+   }
+  },
+  {
+   "id": "h-cw-keep",
+   "text": "這張折價券幫我收進票夾",
+   "page": "coupon_wallet",
+   "capability": "coupon.list",
+   "components": [
+    "coupon_home",
+    "coupon_tab",
+    "pick_coupon",
+    "add_wallet"
+   ],
+   "note": "加入票夾。",
+   "tags": [
+    "perks"
+   ],
+   "destination": {
+    "kind": "capability",
+    "id": "coupon.list"
+   }
+  },
+  {
+   "id": "h-cw-saved",
+   "text": "我存起來的折價券在哪裡看",
+   "page": "coupon_wallet",
+   "capability": "wallet",
+   "components": [
+    "wallet_coupons"
+   ],
+   "note": "票夾的優惠券。",
+   "tags": [
+    "wallet"
+   ],
+   "destination": {
+    "kind": "capability",
+    "id": "wallet"
+   }
+  },
+  {
+   "id": "h-cw-use-shop",
+   "text": "我要去店裡用我存的優惠",
+   "page": "coupon_wallet",
+   "capability": "wallet",
+   "components": [
+    "wallet_coupons",
+    "wallet_pick",
+    "use_coupon"
+   ],
+   "note": "票夾→打開→使用。",
+   "tags": [
+    "wallet"
+   ],
+   "destination": {
+    "kind": "capability",
+    "id": "wallet"
+   }
+  },
+  {
+   "id": "h-cw-redeemed",
+   "text": "兌換過的券在哪查",
+   "page": "coupon_wallet",
+   "capability": "wallet",
+   "components": [
+    "wallet_coupons",
+    "wallet_used"
+   ],
+   "note": "已兌換。",
+   "tags": [
+    "wallet"
+   ],
+   "destination": {
+    "kind": "capability",
+    "id": "wallet"
+   }
+  },
+  {
+   "id": "h-cw-zoo-ticket",
+   "text": "動物園的入場票在哪拿出來",
+   "page": "coupon_wallet",
+   "capability": "wallet",
+   "components": [
+    "wallet_ticket"
+   ],
+   "note": "入場券（不是愛遊動物園服務）。",
+   "tags": [
+    "wallet",
+    "cross_item"
+   ],
+   "destination": {
+    "kind": "capability",
+    "id": "wallet"
+   }
+  },
+  {
+   "id": "h-cw-show",
+   "text": "我要出示票給工作人員掃",
+   "page": "coupon_wallet",
+   "capability": "wallet",
+   "components": [
+    "wallet_ticket"
+   ],
+   "note": "出示 QR code。",
+   "tags": [
+    "wallet",
+    "colloquial"
+   ],
+   "destination": {
+    "kind": "capability",
+    "id": "wallet"
+   }
+  },
+  {
+   "id": "h-cw-open",
+   "text": "打開票夾",
+   "page": "coupon_wallet",
+   "capability": "wallet",
+   "components": [
+    "wallet_coupons"
+   ],
+   "note": "只說票夾。",
+   "tags": [
+    "wallet"
+   ],
+   "destination": {
+    "kind": "capability",
+    "id": "wallet"
+   }
+  },
+  {
+   "id": "h-cw-checkout",
+   "text": "結帳時要按哪裡才能使用優惠券",
+   "page": "coupon_wallet",
+   "capability": "wallet",
+   "components": [
+    "wallet_coupons",
+    "wallet_pick",
+    "use_coupon"
+   ],
+   "note": "結帳使用。",
+   "tags": [
+    "wallet"
+   ],
+   "destination": {
+    "kind": "capability",
+    "id": "wallet"
+   }
+  },
+  {
+   "id": "h-sub-parking",
+   "text": "我想收到停車相關的通知",
+   "page": "subscription",
+   "capability": "subscription",
+   "components": [
+    "pick_topic",
+    "subscribe"
+   ],
+   "note": "訂閱停車費通知（不是繳費）。",
+   "tags": [
+    "subscription",
+    "cross_item"
+   ],
+   "destination": {
+    "kind": "capability",
+    "id": "subscription"
+   }
+  },
+  {
+   "id": "h-sub-what",
+   "text": "有什麼消息可以訂來看",
+   "page": "subscription",
+   "capability": "subscription",
+   "components": [
+    "pick_topic"
+   ],
+   "note": "看可以訂閱什麼。",
+   "tags": [
+    "subscription",
+    "colloquial"
+   ],
+   "destination": {
+    "kind": "capability",
+    "id": "subscription"
+   }
+  },
+  {
+   "id": "h-sub-traffic",
+   "text": "幫我訂交通措施的消息",
+   "page": "subscription",
+   "capability": "subscription",
+   "components": [
+    "pick_topic",
+    "subscribe"
+   ],
+   "note": "交通措施。",
+   "tags": [
+    "subscription"
+   ],
+   "destination": {
+    "kind": "capability",
+    "id": "subscription"
+   }
+  },
+  {
+   "id": "h-sub-health",
+   "text": "健康報報我想訂",
+   "page": "subscription",
+   "capability": "subscription",
+   "components": [
+    "pick_topic",
+    "subscribe"
+   ],
+   "note": "健康報報。",
+   "tags": [
+    "subscription"
+   ],
+   "destination": {
+    "kind": "capability",
+    "id": "subscription"
+   }
+  },
+  {
+   "id": "h-sub-stop",
+   "text": "新住民的資訊不想再收到了",
+   "page": "subscription",
+   "capability": "subscription",
+   "components": [
+    "unsubscribe"
+   ],
+   "note": "退訂。",
+   "tags": [
+    "subscription",
+    "negation"
+   ],
+   "destination": {
+    "kind": "capability",
+    "id": "subscription"
+   }
+  },
+  {
+   "id": "h-sub-cancel",
+   "text": "我要退掉訂閱",
+   "page": "subscription",
+   "capability": "subscription",
+   "components": [
+    "unsubscribe"
+   ],
+   "note": "退掉。",
+   "tags": [
+    "subscription"
+   ],
+   "destination": {
+    "kind": "capability",
+    "id": "subscription"
+   }
+  },
+  {
+   "id": "h-sub-read",
+   "text": "訂閱的那些通知內容在哪裡看",
+   "page": "subscription",
+   "capability": "subscription.items",
+   "components": [
+    "read_messages"
+   ],
+   "note": "訂閱訊息。",
+   "tags": [
+    "subscription"
+   ],
+   "destination": {
+    "kind": "capability",
+    "id": "subscription.items"
+   }
+  },
+  {
+   "id": "h-sub-change",
+   "text": "我想改我訂閱的項目",
+   "page": "subscription",
+   "capability": "subscription.items",
+   "components": [
+    "open_settings"
+   ],
+   "note": "改訂閱項目。",
+   "tags": [
+    "subscription"
+   ],
+   "destination": {
+    "kind": "capability",
+    "id": "subscription.items"
+   }
+  },
+  {
+   "id": "h-sub-sports",
+   "text": "嗯 那個體育的消息 我要訂閱一下",
+   "page": "subscription",
+   "capability": "subscription",
+   "components": [
+    "pick_topic",
+    "subscribe"
+   ],
+   "note": "體育樂園，語音。",
+   "tags": [
+    "subscription",
+    "voice"
+   ],
+   "destination": {
+    "kind": "capability",
+    "id": "subscription"
+   }
+  },
+  {
+   "id": "h-sub-correction",
+   "text": "不是要取消 是要訂閱空氣品質",
+   "page": "subscription",
+   "capability": "subscription",
+   "components": [
+    "pick_topic",
+    "subscribe"
+   ],
+   "note": "更正：訂閱空品。",
+   "tags": [
+    "subscription",
+    "negation"
+   ],
+   "destination": {
+    "kind": "capability",
+    "id": "subscription"
+   }
+  },
+  {
+   "id": "h-native-police",
+   "text": "我要找警察局的電話",
+   "page": null,
+   "capability": "police",
+   "components": [],
+   "note": "原生警政頁（電話說明）：開頁沒有引導。",
+   "tags": [
+    "no_guide"
+   ],
+   "destination": {
+    "kind": "capability",
+    "id": "police"
+   }
+  },
+  {
+   "id": "h-native-perks",
+   "text": "打開優惠那一頁",
+   "page": null,
+   "capability": "app.perks",
+   "components": [],
+   "note": "原生優惠分頁：開頁沒有引導。",
+   "tags": [
+    "no_guide"
+   ],
+   "destination": {
+    "kind": "capability",
+    "id": "app.perks"
+   }
+  },
+  {
+   "id": "h-native-scan",
+   "text": "我要掃描帳單上的條碼繳費",
+   "page": null,
+   "capability": "fees.scan",
+   "components": [],
+   "note": "掃描繳費是原生相機：沒有引導。",
+   "tags": [
+    "no_guide"
+   ],
+   "destination": {
+    "kind": "capability",
+    "id": "fees.scan"
+   }
+  },
+  {
+   "id": "h-native-tax",
+   "text": "繳牌照稅",
+   "page": null,
+   "capability": "fees.tax",
+   "components": [],
+   "note": "地方稅（牌照稅）是原生相機：沒有引導。",
+   "tags": [
+    "no_guide"
+   ],
+   "destination": {
+    "kind": "capability",
+    "id": "fees.tax"
+   }
+  },
+  {
+   "id": "h-out-doctor",
+   "text": "我要掛號看醫生",
+   "page": null,
+   "capability": null,
+   "components": [],
+   "note": "聯醫掛號未串接：不能開引導。",
+   "tags": [
+    "out_of_scope"
+   ]
+  },
+  {
+   "id": "h-out-weather",
+   "text": "今天天氣怎麼樣",
+   "page": null,
+   "capability": null,
+   "components": [],
+   "note": "不是服務。",
+   "tags": [
+    "out_of_scope"
+   ]
+  },
+  {
+   "id": "h-out-taxi",
+   "text": "幫我叫計程車",
+   "page": null,
+   "capability": null,
+   "components": [],
+   "note": "不支援。",
+   "tags": [
+    "out_of_scope"
+   ]
+  },
+  {
+   "id": "h-out-vaccine",
+   "text": "我要預約打疫苗",
+   "page": null,
+   "capability": null,
+   "components": [],
+   "note": "疫苗預約未串接；「預約」不能變成借書預約。",
+   "tags": [
+    "out_of_scope"
+   ]
+  },
+  {
+   "id": "h-out-money",
+   "text": "幫我借五萬塊",
+   "page": null,
+   "capability": null,
+   "components": [],
+   "note": "借錢不是借書。",
+   "tags": [
+    "out_of_scope"
+   ]
+  },
+  {
+   "id": "h-out-train",
+   "text": "我要買高鐵票",
+   "page": null,
+   "capability": null,
+   "components": [],
+   "note": "不是票夾（買票不支援）。",
+   "tags": [
+    "out_of_scope"
+   ]
+  }
+ ]
+}

@@ -21,6 +21,11 @@ class AssistantResult {
   /// in a reply to another [language]: the App translates them for display.
   final String? contentLanguage;
 
+  /// Teaching components the backend chose for the opened page, e.g.
+  /// `{page: library, components: [open_records, check_pickup]}`. Only a
+  /// hint: the App drops unknown ids and adds prerequisites itself.
+  final Map<String, dynamic>? guide;
+
   const AssistantResult({
     required this.sessionId,
     required this.message,
@@ -31,6 +36,7 @@ class AssistantResult {
     this.language = 'zh',
     this.action,
     this.contentLanguage,
+    this.guide,
   });
 
   /// The same reply with [message] and choice titles replaced (translation).
@@ -44,6 +50,7 @@ class AssistantResult {
         language: language,
         action: action,
         contentLanguage: null,
+        guide: guide,
         choices: [
           for (var i = 0; i < choices.length; i++)
             AssistantBookChoice(
@@ -92,6 +99,9 @@ class AssistantResult {
           : 'zh',
       action: json['action'] is String ? json['action'] as String : null,
       contentLanguage: json['content_language'] == 'zh' ? 'zh' : null,
+      guide: json['guide'] is Map<String, dynamic>
+          ? json['guide'] as Map<String, dynamic>
+          : null,
       choices: (json['choices'] as List? ?? [])
           .map((value) => AssistantBookChoice.fromJson(value))
           .toList(),

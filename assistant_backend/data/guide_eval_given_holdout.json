@@ -1,0 +1,4083 @@
+{
+ "results": [
+  {
+   "id": "h-lib-grandkid",
+   "text": "想跟圖書館借幾本給孫女看的繪本",
+   "tags": [
+    "reserve",
+    "colloquial"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "library"
+   },
+   "page": "library",
+   "components": [
+    "open_search",
+    "search_keyword",
+    "pick_book",
+    "choose_branch",
+    "reserve"
+   ],
+   "expected_page": "library",
+   "expected_destination": null,
+   "expected_components": [
+    "open_search",
+    "search_keyword",
+    "pick_book",
+    "choose_branch",
+    "reserve"
+   ],
+   "capability": "library",
+   "group": "library",
+   "page_ok": true,
+   "components_ok": true,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_default",
+   "guide_decider": "default",
+   "page_model_calls": 0,
+   "guide_model_calls": 0,
+   "elapsed_ms": 0,
+   "deterministic": true,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-lib-overdue",
+   "text": "我那本書是不是過期沒還了",
+   "tags": [
+    "records",
+    "colloquial"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "library"
+   },
+   "page": "library",
+   "components": [
+    "open_search",
+    "search_keyword",
+    "pick_book",
+    "choose_branch",
+    "reserve"
+   ],
+   "expected_page": "library",
+   "expected_destination": null,
+   "expected_components": [
+    "open_records"
+   ],
+   "capability": "library",
+   "group": "library",
+   "page_ok": true,
+   "components_ok": false,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_default",
+   "guide_decider": "default",
+   "page_model_calls": 0,
+   "guide_model_calls": 0,
+   "elapsed_ms": 0,
+   "deterministic": true,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-lib-heard-pickup",
+   "text": "有人跟我說我預約的書已經可以去領了是真的嗎",
+   "tags": [
+    "pickup",
+    "voice"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "library"
+   },
+   "page": "library",
+   "components": [
+    "open_records",
+    "check_pickup"
+   ],
+   "expected_page": "library",
+   "expected_destination": null,
+   "expected_components": [
+    "open_records",
+    "check_pickup"
+   ],
+   "capability": "library",
+   "group": "library",
+   "page_ok": true,
+   "components_ok": true,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_keyword",
+   "guide_decider": "keyword",
+   "page_model_calls": 0,
+   "guide_model_calls": 0,
+   "elapsed_ms": 0,
+   "deterministic": true,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-lib-saturday",
+   "text": "圖書館這禮拜六有沒有開放",
+   "tags": [
+    "notices"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "library"
+   },
+   "page": "library",
+   "components": [
+    "open_map",
+    "open_notices"
+   ],
+   "expected_page": "library",
+   "expected_destination": null,
+   "expected_components": [
+    "open_notices"
+   ],
+   "capability": "library",
+   "group": "library",
+   "page_ok": true,
+   "components_ok": false,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_model",
+   "guide_decider": "model",
+   "page_model_calls": 0,
+   "guide_model_calls": 1,
+   "elapsed_ms": 433,
+   "deterministic": false,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-lib-district",
+   "text": "信義區那邊有沒有圖書館",
+   "tags": [
+    "map"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "library"
+   },
+   "page": "library",
+   "components": [
+    "open_map",
+    "open_notices"
+   ],
+   "expected_page": "library",
+   "expected_destination": null,
+   "expected_components": [
+    "open_map"
+   ],
+   "capability": "library",
+   "group": "library",
+   "page_ok": true,
+   "components_ok": false,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_model",
+   "guide_decider": "model",
+   "page_model_calls": 0,
+   "guide_model_calls": 1,
+   "elapsed_ms": 427,
+   "deterministic": false,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-lib-popular",
+   "text": "最受歡迎的書有哪幾本",
+   "tags": [
+    "ranking"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "library"
+   },
+   "page": "library",
+   "components": [
+    "open_search",
+    "search_keyword",
+    "pick_book",
+    "choose_branch",
+    "reserve"
+   ],
+   "expected_page": "library",
+   "expected_destination": null,
+   "expected_components": [
+    "open_ranking"
+   ],
+   "capability": "library",
+   "group": "library",
+   "page_ok": true,
+   "components_ok": false,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_default",
+   "guide_decider": "default",
+   "page_model_calls": 0,
+   "guide_model_calls": 0,
+   "elapsed_ms": 0,
+   "deterministic": true,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-lib-find-title",
+   "text": "幫我找一本叫底層邏輯的書",
+   "tags": [
+    "search",
+    "title"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "detail",
+    "book_id": "lib-book-3"
+   },
+   "page": "library",
+   "components": [
+    "open_search",
+    "search_keyword",
+    "pick_book",
+    "choose_branch",
+    "reserve"
+   ],
+   "expected_page": "library",
+   "expected_destination": null,
+   "expected_components": [
+    "open_search",
+    "search_keyword",
+    "pick_book"
+   ],
+   "capability": "library",
+   "group": "library",
+   "page_ok": true,
+   "components_ok": false,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_default",
+   "guide_decider": "default",
+   "page_model_calls": 0,
+   "guide_model_calls": 0,
+   "elapsed_ms": 0,
+   "deterministic": true,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-lib-rank-reserve",
+   "text": "我想看點閱最高的書然後預約一本",
+   "tags": [
+    "ranking",
+    "reserve",
+    "two_goals",
+    "order"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "library"
+   },
+   "page": "library",
+   "components": [
+    "open_ranking",
+    "pick_book",
+    "choose_branch",
+    "reserve"
+   ],
+   "expected_page": "library",
+   "expected_destination": null,
+   "expected_components": [
+    "open_ranking",
+    "pick_book",
+    "choose_branch",
+    "reserve"
+   ],
+   "capability": "library",
+   "group": "library",
+   "page_ok": true,
+   "components_ok": true,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_model",
+   "guide_decider": "model",
+   "page_model_calls": 0,
+   "guide_model_calls": 1,
+   "elapsed_ms": 428,
+   "deterministic": false,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-lib-news-and-mine",
+   "text": "圖書館的最新消息跟我借的書 一起看一下",
+   "tags": [
+    "two_goals",
+    "voice"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "library"
+   },
+   "page": "library",
+   "components": [
+    "open_notices"
+   ],
+   "expected_page": "library",
+   "expected_destination": null,
+   "expected_components": [
+    "open_notices",
+    "open_records"
+   ],
+   "capability": "library",
+   "group": "library",
+   "page_ok": true,
+   "components_ok": false,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_keyword",
+   "guide_decider": "keyword",
+   "page_model_calls": 0,
+   "guide_model_calls": 0,
+   "elapsed_ms": 0,
+   "deterministic": true,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-lib-only-map",
+   "text": "不用幫我借 我只是要知道分館在哪",
+   "tags": [
+    "map",
+    "negation",
+    "voice"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "library"
+   },
+   "page": "library",
+   "components": [
+    "open_map"
+   ],
+   "expected_page": "library",
+   "expected_destination": null,
+   "expected_components": [
+    "open_map"
+   ],
+   "capability": "library",
+   "group": "library",
+   "page_ok": true,
+   "components_ok": true,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_keyword",
+   "guide_decider": "keyword",
+   "page_model_calls": 0,
+   "guide_model_calls": 0,
+   "elapsed_ms": 0,
+   "deterministic": true,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-lib-homophone",
+   "text": "我要結書",
+   "tags": [
+    "reserve",
+    "homophone",
+    "voice"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "library"
+   },
+   "page": "library",
+   "components": [
+    "open_search",
+    "search_keyword",
+    "pick_book",
+    "choose_branch",
+    "reserve"
+   ],
+   "expected_page": "library",
+   "expected_destination": null,
+   "expected_components": [
+    "open_search",
+    "search_keyword",
+    "pick_book",
+    "choose_branch",
+    "reserve"
+   ],
+   "capability": "library",
+   "group": "library",
+   "page_ok": true,
+   "components_ok": true,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_default",
+   "guide_decider": "default",
+   "page_model_calls": 0,
+   "guide_model_calls": 0,
+   "elapsed_ms": 0,
+   "deterministic": true,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-lib-suggest",
+   "text": "圖書館有什麼好書可以介紹",
+   "tags": [
+    "hot"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "library"
+   },
+   "page": "library",
+   "components": [
+    "open_search",
+    "search_keyword",
+    "pick_book"
+   ],
+   "expected_page": "library",
+   "expected_destination": null,
+   "expected_components": [
+    "open_search",
+    "hot_keyword",
+    "pick_book"
+   ],
+   "capability": "library",
+   "group": "library",
+   "page_ok": true,
+   "components_ok": true,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_keyword",
+   "guide_decider": "keyword",
+   "page_model_calls": 0,
+   "guide_model_calls": 0,
+   "elapsed_ms": 0,
+   "deterministic": true,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-fee-water-jiao",
+   "text": "幫我交水費",
+   "tags": [
+    "pay",
+    "colloquial"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "fees.water"
+   },
+   "page": "fees",
+   "components": [
+    "enter_number",
+    "query_bill",
+    "pick_bill",
+    "to_payment",
+    "choose_method",
+    "confirm_pay"
+   ],
+   "expected_page": "fees",
+   "expected_destination": null,
+   "expected_components": [
+    "enter_number",
+    "query_bill",
+    "pick_bill",
+    "to_payment",
+    "choose_method",
+    "confirm_pay"
+   ],
+   "capability": "fees.water",
+   "group": "fees",
+   "page_ok": true,
+   "components_ok": true,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_default",
+   "guide_decider": "default",
+   "page_model_calls": 0,
+   "guide_model_calls": 0,
+   "elapsed_ms": 0,
+   "deterministic": true,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-fee-ticket",
+   "text": "停車單要怎麼付錢",
+   "tags": [
+    "pay",
+    "colloquial"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "fees.parking"
+   },
+   "page": "fees",
+   "components": [
+    "enter_number",
+    "query_bill"
+   ],
+   "expected_page": "fees",
+   "expected_destination": null,
+   "expected_components": [
+    "enter_number",
+    "query_bill",
+    "pick_bill",
+    "to_payment",
+    "choose_method",
+    "confirm_pay"
+   ],
+   "capability": "fees.parking",
+   "group": "fees",
+   "page_ok": true,
+   "components_ok": false,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_model",
+   "guide_decider": "model",
+   "page_model_calls": 0,
+   "guide_model_calls": 1,
+   "elapsed_ms": 456,
+   "deterministic": false,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-fee-rent",
+   "text": "國宅的租金要繳了",
+   "tags": [
+    "pay"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "fees.housing"
+   },
+   "page": "fees",
+   "components": [
+    "enter_number",
+    "query_bill",
+    "pick_bill",
+    "to_payment",
+    "choose_method",
+    "confirm_pay"
+   ],
+   "expected_page": "fees",
+   "expected_destination": null,
+   "expected_components": [
+    "enter_number",
+    "query_bill",
+    "pick_bill",
+    "to_payment",
+    "choose_method",
+    "confirm_pay"
+   ],
+   "capability": "fees.housing",
+   "group": "fees",
+   "page_ok": true,
+   "components_ok": true,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_default",
+   "guide_decider": "default",
+   "page_model_calls": 0,
+   "guide_model_calls": 0,
+   "elapsed_ms": 0,
+   "deterministic": true,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-fee-hospital-paid",
+   "text": "上個月醫院的費用我付了沒有",
+   "tags": [
+    "history",
+    "cross_item"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "fees.history"
+   },
+   "page": "fees",
+   "components": [
+    "filter_history"
+   ],
+   "expected_page": "fees",
+   "expected_destination": null,
+   "expected_components": [
+    "filter_history"
+   ],
+   "capability": "fees.history",
+   "group": "fees",
+   "page_ok": true,
+   "components_ok": true,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_model",
+   "guide_decider": "model",
+   "page_model_calls": 0,
+   "guide_model_calls": 1,
+   "elapsed_ms": 351,
+   "deterministic": false,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-fee-number",
+   "text": "水費帳單上的號碼要輸入在哪",
+   "tags": [
+    "view"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "fees.water"
+   },
+   "page": "fees",
+   "components": [
+    "enter_number"
+   ],
+   "expected_page": "fees",
+   "expected_destination": null,
+   "expected_components": [
+    "enter_number"
+   ],
+   "capability": "fees.water",
+   "group": "fees",
+   "page_ok": true,
+   "components_ok": true,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_model",
+   "guide_decider": "model",
+   "page_model_calls": 0,
+   "guide_model_calls": 1,
+   "elapsed_ms": 343,
+   "deterministic": false,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-fee-tuition-amount",
+   "text": "我想知道學費要繳多少",
+   "tags": [
+    "view"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "fees.tuition"
+   },
+   "page": "fees",
+   "components": [
+    "enter_number",
+    "query_bill",
+    "pick_bill",
+    "to_payment",
+    "choose_method",
+    "confirm_pay"
+   ],
+   "expected_page": "fees",
+   "expected_destination": null,
+   "expected_components": [
+    "enter_number",
+    "query_bill"
+   ],
+   "capability": "fees.tuition",
+   "group": "fees",
+   "page_ok": true,
+   "components_ok": false,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_keyword",
+   "guide_decider": "keyword",
+   "page_model_calls": 0,
+   "guide_model_calls": 0,
+   "elapsed_ms": 0,
+   "deterministic": true,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-fee-course",
+   "text": "公訓處的課程費用 我要付款",
+   "tags": [
+    "pay",
+    "voice"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "fees.course"
+   },
+   "page": "fees",
+   "components": [
+    "enter_number",
+    "query_bill",
+    "pick_bill",
+    "to_payment",
+    "choose_method",
+    "confirm_pay"
+   ],
+   "expected_page": "fees",
+   "expected_destination": null,
+   "expected_components": [
+    "enter_number",
+    "query_bill",
+    "pick_bill",
+    "to_payment",
+    "choose_method",
+    "confirm_pay"
+   ],
+   "capability": "fees.course",
+   "group": "fees",
+   "page_ok": true,
+   "components_ok": true,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_keyword",
+   "guide_decider": "keyword",
+   "page_model_calls": 0,
+   "guide_model_calls": 0,
+   "elapsed_ms": 0,
+   "deterministic": true,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-fee-method",
+   "text": "平價住宅維護費用悠遊付付得了嗎",
+   "tags": [
+    "pay"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "fees.maintenance"
+   },
+   "page": "fees",
+   "components": [
+    "enter_number",
+    "query_bill",
+    "pick_bill",
+    "to_payment",
+    "choose_method"
+   ],
+   "expected_page": "fees",
+   "expected_destination": null,
+   "expected_components": [
+    "enter_number",
+    "query_bill",
+    "pick_bill",
+    "to_payment",
+    "choose_method"
+   ],
+   "capability": "fees.maintenance",
+   "group": "fees",
+   "page_ok": true,
+   "components_ok": true,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_keyword",
+   "guide_decider": "keyword",
+   "page_model_calls": 0,
+   "guide_model_calls": 0,
+   "elapsed_ms": 0,
+   "deterministic": true,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-fee-correction",
+   "text": "不是學費 是要繳醫藥費",
+   "tags": [
+    "pay",
+    "negation"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "fees.hospital"
+   },
+   "page": "fees",
+   "components": [
+    "enter_number",
+    "query_bill",
+    "pick_bill",
+    "to_payment",
+    "choose_method",
+    "confirm_pay"
+   ],
+   "expected_page": "fees",
+   "expected_destination": null,
+   "expected_components": [
+    "enter_number",
+    "query_bill",
+    "pick_bill",
+    "to_payment",
+    "choose_method",
+    "confirm_pay"
+   ],
+   "capability": "fees.hospital",
+   "group": "fees",
+   "page_ok": true,
+   "components_ok": true,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_default",
+   "guide_decider": "default",
+   "page_model_calls": 0,
+   "guide_model_calls": 0,
+   "elapsed_ms": 0,
+   "deterministic": true,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-fee-unknown",
+   "text": "我要繳費 但不知道是哪一種",
+   "tags": [
+    "pay",
+    "vague"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "fees.other"
+   },
+   "page": "fees",
+   "components": [
+    "pick_fee",
+    "enter_number",
+    "query_bill",
+    "pick_bill",
+    "to_payment",
+    "choose_method",
+    "confirm_pay"
+   ],
+   "expected_page": "fees",
+   "expected_destination": null,
+   "expected_components": [
+    "pick_fee",
+    "enter_number",
+    "query_bill",
+    "pick_bill",
+    "to_payment",
+    "choose_method",
+    "confirm_pay"
+   ],
+   "capability": "fees.other",
+   "group": "fees",
+   "page_ok": true,
+   "components_ok": true,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_default",
+   "guide_decider": "default",
+   "page_model_calls": 0,
+   "guide_model_calls": 0,
+   "elapsed_ms": 0,
+   "deterministic": true,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-ctr-queue",
+   "text": "我想知道戶政那邊現在排到第幾號",
+   "tags": [
+    "view",
+    "voice"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "reservation"
+   },
+   "page": "counter_calling",
+   "components": [
+    "pick_unit",
+    "pick_location",
+    "read_counters"
+   ],
+   "expected_page": "counter_calling",
+   "expected_destination": null,
+   "expected_components": [
+    "pick_unit",
+    "pick_location",
+    "read_counters"
+   ],
+   "capability": "reservation",
+   "group": "counter_calling",
+   "page_ok": true,
+   "components_ok": true,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_default",
+   "guide_decider": "default",
+   "page_model_calls": 0,
+   "guide_model_calls": 0,
+   "elapsed_ms": 0,
+   "deterministic": true,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-ctr-crowd",
+   "text": "中正區的地政現在人多嗎",
+   "tags": [
+    "view",
+    "colloquial"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "reservation"
+   },
+   "page": "counter_calling",
+   "components": [
+    "pick_unit",
+    "pick_location",
+    "read_counters"
+   ],
+   "expected_page": "counter_calling",
+   "expected_destination": null,
+   "expected_components": [
+    "pick_unit",
+    "pick_location",
+    "read_counters"
+   ],
+   "capability": "reservation",
+   "group": "counter_calling",
+   "page_ok": true,
+   "components_ok": true,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_model",
+   "guide_decider": "model",
+   "page_model_calls": 0,
+   "guide_model_calls": 1,
+   "elapsed_ms": 368,
+   "deterministic": false,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-ctr-id-card",
+   "text": "去辦身分證要等幾個人",
+   "tags": [
+    "view",
+    "vague"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "reservation"
+   },
+   "page": "counter_calling",
+   "components": [
+    "pick_unit",
+    "pick_location",
+    "read_counters"
+   ],
+   "expected_page": "counter_calling",
+   "expected_destination": null,
+   "expected_components": [
+    "pick_unit",
+    "pick_location",
+    "read_counters"
+   ],
+   "capability": "reservation",
+   "group": "counter_calling",
+   "page_ok": true,
+   "components_ok": true,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_default",
+   "guide_decider": "default",
+   "page_model_calls": 0,
+   "guide_model_calls": 0,
+   "elapsed_ms": 0,
+   "deterministic": true,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-ctr-tai",
+   "text": "稅務的櫃台現在叫到哪",
+   "tags": [
+    "view",
+    "typo"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "reservation"
+   },
+   "page": "counter_calling",
+   "components": [
+    "pick_unit",
+    "pick_location",
+    "read_counters"
+   ],
+   "expected_page": "counter_calling",
+   "expected_destination": null,
+   "expected_components": [
+    "pick_unit",
+    "pick_location",
+    "read_counters"
+   ],
+   "capability": "reservation",
+   "group": "counter_calling",
+   "page_ok": true,
+   "components_ok": true,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_default",
+   "guide_decider": "default",
+   "page_model_calls": 0,
+   "guide_model_calls": 0,
+   "elapsed_ms": 0,
+   "deterministic": true,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-ctr-remember",
+   "text": "每次都要重新選單位好麻煩 幫我記起來",
+   "tags": [
+    "favorite",
+    "voice"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "reservation"
+   },
+   "page": "counter_calling",
+   "components": [
+    "pick_unit",
+    "pick_location",
+    "read_counters"
+   ],
+   "expected_page": "counter_calling",
+   "expected_destination": null,
+   "expected_components": [
+    "pick_unit",
+    "pick_location",
+    "add_favorite"
+   ],
+   "capability": "reservation",
+   "group": "counter_calling",
+   "page_ok": true,
+   "components_ok": false,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_keyword",
+   "guide_decider": "keyword",
+   "page_model_calls": 0,
+   "guide_model_calls": 0,
+   "elapsed_ms": 0,
+   "deterministic": true,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-ctr-saved",
+   "text": "用我存的那個地點看等多久",
+   "tags": [
+    "favorite",
+    "view",
+    "two_goals"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "reservation"
+   },
+   "page": "counter_calling",
+   "components": [
+    "pick_unit",
+    "pick_location",
+    "read_counters"
+   ],
+   "expected_page": "counter_calling",
+   "expected_destination": null,
+   "expected_components": [
+    "open_favorite",
+    "read_counters"
+   ],
+   "capability": "reservation",
+   "group": "counter_calling",
+   "page_ok": true,
+   "components_ok": false,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_default",
+   "guide_decider": "default",
+   "page_model_calls": 0,
+   "guide_model_calls": 0,
+   "elapsed_ms": 0,
+   "deterministic": true,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-ctr-remove",
+   "text": "常用地點那個舊的不要了",
+   "tags": [
+    "favorite",
+    "colloquial"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "reservation"
+   },
+   "page": "counter_calling",
+   "components": [
+    "open_favorite"
+   ],
+   "expected_page": "counter_calling",
+   "expected_destination": null,
+   "expected_components": [
+    "remove_favorite"
+   ],
+   "capability": "reservation",
+   "group": "counter_calling",
+   "page_ok": true,
+   "components_ok": false,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_keyword",
+   "guide_decider": "keyword",
+   "page_model_calls": 0,
+   "guide_model_calls": 0,
+   "elapsed_ms": 0,
+   "deterministic": true,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-ctr-job",
+   "text": "我要去就業服務處 看現在叫號到哪",
+   "tags": [
+    "view"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "reservation"
+   },
+   "page": "counter_calling",
+   "components": [
+    "pick_unit",
+    "pick_location",
+    "read_counters"
+   ],
+   "expected_page": "counter_calling",
+   "expected_destination": null,
+   "expected_components": [
+    "pick_unit",
+    "pick_location",
+    "read_counters"
+   ],
+   "capability": "reservation",
+   "group": "counter_calling",
+   "page_ok": true,
+   "components_ok": true,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_default",
+   "guide_decider": "default",
+   "page_model_calls": 0,
+   "guide_model_calls": 0,
+   "elapsed_ms": 0,
+   "deterministic": true,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-ctr-two",
+   "text": "看完叫號幫我加進常用",
+   "tags": [
+    "view",
+    "favorite",
+    "two_goals"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "reservation"
+   },
+   "page": "counter_calling",
+   "components": [
+    "pick_unit",
+    "pick_location",
+    "read_counters"
+   ],
+   "expected_page": "counter_calling",
+   "expected_destination": null,
+   "expected_components": [
+    "pick_unit",
+    "pick_location",
+    "read_counters",
+    "add_favorite"
+   ],
+   "capability": "reservation",
+   "group": "counter_calling",
+   "page_ok": true,
+   "components_ok": false,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_default",
+   "guide_decider": "default",
+   "page_model_calls": 0,
+   "guide_model_calls": 0,
+   "elapsed_ms": 0,
+   "deterministic": true,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-ctr-correction",
+   "text": "不是地政 是戶政 現在等幾個",
+   "tags": [
+    "view",
+    "negation"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "reservation"
+   },
+   "page": "counter_calling",
+   "components": [
+    "pick_unit",
+    "pick_location",
+    "read_counters"
+   ],
+   "expected_page": "counter_calling",
+   "expected_destination": null,
+   "expected_components": [
+    "pick_unit",
+    "pick_location",
+    "read_counters"
+   ],
+   "capability": "reservation",
+   "group": "counter_calling",
+   "page_ok": true,
+   "components_ok": true,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_default",
+   "guide_decider": "default",
+   "page_model_calls": 0,
+   "guide_model_calls": 0,
+   "elapsed_ms": 0,
+   "deterministic": true,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-dis-outage-flood",
+   "text": "我們這邊停電又淹水 要通報",
+   "tags": [
+    "report"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "disasterReport"
+   },
+   "page": "disaster_report",
+   "components": [
+    "pick_category",
+    "enter_location",
+    "describe_disaster",
+    "give_consent",
+    "send_report"
+   ],
+   "expected_page": "disaster_report",
+   "expected_destination": null,
+   "expected_components": [
+    "pick_category",
+    "enter_location",
+    "describe_disaster",
+    "give_consent",
+    "send_report"
+   ],
+   "capability": "disasterReport",
+   "group": "disaster_report",
+   "page_ok": true,
+   "components_ok": true,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_default",
+   "guide_decider": "default",
+   "page_model_calls": 0,
+   "guide_model_calls": 0,
+   "elapsed_ms": 0,
+   "deterministic": true,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-dis-pole",
+   "text": "路邊的電線桿倒了",
+   "tags": [
+    "report"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "disasterReport"
+   },
+   "page": "disaster_report",
+   "components": [
+    "pick_category",
+    "enter_location",
+    "describe_disaster",
+    "give_consent",
+    "send_report"
+   ],
+   "expected_page": "disaster_report",
+   "expected_destination": null,
+   "expected_components": [
+    "pick_category",
+    "enter_location",
+    "describe_disaster",
+    "give_consent",
+    "send_report"
+   ],
+   "capability": "disasterReport",
+   "group": "disaster_report",
+   "page_ok": true,
+   "components_ok": true,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_default",
+   "guide_decider": "default",
+   "page_model_calls": 0,
+   "guide_model_calls": 0,
+   "elapsed_ms": 0,
+   "deterministic": true,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-dis-collapse",
+   "text": "山上的路坍方了",
+   "tags": [
+    "report"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "disasterReport"
+   },
+   "page": "disaster_report",
+   "components": [
+    "pick_category",
+    "enter_location",
+    "describe_disaster",
+    "give_consent",
+    "send_report"
+   ],
+   "expected_page": "disaster_report",
+   "expected_destination": null,
+   "expected_components": [
+    "pick_category",
+    "enter_location",
+    "describe_disaster",
+    "give_consent",
+    "send_report"
+   ],
+   "capability": "disasterReport",
+   "group": "disaster_report",
+   "page_ok": true,
+   "components_ok": true,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_default",
+   "guide_decider": "default",
+   "page_model_calls": 0,
+   "guide_model_calls": 0,
+   "elapsed_ms": 0,
+   "deterministic": true,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-dis-typhoon-tree",
+   "text": "颱風把樹吹倒壓到車子",
+   "tags": [
+    "report",
+    "colloquial"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "disasterReport"
+   },
+   "page": "disaster_report",
+   "components": [
+    "pick_category",
+    "enter_location",
+    "describe_disaster",
+    "give_consent",
+    "send_report"
+   ],
+   "expected_page": "disaster_report",
+   "expected_destination": null,
+   "expected_components": [
+    "pick_category",
+    "enter_location",
+    "describe_disaster",
+    "give_consent",
+    "send_report"
+   ],
+   "capability": "disasterReport",
+   "group": "disaster_report",
+   "page_ok": true,
+   "components_ok": true,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_default",
+   "guide_decider": "default",
+   "page_model_calls": 0,
+   "guide_model_calls": 0,
+   "elapsed_ms": 0,
+   "deterministic": true,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-dis-underpass",
+   "text": "地下道積水很深車子過不去",
+   "tags": [
+    "report"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "disasterReport"
+   },
+   "page": "disaster_report",
+   "components": [
+    "pick_category",
+    "enter_location",
+    "describe_disaster",
+    "give_consent",
+    "send_report"
+   ],
+   "expected_page": "disaster_report",
+   "expected_destination": null,
+   "expected_components": [
+    "pick_category",
+    "enter_location",
+    "describe_disaster",
+    "give_consent",
+    "send_report"
+   ],
+   "capability": "disasterReport",
+   "group": "disaster_report",
+   "page_ok": true,
+   "components_ok": true,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_default",
+   "guide_decider": "default",
+   "page_model_calls": 0,
+   "guide_model_calls": 0,
+   "elapsed_ms": 0,
+   "deterministic": true,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-dis-address",
+   "text": "通報災害的地址那格要怎麼填",
+   "tags": [
+    "report"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "disasterReport"
+   },
+   "page": "disaster_report",
+   "components": [
+    "pick_category",
+    "enter_location"
+   ],
+   "expected_page": "disaster_report",
+   "expected_destination": null,
+   "expected_components": [
+    "pick_category",
+    "enter_location"
+   ],
+   "capability": "disasterReport",
+   "group": "disaster_report",
+   "page_ok": true,
+   "components_ok": true,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_model",
+   "guide_decider": "model",
+   "page_model_calls": 0,
+   "guide_model_calls": 1,
+   "elapsed_ms": 289,
+   "deterministic": false,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-dis-status",
+   "text": "災情的狀況要勾哪個",
+   "tags": [
+    "report"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "disasterReport"
+   },
+   "page": "disaster_report",
+   "components": [
+    "pick_category",
+    "enter_location",
+    "describe_disaster"
+   ],
+   "expected_page": "disaster_report",
+   "expected_destination": null,
+   "expected_components": [
+    "pick_category",
+    "enter_location",
+    "describe_disaster"
+   ],
+   "capability": "disasterReport",
+   "group": "disaster_report",
+   "page_ok": true,
+   "components_ok": true,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_model",
+   "guide_decider": "model",
+   "page_model_calls": 0,
+   "guide_model_calls": 1,
+   "elapsed_ms": 312,
+   "deterministic": false,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-dis-grey",
+   "text": "災害通報最後那個送出鍵是灰的",
+   "tags": [
+    "report"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "disasterReport"
+   },
+   "page": "disaster_report",
+   "components": [
+    "pick_category",
+    "enter_location",
+    "describe_disaster",
+    "give_consent",
+    "send_report"
+   ],
+   "expected_page": "disaster_report",
+   "expected_destination": null,
+   "expected_components": [
+    "pick_category",
+    "enter_location",
+    "describe_disaster",
+    "give_consent"
+   ],
+   "capability": "disasterReport",
+   "group": "disaster_report",
+   "page_ok": true,
+   "components_ok": true,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_keyword",
+   "guide_decider": "keyword",
+   "page_model_calls": 0,
+   "guide_model_calls": 0,
+   "elapsed_ms": 0,
+   "deterministic": true,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-dis-drain",
+   "text": "我要回報災情 是水溝堵住淹起來了",
+   "tags": [
+    "report",
+    "cross_item"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "disasterReport"
+   },
+   "page": "disaster_report",
+   "components": [
+    "pick_category",
+    "enter_location",
+    "describe_disaster",
+    "give_consent",
+    "send_report"
+   ],
+   "expected_page": "disaster_report",
+   "expected_destination": null,
+   "expected_components": [
+    "pick_category",
+    "enter_location",
+    "describe_disaster",
+    "give_consent",
+    "send_report"
+   ],
+   "capability": "disasterReport",
+   "group": "disaster_report",
+   "page_ok": true,
+   "components_ok": true,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_keyword",
+   "guide_decider": "keyword",
+   "page_model_calls": 0,
+   "guide_model_calls": 0,
+   "elapsed_ms": 0,
+   "deterministic": true,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-dis-correction",
+   "text": "不是要陳情 是要報災害",
+   "tags": [
+    "report",
+    "negation"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "disasterReport"
+   },
+   "page": "disaster_report",
+   "components": [
+    "pick_category",
+    "enter_location",
+    "describe_disaster",
+    "give_consent",
+    "send_report"
+   ],
+   "expected_page": "disaster_report",
+   "expected_destination": null,
+   "expected_components": [
+    "pick_category",
+    "enter_location",
+    "describe_disaster",
+    "give_consent",
+    "send_report"
+   ],
+   "capability": "disasterReport",
+   "group": "disaster_report",
+   "page_ok": true,
+   "components_ok": true,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_default",
+   "guide_decider": "default",
+   "page_model_calls": 0,
+   "guide_model_calls": 0,
+   "elapsed_ms": 0,
+   "deterministic": true,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-cit-slide",
+   "text": "公園的溜滑梯壞掉了想跟市府說",
+   "tags": [
+    "report",
+    "colloquial"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "reportIssue"
+   },
+   "page": "citizen_report",
+   "components": [
+    "pick_category",
+    "fill_form",
+    "submit_report"
+   ],
+   "expected_page": "citizen_report",
+   "expected_destination": null,
+   "expected_components": [
+    "pick_category",
+    "fill_form",
+    "submit_report"
+   ],
+   "capability": "reportIssue",
+   "group": "citizen_report",
+   "page_ok": true,
+   "components_ok": true,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_default",
+   "guide_decider": "default",
+   "page_model_calls": 0,
+   "guide_model_calls": 0,
+   "elapsed_ms": 0,
+   "deterministic": true,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-cit-construction",
+   "text": "對面工地半夜還在施工很吵 我要申訴",
+   "tags": [
+    "report",
+    "voice"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "reportIssue"
+   },
+   "page": "citizen_report",
+   "components": [
+    "pick_category",
+    "fill_form",
+    "submit_report"
+   ],
+   "expected_page": "citizen_report",
+   "expected_destination": null,
+   "expected_components": [
+    "pick_category",
+    "fill_form",
+    "submit_report"
+   ],
+   "capability": "reportIssue",
+   "group": "citizen_report",
+   "page_ok": true,
+   "components_ok": true,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_keyword",
+   "guide_decider": "keyword",
+   "page_model_calls": 0,
+   "guide_model_calls": 0,
+   "elapsed_ms": 0,
+   "deterministic": true,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-cit-sidewalk",
+   "text": "人行道被機車停滿 我要檢舉",
+   "tags": [
+    "report"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "reportIssue"
+   },
+   "page": "citizen_report",
+   "components": [
+    "pick_category",
+    "fill_form",
+    "submit_report"
+   ],
+   "expected_page": "citizen_report",
+   "expected_destination": null,
+   "expected_components": [
+    "pick_category",
+    "fill_form",
+    "submit_report"
+   ],
+   "capability": "reportIssue",
+   "group": "citizen_report",
+   "page_ok": true,
+   "components_ok": true,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_keyword",
+   "guide_decider": "keyword",
+   "page_model_calls": 0,
+   "guide_model_calls": 0,
+   "elapsed_ms": 0,
+   "deterministic": true,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-cit-address",
+   "text": "我要陳情 地址要寫哪裡",
+   "tags": [
+    "report"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "reportIssue"
+   },
+   "page": "citizen_report",
+   "components": [
+    "pick_category",
+    "fill_form",
+    "submit_report"
+   ],
+   "expected_page": "citizen_report",
+   "expected_destination": null,
+   "expected_components": [
+    "pick_category",
+    "fill_location"
+   ],
+   "capability": "reportIssue",
+   "group": "citizen_report",
+   "page_ok": true,
+   "components_ok": false,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_default",
+   "guide_decider": "default",
+   "page_model_calls": 0,
+   "guide_model_calls": 0,
+   "elapsed_ms": 0,
+   "deterministic": true,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-cit-photo",
+   "text": "反映的時候可以拍照上傳嗎",
+   "tags": [
+    "report"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "reportIssue"
+   },
+   "page": "citizen_report",
+   "components": [
+    "pick_category",
+    "add_photo"
+   ],
+   "expected_page": "citizen_report",
+   "expected_destination": null,
+   "expected_components": [
+    "pick_category",
+    "add_photo"
+   ],
+   "capability": "reportIssue",
+   "group": "citizen_report",
+   "page_ok": true,
+   "components_ok": true,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_keyword",
+   "guide_decider": "keyword",
+   "page_model_calls": 0,
+   "guide_model_calls": 0,
+   "elapsed_ms": 0,
+   "deterministic": true,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-cit-reply",
+   "text": "我上禮拜反映的事情市府回了沒",
+   "tags": [
+    "progress"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "reportIssue"
+   },
+   "page": "citizen_report",
+   "components": [
+    "open_cases",
+    "open_case",
+    "case_detail"
+   ],
+   "expected_page": "citizen_report",
+   "expected_destination": null,
+   "expected_components": [
+    "open_cases",
+    "open_case"
+   ],
+   "capability": "reportIssue",
+   "group": "citizen_report",
+   "page_ok": true,
+   "components_ok": false,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_model",
+   "guide_decider": "model",
+   "page_model_calls": 0,
+   "guide_model_calls": 1,
+   "elapsed_ms": 438,
+   "deterministic": false,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-cit-case-no",
+   "text": "我有案號 想查陳情",
+   "tags": [
+    "progress"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "reportIssue"
+   },
+   "page": "citizen_report",
+   "components": [
+    "open_cases",
+    "search_case"
+   ],
+   "expected_page": "citizen_report",
+   "expected_destination": null,
+   "expected_components": [
+    "open_cases",
+    "search_case"
+   ],
+   "capability": "reportIssue",
+   "group": "citizen_report",
+   "page_ok": true,
+   "components_ok": true,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_keyword",
+   "guide_decider": "keyword",
+   "page_model_calls": 0,
+   "guide_model_calls": 0,
+   "elapsed_ms": 0,
+   "deterministic": true,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-cit-what-wrote",
+   "text": "我想看我當初陳情寫了什麼",
+   "tags": [
+    "progress"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "reportIssue"
+   },
+   "page": "citizen_report",
+   "components": [
+    "pick_category",
+    "fill_form",
+    "submit_report"
+   ],
+   "expected_page": "citizen_report",
+   "expected_destination": null,
+   "expected_components": [
+    "open_cases",
+    "open_case",
+    "case_detail"
+   ],
+   "capability": "reportIssue",
+   "group": "citizen_report",
+   "page_ok": true,
+   "components_ok": false,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_default",
+   "guide_decider": "default",
+   "page_model_calls": 0,
+   "guide_model_calls": 0,
+   "elapsed_ms": 0,
+   "deterministic": true,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-cit-speak",
+   "text": "我不會打字 可以用講的反映嗎",
+   "tags": [
+    "report",
+    "voice"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "reportIssue"
+   },
+   "page": "citizen_report",
+   "components": [
+    "call_1999"
+   ],
+   "expected_page": "citizen_report",
+   "expected_destination": null,
+   "expected_components": [
+    "call_1999"
+   ],
+   "capability": "reportIssue",
+   "group": "citizen_report",
+   "page_ok": true,
+   "components_ok": true,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_keyword",
+   "guide_decider": "keyword",
+   "page_model_calls": 0,
+   "guide_model_calls": 0,
+   "elapsed_ms": 0,
+   "deterministic": true,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-cit-two",
+   "text": "先查我之前陳情的進度 再反映新的問題",
+   "tags": [
+    "two_goals",
+    "order"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "reportIssue"
+   },
+   "page": "citizen_report",
+   "components": [
+    "open_cases",
+    "search_case"
+   ],
+   "expected_page": "citizen_report",
+   "expected_destination": null,
+   "expected_components": [
+    "open_cases",
+    "open_case",
+    "pick_category",
+    "fill_form",
+    "submit_report"
+   ],
+   "capability": "reportIssue",
+   "group": "citizen_report",
+   "page_ok": true,
+   "components_ok": false,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_model",
+   "guide_decider": "model",
+   "page_model_calls": 0,
+   "guide_model_calls": 1,
+   "elapsed_ms": 2315,
+   "deterministic": false,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-do-allowance",
+   "text": "我想申請中低收入老人生活津貼",
+   "tags": [
+    "apply"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "districtOffice"
+   },
+   "page": "district_office",
+   "components": [
+    "open_service",
+    "fill_basic",
+    "fill_details",
+    "next_step",
+    "submit"
+   ],
+   "expected_page": "district_office",
+   "expected_destination": null,
+   "expected_components": [
+    "open_service",
+    "fill_basic",
+    "fill_details",
+    "next_step",
+    "submit"
+   ],
+   "capability": "districtOffice",
+   "group": "district_office",
+   "page_ok": true,
+   "components_ok": true,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_default",
+   "guide_decider": "default",
+   "page_model_calls": 0,
+   "guide_model_calls": 0,
+   "elapsed_ms": 0,
+   "deterministic": true,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-do-relief",
+   "text": "我要辦急難救助",
+   "tags": [
+    "apply"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "districtOffice"
+   },
+   "page": "district_office",
+   "components": [
+    "open_service",
+    "fill_basic",
+    "fill_details",
+    "next_step",
+    "submit"
+   ],
+   "expected_page": "district_office",
+   "expected_destination": null,
+   "expected_components": [
+    "open_service",
+    "fill_basic",
+    "fill_details",
+    "next_step",
+    "submit"
+   ],
+   "capability": "districtOffice",
+   "group": "district_office",
+   "page_ok": true,
+   "components_ok": true,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_default",
+   "guide_decider": "default",
+   "page_model_calls": 0,
+   "guide_model_calls": 0,
+   "elapsed_ms": 0,
+   "deterministic": true,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-do-email",
+   "text": "申辦的表單電子信箱那邊要填什麼",
+   "tags": [
+    "apply"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "districtOffice"
+   },
+   "page": "district_office",
+   "components": [
+    "open_service",
+    "fill_basic",
+    "fill_details",
+    "next_step",
+    "submit"
+   ],
+   "expected_page": "district_office",
+   "expected_destination": null,
+   "expected_components": [
+    "open_service",
+    "fill_basic"
+   ],
+   "capability": "districtOffice",
+   "group": "district_office",
+   "page_ok": true,
+   "components_ok": false,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_keyword",
+   "guide_decider": "keyword",
+   "page_model_calls": 0,
+   "guide_model_calls": 0,
+   "elapsed_ms": 0,
+   "deterministic": true,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-do-where-submit",
+   "text": "申請書最後的送出在哪",
+   "tags": [
+    "apply"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "districtOffice"
+   },
+   "page": "district_office",
+   "components": [
+    "open_service",
+    "fill_basic",
+    "fill_details",
+    "next_step",
+    "submit"
+   ],
+   "expected_page": "district_office",
+   "expected_destination": null,
+   "expected_components": [
+    "open_service",
+    "fill_basic",
+    "fill_details",
+    "next_step",
+    "submit"
+   ],
+   "capability": "districtOffice",
+   "group": "district_office",
+   "page_ok": true,
+   "components_ok": true,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_keyword",
+   "guide_decider": "keyword",
+   "page_model_calls": 0,
+   "guide_model_calls": 0,
+   "elapsed_ms": 0,
+   "deterministic": true,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-do-items",
+   "text": "申辦時要選很多項目怎麼勾",
+   "tags": [
+    "apply"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "districtOffice"
+   },
+   "page": "district_office",
+   "components": [
+    "open_service",
+    "fill_basic",
+    "fill_details",
+    "next_step",
+    "submit"
+   ],
+   "expected_page": "district_office",
+   "expected_destination": null,
+   "expected_components": [
+    "open_service",
+    "pick_items"
+   ],
+   "capability": "districtOffice",
+   "group": "district_office",
+   "page_ok": true,
+   "components_ok": false,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_default",
+   "guide_decider": "default",
+   "page_model_calls": 0,
+   "guide_model_calls": 0,
+   "elapsed_ms": 0,
+   "deterministic": true,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-do-calendar",
+   "text": "申辦表單要填哪一天 月曆怎麼用",
+   "tags": [
+    "apply",
+    "voice"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "districtOffice"
+   },
+   "page": "district_office",
+   "components": [
+    "open_service",
+    "pick_date"
+   ],
+   "expected_page": "district_office",
+   "expected_destination": null,
+   "expected_components": [
+    "open_service",
+    "pick_date"
+   ],
+   "capability": "districtOffice",
+   "group": "district_office",
+   "page_ok": true,
+   "components_ok": true,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_keyword",
+   "guide_decider": "keyword",
+   "page_model_calls": 0,
+   "guide_model_calls": 0,
+   "elapsed_ms": 0,
+   "deterministic": true,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-do-subsidy-progress",
+   "text": "我上個月申請的補助審核到哪了",
+   "tags": [
+    "progress"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "districtOffice.progress"
+   },
+   "page": "district_office",
+   "components": [
+    "check_progress"
+   ],
+   "expected_page": "district_office",
+   "expected_destination": null,
+   "expected_components": [
+    "check_progress"
+   ],
+   "capability": "districtOffice.progress",
+   "group": "district_office",
+   "page_ok": true,
+   "components_ok": true,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_default",
+   "guide_decider": "default",
+   "page_model_calls": 0,
+   "guide_model_calls": 0,
+   "elapsed_ms": 0,
+   "deterministic": true,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-do-closed",
+   "text": "已經辦完的申請案件在哪看",
+   "tags": [
+    "progress"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "districtOffice.progress"
+   },
+   "page": "district_office",
+   "components": [
+    "check_progress",
+    "view_closed"
+   ],
+   "expected_page": "district_office",
+   "expected_destination": null,
+   "expected_components": [
+    "check_progress",
+    "view_closed"
+   ],
+   "capability": "districtOffice.progress",
+   "group": "district_office",
+   "page_ok": true,
+   "components_ok": true,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_keyword",
+   "guide_decider": "keyword",
+   "page_model_calls": 0,
+   "guide_model_calls": 0,
+   "elapsed_ms": 0,
+   "deterministic": true,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-do-no-name",
+   "text": "我要申請東西 但是不知道叫什麼名字",
+   "tags": [
+    "apply",
+    "vague"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "districtOffice"
+   },
+   "page": "district_office",
+   "components": [
+    "open_service",
+    "fill_basic",
+    "fill_details",
+    "next_step",
+    "submit"
+   ],
+   "expected_page": "district_office",
+   "expected_destination": null,
+   "expected_components": [
+    "search_service"
+   ],
+   "capability": "districtOffice",
+   "group": "district_office",
+   "page_ok": true,
+   "components_ok": false,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_default",
+   "guide_decider": "default",
+   "page_model_calls": 0,
+   "guide_model_calls": 0,
+   "elapsed_ms": 0,
+   "deterministic": true,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-do-correction",
+   "text": "不是要查進度 我要提出新的申請",
+   "tags": [
+    "apply",
+    "negation"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "districtOffice"
+   },
+   "page": "district_office",
+   "components": [
+    "open_service",
+    "fill_basic",
+    "fill_details",
+    "next_step",
+    "submit"
+   ],
+   "expected_page": "district_office",
+   "expected_destination": null,
+   "expected_components": [
+    "open_service",
+    "fill_basic",
+    "fill_details",
+    "next_step",
+    "submit"
+   ],
+   "capability": "districtOffice",
+   "group": "district_office",
+   "page_ok": true,
+   "components_ok": true,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_default",
+   "guide_decider": "default",
+   "page_model_calls": 0,
+   "guide_model_calls": 0,
+   "elapsed_ms": 0,
+   "deterministic": true,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-pol-wallet",
+   "text": "我的錢包被扒了想在網路上報案",
+   "tags": [
+    "report",
+    "colloquial"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "police.online"
+   },
+   "page": "police_report",
+   "components": [
+    "read_notice",
+    "fill_contact",
+    "next_step",
+    "fill_case",
+    "agree_case",
+    "submit_report"
+   ],
+   "expected_page": "police_report",
+   "expected_destination": null,
+   "expected_components": [
+    "read_notice",
+    "fill_contact",
+    "next_step",
+    "fill_case",
+    "agree_case",
+    "submit_report"
+   ],
+   "capability": "police.online",
+   "group": "police_report",
+   "page_ok": true,
+   "components_ok": true,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_default",
+   "guide_decider": "default",
+   "page_model_calls": 0,
+   "guide_model_calls": 0,
+   "elapsed_ms": 0,
+   "deterministic": true,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-pol-scam",
+   "text": "有人騙我匯款 我要上網報案",
+   "tags": [
+    "report",
+    "voice"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "police.online"
+   },
+   "page": "police_report",
+   "components": [
+    "read_notice",
+    "fill_contact",
+    "next_step",
+    "fill_case",
+    "agree_case",
+    "submit_report"
+   ],
+   "expected_page": "police_report",
+   "expected_destination": null,
+   "expected_components": [
+    "read_notice",
+    "fill_contact",
+    "next_step",
+    "fill_case",
+    "agree_case",
+    "submit_report"
+   ],
+   "capability": "police.online",
+   "group": "police_report",
+   "page_ok": true,
+   "components_ok": true,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_default",
+   "guide_decider": "default",
+   "page_model_calls": 0,
+   "guide_model_calls": 0,
+   "elapsed_ms": 0,
+   "deterministic": true,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-pol-contact",
+   "text": "線上報案第一頁的聯絡資料怎麼填",
+   "tags": [
+    "report"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "police.online"
+   },
+   "page": "police_report",
+   "components": [
+    "read_notice",
+    "fill_contact",
+    "next_step",
+    "fill_case",
+    "agree_case",
+    "submit_report"
+   ],
+   "expected_page": "police_report",
+   "expected_destination": null,
+   "expected_components": [
+    "read_notice",
+    "fill_contact"
+   ],
+   "capability": "police.online",
+   "group": "police_report",
+   "page_ok": true,
+   "components_ok": false,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_default",
+   "guide_decider": "default",
+   "page_model_calls": 0,
+   "guide_model_calls": 0,
+   "elapsed_ms": 0,
+   "deterministic": true,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-pol-case",
+   "text": "網路報案的案情要寫在哪",
+   "tags": [
+    "report"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "police.online"
+   },
+   "page": "police_report",
+   "components": [
+    "read_notice",
+    "fill_contact",
+    "next_step",
+    "fill_case"
+   ],
+   "expected_page": "police_report",
+   "expected_destination": null,
+   "expected_components": [
+    "read_notice",
+    "fill_contact",
+    "next_step",
+    "fill_case"
+   ],
+   "capability": "police.online",
+   "group": "police_report",
+   "page_ok": true,
+   "components_ok": true,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_keyword",
+   "guide_decider": "keyword",
+   "page_model_calls": 0,
+   "guide_model_calls": 0,
+   "elapsed_ms": 0,
+   "deterministic": true,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-pol-notice",
+   "text": "網路報案要先看的注意事項",
+   "tags": [
+    "report"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "police.online"
+   },
+   "page": "police_report",
+   "components": [
+    "read_notice",
+    "fill_contact",
+    "next_step",
+    "fill_case",
+    "agree_case",
+    "submit_report"
+   ],
+   "expected_page": "police_report",
+   "expected_destination": null,
+   "expected_components": [
+    "read_notice"
+   ],
+   "capability": "police.online",
+   "group": "police_report",
+   "page_ok": true,
+   "components_ok": false,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_default",
+   "guide_decider": "default",
+   "page_model_calls": 0,
+   "guide_model_calls": 0,
+   "elapsed_ms": 0,
+   "deterministic": true,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-pol-handled",
+   "text": "我在網路上報的案子警察處理了沒",
+   "tags": [
+    "records",
+    "voice"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "police.progress"
+   },
+   "page": "police_report",
+   "components": [
+    "open_record",
+    "record_detail"
+   ],
+   "expected_page": "police_report",
+   "expected_destination": null,
+   "expected_components": [
+    "open_record",
+    "record_detail"
+   ],
+   "capability": "police.progress",
+   "group": "police_report",
+   "page_ok": true,
+   "components_ok": true,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_model",
+   "guide_decider": "model",
+   "page_model_calls": 0,
+   "guide_model_calls": 1,
+   "elapsed_ms": 292,
+   "deterministic": false,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-pol-records",
+   "text": "打開我的報案紀錄",
+   "tags": [
+    "records"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "police.records"
+   },
+   "page": "police_report",
+   "components": [
+    "open_record"
+   ],
+   "expected_page": "police_report",
+   "expected_destination": null,
+   "expected_components": [
+    "open_record"
+   ],
+   "capability": "police.records",
+   "group": "police_report",
+   "page_ok": true,
+   "components_ok": true,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_keyword",
+   "guide_decider": "keyword",
+   "page_model_calls": 0,
+   "guide_model_calls": 0,
+   "elapsed_ms": 0,
+   "deterministic": true,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-pol-detail",
+   "text": "我要看那筆報案的詳細內容",
+   "tags": [
+    "records"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "police.records"
+   },
+   "page": "police_report",
+   "components": [
+    "open_record"
+   ],
+   "expected_page": "police_report",
+   "expected_destination": null,
+   "expected_components": [
+    "open_record",
+    "record_detail"
+   ],
+   "capability": "police.records",
+   "group": "police_report",
+   "page_ok": true,
+   "components_ok": false,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_default",
+   "guide_decider": "default",
+   "page_model_calls": 0,
+   "guide_model_calls": 0,
+   "elapsed_ms": 0,
+   "deterministic": true,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-pol-correction",
+   "text": "不是要報新的案 是要看之前報的",
+   "tags": [
+    "records",
+    "negation"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "police.records"
+   },
+   "page": "police_report",
+   "components": [
+    "open_record"
+   ],
+   "expected_page": "police_report",
+   "expected_destination": null,
+   "expected_components": [
+    "open_record"
+   ],
+   "capability": "police.records",
+   "group": "police_report",
+   "page_ok": true,
+   "components_ok": true,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_default",
+   "guide_decider": "default",
+   "page_model_calls": 0,
+   "guide_model_calls": 0,
+   "elapsed_ms": 0,
+   "deterministic": true,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-pol-send",
+   "text": "我被詐騙了 網路報案要怎麼送出",
+   "tags": [
+    "report"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "police.online"
+   },
+   "page": "police_report",
+   "components": [
+    "read_notice",
+    "fill_contact",
+    "next_step",
+    "fill_case",
+    "agree_case",
+    "submit_report"
+   ],
+   "expected_page": "police_report",
+   "expected_destination": null,
+   "expected_components": [
+    "read_notice",
+    "fill_contact",
+    "next_step",
+    "fill_case",
+    "agree_case",
+    "submit_report"
+   ],
+   "capability": "police.online",
+   "group": "police_report",
+   "page_ok": true,
+   "components_ok": true,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_keyword",
+   "guide_decider": "keyword",
+   "page_model_calls": 0,
+   "guide_model_calls": 0,
+   "elapsed_ms": 0,
+   "deterministic": true,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-cw-discount",
+   "text": "有沒有什麼店家折價的券可以拿",
+   "tags": [
+    "perks",
+    "colloquial"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "coupon.list"
+   },
+   "page": "coupon_wallet",
+   "components": [
+    "coupon_home",
+    "coupon_tab",
+    "pick_coupon"
+   ],
+   "expected_page": "coupon_wallet",
+   "expected_destination": null,
+   "expected_components": [
+    "coupon_home",
+    "coupon_tab",
+    "pick_coupon"
+   ],
+   "capability": "coupon.list",
+   "group": "coupon_wallet",
+   "page_ok": true,
+   "components_ok": true,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_model",
+   "guide_decider": "model",
+   "page_model_calls": 0,
+   "guide_model_calls": 1,
+   "elapsed_ms": 300,
+   "deterministic": false,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-cw-events",
+   "text": "我想看最近有哪些優惠可以用",
+   "tags": [
+    "perks"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "coupon.list"
+   },
+   "page": "coupon_wallet",
+   "components": [
+    "coupon_home",
+    "coupon_tab",
+    "pick_coupon"
+   ],
+   "expected_page": "coupon_wallet",
+   "expected_destination": null,
+   "expected_components": [
+    "coupon_home",
+    "coupon_tab",
+    "pick_coupon"
+   ],
+   "capability": "coupon.list",
+   "group": "coupon_wallet",
+   "page_ok": true,
+   "components_ok": true,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_default",
+   "guide_decider": "default",
+   "page_model_calls": 0,
+   "guide_model_calls": 0,
+   "elapsed_ms": 0,
+   "deterministic": true,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-cw-keep",
+   "text": "這張折價券幫我收進票夾",
+   "tags": [
+    "perks"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "coupon.list"
+   },
+   "page": "coupon_wallet",
+   "components": [
+    "coupon_home",
+    "coupon_tab",
+    "pick_coupon"
+   ],
+   "expected_page": "coupon_wallet",
+   "expected_destination": null,
+   "expected_components": [
+    "coupon_home",
+    "coupon_tab",
+    "pick_coupon",
+    "add_wallet"
+   ],
+   "capability": "coupon.list",
+   "group": "coupon_wallet",
+   "page_ok": true,
+   "components_ok": false,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_keyword",
+   "guide_decider": "keyword",
+   "page_model_calls": 0,
+   "guide_model_calls": 0,
+   "elapsed_ms": 0,
+   "deterministic": true,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-cw-saved",
+   "text": "我存起來的折價券在哪裡看",
+   "tags": [
+    "wallet"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "wallet"
+   },
+   "page": "coupon_wallet",
+   "components": [
+    "wallet_coupons",
+    "wallet_pick"
+   ],
+   "expected_page": "coupon_wallet",
+   "expected_destination": null,
+   "expected_components": [
+    "wallet_coupons"
+   ],
+   "capability": "wallet",
+   "group": "coupon_wallet",
+   "page_ok": true,
+   "components_ok": false,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_model",
+   "guide_decider": "model",
+   "page_model_calls": 0,
+   "guide_model_calls": 1,
+   "elapsed_ms": 312,
+   "deterministic": false,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-cw-use-shop",
+   "text": "我要去店裡用我存的優惠",
+   "tags": [
+    "wallet"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "wallet"
+   },
+   "page": "coupon_wallet",
+   "components": [
+    "wallet_coupons"
+   ],
+   "expected_page": "coupon_wallet",
+   "expected_destination": null,
+   "expected_components": [
+    "wallet_coupons",
+    "wallet_pick",
+    "use_coupon"
+   ],
+   "capability": "wallet",
+   "group": "coupon_wallet",
+   "page_ok": true,
+   "components_ok": false,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_default",
+   "guide_decider": "default",
+   "page_model_calls": 0,
+   "guide_model_calls": 0,
+   "elapsed_ms": 0,
+   "deterministic": true,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-cw-redeemed",
+   "text": "兌換過的券在哪查",
+   "tags": [
+    "wallet"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "wallet"
+   },
+   "page": "coupon_wallet",
+   "components": [
+    "wallet_coupons",
+    "wallet_used"
+   ],
+   "expected_page": "coupon_wallet",
+   "expected_destination": null,
+   "expected_components": [
+    "wallet_coupons",
+    "wallet_used"
+   ],
+   "capability": "wallet",
+   "group": "coupon_wallet",
+   "page_ok": true,
+   "components_ok": true,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_model",
+   "guide_decider": "model",
+   "page_model_calls": 0,
+   "guide_model_calls": 1,
+   "elapsed_ms": 452,
+   "deterministic": false,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-cw-zoo-ticket",
+   "text": "動物園的入場票在哪拿出來",
+   "tags": [
+    "wallet",
+    "cross_item"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "wallet"
+   },
+   "page": "coupon_wallet",
+   "components": [
+    "wallet_ticket"
+   ],
+   "expected_page": "coupon_wallet",
+   "expected_destination": null,
+   "expected_components": [
+    "wallet_ticket"
+   ],
+   "capability": "wallet",
+   "group": "coupon_wallet",
+   "page_ok": true,
+   "components_ok": true,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_model",
+   "guide_decider": "model",
+   "page_model_calls": 0,
+   "guide_model_calls": 1,
+   "elapsed_ms": 314,
+   "deterministic": false,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-cw-show",
+   "text": "我要出示票給工作人員掃",
+   "tags": [
+    "wallet",
+    "colloquial"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "wallet"
+   },
+   "page": "coupon_wallet",
+   "components": [
+    "wallet_coupons"
+   ],
+   "expected_page": "coupon_wallet",
+   "expected_destination": null,
+   "expected_components": [
+    "wallet_ticket"
+   ],
+   "capability": "wallet",
+   "group": "coupon_wallet",
+   "page_ok": true,
+   "components_ok": false,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_default",
+   "guide_decider": "default",
+   "page_model_calls": 0,
+   "guide_model_calls": 0,
+   "elapsed_ms": 0,
+   "deterministic": true,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-cw-open",
+   "text": "打開票夾",
+   "tags": [
+    "wallet"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "wallet"
+   },
+   "page": "coupon_wallet",
+   "components": [
+    "wallet_coupons"
+   ],
+   "expected_page": "coupon_wallet",
+   "expected_destination": null,
+   "expected_components": [
+    "wallet_coupons"
+   ],
+   "capability": "wallet",
+   "group": "coupon_wallet",
+   "page_ok": true,
+   "components_ok": true,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_default",
+   "guide_decider": "default",
+   "page_model_calls": 0,
+   "guide_model_calls": 0,
+   "elapsed_ms": 0,
+   "deterministic": true,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-cw-checkout",
+   "text": "結帳時要按哪裡才能使用優惠券",
+   "tags": [
+    "wallet"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "wallet"
+   },
+   "page": "coupon_wallet",
+   "components": [
+    "wallet_coupons",
+    "wallet_pick",
+    "use_coupon"
+   ],
+   "expected_page": "coupon_wallet",
+   "expected_destination": null,
+   "expected_components": [
+    "wallet_coupons",
+    "wallet_pick",
+    "use_coupon"
+   ],
+   "capability": "wallet",
+   "group": "coupon_wallet",
+   "page_ok": true,
+   "components_ok": true,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_keyword",
+   "guide_decider": "keyword",
+   "page_model_calls": 0,
+   "guide_model_calls": 0,
+   "elapsed_ms": 0,
+   "deterministic": true,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-sub-parking",
+   "text": "我想收到停車相關的通知",
+   "tags": [
+    "subscription",
+    "cross_item"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "subscription"
+   },
+   "page": "subscription",
+   "components": [
+    "pick_topic",
+    "subscribe"
+   ],
+   "expected_page": "subscription",
+   "expected_destination": null,
+   "expected_components": [
+    "pick_topic",
+    "subscribe"
+   ],
+   "capability": "subscription",
+   "group": "subscription",
+   "page_ok": true,
+   "components_ok": true,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_keyword",
+   "guide_decider": "keyword",
+   "page_model_calls": 0,
+   "guide_model_calls": 0,
+   "elapsed_ms": 0,
+   "deterministic": true,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-sub-what",
+   "text": "有什麼消息可以訂來看",
+   "tags": [
+    "subscription",
+    "colloquial"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "subscription"
+   },
+   "page": "subscription",
+   "components": [
+    "pick_topic"
+   ],
+   "expected_page": "subscription",
+   "expected_destination": null,
+   "expected_components": [
+    "pick_topic"
+   ],
+   "capability": "subscription",
+   "group": "subscription",
+   "page_ok": true,
+   "components_ok": true,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_model",
+   "guide_decider": "model",
+   "page_model_calls": 0,
+   "guide_model_calls": 1,
+   "elapsed_ms": 276,
+   "deterministic": false,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-sub-traffic",
+   "text": "幫我訂交通措施的消息",
+   "tags": [
+    "subscription"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "subscription"
+   },
+   "page": "subscription",
+   "components": [
+    "pick_topic",
+    "subscribe"
+   ],
+   "expected_page": "subscription",
+   "expected_destination": null,
+   "expected_components": [
+    "pick_topic",
+    "subscribe"
+   ],
+   "capability": "subscription",
+   "group": "subscription",
+   "page_ok": true,
+   "components_ok": true,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_keyword",
+   "guide_decider": "keyword",
+   "page_model_calls": 0,
+   "guide_model_calls": 0,
+   "elapsed_ms": 0,
+   "deterministic": true,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-sub-health",
+   "text": "健康報報我想訂",
+   "tags": [
+    "subscription"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "subscription"
+   },
+   "page": "subscription",
+   "components": [
+    "pick_topic",
+    "subscribe"
+   ],
+   "expected_page": "subscription",
+   "expected_destination": null,
+   "expected_components": [
+    "pick_topic",
+    "subscribe"
+   ],
+   "capability": "subscription",
+   "group": "subscription",
+   "page_ok": true,
+   "components_ok": true,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_keyword",
+   "guide_decider": "keyword",
+   "page_model_calls": 0,
+   "guide_model_calls": 0,
+   "elapsed_ms": 0,
+   "deterministic": true,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-sub-stop",
+   "text": "新住民的資訊不想再收到了",
+   "tags": [
+    "subscription",
+    "negation"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "subscription"
+   },
+   "page": "subscription",
+   "components": [
+    "pick_topic",
+    "subscribe"
+   ],
+   "expected_page": "subscription",
+   "expected_destination": null,
+   "expected_components": [
+    "unsubscribe"
+   ],
+   "capability": "subscription",
+   "group": "subscription",
+   "page_ok": true,
+   "components_ok": false,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_keyword",
+   "guide_decider": "keyword",
+   "page_model_calls": 0,
+   "guide_model_calls": 0,
+   "elapsed_ms": 0,
+   "deterministic": true,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-sub-cancel",
+   "text": "我要退掉訂閱",
+   "tags": [
+    "subscription"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "subscription"
+   },
+   "page": "subscription",
+   "components": [
+    "pick_topic",
+    "subscribe"
+   ],
+   "expected_page": "subscription",
+   "expected_destination": null,
+   "expected_components": [
+    "unsubscribe"
+   ],
+   "capability": "subscription",
+   "group": "subscription",
+   "page_ok": true,
+   "components_ok": false,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_default",
+   "guide_decider": "default",
+   "page_model_calls": 0,
+   "guide_model_calls": 0,
+   "elapsed_ms": 0,
+   "deterministic": true,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-sub-read",
+   "text": "訂閱的那些通知內容在哪裡看",
+   "tags": [
+    "subscription"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "subscription.items"
+   },
+   "page": "subscription",
+   "components": [
+    "read_messages"
+   ],
+   "expected_page": "subscription",
+   "expected_destination": null,
+   "expected_components": [
+    "read_messages"
+   ],
+   "capability": "subscription.items",
+   "group": "subscription",
+   "page_ok": true,
+   "components_ok": true,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_default",
+   "guide_decider": "default",
+   "page_model_calls": 0,
+   "guide_model_calls": 0,
+   "elapsed_ms": 0,
+   "deterministic": true,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-sub-change",
+   "text": "我想改我訂閱的項目",
+   "tags": [
+    "subscription"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "subscription.items"
+   },
+   "page": "subscription",
+   "components": [
+    "read_messages"
+   ],
+   "expected_page": "subscription",
+   "expected_destination": null,
+   "expected_components": [
+    "open_settings"
+   ],
+   "capability": "subscription.items",
+   "group": "subscription",
+   "page_ok": true,
+   "components_ok": false,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_default",
+   "guide_decider": "default",
+   "page_model_calls": 0,
+   "guide_model_calls": 0,
+   "elapsed_ms": 0,
+   "deterministic": true,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-sub-sports",
+   "text": "嗯 那個體育的消息 我要訂閱一下",
+   "tags": [
+    "subscription",
+    "voice"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "subscription"
+   },
+   "page": "subscription",
+   "components": [
+    "pick_topic",
+    "subscribe"
+   ],
+   "expected_page": "subscription",
+   "expected_destination": null,
+   "expected_components": [
+    "pick_topic",
+    "subscribe"
+   ],
+   "capability": "subscription",
+   "group": "subscription",
+   "page_ok": true,
+   "components_ok": true,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_keyword",
+   "guide_decider": "keyword",
+   "page_model_calls": 0,
+   "guide_model_calls": 0,
+   "elapsed_ms": 0,
+   "deterministic": true,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-sub-correction",
+   "text": "不是要取消 是要訂閱空氣品質",
+   "tags": [
+    "subscription",
+    "negation"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "subscription"
+   },
+   "page": "subscription",
+   "components": [
+    "pick_topic",
+    "subscribe"
+   ],
+   "expected_page": "subscription",
+   "expected_destination": null,
+   "expected_components": [
+    "pick_topic",
+    "subscribe"
+   ],
+   "capability": "subscription",
+   "group": "subscription",
+   "page_ok": true,
+   "components_ok": true,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": "guide_default",
+   "guide_decider": "default",
+   "page_model_calls": 0,
+   "guide_model_calls": 0,
+   "elapsed_ms": 0,
+   "deterministic": true,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-native-police",
+   "text": "我要找警察局的電話",
+   "tags": [
+    "no_guide"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "police"
+   },
+   "page": null,
+   "components": null,
+   "expected_page": null,
+   "expected_destination": null,
+   "expected_components": [],
+   "capability": "police",
+   "group": "no_guide",
+   "page_ok": true,
+   "components_ok": true,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": null,
+   "guide_decider": null,
+   "page_model_calls": 0,
+   "guide_model_calls": 0,
+   "elapsed_ms": 0,
+   "deterministic": true,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-native-perks",
+   "text": "打開優惠那一頁",
+   "tags": [
+    "no_guide"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "app.perks"
+   },
+   "page": null,
+   "components": null,
+   "expected_page": null,
+   "expected_destination": null,
+   "expected_components": [],
+   "capability": "app.perks",
+   "group": "no_guide",
+   "page_ok": true,
+   "components_ok": true,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": null,
+   "guide_decider": null,
+   "page_model_calls": 0,
+   "guide_model_calls": 0,
+   "elapsed_ms": 0,
+   "deterministic": true,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-native-scan",
+   "text": "我要掃描帳單上的條碼繳費",
+   "tags": [
+    "no_guide"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "fees.scan"
+   },
+   "page": null,
+   "components": null,
+   "expected_page": null,
+   "expected_destination": null,
+   "expected_components": [],
+   "capability": "fees.scan",
+   "group": "no_guide",
+   "page_ok": true,
+   "components_ok": true,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": null,
+   "guide_decider": null,
+   "page_model_calls": 0,
+   "guide_model_calls": 0,
+   "elapsed_ms": 0,
+   "deterministic": true,
+   "page_model_independent": true,
+   "confirmed": false
+  },
+  {
+   "id": "h-native-tax",
+   "text": "繳牌照稅",
+   "tags": [
+    "no_guide"
+   ],
+   "known_failure": null,
+   "kind": "given",
+   "error": null,
+   "message": null,
+   "destination": {
+    "kind": "capability",
+    "id": "fees.tax"
+   },
+   "page": null,
+   "components": null,
+   "expected_page": null,
+   "expected_destination": null,
+   "expected_components": [],
+   "capability": "fees.tax",
+   "group": "no_guide",
+   "page_ok": true,
+   "components_ok": true,
+   "page_route": "given",
+   "page_decider": "given",
+   "guide_route": null,
+   "guide_decider": null,
+   "page_model_calls": 0,
+   "guide_model_calls": 0,
+   "elapsed_ms": 0,
+   "deterministic": true,
+   "page_model_independent": true,
+   "confirmed": false
+  }
+ ],
+ "skipped": [
+  "h-out-doctor",
+  "h-out-weather",
+  "h-out-taxi",
+  "h-out-vaccine",
+  "h-out-money",
+  "h-out-train"
+ ],
+ "stale": []
+}

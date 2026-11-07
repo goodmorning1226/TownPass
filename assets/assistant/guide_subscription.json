@@ -1,0 +1,109 @@
+{
+  "version": 1,
+  "_comment": "Teaching components of one service page. Shared by the App (guides/<page>_guide.dart holds the pre-written step texts) and the backend (guide.py picks a set). The model may only choose ids listed here; prerequisites are added and ordered by the validator, never by the model. capabilities: capability ids (or roots like 'fees') whose pages this guide runs on. capability_goals: the only goals that fit that sub-page, first = its default. entry_goals: components always added for that capability.",
+  "page": "subscription",
+  "capability": "subscription",
+  "capabilities": [
+    "subscription"
+  ],
+  "title": "訂閱",
+  "default_goal": "subscribe",
+  "capability_goals": {
+    "subscription": [
+      "subscribe",
+      "unsubscribe",
+      "pick_topic"
+    ],
+    "subscription.items": [
+      "read_messages",
+      "open_settings"
+    ]
+  },
+  "entry_goals": {},
+  "components": [
+    {
+      "id": "pick_topic",
+      "title": "打開想訂閱的項目",
+      "description": "在訂閱頁點一個項目的名稱，看它會通知什麼",
+      "keywords": [
+        "可以訂閱什麼",
+        "有哪些訂閱",
+        "訂閱什麼",
+        "訂閱哪些",
+        "有哪些可以訂閱",
+        "訂閱了哪些"
+      ],
+      "requires": []
+    },
+    {
+      "id": "subscribe",
+      "title": "按「訂閱」",
+      "description": "看完說明，自己按「訂閱」收到這個項目的消息",
+      "keywords": [
+        "我要訂閱",
+        "訂閱",
+        "開啟通知",
+        "收到通知",
+        "想收到",
+        "停車費通知",
+        "防汛資訊",
+        "空品資訊",
+        "銀髮資訊",
+        "交通措施",
+        "健康報報",
+        "體育樂園",
+        "新住民"
+      ],
+      "requires": [
+        "pick_topic"
+      ]
+    },
+    {
+      "id": "unsubscribe",
+      "title": "按「取消訂閱」",
+      "description": "打開已經訂閱的項目，自己按「取消訂閱」",
+      "keywords": [
+        "取消訂閱",
+        "退訂",
+        "不想收",
+        "不要再通知",
+        "關掉通知",
+        "太多通知",
+        "通知太多"
+      ],
+      "requires": []
+    },
+    {
+      "id": "read_messages",
+      "title": "打開一則訂閱的消息",
+      "description": "在訂閱的訊息列表點一則，看完整內容",
+      "keywords": [
+        "訂閱的訊息",
+        "訂閱的消息",
+        "訂閱訊息",
+        "訂閱內容",
+        "收到的消息",
+        "未讀"
+      ],
+      "requires": []
+    },
+    {
+      "id": "open_settings",
+      "title": "按「設定」改訂閱項目",
+      "description": "在訂閱的訊息頁按右上角「設定」，去改要訂閱的項目",
+      "keywords": [
+        "訂閱設定",
+        "改訂閱",
+        "設定訂閱",
+        "換訂閱"
+      ],
+      "requires": []
+    }
+  ],
+  "no_extend_from": [
+    "pick_topic"
+  ],
+  "generic_keywords": [
+    "訂閱"
+  ]
+}
