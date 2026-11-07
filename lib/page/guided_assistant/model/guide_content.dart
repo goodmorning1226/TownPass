@@ -1,5 +1,6 @@
 import 'package:town_pass/page/guided_assistant/model/guide_i18n.dart';
 import 'package:town_pass/page/guided_assistant/model/guide_page.dart';
+import 'package:town_pass/page/guided_assistant/model/input_formatter.dart';
 import 'package:town_pass/page/guided_assistant/web/web_guide_probe.dart';
 import 'package:town_pass/page/guided_assistant/web/web_page_state.dart';
 
@@ -51,6 +52,11 @@ class GuideStep {
   /// decides). Not used by the current guides.
   final bool commit;
 
+  /// What the field this step points at holds, when the page's attributes
+  /// do not say it (按住輸入 formats the words for it); null
+  /// lets the microphone read it from the field.
+  final FieldKind? Function(WebPageState s)? field;
+
   const GuideStep({
     required this.target,
     required this.label,
@@ -64,9 +70,12 @@ class GuideStep {
     this.cardTop,
     this.alsoUsable = const [],
     this.commit = false,
+    this.field,
   });
 
   String? targetFor(WebPageState s) => target(s);
+
+  FieldKind? fieldFor(WebPageState s) => field?.call(s);
 
   /// Copy with this step's task-list line and label prefix filled in.
   GuideStep numbered(int todoIndex, String Function(WebPageState s) newLabel) =>
@@ -83,6 +92,7 @@ class GuideStep {
         cardTop: cardTop,
         alsoUsable: alsoUsable,
         commit: commit,
+        field: field,
       );
 }
 

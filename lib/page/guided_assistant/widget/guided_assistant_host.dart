@@ -10,8 +10,10 @@ import 'package:town_pass/page/guided_assistant/model/guide_content.dart';
 import 'package:town_pass/page/guided_assistant/model/guide_i18n.dart';
 import 'package:town_pass/page/guided_assistant/model/guides/guide_registry.dart';
 import 'package:town_pass/page/guided_assistant/widget/guide_highlight.dart';
+import 'package:town_pass/page/guided_assistant/widget/ask_button.dart';
 import 'package:town_pass/page/guided_assistant/widget/guide_motion.dart';
 import 'package:town_pass/page/guided_assistant/widget/guided_assistant_sheet.dart';
+import 'package:town_pass/page/guided_assistant/widget/hold_to_talk.dart';
 import 'package:town_pass/page/main/main_view_controller.dart';
 import 'package:town_pass/service/page_translation.dart';
 import 'package:town_pass/util/tp_bottom_navigation_factory.dart';
@@ -119,16 +121,28 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
                   ),
                 );
               }
-              final homeAsk =
-                  !c.sheetOpen.value && !typingInPage && !hinting && _onHome(c);
+              // 按住提問 on every screen while the assistant is closed (按住輸入
+              // on a step that types into a page field). It stays while
+              // typing, above the keyboard: that is when 按住輸入 helps.
+              final askVisible = !c.sheetOpen.value && !hinting;
+              final onHome = _onHome(c);
               // Variant E: the penguin is enlarged (with a glow and a slow
               // breath) whenever no guide is under way and the first-run hint
               // is not pointing at it.
               final enlarged = !c.guiding && !hinting;
-              if (homeAsk) {
-                layers.add(_homeAskButton(context, c, enlarged: enlarged));
+              final fabShown = !c.sheetOpen.value && !typingInPage;
+              if (askVisible) {
+                layers.add(
+                  _askButton(
+                    context,
+                    c,
+                    enlarged: enlarged,
+                    besideFab: fabShown,
+                    onHome: onHome,
+                  ),
+                );
               }
-              if (!c.sheetOpen.value && !typingInPage) {
+              if (fabShown) {
                 layers.add(_fab(context, c, enlarged: enlarged));
               }
               if (hinting) layers.add(_onboardingArrow(context, c));
@@ -177,7 +191,8 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
                   away ? _offScopeBar(context, c, t) : null,
                 ),
               );
-              final asking = homeAsk && c.homeAsk.value != HomeAsk.idle;
+              final asking =
+                  askVisible && onHome && c.homeAsk.value != HomeAsk.idle;
               layers.add(
                 _slot(
                   context,
@@ -280,28 +295,29 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
         TPBottomNavigationFactory.defaultIndex;
   }
 
-  /// 「按住提問」 left of the penguin on the home tab: 8px from the button
-  /// (56 + 16 margin + 8 gap), moved left by the enlarged penguin's extra
-  /// width (its breathing does not move it).
-  Widget _homeAskButton(
+  /// 「按住提問」 (按住輸入 on a step that types into a page field) left of
+  /// the penguin: 8px from the button (56 + 16 margin + 8 gap), moved left
+  /// by the enlarged penguin's extra width (its breathing does not move it);
+  /// at the right edge while the penguin steps aside for the keyboard. It
+  /// keeps off the step's ring, the penguin, the card and the 「你離開了」
+  /// bar (see [AskButton]).
+  Widget _askButton(
     BuildContext context,
     GuidedAssistantController c, {
     required bool enlarged,
+    required bool besideFab,
+    required bool onHome,
   }) {
     final grow = enlarged ? 56 * (GuideMotion.fabEnlarged - 1) : 0.0;
-    return AnimatedPositioned(
-      key: const ValueKey('layer:homeAskButton'),
-      duration: GuideMotion.of(context, GuideMotion.fabResize),
-      curve: Curves.ease,
-      right: 80 + grow,
-      bottom: _fabBottom(context, c),
-      child: Material(
-        type: MaterialType.transparency,
-        child: _HomeAskButton(
-          state: c.homeAsk.value,
-          onDown: c.homeMicDown,
-          onUp: c.homeMicUp,
-        ),
+    return Positioned.fill(
+      key: const ValueKey('layer:ask'),
+      child: AskButton(
+        controller: c,
+        right: besideFab ? 80 + grow : 16,
+        bottom: _fabBottom(context, c),
+        topClear: MediaQuery.of(context).padding.top + 56,
+        onHome: onHome,
+        avoidTargets: [?c.highlightTarget, assistantFabTarget],
       ),
     );
   }
@@ -318,7 +334,7 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
             padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 4),
             child: Row(
               children: [
-                const _LevelBars(color: TPColors.primary700),
+                const LevelBars(color: TPColors.primary700),
                 const SizedBox(width: 10),
                 Expanded(
                   child: TPText(
@@ -808,19 +824,21 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
       left: 12,
       right: 12,
       top: top,
-      child: Semantics(
-        liveRegion: true,
-        label: gt('助理說'),
-        child: Material(
-          type: MaterialType.transparency,
-          child: _CardMotion(
-            step: c.stepIndex,
-            done: card.variant == CardVariant.done,
-            commit: commit,
-            // A new step (or 開始 / done) slides the content in; a nudge
-            // within the same step only changes the text.
-            contentKey: '${card.variant.name}:${c.stepIndex}',
-            content: content,
+      child: AskObstacle(
+        child: Semantics(
+          liveRegion: true,
+          label: gt('助理說'),
+          child: Material(
+            type: MaterialType.transparency,
+            child: _CardMotion(
+              step: c.stepIndex,
+              done: card.variant == CardVariant.done,
+              commit: commit,
+              // A new step (or 開始 / done) slides the content in; a nudge
+              // within the same step only changes the text.
+              contentKey: '${card.variant.name}:${c.stepIndex}',
+              content: content,
+            ),
           ),
         ),
       ),
@@ -913,43 +931,47 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
       left: 12,
       right: 12,
       top: MediaQuery.of(context).padding.top + 60,
-      child: Semantics(
-        container: true,
-        label: text,
-        child: Material(
-          type: MaterialType.transparency,
-          child: _Appear(
-            fade: false,
-            child: Container(
-              padding: const EdgeInsets.fromLTRB(12, 8, 12, 10),
-              decoration: _warm,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  ExcludeSemantics(
-                    child: TPText(
-                      text,
-                      style: TPTextStyles.h3SemiBold,
-                      color: TPColors.grayscale950,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      Expanded(child: _SecondaryButton(gt('結束引導'), c.endGuide)),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: _PrimaryButton(
-                          gt(t.guide.resumeLabel),
-                          c.returnToGuide,
-                        ),
+      child: AskObstacle(
+        child: Semantics(
+          container: true,
+          label: text,
+          child: Material(
+            type: MaterialType.transparency,
+            child: _Appear(
+              fade: false,
+              child: Container(
+                padding: const EdgeInsets.fromLTRB(12, 8, 12, 10),
+                decoration: _warm,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    ExcludeSemantics(
+                      child: TPText(
+                        text,
+                        style: TPTextStyles.h3SemiBold,
+                        color: TPColors.grayscale950,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                    ],
-                  ),
-                ],
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _SecondaryButton(gt('結束引導'), c.endGuide),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: _PrimaryButton(
+                            gt(t.guide.resumeLabel),
+                            c.returnToGuide,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -1905,223 +1927,5 @@ class _PenguinFabState extends State<_PenguinFab>
         ),
       ],
     );
-  }
-}
-
-/// 「按住提問」: hold to talk, release to ask. Held, it grows a little and
-/// its mic turns into moving level bars; released into a question, a soft
-/// ring spreads from it once ("sent").
-class _HomeAskButton extends StatefulWidget {
-  final HomeAsk state;
-  final VoidCallback onDown;
-  final VoidCallback onUp;
-  const _HomeAskButton({
-    required this.state,
-    required this.onDown,
-    required this.onUp,
-  });
-
-  @override
-  State<_HomeAskButton> createState() => _HomeAskButtonState();
-}
-
-class _HomeAskButtonState extends State<_HomeAskButton>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _sent = AnimationController(
-    vsync: this,
-    duration: GuideMotion.slow,
-  );
-  bool _reduced = false;
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _reduced = GuideMotion.reduced(context);
-  }
-
-  @override
-  void didUpdateWidget(covariant _HomeAskButton old) {
-    super.didUpdateWidget(old);
-    if (old.state == HomeAsk.listening && widget.state == HomeAsk.working) {
-      GuideMotion.tap();
-      if (!_reduced) _sent.forward(from: 0);
-    }
-  }
-
-  @override
-  void dispose() {
-    _sent.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final listening = widget.state == HomeAsk.listening;
-    final fg = listening ? TPColors.white : TPColors.primary700;
-    final quick = GuideMotion.of(context, GuideMotion.quick);
-    return Semantics(
-      button: true,
-      label: gt(HomeAskTexts.aria),
-      excludeSemantics: true,
-      child: Listener(
-        onPointerDown: (_) {
-          GuideMotion.confirm();
-          widget.onDown();
-        },
-        onPointerUp: (_) => widget.onUp(),
-        onPointerCancel: (_) => widget.onUp(),
-        child: AnimatedScale(
-          scale: listening && !_reduced ? 1.06 : 1,
-          duration: quick,
-          curve: GuideMotion.enter,
-          child: Stack(
-            clipBehavior: Clip.none,
-            children: [
-              Positioned.fill(child: IgnorePointer(child: _sentRing())),
-              AnimatedContainer(
-                duration: quick,
-                height: 56,
-                padding: const EdgeInsets.symmetric(horizontal: 14),
-                decoration: BoxDecoration(
-                  color: listening ? TPColors.primary700 : TPColors.white,
-                  border: Border.all(color: TPColors.primary700, width: 2),
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Color(0x33000000),
-                      blurRadius: 6,
-                      offset: Offset(0, 3),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    SizedBox(
-                      width: 22,
-                      height: 22,
-                      child: AnimatedSwitcher(
-                        duration: quick,
-                        child: listening
-                            ? const _LevelBars(
-                                key: ValueKey('bars'),
-                                color: TPColors.white,
-                              )
-                            : Icon(
-                                Icons.mic_none_rounded,
-                                key: const ValueKey('mic'),
-                                color: fg,
-                                size: 22,
-                              ),
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-                    TPText(
-                      gt(
-                        listening
-                            ? HomeAskTexts.listeningLabel
-                            : HomeAskTexts.label,
-                      ),
-                      style: TPTextStyles.h3SemiBold,
-                      color: fg,
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _sentRing() => AnimatedBuilder(
-    animation: _sent,
-    builder: (context, _) {
-      if (!_sent.isAnimating) return const SizedBox.shrink();
-      final t = _sent.value;
-      return Transform.scale(
-        scale: 1 + 0.12 * GuideMotion.enter.transform(t),
-        child: Opacity(
-          opacity: 0.6 * (1 - t),
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              border: Border.all(color: TPColors.primary500, width: 3),
-              borderRadius: BorderRadius.circular(16),
-            ),
-          ),
-        ),
-      );
-    },
-  );
-}
-
-/// Three bars going up and down while listening (still when motion is
-/// reduced). Shown only while the button is held.
-class _LevelBars extends StatefulWidget {
-  final Color color;
-  const _LevelBars({super.key, required this.color});
-
-  @override
-  State<_LevelBars> createState() => _LevelBarsState();
-}
-
-class _LevelBarsState extends State<_LevelBars>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _beat = AnimationController(
-    vsync: this,
-    duration: const Duration(milliseconds: 900),
-  );
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (GuideMotion.reduced(context)) {
-      _beat.stop();
-      _beat.value = 0.5;
-    } else if (!_beat.isAnimating) {
-      _beat.repeat();
-    }
-  }
-
-  @override
-  void dispose() {
-    _beat.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return ExcludeSemantics(
-      child: AnimatedBuilder(
-        animation: _beat,
-        builder: (context, _) => SizedBox(
-          height: 22,
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              for (var i = 0; i < 3; i++) ...[
-                if (i > 0) const SizedBox(width: 3),
-                Container(
-                  width: 4,
-                  height: 20 * _scale(i),
-                  decoration: BoxDecoration(
-                    color: widget.color,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-              ],
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  /// 0.35 → 1 → 0.35, each bar a little later (as the design's animation).
-  double _scale(int i) {
-    final t = (_beat.value - i * 0.15 / 0.9) % 1.0;
-    final wave = 0.5 - 0.5 * math.cos(2 * math.pi * t);
-    return 0.35 + 0.65 * wave;
   }
 }

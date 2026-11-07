@@ -9,6 +9,7 @@ import 'package:town_pass/page/guided_assistant/model/guide_content.dart';
 import 'package:town_pass/page/guided_assistant/model/guide_i18n.dart';
 import 'package:town_pass/page/guided_assistant/widget/guide_highlight.dart';
 import 'package:town_pass/page/guided_assistant/widget/guide_motion.dart';
+import 'package:town_pass/page/guided_assistant/widget/hold_to_talk.dart';
 import 'package:town_pass/util/tp_colors.dart';
 import 'package:town_pass/util/tp_text.dart';
 
@@ -30,32 +31,9 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
   /// Messages already on screen: only ones added later slide in.
   final _seen = <int>{};
 
-  /// Where the finger went down on the microphone, and whether it has slid
-  /// up far enough that releasing cancels (as in the chat panel).
-  Offset? _micOrigin;
+  /// The finger on the microphone has slid up far enough that releasing
+  /// cancels (as in the chat panel; the gesture is [HoldToTalk]).
   bool _micDiscard = false;
-
-  void _micPressStart(PointerDownEvent event) {
-    _micOrigin = event.position;
-    if (_micDiscard) setState(() => _micDiscard = false);
-    GuideMotion.tap();
-    c.micDown();
-  }
-
-  void _micPressMove(PointerMoveEvent event) {
-    final origin = _micOrigin;
-    if (origin == null || !c.listening.value) return;
-    final discard = origin.dy - event.position.dy > 80;
-    if (discard != _micDiscard) setState(() => _micDiscard = discard);
-  }
-
-  void _micPressEnd({required bool cancelled}) {
-    final send = !cancelled && !_micDiscard;
-    _micOrigin = null;
-    if (_micDiscard) setState(() => _micDiscard = false);
-    if (send && c.listening.value) GuideMotion.confirm();
-    c.micUp(send: send);
-  }
 
   GuidedAssistantController get c => widget.controller;
 
@@ -1109,16 +1087,16 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
           clipBehavior: Clip.none,
           children: [
             // A soft ring spreads from the mic only while it listens.
-            if (c.listening.value) const IgnorePointer(child: _MicPulse()),
+            if (c.listening.value) const IgnorePointer(child: MicPulse()),
             Semantics(
               button: true,
               label: gt('按住說話（示範）'),
-              child: Listener(
+              child: HoldToTalk(
                 key: const Key('guided-mic'),
-                onPointerDown: _micPressStart,
-                onPointerMove: _micPressMove,
-                onPointerUp: (_) => _micPressEnd(cancelled: false),
-                onPointerCancel: (_) => _micPressEnd(cancelled: true),
+                onDown: c.micDown,
+                onUp: (send) => c.micUp(send: send),
+                listening: () => c.listening.value,
+                onDiscardChanged: (v) => setState(() => _micDiscard = v),
                 child: AnimatedContainer(
                   duration: GuideMotion.of(context, GuideMotion.quick),
                   curve: GuideMotion.enter,
@@ -1196,14 +1174,9 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
         width: 120,
         height: 6,
         child: c.listening.value
-            ? ClipRRect(
-                borderRadius: BorderRadius.circular(3),
-                child: LinearProgressIndicator(
-                  key: const Key('guided-level'),
-                  value: c.level.value,
-                  color: TPColors.primary500,
-                  backgroundColor: TPColors.grayscale100,
-                ),
+            ? MicLevelMeter(
+                key: const Key('guided-level'),
+                level: c.level.value,
               )
             : null,
       ),
@@ -1548,67 +1521,6 @@ class _TypingDotsState extends State<_TypingDots>
       ),
     ),
   );
-}
-
-/// A soft ring spreading from the mic while it listens. With reduced motion
-/// it is a still, faint ring.
-class _MicPulse extends StatefulWidget {
-  const _MicPulse();
-
-  @override
-  State<_MicPulse> createState() => _MicPulseState();
-}
-
-class _MicPulseState extends State<_MicPulse>
-    with SingleTickerProviderStateMixin {
-  late final _loop = AnimationController(
-    vsync: this,
-    duration: GuideMotion.loop,
-  );
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (GuideMotion.reduced(context)) {
-      _loop.value = 0.5;
-      _loop.stop();
-    } else if (!_loop.isAnimating) {
-      _loop.repeat();
-    }
-  }
-
-  @override
-  void dispose() {
-    _loop.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return RepaintBoundary(child: _ring());
-  }
-
-  Widget _ring() {
-    return AnimatedBuilder(
-      animation: _loop,
-      builder: (context, _) {
-        final t = GuideMotion.enter.transform(_loop.value);
-        final size = 80 + 24 * t;
-        return Container(
-          width: size,
-          height: size,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: TPColors.primary500.withValues(alpha: 0.22 * (1 - t)),
-            border: Border.all(
-              color: TPColors.primary500.withValues(alpha: 0.5 * (1 - t)),
-              width: 2,
-            ),
-          ),
-        );
-      },
-    );
-  }
 }
 
 class _BillIllustration extends StatelessWidget {

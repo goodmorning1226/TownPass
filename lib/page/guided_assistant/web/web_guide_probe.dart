@@ -15,7 +15,9 @@ class WebPageSpec {
   /// Flag name -> JS expression giving a bool, string or number.
   ///
   /// Every spec also gets `__bottomBar` (height of the page's fixed bottom
-  /// bar, for the 助理 button) and `__dialog` (a headlessui dialog is open).
+  /// bar, for the 助理 button) and `__dialog` (a headlessui dialog is open),
+  /// plus `__fieldTargets` (the shown targets holding a text field, comma
+  /// separated) and `__focusField` (a text field is focused) for 按住輸入.
   /// Helpers usable in expressions: q, qa, shown, byText, txt, orig (the
   /// element's innerText in the page's original Chinese, also on a page the
   /// App translated; use it instead of `.innerText`), origContent (the same
@@ -52,10 +54,14 @@ class WebPageSpec {
   const T = {$t};
   const F = {$f};
   const rects = {}, flags = {};
-  for (const k in T) { try { rects[k] = rectOf(T[k]()); } catch (_) { rects[k] = null; } }
+  const fieldTargets = [];
+  for (const k in T) { try { const el = T[k](); rects[k] = rectOf(el); if (rects[k] && hasField(el)) fieldTargets.push(k); } catch (_) { rects[k] = null; } }
+  flags.__fieldTargets = fieldTargets.join(',');
+  try { flags.__focusField = textField(document.activeElement); } catch (_) { flags.__focusField = false; }
   for (const k in F) { try { flags[k] = F[k](); } catch (_) { flags[k] = null; } }
   try { flags.__bottomBar = bottomBar(); } catch (_) { flags.__bottomBar = 0; }
   try { flags.__dialog = qa('[id^="headlessui-dialog-panel"]').some(shown); } catch (_) { flags.__dialog = false; }
+  $_watchFocus
   return JSON.stringify({ path: location.pathname, search: location.search, rects, flags });
 })()
 ''';
@@ -69,7 +75,7 @@ class WebPageSpec {
   /// field whose placeholder the App translated: the original stays in
   /// `data-tp-placeholder` (tp_web_view.dart), so guides keep using the
   /// Chinese placeholder. On an untranslated page it matches as before.
-  @visibleForTesting
+  /// Also used for 按住輸入's step target (web_field_input).
   static String originalPlaceholders(String expression) =>
       expression.replaceAllMapped(
         _placeholder,
@@ -81,6 +87,16 @@ class WebPageSpec {
   /// The page-reading helpers, for tests.
   @visibleForTesting
   static String get helpersForTest => _helpers;
+
+  /// The same helpers for 按住輸入's field scripts
+  /// (web_field_input.dart), so a step target expression reads alike there.
+  static String get pageHelpers => _helpers;
+
+  /// Remembers the field that last lost focus (a window variable only), so
+  /// 按住輸入 still finds it when pressing the button took
+  /// the focus away. Nothing on the page changes.
+  static const _watchFocus =
+      r'''try { if (!window.__tpFocusWatch) { window.__tpFocusWatch = true; document.addEventListener('focusout', (e) => { window.__tpLastField = { el: e.target, at: Date.now() }; }, true); } } catch (_) {}''';
 
   static const _helpers = r'''
     q = (s) => document.querySelector(s),
@@ -113,6 +129,8 @@ class WebPageSpec {
     dialogButton = (title, label) => { const p = dialog(title); return p ? [...p.querySelectorAll('button')].filter(shown).find((b) => txt(b) === label) || null : null; },
     bottomBar = () => { let h = 0; for (const e of qa('.fixed, .floating-box, .sticky')) { if (!shown(e) || e.closest('[id^="headlessui-dialog"]')) continue; const r = e.getBoundingClientRect(); if (r.bottom >= innerHeight - 2 && r.top > innerHeight / 2) h = Math.max(h, innerHeight - r.top); } return Math.round(h); },
     leaf = (e) => ![...e.children].some(shown),
+    textField = (e) => !!e && !e.disabled && !e.readOnly && (e.tagName === 'TEXTAREA' || (e.tagName === 'INPUT' && !/^(radio|checkbox|file|hidden|button|submit|reset|image|range|color)$/i.test(e.type || 'text'))),
+    hasField = (x) => (Array.isArray(x) ? x : [x]).some((e) => !!e && e.nodeType === 1 && ((textField(e) && shown(e)) || [...e.querySelectorAll('input, textarea')].some((i) => textField(i) && shown(i)))),
     textBetween = (scope, head, stop) => {
       const all = qa(scope + ' *').filter((e) => shown(e) && leaf(e));
       const i = all.findIndex((e) => txt(e).startsWith(head));

@@ -297,6 +297,13 @@
    "id": "Batal",
    "th": "ยกเลิก"
   },
+  "填不進去，請點格子自己打字": {
+   "en": "Couldn't fill it in. Please tap the box and type.",
+   "ja": "入力できませんでした。欄をタップして入力してください。",
+   "vi": "Không điền được. Hãy chạm vào ô và tự gõ.",
+   "id": "Tidak bisa diisi. Ketuk kotaknya dan ketik sendiri.",
+   "th": "กรอกไม่ได้ กรุณาแตะช่องแล้วพิมพ์เอง"
+  },
   "好": {
    "en": "OK",
    "ja": "はい",
@@ -345,6 +352,20 @@
    "vi": "Hoàn thành bài hướng dẫn",
    "id": "Selesaikan tutorial",
    "th": "จบบทแนะนำ"
+  },
+  "已填入：{text}": {
+   "en": "Filled in: {text}",
+   "ja": "入力しました：{text}",
+   "vi": "Đã điền: {text}",
+   "id": "Sudah diisi: {text}",
+   "th": "กรอกแล้ว: {text}"
+  },
+  "已復原": {
+   "en": "Undone",
+   "ja": "元に戻しました",
+   "vi": "Đã hoàn tác",
+   "id": "Sudah dibatalkan",
+   "th": "ย้อนกลับแล้ว"
   },
   "已改成「{language}」，模式不變": {
    "en": "Changed to “{language}”. The mode stays the same.",
@@ -408,6 +429,13 @@
    "vi": "Đã tạm dừng hướng dẫn",
    "id": "Panduan dijeda",
    "th": "หยุดการแนะนำชั่วคราวแล้ว"
+  },
+  "復原": {
+   "en": "Undo",
+   "ja": "元に戻す",
+   "vi": "Hoàn tác",
+   "id": "Batalkan",
+   "th": "ย้อนกลับ"
   },
   "想打字？點這裡 ↓": {
    "en": "Want to type? Tap here ↓",
@@ -506,6 +534,20 @@
    "vi": "Nhấn giữ để nói, hoặc chạm lựa chọn ở trên",
    "id": "Tekan tahan untuk bicara, atau ketuk pilihan di atas",
    "th": "กดค้างเพื่อพูด หรือแตะตัวเลือกด้านบน"
+  },
+  "按住輸入": {
+   "en": "Hold to type",
+   "ja": "押して入力",
+   "vi": "Giữ để nhập",
+   "id": "Tahan untuk isi",
+   "th": "กดค้างเพื่อกรอก"
+  },
+  "按住輸入，說完放開會填進格子": {
+   "en": "Hold to dictate; release to fill in the box",
+   "ja": "押したまま話し、離すと欄に入力します",
+   "vi": "Giữ để nói, thả ra sẽ điền vào ô",
+   "id": "Tahan untuk bicara, lepas untuk mengisi kotak",
+   "th": "กดค้างแล้วพูด ปล่อยเพื่อกรอกลงช่อง"
   },
   "按住麥克風說「你好」，或點「改用打字」。": {
    "en": "Hold the microphone and say “Hello”, or tap “Type instead”.",
@@ -647,12 +689,26 @@
    "id": "Bacakan: nonaktif",
    "th": "ปิดการอ่านออกเสียงแล้ว"
   },
+  "格子已經改過了，沒有復原": {
+   "en": "The box was changed since, so nothing was undone",
+   "ja": "欄が変更されたため、元に戻しませんでした",
+   "vi": "Ô đã được sửa, nên không hoàn tác",
+   "id": "Kotak sudah diubah, jadi tidak dibatalkan",
+   "th": "ช่องถูกแก้ไขไปแล้ว จึงไม่ได้ย้อนกลับ"
+  },
   "正在幫你找…": {
    "en": "Looking for it…",
    "ja": "探しています…",
    "vi": "Đang tìm giúp bạn…",
    "id": "Sedang mencarikan…",
    "th": "กำลังหาให้…"
+  },
+  "正在找要填的格子…": {
+   "en": "Finding the box to fill…",
+   "ja": "入力する欄を探しています…",
+   "vi": "Đang tìm ô cần điền…",
+   "id": "Mencari kotak yang diisi…",
+   "th": "กำลังหาช่องที่จะกรอก…"
   },
   "正在聽…": {
    "en": "Listening…",
@@ -667,6 +723,13 @@
    "vi": "Đang nghe… nói xong thì thả ra",
    "id": "Mendengarkan… lepaskan setelah selesai",
    "th": "กำลังฟัง… พูดจบแล้วปล่อย"
+  },
+  "正在聽寫…": {
+   "en": "Writing down what you said…",
+   "ja": "書き起こしています…",
+   "vi": "Đang chép lời bạn nói…",
+   "id": "Sedang menuliskan ucapan Anda…",
+   "th": "กำลังถอดข้อความ…"
   },
   "步驟 {i} / {n}": {
    "en": "Step {i} / {n}",
@@ -696,6 +759,20 @@
    "id": "Tagihan air (contoh)",
    "th": "บิลค่าน้ำ (ตัวอย่าง)"
   },
+  "沒有聽出可以填的內容，請再說一次": {
+   "en": "Didn't catch anything that fits the box. Please say it again.",
+   "ja": "欄に入る内容が聞き取れませんでした。もう一度話してください。",
+   "vi": "Không nghe được nội dung phù hợp với ô. Hãy nói lại.",
+   "id": "Tidak terdengar isi yang cocok untuk kotak. Silakan ucapkan lagi.",
+   "th": "ไม่ได้ยินข้อมูลที่กรอกลงช่องได้ กรุณาพูดอีกครั้ง"
+  },
+  "沒有要填的格子，說的話會交給助理": {
+   "en": "No box to fill; what you say goes to the assistant",
+   "ja": "入力する欄がないので、話した内容はアシスタントに送ります",
+   "vi": "Không có ô cần điền; lời bạn nói sẽ gửi cho trợ lý",
+   "id": "Tidak ada kotak untuk diisi; ucapan Anda dikirim ke asisten",
+   "th": "ไม่มีช่องให้กรอก สิ่งที่พูดจะส่งให้ผู้ช่วย"
+  },
   "泰文": {
    "en": "Thai",
    "ja": "タイ語",
@@ -723,6 +800,13 @@
    "vi": "Hiện đang ở “{mode}”",
    "id": "Sekarang dalam “{mode}”",
    "th": "ตอนนี้เป็น “{mode}”"
+  },
+  "用台語說，助理用中文回答（測試中）": {
+   "en": "Speak Taiwanese; the assistant answers in Chinese (test)",
+   "ja": "台湾語で話すと、アシスタントは中国語で答えます（テスト中）",
+   "vi": "Nói tiếng Đài Loan, trợ lý trả lời bằng tiếng Trung (thử nghiệm)",
+   "id": "Bicara bahasa Taiwan, asisten menjawab dalam bahasa Mandarin (uji coba)",
+   "th": "พูดภาษาไต้หวัน ผู้ช่วยตอบเป็นภาษาจีน (ทดลอง)"
   },
   "用語音說的": {
    "en": "Said by voice",
@@ -829,13 +913,6 @@
    "id": "Lanjutkan panduan",
    "th": "ทำตามคำแนะนำต่อ"
   },
-  "用台語說，助理用中文回答（測試中）": {
-   "en": "Speak Taiwanese; the assistant answers in Chinese (test)",
-   "ja": "台湾語で話すと、アシスタントは中国語で答えます（テスト中）",
-   "vi": "Nói tiếng Đài Loan, trợ lý trả lời bằng tiếng Trung (thử nghiệm)",
-   "id": "Bicara bahasa Taiwan, asisten menjawab dalam bahasa Mandarin (uji coba)",
-   "th": "พูดภาษาไต้หวัน ผู้ช่วยตอบเป็นภาษาจีน (ทดลอง)"
-  },
   "聽你說的話，自動判斷是哪一種語言": {
    "en": "Listens and works out which language you are speaking",
    "ja": "話した言葉から、どの言語かを自動で判断します",
@@ -884,6 +961,20 @@
    "vi": "Thử xem",
    "id": "Coba",
    "th": "ลองดู"
+  },
+  "說完會填入「{field}」": {
+   "en": "Will fill in “{field}”",
+   "ja": "話し終えると「{field}」に入力します",
+   "vi": "Nói xong sẽ điền vào “{field}”",
+   "id": "Setelah bicara, diisi ke “{field}”",
+   "th": "พูดจบแล้วจะกรอกลงใน “{field}”"
+  },
+  "說完會填入目前的格子": {
+   "en": "Will fill in the current box",
+   "ja": "話し終えると今の欄に入力します",
+   "vi": "Nói xong sẽ điền vào ô hiện tại",
+   "id": "Setelah bicara, diisi ke kotak ini",
+   "th": "พูดจบแล้วจะกรอกลงช่องปัจจุบัน"
   },
   "說話的語言：{language}": {
    "en": "Speech language: {language}",

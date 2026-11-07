@@ -148,3 +148,21 @@ abstract class HomeAskTexts {
   static const noMic = '需要麥克風權限才能用語音。可以到手機設定開啟，或點右下角的企鵝用打字問我。';
   static const demo = '（示範版）語音辨識還沒接上，請點右下角的企鵝，用打字問我。';
 }
+
+/// Texts of 按住輸入: the 按住提問 button on a guide step that types into a
+/// page field (widget/ask_button.dart).
+abstract class FieldMicTexts {
+  static const label = '按住輸入';
+  static const aria = '按住輸入，說完放開會填進格子';
+  static const fillInto = '說完會填入「{field}」';
+  static const fillHere = '說完會填入目前的格子';
+  static const finding = '正在找要填的格子…';
+  static const toAssistant = '沒有要填的格子，說的話會交給助理';
+  static const working = '正在聽寫…';
+  static const filled = '已填入：{text}';
+  static const undo = '復原';
+  static const undone = '已復原';
+  static const undoFailed = '格子已經改過了，沒有復原';
+  static const nothing = '沒有聽出可以填的內容，請再說一次';
+  static const failed = '填不進去，請點格子自己打字';
+}

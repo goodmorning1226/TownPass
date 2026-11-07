@@ -12,6 +12,8 @@ import 'package:town_pass/page/guided_assistant/model/guide_content.dart';
 import 'package:town_pass/page/guided_assistant/model/guide_i18n.dart';
 import 'package:town_pass/page/guided_assistant/model/mock_assistant_engine.dart';
 import 'package:town_pass/page/guided_assistant/model/guides/guide_registry.dart';
+import 'package:town_pass/page/guided_assistant/model/input_formatter.dart';
+import 'package:town_pass/page/guided_assistant/web/web_field_input.dart';
 import 'package:town_pass/page/guided_assistant/web/web_guide_probe.dart';
 import 'package:town_pass/page/guided_assistant/web/web_page_state.dart';
 import 'package:town_pass/util/tp_route.dart';
@@ -168,6 +170,23 @@ enum OnboardingStage { hidden, card, pointer, hello, branch, mode }
 /// The home 「按住提問」 button and its answer card.
 enum HomeAsk { idle, listening, tooShort, working, notice, asked }
 
+/// 按住輸入 (the 按住提問 button on a step that types into a page field):
+/// idle, held (recording), or turning the recording into the field's text.
+enum FieldMicPhase { idle, listening, working }
+
+/// A line by the 按住輸入 button: a Chinese [source] for gt() with its
+/// [values]; [undo] offers 「復原」.
+class FieldMicNotice {
+  final String source;
+  final Map<String, Object?> values;
+  final bool undo;
+  const FieldMicNotice(
+    this.source, {
+    this.values = const {},
+    this.undo = false,
+  });
+}
+
 class GuidedAssistantController extends GetxController {
   final MockAssistantEngine engine;
   final Duration thinkDelay;
@@ -195,6 +214,7 @@ class GuidedAssistantController extends GetxController {
     AssistantPageTracker? pageTracker,
     AssistantSpeaker? speaker,
     this.probeOverride,
+    this.fieldInputOverride,
   }) : speaker = speaker ?? AssistantSpeaker(),
        executor = executor ?? AssistantActionExecutor(),
        pageTracker = pageTracker ?? AssistantPageTracker.instance {
@@ -399,6 +419,7 @@ class GuidedAssistantController extends GetxController {
       _speakTimer,
       _toastTimer,
       _offScopeTimer,
+      _fieldTimer,
     ]) {
       t?.cancel();
     }
@@ -1579,7 +1600,19 @@ class GuidedAssistantController extends GetxController {
     }
     if (!started && !isClosed) {
       listening.value = false;
-      _say(_bot(Replies.noMic));
+      final field = _fieldMode;
+      _fieldMode = false;
+      _micProblem(Replies.noMic, field: field);
+    }
+  }
+
+  /// A microphone problem: in the chat, or by the 按住輸入 button when
+  /// it was its press ([field]).
+  void _micProblem(String text, {required bool field}) {
+    if (field) {
+      _showFieldNotice(text);
+    } else {
+      _say(_bot(text));
     }
   }
 
@@ -1593,22 +1626,27 @@ class GuidedAssistantController extends GetxController {
   Future<void> micUp({bool send = true}) async {
     if (!listening.value) return;
     listening.value = false;
+    // The 按住輸入 press: its words go into the page field.
+    final field = _fieldMode;
+    _fieldMode = false;
     final rec = recorder;
     final svc = service;
     if (!send) {
       _micDiscarded = true;
       level.value = 0;
+      if (field) fieldMic.value = FieldMicPhase.idle;
       await rec?.cancel();
       return;
     }
     if (rec == null || svc == null) {
-      _say(_bot(Replies.micDemo));
+      _micProblem(Replies.micDemo, field: field);
       return;
     }
+    if (field) fieldMic.value = FieldMicPhase.working;
     final Uint8List? audio = await rec.stop();
     if (isClosed) return;
     if (audio == null || AssistantRecorder.seconds(audio) < 0.5) {
-      _say(_bot(Replies.tooShort));
+      _micProblem(Replies.tooShort, field: field);
       return;
     }
     final generation = ++_generation;
@@ -1621,17 +1659,26 @@ class GuidedAssistantController extends GetxController {
         language: speechLanguage.value,
       );
     } catch (error) {
-      if (generation != _generation || isClosed) return;
+      if (generation != _generation || isClosed) {
+        if (field && !isClosed) fieldMic.value = FieldMicPhase.idle;
+        return;
+      }
       loading.value = false;
-      _say(
-        _bot(
-          error is FormatException ? error.message : Replies.listeningFailed,
-        ),
+      _micProblem(
+        error is FormatException ? error.message : Replies.listeningFailed,
+        field: field,
       );
       return;
     }
-    if (generation != _generation || isClosed) return;
+    if (generation != _generation || isClosed) {
+      if (field && !isClosed) fieldMic.value = FieldMicPhase.idle;
+      return;
+    }
     loading.value = false;
+    if (field) {
+      await _fillField(heard);
+      return;
+    }
     heardLanguage.value = heard.language;
     // No "is this what you said?" question (owner, 2026-11-08): the backend's
     // best other reading is used and stated; candidate confirmation still
@@ -1664,6 +1711,168 @@ class GuidedAssistantController extends GetxController {
     return (text: heard.text, correctedFrom: heard.correctedFrom);
   }
 
+  // ---------------------------------------------------------------- field mic
+
+  /// Reads and writes the page field for 按住輸入.
+  late final WebFieldInput fieldInput =
+      fieldInputOverride ?? WebFieldInput(_runOnPage);
+
+  /// Tests replace the page field access.
+  final WebFieldInput? fieldInputOverride;
+
+  final fieldMic = FieldMicPhase.idle.obs;
+
+  /// The field the words will go into, read when the microphone is pressed;
+  /// null with [fieldTargetRead]: there is none, so the words become a
+  /// request to the assistant.
+  final fieldTarget = Rxn<FieldInfo>();
+  final fieldTargetRead = false.obs;
+
+  /// What 按住輸入 says now (filled, a problem), for a few seconds;
+  /// [FieldMicNotice.undo] adds 「復原」.
+  final fieldNotice = Rxn<FieldMicNotice>();
+
+  bool _fieldMode = false;
+  Future<FieldInfo?>? _fieldRead;
+  Timer? _fieldTimer;
+
+  static const fieldNoticeTime = Duration(seconds: 5);
+
+  /// The guide's current step types into a page field (its target holds an
+  /// input or textarea, or a page field is focused): the 按住提問 button
+  /// reads 按住輸入 and dictates into the field. From the probe's
+  /// `__fieldTargets` and `__focusField` (web_guide_probe.dart).
+  bool get dictating {
+    if (!_stepRunning || offScopeVisible) return false;
+    if (currentRoute.value != TPRoute.webView) return false;
+    final page = web.now;
+    if (page.flag('__focusField')) return true;
+    final target = currentStep?.targetFor(web);
+    return target != null &&
+        page.text('__fieldTargets').split(',').contains(target);
+  }
+
+  /// 按住輸入 is pressed: listens, and meanwhile finds the field the words
+  /// go into.
+  Future<void> fieldMicDown() async {
+    if (loading.value || listening.value || !dictating) return;
+    _fieldTimer?.cancel();
+    fieldNotice.value = null;
+    fieldTarget.value = null;
+    fieldTargetRead.value = false;
+    final read = _fieldRead = _readField();
+    read.then((info) {
+      if (!identical(read, _fieldRead) || isClosed) return;
+      fieldTarget.value = info;
+      fieldTargetRead.value = true;
+    });
+    _fieldMode = true;
+    fieldMic.value = FieldMicPhase.listening;
+    await micDown();
+  }
+
+  /// Released ([send]) or slid up to cancel.
+  Future<void> fieldMicUp({bool send = true}) async {
+    if (!_fieldMode || !listening.value) {
+      if (fieldMic.value == FieldMicPhase.listening) {
+        fieldMic.value = FieldMicPhase.idle;
+      }
+      return;
+    }
+    await micUp(send: send);
+  }
+
+  Future<FieldInfo?> _readField() async {
+    final id = currentStep?.targetFor(web);
+    final expression = id == null ? null : task.value?.guide.spec.targets[id];
+    try {
+      return await fieldInput.read(stepTarget: expression);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Puts [heard] into the field, written as the field expects. The words
+  /// stay out of the chat, the recent inputs and the decision model, and do
+  /// not change the conversation language. No field: the words are a normal
+  /// request in the assistant (as with its own microphone).
+  Future<void> _fillField(AssistantTranscript heard) async {
+    final info = await (_fieldRead ?? Future<FieldInfo?>.value());
+    _fieldRead = null;
+    if (isClosed) return;
+    if (info == null) {
+      fieldMic.value = FieldMicPhase.idle;
+      final reading = _bestReading(heard);
+      heardLanguage.value = heard.language;
+      _turnLanguage = heard.language;
+      _followSpokenLanguage(heard);
+      openSheet();
+      _sayNotice(heard);
+      submit(reading.text, voice: true);
+      return;
+    }
+    // The words as heard: the backend's correction leans towards service
+    // names, which a field never wants.
+    final said = heard.correctedFrom ?? heard.text;
+    final fill = InputFormatter.fill(
+      said,
+      info,
+      hint: currentStep?.fieldFor(web),
+    );
+    if (fill == null) {
+      _showFieldNotice(FieldMicTexts.nothing);
+      return;
+    }
+    String? value;
+    try {
+      value = await fieldInput.insert(fill);
+    } catch (_) {}
+    if (isClosed) return;
+    if (value == null) {
+      _showFieldNotice(FieldMicTexts.failed);
+      return;
+    }
+    _showFieldNotice(
+      FieldMicTexts.filled,
+      values: {'text': fill.text},
+      undo: true,
+    );
+  }
+
+  /// 復原: the field's value from before the last fill.
+  Future<void> undoFieldFill() async {
+    if (fieldNotice.value?.undo != true) return;
+    fieldNotice.value = null;
+    var ok = false;
+    try {
+      ok = await fieldInput.undo();
+    } catch (_) {}
+    if (isClosed) return;
+    _showFieldNotice(ok ? FieldMicTexts.undone : FieldMicTexts.undoFailed);
+  }
+
+  void _showFieldNotice(
+    String source, {
+    Map<String, Object?> values = const {},
+    bool undo = false,
+  }) {
+    fieldMic.value = FieldMicPhase.idle;
+    fieldNotice.value = FieldMicNotice(source, values: values, undo: undo);
+    _fieldTimer?.cancel();
+    _fieldTimer = Timer(fieldNoticeTime, () => fieldNotice.value = null);
+  }
+
+  /// Runs a field script in the visible TownPass service page only.
+  Future<Object?> _runOnPage(String source) async {
+    final page = pageTracker.currentWebPage;
+    final controller = page?.controller;
+    if (controller == null ||
+        AssistantPageTracker.servicePath(page?.url) == null) {
+      return null;
+    }
+    return controller.evaluateJavascript(source: source);
+  }
+
   // ---------------------------------------------------------------- home ask
 
   /// Bot replies to the home question (they are in the chat history too).
@@ -1681,8 +1890,11 @@ class GuidedAssistantController extends GetxController {
         (m.options != null || m.teachGuideId != null || m.tutorialChoice),
   );
 
-  Future<void> homeMicDown() async {
+  /// 按住提問 is pressed. [card]: the answer shows on the home card (the
+  /// home tab); elsewhere it opens the assistant and problems are toasts.
+  Future<void> homeMicDown({bool card = true}) async {
     if (loading.value || homeAsk.value == HomeAsk.listening) return;
+    _homeCard = card;
     _homeHeldAt = DateTime.now();
     homeAsk.value = HomeAsk.listening;
     final rec = recorder;
@@ -1696,15 +1908,28 @@ class GuidedAssistantController extends GetxController {
     }
   }
 
-  Future<void> homeMicUp() async {
+  /// Released: [send] false (slid up to cancel, or the pointer was
+  /// cancelled) discards the recording; nothing is heard or sent.
+  Future<void> homeMicUp({bool send = true}) async {
     if (homeAsk.value != HomeAsk.listening) return;
     final held = DateTime.now().difference(_homeHeldAt ?? DateTime.now());
     final rec = recorder;
     final svc = service;
     final starting = _homeStart;
     _homeStart = null;
+    if (!send) {
+      homeAsk.value = HomeAsk.idle;
+      level.value = 0;
+      if (starting != null && await starting) await rec?.cancel();
+      return;
+    }
     if (held < const Duration(milliseconds: 400)) {
-      homeAsk.value = HomeAsk.tooShort;
+      if (_homeCard) {
+        homeAsk.value = HomeAsk.tooShort;
+      } else {
+        homeAsk.value = HomeAsk.idle;
+        _showToast(HomeAskTexts.tooShort);
+      }
       if (starting != null && await starting) await rec?.cancel();
       return;
     }
@@ -1745,6 +1970,18 @@ class GuidedAssistantController extends GetxController {
 
   /// Puts what was heard on the home card and answers it as in the chat.
   void askFromHome(AssistantTranscript heard) {
+    if (!_homeCard) {
+      // Not on the home tab: asked in the assistant, as with its own mic.
+      _homeCard = true;
+      final reading = _bestReading(heard);
+      heardLanguage.value = heard.language;
+      _turnLanguage = heard.language;
+      _followSpokenLanguage(heard);
+      openSheet();
+      _sayNotice(heard);
+      submit(reading.text, voice: true);
+      return;
+    }
     _homeFrom = _nextId;
     final reading = _bestReading(heard);
     homeQuestion.value = reading.text;
@@ -1757,9 +1994,17 @@ class GuidedAssistantController extends GetxController {
   }
 
   void _showHomeNotice(String text) {
+    if (!_homeCard) {
+      homeAsk.value = HomeAsk.idle;
+      _showToast(text);
+      return;
+    }
     homeNotice.value = text;
     homeAsk.value = HomeAsk.notice;
   }
+
+  /// The current 按住提問 press answers on the home card.
+  bool _homeCard = true;
 
   void dismissHomeAsk() {
     if (homeAsk.value == HomeAsk.idle) return;

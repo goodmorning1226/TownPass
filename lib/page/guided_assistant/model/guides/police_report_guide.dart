@@ -1,6 +1,7 @@
 import 'package:town_pass/page/guided_assistant/model/guide_content.dart';
 import 'package:town_pass/page/guided_assistant/model/guide_i18n.dart';
 import 'package:town_pass/page/guided_assistant/model/guide_page.dart';
+import 'package:town_pass/page/guided_assistant/model/input_formatter.dart';
 import 'package:town_pass/page/guided_assistant/web/web_guide_probe.dart';
 import 'package:town_pass/page/guided_assistant/web/web_page_state.dart';
 
@@ -316,6 +317,12 @@ final List<GuideComponent> policeReportComponents = [
                 s.now.number('formStep') == 1 &&
                 s.now.text('fieldKey').isEmpty),
         cardTop: _fieldCardTop,
+        // For 按住輸入 (the boxes are plain text inputs).
+        field: (s) => switch (s.now.text('fieldKey')) {
+          'mobile' => FieldKind.phone,
+          'mail' => FieldKind.email,
+          _ => null,
+        },
       ),
     ],
   ),

@@ -1399,7 +1399,7 @@ void main() {
       expect(c.homeAsk.value, HomeAsk.idle);
     });
 
-    testWidgets('the button shows on the home tab only', (tester) async {
+    testWidgets('the button shows off the home tab too', (tester) async {
       final c = makeController();
       await SharedPreferencesService().init();
       Get.put(MainViewController());
@@ -1411,9 +1411,16 @@ void main() {
       await tester.pump();
       expect(find.text(HomeAskTexts.label), findsOneWidget);
       expect(find.bySemanticsLabel('開啟助理'), findsOneWidget);
+      // Owner, 2026-11-08: 按住提問 is on every screen (the answer opens
+      // in the assistant there).
       c.routeChanged(TPRoute.webView);
       await tester.pump();
+      expect(find.text(HomeAskTexts.label), findsOneWidget);
+      c.openSheet();
+      await tester.pump();
       expect(find.text(HomeAskTexts.label), findsNothing);
+      c.closeSheet();
+      await tester.pump();
     });
   });
   group('capability list pages', () {
