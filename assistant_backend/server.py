@@ -693,6 +693,8 @@ def make_handler(assistant, token=""):
                       f"asked={result.get('requested_language')} heard={result.get('language')} "
                       f"gate={result.get('gate_language')}:{result.get('gate_confidence')} "
                       f"gate_ms={result.get('gate_ms')} "
+                      f"taiwanese={result.get('taiwanese_route')}:{result.get('taiwanese_score')} "
+                      f"plausibility={result.get('plausibility')} "
                       f"chars={len(text) if isinstance(text, str) else None} "
                       f"alternatives={len(result.get('alternatives') or [])} "
                       f"confidence={result.get('confidence')}", flush=True)

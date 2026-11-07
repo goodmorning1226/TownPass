@@ -55,6 +55,33 @@ TAIWANESE_UNAVAILABLE = ("missing", "memory", "failed")
 # retried warmer and wrote noise for up to 2 minutes; 500 stopped it on the same
 # clips (docs/AI_TAIWANESE_SPEECH_PLAN.md section 10).
 TAIWANESE_MIN_AUDIO_CTX = 500
+# Taiwanese heard automatically (docs/AI_TAIWANESE_SPEECH_PLAN.md section 12): with the
+# menu on one of these, the language gate's probabilities are scored by
+# taiwanese_gate (a logistic regression, data/taiwanese_gate.json); a clip scoring at
+# least TAIWANESE_GATE_SCORE is decoded by the Taiwanese model instead. Held-out clips:
+# 0.5 hears ~69 % of Taiwanese and sends ~5 % of Taiwan Mandarin (1.5 s cuts: 7 %) to
+# it, which still comes back as Mandarin text about 3 s later; 0.85 would be 40 % and
+# 1.6 %. Owner (2026-11-08): recall first. Empty tuple: off (only the explicit 台語 choice).
+AUTO_TAIWANESE_MENUS = ("zh", "auto")
+TAIWANESE_GATE_SCORE = 0.5
+# Second check: a clip scoring at least this (but under TAIWANESE_GATE_SCORE) whose
+# Chinese decode is not clear is decoded again by the Taiwanese model, and the better
+# of the two is kept. None: off.
+TAIWANESE_RECHECK_SCORE = 0.3
+# Same speaker: after a clip went to the Taiwanese model, the next clips use this
+# lower threshold until one decodes as clear Mandarin or another language, or
+# TAIWANESE_STICKY_SECONDS pass. None: off.
+TAIWANESE_STICKY_SCORE = 0.3
+TAIWANESE_STICKY_SECONDS = 300
+# "Very strange Chinese is Taiwanese" (owner, 2026-11-08; section 13): a clip decoded as
+# Chinese whose text does not read like Mandarin (plausibility.score, average log-prob per
+# character under the Taiwan Mandarin bigram model) is decoded by the Taiwanese model too,
+# whatever the gate said, and the better transcript (plausibility, then status) is kept.
+# Below PLAUSIBILITY_LOW at any status; below PLAUSIBILITY_UNSURE when the decode was not
+# clear. Held-out decodes: ~50 % of Whisper small's Chinese for Taiwanese speech, ~12 % of
+# FLEURS Mandarin, ~3 % of our request sentences (mostly book titles). None: off.
+PLAUSIBILITY_LOW = -8.5
+PLAUSIBILITY_UNSURE = -6.0
 
 
 # Sentences in each language's own script (see WhisperCppRecognizer._fields).
@@ -348,19 +375,44 @@ class WhisperCppRecognizer:
     slowed Breeze-ASR-26 by 1.4-2.5 s a clip and silenced a small Taiwanese
     model, section 9). Without it the clip is heard as Chinese and the reply
     carries "notice". Either way the result language is "zh": the turn is Chinese.
-    Taiwanese is an explicit choice: never the gate, a detection or a check.
+    Taiwanese chosen explicitly skips the gate, the detection and the checks.
+    With the menu on AUTO_TAIWANESE_MENUS and a gate, Taiwanese is also heard
+    automatically (taiwanese_gate; the second check and the same-speaker rule,
+    see the TAIWANESE_* constants); then there is no notice when its model is
+    missing: the clip simply takes the usual path.
     """
 
     def __init__(self, url, timeout=60, multi_url=None, taiwanese=None, gate_url=None):
         self.url = url.rstrip("/")
         self.multi_url = multi_url.rstrip("/") if multi_url else None
         self.taiwanese = taiwanese
+        self._models = None  # (taiwanese_gate model, plausibility model), read on first use
+        self.taiwanese_until = 0.0  # same-speaker rule: lower threshold until then
         self.gate_url = gate_url.rstrip("/") if gate_url and self.multi_url else None
         self.gate_primed = False
         self.timeout = timeout
         self.prompt = vocabulary_prompt()  # conservative estimate: no tokenizer here
         self.prompt_tokens = None
         self.lock = threading.Lock()
+
+    @property
+    def taiwanese_model(self):
+        """taiwanese_gate's coefficients (data/taiwanese_gate.json), only with a Taiwanese hook."""
+        return self._taiwanese_models()[0]
+
+    @property
+    def mandarin(self):
+        """plausibility's Mandarin bigram model (data/mandarin_bigrams.json), only with a Taiwanese hook."""
+        return self._taiwanese_models()[1]
+
+    def _taiwanese_models(self):
+        if self.taiwanese is None:
+            return None, None
+        if self._models is None:
+            import plausibility
+            import taiwanese_gate
+            self._models = (taiwanese_gate.load(), plausibility.load())
+        return self._models
 
     def taiwanese_url(self):
         """(url, None) for the Taiwanese whisper-server, or (None, reason)."""
@@ -519,11 +571,36 @@ class WhisperCppRecognizer:
             top = max(heard, key=heard.get) if heard else None
             menu = language if language in LANGUAGES else "zh"
             sure = top if top and heard[top] >= (CLEAR_LANGUAGE if top == menu else GATE_SWITCH) else None
+            route = "chosen" if taiwanese else None
+            score = None
+            # The gate picked another of our languages (sure of it): that language is
+            # decoded and nothing Taiwanese runs (a Vietnamese clip once scored 0.71).
+            other_language = sure is not None and sure != "zh"
+            if (gate is not None and requested in AUTO_TAIWANESE_MENUS and self.taiwanese_model
+                    and not other_language):
+                # Taiwanese heard automatically (section 12); no notice when its model is missing.
+                import taiwanese_gate
+                score = taiwanese_gate.score(self.taiwanese_model, gate.get("language_probabilities"), seconds)
+                threshold = TAIWANESE_GATE_SCORE
+                if TAIWANESE_STICKY_SCORE is not None and time.monotonic() < self.taiwanese_until:
+                    threshold = min(threshold, TAIWANESE_STICKY_SCORE)
+                if score >= threshold:
+                    taiwanese = self.taiwanese_url()[0]
+                    if taiwanese:
+                        route = "gate" if score >= TAIWANESE_GATE_SCORE else "sticky"
+            reply = None
             if taiwanese:
-                # Chinese characters from Taiwanese speech, no prompt, no language
-                # detection: Taiwanese is an explicit choice, never a detection.
-                reply, used = self._infer(taiwanese, wav, seconds, "zh", prompt=False,
-                                          minimum_ctx=TAIWANESE_MIN_AUDIO_CTX), "zh"
+                # Chinese characters from Taiwanese speech, no prompt, no further
+                # language detection.
+                try:
+                    reply, used = self._infer(taiwanese, wav, seconds, "zh", prompt=False,
+                                              minimum_ctx=TAIWANESE_MIN_AUDIO_CTX), "zh"
+                except (OSError, ValueError):
+                    if route == "chosen":
+                        raise
+                    taiwanese, route = None, None  # heard automatically: the usual path instead
+            if reply is not None:
+                pass
             elif sure:
                 # The gate is sure: one decode, in the language spoken, whatever the menu.
                 reply, used, confidence = self._decode(wav, seconds, sure), sure, heard[sure]
@@ -550,6 +627,9 @@ class WhisperCppRecognizer:
                     # in their own script).
                     decodes[detected] = auto
                 reply, used, confidence = self._decide(wav, seconds, language, language_scores(auto), decodes)
+            if requested in AUTO_TAIWANESE_MENUS and self.taiwanese is not None and not other_language:
+                reply, taiwanese, route, confidence = self._taiwanese_after(
+                    wav, seconds, score, reply, used, taiwanese, route, confidence)
         text, logprob, no_speech = self.summarize(reply)
         if used == "zh":
             text = traditional(text)  # Whisper small and others often write Simplified
@@ -559,11 +639,66 @@ class WhisperCppRecognizer:
                   "language_confidence": confidence,
                   **({"speech_model": "taiwanese"} if taiwanese else {}),
                   **({"notice": notice} if notice else {})}
+        if route or score is not None or (requested in AUTO_TAIWANESE_MENUS and self.taiwanese is not None):
+            # Timing log only: how Taiwanese was decided, and how Mandarin-like the text reads.
+            import plausibility
+            result.update(taiwanese_route=route, taiwanese_score=None if score is None else round(score, 3),
+                          plausibility=plausibility.score(self.mandarin, text) if used == "zh" else None)
         if gate is not None:  # timing log: what the gate heard and how long it took
             top = max(heard, key=heard.get) if heard else None
             result.update(gate_language=top, gate_confidence=heard.get(top), gate_ms=self.gate_ms,
                           candidates=self.candidates)
         return result
+
+    def _key(self, reply):
+        """How good a Chinese decode looks: Chinese script, then how much it reads like
+        Mandarin (plausibility), then status, then log-prob."""
+        import plausibility
+        text, logprob, no_speech = self.summarize(reply)
+        text = traditional(text)
+        read = plausibility.score(self.mandarin, text)
+        return (script_fits(text, "zh"), -99.0 if read is None else read,
+                STATUS_RANK[judge(text, logprob, no_speech)], logprob)
+
+    def _implausible(self, reply):
+        """A Chinese decode that does not read like Mandarin (PLAUSIBILITY_*)."""
+        fits, read, status, _ = self._key(reply)
+        if not fits or read <= -99.0:
+            return False  # Latin letters or almost no Chinese: not for the Taiwanese model
+        return ((PLAUSIBILITY_LOW is not None and read < PLAUSIBILITY_LOW)
+                or (PLAUSIBILITY_UNSURE is not None and status < STATUS_RANK["clear"] and read < PLAUSIBILITY_UNSURE))
+
+    def _taiwanese_after(self, wav, seconds, score, reply, used, taiwanese, route, confidence):
+        """After the usual decode (menu on AUTO_TAIWANESE_MENUS): the second check
+        (TAIWANESE_RECHECK_SCORE, gate score band and a decode that is not clear), the
+        "very strange Chinese" rule (PLAUSIBILITY_*, whatever the gate said) and the
+        same-speaker rule (TAIWANESE_STICKY_*). Returns (reply, taiwanese url or None, route, confidence)."""
+        why = None
+        if not taiwanese and used == "zh":
+            if (score is not None and TAIWANESE_RECHECK_SCORE is not None and score >= TAIWANESE_RECHECK_SCORE
+                    and self._key(reply)[2] < STATUS_RANK["clear"]):
+                why = "recheck"
+            elif self._implausible(reply):
+                why = "implausible"
+        if why:
+            url = self.taiwanese_url()[0]
+            if url:
+                # A second opinion: no temperature retries (like every pass after the first).
+                try:
+                    other = self._infer(url, wav, seconds, "zh", prompt=False,
+                                        minimum_ctx=TAIWANESE_MIN_AUDIO_CTX, fallback=False)
+                except (OSError, ValueError):
+                    other = None
+                if other is not None and self._key(other) > self._key(reply):
+                    reply, taiwanese, route, confidence = other, url, why, None
+        if taiwanese:
+            self.taiwanese_until = time.monotonic() + TAIWANESE_STICKY_SECONDS
+        else:
+            text, logprob, no_speech = self.summarize(reply)
+            text = traditional(text) if used == "zh" else text
+            if used != "zh" or judge(text, logprob, no_speech, used) == "clear":
+                self.taiwanese_until = 0.0  # clear Mandarin or another language: someone else
+        return reply, taiwanese, route, confidence
 
     def _check_chinese(self, wav, seconds, reply):
         """Chinese chosen and no gate: the Chinese pass ran first (the fast path).
@@ -637,6 +772,8 @@ def make_handler(recognizer, model_name):
                       f"chars={len(decoded['text'])} passes={decoded.get('passes')} "
                       f"gate={decoded.get('gate_language')}:{decoded.get('gate_confidence')} "
                       f"gate_ms={decoded.get('gate_ms')} candidates={','.join(decoded.get('candidates') or [])} "
+                      f"taiwanese={decoded.get('taiwanese_route')}:{decoded.get('taiwanese_score')} "
+                      f"plausibility={decoded.get('plausibility')} "
                       f"{elapsed}ms", flush=True)
             self.reply(200, {**decoded, "audio_seconds": round(seconds, 2), "elapsed_ms": elapsed})
     return Handler
