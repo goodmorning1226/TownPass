@@ -85,6 +85,54 @@ def system_prompt(task):
     return POLICIES[task] + "\n" + INSTRUCTIONS[task]
 
 
+# Output format (2026-11-07, Ollama, dev / held-out): lettered options
+# ("choice") cut the proposal from 14.9 to 6.3 generated tokens (~1.5 s on a
+# phone) with held-out 95/102 (tool calls: 94/102) and dev 181/184 (184/184; the
+# 3 are clarifications), 0 wrong services and 0 unexpected navigations.
+# "tools" (the model writes the tool call itself) remains for comparison.
+DECISION_FORMAT = "choice"
+LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+
+def choice_options(tools):
+    """Every tool with each allowed argument combination, lettered A, B, C...
+    The model writes only {"choice": "A"} (~5 tokens instead of ~15-35)."""
+    import itertools
+    options = []
+    for tool in tools:
+        function = tool["function"]
+        properties = function["parameters"]["properties"]
+        keys = list(properties)
+        for values in itertools.product(*[properties[key]["enum"] for key in keys]):
+            options.append({"choice": LETTERS[len(options)], "tool": function["name"],
+                            "arguments": dict(zip(keys, values)), "description": function["description"]})
+            if len(options) == len(LETTERS):
+                return options
+    return options
+
+
+def choice_tool(options):
+    """The one pseudo-tool the model answers with (proposal_schema makes it {"choice": letter})."""
+    return {"type": "function", "function": {"name": "choose", "description": "Pick one option by its letter.",
+            "parameters": {"type": "object", "properties": {"choice": {"type": "string",
+                           "enum": [option["choice"] for option in options]}},
+                           "required": ["choice"], "additionalProperties": False}}}
+
+
+def from_choice(call, options):
+    """{"choice": "B"} (or a "choose" call) back to the real tool call; anything else
+    is returned unchanged for validate_call to accept or reject."""
+    function = call.get("function") if isinstance(call, dict) else None
+    if not isinstance(function, dict):
+        return call
+    letter = function.get("choice", (function.get("arguments") or {}).get("choice")
+                          if function.get("name") == "choose" else None)
+    option = next((o for o in options if o["choice"] == letter), None)
+    if option is None:
+        return call
+    return {"function": {"name": option["tool"], "arguments": dict(option["arguments"])}}
+
+
 def decide(owner, task, context, tools, validate, error):
     """Ask the model for one tool proposal and return the validated (name, args).
 
@@ -101,15 +149,24 @@ def decide(owner, task, context, tools, validate, error):
     # - Compact JSON, Chinese unescaped.
     # Evidence and tools stay separate messages: merging them into one JSON
     # object lost 16 dev cases.
+    if DECISION_FORMAT == "choice":
+        # The model picks a lettered option; each option still names the tool and
+        # its arguments, so the policy text applies unchanged.
+        options = choice_options(tools)
+        model_tools = [choice_tool(options)]
+        last = {"options": options, "answer": "Choose exactly one option and reply with its letter. "
+                "If the request is unclear, choose the option that asks for clarification."}
+    else:
+        options, model_tools, last = [], tools, {"allowed_tools": tools}
     messages = [{"role": "system", "content": system_prompt(task)},
                 {"role": "user", "content": compact(context)},
-                {"role": "user", "content": compact({"allowed_tools": tools})}]
+                {"role": "user", "content": compact(last)}]
     if not owner.model_lock.acquire(timeout=.1):
         raise error("目前有一個需求正在處理，請稍後再試。")
     try:
         # One normal decision plus at most one correction.
         for attempt in range(2):
-            result = owner.model_call(messages, tools)
+            result = owner.model_call(messages, model_tools)
             usage = getattr(owner.usage, "calls", None)
             if usage is not None:
                 usage.append(result.get("prompt_eval_count"))
@@ -120,7 +177,7 @@ def decide(owner, task, context, tools, validate, error):
                 calls = result.get("message", {}).get("tool_calls", [])
                 if len(calls) != 1:
                     raise error("模型沒有提供有效決策，請重試或查看功能列表。")
-                return validate(with_arguments(calls[0]), tools)
+                return validate(with_arguments(from_choice(calls[0], options)), tools)
             except error:
                 if attempt:
                     raise

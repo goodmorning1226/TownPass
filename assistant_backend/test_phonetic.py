@@ -2,7 +2,7 @@ import unittest
 
 from phonetic import fold, rank_books, readings, similarity, syllables, title_score
 from server import Assistant
-from test_server import BOOKS, FakeCatalog, response
+from test_server import BOOKS, FakeCatalog, first, response
 
 
 class PhoneticTests(unittest.TestCase):
@@ -36,7 +36,7 @@ class SoundAlikeTurnTests(unittest.TestCase):
 
         def model(messages, tools):
             self.calls.append(tools)
-            return response(tools[0]["function"]["name"])
+            return first(tools)
         self.app = Assistant(FakeCatalog(), model)
 
     def turn(self, text):
@@ -86,6 +86,12 @@ class ServiceSoundCorrectionTests(unittest.TestCase):
     def test_understood_sentences_books_and_chat_are_never_rewritten(self):
         for text in ("我要繳水廢", "神奇柑仔店", "廣嶋玲子寫的書", "早安", "今天心情真好", "今天會下雨嗎"):
             self.assertEqual(self.workflow.sound_corrections(text), (None, []), text)
+
+    def test_misheard_borrow_opening_is_offered_never_applied(self):
+        auto, options = self.workflow.sound_corrections("佛小姐原子習慣")
+        self.assertIsNone(auto)
+        self.assertEqual(options[0], "我想借原子習慣")
+        self.assertNotIn("我想借你好嗎", self.workflow.sound_corrections("早安你好嗎")[1])
 
     def test_transcription_uses_the_correction_and_says_so(self):
         from server import speech_resolution

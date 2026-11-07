@@ -20,6 +20,8 @@ import time
 import wave
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
+from script import traditional
+
 # Prefer Traditional Chinese output from Whisper-family models.
 STYLE_PROMPT = "可能會說第一個、第二個、第三個。以下是台灣華語的繁體中文句子。"
 MAX_BYTES = 1_100_000  # 30 s of 16 kHz mono PCM16 plus header
@@ -229,9 +231,11 @@ class WhisperCppRecognizer:
     confidence signals and the clear/unsure/unclear gates are the same.
     Standard library only.
 
-    Languages: url serves Chinese (Breeze-ASR-25); multi_url, when given, serves a
-    multilingual Whisper for en/ja/vi/id/th and detects the language for "auto"
-    (a clip detected as Chinese is then transcribed by the Chinese model).
+    Languages: url serves Chinese; multi_url, when given, serves a multilingual
+    Whisper for en/ja/vi/id/th and detects the language for "auto" (a clip
+    detected as Chinese is then transcribed by the Chinese model, unless both
+    are the same model, e.g. Whisper small for everything). Chinese results are
+    read as Traditional (script.traditional).
     """
 
     def __init__(self, url, timeout=60, multi_url=None):
@@ -255,7 +259,9 @@ class WhisperCppRecognizer:
                 "prompt": self.prompt if language == "zh" else "",
                 # temperature_inc > 0 keeps whisper.cpp's fallback: a decode stuck in a
                 # repetition loop (high entropy / low log-prob) is retried warmer.
-                "temperature": "0", "temperature_inc": "0.2", "no_timestamps": "true",
+                # 0.4 allows two retries (0.4, 0.8); 0.2 allowed five, and an unknown
+                # book title then ran past the 40 s limit.
+                "temperature": "0", "temperature_inc": "0.4", "no_timestamps": "true",
                 "no_language_probabilities": "true", "suppress_nst": "true",
                 "audio_ctx": str(self.audio_context(seconds))}
 
@@ -303,13 +309,24 @@ class WhisperCppRecognizer:
                 # Without a multilingual model the Chinese model does everything.
                 used = "zh" if language == "auto" else language
                 reply = self._infer(self.url, wav, seconds, used)
+                heard = self.summarize(reply)[0]
+                if used == "zh" and self.multi_url and heard and cjk_ratio(heard) < 0.5:
+                    # Chinese chosen but another language spoken ("I want to borrow a
+                    # book" in Chinese mode): let the multilingual model detect it
+                    # instead of rejecting the clip as unclear.
+                    other = self._infer(self.multi_url, wav, seconds, "auto")
+                    detected = language_code(other.get("language"), default=None)
+                    if detected and detected != "zh":
+                        reply, used = other, detected
             else:
                 reply = self._infer(self.multi_url, wav, seconds, language)
                 detected = language_code(reply.get("language"), default=None) if language == "auto" else language
                 used = detected or "zh"
-                if used == "zh":  # Chinese is transcribed by the Chinese model
+                if used == "zh" and self.url != self.multi_url:  # a separate Chinese model redoes it
                     reply = self._infer(self.url, wav, seconds, "zh")
         text, logprob, no_speech = self.summarize(reply)
+        if used == "zh":
+            text = traditional(text)  # Whisper small and others often write Simplified
         return {"text": text, "alternatives": [], "alternative_logprobs": [], "language": used,
                 "status": judge(text, logprob, no_speech, used), "avg_logprob": logprob,
                 "no_speech_prob": no_speech}

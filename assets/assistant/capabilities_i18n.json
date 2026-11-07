@@ -277,7 +277,7 @@
    "th": {"title": "สินค้าจำเป็น", "keywords": ["สินค้าจำเป็น", "สิ่งของ"]}
   },
   "library": {
-   "en": {"title": "Library", "keywords": ["library", "borrow a book", "borrow books", "find a book", "books"]},
+   "en": {"title": "Library", "keywords": ["library", "borrow a book", "borrow books", "lend a book", "lend books", "find a book", "books"]},
    "ja": {"title": "図書貸出", "keywords": ["図書館", "本を借りる", "本を探す", "本"]},
    "vi": {"title": "Mượn sách thư viện", "keywords": ["thư viện", "mượn sách", "tìm sách", "sách"]},
    "id": {"title": "Peminjaman buku", "keywords": ["perpustakaan", "pinjam buku", "cari buku", "buku"]},

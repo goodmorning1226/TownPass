@@ -26,13 +26,12 @@ import kotlin.concurrent.thread
 object OnDeviceAssistant {
     private const val TAG = "TownPassAssistant"
     const val MODEL_FILE = "Ministral-3-3B-Instruct-2512-Q4_K_M.gguf"
-    // q8_0, not q5_0: whisper.cpp has ARM i8mm kernels for q8_0 (5.4 s per
-    // clip on a Snapdragon 7 Gen 4 instead of 13.4 s, same accuracy;
-    // docs/AI_ASR_ABLATION.md).
-    const val ASR_FILE = "ggml-breeze-asr-25-q8_0.bin"
+    /** Optional separate Chinese model (e.g. Breeze-ASR-25 q8_0, branch
+     *  feat/asr-breeze-q8). Without it the multilingual model serves Chinese too. */
+    const val ASR_FILE = "ggml-whisper-chinese.bin"  // push_assistant_models.ps1 -Chinese
 
-    /** Multilingual Whisper for en/ja/vi/id/th and language detection (optional;
-     *  the model choice follows docs/AI_ASR_ABLATION.md). */
+    /** Multilingual Whisper (default Whisper small q8_0: 1.4 s a clip) for Chinese
+     *  when no separate model is pushed, en/ja/vi/id/th and language detection. */
     const val MULTI_ASR_FILE = "ggml-whisper-multilingual.bin"  // push_assistant_models.ps1 -Multilingual
     private const val MODEL_PORT = 8771
     private const val WHISPER_PORT = 8772
@@ -59,11 +58,14 @@ object OnDeviceAssistant {
                 val whisper = app.resources.getBoolean(R.bool.assistant_whisper)
                 val models = app.getExternalFilesDir("models") ?: File(app.filesDir, "models")
                 models.mkdirs()
-                // Other speech languages only when the multilingual model was pushed.
+                // Which speech models were pushed: a separate Chinese one, a
+                // multilingual one, or both.
+                val chinese = whisper && File(models, ASR_FILE).isFile
                 val multilingual = whisper && File(models, MULTI_ASR_FILE).isFile
                 val info = Python.getInstance().getModule("device_main")
                     .callAttr("start", MODEL_PORT, WHISPER_PORT, Kwarg("whisper", whisper),
-                        Kwarg("multi_port", if (multilingual) MULTI_WHISPER_PORT else null)).toString()
+                        Kwarg("multi_port", if (multilingual) MULTI_WHISPER_PORT else null),
+                        Kwarg("chinese_model", chinese || !multilingual)).toString()
                 Log.i(TAG, "backend: $info")
                 // Recent 8-core phone SoCs have 6-8 performance cores; leave two for
                 // the UI. Speech and decision run one after the other, never together.
@@ -73,12 +75,14 @@ object OnDeviceAssistant {
                 // they would stay in "background" (little cores only) for good.
                 waitForForeground()
                 if (whisper) {
-                    launch(app, "libwhisper_server.so", File(models, ASR_FILE), WHISPER_PORT,
-                        listOf("-t", threads, "-l", "zh"))
+                    if (chinese || !multilingual) {
+                        launch(app, "libwhisper_server.so", File(models, ASR_FILE), WHISPER_PORT,
+                            listOf("-t", threads, "-l", "zh"))
+                    }
                     if (multilingual) {
-                        // Same binary, second instance: keep the one just started.
+                        // Same binary; a second instance keeps the Chinese one just started.
                         launch(app, "libwhisper_server.so", File(models, MULTI_ASR_FILE), MULTI_WHISPER_PORT,
-                            listOf("-t", threads, "-l", "auto"), stopLeftovers = false)
+                            listOf("-t", threads, "-l", "auto"), stopLeftovers = !chinese)
                     }
                 } else {
                     stopStale("libwhisper_server.so")

@@ -24,6 +24,13 @@ def response(name, arguments=None):
     return {"message": {"tool_calls": [{"function": {"name": name, "arguments": arguments or {}}}]}}
 
 
+def first(tools):
+    """A model that proposes the first offered tool with its first allowed values
+    (with lettered choices: option A, which is the same first tool)."""
+    function = tools[0]["function"]
+    return response(function["name"], {key: spec["enum"][0] for key, spec in function["parameters"]["properties"].items()})
+
+
 class RetrievalTests(unittest.TestCase):
     def test_general_request_needs_no_title(self):
         c = retrieve("我要借書", BOOKS)
@@ -143,7 +150,7 @@ class TurnTests(unittest.TestCase):
     def test_several_books_are_confirmed_before_a_volume_opens(self):
         # The unified workflow asks which book first; a bare "第二本" without the
         # confirmation's resolution ID must not pick a volume.
-        assistant = Assistant(FakeCatalog(), lambda messages, tools: response(tools[0]["function"]["name"]))
+        assistant = Assistant(FakeCatalog(), lambda messages, tools: first(tools))
         result = assistant.turn({"text": "借神奇柑仔店的書", "request_id": "a", "session_id": "s"})
         self.assertEqual((result["kind"], len(result["choices"])), ("confirm_candidates", 2))
         unbound = assistant.turn({"text": "第二本", "request_id": "b", "session_id": "s"})

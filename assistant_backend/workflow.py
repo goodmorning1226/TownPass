@@ -35,6 +35,11 @@ SERVICE_SOUND_CONFIRM = 0.65  # otherwise offer the corrected sentence to confir
 # "<request words>□<request words>": the sentence only asks for the matched word.
 REQUEST_ONLY = re.compile(r"(?:請|我|想|要|幫|我們|給|去|打開|開啟|開|查|看|用|一下|的|吧|啊|喔)+□"
                           r"(?:吧|啊|喔|一下|服務|頁面)?[。！!？?]*")
+# A misheard request opening before an unknown object ("佛小姐原子習慣" for
+# 我想借原子習慣): only offered, never applied silently. "佛小姐"~"我想借" scores
+# 0.51, "烏鴉借"~"我要借" 0.59; unrelated openings ("早安你", "天氣好") 0.2-0.3.
+REQUEST_OPENINGS = ("我想借", "我要借", "我想找", "我要找")
+OPENING_SOUND_CONFIRM = 0.5
 
 
 class Workflow:
@@ -166,7 +171,7 @@ class Workflow:
             item = services.setdefault(found[0]["entry"]["id"], {"score": score, "spans": []})
             item["spans"].append((start, end, term, score, exact_homophone(text[start:end], term)))
         if not services:
-            return None, []
+            return None, self._opening_suggestions(text)
 
         def coverage(item):
             """Characters of the sentence this service's homophone-level words account for:
@@ -205,7 +210,25 @@ class Workflow:
         auto = best if lead["score"] >= SERVICE_SOUND_AUTO and not rivals and exact else None
         options = [corrected(service, item)[0] for service, item in ranked[:2]
                    if item["score"] >= lead["score"] - 0.1]
+        if auto is None:
+            # A misheard opening ("佛小姐…" for 我想借…) comes before word-level guesses.
+            options = list(dict.fromkeys([*self._opening_suggestions(text), *options]))[:2]
         return auto, options
+
+    def _opening_suggestions(self, text):
+        """"我想借原子習慣" for "佛小姐原子習慣": the sentence's first three characters
+        sound like a borrow/find opening and something follows it. Offered only."""
+        from phonetic import similarity, syllables
+        head, rest = text[:3], text[3:].strip()
+        if len(rest) < 2 or len(syllables(head)) != 3:
+            return []
+        scored = sorted(((similarity(syllables(head), syllables(opening)), opening) for opening in REQUEST_OPENINGS),
+                        reverse=True)
+        score, opening = scored[0]
+        if score < OPENING_SOUND_CONFIRM or score >= 1.0:  # 1.0: it already says so
+            return []
+        # The opening itself says borrow / find; the library step decides what the object is.
+        return [opening + rest]
 
     def _navigate(self, payload, entry):
         language = payload.get("language", "zh")

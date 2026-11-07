@@ -248,7 +248,10 @@ def tools_for(context):
 
 def proposal_schema(tools):
     """One branch per tool, so each name can only carry its own arguments. A tool
-    without arguments is just its name (no "arguments":{} for the model to write)."""
+    without arguments is just its name (no "arguments":{} for the model to write).
+    The lettered-choice format (decision.choice_tool) is just {"choice": letter}."""
+    if len(tools) == 1 and tools[0]["function"]["name"] == "choose":
+        return tools[0]["function"]["parameters"]
     branches = []
     for t in tools:
         name = {"type": "string", "enum": [t["function"]["name"]]}

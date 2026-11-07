@@ -32,7 +32,6 @@ from eval_holdout import HOLDOUT
 from evaluate import CASES, call, judge, outcome
 
 HERE = pathlib.Path(__file__).resolve().parent
-S2T = HERE / "data" / "unihan_s2t.tsv"
 
 
 def manifest(limit_per_set=35):
@@ -78,33 +77,7 @@ def add_noise(source, target, snr_db, seed):
         out.writeframes(mixed.tobytes())
 
 
-_S2T = None
-
-
-def traditional(text):
-    """Character-level Simplified -> Traditional with the Unihan table (unambiguous mappings only)."""
-    global _S2T
-    if _S2T is None:
-        _S2T = {}
-        if S2T.exists():
-            for line in S2T.read_text(encoding="utf-8").splitlines():
-                if line and not line.startswith("#"):
-                    simplified, trad = line.split("\t")
-                    _S2T[simplified] = trad
-    return "".join(_S2T.get(char, char) for char in text)
-
-
-_T2S = None
-
-
-def simplified(text):
-    """Traditional -> Simplified (unambiguous): compares transcripts whatever script a model writes."""
-    global _T2S
-    if _T2S is None:
-        path = HERE / "data" / "unihan_t2s.tsv"
-        _T2S = dict(line.split("\t") for line in path.read_text(encoding="utf-8").splitlines()
-                    if line and not line.startswith("#")) if path.exists() else {}
-    return "".join(_T2S.get(char, char) for char in text)
+from script import simplified, traditional  # noqa: E402  (shared with the speech service)
 
 
 def cer(reference, hypothesis):

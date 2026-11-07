@@ -83,7 +83,7 @@ def _serve(server):
 
 
 def start(model_port=8771, whisper_port=8772, assistant_port=8765, asr_port=8770, whisper=True,
-          multi_port=None):
+          multi_port=None, chinese_model=True):
     """Start both HTTP servers once; returns immediately after they listen.
 
     The native model servers may still be loading: until they answer, requests
@@ -92,6 +92,8 @@ def start(model_port=8771, whisper_port=8772, assistant_port=8765, asr_port=8770
     text, so Whisper is neither started nor warmed up.
     multi_port: a second whisper-server with a multilingual model (other
     languages and "auto" detection); None when that model is not on the phone.
+    chinese_model=False: no separate Chinese model (Breeze) was pushed, so the
+    multilingual model (Whisper small) also serves Chinese.
     """
     with _lock:
         if _started.is_set():
@@ -100,9 +102,9 @@ def start(model_port=8771, whisper_port=8772, assistant_port=8765, asr_port=8770
         from http.server import ThreadingHTTPServer
         import asr_server
         import server
-        recognizer = asr_server.WhisperCppRecognizer(
-            os.environ["TOWNPASS_WHISPER_URL"],
-            multi_url=f"http://127.0.0.1:{multi_port}" if whisper and multi_port else None)
+        multi_url = f"http://127.0.0.1:{multi_port}" if whisper and multi_port else None
+        chinese_url = os.environ["TOWNPASS_WHISPER_URL"] if chinese_model or not multi_url else multi_url
+        recognizer = asr_server.WhisperCppRecognizer(chinese_url, multi_url=multi_url)
         asr = ThreadingHTTPServer(("127.0.0.1", asr_port), asr_server.make_handler(recognizer, "whisper.cpp"))
         asr.daemon_threads = True
         assistant = ThreadingHTTPServer(("127.0.0.1", assistant_port), server.make_handler(server.Assistant()))
@@ -113,7 +115,8 @@ def start(model_port=8771, whisper_port=8772, assistant_port=8765, asr_port=8770
         threading.Thread(target=warm_up, args=(recognizer if whisper else None, os.environ["TOWNPASS_MODEL_URL"]),
                          name="assistant-warm-up", daemon=True).start()
         _started.set()
-        speech = f"whisper :{whisper_port}" if whisper else "speech: phone recogniser"
-        if whisper and multi_port:
-            speech += f", multilingual whisper :{multi_port}"
+        speech = "speech: phone recogniser"
+        if whisper:
+            speech = (f"chinese whisper :{whisper_port}" if chinese_url != multi_url else "chinese = multilingual") + (
+                f", multilingual whisper :{multi_port}" if multi_url else "")
         return f"assistant :{assistant_port}, asr :{asr_port}, model :{model_port}, {speech}"

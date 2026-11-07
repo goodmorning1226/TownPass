@@ -197,9 +197,28 @@ class PromptLayoutTests(unittest.TestCase):
         for message in (evidence, tools):
             self.assertNotIn("output_schema", message["content"])
             self.assertNotIn(chr(92) + "u", message["content"])  # Chinese is not escaped
-            self.assertNotIn(", ", message["content"])
+            self.assertNotIn('", "', message["content"])  # compact JSON separators
+            self.assertNotIn('": ', message["content"])
         self.assertEqual(json.loads(evidence["content"])["original_text"], "我要繳水費")
-        self.assertEqual(list(json.loads(tools["content"])), ["allowed_tools"])
+        offered = json.loads(tools["content"])
+        self.assertEqual(list(offered), ["options", "answer"])  # lettered options
+        self.assertEqual([(o["choice"], o["tool"], o["arguments"]) for o in offered["options"]],
+                         [("A", "select_capability", {"capability_id": "fees.water"}), ("B", "request_clarification", {})])
+
+    def test_lettered_choice_maps_back_and_validation_is_unchanged(self):
+        from decision import choice_options, choice_tool, from_choice, with_arguments
+        tools = [server.tool("select_capability", "x", {"capability_id": {"type": "string",
+                             "enum": ["fees.water", "fees.tax"]}}, ["capability_id"]),
+                 server.tool("request_clarification", "y")]
+        options = choice_options(tools)
+        self.assertEqual([o["choice"] for o in options], ["A", "B", "C"])
+        self.assertEqual(server.proposal_schema([choice_tool(options)])["properties"]["choice"]["enum"], ["A", "B", "C"])
+        picked = with_arguments(from_choice({"function": {"choice": "B"}}, options))
+        self.assertEqual(server.validate_call(picked, tools), ("select_capability", {"capability_id": "fees.tax"}))
+        self.assertEqual(server.validate_call(with_arguments(from_choice({"function": {"choice": "C"}}, options)), tools),
+                         ("request_clarification", {}))
+        with self.assertRaises(AssistantError):  # a letter that is not offered
+            server.validate_call(with_arguments(from_choice({"function": {"choice": "Z"}}, options)), tools)
 
     def test_a_tool_without_arguments_is_just_its_name_and_validation_is_unchanged(self):
         from decision import with_arguments
@@ -230,7 +249,8 @@ class MultilingualSpeechTests(unittest.TestCase):
 
     def setUp(self):
         self.calls = []
-        self.heard = {"zh": "chinese", "multi": "english"}  # what each fake model reports
+        self.heard = {"zh": "chinese", "multi": "english"}  # the language each fake model reports
+        self.texts = {"zh": "我要借書", "multi": "multi-text"}  # and the text it writes
         test = self
 
         def fake(name):
@@ -241,7 +261,7 @@ class MultilingualSpeechTests(unittest.TestCase):
                 def do_POST(self):
                     test.calls.append((name, self.rfile.read(int(self.headers["Content-Length"]))))
                     data = json.dumps({"language": test.heard[name], "segments": [
-                        {"text": f"{name}-text", "tokens": [1, 2], "avg_logprob": -0.1, "no_speech_prob": 0.0}]}).encode()
+                        {"text": test.texts[name], "tokens": [1, 2], "avg_logprob": -0.1, "no_speech_prob": 0.0}]}).encode()
                     self.send_response(200)
                     self.send_header("Content-Length", str(len(data)))
                     self.end_headers()
@@ -274,7 +294,21 @@ class MultilingualSpeechTests(unittest.TestCase):
         self.calls.clear()
         self.heard["multi"] = "chinese"
         result = self.recognizer.transcribe(loud_frames(), "auto")
-        self.assertEqual((self.models(), result["language"], result["text"]), (["multi", "zh"], "zh", "zh-text"))
+        self.assertEqual((self.models(), result["language"], result["text"]), (["multi", "zh"], "zh", "我要借書"))
+
+    def test_another_language_in_chinese_mode_is_detected_not_rejected(self):
+        self.texts["zh"] = "I want to borrow a book"  # Breeze writes the English it heard
+        self.texts["multi"] = "I want to borrow a book"
+        result = self.recognizer.transcribe(loud_frames(), "zh")
+        self.assertEqual((self.models(), result["language"], result["status"]), (["zh", "multi"], "en", "clear"))
+        self.assertIn(field("language", "auto"), self.calls[-1][1])
+
+    def test_one_multilingual_model_for_everything_and_simplified_becomes_traditional(self):
+        self.recognizer = WhisperCppRecognizer(self.recognizer.multi_url, multi_url=self.recognizer.multi_url)
+        self.texts["multi"] = "我要缴水费"  # Whisper small writes Simplified
+        self.heard["multi"] = "chinese"
+        result = self.recognizer.transcribe(loud_frames(), "auto")
+        self.assertEqual((self.models(), result["language"], result["text"]), (["multi"], "zh", "我要繳水費"))
 
     def test_without_a_multilingual_model_chinese_does_everything(self):
         self.recognizer.multi_url = None
