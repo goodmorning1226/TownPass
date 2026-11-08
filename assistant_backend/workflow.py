@@ -659,6 +659,14 @@ class Workflow:
             # model could open it, or ask again although the page is named.
             self._trace("vietnamese_sound", [e["id"] for e in entries])
             return self._offer(payload, self._cap_items(entries, language), i18n.t("confirm_capability", language))
+        if language == "vi" and len(matches) == 1 and not matches[0]["fuzzy"]:
+            # One connected page named by its Vietnamese word (exact, or exact once
+            # marks are ignored): open it, as a single sure keyword match does
+            # (docs/AI_CURRENT_RULES.md section 2). Asked, Ministral answered "clarify"
+            # for "xem lịch sử mượn sách" and for most tone slips (2026-11-08 TTS test:
+            # 11 of 42 requests were lost that way); with two or more pages it decides.
+            self._trace("vietnamese_keyword", [entries[0]["id"]])
+            return self._navigate(payload, entries[0])
         ambiguous = len(entries) > 1 or (language == "vi" and any(m["fuzzy"] for m in matches))
         self._trace("capability_model", [e["id"] for e in entries])
         name, args = self._decide(text, entries, ambiguous, payload.get("page_context"))

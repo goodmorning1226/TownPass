@@ -124,6 +124,16 @@ def taiwanese_provider(port, starter=None):
     return provide
 
 
+def vietnamese_provider(port, starter=None):
+    """asr_server's Vietnamese hook (docs/AI_VIETNAMESE.md), like taiwanese_provider:
+    OnDeviceAssistant.startVietnamese starts PhoWhisper on the first Vietnamese clip."""
+    def start_in_app():
+        from java import jclass  # Chaquopy, on the phone only
+        return str(jclass("com.example.townpass.OnDeviceAssistant").startVietnamese())
+
+    return taiwanese_provider(port, starter or start_in_app)
+
+
 # A FAQ question is known text when its best FAQ score reaches this (faq.MEDIUM_CONF:
 # the band the assistant answers from, after a "did you mean"). One e5 embedding
 # (~0.1 s on the phone), only for transcripts the catalogue rules did not know and
@@ -155,7 +165,7 @@ def _serve(server):
 
 def start(model_port=8771, whisper_port=8772, assistant_port=8765, asr_port=8770, whisper=True,
           multi_port=None, chinese_model=True, faq_port=None, faq_dir=None, taiwanese_port=None,
-          decision_model="ministral", gate_port=None):
+          decision_model="ministral", gate_port=None, vietnamese_port=None):
     """Start both HTTP servers once; returns immediately after they listen.
 
     The native model servers may still be loading: until they answer, requests
@@ -172,6 +182,9 @@ def start(model_port=8771, whisper_port=8772, assistant_port=8765, asr_port=8770
     use (docs/AI_TAIWANESE_SPEECH_PLAN.md section 10); None: Taiwanese clips are
     heard as Chinese, with a notice.
     decision_model: "ministral" (default) or "gemma" (OnDeviceAssistant.kt, opt-in build).
+    vietnamese_port: where the App starts the Vietnamese whisper-server on the
+    first Vietnamese decode (docs/AI_VIETNAMESE.md); None, or the file not on the
+    phone: Vietnamese is decoded by the multilingual model as before.
     gate_port: the language gate (Whisper tiny, detection only) that decides the
     speech language before any decode; None (not pushed) works as before.
     """
@@ -186,11 +199,14 @@ def start(model_port=8771, whisper_port=8772, assistant_port=8765, asr_port=8770
         chinese_url = os.environ["TOWNPASS_WHISPER_URL"] if chinese_model or not multi_url else multi_url
         taiwanese = taiwanese_provider(taiwanese_port) if whisper and taiwanese_port else None
         gate_url = f"http://127.0.0.1:{gate_port}" if multi_url and gate_port else None
+        # Needs the multilingual model: it tells Vietnamese from the other languages.
+        vietnamese = vietnamese_provider(vietnamese_port) if multi_url and vietnamese_port else None
         backend = server.Assistant()
         # Same process as the backend: a Chinese transcript the App does not know (no
         # service, command, book, sound-alike or FAQ question) may be Taiwanese (section 13).
         recognizer = asr_server.WhisperCppRecognizer(chinese_url, multi_url=multi_url, taiwanese=taiwanese,
-                                                     gate_url=gate_url, known_text=known_text(backend))
+                                                     gate_url=gate_url, vietnamese=vietnamese,
+                                                     known_text=known_text(backend))
         asr = ThreadingHTTPServer(("127.0.0.1", asr_port), asr_server.make_handler(recognizer, "whisper.cpp"))
         asr.daemon_threads = True
         assistant = ThreadingHTTPServer(("127.0.0.1", assistant_port), server.make_handler(backend))
@@ -212,7 +228,8 @@ def start(model_port=8771, whisper_port=8772, assistant_port=8765, asr_port=8770
             speech = (f"chinese whisper :{whisper_port}" if chinese_url != multi_url else "chinese = multilingual") + (
                 f", multilingual whisper :{multi_port}" if multi_url else "") + (
                 f", taiwanese whisper :{taiwanese_port} on first use" if taiwanese else "") + (
-                f", language gate :{gate_port}" if gate_url else "")
+                f", language gate :{gate_port}" if gate_url else "") + (
+                f", vietnamese whisper :{vietnamese_port} on first use" if vietnamese else "")
         faq_state = f", faq embed :{faq_port}" if faq_port and faq_dir else ", faq off"
         return (f"assistant :{assistant_port}, asr :{asr_port}, model :{model_port} ({server.MODEL}), "
                 f"{speech}{faq_state}")

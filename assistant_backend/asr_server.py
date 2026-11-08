@@ -93,13 +93,20 @@ PLAUSIBILITY_UNSURE = -6.0
 # "any": at any status; "unsure": only when judge() is unsure/unclear; None: off.
 # Needs a known_text callback (device_main); the computer backend has none.
 UNKNOWN_TO_TAIWANESE = "any"
+# Encoder frames for the Vietnamese model (PhoWhisper-small, docs/AI_VIETNAMESE.md):
+# fine-tuned on full 30 s windows, it wrote noise and repeated itself with the
+# shortened window the other models use (WER 13.9 % at 1500 on FLEURS vi).
+VIETNAMESE_MIN_AUDIO_CTX = 1500
 
 
 # Sentences in each language's own script (see WhisperCppRecognizer._fields).
 SCRIPT_PROMPTS = {"ja": "こんにちは。台北市のサービスについて質問します。",
                   "th": "สวัสดีครับ ขอสอบถามบริการของเมืองไทเป"}
-# A transcript in the detected language should contain its script.
-SCRIPTS = {"ja": re.compile(r"[぀-ヿ一-鿿]"), "th": re.compile(r"[฀-๿]")}
+# A transcript in the detected language should contain its script. Vietnamese is
+# written in Latin letters, but a Vietnamese transcript always has its own letters or
+# tone marks (ă â đ ê ô ơ ư, ạ ả ã …), which Indonesian text never has.
+SCRIPTS = {"ja": re.compile(r"[぀-ヿ一-鿿]"), "th": re.compile(r"[฀-๿]"),
+           "vi": re.compile(r"[àáảãạăằắẳẵặâầấẩẫậđèéẻẽẹêềếểễệìíỉĩịòóỏõọôồốổỗộơờớởỡợùúủũụưừứửữựỳýỷỹỵ]", re.I)}
 
 
 # Language decision (docs/AI_LANGUAGE_GATE.md). The chosen language is only a
@@ -128,12 +135,40 @@ SHORT_TEXT = 6
 # Whisper small decides as without a gate (tiny is often unsure about 1-2 s clips,
 # and wrongly sure of another language for ~1 % of short Chinese clips).
 GATE_SWITCH = 0.8
+# Vietnamese chosen (docs/AI_VIETNAMESE.md section 7): tiny hears short Vietnamese
+# as Chinese, even at 0.99 (owner's phone, 2026-11-08: gate zh 0.993 for 1.4 s of
+# Vietnamese, then a 4-character Chinese "translation" after a 32 s retry loop), far
+# more often than Chinese as Vietnamese (1 of 300 FLEURS clips at 0.8). With the menu
+# on one of these languages: the gate's Chinese verdict is never sure; Whisper small
+# detects with a detection-only pass (no decode, so no retry loop) and the candidates
+# are decoded without temperature retries; and when it then settles on Chinese alone
+# with less than CHINESE_SURE and a short or unsure Chinese text (the marks of a
+# translation), the chosen language is decoded too and the better transcript kept
+# (_choose). Both conditions: PhoWhisper writes confident Vietnamese for any audio, so
+# the two decodes' scores cannot be compared, and 3 s crops of Chinese speech are often
+# short or unsure by themselves (12 of 33 FLEURS crops flipped on the text alone, none
+# with both conditions; whole clips: 0 of 40).
+MENU_OVER_CHINESE = ("vi",)
+CHINESE_SURE = 0.9
 # whisper.cpp applies a request's audio_ctx only after detecting the language, so
 # detection uses the audio_ctx of the server's previous decode (1500, a full 30 s
 # window and 6x slower, on a server that never decoded). The gate is therefore primed
 # once with one short decode at GATE_CTX (256 frames = 5.1 s).
 GATE_CTX = 256
 STATUS_RANK = {"clear": 2, "unsure": 1, "unclear": 0}
+# Latin-script languages Whisper mixes up on short clips (owner, 2026-11-08: "Tôi muốn
+# mượn sách" came back as Indonesian). When one of them is picked and a rival has a real
+# chance (at least RIVAL_CHANCE in the gate or in Whisper small), or the transcript reads
+# as the rival (i18n.detect_text_language: "Toi muon muon sach" is unmarked Vietnamese),
+# the rival is decoded too and the better transcript is kept (_choose: a Vietnamese one
+# must contain Vietnamese letters, SCRIPTS). The menu language alone is no reason: on
+# FLEURS clips a decode forced into the menu language turned 8 of 24 Indonesian clips
+# into Vietnamese (docs/AI_LANGUAGE_GATE.md). Tagalog can be added here once it is one
+# of our languages (it is to replace Thai).
+RIVALS = {"id": ("vi",), "vi": ("id",)}
+# 0.1: on FLEURS vi/id clips 0.05 found one more right language but decoded the rival
+# twice as often (22 vs 10 of 436 clip-menu pairs).
+RIVAL_CHANCE = 0.1
 
 
 def language_scores(reply):
@@ -398,16 +433,26 @@ class WhisperCppRecognizer:
     automatically (taiwanese_gate; the second check and the same-speaker rule,
     see the TAIWANESE_* constants); then there is no notice when its model is
     missing: the clip simply takes the usual path.
+
+    Vietnamese (docs/AI_VIETNAMESE.md): vietnamese, when given, works like
+    taiwanese and returns (url, None) for a whisper-server with a Vietnamese
+    model (PhoWhisper-small), started on first use. Every Vietnamese decode
+    (_decode) then goes to it, without a prompt and with the full encoder window
+    (VIETNAMESE_MIN_AUDIO_CTX); the language is still detected as before. Without
+    it, or when it fails, the multilingual model decodes Vietnamese as before.
     """
 
-    def __init__(self, url, timeout=60, multi_url=None, taiwanese=None, gate_url=None, known_text=None):
+    def __init__(self, url, timeout=60, multi_url=None, taiwanese=None, gate_url=None, vietnamese=None,
+                 known_text=None):
         self.url = url.rstrip("/")
         self.multi_url = multi_url.rstrip("/") if multi_url else None
         self.taiwanese = taiwanese
-        # known_text(text) -> bool: does the App know this Chinese text (UNKNOWN_UNSURE_TO_TAIWANESE)?
+        # known_text(text) -> bool: does the App know this Chinese text (UNKNOWN_TO_TAIWANESE)?
         self.known_text = known_text
         self._models = None  # (taiwanese_gate model, plausibility model), read on first use
         self.taiwanese_until = 0.0  # same-speaker rule: lower threshold until then
+        self.vietnamese = vietnamese
+        self.vietnamese_reply = None  # the last decode made by the Vietnamese model
         self.gate_url = gate_url.rstrip("/") if gate_url and self.multi_url else None
         self.gate_primed = False
         self.timeout = timeout
@@ -436,10 +481,18 @@ class WhisperCppRecognizer:
 
     def taiwanese_url(self):
         """(url, None) for the Taiwanese whisper-server, or (None, reason)."""
-        if not callable(self.taiwanese):
+        return self._hook_url(self.taiwanese)
+
+    def vietnamese_url(self):
+        """(url, None) for the Vietnamese whisper-server, or (None, reason)."""
+        return self._hook_url(self.vietnamese)
+
+    @staticmethod
+    def _hook_url(hook):
+        if not callable(hook):
             return None, "missing"
         try:
-            url, reason = self.taiwanese()
+            url, reason = hook()
         except Exception:
             return None, "failed"
         if url:
@@ -514,7 +567,19 @@ class WhisperCppRecognizer:
         return self._post(url, fields, wav)
 
     def _decode(self, wav, seconds, language, fallback=True):
-        """One decode in language: Chinese on the Chinese model, others on the multilingual one."""
+        """One decode in language: Chinese on the Chinese model, Vietnamese on the
+        Vietnamese model when there is one, others on the multilingual one."""
+        if language == "vi" and self.vietnamese:
+            url, _ = self.vietnamese_url()
+            if url:
+                try:
+                    # One pass: no retry loop was seen in 260 clips at the full window,
+                    # and a retry would only add seconds to a bad clip.
+                    self.vietnamese_reply = self._infer(url, wav, seconds, "vi", prompt=False, fallback=False,
+                                                        minimum_ctx=VIETNAMESE_MIN_AUDIO_CTX)
+                    return self.vietnamese_reply
+                except (OSError, ValueError):
+                    pass  # the multilingual model below, as without the Vietnamese model
         return self._infer(self.url if language == "zh" else self.multi_url, wav, seconds, language,
                            fallback=fallback)
 
@@ -555,14 +620,43 @@ class WhisperCppRecognizer:
     def _decide(self, wav, seconds, chosen, scores, decodes):
         """Decode the candidate languages for scores, reusing decodes already made,
         and return (reply, language, confidence)."""
+        self.scores.append(scores)
         order = candidate_languages(scores, chosen)
         for language in order:
             if language not in decodes:
                 # Only a clip's first request keeps the temperature fallback.
                 decodes[language] = self._decode(wav, seconds, language, fallback=self.passes == 0)
+        if order == ["zh"] and chosen in MENU_OVER_CHINESE and scores.get("zh", 0) < CHINESE_SURE:
+            text, logprob, no_speech = self.summarize(decodes["zh"])
+            text = traditional(text)
+            if judge(text, logprob, no_speech, "zh") != "clear" or len(re.sub(r"[\W_]", "", text)) <= SHORT_TEXT:
+                order.append(chosen)  # a short or unsure Chinese text: likely a translation
+                decodes[chosen] = self._decode(wav, seconds, chosen, fallback=False)
         used = self._choose(decodes, order) if len(order) > 1 else order[0]
         self.candidates = order
         return decodes[used], used, scores.get(used)
+
+    def _rivals(self, wav, seconds, reply, used, confidence):
+        """Second opinion for languages Whisper mixes up (RIVALS); returns
+        (reply, language, confidence). Decodes made for this clip are reused."""
+        if used not in RIVALS:
+            return reply, used, confidence
+        import i18n
+        reads_as = i18n.detect_text_language(self.summarize(reply)[0], fallback=used)
+        rivals = [r for r in RIVALS[used] if r in LANGUAGES and (
+            reads_as == r or any(s.get(r, 0) >= RIVAL_CHANCE for s in self.scores))]
+        if not rivals:
+            return reply, used, confidence
+        self.decodes[used] = reply
+        for rival in rivals:
+            if rival not in self.decodes:
+                self.decodes[rival] = self._decode(wav, seconds, rival, fallback=False)
+        order = [used, *rivals]
+        best = self._choose(self.decodes, order)
+        self.candidates = list(dict.fromkeys([*(self.candidates or [used]), *rivals]))
+        if best == used:
+            return reply, used, confidence
+        return self.decodes[best], best, max((s.get(best) for s in self.scores if s.get(best)), default=None)
 
     def transcribe(self, frames, language="zh"):
         """language: one of SPEECH_LANGUAGES; the result names the language used."""
@@ -572,6 +666,8 @@ class WhisperCppRecognizer:
         confidence = None
         notice = None
         self.passes, self.gate_ms, self.candidates = 0, None, None
+        self.decodes, self.scores = {}, []  # this clip's decodes by language, and detections
+        self.vietnamese_reply = None
         requested = language
         buffer = io.BytesIO()
         with wave.open(buffer, "wb") as audio:
@@ -588,15 +684,20 @@ class WhisperCppRecognizer:
                 language = "zh"  # without the Taiwanese model: a plain Chinese decode below
             gate = self._gate(wav, seconds) if detectable else None
             heard = language_scores(gate) if gate is not None else {}
+            if heard:
+                self.scores.append(heard)
             top = max(heard, key=heard.get) if heard else None
             menu = language if language in LANGUAGES else "zh"
             sure = top if top and heard[top] >= (CLEAR_LANGUAGE if top == menu else GATE_SWITCH) else None
+            if sure == "zh" and menu in MENU_OVER_CHINESE:
+                sure = None  # tiny mistakes Vietnamese for Chinese: let Whisper small detect
             route = "chosen" if taiwanese else None
             score = None
             # The gate picked another of our languages (sure of it): that language is
             # decoded and nothing Taiwanese runs (a Vietnamese clip once scored 0.71).
             other_language = sure is not None and sure != "zh"
             automatic = auto_taiwanese(requested) and self.taiwanese is not None and not other_language
+            taiwanese_by_gate = False  # the gate score says Taiwanese (decided below)
             if gate is not None and automatic and self.taiwanese_model:
                 # Taiwanese heard automatically (section 12); no notice when its model is missing.
                 import taiwanese_gate
@@ -604,7 +705,11 @@ class WhisperCppRecognizer:
                 threshold = TAIWANESE_GATE_SCORE
                 if TAIWANESE_STICKY_SCORE is not None and time.monotonic() < self.taiwanese_until:
                     threshold = min(threshold, TAIWANESE_STICKY_SCORE)
-                if score >= threshold:
+                taiwanese_by_gate = score >= threshold
+                # Menu on Vietnamese (MENU_OVER_CHINESE): the gate's Chinese side is not
+                # trusted for this menu, so its Taiwanese verdict waits for Whisper
+                # small's detection below (Vietnamese speech then goes to its own model).
+                if taiwanese_by_gate and menu not in MENU_OVER_CHINESE:
                     taiwanese = self.taiwanese_url()[0]
                     if taiwanese:
                         route = "gate" if score >= TAIWANESE_GATE_SCORE else "sticky"
@@ -634,19 +739,44 @@ class WhisperCppRecognizer:
                 reply = self._infer(self.url, wav, seconds, used)
                 if detectable:
                     reply, used, confidence = self._check_chinese(wav, seconds, reply)
+            elif language in MENU_OVER_CHINESE and (self.vietnamese or taiwanese_by_gate):
+                # Detection only (encoder and one step: cannot loop), then the
+                # candidates are decoded without retries (MENU_OVER_CHINESE). With the
+                # Vietnamese model its decode is never reused, so nothing is lost;
+                # without it (and no Taiwanese verdict to check) the decode below is
+                # reused as before.
+                probe = self._infer(self.multi_url, wav, seconds, "auto", detect_only=True)
+                probed = language_scores(probe)
+                probe_top = max(probed, key=probed.get) if probed else None
+                if taiwanese_by_gate and (probe_top is None or probe_top not in LANGUAGES or probe_top == "zh"):
+                    # Not another of our languages: the gate's Taiwanese verdict applies.
+                    taiwanese = self.taiwanese_url()[0]
+                    if taiwanese:
+                        route = "gate" if score >= TAIWANESE_GATE_SCORE else "sticky"
+                        try:
+                            reply, used = self._infer(taiwanese, wav, seconds, "zh", prompt=False,
+                                                      minimum_ctx=TAIWANESE_MIN_AUDIO_CTX, fallback=False), "zh"
+                        except (OSError, ValueError):
+                            taiwanese, route = None, None
+                if reply is None:
+                    reply, used, confidence = self._decide(wav, seconds, language, probed, self.decodes)
             else:
                 # Detect with the multilingual model; its decode in the detected
                 # language is reused, then decide as with the gate.
                 auto = self._infer(self.multi_url, wav, seconds, "auto")
                 detected = language_code(auto.get("language"), default=None)
-                decodes = {}
+                decodes = self.decodes
                 if (detected in LANGUAGES and (detected != "zh" or self.url == self.multi_url)
+                        and not (detected == "vi" and self.vietnamese and self.vietnamese_url()[0])
                         and (detected not in SCRIPTS or SCRIPTS[detected].search(self.summarize(auto)[0] or ""))):
-                    # Not reused: Chinese when a separate Chinese model exists, and
-                    # Japanese or Thai written in Latin letters (redone with a prompt
-                    # in their own script).
+                    # Not reused: Chinese when a separate Chinese model exists,
+                    # Vietnamese when there is a Vietnamese model, and Japanese or
+                    # Thai written in Latin letters (redone with a prompt in their
+                    # own script).
                     decodes[detected] = auto
                 reply, used, confidence = self._decide(wav, seconds, language, language_scores(auto), decodes)
+            if detectable and not taiwanese:
+                reply, used, confidence = self._rivals(wav, seconds, reply, used, confidence)
             if automatic:
                 reply, taiwanese, route, confidence = self._taiwanese_after(
                     wav, seconds, score, reply, used, taiwanese, route, confidence)
@@ -658,6 +788,7 @@ class WhisperCppRecognizer:
                   "no_speech_prob": no_speech, "passes": self.passes, "requested_language": requested,
                   "language_confidence": confidence,
                   **({"speech_model": "taiwanese"} if taiwanese else {}),
+                  **({"speech_model": "vietnamese"} if reply is self.vietnamese_reply else {}),
                   **({"notice": notice} if notice else {})}
         if route or score is not None or (auto_taiwanese(requested) and self.taiwanese is not None):
             # Timing log only: how Taiwanese was decided, and how Mandarin-like the text reads.
@@ -759,7 +890,8 @@ class WhisperCppRecognizer:
         text, logprob, no_speech = self.summarize(reply)
         if not text:
             return reply, "zh", None
-        decodes = {"zh": reply}
+        decodes = self.decodes
+        decodes["zh"] = reply
         if cjk_ratio(text) < 0.5 or judge(text, logprob, no_speech) != "clear":
             other = self._infer(self.multi_url, wav, seconds, "auto", fallback=False)
             detected = language_code(other.get("language"), default=None)

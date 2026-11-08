@@ -11,6 +11,9 @@
 #   ggml-whisper-taiwanese.bin     -Taiwanese (optional, Breeze-ASR-26 q8_0, 1.5 GB): loaded
 #                                   only when Taiwanese is chosen (docs/AI_TAIWANESE_SPEECH_PLAN.md
 #                                   section 10); -Taiwanese "" (default) removes it from the phone
+#   ggml-whisper-vietnamese.bin    -Vietnamese (optional, VinAI PhoWhisper-small q8_0, 264 MB):
+#                                   decodes every Vietnamese clip, loaded on first use
+#                                   (docs/AI_VIETNAMESE.md); -Vietnamese "" (default) removes it
 #   ggml-whisper-langid.bin        -LanguageGate (optional, default Whisper tiny q8_0, 43 MB):
 #                                   detects the speech language (~0.2 s) before the
 #                                   multilingual model decodes (docs/AI_LANGUAGE_GATE.md);
@@ -33,6 +36,7 @@ param(
     [string]$Multilingual = "D:\TownPassAssistant\models\asr-ablation\ggml-small-q8_0.bin",
     [string]$Chinese = "",
     [string]$Taiwanese = "",
+    [string]$Vietnamese = "",
     [string]$LanguageGate = "D:\TownPassAssistant\models\asr-ablation\ggml-tiny-q8_0.bin",
     [string]$FaqModel = "D:\TownPassAssistant\models\device\multilingual-e5-small-q8_0.gguf",
     [string]$FaqIndex = (Join-Path $env:LOCALAPPDATA "TownPassAssistant\faq_rag"),
@@ -77,6 +81,11 @@ if ($Taiwanese) {
     Push-Model $Taiwanese "ggml-whisper-taiwanese.bin"
 } else {
     & $adb -s $DeviceId shell rm -f "$target/ggml-whisper-taiwanese.bin"
+}
+if ($Vietnamese) {
+    Push-Model $Vietnamese "ggml-whisper-vietnamese.bin"
+} else {
+    & $adb -s $DeviceId shell rm -f "$target/ggml-whisper-vietnamese.bin"
 }
 if (-not $LanguageGate) {
     & $adb -s $DeviceId shell rm -f "$target/ggml-whisper-langid.bin"

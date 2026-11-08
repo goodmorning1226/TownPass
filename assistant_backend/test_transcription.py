@@ -123,6 +123,19 @@ class RepetitionLoopTests(unittest.TestCase):
         for text in ("我要借書", "借書順便繳水費", "我想看看書", "哈哈哈", "第二個", "水費跟地方稅", "停車費停車"):
             self.assertEqual(clean_transcript(text), text)
 
+    def test_spaced_languages_repeat_whole_words_only(self):
+        # Vietnamese syllables share letters ("phản ảnh" holds "ản" twice; on 2026-11-08
+        # it was cut to "phảnh" and the request was lost): only whole words collapse.
+        from server import clean_transcript
+        for text in ("Tôi muốn phản ảnh", "Tôi muốn xem tin nhắn mới nhất", "Mở trang chủ", "Xin chào",
+                     "I want to lend a book"):
+            self.assertEqual(clean_transcript(text + "."), text)
+        self.assertEqual(clean_transcript("Hân Tìm, Hân Tìm, Hân Tìm, Hân Tìm!"), "Hân Tìm")
+        self.assertEqual(clean_transcript("tôi muốn đóng tiền nước tôi muốn đóng tiền nước tôi muốn"),
+                         "tôi muốn đóng tiền nước")
+        self.assertEqual(clean_transcript("I want to lend a book I want to lend a book, I want"),
+                         "I want to lend a book")
+
 
 class ReadWavTests(unittest.TestCase):
     def test_accepts_only_short_16k_mono_pcm16(self):
