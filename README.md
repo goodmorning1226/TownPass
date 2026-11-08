@@ -43,7 +43,6 @@ Developer guide: [ASSISTANT_README.md](ASSISTANT_README.md).
 - [怎麼跑](#怎麼跑)
 - [專案結構](#專案結構)
 - [文件索引](#文件索引)
-- [團隊](#團隊)
 - [授權](#授權)
 - [致謝](#致謝)
 
