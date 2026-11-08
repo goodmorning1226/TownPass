@@ -130,6 +130,66 @@ def _serve(server):
     return thread
 
 
+class Listener:
+    """A loopback HTTP server that can be opened again on the same port.
+
+    iOS reclaims a suspended App's listening sockets: after the phone was locked
+    the port refuses connections although the App still runs, and the App said
+    it could not reach the assistant (2026-11-08). watch() notices and re-opens.
+    """
+
+    def __init__(self, port, handler, timeout=None):
+        self.port = port
+        self.handler = handler
+        self.timeout = timeout
+        self.server = None
+
+    def open(self):
+        from http.server import ThreadingHTTPServer
+        server = ThreadingHTTPServer(("127.0.0.1", self.port), self.handler)
+        server.daemon_threads = True
+        if self.timeout is not None:
+            server.timeout = self.timeout
+        self.server = server
+        _serve(server)
+        return self
+
+    def alive(self):
+        import socket
+        try:
+            with socket.create_connection(("127.0.0.1", self.port), timeout=1):
+                return True
+        except OSError:
+            return False
+
+    def reopen(self):
+        old = self.server
+        if old is not None:
+            # shutdown() waits for serve_forever, which may have died on the dead socket.
+            stopper = threading.Thread(target=old.shutdown, daemon=True)
+            stopper.start()
+            stopper.join(3)
+            try:
+                old.server_close()
+            except OSError:
+                pass
+        self.open()
+
+
+def watch(listeners, interval=2.0, stop=None):
+    """Re-opens any listener whose port stopped accepting connections; runs until stop is set."""
+    stop = stop or threading.Event()
+    while not stop.wait(interval):
+        for listener in listeners:
+            if listener.alive():
+                continue
+            try:
+                listener.reopen()
+                print(f"listener :{listener.port} reopened", flush=True)
+            except OSError as error:  # still suspended or the port is not free yet: next round
+                print(f"listener :{listener.port} not reopened yet ({error.errno})", flush=True)
+
+
 def start(model_port=8771, whisper_port=8772, assistant_port=8765, asr_port=8770, whisper=True,
           multi_port=None, chinese_model=True, faq_port=None, faq_dir=None, taiwanese_port=None,
           decision_model="ministral", gate_port=None):
@@ -156,7 +216,6 @@ def start(model_port=8771, whisper_port=8772, assistant_port=8765, asr_port=8770
         if _started.is_set():
             return "already running"
         configure(model_port, whisper_port, faq_port=faq_port, faq_dir=faq_dir, decision_model=decision_model)
-        from http.server import ThreadingHTTPServer
         import asr_server
         import server
         multi_url = f"http://127.0.0.1:{multi_port}" if whisper and multi_port else None
@@ -165,14 +224,12 @@ def start(model_port=8771, whisper_port=8772, assistant_port=8765, asr_port=8770
         gate_url = f"http://127.0.0.1:{gate_port}" if multi_url and gate_port else None
         recognizer = asr_server.WhisperCppRecognizer(chinese_url, multi_url=multi_url, taiwanese=taiwanese,
                                                      gate_url=gate_url)
-        asr = ThreadingHTTPServer(("127.0.0.1", asr_port), asr_server.make_handler(recognizer, "whisper.cpp"))
-        asr.daemon_threads = True
+        asr = Listener(asr_port, asr_server.make_handler(recognizer, "whisper.cpp"))
         backend = server.Assistant()
-        assistant = ThreadingHTTPServer(("127.0.0.1", assistant_port), server.make_handler(backend))
-        assistant.daemon_threads = True
-        assistant.timeout = 150
-        _serve(asr)
-        _serve(assistant)
+        assistant = Listener(assistant_port, server.make_handler(backend), timeout=150)
+        asr.open()
+        assistant.open()
+        threading.Thread(target=watch, args=([asr, assistant],), name="assistant-listeners", daemon=True).start()
         if faq_port and faq_dir:
             threading.Thread(target=_load_faq, args=(backend,), name="assistant-faq", daemon=True).start()
             # Version C uses the same e5 server; its catalogue vectors are built (or read

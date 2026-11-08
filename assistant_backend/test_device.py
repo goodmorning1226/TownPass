@@ -732,3 +732,63 @@ class DecisionModelTests(unittest.TestCase):
             self.assertEqual(os.environ["TOWNPASS_DECISION_MODEL"], "gemma")
             device_main.configure(8771, 8772)
             self.assertEqual(os.environ["TOWNPASS_DECISION_MODEL"], "ministral")
+
+
+class ListenerTests(unittest.TestCase):
+    """iOS takes a suspended App's listening sockets; device_main opens them again."""
+
+    class Hello(BaseHTTPRequestHandler):
+        def log_message(self, *args):
+            pass
+
+        def do_GET(self):
+            self.send_response(200)
+            self.send_header("Content-Length", "2")
+            self.end_headers()
+            self.wfile.write(b"ok")
+
+    @staticmethod
+    def free_port():
+        import socket
+        with socket.socket() as probe:
+            probe.bind(("127.0.0.1", 0))
+            return probe.getsockname()[1]
+
+    def get(self, port):
+        import urllib.request
+        with urllib.request.urlopen(f"http://127.0.0.1:{port}/", timeout=3) as reply:
+            return reply.read()
+
+    def test_a_lost_listening_socket_is_opened_again_on_the_same_port(self):
+        import threading
+        import device_main
+        port = self.free_port()
+        listener = device_main.Listener(port, self.Hello).open()
+        stop = threading.Event()
+        watcher = threading.Thread(target=device_main.watch, args=([listener],), kwargs={"interval": 0.1, "stop": stop})
+        watcher.start()
+        self.addCleanup(lambda: (stop.set(), watcher.join(), listener.server.shutdown(), listener.server.server_close()))
+        self.assertEqual(self.get(port), b"ok")
+        lost = listener.server
+        lost.socket.close()  # what the system does to a suspended iOS App
+        self.assertFalse(listener.alive())
+        for _ in range(50):
+            if listener.server is not lost and listener.alive():
+                break
+            threading.Event().wait(0.1)
+        self.assertIsNot(listener.server, lost)
+        self.assertEqual(self.get(port), b"ok")
+
+    def test_a_working_listener_is_left_alone(self):
+        import threading
+        import device_main
+        listener = device_main.Listener(self.free_port(), self.Hello).open()
+        self.addCleanup(lambda: (listener.server.shutdown(), listener.server.server_close()))
+        stop = threading.Event()
+        watcher = threading.Thread(target=device_main.watch, args=([listener],), kwargs={"interval": 0.05, "stop": stop})
+        server = listener.server
+        watcher.start()
+        threading.Event().wait(0.3)
+        stop.set()
+        watcher.join()
+        self.assertIs(listener.server, server)

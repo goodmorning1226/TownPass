@@ -5,6 +5,7 @@ import 'dart:typed_data';
 
 import 'package:town_pass/bean/assistant_result.dart';
 import 'package:town_pass/page/assistant/assistant_texts.dart';
+import 'package:town_pass/service/assistant_on_device.dart';
 
 /// Recognised speech. When [confirm] is true the user must pick one of
 /// [options] (the heard text first) before anything is sent. When
@@ -48,6 +49,11 @@ class AssistantService {
 
   AssistantService({this.endpoint = baseUrl});
 
+  /// On-device builds run the assistant on the phone, not on a computer.
+  static const _unreachable = AssistantOnDevice.requested
+      ? 'unreachableOnDevice'
+      : 'unreachable';
+
   /// An App error line in [language] (the turn's language), or in the page
   /// language when that is not known. Backend `error` texts pass through.
   static FormatException _error(String key, [String? language]) =>
@@ -86,7 +92,7 @@ class AssistantService {
     } on TimeoutException {
       throw _error('turnTimeout', language);
     } on SocketException {
-      throw _error('unreachable', language);
+      throw _error(_unreachable, language);
     } on HttpException {
       throw _error('turnDisconnected', language);
     } finally {
@@ -269,7 +275,7 @@ class AssistantService {
     } on TimeoutException {
       throw _error('transcriptionTimeout');
     } on SocketException {
-      throw _error('unreachable');
+      throw _error(_unreachable);
     } on HttpException {
       throw _error('transcriptionDisconnected');
     } finally {

@@ -32,3 +32,6 @@ Runner/GeneratedPluginRegistrant.*
 !default.mode2v3
 !default.pbxuser
 !default.perspectivev3
+
+# On-device assistant frameworks (scripts/setup_ios_on_device.sh), not in git
+OnDevice/

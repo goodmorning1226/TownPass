@@ -603,6 +603,17 @@ abstract final class AssistantTexts {
       'id': 'Tidak dapat terhubung ke asisten di komputer. Periksa backend dan koneksi perangkat.',
       'th': 'เชื่อมต่อผู้ช่วยบนคอมพิวเตอร์ไม่ได้ โปรดตรวจสอบแบ็กเอนด์และการเชื่อมต่อของอุปกรณ์',
     },
+    // On-device builds (ASSISTANT_ON_DEVICE): the assistant runs on the phone.
+    'unreachableOnDevice': {
+      'zh': '手機上的助理還在啟動，或剛從背景回來，請稍候幾秒再試一次。',
+      'en':
+          'The assistant on this phone is still starting or just came back from '
+          'the background. Wait a few seconds and try again.',
+      'ja': 'この端末のアシスタントは起動中か、バックグラウンドから戻ったところです。数秒待ってからもう一度お試しください。',
+      'vi': 'Trợ lý trên điện thoại đang khởi động hoặc vừa quay lại từ nền. Hãy đợi vài giây rồi thử lại.',
+      'id': 'Asisten di ponsel ini masih dimulai atau baru kembali dari latar belakang. Tunggu beberapa detik lalu coba lagi.',
+      'th': 'ผู้ช่วยในโทรศัพท์กำลังเริ่มทำงานหรือเพิ่งกลับจากเบื้องหลัง โปรดรอสักครู่แล้วลองอีกครั้ง',
+    },
     'turnDisconnected': {
       'zh': '助理連線中斷，請重試或使用原服務入口。',
       'en':

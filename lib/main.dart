@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:town_pass/service/page_translation.dart';
 import 'package:flutter/foundation.dart';
@@ -17,6 +19,7 @@ import 'package:town_pass/page/assistant/assistant_view_controller.dart';
 import 'package:town_pass/page/assistant/widget/assistant_host.dart';
 import 'package:town_pass/page/guided_assistant/guided_assistant_controller.dart';
 import 'package:town_pass/page/guided_assistant/model/guide_i18n.dart';
+import 'package:town_pass/service/assistant_on_device.dart';
 import 'package:town_pass/service/assistant_recorder.dart';
 import 'package:town_pass/service/assistant_service.dart';
 import 'package:town_pass/page/guided_assistant/web/web_page_state.dart';
@@ -78,6 +81,11 @@ Future<void> initServices() async {
   await PageTranslation.instance.load();
   // The guided assistant's pre-translated texts (assets/i18n/guide/).
   if (_useMock) await GuideI18n.load();
+  // iOS builds with ASSISTANT_ON_DEVICE=true run the backend and models on the
+  // phone (docs/AI_ON_DEVICE_IOS.md); not awaited: the models load behind it.
+  if (assistantEnabled && !assistantOffline) {
+    unawaited(AssistantOnDevice.start());
+  }
   if (_useMock) {
     Get.put<WebPageState>(WebPageState(), permanent: true);
     Get.put<GuidedAssistantController>(

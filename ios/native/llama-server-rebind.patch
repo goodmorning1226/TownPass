@@ -1,0 +1,33 @@
+diff --git a/tools/server/server-http.cpp b/tools/server/server-http.cpp
+index cf147c7..1c36fa8 100644
+--- a/tools/server/server-http.cpp
++++ b/tools/server/server-http.cpp
+@@ -529,9 +529,26 @@ bool server_http_context::start() {
+     pimpl->pool = std::make_unique<httplib::ThreadPool>(pimpl->n_threads_http, pimpl->n_threads_http + 1024);
+     for (size_t i = 0; i < pimpl->servers.size(); ++i) {
+         const auto & srv = pimpl->servers[i];
+-        pimpl->threads.emplace_back([srv = srv.get(), addr = listening_addresses[i]] {
+-            if (!srv->listen_after_bind()) {
++        const bool rebind = !string_ends_with(pimpl->hosts[i], ".sock");
++        pimpl->threads.emplace_back([srv = srv.get(), addr = listening_addresses[i], host = pimpl->hosts[i], bind_port = port, rebind] {
++            // TownPass iOS: a suspended App loses its listening sockets (the system
++            // reclaims them); listen_after_bind() then fails although nobody called
++            // stop(). Bind the same port again and keep serving, with the model still
++            // loaded. stop() makes listen_after_bind() return true, which ends this loop.
++            while (!srv->listen_after_bind()) {
+                 SRV_ERR("listener on %s stopped unexpectedly\n", addr.c_str());
++                if (!rebind) {
++                    break;
++                }
++                bool bound = false;
++                for (int attempt = 0; !bound && attempt < 3600; attempt++) {
++                    std::this_thread::sleep_for(std::chrono::seconds(1));
++                    bound = srv->bind_to_port(host, bind_port);
++                }
++                if (!bound) {
++                    break;
++                }
++                SRV_INF("listener on %s bound again\n", addr.c_str());
+             }
+         });
+         srv->wait_until_ready();
