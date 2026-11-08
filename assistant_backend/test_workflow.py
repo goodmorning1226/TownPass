@@ -208,5 +208,29 @@ class WorkflowTests(unittest.TestCase):
         self.assertTrue(all(e['mode'] in ('demo', 'local') for e in Registry().entries))
 
 
+class KnownTextTests(unittest.TestCase):
+    """Workflow.known_text: what the App knows, by word or sound (asr_server lets the
+    Taiwanese model try unsure Chinese that matches nothing; section 13)."""
+
+    def setUp(self):
+        self.app = Assistant(FakeCatalog(), lambda *_: response('request_clarification'))
+        self.known = self.app.workflow.known_text
+
+    def test_requests_commands_books_and_sound_alikes_are_known(self):
+        self.app.catalog._data = self.app.catalog.books()  # cached: titles and authors count
+        for text in ('借書', '我要繳水費', '下一頁', '第二個', '弟二個', '取消', '你好', '謝謝你喔', '有哪些功能', '你會做什麼',
+                     '我要解釋', '繳水廢', '借龜兔賽跑', '找一本書', '查我的借閱紀錄', '神奇柑仔店', '我想借原子習慣', '好的', '早安啊小幫手'):
+            self.assertTrue(self.known(text), text)
+
+    def test_strange_chinese_is_not_known(self):
+        for text in ('溫刀揮袖促', '竟然放第一是從事進來', '狂風冰雹過兩天', '我問過律師跟法律人', '', '   '):
+            self.assertFalse(self.known(text), text)
+
+    def test_no_network_for_the_book_list(self):
+        self.app.catalog._data = None  # not loaded: titles are simply not consulted
+        self.assertFalse(self.known('神奇柑仔店'))
+        self.assertTrue(self.known('借書'))
+
+
 if __name__ == '__main__':
     unittest.main()

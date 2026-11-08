@@ -1,6 +1,9 @@
 # 台語語音規劃（V8）：辨識與朗讀
 
-狀態：2026-11-08 調查，App 尚未實作。第 1–8 節是調查與建議；第 9 節是同日完成的模型轉檔與手機速度實測（App 程式沒有改）。
+狀態：2026-11-08 調查。第 1–8 節是調查與建議；第 9 節是同日完成的模型轉檔與手機速度實測；
+第 10 節是電腦上的公開測試集評估，以及 App 的「台語（測試）」選項（branch `feat/taiwanese-asr`，尚未在手機上驗收）；
+第 11 節比較「台語放進自動判斷」與「台語只能手動選」（只做了一部分，已暫停）；
+第 12 節是**現在 App 的做法**：台語自動辨識（語言閘門上的分類器），第 13 節是「中文聽起來很怪就當台語」的補救規則（commit `d63bf32` 起）。
 文中「待實測」的數字都是推估，要等第 6 節的評估跑完才算數。
 相關文件：[語音消融](AI_ASR_ABLATION.md)、[多國語言](AI_MULTILINGUAL_PLAN.md)、[裝置端執行](AI_ON_DEVICE_PLAN.md)、[介面與語音](AI_VOICE_UI_PLAN.md) V8。
 
@@ -366,3 +369,252 @@ alexachang 這個模型是唯一「台語聲音 → 華語漢字」的 small 級
 3. 台語模式不送詞彙提示的改法，以及「第一次切到台語」的載入時間，要在 App 裡實作後再量。
 4. Breeze-26 散布時要自備 Apache-2.0 全文與修改說明（模型庫沒有 LICENSE 檔）。
 5. iOS 沒有測。
+
+## 10. 電腦上的評估與 App 的「台語（測試）」選項（2026-11-08）
+
+擁有者 2026-11-08 的決定：台語辨識採用 **Breeze-ASR-26 q8_0**；alexachang/whisper-hokkien-mandarin 只能拿來比較，**不可以放進 App**
+（訓練資料不明，可能用了只限學術的 TAT）。擁有者不會說台語，所以先用公開測試集評估，不錄音。
+
+### 10.1 測試資料
+
+- 來源：Hugging Face `adi-gov-tw/Taiwan-Tongues-ASR-CE-dataset-hokkien`（版本 `ffcc36b`，不必登入）。裡面是 Common Voice nan-tw 的片段（原本 CC0），
+  重新打包時附上 TRAIL v0.1 授權。TRAIL-D 第四節寫「資料集可自由使用、再分發、修改」，所以可以在本機評估。沒有用 TAT。
+- 放在 `D:\TownPassAssistant\models\taiwanese\eval-data\`（`adi-hokkien\` 是原始 tar、LICENSE、README，`wav\` 是轉好的 16 kHz 單聲道檔），**不在 repo 裡**。
+- 兩組：
+  - **測試組**：test 分割的全部 323 段（大多是單詞或俗語，不是服務請求，所以**不應該導航**）。
+  - **服務詞組**：train 分割裡參考文字含服務詞的 150 段（例如「繳稅」「警察局」「新店區公所」「明仔載市政府有活動，汝敢欲參加」）。
+    服務詞清單在 `scripts/taiwanese_asr_eval.py` 的 `SERVICE_WORDS`、`SERVICE_PHRASES`。「冊」「讀冊」算「書」，「納錢」「繳」算繳費。
+- 電腦上 Breeze 很慢（其他工作也在用 CPU），所以比較用**固定的隨機 100 段**（兩組各 50 段，種子 `20261108`）。
+  q4_K 與「加提示」只跑其中 50 段（各 25 段，是 100 段的子集）。現在的 Whisper small 兩組全部 473 段都跑了。
+
+**參考文字與 CER**：資料只有**台語漢字**（加括號裡的台羅），沒有華語翻譯。CER 是拿模型輸出（華語）對台語漢字算的：去掉括號裡的台羅、
+轉成繁體、「臺」改成「台」、只留漢字與英數字。台語漢字和華語詞不一樣（「冊」對「書」、「汝」對「你」），**CER 偏高，只能拿來比較模型之間**，
+不是「聽錯的比例」。表中「CER（整理後）」是 App 實際送出的文字：先用 `server.clean_transcript` 去掉重複迴圈。
+
+### 10.2 設定
+
+電腦版 whisper.cpp v1.9.5 的 `whisper-server`（MSYS2 UCRT64 建置），啟動參數同 App：`-t 6 -l zh`。請求走 `asr_server.WhisperCppRecognizer`，
+欄位同 App（`temperature 0`、`temperature_inc 0.4`、`suppress_nst`、依長度算 `audio_ctx`）。「台語路徑」就是 App 選台語時的請求：`-l zh`、**沒有詞彙提示**、
+`audio_ctx` 至少 500（見 10.4）。電腦上的秒數受其他工作影響很大（CPU 約 90% 被占用），只能當相對參考；手機時間看第 9.4 節。
+
+### 10.3 結果
+
+**固定 100 段**（測試組 50＋服務詞組 50）：
+
+| 模型與設定 | 每段 CER 中位數 | CER（整理後） | 電腦秒數 中位數／平均／最長 | 空白或聽不清 | 重複迴圈 | 保留服務詞 | 測試組被導航 | 服務詞組被導航 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 現在的 Whisper small q8_0（中文＋詞彙提示，App 中文模式） | 1.00 | 0.83 | 1.2／2.7／28 | 14% | 0% | 6/50 | 1/50 | 2/50 |
+| **Breeze-26 q8_0，台語路徑** | **0.67** | 0.85 | 5.4／6.9／114 | 3% | 2% | **32/50** | **0/50** | 12/50 |
+| alexachang q8_0，台語路徑（只比較，不可放進 App） | 0.67 | 0.66 | 0.9／1.0／2 | 2% | 0% | 27/50 | 0/50 | 11/50 |
+
+**其中 50 段**（各 25 段）：
+
+| 模型與設定 | 每段 CER 中位數 | CER（整理後） | 電腦秒數 中位數／平均 | 空白或聽不清 | 保留服務詞 | 測試組被導航 | 服務詞組被導航 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 現在的 Whisper small q8_0（中文＋提示） | 1.00 | 0.79 | 1.2／2.7 | 12% | 3/25 | 0/25 | 2/25 |
+| **Breeze-26 q8_0，台語路徑** | 0.67 | **0.47** | 5.2／5.4 | 2% | **18/25** | 0/25 | 6/25 |
+| Breeze-26 q8_0，加 App 的中文詞彙提示（audio_ctx 也至少 500） | 0.67 | 0.52 | 6.2／6.4 | 2% | 16/25 | 0/25 | 5/25 |
+| Breeze-26 q4_K，台語路徑 | 0.67 | 0.48 | 3.9／4.0 | 2% | 17/25 | 0/25 | 6/25 |
+| alexachang q8_0，台語路徑 | 0.71 | 0.72 | 0.9／1.0 | 2% | 14/25 | 0/25 | 6/25 |
+
+**修正前**（Breeze-26 q8_0、沒有提示、audio_ctx 照中文用最少 256，只跑到 70 段就停）：測試組 50 段裡 22% 重複迴圈、
+CER（整理後）4.7、每段平均 19 秒；服務詞組 20 段裡一半變成聽不清，每段平均 69 秒，最長超過 2 分鐘。
+
+**解讀**
+- Breeze-26 比現在的 Whisper small 好很多：保留服務詞 32/50 對 6/50，每段 CER 中位數 0.67 對 1.00。Whisper small 對台語多半寫出無意義的字（第 9.3 節）。
+  好的例子：「明仔載市政府有活動，汝敢欲參加」→「明天市政府有活動 你要參加嗎」、「納稅」→「繳稅」、「囡仔冊」→「童書」。
+- 100 段的 CER（整理後）Breeze 是 0.85，比 50 段的 0.47 高很多，主要是 1 段仍然重複迴圈（114 秒、輸出很長）。audio_ctx 500 沒有完全消除迴圈（2%）。
+- **加詞彙提示沒有比較好**（保留服務詞 16/25 對 18/25），而且每段多約 1 秒。照第 9.4 節的結論，台語路徑不送提示。
+- q4_K 和 q8_0 在 50 段上差不多（17/25 對 18/25），電腦上比較快；但手機上 q4_K 反而比較慢（第 9.4 節 3.62 對 3.39 秒），只省約 730 MB 記憶體。維持 q8_0。
+- alexachang 最快、品質接近，但依決定只做比較。
+- **導航**：測試組（不是請求的單詞與俗語）Breeze、alexachang 都是 0/50。Whisper small 在全部 323 段裡有 12 段被導航，1 段在 100 段內：
+  它把詞彙提示的結尾「以下是台灣華語的繁體中文句子」原樣吐出來，讀音修正改成「台萬華戶政」，就開了預約服務。
+  服務詞組被導航的大多合理（「警察局」→ 警政服務、「繳稅」→ 稅費、「停車格」→ 停車費）；明顯錯的是 Breeze 1 段（「最後的節運站」→ 借閱紀錄），alexachang 2 段。
+  導航判斷用電腦上的 backend 跑（`speech_resolution`＋`Assistant.turn`，Ollama ministral-3:3b，**沒有 FAQ 與語意檢索層**，因為這台電腦沒有 e5 伺服器）。
+- 限制：Common Voice 大多是單詞，不像真正的請求句；服務詞組有些是唸華語維基句子。是否「開對服務」還是要用真人台語請求驗證（第 6 節）。
+
+### 10.4 App 的「台語（測試）」選項
+
+- **選單**：對話面板麥克風旁的語言選單、引導助理的語言選單，以及「AI 助理設定 › 助理語言」都多一個「台語（測試）」（按鈕上顯示「台語」）。
+  說明文字「用台語說，助理用中文回答（測試中）」，五種外語也有翻譯（`assets/i18n/guide/ui.json`）。選擇會像其他語言一樣存起來。
+- **只能手動選**：自動偵測不會選到台語（Whisper 沒有台語標籤）；手機語言也不會讓它變成預設。
+- **選台語時**：助理的文字和頁面語言維持中文。錄音送 `X-Language: nan`；`asr_server` 改用台語模型，`-l zh`、**不送詞彙提示**、`audio_ctx` 至少 500
+  （`TAIWANESE_MIN_AUDIO_CTX`；用 256 時短句會重複迴圈，見 10.3）。辨識結果的語言是 `zh`，之後完全走原本的中文流程（包括讀音修正、決策模型）。
+  辨識結果是中文，選單仍然停在台語，不會被切回中文。
+- **第一次用才載入**：`OnDeviceAssistant.startTaiwanese()` 在第一段台語錄音時啟動第三個 `whisper-server`（port 8776，模型檔 `ggml-whisper-taiwanese.bin`），
+  等模型載入完成（最多 60 秒）才辨識。其他兩個語音伺服器照常執行，不會被停掉（12 GB 手機放得下：Ministral 約 2.7 GB＋Whisper small 約 0.5 GB＋Breeze 約 2.0 GB）。
+  載入前會先檢查可用記憶體（檔案大小 ×1.3＋300 MB），不夠就不載入。切回其他語言後台語模型仍留在記憶體裡，直到 App 結束。
+- **檔案不在、記憶體不夠或啟動失敗**：這段錄音改用中文辨識，對話裡先顯示一句中文說明，例如「還沒有安裝台語語音模型，這次先用中文聽。」
+  電腦版後端（faster-whisper）沒有台語模型，也是同樣的處理。
+- 回覆契約只**新增**選填欄位（`speech_notice`、`metrics.speech_model`；`X-Language` 可以是 `nan`），舊版 App 不受影響；其他語言的請求完全一樣（有測試）。
+
+### 10.5 推到手機與安裝
+
+```powershell
+cd D:\github\TownPass-taigi
+# 模型（-Taiwanese 不給就會從手機刪掉；-Chinese 也一樣，有在用 ggml-whisper-chinese.bin 時要一起給）
+.\scripts\push_assistant_models.ps1 -DeviceId 10AF8403R5001SP -Taiwanese D:\TownPassAssistant\models\taiwanese\ggml-breeze-asr-26-q8_0.bin
+# App（裝置端版，建置後安裝並重新開啟）
+.\scripts\run_assistant_on_device.ps1 -DeviceId 10AF8403R5001SP
+```
+
+已經建好的除錯版 APK（`build\app\outputs\flutter-apk\app-debug.apk`）也可以直接用 `adb -s 10AF8403R5001SP install -r` 安裝。
+logcat 標籤 `TownPassAssistant` 會出現 `taiwanese speech loaded in … ms`。
+
+### 10.6 驗證與還沒做的
+
+- Python `python -X utf8 -m unittest discover -s assistant_backend -p "test*.py"`：221 通過（1 個略過）。
+- `fvm flutter analyze`：23 個問題，全部在原本就有的檔案，這次改的檔案沒有。`fvm flutter test`：198 通過。
+- `fvm flutter build apk --debug`（同 `run_assistant_on_device.ps1` 的裝置端參數）：成功。
+- **手機上還沒驗收**：第一次載入時間、audio_ctx 500 在手機上多花的時間（推估約 1 秒）、記憶體峰值、實際開對服務的比例都要在手機上量。
+- 沒有真人台語請求句、否定句、長輩語音（第 6 節）。
+- Breeze-26 散布前要附 Apache-2.0 全文與「轉成 ggml、量化成 q8_0」的說明（第 9.6 節）。
+- 重現：`python -X utf8 scripts/taiwanese_asr_eval.py prepare`，再依序 `transcribe`（`--taiwanese`、`--per-set 50`）、`decide`、`report`；
+  結果在 `eval-data\results\`（每段的 JSONL、`decisions.json`、`summary.json`）。一次只跑一個 whisper-server，用 port 8901。
+
+## 11. 台語要不要放進自動判斷（2026-11-08，只做一部分，已暫停）
+
+擁有者想比較兩種做法：
+- **A：放進自動判斷**（不用另外選）。選單在「中文」或「自動」時，每段錄音自己判斷是不是台語，是就送 Breeze-26，不是就走現在的路徑。三種判斷方式：
+  - A1：用 Whisper small 的語言偵測（台語的機率分布是不是看得出來）。
+  - A2：先用 Whisper small 中文辨識；結果看起來不好（不確定、聽不清、中文字太少）就再用 Breeze 辨識一次，留分數（平均 log-prob）較高的。
+  - A3：偵測成中文的全部送 Breeze。
+- **B：獨立選項**（現在的做法，第 10.4 節）。
+
+依擁有者的優先順序調整，**這一節的電腦運算在中途暫停**：Whisper small 的語言偵測跑完台語 100 段與華語 32 段（共 160 段中的 131 段）；
+華語 FLEURS 的 Whisper small 中文辨識與 Breeze 辨識都還沒跑，所以**華語 CER 的變化、華語被誤送到 Breeze 的比例（A2、A3）還不知道**。
+
+**資料**：台語是第 10 節的固定 100 段。華語、英語、日語用另一個工作準備好的 FLEURS 片段（`D:\TownPassAssistant\eval-data\langgate\fleurs`，只讀，CC BY 4.0）。
+參考文字從 FLEURS 的 tsv 依樣本數對應（同樣長度的句子不只一句時，取最接近兩個模型輸出的那一句）。FLEURS 是 8–15 秒的朗讀新聞句，比服務請求長很多。
+
+**目前看到的**
+
+| | 台語 100 段 | 華語 FLEURS（目前 32 段，8–15 秒） |
+| --- | --- | --- |
+| Whisper small 偵測成中文 | 68 段（zh 機率中位數 0.55） | 32 段（zh 機率中位數 0.99，最低 0.84） |
+| 偵測成我們沒提供的語言（my、ko、la、es） | 16 段 | 0 |
+| 偵測成我們有的其他語言（en、th、vi） | 10 段（現在會用那個語言辨識，錯） | 0 |
+
+- A1 的規則「偵測成我們沒提供的語言，或中文但 zh 機率 < 0.9」：台語 75/100 送 Breeze，長的華語 1/32。
+  但同一條規則用在另一個工作的 **1.5 秒短片段**上（`collect.jsonl`，不用重新運算）：華語 2/12、英語 2/12、日語 5/12、越南語／泰語／印尼語各約 4/12 會被誤送到 Breeze。
+  短的請求句很常見，所以 A1 會讓其他語言變差。
+- 台語 100 段的估算（手機秒數用：Whisper small 1.5 秒、只偵測 0.93 秒、Breeze q8_0 3.4＋約 1 秒＝4.4 秒）：
+
+| 做法 | 台語送 Breeze | 台語 CER（整理後） | 保留服務詞 | 台語測試組被導航 | 台語每段手機秒數（估） | 華語每段手機秒數（估） |
+| --- | --- | --- | --- | --- | --- | --- |
+| 現在（中文模式） | 0 | 0.83 | 6/50 | 1/50 | 1.5 | 1.5 |
+| **B：選台語才用** | 100/100（有選的人） | 0.85 | **32/50** | 0/50 | 4.4 | **1.5（不變）** |
+| A1：偵測規則（zh < 0.9） | 75/100 | 0.68 | 29/50 | 0/50 | 4.5 | 2.4 起（每段多一次偵測，被誤送的要 5.3） |
+| A2：small 不好才用 Breeze | 65/100 觸發，61 段留 Breeze | 0.59 | 25/50 | 0/50 | 4.4 | 1.5 起（觸發的要 5.9；華語觸發率**未量**） |
+| A3：偵測成中文都送 Breeze | 68/100 | 1.05 | 23/50 | 0/50 | 4.3 | **5.3（所有華語都變慢）**；Breeze 的華語 CER **未量** |
+
+- A2 的台語 CER 最低，是因為它會丟掉 Breeze 的重複迴圈輸出（分數低）；保留服務詞反而比 B 少（25 對 32）。代價是每段華語只要 small 不確定就多等約 4.4 秒，
+  而華語的不確定比例還沒量。
+- 結論（暫定）：**建議維持 B（獨立選項）**。它不影響華語與其他語言的速度和結果，台語的保留服務詞最多；A1 對短句的其他語言有誤判，A3 讓所有華語慢 3–4 秒。
+  如果之後想試 A，A2 最值得補量（先量華語 FLEURS 與短請求句的觸發率與 Breeze 的華語 CER）。App 沒有為 A 做任何修改。
+- 繼續的方法：`transcribe --name small-detect --detect --sets all --per-set 50`、`transcribe --name small-q8-prompt --sets fleurs`、
+  `transcribe --name breeze26-q8-taiwanese --taiwanese --sets fleurs`（已完成的段落會跳過），再 `decide`、`routing`。
+
+## 12. 台語自動辨識：語言閘門上的分類器（2026-11-08，已實作）
+
+擁有者 2026-11-08 的決定：**台語要在第一層和其他語言一起自動辨識**，不用手動切到「台語」。目標先求聽得到台語，
+華語被誤送到台語模型只多花約 3 秒（Breeze-26 也會把華語寫成華語），可以接受。「台語（測試）」手動選項保留。
+程式在 commit `d63bf32`（branch `feat/taiwanese-auto`，從 `origin/feat/asr-ablation` `f2226d3` 開出）。
+
+### 12.1 做法
+
+語言閘門（[AI_LANGUAGE_GATE.md](AI_LANGUAGE_GATE.md)：Whisper tiny q8_0，手機上每段約 0.2 秒）回傳 99 種語言的機率。Whisper 沒有台語標籤，
+但台語的機率分布和華語不一樣：華語的 zh 接近 1；台語的 zh 偏低，機率散到韓語（ko）、緬甸語（my）、越南語、泰語等。
+所以在閘門的輸出上加一個很小的分類器：
+
+- `assistant_backend/taiwanese_gate.py`＋`data/taiwanese_gate.json`：邏輯迴歸，特徵是每個語言機率的對數（whisper-server 只列出 > 0.001 的機率，所以下限取 0.001）
+  加上錄音長度（最多 10 秒），共 104 個係數，**沒有新的模型檔**。由 `scripts/taiwanese_gate_classifier.py fit` 產生。
+- 分數 ≥ `TAIWANESE_GATE_SCORE`（0.5）的錄音直接送台語模型（Breeze-26，`-l zh`、不送提示、`audio_ctx` ≥ 500），結果語言是 `zh`，之後走中文流程。
+- 順序很重要：**閘門或 Whisper small 判定是 en／ja／vi／id／th 時，就用那個語言解碼，台語的規則全部不跑**
+  （擁有者的越南語錄音曾被分到台語：閘門 vi 0.925，分類器 0.713）。只有「判定是中文」或「閘門不確定、落到中文路徑」的錄音才可能送台語。
+- 選單任何語言都適用（`AUTO_TAIWANESE_MENUS = None`；給 tuple 可以只限某些選單，`()` 關掉自動部分）。擁有者的錄音曾在選單是 vi／en 時全部漏掉，所以改成全部適用。
+- 第二次檢查 `TAIWANESE_RECHECK_SCORE`（0.3）：分數在 0.3–0.5、而且中文解碼不是 clear 時，再用 Breeze 解一次，留比較好的（第 13 節的比較順序）。
+- 同一位說話者 `TAIWANESE_STICKY_SCORE`（0.3）／`TAIWANESE_STICKY_SECONDS`（300）：有一段送了台語模型之後，接下來 5 分鐘門檻降到 0.3，
+  直到有一段解成清楚的華語或別的語言。
+- 每個常數設成 `None` 就關掉該部分。台語模型檔不在手機上時，自動辨識安靜地不作用（只有手動選台語才會顯示「還沒有安裝」）。
+- 時間記錄（logcat `timing speech`、`diag`）多了 `taiwanese=<route>:<score>`：`gate`、`sticky`、`recheck`、`implausible`、`unknown`、`chosen`（手動）、`None`。
+
+### 12.2 資料與擬合
+
+| 用途 | 台語 | 華語（台灣腔） | 華語（大陸腔） | 其他語言 |
+| --- | --- | --- | --- | --- |
+| 擬合 | Common Voice nan-tw（adi-gov-tw 重新打包，CC0／TRAIL-D）train 分割隨機 400 段 | Common Voice zh-TW（同來源）train 分割隨機 400 段 | FLEURS cmn 偶數檔 20 段 | FLEURS en/ja/vi/id/th 偶數檔各 20 段 |
+| 報告（held-out） | nan-tw **test** 分割全部 323 段 | zh-TW **test** 分割隨機 400 段 | FLEURS cmn 奇數檔 20 段 | FLEURS 奇數檔各 20 段 |
+
+每段都用整段，再從聲音開始處切 3 秒與 1.5 秒（比錄音短的才切）。閘門請求和 App 完全一樣（`WhisperCppRecognizer._gate`：先以 audio_ctx 256 暖機，`-t 4 -l auto`）；
+電腦上每段偵測中位數 0.10 秒。擬合時華語樣本權重 2（誤送華語的代價較高）。
+音檔與閘門輸出在 `D:\TownPassAssistant\models\taiwanese\eval-data\`（`adi-zhtw\`、`gate\gate.jsonl`），不在 repo。
+
+### 12.3 held-out 結果：被判成台語的比例
+
+| 門檻 | 台語（580 段，召回） | 華語台灣腔 zh-TW（925） | 華語 FLEURS（60） | 其他語言（244） |
+| --- | --- | --- | --- | --- |
+| **0.5（採用）** | **69%** | **5.4%** | 1.7% | 14% |
+| 0.7 | 54% | 3.0% | 0% | 8.2% |
+| 0.8 | 46% | 1.9% | 0% | 6.1% |
+| 0.85 | 40% | 1.6% | 0% | 4.5% |
+| 0.9 | 33% | 1.3% | 0% | 4.1% |
+| 0.95 | 23% | 0.9% | 0% | 2.0% |
+
+- 1.5 秒片段：0.5 時台語 69%（160/232）、zh-TW 7.0%（27/388）；0.85 時 40%、2.1%。
+- 其他語言的誤判幾乎都是越南語／印尼語／泰語（英語、日語在 0.7 以上都是 0）；實際 App 裡這些錄音大多先被閘門判成那個語言，不會跑到台語（12.1 的順序）。
+- 只用機率最多做到約 45–50% 召回（華語誤判 2% 時）；試過不同正則化強度、加熵／語言數特徵、深度 3–4 的決策樹、梯度提升樹，差不多。
+  whisper-server 沒有開放編碼器特徵，不重編譯拿不到。所以擁有者決定以召回優先（0.5），並加第 13 節的文字規則。
+- Breeze-26 對華語：50 段被分到台語的 zh-TW 片段，Breeze 的輸出是可用的華語，整段 CER 0.23（3 秒 0.35、1.5 秒切在字中間 0.51），50 段只有 2 段聽不清。
+  例如「我問過律師跟法律人」完全正確、「妳趕快回來」→「你趕快回來」。
+
+### 12.4 各變體在 held-out 上的模擬
+
+（VARIANT_TABLE）
+
+### 12.5 重現
+
+```powershell
+python -X utf8 scripts\taiwanese_gate_classifier.py collect            # 閘門輸出（port 8902）
+python -X utf8 scripts\taiwanese_gate_classifier.py fit --threshold 0.5 # 係數 -> assistant_backend\data\taiwanese_gate.json
+python -X utf8 scripts\taiwanese_gate_classifier.py report             # 12.3 的表
+python -X utf8 scripts\taiwanese_gate_classifier.py decode --model breeze --whole
+python -X utf8 scripts\taiwanese_gate_classifier.py decode --model small
+python -X utf8 scripts\taiwanese_gate_classifier.py simulate           # 12.4 的表
+```
+
+## 13. 中文聽起來很怪就當台語（2026-11-08，已實作）
+
+擁有者在手機上測到兩類漏網：台語「阮兜火燒厝」被 Whisper small 寫成「溫刀揮袖促」（閘門 zh 0.997，台語分數 0.089，unsure），
+以及「哩欸賽藂薩」寫成「竟然放第一是從事進來」（常見字的組合，unsure）。閘門分數抓不到這些，所以在中文解碼之後再看文字：
+
+1. **不像華語**（`PLAUSIBILITY_LOW = -8.5`、`PLAUSIBILITY_UNSURE = -6.0`）：`assistant_backend/plausibility.py` 用台灣華語**字元 bigram 模型**
+   （`data/mandarin_bigrams.json`，610 KB，由 `scripts/build_mandarin_lm.py` 從 FAQ 問答、功能清單、引導文字、我們的請求句集與 3 萬句 CC0 Common Voice zh-TW 文字算出；
+   字出現 ≥ 3 次、bigram ≥ 5 次才保留）算每個字的平均 log 機率。低於 -8.5（不管狀態）或 unsure／unclear 且低於 -6.0 → 也用 Breeze 解一次。
+   「溫刀揮袖促」-10.6、「阮兜火燒厝」-11.4；「借書」-5.4、「下一頁」-6.0、「第二個」-4.4、「取消」-4.9、「我要繳水費」-4.0、「我家失火了」-5.5。
+2. **App 不認得**（`UNKNOWN_TO_TAIWANESE = "any"`；`"unsure"` 只在不清楚時，`None` 關掉）：`Workflow.known_text(text)` 判斷文字是不是 App 知道的東西——
+   取消／問候／是否／翻頁等指令、功能列表問法（含讀音）、選項編號（第二個、弟二個）、`registry.search` 命中、請求句型（借／找／查／預約／申請／繳…）、
+   已載入書目的書名／作者、讀音相近的服務詞（兩字詞只算近似同音或純請求句：「我要解釋」算，「溫刀」≈「問答」不算）、請求開頭（我想借…）、閒聊（你是誰、介紹功能…）。
+   手機上 `device_main.known_text` 再加 FAQ：規則都不認得時，做一次 e5 embedding（約 0.1 秒），FAQ 分數到 `MEDIUM_CONF` 就算認得（`KNOWN_FAQ_CONFIDENCE`：`"medium"`／`"high"`／`None`）。
+   不認得就用 Breeze 再解一次。不用模型、不連網（書目只用已經快取的）。
+3. **比較順序**（留哪一個）：中文字 → App 認得的優先 → 不像華語的分數 → clear > unsure > unclear → 平均 log-prob。
+   所以 Breeze 的「我要繳水費」會贏過 small 清楚但 App 不認得的「我問過律師跟法律人」；兩個都不認得時看 plausibility 與狀態。
+   App 認得的文字不會因為 plausibility 低而被送去（「借龜兔賽跑」是書名，bigram 模型覺得怪，但它是請求）。
+4. 這些規則一樣只在「沒有判定成其他語言」時跑；每個都是常數、`None` 關掉；第二次解碼不開溫度重試。
+
+### 13.1 觸發率（held-out；Whisper small 的中文解碼；LM 的擬合不含我們的請求句）
+
+| 文字 | 段數 | 不像華語（規則 1） | App 不認得（規則 2） | 其中一個 |
+| --- | --- | --- | --- | --- |
+| small 對台語錄音（gate 資料集，非 unclear） | 480–501 | 50% | 90% | 64%（規則 1＋只限 unsure 的規則 2） |
+| small 對台語錄音（第 10 節 473 段） | 361–381 | 47% | 87% | 59% |
+| small 對華語 zh-TW（Common Voice 任意句子） | 385–505 | 16% | 87% | 22% |
+| small 對華語 FLEURS（新聞朗讀） | 57–58 | 14% | 76% | 18% |
+| 我們的 343–376 句請求句（當 clear） | 343–350 | 0.6% | **8%** | — |
+| 同上，當 unsure | 350 | 5.4% | 12% | 12% |
+
+- 規則 2 對「任意華語句子」幾乎都會觸發（Common Voice／FLEURS 的句子不是對 App 說的話），代價是那段多約 3–4 秒、結果是 Breeze 的華語（12.3）。
+  對使用者真正會對 App 說的話，看「請求句」那一列：8%（今天心情真好、我好無聊、台積電今天股價多少、書目還沒快取時的書名）。FAQ 的檢查會再降低 FAQ 問題的觸發。
+- 半數 small 對台語的輸出是看起來通順的中文（優惠、政府飛行服務），bigram 模型抓不到；規則 2 補到 87–90%。
+- 試過用決策模型問「這是不是正常中文？A／B」（Ollama ministral-3:3b，enum schema）：每一類都答 A（0% 判為不正常），不可用，沒再追。
+- 這一節在手機上還沒驗收；第 12.4 節的模擬包含這兩條規則。
