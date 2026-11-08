@@ -128,7 +128,7 @@ fvm dart run build_runner build --delete-conflicting-outputs   # 產生檔不在
 ## 7. 目前狀態與限制（2026-11-08）
 
 - 評估（電腦）：dev 187–188/190、held-out 97/102、多語 46/46，開錯頁 0。
-- 手機速度：中文一句約 1.5 秒辨識＋決策 2–5 秒（Gemma 快、Ministral 準）；台語約 4 秒；越南文約 1.4 秒（base）。
+- 手機速度：中文一句約 1.5 秒辨識＋決策 2–5 秒（Gemma 快、Ministral 準）；台語約 4 秒；越南文（PhoWhisper-base）手機上還沒量，電腦上約 1.4 秒。
 - 台語：只有辨識，朗讀用中文；自動判斷約抓到 7–9 成台語，華語偶爾會多跑一次台語模型（慢 3 秒）。
 - 外語介面與教學文字是 AI 翻譯草稿，待母語者校對。
 - 待辦：泰文換成菲律賓文、印尼文優化、台語朗讀、Release／iOS 未驗證。詳見 `docs/TEAM_TASKS_AFTER_MERGE.md`。
