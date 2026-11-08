@@ -78,11 +78,11 @@ class LlamaServerModelTests(unittest.TestCase):
         heard = []
 
         class Recognizer:
-            def transcribe(self, frames):
-                heard.append(len(frames))
+            def transcribe(self, frames, language="zh", automatic_taiwanese=True):
+                heard.append((len(frames), automatic_taiwanese))
                 return {"text": ""}
         device_main.warm_up(Recognizer(), server.MODEL_URL, limit_s=5)
-        self.assertEqual(heard, [32000])  # one second of 16 kHz PCM16
+        self.assertEqual(heard, [(32000, False)])  # one second of 16 kHz PCM16, no Taiwanese
         from decision import system_prompt
         from decision import POLICIES
         systems = [body["messages"][0]["content"] for _, body in FakeLlamaServer.requests[-len(POLICIES):]]
@@ -710,6 +710,16 @@ class TaiwaneseSpeechTests(unittest.TestCase):
         self.assertEqual(self.recognizer.transcribe(loud_frames(), "nan")["notice"], "failed")
         self.recognizer.taiwanese = None  # e.g. phone recogniser builds: no Taiwanese hook
         self.assertEqual(self.recognizer.transcribe(loud_frames(), "nan")["notice"], "missing")
+
+    def test_warm_up_tone_never_starts_the_taiwanese_model(self):
+        # A sine tone used to pass the Taiwanese gate and load Breeze (1.7 GB) at idle.
+        import array
+        import math
+        tone = array.array("h", (int(3000 * math.sin(i * 0.05)) for i in range(16000))).tobytes()
+        self.speech["zh"] = ("嗚嗚嗚", -1.3)  # unknown, unsure text: would otherwise go to Breeze
+        result = self.recognizer.transcribe(tone, "zh", automatic_taiwanese=False)
+        self.assertEqual((result["language"], self.starts), ("zh", []))
+        self.assertNotIn("nan", self.models())
 
     def test_model_is_started_only_for_taiwanese_clips(self):
         self.recognizer.transcribe(loud_frames(), "zh")  # long clear Chinese: one pass

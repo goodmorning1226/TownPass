@@ -372,7 +372,7 @@ class Recognizer:
         warm = (self.numpy.sin(self.numpy.arange(SAMPLE_RATE) * 0.05) * 3000).astype(self.numpy.int16)
         self.transcribe(warm.tobytes())
 
-    def transcribe(self, frames, language="zh"):
+    def transcribe(self, frames, language="zh", automatic_taiwanese=True):
         """Decode one hold-to-talk clip (<= 30 s, a single Whisper window).
         The computer recogniser is Chinese only (Breeze); language is accepted
         for the shared interface and the result is always Chinese.
@@ -658,8 +658,11 @@ class WhisperCppRecognizer:
             return reply, used, confidence
         return self.decodes[best], best, max((s.get(best) for s in self.scores if s.get(best)), default=None)
 
-    def transcribe(self, frames, language="zh"):
-        """language: one of SPEECH_LANGUAGES; the result names the language used."""
+    def transcribe(self, frames, language="zh", automatic_taiwanese=True):
+        """language: one of SPEECH_LANGUAGES; the result names the language used.
+        automatic_taiwanese=False keeps the Taiwanese rules off for this clip: the
+        warm-up tone passed the Taiwanese gate and loaded the 1.7 GB Breeze model at
+        idle, which swapped the other models out (2026-11-08)."""
         if rms_of(frames) < MIN_RMS:
             return {"text": "", "alternatives": [], "status": "unclear", "reason": "silence"}
         language = language_code(language)
@@ -696,7 +699,8 @@ class WhisperCppRecognizer:
             # The gate picked another of our languages (sure of it): that language is
             # decoded and nothing Taiwanese runs (a Vietnamese clip once scored 0.71).
             other_language = sure is not None and sure != "zh"
-            automatic = auto_taiwanese(requested) and self.taiwanese is not None and not other_language
+            automatic = (automatic_taiwanese and auto_taiwanese(requested) and self.taiwanese is not None
+                         and not other_language)
             taiwanese_by_gate = False  # the gate score says Taiwanese (decided below)
             if gate is not None and automatic and self.taiwanese_model:
                 # Taiwanese heard automatically (section 12); no notice when its model is missing.
@@ -790,7 +794,7 @@ class WhisperCppRecognizer:
                   **({"speech_model": "taiwanese"} if taiwanese else {}),
                   **({"speech_model": "vietnamese"} if reply is self.vietnamese_reply else {}),
                   **({"notice": notice} if notice else {})}
-        if route or score is not None or (auto_taiwanese(requested) and self.taiwanese is not None):
+        if route or score is not None or (automatic_taiwanese and auto_taiwanese(requested) and self.taiwanese is not None):
             # Timing log only: how Taiwanese was decided, and how Mandarin-like the text reads.
             import plausibility
             result.update(taiwanese_route=route, taiwanese_score=None if score is None else round(score, 3),

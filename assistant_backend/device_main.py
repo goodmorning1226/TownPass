@@ -74,7 +74,8 @@ def warm_up(recognizer, model_url, limit_s=900):
     speech = None
     if recognizer is not None:  # None: the phone's own recogniser, no Whisper
         tone = array.array("h", (int(3000 * math.sin(i * 0.05)) for i in range(16000))).tobytes()
-        speech = _retry(lambda: recognizer.transcribe(tone), deadline)
+        # No Taiwanese for the tone: it passed the Taiwanese gate and loaded Breeze at idle.
+        speech = _retry(lambda: recognizer.transcribe(tone, automatic_taiwanese=False), deadline)
     speech_s = time.monotonic() - started
     # The same fixed system messages decision.decide sends, one per task, so each
     # of llama-server's two slots keeps one of them in its prompt cache.
