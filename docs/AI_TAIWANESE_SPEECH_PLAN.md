@@ -570,7 +570,9 @@ logcat 標籤 `TownPassAssistant` 會出現 `taiwanese speech loaded in … ms`�
 
 ### 12.4 各變體在 held-out 上的模擬
 
-（VARIANT_TABLE）
+（2026-11-08 擁有者決定停止這項量測，表格未完成。部分資料保留在 `D:\TownPassAssistant\models\taiwanese\eval-data\gate\`：
+`gate.jsonl`（tiny 判斷結果）、`decode-small.jsonl`（1,599 段，完整）、`decode-breeze.jsonl`（774 段，未完成）。
+要補完：`python -X utf8 scripts\taiwanese_gate_classifier.py decode --model breeze --whole`，再執行 `simulate`。）
 
 ### 12.5 重現
 
