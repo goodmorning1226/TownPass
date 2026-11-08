@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:town_pass/page/basic_info_edit/basic_info_edit_view_controller.dart';
+import 'package:town_pass/service/page_translation.dart';
 import 'package:town_pass/util/tp_app_bar.dart';
 import 'package:town_pass/util/tp_button.dart';
 import 'package:town_pass/util/tp_colors.dart';
@@ -47,17 +48,20 @@ class BasicInfoEditView extends GetView<BasicInfoEditViewController> {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  TextFormField(
-                    controller: controller.controller,
-                    validator: controller.arg.validator,
-                    decoration: InputDecoration(
-                      hintText: '請輸入新${controller.arg.title}',
-                      border: OutlineInputBorder(
-                        borderSide: const BorderSide(color: TPColors.primary500, width: 2.0),
-                        borderRadius: BorderRadius.circular(25.0),
+                  // Obx: the hint follows the page language (PageTranslation).
+                  Obx(
+                    () => TextFormField(
+                      controller: controller.controller,
+                      validator: controller.arg.validator,
+                      decoration: InputDecoration(
+                        hintText: PageTranslation.instance.label('請輸入新${controller.arg.title}'),
+                        border: OutlineInputBorder(
+                          borderSide: const BorderSide(color: TPColors.primary500, width: 2.0),
+                          borderRadius: BorderRadius.circular(25.0),
+                        ),
                       ),
+                      keyboardType: controller.arg.keyboardType,
                     ),
-                    keyboardType: controller.arg.keyboardType,
                   ),
                 ],
               ),

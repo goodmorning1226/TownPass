@@ -72,6 +72,27 @@
    "id": "【Pemberitahuan Pemeliharaan Sistem Selesai】Mulai hari ini layanan penukaran poin \"TownPass - Poin Sehat\" dibuka kembali.[System maintenance has been completed]",
    "th": "【แจ้งการบำรุงรักษาระบบเสร็จสิ้น】ตั้งแต่วันนี้ เปิดให้บริการแลกคะแนน \"TownPass - สะสมคะแนนสุขภาพ\" แล้ว[System maintenance has been completed]"
   },
+  "上一步": {
+   "en": "Back",
+   "ja": "戻る",
+   "vi": "Quay lại",
+   "id": "Kembali",
+   "th": "ย้อนกลับ"
+  },
+  "下一步": {
+   "en": "Next",
+   "ja": "次へ",
+   "vi": "Tiếp theo",
+   "id": "Berikutnya",
+   "th": "ถัดไป"
+  },
+  "不同意": {
+   "en": "Disagree",
+   "ja": "同意しない",
+   "vi": "Không đồng ý",
+   "id": "Tidak Setuju",
+   "th": "ไม่ยอมรับ"
+  },
   "並遵守個人資料 保護法相關規定,保障使用者的個資。\n": {
    "en": "and comply with the Personal Data Protection Act to protect users' personal data.\n",
    "ja": "個人情報保護法の関連規定を遵守し、利用者の個人情報を保護します。\n",
@@ -177,6 +198,13 @@
    "id": "Biaya parkir",
    "th": "ค่าจอดรถ"
   },
+  "備註": {
+   "en": "Notes",
+   "ja": "備考",
+   "vi": "Ghi chú",
+   "id": "Catatan",
+   "th": "หมายเหตุ"
+  },
   "優惠": {
    "en": "Deals",
    "ja": "特典",
@@ -204,6 +232,13 @@
    "vi": "CityPASS duy nhất tại Đài Loan kết hợp giao thông và điểm tham quan, \"Taipei FunPass Unlimited\", đã được làm mới hoàn toàn năm 2024! The only CityPASS in Taiwan that combines transportation with attractions, the \"Taipei FunPass Unlimited,\" has been redesigned for 2024!",
    "id": "CityPASS satu-satunya di Taiwan yang menggabungkan transportasi dan tempat wisata, \"Taipei FunPass Unlimited\", hadir dengan tampilan baru di 2024! The only CityPASS in Taiwan that combines transportation with attractions, the \"Taipei FunPass Unlimited,\" has been redesigned for 2024!",
    "th": "CityPASS หนึ่งเดียวในไต้หวันที่รวมการเดินทางและสถานที่ท่องเที่ยว \"Taipei FunPass Unlimited\" โฉมใหม่ปี 2024! The only CityPASS in Taiwan that combines transportation with attractions, the \"Taipei FunPass Unlimited,\" has been redesigned for 2024!"
+  },
+  "全部": {
+   "en": "All",
+   "ja": "すべて",
+   "vi": "Tất cả",
+   "id": "Semua",
+   "th": "ทั้งหมด"
   },
   "公訓處自費課程": {
    "en": "Civil service training courses",
@@ -239,6 +274,13 @@
    "vi": "thời gian, đối tượng, khu vực và phương thức sử dụng dữ liệu cá nhân đó,",
    "id": "jangka waktu, pihak penerima, wilayah, dan cara penggunaan data pribadi tersebut,",
    "th": "ระยะเวลา ผู้รับ พื้นที่ และวิธีการใช้ข้อมูลส่วนบุคคลดังกล่าว"
+  },
+  "刪除": {
+   "en": "Delete",
+   "ja": "削除",
+   "vi": "Xóa",
+   "id": "Hapus",
+   "th": "ลบ"
   },
   "功能教學": {
    "en": "Tutorial",
@@ -338,6 +380,13 @@
    "id": "Setuju",
    "th": "ยอมรับ"
   },
+  "否": {
+   "en": "No",
+   "ja": "いいえ",
+   "vi": "Không",
+   "id": "Tidak",
+   "th": "ไม่"
+  },
   "命人資你別然書城很，是公麼級在！有真得劇那舉": {
    "en": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
    "ja": "Lorem ipsum dolor sit amet、consectetur！",
@@ -372,6 +421,13 @@
    "vi": "Mượn sách thư viện",
    "id": "Peminjaman buku",
    "th": "ยืมหนังสือห้องสมุด"
+  },
+  "地址": {
+   "en": "Address",
+   "ja": "住所",
+   "vi": "Địa chỉ",
+   "id": "Alamat",
+   "th": "ที่อยู่"
   },
   "地方稅": {
    "en": "Local taxes",
@@ -408,6 +464,13 @@
    "id": "Jika ada masalah penggunaan, silakan hubungi Hotline Warga 1999.",
    "th": "หากมีปัญหาในการใช้งาน โปรดโทรสายด่วนประชาชน 1999"
   },
+  "姓名": {
+   "en": "Name",
+   "ja": "氏名",
+   "vi": "Họ tên",
+   "id": "Nama",
+   "th": "ชื่อ-นามสกุล"
+  },
   "婦幼保護申訴專線": {
    "en": "Women and children protection hotline",
    "ja": "女性・児童保護相談ホットライン",
@@ -429,6 +492,13 @@
    "id": "Keamanan",
    "th": "ความปลอดภัย"
   },
+  "完成": {
+   "en": "Done",
+   "ja": "完了",
+   "vi": "Hoàn tất",
+   "id": "Selesai",
+   "th": "เสร็จสิ้น"
+  },
   "客服信箱": {
    "en": "Customer service email",
    "ja": "お問い合わせメール",
@@ -442,6 +512,13 @@
    "vi": "Bản đồ thân thiện thú cưng",
    "id": "Peta ramah hewan",
    "th": "แผนที่สำหรับสัตว์เลี้ยง"
+  },
+  "展開": {
+   "en": "Expand",
+   "ja": "展開",
+   "vi": "Mở rộng",
+   "id": "Perluas",
+   "th": "ขยาย"
   },
   "已取消訂閱(.+)": {
    "en": "Unsubscribed from (.+)",
@@ -520,6 +597,13 @@
    "id": "Cara mengaktifkan kembali akun",
    "th": "วิธีใช้งานบัญชีอีกครั้ง"
   },
+  "常用": {
+   "en": "Favorites",
+   "ja": "よく使う",
+   "vi": "Thường dùng",
+   "id": "Sering Dipakai",
+   "th": "ใช้บ่อย"
+  },
   "平價住宅維護費": {
    "en": "Low-cost housing maintenance fee",
    "ja": "低家賃住宅の維持費",
@@ -540,6 +624,13 @@
    "vi": "Quét từ ảnh",
    "id": "Pindai dari foto",
    "th": "สแกนจากรูปภาพ"
+  },
+  "必填": {
+   "en": "Required",
+   "ja": "必須",
+   "vi": "Bắt buộc",
+   "id": "Wajib diisi",
+   "th": "จำเป็น"
   },
   "快速登入": {
    "en": "Quick login",
@@ -604,6 +695,13 @@
    "id": "Tabungan karbon saya",
    "th": "สมุดลดคาร์บอนของฉัน"
   },
+  "我知道了": {
+   "en": "Got it",
+   "ja": "わかりました",
+   "vi": "Tôi đã hiểu",
+   "id": "Mengerti",
+   "th": "เข้าใจแล้ว"
+  },
   "或": {
    "en": "or",
    "ja": "または",
@@ -659,6 +757,13 @@
    "vi": "Khám phá Đài Bắc",
    "id": "Jelajahi Taipei",
    "th": "สำรวจไทเป"
+  },
+  "提交": {
+   "en": "Submit",
+   "ja": "送信",
+   "vi": "Gửi",
+   "id": "Kirim",
+   "th": "ส่ง"
   },
   "提供北市民生物資交易量與金額": {
    "en": "Trading volume and value of daily necessities in Taipei",
@@ -716,12 +821,26 @@
    "id": "Setelah akun dinonaktifkan, Anda tidak dapat lagi login ke TownPass atau menggunakan akun TownPass untuk login ke sistem lain. Data terkait tetap disimpan di platform cloud yang bersangkutan.",
    "th": "เมื่อปิดใช้งานบัญชีแล้ว จะไม่สามารถเข้าสู่ระบบ TownPass และไม่สามารถใช้บัญชี TownPass เข้าสู่ระบบอื่นได้อีก ข้อมูลที่เกี่ยวข้องจะยังคงเก็บไว้ในแพลตฟอร์มคลาวด์ที่เกี่ยวข้อง"
   },
+  "搜尋": {
+   "en": "Search",
+   "ja": "検索",
+   "vi": "Tìm kiếm",
+   "id": "Cari",
+   "th": "ค้นหา"
+  },
   "播打網路語音通話": {
    "en": "Make an internet voice call",
    "ja": "インターネット音声通話をかける",
    "vi": "Gọi thoại qua mạng",
    "id": "Lakukan panggilan suara internet",
    "th": "โทรด้วยเสียงผ่านอินเทอร์เน็ต"
+  },
+  "收合": {
+   "en": "Collapse",
+   "ja": "折りたたむ",
+   "vi": "Thu gọn",
+   "id": "Tutup",
+   "th": "ย่อ"
   },
   "收據": {
    "en": "Receipts",
@@ -764,6 +883,27 @@
    "vi": "Thông tin thi công",
    "id": "Informasi konstruksi",
    "th": "ข้อมูลงานก่อสร้าง"
+  },
+  "日期": {
+   "en": "Date",
+   "ja": "日付",
+   "vi": "Ngày",
+   "id": "Tanggal",
+   "th": "วันที่"
+  },
+  "是": {
+   "en": "Yes",
+   "ja": "はい",
+   "vi": "Có",
+   "id": "Ya",
+   "th": "ใช่"
+  },
+  "時間": {
+   "en": "Time",
+   "ja": "時間",
+   "vi": "Thời gian",
+   "id": "Waktu",
+   "th": "เวลา"
   },
   "更多": {
    "en": "More",
@@ -834,6 +974,27 @@
    "vi": "Dữ liệu cá nhân thu thập lần này chỉ được dùng khi cuộc gọi qua mạng được chuyển tới nhân viên đường dây nóng 1999,",
    "id": "Data pribadi yang dikumpulkan ini hanya digunakan saat panggilan internet dialihkan ke petugas Hotline Warga 1999,",
    "th": "ข้อมูลส่วนบุคคลที่เก็บรวบรวมครั้งนี้ใช้เฉพาะเมื่อโอนสายโทรศัพท์อินเทอร์เน็ตไปยังเจ้าหน้าที่สายด่วนประชาชน 1999"
+  },
+  "查無資料": {
+   "en": "No results",
+   "ja": "データがありません",
+   "vi": "Không có dữ liệu",
+   "id": "Tidak ada data",
+   "th": "ไม่พบข้อมูล"
+  },
+  "查看更多": {
+   "en": "See more",
+   "ja": "もっと見る",
+   "vi": "Xem thêm",
+   "id": "Lihat Selengkapnya",
+   "th": "ดูเพิ่มเติม"
+  },
+  "查詢": {
+   "en": "Search",
+   "ja": "検索",
+   "vi": "Tra cứu",
+   "id": "Cari",
+   "th": "ค้นหา"
   },
   "案件查詢": {
    "en": "Case lookup",
@@ -919,6 +1080,13 @@
    "id": "Acara",
    "th": "กิจกรรม"
   },
+  "清除": {
+   "en": "Clear",
+   "ja": "クリア",
+   "vi": "Xóa",
+   "id": "Bersihkan",
+   "th": "ล้าง"
+  },
   "火災通報": {
    "en": "Fire report",
    "ja": "火災通報",
@@ -953,6 +1121,13 @@
    "vi": "Không mở được ứng dụng Mail",
    "id": "Tidak dapat membuka aplikasi email",
    "th": "ไม่สามารถเปิดแอปอีเมลได้"
+  },
+  "無資料": {
+   "en": "No data",
+   "ja": "データなし",
+   "vi": "Không có dữ liệu",
+   "id": "Tidak ada data",
+   "th": "ไม่มีข้อมูล"
   },
   "熱門": {
    "en": "Popular",
@@ -1073,6 +1248,13 @@
    "id": "Akun yang sedang login",
    "th": "บัญชีที่เข้าสู่ระบบอยู่"
   },
+  "確定": {
+   "en": "OK",
+   "ja": "確定",
+   "vi": "Xác nhận",
+   "id": "OK",
+   "th": "ตกลง"
+  },
   "確認": {
    "en": "Confirm",
    "ja": "確認",
@@ -1107,6 +1289,13 @@
    "vi": "Lorem ipsum. Dolor sit amet consectetur; adipiscing elit sed",
    "id": "Lorem ipsum. Dolor sit amet consectetur; adipiscing elit sed",
    "th": "Lorem ipsum. Dolor sit amet consectetur; adipiscing elit sed"
+  },
+  "篩選": {
+   "en": "Filter",
+   "ja": "絞り込み",
+   "vi": "Bộ lọc",
+   "id": "Filter",
+   "th": "ตัวกรอง"
   },
   "簡單森呼吸": {
    "en": "Green spaces map",
@@ -1311,6 +1500,13 @@
    "id": "Jika perlu dialihkan ke petugas Hotline Warga 1999,",
    "th": "เมื่อต้องโอนสายไปยังเจ้าหน้าที่สายด่วนประชาชน 1999"
   },
+  "處理中": {
+   "en": "Processing",
+   "ja": "処理中",
+   "vi": "Đang xử lý",
+   "id": "Sedang diproses",
+   "th": "กำลังดำเนินการ"
+  },
   "親子館": {
    "en": "Parent-child centre",
    "ja": "親子館",
@@ -1402,6 +1598,13 @@
    "id": "Laporan suara",
    "th": "แจ้งด้วยเสียง"
   },
+  "說明": {
+   "en": "Description",
+   "ja": "説明",
+   "vi": "Mô tả",
+   "id": "Keterangan",
+   "th": "คำอธิบาย"
+  },
   "請掃描繳費單的 QR Code": {
    "en": "Please scan the QR Code on the payment slip",
    "ja": "払込票の QR コードをスキャンしてください",
@@ -1416,12 +1619,33 @@
    "id": "Silakan jelaskan saran atau masalah Anda",
    "th": "โปรดอธิบายข้อเสนอแนะหรือปัญหา"
   },
+  "請稍候": {
+   "en": "Please wait",
+   "ja": "お待ちください",
+   "vi": "Vui lòng chờ",
+   "id": "Mohon tunggu",
+   "th": "กรุณารอสักครู่"
+  },
   "請試試其他關鍵字或篩選分類": {
    "en": "Try other keywords or filter categories",
    "ja": "他のキーワードやカテゴリで絞り込んでみてください",
    "vi": "Hãy thử từ khóa hoặc danh mục lọc khác",
    "id": "Coba kata kunci atau kategori filter lain",
    "th": "ลองใช้คำค้นหาหรือหมวดหมู่ตัวกรองอื่น"
+  },
+  "請輸入": {
+   "en": "Please enter",
+   "ja": "入力してください",
+   "vi": "Vui lòng nhập",
+   "id": "Silakan masukkan",
+   "th": "กรุณากรอก"
+  },
+  "請選擇": {
+   "en": "Please select",
+   "ja": "選択してください",
+   "vi": "Vui lòng chọn",
+   "id": "Silakan pilih",
+   "th": "กรุณาเลือก"
   },
   "請選擇建議類型": {
    "en": "Please select a suggestion type",
@@ -1458,6 +1682,41 @@
    "id": "Kartu identitas",
    "th": "บัตรประชาชน"
   },
+  "載入中": {
+   "en": "Loading",
+   "ja": "読み込み中",
+   "vi": "Đang tải",
+   "id": "Memuat",
+   "th": "กำลังโหลด"
+  },
+  "載入中...": {
+   "en": "Loading...",
+   "ja": "読み込み中...",
+   "vi": "Đang tải...",
+   "id": "Memuat...",
+   "th": "กำลังโหลด..."
+  },
+  "載入中…": {
+   "en": "Loading…",
+   "ja": "読み込み中…",
+   "vi": "Đang tải…",
+   "id": "Memuat…",
+   "th": "กำลังโหลด…"
+  },
+  "返回": {
+   "en": "Back",
+   "ja": "戻る",
+   "vi": "Quay lại",
+   "id": "Kembali",
+   "th": "กลับ"
+  },
+  "返回首頁": {
+   "en": "Back to Home",
+   "ja": "ホームに戻る",
+   "vi": "Về trang chủ",
+   "id": "Kembali ke Beranda",
+   "th": "กลับหน้าหลัก"
+  },
   "送出": {
    "en": "Submit",
    "ja": "送信",
@@ -1479,12 +1738,40 @@
    "id": "Alamat surat",
    "th": "ที่อยู่สำหรับติดต่อ"
   },
+  "選填": {
+   "en": "Optional",
+   "ja": "任意",
+   "vi": "Không bắt buộc",
+   "id": "Opsional",
+   "th": "ไม่บังคับ"
+  },
   "里辦服務": {
    "en": "Neighbourhood office",
    "ja": "里の事務所",
    "vi": "Văn phòng phường",
    "id": "Kantor lingkungan",
    "th": "สำนักงานชุมชน"
+  },
+  "重新整理": {
+   "en": "Refresh",
+   "ja": "更新",
+   "vi": "Tải lại",
+   "id": "Muat Ulang",
+   "th": "รีเฟรช"
+  },
+  "重設": {
+   "en": "Reset",
+   "ja": "リセット",
+   "vi": "Đặt lại",
+   "id": "Atur Ulang",
+   "th": "รีเซ็ต"
+  },
+  "重試": {
+   "en": "Retry",
+   "ja": "再試行",
+   "vi": "Thử lại",
+   "id": "Coba Lagi",
+   "th": "ลองอีกครั้ง"
   },
   "金大森": {
    "en": "Jin Da-sen",
@@ -1548,6 +1835,13 @@
    "vi": "Email",
    "id": "Email",
    "th": "อีเมล"
+  },
+  "電話": {
+   "en": "Phone",
+   "ja": "電話",
+   "vi": "Điện thoại",
+   "id": "Telepon",
+   "th": "โทรศัพท์"
   },
   "電話撥號": {
    "en": "Phone call",
