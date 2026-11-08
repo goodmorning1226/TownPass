@@ -1,11 +1,11 @@
 <p align="center">
-  <img src="docs/images/cover.png" alt="TownPass 地端 AI 助理：首頁按住提問、圖書借閱引導教學、越南文頁面翻譯、台語語音與緊急回應" width="100%">
+  <img src="docs/images/cover.png" alt="台北一點就通！微服務入口整合助理：首頁按住提問、圖書借閱引導教學、越南文頁面翻譯、台語語音與緊急回應" width="100%">
 </p>
 
-<h1 align="center">TownPass 地端 AI 助理</h1>
+<h1 align="center">台北一點就通！微服務入口整合助理</h1>
 
 <p align="center">
-  <b>全部在手機上跑的多語市政 AI 助理：說一句話，就幫你打開對的台北通服務。</b><br>
+  <b>TownPass 地端 AI 助理：全部在手機上跑，說一句話，就幫你打開對的台北通服務。</b><br>
   中文 · 台語 · 英文 · 日文 · 越南文 · 印尼文 · 泰文 ｜ 沒有雲端模型，錄音不離開手機。
 </p>
 
