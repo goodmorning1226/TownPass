@@ -158,7 +158,7 @@ Developer guide: [ASSISTANT_README.md](ASSISTANT_README.md).
     <td width="33%"><img src="docs/images/faq-bulk-waste.png" alt="打字問「大型垃圾要丟哪」，助理列出三題臺北市政府環保局的 FAQ 讓使用者選" width="100%"></td>
     <td valign="top">
       <ul>
-        <li>「大包垃圾要怎麼丟」「身分證掉了怎麼辦」→ 從<b>市府 FAQ 8,121 筆</b>（e5 向量，手機上 22 MB 索引）和台北通常見問答找答案。</li>
+        <li>「大包垃圾要怎麼丟」「身分證掉了怎麼辦」→ 從<b>市府 FAQ 8,121 筆</b>（e5 向量，手機上 22 MB 索引）和台北通常見問答找答案。資料來源：臺北市資料大平台〈<a href="https://data.taipei/dataset/detail?id=203f1657-bb4a-45a7-b25f-279b63136645">臺北市市政網站整合平台之常見問答</a>〉。</li>
         <li>查詢前先把口語詞補成 FAQ 用詞：大包垃圾／舊家具 → 巨大垃圾 大型廢棄物；身分證掉了 → 遺失 補發；敬老卡 → 敬老悠遊卡。</li>
         <li>cosine ≥ 0.915 直接回答；≥ 0.88 列出最接近的問題讓使用者選；以下不回，不亂答。答案超過 600 字截斷並提示洽 1999。</li>
       </ul>
@@ -362,12 +362,11 @@ Flutter App 維持在 repo 根目錄，官方目錄不搬動（見 [AGENTS.md](A
 
 - 本 repository 的程式沿用上游 TownPass 的 [GPL-3.0](LICENSE)；保留原作者與來源聲明，對外散布時依 GPL-3.0 條款處理。
 - 模型檔**不在 repo、不在 APK**，由開發者自行下載並推到手機，授權依各模型：Ministral（Apache-2.0）、Gemma（Gemma 授權）、Whisper（MIT）、Breeze-ASR-26（Apache-2.0；散布時要附授權全文與「轉成 ggml、量化成 q8_0」的說明）、PhoWhisper（BSD-3，保留著作權聲明）、multilingual-e5-small（MIT）、ML Kit（Google 條款）。
-- 評估用的公開語音資料：FLEURS（CC BY 4.0）、Common Voice nan-tw／zh-TW（CC0；`adi-gov-tw` 重新打包附 TRAIL v0.1），都不在 repo 裡。
 - 示範用的網頁服務、mock 帳號與 JSON 不代表已取得正式台北通登入或政府 API 的授權。
 
 ## 致謝
 
 - 臺北市政府資訊局開源的 [TownPass](https://github.com/taipei-doit/TownPass) 與 [TownPass-Services](https://github.com/taipei-doit/TownPass-Services)：本專案建立在官方 App 架構與示範網頁服務之上，網頁服務未修改、未打包。
+- 資料：臺北市資料大平台〈[臺北市市政網站整合平台之常見問答](https://data.taipei/dataset/detail?id=203f1657-bb4a-45a7-b25f-279b63136645)〉（市府 FAQ 8,121 筆的來源）。
 - 模型與工具：Mistral AI（Ministral 3）、Google（Gemma 4、ML Kit）、OpenAI（Whisper）、聯發科技研究中心與陽明交通大學（Breeze-ASR-26）、VinAI（PhoWhisper）、Microsoft（multilingual-e5-small）、[llama.cpp](https://github.com/ggml-org/llama.cpp)、[whisper.cpp](https://github.com/ggml-org/whisper.cpp)、[Chaquopy](https://chaquo.com/chaquopy/)、Unihan 資料庫。
-- 評估資料：Google FLEURS、Mozilla Common Voice，以及 Hugging Face `adi-gov-tw` 重新打包的 Taiwan-Tongues（nan-tw／zh-TW）資料集。
 - README 的版面參考了 taipei-doit 2025 年作品 [Carbon Notebook](https://github.com/taipei-doit/townpass2025-carbon-notebook) 的結構；內容與設計為本專案自行撰寫。
