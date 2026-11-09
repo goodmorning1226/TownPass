@@ -651,6 +651,16 @@ class Workflow:
                                                                matches[0])
             if offered:
                 return offered
+            # As in Chinese: the FAQ first (the App translates the request when asked,
+            # then sends faq_text); the "not connected" reason only when it has nothing.
+            faq = self._foreign_faq(payload)
+            if faq:
+                return faq
+            positive = i18n.positive_text(text, language)
+            if (T2_GENERIC and self._says_more_than_common_word(payload, positive, matches[0])
+                    and self._not_what_is_meant(positive, entries[0])):
+                self._trace("generic_no_match", [entries[0]["id"]])
+                return self.reply(payload, i18n.t("no_match", language))
             self._trace("unavailable_direct", [entries[0]["id"]])
             return self._navigate(payload, entries[0])
         if language == "vi" and all(m["fuzzy"] for m in matches):
@@ -821,8 +831,26 @@ class Workflow:
                 offered = T2_GENERIC and self._generic_unavailable(payload, text, positive_text(text), matches[0])
                 if offered:
                     return offered
+                # A disconnected page does not stop the FAQ ("我要預約打流感疫苗" may be a
+                # question the FAQ answers): its "not connected" reason is the last answer.
+                faq = self._faq(payload, text)
+                if faq:
+                    return faq
+                if (T2_GENERIC and self._says_more_than_common_word(payload, positive_text(text), matches[0])
+                        and self._not_what_is_meant(positive_text(text), entries[0])):
+                    # "公園可以帶狗嗎" found 簡單森呼吸 only by 公園 and semantic retrieval
+                    # does not mean it either: its "not connected" reason does not
+                    # answer the question (owner, 2026-11-08). "我要預約打流感疫苗"
+                    # (the page is what is meant) keeps the reason.
+                    self._trace("generic_no_match", [entries[0]["id"]])
+                    return self.reply(payload, NO_RELATED, action="no_related")
                 self._trace("unavailable_direct", [entries[0]["id"]])
                 return self._navigate(payload, entries[0])
+            if not any(e["enabled"] for e in entries):
+                # Only disconnected pages: none can open, so the FAQ answers first.
+                faq = self._faq(payload, text)
+                if faq:
+                    return faq
             ambiguous = len(entries) > 1 or any(m["fuzzy"] for m in matches)
             root = current_root(payload.get("page_context"))
             if ambiguous and root:
@@ -979,6 +1007,26 @@ class Workflow:
             return len(term.split()) == 1
         return bool(terms) and all(short(term) or shared(term) for term in terms)
 
+    def _says_more_than_common_word(self, payload, positive, match):
+        """Whether a single disconnected page was found only by a common word
+        (_common_word) while the sentence says more (GENERIC_REST)."""
+        language = payload.get("language", "zh")
+        entry, terms = match["entry"], [term for term in match.get("evidence") or [] if term]
+        if not self._common_word(entry, terms, language):
+            return False
+        rest = (len(matching.normalized(i18n.strip_fillers(positive, language)))
+                - max(len(matching.normalized(term)) for term in terms))
+        return rest >= (GENERIC_REST if language == "zh" else GENERIC_REST_FOREIGN)
+
+    def _not_what_is_meant(self, positive, entry):
+        """Whether semantic retrieval ranks another page than this disconnected one
+        first. Without a ready index nothing is known: False keeps the usual answer."""
+        index = getattr(self.owner, "semantic", None)
+        if index is None or not index.ready:
+            return False
+        found = [e for _, e in index.search(positive)]
+        return bool(found) and found[0]["id"] != entry["id"]
+
     def _generic_unavailable(self, payload, text, positive, match):
         """Version D (T2_GENERIC): a single disconnected page matched by a common
         word while the sentence says more ("公園旁邊的大樹被風吹倒擋住路"): when
@@ -987,12 +1035,8 @@ class Workflow:
         None keeps the usual "not connected" answer, also when the disconnected
         page itself ranks first ("我要預約打流感疫苗")."""
         language = payload.get("language", "zh")
-        entry, terms = match["entry"], [term for term in match.get("evidence") or [] if term]
-        if not self._common_word(entry, terms, language):
-            return None
-        rest = (len(matching.normalized(i18n.strip_fillers(positive, language)))
-                - max(len(matching.normalized(term)) for term in terms))
-        if rest < (GENERIC_REST if language == "zh" else GENERIC_REST_FOREIGN):
+        entry = match["entry"]
+        if not self._says_more_than_common_word(payload, positive, match):
             return None
         index = getattr(self.owner, "semantic", None)
         if index is None or not index.ready:

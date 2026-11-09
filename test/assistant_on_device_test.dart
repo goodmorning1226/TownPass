@@ -1,6 +1,7 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:town_pass/service/assistant_on_device.dart';
+import 'package:town_pass/service/assistant_service.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -66,5 +67,13 @@ void main() {
       isNull,
     );
     expect(calls, isEmpty);
+  });
+
+  test('without a computer address the assistant uses the phone itself', () {
+    // On-device builds always do (AssistantService.baseUrl); here no
+    // ASSISTANT_BASE_URL is given either.
+    expect(AssistantService.onDeviceUrl, 'http://127.0.0.1:8765');
+    expect(AssistantService.baseUrl, AssistantService.onDeviceUrl);
+    expect(AssistantService().endpoint, startsWith('http://127.0.0.1:'));
   });
 }

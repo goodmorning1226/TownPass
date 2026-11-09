@@ -2506,6 +2506,27 @@ void main() {
     expect(AssistantSpeaker.speakable('嗨！'), '嗨！');
   });
 
+  test('Vietnamese and other Latin-script voices pause at line and paragraph breaks', () {
+    // Their voices read 「。」 as nothing: each line ends with "." instead.
+    expect(
+      AssistantSpeaker.speakable(
+        'Trợ lý có thể mở các chức năng:\n• Trang chủ\n• Bỏ phiếu【未串接】\n\nNói "trang sau" để xem tiếp',
+        language: 'vi',
+      ),
+      'Trợ lý có thể mở các chức năng. Trang chủ. Bỏ phiếu. Nói "trang sau" để xem tiếp.',
+    );
+    expect(
+      AssistantSpeaker.speakable('Done.\nNext one', language: 'en'),
+      'Done. Next one.',
+    );
+    expect(
+      AssistantSpeaker.speakable('Xin chào!', language: 'vi'),
+      'Xin chào!',
+    );
+    // Chinese keeps its own full stop.
+    expect(AssistantSpeaker.speakable('第一行\n第二行'), '第一行。 第二行。');
+  });
+
   testWidgets(
     'Options show numbers and a hint; the header has the read-aloud switch',
     (tester) async {

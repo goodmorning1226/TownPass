@@ -42,6 +42,7 @@ scripts/push_assistant_models_ios.sh <device-id>   # 模型複製到 App 的 Doc
 | `Ministral-3-3B-Instruct-2512-Q4_K_M.gguf` | Mistral AI，Apache-2.0 | 2.1 GB | 是 |
 | `ggml-whisper-multilingual.bin` | Whisper small q8_0（ggerganov/whisper.cpp），MIT | 253 MB | 語音 |
 | `ggml-whisper-langid.bin` | Whisper tiny q8_0，MIT | 42 MB | 選用 |
+| `ggml-whisper-taiwanese.bin` | Breeze-ASR-26（MediaTek Research＋陽明交大），Apache-2.0；官方權重以 whisper.cpp `convert-h5-to-ggml.py` 轉換、`whisper-quantize` q8_0 | 1.66 GB | 台語（選用） |
 | `multilingual-e5-small-q8_0.gguf`＋`faq_rag/` | Microsoft，MIT（`prepare_assistant_models.ps1`、`build_faq_index.py`） | 132 MB＋22 MB | 選用 |
 
 紀錄：`Library/Caches/on_device_assistant.log`（Python 與各 server 的輸出，只有數字與檔名），可用
@@ -58,16 +59,25 @@ scripts/push_assistant_models_ios.sh <device-id>   # 模型複製到 App 的 Doc
 - **鎖定手機後**：App 被暫停時 iOS 會收回監聽中的 socket（07:52 實測：whisper `server listen failed` 後結束、
   llama `listener ... stopped unexpectedly`、:8765 也連不上，App 顯示連不到助理）。現在三者都會在同一個 port 重開：
   Python 的 `device_main.watch` 每 2 秒檢查 :8765／:8770；llama-server 加了 `ios/native/llama-server-rebind.patch`
-  （自己重新 bind，不重載模型，`scripts/build_ios_llama_server.sh` 重建）；whisper-server 結束後等 App 回到前景再啟動。
+  （自己重新 bind，不重載模型，`scripts/build_ios_llama_server.sh` 重建）；whisper-server 也加了 `ios/native/whisper-server-ios.patch` 原地重新 bind（`scripts/build_ios_whisper_server.sh` 重建），模型不重載；萬一仍結束，App 回到前景再啟動。
   紀錄檔中會看到 `listener :8765 reopened`、`bound again`、`restarting`。
 - Python 的 `print` 改寫到 fd 1/2，和各 server 的輸出一起進紀錄檔（`backend:`、`timing warm-up`）。
 
+- **記憶體（台語）**：模型權重放在 GPU 上是 wired memory，不算在 App 的額度（`os_proc_available_memory`）裡。
+  8 GB 的 iPhone 17（實體 7672 MB）載完 Ministral、Whisper small、tiny、e5 後，App 額度還有約 4.5 GB，
+  但整支手機只剩約 800 MB；載入 Breeze-ASR-26 q8_0（約 2.2 GB）時 iOS 以 `vm-pageshortage` 結束 App。
+  現在台語啟動前同時檢查 App 額度與手機實際可用記憶體（需要 = 檔案大小＋600 MB，保留 400 MB），不夠就回 `memory`（台語片段當中文並提示），不再閃退。
+  台語 q8_0 要 12 GB 的機型：iPhone 17 Pro Max（實體 11695 MB）啟動後手機約有 2.8 GB 可用，夠載入。
+- 暖機的測試音不載入台語模型（`warm_taiwanese=False`）；llama-server 以 `/health` 200 判斷載完，台語等所有啟動模型載完才載入。
+- e5 與 FAQ 索引：`scripts/convert_e5_gguf.py` 轉 q8_0（132 MB），`scripts/build_faq_index.py` 以 Mac 上的 llama-server 建 8,121 筆索引（22 MB）；
+  手機上 `faq embed :8774`、`timing faq-load entries=8121`。
+
 ## 與 Android 的差別
 
-- 台語（Breeze-ASR-26）尚未接：`taiwanese_port=None`，台語片段當中文辨識並提示。
+- 台語（Breeze-ASR-26，:8776）：第一次遇到可能是台語的片段才啟動，和 Android 一樣（main 的台語自動判斷）。iOS 沒有 Java bridge，App 把 C 函式指標交給 Python（`device_main.native_starter`，ctypes 呼叫 `OnDeviceAssistant.startTaiwanese`）；可用記憶體不夠（`os_proc_available_memory`）時回 `memory`，台語片段照舊當中文並提示。
 - 沒有 CPU 核心綁定；iPhone 上主要由 GPU（Metal）計算，執行緒數 = 核心數 − 2（2–4）。
 - Python 沒有內建 CA 憑證：建置時把這台 Mac 的 Apple 根憑證匯出成 `python/cacert.pem`，以 `SSL_CERT_FILE` 指定，
   圖書館藏清單與台北通常見問答的 HTTPS 下載才能驗證。
 - 框架目前是 2026-11-07 在這台 Mac 上建好的（llama.cpp b12182、whisper.cpp v1.9.5，`CMAKE_SYSTEM_NAME=iOS`、arm64、
-  Release、Metal＋Accelerate、最低 iOS 16.4，`native-src/ios-out/wrap/*_entry.cpp`）；LlamaServer 用 `scripts/build_ios_llama_server.sh` 重建（含 rebind patch）；WhisperServer 與 Python 的重建腳本待補。
+  Release、Metal＋Accelerate、最低 iOS 16.4，`native-src/ios-out/wrap/*_entry.cpp`）；LlamaServer 用 `scripts/build_ios_llama_server.sh` 重建（含 rebind patch）；WhisperServer 用 `scripts/build_ios_whisper_server.sh`；Python 的重建腳本待補。
 - 模擬器不支援（框架只有 iPhone arm64）。

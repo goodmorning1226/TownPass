@@ -56,13 +56,17 @@ def _retry(action, deadline):
     return None
 
 
-def warm_up(recognizer, model_url, limit_s=900):
+def warm_up(recognizer, model_url, limit_s=900, taiwanese=True):
     """Load both models and prepare the fixed start of a decision before the user asks.
 
     A first request otherwise pays for reading the model files into memory
     (23-49 s on a vivo V2511 instead of ~17 s). The decision prompt's fixed
     system policy is processed once here; llama-server keeps it in its prompt
     cache, so a real request only processes what follows it. Numbers only are logged.
+    taiwanese=False: the warm-up tone must not load the Taiwanese model. Its Chinese
+    transcript is nonsense, so the "implausible Chinese" rule would start Breeze-ASR-26
+    (~2 GB) at every launch; on iOS that load ran into the other models' start-up and
+    crashed the App (2026-11-08). Real clips still use it.
     """
     import array
     import math
@@ -74,7 +78,14 @@ def warm_up(recognizer, model_url, limit_s=900):
     speech = None
     if recognizer is not None:  # None: the phone's own recogniser, no Whisper
         tone = array.array("h", (int(3000 * math.sin(i * 0.05)) for i in range(16000))).tobytes()
-        speech = _retry(lambda: recognizer.transcribe(tone), deadline)
+        hook = getattr(recognizer, "taiwanese", None)
+        if not taiwanese:
+            recognizer.taiwanese = None
+        try:
+            speech = _retry(lambda: recognizer.transcribe(tone), deadline)
+        finally:
+            if not taiwanese:
+                recognizer.taiwanese = hook
     speech_s = time.monotonic() - started
     # The same fixed system messages decision.decide sends, one per task, so each
     # of llama-server's two slots keeps one of them in its prompt cache.
@@ -122,6 +133,21 @@ def taiwanese_provider(port, starter=None):
         state = starter()
         return (f"http://127.0.0.1:{port}", None) if state == "ready" else (None, state)
     return provide
+
+
+def native_starter(address):
+    """The iOS App's Taiwanese starter: a C function at address (OnDeviceAssistant.swift)
+    that starts the Taiwanese whisper-server if needed and returns the same states as
+    Android's startTaiwanese ("ready", "missing", "memory", "failed"). iOS has no Java
+    bridge, so the App hands Python a function pointer; ctypes releases the GIL while
+    the App loads the model (seconds)."""
+    import ctypes
+    function = ctypes.CFUNCTYPE(ctypes.c_char_p)(address)
+
+    def start_in_app():
+        state = function()
+        return state.decode("utf-8", "replace") if state else "failed"
+    return start_in_app
 
 
 # A FAQ question is known text when its best FAQ score reaches this (faq.MEDIUM_CONF:
@@ -215,7 +241,7 @@ def watch(listeners, interval=2.0, stop=None):
 
 def start(model_port=8771, whisper_port=8772, assistant_port=8765, asr_port=8770, whisper=True,
           multi_port=None, chinese_model=True, faq_port=None, faq_dir=None, taiwanese_port=None,
-          decision_model="ministral", gate_port=None):
+          decision_model="ministral", gate_port=None, taiwanese_starter=None, warm_taiwanese=True):
     """Start both HTTP servers once; returns immediately after they listen.
 
     The native model servers may still be loading: until they answer, requests
@@ -232,6 +258,9 @@ def start(model_port=8771, whisper_port=8772, assistant_port=8765, asr_port=8770
     use (docs/AI_TAIWANESE_SPEECH_PLAN.md section 10); None: Taiwanese clips are
     heard as Chinese, with a notice.
     decision_model: "ministral" (default) or "gemma" (OnDeviceAssistant.kt, opt-in build).
+    taiwanese_starter: how to start the Taiwanese server (iOS: native_starter);
+    None: Android's Java bridge.
+    warm_taiwanese=False (iOS): the warm-up never loads the Taiwanese model (warm_up).
     gate_port: the language gate (Whisper tiny, detection only) that decides the
     speech language before any decode; None (not pushed) works as before.
     """
@@ -243,7 +272,7 @@ def start(model_port=8771, whisper_port=8772, assistant_port=8765, asr_port=8770
         import server
         multi_url = f"http://127.0.0.1:{multi_port}" if whisper and multi_port else None
         chinese_url = os.environ["TOWNPASS_WHISPER_URL"] if chinese_model or not multi_url else multi_url
-        taiwanese = taiwanese_provider(taiwanese_port) if whisper and taiwanese_port else None
+        taiwanese = taiwanese_provider(taiwanese_port, taiwanese_starter) if whisper and taiwanese_port else None
         gate_url = f"http://127.0.0.1:{gate_port}" if multi_url and gate_port else None
         backend = server.Assistant()
         # Same process as the backend: a Chinese transcript the App does not know (no
@@ -262,6 +291,7 @@ def start(model_port=8771, whisper_port=8772, assistant_port=8765, asr_port=8770
             import semantic
             backend.semantic = semantic.load_default(backend.workflow.registry)
         threading.Thread(target=warm_up, args=(recognizer if whisper else None, os.environ["TOWNPASS_MODEL_URL"]),
+                         kwargs={"taiwanese": warm_taiwanese},
                          name="assistant-warm-up", daemon=True).start()
         _started.set()
         speech = "speech: phone recogniser"

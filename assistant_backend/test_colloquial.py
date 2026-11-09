@@ -165,6 +165,22 @@ class T2Tests(unittest.TestCase):
             self.assertEqual(result["kind"], "unsupported", text)
             self.assertEqual(result["metrics"]["route"], "unavailable_direct")
 
+    def test_a_common_word_alone_does_not_answer_with_the_disconnected_page(self):
+        # "公園可以帶狗嗎": 公園 finds 簡單森呼吸, but semantic retrieval means another
+        # disconnected page and no FAQ is close: not "簡單森呼吸：尚無核對過的地點資料".
+        text = "公園可以帶狗嗎"
+        app = self.app(choose="request_clarification", meaning={positive_text(text): "zoo"})
+        result = self.turn(app, text)
+        self.assertEqual((result["kind"], result["action"]), ("reply", "no_related"))
+        self.assertEqual(result["metrics"]["route"], "generic_no_match")
+        self.assertNotIn("簡單森呼吸", result["message"])
+
+    def test_naming_the_disconnected_page_still_gives_its_reason(self):
+        app = self.app(meaning={positive_text("森呼吸是什麼"): "greenMap"})
+        result = self.turn(app, "森呼吸是什麼")
+        self.assertEqual(result["kind"], "unsupported")
+        self.assertIn(REGISTRY.by_id["greenMap"]["reason"], result["message"])
+
     def test_semantic_off_keeps_the_usual_answer(self):
         app = Assistant(FakeCatalog(), lambda messages, tools: first(tools))
         result = self.turn(app, "公園旁邊的大樹被風吹倒擋住路")

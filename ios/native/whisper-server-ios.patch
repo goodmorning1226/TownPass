@@ -1,0 +1,68 @@
+diff --git a/examples/common-whisper.cpp b/examples/common-whisper.cpp
+index b12481c..5a750de 100644
+--- a/examples/common-whisper.cpp
++++ b/examples/common-whisper.cpp
+@@ -1,3 +1,4 @@
++extern "C" int townpass_system_unavailable(const char *); // iOS: no shell (TownPass on-device patch)
+ #define _USE_MATH_DEFINES // for M_PI
+ 
+ #include "common-whisper.h"
+@@ -234,7 +235,7 @@ bool speak_with_file(const std::string & command, const std::string & text, cons
+     } else {
+         speak_file.write(text.c_str(), text.size());
+         speak_file.close();
+-        int ret = system((command + " " + std::to_string(voice_id) + " " + path).c_str());
++        int ret = townpass_system_unavailable((command + " " + std::to_string(voice_id) + " " + path).c_str());
+         if (ret != 0) {
+             fprintf(stderr, "%s: failed to speak\n", __func__);
+             return false;
+diff --git a/examples/server/server.cpp b/examples/server/server.cpp
+index b745f4d..fe1b931 100644
+--- a/examples/server/server.cpp
++++ b/examples/server/server.cpp
+@@ -1,3 +1,4 @@
++extern "C" int townpass_system_unavailable(const char *); // iOS: no shell (TownPass on-device patch)
+ #include "common.h"
+ #include "common-whisper.h"
+ 
+@@ -283,7 +284,7 @@ struct whisper_print_user_data {
+ };
+ 
+ void check_ffmpeg_availibility() {
+-    int result = system("ffmpeg -version");
++    int result = townpass_system_unavailable("ffmpeg -version");
+ 
+     if (result == 0) {
+         std::cout << "ffmpeg is available." << std::endl;
+@@ -321,7 +322,7 @@ bool convert_to_wav(const std::string & temp_filename, std::string & error_resp,
+     cmd_stream << "ffmpeg -i \"" << temp_filename << "\" -y -ar 16000 -ac " << (stereo ? 2 : 1) << " -c:a pcm_s16le \"" << converted_filename_temp << "\" 2>&1";
+     std::string cmd = cmd_stream.str();
+ 
+-    int status = std::system(cmd.c_str());
++    int status = townpass_system_unavailable(cmd.c_str());
+     if (status != 0) {
+         error_resp = "{\"error\":\"FFmpeg conversion failed.\"}";
+         return false;
+@@ -1294,8 +1295,21 @@ int main(int argc, char ** argv) {
+     };
+ 
+     std::thread t([&] {
+-        if (!svr->listen_after_bind()) {
++        // TownPass iOS: a suspended App loses its listening sockets (the system
++        // reclaims them); listen_after_bind() then fails although nobody called
++        // stop(). Bind the same port again and keep serving, with the model still
++        // loaded. stop() makes listen_after_bind() return true, which ends this loop.
++        while (!svr->listen_after_bind()) {
+             fprintf(stderr, "error: server listen failed\n");
++            bool bound = false;
++            for (int attempt = 0; !bound && attempt < 3600; attempt++) {
++                std::this_thread::sleep_for(std::chrono::seconds(1));
++                bound = svr->bind_to_port(sparams.hostname, sparams.port);
++            }
++            if (!bound) {
++                break;
++            }
++            fprintf(stderr, "whisper-server: listener on %s:%d bound again\n", sparams.hostname.c_str(), sparams.port);
+         }
+     });
+ 

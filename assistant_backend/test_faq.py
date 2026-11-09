@@ -343,3 +343,55 @@ class ForeignFaqHttpTests(unittest.TestCase):
                                          data=body, headers={"Content-Type": "application/json"})
         with urllib.request.urlopen(request, timeout=30) as response:
             self.assertEqual(response.status, 200)
+
+
+class DisconnectedPageFaqTests(unittest.TestCase):
+    """A request that names one disconnected page still reaches the FAQ (owner, 2026-11-08)."""
+
+    def app(self, hits):
+        self.faq = FakeFaq(hits)
+        return Assistant(FakeCatalog(), lambda messages, tools: first(tools), faq=self.faq)
+
+    @staticmethod
+    def turn(app, text, **kwargs):
+        return app.turn({"text": text, "request_id": "faq-request", "session_id": "faq", **kwargs})
+
+    def test_an_faq_answer_comes_before_the_not_connected_reason(self):
+        app = self.app([hit("1", HIGH, "門診掛號要帶什麼？", "請攜帶健保卡。", "衛生局")])
+        result = self.turn(app, "幫我掛號")
+        self.assertEqual((result["kind"], result["action"]), ("reply", "faq_answer"))
+        self.assertIn("請攜帶健保卡。", result["message"])
+        self.assertEqual(self.faq.queries, ["幫我掛號"])
+
+    def test_without_a_close_faq_the_reason_is_still_given(self):
+        from registry import Registry
+        app = self.app([hit("1", BELOW)])
+        result = self.turn(app, "幫我掛號")
+        self.assertEqual(result["kind"], "unsupported")
+        self.assertIsNone(result["destination"])
+        self.assertIn(Registry().by_id["medicalAppointment"]["reason"], result["message"])
+
+    def test_other_languages_ask_for_the_translation_then_answer_from_the_faq(self):
+        app = self.app([hit("1", HIGH, "動物園幾點開？", "九點開園。", "動物園")])
+        asked = self.turn(app, "zoo", language="en")
+        self.assertEqual(asked["action"], "translate_for_faq")
+        answered = self.turn(app, "zoo", language="en", faq_text="動物園幾點開")
+        self.assertEqual(answered["action"], "faq_answer")
+        self.assertIn("九點開園。", answered["message"])
+
+
+class DisconnectedCandidatesFaqTests(unittest.TestCase):
+    """Several matches that are all disconnected: none can open, so the FAQ answers first."""
+
+    def test_faq_before_offering_only_disconnected_pages(self):
+        faq_index = FakeFaq([hit("1", HIGH, "掛號要帶什麼", "請帶健保卡。", "衛生局")])
+        app = Assistant(FakeCatalog(), lambda messages, tools: first(tools), faq=faq_index)
+        result = app.turn({"text": "我要掛號跟去動物園", "request_id": "r", "session_id": "s"})
+        self.assertEqual(result["action"], "faq_answer")
+        self.assertIn("請帶健保卡。", result["message"])
+
+    def test_without_faq_they_are_still_offered(self):
+        app = Assistant(FakeCatalog(), lambda messages, tools: first(tools), faq=FakeFaq([]))
+        result = app.turn({"text": "我要掛號跟去動物園", "request_id": "r", "session_id": "s"})
+        self.assertEqual(result["kind"], "confirm_candidates")
+        self.assertFalse(any(choice["enabled"] for choice in result["choices"]))

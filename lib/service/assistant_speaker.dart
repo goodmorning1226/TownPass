@@ -41,7 +41,7 @@ class AssistantSpeaker {
   /// [language] is the reply's language ('zh', 'en', ...); a phone without a
   /// voice for it keeps the previous one (the text is always shown).
   Future<void> speak(String text, {String language = 'zh'}) async {
-    final spoken = speakable(text);
+    final spoken = speakable(text, language: language);
     if (spoken.isEmpty) return;
     try {
       final tts = _tts ??= await _create();
@@ -74,7 +74,14 @@ class AssistantSpeaker {
   /// Text as it should be spoken: no list bullets or bracketed status tags,
   /// and every line or list item ends with sentence punctuation so the engine
   /// pauses between them instead of running the list together.
-  static String speakable(String text) {
+  ///
+  /// The full stop is the [language]'s own: Chinese and Japanese voices stop at
+  /// 「。」, but the Vietnamese, English, Indonesian and Thai voices read it as
+  /// nothing, so their lines and paragraphs ran together (owner, 2026-11-08);
+  /// they get "." instead, and a line that ends with a colon, comma or
+  /// semicolon gets a full stop there too (a line break is a sentence break).
+  static String speakable(String text, {String language = 'zh'}) {
+    final cjk = language == 'zh' || language == 'ja';
     final lines = <String>[];
     for (final raw in text.split('\n')) {
       var line = raw
@@ -83,7 +90,12 @@ class AssistantSpeaker {
           .replaceAll(RegExp(r'\s+'), ' ')
           .trim();
       if (line.isEmpty) continue;
-      if (!RegExp(r'[。！？!?：:，,；;…]$').hasMatch(line)) line = '$line。';
+      if (cjk) {
+        if (!RegExp(r'[。！？!?：:，,；;…]$').hasMatch(line)) line = '$line。';
+      } else {
+        line = line.replaceFirst(RegExp(r'\s*[:：,，;；。]+$'), '');
+        if (!RegExp(r'[.!?…！？]$').hasMatch(line)) line = '$line.';
+      }
       lines.add(line);
     }
     return lines.join(' ');

@@ -1098,3 +1098,65 @@ class ListenerTests(unittest.TestCase):
         stop.set()
         watcher.join()
         self.assertIs(listener.server, server)
+
+
+class NativeStarterTests(unittest.TestCase):
+    """iOS hands Python a C function that starts the Taiwanese whisper-server."""
+
+    def test_the_app_function_is_called_and_its_state_returned(self):
+        import ctypes
+        import device_main
+        calls = []
+
+        @ctypes.CFUNCTYPE(ctypes.c_char_p)
+        def app_starter():
+            calls.append(1)
+            return b"ready"
+
+        address = ctypes.cast(app_starter, ctypes.c_void_p).value
+        provide = device_main.taiwanese_provider(8776, device_main.native_starter(address))
+        self.assertEqual(provide(), ("http://127.0.0.1:8776", None))
+        self.assertEqual(calls, [1])
+
+    def test_a_missing_model_is_reported_not_raised(self):
+        import ctypes
+        import device_main
+
+        @ctypes.CFUNCTYPE(ctypes.c_char_p)
+        def app_starter():
+            return b"missing"
+
+        address = ctypes.cast(app_starter, ctypes.c_void_p).value
+        provide = device_main.taiwanese_provider(8776, device_main.native_starter(address))
+        self.assertEqual(provide(), (None, "missing"))
+
+
+class WarmUpTaiwaneseTests(unittest.TestCase):
+    """iOS: the warm-up tone must not start the Taiwanese model (it crashed the App)."""
+
+    class Recognizer:
+        def __init__(self):
+            self.taiwanese = lambda: ("http://127.0.0.1:8776", None)
+            self.hooks = []
+
+        def transcribe(self, frames, language="zh"):
+            self.hooks.append(self.taiwanese)
+            return {"text": "", "status": "unclear"}
+
+    def warm(self, recognizer, **kwargs):
+        import device_main
+        with patch("server.fetch_json", return_value={}):
+            device_main.warm_up(recognizer, "http://127.0.0.1:9", limit_s=5, **kwargs)
+
+    def test_without_taiwanese_the_hook_is_off_during_the_tone_and_back_after(self):
+        recognizer = self.Recognizer()
+        hook = recognizer.taiwanese
+        self.warm(recognizer, taiwanese=False)
+        self.assertEqual(recognizer.hooks, [None])
+        self.assertIs(recognizer.taiwanese, hook)
+
+    def test_by_default_android_keeps_the_hook(self):
+        recognizer = self.Recognizer()
+        hook = recognizer.taiwanese
+        self.warm(recognizer)
+        self.assertEqual(recognizer.hooks, [hook])

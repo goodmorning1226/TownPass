@@ -40,10 +40,15 @@ class AssistantTranscript {
 }
 
 class AssistantService {
-  static const baseUrl = String.fromEnvironment(
-    'ASSISTANT_BASE_URL',
-    defaultValue: 'http://127.0.0.1:8765',
-  );
+  /// The phone's own backend (on-device builds) on loopback.
+  static const onDeviceUrl = 'http://127.0.0.1:8765';
+
+  /// On-device builds (ASSISTANT_ON_DEVICE) always use the phone's own
+  /// backend, even when ASSISTANT_BASE_URL is also given: the assistant never
+  /// talks to a computer there. Other builds use ASSISTANT_BASE_URL.
+  static const baseUrl = AssistantOnDevice.requested
+      ? onDeviceUrl
+      : String.fromEnvironment('ASSISTANT_BASE_URL', defaultValue: onDeviceUrl);
   final String endpoint;
   HttpClient? _active;
 

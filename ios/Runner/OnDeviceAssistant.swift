@@ -1,6 +1,7 @@
 import Flutter
 import Foundation
 import UIKit
+import os
 
 /// Runs the local service assistant inside the iOS App (docs/AI_ON_DEVICE_IOS.md),
 /// the iOS twin of android/.../OnDeviceAssistant.kt. Same loopback endpoints, so
@@ -29,14 +30,28 @@ final class OnDeviceAssistant {
   static let gateAsrFile = "ggml-whisper-langid.bin"
   static let faqModelFile = "multilingual-e5-small-q8_0.gguf"
   static let faqIndexDir = "faq_rag"
+  /// Breeze-ASR-26 q8_0 (Taiwanese speech -> Mandarin characters), loaded on the
+  /// first Taiwanese clip (docs/AI_TAIWANESE_SPEECH_PLAN.md), as on Android.
+  static let taiwaneseAsrFile = "ggml-whisper-taiwanese.bin"
 
   private static let modelPort = 8771
   private static let multiWhisperPort = 8773
   private static let faqEmbedPort = 8774
   private static let gateWhisperPort = 8775
+  private static let taiwaneseWhisperPort = 8776
 
   private let lock = NSLock()
   private var state: String?
+
+  // Set by launch(); startTaiwanese() starts the Taiwanese server with them.
+  private var modelsDirectory: URL?
+  private var whisperLibrary: String?
+  private var whisperThreads = "4"
+  private let taiwaneseLock = NSLock()
+  private var taiwaneseStarted = false
+  /// Signalled when every start-up server has loaded (or given up): the
+  /// Taiwanese model never loads while another model is still loading.
+  private let startupDone = DispatchSemaphore(value: 0)
 
   private typealias ServerMain = @convention(c) (
     Int32, UnsafeMutablePointer<UnsafeMutablePointer<CChar>?>?
@@ -108,6 +123,12 @@ final class OnDeviceAssistant {
       has(Self.faqModelFile)
       && fileManager.fileExists(atPath: faqIndex.appendingPathComponent("embeddings.bin").path)
 
+    let cpu = ProcessInfo.processInfo.activeProcessorCount
+    let threads = String(max(2, min(4, cpu - 2)))
+    modelsDirectory = models
+    whisperLibrary = "\(frameworks)/WhisperServer.framework/WhisperServer"
+    whisperThreads = threads
+
     // Python first: it listens at once; the native servers load behind it.
     let pythonInfo = startPython(
       library: python, home: "\(resources)/python", backend: backend, support: support.path,
@@ -120,16 +141,18 @@ final class OnDeviceAssistant {
         "gate_port=\(gate ? String(Self.gateWhisperPort) : "None")",
         "faq_port=\(faq ? String(Self.faqEmbedPort) : "None")",
         "faq_dir=\(faq ? pythonString(faqIndex.path) : "None")",
-        // No Taiwanese model on iOS yet: Taiwanese clips are heard as Chinese, with a notice.
-        "taiwanese_port=None",
+        // Always offered with Whisper: the file is looked for on first use
+        // (startTaiwanese); without it Taiwanese clips are heard as Chinese, with a notice.
+        "taiwanese_port=\(multilingual ? String(Self.taiwaneseWhisperPort) : "None")",
+        "taiwanese_starter=device_main.native_starter(\(UInt(bitPattern: unsafeBitCast(taiwaneseStarter, to: Int.self))))",
         "decision_model='ministral'",
+        // The warm-up tone would load the Taiwanese model at every launch (device_main.warm_up).
+        "warm_taiwanese=False",
       ])
     if let pythonInfo { return "failed: \(pythonInfo)" }
 
-    // iPhone 15-17 Pro: 2 performance + 4 efficiency cores; the GPU (Metal) does
-    // most of the work, so a few CPU threads are enough.
-    let cpu = ProcessInfo.processInfo.activeProcessorCount
-    let threads = String(max(2, min(4, cpu - 2)))
+    // iPhone 15-17: 2 performance + 4 efficiency cores; the GPU (Metal) does
+    // most of the work, so a few CPU threads (threads, above) are enough.
     let llama = "\(frameworks)/LlamaServer.framework/LlamaServer"
     let whisper = "\(frameworks)/WhisperServer.framework/WhisperServer"
     // One server at a time, each started after the previous one listens: started
@@ -173,20 +196,78 @@ final class OnDeviceAssistant {
             library: server.library, symbol: server.symbol, name: server.name,
             arguments: server.arguments, restart: server.symbol == "townpass_whisper_server")
         else { continue }
-        // Servers listen only after their model has loaded.
-        while !listening(server.port) && Date().timeIntervalSince(began) < 180 {
+        // Ready = model loaded. whisper-server listens only after loading, but
+        // llama-server listens at once and answers /health with 503 until its model
+        // is loaded; starting the next model before that overlapped their GPU set-up
+        // and the App crashed (2026-11-08).
+        let llama = server.symbol == "townpass_llama_server"
+        func ready() -> Bool { llama ? healthy(server.port) : listening(server.port) }
+        while !ready() && Date().timeIntervalSince(began) < 180 {
           Thread.sleep(forTimeInterval: 0.25)
         }
         note(
           String(
-            format: "%@ %@ after %.1f s", server.name,
-            listening(server.port) ? "listening" : "not listening", Date().timeIntervalSince(began)))
+            format: "%@ %@ after %.1f s; %@", server.name,
+            ready() ? "ready" : "not ready", Date().timeIntervalSince(began), memoryNote()))
       }
+      startupDone.signal()
     }
     starter.name = "assistant-start"
     starter.start()
     return "started python :8765; loading " + plan.map { "\($0.name) :\($0.port)" }
       .joined(separator: ", ") + (multilingual ? "" : "; no whisper model")
+  }
+
+  private func availableMB() -> Int { Int(os_proc_available_memory() >> 20) }
+
+  /// Physical memory the phone could give right now: free, inactive, speculative
+  /// and purgeable pages (wired GPU buffers and other apps' active pages are not).
+  private func reclaimableMemory() -> UInt64 {
+    var info = vm_statistics64()
+    var count = mach_msg_type_number_t(
+      MemoryLayout<vm_statistics64_data_t>.size / MemoryLayout<integer_t>.size)
+    let status = withUnsafeMutablePointer(to: &info) {
+      $0.withMemoryRebound(to: integer_t.self, capacity: Int(count)) {
+        host_statistics64(mach_host_self(), HOST_VM_INFO64, $0, &count)
+      }
+    }
+    guard status == KERN_SUCCESS else { return 0 }
+    let pages =
+      UInt64(info.free_count) + UInt64(info.inactive_count) + UInt64(info.speculative_count)
+      + UInt64(info.purgeable_count)
+    return pages * UInt64(vm_kernel_page_size)
+  }
+
+  private func memoryNote() -> String {
+    "\(availableMB()) MB app budget, \(reclaimableMemory() >> 20) MB phone free, "
+      + "\(ProcessInfo.processInfo.physicalMemory >> 20) MB RAM"
+  }
+
+  /// Whether llama-server on 127.0.0.1:[port] has loaded its model (GET /health is 200).
+  private func healthy(_ port: Int) -> Bool {
+    let socket = Darwin.socket(AF_INET, SOCK_STREAM, 0)
+    guard socket >= 0 else { return false }
+    defer { close(socket) }
+    var timeout = timeval(tv_sec: 2, tv_usec: 0)
+    setsockopt(socket, SOL_SOCKET, SO_RCVTIMEO, &timeout, socklen_t(MemoryLayout<timeval>.size))
+    var address = sockaddr_in()
+    address.sin_len = UInt8(MemoryLayout<sockaddr_in>.size)
+    address.sin_family = sa_family_t(AF_INET)
+    address.sin_port = in_port_t(UInt16(port).bigEndian)
+    address.sin_addr.s_addr = inet_addr("127.0.0.1")
+    let connected = withUnsafePointer(to: &address) {
+      $0.withMemoryRebound(to: sockaddr.self, capacity: 1) {
+        connect(socket, $0, socklen_t(MemoryLayout<sockaddr_in>.size)) == 0
+      }
+    }
+    guard connected else { return false }
+    let request = "GET /health HTTP/1.0\r\nHost: 127.0.0.1\r\n\r\n"
+    guard request.withCString({ send(socket, $0, strlen($0), 0) }) > 0 else { return false }
+    var buffer = [UInt8](repeating: 0, count: 64)
+    let count = recv(socket, &buffer, buffer.count, 0)
+    guard count > 12 else { return false }
+    // "HTTP/1.1 200 OK"
+    return String(decoding: buffer[9..<12], as: UTF8.self) == "200"
   }
 
   private func appIsActive() -> Bool {
@@ -208,6 +289,61 @@ final class OnDeviceAssistant {
         connect(socket, $0, socklen_t(MemoryLayout<sockaddr_in>.size)) == 0
       }
     }
+  }
+
+  /// Starts the Taiwanese whisper-server if it is not running yet and waits until
+  /// it has loaded (called by the backend through device_main.native_starter, on a
+  /// backend thread, only for clips that may be Taiwanese). Returns "ready",
+  /// "missing" (file not pushed), "memory" (not enough free memory; nothing else
+  /// is stopped) or "failed", like Android's OnDeviceAssistant.startTaiwanese.
+  func startTaiwanese() -> String {
+    taiwaneseLock.lock()
+    defer { taiwaneseLock.unlock() }
+    guard let models = modelsDirectory, let whisper = whisperLibrary else { return "failed" }
+    if listening(Self.taiwaneseWhisperPort) { return "ready" }
+    // Not while the start-up models are still loading (one load at a time).
+    if startupDone.wait(timeout: .now() + 300) == .success { startupDone.signal() }
+    let model = models.appendingPathComponent(Self.taiwaneseAsrFile)
+    guard
+      let size = (try? FileManager.default.attributesOfItem(atPath: model.path))?[.size] as? UInt64
+    else { return "missing" }
+    let began = Date()
+    if !taiwaneseStarted {
+      // On the GPU it takes its weights (the file) plus ~600 MB of large-model caches
+      // and compute buffers (kv cross 1500 x 32 layers, decode). Android's CPU figure
+      // (1.28x the file) over-counted and refused a 12 GB iPhone with 2.8 GB free.
+      // Both limits must allow it: the App's own budget (os_proc_available_memory)
+      // and the phone's free physical memory. Model weights on the GPU are wired
+      // memory that the App's budget does not count: on an 8 GB iPhone 17 the
+      // budget said 4.5 GB free while the phone had 54 MB left, and iOS killed the
+      // App for page shortage (vm-pageshortage) as Breeze loaded (2026-11-08).
+      let needed = size + 600 * 1024 * 1024
+      let budget = UInt64(os_proc_available_memory())
+      let physical = reclaimableMemory()
+      let reserve: UInt64 = 400 * 1024 * 1024  // iOS and its services
+      note(
+        "taiwanese speech: needs \(needed >> 20) MB; app budget \(budget >> 20) MB, "
+          + "phone free \(physical >> 20) MB (keeps \(reserve >> 20) MB)")
+      if budget < needed || physical < needed + reserve {
+        return "memory"
+      }
+      guard
+        runServer(
+          library: whisper, symbol: "townpass_whisper_server", name: "whisper-taiwanese",
+          arguments: serverArguments(models, Self.taiwaneseAsrFile, Self.taiwaneseWhisperPort)
+            + ["-t", whisperThreads, "-l", "zh"], restart: true)
+      else { return "failed" }
+      taiwaneseStarted = true
+    }
+    // whisper-server listens only after the model has loaded.
+    while Date().timeIntervalSince(began) < 60 {
+      if listening(Self.taiwaneseWhisperPort) {
+        note(String(format: "taiwanese speech loaded in %.1f s", Date().timeIntervalSince(began)))
+        return "ready"
+      }
+      Thread.sleep(forTimeInterval: 0.2)
+    }
+    return "failed"
   }
 
   /// To the system log and to on_device_assistant.log (stderr, once redirected).
@@ -232,11 +368,12 @@ final class OnDeviceAssistant {
     }
     let main = unsafeBitCast(address, to: ServerMain.self)
     let argv = ([name] + arguments).map { strdup($0) }
-    // whisper-server returns from main() when iOS reclaims its listening socket
-    // while the App is suspended (phone locked); it is run again once the App is
-    // active. llama-server binds the same port again by itself (patched,
-    // ios/native/llama-server-rebind.patch). Quick repeated exits (a broken
-    // model or port) stop after five tries.
+    // When iOS reclaims a suspended App's listening socket, llama-server and
+    // whisper-server bind the same port again by themselves, keeping the model
+    // loaded (ios/native/llama-server-rebind.patch, whisper-server-ios.patch).
+    // Unpatched whisper-server returned from main() instead and reloaded its model
+    // on every resume (Breeze: 1.6 GB); if a server still exits, it is run again
+    // once the App is active. Quick repeated exits stop after five tries.
     let thread = Thread { [self] in
       var quickExits = 0
       while true {
@@ -312,4 +449,11 @@ final class OnDeviceAssistant {
     "'" + value.replacingOccurrences(of: "\\", with: "\\\\").replacingOccurrences(of: "'", with: "\\'")
       + "'"
   }
+}
+
+/// The C function the backend calls to start the Taiwanese server
+/// (device_main.native_starter). ctypes copies the returned text; the few bytes
+/// of each strdup are not freed (one call per Taiwanese clip at most).
+private let taiwaneseStarter: @convention(c) () -> UnsafeMutablePointer<CChar>? = {
+  strdup(OnDeviceAssistant.shared.startTaiwanese())
 }
