@@ -78,11 +78,11 @@ class LlamaServerModelTests(unittest.TestCase):
         heard = []
 
         class Recognizer:
-            def transcribe(self, frames):
-                heard.append(len(frames))
+            def transcribe(self, frames, language="zh", automatic_taiwanese=True):
+                heard.append((len(frames), automatic_taiwanese))
                 return {"text": ""}
         device_main.warm_up(Recognizer(), server.MODEL_URL, limit_s=5)
-        self.assertEqual(heard, [32000])  # one second of 16 kHz PCM16
+        self.assertEqual(heard, [(32000, False)])  # one second of 16 kHz PCM16, no Taiwanese
         from decision import system_prompt
         from decision import POLICIES
         systems = [body["messages"][0]["content"] for _, body in FakeLlamaServer.requests[-len(POLICIES):]]
@@ -427,6 +427,72 @@ class MultilingualSpeechTests(unittest.TestCase):
                          ("vi", ("multi", "vi", False)))
         self.assertEqual(recognizer.transcribe(loud_frames(), "auto")["language"], "zh")
 
+    # --- Vietnamese and Indonesian (RIVALS) -------------------------------------
+
+    def test_vietnamese_heard_as_indonesian_is_checked_in_vietnamese(self):
+        # Owner, 2026-11-08: "Tôi muốn mượn sách" with Vietnamese chosen came back as
+        # Indonesian. Malay and Javanese fold into Indonesian and make the gate sure;
+        # the Indonesian decode reads as unmarked Vietnamese, so Vietnamese is decoded too.
+        self.speech["id"], self.speech["vi"] = ("Toi muon muon sach", -0.5), ("Tôi muốn mượn sách", -0.3)
+        recognizer = self.with_gate({"ms": 0.5, "id": 0.35, "vi": 0.02})
+        result = recognizer.transcribe(loud_frames(), "vi")
+        self.assertEqual(self.requests(), [("gate", "auto", True), ("multi", "id", False), ("multi", "vi", False)])
+        self.assertEqual((result["language"], result["text"], result["candidates"]), ("vi", "Tôi muốn mượn sách", ["id", "vi"]))
+        vi_body = [body for name, language, detect, body in self.calls if language == "vi"][0]
+        self.assertIn(field("temperature_inc", "0") + CRLF, vi_body)  # a second opinion: no retries
+
+    def test_indonesian_stays_indonesian_with_vietnamese_chosen(self):
+        # The menu alone is no reason for a Vietnamese decode (Whisper forced into the
+        # menu language writes a plausible translation).
+        self.speech["id"], self.speech["vi"] = ("saya mau pinjam buku", -0.2), ("Tôi muốn mượn sách", -0.1)
+        recognizer = self.with_gate({"id": 0.9})
+        self.assertEqual(recognizer.transcribe(loud_frames(), "vi")["language"], "id")
+        self.assertEqual(self.requests()[1:], [("multi", "id", False)])
+        # When it is decoded (a real chance), a worse-scoring Vietnamese text loses.
+        self.speech["vi"] = ("Xay mau binh búc", -0.9)
+        recognizer = self.with_gate({"id": 0.85, "vi": 0.1})
+        self.assertEqual(recognizer.transcribe(loud_frames(), "vi")["language"], "id")
+        # Without Vietnamese letters a "Vietnamese" transcript loses even when it scores better.
+        self.speech["vi"] = ("saya mau pinjam buku", -0.1)
+        recognizer = self.with_gate({"vi": 0.7, "id": 0.2})
+        result = recognizer.transcribe(loud_frames(), "vi")
+        self.assertEqual((result["language"], result["text"]), ("id", "saya mau pinjam buku"))
+
+    def test_rival_only_with_a_real_chance_or_chosen(self):
+        recognizer = self.with_gate({"id": 0.9, "vi": 0.05})
+        recognizer.transcribe(loud_frames(), "en")
+        self.assertEqual(self.requests(), [("gate", "auto", True), ("multi", "id", False)])
+        self.calls.clear()
+        recognizer = self.with_gate({"id": 0.85, "vi": 0.12})  # 12 %: a real chance
+        recognizer.transcribe(loud_frames(), "en")
+        self.assertEqual(self.requests()[1:], [("multi", "id", False), ("multi", "vi", False)])
+        self.calls.clear()
+        recognizer = self.with_gate({"vi": 0.95})  # Vietnamese, clear and with its letters
+        self.assertEqual(recognizer.transcribe(loud_frames(), "vi")["language"], "vi")
+        self.assertEqual(self.requests()[1:], [("multi", "vi", False)])
+
+    def test_vietnamese_from_whisper_small_is_checked_too(self):
+        # No gate: small detects Indonesian (clear), Vietnamese was chosen.
+        self.detected["multi"] = "indonesian"
+        self.probabilities["multi"] = {"id": 0.7, "vi": 0.2}
+        self.speech["id"], self.speech["vi"] = ("Toi muon muon sach", -0.5), ("Tôi muốn mượn sách", -0.3)
+        result = self.recognizer.transcribe(loud_frames(), "vi")
+        self.assertEqual(self.requests(), [("multi", "auto", False), ("multi", "vi", False)])
+        self.assertEqual((result["language"], result["language_confidence"]), ("vi", 0.2))
+        # A Vietnamese detection whose text has no Vietnamese letters is redone in Vietnamese.
+        self.calls.clear()
+        self.detected["multi"], self.probabilities["multi"] = "vietnamese", {"vi": 0.9}
+        self.speech["vi"] = ("Toi muon muon sach", -0.3)
+        result = self.recognizer.transcribe(loud_frames(), "vi")
+        self.assertEqual([language for _, language, _ in self.requests()], ["auto", "vi"])
+
+    def test_vietnamese_script(self):
+        from asr_server import script_fits
+        self.assertTrue(script_fits("Tôi muốn mượn sách", "vi"))
+        self.assertTrue(script_fits("đi", "vi"))
+        self.assertFalse(script_fits("Toi muon muon sach", "vi"))
+        self.assertTrue(script_fits("saya mau pinjam buku", "id"))
+
     def test_gate_also_serves_other_languages_without_an_auto_pass(self):
         self.detected["multi"] = "english"
         recognizer = self.with_gate({"en": 0.97})
@@ -644,6 +710,16 @@ class TaiwaneseSpeechTests(unittest.TestCase):
         self.assertEqual(self.recognizer.transcribe(loud_frames(), "nan")["notice"], "failed")
         self.recognizer.taiwanese = None  # e.g. phone recogniser builds: no Taiwanese hook
         self.assertEqual(self.recognizer.transcribe(loud_frames(), "nan")["notice"], "missing")
+
+    def test_warm_up_tone_never_starts_the_taiwanese_model(self):
+        # A sine tone used to pass the Taiwanese gate and load Breeze (1.7 GB) at idle.
+        import array
+        import math
+        tone = array.array("h", (int(3000 * math.sin(i * 0.05)) for i in range(16000))).tobytes()
+        self.speech["zh"] = ("嗚嗚嗚", -1.3)  # unknown, unsure text: would otherwise go to Breeze
+        result = self.recognizer.transcribe(tone, "zh", automatic_taiwanese=False)
+        self.assertEqual((result["language"], self.starts), ("zh", []))
+        self.assertNotIn("nan", self.models())
 
     def test_model_is_started_only_for_taiwanese_clips(self):
         self.recognizer.transcribe(loud_frames(), "zh")  # long clear Chinese: one pass
@@ -993,6 +1069,132 @@ class AutoTaiwaneseTests(unittest.TestCase):
             self.assertIsNone(self.heard()["taiwanese_route"])
 
 
+class VietnameseSpeechTests(unittest.TestCase):
+    """Vietnamese (docs/AI_VIETNAMESE.md): an optional Vietnamese model, started on
+    first use, makes every Vietnamese decode, without a prompt and with the full
+    encoder window; the language is still detected as before. Without it the
+    multilingual model decodes Vietnamese as before."""
+
+    def setUp(self):
+        MultilingualSpeechTests.setUp(self)
+        self.detected["vi"], self.server_speech["vi"] = "vietnamese", {"vi": ("tôi muốn đóng tiền nước", -0.2)}
+        vi, self.vi_url = serve(self.fake("vi"))
+        self.addCleanup(vi.server_close)
+        self.addCleanup(vi.shutdown)
+        self.starts = []
+        self.state = "ready"
+
+        def starter():
+            self.starts.append(self.state)
+            return self.state
+        from device_main import vietnamese_provider
+        self.port = int(self.vi_url.rstrip("/").rsplit(":", 1)[1])
+        self.hook = vietnamese_provider(self.port, starter)
+        self.recognizer.vietnamese = self.hook
+
+    requests = MultilingualSpeechTests.requests
+
+    def test_detected_vietnamese_is_decoded_by_its_model(self):
+        self.detected["multi"] = "vietnamese"
+        result = self.recognizer.transcribe(loud_frames(), "vi")
+        # Menu on Vietnamese: a detection-only pass, then the Vietnamese model (MENU_OVER_CHINESE).
+        self.assertEqual(self.requests(), [("multi", "auto", True), ("vi", "vi", False)])
+        self.assertEqual((result["language"], result["text"], result["speech_model"]),
+                         ("vi", "tôi muốn đóng tiền nước", "vietnamese"))
+        body = self.calls[-1][3]
+        self.assertIn(field("prompt", "") + CRLF, body)
+        self.assertIn(field("audio_ctx", "1500"), body)
+        self.assertEqual(set(self.starts), {"ready"})  # asked on use; the App starts it once
+
+    def test_with_the_gate_sure_of_vietnamese_one_decode_by_its_model(self):
+        self.recognizer.gate_url = self.urls["gate"]
+        self.probabilities["gate"], self.detected["gate"] = {"vi": 0.95}, "vietnamese"
+        result = self.recognizer.transcribe(loud_frames(), "zh")
+        self.assertEqual(self.requests(), [("gate", "auto", True), ("vi", "vi", False)])
+        self.assertEqual((result["language"], result["speech_model"]), ("vi", "vietnamese"))
+
+    def test_without_the_model_vietnamese_is_decoded_as_before(self):
+        self.detected["multi"] = "vietnamese"
+        for state in ("missing", "memory", "failed"):
+            self.calls.clear()
+            self.state = state
+            result = self.recognizer.transcribe(loud_frames(), "vi")
+            # The file is not on the phone: the probe, then Whisper small decodes Vietnamese.
+            self.assertEqual((self.requests(), result["text"]),
+                             ([("multi", "auto", True), ("multi", "vi", False)], "tôi muốn mượn sách"))
+            self.assertNotIn("speech_model", result)
+        self.recognizer.vietnamese = None  # no hook at all (e.g. no multilingual model): as before
+        self.calls.clear()
+        self.assertEqual(self.recognizer.transcribe(loud_frames(), "vi")["text"], "tôi muốn mượn sách")
+        self.assertEqual(self.requests(), [("multi", "auto", False)])
+
+    def test_a_broken_server_falls_back_to_the_multilingual_model(self):
+        self.detected["multi"] = "vietnamese"
+        from device_main import vietnamese_provider
+        self.recognizer.vietnamese = vietnamese_provider(1, lambda: "ready")  # nothing listens on port 1
+        result = self.recognizer.transcribe(loud_frames(), "vi")
+        self.assertEqual((result["language"], result["text"]), ("vi", "tôi muốn mượn sách"))
+        self.assertNotIn("speech_model", result)
+
+    def test_other_languages_never_start_it(self):
+        self.recognizer.transcribe(loud_frames(), "zh")
+        for language, detected in (("en", "english"), ("auto", "japanese"), ("ja", "japanese")):
+            self.detected["multi"] = detected
+            self.recognizer.transcribe(loud_frames(), language)
+        self.assertEqual(self.starts, [])
+        self.assertNotIn("vi", [name for name, *_ in self.calls])
+
+    def test_provider_reports_the_app_state(self):
+        from device_main import vietnamese_provider
+        self.assertEqual(vietnamese_provider(8777, lambda: "ready")(), ("http://127.0.0.1:8777", None))
+        self.assertEqual(vietnamese_provider(8777, lambda: "missing")(), (None, "missing"))
+
+    # --- the Vietnamese menu against a Chinese gate verdict (MENU_OVER_CHINESE) ---
+
+    def gated(self, gate_scores, small_scores, chinese=("你所屬的大貴", -0.713)):
+        self.recognizer.gate_url = self.urls["gate"]
+        self.probabilities["gate"], self.detected["gate"] = gate_scores, max(gate_scores, key=gate_scores.get)
+        self.probabilities["multi"], self.detected["multi"] = small_scores, max(small_scores, key=small_scores.get)
+        self.speech["zh"] = chinese
+        return self.recognizer
+
+    def test_owner_case_gate_sure_of_chinese_short_unsure_translation_becomes_vietnamese(self):
+        # Phone log 2026-11-08: 1.4 s of Vietnamese, gate zh 0.993, Chinese decode of 4
+        # characters at -0.713 (unsure), 32 s of retries. Expected: Vietnamese, no retries.
+        self.gated({"zh": 0.993, "vi": 0.004}, {"zh": 0.70, "vi": 0.04})
+        result = self.recognizer.transcribe(loud_frames(), "vi")
+        self.assertEqual((result["language"], result["text"], result["speech_model"]),
+                         ("vi", "tôi muốn đóng tiền nước", "vietnamese"))
+        self.assertEqual(self.requests(), [("gate", "auto", True), ("multi", "auto", True),
+                                           ("zh", "zh", False), ("vi", "vi", False)])
+        for name, language, detect, body in self.calls[1:]:  # no temperature retries after the gate
+            self.assertIn(field("temperature_inc", "0"), body, (name, language))
+        self.assertEqual(result["candidates"], ["zh", "vi"])
+
+    def test_small_detects_vietnamese_one_vietnamese_decode(self):
+        self.gated({"zh": 0.94, "vi": 0.06}, {"vi": 0.91, "zh": 0.07})
+        result = self.recognizer.transcribe(loud_frames(), "vi")
+        self.assertEqual((result["language"], result["speech_model"]), ("vi", "vietnamese"))
+        self.assertEqual(self.requests(), [("gate", "auto", True), ("multi", "auto", True), ("vi", "vi", False)])
+
+    def test_clear_longer_chinese_stays_chinese_with_the_vietnamese_menu(self):
+        # FLEURS zh-001 (2026-11-08): PhoWhisper wrote confident Vietnamese for Chinese
+        # audio; a clear Chinese decode of more than SHORT_TEXT characters is kept.
+        self.gated({"zh": 0.992}, {"zh": 0.91, "ja": 0.01}, chinese=("蓋甲等元素屬於金屬", -0.425))
+        result = self.recognizer.transcribe(loud_frames(), "vi")
+        self.assertEqual((result["language"], result["text"]), ("zh", "蓋甲等元素屬於金屬"))
+        self.assertEqual(self.requests(), [("gate", "auto", True), ("multi", "auto", True), ("zh", "zh", False)])
+        self.assertNotIn("speech_model", result)
+        self.assertEqual(self.starts, [])
+
+    def test_other_menus_keep_the_gate(self):
+        self.gated({"zh": 0.993}, {"zh": 0.70})
+        for menu in ("zh", "auto", "en"):
+            self.calls.clear()
+            result = self.recognizer.transcribe(loud_frames(), menu)
+            self.assertEqual((result["language"], self.requests()), ("zh", [("gate", "auto", True), ("zh", "zh", False)]), menu)
+
+
 class OutputConstraintTests(unittest.TestCase):
     def test_lettered_choice_gets_an_exact_grammar_other_schemas_keep_response_format(self):
         from server import output_constraint
@@ -1129,34 +1331,3 @@ class NativeStarterTests(unittest.TestCase):
         address = ctypes.cast(app_starter, ctypes.c_void_p).value
         provide = device_main.taiwanese_provider(8776, device_main.native_starter(address))
         self.assertEqual(provide(), (None, "missing"))
-
-
-class WarmUpTaiwaneseTests(unittest.TestCase):
-    """iOS: the warm-up tone must not start the Taiwanese model (it crashed the App)."""
-
-    class Recognizer:
-        def __init__(self):
-            self.taiwanese = lambda: ("http://127.0.0.1:8776", None)
-            self.hooks = []
-
-        def transcribe(self, frames, language="zh"):
-            self.hooks.append(self.taiwanese)
-            return {"text": "", "status": "unclear"}
-
-    def warm(self, recognizer, **kwargs):
-        import device_main
-        with patch("server.fetch_json", return_value={}):
-            device_main.warm_up(recognizer, "http://127.0.0.1:9", limit_s=5, **kwargs)
-
-    def test_without_taiwanese_the_hook_is_off_during_the_tone_and_back_after(self):
-        recognizer = self.Recognizer()
-        hook = recognizer.taiwanese
-        self.warm(recognizer, taiwanese=False)
-        self.assertEqual(recognizer.hooks, [None])
-        self.assertIs(recognizer.taiwanese, hook)
-
-    def test_by_default_android_keeps_the_hook(self):
-        recognizer = self.Recognizer()
-        hook = recognizer.taiwanese
-        self.warm(recognizer)
-        self.assertEqual(recognizer.hooks, [hook])

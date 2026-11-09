@@ -699,24 +699,50 @@ String _failedToLoadUrlData({String? url}) {
 }
 
 /// Injected into a service page (see _TPWebViewState._translatePage). Runs
-/// once per document; later calls rescan. Each Chinese text node (and input
-/// placeholder) is replaced by its translation, remembering what was written
-/// so Vue re-rendering the Chinese text gets translated again. The original
-/// Chinese stays queryable for the guided assistant's probes:
-/// `window.__townpassOriginal(el)`, `window.__townpassOriginalPlaceholder(el)`
-/// and the `data-tp-placeholder` attribute. What the user sees is unchanged.
+/// once per document; later calls rescan. Each Chinese text node and visible
+/// attribute (`placeholder`, `title`, `aria-label`, `alt`, and the `value` of
+/// button-like inputs that are not form data) is replaced by its translation,
+/// remembering what was written so Vue re-rendering the Chinese text gets
+/// translated again. Subtrees marked `translate="no"` (or `.notranslate`),
+/// scripts, styles and editable text are left alone. The original Chinese
+/// stays queryable for the guided assistant's probes:
+/// `window.__townpassOriginal(el)`, `window.__townpassOriginalPlaceholder(el)`,
+/// `window.__townpassOriginalAttribute(el, name)` and the `data-tp-<attribute>`
+/// attributes (e.g. `data-tp-placeholder`). What the user sees is unchanged.
 const _translationScript = r'''
 (function () {
   if (window.__townpassTranslate) { window.__townpassTranslate.scan(); return; }
   var chinese = /[㐀-鿿]/;
   var skip = { SCRIPT: 1, STYLE: 1, NOSCRIPT: 1, TEXTAREA: 1, CODE: 1 };
+  // Attributes shown to the user. An input's value is only translated for
+  // button-like inputs without a name: a named one is sent with the form.
+  var attributes = ['placeholder', 'title', 'aria-label', 'alt', 'value'];
+  var attributeSelector = '[placeholder], [title], [aria-label], [alt], ' +
+    'input[type=button][value]:not([name]), input[type=submit][value]:not([name]), ' +
+    'input[type=reset][value]:not([name])';
+  var limit = 400;
   var written = new WeakMap();
   // Text node -> the Chinese it held before we wrote the translation.
   var original = new WeakMap();
+  // Element -> { attribute: translation we wrote }.
+  var writtenAttributes = new WeakMap();
   var timer = null;
   var busy = false;
+  function excluded(el) {
+    return !el || (el.closest && el.closest('[translate="no"], .notranslate') !== null);
+  }
   function wanted(value, target) {
     return value && chinese.test(value) && written.get(target) !== value;
+  }
+  function wantedAttribute(el, name, value) {
+    var done = writtenAttributes.get(el);
+    return value && chinese.test(value) && !(done && done[name] === value);
+  }
+  function translatesAttribute(el, name) {
+    if (name !== 'value') return true;
+    if (el.tagName !== 'INPUT' || el.hasAttribute('name')) return false;
+    var type = (el.getAttribute('type') || '').toLowerCase();
+    return type === 'button' || type === 'submit' || type === 'reset';
   }
   function collect() {
     var items = [];
@@ -725,23 +751,35 @@ const _translationScript = r'''
     while ((node = walker.nextNode())) {
       var parent = node.parentElement;
       if (!parent || skip[parent.tagName] || parent.isContentEditable) continue;
-      if (wanted(node.nodeValue, node)) items.push({ node: node, text: node.nodeValue });
+      if (!wanted(node.nodeValue, node) || excluded(parent)) continue;
+      items.push({ node: node, text: node.nodeValue });
     }
-    var fields = document.querySelectorAll('input[placeholder], textarea[placeholder]');
-    for (var i = 0; i < fields.length; i++) {
-      var value = fields[i].getAttribute('placeholder');
-      if (wanted(value, fields[i])) items.push({ field: fields[i], text: value });
+    var elements = document.body.querySelectorAll(attributeSelector);
+    for (var i = 0; i < elements.length; i++) {
+      var el = elements[i];
+      if (excluded(el)) continue;
+      for (var a = 0; a < attributes.length; a++) {
+        var name = attributes[a];
+        if (!el.hasAttribute(name) || !translatesAttribute(el, name)) continue;
+        var value = el.getAttribute(name);
+        if (wantedAttribute(el, name, value)) items.push({ el: el, attribute: name, text: value });
+      }
     }
-    return items.slice(0, 400);
+    return items.slice(0, limit);
   }
   function scan() {
     if (busy) { schedule(); return; }
     var all = collect();
     if (!all.length) return;
     busy = true;
-    // Batches of 20, each written as soon as it is translated.
+    // Batches of 20, each written as soon as it is translated. A page with
+    // more nodes than one scan takes is scanned again for the rest.
     var next = function (start) {
-      if (start >= all.length) { busy = false; return; }
+      if (start >= all.length) {
+        busy = false;
+        if (all.length >= limit) schedule();
+        return;
+      }
       apply(all.slice(start, start + 20)).finally(function () { next(start + 20); });
     };
     next(0);
@@ -762,10 +800,12 @@ const _translationScript = r'''
           written.set(item.node, value);
           item.node.nodeValue = value;
         } else {
-          if (item.field.getAttribute('placeholder') !== item.text) return;
-          item.field.setAttribute('data-tp-placeholder', item.text);
-          written.set(item.field, translated);
-          item.field.setAttribute('placeholder', translated);
+          if (item.el.getAttribute(item.attribute) !== item.text) return;
+          item.el.setAttribute('data-tp-' + item.attribute, item.text);
+          var done = writtenAttributes.get(item.el) || {};
+          done[item.attribute] = translated;
+          writtenAttributes.set(item.el, done);
+          item.el.setAttribute(item.attribute, translated);
         }
       });
     });
@@ -775,6 +815,15 @@ const _translationScript = r'''
   function originalOf(node) {
     var value = node.nodeValue;
     return written.get(node) === value && original.has(node) ? original.get(node) : value;
+  }
+  function originalAttribute(el, name) {
+    if (!el || !el.getAttribute) return null;
+    var value = el.getAttribute(name);
+    var done = writtenAttributes.get(el);
+    if (value !== null && done && done[name] === value && el.hasAttribute('data-tp-' + name)) {
+      return el.getAttribute('data-tp-' + name);
+    }
+    return value;
   }
   window.__townpassOriginal = function (el) {
     if (!el) return '';
@@ -790,17 +839,13 @@ const _translationScript = r'''
     return out;
   };
   window.__townpassOriginalPlaceholder = function (el) {
-    if (!el || !el.getAttribute) return null;
-    var value = el.getAttribute('placeholder');
-    if (value !== null && written.get(el) === value && el.hasAttribute('data-tp-placeholder')) {
-      return el.getAttribute('data-tp-placeholder');
-    }
-    return value;
+    return originalAttribute(el, 'placeholder');
   };
+  window.__townpassOriginalAttribute = originalAttribute;
   function schedule() { clearTimeout(timer); timer = setTimeout(scan, 300); }
   new MutationObserver(schedule).observe(document.body, {
     childList: true, subtree: true, characterData: true,
-    attributes: true, attributeFilter: ['placeholder']
+    attributes: true, attributeFilter: attributes
   });
   window.__townpassTranslate = { scan: scan };
   scan();

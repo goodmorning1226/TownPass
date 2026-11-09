@@ -422,6 +422,17 @@ def clean_transcript(text):
     undo a recogniser repetition loop: a phrase of 2+ characters said once but
     written back-to-back several times (我想借底層邏輯我想借底層邏輯…) is kept once."""
     text = re.sub(r"[\s。．.！!？?，,]+$", "", text.strip())
+    if re.search(r"[A-Za-z]\S*\s", text):
+        # Space-separated writing (Vietnamese, English): a loop repeats whole words.
+        # Inside a word letters repeat legitimately ("phản ảnh" holds "ản" twice,
+        # and was cut to "phảnh" by the character rule below).
+        text = re.sub(r"(?<![^\s，,。])(\S+?(?:\s+\S+?)*?)(?:[\s，,。]+\1)+(?![^\s，,。])", r"\1", text)
+        words = text.split()
+        for cut in range(2, len(words)):
+            head, tail = words[:cut], [w.strip("，,。") for w in words[cut:]]
+            if len(tail) >= 2 and head[:len(tail)] == tail:
+                return " ".join(head).rstrip("，,。")
+        return text
     text = re.sub(r"(.{2,}?)(?:[\s，,。]*\1)+", r"\1", text)
     # The loop usually stops mid-phrase: drop a trailing copy of the phrase's start.
     for cut in range(4, len(text) - 1):

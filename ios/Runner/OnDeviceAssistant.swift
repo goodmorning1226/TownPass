@@ -146,8 +146,6 @@ final class OnDeviceAssistant {
         "taiwanese_port=\(multilingual ? String(Self.taiwaneseWhisperPort) : "None")",
         "taiwanese_starter=device_main.native_starter(\(UInt(bitPattern: unsafeBitCast(taiwaneseStarter, to: Int.self))))",
         "decision_model='ministral'",
-        // The warm-up tone would load the Taiwanese model at every launch (device_main.warm_up).
-        "warm_taiwanese=False",
       ])
     if let pythonInfo { return "failed: \(pythonInfo)" }
 

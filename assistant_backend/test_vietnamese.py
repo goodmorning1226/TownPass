@@ -105,6 +105,11 @@ class NegationTests(unittest.TestCase):
         self.assertEqual(i18n.positive_text("không phải tiền nước, mà là tiền học", "vi"), "là tiền học")
         self.assertEqual(i18n.positive_text("tôi muốn đóng tiền nước, không phải tiền học", "vi"),
                          "tôi muốn đóng tiền nước")
+        # Speech carries no comma (PhoWhisper writes none).
+        self.assertEqual(i18n.positive_text("tôi muốn đóng tiền nước không phải tiền học", "vi"),
+                         "tôi muốn đóng tiền nước")
+        self.assertEqual(i18n.positive_text("toi muon dong tien nuoc khong phai tien hoc", "vi"),
+                         "toi muon dong tien nuoc")
 
     def test_a_state_or_a_question_is_not_a_refusal(self):
         for text in ("tiền nước tháng này chưa trả", "đèn đường trước nhà không sáng",
@@ -170,6 +175,20 @@ class TurnTests(unittest.TestCase):
         self.assertEqual(result["kind"], "confirm_candidates")
         self.assertIsNone(result["destination"])
         self.assertEqual([c["title"] for c in result["choices"]], ["Tiền nước"])
+
+    def test_one_sure_match_opens_without_the_model(self):
+        def refuse(messages, tools):  # a model that always asks for clarification
+            return {"message": {"tool_calls": [{"function": {"name": "request_clarification", "arguments": {}}}]}}
+        for text, expected in (("xem lịch sử mượn sách", "library.records"), ("Tôi muốn xem tin nhẫn", "messages"),
+                               ("tôi muốn sửa số điện thoái", "profile")):
+            result = self.turn(text, model=refuse)
+            self.assertEqual((result["kind"], (result["destination"] or {}).get("id")), ("navigate", expected), text)
+            self.assertEqual(result["metrics"]["model_calls"], 0)
+        # Two pages, or a sound-alike only, still go to the model or to the user.
+        two = self.turn("tiền nước hay phí đỗ xe", model=refuse)
+        self.assertIsNone(two["destination"])
+        self.assertEqual(two["metrics"]["model_calls"], 1)
+        self.assertEqual(self.turn("tôi muốn trả tiềng nướt", model=refuse)["kind"], "confirm_candidates")
 
     def test_a_question_is_answered_and_a_refusal_opens_nothing(self):
         asked = self.turn("Bạn có thể giúp tôi đóng tiền nước được không?")

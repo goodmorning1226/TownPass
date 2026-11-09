@@ -1,4 +1,4 @@
-# TownPass 地端 AI 助理：技術總覽（2026-11-08）
+# 台北一點就通！微服務入口整合助理：技術總覽（2026-11-08）
 
 一份就看完的技術說明：用了哪些模型、文字怎麼篩選與比對、每一層的規則與門檻、速度與驗證方式。
 行為規則以 `docs/AI_CURRENT_RULES.md` 為準；本文說明「怎麼做到」。各節末尾標出程式位置。
@@ -32,7 +32,7 @@
 | 台語辨識 | Breeze-ASR-26 | q8_0，1.66 GB | 聯發科技研究中心＋陽明交大，Apache-2.0 | 以 `-l zh`、不給提示、`audio_ctx ≥ 500` 解碼，輸出中文字 | 約 3.4–4.4 秒 |
 | 向量檢索 | multilingual-e5-small | q8_0，132 MB，384 維 | Microsoft，MIT | llama-server embedding，`query:`／`passage:` 前綴 | 一次查詢數十毫秒 |
 | 頁面翻譯 | ML Kit on-device translation | 每語言約 30 MB | Google | 第一次下載後離線 | 預翻好的字串直接用，剩下才即時翻 |
-| 越南文（評估中） | PhoWhisper-small | q8_0，264 MB | VinAI（越南），BSD-3 | 需完整 `audio_ctx` 1500 | 估約 2.5–3.5 秒；字錯誤率 32% → 14% |
+| 越南文 | PhoWhisper-base（small 另有 264 MB 版） | q8_0，82 MB | VinAI（越南），BSD-3 | 需完整 `audio_ctx` 1500，第一次用到才啟動 | 手機未量（電腦約 1.4 秒）；字錯誤率 32% → 8%（合成語音請求） |
 
 評估過但不採用：Breeze-ASR-25（中文，5.4 秒太慢）、Whisper medium／large-turbo（太慢）、bge 向量模型（換成 e5）、
 alexachang 台語模型（訓練資料不明，只當對照）、ViWhisper（資料授權不明）、越南文 Whisper 提示詞（反而變差）。

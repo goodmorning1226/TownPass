@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:town_pass/gen/assets.gen.dart';
 import 'package:town_pass/page/feedback/feedback_view_controller.dart';
+import 'package:town_pass/service/page_translation.dart';
 import 'package:town_pass/util/tp_app_bar.dart';
 import 'package:town_pass/util/tp_bottom_sheet.dart';
 import 'package:town_pass/util/tp_button.dart';
@@ -116,20 +117,23 @@ class FeedbackView extends GetView<FeedbackViewController> {
                     const SizedBox(height: 13),
                     SizedBox(
                       height: 223,
-                      child: TextField(
-                        controller: controller.controller,
-                        decoration: InputDecoration(
-                          enabledBorder: const OutlineInputBorder(borderSide: BorderSide(color: TPColors.grayscale500)),
-                          focusedBorder: const OutlineInputBorder(borderSide: BorderSide(color: TPColors.grayscale500)),
-                          hintStyle: TPTextStyles.bodyRegular.copyWith(color: TPColors.grayscale400),
-                          hintText: '請描述建議與問題',
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                      // Obx: the hint follows the page language (PageTranslation).
+                      child: Obx(
+                        () => TextField(
+                          controller: controller.controller,
+                          decoration: InputDecoration(
+                            enabledBorder: const OutlineInputBorder(borderSide: BorderSide(color: TPColors.grayscale500)),
+                            focusedBorder: const OutlineInputBorder(borderSide: BorderSide(color: TPColors.grayscale500)),
+                            hintStyle: TPTextStyles.bodyRegular.copyWith(color: TPColors.grayscale400),
+                            hintText: PageTranslation.instance.label('請描述建議與問題'),
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                          ),
+                          onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
+                          textAlignVertical: TextAlignVertical.top,
+                          expands: true,
+                          keyboardType: TextInputType.multiline,
+                          maxLines: null,
                         ),
-                        onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
-                        textAlignVertical: TextAlignVertical.top,
-                        expands: true,
-                        keyboardType: TextInputType.multiline,
-                        maxLines: null,
                       ),
                     ),
                     const SizedBox(height: 13),
@@ -139,32 +143,35 @@ class FeedbackView extends GetView<FeedbackViewController> {
                         Assets.svg.iconInfo.svg(height: 24, width: 24),
                         const SizedBox(width: 8),
                         Flexible(
-                          child: RichText(
-                            text: TextSpan(
-                              text: '若您對市政府有任何建議或問題請至',
-                              style: const TextStyle(color: TPColors.grayscale700),
-                              children: [
-                                TextSpan(
-                                  text: '有話要說',
-                                  style: const TextStyle(
-                                    decoration: TextDecoration.underline,
-                                    color: TPColors.primary500,
+                          // Obx: the spans follow the page language (PageTranslation).
+                          child: Obx(
+                            () => RichText(
+                              text: TextSpan(
+                                text: PageTranslation.instance.label('若您對市政府有任何建議或問題請至'),
+                                style: const TextStyle(color: TPColors.grayscale700),
+                                children: [
+                                  TextSpan(
+                                    text: PageTranslation.instance.label('有話要說'),
+                                    style: const TextStyle(
+                                      decoration: TextDecoration.underline,
+                                      color: TPColors.primary500,
+                                    ),
+                                    recognizer: TapGestureRecognizer()..onTap = () {},
                                   ),
-                                  recognizer: TapGestureRecognizer()..onTap = () {},
-                                ),
-                                const TextSpan(text: '，若系統操作上有任何問題請'),
-                                TextSpan(
-                                  text: '打客服電話 ${controller.contactPhoneNumber}',
-                                  style: const TextStyle(
-                                    decoration: TextDecoration.underline,
-                                    color: TPColors.primary500,
+                                  TextSpan(text: PageTranslation.instance.label('，若系統操作上有任何問題請')),
+                                  TextSpan(
+                                    text: PageTranslation.instance.label('打客服電話 ${controller.contactPhoneNumber}'),
+                                    style: const TextStyle(
+                                      decoration: TextDecoration.underline,
+                                      color: TPColors.primary500,
+                                    ),
+                                    recognizer: TapGestureRecognizer()
+                                      ..onTap = () {
+                                        launchUrlString('tel://${controller.contactPhoneNumber}');
+                                      },
                                   ),
-                                  recognizer: TapGestureRecognizer()
-                                    ..onTap = () {
-                                      launchUrlString('tel://${controller.contactPhoneNumber}');
-                                    },
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ),
                         ),

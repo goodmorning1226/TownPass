@@ -20,6 +20,7 @@ import kotlin.concurrent.thread
  *    with TOWNPASS_DECISION_MODEL=gemma)          127.0.0.1:8771
  *  - whisper.cpp whisper-server (Breeze-ASR-25)     127.0.0.1:8772
  *  - whisper.cpp whisper-server (Taiwanese, Breeze-ASR-26) 127.0.0.1:8776, started on first use
+ *  - whisper.cpp whisper-server (Vietnamese, PhoWhisper-small) 127.0.0.1:8777, started on first use
  *  - llama-server --embedding (multilingual-e5-small) 127.0.0.1:8774, optional FAQ layer
  *  - whisper-server (Whisper tiny, language detection only) 127.0.0.1:8775, optional
  *  - Python backend via Chaquopy (device_main.py)   127.0.0.1:8765 and :8770
@@ -47,6 +48,10 @@ object OnDeviceAssistant {
      *  台語 is chosen and a clip arrives ([startTaiwanese]); without it Taiwanese
      *  clips are heard as Chinese and the App says so. */
     const val TAIWANESE_ASR_FILE = "ggml-whisper-taiwanese.bin"  // push_assistant_models.ps1 -Taiwanese
+    /** Optional Vietnamese model (VinAI PhoWhisper-small q8_0, BSD-3-Clause, 264 MB;
+     *  docs/AI_VIETNAMESE.md). Loaded on the first Vietnamese decode ([startVietnamese]);
+     *  without it Whisper small decodes Vietnamese as before. */
+    const val VIETNAMESE_ASR_FILE = "ggml-whisper-vietnamese.bin"  // push_assistant_models.ps1 -Vietnamese
     /** Optional language gate (docs/AI_LANGUAGE_GATE.md): Whisper tiny q8_0 (43 MB, ~0.2 s a
      *  clip) only detects the speech language before the multilingual model decodes, so
      *  speech is never decoded (translated) in a language the speaker did not use. Needs
@@ -62,6 +67,7 @@ object OnDeviceAssistant {
     private const val WHISPER_PORT = 8772
     private const val MULTI_WHISPER_PORT = 8773
     private const val TAIWANESE_WHISPER_PORT = 8776
+    private const val VIETNAMESE_WHISPER_PORT = 8777
     private const val GATE_WHISPER_PORT = 8775
     private val processes = mutableListOf<Process>()
 
@@ -72,6 +78,8 @@ object OnDeviceAssistant {
     private var whisperThreads = "4"
     private val taiwaneseLock = Any()
     private var taiwanese: Process? = null
+    private val vietnameseLock = Any()
+    private var vietnamese: Process? = null
 
     @Volatile
     private var started = false
@@ -119,6 +127,8 @@ object OnDeviceAssistant {
                         Kwarg("gate_port", if (gate) GATE_WHISPER_PORT else null),
                         // Always offered with Whisper: the file is looked for on first use.
                         Kwarg("taiwanese_port", if (whisper) TAIWANESE_WHISPER_PORT else null),
+                        // Offered with the multilingual model: the file is looked for on first use.
+                        Kwarg("vietnamese_port", if (whisper && multilingual) VIETNAMESE_WHISPER_PORT else null),
                         Kwarg("decision_model", decisionModel)).toString()
                 Log.i(TAG, "backend: $info")
                 // Recent 8-core phone SoCs have 6-8 performance cores; leave two for
@@ -185,38 +195,55 @@ object OnDeviceAssistant {
      * nothing else is stopped) or "failed". The other speech servers keep running.
      */
     @JvmStatic
-    fun startTaiwanese(): String {
-        synchronized(taiwaneseLock) {
-            val app = appContext ?: return "failed"
-            taiwanese?.let { if (it.isAlive && listening(TAIWANESE_WHISPER_PORT)) return "ready" }
-            val models = app.getExternalFilesDir("models") ?: File(app.filesDir, "models")
-            val model = File(models, TAIWANESE_ASR_FILE)
-            if (!model.isFile) return "missing"
-            // Breeze-ASR-26 q8_0 peaked at 1.28x its file size on the phone (2.0 GB for 1.58 GB).
-            val memory = ActivityManager.MemoryInfo()
-            (app.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager).getMemoryInfo(memory)
-            val needed = model.length() * 13 / 10 + 300L * 1024 * 1024
-            if (memory.availMem < needed) {
-                Log.w(TAG, "taiwanese speech: ${memory.availMem shr 20} MB free, needs ${needed shr 20} MB")
-                return "memory"
-            }
-            taiwanese?.destroy()
-            val started = System.currentTimeMillis()
-            val process = launch(app, "libwhisper_server.so", model, TAIWANESE_WHISPER_PORT,
-                listOf("-t", whisperThreads, "-l", "zh"), stopLeftovers = false) ?: return "failed"
-            taiwanese = process
-            // whisper-server listens only after the model has loaded.
-            while (System.currentTimeMillis() - started < 60_000) {
-                if (!process.isAlive) return "failed"
-                if (listening(TAIWANESE_WHISPER_PORT)) {
-                    Log.i(TAG, "taiwanese speech loaded in ${System.currentTimeMillis() - started} ms")
-                    return "ready"
-                }
-                Thread.sleep(200)
-            }
-            process.destroy()
-            return "failed"
+    fun startTaiwanese(): String = synchronized(taiwaneseLock) {
+        val (state, process) = startOnFirstUse("taiwanese", TAIWANESE_ASR_FILE, TAIWANESE_WHISPER_PORT, "zh", taiwanese)
+        taiwanese = process
+        state
+    }
+
+    /**
+     * Same as [startTaiwanese] for the Vietnamese model (device_main.vietnamese_provider),
+     * called on the first clip decoded in Vietnamese (chosen or detected).
+     */
+    @JvmStatic
+    fun startVietnamese(): String = synchronized(vietnameseLock) {
+        val (state, process) = startOnFirstUse("vietnamese", VIETNAMESE_ASR_FILE, VIETNAMESE_WHISPER_PORT, "vi",
+            vietnamese)
+        vietnamese = process
+        state
+    }
+
+    /** Starts (or keeps) a whisper-server loaded on first use; returns the state and its process. */
+    private fun startOnFirstUse(label: String, fileName: String, port: Int, language: String,
+                                current: Process?): Pair<String, Process?> {
+        val app = appContext ?: return "failed" to current
+        current?.let { if (it.isAlive && listening(port)) return "ready" to it }
+        val models = app.getExternalFilesDir("models") ?: File(app.filesDir, "models")
+        val model = File(models, fileName)
+        if (!model.isFile) return "missing" to current
+        // Breeze-ASR-26 q8_0 peaked at 1.28x its file size on the phone (2.0 GB for 1.58 GB).
+        val memory = ActivityManager.MemoryInfo()
+        (app.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager).getMemoryInfo(memory)
+        val needed = model.length() * 13 / 10 + 300L * 1024 * 1024
+        if (memory.availMem < needed) {
+            Log.w(TAG, "$label speech: ${memory.availMem shr 20} MB free, needs ${needed shr 20} MB")
+            return "memory" to current
         }
+        current?.destroy()
+        val started = System.currentTimeMillis()
+        val process = launch(app, "libwhisper_server.so", model, port,
+            listOf("-t", whisperThreads, "-l", language), stopLeftovers = false) ?: return "failed" to null
+        // whisper-server listens only after the model has loaded.
+        while (System.currentTimeMillis() - started < 60_000) {
+            if (!process.isAlive) return "failed" to null
+            if (listening(port)) {
+                Log.i(TAG, "$label speech loaded in ${System.currentTimeMillis() - started} ms")
+                return "ready" to process
+            }
+            Thread.sleep(200)
+        }
+        process.destroy()
+        return "failed" to null
     }
 
     private fun launch(app: Context, binary: String, model: File, port: Int, extra: List<String>,

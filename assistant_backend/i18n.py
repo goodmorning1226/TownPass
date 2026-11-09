@@ -128,7 +128,10 @@ NEGATION = {
     "id": r"\b(?:tidak|tak|bukan|jangan|nggak|gak)\b",
     "th": r"(?:ไม่|อย่า)",
 }
-_CLAUSE = re.compile(r"[,，;；.。!！?？、]|\b(?:but|instead|rather|tapi|nhưng|nhung|mà)\b|แต่|けど|が、")
+# Speech has no commas: "tiền nước không phải tiền học" (water, not tuition) splits
+# before "không phải", keeping the marker with the clause it negates.
+_CLAUSE = re.compile(r"[,，;；.。!！?？、]|\b(?:but|instead|rather|tapi|nhưng|nhung|mà)\b|แต่|けど|が、"
+                     r"|(?<=\S)\s+(?=(?:không|khong) (?:phải|phai)\b)")
 
 
 def matches(table, text, language):

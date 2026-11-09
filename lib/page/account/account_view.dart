@@ -7,6 +7,7 @@ import 'package:town_pass/page/account/widget/account_view_footer.dart';
 import 'package:town_pass/page/guided_assistant/assistant_settings_view.dart';
 import 'package:town_pass/page/guided_assistant/guided_assistant_controller.dart';
 import 'package:town_pass/page/guided_assistant/model/assistant_settings.dart';
+import 'package:town_pass/service/page_translation.dart';
 import 'package:town_pass/util/tp_colors.dart';
 import 'package:town_pass/util/tp_route.dart';
 import 'package:town_pass/util/tp_setting_list.dart';
@@ -42,7 +43,7 @@ class AccountView extends GetView<AccountViewController> {
                         behavior: HitTestBehavior.opaque,
                         onTap: () async => await Get.toNamed(TPRoute.setting)?.then((value) => controller.syncAccount()),
                         child: Semantics(
-                          label: '設定',
+                          label: PageTranslation.instance.label('設定'),
                           child: Assets.svg.iconSettings.svg(),
                         ),
                       ),
@@ -60,7 +61,7 @@ class AccountView extends GetView<AccountViewController> {
                         behavior: HitTestBehavior.opaque,
                         onTap: () async => await Get.toNamed(TPRoute.setting)?.then((value) => controller.syncAccount()),
                         child: Semantics(
-                          label: '設定',
+                          label: PageTranslation.instance.label('設定'),
                           child: Assets.svg.iconSettings.svg(),
                         ),
                       ),
