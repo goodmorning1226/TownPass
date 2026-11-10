@@ -28,12 +28,29 @@ iOS 不能開子行程，所以每個 native server 的 `main()` 以函式匯出
 
 ## 建置與安裝
 
+一鍵（2026-11-10 加，和 Android 的 `run_assistant_on_device.ps1` 同樣的旗標；還沒在 Mac 上實跑）：
+
+```bash
+scripts/setup_ios_on_device.sh                     # 第一次：框架放進 ios/OnDevice/（不進 git，約 145 MB）
+scripts/run_assistant_on_device.sh --push-models   # 建置（release）、安裝、推模型、啟動；只接一支 iPhone 時不用給 --device
+scripts/run_assistant_on_device.sh                 # 之後：模型沒換就不用再推
+scripts/run_assistant_on_device.sh --chat          # 聊天面板（ASSISTANT_GUIDED=false）
+```
+
+腳本會先檢查是 Mac、`ios/OnDevice/` 三個框架都在、裝置是 iPhone 實機（給 Android 裝置 ID 會提示改用 `.ps1`，模擬器直接拒絕）。
+`--decision-model` 只接受 `ministral`（iOS 還沒有 Gemma）。
+
+手動（同樣效果）：
+
 ```bash
 scripts/setup_ios_on_device.sh            # 框架放進 ios/OnDevice/（不進 git，約 145 MB）
 fvm flutter run -d <device-id> --release \
   --dart-define=ASSISTANT_ENABLED=true --dart-define=ASSISTANT_ON_DEVICE=true
 scripts/push_assistant_models_ios.sh <device-id>   # 模型複製到 App 的 Documents/models（手機要解鎖）
 ```
+
+Android 從 2026-11-10 起也認 `--dart-define=ASSISTANT_ON_DEVICE=true`（`android/app/build.gradle` 讀 Flutter 傳給 Gradle 的 dart-defines），
+所以兩個平台的 flutter 旗標相同；`TOWNPASS_ON_DEVICE` 環境變數仍可用。
 
 模型複製後要重開 App 才會載入。檔名與 Android 相同：
 
@@ -73,6 +90,9 @@ scripts/push_assistant_models_ios.sh <device-id>   # 模型複製到 App 的 Doc
   手機上 `faq embed :8774`、`timing faq-load entries=8121`。
 
 ## 與 Android 的差別
+
+- 還沒有的：Gemma 4 E2B 決策模型（只有 Ministral）、越南文 PhoWhisper（越南文由 Whisper small 解碼）。後端已支援，
+  要在 `OnDeviceAssistant.swift` 加對應的 server 與 starter、`push_assistant_models_ios.sh` 加檔案。
 
 - 台語（Breeze-ASR-26，:8776）：第一次遇到可能是台語的片段才啟動，和 Android 一樣（main 的台語自動判斷）。iOS 沒有 Java bridge，App 把 C 函式指標交給 Python（`device_main.native_starter`，ctypes 呼叫 `OnDeviceAssistant.startTaiwanese`）；可用記憶體不夠（`os_proc_available_memory`）時回 `memory`，台語片段照舊當中文並提示。
 - 沒有 CPU 核心綁定；iPhone 上主要由 GPU（Metal）計算，執行緒數 = 核心數 − 2（2–4）。

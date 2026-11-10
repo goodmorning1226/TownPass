@@ -11,7 +11,7 @@
 
 <p align="center">
   <code>Flutter 3.47.6</code> ·
-  <code>Android 實機</code> ·
+  <code>Android ＋ iPhone 實機</code> ·
   <code>llama.cpp + whisper.cpp</code> ·
   <code>Chaquopy Python</code> ·
   <code>GPL-3.0</code>
@@ -30,7 +30,8 @@ choice, phonetic and e5 semantic matching, then 8,121 Taipei City FAQ entries) o
 page, lists options or answers; and a guided mode (penguin, task cards, highlight halos, hold-to-speak form filling)
 walks you through the real service page, which is translated on the fly. On the computer evaluation sets it scores
 187–188/190 (dev), 97/102 (held-out) and 46/46 (five foreign languages) with zero wrong pages opened.
-Built with Flutter 3.47.6, a Chaquopy-embedded Python backend, llama.cpp and whisper.cpp on Android; GPL-3.0.
+Built with Flutter 3.47.6, an embedded Python backend (Chaquopy on Android, CPython on iPhone), llama.cpp and whisper.cpp,
+running on both Android and iPhone from one code base; GPL-3.0.
 Developer guide: [ASSISTANT_README.md](ASSISTANT_README.md).
 
 ## 目錄
@@ -173,15 +174,15 @@ Developer guide: [ASSISTANT_README.md](ASSISTANT_README.md).
 
 ## 架構
 
-手機（Android，建議 12 GB 記憶體）上有一個 Flutter App、一個 Python 後端和六個模型伺服器，全部綁在 `127.0.0.1`。
-App 只直接連後端 `:8765`。
+手機（Android 建議 12 GB 記憶體；iPhone 也可以）上有一個 Flutter App、一個 Python 後端和六個模型伺服器，全部綁在 `127.0.0.1`。
+App 只直接連後端 `:8765`。Android 與 iPhone 是同一份 App、後端與規則，只有啟動模型伺服器的原生程式不同（Kotlin／Swift）。
 
 ```mermaid
 flowchart LR
-    subgraph phone["Android 手機：全部在裝置上執行"]
+    subgraph phone["手機（Android／iPhone）：全部在裝置上執行"]
         direction TB
         app["Flutter App（GetX）<br/>引導助理／聊天面板、按住提問<br/>WebView 服務頁＋ML Kit 頁面翻譯"]
-        backend["Python 後端（Chaquopy）:8765<br/>緊急 → 指令 → 關鍵字 → 決策模型 → 讀音 → 語意 → 意圖 → FAQ"]
+        backend["Python 後端（Android：Chaquopy；iPhone：內嵌 CPython）:8765<br/>緊急 → 指令 → 關鍵字 → 決策模型 → 讀音 → 語意 → 意圖 → FAQ"]
         subgraph speech["語音：whisper-server"]
             direction TB
             tiny[":8775 Whisper tiny<br/>語言判斷，約 0.2 秒"]
@@ -237,8 +238,10 @@ flowchart LR
 執行方式與工具：
 
 - **App**：Flutter 3.47.6／Dart 3.13.5（`.fvmrc` 鎖定）、GetX，沿用官方 `TPRoute`／`TPWebView`／WebView bridge（`{name, data}` 契約只新增欄位）。
-- **後端**：Python（Chaquopy 內嵌於 Android），`assistant_backend/`；電腦開發時同一份程式配 Ollama。
-- **模型執行**：llama.cpp b12182 `llama-server`（決策、e5）、whisper.cpp v1.9.5 `whisper-server`（四個語音伺服器）；Kotlin 負責啟動、CPU 綁定（提示用 5 核、生成用 3 核）、第一次用到才載入台語／越南文模型並先檢查可用記憶體。
+- **後端**：Python（Android 用 Chaquopy、iPhone 用 BeeWare CPython 3.13 內嵌），`assistant_backend/`；電腦開發時同一份程式配 Ollama。
+- **模型執行**：llama.cpp b12182 `llama-server`（決策、e5）、whisper.cpp v1.9.5 `whisper-server`（四個語音伺服器）。
+  Android 由 Kotlin 負責啟動、CPU 綁定（提示用 5 核、生成用 3 核）、第一次用到才載入台語／越南文模型並先檢查可用記憶體；
+  iPhone 由 Swift 在 App 內以執行緒啟動（iOS 不能開子行程）、用 Metal GPU 計算，鎖定手機後自動重新 bind 埠號（[AI_ON_DEVICE_IOS.md](docs/AI_ON_DEVICE_IOS.md)）。
 - **檢索資料**：`capabilities.json` 109 項功能（86 項可開）、5 種外語的標題與關鍵字、464 句口語例句、Unihan 台灣讀音表（2 萬多字）、市府 FAQ 8,121 筆的 e5 索引。
 - **原則**：**不用中國開發的模型與工具**（CosyVoice、sherpa-onnx、GPT-SoVITS、FunASR 等一律不用）；**官方 TownPass-Services 網頁不修改、不複製、不打包**，App 透過網頁自己的換頁機制（History API）在頁面內切換；模型檔不放進 repo 也不放進 APK，由開發者自己推到手機。
 - 評估過但不採用：Breeze-ASR-25（中文，5.4 秒太慢）、Whisper medium／large-turbo（太慢）、bge 向量模型（換成 e5）、ViWhisper（訓練資料授權不明）、alexachang 台語模型（訓練資料不明，只當對照）。
@@ -277,14 +280,28 @@ flowchart LR
 - 越南文：PhoWhisper-base 在手機上還沒量，電腦上約 1.4 秒。
 - 第一次啟動要載模型約 1–2 分鐘，並在背景建語意索引約 1 分鐘（之後有快取）。
 
+### 手機速度（iPhone 17，iOS）
+
+- 決策模型用 Metal GPU：讀提示 282–505 tok/s（Android 約 50），一次決策約 **0.9 秒**。
+- 8 GB 機型載不下台語模型，會當中文處理並提示；12 GB 的 Pro Max 可以載。
+
 ### 測試
 
-Python 約 300 個單元測試、Flutter 555 個；教學流程 177 條重播；`extract_guide_strings.py --check` 檢查 6 語教學文字缺漏。
+Python 約 350 個單元測試、Flutter 568 個；教學流程 177 條重播；`extract_guide_strings.py --check` 檢查 6 語教學文字缺漏。
 
 ## 怎麼跑
 
-需要 Windows ＋ Android 實機（建議 12 GB 記憶體）、FVM（Flutter 3.47.6 鎖在 `.fvmrc`）、Android SDK（Platform 36、NDK 29）、JDK 17、Python 3.11+、adb；
-模型檔放在 repo 外（預設 `D:\TownPassAssistant\models\...`，見 `scripts/prepare_assistant_models.ps1`）。
+看是哪種手機選腳本；兩邊是同一份程式、同一個開關（`--dart-define=ASSISTANT_ON_DEVICE=true`，腳本已帶好）。
+
+| 手機 | 電腦 | 建置、安裝、啟動 |
+| --- | --- | --- |
+| Android | Windows（adb） | `scripts\run_assistant_on_device.ps1 -DeviceId <id>` |
+| iPhone | Mac＋Xcode | `scripts/run_assistant_on_device.sh --push-models`（第一次；之後不加） |
+
+兩邊都要 FVM（Flutter 3.47.6 鎖在 `.fvmrc`），模型檔放在 repo 外，由開發者推到手機。
+
+**Android**：Windows、Android SDK（Platform 36、NDK 29）、JDK 17、Python 3.11+、adb，建議 12 GB 記憶體的手機；
+模型預設在 `D:\TownPassAssistant\models\...`（見 `scripts/prepare_assistant_models.ps1`）。
 
 ```powershell
 fvm install
@@ -303,11 +320,23 @@ fvm dart run build_runner build --delete-conflicting-outputs   # 產生檔不在
 .\scripts\run_assistant_on_device.ps1 -DeviceId <id> -Chat                 # 聊天面板
 ```
 
+**iPhone**：Mac＋Xcode；模型放在 `~/Library/Application Support/TownPassAssistant/models`（見 `scripts/push_assistant_models_ios.sh`）。
+
+```bash
+fvm install && fvm flutter pub get --enforce-lockfile
+fvm dart run build_runner build --delete-conflicting-outputs
+scripts/setup_ios_on_device.sh                       # 原生框架放進 ios/OnDevice/（不進 git）
+scripts/run_assistant_on_device.sh --push-models     # 第一次：建置、安裝、推模型、啟動（手機要解鎖）
+scripts/run_assistant_on_device.sh --chat            # 聊天面板
+```
+
+iPhone 目前只有 Ministral（沒有 Gemma），越南文用 Whisper small。一鍵腳本是 2026-11-10 新加的、還沒在 Mac 上實跑；手動步驟見 [docs/AI_ON_DEVICE_IOS.md](docs/AI_ON_DEVICE_IOS.md)。
+
 - 完整的開發者指南（目錄、模型清單、改東西的流程、評估指令、目前限制）：[ASSISTANT_README.md](ASSISTANT_README.md)。
 - 電腦上開發（Ollama ＋ Python，模擬器，不用手機）：[docs/TEAM_LOCAL_SETUP.md](docs/TEAM_LOCAL_SETUP.md)。
 - 看記錄：`adb logcat -s TownPassAssistant python.stdout`；`timing speech` 行有語言判斷結果與耗時，`timing turn` 行有決策耗時。
 - 完全關掉助理：`--dart-define=ASSISTANT_ENABLED=false`。
-- Debug APK 通過不等於 Release／iOS 已驗證；iOS 在本 fork 尚未驗證。
+- iPhone 版已在 iPhone 17 上以 release 實機驗證（2026-11-08–09）；Android 以 Debug APK 實機驗證，Release 尚未驗證。
 
 ## 專案結構
 
@@ -342,8 +371,8 @@ Flutter App 維持在 repo 根目錄，官方目錄不搬動（見 [AGENTS.md](A
 | 進度、測試與團隊 | [AI_ASSISTANT_PROGRESS.md](docs/AI_ASSISTANT_PROGRESS.md)、[AI_ASSISTANT_TEST_REPORT_20261107.md](docs/AI_ASSISTANT_TEST_REPORT_20261107.md)、[TEAM_TASKS_AFTER_MERGE.md](docs/TEAM_TASKS_AFTER_MERGE.md)、[AI_AGENT_HANDOFF.md](docs/AI_AGENT_HANDOFF.md)、[TEAM_LOCAL_SETUP.md](docs/TEAM_LOCAL_SETUP.md) |
 | 官方與同步 | [UPSTREAM_README.md](docs/UPSTREAM_README.md)（官方專案說明）、[DEVELOPMENT.md](docs/DEVELOPMENT.md)、[UPSTREAM_SYNC_20261103.md](docs/UPSTREAM_SYNC_20261103.md)、[AGENTS.md](AGENTS.md) |
 
-目前狀態與限制（2026-11-08）：外語介面與教學文字是 AI 翻譯草稿，待母語者校對；台語只有辨識、朗讀用中文；
-待辦有泰文換成菲律賓文、印尼文優化、台語朗讀，Release／iOS 未驗證。詳見 [docs/TEAM_TASKS_AFTER_MERGE.md](docs/TEAM_TASKS_AFTER_MERGE.md)。
+目前狀態與限制（2026-11-10）：外語介面與教學文字是 AI 翻譯草稿，待母語者校對；台語只有辨識、朗讀用中文；
+待辦有泰文換成菲律賓文、印尼文優化、台語朗讀、iPhone 的 Gemma 與越南文模型，Android Release 未驗證。詳見 [docs/TEAM_TASKS_AFTER_MERGE.md](docs/TEAM_TASKS_AFTER_MERGE.md)。
 
 ## 授權
 

@@ -1,5 +1,7 @@
 # Builds and runs the App with the assistant fully on the phone (no computer
 # backend): Python backend via Chaquopy, llama.cpp and whisper.cpp servers in the App.
+# Android only; an iPhone is built on a Mac with run_assistant_on_device.sh (same
+# --dart-define flags, docs/AI_ON_DEVICE_IOS.md).
 # Prerequisites: build_assistant_native.ps1, prepare_assistant_models.ps1, push_assistant_models.ps1.
 # -Speech system: the phone's own on-device speech recogniser instead of Whisper
 # (docs/AI_ASR_ABLATION.md); the Whisper model is then not used.
@@ -16,10 +18,20 @@ $ErrorActionPreference = "Continue"
 $root = Split-Path -Parent $PSScriptRoot
 $sdk = if ($env:ANDROID_HOME) { $env:ANDROID_HOME } else { "D:\Android\Sdk" }
 $adb = Join-Path $sdk "platform-tools\adb.exe"
+$devices = @(& $adb devices | Select-String '^\S+\s+device$' | ForEach-Object { ($_ -split '\s+')[0] })
 if (-not $DeviceId) {
-    $devices = @(& $adb devices | Select-String '^\S+\s+device$' | ForEach-Object { ($_ -split '\s+')[0] })
     if ($devices.Count -ne 1) { throw "Connect one authorized Android device, or specify -DeviceId." }
     $DeviceId = $devices[0]
+}
+if ($devices -notcontains $DeviceId) {
+    # Not an Android device adb can use: say which script installs it.
+    $known = @()
+    try { $known = @(fvm flutter devices --machine 2>$null | Out-String | ConvertFrom-Json) } catch {}
+    $device = $known | Where-Object { $_.id -eq $DeviceId } | Select-Object -First 1
+    if ($device -and "$($device.targetPlatform)" -like "ios*") {
+        throw "$DeviceId is an iPhone: build it on a Mac with scripts/run_assistant_on_device.sh (docs/AI_ON_DEVICE_IOS.md)."
+    }
+    throw "$DeviceId is not an authorized Android device (adb devices: $($devices -join ', '))."
 }
 $abi = (& $adb -s $DeviceId shell getprop ro.product.cpu.abi).Trim()
 $platform = @{ "arm64-v8a" = "android-arm64"; "x86_64" = "android-x64" }[$abi]
@@ -31,9 +43,14 @@ foreach ($binary in @("libllama_server.so", "libwhisper_server.so")) {
 }
 # A computer-backend port forward would shadow the App's own loopback server.
 & $adb -s $DeviceId reverse --remove tcp:8765 2>$null
-$env:TOWNPASS_ON_DEVICE = "1"
-$env:TOWNPASS_SPEECH = $Speech
-$env:TOWNPASS_DECISION_MODEL = $DecisionModel
+# The build reads the same --dart-define flags as iOS (android/app/build.gradle);
+# TOWNPASS_* variables left in this shell would override them, so they are cleared
+# for the build and put back afterwards.
+$saved = @{}
+foreach ($name in @("TOWNPASS_ON_DEVICE", "TOWNPASS_SPEECH", "TOWNPASS_DECISION_MODEL")) {
+    $saved[$name] = [Environment]::GetEnvironmentVariable($name, "Process")
+    [Environment]::SetEnvironmentVariable($name, $null, "Process")
+}
 Push-Location $root
 try {
     $mode = if ($Release) { "release" } else { "debug" }
@@ -43,8 +60,9 @@ try {
     # then install and launch it. Python is 64-bit only, so Flutter must not force
     # its default ABI list (with armeabi-v7a).
     fvm flutter build apk "--$mode" --target-platform $platform --android-project-arg=disable-abi-filtering=true `
-        --dart-define=ASSISTANT_ENABLED=true --dart-define=ASSISTANT_BASE_URL=http://127.0.0.1:8765 `
-        "--dart-define=ASSISTANT_SPEECH=$Speech" "--dart-define=ASSISTANT_GUIDED=$(if ($Chat) { 'false' } else { 'true' })"
+        --dart-define=ASSISTANT_ENABLED=true --dart-define=ASSISTANT_ON_DEVICE=true `
+        "--dart-define=ASSISTANT_SPEECH=$Speech" "--dart-define=ASSISTANT_DECISION_MODEL=$DecisionModel" `
+        "--dart-define=ASSISTANT_GUIDED=$(if ($Chat) { 'false' } else { 'true' })"
     # fvm does not always pass Flutter's exit code on: also require a fresh APK,
     # so a failed build never installs the previous one.
     if ($LASTEXITCODE -or -not (Test-Path $apk) -or (Get-Item $apk).LastWriteTime -lt $buildStarted) {
@@ -57,7 +75,5 @@ try {
     Write-Host "Installed and started. The models take a little while to load; the USB cable can be unplugged."
 } finally {
     Pop-Location
-    Remove-Item Env:TOWNPASS_ON_DEVICE
-    Remove-Item Env:TOWNPASS_SPEECH
-    Remove-Item Env:TOWNPASS_DECISION_MODEL
+    foreach ($name in $saved.Keys) { [Environment]::SetEnvironmentVariable($name, $saved[$name], "Process") }
 }

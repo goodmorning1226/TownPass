@@ -71,23 +71,36 @@ dependencies {
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.5'
 }
 
-// On-device assistant (docs/AI_ON_DEVICE_PLAN.md). Opt-in with TOWNPASS_ON_DEVICE=1
+// Flutter's --dart-define values (Flutter hands them to Gradle base64-encoded in
+// the dart-defines property), so Android takes the same build flags as iOS
+// (docs/AI_ON_DEVICE_IOS.md): ASSISTANT_ON_DEVICE=true, ASSISTANT_SPEECH,
+// ASSISTANT_DECISION_MODEL.
+def dartDefines = (project.findProperty("dart-defines") ?: "").toString().split(",")
+    .findAll { it }
+    .collect { new String(it.decodeBase64(), "UTF-8") }
+    .findAll { it.contains("=") }
+    .collectEntries { define -> [define.substring(0, define.indexOf("=")), define.substring(define.indexOf("=") + 1)] }
+
+// On-device assistant (docs/AI_ON_DEVICE_PLAN.md). Opt-in with
+// --dart-define=ASSISTANT_ON_DEVICE=true (the same flag as iOS), TOWNPASS_ON_DEVICE=1
 // or -Ptownpass.onDevice=true; other builds are unchanged. Packs the Python
 // backend (Chaquopy) and the llama.cpp / whisper.cpp servers built by
 // scripts/build_assistant_native.ps1. 64-bit devices only.
 def assistantOnDevice = ["1", "true"].contains(
-    (project.findProperty("townpass.onDevice") ?: System.getenv("TOWNPASS_ON_DEVICE") ?: "").toString())
+    (project.findProperty("townpass.onDevice") ?: System.getenv("TOWNPASS_ON_DEVICE")
+        ?: dartDefines["ASSISTANT_ON_DEVICE"] ?: "").toString().trim().toLowerCase())
 if (assistantOnDevice) {
     apply plugin: "com.chaquo.python"
-    // TOWNPASS_SPEECH=system: the phone's own speech recogniser, no Whisper
-    // (docs/AI_ASR_ABLATION.md); default whisper.
-    def assistantWhisper = (project.findProperty("townpass.speech") ?: System.getenv("TOWNPASS_SPEECH") ?: "whisper")
-        .toString() != "system"
-    // TOWNPASS_DECISION_MODEL=gemma: Gemma 4 E2B instead of Ministral 3B as the
-    // decision model (opt-in, docs/AI_DECISION_MODEL_ABLATION_PLAN.md section 8);
-    // default ministral.
+    // TOWNPASS_SPEECH=system (or ASSISTANT_SPEECH=system): the phone's own speech
+    // recogniser, no Whisper (docs/AI_ASR_ABLATION.md); default whisper.
+    def assistantWhisper = (project.findProperty("townpass.speech") ?: System.getenv("TOWNPASS_SPEECH")
+        ?: dartDefines["ASSISTANT_SPEECH"] ?: "whisper").toString() != "system"
+    // TOWNPASS_DECISION_MODEL=gemma (or ASSISTANT_DECISION_MODEL=gemma): Gemma 4 E2B
+    // instead of Ministral 3B as the decision model (opt-in,
+    // docs/AI_DECISION_MODEL_ABLATION_PLAN.md section 8); default ministral.
     def assistantDecisionModel = (project.findProperty("townpass.decisionModel")
-        ?: System.getenv("TOWNPASS_DECISION_MODEL") ?: "ministral").toString().trim().toLowerCase()
+        ?: System.getenv("TOWNPASS_DECISION_MODEL") ?: dartDefines["ASSISTANT_DECISION_MODEL"]
+        ?: "ministral").toString().trim().toLowerCase()
     if (!["ministral", "gemma"].contains(assistantDecisionModel)) {
         throw new GradleException("TOWNPASS_DECISION_MODEL must be ministral or gemma, not $assistantDecisionModel")
     }

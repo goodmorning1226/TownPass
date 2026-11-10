@@ -114,6 +114,12 @@
   - 換決策模型：規劃在 `docs/AI_DECISION_MODEL_ABLATION_PLAN.md`，尚未實作。
 - 「外語先翻中文再決策」實驗（`exp/pivot-translation`）：用開源翻譯時沒有比較好，要先收集 ML Kit 在手機上的實際翻譯再決定（`docs/PIVOT_TRANSLATION_EXPERIMENT.md`，在該分支）。
 
+### T14b iPhone 版補齊（2026-11-10，需要 Mac）
+- iPhone 版已併入 main（`feat/ios-on-device`，`docs/AI_ON_DEVICE_IOS.md`）。缺 Gemma 決策模型與越南文 PhoWhisper：
+  `OnDeviceAssistant.swift` 加 server／starter，`push_assistant_models_ios.sh` 加檔案。
+- `scripts/run_assistant_on_device.sh`（一鍵建置、安裝、推模型、啟動）還沒在 Mac 上實跑，第一次用時確認。
+- 電腦的口語評估把「未串接功能先查 FAQ」算成沒找到（外語要 App 翻譯，電腦模擬不了）；要的話把 `eval_colloquial.py` 加一類「FAQ 回答」。
+
 ### T15 其他後端與前端問題
 - 報告 4.7、4.8 列的：10 位數電話被當 ISBN、功能列表「下一頁」繞回跳項、只說作者時開首頁、FAQ 標題 `&gt;`、
   FAQ embedding 逾時寫死 5 秒、翻譯下載橫幅的黃色底線、半透明面板、重開不捲到最新訊息。

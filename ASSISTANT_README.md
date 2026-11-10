@@ -3,7 +3,7 @@
 這是 TownPass（台北通）fork 加上的**全程在手機上執行**的 AI 助理：聽懂你說的話（中文、台語、英文、日文、越南文、印尼文、泰文），
 幫你打開對的市政服務頁面、回答市府 FAQ，並在服務頁面上一步步教你操作。沒有雲端模型，錄音不離開手機。
 
-- 分支：`feat/asr-ablation`（team fork `goodmorning1226/TownPass`）。
+- 分支：`main`（team fork `goodmorning1226/TownPass`；含 iPhone 版 `feat/ios-on-device`）。Android 與 iPhone 都全程在手機上跑。
 - 行為規則：[docs/AI_CURRENT_RULES.md](docs/AI_CURRENT_RULES.md)（唯一準則）。
 - 技術細節：[docs/AI_TECHNICAL_OVERVIEW.md](docs/AI_TECHNICAL_OVERVIEW.md)。
 - 改程式之前先讀 [AGENTS.md](AGENTS.md)。
@@ -25,12 +25,12 @@
 ## 2. 架構一眼看完
 
 ```
-手機（Android，12 GB 建議）
+手機（Android 建議 12 GB；或 iPhone）
 ├─ Flutter App（GetX）
 │   ├─ 引導助理／聊天面板、按住提問／按住輸入、語言選單
 │   ├─ WebView 服務頁（官方 TownPass-Services 網頁，不修改；頁內換頁用 History API）
 │   └─ 頁面翻譯：預翻字串 + Google ML Kit（離線）
-├─ Python 後端（Chaquopy）:8765  ← App 唯一直接連的地方
+├─ Python 後端（Android：Chaquopy；iPhone：內嵌 CPython）:8765  ← App 唯一直接連的地方
 │   └─ 對話流程：緊急 → 指令 → 關鍵字 → 決策模型 → 讀音 → 語意 → 意圖 → FAQ
 ├─ llama-server :8771  決策模型 Ministral 3B（或 Gemma 4 E2B）
 ├─ llama-server :8774  e5 向量模型（FAQ、語意檢索）
@@ -60,19 +60,34 @@
 | `lib/service/` | 後端連線、頁面翻譯、語言選單、建議句、動作執行 |
 | `lib/util/tp_web_view.dart` | WebView：翻譯注入、頁內換頁 |
 | `android/app/src/ondevice/` | Kotlin：啟動各模型伺服器、CPU 綁定、Gemma／台語／越南文選項 |
+| `ios/Runner/OnDeviceAssistant.swift`、`ios/native/`、`ios/scripts/` | iPhone：在 App 內以執行緒啟動各模型伺服器、鎖定後重新 bind、Xcode 內嵌階段 |
 | `scripts/` | 建置、推模型、評估、抽字串 |
 | `tool/guide_audit/` | 教學流程錄製與重播（Node＋Chrome） |
 | `docs/` | 規則、技術總覽、各實驗紀錄、團隊待辦 `TEAM_TASKS_AFTER_MERGE.md` |
 
-## 4. 怎麼跑起來（Windows＋Android 實機）
+## 4. 怎麼跑起來（看是哪種手機）
 
-需要：FVM（Flutter 3.47.6 鎖在 `.fvmrc`）、Android SDK（Platform 36、NDK 29）、JDK 17、Python 3.11+、adb；模型檔在 repo 外（預設 `D:\TownPassAssistant\models\...`，見 `scripts/prepare_assistant_models.ps1`）。
+兩種手機用同一份程式、同一個開關 `--dart-define=ASSISTANT_ENABLED=true --dart-define=ASSISTANT_ON_DEVICE=true`，腳本已經帶好；
+差別只在用哪台電腦、跑哪個腳本。裝置 ID 用 `fvm flutter devices` 看；腳本拿到另一種手機會直接說該用哪一個。
 
-```powershell
+| 手機 | 電腦 | 一次性準備 | 建置、安裝、啟動 |
+| --- | --- | --- | --- |
+| Android | Windows（adb） | `build_assistant_native.ps1`；`push_assistant_models.ps1 -DeviceId <id> …` | `scripts\run_assistant_on_device.ps1 -DeviceId <id>` |
+| iPhone | Mac＋Xcode | `setup_ios_on_device.sh` | `scripts/run_assistant_on_device.sh --push-models`（第一次）；之後不加 `--push-models` |
+
+兩邊都要先：
+
+```sh
 fvm install
 fvm flutter pub get --enforce-lockfile
 fvm dart run build_runner build --delete-conflicting-outputs   # 產生檔不在 Git，每次 clone 後都要
+```
 
+### Android（Windows）
+
+需要：Android SDK（Platform 36、NDK 29）、JDK 17、Python 3.11+、adb；模型檔在 repo 外（預設 `D:\TownPassAssistant\models\...`，見 `scripts/prepare_assistant_models.ps1`）。
+
+```powershell
 # 原生程式庫（llama-server、whisper-server 的 .so，不在 Git）
 .\scripts\build_assistant_native.ps1
 
@@ -90,6 +105,24 @@ fvm dart run build_runner build --delete-conflicting-outputs   # 產生檔不在
 
 - 第一次啟動要載模型（約 1–2 分鐘），並在背景建語意索引（約 1 分鐘，之後有快取）。
 - 看記錄：`adb logcat -s TownPassAssistant python.stdout`，`timing speech` 行有語言判斷結果和耗時，`timing turn` 行有決策耗時。
+
+### iPhone（Mac）
+
+細節與實測見 [docs/AI_ON_DEVICE_IOS.md](docs/AI_ON_DEVICE_IOS.md)。
+
+```bash
+scripts/setup_ios_on_device.sh                       # 原生框架放進 ios/OnDevice/（不進 git，約 145 MB）
+scripts/run_assistant_on_device.sh --push-models     # 第一次：建置（release）、安裝、推模型、啟動
+scripts/run_assistant_on_device.sh                   # 之後：只建置、安裝、啟動
+scripts/run_assistant_on_device.sh --chat            # 聊天面板
+```
+
+- 模型放在 Mac 的 `~/Library/Application Support/TownPassAssistant/models`（目錄見 `scripts/push_assistant_models_ios.sh`）；推模型時手機要解鎖。
+- iPhone 目前只有 Ministral（沒有 Gemma），越南文用 Whisper small（沒有 PhoWhisper）；8 GB 機型載不下台語模型，台語會當中文處理並提示。
+- 記錄：App 的 `Library/Caches/on_device_assistant.log`。
+- `run_assistant_on_device.sh` 是 2026-11-10 加的一鍵腳本，還沒在 Mac 上實跑；有問題時照 `docs/AI_ON_DEVICE_IOS.md` 的手動三步驟。
+
+### 共通
 - 電腦上開發（Ollama＋Python，不用手機）：[docs/TEAM_LOCAL_SETUP.md](docs/TEAM_LOCAL_SETUP.md)。
 
 ## 5. 模型清單
@@ -125,10 +158,11 @@ fvm dart run build_runner build --delete-conflicting-outputs   # 產生檔不在
 4. 測試：`python -X utf8 -m unittest discover -s assistant_backend -p "test*.py"`、`fvm flutter analyze`、`fvm flutter test`、`python scripts\extract_guide_strings.py --check`。
 5. commit 要經擁有者同意；一個 commit 解決一件事。
 
-## 7. 目前狀態與限制（2026-11-08）
+## 7. 目前狀態與限制（2026-11-10）
 
-- 評估（電腦）：dev 187–188/190、held-out 97/102、多語 46/46，開錯頁 0。
-- 手機速度：中文一句約 1.5 秒辨識＋決策 2–5 秒（Gemma 快、Ministral 準）；台語約 4 秒；越南文（PhoWhisper-base）手機上還沒量，電腦上約 1.4 秒。
+- 評估（電腦，2026-11-10 合併 iPhone 版後重跑）：dev 188/190、held-out 97/102、多語 46/46（另越南文變體 20/20），開錯頁 0。
+- 手機速度（Android vivo V2511）：中文一句約 1.5 秒辨識＋決策 2–5 秒（Gemma 快、Ministral 準）；台語約 4 秒；越南文（PhoWhisper-base）手機上還沒量，電腦上約 1.4 秒。
+- 手機速度（iPhone 17，Metal）：一次決策約 0.9 秒（讀提示 282–505 tok/s，Android 約 50 tok/s）。
 - 台語：只有辨識，朗讀用中文；自動判斷約抓到 7–9 成台語，華語偶爾會多跑一次台語模型（慢 3 秒）。
 - 外語介面與教學文字是 AI 翻譯草稿，待母語者校對。
-- 待辦：泰文換成菲律賓文、印尼文優化、台語朗讀、Release／iOS 未驗證。詳見 `docs/TEAM_TASKS_AFTER_MERGE.md`。
+- 待辦：泰文換成菲律賓文、印尼文優化、台語朗讀、iPhone 的 Gemma 與越南文模型、Android Release 未驗證。詳見 `docs/TEAM_TASKS_AFTER_MERGE.md`。
