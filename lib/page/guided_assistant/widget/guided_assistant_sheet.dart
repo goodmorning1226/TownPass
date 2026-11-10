@@ -9,7 +9,9 @@ import 'package:town_pass/page/guided_assistant/model/guide_content.dart';
 import 'package:town_pass/page/guided_assistant/model/guide_i18n.dart';
 import 'package:town_pass/page/guided_assistant/widget/guide_highlight.dart';
 import 'package:town_pass/page/guided_assistant/widget/guide_motion.dart';
+import 'package:town_pass/page/assistant/widget/model_download_card.dart';
 import 'package:town_pass/page/guided_assistant/widget/hold_to_talk.dart';
+import 'package:town_pass/service/assistant_model_download.dart';
 import 'package:town_pass/service/assistant_on_device.dart';
 import 'package:town_pass/util/tp_colors.dart';
 import 'package:town_pass/util/tp_text.dart';
@@ -38,10 +40,15 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
 
   GuidedAssistantController get c => widget.controller;
 
+  /// The phone's model downloads (on-device builds only).
+  AssistantModelDownload? get _downloads => AssistantModelDownload.maybe;
+
   @override
   void initState() {
     super.initState();
     _seen.addAll(c.messages.map((m) => m.id));
+    // The user may have pushed or deleted models since the App started.
+    _downloads?.refreshStatus();
     _worker = everAll([
       c.messages,
       c.loading,
@@ -98,18 +105,31 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 _header(),
-                // An ended task (我自己來, 結束引導) keeps its card so 繼續引導
-                // can pick it up again. While typing it folds away so the chat
-                // and the text box keep their room.
-                if (!typingOpen &&
-                    c.task.value != null &&
-                    c.task.value!.status != TaskStatus.finished)
-                  // At most about half of the room: a long task list (or a
-                  // longer language) scrolls instead of pushing the chat
-                  // and the microphone off the screen.
-                  Flexible(child: _taskCard(c.task.value!)),
-                Expanded(child: _chat()),
-                _bottom(context, typingOpen: typingOpen),
+                // No core models on the phone yet: the download first
+                // (docs/AI_CURRENT_RULES.md section 7).
+                if (_downloads?.needsCore ?? false)
+                  Expanded(
+                    child: ModelDownloadCard(
+                      downloads: _downloads!,
+                      onLater: c.closeSheet,
+                    ),
+                  )
+                else ...[
+                  // An ended task (我自己來, 結束引導) keeps its card so 繼續引導
+                  // can pick it up again. While typing it folds away so the chat
+                  // and the text box keep their room.
+                  if (!typingOpen &&
+                      c.task.value != null &&
+                      c.task.value!.status != TaskStatus.finished)
+                    // At most about half of the room: a long task list (or a
+                    // longer language) scrolls instead of pushing the chat
+                    // and the microphone off the screen.
+                    Flexible(child: _taskCard(c.task.value!)),
+                  if (_downloads != null)
+                    ModelDownloadBanner(downloads: _downloads!),
+                  Expanded(child: _chat()),
+                  _bottom(context, typingOpen: typingOpen),
+                ],
               ],
             ),
           ),

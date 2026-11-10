@@ -268,6 +268,234 @@ abstract final class AssistantTexts {
       'id': 'Sedang diproses…',
       'th': 'กำลังดำเนินการ…',
     },
+    // Model downloads on the phone (AssistantModelDownload, docs/AI_MODEL_DOWNLOAD.md).
+    'modelsTitle': {
+      'zh': '下載離線助理',
+      'en': 'Download the offline assistant',
+      'ja': 'オフラインアシスタントをダウンロード',
+      'vi': 'Tải trợ lý ngoại tuyến',
+      'id': 'Unduh asisten offline',
+      'th': 'ดาวน์โหลดผู้ช่วยแบบออฟไลน์',
+    },
+    'modelsBody': {
+      'zh':
+          '助理全部在這支手機上執行，錄音不會上傳。第一次使用要先下載模型，約 {size}。'
+          '建議連上 Wi-Fi；下載只在 App 開著時進行，可以隨時暫停。',
+      'en':
+          'The assistant runs entirely on this phone; recordings are never '
+          'uploaded. Before the first use it needs its models, about {size}. '
+          'Wi-Fi is recommended; the download runs while the App is open and '
+          'can be paused at any time.',
+      'ja':
+          'アシスタントはすべてこの端末で動き、録音はアップロードされません。'
+          '初回はモデル（約 {size}）のダウンロードが必要です。Wi-Fi をおすすめします。'
+          'ダウンロードはアプリを開いている間に行われ、いつでも一時停止できます。',
+      'vi':
+          'Trợ lý chạy hoàn toàn trên điện thoại này, bản ghi âm không được tải lên. '
+          'Lần đầu cần tải mô hình, khoảng {size}. Nên dùng Wi-Fi; việc tải chỉ chạy '
+          'khi ứng dụng đang mở và có thể tạm dừng bất cứ lúc nào.',
+      'id':
+          'Asisten berjalan sepenuhnya di ponsel ini; rekaman tidak pernah diunggah. '
+          'Sebelum dipakai pertama kali, modelnya perlu diunduh, sekitar {size}. '
+          'Disarankan memakai Wi-Fi; unduhan berjalan saat aplikasi terbuka dan bisa '
+          'dijeda kapan saja.',
+      'th':
+          'ผู้ช่วยทำงานบนโทรศัพท์เครื่องนี้ทั้งหมด เสียงที่บันทึกจะไม่ถูกอัปโหลด '
+          'ก่อนใช้ครั้งแรกต้องดาวน์โหลดโมเดลประมาณ {size} แนะนำให้ใช้ Wi-Fi '
+          'การดาวน์โหลดทำงานขณะเปิดแอปและหยุดชั่วคราวได้ทุกเมื่อ',
+    },
+    'modelsLite': {
+      'zh': '這支手機的記憶體較小，會使用精簡版：多數需求會列出選項讓你選。',
+      'en':
+          'This phone has less memory, so it gets the lite version: most '
+          'requests show options for you to choose from.',
+      'ja': 'この端末はメモリが少ないため、ライト版になります。多くの依頼は選択肢から選んでいただきます。',
+      'vi': 'Điện thoại này ít bộ nhớ nên dùng bản rút gọn: hầu hết yêu cầu sẽ hiện các lựa chọn để bạn chọn.',
+      'id':
+          'Memori ponsel ini lebih kecil, jadi memakai versi ringan: sebagian besar '
+          'permintaan menampilkan pilihan untuk Anda pilih.',
+      'th': 'โทรศัพท์เครื่องนี้มีหน่วยความจำน้อย จึงใช้รุ่นแบบย่อ คำขอส่วนใหญ่จะแสดงตัวเลือกให้คุณเลือก',
+    },
+    'modelsTaiwanese': {
+      'zh': '台語辨識（另外 {size}）',
+      'en': 'Taiwanese speech (another {size})',
+      'ja': '台湾語の認識（追加 {size}）',
+      'vi': 'Nhận dạng tiếng Đài (thêm {size})',
+      'id': 'Pengenalan bahasa Taiwan (tambahan {size})',
+      'th': 'การรู้จำภาษาไต้หวัน (เพิ่มอีก {size})',
+    },
+    'modelsDownload': {
+      'zh': '下載',
+      'en': 'Download',
+      'ja': 'ダウンロード',
+      'vi': 'Tải xuống',
+      'id': 'Unduh',
+      'th': 'ดาวน์โหลด',
+    },
+    'modelsLater': {
+      'zh': '稍後',
+      'en': 'Later',
+      'ja': 'あとで',
+      'vi': 'Để sau',
+      'id': 'Nanti',
+      'th': 'ไว้ทีหลัง',
+    },
+    'modelsProgress': {
+      'zh': '已下載 {done} / {total}（{percent}%）',
+      'en': '{done} of {total} downloaded ({percent}%)',
+      'ja': '{done} / {total} ダウンロード済み（{percent}%）',
+      'vi': 'Đã tải {done} / {total} ({percent}%)',
+      'id': '{done} dari {total} terunduh ({percent}%)',
+      'th': 'ดาวน์โหลดแล้ว {done} / {total} ({percent}%)',
+    },
+    'modelsPause': {
+      'zh': '暫停',
+      'en': 'Pause',
+      'ja': '一時停止',
+      'vi': 'Tạm dừng',
+      'id': 'Jeda',
+      'th': 'หยุดชั่วคราว',
+    },
+    'modelsResume': {
+      'zh': '繼續下載',
+      'en': 'Resume download',
+      'ja': 'ダウンロードを再開',
+      'vi': 'Tiếp tục tải',
+      'id': 'Lanjutkan unduhan',
+      'th': 'ดาวน์โหลดต่อ',
+    },
+    'modelsPaused': {
+      'zh': '已暫停，下次會從中斷的地方繼續。',
+      'en': 'Paused. It continues from where it stopped.',
+      'ja': '一時停止しました。次回は中断したところから続けます。',
+      'vi': 'Đã tạm dừng. Lần sau sẽ tiếp tục từ chỗ dừng.',
+      'id': 'Dijeda. Nanti dilanjutkan dari titik berhenti.',
+      'th': 'หยุดชั่วคราวแล้ว ครั้งหน้าจะทำต่อจากจุดที่หยุด',
+    },
+    'modelsDecisionPending': {
+      'zh': '理解模型下載中（{percent}%）；在那之前，多數需求會先列出選項讓你選。',
+      'en':
+          'The understanding model is downloading ({percent}%); until then most '
+          'requests show options to choose from.',
+      'ja': '理解モデルをダウンロード中（{percent}%）。それまでは多くの依頼で選択肢を表示します。',
+      'vi': 'Đang tải mô hình hiểu yêu cầu ({percent}%); trước đó hầu hết yêu cầu sẽ hiện các lựa chọn.',
+      'id':
+          'Model pemahaman sedang diunduh ({percent}%); sampai selesai, sebagian besar '
+          'permintaan menampilkan pilihan.',
+      'th': 'กำลังดาวน์โหลดโมเดลทำความเข้าใจ ({percent}%) ระหว่างนี้คำขอส่วนใหญ่จะแสดงตัวเลือกให้เลือก',
+    },
+    'modelsErrorNetwork': {
+      'zh': '網路中斷，下載停止了。已下載的部分會保留，連上網路後再試一次。',
+      'en':
+          'The connection dropped and the download stopped. What arrived is '
+          'kept; try again once you are online.',
+      'ja': '通信が切れてダウンロードが止まりました。取得済みの分は残ります。接続後にもう一度お試しください。',
+      'vi': 'Mất kết nối nên việc tải đã dừng. Phần đã tải được giữ lại; hãy thử lại khi có mạng.',
+      'id':
+          'Koneksi terputus dan unduhan berhenti. Bagian yang sudah ada disimpan; '
+          'coba lagi setelah terhubung.',
+      'th': 'การเชื่อมต่อขาดหายและการดาวน์โหลดหยุดลง ส่วนที่ได้แล้วจะเก็บไว้ ลองอีกครั้งเมื่อเชื่อมต่อได้',
+    },
+    'modelsErrorStorage': {
+      'zh': '手機空間不足：還需要 {size}。清出空間後再試一次。',
+      'en': 'Not enough space on the phone: {size} more is needed. Free some space and try again.',
+      'ja': '端末の空き容量が足りません。あと {size} 必要です。空きを作ってからもう一度お試しください。',
+      'vi': 'Điện thoại không đủ dung lượng: cần thêm {size}. Hãy giải phóng bộ nhớ rồi thử lại.',
+      'id': 'Ruang ponsel tidak cukup: perlu {size} lagi. Kosongkan ruang lalu coba lagi.',
+      'th': 'พื้นที่ในโทรศัพท์ไม่พอ ต้องการอีก {size} โปรดเพิ่มพื้นที่แล้วลองอีกครั้ง',
+    },
+    'modelsErrorChecksum': {
+      'zh': '下載的檔案沒有通過檢查，已經刪除，請再試一次。',
+      'en': 'A downloaded file failed its check and was deleted. Please try again.',
+      'ja': 'ダウンロードしたファイルが検証に通らなかったため削除しました。もう一度お試しください。',
+      'vi': 'Một tệp tải về không qua kiểm tra và đã bị xóa. Vui lòng thử lại.',
+      'id': 'Berkas yang diunduh gagal diperiksa dan sudah dihapus. Silakan coba lagi.',
+      'th': 'ไฟล์ที่ดาวน์โหลดไม่ผ่านการตรวจสอบและถูกลบแล้ว โปรดลองอีกครั้ง',
+    },
+    'modelsErrorSource': {
+      'zh': '這個版本還沒有設定模型的下載來源（開發版）。請用 adb／devicectl 推模型，或建置時設定 ASSISTANT_MODEL_BASE_URL。',
+      'en':
+          'This build has no download source for the models yet (development '
+          'build). Push them with adb/devicectl, or build with '
+          'ASSISTANT_MODEL_BASE_URL.',
+      'ja':
+          'このビルドにはモデルのダウンロード元がまだ設定されていません（開発版）。'
+          'adb／devicectl で転送するか、ASSISTANT_MODEL_BASE_URL を指定してビルドしてください。',
+      'vi':
+          'Bản này chưa có nguồn tải mô hình (bản phát triển). Hãy chép bằng adb/devicectl '
+          'hoặc build với ASSISTANT_MODEL_BASE_URL.',
+      'id':
+          'Build ini belum punya sumber unduhan model (build pengembangan). Salin dengan '
+          'adb/devicectl, atau build dengan ASSISTANT_MODEL_BASE_URL.',
+      'th':
+          'รุ่นนี้ยังไม่ได้ตั้งค่าแหล่งดาวน์โหลดโมเดล (รุ่นพัฒนา) โปรดคัดลอกด้วย adb/devicectl '
+          'หรือ build พร้อม ASSISTANT_MODEL_BASE_URL',
+    },
+    'modelsUnavailable': {
+      'zh': '這支手機的記憶體不足，無法執行離線助理。',
+      'en': 'This phone does not have enough memory for the offline assistant.',
+      'ja': 'この端末はメモリが足りないため、オフラインアシスタントを使えません。',
+      'vi': 'Điện thoại này không đủ bộ nhớ để chạy trợ lý ngoại tuyến.',
+      'id': 'Memori ponsel ini tidak cukup untuk menjalankan asisten offline.',
+      'th': 'โทรศัพท์เครื่องนี้มีหน่วยความจำไม่พอสำหรับผู้ช่วยแบบออฟไลน์',
+    },
+    'modelsRetry': {
+      'zh': '再試一次',
+      'en': 'Try again',
+      'ja': 'もう一度',
+      'vi': 'Thử lại',
+      'id': 'Coba lagi',
+      'th': 'ลองอีกครั้ง',
+    },
+    'modelsFailed': {
+      'zh': '目前無法取得模型下載的狀態，請稍後再試。',
+      'en': 'The model download status is not available right now. Try again shortly.',
+      'ja': '現在モデルのダウンロード状況を取得できません。しばらくしてからお試しください。',
+      'vi': 'Hiện không lấy được trạng thái tải mô hình. Hãy thử lại sau.',
+      'id': 'Status unduhan model belum bisa diambil. Coba lagi sebentar lagi.',
+      'th': 'ขณะนี้ดูสถานะการดาวน์โหลดโมเดลไม่ได้ โปรดลองใหม่ภายหลัง',
+    },
+    'modelsSettingsHeader': {
+      'zh': '離線模型',
+      'en': 'Offline models',
+      'ja': 'オフラインモデル',
+      'vi': 'Mô hình ngoại tuyến',
+      'id': 'Model offline',
+      'th': 'โมเดลแบบออฟไลน์',
+    },
+    'modelsSettingsState': {
+      'zh': '這支手機已下載 {have}，還有 {missing} 未下載。',
+      'en': '{have} on this phone, {missing} not downloaded yet.',
+      'ja': 'この端末に {have}、未ダウンロード {missing}。',
+      'vi': 'Đã có {have} trên máy, còn {missing} chưa tải.',
+      'id': '{have} sudah ada di ponsel, {missing} belum diunduh.',
+      'th': 'มีในโทรศัพท์แล้ว {have} ยังไม่ได้ดาวน์โหลด {missing}',
+    },
+    'modelsTaiwaneseAdd': {
+      'zh': '下載台語辨識（{size}）',
+      'en': 'Download Taiwanese speech ({size})',
+      'ja': '台湾語の認識をダウンロード（{size}）',
+      'vi': 'Tải nhận dạng tiếng Đài ({size})',
+      'id': 'Unduh pengenalan bahasa Taiwan ({size})',
+      'th': 'ดาวน์โหลดการรู้จำภาษาไต้หวัน ({size})',
+    },
+    'modelsDelete': {
+      'zh': '刪除已下載的模型',
+      'en': 'Delete the downloaded models',
+      'ja': 'ダウンロードしたモデルを削除',
+      'vi': 'Xóa các mô hình đã tải',
+      'id': 'Hapus model yang sudah diunduh',
+      'th': 'ลบโมเดลที่ดาวน์โหลดแล้ว',
+    },
+    'modelsDeleteConfirm': {
+      'zh': '刪除後要重新下載才能使用助理。確定刪除嗎？',
+      'en':
+          'The assistant needs them downloaded again afterwards. Delete them?',
+      'ja': '削除すると、アシスタントを使うには再ダウンロードが必要です。削除しますか？',
+      'vi': 'Sau khi xóa phải tải lại mới dùng được trợ lý. Xóa không?',
+      'id': 'Setelah dihapus, asisten perlu diunduh lagi. Hapus sekarang?',
+      'th': 'หลังลบต้องดาวน์โหลดใหม่จึงจะใช้ผู้ช่วยได้ ต้องการลบหรือไม่',
+    },
     // The iPhone's own assistant after the App came back from the background
     // (AssistantOnDevice.reconnecting).
     'reconnecting': {

@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:town_pass/page/assistant/assistant_texts.dart';
 import 'package:town_pass/page/assistant/assistant_view_controller.dart';
+import 'package:town_pass/page/assistant/widget/model_download_card.dart';
+import 'package:town_pass/service/assistant_model_download.dart';
 import 'package:town_pass/service/assistant_on_device.dart';
 import 'package:town_pass/service/assistant_recent_inputs.dart';
 import 'package:town_pass/service/assistant_speech_language.dart';
@@ -243,21 +245,43 @@ class _AssistantSheetState extends State<AssistantSheet> {
             top: media.padding.top,
             bottom: math.max(media.viewInsets.bottom, media.padding.bottom),
           ),
-          child: Column(
-            children: [
-              _header(),
-              Expanded(
-                child: Obx(
-                  () => controller.messages.isEmpty && !controller.busy.value
-                      ? _suggestions()
-                      : _conversation(),
-                ),
-              ),
-              _keyboard ? _keyboardBar() : _voiceBar(),
-            ],
-          ),
+          // Inside build's Obx: a change of the download status rebuilds it.
+          child: _panel(AssistantModelDownload.maybe),
         ),
       ),
+    );
+  }
+
+  /// No core models on the phone yet: the download first
+  /// (docs/AI_CURRENT_RULES.md section 7); then the conversation, with a
+  /// banner while the decision model is still to come.
+  Widget _panel(AssistantModelDownload? downloads) {
+    if (downloads != null && downloads.needsCore) {
+      return Column(
+        children: [
+          _header(),
+          Expanded(
+            child: ModelDownloadCard(
+              downloads: downloads,
+              onLater: controller.closePanel,
+            ),
+          ),
+        ],
+      );
+    }
+    return Column(
+      children: [
+        _header(),
+        if (downloads != null) ModelDownloadBanner(downloads: downloads),
+        Expanded(
+          child: Obx(
+            () => controller.messages.isEmpty && !controller.busy.value
+                ? _suggestions()
+                : _conversation(),
+          ),
+        ),
+        _keyboard ? _keyboardBar() : _voiceBar(),
+      ],
     );
   }
 

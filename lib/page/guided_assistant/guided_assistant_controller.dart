@@ -19,6 +19,7 @@ import 'package:town_pass/util/tp_route.dart';
 import 'package:town_pass/bean/assistant_result.dart';
 import 'package:town_pass/page/main/main_view_controller.dart';
 import 'package:town_pass/service/assistant_action_executor.dart';
+import 'package:town_pass/service/assistant_model_download.dart';
 import 'package:town_pass/service/assistant_page_tracker.dart';
 import 'package:town_pass/service/assistant_recent_inputs.dart';
 import 'package:town_pass/service/assistant_recorder.dart';
@@ -1652,8 +1653,17 @@ class GuidedAssistantController extends GetxController {
     if (!readAloud.value) speaker.stop();
   }
 
+  /// No core models on the phone yet (docs/AI_CURRENT_RULES.md section 7):
+  /// the assistant sheet shows the download instead of listening.
+  bool _downloadFirst() {
+    if (!(AssistantModelDownload.maybe?.needsCore ?? false)) return false;
+    openSheet();
+    return true;
+  }
+
   Future<void> micDown() async {
     if (loading.value || listening.value) return;
+    if (_downloadFirst()) return;
     final rec = recorder;
     if (rec == null || service == null) {
       listening.value = true;
@@ -1826,6 +1836,7 @@ class GuidedAssistantController extends GetxController {
   /// go into.
   Future<void> fieldMicDown() async {
     if (loading.value || listening.value || !dictating) return;
+    if (_downloadFirst()) return;
     _fieldTimer?.cancel();
     fieldNotice.value = null;
     fieldTarget.value = null;
@@ -1964,6 +1975,7 @@ class GuidedAssistantController extends GetxController {
   /// home tab); elsewhere it opens the assistant and problems are toasts.
   Future<void> homeMicDown({bool card = true}) async {
     if (loading.value || homeAsk.value == HomeAsk.listening) return;
+    if (_downloadFirst()) return;
     _homeCard = card;
     _homeHeldAt = DateTime.now();
     homeAsk.value = HomeAsk.listening;

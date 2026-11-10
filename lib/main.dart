@@ -19,6 +19,7 @@ import 'package:town_pass/page/assistant/assistant_view_controller.dart';
 import 'package:town_pass/page/assistant/widget/assistant_host.dart';
 import 'package:town_pass/page/guided_assistant/guided_assistant_controller.dart';
 import 'package:town_pass/page/guided_assistant/model/guide_i18n.dart';
+import 'package:town_pass/service/assistant_model_download.dart';
 import 'package:town_pass/service/assistant_on_device.dart';
 import 'package:town_pass/service/assistant_recorder.dart';
 import 'package:town_pass/service/assistant_service.dart';
@@ -85,6 +86,14 @@ Future<void> initServices() async {
   // phone (docs/AI_ON_DEVICE_IOS.md); not awaited: the models load behind it.
   if (assistantEnabled && !assistantOffline) {
     unawaited(AssistantOnDevice.start());
+    // On-device builds (Android and iPhone) download their models in the App
+    // when the user agrees (docs/AI_MODEL_DOWNLOAD.md).
+    if (AssistantOnDevice.requested) {
+      Get.put<AssistantModelDownload>(
+        AssistantModelDownload(),
+        permanent: true,
+      );
+    }
   }
   if (_useMock) {
     Get.put<WebPageState>(WebPageState(), permanent: true);
