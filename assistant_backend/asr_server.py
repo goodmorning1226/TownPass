@@ -26,6 +26,10 @@ from script import traditional
 STYLE_PROMPT = "可能會說第一個、第二個、第三個。以下是台灣華語的繁體中文句子。"
 MAX_BYTES = 1_100_000  # 30 s of 16 kHz mono PCM16 plus header
 SAMPLE_RATE = 16000
+# A speech model still loading right after launch: a clip waits this long for it
+# (whisper-server refuses connections until loaded), asking every READY_PAUSE_S.
+READY_WAIT_S = 60
+READY_PAUSE_S = 1.0
 # Hold-to-talk bounds the clip, so a VAD pass mostly adds latency (~1 s on CPU).
 # Near-silent audio is rejected instead, which stops Whisper inventing text.
 MIN_RMS = 0.003
@@ -455,6 +459,7 @@ class WhisperCppRecognizer:
         self.vietnamese_reply = None  # the last decode made by the Vietnamese model
         self.gate_url = gate_url.rstrip("/") if gate_url and self.multi_url else None
         self.gate_primed = False
+        self.waited_for_model = False  # a request waited for a loading speech model
         self.timeout = timeout
         self.prompt = vocabulary_prompt()  # conservative estimate: no tokenizer here
         self.prompt_tokens = None
@@ -553,11 +558,36 @@ class WhisperCppRecognizer:
         return text, round(logprob, 3), round(no_speech, 3)
 
     def _post(self, url, fields, wav):
+        """One whisper-server request. whisper-server listens only once its model has
+        loaded: right after the App starts (or a model was just downloaded) the
+        connection is refused, and the clip waits for it, up to READY_WAIT_S,
+        instead of failing (2026-11-11: the first spoken question after launch)."""
+        import urllib.error
         import urllib.request
         body, content_type = self.multipart(fields, wav)
-        request = urllib.request.Request(url + "/inference", data=body, headers={"Content-Type": content_type})
-        with urllib.request.urlopen(request, timeout=self.timeout) as response:
-            return json.loads(response.read(2_000_000))
+        deadline = time.monotonic() + READY_WAIT_S
+        while True:
+            request = urllib.request.Request(url + "/inference", data=body, headers={"Content-Type": content_type})
+            try:
+                with urllib.request.urlopen(request, timeout=self.timeout) as response:
+                    return json.loads(response.read(2_000_000))
+            except urllib.error.URLError as exc:
+                refused = not isinstance(exc, urllib.error.HTTPError) and isinstance(exc.reason, ConnectionRefusedError)
+                if not refused or time.monotonic() + READY_PAUSE_S > deadline:
+                    raise
+            self.waited_for_model = True
+            time.sleep(READY_PAUSE_S)
+
+    def ready(self):
+        """Whether the speech model this recogniser decodes with answers (GET /health)."""
+        import socket
+        import urllib.parse
+        parsed = urllib.parse.urlsplit(self.multi_url or self.url)
+        try:
+            with socket.create_connection((parsed.hostname, parsed.port or 80), timeout=0.3):
+                return True
+        except OSError:
+            return False
 
     def _infer(self, url, wav, seconds, language, prompt=True, detect_only=False, minimum_ctx=256, fallback=True):
         self.passes = getattr(self, "passes", 0) + 1  # requests to the speech models for this clip (timing log)
@@ -925,7 +955,8 @@ def make_handler(recognizer, model_name):
 
         def do_GET(self):
             if self.path == "/health":
-                return self.reply(200, {"model": model_name, "sample_rate": SAMPLE_RATE})
+                ready = recognizer.ready() if hasattr(recognizer, "ready") else True
+                return self.reply(200, {"model": model_name, "sample_rate": SAMPLE_RATE, "ready": ready})
             self.reply(404, {"error": "not found"})
 
         def do_POST(self):

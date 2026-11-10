@@ -53,6 +53,64 @@ class AssistantError(Exception):
     pass
 
 
+# The phone's model servers load after the App starts (decision model ~2 GB): a request
+# that arrives first waits for them instead of failing at once (2026-11-11, the first
+# spoken question after launch failed on Android and iPhone). llama-server answers 503
+# while loading; a server not started yet refuses the connection.
+MODEL_READY_WAIT_S = 75
+# When the user last asked (turns and speech): the warm-up gives way (device_main.warm_up).
+USER_REQUEST_AT = 0.0
+
+
+def _answers(url, timeout=0.5):
+    """GET url answers 200 (a llama-server that has loaded, the speech service)."""
+    try:
+        with urllib.request.urlopen(url, timeout=timeout) as response:
+            return response.status == 200, json.loads(response.read(65536) or b"{}")
+    except (OSError, ValueError):
+        return False, {}
+
+
+def readiness(assistant):
+    """What the App shows while models load (AssistantReadiness): the decision model
+    (None: none on this phone, or Ollama on the computer) and speech (None: no
+    speech service). True once each answers."""
+    decision = None
+    if MODEL_API == "openai" and assistant.model_available:
+        decision = _answers(MODEL_URL + "/health")[0]
+    speech = None
+    asr = os.environ.get("TOWNPASS_ASR_URL")
+    if asr and asr.endswith("/v1/transcribe"):
+        up, body = _answers(asr[: -len("/v1/transcribe")] + "/health")
+        speech = bool(up and body.get("ready", True))
+    return {"decision": decision, "speech": speech}
+
+
+def note_user_request():
+    global USER_REQUEST_AT
+    USER_REQUEST_AT = time.monotonic()
+
+
+def loading(exc):
+    """Whether exc means a local model server is still loading (not a real failure)."""
+    if isinstance(exc, urllib.error.HTTPError):
+        return exc.code == 503
+    return isinstance(exc, urllib.error.URLError) and isinstance(exc.reason, ConnectionRefusedError)
+
+
+def model_reply(payload, wait_s=None, pause_s=1.0):
+    """llama-server's chat completion, waiting up to wait_s for a loading model."""
+    deadline = time.monotonic() + (MODEL_READY_WAIT_S if wait_s is None else wait_s)
+    while True:
+        try:
+            return fetch_json(MODEL_URL + "/v1/chat/completions", payload, timeout=MODEL_TIMEOUT)
+        except (urllib.error.URLError, ConnectionRefusedError) as exc:
+            refused = isinstance(exc, ConnectionRefusedError)
+            if not (refused or loading(exc)) or time.monotonic() + pause_s > deadline:
+                raise
+        time.sleep(pause_s)
+
+
 def fetch_json(url, payload=None, timeout=15):
     request = urllib.request.Request(
         url,
@@ -399,10 +457,10 @@ class Assistant:
             schema = proposal_schema(tools)
             if MODEL_API == "openai":
                 # Same messages and limits; the output constraint comes from the schema.
-                reply = fetch_json(MODEL_URL + "/v1/chat/completions", {
+                reply = model_reply({
                     "model": MODEL, "messages": alternating(messages), "temperature": 0, "max_tokens": 180,
                     **output_constraint(schema),
-                }, timeout=MODEL_TIMEOUT)
+                })
                 content = reply["choices"][0]["message"]["content"]
                 result = {"prompt_eval_count": (reply.get("usage") or {}).get("prompt_tokens"),
                           "timing": llama_timing(reply.get("timings"))}
@@ -422,6 +480,7 @@ class Assistant:
             raise AssistantError("決策模型未回應，請確認電腦上的 Ollama 正在執行，再重試。") from exc
 
     def turn(self, payload):
+        note_user_request()
         request_id = payload.get("request_id")
         session = payload.get("session_id") or str(uuid.uuid4())
         text = payload.get("text", "")
@@ -647,6 +706,7 @@ def make_handler(assistant, token=""):
                     "faq_entries": assistant.faq.count if assistant.faq else 0,
                     "semantic_ready": bool(assistant.semantic and assistant.semantic.ready),
                     "decision_model": assistant.model_available,
+                    "ready": readiness(assistant),
                     "data_mode": "demo"})
             if self.path == "/v1/models":
                 # Model downloads (docs/AI_MODEL_DOWNLOAD.md); not managed on the computer.
@@ -754,6 +814,7 @@ def make_handler(assistant, token=""):
             Audio is never stored or logged. The text goes back to the App, which
             shows it as the user's message and sends it as a normal turn.
             """
+            note_user_request()
             from asr_server import MAX_BYTES, read_wav
             if self.headers.get("Transfer-Encoding") or self.headers.get("Content-Length") is None:
                 return self.reply(411, {"error": "App 傳送格式不符，請更新 App 後重試。"})

@@ -21,6 +21,7 @@ import 'package:town_pass/page/guided_assistant/guided_assistant_controller.dart
 import 'package:town_pass/page/guided_assistant/model/guide_i18n.dart';
 import 'package:town_pass/service/assistant_model_download.dart';
 import 'package:town_pass/service/assistant_on_device.dart';
+import 'package:town_pass/service/assistant_readiness.dart';
 import 'package:town_pass/service/assistant_recorder.dart';
 import 'package:town_pass/service/assistant_service.dart';
 import 'package:town_pass/page/guided_assistant/web/web_page_state.dart';
@@ -93,6 +94,9 @@ Future<void> initServices() async {
         AssistantModelDownload(),
         permanent: true,
       );
+      // The models load for up to a minute after launch: the waiting line says
+      // so until they answer (AssistantReadiness).
+      AssistantReadiness.watch(AssistantService());
     }
   }
   if (_useMock) {

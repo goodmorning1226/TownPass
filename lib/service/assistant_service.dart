@@ -95,7 +95,9 @@ class AssistantService {
         language,
         faqText,
         pageStep,
-      ).timeout(const Duration(seconds: 85));
+        // Long enough for a model still loading right after launch (the backend
+        // waits up to 75 s for it, server.MODEL_READY_WAIT_S).
+      ).timeout(const Duration(seconds: 150));
     } on TimeoutException {
       throw _error('turnTimeout', language);
     } on SocketException {
@@ -231,7 +233,9 @@ class AssistantService {
       request.add(payload);
       // Detection plus the Chinese model for Chinese can take two passes.
       final response = await request.close().timeout(
-        Duration(seconds: language == null || language == 'zh' ? 45 : 70),
+        // Two passes for some clips, plus up to 60 s for a speech model still
+        // loading right after launch (asr_server.READY_WAIT_S).
+        Duration(seconds: language == null || language == 'zh' ? 110 : 130),
       );
       final body = await response
           .transform(utf8.decoder)
@@ -298,6 +302,10 @@ class AssistantService {
   }
 
   // ------------------------------------------------- model downloads (phone)
+
+  /// GET /health: catalogue, FAQ and `ready` (whether the phone's models
+  /// answer yet; AssistantReadiness).
+  Future<Map<String, dynamic>> health() => _models('GET', '/health');
 
   /// The phone's model files and their download (docs/AI_MODEL_DOWNLOAD.md).
   /// `{"managed": false}` on the computer backend.

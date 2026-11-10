@@ -67,12 +67,19 @@ def warm_up(recognizer, model_url, limit_s=900, decision=True):
     import array
     import math
     import time
+    import server
     from decision import system_prompt
     from server import fetch_json
     started = time.monotonic()
     deadline = started + limit_s
+
+    def user_first():
+        """The user asked since the warm-up began: their request warms the models
+        itself, and the warm-up would only compete with it (2026-11-11)."""
+        return server.USER_REQUEST_AT > started
+
     speech = None
-    if recognizer is not None:  # None: the phone's own recogniser, no Whisper
+    if recognizer is not None and not user_first():  # None: the phone's own recogniser, no Whisper
         tone = array.array("h", (int(3000 * math.sin(i * 0.05)) for i in range(16000))).tobytes()
         # No Taiwanese for the tone: it passed the Taiwanese gate and loaded Breeze at idle.
         speech = _retry(lambda: recognizer.transcribe(tone, automatic_taiwanese=False), deadline)
@@ -84,6 +91,10 @@ def warm_up(recognizer, model_url, limit_s=900, decision=True):
     from decision import POLICIES
     warmed = True
     for task in (POLICIES if decision else ()):  # library, capability, guide: one llama-server slot each
+        if user_first():
+            print("timing warm-up stopped: the user asked first", flush=True)
+            decision = False
+            break
         messages = [{"role": "system", "content": system_prompt(task)}, {"role": "user", "content": "{}"}]
         warmed = _retry(lambda: fetch_json(model_url + "/v1/chat/completions", {
             "messages": messages, "temperature": 0, "max_tokens": 1}, timeout=300), deadline) and warmed

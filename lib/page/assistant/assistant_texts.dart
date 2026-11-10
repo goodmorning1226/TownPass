@@ -496,6 +496,15 @@ abstract final class AssistantTexts {
       'id': 'Setelah dihapus, asisten perlu diunduh lagi. Hapus sekarang?',
       'th': 'หลังลบต้องดาวน์โหลดใหม่จึงจะใช้ผู้ช่วยได้ ต้องการลบหรือไม่',
     },
+    // Right after launch the phone's models are still loading (AssistantReadiness).
+    'modelsLoading': {
+      'zh': '模型載入中，好了會自動回答…',
+      'en': 'The models are loading; the answer follows by itself…',
+      'ja': 'モデルを読み込み中です。終わりしだい自動で答えます…',
+      'vi': 'Đang tải mô hình, xong sẽ tự trả lời…',
+      'id': 'Model sedang dimuat; jawaban menyusul otomatis…',
+      'th': 'กำลังโหลดโมเดล เสร็จแล้วจะตอบเอง…',
+    },
     // The iPhone's own assistant after the App came back from the background
     // (AssistantOnDevice.reconnecting).
     'reconnecting': {
