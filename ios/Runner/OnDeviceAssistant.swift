@@ -54,11 +54,17 @@ final class OnDeviceAssistant {
     let symbol: String
     let port: Int
     let arguments: [String]
+    /// Its model file in Documents/models.
+    var file: String? = nil
     var llama: Bool { symbol == "townpass_llama_server" }
   }
   private let serversLock = NSLock()
   /// Every server started so far, in start order.
   private var servers: [Server] = []
+  /// The start-up servers by ensureServer name, also those whose file is not here yet.
+  private var planned: [String: Server] = [:]
+  /// One model load at a time (overlapping Metal set-ups crashed the App, 2026-11-08).
+  private let loadLock = NSLock()
   /// Names of servers whose thread gave up (it kept exiting); recover() runs them again.
   private var stopped: Set<String> = []
   private let recoverLock = NSLock()
@@ -185,9 +191,9 @@ final class OnDeviceAssistant {
     guard fileManager.fileExists(atPath: python), fileManager.fileExists(atPath: backend) else {
       return "not embedded: build with ios/OnDevice/ (scripts/setup_ios_on_device.sh)"
     }
-    guard has(Self.modelFile) else {
-      return "missing \(Self.modelFile): run scripts/push_assistant_models_ios.sh"
-    }
+    // Without the model files (not downloaded yet) Python still starts, so the App
+    // can show and run the download (docs/AI_MODEL_DOWNLOAD.md); ensureServer then
+    // starts each server once its file is in place. Pushed files work as before.
 
     // Everything the servers and Python print goes to one log the Mac can copy
     // back (Library/Caches/on_device_assistant.log, this launch); release iOS shows no stdout.
@@ -232,6 +238,12 @@ final class OnDeviceAssistant {
         "taiwanese_port=\(multilingual ? String(Self.taiwaneseWhisperPort) : "None")",
         "taiwanese_starter=device_main.native_starter(\(UInt(bitPattern: unsafeBitCast(taiwaneseStarter, to: Int.self))))",
         "decision_model='ministral'",
+        // Model downloads (models.py): where they go, the phone's total memory for
+        // the tier, and how Python asks for a server once its file has arrived.
+        "models_dir=\(pythonString(models.path))",
+        "ram_mb=\(ProcessInfo.processInfo.physicalMemory >> 20)",
+        "platform='ios'",
+        "server_starter=device_main.native_server_starter(\(UInt(bitPattern: unsafeBitCast(serverStarter, to: Int.self))))",
       ])
     if let pythonInfo { return "failed: \(pythonInfo)" }
 
@@ -243,46 +255,48 @@ final class OnDeviceAssistant {
     // together, their Metal shader compiles overlapped, the system's shader
     // compiler connection dropped (XPC_ERROR_CONNECTION_INTERRUPTED) and
     // whisper.cpp aborted on a half-made GPU context. The decision model first.
-    var plan: [Server] = [
-      // Same settings as Android: one 2048-token slot per decision policy kept in
-      // the prompt cache, no host-RAM prompt cache, no thinking block.
-      Server(
-        name: "llama-decision", library: llama, symbol: "townpass_llama_server", port: Self.modelPort,
-        arguments: serverArguments(models, Self.modelFile, Self.modelPort)
-          + ["-t", threads, "-c", "6144", "-np", "3", "--cache-ram", "0",
-             "--reasoning", "off", "--no-webui"])
-    ]
-    if multilingual {
-      plan.append(
-        Server(
-          name: "whisper-multilingual", library: whisper, symbol: "townpass_whisper_server",
-          port: Self.multiWhisperPort,
-          arguments: serverArguments(models, Self.multiAsrFile, Self.multiWhisperPort)
-            + ["-t", threads, "-l", "auto"]))
-    }
-    if gate {
-      // Detection only (encoder + one step): on the CPU (-ng), ~0.2 s a clip,
-      // and one GPU context fewer.
-      plan.append(
-        Server(
-          name: "whisper-langid", library: whisper, symbol: "townpass_whisper_server",
-          port: Self.gateWhisperPort,
-          arguments: serverArguments(models, Self.gateAsrFile, Self.gateWhisperPort)
-            + ["-t", threads, "-l", "auto", "-ng"]))
-    }
-    if faq {
-      // On the CPU (--device none, 2026-11-10): the backend builds its semantic index
-      // with this server in the first minute after launch, and iOS refuses GPU work
-      // from an App in the background, so locking the phone then could stop it. A
-      // small model: one query is fast on the CPU, and the index is cached after.
-      plan.append(
-        Server(
-          name: "llama-embedding", library: llama, symbol: "townpass_llama_server",
-          port: Self.faqEmbedPort,
-          arguments: serverArguments(models, Self.faqModelFile, Self.faqEmbedPort)
-            + ["--embedding", "--pooling", "mean", "-c", "512", "-b", "512", "-ub", "512",
-               "-np", "1", "-t", "2", "--device", "none", "--no-webui"]))
-    }
+    // Same settings as Android: one 2048-token slot per decision policy kept in
+    // the prompt cache, no host-RAM prompt cache, no thinking block.
+    let decision = Server(
+      name: "llama-decision", library: llama, symbol: "townpass_llama_server", port: Self.modelPort,
+      arguments: serverArguments(models, Self.modelFile, Self.modelPort)
+        + ["-t", threads, "-c", "6144", "-np", "3", "--cache-ram", "0",
+           "--reasoning", "off", "--no-webui"],
+      file: Self.modelFile)
+    let multi = Server(
+      name: "whisper-multilingual", library: whisper, symbol: "townpass_whisper_server",
+      port: Self.multiWhisperPort,
+      arguments: serverArguments(models, Self.multiAsrFile, Self.multiWhisperPort)
+        + ["-t", threads, "-l", "auto"],
+      file: Self.multiAsrFile)
+    // Detection only (encoder + one step): on the CPU (-ng), ~0.2 s a clip,
+    // and one GPU context fewer.
+    let langid = Server(
+      name: "whisper-langid", library: whisper, symbol: "townpass_whisper_server",
+      port: Self.gateWhisperPort,
+      arguments: serverArguments(models, Self.gateAsrFile, Self.gateWhisperPort)
+        + ["-t", threads, "-l", "auto", "-ng"],
+      file: Self.gateAsrFile)
+    // On the CPU (--device none, 2026-11-10): the backend builds its semantic index
+    // with this server in the first minute after launch, and iOS refuses GPU work
+    // from an App in the background, so locking the phone then could stop it. A
+    // small model: one query is fast on the CPU, and the index is cached after.
+    let embedding = Server(
+      name: "llama-embedding", library: llama, symbol: "townpass_llama_server",
+      port: Self.faqEmbedPort,
+      arguments: serverArguments(models, Self.faqModelFile, Self.faqEmbedPort)
+        + ["--embedding", "--pooling", "mean", "-c", "512", "-b", "512", "-ub", "512",
+           "-np", "1", "-t", "2", "--device", "none", "--no-webui"],
+      file: Self.faqModelFile)
+    serversLock.lock()
+    planned = ["decision": decision, "multilingual": multi, "gate": langid, "embedding": embedding]
+    serversLock.unlock()
+    // The ones whose files are here now; the others start once downloaded (ensureServer).
+    var plan: [Server] = []
+    if has(Self.modelFile) { plan.append(decision) }
+    if multilingual { plan.append(multi) }
+    if gate { plan.append(langid) }
+    if faq { plan.append(embedding) }
     let starter = Thread { [self] in
       for server in plan {
         let began = Date()
@@ -398,33 +412,19 @@ final class OnDeviceAssistant {
     guard
       let size = (try? FileManager.default.attributesOfItem(atPath: model.path))?[.size] as? UInt64
     else { return "missing" }
+    loadLock.lock()
+    defer { loadLock.unlock() }
     let began = Date()
     if !taiwaneseStarted {
-      // On the GPU it takes its weights (the file) plus ~600 MB of large-model caches
-      // and compute buffers (kv cross 1500 x 32 layers, decode). Android's CPU figure
-      // (1.28x the file) over-counted and refused a 12 GB iPhone with 2.8 GB free.
-      // Both limits must allow it: the App's own budget (os_proc_available_memory)
-      // and the phone's free physical memory. Model weights on the GPU are wired
-      // memory that the App's budget does not count: on an 8 GB iPhone 17 the
-      // budget said 4.5 GB free while the phone had 54 MB left, and iOS killed the
-      // App for page shortage (vm-pageshortage) as Breeze loaded (2026-11-08).
-      let needed = size + 600 * 1024 * 1024
-      let budget = UInt64(os_proc_available_memory())
-      let physical = reclaimableMemory()
-      let reserve: UInt64 = 400 * 1024 * 1024  // iOS and its services
-      note(
-        "taiwanese speech: needs \(needed >> 20) MB; app budget \(budget >> 20) MB, "
-          + "phone free \(physical >> 20) MB (keeps \(reserve >> 20) MB)")
-      if budget < needed || physical < needed + reserve {
-        return "memory"
-      }
+      guard memoryAllows(size, for: "taiwanese speech") else { return "memory" }
       guard
         runServer(
           Server(
             name: Self.taiwaneseName, library: whisper, symbol: "townpass_whisper_server",
             port: Self.taiwaneseWhisperPort,
             arguments: serverArguments(models, Self.taiwaneseAsrFile, Self.taiwaneseWhisperPort)
-              + ["-t", whisperThreads, "-l", "zh"]))
+              + ["-t", whisperThreads, "-l", "zh"],
+            file: Self.taiwaneseAsrFile))
       else { return "failed" }
       taiwaneseStarted = true
     }
@@ -435,6 +435,65 @@ final class OnDeviceAssistant {
         return "ready"
       }
       Thread.sleep(forTimeInterval: 0.2)
+    }
+    return "failed"
+  }
+
+  /// Whether a model of size bytes can load now. On the GPU it takes its weights (the
+  /// file) plus ~600 MB of caches and compute buffers (Breeze: kv cross 1500 x 32
+  /// layers, decode). Android's CPU figure (1.28x the file) over-counted and refused
+  /// a 12 GB iPhone with 2.8 GB free. Both limits must allow it: the App's own budget
+  /// (os_proc_available_memory) and the phone's free physical memory. Model weights
+  /// on the GPU are wired memory that the App's budget does not count: on an 8 GB
+  /// iPhone 17 the budget said 4.5 GB free while the phone had 54 MB left, and iOS
+  /// killed the App for page shortage (vm-pageshortage) as Breeze loaded (2026-11-08).
+  private func memoryAllows(_ size: UInt64, for label: String) -> Bool {
+    let needed = size + 600 * 1024 * 1024
+    let budget = UInt64(os_proc_available_memory())
+    let physical = reclaimableMemory()
+    let reserve: UInt64 = 400 * 1024 * 1024  // iOS and its services
+    note(
+      "\(label): needs \(needed >> 20) MB; app budget \(budget >> 20) MB, "
+        + "phone free \(physical >> 20) MB (keeps \(reserve >> 20) MB)")
+    return budget >= needed && physical >= needed + reserve
+  }
+
+  /// Starts a start-up server whose model file arrived after launch: the App downloads
+  /// the models (docs/AI_MODEL_DOWNLOAD.md) and device_main.Activator calls this through
+  /// serverStarter with "decision", "multilingual", "gate" or "embedding", on a backend
+  /// thread. Waits until the model has loaded. Returns "ready" (also when it already
+  /// runs), "missing" (no file), "memory" (not enough free memory now; Python tries
+  /// again with the next file or launch) or "failed", like Android's ensureServer.
+  func ensureServer(_ name: String) -> String {
+    serversLock.lock()
+    let server = planned[name]
+    let running = server.map { candidate in
+      servers.contains { $0.name == candidate.name } && !stopped.contains(candidate.name)
+    } ?? false
+    serversLock.unlock()
+    guard let server, let file = server.file, let models = modelsDirectory else { return "failed" }
+    func ready() -> Bool { server.llama ? healthy(server.port) : listening(server.port) }
+    if ready() { return "ready" }
+    guard
+      let size = (try? FileManager.default.attributesOfItem(
+        atPath: models.appendingPathComponent(file).path))?[.size] as? UInt64
+    else { return "missing" }
+    // Not while the start-up models are still loading, and one load at a time.
+    if startupDone.wait(timeout: .now() + 300) == .success { startupDone.signal() }
+    loadLock.lock()
+    defer { loadLock.unlock() }
+    let began = Date()
+    if !running {
+      guard memoryAllows(size, for: server.name) else { return "memory" }
+      guard runServer(server) else { return "failed" }
+    }
+    while Date().timeIntervalSince(began) < 180 {
+      if ready() {
+        note(String(format: "%@ started after download in %.1f s; %@", server.name,
+                    Date().timeIntervalSince(began), memoryNote()))
+        return "ready"
+      }
+      Thread.sleep(forTimeInterval: 0.25)
     }
     return "failed"
   }
@@ -556,4 +615,12 @@ final class OnDeviceAssistant {
 /// of each strdup are not freed (one call per Taiwanese clip at most).
 private let taiwaneseStarter: @convention(c) () -> UnsafeMutablePointer<CChar>? = {
   strdup(OnDeviceAssistant.shared.startTaiwanese())
+}
+
+/// The C function the backend calls to start a server once its model file has been
+/// downloaded (device_main.native_server_starter -> OnDeviceAssistant.ensureServer).
+/// The name is "decision", "multilingual", "gate" or "embedding"; ctypes copies the
+/// returned text (a few bytes per downloaded file are not freed).
+private let serverStarter: @convention(c) (UnsafePointer<CChar>?) -> UnsafeMutablePointer<CChar>? = { name in
+  strdup(OnDeviceAssistant.shared.ensureServer(name.map { String(cString: $0) } ?? ""))
 }

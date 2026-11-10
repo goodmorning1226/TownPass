@@ -10,8 +10,13 @@
 # -DecisionModel gemma: Gemma 4 E2B instead of Ministral 3B as the decision model
 #   (opt-in; push it first with push_assistant_models.ps1 -DecisionModel gemma;
 #   docs/AI_DECISION_MODEL_ABLATION_PLAN.md section 8). Default ministral.
+# -ModelBaseUrl: a mirror the App downloads missing models from
+#   (ASSISTANT_MODEL_BASE_URL, docs/AI_MODEL_DOWNLOAD.md), e.g. http://127.0.0.1:8899
+#   for scripts/serve_assistant_models.py through adb reverse (set up here).
+#   Without it, models pushed with push_assistant_models.ps1 work as before.
 param([string]$DeviceId, [switch]$Release, [ValidateSet("whisper", "system")][string]$Speech = "whisper",
-      [switch]$Chat, [ValidateSet("ministral", "gemma")][string]$DecisionModel = "ministral")
+      [switch]$Chat, [ValidateSet("ministral", "gemma")][string]$DecisionModel = "ministral",
+      [string]$ModelBaseUrl = "")
 # Native tools write progress to stderr; Windows PowerShell 5.1 would treat that as
 # an error when output is redirected, so failures are detected by exit codes instead.
 $ErrorActionPreference = "Continue"
@@ -43,6 +48,13 @@ foreach ($binary in @("libllama_server.so", "libwhisper_server.so")) {
 }
 # A computer-backend port forward would shadow the App's own loopback server.
 & $adb -s $DeviceId reverse --remove tcp:8765 2>$null
+$mirror = @()
+if ($ModelBaseUrl) {
+    $mirror = @("--dart-define=ASSISTANT_MODEL_BASE_URL=$ModelBaseUrl")
+    # A mirror on this computer (serve_assistant_models.py): the phone's 127.0.0.1 port leads here.
+    $local = [regex]::Match($ModelBaseUrl, '^http://(?:127\.0\.0\.1|localhost):(\d+)')
+    if ($local.Success) { & $adb -s $DeviceId reverse "tcp:$($local.Groups[1].Value)" "tcp:$($local.Groups[1].Value)" }
+}
 # The build reads the same --dart-define flags as iOS (android/app/build.gradle);
 # TOWNPASS_* variables left in this shell would override them, so they are cleared
 # for the build and put back afterwards.
@@ -62,7 +74,7 @@ try {
     fvm flutter build apk "--$mode" --target-platform $platform --android-project-arg=disable-abi-filtering=true `
         --dart-define=ASSISTANT_ENABLED=true --dart-define=ASSISTANT_ON_DEVICE=true `
         "--dart-define=ASSISTANT_SPEECH=$Speech" "--dart-define=ASSISTANT_DECISION_MODEL=$DecisionModel" `
-        "--dart-define=ASSISTANT_GUIDED=$(if ($Chat) { 'false' } else { 'true' })"
+        "--dart-define=ASSISTANT_GUIDED=$(if ($Chat) { 'false' } else { 'true' })" @mirror
     # fvm does not always pass Flutter's exit code on: also require a fresh APK,
     # so a failed build never installs the previous one.
     if ($LASTEXITCODE -or -not (Test-Path $apk) -or (Get-Item $apk).LastWriteTime -lt $buildStarted) {

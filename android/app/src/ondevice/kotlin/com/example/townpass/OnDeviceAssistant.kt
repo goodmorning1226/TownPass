@@ -69,7 +69,24 @@ object OnDeviceAssistant {
     private const val TAIWANESE_WHISPER_PORT = 8776
     private const val VIETNAMESE_WHISPER_PORT = 8777
     private const val GATE_WHISPER_PORT = 8775
+    /** The decision model's server arguments (start-up and [ensureServer]): three
+     *  slots of 2048 tokens, one each keeps the service, library and guide policy in
+     *  the prompt cache (requests are <= ~1000 tokens; the backend sends one request
+     *  at a time). --cache-ram 0: llama.cpp's host-RAM prompt cache (8 GiB by default)
+     *  grew the server by 1.8-2.4 GB in 40 turns on the PC; with a slot per policy
+     *  nothing is evicted, so it gains nothing (docs/SPEED_CACHE_EXPERIMENT.md).
+     *  --reasoning off: no thinking block before the answer; with a grammar it could
+     *  run to the 180-token limit (~30 s on a phone) and fail. */
+    private val DECISION_ARGS = listOf("-c", "6144", "-np", "3", "--cache-ram", "0", "--reasoning", "off", "--no-webui")
+    /** e5 for the FAQ and semantic retrieval: queried only after a decision has
+     *  finished, one short query at a time: two threads, one 512-token slot (~130 MB). */
+    private val EMBEDDING_ARGS = listOf("--embedding", "--pooling", "mean", "-c", "512", "-b", "512", "-ub", "512",
+        "-np", "1", "-t", "2", "--no-webui")
     private val processes = mutableListOf<Process>()
+    private val serverLock = Any()
+    /** The decision model file chosen in [start] (Ministral, or Gemma when built for it and present). */
+    @Volatile
+    private var decisionFileName = MODEL_FILE
 
     /** Set by [start]; [startTaiwanese] launches the Taiwanese server with them. */
     @Volatile
@@ -118,6 +135,11 @@ object OnDeviceAssistant {
                     decisionModel = "ministral"
                 }
                 val decisionFile = File(models, if (decisionModel == "gemma") GEMMA_MODEL_FILE else MODEL_FILE)
+                decisionFileName = decisionFile.name
+                // The phone's total memory picks which models it downloads (tier,
+                // docs/AI_MODEL_DOWNLOAD.md); 12 GB phones report ~11,200 MB.
+                val memory = ActivityManager.MemoryInfo()
+                (app.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager).getMemoryInfo(memory)
                 val info = Python.getInstance().getModule("device_main")
                     .callAttr("start", MODEL_PORT, WHISPER_PORT, Kwarg("whisper", whisper),
                         Kwarg("multi_port", if (multilingual) MULTI_WHISPER_PORT else null),
@@ -129,7 +151,12 @@ object OnDeviceAssistant {
                         Kwarg("taiwanese_port", if (whisper) TAIWANESE_WHISPER_PORT else null),
                         // Offered with the multilingual model: the file is looked for on first use.
                         Kwarg("vietnamese_port", if (whisper && multilingual) VIETNAMESE_WHISPER_PORT else null),
-                        Kwarg("decision_model", decisionModel)).toString()
+                        Kwarg("decision_model", decisionModel),
+                        // Missing files are downloaded by the App (models.py); [ensureServer]
+                        // then starts their servers.
+                        Kwarg("models_dir", models.absolutePath),
+                        Kwarg("ram_mb", memory.totalMem shr 20),
+                        Kwarg("platform", "android")).toString()
                 Log.i(TAG, "backend: $info")
                 // Recent 8-core phone SoCs have 6-8 performance cores; leave two for
                 // the UI. Speech and decision run one after the other, never together.
@@ -162,24 +189,19 @@ object OnDeviceAssistant {
                 // Same arguments for both decision models (Gemma 4 needs no extra flag:
                 // its chat template has a system role, and --reasoning off keeps its
                 // thinking channel closed).
-                launch(app, "libllama_server.so", decisionFile, MODEL_PORT,
-                    // Three slots of 2048 tokens: one each keeps the service, library and
-                    // guide policy in the prompt cache (requests are <= ~1000 tokens; the
-                    // backend sends one request at a time). --cache-ram 0: llama.cpp's
-                    // host-RAM prompt cache (8 GiB by default) grew the server by 1.8-2.4 GB
-                    // in 40 turns on the PC; with a slot per policy nothing is evicted,
-                    // so it gains nothing (docs/SPEED_CACHE_EXPERIMENT.md, exp/speed-cache).
-                    llamaCpuArgs() + listOf("-c", "6144", "-np", "3", "--cache-ram", "0",
-                        // No thinking block before the answer: with a grammar it could
-                        // run to the 180-token limit (~30 s on a phone) and fail.
-                        "--reasoning", "off", "--no-webui"))
+                // Stops leftover llama-server copies first, even when the model is not on
+                // the phone yet (then nothing starts; ensureServer starts it once downloaded).
+                if (decisionFile.isFile) {
+                    launch(app, "libllama_server.so", decisionFile, MODEL_PORT, llamaCpuArgs() + DECISION_ARGS)
+                } else {
+                    stopStale("libllama_server.so")
+                    Log.i(TAG, "no ${decisionFile.name} yet; the App downloads it (docs/AI_MODEL_DOWNLOAD.md)")
+                }
                 if (faq) {
                     // Same binary, started after the decision model (whose launch stops
-                    // leftover copies). Queried only after a decision has finished, one
-                    // short query at a time: two threads, one 512-token slot (~130 MB).
+                    // leftover copies).
                     launch(app, "libllama_server.so", File(models, FAQ_MODEL_FILE), FAQ_EMBED_PORT,
-                        listOf("--embedding", "--pooling", "mean", "-c", "512", "-b", "512", "-ub", "512",
-                            "-np", "1", "-t", "2", "--no-webui"), stopLeftovers = false)
+                        EMBEDDING_ARGS, stopLeftovers = false)
                 }
             } catch (error: Throwable) {
                 Log.e(TAG, "on-device assistant failed to start", error)
@@ -211,6 +233,80 @@ object OnDeviceAssistant {
             vietnamese)
         vietnamese = process
         state
+    }
+
+    /**
+     * Starts a model server whose file arrived after start-up: the App downloads the
+     * models (docs/AI_MODEL_DOWNLOAD.md) and device_main.Activator calls this on a
+     * backend thread once a file is in place. [name]: "decision", "multilingual",
+     * "gate" or "embedding". Waits until the model has loaded. Returns "ready"
+     * (also when it was already running), "missing" (no file), "memory" (not enough
+     * free memory now; tried again later) or "failed".
+     */
+    @JvmStatic
+    fun ensureServer(name: String): String = synchronized(serverLock) {
+        val app = appContext ?: return "failed"
+        val models = app.getExternalFilesDir("models") ?: File(app.filesDir, "models")
+        val (fileName, port) = when (name) {
+            "decision" -> decisionFileName to MODEL_PORT
+            "multilingual" -> MULTI_ASR_FILE to MULTI_WHISPER_PORT
+            "gate" -> GATE_ASR_FILE to GATE_WHISPER_PORT
+            "embedding" -> FAQ_MODEL_FILE to FAQ_EMBED_PORT
+            else -> return "failed"
+        }
+        val llama = name == "decision" || name == "embedding"
+        fun loaded() = if (llama) healthy(port) else listening(port)
+        fun waitLoaded(process: Process?): String {
+            val deadline = System.currentTimeMillis() + 180_000
+            while (System.currentTimeMillis() < deadline) {
+                if (process != null && !process.isAlive) return "failed"
+                if (loaded()) return "ready"
+                Thread.sleep(250)
+            }
+            return "failed"
+        }
+        if (loaded()) return "ready"
+        // A llama-server that listens but is not healthy yet is still loading.
+        if (listening(port)) return waitLoaded(null)
+        val model = File(models, fileName)
+        if (!model.isFile) return "missing"
+        val memory = ActivityManager.MemoryInfo()
+        (app.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager).getMemoryInfo(memory)
+        val needed = model.length() + 300L * 1024 * 1024
+        if (memory.availMem < needed) {
+            Log.w(TAG, "$name: ${memory.availMem shr 20} MB free, needs ${needed shr 20} MB; next launch")
+            return "memory"
+        }
+        // Forked from the foreground CPU group, like the servers started at launch.
+        waitForForeground()
+        val started = System.currentTimeMillis()
+        val process = when (name) {
+            "decision" -> launch(app, "libllama_server.so", model, port, llamaCpuArgs() + DECISION_ARGS,
+                stopLeftovers = false)
+            "embedding" -> launch(app, "libllama_server.so", model, port, EMBEDDING_ARGS, stopLeftovers = false)
+            "gate" -> launch(app, "libwhisper_server.so", model, port,
+                listOf("-t", whisperThreads.toInt().coerceAtMost(4).toString(), "-l", "auto"), stopLeftovers = false)
+            else -> launch(app, "libwhisper_server.so", model, port, listOf("-t", whisperThreads, "-l", "auto"),
+                stopLeftovers = false)
+        } ?: return "failed"
+        val state = waitLoaded(process)
+        Log.i(TAG, "$name started after download: $state in ${System.currentTimeMillis() - started} ms")
+        if (state != "ready") process.destroy()
+        state
+    }
+
+    /** Whether llama-server on [port] has loaded its model (GET /health answers 200). */
+    private fun healthy(port: Int) = try {
+        val connection = java.net.URL("http://127.0.0.1:$port/health").openConnection() as java.net.HttpURLConnection
+        connection.connectTimeout = 500
+        connection.readTimeout = 1000
+        try {
+            connection.responseCode == 200
+        } finally {
+            connection.disconnect()
+        }
+    } catch (_: Exception) {
+        false
     }
 
     /** Starts (or keeps) a whisper-server loaded on first use; returns the state and its process. */
