@@ -103,8 +103,11 @@ class OwnerRulesTests(unittest.TestCase):
 
     def test_everyday_faq_words_are_expanded(self):
         import faq
-        self.assertIn("巨大垃圾", faq.expand("大包垃圾要怎麼丟"))
-        self.assertEqual(faq.expand("繳水費"), "繳水費")
+        for text in ("大包垃圾要怎麼丟", "大型家戶垃圾要怎麼丟", "家裡有大件垃圾", "舊沙發要怎麼丟"):
+            self.assertIn("巨大垃圾", faq.expand(text), text)
+        self.assertIn("遺失", faq.expand("身分證弄丟了"))
+        for text in ("繳水費", "大型活動要申請嗎"):
+            self.assertEqual(faq.expand(text), text, text)
 
 
 if __name__ == "__main__":

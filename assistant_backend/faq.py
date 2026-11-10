@@ -22,6 +22,7 @@ import array
 import heapq
 import json
 import math
+import re
 import os
 import pathlib
 import sys
@@ -40,17 +41,20 @@ EMBED_TIMEOUT = 5
 # scores sit in a narrow, high band); re-tune if either changes.
 # Everyday words -> the wording the FAQ uses, appended before embedding (e5 does
 # not connect "大包垃圾" with "巨大垃圾(大型廢棄物)").
+# Each entry: a regular expression over the request, and the FAQ words to append.
 COLLOQUIAL = (
-    (("大包垃圾", "大型垃圾", "大件垃圾", "舊家具", "舊沙發", "舊床墊", "舊衣櫃", "粗大垃圾"), "巨大垃圾 大型廢棄物 收運"),
-    (("垃圾車", "倒垃圾", "丟垃圾"), "垃圾車 收運時間 清運"),
-    (("資源回收", "回收物"), "資源回收 分類"),
-    (("身分證掉了", "身分證不見", "身份證掉了", "身份證不見"), "身分證 遺失 補發"),
-    (("敬老卡", "老人卡"), "敬老悠遊卡 申請"),
+    # 大型家戶垃圾, 大包垃圾, 家裡的大件垃圾, 舊沙發, 粗大垃圾 ... -> the FAQ's 巨大垃圾(大型廢棄物)
+    (r"(?:大型|大件|大包|巨大|粗大|家戶|大的).{0,4}垃圾|垃圾.{0,4}(?:大型|大件|大包|巨大|粗大)|舊(?:家具|沙發|床墊|衣櫃|桌子|椅子)|"
+     r"(?:家具|沙發|床墊|衣櫃)(?:要|怎麼|如何|可以)?.{0,3}(?:丟|回收|清運|收)", "巨大垃圾 大型廢棄物 收運"),
+    (r"垃圾車|倒垃圾|丟垃圾|垃圾.{0,3}(?:幾點|時間)", "垃圾車 收運時間 清運"),
+    (r"資源回收|回收物", "資源回收 分類"),
+    (r"身[分份]證.{0,3}(?:掉|不見|遺失|弄丟|丟了)", "身分證 遺失 補發"),
+    (r"敬老卡|老人卡", "敬老悠遊卡 申請"),
 )
 
 
 def expand(text):
-    extra = [words for keys, words in COLLOQUIAL if any(key in text for key in keys)]
+    extra = [words for pattern, words in COLLOQUIAL if re.search(pattern, text)]
     return text + (" " + " ".join(extra) if extra else "")
 
 
