@@ -21,6 +21,9 @@ if ! git -C "$SRC" apply --check --reverse "$ROOT/ios/native/llama-server-rebind
   git -C "$SRC" checkout -- tools/server/server-http.cpp
   git -C "$SRC" apply "$ROOT/ios/native/llama-server-rebind.patch"
 fi
+# CMAKE_MACOSX_BUNDLE=OFF: for iOS, CMake makes every executable an App bundle, and
+# newer CMake refuses the server's install rule without a bundle destination
+# (GitHub's macos-26 runner, 2026-11-11). Only the libraries are used here.
 if [ ! -f "$BUILD/build.ninja" ]; then
   cmake -S "$SRC" -B "$BUILD" -G Ninja -DCMAKE_SYSTEM_NAME=iOS -DCMAKE_OSX_SYSROOT=iphoneos \
     -DCMAKE_OSX_ARCHITECTURES=arm64 -DCMAKE_OSX_DEPLOYMENT_TARGET=16.4 -DCMAKE_BUILD_TYPE=Release \
