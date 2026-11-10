@@ -1,0 +1,109 @@
+# Builds an unsigned iPhone .ipa of the on-device assistant on a GitHub macOS runner,
+# for testing from a Windows PC without a Mac (docs/IOS_BUILD_WITHOUT_MAC.md).
+# The .ipa is then signed and installed with Sideloadly; the App downloads its
+# models itself (docs/AI_MODEL_DOWNLOAD.md).
+#
+# Runs on pushes to the ci/ios-build branch only (and by hand). Not meant for main
+# or for upstream: it changes nothing in the App.
+name: iOS build (unsigned, on-device assistant)
+
+on:
+  push:
+    branches: [ci/ios-build]
+  workflow_dispatch:
+
+concurrency:
+  group: ios-build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ipa:
+    runs-on: macos-26
+    timeout-minutes: 90
+    env:
+      NATIVE: ${{ github.workspace }}/../native
+      LLAMA_TAG: b12182
+      WHISPER_TAG: v1.9.5
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Versions
+        run: |
+          sw_vers
+          xcodebuild -version
+          FLUTTER=$(python3 -c "import json; print(json.load(open('.fvmrc'))['flutter'])")
+          echo "FLUTTER_VERSION=$FLUTTER" >> "$GITHUB_ENV"
+          echo "Flutter $FLUTTER (.fvmrc)"
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      # The native frameworks take most of the time; kept between runs while the
+      # tags and our patches stay the same.
+      - name: Cache native frameworks
+        id: native
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.NATIVE }}/ios-out
+          key: ios-native-${{ env.LLAMA_TAG }}-${{ env.WHISPER_TAG }}-${{ hashFiles('ios/native/**', 'scripts/build_ios_llama_server.sh', 'scripts/build_ios_whisper_server.sh') }}
+
+      - name: Build LlamaServer and WhisperServer frameworks
+        if: steps.native.outputs.cache-hit != 'true'
+        run: |
+          brew list ninja >/dev/null 2>&1 || brew install ninja
+          mkdir -p "$NATIVE"
+          git clone --depth 1 --branch "$LLAMA_TAG" https://github.com/ggml-org/llama.cpp "$NATIVE/llama.cpp"
+          git clone --depth 1 --branch "$WHISPER_TAG" https://github.com/ggml-org/whisper.cpp "$NATIVE/whisper.cpp"
+          scripts/build_ios_llama_server.sh "$NATIVE/llama.cpp" "$NATIVE/ios-out"
+          scripts/build_ios_whisper_server.sh "$NATIVE/whisper.cpp" "$NATIVE/ios-out"
+
+      # CPython for iOS from BeeWare's Python-Apple-support (the newest 3.13 build).
+      - name: Python framework
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG=$(gh release list -R beeware/Python-Apple-support --limit 50 --json tagName \
+            --jq '[.[].tagName | select(startswith("3.13-b"))][0]')
+          echo "Python-Apple-support $TAG"
+          mkdir -p "$NATIVE/python-ios-$TAG"
+          gh release download "$TAG" -R beeware/Python-Apple-support --pattern 'Python-3.13-iOS-support.*.tar.gz' \
+            --dir "$RUNNER_TEMP"
+          tar -xzf "$RUNNER_TEMP"/Python-3.13-iOS-support.*.tar.gz -C "$NATIVE/python-ios-$TAG"
+          ls "$NATIVE/python-ios-$TAG"
+
+      - name: Put the frameworks in ios/OnDevice
+        run: scripts/setup_ios_on_device.sh "$NATIVE"
+
+      - name: Flutter packages and generated code
+        run: |
+          flutter --version
+          flutter pub get --enforce-lockfile
+          dart run build_runner build --delete-conflicting-outputs
+
+      - name: Build (release, not signed)
+        run: |
+          flutter build ios --release --no-codesign \
+            --dart-define=ASSISTANT_ENABLED=true --dart-define=ASSISTANT_ON_DEVICE=true \
+            --dart-define=ASSISTANT_DECISION_MODEL=ministral --dart-define=ASSISTANT_GUIDED=true
+          APP=build/ios/iphoneos/Runner.app
+          test -d "$APP/Frameworks/LlamaServer.framework"
+          test -d "$APP/Frameworks/WhisperServer.framework"
+          test -d "$APP/Frameworks/Python.framework"
+          test -f "$APP/assistant_backend/models.json"
+          du -sh "$APP"
+
+      - name: Package .ipa
+        run: |
+          mkdir -p ipa/Payload
+          cp -R build/ios/iphoneos/Runner.app ipa/Payload/
+          (cd ipa && zip -qry "../TownPass-assistant-unsigned.ipa" Payload)
+          ls -lh TownPass-assistant-unsigned.ipa
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: TownPass-assistant-unsigned-ipa
+          path: TownPass-assistant-unsigned.ipa
+          retention-days: 14
