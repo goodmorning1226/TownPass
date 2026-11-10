@@ -25,6 +25,9 @@ iOS 不能開子行程，所以每個 native server 的 `main()` 以函式匯出
   **不要**同時給 `ASSISTANT_BASE_URL`（給了就仍連那台電腦）。
 - 不給：什麼都不啟動，照舊用 `ASSISTANT_BASE_URL` 連 LAN 後端。
 - `ios/OnDevice/` 沒有框架、或建置模擬器時，Xcode 的「Embed On-Device Assistant」階段直接略過，App 與以前相同。
+- 模型也可以讓 App 自己下載（branch `feat/model-download`，[AI_MODEL_DOWNLOAD.md](AI_MODEL_DOWNLOAD.md)）：
+  沒有任何模型時 Python 仍會啟動，助理畫面顯示「下載離線助理」；檔案下載好後 `ensureServer` 啟動對應的 server，不用重開 App。
+  這部分的 Swift 還沒在 Mac 上編譯過。
 
 ## 建置與安裝
 

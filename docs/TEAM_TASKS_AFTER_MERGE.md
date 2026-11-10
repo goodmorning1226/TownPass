@@ -120,6 +120,11 @@
 - `scripts/run_assistant_on_device.sh`（一鍵建置、安裝、推模型、啟動）還沒在 Mac 上實跑，第一次用時確認。
 - 電腦的口語評估把「未串接功能先查 FAQ」算成沒找到（外語要 App 翻譯，電腦模擬不了）；要的話把 `eval_colloquial.py` 加一類「FAQ 回答」。
 
+### T14c App 內下載模型上線前（2026-11-10，`docs/AI_MODEL_DOWNLOAD.md` 第 7 節）
+- 在團隊 Hugging Face 開 repo，上傳 e5、FAQ 索引、Breeze q8_0／q4_K、PhoWhisper（附授權與來源），再用 `build_model_manifest.py --team-url` 更新清單。要用擁有者的帳號。
+- Android 實機走完整流程（刪掉模型 → 同意 → 下載 → 不重開就能用）；iPhone 在 Mac 上編譯 `ensureServer` 並實測。
+- 用 8 GB 的 iPhone 17 量分級門檻與台語 q4_K；和市府討論鏡像或商店的背景下載。
+
 ### T15 其他後端與前端問題
 - 報告 4.7、4.8 列的：10 位數電話被當 ISBN、功能列表「下一頁」繞回跳項、只說作者時開首頁、FAQ 標題 `&gt;`、
   FAQ embedding 逾時寫死 5 秒、翻譯下載橫幅的黃色底線、半透明面板、重開不捲到最新訊息。
