@@ -84,6 +84,34 @@ def with_arguments(call):
     return {**call, "function": {**function, "arguments": {}}}
 
 
+def _single_choice(tool):
+    """A call to tool with every argument at its only allowed value (the tools
+    here offer exactly one book ID, one query and one search type)."""
+    properties = tool["function"]["parameters"].get("properties") or {}
+    arguments = {key: spec["enum"][0] for key, spec in properties.items() if len(spec.get("enum") or ()) == 1}
+    return {"function": {"name": tool["function"]["name"], "arguments": arguments}}
+
+
+def rule_decision(tools, validate, error):
+    """The decision without the decision model: it is still downloading, or the
+    phone's tier has none (docs/AI_CURRENT_RULES.md section 7, 2026-11-10).
+
+    Only choices that cannot open a wrong page: confirming the candidates (the
+    user picks), a cancel, a unique verified book or an explicit search, the
+    library home only when the request was clearly about the library (no
+    "unsupported" option offered), otherwise a clarification, which the callers
+    follow with the FAQ."""
+    by_name = {tool["function"]["name"]: tool for tool in tools}
+    for name in ("confirm_candidates", "cancel", "open_library_book", "locate_library_book"):
+        if name in by_name:
+            return validate(_single_choice(by_name[name]), tools)
+    if "open_library" in by_name and "unsupported" not in by_name:
+        return validate(_single_choice(by_name["open_library"]), tools)
+    if "request_clarification" in by_name:
+        return validate(_single_choice(by_name["request_clarification"]), tools)
+    raise error("助理的理解模型還在下載，請稍後再試，或問「有哪些功能」。")
+
+
 def system_prompt(task):
     """The fixed system message of a task (also sent by the phone's warm-up)."""
     return POLICIES[task] + "\n" + INSTRUCTIONS[task]
@@ -178,6 +206,8 @@ def decide(owner, task, context, tools, validate, error):
     # - Compact JSON, Chinese unescaped.
     # Evidence and tools stay separate messages: merging them into one JSON
     # object lost 16 dev cases.
+    if not getattr(owner, "model_available", True):
+        return rule_decision(tools, validate, error)
     if DECISION_FORMAT == "choice":
         # The model picks a lettered option; each option still names the tool and
         # its arguments, so the policy text applies unchanged.

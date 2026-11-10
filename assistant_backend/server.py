@@ -27,6 +27,8 @@ MODEL = "gemma4:e2b" if decision.GEMMA else "ministral-3:3b"
 CATALOG_URL = "https://taipei-pass-service.vercel.app/mock/library/library_book_list.json"
 CATALOG_VERSION = "570531a9244c3dba1e1f09907468ca55875ccc4b1af6fe1e5115cfdb2252f4ac"
 CONTRACT = 3  # 3: optional request "context" (page/last action hint)
+# Model downloads on the phone (models.py; GET /v1/models is the status).
+MODEL_ACTIONS = {"/v1/models/download": "download", "/v1/models/cancel": "cancel", "/v1/models/delete": "delete"}
 # Avoid a multi-second model reload after a short idle period during a demo.
 # The model keeps ~3 GB of VRAM while loaded; override with an Ollama duration.
 KEEP_ALIVE = os.environ.get("TOWNPASS_ASSISTANT_KEEP_ALIVE", "30m")
@@ -326,6 +328,12 @@ class Assistant:
         # Version C: semantic retrieval over the catalogue (semantic.CatalogIndex); None runs without it.
         self.semantic = semantic
         self.model_lock = threading.Lock()
+        # False while the phone has no decision model (still downloading, or the lite
+        # tier; docs/AI_CURRENT_RULES.md section 7): decisions follow decision.rule_decision.
+        # TOWNPASS_NO_DECISION_MODEL=1 evaluates that mode on the computer.
+        self.model_available = os.environ.get("TOWNPASS_NO_DECISION_MODEL") != "1"
+        # Model downloads on the phone (models.Downloads); None on the computer.
+        self.downloads = None
         self.usage = threading.local()  # per-request model call log for metrics
         self.workflow = Workflow(self, retrieve, tool, validate_call, AssistantError)
 
@@ -587,7 +595,12 @@ def make_handler(assistant, token=""):
                     "catalog": [{k: v for k, v in e.items() if k != "navigation"} for e in registry.entries],
                     "faq_entries": assistant.faq.count if assistant.faq else 0,
                     "semantic_ready": bool(assistant.semantic and assistant.semantic.ready),
+                    "decision_model": assistant.model_available,
                     "data_mode": "demo"})
+            if self.path == "/v1/models":
+                # Model downloads (docs/AI_MODEL_DOWNLOAD.md); not managed on the computer.
+                downloads = assistant.downloads
+                return self.reply(200, downloads.status() if downloads else {"managed": False})
             self.reply(404, {"error": "找不到此功能。"})
 
         def drain(self, limit):
@@ -610,6 +623,8 @@ def make_handler(assistant, token=""):
                 return self.reply(401, {"error": "連線授權失敗。"})
             if self.path == "/v1/assistant/transcriptions":
                 return self.transcription()
+            if self.path in MODEL_ACTIONS:
+                return self.models(MODEL_ACTIONS[self.path])
             if self.path != "/v1/assistant/turns":
                 return self.reply(404, {"error": "找不到此功能。"})
             if self.headers.get("Origin"):
@@ -636,6 +651,51 @@ def make_handler(assistant, token=""):
                 self.reply(422, {"error": str(exc)})
             except Exception:
                 self.reply(500, {"error": "助理暫時無法處理，請使用原服務入口。"})
+
+        def models(self, action):
+            """Start, pause or delete model downloads (docs/AI_MODEL_DOWNLOAD.md).
+            Body: {"parts": [...], "base_url": mirror} for download, {"parts": [...]}
+            for delete (models.PARTS); the reply is the new status. Only the App on
+            this phone calls it (no Origin)."""
+            downloads = assistant.downloads
+            if self.headers.get("Origin"):
+                self.drain(8192)
+                return self.reply(403, {"error": "此測試服務僅接受 App 或本機 API 呼叫。"})
+            try:
+                self.connection.settimeout(10)
+                length = int(self.headers.get("Content-Length") or "0")
+                if not 0 <= length <= 2048:
+                    return self.reply(413, {"error": "請求內容過長。"})
+                body = json.loads(self.rfile.read(length)) if length else {}
+                if not isinstance(body, dict) or set(body) - {"parts", "base_url"}:
+                    raise AssistantError("請求欄位不正確。")
+                if downloads is None:
+                    return self.reply(409, {"error": "這個版本的模型不是由 App 下載。", "managed": False})
+                parts = body.get("parts")
+                if parts is not None and (not isinstance(parts, list) or not all(isinstance(p, str) for p in parts)):
+                    raise AssistantError("請求欄位不正確。")
+                base_url = body.get("base_url")
+                if base_url is not None and not isinstance(base_url, str):
+                    raise AssistantError("請求欄位不正確。")
+                if action == "download":
+                    try:
+                        downloads.start(parts, base_url=base_url)
+                    except ValueError as exc:
+                        raise AssistantError(str(exc)) from exc
+                elif action == "cancel":
+                    downloads.cancel()
+                else:
+                    try:
+                        downloads.delete(parts)
+                    except ValueError as exc:
+                        raise AssistantError(str(exc)) from exc
+                    if not downloads.ready("decision"):
+                        assistant.model_available = False
+                self.reply(200, downloads.status())
+            except (ValueError, UnicodeError):
+                self.reply(400, {"error": "請使用正確的 JSON 格式。"})
+            except AssistantError as exc:
+                self.reply(422, {"error": str(exc)})
 
         def transcription(self):
             """Validate in-memory WAV audio and forward it to the loopback ASR service.

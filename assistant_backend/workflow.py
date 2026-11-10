@@ -166,8 +166,18 @@ class Workflow:
                 "message": message, "destination": None, "choices": [], "data_mode": "demo",
                 "language": payload.get("language", "zh"), **extra}
 
+    @property
+    def no_model(self):
+        """Whether the decision model is missing (still downloading, or the lite
+        tier): candidates are then always offered, even a single one
+        (docs/AI_CURRENT_RULES.md section 7)."""
+        return not getattr(self.owner, "model_available", True)
+
     def _decide(self, text, entries, confirmation=False, context=None, sound=None, note=None):
         """Capability (or candidate-confirmation) decision among retrieved entries."""
+        if self.no_model:
+            self._trace("no_model", [e["id"] for e in entries])
+            return "confirm_candidates", {}
         if confirmation:
             tools = [self.tool("confirm_candidates", "Show these candidates and wait for user selection; do not navigate.")]
         else:
@@ -544,10 +554,11 @@ class Workflow:
             return self._offer(payload, self._cap_items([entry], language), text, action="emergency")
         return self.reply(payload, text, action="emergency")
 
-    def _offer_services(self, payload, entries, message, language=None):
+    def _offer_services(self, payload, entries, message, language=None, keep_choice=False):
         """Services to confirm; a single connected one opens directly instead
-        (owner, 2026-11-08). Emergencies and books keep their own offers."""
-        if len(entries) == 1 and entries[0]["enabled"]:
+        (owner, 2026-11-08). Emergencies and books keep their own offers.
+        keep_choice: offer even a single one (no decision model, section 7)."""
+        if len(entries) == 1 and entries[0]["enabled"] and not keep_choice:
             self._trace("single_candidate", [entries[0]["id"]])
             return self._navigate(payload, entries[0])
         return self._offer(payload, self._cap_items(entries, language or payload.get("language", "zh")), message)
@@ -681,7 +692,8 @@ class Workflow:
         self._trace("capability_model", [e["id"] for e in entries])
         name, args = self._decide(text, entries, ambiguous, payload.get("page_context"))
         if name == "confirm_candidates":
-            return self._offer_services(payload, entries, i18n.t("confirm_capability", language), language)
+            return self._offer_services(payload, entries, i18n.t("confirm_capability", language), language,
+                                        keep_choice=self.no_model)
         if name == "select_capability":
             return self._navigate(payload, self.registry.by_id[args["capability_id"]])
         return self.reply(payload, i18n.t("clarify", language))
@@ -698,6 +710,9 @@ class Workflow:
                 # The guide stage's keywords and question rules are Chinese: the
                 # (sub-)page's whole task, without a model call.
                 plan, route = self.guides.default_plan(page, reply.get("destination")), "guide_default_language"
+            elif self.no_model:
+                # No decision model yet (section 7): the page's whole task as well.
+                plan, route = self.guides.default_plan(page, reply.get("destination")), "guide_default_no_model"
             else:
                 text = payload.get("text", "").strip()
                 from server import positive_text
@@ -867,7 +882,8 @@ class Workflow:
             self._trace("capability_model", [e["id"] for e in entries])
             name, args = self._decide(text, entries, ambiguous, payload.get("page_context"))
             if name == "confirm_candidates":
-                return self._offer_services(payload, entries, "你想使用哪個功能？請先確認。")
+                return self._offer_services(payload, entries, "你想使用哪個功能？請先確認。",
+                                            keep_choice=self.no_model)
             if name == "select_capability":
                 return self._navigate(payload, self.registry.by_id[args["capability_id"]])
             return self._faq(payload, text) or self.reply(payload, "請補充想使用的服務或操作，也可以問「有哪些功能」。")

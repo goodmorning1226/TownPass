@@ -1,0 +1,130 @@
+{
+ "version": 1,
+ "team_url": "",
+ "files": [
+  {
+   "id": "langid",
+   "name": "ggml-whisper-langid.bin",
+   "part": "core",
+   "size": 43537433,
+   "sha256": "c2085835d3f50733e2ff6e4b41ae8a2b8d8110461e18821b09a15c40c42d1cca",
+   "path": "whisper/ggml-tiny-q8_0.bin",
+   "url": "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-tiny-q8_0.bin",
+   "server": "gate",
+   "license": "MIT (OpenAI Whisper tiny, whisper.cpp ggml)"
+  },
+  {
+   "id": "speech",
+   "name": "ggml-whisper-multilingual.bin",
+   "part": "core",
+   "size": 264464607,
+   "sha256": "49c8fb02b65e6049d5fa6c04f81f53b867b5ec9540406812c643f177317f779f",
+   "path": "whisper/ggml-small-q8_0.bin",
+   "url": "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-small-q8_0.bin",
+   "server": "multilingual",
+   "license": "MIT (OpenAI Whisper small, whisper.cpp ggml)"
+  },
+  {
+   "id": "embedding",
+   "name": "multilingual-e5-small-q8_0.gguf",
+   "part": "core",
+   "size": 132441760,
+   "sha256": "1d76aaf0627f8385090b4027fcd3827861e7d51f1e27c9f0f479551b6da810d3",
+   "path": "e5/multilingual-e5-small-q8_0.gguf",
+   "server": "embedding",
+   "license": "MIT (Microsoft multilingual-e5-small; GGUF q8_0 by this project)"
+  },
+  {
+   "id": "faq-embeddings",
+   "name": "faq_rag/embeddings.bin",
+   "part": "core",
+   "size": 12473856,
+   "sha256": "483043bfeddb364bcd43a84866341f99b552e861d10f1c74df04a670028c9a19",
+   "path": "faq_rag/embeddings.bin",
+   "server": "embedding",
+   "license": "Taipei City FAQ, Open Government Data License v1.0 (data.taipei)"
+  },
+  {
+   "id": "faq-metadata",
+   "name": "faq_rag/metadata.json",
+   "part": "core",
+   "size": 6572186,
+   "sha256": "b771de1a423dcb13ae504e49d0f522499ed463085810a86aeb9ab31410e0bbd4",
+   "path": "faq_rag/metadata.json",
+   "server": "embedding",
+   "license": "Taipei City FAQ, Open Government Data License v1.0 (data.taipei)"
+  },
+  {
+   "id": "faq-model-info",
+   "name": "faq_rag/model_info.json",
+   "part": "core",
+   "size": 409,
+   "sha256": "999d8469d836348696b62882e13fc2c3097937b7ce4c9c3cb24cb8c9bcd049c1",
+   "path": "faq_rag/model_info.json",
+   "server": "embedding"
+  },
+  {
+   "id": "vietnamese",
+   "name": "ggml-whisper-vietnamese.bin",
+   "part": "core",
+   "size": 81768602,
+   "sha256": "9e78100d845978524462f17c2a2f22770e288393719973056033526335621d2a",
+   "path": "vietnamese/ggml-phowhisper-base-q8_0.bin",
+   "platforms": [
+    "android"
+   ],
+   "license": "BSD-3-Clause (VinAI PhoWhisper-base; ggml q8_0 by this project)"
+  },
+  {
+   "id": "ministral",
+   "name": "Ministral-3-3B-Instruct-2512-Q4_K_M.gguf",
+   "part": "decision",
+   "size": 2147023008,
+   "sha256": "9ed150d4367e68df0ac8e1540f6ddc65b42d0ee26378329d1ecbca60f93fc5f8",
+   "path": "decision/Ministral-3-3B-Instruct-2512-Q4_K_M.gguf",
+   "url": "https://huggingface.co/mistralai/Ministral-3-3B-Instruct-2512-GGUF/resolve/main/Ministral-3-3B-Instruct-2512-Q4_K_M.gguf",
+   "server": "decision",
+   "decision_model": "ministral",
+   "license": "Apache-2.0 (Mistral AI)"
+  },
+  {
+   "id": "gemma",
+   "name": "gemma-4-E2B-it-Q4_0.gguf",
+   "part": "decision",
+   "size": 2841481184,
+   "sha256": "8e30dff3ac4c8434c49a7036fa15564bdbb6044e42bf04550bf1a096ad7e6a52",
+   "path": "decision/gemma-4-E2B-it-Q4_0.gguf",
+   "url": "https://huggingface.co/ggml-org/gemma-4-E2B-it-GGUF/resolve/main/gemma-4-E2B-it-Q4_0.gguf",
+   "server": "decision",
+   "decision_model": "gemma",
+   "platforms": [
+    "android"
+   ],
+   "license": "Gemma Terms of Use (Google)"
+  },
+  {
+   "id": "taiwanese",
+   "name": "ggml-whisper-taiwanese.bin",
+   "part": "taiwanese",
+   "size": 1656129708,
+   "sha256": "e878f611bf3ef407cff3c1e2ecf5f60dc92bc6dd09a85b22166731c0d92764a1",
+   "path": "taiwanese/ggml-breeze-asr-26-q8_0.bin",
+   "tiers": [
+    "full"
+   ],
+   "license": "Apache-2.0 (MediaTek Research Breeze-ASR-26; ggml q8_0 by this project)"
+  },
+  {
+   "id": "taiwanese-q4",
+   "name": "ggml-whisper-taiwanese.bin",
+   "part": "taiwanese",
+   "size": 888932908,
+   "sha256": "747896198b388e1ab77397cb82136dd3bd5fc1823f7e0c60757166b20ff9abbe",
+   "path": "taiwanese/ggml-breeze-asr-26-q4_k.bin",
+   "tiers": [
+    "standard"
+   ],
+   "license": "Apache-2.0 (MediaTek Research Breeze-ASR-26; ggml q4_K by this project)"
+  }
+ ]
+}
