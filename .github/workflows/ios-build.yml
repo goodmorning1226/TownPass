@@ -20,8 +20,12 @@ jobs:
   ipa:
     runs-on: macos-26
     timeout-minutes: 90
+    defaults:
+      run:
+        shell: bash
     env:
       NATIVE: ${{ github.workspace }}/../native
+      LOGS: ${{ github.workspace }}/../logs
       LLAMA_TAG: b12182
       WHISPER_TAG: v1.9.5
     steps:
@@ -53,6 +57,7 @@ jobs:
       - name: Build LlamaServer and WhisperServer frameworks
         if: steps.native.outputs.cache-hit != 'true'
         run: |
+          mkdir -p "$LOGS"; exec > >(tee "$LOGS/native.log") 2>&1
           brew list ninja >/dev/null 2>&1 || brew install ninja
           mkdir -p "$NATIVE"
           git clone --depth 1 --branch "$LLAMA_TAG" https://github.com/ggml-org/llama.cpp "$NATIVE/llama.cpp"
@@ -65,6 +70,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          mkdir -p "$LOGS"; exec > >(tee "$LOGS/python.log") 2>&1
           TAG=$(gh release list -R beeware/Python-Apple-support --limit 50 --json tagName \
             --jq '[.[].tagName | select(startswith("3.13-b"))][0]')
           echo "Python-Apple-support $TAG"
@@ -75,16 +81,20 @@ jobs:
           ls "$NATIVE/python-ios-$TAG"
 
       - name: Put the frameworks in ios/OnDevice
-        run: scripts/setup_ios_on_device.sh "$NATIVE"
+        run: |
+          mkdir -p "$LOGS"; exec > >(tee "$LOGS/setup.log") 2>&1
+          scripts/setup_ios_on_device.sh "$NATIVE"
 
       - name: Flutter packages and generated code
         run: |
+          mkdir -p "$LOGS"; exec > >(tee "$LOGS/flutter-pub.log") 2>&1
           flutter --version
           flutter pub get --enforce-lockfile
           dart run build_runner build --delete-conflicting-outputs
 
       - name: Build (release, not signed)
         run: |
+          mkdir -p "$LOGS"; exec > >(tee "$LOGS/flutter-build.log") 2>&1
           flutter build ios --release --no-codesign \
             --dart-define=ASSISTANT_ENABLED=true --dart-define=ASSISTANT_ON_DEVICE=true \
             --dart-define=ASSISTANT_DECISION_MODEL=ministral --dart-define=ASSISTANT_GUIDED=true
@@ -107,3 +117,14 @@ jobs:
           name: TownPass-assistant-unsigned-ipa
           path: TownPass-assistant-unsigned.ipa
           retention-days: 14
+
+      # The job log needs a GitHub login; annotations are public, so the end of a
+      # failed step's output can be read from the API without one.
+      - name: Show the end of a failed step
+        if: failure()
+        run: |
+          for log in "$LOGS"/*.log; do
+            [ -f "$log" ] || continue
+            text=$(tail -n 60 "$log" | sed -e 's/%/%25/g' -e 's/\r//g' | awk '{printf "%s%%0A", $0}')
+            echo "::error title=$(basename "$log" .log)::$text"
+          done
