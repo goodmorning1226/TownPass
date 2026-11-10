@@ -20,6 +20,7 @@ import 'package:town_pass/bean/assistant_result.dart';
 import 'package:town_pass/page/main/main_view_controller.dart';
 import 'package:town_pass/service/assistant_action_executor.dart';
 import 'package:town_pass/service/assistant_model_download.dart';
+import 'package:town_pass/service/assistant_on_device.dart';
 import 'package:town_pass/service/assistant_page_tracker.dart';
 import 'package:town_pass/service/assistant_recent_inputs.dart';
 import 'package:town_pass/service/assistant_recorder.dart';
@@ -203,11 +204,18 @@ class GuidedAssistantController extends GetxController {
   final AssistantRecorder? recorder;
   final AssistantPageTracker pageTracker;
 
+  /// When the backend fails, answer from the pre-written demo replies (a
+  /// computer backend that is not running). Off in on-device builds: the
+  /// phone's own assistant says what went wrong instead, since a demo reply
+  /// was taken for an FAQ answer in airplane mode (2026-11-11).
+  final bool demoFallback;
+
   GuidedAssistantController({
     this.engine = const MockAssistantEngine(),
     this.thinkDelay = const Duration(milliseconds: 1200),
     this.runOnboarding = false,
     this.service,
+    this.demoFallback = !AssistantOnDevice.requested,
     this.recorder,
     AssistantActionExecutor? executor,
     AssistantPageTracker? pageTracker,
@@ -588,6 +596,12 @@ class GuidedAssistantController extends GetxController {
       if (generation != _generation || isClosed) return;
       loading.value = false;
       if (choiceId != null || pageStep != null) {
+        _say(
+          _bot(error is FormatException ? error.message : Replies.pageFailed),
+        );
+        return;
+      }
+      if (!demoFallback) {
         _say(
           _bot(error is FormatException ? error.message : Replies.pageFailed),
         );

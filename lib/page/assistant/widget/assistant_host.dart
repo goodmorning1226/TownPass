@@ -8,6 +8,7 @@ import 'package:town_pass/page/assistant/assistant_view_controller.dart';
 import 'package:town_pass/page/assistant/widget/model_download_card.dart';
 import 'package:town_pass/service/assistant_model_download.dart';
 import 'package:town_pass/service/assistant_on_device.dart';
+import 'package:town_pass/service/assistant_readiness.dart';
 import 'package:town_pass/service/assistant_recent_inputs.dart';
 import 'package:town_pass/service/assistant_speech_language.dart';
 import 'package:town_pass/service/page_translation.dart';
@@ -463,10 +464,19 @@ class _AssistantSheetState extends State<AssistantSheet> {
         const SizedBox(width: 12),
         Expanded(
           // An iPhone just back from the background: its servers come back first.
-          child: ValueListenableBuilder<bool>(
-            valueListenable: AssistantOnDevice.reconnecting,
-            builder: (_, reconnecting, _) => TPText(
-              _t(reconnecting ? 'reconnecting' : 'processing'),
+          child: ListenableBuilder(
+            listenable: Listenable.merge([
+              AssistantOnDevice.reconnecting,
+              AssistantReadiness.loading,
+            ]),
+            builder: (_, _) => TPText(
+              _t(
+                AssistantOnDevice.reconnecting.value
+                    ? 'reconnecting'
+                    : AssistantReadiness.loading.value
+                    ? 'modelsLoading'
+                    : 'processing',
+              ),
               color: TPColors.grayscale700,
             ),
           ),

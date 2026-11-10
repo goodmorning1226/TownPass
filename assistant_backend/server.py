@@ -9,7 +9,9 @@ import difflib
 import hashlib
 import json
 import os
+import pathlib
 import re
+import tempfile
 import threading
 import time
 import unicodedata
@@ -49,6 +51,64 @@ if __name__ == "__main__":
 
 class AssistantError(Exception):
     pass
+
+
+# The phone's model servers load after the App starts (decision model ~2 GB): a request
+# that arrives first waits for them instead of failing at once (2026-11-11, the first
+# spoken question after launch failed on Android and iPhone). llama-server answers 503
+# while loading; a server not started yet refuses the connection.
+MODEL_READY_WAIT_S = 75
+# When the user last asked (turns and speech): the warm-up gives way (device_main.warm_up).
+USER_REQUEST_AT = 0.0
+
+
+def _answers(url, timeout=0.5):
+    """GET url answers 200 (a llama-server that has loaded, the speech service)."""
+    try:
+        with urllib.request.urlopen(url, timeout=timeout) as response:
+            return response.status == 200, json.loads(response.read(65536) or b"{}")
+    except (OSError, ValueError):
+        return False, {}
+
+
+def readiness(assistant):
+    """What the App shows while models load (AssistantReadiness): the decision model
+    (None: none on this phone, or Ollama on the computer) and speech (None: no
+    speech service). True once each answers."""
+    decision = None
+    if MODEL_API == "openai" and assistant.model_available:
+        decision = _answers(MODEL_URL + "/health")[0]
+    speech = None
+    asr = os.environ.get("TOWNPASS_ASR_URL")
+    if asr and asr.endswith("/v1/transcribe"):
+        up, body = _answers(asr[: -len("/v1/transcribe")] + "/health")
+        speech = bool(up and body.get("ready", True))
+    return {"decision": decision, "speech": speech}
+
+
+def note_user_request():
+    global USER_REQUEST_AT
+    USER_REQUEST_AT = time.monotonic()
+
+
+def loading(exc):
+    """Whether exc means a local model server is still loading (not a real failure)."""
+    if isinstance(exc, urllib.error.HTTPError):
+        return exc.code == 503
+    return isinstance(exc, urllib.error.URLError) and isinstance(exc.reason, ConnectionRefusedError)
+
+
+def model_reply(payload, wait_s=None, pause_s=1.0):
+    """llama-server's chat completion, waiting up to wait_s for a loading model."""
+    deadline = time.monotonic() + (MODEL_READY_WAIT_S if wait_s is None else wait_s)
+    while True:
+        try:
+            return fetch_json(MODEL_URL + "/v1/chat/completions", payload, timeout=MODEL_TIMEOUT)
+        except (urllib.error.URLError, ConnectionRefusedError) as exc:
+            refused = isinstance(exc, ConnectionRefusedError)
+            if not (refused or loading(exc)) or time.monotonic() + pause_s > deadline:
+                raise
+        time.sleep(pause_s)
 
 
 def fetch_json(url, payload=None, timeout=15):
@@ -114,24 +174,73 @@ def normalize(text):
     return re.sub(r"[\s：:，,。.!！?？《》「」\"'·]", "", unicodedata.normalize("NFKC", text)).lower()
 
 
+def catalog_cache():
+    """Where the last verified catalogue is kept on this device (the phone: the App's
+    support folder, LOCALAPPDATA; elsewhere the temporary folder)."""
+    configured = os.environ.get("TOWNPASS_CATALOG_CACHE")
+    if configured:
+        return pathlib.Path(configured)
+    base = os.environ.get("LOCALAPPDATA") or tempfile.gettempdir()
+    return pathlib.Path(base) / "TownPassAssistant" / "library_catalog.json"
+
+
+def _verified(data):
+    canonical = json.dumps(data, sort_keys=True, ensure_ascii=True, separators=(",", ":"))
+    return hashlib.sha256(canonical.encode()).hexdigest() == CATALOG_VERSION
+
+
 class Catalog:
-    def __init__(self):
+    """The demo library catalogue (CATALOG_URL), checked against CATALOG_VERSION and
+    fetched again after 60 s.
+
+    Offline (airplane mode, 2026-11-11) the last copy is kept: the one in memory,
+    else the one saved on this device after the last successful fetch. Without
+    any copy only book requests fail; the workflow carries on without books
+    otherwise (docs/AI_CURRENT_RULES.md section 5). The copy is the downloaded
+    data, not packaged in the App."""
+
+    def __init__(self, fetch=None, cache=None):
         self._data = None
         self._time = 0
         self._lock = threading.Lock()
+        self._fetch = fetch or (lambda: fetch_json(CATALOG_URL))
+        self._cache = cache
+
+    @property
+    def cache(self):
+        return self._cache or catalog_cache()
+
+    def _read_cache(self):
+        try:
+            data = json.loads(self.cache.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            return None
+        return data["data"] if isinstance(data, dict) and _verified(data) else None
+
+    def _write_cache(self, data):
+        try:
+            self.cache.parent.mkdir(parents=True, exist_ok=True)
+            self.cache.write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
+        except OSError:
+            pass
 
     def books(self, force=False):
         with self._lock:
             if force or self._data is None or time.monotonic() - self._time > 60:
                 try:
-                    data = fetch_json(CATALOG_URL)
+                    data = self._fetch()
                 except (OSError, ValueError) as exc:
-                    raise AssistantError("無法載入示範書目，請稍後重試或從原圖書頁面搜尋。") from exc
-                canonical = json.dumps(data, sort_keys=True, ensure_ascii=True, separators=(",", ":"))
-                if hashlib.sha256(canonical.encode()).hexdigest() != CATALOG_VERSION:
+                    if self._data is None:
+                        self._data = self._read_cache()
+                    if self._data is None:
+                        raise AssistantError("無法載入示範書目，請稍後重試或從原圖書頁面搜尋。") from exc
+                    self._time = time.monotonic()  # offline: the kept copy, asked again in 60 s
+                    return self._data
+                if not _verified(data):
                     raise AssistantError("圖書服務資料已更新，請先從原圖書頁面搜尋；助理需要重新核對版本。")
                 self._data = data["data"]
                 self._time = time.monotonic()
+                self._write_cache(data)
             return self._data
 
 
@@ -348,10 +457,10 @@ class Assistant:
             schema = proposal_schema(tools)
             if MODEL_API == "openai":
                 # Same messages and limits; the output constraint comes from the schema.
-                reply = fetch_json(MODEL_URL + "/v1/chat/completions", {
+                reply = model_reply({
                     "model": MODEL, "messages": alternating(messages), "temperature": 0, "max_tokens": 180,
                     **output_constraint(schema),
-                }, timeout=MODEL_TIMEOUT)
+                })
                 content = reply["choices"][0]["message"]["content"]
                 result = {"prompt_eval_count": (reply.get("usage") or {}).get("prompt_tokens"),
                           "timing": llama_timing(reply.get("timings"))}
@@ -371,6 +480,7 @@ class Assistant:
             raise AssistantError("決策模型未回應，請確認電腦上的 Ollama 正在執行，再重試。") from exc
 
     def turn(self, payload):
+        note_user_request()
         request_id = payload.get("request_id")
         session = payload.get("session_id") or str(uuid.uuid4())
         text = payload.get("text", "")
@@ -596,6 +706,7 @@ def make_handler(assistant, token=""):
                     "faq_entries": assistant.faq.count if assistant.faq else 0,
                     "semantic_ready": bool(assistant.semantic and assistant.semantic.ready),
                     "decision_model": assistant.model_available,
+                    "ready": readiness(assistant),
                     "data_mode": "demo"})
             if self.path == "/v1/models":
                 # Model downloads (docs/AI_MODEL_DOWNLOAD.md); not managed on the computer.
@@ -703,6 +814,7 @@ def make_handler(assistant, token=""):
             Audio is never stored or logged. The text goes back to the App, which
             shows it as the user's message and sends it as a normal turn.
             """
+            note_user_request()
             from asr_server import MAX_BYTES, read_wav
             if self.headers.get("Transfer-Encoding") or self.headers.get("Content-Length") is None:
                 return self.reply(411, {"error": "App 傳送格式不符，請更新 App 後重試。"})

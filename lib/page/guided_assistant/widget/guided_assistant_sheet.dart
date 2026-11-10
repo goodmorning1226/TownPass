@@ -13,6 +13,7 @@ import 'package:town_pass/page/assistant/widget/model_download_card.dart';
 import 'package:town_pass/page/guided_assistant/widget/hold_to_talk.dart';
 import 'package:town_pass/service/assistant_model_download.dart';
 import 'package:town_pass/service/assistant_on_device.dart';
+import 'package:town_pass/service/assistant_readiness.dart';
 import 'package:town_pass/util/tp_colors.dart';
 import 'package:town_pass/util/tp_text.dart';
 
@@ -553,10 +554,17 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
         Expanded(
           // On an iPhone just back from the background, the phone's servers
           // come back first (AssistantOnDevice.settle).
-          child: ValueListenableBuilder<bool>(
-            valueListenable: AssistantOnDevice.reconnecting,
-            builder: (_, reconnecting, _) => TPText(
-              reconnecting ? gt('助理重新連線中…') : gt('正在幫你找…'),
+          child: ListenableBuilder(
+            listenable: Listenable.merge([
+              AssistantOnDevice.reconnecting,
+              AssistantReadiness.loading,
+            ]),
+            builder: (_, _) => TPText(
+              AssistantOnDevice.reconnecting.value
+                  ? gt('助理重新連線中…')
+                  : AssistantReadiness.loading.value
+                  ? gt('模型載入中，好了會自動回答…')
+                  : gt('正在幫你找…'),
               style: TPTextStyles.h3Regular,
               color: TPColors.grayscale800,
             ),
