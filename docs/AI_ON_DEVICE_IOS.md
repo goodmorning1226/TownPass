@@ -64,6 +64,7 @@ Android 從 2026-11-10 起也認 `--dart-define=ASSISTANT_ON_DEVICE=true`（`and
 
 紀錄：`Library/Caches/on_device_assistant.log`（Python 與各 server 的輸出，只有數字與檔名），可用
 `xcrun devicectl device copy from --domain-type appDataContainer --domain-identifier com.example.townpass --source Library/Caches/on_device_assistant.log --destination <檔案>` 取回。
+上一次啟動的紀錄留在 `Library/Caches/on_device_assistant.prev.log`（2026-11-10 起；出事後重開 App 也查得到），同樣的指令把 `--source` 換掉即可。
 
 ## 實測（iPhone 17，A19，2026-11-08）
 
@@ -78,6 +79,7 @@ Android 從 2026-11-10 起也認 `--dart-define=ASSISTANT_ON_DEVICE=true`（`and
   Python 的 `device_main.watch` 每 2 秒檢查 :8765／:8770；llama-server 加了 `ios/native/llama-server-rebind.patch`
   （自己重新 bind，不重載模型，`scripts/build_ios_llama_server.sh` 重建）；whisper-server 也加了 `ios/native/whisper-server-ios.patch` 原地重新 bind（`scripts/build_ios_whisper_server.sh` 重建），模型不重載；萬一仍結束，App 回到前景再啟動。
   紀錄檔中會看到 `listener :8765 reopened`、`bound again`、`restarting`。
+  2026-11-10 還有漏洞，見下面「鎖定與背景」。
 - Python 的 `print` 改寫到 fd 1/2，和各 server 的輸出一起進紀錄檔（`backend:`、`timing warm-up`）。
 
 - **記憶體（台語）**：模型權重放在 GPU 上是 wired memory，不算在 App 的額度（`os_proc_available_memory`）裡。
@@ -88,6 +90,46 @@ Android 從 2026-11-10 起也認 `--dart-define=ASSISTANT_ON_DEVICE=true`（`and
 - 暖機的測試音不載入台語模型（`transcribe(..., automatic_taiwanese=False)`，團隊在 asr-ablation 的修正）；llama-server 以 `/health` 200 判斷載完，台語等所有啟動模型載完才載入。
 - e5 與 FAQ 索引：`scripts/convert_e5_gguf.py` 轉 q8_0（132 MB），`scripts/build_faq_index.py` 以 Mac 上的 llama-server 建 8,121 筆索引（22 MB）；
   手機上 `faq embed :8774`、`timing faq-load entries=8121`。
+
+## 鎖定與背景（2026-11-10，branch `fix/ios-resume`，尚待 iPhone 實測）
+
+**現象**（擁有者，iPhone 17 Pro Max）：載入助理後，每次鎖定手機或滑到背景，回來後模型都連不上，要把 App 滑掉重開才恢復。
+
+**從程式看出的原因**（還沒有紀錄檔證實）：
+
+1. 只有 whisper-server 設成「結束就等 App 回到前景再跑」；**決策模型（:8771）和 e5（:8774）的 llama-server 結束後不會重啟**。
+   socket 被收回的情況有 rebind patch 處理，但只要 llama-server 因為別的原因從 main() 返回，App 還活著，助理就一直連不到，只能殺掉 App。
+2. **iOS 不允許背景中的 App 送 GPU 工作**。鎖定時正在跑的決策或語音一定失敗；
+   開 App 後約一分鐘內，後端用 e5 建語意索引，這段時間鎖定最容易出事。
+
+**修正**：
+
+| | 做法 | 位置 |
+| --- | --- | --- |
+| 1 | 四個 native server 全部「結束就等 App 回到前景再跑」，10 秒內連續結束 5 次才放棄；放棄的 server 在 App 下次回到前景時再跑一次（`recover()`） | `OnDeviceAssistant.swift` `runServer`、`recover` |
+| 2 | 回到前景（`UIApplication.didBecomeActiveNotification`、`UIScene.didActivateNotification`）時檢查每個 server，紀錄檔寫一行 `foreground: python=… llama-decision=… …`；新的 method `status` 回報 `ready`、`python`、各 server 是否回應 | 同上 `status()` |
+| 3 | e5 改在 CPU 跑（`--device none`），建索引時鎖定不會碰到 GPU；e5 很小，索引建一次就快取 | 同上 |
+| 4 | 上一次的紀錄改名為 `on_device_assistant.prev.log` 保留；server 結束時記下 App 當時是否在前景 | 同上 |
+| 5 | App 從背景回來後（`paused`／`hidden` → `resumed`；只拉控制中心的 `inactive` 不算），送出的第一個請求先等 `status` 說 ready，最多 20 秒，之後照常送出；等待時顯示「助理重新連線中…」（6 語） | `lib/service/assistant_on_device.dart` `OnDeviceResume`、`assistant_service.dart`、兩個介面的等待列 |
+
+Android 不受影響：`AssistantOnDevice.start` 在 Android 不啟用，`settle()` 立刻返回；Android 的 server 是獨立行程，沒有這個問題。
+
+**沒有在 Mac 上驗證過的地方**（這個 branch 在 Windows 上寫，Dart 有單元測試，Swift 沒有編譯過）：
+
+- llama-server 的 `main()` 在同一個行程裡**第二次呼叫**（重啟）是否正常；whisper-server 已經這樣用過。若重啟就閃退，至少 App 會整個重開，不會卡在連不上。
+- b12182 的 `--device none` 是否讓 e5 完全不用 Metal，以及 iPhone CPU 上建索引要多久（Android 的 CPU 約 1 分鐘）。
+
+**實測步驟**（iPhone，release 建置，每項做完都不殺 App，直接再問一句）：
+
+1. 開 App、等模型載完（紀錄 `llama-embedding ready`），閒置時鎖定 1 分鐘再解鎖。
+2. 問一句需要模型的話（例如「我要繳費」），回答出來前鎖定，再解鎖。
+3. 剛開 App 一分鐘內（還在建索引）鎖定，再解鎖。
+4. 滑到背景超過 10 分鐘，再回來。
+5. 切到別的 App（例如相機錄影一段）再回來。
+
+每項記下：回來後第一句多久有回應、有沒有出現「助理重新連線中…」、有沒有要殺 App。
+有任何一項失敗，先**不要重開 App**，把 `on_device_assistant.log` 拉出來；已經重開就拉 `.prev.log`。
+看 `exited with`、`keeps exiting`、`started again`、`foreground:` 這幾行。
 
 ## 與 Android 的差別
 
