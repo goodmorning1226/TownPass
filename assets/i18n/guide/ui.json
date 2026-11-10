@@ -703,6 +703,13 @@
    "id": "Sedang mencarikan…",
    "th": "กำลังหาให้…"
   },
+  "助理重新連線中…": {
+   "en": "Reconnecting the assistant…",
+   "ja": "アシスタントに再接続しています…",
+   "vi": "Đang kết nối lại trợ lý…",
+   "id": "Menghubungkan ulang asisten…",
+   "th": "กำลังเชื่อมต่อผู้ช่วยอีกครั้ง…"
+  },
   "正在找要填的格子…": {
    "en": "Finding the box to fill…",
    "ja": "入力する欄を探しています…",

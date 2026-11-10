@@ -79,6 +79,8 @@ class AssistantService {
   }) async {
     assert(pageStep == null || pageStep == 1 || pageStep == -1);
     cancel();
+    // Just back from the background on an iPhone: the phone's servers first.
+    await AssistantOnDevice.settle();
     final client = HttpClient()..connectionTimeout = const Duration(seconds: 8);
     _active = client;
     try {
@@ -211,6 +213,7 @@ class AssistantService {
     String? language,
   }) async {
     cancel();
+    await AssistantOnDevice.settle();
     final client = HttpClient()..connectionTimeout = const Duration(seconds: 8);
     _active = client;
     try {

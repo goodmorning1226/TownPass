@@ -268,6 +268,16 @@ abstract final class AssistantTexts {
       'id': 'Sedang diproses…',
       'th': 'กำลังดำเนินการ…',
     },
+    // The iPhone's own assistant after the App came back from the background
+    // (AssistantOnDevice.reconnecting).
+    'reconnecting': {
+      'zh': '助理重新連線中…',
+      'en': 'Reconnecting the assistant…',
+      'ja': 'アシスタントに再接続しています…',
+      'vi': 'Đang kết nối lại trợ lý…',
+      'id': 'Menghubungkan ulang asisten…',
+      'th': 'กำลังเชื่อมต่อผู้ช่วยอีกครั้ง…',
+    },
     'cancel': {
       'zh': '取消',
       'en': 'Cancel',

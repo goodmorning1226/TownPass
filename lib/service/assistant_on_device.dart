@@ -1,7 +1,9 @@
+import 'dart:async';
 import 'dart:io' show Platform;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 
 /// The local assistant inside the iOS App (docs/AI_ON_DEVICE_IOS.md): the
 /// backend, the decision model and Whisper run on the iPhone, on the same
@@ -15,6 +17,14 @@ import 'package:flutter/services.dart';
 class AssistantOnDevice {
   static const requested = bool.fromEnvironment('ASSISTANT_ON_DEVICE');
   static const _channel = MethodChannel('townpass/on_device_assistant');
+
+  /// Waits after the App comes back from the background; set by [start].
+  static OnDeviceResume? _resume;
+
+  /// True while a request waits for the phone's servers after the App came
+  /// back from the background: the waiting line then says the assistant is
+  /// reconnecting instead of looking for the answer.
+  static final ValueNotifier<bool> reconnecting = ValueNotifier(false);
 
   /// Whether this build runs the local assistant: [build] (default [requested])
   /// on iOS ([isIOS], default the platform).
@@ -30,6 +40,7 @@ class AssistantOnDevice {
     MethodChannel? channel,
   }) async {
     if (!enabled(isIOS: isIOS, build: build)) return null;
+    _resume ??= OnDeviceResume(channel ?? _channel)..attach();
     try {
       final info = await (channel ?? _channel).invokeMethod<String>('start');
       if (kDebugMode) debugPrint('on-device assistant: $info');
@@ -38,6 +49,105 @@ class AssistantOnDevice {
       return 'failed: ${error.code}';
     } on MissingPluginException {
       return 'failed: not available';
+    }
+  }
+
+  /// Called before every request: after the App came back from the background
+  /// (phone locked, another App), waits until the phone's servers answer again,
+  /// at most [OnDeviceResume.limit]; at once otherwise, and always at once in
+  /// builds without the local assistant (Android, LAN backend).
+  static Future<void> settle() => _resume?.settle() ?? Future<void>.value();
+
+  /// Forgets [start]'s observer (tests).
+  @visibleForTesting
+  static void reset() {
+    _resume?.detach();
+    _resume = null;
+    reconnecting.value = false;
+  }
+}
+
+/// iOS takes a suspended App's sockets and may stop a model server while the
+/// App is away (docs/AI_ON_DEVICE_IOS.md, 鎖定與背景). The native side restarts
+/// them when the App is active again (OnDeviceAssistant.swift); a request sent
+/// before they answer would fail, so the first requests after coming back wait
+/// for the "status" call to say ready (2026-11-10: the decision model stayed
+/// down after locking the phone until the App was killed).
+class OnDeviceResume with WidgetsBindingObserver {
+  OnDeviceResume(
+    this._channel, {
+    this.limit = const Duration(seconds: 20),
+    this.poll = const Duration(milliseconds: 500),
+    ValueNotifier<bool>? reconnecting,
+  }) : reconnecting = reconnecting ?? AssistantOnDevice.reconnecting;
+
+  final MethodChannel _channel;
+
+  /// Longest wait; the request is then sent anyway (it says the assistant on
+  /// the phone is still starting if the servers are still down).
+  final Duration limit;
+  final Duration poll;
+  final ValueNotifier<bool> reconnecting;
+
+  bool _away = false;
+  bool _pending = false;
+  int _generation = 0;
+  Future<void>? _waiting;
+
+  void attach() => WidgetsBinding.instance.addObserver(this);
+
+  void detach() => WidgetsBinding.instance.removeObserver(this);
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    switch (state) {
+      case AppLifecycleState.hidden:
+      case AppLifecycleState.paused:
+        // Away (locked, another App); "inactive" alone (Control Center, a
+        // system sheet) keeps the App running.
+        _away = true;
+      case AppLifecycleState.resumed:
+        if (!_away) return;
+        _away = false;
+        _pending = true;
+        _generation++;
+        _waiting = _wait(_generation);
+      case AppLifecycleState.inactive:
+      case AppLifecycleState.detached:
+        break;
+    }
+  }
+
+  /// Completes once the servers answer after a resume, or at once.
+  Future<void> settle() =>
+      _pending ? (_waiting ??= _wait(_generation)) : Future<void>.value();
+
+  Future<void> _wait(int generation) async {
+    final watch = Stopwatch()..start();
+    try {
+      while (!await _ready()) {
+        if (watch.elapsed >= limit || generation != _generation) return;
+        reconnecting.value = true;
+        await Future<void>.delayed(poll);
+      }
+    } finally {
+      if (generation == _generation) {
+        _pending = false;
+        _waiting = null;
+        reconnecting.value = false;
+      }
+    }
+  }
+
+  Future<bool> _ready() async {
+    try {
+      final status = await _channel.invokeMapMethod<String, Object?>('status');
+      return status == null || status['ready'] == true;
+    } on PlatformException {
+      return true;
+    } on MissingPluginException {
+      // A native side without "status": nothing to wait for.
+      return true;
     }
   }
 }

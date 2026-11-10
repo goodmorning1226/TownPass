@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:town_pass/page/assistant/assistant_texts.dart';
 import 'package:town_pass/page/assistant/assistant_view_controller.dart';
+import 'package:town_pass/service/assistant_on_device.dart';
 import 'package:town_pass/service/assistant_recent_inputs.dart';
 import 'package:town_pass/service/assistant_speech_language.dart';
 import 'package:town_pass/service/page_translation.dart';
@@ -436,7 +437,16 @@ class _AssistantSheetState extends State<AssistantSheet> {
           ),
         ),
         const SizedBox(width: 12),
-        Expanded(child: TPText(_t('processing'), color: TPColors.grayscale700)),
+        Expanded(
+          // An iPhone just back from the background: its servers come back first.
+          child: ValueListenableBuilder<bool>(
+            valueListenable: AssistantOnDevice.reconnecting,
+            builder: (_, reconnecting, _) => TPText(
+              _t(reconnecting ? 'reconnecting' : 'processing'),
+              color: TPColors.grayscale700,
+            ),
+          ),
+        ),
         TextButton(onPressed: controller.cancel, child: Text(_t('cancel'))),
       ],
     ),
