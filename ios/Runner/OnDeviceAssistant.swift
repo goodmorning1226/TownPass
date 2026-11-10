@@ -34,14 +34,34 @@ final class OnDeviceAssistant {
   /// first Taiwanese clip (docs/AI_TAIWANESE_SPEECH_PLAN.md), as on Android.
   static let taiwaneseAsrFile = "ggml-whisper-taiwanese.bin"
 
+  private static let assistantPort = 8765
+  private static let asrPort = 8770
   private static let modelPort = 8771
   private static let multiWhisperPort = 8773
   private static let faqEmbedPort = 8774
   private static let gateWhisperPort = 8775
   private static let taiwaneseWhisperPort = 8776
+  private static let taiwaneseName = "whisper-taiwanese"
 
   private let lock = NSLock()
   private var state: String?
+
+  /// A native server this launch started: what status() checks and what recover()
+  /// runs again when its thread gave up while the App was away.
+  private struct Server {
+    let name: String
+    let library: String
+    let symbol: String
+    let port: Int
+    let arguments: [String]
+    var llama: Bool { symbol == "townpass_llama_server" }
+  }
+  private let serversLock = NSLock()
+  /// Every server started so far, in start order.
+  private var servers: [Server] = []
+  /// Names of servers whose thread gave up (it kept exiting); recover() runs them again.
+  private var stopped: Set<String> = []
+  private let recoverLock = NSLock()
 
   // Set by launch(); startTaiwanese() starts the Taiwanese server with them.
   private var modelsDirectory: URL?
@@ -68,10 +88,69 @@ final class OnDeviceAssistant {
           let info = self.start()
           DispatchQueue.main.async { result(info) }
         }
+      case "status":
+        DispatchQueue.global(qos: .userInitiated).async {
+          let info = self.status()
+          DispatchQueue.main.async { result(info) }
+        }
       default:
         result(FlutterMethodNotImplemented)
       }
     }
+    // Back in the foreground (phone unlocked, back from another App): run again any
+    // server that stopped while the App was away. Both notifications, since the App
+    // uses the UIScene lifecycle; recover() runs once at a time and does nothing
+    // when every server is running.
+    for name in [UIApplication.didBecomeActiveNotification, UIScene.didActivateNotification] {
+      NotificationCenter.default.addObserver(forName: name, object: nil, queue: nil) { [weak self] _ in
+        DispatchQueue.global(qos: .userInitiated).async { self?.recover() }
+      }
+    }
+  }
+
+  /// Which servers answer now ("status" from Dart, which waits for ready after the
+  /// App comes back: lib/service/assistant_on_device.dart). ready: Python's two
+  /// listeners and every start-up server answer; the Taiwanese server (first use
+  /// only) is listed but not required. Nothing launched (not started yet, no
+  /// model files) is ready too: there is nothing to wait for.
+  func status() -> [String: Any] {
+    lock.lock()
+    let started = state != nil
+    lock.unlock()
+    serversLock.lock()
+    let list = servers
+    serversLock.unlock()
+    let python = listening(Self.assistantPort) && listening(Self.asrPort)
+    var answering: [String: Bool] = [:]
+    for server in list {
+      answering[server.name] = server.llama ? healthy(server.port) : listening(server.port)
+    }
+    let ready = !started || list.isEmpty
+      || (python && list.allSatisfy { $0.name == Self.taiwaneseName || answering[$0.name] == true })
+    return ["started": started, "python": python, "servers": answering, "ready": ready]
+  }
+
+  /// After the App comes back to the foreground: a server whose thread gave up (it
+  /// kept exiting, e.g. while iOS had the App suspended) is run again, then which
+  /// servers answer is logged. Servers that only exited once restart by themselves
+  /// (runServer); Python re-opens its own listeners (device_main.watch).
+  private func recover() {
+    guard recoverLock.try() else { return }
+    defer { recoverLock.unlock() }
+    serversLock.lock()
+    let again = servers.filter { stopped.contains($0.name) }
+    stopped.subtract(again.map(\.name))
+    let any = !servers.isEmpty
+    serversLock.unlock()
+    guard any else { return }
+    for server in again {
+      note("\(server.name) started again after the App came back")
+      _ = runServer(server)
+    }
+    let now = status()
+    let answering = (now["servers"] as? [String: Bool] ?? [:])
+      .sorted { $0.key < $1.key }.map { "\($0.key)=\($0.value)" }.joined(separator: " ")
+    note("foreground: python=\(now["python"] ?? false) \(answering); \(memoryNote())")
   }
 
   /// Starts everything once; returns what was started (or why not), numbers and
@@ -111,8 +190,15 @@ final class OnDeviceAssistant {
     }
 
     // Everything the servers and Python print goes to one log the Mac can copy
-    // back (Library/Caches/on_device_assistant.log, this launch only); release iOS shows no stdout.
-    let log = caches.appendingPathComponent("on_device_assistant.log").path
+    // back (Library/Caches/on_device_assistant.log, this launch); release iOS shows no stdout.
+    // The previous launch's log is kept as on_device_assistant.prev.log: after a
+    // failure the App is usually started again, which used to overwrite the only
+    // record of what went wrong.
+    let logURL = caches.appendingPathComponent("on_device_assistant.log")
+    let previousLog = caches.appendingPathComponent("on_device_assistant.prev.log")
+    try? fileManager.removeItem(at: previousLog)
+    try? fileManager.moveItem(at: logURL, to: previousLog)
+    let log = logURL.path
     if freopen(log, "w", stdout) != nil { setvbuf(stdout, nil, _IOLBF, 0) }
     if freopen(log, "a", stderr) != nil { setvbuf(stderr, nil, _IONBF, 0) }
 
@@ -157,48 +243,55 @@ final class OnDeviceAssistant {
     // together, their Metal shader compiles overlapped, the system's shader
     // compiler connection dropped (XPC_ERROR_CONNECTION_INTERRUPTED) and
     // whisper.cpp aborted on a half-made GPU context. The decision model first.
-    var plan: [(name: String, library: String, symbol: String, port: Int, arguments: [String])] = [
+    var plan: [Server] = [
       // Same settings as Android: one 2048-token slot per decision policy kept in
       // the prompt cache, no host-RAM prompt cache, no thinking block.
-      ("llama-decision", llama, "townpass_llama_server", Self.modelPort,
-       serverArguments(models, Self.modelFile, Self.modelPort)
-         + ["-t", threads, "-c", "6144", "-np", "3", "--cache-ram", "0",
-            "--reasoning", "off", "--no-webui"])
+      Server(
+        name: "llama-decision", library: llama, symbol: "townpass_llama_server", port: Self.modelPort,
+        arguments: serverArguments(models, Self.modelFile, Self.modelPort)
+          + ["-t", threads, "-c", "6144", "-np", "3", "--cache-ram", "0",
+             "--reasoning", "off", "--no-webui"])
     ]
     if multilingual {
       plan.append(
-        ("whisper-multilingual", whisper, "townpass_whisper_server", Self.multiWhisperPort,
-         serverArguments(models, Self.multiAsrFile, Self.multiWhisperPort)
-           + ["-t", threads, "-l", "auto"]))
+        Server(
+          name: "whisper-multilingual", library: whisper, symbol: "townpass_whisper_server",
+          port: Self.multiWhisperPort,
+          arguments: serverArguments(models, Self.multiAsrFile, Self.multiWhisperPort)
+            + ["-t", threads, "-l", "auto"]))
     }
     if gate {
       // Detection only (encoder + one step): on the CPU (-ng), ~0.2 s a clip,
       // and one GPU context fewer.
       plan.append(
-        ("whisper-langid", whisper, "townpass_whisper_server", Self.gateWhisperPort,
-         serverArguments(models, Self.gateAsrFile, Self.gateWhisperPort)
-           + ["-t", threads, "-l", "auto", "-ng"]))
+        Server(
+          name: "whisper-langid", library: whisper, symbol: "townpass_whisper_server",
+          port: Self.gateWhisperPort,
+          arguments: serverArguments(models, Self.gateAsrFile, Self.gateWhisperPort)
+            + ["-t", threads, "-l", "auto", "-ng"]))
     }
     if faq {
+      // On the CPU (--device none, 2026-11-10): the backend builds its semantic index
+      // with this server in the first minute after launch, and iOS refuses GPU work
+      // from an App in the background, so locking the phone then could stop it. A
+      // small model: one query is fast on the CPU, and the index is cached after.
       plan.append(
-        ("llama-embedding", llama, "townpass_llama_server", Self.faqEmbedPort,
-         serverArguments(models, Self.faqModelFile, Self.faqEmbedPort)
-           + ["--embedding", "--pooling", "mean", "-c", "512", "-b", "512", "-ub", "512",
-              "-np", "1", "-t", "2", "--no-webui"]))
+        Server(
+          name: "llama-embedding", library: llama, symbol: "townpass_llama_server",
+          port: Self.faqEmbedPort,
+          arguments: serverArguments(models, Self.faqModelFile, Self.faqEmbedPort)
+            + ["--embedding", "--pooling", "mean", "-c", "512", "-b", "512", "-ub", "512",
+               "-np", "1", "-t", "2", "--device", "none", "--no-webui"]))
     }
     let starter = Thread { [self] in
       for server in plan {
         let began = Date()
-        guard
-          runServer(
-            library: server.library, symbol: server.symbol, name: server.name,
-            arguments: server.arguments, restart: server.symbol == "townpass_whisper_server")
-        else { continue }
+        guard runServer(server) else { continue }
         // Ready = model loaded. whisper-server listens only after loading, but
         // llama-server listens at once and answers /health with 503 until its model
         // is loaded; starting the next model before that overlapped their GPU set-up
         // and the App crashed (2026-11-08).
-        let llama = server.symbol == "townpass_llama_server"
+        let llama = server.llama
         func ready() -> Bool { llama ? healthy(server.port) : listening(server.port) }
         while !ready() && Date().timeIntervalSince(began) < 180 {
           Thread.sleep(forTimeInterval: 0.25)
@@ -327,9 +420,11 @@ final class OnDeviceAssistant {
       }
       guard
         runServer(
-          library: whisper, symbol: "townpass_whisper_server", name: "whisper-taiwanese",
-          arguments: serverArguments(models, Self.taiwaneseAsrFile, Self.taiwaneseWhisperPort)
-            + ["-t", whisperThreads, "-l", "zh"], restart: true)
+          Server(
+            name: Self.taiwaneseName, library: whisper, symbol: "townpass_whisper_server",
+            port: Self.taiwaneseWhisperPort,
+            arguments: serverArguments(models, Self.taiwaneseAsrFile, Self.taiwaneseWhisperPort)
+              + ["-t", whisperThreads, "-l", "zh"]))
       else { return "failed" }
       taiwaneseStarted = true
     }
@@ -355,34 +450,41 @@ final class OnDeviceAssistant {
   }
 
   /// Runs a native server's main() on its own thread; false when it could not be opened.
-  private func runServer(
-    library: String, symbol: String, name: String, arguments: [String], restart: Bool
-  ) -> Bool {
-    guard let handle = dlopen(library, RTLD_NOW | RTLD_LOCAL),
-      let address = dlsym(handle, symbol)
+  private func runServer(_ server: Server) -> Bool {
+    let name = server.name
+    guard let handle = dlopen(server.library, RTLD_NOW | RTLD_LOCAL),
+      let address = dlsym(handle, server.symbol)
     else {
       note("cannot open \(name) (\(String(cString: dlerror())))")
       return false
     }
+    serversLock.lock()
+    if !servers.contains(where: { $0.name == name }) { servers.append(server) }
+    serversLock.unlock()
     let main = unsafeBitCast(address, to: ServerMain.self)
-    let argv = ([name] + arguments).map { strdup($0) }
+    let argv = ([name] + server.arguments).map { strdup($0) }
     // When iOS reclaims a suspended App's listening socket, llama-server and
     // whisper-server bind the same port again by themselves, keeping the model
     // loaded (ios/native/llama-server-rebind.patch, whisper-server-ios.patch).
     // Unpatched whisper-server returned from main() instead and reloaded its model
-    // on every resume (Breeze: 1.6 GB); if a server still exits, it is run again
-    // once the App is active. Quick repeated exits stop after five tries.
+    // on every resume (Breeze: 1.6 GB). A server that still exits is run again once
+    // the App is active: every server, the decision model and e5 included (until
+    // 2026-11-10 only whisper-server was, and a stopped decision model stayed down
+    // until the App was killed). Quick repeated exits stop after five tries; the
+    // server is then run again the next time the App comes back (recover()).
     let thread = Thread { [self] in
       var quickExits = 0
       while true {
         let began = Date()
         var pointers: [UnsafeMutablePointer<CChar>?] = argv + [nil]
         let code = main(Int32(argv.count), &pointers)
-        note("\(name) exited with \(code)")
-        guard restart else { return }
+        note("\(name) exited with \(code) (App \(appIsActive() ? "active" : "not active"))")
         quickExits = Date().timeIntervalSince(began) < 10 ? quickExits + 1 : 0
         if quickExits >= 5 {
-          note("\(name) keeps exiting; not restarted")
+          note("\(name) keeps exiting; run again when the App comes back")
+          serversLock.lock()
+          stopped.insert(name)
+          serversLock.unlock()
           return
         }
         while !appIsActive() { Thread.sleep(forTimeInterval: 1) }
