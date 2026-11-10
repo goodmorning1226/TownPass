@@ -78,7 +78,7 @@
 模型有兩種放法，可以混用（大小相符的檔案不會重下）：
 **開發者推**（上表的 push 腳本），或**讓 App 自己下載**——第一次打開助理會問「下載離線助理（約 X GB）」，使用者同意才下載，
 依手機記憶體分級（12 GB 全部、8 GB 台語用 q4_K、7 GB 以下精簡版），說明見 [docs/AI_MODEL_DOWNLOAD.md](docs/AI_MODEL_DOWNLOAD.md)。
-自己轉檔的模型還沒上傳到團隊 Hugging Face，目前測下載要用電腦當鏡像：
+自己轉檔的模型放在 Hugging Face `allensung1226/townpass-assistant-models`，App 直接下載；不想連外時可以用電腦當鏡像：
 `python -X utf8 scripts\serve_assistant_models.py`，再 `run_assistant_on_device.ps1 -ModelBaseUrl http://127.0.0.1:8899`。
 
 兩邊都要先：
@@ -171,5 +171,5 @@ scripts/run_assistant_on_device.sh --chat            # 聊天面板
 - 手機速度（iPhone 17，Metal）：一次決策約 0.9 秒（讀提示 282–505 tok/s，Android 約 50 tok/s）。
 - 台語：只有辨識，朗讀用中文；自動判斷約抓到 7–9 成台語，華語偶爾會多跑一次台語模型（慢 3 秒）。
 - 外語介面與教學文字是 AI 翻譯草稿，待母語者校對。
-- App 內下載模型（branch `feat/model-download`）：電腦上的測試與實際下載都過了，**還沒在手機上走過完整流程**；自己轉檔的模型還沒上傳到團隊 Hugging Face。
+- App 內下載模型（branch `feat/model-download`）：電腦上的測試與實際下載都過了，**還沒在手機上走過完整流程**；全部模型都可以直接下載（自己轉檔的放在 Hugging Face `allensung1226/townpass-assistant-models`）。
 - 待辦：泰文換成菲律賓文、印尼文優化、台語朗讀、iPhone 的 Gemma 與越南文模型、Android Release 未驗證。詳見 `docs/TEAM_TASKS_AFTER_MERGE.md`。

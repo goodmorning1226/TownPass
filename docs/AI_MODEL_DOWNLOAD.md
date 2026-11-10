@@ -87,7 +87,9 @@
 - Python：`assistant_backend/test_models.py`（本機 HTTP 伺服器：續傳、暫停、雜湊值不符、404、空間不足、沒有來源、分級、刪除；沒有決策模型的行為；HTTP 端點；Activator）。
 - Flutter：`test/assistant_model_download_test.dart`（狀態解析、分級預設、輪詢、下載卡片各狀態、引導介面缺模型時顯示下載、按住提問改開下載）。
 - 電腦上實際下載核心 541 MB（本機鏡像）：中途暫停在 314 MB、續傳完成，全部 SHA-256 通過。
-- **還沒做**：Android 實機上走完整流程（刪掉手機上的模型 → 同意 → 下載 → 不重開就能用）；iPhone（Swift 未編譯）；團隊 Hugging Face 還沒上傳，`team_url` 是空的。
+- 2026-11-11：自己轉檔的 7 個檔案上傳到 Hugging Face [`allensung1226/townpass-assistant-models`](https://huggingface.co/allensung1226/townpass-assistant-models)（附授權全文與來源說明），`team_url` 指向它；
+  在電腦上不設鏡像、直接從 Hugging Face 下載核心模型成功（34 秒，SHA-256 全部通過）。
+- **還沒做**：Android 實機上走完整流程（刪掉手機上的模型 → 同意 → 下載 → 不重開就能用）；iPhone（Swift 未編譯）。
 
 Android 實機測試（手機接上後）：
 
@@ -99,8 +101,7 @@ adb -s <id> shell rm -r /sdcard/Android/data/com.example.townpass/files/models  
 
 ## 7. 上線前還要做
 
-1. 在團隊 Hugging Face 開 repo，上傳 e5、FAQ 索引、Breeze q8_0／q4_K、PhoWhisper（附授權與來源說明），
-   再 `python -X utf8 scripts/build_model_manifest.py --team-url https://huggingface.co/<team>/<repo>/resolve/main`。上傳要用擁有者的帳號。
+1. ~~在團隊 Hugging Face 開 repo 並上傳~~（2026-11-11 完成）。換檔案時重新上傳，再 `python -X utf8 scripts/build_model_manifest.py --team-url https://huggingface.co/allensung1226/townpass-assistant-models/resolve/main`。
 2. 和市府討論：是否改由市府伺服器當鏡像（`ASSISTANT_MODEL_BASE_URL`），或改用 Apple Background Assets／Google Play Asset Delivery（要經過商店發布，可在背景下載）。
 3. 用 8 GB 的 iPhone 17 和 12 GB 的手機實測分級門檻與台語 q4_K 是否載得進去。
 4. FAQ 資料更新時重建索引，並重跑 `build_model_manifest.py`；舊索引的手機會因大小或雜湊值不同而重新下載。

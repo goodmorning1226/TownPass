@@ -121,7 +121,7 @@
 - 電腦的口語評估把「未串接功能先查 FAQ」算成沒找到（外語要 App 翻譯，電腦模擬不了）；要的話把 `eval_colloquial.py` 加一類「FAQ 回答」。
 
 ### T14c App 內下載模型上線前（2026-11-10，`docs/AI_MODEL_DOWNLOAD.md` 第 7 節）
-- 在團隊 Hugging Face 開 repo，上傳 e5、FAQ 索引、Breeze q8_0／q4_K、PhoWhisper（附授權與來源），再用 `build_model_manifest.py --team-url` 更新清單。要用擁有者的帳號。
+- ~~上傳自己轉檔的模型到 Hugging Face~~：2026-11-11 完成（`allensung1226/townpass-assistant-models`），清單已指向它。
 - Android 實機走完整流程（刪掉模型 → 同意 → 下載 → 不重開就能用）；iPhone 在 Mac 上編譯 `ensureServer` 並實測。
 - 用 8 GB 的 iPhone 17 量分級門檻與台語 q4_K；和市府討論鏡像或商店的背景下載。
 
