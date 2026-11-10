@@ -69,12 +69,29 @@
 ## 6. 模型與資料
 
 - 全部在手機上跑：決策 Ministral 3B（預設）或 Gemma 4 E2B（`-DecisionModel gemma`）、Whisper small（語音）、Whisper tiny（語言判斷）、Breeze-ASR-26（台語）、PhoWhisper-base（越南文）、e5（檢索）。
-  網路只用來抓資料（圖書館藏、台北通問答）和第一次下載 ML Kit 翻譯檔。
+  網路只用來抓資料（圖書館藏、台北通問答）、第一次下載 ML Kit 翻譯檔，以及使用者同意後下載模型（第 7 節）。
 - Android 和 iPhone 用同一份後端與規則、同一個開關 `--dart-define=ASSISTANT_ON_DEVICE=true`；Android 在 Windows 用 `scripts/run_assistant_on_device.ps1`，
   iPhone 在 Mac 用 `scripts/run_assistant_on_device.sh`（`docs/AI_ON_DEVICE_IOS.md`）。iPhone 目前只有 Ministral，沒有 Gemma 與越南文模型（越南文用 Whisper small）。
 - 不用中國開發的模型與工具；不複製、打包官方 TownPass-Services 的程式或內容。
 
-## 7. 改規則時
+## 7. 模型下載與手機分級（2026-11-10，為整併進台北通準備；`docs/AI_MODEL_DOWNLOAD.md`）
+
+- **模型不包在 App 裡**。第一次打開助理時，如果核心模型還沒下載，先顯示「下載離線助理（約 X GB，建議使用 Wi-Fi）」；**使用者按下載才下載**，不會在背景偷偷下載。
+  下載只在 App 開著時進行，可以暫停、取消、斷線後續傳；每個檔案下載完檢查大小與 SHA-256，不符就刪掉重下，不會載入。
+- **分批**：核心（語言判斷、語音、檢索、FAQ 索引、越南文，約 0.5 GB）下載好助理就能用；決策模型接著下載；台語是選項。
+  開發者用 adb／devicectl 推進去的檔案照樣有效（大小相符就不重下）。
+- **沒有決策模型時**（還在下載，或精簡版）：緊急、指令、關鍵字很有把握直接開頁、FAQ 的規則都不變；
+  原本要問模型的地方一律**列出候選讓使用者選，只有一個也列出來**，不直接開頁；書：唯一確定的書照常開，有搜尋詞就開搜尋結果，其餘請使用者補充；
+  分不出意圖時先查 FAQ，再請使用者補充；教學用該頁的預設步驟。（`decision.rule_decision`、`workflow.no_model`）
+- **依手機總記憶體分級**：10.5 GB 以上全部下載（台語 Breeze q8_0）；7–10.5 GB 台語改用 q4_K（載入前仍檢查可用記憶體）；
+  7 GB 以下只下載核心（精簡版，沒有決策模型），**前提是精簡模式不比完整模式多開錯頁**，否則不顯示助理。
+  2026-11-10 評估：主評估開錯頁 0、開錯服務 0；dev 210 句裡 207 句到得了正確服務（68 句要多按一下）、held-out 105 句裡 92 句；
+  口語四組開錯頁 0／1／0／0（有模型時 1／3／6／5；那 1 題有模型時也一樣），所以精簡版提供。（`docs/AI_MODEL_DOWNLOAD.md` 第 3 節）
+- **下載來源**：Ministral、Whisper、Gemma 從原作者的 Hugging Face；我們自己轉檔或建的檔案（e5、FAQ 索引、Breeze、PhoWhisper）放團隊的 Hugging Face。
+  `ASSISTANT_MODEL_BASE_URL` 可以把全部檔案改成從一個鏡像下載（市府伺服器、或測試用的本機伺服器）。來源沒設定的檔案不提供下載。
+- 下載期間與之後，錄音、文字與使用紀錄一樣不離開手機；下載只送出檔案請求。
+
+## 8. 改規則時
 
 1. 先改這份文件，寫上日期和原因。
 2. 改程式與測試；舊規則的測試要改成新規則，不要刪掉不管。
