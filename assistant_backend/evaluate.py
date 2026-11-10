@@ -58,6 +58,9 @@ def targets(expect):
 REPLY = want("reply")                           # template or clarification
 NONE = want(("reply", "unsupported"))           # any honest answer without navigation
 UNSUPPORTED = want("unsupported")               # catalogued capability that is not connected
+# A disconnected capability the FAQ may answer (owner, 2026-11-09; docs/AI_CURRENT_RULES.md
+# section 2): the FAQ answer first, else the "not connected" reason; never navigate.
+FAQ_OR_UNSUPPORTED = want(("reply", "unsupported"))
 LISTING = want("capability_list", choices=2)
 CONFIRM = want("confirm_candidates", choices=2)
 CONFIRM_ONE = want("confirm_candidates", choices=1)
@@ -172,7 +175,8 @@ CASES = [
     one("from_holdout", "手機條碼載具", cap("invoice")), one("from_holdout", "看最新活動", cap("activities")),
     one("from_holdout", "圖書館的公告", cap("library.notices")), one("from_holdout", "我借了哪些書", cap("library.records")),
     one("from_holdout", "熱門的書有哪些", cap("library.ranking")),
-    one("from_holdout", "可以帶狗去哪裡散步", want("unsupported", target=("petFriendlyMap",))),
+    # Found only by a common word, the sentence asks more: "nothing found" (2026-11-09).
+    one("from_holdout", "可以帶狗去哪裡散步", want(("reply", "unsupported"), target=("petFriendlyMap",))),
     one("from_holdout", "改成英文", cap("language")),  # language page works since 2026-11-07
     one("from_holdout", "查案件", CONFIRM), one("from_holdout", "我的案件辦到哪了", CONFIRM),
     one("from_holdout", "進度查詢", CONFIRM),
@@ -246,7 +250,7 @@ CASES = [
     one("capability", "幫我查繳費項目", cap("fees.search")),
     one("capability", "我的圖書預約清單", cap("library.reservations")),
     one("capability", "我要停用帳號", cap("suspend")),
-    one("unavailable", "幫我掛號", UNSUPPORTED), one("unavailable", "疫苗預約", UNSUPPORTED),
+    one("unavailable", "幫我掛號", UNSUPPORTED), one("unavailable", "疫苗預約", FAQ_OR_UNSUPPORTED),
     one("unavailable", "我要聽廣播", UNSUPPORTED), one("unavailable", "動物園", UNSUPPORTED),
     one("unavailable", "網路投票", UNSUPPORTED), one("capability", "切換英文介面", cap("language")),
     one("unavailable", "我要登出", UNSUPPORTED), one("unavailable", "圖書館地圖", UNSUPPORTED),

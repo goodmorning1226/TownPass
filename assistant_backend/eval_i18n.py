@@ -11,7 +11,7 @@ import sys
 import time
 from collections import Counter
 
-from evaluate import LISTING, NONE, REPLY, UNSUPPORTED, call, cap, judge, outcome, want
+from evaluate import FAQ_OR_UNSUPPORTED, LISTING, NONE, REPLY, call, cap, judge, outcome, want
 
 HOME = want("navigate", [{"kind": "home"}, {"kind": "capability", "id": "library"}])
 
@@ -21,19 +21,21 @@ def offer(capability_id):
     return want(("navigate", "confirm_candidates"), [{"kind": "capability", "id": capability_id}, None],
                 target=(capability_id,))
 
+# Vaccine booking is not connected: the FAQ first (the App translates the request
+# for it, action translate_for_faq), else the "not connected" reason (2026-11-09).
 CASES = {
     "en": [("I want to pay my water bill", cap("fees.water")), ("pay for parking", cap("fees.parking")),
            ("I want to borrow a book", HOME), ("show my borrowing records", cap("library.records")),
-           ("report to the police online", cap("police.online")), ("I want a vaccine appointment", UNSUPPORTED),
+           ("report to the police online", cap("police.online")), ("I want a vaccine appointment", FAQ_OR_UNSUPPORTED),
            ("hello", REPLY), ("what can you do", LISTING), ("I don't want to borrow books", NONE),
            ("tell me a joke", NONE)],
     "ja": [("水道料金を払いたい", cap("fees.water")), ("駐車料金を払いたい", cap("fees.parking")),
            ("本を借りたい", HOME), ("貸出履歴を見たい", cap("library.records")),
-           ("オンライン通報したい", cap("police.online")), ("ワクチンを予約したい", UNSUPPORTED),
+           ("オンライン通報したい", cap("police.online")), ("ワクチンを予約したい", FAQ_OR_UNSUPPORTED),
            ("こんにちは", REPLY), ("何ができますか", LISTING), ("面白い話をして", NONE)],
     "vi": [("Tôi muốn đóng tiền nước", cap("fees.water")), ("Tôi muốn trả phí đỗ xe", cap("fees.parking")),
            ("Tôi muốn mượn sách", HOME), ("Xem lịch sử mượn sách", cap("library.records")),
-           ("Tôi muốn trình báo trực tuyến", cap("police.online")), ("Tôi muốn đặt lịch tiêm vắc-xin", UNSUPPORTED),
+           ("Tôi muốn trình báo trực tuyến", cap("police.online")), ("Tôi muốn đặt lịch tiêm vắc-xin", FAQ_OR_UNSUPPORTED),
            ("Xin chào", REPLY), ("Bạn làm được gì", LISTING), ("Tôi không muốn mượn sách", NONE)],
     # Vietnamese as typed without marks, as heard with regional sounds, and as spoken
     # (docs/AI_VIETNAMESE.md); written for this set, a dev set like the lines above.
@@ -51,11 +53,11 @@ CASES = {
         ("tôi muốn đóng tiền nước, không phải tiền học", cap("fees.water"))],
     "id": [("Saya mau bayar tagihan air", cap("fees.water")), ("Saya mau bayar parkir", cap("fees.parking")),
            ("Saya mau pinjam buku", HOME), ("Lihat riwayat peminjaman", cap("library.records")),
-           ("Saya mau lapor polisi online", cap("police.online")), ("Saya mau janji vaksin", UNSUPPORTED),
+           ("Saya mau lapor polisi online", cap("police.online")), ("Saya mau janji vaksin", FAQ_OR_UNSUPPORTED),
            ("Halo", REPLY), ("Bisa apa saja", LISTING), ("Saya tidak mau pinjam buku", NONE)],
     "th": [("อยากจ่ายค่าน้ำ", cap("fees.water")), ("อยากจ่ายค่าจอดรถ", cap("fees.parking")),
            ("อยากยืมหนังสือ", HOME), ("ดูประวัติการยืม", cap("library.records")),
-           ("อยากแจ้งความออนไลน์", cap("police.online")), ("อยากจองวัคซีน", UNSUPPORTED),
+           ("อยากแจ้งความออนไลน์", cap("police.online")), ("อยากจองวัคซีน", FAQ_OR_UNSUPPORTED),
            ("สวัสดีครับ", REPLY), ("ทำอะไรได้บ้าง", LISTING), ("ไม่อยากยืมหนังสือ", NONE)],
 }
 

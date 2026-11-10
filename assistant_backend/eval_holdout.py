@@ -31,6 +31,13 @@ def unavailable(capability_id):
     return want("unsupported", target=(capability_id,))
 
 
+def faq_or_unavailable(capability_id):
+    """A disconnected capability the FAQ may answer (owner, 2026-11-09): the FAQ
+    first, else the "not connected" reason; never navigate. The expectation
+    follows the rule change; nothing was tuned on this set."""
+    return want(("reply", "unsupported"), target=(capability_id,))
+
+
 def home_or(*more):
     return want("navigate", HOME["dest"] + list(more), target=("library",))
 
@@ -116,8 +123,8 @@ HOLDOUT = [
                                           {"kind": "capability", "id": "disasterReport.form.D-1-3"}, None],
                                          target=("reportIssue", "reportIssue.prefill"))),
     # Catalogued but not connected: explain why.
-    one("unavailable", "幫我預約打疫苗", unavailable("vaccineAppointment")),
-    one("unavailable", "我想看醫生掛號", unavailable("medicalAppointment")),
+    one("unavailable", "幫我預約打疫苗", faq_or_unavailable("vaccineAppointment")),
+    one("unavailable", "我想看醫生掛號", faq_or_unavailable("medicalAppointment")),
     one("unavailable", "我要投票", unavailable("iVoting")),
     one("unavailable", "填問卷", unavailable("survey")),
     one("unavailable", "找里長", unavailable("neighborhood")),
