@@ -9,7 +9,9 @@ import difflib
 import hashlib
 import json
 import os
+import pathlib
 import re
+import tempfile
 import threading
 import time
 import unicodedata
@@ -114,24 +116,73 @@ def normalize(text):
     return re.sub(r"[\s：:，,。.!！?？《》「」\"'·]", "", unicodedata.normalize("NFKC", text)).lower()
 
 
+def catalog_cache():
+    """Where the last verified catalogue is kept on this device (the phone: the App's
+    support folder, LOCALAPPDATA; elsewhere the temporary folder)."""
+    configured = os.environ.get("TOWNPASS_CATALOG_CACHE")
+    if configured:
+        return pathlib.Path(configured)
+    base = os.environ.get("LOCALAPPDATA") or tempfile.gettempdir()
+    return pathlib.Path(base) / "TownPassAssistant" / "library_catalog.json"
+
+
+def _verified(data):
+    canonical = json.dumps(data, sort_keys=True, ensure_ascii=True, separators=(",", ":"))
+    return hashlib.sha256(canonical.encode()).hexdigest() == CATALOG_VERSION
+
+
 class Catalog:
-    def __init__(self):
+    """The demo library catalogue (CATALOG_URL), checked against CATALOG_VERSION and
+    fetched again after 60 s.
+
+    Offline (airplane mode, 2026-11-11) the last copy is kept: the one in memory,
+    else the one saved on this device after the last successful fetch. Without
+    any copy only book requests fail; the workflow carries on without books
+    otherwise (docs/AI_CURRENT_RULES.md section 5). The copy is the downloaded
+    data, not packaged in the App."""
+
+    def __init__(self, fetch=None, cache=None):
         self._data = None
         self._time = 0
         self._lock = threading.Lock()
+        self._fetch = fetch or (lambda: fetch_json(CATALOG_URL))
+        self._cache = cache
+
+    @property
+    def cache(self):
+        return self._cache or catalog_cache()
+
+    def _read_cache(self):
+        try:
+            data = json.loads(self.cache.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            return None
+        return data["data"] if isinstance(data, dict) and _verified(data) else None
+
+    def _write_cache(self, data):
+        try:
+            self.cache.parent.mkdir(parents=True, exist_ok=True)
+            self.cache.write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
+        except OSError:
+            pass
 
     def books(self, force=False):
         with self._lock:
             if force or self._data is None or time.monotonic() - self._time > 60:
                 try:
-                    data = fetch_json(CATALOG_URL)
+                    data = self._fetch()
                 except (OSError, ValueError) as exc:
-                    raise AssistantError("無法載入示範書目，請稍後重試或從原圖書頁面搜尋。") from exc
-                canonical = json.dumps(data, sort_keys=True, ensure_ascii=True, separators=(",", ":"))
-                if hashlib.sha256(canonical.encode()).hexdigest() != CATALOG_VERSION:
+                    if self._data is None:
+                        self._data = self._read_cache()
+                    if self._data is None:
+                        raise AssistantError("無法載入示範書目，請稍後重試或從原圖書頁面搜尋。") from exc
+                    self._time = time.monotonic()  # offline: the kept copy, asked again in 60 s
+                    return self._data
+                if not _verified(data):
                     raise AssistantError("圖書服務資料已更新，請先從原圖書頁面搜尋；助理需要重新核對版本。")
                 self._data = data["data"]
                 self._time = time.monotonic()
+                self._write_cache(data)
             return self._data
 
 

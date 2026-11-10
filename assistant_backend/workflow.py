@@ -166,6 +166,14 @@ class Workflow:
                 "message": message, "destination": None, "choices": [], "data_mode": "demo",
                 "language": payload.get("language", "zh"), **extra}
 
+    def _books_if_any(self):
+        """The book catalogue, or none when it cannot be had (offline with no saved
+        copy, server.Catalog): a request that is not about books carries on."""
+        try:
+            return self.owner.catalog.books()
+        except self.error:
+            return []
+
     @property
     def no_model(self):
         """Whether the decision model is missing (still downloading, or the lite
@@ -802,7 +810,7 @@ class Workflow:
         if not any(m["entry"]["id"] not in ("library",) for m in matches):
             # Unmatched requests also consult the (cached) book catalogue, so a
             # title named without a verb is still recognised.
-            books = self.owner.catalog.books() if (matches or LIBRARY_CUE.search(text) or len(text) >= 3) else []
+            books = self._books_if_any() if (matches or LIBRARY_CUE.search(text) or len(text) >= 3) else []
             if books:
                 context = self.retrieve(text, books)
                 if not context["other"] and context["library_candidate"]:
