@@ -1,0 +1,47 @@
+# Decision-model speed on an ARM64 CPU, without a phone (docs/AI_DECISION_MODEL_ARM_BENCH.md).
+# Runs on pushes to the ci/arm-bench branch only (and by hand); changes nothing in the App.
+name: ARM decision-model speed
+
+on:
+  push:
+    branches: [ci/arm-bench]
+  workflow_dispatch:
+
+jobs:
+  bench:
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: CPU
+        run: lscpu | grep -E "Model name|^CPU\(s\)|Flags" | cut -c1-300
+
+      # llama.cpp b12182 with the App's Android flags (scripts/build_assistant_native.ps1).
+      - name: Build llama-bench and llama-quantize
+        run: |
+          sudo apt-get update -q && sudo apt-get install -yq ninja-build cmake > /dev/null
+          git clone --depth 1 --branch b12182 https://github.com/ggml-org/llama.cpp "$RUNNER_TEMP/llama.cpp"
+          cmake -S "$RUNNER_TEMP/llama.cpp" -B "$RUNNER_TEMP/build" -G Ninja -DCMAKE_BUILD_TYPE=Release \
+            -DBUILD_SHARED_LIBS=OFF -DGGML_NATIVE=OFF -DGGML_OPENMP=OFF -DGGML_LLAMAFILE=OFF \
+            -DGGML_CPU_ARM_ARCH=armv8.6-a+dotprod+i8mm+fp16 -DGGML_CPU_KLEIDIAI=ON \
+            -DLLAMA_OPENSSL=OFF -DLLAMA_BUILD_TESTS=OFF -DLLAMA_CURL=OFF
+          ninja -C "$RUNNER_TEMP/build" llama-bench llama-quantize
+
+      - name: Measure the candidates
+        run: bash scripts/arm_bench_models.sh "$RUNNER_TEMP/build/bin" "$RUNNER_TEMP/models" results.jsonl
+
+      - name: Report
+        if: always()
+        run: |
+          python3 scripts/arm_bench_report.py results.jsonl report.md
+          cat report.md >> "$GITHUB_STEP_SUMMARY"
+          cat report.md
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: arm-bench
+          path: |
+            results.jsonl
+            report.md
