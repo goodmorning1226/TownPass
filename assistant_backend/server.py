@@ -515,19 +515,24 @@ class Assistant:
         started = time.monotonic()
         self.usage.calls, self.usage.timings = [], []
         self.usage.route, self.usage.candidates, self.usage.semantic = None, [], None
+        self.usage.classifier = []  # TOWNPASS_DECISION_BACKEND=classifier decisions (classifier.py)
         result = self.workflow.handle(payload)
         tokens = [count for count in self.usage.calls if count is not None]
         result["metrics"] = {"elapsed_ms": round((time.monotonic() - started) * 1000),
             "model_calls": len(self.usage.calls), "prompt_tokens": sum(tokens) if tokens else None,
             "model": MODEL if self.usage.calls else None, "page_capability": self._page_id(context),
             "route": self.usage.route, "candidates": self.usage.candidates, "semantic": self.usage.semantic,
-            "model_timings": [timing for timing in self.usage.timings if timing]}
+            "model_timings": [timing for timing in self.usage.timings if timing],
+            **({"classifier": self.usage.classifier} if self.usage.classifier else {})}
         if TIMING_LOG:
             # Numbers only (never the request text), for measuring a phone's speed.
             calls = " ".join(f"[prompt {t['prompt_tokens']} tok cached {t['cached_tokens']} {t['prompt_ms']} ms"
                              f" | gen {t['generated_tokens']} tok {t['generate_ms']} ms]"
                              for t in result["metrics"]["model_timings"])
-            print(f"timing turn total={result['metrics']['elapsed_ms']} ms route={self.usage.route} {calls}",
+            # Classifier decisions (classifier.py): how many and how many candidates in total.
+            scored = f" cls {len(self.usage.classifier)} x {sum(len(c['scores']) for c in self.usage.classifier)}" \
+                if self.usage.classifier else ""
+            print(f"timing turn total={result['metrics']['elapsed_ms']} ms route={self.usage.route} {calls}{scored}",
                   flush=True)
         return result
 

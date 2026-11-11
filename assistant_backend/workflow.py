@@ -18,6 +18,7 @@ import threading
 import time
 import uuid
 
+import classifier
 import emergency
 import i18n
 import qna
@@ -157,6 +158,9 @@ class Workflow:
         self.guides = GuidePlanner()
         self.pending = {}
         self.lock = threading.RLock()
+        # TOWNPASS_DECISION_BACKEND=classifier (experiment, docs/AI_DECISION_CLASSIFIER.md):
+        # capability and intent decisions scored by a cross-encoder instead of the LLM.
+        self.classifier = classifier.Classifier(self.registry) if classifier.ENABLED else None
 
     def reply(self, payload, message, **extra):
         from server import CATALOG_VERSION, CONTRACT
@@ -186,6 +190,21 @@ class Workflow:
         if self.no_model:
             self._trace("no_model", [e["id"] for e in entries])
             return "confirm_candidates", {}
+        if self.classifier is not None:
+            extra = []
+            index = getattr(self.owner, "semantic", None)
+            if classifier.EXPAND and not sound and not note and index is not None and index.ready \
+                    and all(e["id"] in self.registry.by_id for e in entries):
+                from server import positive_text
+                extra = [entry for _, entry in index.search(positive_text(text) or text, threshold=-1.0, margin=1.0,
+                                                            limit=classifier.EXPAND_LIMIT)]
+            try:
+                return self.classifier.capability(self.owner, text, entries, confirmation,
+                                                  getattr(self.owner.usage, "language", "zh"), sound, note, extra)
+            except classifier.ClassifierUnavailable:
+                # Never guess: list the candidates (or ask), as without a decision model.
+                self._trace("classifier_unavailable", [e["id"] for e in entries])
+                return "confirm_candidates", {}
         if confirmation:
             tools = [self.tool("confirm_candidates", "Show these candidates and wait for user selection; do not navigate.")]
         else:
@@ -234,8 +253,11 @@ class Workflow:
         view["unique_exact_id"] = context["exact"][0]["id"] if context["exact"] else None
         self._trace("library_model", (["library"] if context["library_candidate"] else [])
                     + [b["id"] for b in context["books"]])
-        name, _ = decide(self.owner, "library", {"original_text": text, "retrieval": view}, tools,
-                         self.validate, self.error)
+        if classifier.ONLY:
+            name = self._library_rule(text, context, tools)
+        else:
+            name, _ = decide(self.owner, "library", {"original_text": text, "retrieval": view}, tools,
+                             self.validate, self.error)
         if name == "open_library" or (name in ("locate_library_book", "open_library_book") and not context["books"]):
             return self.reply(payload, "請在圖書借閱頁搜尋想看的書。這裡使用示範資料。", kind="navigate",
                               action="open_library", destination={"kind": "home"})
@@ -257,6 +279,28 @@ class Workflow:
                 kind="unsupported", action="unsupported")
         return self._faq(payload, text) or self.reply(
             payload, "你想先使用哪個服務？可以描述想做的事，或問「有哪些功能」。", action="request_clarification")
+
+    # Option B (TOWNPASS_DECISION_BACKEND=classifier_only): a borrowed / searched object
+    # that names a kind of book (dev: 幫我借一部童話選集; eval_colloquial_dev: 我欲借冊, Taiwanese
+    # 冊 = book). 證書, 申請書, 說明書 and 手冊 are not books.
+    BOOKISH = re.compile(r"故事|童話|小說|繪本|漫畫|詩集|選集|文集|(?<![證請明])書|(?<!手)冊")
+
+    def _library_rule(self, text, context, tools):
+        """The library decision without a model (docs/AI_DECISION_CLASSIFIER.md section 10),
+        from decision.rule_decision: cancel; a verified book; matching catalogue books;
+        the library home when the evidence is clear and no other service is named; for a
+        weak "borrow/find <object>" only when the object names a kind of book; otherwise a
+        clarification (the caller then tries the FAQ)."""
+        names = [t["function"]["name"] for t in tools]
+        for name in ("cancel", "open_library_book", "locate_library_book"):
+            if name in names:
+                return name
+        if "open_library" in names:
+            if "unsupported" not in names:
+                return "open_library"
+            if self.BOOKISH.search(context.get("action_object") or context.get("query") or ""):
+                return "open_library"
+        return "request_clarification"
 
     @staticmethod
     def _faq_text(entry):
@@ -727,8 +771,9 @@ class Workflow:
         self._trace("capability_model", [e["id"] for e in entries])
         name, args = self._decide(text, entries, ambiguous, payload.get("page_context"))
         if name == "confirm_candidates":
-            return self._offer_services(payload, entries, i18n.t("confirm_capability", language), language,
-                                        keep_choice=self.no_model)
+            # The classifier (classifier.py) may name the pages to list and keep even one as a choice.
+            return self._offer_services(payload, args.get("offer") or entries, i18n.t("confirm_capability", language),
+                                        language, keep_choice=self.no_model or args.get("keep_choice", False))
         if name == "select_capability":
             return self._navigate(payload, self.registry.by_id[args["capability_id"]])
         if language in ("id", "tl") and name == "request_clarification":
@@ -758,6 +803,9 @@ class Workflow:
         (unchanged). When that page has teaching components, the guide stage
         (guide.py) adds which ones to teach, as reply["guide"]. Every path
         that navigates passes here, the other languages included."""
+        usage = getattr(self.owner, "usage", None)
+        if usage is not None:
+            usage.language = payload.get("language", "zh")  # the classifier's candidate texts
         reply = self._handle(payload)
         page = self.guides.page_for(reply.get("destination")) if reply.get("kind") == "navigate" else None
         if page:
@@ -765,14 +813,21 @@ class Workflow:
                 # The guide stage's keywords and question rules are Chinese: the
                 # (sub-)page's whole task, without a model call.
                 plan, route = self.guides.default_plan(page, reply.get("destination")), "guide_default_language"
-            elif self.no_model:
-                # No decision model yet (section 7): the page's whole task as well.
-                plan, route = self.guides.default_plan(page, reply.get("destination")), "guide_default_no_model"
+            elif self.no_model or (classifier.ONLY and classifier.ONLY_GUIDE != "keywords"):
+                # No decision model yet (section 7), or option B (no decision LLM at all,
+                # docs/AI_DECISION_CLASSIFIER.md section 10): the page's whole task as well.
+                plan, route = self.guides.default_plan(page, reply.get("destination")), \
+                    "guide_default_no_model" if self.no_model else "guide_default_classifier_only"
             else:
                 text = payload.get("text", "").strip()
                 from server import positive_text
+
+                def no_model(*args):
+                    # Option B with TOWNPASS_CLASSIFIER_ONLY_GUIDE=keywords: the guide's own
+                    # keyword rules, and where it would ask the model, its keyword fallback.
+                    raise self.error("no decision model (option B)")
                 plan, route = self.guides.plan(self.owner, page, positive_text(text) or text, self.tool,
-                                               self.validate, self.error, decide,
+                                               self.validate, self.error, no_model if classifier.ONLY else decide,
                                                destination=reply.get("destination"))
             self.owner.usage.guide_route = route
             reply["guide"] = plan
@@ -937,8 +992,9 @@ class Workflow:
             self._trace("capability_model", [e["id"] for e in entries])
             name, args = self._decide(text, entries, ambiguous, payload.get("page_context"))
             if name == "confirm_candidates":
-                return self._offer_services(payload, entries, "你想使用哪個功能？請先確認。",
-                                            keep_choice=self.no_model)
+                # The classifier (classifier.py) may name the pages to list and keep even one as a choice.
+                return self._offer_services(payload, args.get("offer") or entries, "你想使用哪個功能？請先確認。",
+                                            keep_choice=self.no_model or args.get("keep_choice", False))
             if name == "select_capability":
                 return self._navigate(payload, self.registry.by_id[args["capability_id"]])
             return self._faq(payload, text) or self.reply(payload, "請補充想使用的服務或操作，也可以問「有哪些功能」。")
@@ -977,7 +1033,13 @@ class Workflow:
         evidence = {"original_text": text, "candidates": [],
                     "note": "No catalogue service matched. Decide what kind of message this is."}
         self._trace("intent_model")
-        name, _ = decide(self.owner, "capability", evidence, tools, self.validate, self.error)
+        if self.classifier is not None:
+            try:
+                name = self.classifier.intent(self.owner, text)
+            except classifier.ClassifierUnavailable:
+                name = "request_clarification"
+        else:
+            name, _ = decide(self.owner, "capability", evidence, tools, self.validate, self.error)
         language = payload.get("language", "zh")
         if name == "list_capabilities":
             self._trace("intent_listing")
