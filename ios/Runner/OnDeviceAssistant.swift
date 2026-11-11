@@ -11,6 +11,8 @@ import os
 ///  - whisper.cpp whisper-server (Whisper small, multilingual) 127.0.0.1:8773
 ///  - whisper-server (Whisper tiny, language detection only)   127.0.0.1:8775, optional
 ///  - llama-server --embedding (multilingual-e5-small)         127.0.0.1:8774, optional
+///  - llama-server --reranking (decision classifier)           127.0.0.1:8778, instead of
+///    the decision model in builds with ASSISTANT_DECISION_MODEL=classifier (option B')
 ///  - Python backend (device_main.py, embedded CPython 3.13)   127.0.0.1:8765 and :8770
 ///
 /// iOS cannot start child processes, so each native server's main() runs on its
@@ -33,6 +35,11 @@ final class OnDeviceAssistant {
   /// Breeze-ASR-26 q8_0 (Taiwanese speech -> Mandarin characters), loaded on the
   /// first Taiwanese clip (docs/AI_TAIWANESE_SPEECH_PLAN.md), as on Android.
   static let taiwaneseAsrFile = "ggml-whisper-taiwanese.bin"
+  /// Option B' (docs/AI_DECISION_CLASSIFIER.md section 12, opt-in with
+  /// --dart-define=ASSISTANT_DECISION_MODEL=classifier): no decision model at all; this
+  /// cross-encoder (fine-tuned from Microsoft multilingual-e5-small, MIT, 132 MB) scores
+  /// the candidate pages. Same file and port as Android's OnDeviceAssistant.kt.
+  static let classifierModelFile = "townpass-decision-e5-ce-v1-q8_0.gguf"
 
   private static let assistantPort = 8765
   private static let asrPort = 8770
@@ -41,6 +48,7 @@ final class OnDeviceAssistant {
   private static let faqEmbedPort = 8774
   private static let gateWhisperPort = 8775
   private static let taiwaneseWhisperPort = 8776
+  private static let classifierPort = 8778  // device_main.PORTS["classifier"]
   private static let taiwaneseName = "whisper-taiwanese"
 
   private let lock = NSLock()
@@ -90,8 +98,11 @@ final class OnDeviceAssistant {
       guard let self else { return }
       switch call.method {
       case "start":
+        // The build's ASSISTANT_DECISION_MODEL, sent by lib/service/assistant_on_device.dart.
+        let arguments = call.arguments as? [String: Any]
+        let decisionModel = arguments?["decision_model"] as? String ?? "ministral"
         DispatchQueue.global(qos: .userInitiated).async {
-          let info = self.start()
+          let info = self.start(decisionModel: decisionModel)
           DispatchQueue.main.async { result(info) }
         }
       case "status":
@@ -162,17 +173,19 @@ final class OnDeviceAssistant {
   /// Starts everything once; returns what was started (or why not), numbers and
   /// file names only. The models load behind the listening Python servers:
   /// requests get the usual "not ready yet" replies until they answer.
-  func start() -> String {
+  /// decisionModel: "ministral" (default) or "classifier" (option B': no decision
+  /// model, the decision classifier instead); anything else counts as "ministral".
+  func start(decisionModel: String = "ministral") -> String {
     lock.lock()
     defer { lock.unlock() }
     if let state { return state }
-    let info = launch()
+    let info = launch(classifierMode: decisionModel == "classifier")
     state = info
     note(info)
     return info
   }
 
-  private func launch() -> String {
+  private func launch(classifierMode: Bool) -> String {
     let fileManager = FileManager.default
     guard
       let documents = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first,
@@ -237,7 +250,7 @@ final class OnDeviceAssistant {
         // (startTaiwanese); without it Taiwanese clips are heard as Chinese, with a notice.
         "taiwanese_port=\(multilingual ? String(Self.taiwaneseWhisperPort) : "None")",
         "taiwanese_starter=device_main.native_starter(\(UInt(bitPattern: unsafeBitCast(taiwaneseStarter, to: Int.self))))",
-        "decision_model='ministral'",
+        "decision_model=\(classifierMode ? "'classifier'" : "'ministral'")",
         // Model downloads (models.py): where they go, the phone's total memory for
         // the tier, and how Python asks for a server once its file has arrived.
         "models_dir=\(pythonString(models.path))",
@@ -288,12 +301,32 @@ final class OnDeviceAssistant {
         + ["--embedding", "--pooling", "mean", "-c", "512", "-b", "512", "-ub", "512",
            "-np", "1", "-t", "2", "--device", "none", "--no-webui"],
       file: Self.faqModelFile)
+    // Option B': the decision classifier instead of the decision model, on the CPU like
+    // e5 (a small model; one GPU context fewer). Four 512-token slots score a decision's
+    // (request, page) pairs together. --pooling rank: the GGUF does not say its pooling.
+    let classifier = Server(
+      name: "llama-classifier", library: llama, symbol: "townpass_llama_server",
+      port: Self.classifierPort,
+      arguments: serverArguments(models, Self.classifierModelFile, Self.classifierPort)
+        + ["--reranking", "--pooling", "rank", "-c", "2048", "-np", "4", "-b", "512", "-ub", "512",
+           "-t", "2", "--device", "none", "--no-webui"],
+      file: Self.classifierModelFile)
     serversLock.lock()
-    planned = ["decision": decision, "multilingual": multi, "gate": langid, "embedding": embedding]
+    // One decision server per build: ensureServer("decision") fails in classifier mode.
+    planned = ["multilingual": multi, "gate": langid, "embedding": embedding]
+    if classifierMode {
+      planned["classifier"] = classifier
+    } else {
+      planned["decision"] = decision
+    }
     serversLock.unlock()
     // The ones whose files are here now; the others start once downloaded (ensureServer).
     var plan: [Server] = []
-    if has(Self.modelFile) { plan.append(decision) }
+    if classifierMode {
+      if has(Self.classifierModelFile) { plan.append(classifier) }
+    } else if has(Self.modelFile) {
+      plan.append(decision)
+    }
     if multilingual { plan.append(multi) }
     if gate { plan.append(langid) }
     if faq { plan.append(embedding) }
@@ -460,7 +493,8 @@ final class OnDeviceAssistant {
 
   /// Starts a start-up server whose model file arrived after launch: the App downloads
   /// the models (docs/AI_MODEL_DOWNLOAD.md) and device_main.Activator calls this through
-  /// serverStarter with "decision", "multilingual", "gate" or "embedding", on a backend
+  /// serverStarter with "decision", "multilingual", "gate", "embedding" or "classifier"
+  /// (option B' builds only), on a backend
   /// thread. Waits until the model has loaded. Returns "ready" (also when it already
   /// runs), "missing" (no file), "memory" (not enough free memory now; Python tries
   /// again with the next file or launch) or "failed", like Android's ensureServer.
@@ -619,7 +653,7 @@ private let taiwaneseStarter: @convention(c) () -> UnsafeMutablePointer<CChar>? 
 
 /// The C function the backend calls to start a server once its model file has been
 /// downloaded (device_main.native_server_starter -> OnDeviceAssistant.ensureServer).
-/// The name is "decision", "multilingual", "gate" or "embedding"; ctypes copies the
+/// The name is "decision", "multilingual", "gate", "embedding" or "classifier"; ctypes copies the
 /// returned text (a few bytes per downloaded file are not freed).
 private let serverStarter: @convention(c) (UnsafePointer<CChar>?) -> UnsafeMutablePointer<CChar>? = { name in
   strdup(OnDeviceAssistant.shared.ensureServer(name.map { String(cString: $0) } ?? ""))

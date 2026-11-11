@@ -46,6 +46,37 @@ void main() {
     expect(calls, ['start']);
   });
 
+  test("the build's decision model goes to the native side", () async {
+    final arguments = <Object?>[];
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(channel, (call) async {
+          arguments.add(call.arguments);
+          return 'started python :8765';
+        });
+    // Tests run without --dart-define=ASSISTANT_DECISION_MODEL: the default.
+    expect(AssistantOnDevice.decisionModelDefine, 'ministral');
+    await AssistantOnDevice.start(isIOS: true, build: true, channel: channel);
+    AssistantOnDevice.reset();
+    await AssistantOnDevice.start(
+      isIOS: true,
+      build: true,
+      channel: channel,
+      model: 'classifier',
+    );
+    AssistantOnDevice.reset();
+    await AssistantOnDevice.start(
+      isIOS: true,
+      build: true,
+      channel: channel,
+      model: 'unknown',
+    );
+    expect(arguments, [
+      {'decision_model': 'ministral'},
+      {'decision_model': 'classifier'},
+      {'decision_model': 'ministral'},
+    ]);
+  });
+
   test('a native failure is reported, not thrown', () async {
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(

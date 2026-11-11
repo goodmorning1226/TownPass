@@ -253,7 +253,9 @@ class Workflow:
         view["unique_exact_id"] = context["exact"][0]["id"] if context["exact"] else None
         self._trace("library_model", (["library"] if context["library_candidate"] else [])
                     + [b["id"] for b in context["books"]])
-        if classifier.ONLY:
+        if classifier.ONLY and not self.no_model:
+            # Option B (no decision LLM). Without the classifier on the phone yet the
+            # no-model rules apply (decision.rule_decision, rules section 7), as in every mode.
             name = self._library_rule(text, context, tools)
         else:
             name, _ = decide(self.owner, "library", {"original_text": text, "retrieval": view}, tools,
@@ -1033,7 +1035,7 @@ class Workflow:
         evidence = {"original_text": text, "candidates": [],
                     "note": "No catalogue service matched. Decide what kind of message this is."}
         self._trace("intent_model")
-        if self.classifier is not None:
+        if self.classifier is not None and not self.no_model:
             try:
                 name = self.classifier.intent(self.owner, text)
             except classifier.ClassifierUnavailable:

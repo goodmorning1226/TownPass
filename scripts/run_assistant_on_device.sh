@@ -12,7 +12,10 @@
 #                     (models-dir as there); the App must be installed first, the
 #                     models go into its Documents folder. Needed once, or when a
 #                     model changes.
-#   --decision-model  ministral only on iOS for now (Gemma runs on Android)
+#   --decision-model  ministral (default) or classifier: no decision model at all,
+#                     the 132 MB decision classifier instead (option B', opt-in,
+#                     docs/AI_DECISION_CLASSIFIER.md section 12; not yet built on a Mac).
+#                     Gemma runs on Android only.
 #
 # Always a release build: a debug App on an iPhone does not start again from the
 # home screen without the debugger. The phone must be unlocked.
@@ -31,7 +34,7 @@ while [ $# -gt 0 ]; do
       if [ $# -gt 1 ] && [ "${2#--}" = "$2" ]; then MODELS="$2"; shift; fi
       shift ;;
     --decision-model) DECISION="${2:?--decision-model needs a name}"; shift 2 ;;
-    -h|--help) sed -n '2,19p' "$0"; exit 0 ;;
+    -h|--help) sed -n '2,22p' "$0"; exit 0 ;;
     *) echo "unknown option: $1 (see --help)" >&2; exit 2 ;;
   esac
 done
@@ -40,8 +43,8 @@ if [ "$(uname)" != "Darwin" ]; then
   echo "An iPhone build needs a Mac with Xcode. Android: scripts/run_assistant_on_device.ps1" >&2
   exit 1
 fi
-if [ "$DECISION" != "ministral" ]; then
-  echo "iOS runs Ministral 3B only for now; Gemma: run_assistant_on_device.ps1 -DecisionModel gemma (Android)" >&2
+if [ "$DECISION" != "ministral" ] && [ "$DECISION" != "classifier" ]; then
+  echo "iOS runs Ministral 3B or the classifier (--decision-model classifier); Gemma: run_assistant_on_device.ps1 -DecisionModel gemma (Android)" >&2
   exit 1
 fi
 for name in Python LlamaServer WhisperServer; do

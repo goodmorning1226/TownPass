@@ -1,8 +1,9 @@
 # 決策分類器實驗（Route 1：cross-encoder 取代決策 LLM）
 
-日期：2026-11-11～12。分支 `exp/decision-classifier`（worktree `D:\github\TownPass-cls`，基於 `00a8733`），**全部未提交**。
+日期：2026-11-11～12。分支 `exp/decision-classifier`（worktree `D:\github\TownPass-cls`，基於 `00a8733`，commit `94bdc10`）。
+**2026-11-12 起選項 B′ 是 App 的選項**（`-DecisionModel classifier`，分支 `feat/classifier-decision`，第 12 節），規則寫進 `AI_CURRENT_RULES.md` 第 6–7 節；下面第 1–11 節是電腦實驗的紀錄。
 資料、模型、紀錄在 repo 外：`D:\TownPassAssistant\decision-classifier\`；訓練環境 `D:\TownPassAssistant\train-venv`。
-預設行為完全不變；只有 `TOWNPASS_DECISION_BACKEND=classifier` 才啟用，所以 `AI_CURRENT_RULES.md` 沒有改。
+預設行為完全不變；只有 `TOWNPASS_DECISION_BACKEND=classifier`（或 App 的 `ASSISTANT_DECISION_MODEL=classifier`）才啟用。
 
 ## 1. 結論
 
@@ -331,3 +332,140 @@ v3 的修正來自兩句 dev：「有沒有比較多人借的書」原本開到�
   - `data\`、`models\`、`results\`、`logs\`、`cache\`（語意索引與圖書館藏副本）。
 - 重跑評估：先開 e5 :8973 與分類器 :8972，再 `bash scripts/run_eval.sh <名稱> TOWNPASS_DECISION_BACKEND=classifier`，最後 `python -X utf8 scripts/summarize.py <名稱>`。
 - 復原：刪除 `classifier.py`、`test_classifier.py`、本文件，再 `git checkout assistant_backend/workflow.py assistant_backend/server.py`。
+
+## 12. App 選項：選項 B′ 給手機實測（2026-11-12，分支 `feat/classifier-decision`）
+
+擁有者同意把選項 B′ 做成 App 的選項。預設不變（Ministral）；規則寫在 `AI_CURRENT_RULES.md` 第 6–7 節。
+分支從 `feat/assistant-languages`（`da2f8a5`：main、模型下載、iOS 回復、第一句就緒、印尼文＋菲律賓文）開出，`git merge --no-commit exp/decision-classifier`（`94bdc10`）沒有衝突；
+`workflow.py` 裡語言規則（印尼文、菲律賓文「模型只回請補充就列出」）和分類器的掛勾都在，逐段看過。
+
+### 12.1 怎麼開
+
+| 平台 | 指令 |
+| --- | --- |
+| Android（Windows） | `.\scripts\run_assistant_on_device.ps1 -DecisionModel classifier [-ModelBaseUrl http://127.0.0.1:8899]` |
+| iPhone（Mac） | `scripts/run_assistant_on_device.sh --decision-model classifier`（**還沒在 Mac 上編譯過**） |
+| 直接建置 | `--dart-define=ASSISTANT_DECISION_MODEL=classifier`（Android 的 Gradle 也接受 `TOWNPASS_DECISION_MODEL=classifier`） |
+
+`device_main.configure(decision_model="classifier")` 在匯入後端之前設定：`TOWNPASS_DECISION_BACKEND=classifier_only`、`TOWNPASS_CLASSIFIER_ONLY_GUIDE=keywords`、
+`TOWNPASS_CLASSIFIER_URL=http://127.0.0.1:8778`、`TOWNPASS_CLASSIFIER_WAIT=75`（剛開 App 時等分類器載好，同決策模型的 75 秒）。
+
+### 12.2 改了什麼
+
+- **下載**：`models.json` 多一筆 `classifier`（decision 批次、`decision_model: classifier`、Android＋iOS、132,441,120 bytes、SHA-256 `ae1745a7…6e22f`、
+  路徑 `decision/townpass-decision-e5-ce-v1-q8_0.gguf`，從 `team_url`）。**沒有上傳** Hugging Face；測試用本機鏡像或 `push_assistant_models.ps1 -DecisionModel classifier`。
+- **分級**：分類器模式的 decision 批次每個等級都下載（`models.EVERY_TIER`），lite 手機也有，所以 `assistant` 是 `full`；其他模式不變。
+- **原生伺服器**：port 8778，`llama-server --reranking --pooling rank -c 2048 -np 4 -b 512 -ub 512 -t 2`（四個 512-token slot 一起打分；兩個執行緒，同 e5）。
+  Android 在前景 CPU 群組啟動（同其他伺服器），`ensureServer("classifier")` 下載後啟動並等 `/health`；這個模式不啟動決策模型（手機上有 Ministral 檔案也不啟動），
+  `ensureServer("decision")` 回 `failed`。iOS 同樣的 `Server` 清單項目（CPU、`--device none`，同 e5），`planned`／`ensureServer`／`memoryAllows`／`recover` 走同一套；
+  決策模型的值由 Dart 在 `start` 時傳給原生端（`AssistantOnDevice.decisionModel`）。
+- **就緒**：`/health` 的 `ready.decision` 在這個模式問分類器的 `/health`，不等決策 LLM；分類器還沒下載時是 `null`（沒有東西要等）。
+  暖機不送決策提示，改送一次分類器打分（使用者先問就不做）。
+- **還沒下載完時**：跟沒有決策模型一樣（規則第 7 節）：圖書走 `decision.rule_decision`、意圖也不問分類器，只有一個也列出來。
+- **App 介面**：下載卡片顯示的大小來自後端（分類器模式在 8 GB 手機上是核心＋126 MB）；「精簡版」說明改看 `assistant == lite`，所以 lite 手機有分類器時不顯示。沒有新文字。
+- `/health` 的 `model` 是 `townpass-decision-e5-ce-v1-q8_0`。
+
+### 12.3 電腦評估（2026-11-12，同一台電腦、一次只跑一組，自己的 port 8981–8983）
+
+工具：`D:\TownPassAssistant\classifier-app\run_eval.py`（改自第 10 節的 run_setup.py）、`summarize.py`；結果在 `D:\TownPassAssistant\classifier-app\results\`。
+e5 用 `build-host-b12182` 的 llama-server（CPU）；分類器同上、`-t 4`；決策 LLM 是 Ollama `ministral-3:3b`（:11434）。每組先把程式複製一份快照再跑。
+
+- (a0) `feat/assistant-languages`（`da2f8a5`）原樣，預設 Ministral。
+- (a) 本分支，預設 Ministral（沒有任何開關）。
+- (b) 本分支，`classifier_only`＋`keywords`（選項 B′，App 的分類器模式）。
+
+**evaluate.py**（通過案例；答對輪數／要多按一下／沒開頁／**開錯**）
+
+| 集合 | (a0) | (a) | (b) | 第 10 節 (3′)（舊基底 `00a8733`） |
+| --- | --- | --- | --- | --- |
+| dev（190 案例，210 輪） | 188；208／33／2／**0** | 188；208／33／2／**0** | 186；206／36／4／**0** | 186；206／36／4／**0** |
+| held-out（102 案例，105 輪，只報告） | 97；100／10／4＋上層 1／**0** | 97；100／10／4＋1／**0** | 93；96／11／8＋1／**0** | 93；96／11／8＋1／**0** |
+
+**多語**（eval_i18n.py，本分支 96 句，含印尼文、菲律賓文；舊基底 66 句）：三組有、無 `--send-language` 都是 96/96，開錯 0。
+
+**口語集**（答對／列出要多按一下／沒找到／**開錯**）
+
+| 集合 | (a0) | (a) | (b) | 第 10 節 (3′) |
+| --- | --- | --- | --- | --- |
+| 中文口語（100，held-out） | 58／15／26／**1** | 58／15／26／**1** | 53／21／26／**0** | 48／23／29／**0** |
+| 外語 held-out（125；泰文已換成菲律賓文） | 78／16／27／**4** | 78／16／27／**4** | 80／18／25／**2** | 71／21／32／**1** |
+| 口語 dev（186） | 102／19／59／**6** | 102／19／59／**6** | 115／33／38／**0** | 115／34／37／**0** |
+| 報告 held-out（80） | 22／25／28／**5** | 22／25／28／**5** | 19／38／22／**1** | 19／40／20／**1** |
+| 開錯合計 | **16** | **16** | **3** | **2** |
+
+- (a) 和 (a0) 每一題的結果都相同（開錯的 16 題逐題一樣）：預設模式沒有被這次改動影響。
+  任務說明裡 `feat/assistant-languages` 的 1／3／6／4 是更早一次 Ollama 的結果；同一天同一台電腦重跑 (a0) 是 1／4／6／5，Ollama 本來就有一兩題的浮動（第 10 節也看到）。
+- (b) 的 3 個開錯頁：
+  - 「hồ sơ em nộp hôm trước giờ xử lý tới đâu rồi」→ 基本資料：越南文關鍵字規則直接開的，沒經過決策；(a0)、(a) 也一樣。
+  - 「Anong mga services ang meron dito sa TownPass?」→ 服務總覽（應列出功能）：菲律賓文是本分支才有的語言，舊基底的評估沒有這題；(a0)、(a) 也開錯。這是 held-out 題，**沒有拿它調整**。
+  - 「上個月水費我到底繳了沒有，哪裡查得到」→ 水費（應為帳務紀錄）：第 10 節就有；(a0)、(a) 也開錯。
+- (b) 比第 10 節多答對的（中文口語 53 對 48、外語 80 對 71）來自本分支的語言規則與 FAQ 用詞補充，不是分類器改了。
+
+**教學**（eval_guides `--end-to-end`；頁面正確、教學步驟正確、頁面對時的教學步驟正確、決策模型呼叫）
+
+| 集合 | (a0)／(a) | (b) |
+| --- | --- | --- |
+| dev（184） | 106、102、102/106、177 次 | 104、99、99/104、0 次 |
+| held-out（102，只報告） | 46、36、36/46、106 次 | 47、32、32/47、0 次 |
+
+**每輪手機秒數估計**（方法同第 10 節：LLM 用手機實測的讀提示／生成速度換算；分類器**假設**每個候選 0.10 s，手機沒量過）
+
+| 集合 | (a) 決策 LLM 呼叫／輪、秒／輪 | (b) 分類器決策／輪、秒／輪 |
+| --- | --- | --- |
+| dev | 0.72、7.2 s | 0.53、0.14 s |
+| held-out | 0.87、9.0 s | 0.61、0.17 s |
+| 中文口語 | 0.91、8.6 s | 0.88、0.19 s |
+| 外語 held-out | 0.82、7.2 s | 0.80、0.19 s |
+| 口語 dev | 0.56、5.9 s | 0.38、0.12 s |
+| 報告 held-out | 0.86、8.2 s | 0.71、0.18 s |
+
+(a) 的秒數比第 10 節 (1) 高，是因為 Ollama 的 token 數不含提示快取（第 10 節已說明 Ollama 的秒數偏高），這裡只看量級。
+
+### 12.4 Android 模擬器（2026-11-12；實機這次不在，沒有測）
+
+AVD `TownPass_API_35`（x86_64、8 GB → `standard` 等級），`run_assistant_on_device.ps1 -DeviceId emulator-5554 -DecisionModel classifier -ModelBaseUrl http://127.0.0.1:8989`，
+鏡像是 `serve_assistant_models.py --port 8989`。模擬器上原本就有核心模型與 Ministral（之前推的），沒有分類器。
+
+- 啟動：`classifier :8778 … models standard tier, classifier not downloaded`；**沒有啟動 Ministral**（檔案在也不啟動）。
+- 助理面板顯示「理解模型下載中」橫幅，按「繼續下載」→ 從鏡像下載分類器（126 MB）、SHA-256 通過 → `classifier started after download: ready in 4345 ms`，不用重開 App。
+- 第一句（英文建議句「Pay my water bill」，介面操作）：直接開水費頁，整輪 341 ms（分類器 1 次、3 個候選）。
+- 冷啟動後立刻送第一句「我要繳停車費」：後端等分類器載好再決定，開停車費頁，整輪 4.5 s（其中等分類器 4.4 s）；之後 `/health` 是 `ready: {decision: true, speech: true}`。
+  沒有使用者請求時的暖機：`timing warm-up speech=ok 7.8s decision=skipped classifier=ok 7.9s`。
+- 打字請求（經 `adb forward` 送到 App 自己的後端，和 App 同一個 HTTP 介面；模擬器同時在跑電腦評估，數字只供參考）：
+
+  | 請求 | 結果 | 後端時間 | 分類器 |
+  | --- | --- | --- | --- |
+  | 我要繳水費 | 開水費 | 1.27 s | 關鍵字 647 ms |
+  | 我想借書 | 開圖書首頁（規則） | 1.13 s | — |
+  | 幫我查停車費 | 開停車費 | 1.27 s | 756 ms |
+  | 垃圾車幾點來 | 沒找到（請換說法／1999） | 4.74 s | 語意 266 ms＋意圖 676 ms |
+  | 我要申請育兒津貼 | 列出 FAQ 問題 | 3.14 s | 679 ms |
+  | 有哪些功能／你好 | 列出功能／打招呼（規則） | < 0.01 s | — |
+  | 借龜兔賽跑 | 請使用者補充（選項 B 已知的損失，第 10 節） | 2.05 s | — |
+  | I want to pay my parking fee | 開停車費 | 0.48 s | 269 ms |
+  | where can I see my library loans | 開借閱紀錄 | 1.89 s | 1,611 ms |
+  | 水道料金を払いたい | 開水費 | 0.27 s | 145 ms |
+  | saya mau bayar tagihan air | 開水費（印尼文規則） | 2.38 s | — |
+  | gusto kong magbayad ng parking | 開停車費（菲律賓文規則） | 0.31 s | — |
+
+- 記憶體（模擬器 RSS）：分類器 llama-server 約 251 MB、e5 約 249 MB；沒有 2 GB 的決策模型。
+- 模擬器是 x86_64、和電腦評估搶 CPU，分類器每次 0.15–1.6 s，**不能代表手機**；手機的每輪時間要在實機上看 `timing turn … cls N x M` 那行。
+
+### 12.5 測試
+
+- Python：`assistant_backend/test_classifier_app.py`（12 項：port 與伺服器名稱、configure、清單、三個等級＋兩個平台、其他模式不變、lite 下載分類器、
+  Activator 啟動 `classifier` 不預熱 LLM、分類器載入中會等／不等、就緒問分類器、暖機只打分一次、沒下載時不用分類器）；全部 440 項通過（1 項跳過）。
+- Flutter：`test/assistant_on_device_test.dart`（決策模型的值傳給原生端）、`test/assistant_model_download_test.dart`（lite＋分類器下載核心＋分類器、卡片大小、不顯示精簡版）；全部 602 項通過。
+- `flutter analyze`：只有原本上游的 7 個 warning；`flutter build apk --debug`（模擬器 x86_64、分類器模式）成功。
+
+### 12.6 還沒驗證
+
+- **iPhone**：Swift 沒有編譯過（這台是 Windows），要在 Mac 上 `run_assistant_on_device.sh --decision-model classifier` 建置並實測。
+- **實機**：手機上的每次決策時間與記憶體（ARM，`-t 2`）、長時間使用、語音。
+- **Hugging Face**：分類器沒有上傳；要擁有者同意後上傳到 `allensung1226/townpass-assistant-models` 的 `decision/townpass-decision-e5-ce-v1-q8_0.gguf`，清單已經寫好。
+
+### 12.7 復原
+
+- 不用分類器：照常建置（`-DecisionModel ministral` 或不給），什麼都不變。
+- 拿掉整個選項：不要合併 `feat/classifier-decision`（還沒提交）；或在該 worktree `git merge --abort`（取消合併並還原已暫存的部分），再 `git checkout -- .` 並刪除 `assistant_backend/test_classifier_app.py`。
+- 手機上刪掉分類器：App 的「刪除模型」，或 `adb shell rm /sdcard/Android/data/com.example.townpass/files/models/townpass-decision-e5-ce-v1-q8_0.gguf`。

@@ -21,11 +21,13 @@ import uuid
 import sys
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
+import classifier  # noqa: E402  (TOWNPASS_DECISION_BACKEND: the decision classifier, opt-in)
 import decision  # noqa: E402  (TOWNPASS_DECISION_MODEL: Ministral by default, or Gemma)
 
 # Ollama tag and the reported model name; llama-server (the phone) serves the file
-# OnDeviceAssistant.kt loaded for the same TOWNPASS_DECISION_MODEL.
-MODEL = "gemma4:e2b" if decision.GEMMA else "ministral-3:3b"
+# OnDeviceAssistant.kt loaded for the same TOWNPASS_DECISION_MODEL. With no decision
+# model at all (classifier_only, option B'), the classifier's name.
+MODEL = classifier.MODEL_NAME if classifier.ONLY else "gemma4:e2b" if decision.GEMMA else "ministral-3:3b"
 CATALOG_URL = "https://taipei-pass-service.vercel.app/mock/library/library_book_list.json"
 CATALOG_VERSION = "570531a9244c3dba1e1f09907468ca55875ccc4b1af6fe1e5115cfdb2252f4ac"
 CONTRACT = 3  # 3: optional request "context" (page/last action hint)
@@ -74,10 +76,11 @@ def _answers(url, timeout=0.5):
 def readiness(assistant):
     """What the App shows while models load (AssistantReadiness): the decision model
     (None: none on this phone, or Ollama on the computer) and speech (None: no
-    speech service). True once each answers."""
+    speech service). True once each answers. In classifier_only mode (option B')
+    "decision" is the classifier's llama-server: there is no decision LLM to wait for."""
     decision = None
     if MODEL_API == "openai" and assistant.model_available:
-        decision = _answers(MODEL_URL + "/health")[0]
+        decision = _answers((classifier.URL if classifier.ONLY else MODEL_URL) + "/health")[0]
     speech = None
     asr = os.environ.get("TOWNPASS_ASR_URL")
     if asr and asr.endswith("/v1/transcribe"):

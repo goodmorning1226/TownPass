@@ -6,6 +6,11 @@ scripts/push_assistant_models.ps1 pushes. Files from the original authors keep
 their Hugging Face URL (their size and SHA-256 matched those listings on
 2026-11-10); our own conversions and the FAQ index have only a path, served
 from the manifest's team_url (or TOWNPASS_MODEL_BASE_URL on the phone).
+The decision classifier (id "classifier", ASSISTANT_DECISION_MODEL=classifier,
+docs/AI_DECISION_CLASSIFIER.md) is one of ours too: it is offered from team_url only
+once the owner has uploaded it there; until then test it with a local mirror
+(scripts/serve_assistant_models.py) or push it with push_assistant_models.ps1
+-DecisionModel classifier.
 
   python -X utf8 scripts/build_model_manifest.py [--team-url https://huggingface.co/<team>/<repo>/resolve/main]
 """
@@ -49,6 +54,14 @@ FILES = [
      r"D:\TownPassAssistant\model-study\dl-gemma4-e2b-q4_0\gemma-4-E2B-it-Q4_0.gguf", "decision/gemma-4-E2B-it-Q4_0.gguf",
      f"{HF}/ggml-org/gemma-4-E2B-it-GGUF/resolve/main/gemma-4-E2B-it-Q4_0.gguf",
      {"server": "decision", "decision_model": "gemma", "platforms": ["android"], "license": "Gemma Terms of Use (Google)"}),
+    # Option B' (docs/AI_DECISION_CLASSIFIER.md sections 10-12): the decision classifier
+    # replaces the decision model (ASSISTANT_DECISION_MODEL=classifier); 132 MB, so
+    # every tier gets it (models.Downloads.parts_for_phone).
+    ("classifier", "townpass-decision-e5-ce-v1-q8_0.gguf", "decision",
+     r"D:\TownPassAssistant\decision-classifier\models\townpass-decision-e5-ce-v1-q8_0.gguf",
+     "decision/townpass-decision-e5-ce-v1-q8_0.gguf", None,
+     {"server": "classifier", "decision_model": "classifier", "platforms": ["android", "ios"],
+      "license": "MIT (cross-encoder fine-tuned by this project from Microsoft multilingual-e5-small; GGUF q8_0)"}),
     ("taiwanese", "ggml-whisper-taiwanese.bin", "taiwanese", rf"{MODELS}\taiwanese\ggml-breeze-asr-26-q8_0.bin",
      "taiwanese/ggml-breeze-asr-26-q8_0.bin", None,
      {"tiers": ["full"], "license": "Apache-2.0 (MediaTek Research Breeze-ASR-26; ggml q8_0 by this project)"}),

@@ -30,11 +30,17 @@ when no model is loaded).
 Off by default; with the switch unset nothing here runs. When the classifier
 server does not answer, the decision falls back to decision.rule_decision
 (list the candidates / ask), which cannot open a wrong page.
+
+On the phone (device_main.configure, ASSISTANT_DECISION_MODEL=classifier) the App
+runs classifier_only with TOWNPASS_CLASSIFIER_ONLY_GUIDE=keywords (option B') and the
+server on port 8778; TOWNPASS_CLASSIFIER_WAIT (seconds) lets a decision wait for a
+server that is still loading, like server.model_reply does for the decision model.
 """
 import json
 import math
 import os
 import time
+import urllib.error
 import urllib.request
 
 BACKEND = os.environ.get("TOWNPASS_DECISION_BACKEND", "llm").strip().lower()
@@ -47,6 +53,12 @@ ONLY = BACKEND == "classifier_only"
 ONLY_GUIDE = os.environ.get("TOWNPASS_CLASSIFIER_ONLY_GUIDE", "default").strip().lower()
 URL = os.environ.get("TOWNPASS_CLASSIFIER_URL", "http://127.0.0.1:8972").rstrip("/")
 TIMEOUT = float(os.environ.get("TOWNPASS_CLASSIFIER_TIMEOUT", "10"))
+# How long a decision waits for a server that is still starting or loading (it refuses
+# the connection or answers 503); 0 (the computer) fails at once. The phone sets 75 s
+# (device_main.configure), as for the decision model (server.MODEL_READY_WAIT_S).
+WAIT_S = float(os.environ.get("TOWNPASS_CLASSIFIER_WAIT", "0"))
+# The model the App downloads for this mode (assets/assistant/models.json "classifier").
+MODEL_NAME = "townpass-decision-e5-ce-v1-q8_0"
 
 # Probability thresholds (sigmoid of the model's score), for townpass-decision-e5-ce-v1-q8_0.gguf.
 # Tuned on the dev sets only
@@ -109,24 +121,38 @@ def sigmoid(value):
     return 1.0 / (1.0 + math.exp(-max(-60.0, min(60.0, value))))
 
 
-def rerank(query, documents, url=None, timeout=None):
-    """Scores (logits) of query against each document, in the documents' order."""
+def loading(exc):
+    """Whether exc means the classifier server is still starting or loading its model."""
+    if isinstance(exc, urllib.error.HTTPError):
+        return exc.code == 503
+    if isinstance(exc, urllib.error.URLError):
+        return isinstance(exc.reason, ConnectionRefusedError)
+    return isinstance(exc, ConnectionRefusedError)
+
+
+def rerank(query, documents, url=None, timeout=None, wait_s=None, pause_s=0.5):
+    """Scores (logits) of query against each document, in the documents' order.
+    wait_s (default WAIT_S): how long to wait for a server that is still loading."""
     if not documents:
         return []
     body = json.dumps({"query": query, "documents": documents}, ensure_ascii=False).encode("utf-8")
-    request = urllib.request.Request((url or URL) + "/v1/rerank", data=body,
-                                     headers={"Content-Type": "application/json"})
-    try:
-        with urllib.request.urlopen(request, timeout=timeout or TIMEOUT) as response:
-            results = json.load(response)["results"]
-        scores = [None] * len(documents)
-        for row in results:
-            scores[row["index"]] = float(row["relevance_score"])
-        if any(score is None for score in scores):
-            raise ValueError("missing scores")
-        return scores
-    except (OSError, ValueError, KeyError, TypeError, IndexError) as exc:
-        raise ClassifierUnavailable(str(exc)) from exc
+    deadline = time.monotonic() + (WAIT_S if wait_s is None else wait_s)
+    while True:
+        request = urllib.request.Request((url or URL) + "/v1/rerank", data=body,
+                                         headers={"Content-Type": "application/json"})
+        try:
+            with urllib.request.urlopen(request, timeout=timeout or TIMEOUT) as response:
+                results = json.load(response)["results"]
+            scores = [None] * len(documents)
+            for row in results:
+                scores[row["index"]] = float(row["relevance_score"])
+            if any(score is None for score in scores):
+                raise ValueError("missing scores")
+            return scores
+        except (OSError, ValueError, KeyError, TypeError, IndexError) as exc:
+            if not loading(exc) or time.monotonic() + pause_s > deadline:
+                raise ClassifierUnavailable(str(exc)) from exc
+        time.sleep(pause_s)
 
 
 class Classifier:

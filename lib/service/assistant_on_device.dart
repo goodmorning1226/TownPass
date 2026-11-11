@@ -16,6 +16,25 @@ import 'package:flutter/widgets.dart';
 /// before. Android starts its own copy natively (OnDeviceAssistant.kt).
 class AssistantOnDevice {
   static const requested = bool.fromEnvironment('ASSISTANT_ON_DEVICE');
+
+  /// `--dart-define=ASSISTANT_DECISION_MODEL`: "ministral" (default), "gemma"
+  /// (Android only) or "classifier" (option B': no decision model, the 132 MB
+  /// decision classifier instead; docs/AI_DECISION_CLASSIFIER.md section 12).
+  /// Android reads it in its Gradle build; iOS gets it with "start".
+  static const decisionModelDefine = String.fromEnvironment(
+    'ASSISTANT_DECISION_MODEL',
+    defaultValue: 'ministral',
+  );
+
+  /// [value] (default [decisionModelDefine]) as one of the known values; an
+  /// unknown one is the default.
+  static String decisionModel([String value = decisionModelDefine]) {
+    final name = value.trim().toLowerCase();
+    return const ['ministral', 'gemma', 'classifier'].contains(name)
+        ? name
+        : 'ministral';
+  }
+
   static const _channel = MethodChannel('townpass/on_device_assistant');
 
   /// Waits after the App comes back from the background; set by [start].
@@ -38,11 +57,14 @@ class AssistantOnDevice {
     bool? isIOS,
     bool build = requested,
     MethodChannel? channel,
+    String model = decisionModelDefine,
   }) async {
     if (!enabled(isIOS: isIOS, build: build)) return null;
     _resume ??= OnDeviceResume(channel ?? _channel)..attach();
     try {
-      final info = await (channel ?? _channel).invokeMethod<String>('start');
+      final info = await (channel ?? _channel).invokeMethod<String>('start', {
+        'decision_model': decisionModel(model),
+      });
       if (kDebugMode) debugPrint('on-device assistant: $info');
       return info;
     } on PlatformException catch (error) {

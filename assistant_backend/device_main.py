@@ -14,6 +14,9 @@ side, the HTTP contract and the decision path are unchanged:
     (detection only, docs/AI_LANGUAGE_GATE.md)
   llama-server --embedding on faq_port for the optional FAQ layer (faq.py)
     and the catalogue's semantic retrieval (semantic.py)
+  llama-server --reranking on 8778 with the decision classifier, in place of
+    the decision model when the App is built with ASSISTANT_DECISION_MODEL=classifier
+    (option B', docs/AI_DECISION_CLASSIFIER.md)
 """
 from __future__ import annotations
 
@@ -24,11 +27,24 @@ _started = threading.Event()
 _lock = threading.Lock()
 
 
+# The App's ASSISTANT_DECISION_MODEL values (OnDeviceAssistant.kt / .swift).
+DECISION_MODELS = ("ministral", "gemma", "classifier")
+
+
 def configure(model_port, whisper_port, model_timeout=70, faq_port=None, faq_dir=None, decision_model="ministral"):
     """Point server.py at llama-server before it is imported (its settings are module constants).
     decision_model: "ministral" (default) or "gemma", the GGUF the App loaded into
-    llama-server; selects decision.py's prompt variant."""
+    llama-server, which selects decision.py's prompt variant; or "classifier" (option B',
+    docs/AI_DECISION_CLASSIFIER.md sections 10-12): no decision LLM at all, the decision
+    classifier on PORTS["classifier"], library rules and the guides' keyword rules."""
     os.environ["TOWNPASS_DECISION_MODEL"] = "gemma" if decision_model == "gemma" else "ministral"
+    if decision_model == "classifier":
+        os.environ["TOWNPASS_DECISION_BACKEND"] = "classifier_only"
+        os.environ["TOWNPASS_CLASSIFIER_ONLY_GUIDE"] = "keywords"
+        os.environ["TOWNPASS_CLASSIFIER_URL"] = _url("classifier")
+        # A decision right after launch waits for the loading classifier, as for the
+        # decision model (server.MODEL_READY_WAIT_S; server is not imported yet).
+        os.environ["TOWNPASS_CLASSIFIER_WAIT"] = "75"
     if faq_port and faq_dir:
         os.environ["TOWNPASS_FAQ_EMBED_URL"] = f"http://127.0.0.1:{faq_port}"
         os.environ["TOWNPASS_FAQ_DIR"] = faq_dir
@@ -56,13 +72,15 @@ def _retry(action, deadline):
     return None
 
 
-def warm_up(recognizer, model_url, limit_s=900, decision=True):
+def warm_up(recognizer, model_url, limit_s=900, decision=True, classifier_url=None):
     """Load both models and prepare the fixed start of a decision before the user asks.
 
     A first request otherwise pays for reading the model files into memory
     (23-49 s on a vivo V2511 instead of ~17 s). The decision prompt's fixed
     system policy is processed once here; llama-server keeps it in its prompt
     cache, so a real request only processes what follows it. Numbers only are logged.
+    classifier_url (option B', no decision LLM; decision is then False): one
+    scoring call reads the classifier into memory instead.
     """
     import array
     import math
@@ -98,10 +116,19 @@ def warm_up(recognizer, model_url, limit_s=900, decision=True):
         messages = [{"role": "system", "content": system_prompt(task)}, {"role": "user", "content": "{}"}]
         warmed = _retry(lambda: fetch_json(model_url + "/v1/chat/completions", {
             "messages": messages, "temperature": 0, "max_tokens": 1}, timeout=300), deadline) and warmed
+    scored = ""
+    if classifier_url and not user_first():
+        import classifier
+        try:
+            classifier.rerank("你好", [classifier.GREETING_DOC], url=classifier_url,
+                              wait_s=max(0.0, min(180.0, deadline - time.monotonic())))
+            scored = " classifier=ok"
+        except classifier.ClassifierUnavailable:
+            scored = " classifier=failed"
     state = "skipped" if recognizer is None else "ok" if speech else "failed"
     decided = "skipped" if not decision else "ok" if warmed else "failed"
     print(f"timing warm-up speech={state} {speech_s:.1f}s "
-          f"decision={decided} {time.monotonic() - started:.1f}s", flush=True)
+          f"decision={decided}{scored} {time.monotonic() - started:.1f}s", flush=True)
 
 
 def _load_faq(backend):
@@ -184,11 +211,12 @@ def java_server_starter(name):
 
 
 # The native servers' loopback ports, the same on Android and iOS
-# (OnDeviceAssistant.kt, OnDeviceAssistant.swift).
+# (OnDeviceAssistant.kt, OnDeviceAssistant.swift). "classifier": the decision
+# classifier (llama-server --reranking), only with ASSISTANT_DECISION_MODEL=classifier.
 PORTS = {"decision": 8771, "chinese": 8772, "multilingual": 8773, "embedding": 8774, "gate": 8775,
-         "taiwanese": 8776, "vietnamese": 8777}
+         "taiwanese": 8776, "vietnamese": 8777, "classifier": 8778}
 # Names the native side's ensureServer starts once their model file is there.
-SERVERS = ("decision", "multilingual", "gate", "embedding")
+SERVERS = ("decision", "multilingual", "gate", "embedding", "classifier")
 # The optional separate Chinese model (Android only, never downloaded).
 CHINESE_ASR_FILE = "ggml-whisper-chinese.bin"
 
@@ -260,11 +288,15 @@ class Activator:
                     import semantic
                     backend.semantic = semantic.load_default(backend.workflow.registry)
             decision = [e["id"] for e in self.downloads.wanted("decision")]
-            if not backend.model_available and decision and self.has(decision[0]) and self._start("decision"):
+            # The decision part's server: the decision model, or the classifier (option B').
+            name = "classifier" if self.downloads.decision_model == "classifier" else "decision"
+            if not backend.model_available and decision and self.has(decision[0]) and self._start(name):
                 backend.model_available = True
-                # The decision policies into llama-server's prompt cache, as at start-up.
-                threading.Thread(target=warm_up, args=(None, os.environ.get("TOWNPASS_MODEL_URL", _url("decision"))),
-                                 name="assistant-warm-up", daemon=True).start()
+                if name == "decision":
+                    # The decision policies into llama-server's prompt cache, as at start-up.
+                    threading.Thread(target=warm_up,
+                                     args=(None, os.environ.get("TOWNPASS_MODEL_URL", _url("decision"))),
+                                     name="assistant-warm-up", daemon=True).start()
 
 
 # A FAQ question is known text when its best FAQ score reaches this (faq.MEDIUM_CONF:
@@ -375,7 +407,8 @@ def start(model_port=8771, whisper_port=8772, assistant_port=8765, asr_port=8770
     taiwanese_port: where the App starts the Taiwanese whisper-server on first
     use (docs/AI_TAIWANESE_SPEECH_PLAN.md section 10); None: Taiwanese clips are
     heard as Chinese, with a notice.
-    decision_model: "ministral" (default) or "gemma" (OnDeviceAssistant.kt, opt-in build).
+    decision_model: "ministral" (default), "gemma" or "classifier" (OnDeviceAssistant.kt,
+    opt-in builds; "classifier": no decision LLM, configure).
     vietnamese_port: where the App starts the Vietnamese whisper-server on the
     first Vietnamese decode (docs/AI_VIETNAMESE.md); None, or the file not on the
     phone: Vietnamese is decoded by the multilingual model as before.
@@ -392,6 +425,9 @@ def start(model_port=8771, whisper_port=8772, assistant_port=8765, asr_port=8770
     with _lock:
         if _started.is_set():
             return "already running"
+        if decision_model not in DECISION_MODELS:
+            decision_model = "ministral"
+        classifier_mode = decision_model == "classifier"
         configure(model_port, whisper_port, faq_port=faq_port, faq_dir=faq_dir, decision_model=decision_model)
         import asr_server
         import server
@@ -431,13 +467,17 @@ def start(model_port=8771, whisper_port=8772, assistant_port=8765, asr_port=8770
             # from models/semantic_cache) in the background once the server answers.
             import semantic
             backend.semantic = semantic.load_default(backend.workflow.registry)
+        # Option B' has no decision LLM to warm: one classifier call instead (when it is here).
         threading.Thread(target=warm_up, args=(recognizer if whisper else None, os.environ["TOWNPASS_MODEL_URL"]),
-                         kwargs={"decision": backend.model_available},
+                         kwargs={"decision": backend.model_available and not classifier_mode,
+                                 "classifier_url": _url("classifier")
+                                 if classifier_mode and backend.model_available else None},
                          name="assistant-warm-up", daemon=True).start()
         _started.set()
         downloads_state = ""
         if activator is not None:
-            downloads_state = (f", models {activator.downloads.tier} tier, decision "
+            downloads_state = (f", models {activator.downloads.tier} tier, "
+                               f"{'classifier' if classifier_mode else 'decision'} "
                                f"{'on the phone' if backend.model_available else 'not downloaded'}")
         speech = "speech: phone recogniser"
         if whisper:
@@ -447,5 +487,6 @@ def start(model_port=8771, whisper_port=8772, assistant_port=8765, asr_port=8770
                 f", language gate :{gate_port}" if gate_url else "") + (
                 f", vietnamese whisper :{vietnamese_port} on first use" if vietnamese else "")
         faq_state = f", faq embed :{faq_port}" if faq_port and faq_dir else ", faq off"
-        return (f"assistant :{assistant_port}, asr :{asr_port}, model :{model_port} ({server.MODEL}), "
+        model = f"classifier :{PORTS['classifier']}" if classifier_mode else f"model :{model_port}"
+        return (f"assistant :{assistant_port}, asr :{asr_port}, {model} ({server.MODEL}), "
                 f"{speech}{faq_state}{downloads_state}")

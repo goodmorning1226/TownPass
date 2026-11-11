@@ -98,11 +98,13 @@ if (assistantOnDevice) {
     // TOWNPASS_DECISION_MODEL=gemma (or ASSISTANT_DECISION_MODEL=gemma): Gemma 4 E2B
     // instead of Ministral 3B as the decision model (opt-in,
     // docs/AI_DECISION_MODEL_ABLATION_PLAN.md section 8); default ministral.
+    // classifier: no decision model at all, the decision classifier instead
+    // (option B', opt-in, docs/AI_DECISION_CLASSIFIER.md section 12).
     def assistantDecisionModel = (project.findProperty("townpass.decisionModel")
         ?: System.getenv("TOWNPASS_DECISION_MODEL") ?: dartDefines["ASSISTANT_DECISION_MODEL"]
         ?: "ministral").toString().trim().toLowerCase()
-    if (!["ministral", "gemma"].contains(assistantDecisionModel)) {
-        throw new GradleException("TOWNPASS_DECISION_MODEL must be ministral or gemma, not $assistantDecisionModel")
+    if (!["ministral", "gemma", "classifier"].contains(assistantDecisionModel)) {
+        throw new GradleException("TOWNPASS_DECISION_MODEL must be ministral, gemma or classifier, not $assistantDecisionModel")
     }
     android {
         buildFeatures { resValues = true }  // off by default since AGP 9
