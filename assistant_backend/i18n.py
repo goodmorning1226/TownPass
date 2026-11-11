@@ -10,6 +10,7 @@ Service names and keywords per language are in assets/assistant/capabilities_i18
 import re
 import unicodedata
 
+import indonesian
 import vietnamese
 
 LANGUAGES = ("zh", "en", "ja", "vi", "id", "th")
@@ -18,7 +19,13 @@ LANGUAGES = ("zh", "en", "ja", "vi", "id", "th")
 _VI = re.compile(r"[àáảãạăằắẳẵặâầấẩẫậđèéẻẽẹêềếểễệìíỉĩịòóỏõọôồốổỗộơờớởỡợùúủũụưừứửữựỳýỷỹỵ]", re.I)
 _ID_WORDS = re.compile(r"\b(saya|aku|mau|ingin|bayar|tagihan|pinjam|buku|tolong|bisa|apa|tidak|nggak|gak|yang|di|ke|"
                        r"untuk|dong|lihat|riwayat|peminjaman|halo|hai|terima|kasih|selamat|cari|buka|minta|layanan|"
-                       r"ini|itu|dengan|dan|sudah|belum|berapa|bagaimana|dimana|pajak|parkir|air|perpustakaan|polisi)\b", re.I)
+                       r"ini|itu|dengan|dan|sudah|belum|berapa|bagaimana|dimana|pajak|parkir|air|perpustakaan|polisi|"
+                       # Chat spellings and everyday words (2026-11-11, docs/AI_INDONESIAN.md); none is English.
+                       r"sy|yg|utk|gmn|gimana|byr|bhs|mw|pengen|liat|pinjem|perpus|ga|enggak|udah|aja|nih|"
+                       r"sih|deh|ya|kok|ganti|ubah|atur|ambil|nomor|nomer|antrean|antrian|bahasa|pesan|akun|"
+                       r"pengaturan|notifikasi|biaya|uang|sekolah|sewa|rumah|sakit|laporan|lapor|keluhan|"
+                       r"jalan|lampu|listrik|banjir|kantor|cek|saja|ada|lagi|kamu|baru|semua|halaman|kapan|"
+                       r"tiket|dompet|langganan|kupon|diskon|acara|kegiatan|masukan|pertanyaan|umum|beranda)\b", re.I)
 _EN_WORDS = re.compile(r"\b(i|want|the|my|to|a|please|pay|show|open|where|how|what|can|is|book|bill|help)\b", re.I)
 
 
@@ -69,14 +76,17 @@ CANCEL = {
     "ja": r"(?:キャンセル|やめて|やっぱりいい|もういい|戻って|取り消し)[。！!]*",
     "vi": r"(?:thôi\s*)?(?:hủy|huỷ|hủy bỏ|huỷ bỏ|thôi|không cần(?: nữa)?|khỏi(?: cần)?|quay lại|quay về|trở lại|"
           r"dừng(?: lại)?|ngừng(?: lại)?|bỏ qua|bỏ đi|không (?:muốn|làm) nữa)(?:\s+(?:nữa|đi|ạ|nhé|nha|đâu|rồi|luôn))*[.!]*",
-    "id": r"(?:batal|batalkan|tidak jadi|ga jadi|kembali|sudahlah)[.!]*",
+    "id": r"(?:(?:udah|sudah|eh|ya)[,\s]+)?(?:batal|batalkan|tidak jadi|ga jadi|gak jadi|nggak jadi|enggak jadi|"
+          r"tidak usah|ga usah|gak usah|nggak usah|gausah|kembali|sudahlah|udahlah|udahan|stop)"
+          r"(?:[,\s]+(?:aja|saja|deh|dulu|ya|lah|dong|batal|batalkan))*[.!]*",
     "th": r"(?:ยกเลิก|ไม่เอาแล้ว|ช่างมัน|กลับ)[。!]*",
 }
 GREETING = {
     "en": r"(?:hi|hello|hey|thanks?|thank you|good (?:morning|afternoon|evening))[!.\s]*",
     "ja": r"(?:こんにちは|こんばんは|おはよう(?:ございます)?|ありがとう(?:ございます)?)[！!。\s]*",
     "vi": r"(?:xin chào|chào|alo|a lô|cảm ơn|cám ơn)(?:\s+(?:bạn|anh|chị|em|ạ|nhé|nhiều|nha))*[!.\s]*",
-    "id": r"(?:halo|hai|selamat (?:pagi|siang|sore|malam)|terima kasih|makasih)[!.\s]*",
+    "id": r"(?:(?:halo|hallo|hai|permisi|selamat (?:pagi|siang|sore|malam)|terima ?kasih|makasih|trims)"
+          r"(?:[,!.\s]+(?:ya|banyak|kak|min|semua|selamat (?:pagi|siang|sore|malam)))*[!.,\s]*)+",
     "th": r"(?:สวัสดี(?:ครับ|ค่ะ)?|ขอบคุณ(?:ครับ|ค่ะ)?)[!\s]*",
 }
 LISTING = {
@@ -87,7 +97,8 @@ LISTING = {
           r"|(?:bạn|ứng dụng|app|trợ lý)(?: này)? (?:có thể )?(?:làm|giúp)(?: được)?(?: (?:cho )?(?:tôi|mình|em|anh|chị))?"
           r"(?: được)? (?:những )?(?:gì|việc gì)|(?:làm|giúp) được (?:những )?gì"
           r"|có (?:những )?(?:dịch vụ|chức năng|tính năng) (?:gì|nào)|(?:ứng dụng|app) (?:này )?có (?:gì|những gì))(?!\w)",
-    "id": r"bisa apa saja|layanan apa saja|daftar layanan|fitur apa",
+    "id": r"bisa apa saja|bisa apa aja|layanan apa saja|layanan apa aja|daftar layanan|fitur apa"
+          r"|(?:kamu|aplikasi(?: ini)?|asisten(?: ini)?) bisa (?:bantu apa|ngapain|apa)",
     "th": r"ทำอะไรได้บ้าง|มีบริการอะไรบ้าง|มีฟังก์ชันอะไรบ้าง|รายการบริการ",
 }
 YES = {
@@ -125,12 +136,17 @@ NEGATION = {
     "vi": r"\b(?:đừng|khỏi cần|khoi can)\b|\b(?:thì|thi|là|la)\s+(?:không|khong|ko)\s*$|\b(?:không|khong|ko|hok|hông|chẳng|chang)\s+(?:(?:hề|he|có|co|còn|con)\s+)?"
           r"(?:muốn|muon|cần|can|phải|phai|định|dinh|thích|thich|mở|mo|dùng|dung|đóng|dong|mượn|trả|tra|xem|"
           r"làm|lam|đi|di|nộp|nop|đặt|dat|lấy|lay|báo|bao)\b",
-    "id": r"\b(?:tidak|tak|bukan|jangan|nggak|gak)\b",
+    # Also chat spellings ("sy ga mau pinjem buku"). Describing a state is not a refusal
+    # (2026-11-11): "lampu jalan tidak menyala" (the street light is out), "aplikasi
+    # tidak bisa dibuka". A question tail ("... nggak?") is dropped first (positive_text).
+    "id": r"\b(?:bukan|jangan|ogah|emoh|gausah)\b|\b(?:tidak|tak|nggak|ngga|enggak|engga|gak|ga|gk|kagak|ndak|tdk)\b"
+          r"(?!\s+(?:bisa|bs|ada|nyala|menyala|jalan|berjalan|berfungsi|muncul|keluar|terbuka|kebuka|sampai|datang|"
+          r"lancar|jelas|aktif|hidup)\b)",
     "th": r"(?:ไม่|อย่า)",
 }
 # Speech has no commas: "tiền nước không phải tiền học" (water, not tuition) splits
 # before "không phải", keeping the marker with the clause it negates.
-_CLAUSE = re.compile(r"[,，;；.。!！?？、]|\b(?:but|instead|rather|tapi|nhưng|nhung|mà)\b|แต่|けど|が、"
+_CLAUSE = re.compile(r"[,，;；.。!！?？、]|\b(?:but|instead|rather|tapi|tetapi|melainkan|nhưng|nhung|mà)\b|แต่|けど|が、"
                      r"|(?<=\S)\s+(?=(?:không|khong) (?:phải|phai)\b)")
 
 
@@ -294,6 +310,8 @@ def positive_text(text, language):
     clauses = [c for c in _CLAUSE.split(text) if c and c.strip()]
     if language == "vi":  # "... được không?" asks; it does not refuse
         clauses = [vietnamese.drop_question_tail(c) for c in clauses]
+    if language == "id":  # "Ada pesan baru nggak?" asks; it does not refuse
+        clauses = [indonesian.drop_question_tail(c) for c in clauses]
     kept = [c for c in clauses if not re.search(pattern, fold(c), re.I)]
     return " ".join(kept).strip()
 

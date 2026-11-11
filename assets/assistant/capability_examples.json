@@ -13,6 +13,7 @@
    "th": ["อยากแจ้งความเสียหายจากน้ำท่วม"]
   },
   "disasterReport.form.D-1-1": {
+   "id": ["Ada kabel yang jatuh ke jalan setelah angin kencang", "Tiang listrik miring mau roboh"],
    "zh": ["巷口電線掉下來了", "風太大，我家門口那根電線桿歪掉快倒了，線都垂到地上", "颱風把電線吹斷掛在路上",
           "電線桿被車撞歪了", "路邊的電纜垂下來快碰到人", "有一條電線斷掉掉在地上還在冒火花", "電信的線被樹枝扯斷了",
           "電線桿傾斜很危險", "頭頂上的電線鬆脫垂到馬路", "纜線被風吹斷掉在人行道上"],
@@ -62,6 +63,7 @@
    "vi": ["mở phần cài đặt của ứng dụng"]
   },
   "profile": {
+   "id": ["Data diri di akun perlu diperbarui", "Nomor telepon saya sudah ganti"],
    "zh": ["我換手機號碼了要去哪裡改", "我搬家了要改地址", "更新我的電子郵件", "我的電子信箱換了要更新", "我的生日填錯了要改",
           "修改聯絡電話", "我的名字要更新"],
    "vi": ["tôi muốn đổi email trong hồ sơ", "cập nhật địa chỉ nhà của tôi"]
@@ -75,14 +77,17 @@
           "自訂我的常用服務"]
   },
   "activities": {
+   "id": ["Akhir pekan ini ada festival apa di kota", "Kegiatan seru untuk keluarga di Taipei"],
    "zh": ["週末想帶孫子出去，市政府有沒有辦什麼好玩的", "最近台北有什麼好玩的可以參加", "這個週末市政府辦了哪些展覽或表演",
           "這個月有什麼展覽或講座", "假日有什麼市府舉辦的活動"]
   },
   "feedback": {
+   "id": ["Aplikasi ini sering macet, mau kasih tahu", "Mau memberi saran supaya aplikasi lebih bagus"],
    "zh": ["我要給意見", "這個App很難用，我想跟你們反應一下", "這個App很難用我想跟你們抱怨一下", "App當機了我想回報",
           "我想對這個App提建議", "App有bug要回報給開發團隊"]
   },
   "language": {
+   "id": ["Tulisan di layar mau diganti ke bahasa lain", "Saya tidak bisa baca tulisan Mandarin di sini"],
    "zh": ["我看護是越南人，可以把字變成她看得懂的嗎", "把畫面換成英文", "這個App可以用日文嗎", "我想改成泰文介面",
           "看不懂中文想換語言"],
    "vi": ["tôi muốn đổi ứng dụng sang tiếng Việt", "làm sao chuyển ngôn ngữ của app"]
@@ -131,6 +136,7 @@
   "locationSearch": {"zh": ["附近的廁所在哪", "幫我找我附近有什麼地方", "附近有什麼", "找最近的停車場", "周邊有哪些設施"]},
   "waterMeter": {"zh": ["我要回報家裡水錶的數字", "自報水表度數", "查用水量", "這期用了幾度水"]},
   "districtOffice.progress": {
+   "id": ["Berkas yang saya ajukan kemarin prosesnya sampai mana", "Kapan dokumen permohonanku selesai diperiksa"],
    "zh": ["之前在網路上送的申請不知道審到哪裡了", "上禮拜送出的申請審核完了沒", "我申請的補助審核好了沒", "查詢申請進度",
           "線上申請的案件狀態"],
    "vi": ["đơn tôi nộp tuần trước xử lý xong chưa", "xem tình trạng hồ sơ của tôi"]
@@ -167,6 +173,7 @@
           "陳情項目有哪些", "陳情的類別清單"]
   },
   "police.online": {
+   "id": ["Ponselku dicuri orang tadi siang", "Ada yang membobol rumahku, perlu dilaporkan"],
    "zh": ["我要在網路上報案", "我的機車被偷了，可以不用跑警察局直接在手機上報案嗎", "我想報案",
           "我的機車被偷了想在網路上報警", "東西被偷想用手機報警"],
    "en": ["repot a crime"],
@@ -177,6 +184,7 @@
           "查以前報警的資料"]
   },
   "reservation": {
+   "id": ["Giliran nomor di konter sekarang berapa", "Sekarang nomor berapa yang dipanggil di loket"],
    "zh": ["我想知道公家機關櫃台現在叫到幾號", "區公所這馬叫到幾號矣", "臨櫃現在叫到幾號", "線上抽號碼牌", "去機關辦事先拿號"],
    "vi": ["tôi muốn lấy số chờ ở quầy", "bây giờ quầy đang gọi tới số mấy"]
   },
@@ -200,11 +208,13 @@
    "zh": ["我要去西門町那個就業服務站問職訓，現在叫到幾號", "西門町找工作的服務站要排多久", "西門的就業服務站叫號到哪"]
   },
   "library": {
+   "id": ["Mau cari novel untuk dibaca akhir pekan", "Apakah ada buku resep masakan yang bisa dipinjam"],
    "zh": ["我欲借冊", "我要借一本推理小說", "幫我查圖書館有沒有這本書", "小孩想看繪本可以去哪借"],
    "ja": ["図書"],
    "vi": ["muon muon sach", "tôi muốn mượn một cuốn tiểu thuyết", "thư viện có sách tiếng Việt không", "con tôi muốn mượn truyện tranh"]
   },
   "library.ranking": {
+   "id": ["Rekomendasi bacaan terpopuler bulan ini", "Rekomendasi buku yang banyak dibaca orang"],
    "zh": ["圖書館最紅的書是哪幾本，給我看一下", "不知道要借什麼，有沒有比較多人借的書", "現在圖書館最受歡迎的書是哪幾本",
           "熱門借閱排行"],
    "vi": ["dạo này mọi người hay đọc sách gì", "sách nào đang được mượn nhiều nhất"]
@@ -213,10 +223,12 @@
    "zh": ["館方最新發布的通知", "圖書館最近有沒有公布什麼休館或活動的事情", "圖書館最近有發布什麼通知嗎", "圖書館休館公告"]
   },
   "library.reservations": {
+   "id": ["Buku yang saya pesan kemarin sudah bisa diambil belum", "Antrean buku yang sudah saya booking"],
    "zh": ["我預約的書", "我之前排隊等的那本書到了沒，在哪裡看", "預約的書可以去拿了嗎", "我預約的書到了沒",
           "我預定要拿的書到了沒"]
   },
   "library.records": {
+   "id": ["Batas waktu mengembalikan novel pinjamanku", "Daftar buku yang masih ada di tangan saya"],
    "zh": ["我借的冊當時愛還", "我之前在圖書館拿了哪些書", "查我的借閱歷史和到期日"],
    "en": ["When do I have to return my library books?"],
    "ja": ["借りている本の返却期限を確認したい"],
@@ -229,10 +241,11 @@
           "我不知道要繳的費用叫什麼，幫我查一下", "查詢可以繳的費用項目"],
    "vi": ["thư viện gần nhà tôi ở đâu", "chỉ đường đến thư viện gần nhất"]
   },
-  "fees.course": {"zh": ["報名了公務人員訓練處的自費班，要繳學費", "我報名了公務人員訓練處的課要付費", "公訓處課程費用"]},
-  "fees.tuition": {"zh": ["小孩學校開學要繳的錢", "繳小孩的註冊費", "孩子的學費要在哪裡付"]},
+  "fees.course": {"id": ["Saya ikut kelas pelatihan berbayar, mau bayar biayanya", "Biaya kelas keterampilan kerja"], "zh": ["報名了公務人員訓練處的自費班，要繳學費", "我報名了公務人員訓練處的課要付費", "公訓處課程費用"]},
+  "fees.tuition": {"id": ["Anak saya mau masuk sekolah, uang pendaftarannya bayar di mana", "Iuran sekolah anak bulan depan"], "zh": ["小孩學校開學要繳的錢", "繳小孩的註冊費", "孩子的學費要在哪裡付"]},
   "fees.maintenance": {"zh": ["我住平宅，要繳那個維護的錢", "平價住宅的管理費要繳", "住平宅每個月要付的錢"]},
   "fees.parking": {
+   "id": ["Ada kertas tagihan parkir di kaca mobil saya", "Mobil saya diparkir di pinggir jalan, harus bayar di mana"],
    "en": ["I got a parking ticket on my scooter, where can I pay it?"],
    "vi": ["Đóng phí gửi xe ở đâu?", "tôi đậu xe ngoài đường bị dán giấy đóng tiền", "xe máy gửi ở bãi thì trả tiền ở đâu", "tôi muốn trả tiền đậu xe hôm qua"],
    "zh": ["路邊停車的單子要繳", "停車格的錢要付", "機車停車費怎麼繳"],
@@ -244,6 +257,7 @@
    "vi": ["quay về màn hình đầu tiên"]
   },
   "app.perks": {
+   "id": ["Voucher murah buat warga Taipei", "Mau cari voucher belanja"],
    "zh": ["有沒有特價的活動", "有沒有可以省錢的券能領", "我想看看哪些店家在打折"],
    "en": ["are there any deals or coupons for me"],
    "ja": ["割引のお知らせを見たい"],
@@ -251,24 +265,29 @@
   },
   "app.bills": {"zh": ["目前還有哪些待繳的帳", "把我所有要繳的錢列出來", "我的帳單都放在哪裡"], "en": ["list my unpaid bills"]},
   "messages": {
+   "id": ["Ada kabar terbaru untuk saya di aplikasi", "Tunjukkan surat yang dikirim ke akun saya"],
    "zh": ["有人傳東西給我嗎", "看一下App寄給我的信", "剛剛跳出來的那則內容在哪裡看", "我有沒有新的消息"],
    "en": ["do I have any new messages"],
    "vi": ["xem tin nhắn thành phố gửi cho tôi", "có thông báo mới nào không"]
   },
   "invoice": {
+   "id": ["Kode belanja di ponsel untuk struk elektronik", "Mau tunjukkan barcode struk ke kasir"],
    "zh": ["我想用手機存發票", "結帳時要給店員掃的那個條碼在哪", "店員要我出示載具，在哪打開"],
    "en": ["show my e-invoice barcode"]
   },
   "notification_settings": {
+   "id": ["Pengingat dari aplikasi mengganggu", "Bunyi pemberitahuan aplikasi terlalu sering"],
    "zh": ["App一直跳通知好煩想關掉", "不要再推播給我了", "哪裡可以改要不要收到提醒", "我想把提醒聲音打開"],
    "en": ["turn off push notifications"]
   },
   "districtOffice": {
+   "id": ["Mau mengurus dokumen di kantor kecamatan", "Mau daftar bantuan dari pemerintah kota secara online"],
    "zh": ["市府的線上申辦在哪裡", "線上可以辦哪些市府的申請", "不用跑區公所就能送件的地方"],
    "en": ["apply for city government services online"],
    "vi": ["tôi muốn làm hồ sơ xin trợ cấp", "tôi cần nộp đơn cho quận"]
   },
   "reportIssue": {
+   "id": ["Trotoar retak di gang sebelah perlu diperbaiki kota", "Tetangga menyalakan musik keras sampai pagi"],
    "zh": ["我想跟市政府反應一件事", "附近工地每天半夜還在施工太吵了想投訴", "我對市府有意見想表達",
           "巷口一直有人亂丟垃圾要找誰處理"],
    "en": ["I want to file a complaint with the city"],
@@ -280,20 +299,23 @@
    "vi": ["tôi cần gặp cảnh sát", "có người lừa đảo tôi, tôi muốn báo công an"]
   },
   "wallet": {"zh": ["打開我的電子票", "我領到的票券要去哪看", "上次拿到的入場券在哪"], "en": ["where are my tickets"]},
-  "fees.history": {"zh": ["我上個月繳了哪些錢", "我之前付過的帳單明細", "查一下我繳費的歷史"], "en": ["what have I already paid"]},
+  "fees.history": {"id": ["Daftar transaksi pembayaran sebelumnya", "Bukti transfer tagihan lama"], "zh": ["我上個月繳了哪些錢", "我之前付過的帳單明細", "查一下我繳費的歷史"], "en": ["what have I already paid"]},
   "fees.scan": {
+   "id": ["Saya punya kertas tagihan dengan kode, mau difoto untuk bayar", "Bayar pakai kamera dari kode di kertas tagihan"],
    "zh": ["我手上有一張紙本帳單想用手機拍了直接付", "開相機對準繳費單付款", "掃一下單子上的條碼繳錢"],
    "en": ["scan the barcode on a bill to pay it"],
    "vi": ["xem các hóa đơn tôi thanh toán gần đây", "xem lại các lần tôi đóng tiền"]
   },
   "fees.water": {
+   "id": ["Rekening air rumah saya bulan ini belum lunas", "Mau melunasi tagihan air minum di rumah"],
    "zh": ["自來水的帳單要繳", "這期的水錢還沒付", "這兩個月的用水帳單要付"],
    "en": ["pay my water bill"],
    "vi": ["Tôi muốn trả tiền nước", "hóa đơn nước tháng này tôi muốn thanh toán", "nhà tôi tới kỳ đóng tiền nước rồi", "trả tiền nước ở đâu vậy"]
   },
-  "fees.tax": {"zh": ["牌照稅要繳了", "房屋稅單寄來了要在哪繳", "地價稅可以在這裡繳嗎"], "en": ["pay my house tax"]},
-  "fees.housing": {"zh": ["公共住宅每個月的租金要付了", "國宅的租金跟管理費怎麼付", "社宅這個月的租金要繳"]},
+  "fees.tax": {"id": ["Surat tagihan pajak rumah sudah datang", "Mau melunasi pajak motor tahun ini"], "zh": ["牌照稅要繳了", "房屋稅單寄來了要在哪繳", "地價稅可以在這裡繳嗎"], "en": ["pay my house tax"]},
+  "fees.housing": {"id": ["Uang sewa bulanan tempat tinggal dari pemerintah", "Saya tinggal di perumahan sosial, mau bayar sewanya"], "zh": ["公共住宅每個月的租金要付了", "國宅的租金跟管理費怎麼付", "社宅這個月的租金要繳"]},
   "fees.hospital": {
+   "id": ["Habis dirawat di rumah sakit, mau melunasi biayanya", "Tagihan dokter dari rumah sakit kota"],
    "zh": ["在市立聯合醫院看病的錢還沒付", "去聯醫看診的費用要繳", "醫院寄來的看診帳單要付"],
    "en": ["pay my bill from the city hospital"],
    "vi": ["tới hạn đóng thuế nhà rồi", "tôi muốn nộp thuế thành phố"],
@@ -301,10 +323,12 @@
   },
   "fees.other": {"zh": ["清單上找不到的費用要去哪裡付", "不在那些項目裡的繳費", "其他類別的帳要付"]},
   "reportIssue.progress": {
+   "id": ["Laporan masalah jalan yang saya kirim sudah dijawab belum", "Mau lihat jawaban pemerintah atas keluhan saya"],
    "zh": ["我上次陳情的事情處理得怎麼樣", "我反映的問題市府回覆了沒", "之前投訴的案子現在進度"],
    "en": ["has the city answered my complaint yet"]
   },
   "police.progress": {
+   "id": ["Kasus pencurian yang saya laporkan sudah ditangani belum", "Kelanjutan kasus pencurian yang kulaporkan"],
    "zh": ["我報案之後警察那邊處理到哪了", "上次去派出所報的案子有消息嗎", "網路報案的案件查一下"],
    "en": ["what is the status of my police report"]
   },
@@ -319,15 +343,17 @@
    "zh": ["族人通過職業技能檢定後能領的獎勵", "原住民考技術士檢定有沒有獎勵", "族人拿到丙級證照的獎勵金怎麼申請"]
   },
   "disasterReport.form.D-1-3": {
+   "id": ["Penerangan gang gelap karena lampunya padam", "Lampu di pinggir jalan mati semalaman"],
    "zh": ["騎樓外面的街燈壞掉了", "晚上路邊的燈一直閃個不停", "我們這條路的照明燈不亮很危險"],
    "en": ["the street lamp on my road is broken"]
   },
   "disasterReport.form.D-1-4": {
+   "id": ["Rumah saya tiba-tiba gelap, listriknya mati", "Satu kompleks tidak ada aliran listrik"],
    "zh": ["附近大範圍斷電好幾個小時了", "颱風過後我們這區一直沒電", "家裡跟鄰居全部斷電了"],
    "en": ["the power is out in my neighborhood"],
    "vi": ["khu tôi bị mất điện từ sáng", "nhà tôi tự nhiên không có điện"]
   },
-  "disasterReport.form.D-2-3": {"zh": ["橋上的欄杆被撞壞了", "那座橋的路面有很大的坑洞", "人行陸橋的扶手掉下來了"]},
+  "disasterReport.form.D-2-3": {"id": ["Pagar jembatan di dekat sungai patah", "Jembatan kecil di kampung saya retak"], "zh": ["橋上的欄杆被撞壞了", "那座橋的路面有很大的坑洞", "人行陸橋的扶手掉下來了"]},
   "disasterReport.form.D-3-2": {"zh": ["有大石塊從邊坡滾下來", "山坡上的土整片滑下來蓋住路", "上山的路被落下的石塊擋住"]},
   "disasterReport.form.D-4-1": {"zh": ["社區大樓有一層樓失火了要通報", "看到一棟住宅窗戶在冒火", "隔壁那間透天厝著火了"]},
   "disasterReport.form.D-4-3": {"zh": ["附近的工廠冒出大火", "工業區有一間廠房起火了", "鐵工廠那邊著火了要通報"]},

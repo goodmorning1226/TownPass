@@ -55,6 +55,18 @@ CASES = {
            ("Saya mau pinjam buku", HOME), ("Lihat riwayat peminjaman", cap("library.records")),
            ("Saya mau lapor polisi online", cap("police.online")), ("Saya mau janji vaksin", FAQ_OR_UNSUPPORTED),
            ("Halo", REPLY), ("Bisa apa saja", LISTING), ("Saya tidak mau pinjam buku", NONE)],
+    # Everyday and chat-style Indonesian (docs/AI_INDONESIAN.md); written for this set,
+    # a dev set like the lines above.
+    "id_variants": [
+        ("mau bayar air", cap("fees.water")), ("tolong bayarin tagihan aer", cap("fees.water")),
+        ("sy mau bayar tagihan air yg bln ini", cap("fees.water")), ("gmn caranya bayar parkr mobil", offer("fees.parking")),
+        ("mw ke perpus", HOME), ("pinjem buku dong", HOME), ("ambil no antrian", cap("reservation")),
+        ("ganti no hp sy", cap("profile")), ("buka pengaturan notif", cap("notification_settings")),
+        ("Ada pesan baru nggak?", cap("messages")), ("Ada promo apa?", cap("app.perks")),
+        ("Lihat buku yang saya pesan", cap("library.reservations")), ("Cek histori pembayaran saya", cap("fees.history")),
+        ("Layanan pengajuan online", cap("districtOffice")), ("Bayar SPP anak saya", cap("fees.tuition")),
+        ("Bukan bayar air, tapi bayar parkir", cap("fees.parking")), ("sy ga mau pinjem buku", NONE),
+        ("gak jadi deh", NONE), ("makasih ya", REPLY), ("aplikasi ini bisa bantu apa?", LISTING)],
     "th": [("อยากจ่ายค่าน้ำ", cap("fees.water")), ("อยากจ่ายค่าจอดรถ", cap("fees.parking")),
            ("อยากยืมหนังสือ", HOME), ("ดูประวัติการยืม", cap("library.records")),
            ("อยากแจ้งความออนไลน์", cap("police.online")), ("อยากจองวัคซีน", FAQ_OR_UNSUPPORTED),

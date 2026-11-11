@@ -696,7 +696,19 @@ class Workflow:
             # 11 of 42 requests were lost that way); with two or more pages it decides.
             self._trace("vietnamese_keyword", [entries[0]["id"]])
             return self._navigate(payload, entries[0])
-        ambiguous = len(entries) > 1 or (language == "vi" and any(m["fuzzy"] for m in matches))
+        if language == "id" and all(m["fuzzy"] for m in matches):
+            # Indonesian worded or spelled almost like a keyword ("gmn caranya bayar parkr"):
+            # only offered, without a model call, like Vietnamese sound-alikes (2026-11-11).
+            self._trace("indonesian_similar", [e["id"] for e in entries])
+            return self._offer(payload, self._cap_items(entries, language), i18n.t("confirm_capability", language))
+        if language == "id" and len(matches) == 1 and not matches[0]["fuzzy"] and self._indonesian_sure(text, matches[0]):
+            # One connected page named by a keyword of two or more words, or by a word in
+            # a sentence that asks for something ("mau", "tolong", "lihat"…): open it, as a
+            # sure single keyword match does (docs/AI_CURRENT_RULES.md section 2). Asked,
+            # Ministral answered "clarify" for 32 of 145 such dev sentences ("Mau bayar air").
+            self._trace("indonesian_keyword", [entries[0]["id"]])
+            return self._navigate(payload, entries[0])
+        ambiguous = len(entries) > 1 or (language in ("vi", "id") and any(m["fuzzy"] for m in matches))
         self._trace("capability_model", [e["id"] for e in entries])
         name, args = self._decide(text, entries, ambiguous, payload.get("page_context"))
         if name == "confirm_candidates":
@@ -704,7 +716,25 @@ class Workflow:
                                         keep_choice=self.no_model)
         if name == "select_capability":
             return self._navigate(payload, self.registry.by_id[args["capability_id"]])
+        if language == "id" and name == "request_clarification":
+            # The catalogue named these pages but the model asked again: the user picks
+            # one instead of repeating the request; nothing opens.
+            self._trace("indonesian_offer", [e["id"] for e in entries])
+            return self._offer(payload, self._cap_items(entries, language), i18n.t("confirm_capability", language))
         return self.reply(payload, i18n.t("clarify", language))
+
+    def _indonesian_sure(self, text, match):
+        """A single Indonesian keyword match sure enough to open without the model: a
+        keyword of two or more words, or a word in a request ("lihat ...") unless the
+        page is a hub other pages sit under (the bills tab, the library): its single
+        words are general ("pembayaran"), and a misheard specific word ("Lihat Rewaiat
+        Pembayaran", riwayat pembayaran) left only the hub (2026-11-11 speech test)."""
+        import indonesian
+        if any(len(term.split()) >= 2 for term in match["evidence"]):
+            return True
+        if not hasattr(self, "_hubs"):
+            self._hubs = {parent for entry in self.registry.entries for parent in self.registry.ancestors(entry)}
+        return match["entry"]["id"] not in self._hubs and indonesian.has_request_cue(text)
 
     def handle(self, payload):
         """One reply. Which page opens is decided by the page stage below

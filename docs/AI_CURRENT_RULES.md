@@ -1,4 +1,4 @@
-# 助理現行規則（2026-11-10）
+# 助理現行規則（2026-11-11）
 
 這份是助理行為的**唯一準則**。其他文件裡和這裡衝突的舊規則（例如「一律候選確認」「語音要問『是這句嗎？』」「語言選單是偏好、偵測不確定就用選單語言」）都以這裡為準。
 規則改了就改這份，再改程式與測試。每條後面是做這件事的程式位置。
@@ -56,6 +56,18 @@
   選單選越南文時，閘門說「中文」一律不算數，改由 Whisper small 只偵測語言再決定；small 也說中文但把握不到九成、而且中文很短或不清楚時，再用越南文模型聽一次取較好的（`asr_server.MENU_OVER_CHINESE`）。閘門的台語判定在越南文選單下也要等這次偵測沒選到越南文才採用。
   比對：不打聲調、聲調聽錯、南北口音（d/gi/r/v、ch/tr、s/x、字尾 n/ng、c/t）都能對到；只靠口音合併或單音節沒聲調對到的，一律列出來讓使用者選；只對到**一個**已串接頁面而且不是靠口音時直接開，不問模型（`assistant_backend/vietnamese.py`、`workflow._handle_language`）。
   轉寫清理對有空白的文字只合併整個重複的詞（「phản ảnh」不會被切壞）；「X không phải Y」在 không phải 前切句。
+- **印尼文**（2026-11-11，`docs/AI_INDONESIAN.md`；原因：外語保留集的印尼文 25 句只對 11 句，
+  合成語音與打字的開發集顯示主要損失在比對，不在聽寫——決策模型對只對到一個頁面的印尼文常回「請補充」，口語與聊天縮寫對不到關鍵字）：
+  - 聊天縮寫與口語寫法先換成標準寫法再比對（sy→saya、yg→yang、gmn／gimana→bagaimana、byr／bayarin→bayar、pinjem→pinjam、
+    perpus→perpustakaan、antrian／antre→antrean、no hp→nomor telepon、nggak／gak／ga→tidak…），只換整個詞，用固定清單，不做詞幹切除。（`assistant_backend/indonesian.py`、`registry.search_language`）
+  - 句尾的「…nggak?」「…gak?」「…atau tidak?」是問句，不是拒絕（「Ada pesan baru nggak?」）；「tidak bisa／tidak menyala」等描述狀態也不是拒絕；
+    聊天寫法的否定（「sy ga mau pinjem buku」）照樣算拒絕。（`i18n.NEGATION`、`indonesian.drop_question_tail`）
+  - 只對到**一個**已串接頁面、不是模糊比對，而且是靠兩個字以上的關鍵詞、或句子有請求詞（mau、tolong、lihat、bayar、cek…）時，直接開，不問模型；
+    但「底下還有其他頁面」的總頁（帳務、服務總覽、圖書、警政…）只靠一個字（「pembayaran」）對到時仍交給模型——語音把具體的詞聽錯時（「Lihat Rewaiat Pembayaran」）只剩總頁的字，直接開會開錯；
+    只是拼法相近（打錯字）對到的，一律列出來讓使用者選，不問模型、不直接開；
+    模型對已對到的頁面回「請補充」時，把這些頁面列出來讓使用者選（不開頁）。（`workflow._handle_language`、`workflow._indonesian_sure`）
+  - 語音連寫或拆開的詞（「sewarusun」＝sewa rusun）以整個詞比對也算對到；不切詞的一部分。（`indonesian.contains_joined`）
+  - 語音：印尼文仍用 Whisper small、不加提示句（實測字錯率變差）。印尼文專用模型（anggiatm/whisper-small-id）在電腦上評估過，效果好但較慢，**尚未接進 App**，等擁有者決定。
 - 支援：中文、台語（只辨識）、英文、日文、越南文、印尼文、泰文。**待辦：泰文換成菲律賓文**。
 
 ## 5. 介面
