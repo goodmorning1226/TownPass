@@ -1867,16 +1867,16 @@ void main() {
       start({'assistant_speech_language': 'zh'});
       final c = withSpeech(
         const AssistantTranscript(
-          'ฉันอยากยืมหนังสือ',
-          language: 'th',
+          'Gusto kong humiram ng libro',
+          language: 'tl',
           languageConfidence: 0.9,
         ),
       );
       await Future<void>.delayed(Duration.zero);
       await speak(c);
-      expect(AssistantTexts.conversation.value, 'th');
-      expect(PageTranslation.instance.language.value, 'th');
-      expect(c.speechLanguage.value, 'th');
+      expect(AssistantTexts.conversation.value, 'tl');
+      expect(PageTranslation.instance.language.value, 'tl');
+      expect(c.speechLanguage.value, 'tl');
     });
 
     test('a short unsure 你好 switches back to Chinese, not the menu', () async {

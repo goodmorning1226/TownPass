@@ -277,7 +277,7 @@ class MultilingualSpeechTests(unittest.TestCase):
         self.server_speech = {}  # per-server overrides of speech (the Taiwanese model)
         self.speech = {"zh": ("我要借這個月新到的書", -0.1), "en": ("I want to borrow a new book", -0.7),
                        "ja": ("今月の新しい本を借りたい", -0.8), "vi": ("tôi muốn mượn sách", -0.9),
-                       "id": ("saya mau pinjam buku", -0.9), "th": ("ฉันอยากยืมหนังสือ", -0.9)}
+                       "id": ("saya mau pinjam buku", -0.9), "tl": ("gusto kong humiram ng libro", -0.9)}
         test = self
 
         def fake(name):
@@ -412,11 +412,15 @@ class MultilingualSpeechTests(unittest.TestCase):
         self.assertEqual(recognizer.transcribe(loud_frames(), "zh")["language"], "en")
 
     def test_detection_outside_our_languages(self):
-        # Lao counts for Thai, Malay for Indonesian (the nearest of ours).
+        # Malay counts for Indonesian (the nearest of ours). Thai and Lao are not ours
+        # any more (Filipino replaced Thai, 2026-11-11): like Korean, the chosen
+        # language is decoded.
+        self.detected["multi"], self.probabilities["multi"] = "lao", {"lo": 0.7, "th": 0.2}
         recognizer = self.with_gate({"lo": 0.7, "th": 0.2})
         result = recognizer.transcribe(loud_frames(), "en")
-        self.assertEqual((result["language"], self.requests()[-1]), ("th", ("multi", "th", False)))
+        self.assertEqual((result["language"], self.requests()[-1]), ("en", ("multi", "en", False)))
         self.calls.clear()
+        self.detected["multi"], self.probabilities["multi"] = "chinese", {}
         recognizer = self.with_gate({"ms": 0.5, "id": 0.4})
         self.assertEqual(recognizer.transcribe(loud_frames(), "zh")["language"], "id")
         # Korean: none of ours is a candidate, so the chosen language is decoded.
@@ -485,6 +489,30 @@ class MultilingualSpeechTests(unittest.TestCase):
         self.speech["vi"] = ("Toi muon muon sach", -0.3)
         result = self.recognizer.transcribe(loud_frames(), "vi")
         self.assertEqual([language for _, language, _ in self.requests()], ["auto", "vi"])
+
+    # --- Filipino and Indonesian (RIVALS, docs/AI_FILIPINO.md) ------------------
+
+    def test_filipino_heard_as_indonesian_is_checked_in_filipino(self):
+        # Both are Latin script without letters of their own: a real chance of the other
+        # language decodes it too, and the better transcript is kept.
+        self.speech["id"], self.speech["tl"] = ("gus to kong mag bayad ng tubig", -0.8), ("gusto kong magbayad ng tubig", -0.3)
+        recognizer = self.with_gate({"id": 0.85, "tl": 0.12})
+        result = recognizer.transcribe(loud_frames(), "tl")
+        self.assertEqual(self.requests()[1:], [("multi", "id", False), ("multi", "tl", False)])
+        self.assertEqual((result["language"], result["text"]), ("tl", "gusto kong magbayad ng tubig"))
+        # The Indonesian text reads as Filipino (common words): checked even without a chance.
+        self.calls.clear()
+        recognizer = self.with_gate({"id": 0.9})
+        self.assertEqual(recognizer.transcribe(loud_frames(), "tl")["language"], "tl")
+        self.assertEqual(self.requests()[1:], [("multi", "id", False), ("multi", "tl", False)])
+
+    def test_indonesian_stays_indonesian_with_filipino_chosen(self):
+        self.speech["id"], self.speech["tl"] = ("saya mau pinjam buku", -0.2), ("gusto kong humiram ng libro", -0.6)
+        recognizer = self.with_gate({"id": 0.9})
+        self.assertEqual(recognizer.transcribe(loud_frames(), "tl")["language"], "id")
+        self.assertEqual(self.requests()[1:], [("multi", "id", False)])  # the menu alone is no reason
+        recognizer = self.with_gate({"id": 0.8, "tl": 0.15})
+        self.assertEqual(recognizer.transcribe(loud_frames(), "tl")["language"], "id")  # decoded, scores worse
 
     def test_vietnamese_script(self):
         from asr_server import script_fits
@@ -615,9 +643,14 @@ class MultilingualSpeechTests(unittest.TestCase):
         self.assertEqual(self.requests(), [("multi", "auto", False)])
 
     def test_detection_outside_our_languages_without_a_gate(self):
-        self.detected["multi"] = "lao"  # counts for Thai
+        self.detected["multi"] = "lao"  # not ours (Thai was replaced by Filipino): the chosen language
         result = self.recognizer.transcribe(loud_frames(), "en")
-        self.assertEqual((self.requests(), result["language"]), ([("multi", "auto", False), ("multi", "th", False)], "th"))
+        self.assertEqual((self.requests(), result["language"]), ([("multi", "auto", False), ("multi", "en", False)], "en"))
+        self.calls.clear()
+        self.detected["multi"] = "tagalog"  # Filipino is ours, Whisper's "tl"
+        self.speech["tl"] = ("gusto kong humiram ng libro", -0.3)
+        result = self.recognizer.transcribe(loud_frames(), "auto")
+        self.assertEqual((result["language"], result["text"]), ("tl", "gusto kong humiram ng libro"))
         self.calls.clear()
         self.detected["multi"], self.probabilities["multi"] = "korean", {"ko": 0.9}
         self.assertEqual(self.recognizer.transcribe(loud_frames(), "id")["language"], "id")
@@ -636,13 +669,15 @@ class MultilingualSpeechTests(unittest.TestCase):
 
     def test_language_codes(self):
         from asr_server import language_code
-        self.assertEqual([language_code(v) for v in ("en-US", "ja", "english", "", None, "xx", "AUTO", "th-TH")],
-                         ["en", "ja", "en", "zh", "zh", "zh", "auto", "th"])
+        self.assertEqual([language_code(v) for v in ("en-US", "ja", "english", "", None, "xx", "AUTO", "th-TH",
+                                                      "tl", "fil-PH", "tagalog", "Filipino")],
+                         ["en", "ja", "en", "zh", "zh", "zh", "auto", "zh", "tl", "tl", "tl", "tl"])
 
     def test_language_scores_and_candidates(self):
         from asr_server import CLEAR_LANGUAGE, candidate_languages, language_scores
-        self.assertEqual(language_scores({"language": "lao", "language_probabilities": {"lo": 0.5, "th": 0.3}}),
-                         {"th": 0.8})
+        self.assertEqual(language_scores({"language": "lao", "language_probabilities": {"lo": 0.5, "th": 0.3}}), {})
+        self.assertEqual(language_scores({"language": "tagalog", "language_probabilities": {"tl": 0.6, "id": 0.2}}),
+                         {"tl": 0.6, "id": 0.2})
         self.assertEqual(language_scores({"language": "korean", "language_probabilities": {"ko": 0.8, "ja": 0.05}}),
                          {"ja": 0.05})
         self.assertEqual(language_scores({"language": "japanese"}), {"ja": 1.0})  # no probabilities: as detected

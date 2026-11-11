@@ -34,7 +34,8 @@ class AssistantSpeaker {
     'ja': 'ja-JP',
     'vi': 'vi-VN',
     'id': 'id-ID',
-    'th': 'th-TH',
+    // Filipino ('tl' in the App): Android's Google TTS voice is fil-PH.
+    'tl': 'fil-PH',
   };
   String? _locale;
 
@@ -76,7 +77,7 @@ class AssistantSpeaker {
   /// pauses between them instead of running the list together.
   ///
   /// The full stop is the [language]'s own: Chinese and Japanese voices stop at
-  /// 「。」, but the Vietnamese, English, Indonesian and Thai voices read it as
+  /// 「。」, but the Vietnamese, English, Indonesian and Filipino voices read it as
   /// nothing, so their lines and paragraphs ran together (owner, 2026-11-08);
   /// they get "." instead, and a line that ends with a colon, comma or
   /// semicolon gets a full stop there too (a line break is a sentence break).

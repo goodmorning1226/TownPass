@@ -175,7 +175,7 @@ class AssistantService {
   /// returns the recognised text. Nothing is stored on the device or server.
   ///
   /// [language] is 'auto' (detect) or a speech language code ('zh', 'en', 'ja',
-  /// 'vi', 'id', 'th'); the backend falls back to Chinese without a
+  /// 'vi', 'id', 'tl'); the backend falls back to Chinese without a
   /// multilingual model.
   Future<AssistantTranscript> transcribe(
     Uint8List wav, {

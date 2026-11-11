@@ -6,7 +6,7 @@
 {"id": "ch005", "language": "zh", "text": "啊我們家巷子口那個路燈啊，已經壞好幾天了，晚上都黑漆漆的很危險耶，這要跟誰講啊", "intent": "service", "expected_ids": ["disasterReport.form.D-1-3", "reportIssue"], "note": "report lang_zh_tw-52 (FAIL)"},
 {"id": "ch006", "language": "ja", "text": "家の前の街灯が壊れています", "intent": "service", "expected_ids": ["disasterReport.form.D-1-3", "reportIssue"], "note": "report lang_en_ja-ja-10 (FAIL)"},
 {"id": "ch007", "language": "id", "text": "Lampu jalan di depan rumah rusak, mau lapor", "intent": "service", "expected_ids": ["disasterReport.form.D-1-3", "reportIssue"], "note": "report lang_sea-38 (FAIL)"},
-{"id": "ch008", "language": "th", "text": "ไฟถนนเสียค่ะ จะแจ้งได้ที่ไหน", "intent": "service", "expected_ids": ["disasterReport.form.D-1-3", "reportIssue"], "note": "report lang_sea-40 (FAIL)"},
+{"id": "ch008", "language": "tl", "text": "Sira po yung ilaw sa poste dito sa kalye namin, saan po ito ire-report?", "intent": "service", "expected_ids": ["disasterReport.form.D-1-3", "reportIssue"], "note": "broken street light, where to report; po politeness"},
 {"id": "ch009", "language": "id", "text": "Lampu jalan rusak", "intent": "service", "expected_ids": ["disasterReport.form.D-1-3", "reportIssue"], "note": "report lang_sea-P5 (FAIL)"},
 {"id": "ch010", "language": "zh", "text": "我們整條街都沒有電", "intent": "service", "expected_ids": ["disasterReport.form.D-1-4"], "note": "report nav-093 (FAIL)"},
 {"id": "ch011", "language": "zh", "text": "那座橋怪怪的", "intent": "service", "expected_ids": ["disasterReport.form.D-2-3"], "note": "report daily_disaster_cross-16 (FAIL)"},

@@ -1,6 +1,6 @@
 {
  "version": 1,
- "status": "DRAFT translations (machine-assisted, 2026-11-08), pending native-speaker review. Keys are the Chinese source texts in lib/page/guided_assistant/; keep {name} placeholders; {page:X} shows the page's own word X as the page shows it (translated by PageTranslation).",
+ "status": "DRAFT translations (machine-assisted, 2026-11-08; Filipino tl AI drafts 2026-11-11), pending native-speaker review. Keys are the Chinese source texts in lib/page/guided_assistant/; keep {name} placeholders; {page:X} shows the page's own word X as the page shows it (translated by PageTranslation).",
  "section": "district_office",
  "strings": {
   "{again}你想申請什麼？先點一個大類打開來看：「申訴類」或「補助類」。": {
@@ -8,910 +8,910 @@
    "ja": "{again}何を申請しますか？まず大きな分類をタップして開いてください：「{page:申訴類}」か「{page:補助類}」。",
    "vi": "{again}Bạn muốn nộp đơn gì? Trước tiên hãy bấm vào một nhóm để mở ra: “{page:申訴類}” hoặc “{page:補助類}”.",
    "id": "{again}Anda ingin mengajukan apa? Ketuk dulu satu kategori untuk membukanya: “{page:申訴類}” atau “{page:補助類}”.",
-   "th": "{again}ต้องการยื่นเรื่องอะไร? แตะหมวดใหญ่หนึ่งหมวดเพื่อเปิดดูก่อน: “{page:申訴類}” หรือ “{page:補助類}”"
+   "tl": "{again}Ano ang gusto mong i-apply? I-tap muna ang isang kategorya para buksan ito: “{page:申訴類}” o “{page:補助類}”."
   },
   "{again}點你要申請的那一項{example}。": {
    "en": "{again}Tap the item you want to apply for{example}.",
    "ja": "{again}申請したい項目をタップしてください{example}。",
    "vi": "{again}Bấm vào mục bạn muốn nộp đơn{example}.",
    "id": "{again}Ketuk item yang ingin Anda ajukan{example}.",
-   "th": "{again}แตะรายการที่ต้องการยื่น{example}"
+   "tl": "{again}I-tap ang item na gusto mong i-apply{example}."
   },
   "{note}你改回「同意」了！資料沒問題，就自己按最下面的「送出」。": {
    "en": "{note}You changed it back to “{page:同意}”! If the information is fine, tap “{page:送出}” at the bottom yourself.",
    "ja": "{note}「{page:同意}」に戻しました！内容に問題なければ、ご自分で一番下の「{page:送出}」を押してください。",
    "vi": "{note}Bạn đã chọn lại “{page:同意}”! Nếu thông tin không có vấn đề, hãy tự bấm “{page:送出}” ở dưới cùng.",
    "id": "{note}Anda mengubahnya kembali ke “{page:同意}”! Jika datanya sudah benar, ketuk sendiri “{page:送出}” paling bawah.",
-   "th": "{note}คุณเปลี่ยนกลับเป็น “{page:同意}” แล้ว! ถ้าข้อมูลไม่มีปัญหา กด “{page:送出}” ด้านล่างสุดด้วยตัวเอง"
+   "tl": "{note}Ibinalik mo sa “{page:同意}”! Kung tama ang impormasyon, ikaw mismo ang mag-tap ng “{page:送出}” sa ibaba."
   },
   "{note}你選了「不同意」。這樣「送出」會不能按，申請送不出去；要送出，就改點「同意」。": {
    "en": "{note}You chose “{page:不同意}”. Then “{page:送出}” cannot be tapped and the application cannot be sent; to send it, tap “{page:同意}” instead.",
    "ja": "{note}「{page:不同意}」を選びました。この場合「{page:送出}」は押せず、申請は送れません。送るときは「{page:同意}」を押してください。",
    "vi": "{note}Bạn đã chọn “{page:不同意}”. Như vậy sẽ không bấm được “{page:送出}”, đơn không gửi đi được; muốn gửi thì bấm “{page:同意}”.",
    "id": "{note}Anda memilih “{page:不同意}”. Dengan begitu “{page:送出}” tidak bisa diketuk dan permohonan tidak bisa dikirim; untuk mengirim, ketuk “{page:同意}”.",
-   "th": "{note}คุณเลือก “{page:不同意}” แบบนี้จะกด “{page:送出}” ไม่ได้ และส่งคำขอไม่ได้ ถ้าจะส่ง ให้กด “{page:同意}”"
+   "tl": "{note}Pinili mo ang “{page:不同意}”. Dahil dito, hindi mata-tap ang “{page:送出}” at hindi maipapadala ang aplikasyon; para maipadala ito, i-tap na lang ang “{page:同意}”."
   },
   "{note}這是你填的資料，{scroll}從上到下檢查一遍。「個人資料是否提供給承辦員」已經預先選了「同意」，不想提供就改點「不同意」。沒問題就自己按「送出」喔；要改就按「修改」。這是示範網站，不會真的送出。": {
    "en": "{note}This is what you filled in. {scroll}Check it once from top to bottom. “{page:個人資料是否提供給承辦員}” is already set to “{page:同意}”; if you do not want to share your data, tap “{page:不同意}” instead. If all is fine, tap “{page:送出}” yourself; to change something, tap “{page:修改}”. This is a demo site, so nothing is really sent.",
    "ja": "{note}これはあなたが入力した内容です。{scroll}上から下まで一度確認してください。「{page:個人資料是否提供給承辦員}」は最初から「{page:同意}」が選ばれています。提供したくないときは「{page:不同意}」を押してください。問題なければ、ご自分で「{page:送出}」を押してください。直すときは「{page:修改}」を押します。これはデモサイトなので、実際には送信されません。",
    "vi": "{note}Đây là thông tin bạn đã điền. {scroll}Hãy kiểm tra một lượt từ trên xuống dưới. Mục “{page:個人資料是否提供給承辦員}” đã được chọn sẵn “{page:同意}”; nếu không muốn cung cấp, hãy bấm “{page:不同意}”. Nếu không có vấn đề, bạn tự bấm “{page:送出}” nhé; muốn sửa thì bấm “{page:修改}”. Đây là trang web mẫu, sẽ không gửi thật.",
    "id": "{note}Ini data yang Anda isi. {scroll}Periksa sekali dari atas ke bawah. “{page:個人資料是否提供給承辦員}” sudah dipilih “{page:同意}”; jika tidak ingin memberikan data, ketuk “{page:不同意}”. Jika sudah benar, ketuk sendiri “{page:送出}”; untuk mengubah, ketuk “{page:修改}”. Ini situs demo, jadi tidak benar-benar dikirim.",
-   "th": "{note}นี่คือข้อมูลที่คุณกรอก {scroll}ตรวจดูจากบนลงล่างหนึ่งรอบ ข้อ “{page:個人資料是否提供給承辦員}” ถูกเลือก “{page:同意}” ไว้แล้ว ถ้าไม่ต้องการให้ข้อมูล ให้กด “{page:不同意}” ถ้าไม่มีปัญหา กด “{page:送出}” ด้วยตัวเอง ถ้าจะแก้ กด “{page:修改}” นี่เป็นเว็บไซต์สาธิต จะไม่ส่งจริง"
+   "tl": "{note}Ito ang mga inilagay mo. {scroll}Suriin ito minsan mula itaas hanggang ibaba. Naka-set na sa “{page:同意}” ang “{page:個人資料是否提供給承辦員}”; kung ayaw mong ibahagi ang iyong data, i-tap na lang ang “{page:不同意}”. Kung maayos ang lahat, ikaw mismo ang mag-tap ng “{page:送出}”; para may baguhin, i-tap ang “{page:修改}”. Demo site lang ito, kaya walang talagang maipapadala."
   },
   "{scroll}「個人資料是否提供給承辦員」選了「不同意」，「送出」就不能按。要送出申請，請改點「同意」。": {
    "en": "{scroll}“{page:個人資料是否提供給承辦員}” is set to “{page:不同意}”, so “{page:送出}” cannot be tapped. To send the application, tap “{page:同意}” instead.",
    "ja": "{scroll}「{page:個人資料是否提供給承辦員}」が「{page:不同意}」になっているので、「{page:送出}」は押せません。申請を送るには「{page:同意}」を押してください。",
    "vi": "{scroll}Mục “{page:個人資料是否提供給承辦員}” đang chọn “{page:不同意}”, nên không bấm được “{page:送出}”. Muốn gửi đơn, hãy bấm “{page:同意}”.",
    "id": "{scroll}“{page:個人資料是否提供給承辦員}” dipilih “{page:不同意}”, jadi “{page:送出}” tidak bisa diketuk. Untuk mengirim permohonan, ketuk “{page:同意}”.",
-   "th": "{scroll}ข้อ “{page:個人資料是否提供給承辦員}” เลือก “{page:不同意}” อยู่ จึงกด “{page:送出}” ไม่ได้ ถ้าจะส่งคำขอ ให้กด “{page:同意}”"
+   "tl": "{scroll}Naka-set sa “{page:不同意}” ang “{page:個人資料是否提供給承辦員}”, kaya hindi mata-tap ang “{page:送出}”. Para maipadala ang aplikasyon, i-tap na lang ang “{page:同意}”."
   },
   "{scroll}按最下面的「上一步」，先回到申辦首頁。": {
    "en": "{scroll}Tap “{page:上一步}” at the very bottom to go back to the Applications home page first.",
    "ja": "{scroll}一番下の「{page:上一步}」を押して、まず申請サービスのトップページに戻ってください。",
    "vi": "{scroll}Bấm “{page:上一步}” ở dưới cùng để quay về trang chủ nộp đơn trước.",
    "id": "{scroll}Ketuk “{page:上一步}” paling bawah untuk kembali dulu ke halaman utama permohonan.",
-   "th": "{scroll}กด “{page:上一步}” ด้านล่างสุด เพื่อกลับไปหน้าแรกของบริการยื่นคำร้องก่อน"
+   "tl": "{scroll}I-tap ang “{page:上一步}” sa pinakaibaba para bumalik muna sa home page ng Mga Aplikasyon."
   },
   "{scroll}點一下{what}的框框，會跳出日曆。": {
    "en": "{scroll}Tap the box for {what}. A calendar will pop up.",
    "ja": "{scroll}{what}の枠をタップすると、カレンダーが出ます。",
    "vi": "{scroll}Bấm vào ô nhập của {what}, lịch sẽ hiện ra.",
    "id": "{scroll}Ketuk kotak isian {what}, kalender akan muncul.",
-   "th": "{scroll}แตะกล่องของ {what} แล้วปฏิทินจะขึ้นมา"
+   "tl": "{scroll}I-tap ang kahon para sa {what}. May lalabas na kalendaryo."
   },
   "{scroll}點一下{what}，會跳出選單。": {
    "en": "{scroll}Tap {what}. A menu will pop up.",
    "ja": "{scroll}{what}をタップすると、メニューが出ます。",
    "vi": "{scroll}Bấm vào {what}, menu sẽ hiện ra.",
    "id": "{scroll}Ketuk {what}, menu akan muncul.",
-   "th": "{scroll}แตะ{what} แล้วเมนูจะขึ้นมา"
+   "tl": "{scroll}I-tap ang {what}. May lalabas na menu."
   },
   "{what}要勾選{pick}，可以勾好幾個。": {
    "en": "In {what}, tick what applies{pick}. You can tick more than one.",
    "ja": "{what}はチェックを入れてください{pick}。いくつでも選べます。",
    "vi": "Ở {what}, hãy đánh dấu{pick}. Có thể chọn nhiều mục.",
    "id": "Di {what}, centang yang sesuai{pick}. Boleh lebih dari satu.",
-   "th": "ที่ {what} ให้ติ๊กเลือก{pick} เลือกได้หลายข้อ"
+   "tl": "Sa {what}, lagyan ng tsek ang naaangkop{pick}. Puwede kang mag-tsek ng higit sa isa."
   },
   "{what}選一個{pick}。": {
    "en": "In {what}, pick one{pick}.",
    "ja": "{what}から1つ選んでください{pick}。",
    "vi": "Ở {what}, hãy chọn một{pick}.",
    "id": "Di {what}, pilih satu{pick}.",
-   "th": "ที่ {what} ให้เลือกหนึ่งข้อ{pick}"
+   "tl": "Sa {what}, pumili ng isa{pick}."
   },
   "{what}還沒有選項，要先選好上面那一格喔。": {
    "en": "There are no choices in {what} yet. Please fill in the box above it first.",
    "ja": "{what}にはまだ選択肢がありません。先に上の欄を選んでください。",
    "vi": "Ở {what} chưa có lựa chọn, hãy chọn ô phía trên trước nhé.",
    "id": "Belum ada pilihan di {what}. Isi dulu kolom di atasnya, ya.",
-   "th": "ที่ {what} ยังไม่มีตัวเลือก ต้องเลือกช่องด้านบนก่อน"
+   "tl": "Wala pang pagpipilian sa {what}. Pakipunan muna ang kahon sa itaas nito."
   },
   "「{month}」兩邊的箭頭": {
    "en": "the arrows on both sides of “{month}”",
    "ja": "「{month}」の両側の矢印",
    "vi": "mũi tên hai bên “{month}”",
    "id": "panah di kedua sisi “{month}”",
-   "th": "ลูกศรสองข้างของ “{month}”"
+   "tl": "ang mga arrow sa magkabilang gilid ng “{month}”"
   },
   "「{name}」的框框": {
    "en": "the box for “{name}”",
    "ja": "「{name}」の枠",
    "vi": "ô nhập của “{name}”",
    "id": "kotak isian “{name}”",
-   "th": "กล่องของ “{name}”"
+   "tl": "ang kahon para sa “{name}”"
   },
   "「{section}」收起來了，點一下把它打開。": {
    "en": "“{section}” is folded up. Tap it to open it.",
    "ja": "「{section}」が閉じています。タップして開いてください。",
    "vi": "Phần “{section}” đang thu gọn, bấm vào để mở ra.",
    "id": "Bagian “{section}” sedang tertutup. Ketuk untuk membukanya.",
-   "th": "ส่วน “{section}” ถูกพับอยู่ แตะเพื่อเปิด"
+   "tl": "Nakatiklop ang “{section}”. I-tap ito para buksan."
   },
   "「{section}」有「*」的都要填。照亮起來的那一格，一格一格填就好。還有沒填的，按「下一步」不會動，也不一定有紅字。{red}": {
    "en": "In “{section}”, every box marked “*” must be filled in. Just follow the highlighted box and fill them in one by one. While a box is still empty, “{page:下一步}” does nothing, and there may be no red message. {red}",
    "ja": "「{section}」の「*」がついた欄はすべて入力が必要です。光っている欄を、1つずつ入力すれば大丈夫です。まだ空いている欄があると、「{page:下一步}」を押しても進まず、赤い字が出ないこともあります。{red}",
    "vi": "Trong “{section}”, các ô có dấu “*” đều phải điền. Cứ theo ô đang sáng, điền từng ô một là được. Nếu còn ô chưa điền, bấm “{page:下一步}” sẽ không chuyển trang, và có thể không có chữ đỏ. {red}",
    "id": "Di “{section}”, semua kolom bertanda “*” wajib diisi. Ikuti kolom yang menyala dan isi satu per satu. Selama masih ada yang kosong, “{page:下一步}” tidak akan berfungsi, dan mungkin tidak ada tulisan merah. {red}",
-   "th": "ใน “{section}” ช่องที่มี “*” ต้องกรอกทั้งหมด กรอกตามช่องที่สว่างทีละช่องก็พอ ถ้ายังมีช่องที่ไม่ได้กรอก กด “{page:下一步}” จะไม่ไปต่อ และอาจไม่มีตัวอักษรสีแดง {red}"
+   "tl": "Sa “{section}”, dapat punan ang bawat kahong may markang “*”. Sundan lang ang naka-highlight na kahon at punan ang mga ito isa-isa. Habang may kahong walang laman, walang mangyayari sa “{page:下一步}”, at maaaring walang pulang mensahe. {red}"
   },
   "「申辦中」是還在辦的，「已結案」是辦完的，點一下就能切換。": {
    "en": "“{page:申辦中}” are still in progress, “{page:已結案}” are finished. Tap to switch.",
    "ja": "「{page:申辦中}」は手続き中、「{page:已結案}」は完了したものです。タップで切り替えられます。",
    "vi": "“{page:申辦中}” là hồ sơ đang xử lý, “{page:已結案}” là đã xong. Bấm để chuyển qua lại.",
    "id": "“{page:申辦中}” masih diproses, “{page:已結案}” sudah selesai. Ketuk untuk berpindah.",
-   "th": "“{page:申辦中}” คือเรื่องที่ยังดำเนินการอยู่ “{page:已結案}” คือเรื่องที่เสร็จแล้ว แตะเพื่อสลับ"
+   "tl": "Ang “{page:申辦中}” ay ginagawa pa, ang “{page:已結案}” ay tapos na. I-tap para lumipat."
   },
   "「申辦中」有 {active} 件，「已結案」有 {closed} 件。": {
    "en": "You have {active} in “{page:申辦中}” and {closed} in “{page:已結案}”. ",
    "ja": "「{page:申辦中}」が {active} 件、「{page:已結案}」が {closed} 件です。",
    "vi": "Có {active} hồ sơ “{page:申辦中}” và {closed} hồ sơ “{page:已結案}”. ",
    "id": "Ada {active} di “{page:申辦中}” dan {closed} di “{page:已結案}”. ",
-   "th": "มี “{page:申辦中}” {active} เรื่อง และ “{page:已結案}” {closed} เรื่อง "
+   "tl": "May {active} ka sa “{page:申辦中}” at {closed} sa “{page:已結案}”. "
   },
   "」或「": {
    "en": "” or “",
    "ja": "」か「",
    "vi": "” hoặc “",
    "id": "” atau “",
-   "th": "” หรือ “"
+   "tl": "” o “"
   },
   "上面左右的箭頭": {
    "en": "the left and right arrows at the top",
    "ja": "上の左右の矢印",
    "vi": "mũi tên trái phải ở phía trên",
    "id": "panah kiri dan kanan di atas",
-   "th": "ลูกศรซ้ายขวาด้านบน"
+   "tl": "ang mga arrow sa kaliwa at kanan sa itaas"
   },
   "之後你自己看": {
    "en": "You check later",
    "ja": "後でご自分で確認",
    "vi": "Bạn tự xem sau",
    "id": "Cek sendiri nanti",
-   "th": "ดูเองภายหลัง"
+   "tl": "Ikaw ang titingin mamaya"
   },
   "之後到「查詢」看進度": {
    "en": "Later, check progress in “{page:查詢}”",
    "ja": "後で「{page:查詢}」で進捗を確認",
    "vi": "Sau đó xem tiến độ ở “{page:查詢}”",
    "id": "Nanti cek progres di “{page:查詢}”",
-   "th": "ภายหลังดูความคืบหน้าที่ “{page:查詢}”"
+   "tl": "Mamaya, tingnan ang progreso sa “{page:查詢}”"
   },
   "亮起來的框框": {
    "en": "the highlighted box",
    "ja": "光っている枠",
    "vi": "ô đang sáng",
    "id": "kotak yang menyala",
-   "th": "กล่องที่สว่างอยู่"
+   "tl": "ang naka-highlight na kahon"
   },
   "亮起來的這一格": {
    "en": "the highlighted field",
    "ja": "光っている項目",
    "vi": "mục đang sáng",
    "id": "kolom yang menyala",
-   "th": "รายการที่สว่างอยู่"
+   "tl": "ang naka-highlight na field"
   },
   "你回到申辦首頁了。": {
    "en": "You are back on the Applications home page. ",
    "ja": "申請サービスのトップページに戻りました。",
    "vi": "Bạn đã quay về trang chủ nộp đơn. ",
    "id": "Anda sudah kembali ke halaman utama permohonan. ",
-   "th": "คุณกลับมาที่หน้าแรกของบริการยื่นคำร้องแล้ว "
+   "tl": "Bumalik ka na sa home page ng Mga Aplikasyon. "
   },
   "先回到申辦首頁。": {
    "en": "First go back to the Applications home page.",
    "ja": "まず申請サービスのトップページに戻ってください。",
    "vi": "Trước tiên hãy quay về trang chủ nộp đơn.",
    "id": "Kembali dulu ke halaman utama permohonan.",
-   "th": "กลับไปหน้าแรกของบริการยื่นคำร้องก่อน"
+   "tl": "Bumalik muna sa home page ng Mga Aplikasyon."
   },
   "先往下滑，把「個人資料是否提供給承辦員」這段說明看完喔。看到了，我再告訴你要按哪裡。": {
    "en": "First scroll down and read the whole “{page:個人資料是否提供給承辦員}” part. When you have read it, I will tell you where to tap.",
    "ja": "まず下にスクロールして、「{page:個人資料是否提供給承辦員}」の説明を最後まで読んでください。読み終わったら、どこを押すかお伝えします。",
    "vi": "Trước tiên hãy kéo xuống và đọc hết phần giải thích “{page:個人資料是否提供給承辦員}” nhé. Đọc xong, mình sẽ chỉ bạn bấm vào đâu.",
    "id": "Gulir ke bawah dulu dan baca sampai habis penjelasan “{page:個人資料是否提供給承辦員}”, ya. Setelah itu, saya beri tahu bagian mana yang diketuk.",
-   "th": "เลื่อนลงก่อน แล้วอ่านคำอธิบาย “{page:個人資料是否提供給承辦員}” ให้จบ อ่านแล้วจะบอกว่าต้องกดตรงไหน"
+   "tl": "Mag-scroll muna pababa at basahin ang buong bahagi ng “{page:個人資料是否提供給承辦員}”. Kapag nabasa mo na, sasabihin ko kung saan ita-tap."
   },
   "先按下面的「修改」回到上一頁，再按最下面的「上一步」回到申辦首頁。": {
    "en": "First tap “{page:修改}” below to go back one page, then tap “{page:上一步}” at the very bottom to return to the Applications home page.",
    "ja": "まず下の「{page:修改}」を押して前のページに戻り、次に一番下の「{page:上一步}」を押して申請サービスのトップページに戻ってください。",
    "vi": "Trước tiên bấm “{page:修改}” bên dưới để về trang trước, rồi bấm “{page:上一步}” ở dưới cùng để về trang chủ nộp đơn.",
    "id": "Ketuk dulu “{page:修改}” di bawah untuk kembali ke halaman sebelumnya, lalu ketuk “{page:上一步}” paling bawah untuk kembali ke halaman utama permohonan.",
-   "th": "กด “{page:修改}” ด้านล่างเพื่อกลับไปหน้าก่อน แล้วกด “{page:上一步}” ด้านล่างสุดเพื่อกลับไปหน้าแรกของบริการยื่นคำร้อง"
+   "tl": "I-tap muna ang “{page:修改}” sa ibaba para bumalik ng isang page, at i-tap ang “{page:上一步}” sa pinakaibaba para bumalik sa home page ng Mga Aplikasyon."
   },
   "到「查詢」看案件進度": {
    "en": "Check case progress in “{page:查詢}”",
    "ja": "「{page:查詢}」で案件の進捗を見る",
    "vi": "Xem tiến độ hồ sơ ở “{page:查詢}”",
    "id": "Lihat progres kasus di “{page:查詢}”",
-   "th": "ดูความคืบหน้าของเรื่องที่ “{page:查詢}”"
+   "tl": "Tingnan ang progreso ng kaso sa “{page:查詢}”"
   },
   "到確認頁了！看一下你填的資料對不對。": {
    "en": "You are on the review page! Check that what you filled in is correct.",
    "ja": "確認ページに来ました！入力した内容が正しいか見てください。",
    "vi": "Đã đến trang xác nhận! Xem lại thông tin bạn điền có đúng không.",
    "id": "Sudah di halaman konfirmasi! Periksa apakah data yang Anda isi sudah benar.",
-   "th": "มาถึงหน้ายืนยันแล้ว! ดูว่าข้อมูลที่กรอกถูกต้องไหม"
+   "tl": "Nasa review page ka na! Suriin kung tama ang mga inilagay mo."
   },
   "勾選符合你情況的項目{example}，可以選好幾個。選好按最下面的「確認」。": {
    "en": "Tick the items that fit your situation{example}. You can pick more than one. When done, tap “{page:確認}” at the bottom.",
    "ja": "あなたの状況に合う項目にチェックを入れてください{example}。いくつでも選べます。選んだら一番下の「{page:確認}」を押します。",
    "vi": "Đánh dấu các mục đúng với trường hợp của bạn{example}, có thể chọn nhiều mục. Chọn xong bấm “{page:確認}” ở dưới cùng.",
    "id": "Centang item yang sesuai dengan keadaan Anda{example}. Boleh lebih dari satu. Setelah itu, ketuk “{page:確認}” paling bawah.",
-   "th": "ติ๊กรายการที่ตรงกับกรณีของคุณ{example} เลือกได้หลายข้อ เลือกแล้วกด “{page:確認}” ด้านล่างสุด"
+   "tl": "Lagyan ng tsek ang mga item na akma sa sitwasyon mo{example}. Puwede kang pumili ng higit sa isa. Kapag tapos na, i-tap ang “{page:確認}” sa ibaba."
   },
   "可以向市府申請補助或提出申訴：在「申辦」選一個項目，把表單填好按「下一步」，檢查後再「送出」。在「查詢」可以看案件辦到哪裡。": {
    "en": "You can apply to the city government for a subsidy or file a complaint: pick an item in “{page:申辦}”, fill in the form and tap “{page:下一步}”, check it, then tap “{page:送出}”. In “{page:查詢}” you can see how far your case has gone.",
    "ja": "市役所に補助の申請や陳情ができます：「{page:申辦}」で項目を選び、フォームに入力して「{page:下一步}」を押し、確認してから「{page:送出}」します。「{page:查詢}」で案件の進み具合を見られます。",
    "vi": "Bạn có thể xin trợ cấp hoặc gửi khiếu nại đến chính quyền thành phố: chọn một mục ở “{page:申辦}”, điền biểu mẫu rồi bấm “{page:下一步}”, kiểm tra lại rồi bấm “{page:送出}”. Ở “{page:查詢}” có thể xem hồ sơ đang xử lý đến đâu.",
    "id": "Anda bisa mengajukan subsidi atau keluhan ke pemerintah kota: pilih item di “{page:申辦}”, isi formulir lalu ketuk “{page:下一步}”, periksa, lalu ketuk “{page:送出}”. Di “{page:查詢}” Anda bisa melihat sampai mana kasus Anda diproses.",
-   "th": "ขอเงินอุดหนุนหรือยื่นเรื่องร้องเรียนต่อเทศบาลได้: เลือกรายการใน “{page:申辦}” กรอกแบบฟอร์มแล้วกด “{page:下一步}” ตรวจดูแล้วกด “{page:送出}” ที่ “{page:查詢}” ดูได้ว่าเรื่องไปถึงไหนแล้ว"
+   "tl": "Puwede kang mag-apply sa pamahalaang lungsod para sa subsidy o magsampa ng reklamo: pumili ng item sa “{page:申辦}”, punan ang form at i-tap ang “{page:下一步}”, suriin ito, at i-tap ang “{page:送出}”. Sa “{page:查詢}”, makikita mo kung hanggang saan na ang iyong kaso."
   },
   "回到申辦服務": {
    "en": "Back to Applications",
    "ja": "申請サービスに戻る",
    "vi": "Quay lại Dịch vụ nộp đơn",
    "id": "Kembali ke Layanan permohonan",
-   "th": "กลับไปที่บริการยื่นคำร้อง"
+   "tl": "Bumalik sa Mga Aplikasyon"
   },
   "回到申辦畫面": {
    "en": "Back to the application screen",
    "ja": "申請画面に戻る",
    "vi": "Quay lại màn hình nộp đơn",
    "id": "Kembali ke layar permohonan",
-   "th": "กลับไปหน้าจอยื่นคำร้อง"
+   "tl": "Bumalik sa screen ng aplikasyon"
   },
   "在「您遇到哪些問題?」的框框打關鍵字，按右邊的放大鏡，下面就會只留下符合的項目。按了放大鏡還是寫「查無任何申辦相關項目」，就是沒有找到，換個詞再試。": {
    "en": "Type a keyword in the “{page:您遇到哪些問題?}” box and tap the magnifier on the right. Only matching items will stay below. If it still says “{page:查無任何申辦相關項目}” after you tap the magnifier, nothing was found; try another word.",
    "ja": "「{page:您遇到哪些問題?}」の枠にキーワードを入れて、右の虫めがねを押すと、合う項目だけが下に残ります。虫めがねを押しても「{page:查無任何申辦相關項目}」のままなら、見つかっていません。別の言葉で試してください。",
    "vi": "Gõ từ khóa vào ô “{page:您遇到哪些問題?}”, bấm kính lúp bên phải, bên dưới sẽ chỉ còn các mục phù hợp. Bấm kính lúp rồi mà vẫn ghi “{page:查無任何申辦相關項目}” thì là không tìm thấy, hãy thử từ khác.",
    "id": "Ketik kata kunci di kotak “{page:您遇到哪些問題?}”, lalu ketuk kaca pembesar di kanan. Di bawah hanya tersisa item yang cocok. Jika setelah mengetuk kaca pembesar masih tertulis “{page:查無任何申辦相關項目}”, berarti tidak ditemukan; coba kata lain.",
-   "th": "พิมพ์คำค้นในช่อง “{page:您遇到哪些問題?}” แล้วกดแว่นขยายทางขวา ด้านล่างจะเหลือแค่รายการที่ตรงกัน ถ้ากดแว่นขยายแล้วยังขึ้น “{page:查無任何申辦相關項目}” แปลว่าไม่พบ ลองคำอื่น"
+   "tl": "Mag-type ng keyword sa kahon na “{page:您遇到哪些問題?}” at i-tap ang magnifier sa kanan. Ang mga tugmang item lang ang maiiwan sa ibaba. Kung nakasulat pa rin ang “{page:查無任何申辦相關項目}” pagka-tap mo ng magnifier, walang nakita; subukan ang ibang salita."
   },
   "在日曆上點一下那一天。要換月份，按{arrows}。": {
    "en": "Tap the day on the calendar. To change the month, tap {arrows}.",
    "ja": "カレンダーでその日をタップしてください。月を変えるには、{arrows}を押します。",
    "vi": "Bấm vào ngày đó trên lịch. Muốn đổi tháng, bấm {arrows}.",
    "id": "Ketuk tanggalnya di kalender. Untuk ganti bulan, ketuk {arrows}.",
-   "th": "แตะวันนั้นบนปฏิทิน ถ้าจะเปลี่ยนเดือน กด{arrows}"
+   "tl": "I-tap ang araw sa kalendaryo. Para palitan ang buwan, i-tap ang {arrows}."
   },
   "在日曆選日期": {
    "en": "Pick a date on the calendar",
    "ja": "カレンダーで日付を選ぶ",
    "vi": "Chọn ngày trên lịch",
    "id": "Pilih tanggal di kalender",
-   "th": "เลือกวันที่บนปฏิทิน"
+   "tl": "Pumili ng petsa sa kalendaryo"
   },
   "在申辦首頁點上面的「查詢」，就能看到申辦中和已結案的案件。": {
    "en": "On the Applications home page, tap “{page:查詢}” at the top to see cases in progress and finished cases.",
    "ja": "申請サービスのトップページで上の「{page:查詢}」を押すと、手続き中と完了した案件が見られます。",
    "vi": "Ở trang chủ nộp đơn, bấm “{page:查詢}” ở trên để xem hồ sơ đang xử lý và đã xong.",
    "id": "Di halaman utama permohonan, ketuk “{page:查詢}” di atas untuk melihat kasus yang sedang diproses dan yang sudah selesai.",
-   "th": "ที่หน้าแรกของบริการยื่นคำร้อง กด “{page:查詢}” ด้านบน จะเห็นเรื่องที่กำลังดำเนินการและที่เสร็จแล้ว"
+   "tl": "Sa home page ng Mga Aplikasyon, i-tap ang “{page:查詢}” sa itaas para makita ang mga kasong isinasagawa pa at ang mga natapos na."
   },
   "基本資料": {
    "en": "Basic information",
    "ja": "基本情報",
    "vi": "Thông tin cơ bản",
    "id": "Data dasar",
-   "th": "ข้อมูลพื้นฐาน"
+   "tl": "Pangunahing impormasyon"
   },
   "基本資料填好了！": {
    "en": "Basic information is filled in!",
    "ja": "基本情報の入力ができました！",
    "vi": "Đã điền xong thông tin cơ bản!",
    "id": "Data dasar sudah diisi!",
-   "th": "กรอกข้อมูลพื้นฐานเสร็จแล้ว!"
+   "tl": "Napunan na ang pangunahing impormasyon!"
   },
   "填基本資料": {
    "en": "Fill in basic info",
    "ja": "基本情報を入力",
    "vi": "Điền thông tin cơ bản",
    "id": "Isi data dasar",
-   "th": "กรอกข้อมูลพื้นฐาน"
+   "tl": "Punan ang pangunahing info"
   },
   "填寫基本資料": {
    "en": "Fill in the basic information",
    "ja": "基本情報を入力する",
    "vi": "Điền thông tin cơ bản",
    "id": "Mengisi data dasar",
-   "th": "กรอกข้อมูลพื้นฐาน"
+   "tl": "Punan ang pangunahing impormasyon"
   },
   "填寫申辦服務資料": {
    "en": "Fill in the application details",
    "ja": "申請内容を入力する",
    "vi": "Điền thông tin hồ sơ",
    "id": "Mengisi data permohonan",
-   "th": "กรอกข้อมูลคำร้อง"
+   "tl": "Punan ang mga detalye ng aplikasyon"
   },
   "填申辦資料": {
    "en": "Fill in application details",
    "ja": "申請内容を入力",
    "vi": "Điền thông tin hồ sơ",
    "id": "Isi data permohonan",
-   "th": "กรอกข้อมูลคำร้อง"
+   "tl": "Punan ang detalye ng aplikasyon"
   },
   "好的！已經幫你打開「申辦服務」。我們先選要申請的項目，再一格一格填表單，最後由你自己確認送出。我會在畫面上一步一步帶你做。": {
    "en": "OK! I opened “Applications” for you. First we pick what to apply for, then fill in the form box by box, and at the end you check and send it yourself. I will guide you step by step on the screen.",
    "ja": "わかりました！「申請サービス」を開きました。まず申請する項目を選び、次にフォームを1つずつ入力して、最後はご自分で確認して送信します。画面で一歩ずつご案内します。",
    "vi": "Được rồi! Mình đã mở “Dịch vụ nộp đơn” cho bạn. Trước tiên chọn mục muốn nộp, rồi điền biểu mẫu từng ô, cuối cùng bạn tự kiểm tra và gửi. Mình sẽ hướng dẫn từng bước trên màn hình.",
    "id": "Baik! “Layanan permohonan” sudah dibuka. Pertama pilih yang ingin diajukan, lalu isi formulir satu per satu, terakhir Anda sendiri yang memeriksa dan mengirim. Saya akan memandu langkah demi langkah di layar.",
-   "th": "ได้เลย! เปิด “บริการยื่นคำร้อง” ให้แล้ว เราจะเลือกรายการที่ต้องการยื่นก่อน แล้วกรอกแบบฟอร์มทีละช่อง สุดท้ายคุณตรวจและส่งเอง จะพาทำทีละขั้นบนหน้าจอ"
+   "tl": "OK po! Binuksan ko na ang “Mga Aplikasyon” para sa iyo. Una, pipiliin natin kung ano ang ia-apply, saka pupunan natin ang form isa-isang kahon, at sa huli ikaw mismo ang magsusuri at magpapadala nito. Gagabayan kita nang hakbang-hakbang sa screen."
   },
   "好的！已經幫你打開「申辦服務」，我會在畫面上一步一步帶你做。": {
    "en": "OK! I opened “Applications” for you. I will guide you step by step on the screen.",
    "ja": "わかりました！「申請サービス」を開きました。画面で一歩ずつご案内します。",
    "vi": "Được rồi! Mình đã mở “Dịch vụ nộp đơn” cho bạn, mình sẽ hướng dẫn từng bước trên màn hình.",
    "id": "Baik! “Layanan permohonan” sudah dibuka. Saya akan memandu langkah demi langkah di layar.",
-   "th": "ได้เลย! เปิด “บริการยื่นคำร้อง” ให้แล้ว จะพาทำทีละขั้นบนหน้าจอ"
+   "tl": "OK po! Binuksan ko na ang “Mga Aplikasyon” para sa iyo. Gagabayan kita nang hakbang-hakbang sa screen."
   },
   "好的！申辦服務打開了，我們一起來{task}。": {
    "en": "OK! Applications is open. Let’s do this together: {task}.",
    "ja": "わかりました！申請サービスが開きました。一緒に「{task}」をしましょう。",
    "vi": "Được rồi! Dịch vụ nộp đơn đã mở, mình cùng làm nhé: {task}.",
    "id": "Baik! Layanan permohonan sudah terbuka. Ayo kita lakukan bersama: {task}.",
-   "th": "ได้เลย! เปิดบริการยื่นคำร้องแล้ว มาทำด้วยกัน: {task}"
+   "tl": "OK! Bukas na ang Mga Aplikasyon. Sabay nating gawin ito: {task}."
   },
   "好的！申辦服務打開了，我們先選要申請的項目吧。": {
    "en": "OK! Applications is open. Let’s first pick what to apply for.",
    "ja": "わかりました！申請サービスが開きました。まず申請する項目を選びましょう。",
    "vi": "Được rồi! Dịch vụ nộp đơn đã mở, mình chọn mục muốn nộp trước nhé.",
    "id": "Baik! Layanan permohonan sudah terbuka. Ayo pilih dulu yang ingin diajukan.",
-   "th": "ได้เลย! เปิดบริการยื่นคำร้องแล้ว มาเลือกรายการที่จะยื่นกันก่อน"
+   "tl": "OK! Bukas na ang Mga Aplikasyon. Piliin muna natin kung ano ang ia-apply."
   },
   "建議還是把說明看完喔。": {
    "en": "It is still best to read the explanation. ",
    "ja": "やはり説明は最後まで読むのがおすすめです。",
    "vi": "Bạn vẫn nên đọc hết phần giải thích nhé. ",
    "id": "Sebaiknya tetap baca penjelasannya sampai habis, ya. ",
-   "th": "ยังแนะนำให้อ่านคำอธิบายให้จบ "
+   "tl": "Mas mabuti pa ring basahin ang paliwanag. "
   },
   "往上滑一點，": {
    "en": "Scroll up a little. ",
    "ja": "少し上にスクロールして、",
    "vi": "Kéo lên một chút. ",
    "id": "Gulir ke atas sedikit. ",
-   "th": "เลื่อนขึ้นอีกนิด "
+   "tl": "Mag-scroll pataas nang kaunti. "
   },
   "往下滑一點，": {
    "en": "Scroll down a little. ",
    "ja": "少し下にスクロールして、",
    "vi": "Kéo xuống một chút. ",
    "id": "Gulir ke bawah sedikit. ",
-   "th": "เลื่อนลงอีกนิด "
+   "tl": "Mag-scroll pababa nang kaunti. "
   },
   "往下滑到最下面，": {
    "en": "Scroll down to the very bottom. ",
    "ja": "一番下までスクロールして、",
    "vi": "Kéo xuống dưới cùng. ",
    "id": "Gulir sampai paling bawah. ",
-   "th": "เลื่อนลงไปล่างสุด "
+   "tl": "Mag-scroll pababa hanggang sa pinakaibaba. "
   },
   "往下滑，": {
    "en": "Scroll down. ",
    "ja": "下にスクロールして、",
    "vi": "Kéo xuống. ",
    "id": "Gulir ke bawah. ",
-   "th": "เลื่อนลง "
+   "tl": "Mag-scroll pababa. "
   },
   "往下滑，接著填「申辦服務資料」。": {
    "en": "Scroll down and fill in “{page:申辦服務資料}” next.",
    "ja": "下にスクロールして、次は「{page:申辦服務資料}」を入力します。",
    "vi": "Kéo xuống, tiếp theo điền “{page:申辦服務資料}”.",
    "id": "Gulir ke bawah, lalu isi “{page:申辦服務資料}”.",
-   "th": "เลื่อนลง แล้วกรอก “{page:申辦服務資料}” ต่อ"
+   "tl": "Mag-scroll pababa at punan ang “{page:申辦服務資料}” sunod."
   },
   "從最上面的「基本資料」開始填，填完往下滑。": {
    "en": "Start with “{page:基本資料}” at the top, then scroll down when done.",
    "ja": "一番上の「{page:基本資料}」から入力して、終わったら下にスクロールします。",
    "vi": "Bắt đầu điền từ “{page:基本資料}” ở trên cùng, điền xong thì kéo xuống.",
    "id": "Mulai isi dari “{page:基本資料}” paling atas, setelah selesai gulir ke bawah.",
-   "th": "เริ่มกรอกจาก “{page:基本資料}” ด้านบนสุด กรอกเสร็จแล้วเลื่อนลง"
+   "tl": "Magsimula sa “{page:基本資料}” sa itaas, saka mag-scroll pababa kapag tapos na."
   },
   "想改選的項目，按「申訴項目」旁邊的「變更」。": {
    "en": "To change your picks, tap “{page:變更}” next to “{page:申訴項目}”.",
    "ja": "選んだ項目を変えるには、「{page:申訴項目}」の横の「{page:變更}」を押します。",
    "vi": "Muốn chọn lại, bấm “{page:變更}” bên cạnh “{page:申訴項目}”.",
    "id": "Untuk mengubah pilihan, ketuk “{page:變更}” di samping “{page:申訴項目}”.",
-   "th": "ถ้าจะเปลี่ยนที่เลือก กด “{page:變更}” ข้าง “{page:申訴項目}”"
+   "tl": "Para palitan ang mga napili mo, i-tap ang “{page:變更}” sa tabi ng “{page:申訴項目}”."
   },
   "想看已經辦完的案件，點右邊的「已結案」。": {
    "en": "To see finished cases, tap “{page:已結案}” on the right.",
    "ja": "完了した案件を見るには、右の「{page:已結案}」をタップします。",
    "vi": "Muốn xem hồ sơ đã xong, bấm “{page:已結案}” bên phải.",
    "id": "Untuk melihat kasus yang sudah selesai, ketuk “{page:已結案}” di kanan.",
-   "th": "ถ้าจะดูเรื่องที่เสร็จแล้ว แตะ “{page:已結案}” ทางขวา"
+   "tl": "Para makita ang mga natapos na kaso, i-tap ang “{page:已結案}” sa kanan."
   },
   "想看還在辦的，點左邊的「申辦中」。": {
    "en": "To see cases still in progress, tap “{page:申辦中}” on the left.",
    "ja": "手続き中のものを見るには、左の「{page:申辦中}」をタップします。",
    "vi": "Muốn xem hồ sơ đang xử lý, bấm “{page:申辦中}” bên trái.",
    "id": "Untuk melihat yang masih diproses, ketuk “{page:申辦中}” di kiri.",
-   "th": "ถ้าจะดูเรื่องที่ยังดำเนินการ แตะ “{page:申辦中}” ทางซ้าย"
+   "tl": "Para makita ang mga kasong isinasagawa pa, i-tap ang “{page:申辦中}” sa kaliwa."
   },
   "我要查申辦進度": {
    "en": "I want to check my application progress",
    "ja": "申請の進捗を確認したい",
    "vi": "Tôi muốn xem tiến độ hồ sơ",
    "id": "Saya ingin cek status permohonan",
-   "th": "ต้องการดูสถานะคำร้อง"
+   "tl": "Gusto kong tingnan ang progreso ng aplikasyon ko"
   },
   "我要申請補助": {
    "en": "I want to apply for a subsidy",
    "ja": "補助を申請したい",
    "vi": "Tôi muốn xin trợ cấp",
    "id": "Saya ingin mengajukan subsidi",
-   "th": "ต้องการขอเงินอุดหนุน"
+   "tl": "Gusto kong mag-apply ng subsidiya"
   },
   "打好了嗎？按右邊的放大鏡找找看。": {
    "en": "Done typing? Tap the magnifier on the right to search.",
    "ja": "入力できましたか？右の虫めがねを押して探してみましょう。",
    "vi": "Gõ xong chưa? Bấm kính lúp bên phải để tìm nhé.",
    "id": "Sudah diketik? Ketuk kaca pembesar di kanan untuk mencari.",
-   "th": "พิมพ์เสร็จหรือยัง? กดแว่นขยายทางขวาเพื่อค้นหา"
+   "tl": "Tapos nang mag-type? I-tap ang magnifying glass sa kanan para maghanap."
   },
   "找到了！下面就是符合的項目。": {
    "en": "Found it! The matching items are below.",
    "ja": "見つかりました！下が合う項目です。",
    "vi": "Tìm thấy rồi! Các mục phù hợp ở bên dưới.",
    "id": "Ketemu! Item yang cocok ada di bawah.",
-   "th": "เจอแล้ว! รายการที่ตรงกันอยู่ด้านล่าง"
+   "tl": "Nakita na! Nasa ibaba ang mga tugmang item."
   },
   "找申辦項目": {
    "en": "Find an application item",
    "ja": "申請項目を探す",
    "vi": "Tìm mục nộp đơn",
    "id": "Cari item permohonan",
-   "th": "หารายการคำร้อง"
+   "tl": "Maghanap ng item ng aplikasyon"
   },
   "按「下一步」檢查資料": {
    "en": "Tap “{page:下一步}” to review",
    "ja": "「{page:下一步}」を押して内容を確認",
    "vi": "Bấm “{page:下一步}” để kiểm tra",
    "id": "Ketuk “{page:下一步}” untuk memeriksa",
-   "th": "กด “{page:下一步}” เพื่อตรวจข้อมูล"
+   "tl": "I-tap ang “{page:下一步}” para suriin"
   },
   "按表單最下面右邊的「下一步」。": {
    "en": "Tap “{page:下一步}” at the bottom right of the form.",
    "ja": "フォームの一番下、右側の「{page:下一步}」を押してください。",
    "vi": "Bấm “{page:下一步}” ở góc dưới bên phải của biểu mẫu.",
    "id": "Ketuk “{page:下一步}” di kanan bawah formulir.",
-   "th": "กด “{page:下一步}” ที่มุมขวาล่างสุดของแบบฟอร์ม"
+   "tl": "I-tap ang “{page:下一步}” sa kanang ibaba ng form."
   },
   "按表單最下面右邊的「下一步」。如果按了還停在這一頁，往上找紅字（例如「{warn}不能為空」），把那一格補好。": {
    "en": "Tap “{page:下一步}” at the bottom right of the form. If you are still on this page after tapping, look up for red text (for example, “{warn}” cannot be empty) and fill in that box.",
    "ja": "フォームの一番下、右側の「{page:下一步}」を押してください。押してもこのページのままなら、上にある赤い文字（例：「{warn}」は空欄にできません）を探して、その欄を入力してください。",
    "vi": "Bấm “{page:下一步}” ở góc dưới bên phải của biểu mẫu. Nếu bấm rồi mà vẫn ở trang này, hãy tìm chữ đỏ ở phía trên (ví dụ “{warn}” không được để trống) và điền ô đó.",
    "id": "Ketuk “{page:下一步}” di kanan bawah formulir. Jika setelah diketuk masih di halaman ini, cari tulisan merah di atas (misalnya “{warn}” tidak boleh kosong) dan isi kolom itu.",
-   "th": "กด “{page:下一步}” ที่มุมขวาล่างสุดของแบบฟอร์ม ถ้ากดแล้วยังอยู่หน้านี้ ให้เลื่อนขึ้นหาตัวอักษรสีแดง (เช่น “{warn}” ห้ามว่าง) แล้วกรอกช่องนั้น"
+   "tl": "I-tap ang “{page:下一步}” sa kanang ibaba ng form. Kung nasa pahinang ito ka pa rin pagkatapos mag-tap, hanapin sa itaas ang pulang text (halimbawa, hindi puwedeng walang laman ang “{warn}”) at punan ang kahong iyon."
   },
   "日期": {
    "en": "the date",
    "ja": "日付",
    "vi": "ngày",
    "id": "tanggal",
-   "th": "วันที่"
+   "tl": "petsa"
   },
   "日期已經填進框框了，想改再點一次框框。": {
    "en": "The date is in the box now. To change it, tap the box again.",
    "ja": "日付が枠に入りました。変えるときは、もう一度枠をタップします。",
    "vi": "Ngày đã được điền vào ô, muốn đổi thì bấm vào ô lần nữa.",
    "id": "Tanggal sudah masuk ke kotak. Untuk mengubah, ketuk kotaknya lagi.",
-   "th": "วันที่ใส่ในช่องแล้ว ถ้าจะเปลี่ยน แตะช่องอีกครั้ง"
+   "tl": "Nasa kahon na ang petsa. Para palitan ito, i-tap ulit ang kahon."
   },
   "日期選好了！": {
    "en": "Date picked!",
    "ja": "日付を選べました！",
    "vi": "Đã chọn ngày xong!",
    "id": "Tanggal sudah dipilih!",
-   "th": "เลือกวันที่แล้ว!"
+   "tl": "Napili na ang petsa!"
   },
   "有紅字「{warn}不能為空」的地方也要補好。": {
    "en": "Also fill in any box with red text saying “{warn}” cannot be empty.",
    "ja": "「{warn}」は空欄にできない、という赤い文字が出ているところも入力してください。",
    "vi": "Chỗ nào có chữ đỏ báo “{warn}” không được để trống cũng phải điền.",
    "id": "Kolom dengan tulisan merah “{warn}” tidak boleh kosong juga harus diisi.",
-   "th": "ตรงที่มีตัวอักษรสีแดงว่า “{warn}” ห้ามว่าง ก็ต้องกรอกด้วย"
+   "tl": "Punan din ang anumang kahon na may pulang text na nagsasabing hindi puwedeng walang laman ang “{warn}”."
   },
   "查申辦進度": {
    "en": "Check application progress",
    "ja": "申請の進捗を確認",
    "vi": "Xem tiến độ hồ sơ",
    "id": "Cek status permohonan",
-   "th": "ดูสถานะคำร้อง"
+   "tl": "Tingnan ang progreso ng aplikasyon"
   },
   "檢查一下資料對不對，沒問題就自己按最下面的「送出」；要改就按「修改」。「個人資料是否提供給承辦員」選「不同意」的話，「送出」會不能按，申請就送不出去。": {
    "en": "Check that the information is correct. If all is fine, tap “{page:送出}” at the bottom yourself; to change something, tap “{page:修改}”. If “{page:個人資料是否提供給承辦員}” is set to “{page:不同意}”, “{page:送出}” cannot be tapped and the application cannot be sent.",
    "ja": "内容が正しいか確認してください。問題なければ、ご自分で一番下の「{page:送出}」を押します。直すときは「{page:修改}」を押します。「{page:個人資料是否提供給承辦員}」で「{page:不同意}」を選ぶと「{page:送出}」は押せず、申請は送れません。",
    "vi": "Kiểm tra thông tin có đúng không, nếu ổn thì tự bấm “{page:送出}” ở dưới cùng; muốn sửa thì bấm “{page:修改}”. Nếu mục “{page:個人資料是否提供給承辦員}” chọn “{page:不同意}”, sẽ không bấm được “{page:送出}” và đơn không gửi đi được.",
    "id": "Periksa apakah datanya benar. Jika sudah, ketuk sendiri “{page:送出}” paling bawah; untuk mengubah, ketuk “{page:修改}”. Jika “{page:個人資料是否提供給承辦員}” dipilih “{page:不同意}”, “{page:送出}” tidak bisa diketuk dan permohonan tidak bisa dikirim.",
-   "th": "ตรวจดูว่าข้อมูลถูกต้องไหม ถ้าไม่มีปัญหา กด “{page:送出}” ด้านล่างสุดด้วยตัวเอง ถ้าจะแก้ กด “{page:修改}” ถ้าข้อ “{page:個人資料是否提供給承辦員}” เลือก “{page:不同意}” จะกด “{page:送出}” ไม่ได้ และส่งคำขอไม่ได้"
+   "tl": "Suriin kung tama ang impormasyon. Kung ayos lahat, ikaw mismo ang mag-tap ng “{page:送出}” sa ibaba; para may baguhin, i-tap ang “{page:修改}”. Kung “{page:不同意}” ang nakatakda sa “{page:個人資料是否提供給承辦員}”, hindi mata-tap ang “{page:送出}” at hindi maipapadala ang aplikasyon."
   },
   "滑到最下面，按「下一步」。": {
    "en": "Scroll to the very bottom and tap “{page:下一步}”.",
    "ja": "一番下までスクロールして、「{page:下一步}」を押します。",
    "vi": "Kéo xuống dưới cùng, bấm “{page:下一步}”.",
    "id": "Gulir ke paling bawah, lalu ketuk “{page:下一步}”.",
-   "th": "เลื่อนลงไปล่างสุด แล้วกด “{page:下一步}”"
+   "tl": "Mag-scroll hanggang sa pinakaibaba at i-tap ang “{page:下一步}”."
   },
   "用關鍵字找申辦項目": {
    "en": "Search application items by keyword",
    "ja": "キーワードで申請項目を探す",
    "vi": "Tìm mục nộp đơn bằng từ khóa",
    "id": "Cari item permohonan dengan kata kunci",
-   "th": "ค้นหารายการคำร้องด้วยคำค้น"
+   "tl": "Maghanap ng item ng aplikasyon gamit ang keyword"
   },
   "申辦": {
    "en": "Apply",
    "ja": "申請",
    "vi": "Nộp đơn",
    "id": "Mengajukan",
-   "th": "ยื่นคำร้อง"
+   "tl": "Mag-apply"
   },
   "申辦服務": {
    "en": "Applications",
    "ja": "申請サービス",
    "vi": "Dịch vụ nộp đơn",
    "id": "Layanan permohonan",
-   "th": "บริการยื่นคำร้อง"
+   "tl": "Mga Aplikasyon"
   },
   "申辦服務資料": {
    "en": "Application details",
    "ja": "申請内容",
    "vi": "Thông tin hồ sơ",
    "id": "Data permohonan",
-   "th": "ข้อมูลคำร้อง"
+   "tl": "Detalye ng aplikasyon"
   },
   "申辦服務資料填好了！": {
    "en": "Application details are filled in!",
    "ja": "申請内容の入力ができました！",
    "vi": "Đã điền xong thông tin hồ sơ!",
    "id": "Data permohonan sudah diisi!",
-   "th": "กรอกข้อมูลคำร้องเสร็จแล้ว!"
+   "tl": "Napunan na ang detalye ng aplikasyon!"
   },
   "畫面寫「案件已完成申辦」。按「確認」回到申辦首頁，之後點上面的「查詢」可以看進度。這是示範網站，沒有真的送出。": {
    "en": "The screen says “{page:案件已完成申辦}”. Tap “{page:確認}” to go back to the Applications home page; later tap “{page:查詢}” at the top to see the progress. This is a demo site, so nothing was really sent.",
    "ja": "画面に「{page:案件已完成申辦}」と出ています。「{page:確認}」を押すと申請サービスのトップページに戻ります。後で上の「{page:查詢}」を押すと進捗が見られます。これはデモサイトなので、実際には送信されていません。",
    "vi": "Màn hình hiện “{page:案件已完成申辦}”. Bấm “{page:確認}” để về trang chủ nộp đơn, sau đó bấm “{page:查詢}” ở trên để xem tiến độ. Đây là trang web mẫu, chưa gửi thật.",
    "id": "Layar menampilkan “{page:案件已完成申辦}”. Ketuk “{page:確認}” untuk kembali ke halaman utama permohonan, nanti ketuk “{page:查詢}” di atas untuk melihat progres. Ini situs demo, jadi tidak benar-benar dikirim.",
-   "th": "หน้าจอขึ้นว่า “{page:案件已完成申辦}” กด “{page:確認}” เพื่อกลับไปหน้าแรกของบริการยื่นคำร้อง ภายหลังแตะ “{page:查詢}” ด้านบนเพื่อดูความคืบหน้า นี่เป็นเว็บไซต์สาธิต ไม่ได้ส่งจริง"
+   "tl": "Nakasulat sa screen ang “{page:案件已完成申辦}”. I-tap ang “{page:確認}” para bumalik sa home page ng Mga Aplikasyon; mamaya, i-tap ang “{page:查詢}” sa itaas para makita ang progreso. Demo site ito, kaya walang talagang naipadala."
   },
   "畫面說「查無任何申辦相關項目」，沒有找到。換個簡單一點的詞，例如「補助」或「原住民」，或把框框清空看全部的項目。": {
    "en": "The screen says “{page:查無任何申辦相關項目}”: nothing was found. Try a simpler word, e.g. “補助” (subsidy) or “原住民” (Indigenous), or clear the box to see all items.",
    "ja": "画面に「{page:查無任何申辦相關項目}」と出ていて、見つかりませんでした。「補助」（補助金）や「原住民」（先住民）のような簡単な言葉に変えるか、枠を空にしてすべての項目を見てください。",
    "vi": "Màn hình báo “{page:查無任何申辦相關項目}”, không tìm thấy. Hãy thử từ đơn giản hơn, ví dụ “補助” (trợ cấp) hoặc “原住民” (người bản địa), hoặc xóa trống ô để xem tất cả các mục.",
    "id": "Layar menampilkan “{page:查無任何申辦相關項目}”, tidak ditemukan. Coba kata yang lebih sederhana, misalnya “補助” (subsidi) atau “原住民” (masyarakat adat), atau kosongkan kotaknya untuk melihat semua item.",
-   "th": "หน้าจอขึ้นว่า “{page:查無任何申辦相關項目}” ไม่พบรายการ ลองใช้คำที่ง่ายขึ้น เช่น “補助” (เงินอุดหนุน) หรือ “原住民” (ชนพื้นเมือง) หรือล้างช่องเพื่อดูทุกรายการ"
+   "tl": "Nakasulat sa screen ang “{page:查無任何申辦相關項目}”: walang nakita. Subukan ang mas simpleng salita, hal. “補助” (subsidiya) o “原住民” (Katutubo), o burahin ang laman ng kahon para makita ang lahat ng item."
   },
   "目前沒有已結案的案件。": {
    "en": "There are no finished cases yet.",
    "ja": "今のところ完了した案件はありません。",
    "vi": "Hiện chưa có hồ sơ nào đã xong.",
    "id": "Saat ini belum ada kasus yang selesai.",
-   "th": "ตอนนี้ยังไม่มีเรื่องที่เสร็จแล้ว"
+   "tl": "Wala pang natapos na kaso."
   },
   "看已結案的案件": {
    "en": "See finished cases",
    "ja": "完了した案件を見る",
    "vi": "Xem hồ sơ đã xong",
    "id": "Lihat kasus yang selesai",
-   "th": "ดูเรื่องที่เสร็จแล้ว"
+   "tl": "Tingnan ang mga natapos na kaso"
   },
   "確認後自己按「送出」": {
    "en": "Check, then tap “{page:送出}” yourself",
    "ja": "確認してからご自分で「{page:送出}」を押す",
    "vi": "Kiểm tra rồi tự bấm “{page:送出}”",
    "id": "Periksa, lalu ketuk sendiri “{page:送出}”",
-   "th": "ตรวจแล้วกด “{page:送出}” ด้วยตัวเอง"
+   "tl": "Suriin, saka ikaw mismo ang mag-tap ng “{page:送出}”"
   },
   "確認資料": {
    "en": "Review details",
    "ja": "内容を確認",
    "vi": "Xác nhận thông tin",
    "id": "Periksa data",
-   "th": "ตรวจข้อมูล"
+   "tl": "Suriin ang detalye"
   },
   "第一件「{title}」現在是「{status}」。": {
    "en": "The first one, “{title}”, is now “{status}”. ",
    "ja": "1件目の「{title}」は今「{status}」です。",
    "vi": "Hồ sơ đầu tiên “{title}” hiện đang “{status}”. ",
    "id": "Kasus pertama, “{title}”, sekarang “{status}”. ",
-   "th": "เรื่องแรก “{title}” ตอนนี้อยู่ในสถานะ “{status}” "
+   "tl": "Ang una, “{title}”, ay “{status}” na ngayon. "
   },
   "第一件是「{title}」。": {
    "en": "The first one is “{title}”. ",
    "ja": "1件目は「{title}」です。",
    "vi": "Hồ sơ đầu tiên là “{title}”. ",
    "id": "Kasus pertama adalah “{title}”. ",
-   "th": "เรื่องแรกคือ “{title}” "
+   "tl": "Ang una ay “{title}”. "
   },
   "表單打開了！照畫面一格一格填，有「*」的都要填。": {
    "en": "The form is open! Fill it in box by box as shown; every box marked “*” must be filled in.",
    "ja": "フォームが開きました！画面のとおり1つずつ入力してください。「*」がついた欄はすべて必須です。",
    "vi": "Biểu mẫu đã mở! Điền từng ô theo màn hình, ô nào có dấu “*” đều phải điền.",
    "id": "Formulir sudah terbuka! Isi satu per satu sesuai layar; semua kolom bertanda “*” wajib diisi.",
-   "th": "เปิดแบบฟอร์มแล้ว! กรอกทีละช่องตามหน้าจอ ช่องที่มี “*” ต้องกรอกทั้งหมด"
+   "tl": "Bukas na ang form! Punan ito isa-isang kahon ayon sa nasa screen; dapat punan ang bawat kahong may “*”."
   },
   "要同意就不用改，檢查好資料直接按「送出」。選「同意」，承辦員依法辦案需要時可以申請取得你的個人資料。注意：選「不同意」的話，「送出」會不能按，這個申請就送不出去。": {
    "en": "If you agree, leave it as it is, check your data and tap “{page:送出}”. With “{page:同意}”, the case officer may request your personal data when the case needs it under the law. Note: if you choose “{page:不同意}”, “{page:送出}” cannot be tapped and this application cannot be sent.",
    "ja": "同意するなら変えなくてかまいません。内容を確認して「{page:送出}」を押してください。「{page:同意}」を選ぶと、担当者が法律に基づき手続きで必要なときに、あなたの個人情報の取得を申請できます。注意：「{page:不同意}」を選ぶと「{page:送出}」が押せなくなり、この申請は送れません。",
    "vi": "Nếu đồng ý thì không cần đổi, kiểm tra xong thông tin rồi bấm “{page:送出}”. Chọn “{page:同意}”, khi cần xử lý hồ sơ theo luật, cán bộ phụ trách có thể xin lấy dữ liệu cá nhân của bạn. Lưu ý: nếu chọn “{page:不同意}”, sẽ không bấm được “{page:送出}” và đơn này không gửi đi được.",
    "id": "Jika setuju, tidak perlu diubah; periksa datanya lalu ketuk “{page:送出}”. Dengan “{page:同意}”, petugas boleh meminta data pribadi Anda bila diperlukan untuk menangani kasus sesuai hukum. Catatan: jika memilih “{page:不同意}”, “{page:送出}” tidak bisa diketuk dan permohonan ini tidak bisa dikirim.",
-   "th": "ถ้ายินยอมก็ไม่ต้องเปลี่ยน ตรวจข้อมูลแล้วกด “{page:送出}” ได้เลย ถ้าเลือก “{page:同意}” เมื่อเจ้าหน้าที่ต้องใช้ในการดำเนินเรื่องตามกฎหมาย จะขอรับข้อมูลส่วนตัวของคุณได้ หมายเหตุ: ถ้าเลือก “{page:不同意}” จะกด “{page:送出}” ไม่ได้ และส่งคำขอนี้ไม่ได้"
+   "tl": "Kung sang-ayon ka, hayaan lang ito, suriin ang iyong datos at i-tap ang “{page:送出}”. Kapag “{page:同意}”, maaaring hilingin ng case officer ang iyong personal na datos kapag kailangan ito ng kaso ayon sa batas. Paalala: kung pipiliin mo ang “{page:不同意}”, hindi mata-tap ang “{page:送出}” at hindi maipapadala ang aplikasyong ito."
   },
   "要送出申請，「個人資料是否提供給承辦員」要選「同意」，再自己按最下面的「送出」。": {
    "en": "To send the application, “{page:個人資料是否提供給承辦員}” must be “{page:同意}”; then tap “{page:送出}” at the bottom yourself.",
    "ja": "申請を送るには、「{page:個人資料是否提供給承辦員}」で「{page:同意}」を選び、ご自分で一番下の「{page:送出}」を押してください。",
    "vi": "Muốn gửi đơn, mục “{page:個人資料是否提供給承辦員}” phải chọn “{page:同意}”, rồi tự bấm “{page:送出}” ở dưới cùng.",
    "id": "Untuk mengirim permohonan, “{page:個人資料是否提供給承辦員}” harus dipilih “{page:同意}”, lalu ketuk sendiri “{page:送出}” paling bawah.",
-   "th": "ถ้าจะส่งคำขอ ข้อ “{page:個人資料是否提供給承辦員}” ต้องเลือก “{page:同意}” แล้วกด “{page:送出}” ด้านล่างสุดด้วยตัวเอง"
+   "tl": "Para maipadala ang aplikasyon, dapat “{page:同意}” ang “{page:個人資料是否提供給承辦員}”; saka ikaw mismo ang mag-tap ng “{page:送出}” sa ibaba."
   },
   "說明看完了！{scroll}「個人資料是否提供給承辦員」是問：承辦員辦案需要時，可不可以申請看你的資料。畫面已經先幫你選「同意」；如果不想讓承辦員申請看你的資料，請點「不同意」。": {
    "en": "You have read it! {scroll}“{page:個人資料是否提供給承辦員}” asks: when the case officer needs it for your case, may they request to see your data? The screen has already chosen “{page:同意}” for you; if you do not want the officer to request your data, tap “{page:不同意}”.",
    "ja": "説明を読み終わりました！{scroll}「{page:個人資料是否提供給承辦員}」は、担当者が手続きで必要なときに、あなたの資料の閲覧を申請してよいか、という質問です。画面では最初から「{page:同意}」が選ばれています。担当者に資料を見られたくないときは「{page:不同意}」を押してください。",
    "vi": "Bạn đã đọc xong! {scroll}“{page:個人資料是否提供給承辦員}” là hỏi: khi cán bộ phụ trách cần để xử lý hồ sơ, họ có được xin xem dữ liệu của bạn không. Màn hình đã chọn sẵn “{page:同意}” cho bạn; nếu không muốn cán bộ xin xem dữ liệu của bạn, hãy bấm “{page:不同意}”.",
    "id": "Sudah dibaca! {scroll}“{page:個人資料是否提供給承辦員}” menanyakan: jika petugas memerlukannya untuk menangani kasus, bolehkah mereka meminta untuk melihat data Anda? Layar sudah memilihkan “{page:同意}”; jika Anda tidak ingin petugas meminta data Anda, ketuk “{page:不同意}”.",
-   "th": "อ่านคำอธิบายจบแล้ว! {scroll}“{page:個人資料是否提供給承辦員}” ถามว่า เมื่อเจ้าหน้าที่ต้องใช้ในการดำเนินเรื่อง จะขอดูข้อมูลของคุณได้ไหม หน้าจอเลือก “{page:同意}” ไว้ให้แล้ว ถ้าไม่ต้องการให้เจ้าหน้าที่ขอดูข้อมูลของคุณ ให้กด “{page:不同意}”"
+   "tl": "Nabasa mo na! {scroll}Ang tanong ng “{page:個人資料是否提供給承辦員}”: kapag kailangan ito ng case officer para sa kaso mo, puwede ba silang humiling na makita ang iyong datos? Napili na ng screen ang “{page:同意}” para sa iyo; kung ayaw mong humiling ang officer ng iyong datos, i-tap ang “{page:不同意}”."
   },
   "資料沒問題，就自己按最下面的「送出」；要改就按「修改」。": {
    "en": "If the information is fine, tap “{page:送出}” at the bottom yourself; to change something, tap “{page:修改}”.",
    "ja": "内容に問題なければ、ご自分で一番下の「{page:送出}」を押してください。直すときは「{page:修改}」を押します。",
    "vi": "Nếu thông tin không có vấn đề, hãy tự bấm “{page:送出}” ở dưới cùng; muốn sửa thì bấm “{page:修改}”.",
    "id": "Jika datanya sudah benar, ketuk sendiri “{page:送出}” paling bawah; untuk mengubah, ketuk “{page:修改}”.",
-   "th": "ถ้าข้อมูลไม่มีปัญหา กด “{page:送出}” ด้านล่างสุดด้วยตัวเอง ถ้าจะแก้ กด “{page:修改}”"
+   "tl": "Kung ayos ang impormasyon, ikaw mismo ang mag-tap ng “{page:送出}” sa ibaba; para may baguhin, i-tap ang “{page:修改}”."
   },
   "送出了！畫面寫「案件已完成申辦」。這是示範網站，沒有真的送出喔。": {
    "en": "Sent! The screen says “{page:案件已完成申辦}”. This is a demo site, so nothing was really sent.",
    "ja": "送信しました！画面に「{page:案件已完成申辦}」と出ています。これはデモサイトなので、実際には送信されていません。",
    "vi": "Đã gửi! Màn hình ghi “{page:案件已完成申辦}”. Đây là trang web mẫu, không gửi thật.",
    "id": "Terkirim! Layar menampilkan “{page:案件已完成申辦}”. Ini situs demo, jadi tidak benar-benar dikirim.",
-   "th": "ส่งแล้ว! หน้าจอขึ้นว่า “{page:案件已完成申辦}” นี่เป็นเว็บไซต์สาธิต ไม่ได้ส่งจริง"
+   "tl": "Naipadala na! Nakasulat sa screen ang “{page:案件已完成申辦}”. Demo site ito, kaya walang talagang naipadala."
   },
   "送出了！畫面寫「案件已完成申辦」，之後可以在「查詢」看辦到哪裡。這是示範網站，沒有真的送出喔。": {
    "en": "Sent! The screen says “{page:案件已完成申辦}”. Later you can see how far it has gone in “{page:查詢}”. This is a demo site, so nothing was really sent.",
    "ja": "送信しました！画面に「{page:案件已完成申辦}」と出ています。後で「{page:查詢}」で進み具合を見られます。これはデモサイトなので、実際には送信されていません。",
    "vi": "Đã gửi! Màn hình hiện “{page:案件已完成申辦}”, sau này có thể xem tiến độ ở “{page:查詢}”. Đây là trang web mẫu, chưa gửi thật đâu.",
    "id": "Terkirim! Layar menampilkan “{page:案件已完成申辦}”. Nanti Anda bisa melihat prosesnya di “{page:查詢}”. Ini situs demo, jadi tidak benar-benar dikirim.",
-   "th": "ส่งแล้ว! หน้าจอขึ้นว่า “{page:案件已完成申辦}” ภายหลังดูได้ที่ “{page:查詢}” ว่าเรื่องไปถึงไหน นี่เป็นเว็บไซต์สาธิต ไม่ได้ส่งจริง"
+   "tl": "Naipadala na! Nakasulat sa screen ang “{page:案件已完成申辦}”. Mamaya, makikita mo sa “{page:查詢}” kung hanggang saan na ito. Demo site ito, kaya walang talagang naipadala."
   },
   "送出了！這是示範網站，沒有真的送出喔。": {
    "en": "Sent! This is a demo site, so nothing was really sent.",
    "ja": "送信しました！これはデモサイトなので、実際には送信されていません。",
    "vi": "Đã gửi! Đây là trang web mẫu, chưa gửi thật đâu.",
    "id": "Terkirim! Ini situs demo, jadi tidak benar-benar dikirim.",
-   "th": "ส่งแล้ว! นี่เป็นเว็บไซต์สาธิต ไม่ได้ส่งจริง"
+   "tl": "Naipadala na! Demo site ito, kaya walang talagang naipadala."
   },
   "這些是已經辦完的案件{n}。{first}": {
    "en": "These are your finished cases{n}. {first}",
    "ja": "これらは完了した案件です{n}。{first}",
    "vi": "Đây là các hồ sơ đã xong{n}. {first}",
    "id": "Ini kasus yang sudah selesai{n}. {first}",
-   "th": "นี่คือเรื่องที่เสร็จแล้ว{n} {first}"
+   "tl": "Ito ang mga natapos mong kaso{n}. {first}"
   },
   "這些是已經辦完的案件。": {
    "en": "These are your finished cases.",
    "ja": "これらは完了した案件です。",
    "vi": "Đây là các hồ sơ đã xong.",
    "id": "Ini kasus yang sudah selesai.",
-   "th": "นี่คือเรื่องที่เสร็จแล้ว"
+   "tl": "Ito ang mga natapos mong kaso."
   },
   "這是「申辦服務」": {
    "en": "This is “Applications”",
    "ja": "これは「申請サービス」です",
    "vi": "Đây là “Dịch vụ nộp đơn”",
    "id": "Ini “Layanan permohonan”",
-   "th": "นี่คือ “บริการยื่นคำร้อง”"
+   "tl": "Ito ang “Mga Aplikasyon”"
   },
   "這段是說：承辦員依法辦案需要時，可以透過申請程序取得你的個人資料。": {
    "en": "This part says: when the case officer needs it to handle a case under the law, they can get your personal data through an application process.",
    "ja": "この部分は、担当者が法律に基づき手続きで必要なときに、申請手続きを通してあなたの個人情報を取得できる、という意味です。",
    "vi": "Đoạn này nói: khi cán bộ phụ trách cần để xử lý hồ sơ theo luật, họ có thể lấy dữ liệu cá nhân của bạn qua thủ tục xin phép.",
    "id": "Bagian ini berarti: jika petugas memerlukannya untuk menangani kasus sesuai hukum, mereka bisa mendapatkan data pribadi Anda melalui prosedur permohonan.",
-   "th": "ส่วนนี้หมายความว่า เมื่อเจ้าหน้าที่ต้องใช้ในการดำเนินเรื่องตามกฎหมาย สามารถขอรับข้อมูลส่วนตัวของคุณผ่านขั้นตอนการยื่นขอได้"
+   "tl": "Ang sinasabi ng bahaging ito: kapag kailangan ito ng case officer para hawakan ang kaso ayon sa batas, makukuha nila ang iyong personal na datos sa pamamagitan ng proseso ng aplikasyon."
   },
   "這裡就是你的申辦案件！{count}{first}卡片下面的 1 到 5 是辦理的進度。": {
    "en": "Here are your applications! {count}{first}The 1 to 5 under each card shows the progress.",
    "ja": "ここがあなたの申請案件です！{count}{first}カードの下の 1 から 5 が手続きの進み具合です。",
    "vi": "Đây là các hồ sơ của bạn! {count}{first}Số 1 đến 5 dưới mỗi thẻ là tiến độ xử lý.",
    "id": "Ini permohonan Anda! {count}{first}Angka 1 sampai 5 di bawah kartu menunjukkan progresnya.",
-   "th": "นี่คือคำร้องของคุณ! {count}{first}เลข 1 ถึง 5 ใต้การ์ดคือความคืบหน้า"
+   "tl": "Narito ang iyong mga aplikasyon! {count}{first}Ipinapakita ng 1 hanggang 5 sa ilalim ng bawat card ang progreso."
   },
   "這裡就是你的申辦案件！卡片下面的 1 到 5 是辦理的進度。": {
    "en": "Here are your applications! The 1 to 5 under each card shows the progress.",
    "ja": "ここがあなたの申請案件です！カードの下の 1 から 5 が手続きの進み具合です。",
    "vi": "Đây là các hồ sơ của bạn! Số 1 đến 5 dưới mỗi thẻ là tiến độ xử lý.",
    "id": "Ini permohonan Anda! Angka 1 sampai 5 di bawah kartu menunjukkan progresnya.",
-   "th": "นี่คือคำร้องของคุณ! เลข 1 ถึง 5 ใต้การ์ดคือความคืบหน้า"
+   "tl": "Narito ang iyong mga aplikasyon! Ipinapakita ng 1 hanggang 5 sa ilalim ng bawat card ang progreso."
   },
   "這裡是「查詢」。先點上面的「申辦」，回到申請項目。": {
    "en": "This is “{page:查詢}”. First tap “{page:申辦}” at the top to go back to the application items.",
    "ja": "ここは「{page:查詢}」です。まず上の「{page:申辦}」をタップして、申請項目に戻ってください。",
    "vi": "Đây là “{page:查詢}”. Trước tiên bấm “{page:申辦}” ở trên để quay lại các mục nộp đơn.",
    "id": "Ini “{page:查詢}”. Ketuk dulu “{page:申辦}” di atas untuk kembali ke item permohonan.",
-   "th": "นี่คือ “{page:查詢}” แตะ “{page:申辦}” ด้านบนก่อน เพื่อกลับไปที่รายการคำร้อง"
+   "tl": "Ito ang “{page:查詢}”. I-tap muna ang “{page:申辦}” sa itaas para bumalik sa mga item ng aplikasyon."
   },
   "這裡是你的申辦案件。目前沒有「申辦中」的案件；辦完的可以點「已結案」看。": {
    "en": "These are your applications. There are no cases “{page:申辦中}” right now; to see finished ones, tap “{page:已結案}”.",
    "ja": "ここがあなたの申請案件です。今「{page:申辦中}」の案件はありません。完了したものは「{page:已結案}」をタップすると見られます。",
    "vi": "Đây là các hồ sơ của bạn. Hiện không có hồ sơ “{page:申辦中}”; hồ sơ đã xong thì bấm “{page:已結案}” để xem.",
    "id": "Ini permohonan Anda. Saat ini tidak ada kasus “{page:申辦中}”; untuk yang sudah selesai, ketuk “{page:已結案}”.",
-   "th": "นี่คือคำร้องของคุณ ตอนนี้ไม่มีเรื่อง “{page:申辦中}” ถ้าจะดูที่เสร็จแล้ว แตะ “{page:已結案}”"
+   "tl": "Ito ang iyong mga aplikasyon. Walang kasong “{page:申辦中}” sa ngayon; para makita ang mga natapos na, i-tap ang “{page:已結案}”."
   },
   "選同意或不同意": {
    "en": "Choose agree or disagree",
    "ja": "同意か不同意を選ぶ",
    "vi": "Chọn đồng ý hoặc không đồng ý",
    "id": "Pilih setuju atau tidak setuju",
-   "th": "เลือกยินยอมหรือไม่ยินยอม"
+   "tl": "Pumili: sang-ayon o hindi sang-ayon"
   },
   "選好了！": {
    "en": "Done!",
    "ja": "選べました！",
    "vi": "Đã chọn xong!",
    "id": "Sudah dipilih!",
-   "th": "เลือกแล้ว!"
+   "tl": "Tapos na!"
   },
   "選好了！按最下面的「確認」。": {
    "en": "Done! Tap “{page:確認}” at the bottom.",
    "ja": "選べました！一番下の「{page:確認}」を押してください。",
    "vi": "Chọn xong rồi! Bấm “{page:確認}” ở dưới cùng.",
    "id": "Sudah dipilih! Ketuk “{page:確認}” paling bawah.",
-   "th": "เลือกแล้ว! กด “{page:確認}” ด้านล่างสุด"
+   "tl": "Tapos na! I-tap ang “{page:確認}” sa ibaba."
   },
   "選好了！框框那裡會寫你選的項目，想改可以按「變更」。": {
    "en": "Done! The box now shows what you picked. To change it, tap “{page:變更}”.",
    "ja": "選べました！枠に選んだ項目が表示されます。変えるときは「{page:變更}」を押します。",
    "vi": "Chọn xong rồi! Ô sẽ hiện các mục bạn đã chọn, muốn đổi thì bấm “{page:變更}”.",
    "id": "Sudah dipilih! Kotak itu akan menampilkan pilihan Anda. Untuk mengubah, ketuk “{page:變更}”.",
-   "th": "เลือกแล้ว! ในกล่องจะแสดงรายการที่เลือก ถ้าจะเปลี่ยน กด “{page:變更}”"
+   "tl": "Tapos na! Makikita na sa kahon ang napili mo. Para palitan ito, i-tap ang “{page:變更}”."
   },
   "選日期": {
    "en": "Pick a date",
    "ja": "日付を選ぶ",
    "vi": "Chọn ngày",
    "id": "Pilih tanggal",
-   "th": "เลือกวันที่"
+   "tl": "Pumili ng petsa"
   },
   "選申訴項目": {
    "en": "Pick complaint items",
    "ja": "陳情項目を選ぶ",
    "vi": "Chọn mục khiếu nại",
    "id": "Pilih item keluhan",
-   "th": "เลือกรายการร้องเรียน"
+   "tl": "Pumili ng item ng reklamo"
   },
   "選申訴項目（可多選）": {
    "en": "Pick complaint items (more than one OK)",
    "ja": "陳情項目を選ぶ（複数可）",
    "vi": "Chọn mục khiếu nại (chọn được nhiều)",
    "id": "Pilih item keluhan (boleh lebih dari satu)",
-   "th": "เลือกรายการร้องเรียน (เลือกได้หลายข้อ)"
+   "tl": "Pumili ng item ng reklamo (puwede ang higit sa isa)"
   },
   "選申辦項目": {
    "en": "Pick an application item",
    "ja": "申請項目を選ぶ",
    "vi": "Chọn mục nộp đơn",
    "id": "Pilih item permohonan",
-   "th": "เลือกรายการคำร้อง"
+   "tl": "Pumili ng item ng aplikasyon"
   },
   "選要不要提供個人資料": {
    "en": "Choose whether to share personal data",
    "ja": "個人情報を提供するか選ぶ",
    "vi": "Chọn có cung cấp dữ liệu cá nhân hay không",
    "id": "Pilih apakah data pribadi diberikan",
-   "th": "เลือกว่าจะให้ข้อมูลส่วนตัวหรือไม่"
+   "tl": "Piliin kung ibabahagi ang personal na datos"
   },
   "都填好了！{scroll}按「下一步」。下一頁還可以檢查，不會馬上送出。": {
    "en": "All filled in! {scroll}Tap “{page:下一步}”. You can still check on the next page; nothing is sent right away.",
    "ja": "すべて入力できました！{scroll}「{page:下一步}」を押してください。次のページでまだ確認できるので、すぐには送信されません。",
    "vi": "Đã điền xong hết! {scroll}Bấm “{page:下一步}”. Trang sau vẫn có thể kiểm tra, sẽ không gửi ngay.",
    "id": "Semua sudah diisi! {scroll}Ketuk “{page:下一步}”. Di halaman berikutnya masih bisa diperiksa, tidak langsung dikirim.",
-   "th": "กรอกครบแล้ว! {scroll}กด “{page:下一步}” หน้าถัดไปยังตรวจได้ ยังไม่ส่งทันที"
+   "tl": "Napunan na lahat! {scroll}I-tap ang “{page:下一步}”. Masusuri mo pa ito sa susunod na pahina; walang maipapadala agad."
   },
   "開啟申辦服務": {
    "en": "Open Applications",
    "ja": "申請サービスを開く",
    "vi": "Mở Dịch vụ nộp đơn",
    "id": "Buka Layanan permohonan",
-   "th": "เปิดบริการยื่นคำร้อง"
+   "tl": "Buksan ang Mga Aplikasyon"
   },
   "點「已結案」看辦完的案件；點「申辦中」看還在辦的。": {
    "en": "Tap “{page:已結案}” to see finished cases; tap “{page:申辦中}” to see ones still in progress.",
    "ja": "「{page:已結案}」をタップすると完了した案件、「{page:申辦中}」をタップすると手続き中の案件が見られます。",
    "vi": "Bấm “{page:已結案}” để xem hồ sơ đã xong; bấm “{page:申辦中}” để xem hồ sơ đang xử lý.",
    "id": "Ketuk “{page:已結案}” untuk kasus yang selesai; ketuk “{page:申辦中}” untuk yang masih diproses.",
-   "th": "แตะ “{page:已結案}” เพื่อดูเรื่องที่เสร็จแล้ว แตะ “{page:申辦中}” เพื่อดูเรื่องที่ยังดำเนินการ"
+   "tl": "I-tap ang “{page:已結案}” para makita ang mga natapos na kaso; i-tap ang “{page:申辦中}” para makita ang mga isinasagawa pa."
   },
   "點「申訴類」或「補助類」打開清單，再點你要申請的項目。也可以在上面的框框打關鍵字找。": {
    "en": "Tap “{page:申訴類}” or “{page:補助類}” to open the list, then tap the item you want. You can also type a keyword in the box at the top.",
    "ja": "「{page:申訴類}」か「{page:補助類}」をタップして一覧を開き、申請したい項目をタップします。上の枠にキーワードを入れて探すこともできます。",
    "vi": "Bấm “{page:申訴類}” hoặc “{page:補助類}” để mở danh sách, rồi bấm vào mục bạn muốn nộp. Cũng có thể gõ từ khóa vào ô phía trên để tìm.",
    "id": "Ketuk “{page:申訴類}” atau “{page:補助類}” untuk membuka daftar, lalu ketuk item yang ingin diajukan. Bisa juga ketik kata kunci di kotak atas.",
-   "th": "แตะ “{page:申訴類}” หรือ “{page:補助類}” เพื่อเปิดรายการ แล้วแตะรายการที่จะยื่น หรือพิมพ์คำค้นในช่องด้านบนก็ได้"
+   "tl": "I-tap ang “{page:申訴類}” o “{page:補助類}” para buksan ang listahan, saka i-tap ang item na gusto mo. Puwede ka ring mag-type ng keyword sa kahon sa itaas."
   },
   "點一下{what}的框框，打上你的電子信箱，例如 abc@gmail.com。": {
    "en": "Tap the box for {what} and type your e-mail, e.g. abc@gmail.com.",
    "ja": "{what}の枠をタップして、メールアドレスを入力してください。例：abc@gmail.com。",
    "vi": "Bấm vào ô nhập của {what}, gõ email của bạn, ví dụ abc@gmail.com.",
    "id": "Ketuk kotak isian {what}, lalu ketik e-mail Anda, misalnya abc@gmail.com.",
-   "th": "แตะกล่องของ {what} แล้วพิมพ์อีเมลของคุณ เช่น abc@gmail.com"
+   "tl": "I-tap ang kahon para sa {what} at i-type ang iyong email, hal. abc@gmail.com."
   },
   "點一下{what}的框框，把內容寫進去（{hint}）。": {
    "en": "Tap the box for {what} and write it in ({hint}).",
    "ja": "{what}の枠をタップして、内容を書いてください（{hint}）。",
    "vi": "Bấm vào ô nhập của {what}, rồi viết nội dung vào ({hint}).",
    "id": "Ketuk kotak isian {what}, lalu tulis isinya ({hint}).",
-   "th": "แตะกล่องของ {what} แล้วเขียนข้อมูลลงไป ({hint})"
+   "tl": "I-tap ang kahon para sa {what} at isulat ito ({hint})."
   },
   "點一下{what}的框框，把資料打進去。": {
    "en": "Tap the box for {what} and type in the information.",
    "ja": "{what}の枠をタップして、内容を入力してください。",
    "vi": "Bấm vào ô nhập của {what}, rồi gõ thông tin vào.",
    "id": "Ketuk kotak isian {what}, lalu ketik datanya.",
-   "th": "แตะกล่องของ {what} แล้วพิมพ์ข้อมูลลงไป"
+   "tl": "I-tap ang kahon para sa {what} at i-type ang impormasyon."
   },
   "點一下{what}的框框，會跳出日曆，點那一天就好。": {
    "en": "Tap the box for {what}. A calendar will pop up; just tap the day.",
    "ja": "{what}の枠をタップするとカレンダーが出るので、その日をタップするだけです。",
    "vi": "Bấm vào ô nhập của {what}, lịch sẽ hiện ra, chỉ cần bấm vào ngày đó.",
    "id": "Ketuk kotak isian {what}, kalender akan muncul. Cukup ketuk tanggalnya.",
-   "th": "แตะกล่องของ {what} แล้วปฏิทินจะขึ้นมา แตะวันนั้นก็พอ"
+   "tl": "I-tap ang kahon para sa {what}. Lalabas ang kalendaryo; i-tap lang ang araw."
   },
   "點一下{what}的框框，會跳出選單，可以選好幾個。": {
    "en": "Tap the box for {what}. A menu will pop up, and you can pick more than one.",
    "ja": "{what}の枠をタップするとメニューが出ます。いくつでも選べます。",
    "vi": "Bấm vào ô nhập của {what}, menu sẽ hiện ra, có thể chọn nhiều mục.",
    "id": "Ketuk kotak isian {what}, menu akan muncul. Boleh pilih lebih dari satu.",
-   "th": "แตะกล่องของ {what} แล้วเมนูจะขึ้นมา เลือกได้หลายข้อ"
+   "tl": "I-tap ang kahon para sa {what}. Lalabas ang menu, at puwede kang pumili ng higit sa isa."
   },
   "點一下{what}，從清單選一個。": {
    "en": "Tap {what} and pick one from the list.",
    "ja": "{what}をタップして、一覧から1つ選んでください。",
    "vi": "Bấm vào {what}, rồi chọn một mục trong danh sách.",
    "id": "Ketuk {what}, lalu pilih satu dari daftar.",
-   "th": "แตะ {what} แล้วเลือกหนึ่งอย่างจากรายการ"
+   "tl": "I-tap ang {what} at pumili ng isa mula sa listahan."
   },
   "點一下上面的「查詢」，就能看到你申辦的案件。": {
    "en": "Tap “{page:查詢}” at the top to see your applications.",
    "ja": "上の「{page:查詢}」をタップすると、あなたの申請案件が見られます。",
    "vi": "Bấm “{page:查詢}” ở trên là thấy các hồ sơ bạn đã nộp.",
    "id": "Ketuk “{page:查詢}” di atas untuk melihat permohonan Anda.",
-   "th": "แตะ “{page:查詢}” ด้านบน จะเห็นคำร้องของคุณ"
+   "tl": "I-tap ang “{page:查詢}” sa itaas para makita ang iyong mga aplikasyon."
   },
   "點一下上面的框框，打你想辦的事，例如「補助」或「原住民」，再按右邊的放大鏡。": {
    "en": "Tap the box at the top, type what you want to do, e.g. “補助” (subsidy) or “原住民” (Indigenous), then tap the magnifier on the right.",
    "ja": "上の枠をタップして、したいことを入力してください。例：「補助」（補助金）や「原住民」（先住民）。それから右の虫めがねを押します。",
    "vi": "Bấm vào ô phía trên, gõ việc bạn muốn làm, ví dụ “補助” (trợ cấp) hoặc “原住民” (người bản địa), rồi bấm kính lúp bên phải.",
    "id": "Ketuk kotak di atas, ketik yang ingin Anda urus, misalnya “補助” (subsidi) atau “原住民” (masyarakat adat), lalu ketuk kaca pembesar di kanan.",
-   "th": "แตะช่องด้านบน พิมพ์เรื่องที่ต้องการทำ เช่น “補助” (เงินอุดหนุน) หรือ “原住民” (ชนพื้นเมือง) แล้วกดแว่นขยายทางขวา"
+   "tl": "I-tap ang kahon sa itaas, i-type ang gusto mong gawin, hal. “補助” (subsidiya) o “原住民” (Katutubo), saka i-tap ang magnifying glass sa kanan."
   },
   "點你要申請的那一項，就會打開申請表單。": {
    "en": "Tap the item you want to apply for, and the application form will open.",
    "ja": "申請したい項目をタップすると、申請フォームが開きます。",
    "vi": "Bấm vào mục bạn muốn nộp, biểu mẫu sẽ mở ra.",
    "id": "Ketuk item yang ingin diajukan, formulir permohonan akan terbuka.",
-   "th": "แตะรายการที่ต้องการยื่น แล้วแบบฟอร์มจะเปิดขึ้น"
+   "tl": "I-tap ang item na gusto mong aplayan, at magbubukas ang form ng aplikasyon."
   },
   "點日期的框框會跳出日曆。點那一天就好；要換月份，按月份兩邊的箭頭。": {
    "en": "Tap the date box and a calendar pops up. Just tap the day; to change the month, tap the arrows on both sides of the month.",
    "ja": "日付の枠をタップするとカレンダーが出ます。その日をタップするだけです。月を変えるには、月の両側の矢印を押します。",
    "vi": "Bấm vào ô ngày, lịch sẽ hiện ra. Chỉ cần bấm vào ngày đó; muốn đổi tháng, bấm mũi tên hai bên tên tháng.",
    "id": "Ketuk kotak tanggal, kalender akan muncul. Cukup ketuk tanggalnya; untuk ganti bulan, ketuk panah di kedua sisi bulan.",
-   "th": "แตะช่องวันที่ แล้วปฏิทินจะขึ้นมา แตะวันนั้นก็พอ ถ้าจะเปลี่ยนเดือน กดลูกศรสองข้างของเดือน"
+   "tl": "I-tap ang kahon ng petsa at lalabas ang kalendaryo. I-tap lang ang araw; para palitan ang buwan, i-tap ang mga arrow sa magkabilang gilid ng buwan."
   },
   "點框框會跳出選單，勾選符合的項目（可以選好幾個），再按最下面的「確認」。": {
    "en": "Tap the box and a menu pops up. Tick the items that apply (more than one is OK), then tap “{page:確認}” at the bottom.",
    "ja": "枠をタップするとメニューが出ます。合う項目にチェックを入れて（いくつでも可）、一番下の「{page:確認}」を押します。",
    "vi": "Bấm vào ô, menu sẽ hiện ra. Đánh dấu các mục phù hợp (có thể chọn nhiều), rồi bấm “{page:確認}” ở dưới cùng.",
    "id": "Ketuk kotaknya, menu akan muncul. Centang item yang sesuai (boleh lebih dari satu), lalu ketuk “{page:確認}” paling bawah.",
-   "th": "แตะกล่องแล้วเมนูจะขึ้นมา ติ๊กรายการที่ตรงกัน (เลือกได้หลายข้อ) แล้วกด “{page:確認}” ด้านล่างสุด"
+   "tl": "I-tap ang kahon at lalabas ang menu. I-tick ang mga angkop na item (puwede ang higit sa isa), saka i-tap ang “{page:確認}” sa ibaba."
   },
   "點要申辦的項目": {
    "en": "Tap the item to apply for",
    "ja": "申請する項目をタップ",
    "vi": "Bấm vào mục muốn nộp đơn",
    "id": "Ketuk item yang akan diajukan",
-   "th": "แตะรายการที่จะยื่น"
+   "tl": "I-tap ang item na ia-apply"
   },
   "，例如「{first}」": {
    "en": ", e.g. “{first}”",
    "ja": "（例：「{first}」）",
    "vi": ", ví dụ “{first}”",
    "id": ", misalnya “{first}”",
-   "th": " เช่น “{first}”"
+   "tl": ", hal. “{first}”"
   },
   "，共 {n} 件": {
    "en": ", {n} in total",
    "ja": "、全部で {n} 件",
    "vi": ", tổng cộng {n} hồ sơ",
    "id": ", total {n}",
-   "th": " ทั้งหมด {n} เรื่อง"
+   "tl": ", kabuuang {n}"
   },
   "：點「{choices}」": {
    "en": ": tap “{choices}”",
    "ja": "：「{choices}」をタップ",
    "vi": ": bấm “{choices}”",
    "id": ": ketuk “{choices}”",
-   "th": ": แตะ “{choices}”"
+   "tl": ": i-tap ang “{choices}”"
   }
  }
 }

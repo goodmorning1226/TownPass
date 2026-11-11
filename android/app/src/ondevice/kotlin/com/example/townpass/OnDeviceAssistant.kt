@@ -41,7 +41,7 @@ object OnDeviceAssistant {
     const val ASR_FILE = "ggml-whisper-chinese.bin"  // push_assistant_models.ps1 -Chinese
 
     /** Multilingual Whisper (default Whisper small q8_0: 1.4 s a clip) for Chinese
-     *  when no separate model is pushed, en/ja/vi/id/th and language detection. */
+     *  when no separate model is pushed, en/ja/vi/id/tl and language detection. */
     const val MULTI_ASR_FILE = "ggml-whisper-multilingual.bin"  // push_assistant_models.ps1 -Multilingual
     /** Optional Taiwanese model (Breeze-ASR-26 q8_0: Taiwanese speech -> Mandarin
      *  characters, docs/AI_TAIWANESE_SPEECH_PLAN.md section 10). Loaded only when

@@ -1,6 +1,6 @@
 {
  "version": 1,
- "status": "DRAFT translations (machine-assisted, 2026-11-08), pending native-speaker review. Keys are the Chinese source texts in lib/page/guided_assistant/; keep {name} placeholders; {page:X} shows the page's own word X as the page shows it (translated by PageTranslation).",
+ "status": "DRAFT translations (machine-assisted, 2026-11-08; Filipino tl AI drafts 2026-11-11), pending native-speaker review. Keys are the Chinese source texts in lib/page/guided_assistant/; keep {name} placeholders; {page:X} shows the page's own word X as the page shows it (translated by PageTranslation).",
  "section": "library",
  "strings": {
   "《{book}》": {
@@ -8,735 +8,735 @@
    "ja": "『{book}』",
    "vi": "“{book}”",
    "id": "“{book}”",
-   "th": "“{book}”"
+   "tl": "“{book}”"
   },
   "「{branch}」": {
    "en": "“{branch}”",
    "ja": "「{branch}」",
    "vi": "“{branch}”",
    "id": "“{branch}”",
-   "th": "“{branch}”"
+   "tl": "“{branch}”"
   },
   "「熱門關鍵字」是大家常找的字，點一個就會幫你搜尋。": {
    "en": "“{page:熱門關鍵字}” are words many people search for. Tap one and it will search for you.",
    "ja": "「{page:熱門關鍵字}」は、みんながよく探す言葉です。1つタップすると検索します。",
    "vi": "“{page:熱門關鍵字}” là những từ mọi người hay tìm. Chạm vào một từ là sẽ tìm giúp bạn.",
    "id": "“{page:熱門關鍵字}” adalah kata yang sering dicari orang. Ketuk salah satu, nanti langsung dicarikan.",
-   "th": "“{page:熱門關鍵字}” คือคำที่คนค้นหาบ่อย แตะคำใดคำหนึ่งแล้วจะค้นหาให้"
+   "tl": "Ang “{page:熱門關鍵字}” ay mga salitang madalas hanapin ng marami. I-tap ang isa at maghahanap ito para sa iyo."
   },
   "「預約」還不能按，因為還沒勾要借哪一冊。先在那一冊右邊的小方框打勾。": {
    "en": "“{page:預約}” can’t be tapped yet because no volume is ticked. First tick the small box to the right of the volume you want.",
    "ja": "まだ借りる巻にチェックがないので、「{page:預約}」は押せません。まず、その巻の右にある小さな四角にチェックを入れてください。",
    "vi": "Chưa chạm được “{page:預約}” vì chưa đánh dấu tập muốn mượn. Trước tiên, đánh dấu vào ô nhỏ bên phải tập đó.",
    "id": "“{page:預約}” belum bisa diketuk karena belum ada jilid yang dicentang. Centang dulu kotak kecil di kanan jilid itu.",
-   "th": "ยังกด “{page:預約}” ไม่ได้ เพราะยังไม่ได้ติ๊กเล่มที่อยากยืม ติ๊กช่องเล็กๆ ทางขวาของเล่มนั้นก่อน"
+   "tl": "Hindi pa mata-tap ang “{page:預約}” dahil wala pang naka-tick na volume. I-tick muna ang maliit na kahon sa kanan ng volume na gusto mo."
   },
   "「預約」還不能按，因為還沒選取書館。點「請選擇取書館」選一間。": {
    "en": "“{page:預約}” can’t be tapped yet because no pickup library is chosen. Tap “{page:請選擇取書館}” and choose one.",
    "ja": "まだ受取館を選んでいないので、「{page:預約}」は押せません。「{page:請選擇取書館}」を押して1つ選んでください。",
    "vi": "Chưa chạm được “{page:預約}” vì chưa chọn thư viện nhận sách. Chạm “{page:請選擇取書館}” và chọn một nơi.",
    "id": "“{page:預約}” belum bisa diketuk karena perpustakaan pengambilan belum dipilih. Ketuk “{page:請選擇取書館}” lalu pilih satu.",
-   "th": "ยังกด “{page:預約}” ไม่ได้ เพราะยังไม่ได้เลือกห้องสมุดที่จะรับหนังสือ กด “{page:請選擇取書館}” แล้วเลือกหนึ่งแห่ง"
+   "tl": "Hindi pa mata-tap ang “{page:預約}” dahil wala pang napiling aklatang kukunan. I-tap ang “{page:請選擇取書館}” at pumili ng isa."
   },
   "一本書最多只能勾 7 冊，已經勾滿了。按「關閉」就好，不用再勾。": {
    "en": "You can tick at most 7 volumes of one book, and you have reached that. Just tap “{page:關閉}”; no need to tick more.",
    "ja": "1冊の本につき最大7冊までしかチェックできず、もう上限です。「{page:關閉}」を押すだけで大丈夫です。これ以上チェックしなくていいです。",
    "vi": "Mỗi cuốn sách chỉ đánh dấu được tối đa 7 tập, bạn đã đủ rồi. Chỉ cần chạm “{page:關閉}”, không cần đánh dấu thêm.",
    "id": "Satu buku paling banyak 7 jilid yang bisa dicentang, dan sudah penuh. Cukup ketuk “{page:關閉}”, tidak perlu mencentang lagi.",
-   "th": "หนังสือหนึ่งเล่มติ๊กได้สูงสุด 7 เล่มย่อย ตอนนี้ครบแล้ว กด “{page:關閉}” ได้เลย ไม่ต้องติ๊กเพิ่ม"
+   "tl": "Hanggang 7 volume lang ng isang libro ang puwedeng i-tick, at naabot mo na iyon. I-tap lang ang “{page:關閉}”; hindi na kailangang mag-tick pa."
   },
   "不知道要找什麼嗎？點一個下面的「熱門關鍵字」看看。": {
    "en": "Not sure what to look for? Tap one of the “{page:熱門關鍵字}” below.",
    "ja": "何を探すか迷っていますか？下の「{page:熱門關鍵字}」を1つタップしてみましょう。",
    "vi": "Chưa biết tìm gì? Hãy chạm thử một “{page:熱門關鍵字}” ở bên dưới.",
    "id": "Belum tahu mau cari apa? Coba ketuk salah satu “{page:熱門關鍵字}” di bawah.",
-   "th": "ยังไม่รู้จะหาอะไรใช่ไหม ลองแตะ “{page:熱門關鍵字}” ข้างล่างสักคำ"
+   "tl": "Hindi sigurado kung ano ang hahanapin? I-tap ang isa sa mga “{page:熱門關鍵字}” sa ibaba."
   },
   "之後你自己去": {
    "en": "Later, you go yourself",
    "ja": "あとでご自分で行きます",
    "vi": "Sau đó bạn tự đi",
    "id": "Nanti Anda pergi sendiri",
-   "th": "ภายหลังคุณไปเอง"
+   "tl": "Pagkatapos, ikaw mismo ang pupunta"
   },
   "什麼是館藏？": {
    "en": "What are library holdings?",
    "ja": "所蔵とは何ですか？",
    "vi": "Sách lưu trữ của thư viện là gì?",
    "id": "Apa itu koleksi perpustakaan?",
-   "th": "หนังสือในคลังห้องสมุดคืออะไร"
+   "tl": "Ano ang library holdings?"
   },
   "你選的取書館": {
    "en": "the pickup library you chose",
    "ja": "選んだ受取館",
    "vi": "thư viện nhận sách bạn đã chọn",
    "id": "perpustakaan pengambilan yang Anda pilih",
-   "th": "ห้องสมุดที่คุณเลือกไปรับหนังสือ"
+   "tl": "aklatang kukunan na pinili mo"
   },
   "借書": {
    "en": "Borrow a book",
    "ja": "本を借りる",
    "vi": "Mượn sách",
    "id": "Pinjam buku",
-   "th": "ยืมหนังสือ"
+   "tl": "Manghiram ng libro"
   },
   "先點一下上面的「關鍵字搜尋」。": {
    "en": "First, tap “{page:關鍵字搜尋}” at the top.",
    "ja": "まず、上の「{page:關鍵字搜尋}」をタップしてください。",
    "vi": "Trước tiên, chạm vào “{page:關鍵字搜尋}” ở phía trên.",
    "id": "Pertama, ketuk “{page:關鍵字搜尋}” di atas.",
-   "th": "ก่อนอื่น แตะ “{page:關鍵字搜尋}” ด้านบน"
+   "tl": "I-tap muna ang “{page:關鍵字搜尋}” sa itaas."
   },
   "先點一下上面的「館藏查詢」。": {
    "en": "First, tap “{page:館藏查詢}” at the top.",
    "ja": "まず、上の「{page:館藏查詢}」をタップしてください。",
    "vi": "Trước tiên, chạm vào “{page:館藏查詢}” ở phía trên.",
    "id": "Pertama, ketuk “{page:館藏查詢}” di atas.",
-   "th": "ก่อนอื่น แตะ “{page:館藏查詢}” ด้านบน"
+   "tl": "I-tap muna ang “{page:館藏查詢}” sa itaas."
   },
   "取書館就是你要去拿書的圖書館。": {
    "en": "The pickup library is the library where you go to get the book.",
    "ja": "受取館とは、本を受け取りに行く図書館のことです。",
    "vi": "Thư viện nhận sách là thư viện bạn sẽ đến lấy sách.",
    "id": "Perpustakaan pengambilan adalah perpustakaan tempat Anda mengambil buku.",
-   "th": "ห้องสมุดรับหนังสือ คือห้องสมุดที่คุณจะไปรับหนังสือ"
+   "tl": "Ang aklatang kukunan ay ang aklatang pupuntahan mo para kunin ang libro."
   },
   "取書館選好了！": {
    "en": "Pickup library chosen!",
    "ja": "受取館を選びました！",
    "vi": "Đã chọn thư viện nhận sách!",
    "id": "Perpustakaan pengambilan sudah dipilih!",
-   "th": "เลือกห้องสมุดรับหนังสือแล้ว!"
+   "tl": "Napili na ang aklatang kukunan!"
   },
   "可以搜尋圖書館有哪些書，選好書再預約，之後到圖書館取書。也可以看排行、公告、我的紀錄和分館地圖。": {
    "en": "You can search for books in the library, reserve the one you want, and later pick it up at the library. You can also see rankings, notices, your records and the branch map.",
    "ja": "図書館にある本を検索し、本を選んで予約して、あとで図書館で受け取れます。ランキング、お知らせ、利用記録、分館マップも見られます。",
    "vi": "Bạn có thể tìm sách trong thư viện, chọn sách rồi đặt trước, sau đó đến thư viện lấy sách. Bạn cũng có thể xem bảng xếp hạng, thông báo, hồ sơ của bạn và bản đồ chi nhánh.",
    "id": "Anda bisa mencari buku di perpustakaan, memilih buku lalu memesannya, kemudian mengambilnya di perpustakaan. Anda juga bisa melihat peringkat, pengumuman, catatan Anda, dan peta cabang.",
-   "th": "ค้นหาว่าห้องสมุดมีหนังสืออะไรบ้าง เลือกหนังสือแล้วจอง จากนั้นไปรับที่ห้องสมุด ดูอันดับ ประกาศ บันทึกของฉัน และแผนที่สาขาได้ด้วย"
+   "tl": "Puwede kang maghanap ng mga libro sa aklatan, magreserba ng gusto mo, at kunin ito sa aklatan pagkatapos. Makikita mo rin ang mga ranking, abiso, iyong mga tala at ang mapa ng mga sangay."
   },
   "可取書會寫取書館和取書期限，帶著借書證在期限前去拿。": {
    "en": "Books ready for pickup show the pickup library and the pickup deadline. Bring your library card and get them before the deadline.",
    "ja": "受取可能な本には、受取館と受取期限が書いてあります。図書館カードを持って、期限までに受け取りに行きましょう。",
    "vi": "Sách có thể nhận sẽ ghi thư viện nhận sách và hạn nhận. Hãy mang thẻ thư viện đến lấy trước hạn.",
    "id": "Buku yang siap diambil mencantumkan perpustakaan pengambilan dan batas waktunya. Bawa kartu perpustakaan dan ambil sebelum batas waktu.",
-   "th": "หนังสือที่รับได้จะแสดงห้องสมุดรับหนังสือและวันหมดเขตรับ นำบัตรห้องสมุดไปรับก่อนหมดเขต"
+   "tl": "Ipinapakita ng mga librong handa nang kunin ang aklatang kukunan at ang deadline ng pagkuha. Dalhin ang iyong library card at kunin ang mga ito bago ang deadline."
   },
   "回到借書": {
    "en": "Back to borrowing",
    "ja": "本の貸出に戻る",
    "vi": "Quay lại mượn sách",
    "id": "Kembali ke pinjam buku",
-   "th": "กลับไปที่การยืมหนังสือ"
+   "tl": "Bumalik sa paghiram"
   },
   "回到借書畫面": {
    "en": "Back to the borrowing screen",
    "ja": "貸出画面に戻る",
    "vi": "Quay lại màn hình mượn sách",
    "id": "Kembali ke layar pinjam buku",
-   "th": "กลับไปหน้าจอยืมหนังสือ"
+   "tl": "Bumalik sa screen ng paghiram"
   },
   "回到圖書借閱": {
    "en": "Back to Library",
    "ja": "図書貸出に戻る",
    "vi": "Quay lại Mượn sách thư viện",
    "id": "Kembali ke Peminjaman buku",
-   "th": "กลับไปที่ยืมหนังสือห้องสมุด"
+   "tl": "Bumalik sa Aklatan"
   },
   "圖書借閱": {
    "en": "Library",
    "ja": "図書貸出",
    "vi": "Mượn sách thư viện",
    "id": "Peminjaman buku",
-   "th": "ยืมหนังสือห้องสมุด"
+   "tl": "Aklatan"
   },
   "在我的紀錄點「可取書」那一行。": {
    "en": "In “{page:我的紀錄}”, tap the “{page:可取書}” row.",
    "ja": "「{page:我的紀錄}」で「{page:可取書}」の行をタップしてください。",
    "vi": "Trong “{page:我的紀錄}”, chạm vào dòng “{page:可取書}”.",
    "id": "Di “{page:我的紀錄}”, ketuk baris “{page:可取書}”.",
-   "th": "ใน “{page:我的紀錄}” แตะแถว “{page:可取書}”"
+   "tl": "Sa “{page:我的紀錄}”, i-tap ang row na “{page:可取書}”."
   },
   "在搜尋框打書名或作者，再按右邊的放大鏡。": {
    "en": "Type a book title or author in the search box, then tap the magnifying glass on the right.",
    "ja": "検索欄に書名か著者名を入力して、右の虫めがねを押してください。",
    "vi": "Gõ tên sách hoặc tác giả vào ô tìm kiếm, rồi chạm vào kính lúp bên phải.",
    "id": "Ketik judul buku atau nama penulis di kotak pencarian, lalu ketuk kaca pembesar di kanan.",
-   "th": "พิมพ์ชื่อหนังสือหรือชื่อผู้แต่งในช่องค้นหา แล้วกดแว่นขยายทางขวา"
+   "tl": "I-type ang pamagat o awtor ng libro sa search box, saka i-tap ang magnifying glass sa kanan."
   },
   "在搜尋結果點你想借的那本書。": {
    "en": "In the search results, tap the book you want to borrow.",
    "ja": "検索結果から、借りたい本をタップしてください。",
    "vi": "Trong kết quả tìm kiếm, chạm vào cuốn sách bạn muốn mượn.",
    "id": "Di hasil pencarian, ketuk buku yang ingin Anda pinjam.",
-   "th": "ในผลการค้นหา แตะหนังสือที่คุณอยากยืม"
+   "tl": "Sa mga resulta ng paghahanap, i-tap ang librong gusto mong hiramin."
   },
   "在搜尋結果點書名，可以看這本書的詳細內容。": {
    "en": "Tap a title in the search results to see the details of the book.",
    "ja": "検索結果の書名をタップすると、本の詳しい内容が見られます。",
    "vi": "Chạm vào tên sách trong kết quả tìm kiếm để xem chi tiết cuốn sách.",
    "id": "Ketuk judul di hasil pencarian untuk melihat detail buku.",
-   "th": "แตะชื่อหนังสือในผลการค้นหา เพื่อดูรายละเอียดของหนังสือ"
+   "tl": "I-tap ang isang pamagat sa mga resulta ng paghahanap para makita ang detalye ng libro."
   },
   "在館藏查詢往下滑，點「點閱排行」右邊的「更多」。": {
    "en": "In “{page:館藏查詢}”, scroll down and tap “{page:更多}” to the right of “{page:點閱排行}”.",
    "ja": "「{page:館藏查詢}」で下にスクロールして、「{page:點閱排行}」の右にある「{page:更多}」をタップしてください。",
    "vi": "Trong “{page:館藏查詢}”, kéo xuống rồi chạm “{page:更多}” bên phải “{page:點閱排行}”.",
    "id": "Di “{page:館藏查詢}”, gulir ke bawah lalu ketuk “{page:更多}” di kanan “{page:點閱排行}”.",
-   "th": "ใน “{page:館藏查詢}” เลื่อนลง แล้วแตะ “{page:更多}” ทางขวาของ “{page:點閱排行}”"
+   "tl": "Sa “{page:館藏查詢}”, mag-scroll pababa at i-tap ang “{page:更多}” sa kanan ng “{page:點閱排行}”."
   },
   "在館藏查詢滑到最下面，點「重要訊息」右邊的「更多」。": {
    "en": "In “{page:館藏查詢}”, scroll to the bottom and tap “{page:更多}” to the right of “{page:重要訊息}”.",
    "ja": "「{page:館藏查詢}」でいちばん下までスクロールして、「{page:重要訊息}」の右にある「{page:更多}」をタップしてください。",
    "vi": "Trong “{page:館藏查詢}”, kéo xuống cuối cùng rồi chạm “{page:更多}” bên phải “{page:重要訊息}”.",
    "id": "Di “{page:館藏查詢}”, gulir sampai paling bawah lalu ketuk “{page:更多}” di kanan “{page:重要訊息}”.",
-   "th": "ใน “{page:館藏查詢}” เลื่อนลงไปล่างสุด แล้วแตะ “{page:更多}” ทางขวาของ “{page:重要訊息}”"
+   "tl": "Sa “{page:館藏查詢}”, mag-scroll hanggang sa ibaba at i-tap ang “{page:更多}” sa kanan ng “{page:重要訊息}”."
   },
   "好的！圖書館服務打開了，我們一起來{task}。": {
    "en": "OK! The library service is open. Let’s do this together: {task}.",
    "ja": "はい！図書館サービスを開きました。一緒に「{task}」をしましょう。",
    "vi": "Được rồi! Dịch vụ thư viện đã mở. Mình cùng làm nhé: {task}.",
    "id": "Baik! Layanan perpustakaan sudah terbuka. Ayo kita lakukan bersama: {task}.",
-   "th": "ได้เลย! เปิดบริการห้องสมุดแล้ว มาทำด้วยกัน: {task}"
+   "tl": "OK! Bukas na ang serbisyo ng aklatan. Sabay nating gawin ito: {task}."
   },
   "好的！圖書館服務打開了，我們一起找書吧。": {
    "en": "OK! The library service is open. Let’s find a book together.",
    "ja": "はい！図書館サービスを開きました。一緒に本を探しましょう。",
    "vi": "Được rồi! Dịch vụ thư viện đã mở. Mình cùng tìm sách nhé.",
    "id": "Baik! Layanan perpustakaan sudah terbuka. Ayo cari buku bersama.",
-   "th": "ได้เลย! เปิดบริการห้องสมุดแล้ว มาหาหนังสือด้วยกัน"
+   "tl": "OK! Bukas na ang serbisyo ng aklatan. Sabay tayong maghanap ng libro."
   },
   "好的！已經幫你打開圖書館服務。我們先找到書、預約，之後再到圖書館取書。我會在畫面上一步一步帶你做。": {
    "en": "OK! I opened the library service for you. First we find a book and reserve it, then later you pick it up at the library. I’ll guide you step by step on the screen.",
    "ja": "はい！図書館サービスを開きました。まず本を探して予約し、あとで図書館で受け取ります。画面で一つずつご案内します。",
    "vi": "Được rồi! Mình đã mở dịch vụ thư viện cho bạn. Trước tiên mình tìm sách và đặt trước, sau đó bạn đến thư viện lấy sách. Mình sẽ hướng dẫn từng bước trên màn hình.",
    "id": "Baik! Layanan perpustakaan sudah saya bukakan. Kita cari buku dan memesannya dulu, nanti Anda ambil di perpustakaan. Saya akan memandu langkah demi langkah di layar.",
-   "th": "ได้เลย! เปิดบริการห้องสมุดให้แล้ว เราจะหาหนังสือและจองก่อน แล้วค่อยไปรับที่ห้องสมุด จะพาทำทีละขั้นบนหน้าจอ"
+   "tl": "OK po! Binuksan ko na ang serbisyo ng aklatan para sa iyo. Una, hahanapin natin ang libro at irereserba ito, saka mo ito kukunin sa aklatan pagkatapos. Gagabayan kita nang hakbang-hakbang sa screen."
   },
   "好的！已經幫你打開圖書館服務，我會在畫面上一步一步帶你做。": {
    "en": "OK! I opened the library service for you. I’ll guide you step by step on the screen.",
    "ja": "はい！図書館サービスを開きました。画面で一つずつご案内します。",
    "vi": "Được rồi! Mình đã mở dịch vụ thư viện cho bạn. Mình sẽ hướng dẫn từng bước trên màn hình.",
    "id": "Baik! Layanan perpustakaan sudah saya bukakan. Saya akan memandu langkah demi langkah di layar.",
-   "th": "ได้เลย! เปิดบริการห้องสมุดให้แล้ว จะพาทำทีละขั้นบนหน้าจอ"
+   "tl": "OK po! Binuksan ko na ang serbisyo ng aklatan para sa iyo. Gagabayan kita nang hakbang-hakbang sa screen."
   },
   "如果畫面寫「請啟用定位服務」，要先允許「城市通」使用你的位置，才會列出附近的分館。": {
    "en": "If the page says “{page:請啟用定位服務}”, first allow “{page:城市通}” to use your location; then nearby branches will be listed.",
    "ja": "画面に「{page:請啟用定位服務}」と出たら、まず「{page:城市通}」に位置情報の使用を許可してください。そうすると近くの分館が表示されます。",
    "vi": "Nếu màn hình ghi “{page:請啟用定位服務}”, hãy cho phép “{page:城市通}” dùng vị trí của bạn trước, khi đó mới hiện các chi nhánh gần đó.",
    "id": "Kalau layar menulis “{page:請啟用定位服務}”, izinkan dulu “{page:城市通}” memakai lokasi Anda, baru cabang terdekat akan ditampilkan.",
-   "th": "ถ้าหน้าจอเขียนว่า “{page:請啟用定位服務}” ให้อนุญาตให้ “{page:城市通}” ใช้ตำแหน่งของคุณก่อน แล้วจะแสดงสาขาที่อยู่ใกล้"
+   "tl": "Kung nakasulat sa pahina ang “{page:請啟用定位服務}”, payagan muna ang “{page:城市通}” na gamitin ang iyong lokasyon; saka ililista ang mga kalapit na sangay."
   },
   "往下滑一點，找到「點閱排行」。": {
    "en": "Scroll down a little to find “{page:點閱排行}”.",
    "ja": "少し下にスクロールして、「{page:點閱排行}」を探してください。",
    "vi": "Kéo xuống một chút để tìm “{page:點閱排行}”.",
    "id": "Gulir ke bawah sedikit untuk menemukan “{page:點閱排行}”.",
-   "th": "เลื่อนลงอีกนิด หา “{page:點閱排行}”"
+   "tl": "Mag-scroll pababa nang kaunti para makita ang “{page:點閱排行}”."
   },
   "往下滑到最下面，找到「重要訊息」。": {
    "en": "Scroll down to the bottom to find “{page:重要訊息}”.",
    "ja": "いちばん下までスクロールして、「{page:重要訊息}」を探してください。",
    "vi": "Kéo xuống cuối cùng để tìm “{page:重要訊息}”.",
    "id": "Gulir sampai paling bawah untuk menemukan “{page:重要訊息}”.",
-   "th": "เลื่อนลงไปล่างสุด หา “{page:重要訊息}”"
+   "tl": "Mag-scroll pababa hanggang sa ibaba para makita ang “{page:重要訊息}”."
   },
   "我們先找書！點一下上面的「關鍵字搜尋」。": {
    "en": "Let’s find a book first! Tap “{page:關鍵字搜尋}” at the top.",
    "ja": "まず本を探しましょう！上の「{page:關鍵字搜尋}」をタップしてください。",
    "vi": "Mình tìm sách trước nhé! Chạm vào “{page:關鍵字搜尋}” ở phía trên.",
    "id": "Kita cari buku dulu! Ketuk “{page:關鍵字搜尋}” di atas.",
-   "th": "มาหาหนังสือกันก่อน! แตะ “{page:關鍵字搜尋}” ด้านบน"
+   "tl": "Maghanap muna tayo ng libro! I-tap ang “{page:關鍵字搜尋}” sa itaas."
   },
   "打勾": {
    "en": "Tick",
    "ja": "チェック",
    "vi": "Đánh dấu",
    "id": "Centang",
-   "th": "ติ๊ก"
+   "tl": "I-tick"
   },
   "打好了嗎？按右邊的放大鏡搜尋。": {
    "en": "Done typing? Tap the magnifying glass on the right to search.",
    "ja": "入力できましたか？右の虫めがねを押して検索してください。",
    "vi": "Gõ xong chưa? Chạm vào kính lúp bên phải để tìm.",
    "id": "Sudah selesai mengetik? Ketuk kaca pembesar di kanan untuk mencari.",
-   "th": "พิมพ์เสร็จหรือยัง กดแว่นขยายทางขวาเพื่อค้นหา"
+   "tl": "Tapos nang mag-type? I-tap ang magnifying glass sa kanan para maghanap."
   },
   "打開我的紀錄": {
    "en": "Open my records",
    "ja": "利用記録を開く",
    "vi": "Mở hồ sơ của tôi",
    "id": "Buka catatan saya",
-   "th": "เปิดบันทึกของฉัน"
+   "tl": "Buksan ang aking mga tala"
   },
   "打開關鍵字搜尋": {
    "en": "Open keyword search",
    "ja": "キーワード検索を開く",
    "vi": "Mở tìm kiếm từ khóa",
    "id": "Buka pencarian kata kunci",
-   "th": "เปิดการค้นหาด้วยคำสำคัญ"
+   "tl": "Buksan ang paghahanap gamit ang keyword"
   },
   "找一本書": {
    "en": "Find a book",
    "ja": "本を1冊探す",
    "vi": "Tìm một cuốn sách",
    "id": "Cari satu buku",
-   "th": "หาหนังสือหนึ่งเล่ม"
+   "tl": "Maghanap ng libro"
   },
   "找到了！上下滑動看看，想借哪一本，點一下書名就好。": {
    "en": "Found them! Scroll up and down, and tap the title of the book you want.",
    "ja": "見つかりました！上下にスクロールして、借りたい本の書名をタップしてください。",
    "vi": "Tìm thấy rồi! Kéo lên xuống để xem, muốn mượn cuốn nào thì chạm vào tên sách.",
    "id": "Ketemu! Gulir ke atas dan bawah, lalu ketuk judul buku yang ingin dipinjam.",
-   "th": "เจอแล้ว! เลื่อนขึ้นลงดู อยากยืมเล่มไหน แตะชื่อหนังสือได้เลย"
+   "tl": "Nakita na! Mag-scroll pataas at pababa, at i-tap ang pamagat ng librong gusto mo."
   },
   "找到書了！點書名就能看詳細內容。": {
    "en": "Books found! Tap a title to see the details.",
    "ja": "本が見つかりました！書名をタップすると詳しい内容が見られます。",
    "vi": "Đã tìm thấy sách! Chạm vào tên sách để xem chi tiết.",
    "id": "Buku ditemukan! Ketuk judul untuk melihat detail.",
-   "th": "เจอหนังสือแล้ว! แตะชื่อหนังสือเพื่อดูรายละเอียด"
+   "tl": "May nakitang mga libro! I-tap ang isang pamagat para makita ang detalye."
   },
   "找熱門的書": {
    "en": "Find popular books",
    "ja": "人気の本を探す",
    "vi": "Tìm sách được ưa chuộng",
    "id": "Cari buku populer",
-   "th": "หาหนังสือยอดนิยม"
+   "tl": "Maghanap ng mga sikat na libro"
   },
   "找附近的圖書館": {
    "en": "Find a library nearby",
    "ja": "近くの図書館を探す",
    "vi": "Tìm thư viện gần đây",
    "id": "Cari perpustakaan terdekat",
-   "th": "หาห้องสมุดใกล้ๆ"
+   "tl": "Maghanap ng kalapit na aklatan"
   },
   "接下來，點這裡選要去哪間圖書館拿書。": {
    "en": "Next, tap here to choose which library you’ll pick the book up at.",
    "ja": "次に、ここをタップして、本を受け取る図書館を選んでください。",
    "vi": "Tiếp theo, chạm vào đây để chọn thư viện bạn sẽ đến lấy sách.",
    "id": "Selanjutnya, ketuk di sini untuk memilih perpustakaan tempat mengambil buku.",
-   "th": "ต่อไป แตะตรงนี้เพื่อเลือกห้องสมุดที่จะไปรับหนังสือ"
+   "tl": "Susunod, i-tap dito para piliin kung saang aklatan mo kukunin ang libro."
   },
   "搜尋書籍": {
    "en": "Search for books",
    "ja": "本を検索",
    "vi": "Tìm sách",
    "id": "Cari buku",
-   "th": "ค้นหาหนังสือ"
+   "tl": "Maghanap ng mga libro"
   },
   "搜尋頁打開了！在上面的框打書名就可以找書。": {
    "en": "The search page is open! Type a book title in the box at the top to find books.",
    "ja": "検索ページが開きました！上の欄に書名を入力すると本を探せます。",
    "vi": "Trang tìm kiếm đã mở! Gõ tên sách vào ô phía trên để tìm sách.",
    "id": "Halaman pencarian sudah terbuka! Ketik judul buku di kotak atas untuk mencari.",
-   "th": "เปิดหน้าค้นหาแล้ว! พิมพ์ชื่อหนังสือในช่องด้านบนเพื่อหาหนังสือ"
+   "tl": "Bukas na ang pahina ng paghahanap! I-type ang pamagat ng libro sa kahon sa itaas para maghanap."
   },
   "最後確認一下：預約{what}，在{where}拿書。沒問題就自己按「預約」喔。": {
    "en": "One last check: you are reserving {what} and picking it up at {where}. If it looks right, tap “{page:預約}” yourself.",
    "ja": "最後の確認です：{what}を予約して、{where}で受け取ります。問題なければ、ご自分で「{page:預約}」を押してください。",
    "vi": "Kiểm tra lần cuối: đặt trước {what}, nhận sách tại {where}. Nếu đúng, bạn tự chạm “{page:預約}” nhé.",
    "id": "Cek terakhir: memesan {what}, ambil bukunya di {where}. Kalau sudah benar, ketuk sendiri “{page:預約}”.",
-   "th": "ตรวจสอบครั้งสุดท้าย: จอง{what} รับหนังสือที่{where} ถ้าถูกต้องแล้ว กด “{page:預約}” เองได้เลย"
+   "tl": "Huling pagsusuri: irereserba mo ang {what} at kukunin mo ito sa {where}. Kung tama ito, ikaw mismo ang mag-tap ng “{page:預約}”."
   },
   "沒有找到書": {
    "en": "No books found",
    "ja": "本が見つかりません",
    "vi": "Không tìm thấy sách",
    "id": "Buku tidak ditemukan",
-   "th": "ไม่พบหนังสือ"
+   "tl": "Walang nakitang libro"
   },
   "沒有預約成功": {
    "en": "Not reserved",
    "ja": "予約できませんでした",
    "vi": "Chưa đặt được",
    "id": "Pemesanan gagal",
-   "th": "จองไม่สำเร็จ"
+   "tl": "Hindi nareserba"
   },
   "看一下書名和取書館對不對，沒問題就自己按「預約」。": {
    "en": "Check that the title and pickup library are right. If so, tap “{page:預約}” yourself.",
    "ja": "書名と受取館が正しいか確認して、問題なければご自分で「{page:預約}」を押してください。",
    "vi": "Xem tên sách và thư viện nhận sách có đúng không, nếu đúng thì bạn tự chạm “{page:預約}”.",
    "id": "Periksa apakah judul dan perpustakaan pengambilan sudah benar. Kalau benar, ketuk sendiri “{page:預約}”.",
-   "th": "ดูว่าชื่อหนังสือและห้องสมุดรับหนังสือถูกต้องไหม ถ้าถูกแล้ว กด “{page:預約}” เอง"
+   "tl": "Tingnan kung tama ang pamagat at ang aklatang kukunan. Kung tama, ikaw mismo ang mag-tap ng “{page:預約}”."
   },
   "看分館地圖": {
    "en": "See the branch map",
    "ja": "分館マップを見る",
    "vi": "Xem bản đồ chi nhánh",
    "id": "Lihat peta cabang",
-   "th": "ดูแผนที่สาขา"
+   "tl": "Tingnan ang mapa ng mga sangay"
   },
   "看可以取的書": {
    "en": "See books ready for pickup",
    "ja": "受け取れる本を見る",
    "vi": "Xem sách có thể nhận",
    "id": "Lihat buku yang siap diambil",
-   "th": "ดูหนังสือที่รับได้"
+   "tl": "Tingnan ang mga librong handa nang kunin"
   },
   "看圖書館公告": {
    "en": "See library notices",
    "ja": "図書館のお知らせを見る",
    "vi": "Xem thông báo của thư viện",
    "id": "Lihat pengumuman perpustakaan",
-   "th": "ดูประกาศของห้องสมุด"
+   "tl": "Tingnan ang mga abiso ng aklatan"
   },
   "看我的紀錄": {
    "en": "See my records",
    "ja": "利用記録を見る",
    "vi": "Xem hồ sơ của tôi",
    "id": "Lihat catatan saya",
-   "th": "ดูบันทึกของฉัน"
+   "tl": "Tingnan ang aking mga tala"
   },
   "看點閱排行": {
    "en": "See the most-viewed ranking",
    "ja": "閲覧ランキングを見る",
    "vi": "Xem bảng xếp hạng lượt xem",
    "id": "Lihat peringkat terpopuler",
-   "th": "ดูอันดับยอดเข้าชม"
+   "tl": "Tingnan ang ranking ng pinakamaraming tumingin"
   },
   "確認後按「預約」": {
    "en": "Check, then tap “{page:預約}”",
    "ja": "確認してから「{page:預約}」を押す",
    "vi": "Kiểm tra rồi chạm “{page:預約}”",
    "id": "Periksa, lalu ketuk “{page:預約}”",
-   "th": "ตรวจสอบแล้วกด “{page:預約}”"
+   "tl": "Suriin, saka i-tap ang “{page:預約}”"
   },
   "等通知，到館取書": {
    "en": "Wait for the notice, then pick up the book",
    "ja": "通知を待って、図書館で受け取る",
    "vi": "Chờ thông báo, rồi đến thư viện lấy sách",
    "id": "Tunggu pemberitahuan, lalu ambil buku di perpustakaan",
-   "th": "รอการแจ้งเตือน แล้วไปรับหนังสือที่ห้องสมุด"
+   "tl": "Hintayin ang abiso, saka kunin ang libro"
   },
   "輸入書名搜尋": {
    "en": "Search by book title",
    "ja": "書名を入力して検索",
    "vi": "Gõ tên sách để tìm",
    "id": "Cari dengan judul buku",
-   "th": "พิมพ์ชื่อหนังสือเพื่อค้นหา"
+   "tl": "Maghanap ayon sa pamagat ng libro"
   },
   "這些是圖書館的公告，休館或活動的消息都在這裡。": {
    "en": "These are the library’s notices. News about closures and events is here.",
    "ja": "これは図書館のお知らせです。休館やイベントの情報はここにあります。",
    "vi": "Đây là thông báo của thư viện, tin về ngày nghỉ hay sự kiện đều ở đây.",
    "id": "Ini pengumuman perpustakaan. Info libur atau acara ada di sini.",
-   "th": "นี่คือประกาศของห้องสมุด ข่าววันปิดหรือกิจกรรมอยู่ที่นี่"
+   "tl": "Ito ang mga abiso ng aklatan. Narito ang mga balita tungkol sa pagsasara at mga event."
   },
   "這些是大家常找的書！點書名就能看詳細內容。": {
    "en": "These are books many people look for! Tap a title to see the details.",
    "ja": "これはみんながよく探す本です！書名をタップすると詳しい内容が見られます。",
    "vi": "Đây là những cuốn sách mọi người hay tìm! Chạm vào tên sách để xem chi tiết.",
    "id": "Ini buku yang sering dicari orang! Ketuk judul untuk melihat detail.",
-   "th": "นี่คือหนังสือที่คนหาบ่อย! แตะชื่อหนังสือเพื่อดูรายละเอียด"
+   "tl": "Ito ang mga librong madalas hanapin ng marami! I-tap ang isang pamagat para makita ang detalye."
   },
   "這些書可以去拿了！看一下「取書館」和「取書期限」，記得在期限前去拿喔。": {
    "en": "These books are ready to pick up! Check the “{page:取書館}” and the “{page:取書期限}”, and remember to go before the deadline.",
    "ja": "これらの本は受け取れます！「{page:取書館}」と「{page:取書期限}」を確認して、期限までに受け取りに行きましょう。",
    "vi": "Những cuốn sách này đã có thể nhận! Xem “{page:取書館}” và “{page:取書期限}”, nhớ đến lấy trước hạn nhé.",
    "id": "Buku-buku ini sudah bisa diambil! Lihat “{page:取書館}” dan “{page:取書期限}”, jangan lupa ambil sebelum batas waktu.",
-   "th": "หนังสือเหล่านี้ไปรับได้แล้ว! ดู “{page:取書館}” และ “{page:取書期限}” อย่าลืมไปรับก่อนหมดเขต"
+   "tl": "Handa nang kunin ang mga librong ito! Tingnan ang “{page:取書館}” at ang “{page:取書期限}”, at tandaang pumunta bago ang deadline."
   },
   "這就是這本書的詳細內容！": {
    "en": "Here are the details of this book!",
    "ja": "これがこの本の詳しい内容です！",
    "vi": "Đây là chi tiết của cuốn sách này!",
    "id": "Ini detail buku ini!",
-   "th": "นี่คือรายละเอียดของหนังสือเล่มนี้!"
+   "tl": "Narito ang detalye ng librong ito!"
   },
   "這是「圖書借閱」": {
    "en": "This is “Library”",
    "ja": "これは「図書貸出」です",
    "vi": "Đây là “Mượn sách thư viện”",
    "id": "Ini “Peminjaman buku”",
-   "th": "นี่คือ “ยืมหนังสือห้องสมุด”"
+   "tl": "Ito ang “Aklatan”"
   },
   "這是你的紀錄！預約、可取書、借閱中都在這裡。": {
    "en": "These are your records! Reservations, books ready for pickup and books on loan are all here.",
    "ja": "これがあなたの記録です！予約中、受取可能、貸出中の本がすべてここにあります。",
    "vi": "Đây là hồ sơ của bạn! Sách đặt trước, sách có thể nhận và sách đang mượn đều ở đây.",
    "id": "Ini catatan Anda! Pemesanan, buku siap diambil, dan buku yang sedang dipinjam ada di sini.",
-   "th": "นี่คือบันทึกของคุณ! การจอง หนังสือที่รับได้ และหนังสือที่ยืมอยู่ อยู่ที่นี่ทั้งหมด"
+   "tl": "Ito ang iyong mga tala! Narito lahat ang mga reserbasyon, mga librong handa nang kunin at mga librong hiniram."
   },
   "這是分館地圖！允許使用位置，就能看到離你最近的圖書館。": {
    "en": "This is the branch map! Allow location access to see the library nearest you.",
    "ja": "これは分館マップです！位置情報の利用を許可すると、いちばん近い図書館が見られます。",
    "vi": "Đây là bản đồ chi nhánh! Cho phép dùng vị trí để xem thư viện gần bạn nhất.",
    "id": "Ini peta cabang! Izinkan akses lokasi untuk melihat perpustakaan terdekat.",
-   "th": "นี่คือแผนที่สาขา! อนุญาตให้ใช้ตำแหน่ง แล้วจะเห็นห้องสมุดที่ใกล้คุณที่สุด"
+   "tl": "Ito ang mapa ng mga sangay! Payagan ang access sa lokasyon para makita ang aklatang pinakamalapit sa iyo."
   },
   "這是點閱排行，越前面越多人看！點書名可以看詳細內容。": {
    "en": "This is the most-viewed ranking: the higher a book is, the more people viewed it! Tap a title to see the details.",
    "ja": "これは閲覧ランキングです。上にあるほど多くの人が見ています！書名をタップすると詳しい内容が見られます。",
    "vi": "Đây là bảng xếp hạng lượt xem, càng ở trên càng nhiều người xem! Chạm vào tên sách để xem chi tiết.",
    "id": "Ini peringkat paling banyak dilihat, makin atas makin banyak yang melihat! Ketuk judul untuk melihat detail.",
-   "th": "นี่คืออันดับยอดเข้าชม ยิ่งอยู่บนยิ่งมีคนดูมาก! แตะชื่อหนังสือเพื่อดูรายละเอียด"
+   "tl": "Ito ang ranking ng pinakamaraming tumingin: habang mas mataas ang libro, mas marami ang tumingin dito! I-tap ang isang pamagat para makita ang detalye."
   },
   "這本書": {
    "en": "this book",
    "ja": "この本",
    "vi": "cuốn sách này",
    "id": "buku ini",
-   "th": "หนังสือเล่มนี้"
+   "tl": "librong ito"
   },
   "這本書不能預約喔，頁面上寫「本館藏不提供預約」。按左上角的「‹」回上一頁，換一本書看看。": {
    "en": "This book can’t be reserved. The page says “{page:本館藏不提供預約}”. Tap “‹” at the top left to go back, and try another book.",
    "ja": "この本は予約できません。ページに「{page:本館藏不提供預約}」と書いてあります。左上の「‹」を押して前のページに戻り、別の本を探してみましょう。",
    "vi": "Cuốn sách này không đặt trước được, trang có ghi “{page:本館藏不提供預約}”. Chạm “‹” ở góc trên bên trái để quay lại, rồi thử cuốn khác.",
    "id": "Buku ini tidak bisa dipesan. Halaman menulis “{page:本館藏不提供預約}”. Ketuk “‹” di kiri atas untuk kembali, lalu coba buku lain.",
-   "th": "หนังสือเล่มนี้จองไม่ได้ หน้าเว็บเขียนว่า “{page:本館藏不提供預約}” กด “‹” มุมซ้ายบนเพื่อย้อนกลับ แล้วลองเล่มอื่น"
+   "tl": "Hindi puwedeng ireserba ang librong ito. Nakasulat sa pahina ang “{page:本館藏不提供預約}”. I-tap ang “‹” sa kaliwang itaas para bumalik, at subukan ang ibang libro."
   },
   "這本書分成好幾冊。在想借的那一冊右邊的小方框打勾，可以勾不只一冊，最多 7 冊。": {
    "en": "This book comes in several volumes. Tick the small box to the right of each volume you want. You can tick more than one, up to 7.",
    "ja": "この本は何冊かに分かれています。借りたい巻の右にある小さな四角にチェックを入れます。複数選べます（最大7冊）。",
    "vi": "Cuốn sách này chia thành nhiều tập. Đánh dấu vào ô nhỏ bên phải tập bạn muốn mượn. Có thể chọn nhiều tập, tối đa 7 tập.",
    "id": "Buku ini terbagi beberapa jilid. Centang kotak kecil di kanan jilid yang ingin dipinjam. Boleh lebih dari satu, paling banyak 7.",
-   "th": "หนังสือเล่มนี้แบ่งเป็นหลายเล่มย่อย ติ๊กช่องเล็กๆ ทางขวาของเล่มที่อยากยืม เลือกได้มากกว่าหนึ่ง สูงสุด 7 เล่ม"
+   "tl": "May ilang volume ang librong ito. I-tick ang maliit na kahon sa kanan ng bawat volume na gusto mo. Puwede kang mag-tick ng higit sa isa, hanggang 7."
   },
   "這本書有好幾冊。先在想借的那一冊右邊的小方框打勾（例如 V. 1）。": {
    "en": "This book has several volumes. First tick the small box to the right of the volume you want (for example V. 1).",
    "ja": "この本は何冊かに分かれています。まず、借りたい巻の右にある小さな四角にチェックを入れてください（例：V. 1）。",
    "vi": "Cuốn sách này có nhiều tập. Trước tiên, đánh dấu vào ô nhỏ bên phải tập bạn muốn mượn (ví dụ V. 1).",
    "id": "Buku ini punya beberapa jilid. Centang dulu kotak kecil di kanan jilid yang ingin dipinjam (misalnya V. 1).",
-   "th": "หนังสือเล่มนี้มีหลายเล่มย่อย ก่อนอื่นให้ติ๊กช่องเล็กๆ ทางขวาของเล่มที่อยากยืม (เช่น V. 1)"
+   "tl": "May ilang volume ang librong ito. I-tick muna ang maliit na kahon sa kanan ng volume na gusto mo (halimbawa V. 1)."
   },
   "這本書現在沒有可以取書的圖書館。按右上角「✕」關掉，再按左上角「‹」換一本書。": {
    "en": "There is no library where you can pick up this book right now. Tap “✕” at the top right to close this, then tap “‹” at the top left to choose another book.",
    "ja": "この本は今、受け取れる図書館がありません。右上の「✕」で閉じてから、左上の「‹」を押して別の本を選びましょう。",
    "vi": "Hiện không có thư viện nào để nhận cuốn sách này. Chạm “✕” ở góc trên bên phải để đóng, rồi chạm “‹” ở góc trên bên trái để chọn cuốn khác.",
    "id": "Saat ini tidak ada perpustakaan untuk mengambil buku ini. Ketuk “✕” di kanan atas untuk menutup, lalu ketuk “‹” di kiri atas untuk memilih buku lain.",
-   "th": "ตอนนี้ไม่มีห้องสมุดที่รับหนังสือเล่มนี้ได้ กด “✕” มุมขวาบนเพื่อปิด แล้วกด “‹” มุมซ้ายบนเพื่อเลือกเล่มอื่น"
+   "tl": "Walang aklatan sa ngayon kung saan puwedeng kunin ang librong ito. I-tap ang “✕” sa kanang itaas para isara ito, saka i-tap ang “‹” sa kaliwang itaas para pumili ng ibang libro."
   },
   "這本書現在沒有可以取書的圖書館。按左上角「‹」回上一頁，換一本書。": {
    "en": "There is no library where you can pick up this book right now. Tap “‹” at the top left to go back and choose another book.",
    "ja": "この本は今、受け取れる図書館がありません。左上の「‹」を押して前のページに戻り、別の本を選びましょう。",
    "vi": "Hiện không có thư viện nào để nhận cuốn sách này. Chạm “‹” ở góc trên bên trái để quay lại và chọn cuốn khác.",
    "id": "Saat ini tidak ada perpustakaan untuk mengambil buku ini. Ketuk “‹” di kiri atas untuk kembali dan memilih buku lain.",
-   "th": "ตอนนี้ไม่มีห้องสมุดที่รับหนังสือเล่มนี้ได้ กด “‹” มุมซ้ายบนเพื่อย้อนกลับ แล้วเลือกเล่มอื่น"
+   "tl": "Walang aklatan sa ngayon kung saan puwedeng kunin ang librong ito. I-tap ang “‹” sa kaliwang itaas para bumalik at pumili ng ibang libro."
   },
   "這本書現在沒有可以取書的圖書館，不能預約。回上一頁換一本書。": {
    "en": "There is no library where you can pick up this book right now, so it can’t be reserved. Go back and choose another book.",
    "ja": "この本は今、受け取れる図書館がないので予約できません。前のページに戻って別の本を選びましょう。",
    "vi": "Hiện không có thư viện nào để nhận cuốn sách này nên không đặt trước được. Hãy quay lại và chọn cuốn khác.",
    "id": "Saat ini tidak ada perpustakaan untuk mengambil buku ini, jadi tidak bisa dipesan. Kembali dan pilih buku lain.",
-   "th": "ตอนนี้ไม่มีห้องสมุดที่รับหนังสือเล่มนี้ได้ จึงจองไม่ได้ ย้อนกลับแล้วเลือกเล่มอื่น"
+   "tl": "Walang aklatan sa ngayon kung saan puwedeng kunin ang librong ito, kaya hindi ito mareserba. Bumalik at pumili ng ibang libro."
   },
   "這本書的館藏不提供預約。按左上角的「‹」回到搜尋結果，選另一本書。": {
    "en": "This book’s copies can’t be reserved. Tap “‹” at the top left to go back to the search results, and pick another book.",
    "ja": "この本の所蔵は予約できません。左上の「‹」を押して検索結果に戻り、別の本を選んでください。",
    "vi": "Sách này không cho đặt trước. Chạm “‹” ở góc trên bên trái để quay lại kết quả tìm kiếm, rồi chọn cuốn khác.",
    "id": "Koleksi buku ini tidak bisa dipesan. Ketuk “‹” di kiri atas untuk kembali ke hasil pencarian, lalu pilih buku lain.",
-   "th": "หนังสือเล่มนี้ไม่เปิดให้จอง กด “‹” มุมซ้ายบนเพื่อกลับไปที่ผลการค้นหา แล้วเลือกเล่มอื่น"
+   "tl": "Hindi puwedeng ireserba ang mga kopya ng librong ito. I-tap ang “‹” sa kaliwang itaas para bumalik sa mga resulta ng paghahanap, at pumili ng ibang libro."
   },
   "這次沒有找到書。在上面的框打別的書名，例如「神奇柑仔店」，再按放大鏡。想看「熱門關鍵字」，就把框裡的字刪掉再按放大鏡。": {
    "en": "No books were found this time. Type another title in the box at the top, for example “{page:神奇柑仔店}”, and tap the magnifying glass. To see the “{page:熱門關鍵字}” again, delete the words in the box and tap the magnifying glass.",
    "ja": "今回は本が見つかりませんでした。上の欄に別の書名（例：「{page:神奇柑仔店}」）を入力して、虫めがねを押してください。「{page:熱門關鍵字}」を見たいときは、欄の文字を消して虫めがねを押します。",
    "vi": "Lần này không tìm thấy sách. Gõ tên sách khác vào ô phía trên, ví dụ “{page:神奇柑仔店}”, rồi chạm kính lúp. Muốn xem “{page:熱門關鍵字}”, hãy xóa chữ trong ô rồi chạm kính lúp.",
    "id": "Kali ini buku tidak ditemukan. Ketik judul lain di kotak atas, misalnya “{page:神奇柑仔店}”, lalu ketuk kaca pembesar. Untuk melihat “{page:熱門關鍵字}”, hapus tulisan di kotak lalu ketuk kaca pembesar.",
-   "th": "ครั้งนี้ไม่พบหนังสือ พิมพ์ชื่อหนังสืออื่นในช่องด้านบน เช่น “{page:神奇柑仔店}” แล้วกดแว่นขยาย ถ้าอยากเห็น “{page:熱門關鍵字}” ให้ลบคำในช่องแล้วกดแว่นขยาย"
+   "tl": "Walang nakitang libro ngayon. Mag-type ng ibang pamagat sa kahon sa itaas, halimbawa “{page:神奇柑仔店}”, at i-tap ang magnifying glass. Para makita ulit ang “{page:熱門關鍵字}”, burahin ang mga salita sa kahon at i-tap ang magnifying glass."
   },
   "這次沒有找到書（畫面寫「查無資料」）。把框裡的字刪掉，再按右邊的放大鏡，「熱門關鍵字」就會再出現，可以換一個點，例如「神奇柑仔店」。": {
    "en": "No books were found this time (the page says “{page:查無資料}”). Delete the words in the box and tap the magnifying glass on the right; the “{page:熱門關鍵字}” will show again, and you can tap another one, for example “{page:神奇柑仔店}”.",
    "ja": "今回は本が見つかりませんでした（画面に「{page:查無資料}」と出ています）。欄の文字を消して右の虫めがねを押すと、「{page:熱門關鍵字}」がまた出ます。別のものを押してみましょう。例：「{page:神奇柑仔店}」。",
    "vi": "Lần này không tìm thấy sách (màn hình ghi “{page:查無資料}”). Xóa chữ trong ô rồi chạm kính lúp bên phải, “{page:熱門關鍵字}” sẽ hiện lại, bạn có thể chọn từ khác, ví dụ “{page:神奇柑仔店}”.",
    "id": "Kali ini buku tidak ditemukan (layar menulis “{page:查無資料}”). Hapus tulisan di kotak lalu ketuk kaca pembesar di kanan, “{page:熱門關鍵字}” akan muncul lagi, dan Anda bisa ketuk yang lain, misalnya “{page:神奇柑仔店}”.",
-   "th": "ครั้งนี้ไม่พบหนังสือ (หน้าจอเขียนว่า “{page:查無資料}”) ลบคำในช่อง แล้วกดแว่นขยายทางขวา “{page:熱門關鍵字}” จะกลับมา แล้วลองแตะคำอื่น เช่น “{page:神奇柑仔店}”"
+   "tl": "Walang nakitang libro ngayon (nakasulat sa pahina ang “{page:查無資料}”). Burahin ang mga salita sa kahon at i-tap ang magnifying glass sa kanan; lalabas ulit ang “{page:熱門關鍵字}”, at puwede kang mag-tap ng iba, halimbawa “{page:神奇柑仔店}”."
   },
   "這次沒有找到書（畫面寫「查無資料」）。換個書名再搜尋一次，例如「神奇柑仔店」。": {
    "en": "No books were found this time (the page says “{page:查無資料}”). Search again with another title, for example “{page:神奇柑仔店}”.",
    "ja": "今回は本が見つかりませんでした（画面に「{page:查無資料}」と出ています）。別の書名でもう一度検索しましょう。例：「{page:神奇柑仔店}」。",
    "vi": "Lần này không tìm thấy sách (màn hình ghi “{page:查無資料}”). Hãy tìm lại với tên sách khác, ví dụ “{page:神奇柑仔店}”.",
    "id": "Kali ini buku tidak ditemukan (layar menulis “{page:查無資料}”). Cari lagi dengan judul lain, misalnya “{page:神奇柑仔店}”.",
-   "th": "ครั้งนี้ไม่พบหนังสือ (หน้าจอเขียนว่า “{page:查無資料}”) ลองค้นหาใหม่ด้วยชื่ออื่น เช่น “{page:神奇柑仔店}”"
+   "tl": "Walang nahanap na libro ngayon (nakasulat sa page ang “{page:查無資料}”). Maghanap ulit gamit ang ibang pamagat, halimbawa “{page:神奇柑仔店}”."
   },
   "這次沒有預約成功，原因是「{reason}」。可以按「查看預約清單」看看，或換一本書。": {
    "en": "The reservation didn’t go through. The reason: “{reason}”. You can tap “{page:查看預約清單}” to check, or try another book.",
    "ja": "今回は予約できませんでした。理由は「{reason}」です。「{page:查看預約清單}」を押して確認するか、別の本にしてみましょう。",
    "vi": "Lần này đặt trước không thành công, lý do là “{reason}”. Bạn có thể chạm “{page:查看預約清單}” để xem, hoặc chọn cuốn khác.",
    "id": "Kali ini pemesanan gagal, alasannya “{reason}”. Anda bisa ketuk “{page:查看預約清單}” untuk melihat, atau pilih buku lain.",
-   "th": "ครั้งนี้จองไม่สำเร็จ เหตุผลคือ “{reason}” กด “{page:查看預約清單}” เพื่อดู หรือเปลี่ยนเป็นเล่มอื่น"
+   "tl": "Hindi natuloy ang reserbasyon. Ang dahilan: “{reason}”. Puwede mong i-tap ang “{page:查看預約清單}” para tingnan, o sumubok ng ibang libro."
   },
   "這次沒有預約成功，畫面上有寫原因。可以按「查看預約清單」看看，或換一本書。": {
    "en": "The reservation didn’t go through. The reason is shown on the screen. You can tap “{page:查看預約清單}” to check, or try another book.",
    "ja": "今回は予約できませんでした。理由は画面に書いてあります。「{page:查看預約清單}」を押して確認するか、別の本にしてみましょう。",
    "vi": "Lần này đặt trước không thành công, lý do có ghi trên màn hình. Bạn có thể chạm “{page:查看預約清單}” để xem, hoặc chọn cuốn khác.",
    "id": "Kali ini pemesanan gagal, alasannya tertulis di layar. Anda bisa ketuk “{page:查看預約清單}” untuk melihat, atau pilih buku lain.",
-   "th": "ครั้งนี้จองไม่สำเร็จ เหตุผลเขียนอยู่บนหน้าจอ กด “{page:查看預約清單}” เพื่อดู หรือเปลี่ยนเป็นเล่มอื่น"
+   "tl": "Hindi natuloy ang reserbasyon. Nakasulat sa screen ang dahilan. Puwede mong i-tap ang “{page:查看預約清單}” para tingnan, o sumubok ng ibang libro."
   },
   "這頁有書的介紹和館藏。想借的話，在下面選取書館再預約。": {
    "en": "This page has the book’s description and copies. To borrow it, choose a pickup library below, then reserve.",
    "ja": "このページには本の紹介と所蔵があります。借りたいときは、下で受取館を選んでから予約してください。",
    "vi": "Trang này có giới thiệu sách và nơi lưu trữ. Muốn mượn thì chọn thư viện nhận sách ở bên dưới rồi đặt trước.",
    "id": "Halaman ini berisi info buku dan koleksinya. Kalau mau pinjam, pilih perpustakaan pengambilan di bawah lalu pesan.",
-   "th": "หน้านี้มีคำแนะนำหนังสือและข้อมูลเล่มในคลัง ถ้าอยากยืม เลือกห้องสมุดรับหนังสือข้างล่างแล้วจอง"
+   "tl": "Nasa page na ito ang paglalarawan ng libro at ang mga kopya nito. Para hiramin ito, pumili ng aklatang kukunan sa ibaba, saka magpareserba."
   },
   "選一本": {
    "en": "Pick one",
    "ja": "1冊選ぶ",
    "vi": "Chọn một cuốn",
    "id": "Pilih satu",
-   "th": "เลือกหนึ่งเล่ม"
+   "tl": "Pumili ng isa"
   },
   "選一本想借的書": {
    "en": "Pick a book to borrow",
    "ja": "借りたい本を選ぶ",
    "vi": "Chọn sách muốn mượn",
    "id": "Pilih buku yang ingin dipinjam",
-   "th": "เลือกหนังสือที่อยากยืม"
+   "tl": "Pumili ng librong hihiramin"
   },
   "選好了！按右上角的「✕」關掉這個視窗。": {
    "en": "Done! Tap “✕” at the top right to close this window.",
    "ja": "選べました！右上の「✕」を押して、この画面を閉じてください。",
    "vi": "Chọn xong rồi! Chạm “✕” ở góc trên bên phải để đóng cửa sổ này.",
    "id": "Sudah dipilih! Ketuk “✕” di kanan atas untuk menutup jendela ini.",
-   "th": "เลือกแล้ว! กด “✕” มุมขวาบนเพื่อปิดหน้าต่างนี้"
+   "tl": "Tapos na! I-tap ang “✕” sa kanang itaas para isara ang window na ito."
   },
   "選擇取書館": {
    "en": "Choose a pickup library",
    "ja": "受取館を選ぶ",
    "vi": "Chọn thư viện nhận sách",
    "id": "Pilih perpustakaan pengambilan",
-   "th": "เลือกห้องสมุดรับหนังสือ"
+   "tl": "Pumili ng aklatang kukunan"
   },
   "開啟圖書館服務": {
    "en": "Open the library service",
    "ja": "図書館サービスを開く",
    "vi": "Mở dịch vụ thư viện",
    "id": "Buka layanan perpustakaan",
-   "th": "เปิดบริการห้องสมุด"
+   "tl": "Buksan ang serbisyo ng aklatan"
   },
   "預約和借書一樣嗎？": {
    "en": "Is reserving the same as borrowing?",
    "ja": "予約と貸出は同じですか？",
    "vi": "Đặt trước có giống mượn sách không?",
    "id": "Apakah memesan sama dengan meminjam?",
-   "th": "การจองกับการยืมเหมือนกันไหม"
+   "tl": "Pareho ba ang pagpapareserba at paghiram?"
   },
   "預約好了。等圖書館通知書到了，再去你選的取書館把書借回家。": {
    "en": "Reserved. When the library tells you the book has arrived, go to the pickup library you chose and borrow it.",
    "ja": "予約できました。図書館から本が届いたと通知が来たら、選んだ受取館で本を借りてください。",
    "vi": "Đã đặt trước. Khi thư viện báo sách đã về, hãy đến thư viện nhận sách bạn đã chọn để mượn về nhà.",
    "id": "Sudah dipesan. Saat perpustakaan memberi tahu bukunya sudah tiba, datang ke perpustakaan pengambilan yang Anda pilih untuk meminjamnya.",
-   "th": "จองแล้ว เมื่อห้องสมุดแจ้งว่าหนังสือมาถึงแล้ว ไปยืมหนังสือที่ห้องสมุดที่คุณเลือกไว้"
+   "tl": "Naireserba na. Kapag sinabi ng aklatan na dumating na ang libro, pumunta sa aklatang pinili mo at hiramin ito."
   },
   "預約好了！這是示範網站，沒有真的送出喔。": {
    "en": "Reserved! This is a demo site, so nothing was really sent.",
    "ja": "予約できました！これはデモサイトなので、実際には送信されていません。",
    "vi": "Đã đặt trước! Đây là trang web mẫu, không thực sự gửi đi.",
    "id": "Sudah dipesan! Ini situs demo, jadi tidak benar-benar dikirim.",
-   "th": "จองแล้ว! นี่เป็นเว็บไซต์สาธิต ไม่ได้ส่งจริง"
+   "tl": "Naireserba na! Demo site ito, kaya walang talagang naipadala."
   },
   "預約書籍": {
    "en": "Reserve a book",
    "ja": "本を予約",
    "vi": "Đặt trước sách",
    "id": "Pesan buku",
-   "th": "จองหนังสือ"
+   "tl": "Magpareserba ng libro"
   },
   "點「請選擇取書館」，選一個你方便去拿書的圖書館，再按右上角的「✕」。": {
    "en": "Tap “{page:請選擇取書館}”, choose a library that’s easy for you to get to, then tap “✕” at the top right.",
    "ja": "「{page:請選擇取書館}」をタップして、受け取りに行きやすい図書館を選び、右上の「✕」を押してください。",
    "vi": "Chạm “{page:請選擇取書館}”, chọn thư viện bạn tiện đến lấy sách, rồi chạm “✕” ở góc trên bên phải.",
    "id": "Ketuk “{page:請選擇取書館}”, pilih perpustakaan yang mudah Anda datangi, lalu ketuk “✕” di kanan atas.",
-   "th": "แตะ “{page:請選擇取書館}” เลือกห้องสมุดที่คุณสะดวกไปรับหนังสือ แล้วกด “✕” มุมขวาบน"
+   "tl": "I-tap ang “{page:請選擇取書館}”, pumili ng aklatang madali mong mapupuntahan, saka i-tap ang “✕” sa kanang itaas."
   },
   "點一下「可取書」，看看哪本書可以去拿了。": {
    "en": "Tap “{page:可取書}” to see which books are ready to pick up.",
    "ja": "「{page:可取書}」をタップして、どの本を受け取れるか見てみましょう。",
    "vi": "Chạm “{page:可取書}” để xem cuốn nào đã có thể đến lấy.",
    "id": "Ketuk “{page:可取書}” untuk melihat buku mana yang sudah bisa diambil.",
-   "th": "แตะ “{page:可取書}” เพื่อดูว่าหนังสือเล่มไหนไปรับได้แล้ว"
+   "tl": "I-tap ang “{page:可取書}” para makita kung aling mga libro ang puwede nang kunin."
   },
   "點一下「重要訊息」右邊的「更多」。": {
    "en": "Tap “{page:更多}” to the right of “{page:重要訊息}”.",
    "ja": "「{page:重要訊息}」の右にある「{page:更多}」をタップしてください。",
    "vi": "Chạm “{page:更多}” bên phải “{page:重要訊息}”.",
    "id": "Ketuk “{page:更多}” di kanan “{page:重要訊息}”.",
-   "th": "แตะ “{page:更多}” ทางขวาของ “{page:重要訊息}”"
+   "tl": "I-tap ang “{page:更多}” sa kanan ng “{page:重要訊息}”."
   },
   "點一下「點閱排行」右邊的「更多」。": {
    "en": "Tap “{page:更多}” to the right of “{page:點閱排行}”.",
    "ja": "「{page:點閱排行}」の右にある「{page:更多}」をタップしてください。",
    "vi": "Chạm “{page:更多}” bên phải “{page:點閱排行}”.",
    "id": "Ketuk “{page:更多}” di kanan “{page:點閱排行}”.",
-   "th": "แตะ “{page:更多}” ทางขวาของ “{page:點閱排行}”"
+   "tl": "I-tap ang “{page:更多}” sa kanan ng “{page:點閱排行}”."
   },
   "點一下上面的「分館地圖」。": {
    "en": "Tap “{page:分館地圖}” at the top.",
    "ja": "上の「{page:分館地圖}」をタップしてください。",
    "vi": "Chạm vào “{page:分館地圖}” ở phía trên.",
    "id": "Ketuk “{page:分館地圖}” di atas.",
-   "th": "แตะ “{page:分館地圖}” ด้านบน"
+   "tl": "I-tap ang “{page:分館地圖}” sa itaas."
   },
   "點一下上面的「我的紀錄」。": {
    "en": "Tap “{page:我的紀錄}” at the top.",
    "ja": "上の「{page:我的紀錄}」をタップしてください。",
    "vi": "Chạm vào “{page:我的紀錄}” ở phía trên.",
    "id": "Ketuk “{page:我的紀錄}” di atas.",
-   "th": "แตะ “{page:我的紀錄}” ด้านบน"
+   "tl": "I-tap ang “{page:我的紀錄}” sa itaas."
   },
   "點一下你方便去拿書的圖書館。": {
    "en": "Tap a library that’s easy for you to get to.",
    "ja": "受け取りに行きやすい図書館をタップしてください。",
    "vi": "Chạm vào thư viện bạn tiện đến lấy sách.",
    "id": "Ketuk perpustakaan yang mudah Anda datangi.",
-   "th": "แตะห้องสมุดที่คุณสะดวกไปรับหนังสือ"
+   "tl": "I-tap ang aklatang madali mong mapupuntahan."
   },
   "點一下搜尋框，打書名或作者，打好按右邊的放大鏡。": {
    "en": "Tap the search box and type a title or author. When done, tap the magnifying glass on the right.",
    "ja": "検索欄をタップして、書名か著者名を入力し、右の虫めがねを押してください。",
    "vi": "Chạm vào ô tìm kiếm, gõ tên sách hoặc tác giả, gõ xong thì chạm kính lúp bên phải.",
    "id": "Ketuk kotak pencarian, ketik judul atau nama penulis, lalu ketuk kaca pembesar di kanan.",
-   "th": "แตะช่องค้นหา พิมพ์ชื่อหนังสือหรือชื่อผู้แต่ง พิมพ์เสร็จแล้วกดแว่นขยายทางขวา"
+   "tl": "I-tap ang search box at i-type ang pamagat o awtor. Kapag tapos na, i-tap ang magnifying glass sa kanan."
   },
   "點一下框框，打你想找的書名，例如「神奇柑仔店」。": {
    "en": "Tap the box and type the title you’re looking for, e.g. “神奇柑仔店”.",
    "ja": "欄をタップして、探したい書名を入力してください。例：「神奇柑仔店」。",
    "vi": "Chạm vào ô và gõ tên sách bạn muốn tìm, ví dụ “神奇柑仔店”.",
    "id": "Ketuk kotaknya dan ketik judul yang Anda cari, misalnya “神奇柑仔店”.",
-   "th": "แตะช่องแล้วพิมพ์ชื่อหนังสือที่อยากหา เช่น “神奇柑仔店”"
+   "tl": "I-tap ang box at i-type ang pamagat na hinahanap mo, hal. “神奇柑仔店”."
   },
   "點公告的標題，可以看完整的內容。": {
    "en": "Tap a notice’s title to read all of it.",
    "ja": "お知らせのタイトルをタップすると、全文が読めます。",
    "vi": "Chạm vào tiêu đề thông báo để xem toàn bộ nội dung.",
    "id": "Ketuk judul pengumuman untuk membaca isi lengkapnya.",
-   "th": "แตะหัวข้อประกาศเพื่ออ่านเนื้อหาทั้งหมด"
+   "tl": "I-tap ang pamagat ng isang abiso para mabasa ito nang buo."
   },
   "點每一行可以打開來看是哪幾本書。": {
    "en": "Tap each row to open it and see which books are in it.",
    "ja": "各行をタップすると、どの本かが見られます。",
    "vi": "Chạm vào từng dòng để mở ra xem là những cuốn nào.",
    "id": "Ketuk setiap baris untuk membuka dan melihat bukunya.",
-   "th": "แตะแต่ละแถวเพื่อเปิดดูว่ามีหนังสือเล่มไหนบ้าง"
+   "tl": "I-tap ang bawat row para buksan ito at makita kung aling mga libro ang nasa loob nito."
   },
   "點熱門關鍵字": {
    "en": "Tap a popular keyword",
    "ja": "人気キーワードをタップ",
    "vi": "Chạm từ khóa phổ biến",
    "id": "Ketuk kata kunci populer",
-   "th": "แตะคำค้นยอดนิยม"
+   "tl": "I-tap ang isang sikat na keyword"
   },
   "點畫面上方的「分館地圖」。": {
    "en": "Tap “{page:分館地圖}” at the top of the screen.",
    "ja": "画面上の「{page:分館地圖}」をタップしてください。",
    "vi": "Chạm vào “{page:分館地圖}” ở phía trên màn hình.",
    "id": "Ketuk “{page:分館地圖}” di bagian atas layar.",
-   "th": "แตะ “{page:分館地圖}” ด้านบนของหน้าจอ"
+   "tl": "I-tap ang “{page:分館地圖}” sa itaas ng screen."
   },
   "點畫面上方的「我的紀錄」。": {
    "en": "Tap “{page:我的紀錄}” at the top of the screen.",
    "ja": "画面上の「{page:我的紀錄}」をタップしてください。",
    "vi": "Chạm vào “{page:我的紀錄}” ở phía trên màn hình.",
    "id": "Ketuk “{page:我的紀錄}” di bagian atas layar.",
-   "th": "แตะ “{page:我的紀錄}” ด้านบนของหน้าจอ"
+   "tl": "I-tap ang “{page:我的紀錄}” sa itaas ng screen."
   },
   "點閱排行是大家最常看的書，點書名就能看詳細內容。": {
    "en": "The most-viewed ranking shows the books people view most. Tap a title to see the details.",
    "ja": "閲覧ランキングは、みんながいちばんよく見る本です。書名をタップすると詳しい内容が見られます。",
    "vi": "Bảng xếp hạng lượt xem là những cuốn sách mọi người xem nhiều nhất. Chạm vào tên sách để xem chi tiết.",
    "id": "Peringkat terpopuler berisi buku yang paling sering dilihat orang. Ketuk judul untuk melihat detail.",
-   "th": "อันดับยอดเข้าชมคือหนังสือที่คนดูมากที่สุด แตะชื่อหนังสือเพื่อดูรายละเอียด"
+   "tl": "Ipinapakita ng ranking ng pinakatinitingnan ang mga librong pinakamadalas tingnan ng mga tao. I-tap ang isang pamagat para makita ang mga detalye."
   }
  }
 }
