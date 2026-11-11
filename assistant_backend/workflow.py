@@ -615,7 +615,7 @@ class Workflow:
                           kind="navigate", action="open_library_book", destination={"kind": "detail", "book_id": item["book_id"]})
 
     def _handle_language(self, payload, text, pending, resolution):
-        """A request in English, Japanese, Vietnamese, Indonesian or Thai: the same
+        """A request in English, Japanese, Vietnamese, Indonesian or Filipino: the same
         steps as the Chinese path with that language's rules, names and replies
         (i18n.py, capabilities_i18n.json). The decision model, its tools and the
         validation are the same; book titles are Chinese, so a library request
@@ -677,11 +677,26 @@ class Workflow:
                 return faq
             positive = i18n.positive_text(text, language)
             if (T2_GENERIC and self._says_more_than_common_word(payload, positive, matches[0])
-                    and self._not_what_is_meant(positive, entries[0])):
+                    and self._not_what_is_meant(positive, entries[0], language)):
                 self._trace("generic_no_match", [entries[0]["id"]])
                 return self.reply(payload, i18n.t("no_match", language))
             self._trace("unavailable_direct", [entries[0]["id"]])
             return self._navigate(payload, entries[0])
+        if language == "tl" and all(m["fuzzy"] for m in matches):
+            # Filipino worded or heard close to a keyword ("bill sa tubi"): offered only.
+            self._trace("filipino_similar", [e["id"] for e in entries])
+            return self._offer(payload, self._cap_items(entries, language), i18n.t("confirm_capability", language))
+        if language == "tl" and len(matches) == 1 and not matches[0]["fuzzy"] and entries[0]["enabled"]:
+            # As for Vietnamese below: Ministral answered "clarify" for most Filipino requests
+            # whose one page retrieval had named (2026-11-11 speech test, docs/AI_FILIPINO.md).
+            # Opened when sure (a keyword of two words, or one word with at most one other
+            # content word); otherwise the model decides, and when it only asks for more,
+            # the page is listed for the user to choose (below). Start pages (LIST_LAST) are
+            # never opened this way: "what services are there" asks for the list, not 服務總覽.
+            if (entries[0]["id"] not in LIST_LAST
+                    and i18n.filipino_sure(i18n.positive_text(text, language), matches[0]["evidence"])):
+                self._trace("filipino_keyword", [entries[0]["id"]])
+                return self._navigate(payload, entries[0])
         if language == "vi" and all(m["fuzzy"] for m in matches):
             # Vietnamese heard with regional sounds or a one-syllable word without marks
             # (registry._vietnamese_sound): only offered, without a model call; the
@@ -716,10 +731,12 @@ class Workflow:
                                         keep_choice=self.no_model)
         if name == "select_capability":
             return self._navigate(payload, self.registry.by_id[args["capability_id"]])
-        if language == "id" and name == "request_clarification":
+        if language in ("id", "tl") and name == "request_clarification":
             # The catalogue named these pages but the model asked again: the user picks
-            # one instead of repeating the request; nothing opens.
-            self._trace("indonesian_offer", [e["id"] for e in entries])
+            # one instead of repeating the request; nothing opens. Ministral rarely follows
+            # Filipino (docs/AI_FILIPINO.md) and often asks again in Indonesian
+            # (docs/AI_INDONESIAN.md).
+            self._trace("indonesian_offer" if language == "id" else "filipino_offer", [e["id"] for e in entries])
             return self._offer(payload, self._cap_items(entries, language), i18n.t("confirm_capability", language))
         return self.reply(payload, i18n.t("clarify", language))
 
@@ -988,7 +1005,7 @@ class Workflow:
         if index is None or not index.ready or len(re.findall(r"\w", positive)) < SEMANTIC_MIN_CHARS:
             return None
         started = time.monotonic()
-        found = index.search(positive)
+        found = index.search(positive, language=payload.get("language", "zh"))
         # For metrics: embedding + scoring time and what was found, even when a
         # later layer decides the turn.
         self.owner.usage.semantic = {"ms": round((time.monotonic() - started) * 1000),
@@ -1064,7 +1081,7 @@ class Workflow:
         def short(term):
             if language == "zh" or re.search(r"[一-鿿]", term):
                 return len(matching.normalized(term)) <= 2
-            if language in ("ja", "th"):
+            if language == "ja":
                 return len(matching.normalized(term)) <= 3
             return len(term.split()) == 1
         return bool(terms) and all(short(term) or shared(term) for term in terms)
@@ -1080,13 +1097,13 @@ class Workflow:
                 - max(len(matching.normalized(term)) for term in terms))
         return rest >= (GENERIC_REST if language == "zh" else GENERIC_REST_FOREIGN)
 
-    def _not_what_is_meant(self, positive, entry):
+    def _not_what_is_meant(self, positive, entry, language="zh"):
         """Whether semantic retrieval ranks another page than this disconnected one
         first. Without a ready index nothing is known: False keeps the usual answer."""
         index = getattr(self.owner, "semantic", None)
         if index is None or not index.ready:
             return False
-        found = [e for _, e in index.search(positive)]
+        found = [e for _, e in index.search(positive, language=language)]
         return bool(found) and found[0]["id"] != entry["id"]
 
     def _generic_unavailable(self, payload, text, positive, match):
@@ -1103,7 +1120,7 @@ class Workflow:
         index = getattr(self.owner, "semantic", None)
         if index is None or not index.ready:
             return None
-        found = [e for _, e in index.search(positive)]
+        found = [e for _, e in index.search(positive, language=language)]
         if not found or found[0]["id"] == entry["id"] or not found[0]["enabled"]:
             return None
         entries = [e for e in found if e["enabled"]] + [entry]

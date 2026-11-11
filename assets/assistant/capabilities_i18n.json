@@ -1,770 +1,770 @@
 {
  "version": 1,
- "status": "draft 2026-11-07, to be reviewed by speakers of each language (docs/AI_MULTILINGUAL_PLAN.md)",
- "languages": ["en", "ja", "vi", "id", "th"],
+ "status": "draft 2026-11-07 (Filipino tl: AI draft 2026-11-11, replaced Thai), to be reviewed by speakers of each language (docs/AI_MULTILINGUAL_PLAN.md, docs/AI_FILIPINO.md)",
+ "languages": ["en", "ja", "vi", "id", "tl"],
  "capabilities": {
   "app.home": {
    "en": {"title": "Home", "keywords": ["home", "home page", "main screen", "go home"]},
    "ja": {"title": "ホーム", "keywords": ["ホーム", "トップ", "ホーム画面"]},
    "vi": {"title": "Trang chủ", "keywords": ["trang chủ", "màn hình chính", "về trang chủ", "trang đầu", "về màn hình chính"]},
    "id": {"title": "Beranda", "keywords": ["beranda", "halaman utama", "layar utama"]},
-   "th": {"title": "หน้าแรก", "keywords": ["หน้าแรก", "หน้าหลัก", "กลับหน้าแรก"]}
+   "tl": {"title": "Home", "keywords": ["home", "pangunahing pahina", "unang pahina", "bumalik sa home"]}
   },
   "app.services": {
    "en": {"title": "All services", "keywords": ["all services", "service list", "services"]},
    "ja": {"title": "サービス一覧", "keywords": ["サービス一覧", "全サービス", "サービス"]},
    "vi": {"title": "Tất cả dịch vụ", "keywords": ["tất cả dịch vụ", "danh sách dịch vụ", "dịch vụ"]},
    "id": {"title": "Semua layanan", "keywords": ["semua layanan", "daftar layanan", "layanan"]},
-   "th": {"title": "บริการทั้งหมด", "keywords": ["บริการทั้งหมด", "รายการบริการ", "บริการ"]}
+   "tl": {"title": "Lahat ng serbisyo", "keywords": ["lahat ng serbisyo", "listahan ng serbisyo", "mga serbisyo"]}
   },
   "app.perks": {
    "en": {"title": "Deals", "keywords": ["deals", "discount", "discounts", "coupon", "offers"]},
    "ja": {"title": "特典", "keywords": ["特典", "割引", "クーポン", "お得"]},
    "vi": {"title": "Ưu đãi", "keywords": ["ưu đãi", "giảm giá", "phiếu giảm giá", "khuyến mãi", "mã giảm giá", "phiếu ưu đãi", "khuyến mại", "voucher"]},
    "id": {"title": "Promo", "keywords": ["promo", "diskon", "kupon", "penawaran"]},
-   "th": {"title": "สิทธิพิเศษ", "keywords": ["สิทธิพิเศษ", "ส่วนลด", "คูปอง", "โปรโมชั่น"]}
+   "tl": {"title": "Mga promo", "keywords": ["promo", "mga promo", "diskuwento", "kupon", "alok"]}
   },
   "app.bills": {
    "en": {"title": "Bills", "keywords": ["bills", "my bills", "pay a bill", "payments"]},
    "ja": {"title": "請求", "keywords": ["請求", "支払い", "請求書"]},
    "vi": {"title": "Hóa đơn", "keywords": ["hóa đơn", "thanh toán", "hóa đơn của tôi", "các hóa đơn", "hóa đơn cần trả"]},
    "id": {"title": "Tagihan", "keywords": ["tagihan", "bayar tagihan", "pembayaran"]},
-   "th": {"title": "บิล", "keywords": ["บิล", "ใบแจ้งหนี้", "ชำระเงิน", "จ่ายบิล"]}
+   "tl": {"title": "Mga bayarin", "keywords": ["mga bayarin", "bayarin ko", "magbayad ng bill", "pagbabayad", "mga bill ko"]}
   },
   "account": {
    "en": {"title": "Account", "keywords": ["account", "my account"]},
    "ja": {"title": "アカウント", "keywords": ["アカウント", "マイアカウント"]},
    "vi": {"title": "Tài khoản", "keywords": ["tài khoản", "tài khoản của tôi", "tài khoản của mình", "thông tin tài khoản"]},
    "id": {"title": "Akun", "keywords": ["akun", "akun saya"]},
-   "th": {"title": "บัญชี", "keywords": ["บัญชี", "บัญชีของฉัน"]}
+   "tl": {"title": "Account", "keywords": ["account", "account ko", "aking account"]}
   },
   "settings": {
    "en": {"title": "Settings", "keywords": ["settings", "preferences", "setting"]},
    "ja": {"title": "設定", "keywords": ["設定", "せってい"]},
    "vi": {"title": "Cài đặt", "keywords": ["cài đặt", "thiết lập", "cài đặt ứng dụng", "thiết lập ứng dụng"]},
    "id": {"title": "Pengaturan", "keywords": ["pengaturan", "setelan"]},
-   "th": {"title": "การตั้งค่า", "keywords": ["การตั้งค่า", "ตั้งค่า"]}
+   "tl": {"title": "Settings", "keywords": ["settings", "mga setting", "setting"]}
   },
   "profile": {
    "en": {"title": "Personal details", "keywords": ["personal details", "profile", "my information", "email", "phone number", "address"]},
    "ja": {"title": "基本情報", "keywords": ["基本情報", "プロフィール", "個人情報", "メールアドレス", "電話番号", "住所"]},
    "vi": {"title": "Thông tin cá nhân", "keywords": ["thông tin cá nhân", "hồ sơ", "email", "số điện thoại", "địa chỉ", "thông tin của tôi", "đổi số điện thoại", "sửa thông tin", "cập nhật thông tin", "đổi địa chỉ"]},
    "id": {"title": "Data pribadi", "keywords": ["data pribadi", "profil", "email", "nomor telepon", "alamat", "ubah profil", "alamat email"]},
-   "th": {"title": "ข้อมูลส่วนตัว", "keywords": ["ข้อมูลส่วนตัว", "โปรไฟล์", "อีเมล", "เบอร์โทร", "ที่อยู่"]}
+   "tl": {"title": "Personal na detalye", "keywords": ["personal na detalye", "personal na impormasyon", "profile", "impormasyon ko", "email", "numero ng telepono", "address", "tirahan"]}
   },
   "start_page": {
    "en": {"title": "App start page", "keywords": ["start page", "default page", "startup page"]},
    "ja": {"title": "起動ページ", "keywords": ["起動ページ", "最初のページ", "スタートページ"]},
    "vi": {"title": "Trang khởi động", "keywords": ["trang khởi động", "trang mặc định"]},
    "id": {"title": "Halaman awal aplikasi", "keywords": ["halaman awal", "halaman default"]},
-   "th": {"title": "หน้าเริ่มต้นแอป", "keywords": ["หน้าเริ่มต้น", "หน้าเปิดแอป"]}
+   "tl": {"title": "Panimulang pahina ng App", "keywords": ["panimulang pahina", "start page", "default na pahina"]}
   },
   "pinned": {
    "en": {"title": "My services and pinned", "keywords": ["my services", "pinned", "favorite services", "pin"]},
    "ja": {"title": "マイサービスとピン留め", "keywords": ["マイサービス", "ピン留め", "よく使うサービス"]},
    "vi": {"title": "Dịch vụ của tôi và ghim", "keywords": ["dịch vụ của tôi", "ghim", "dịch vụ thường dùng"]},
    "id": {"title": "Layanan saya dan sematan", "keywords": ["layanan saya", "sematkan", "layanan favorit"]},
-   "th": {"title": "บริการของฉันและปักหมุด", "keywords": ["บริการของฉัน", "ปักหมุด", "บริการที่ใช้บ่อย"]}
+   "tl": {"title": "Aking mga serbisyo at naka-pin", "keywords": ["aking mga serbisyo", "mga serbisyo ko", "naka-pin", "paboritong serbisyo", "i-pin"]}
   },
   "messages": {
    "en": {"title": "Messages", "keywords": ["messages", "notifications", "inbox"]},
    "ja": {"title": "メッセージ", "keywords": ["メッセージ", "通知", "お知らせ"]},
    "vi": {"title": "Tin nhắn", "keywords": ["tin nhắn", "thông báo", "hộp thư", "hộp thư đến", "thư của tôi", "tin nhắn mới"]},
    "id": {"title": "Pesan", "keywords": ["pesan", "notifikasi", "kotak masuk", "pesan baru", "pesan masuk", "kotak pesan"]},
-   "th": {"title": "ข้อความ", "keywords": ["ข้อความ", "การแจ้งเตือน", "กล่องข้อความ"]}
+   "tl": {"title": "Mga mensahe", "keywords": ["mensahe", "mga mensahe", "notipikasyon", "inbox", "mensahe ng lungsod"]}
   },
   "activities": {
    "en": {"title": "Events", "keywords": ["events", "activities", "latest events", "what's on"]},
    "ja": {"title": "イベント情報", "keywords": ["イベント", "イベント情報", "催し"]},
    "vi": {"title": "Sự kiện", "keywords": ["sự kiện", "hoạt động", "sự kiện mới", "sự kiện thành phố", "lễ hội"]},
    "id": {"title": "Acara", "keywords": ["acara", "kegiatan", "acara terbaru", "event", "acara seru", "event seru"]},
-   "th": {"title": "กิจกรรม", "keywords": ["กิจกรรม", "อีเวนต์", "กิจกรรมล่าสุด"]}
+   "tl": {"title": "Mga event", "keywords": ["mga event", "event", "aktibidad", "mga aktibidad", "pinakabagong event"]}
   },
   "invoice": {
    "en": {"title": "Mobile barcode carrier", "keywords": ["mobile barcode", "e-invoice", "invoice carrier", "receipt barcode"]},
    "ja": {"title": "モバイルバーコード", "keywords": ["モバイルバーコード", "電子発票", "発票", "レシート"]},
    "vi": {"title": "Mã vạch hóa đơn điện tử", "keywords": ["mã vạch điện thoại", "hóa đơn điện tử", "hóa đơn", "mã vạch hóa đơn"]},
    "id": {"title": "Barcode faktur seluler", "keywords": ["barcode ponsel", "faktur elektronik", "struk", "barcode faktur", "faktur", "kode faktur"]},
-   "th": {"title": "บาร์โค้ดใบเสร็จมือถือ", "keywords": ["บาร์โค้ดมือถือ", "ใบเสร็จอิเล็กทรอนิกส์", "ใบเสร็จ"]}
+   "tl": {"title": "Mobile barcode carrier", "keywords": ["mobile barcode", "barcode sa telepono", "e-invoice", "barcode ng resibo", "resibo"]}
   },
   "feedback": {
    "en": {"title": "Feedback", "keywords": ["feedback", "app problem", "report an app issue"]},
    "ja": {"title": "ご意見", "keywords": ["ご意見", "フィードバック", "アプリの問題"]},
    "vi": {"title": "Góp ý", "keywords": ["góp ý", "phản hồi", "lỗi ứng dụng", "báo lỗi", "góp ý ứng dụng"]},
    "id": {"title": "Masukan", "keywords": ["masukan", "umpan balik", "masalah aplikasi", "aplikasi error", "aplikasinya error", "aplikasi bermasalah", "kritik dan saran", "saran aplikasi"]},
-   "th": {"title": "ข้อเสนอแนะ", "keywords": ["ข้อเสนอแนะ", "ความคิดเห็น", "ปัญหาแอป"]}
+   "tl": {"title": "Puna", "keywords": ["puna", "feedback", "problema sa app", "mag-report ng problema sa app"]}
   },
   "language": {
    "en": {"title": "Language", "keywords": ["language", "change language", "english interface"]},
    "ja": {"title": "言語", "keywords": ["言語", "言語変更", "英語表示"]},
    "vi": {"title": "Ngôn ngữ", "keywords": ["ngôn ngữ", "đổi ngôn ngữ", "đổi sang tiếng việt", "chuyển sang tiếng việt", "chuyển ngôn ngữ", "cài đặt ngôn ngữ"]},
    "id": {"title": "Bahasa", "keywords": ["ganti bahasa", "pengaturan bahasa", "ubah bahasa", "bahasa aplikasi"]},
-   "th": {"title": "ภาษา", "keywords": ["ภาษา", "เปลี่ยนภาษา"]}
+   "tl": {"title": "Wika", "keywords": ["wika", "palitan ang wika", "baguhin ang wika", "gawing filipino", "gawing tagalog", "filipino na wika"]}
   },
   "notification_settings": {
    "en": {"title": "Notification settings", "keywords": ["notification settings", "reminder settings"]},
    "ja": {"title": "通知設定", "keywords": ["通知設定", "リマインダー設定"]},
    "vi": {"title": "Cài đặt thông báo", "keywords": ["cài đặt thông báo", "nhắc nhở", "tắt thông báo", "bật thông báo"]},
    "id": {"title": "Pengaturan notifikasi", "keywords": ["pengaturan notifikasi", "pengingat", "atur notifikasi", "matikan notifikasi", "nyalakan notifikasi", "atur pengingat"]},
-   "th": {"title": "ตั้งค่าการแจ้งเตือน", "keywords": ["ตั้งค่าการแจ้งเตือน", "การเตือน"]}
+   "tl": {"title": "Settings ng notification", "keywords": ["settings ng notification", "setting ng notipikasyon", "settings ng paalala", "paalala"]}
   },
   "quick_login": {
    "en": {"title": "Quick login", "keywords": ["quick login", "fingerprint login", "face id"]},
    "ja": {"title": "クイックログイン", "keywords": ["クイックログイン", "生体認証", "指紋"]},
    "vi": {"title": "Đăng nhập nhanh", "keywords": ["đăng nhập nhanh", "vân tay", "sinh trắc học"]},
    "id": {"title": "Login cepat", "keywords": ["login cepat", "sidik jari", "biometrik"]},
-   "th": {"title": "เข้าสู่ระบบด่วน", "keywords": ["เข้าสู่ระบบด่วน", "สแกนนิ้ว", "ไบโอเมตริกซ์"]}
+   "tl": {"title": "Mabilis na pag-log in", "keywords": ["mabilis na pag-log in", "fingerprint", "face id"]}
   },
   "authorization": {
    "en": {"title": "History and authorisations", "keywords": ["authorization", "permissions", "usage history"]},
    "ja": {"title": "履歴と権限管理", "keywords": ["権限管理", "利用履歴"]},
    "vi": {"title": "Lịch sử và ủy quyền", "keywords": ["quản lý ủy quyền", "lịch sử sử dụng"]},
    "id": {"title": "Riwayat dan otorisasi", "keywords": ["otorisasi", "riwayat penggunaan"]},
-   "th": {"title": "ประวัติและการอนุญาต", "keywords": ["การอนุญาต", "ประวัติการใช้งาน"]}
+   "tl": {"title": "Kasaysayan at mga pahintulot", "keywords": ["pahintulot", "mga pahintulot", "kasaysayan ng paggamit", "awtorisasyon"]}
   },
   "logout": {
    "en": {"title": "Log out", "keywords": ["log out", "logout", "sign out"]},
    "ja": {"title": "ログアウト", "keywords": ["ログアウト", "サインアウト"]},
    "vi": {"title": "Đăng xuất", "keywords": ["đăng xuất", "thoát tài khoản"]},
    "id": {"title": "Keluar", "keywords": ["keluar akun", "logout"]},
-   "th": {"title": "ออกจากระบบ", "keywords": ["ออกจากระบบ", "ล็อกเอาต์"]}
+   "tl": {"title": "Mag-log out", "keywords": ["lumabas sa account", "mag-sign out"]}
   },
   "suspend": {
    "en": {"title": "Deactivate account", "keywords": ["deactivate account", "delete account", "close account", "delete my account", "close my account"]},
    "ja": {"title": "アカウント停止", "keywords": ["アカウント停止", "アカウント削除"]},
    "vi": {"title": "Ngừng tài khoản", "keywords": ["xóa tài khoản", "ngừng tài khoản"]},
    "id": {"title": "Nonaktifkan akun", "keywords": ["hapus akun", "nonaktifkan akun"]},
-   "th": {"title": "ปิดใช้งานบัญชี", "keywords": ["ลบบัญชี", "ปิดบัญชี"]}
+   "tl": {"title": "I-deactivate ang account", "keywords": ["i-deactivate ang account", "burahin ang account", "isara ang account", "tanggalin ang account ko", "burahin ang account ko"]}
   },
   "news": {
    "en": {"title": "City news", "keywords": ["city news", "news"]},
    "ja": {"title": "市政ニュース", "keywords": ["ニュース", "市政ニュース"]},
    "vi": {"title": "Tin tức thành phố", "keywords": ["tin tức", "tin tức thành phố"]},
    "id": {"title": "Berita kota", "keywords": ["berita", "berita kota"]},
-   "th": {"title": "ข่าวเมือง", "keywords": ["ข่าว", "ข่าวเมือง"]}
+   "tl": {"title": "Balita ng lungsod", "keywords": ["balita", "balita ng lungsod"]}
   },
   "bill_settings": {
    "en": {"title": "My bill settings", "keywords": ["bill settings", "add a bill"]},
    "ja": {"title": "請求設定", "keywords": ["請求設定", "請求の追加"]},
    "vi": {"title": "Cài đặt hóa đơn", "keywords": ["cài đặt hóa đơn", "thêm hóa đơn"]},
    "id": {"title": "Pengaturan tagihan", "keywords": ["pengaturan tagihan", "tambah tagihan"]},
-   "th": {"title": "ตั้งค่าบิล", "keywords": ["ตั้งค่าบิล", "เพิ่มบิล"]}
+   "tl": {"title": "Settings ng aking mga bill", "keywords": ["magdagdag ng bill na susubaybayan"]}
   },
   "1999": {
    "en": {"title": "1999 hotline", "keywords": ["1999", "citizen hotline", "city hotline"]},
    "ja": {"title": "1999 市民ホットライン", "keywords": ["1999", "市民ホットライン"]},
    "vi": {"title": "Đường dây nóng 1999", "keywords": ["1999", "đường dây nóng"]},
    "id": {"title": "Hotline 1999", "keywords": ["1999", "hotline warga"]},
-   "th": {"title": "สายด่วน 1999", "keywords": ["1999", "สายด่วนประชาชน"]}
+   "tl": {"title": "1999 hotline", "keywords": ["1999", "hotline ng lungsod", "hotline ng mamamayan"]}
   },
   "districtOffice": {
    "en": {"title": "Applications", "keywords": ["apply", "application", "city government services", "apply for"]},
    "ja": {"title": "申請サービス", "keywords": ["申請", "手続き", "市役所のサービス"]},
    "vi": {"title": "Dịch vụ nộp đơn", "keywords": ["nộp đơn", "đăng ký", "thủ tục", "nộp hồ sơ", "làm thủ tục", "nộp đơn trực tuyến", "làm giấy tờ"]},
    "id": {"title": "Layanan permohonan", "keywords": ["mengajukan", "permohonan", "layanan pemerintah", "pengajuan", "pengajuan online", "layanan pengajuan", "urus surat", "urus dokumen", "permohonan online", "ajukan permohonan"]},
-   "th": {"title": "บริการยื่นคำร้อง", "keywords": ["ยื่นคำร้อง", "สมัคร", "บริการของเมือง"]}
+   "tl": {"title": "Mga aplikasyon", "keywords": ["mag-apply", "mag-aplay", "aplikasyon", "serbisyo ng pamahalaang lungsod"]}
   },
   "reportIssue": {
    "en": {"title": "Report an issue", "keywords": ["complaint", "report a problem", "petition", "report an issue"]},
    "ja": {"title": "ご意見・陳情", "keywords": ["陳情", "苦情", "通報"]},
    "vi": {"title": "Phản ánh", "keywords": ["phản ánh", "khiếu nại", "báo cáo vấn đề", "phản ánh vấn đề", "báo hư hỏng", "tố cáo", "khiếu nại tiếng ồn"]},
    "id": {"title": "Sampaikan keluhan", "keywords": ["keluhan", "pengaduan", "laporkan masalah", "lapor ke pemerintah kota", "keluhan ke pemerintah", "jalan berlubang", "sampaikan keluhan"]},
-   "th": {"title": "ร้องเรียน", "keywords": ["ร้องเรียน", "แจ้งปัญหา", "ข้อร้องเรียน"]}
+   "tl": {"title": "Mag-ulat ng isyu", "keywords": ["reklamo", "magreklamo", "mag-ulat ng problema", "mag-ulat ng isyu", "petisyon", "isumbong sa lungsod"]}
   },
   "reservation": {
    "en": {"title": "Counter queue number", "keywords": ["queue number", "take a number", "counter", "waiting number"]},
    "ja": {"title": "窓口の番号札", "keywords": ["番号札", "窓口", "順番待ち"]},
    "vi": {"title": "Lấy số thứ tự", "keywords": ["lấy số", "số thứ tự", "quầy", "lấy số thứ tự", "bốc số", "xếp hàng", "số đang gọi"]},
    "id": {"title": "Nomor antrean loket", "keywords": ["nomor antrean", "ambil nomor", "loket", "antrean", "ambil antrean", "antrean loket", "nomor urut"]},
-   "th": {"title": "บัตรคิวเคาน์เตอร์", "keywords": ["บัตรคิว", "รับคิว", "เคาน์เตอร์"]}
+   "tl": {"title": "Numero ng pila sa counter", "keywords": ["numero ng pila", "kumuha ng numero", "pila sa counter", "numero sa pila", "counter", "pumila"]}
   },
   "iVoting": {
    "en": {"title": "Online voting", "keywords": ["online voting", "vote"]},
    "ja": {"title": "オンライン投票", "keywords": ["投票", "オンライン投票"]},
    "vi": {"title": "Bỏ phiếu trực tuyến", "keywords": ["bỏ phiếu", "bỏ phiếu trực tuyến"]},
    "id": {"title": "Voting online", "keywords": ["voting", "pemungutan suara"]},
-   "th": {"title": "โหวตออนไลน์", "keywords": ["โหวต", "ลงคะแนน"]}
+   "tl": {"title": "Online na botohan", "keywords": ["online na botohan", "bumoto", "botohan"]}
   },
   "dashboard": {
    "en": {"title": "City data dashboard", "keywords": ["dashboard", "city data"]},
    "ja": {"title": "市政ダッシュボード", "keywords": ["ダッシュボード", "市政データ"]},
    "vi": {"title": "Bảng dữ liệu thành phố", "keywords": ["bảng điều khiển", "dữ liệu thành phố"]},
    "id": {"title": "Dasbor data kota", "keywords": ["dasbor", "data kota"]},
-   "th": {"title": "แดชบอร์ดข้อมูลเมือง", "keywords": ["แดชบอร์ด", "ข้อมูลเมือง"]}
+   "tl": {"title": "Dashboard ng datos ng lungsod", "keywords": ["dashboard", "datos ng lungsod"]}
   },
   "survey": {
    "en": {"title": "Surveys", "keywords": ["survey", "questionnaire"]},
    "ja": {"title": "アンケート", "keywords": ["アンケート", "意見調査"]},
    "vi": {"title": "Khảo sát", "keywords": ["khảo sát", "bảng câu hỏi"]},
    "id": {"title": "Survei", "keywords": ["survei", "kuesioner"]},
-   "th": {"title": "แบบสำรวจ", "keywords": ["แบบสำรวจ", "แบบสอบถาม"]}
+   "tl": {"title": "Mga survey", "keywords": ["survey", "talatanungan"]}
   },
   "police": {
    "en": {"title": "Police services", "keywords": ["police", "report to the police", "call the police"]},
    "ja": {"title": "警察サービス", "keywords": ["警察", "通報", "被害届"]},
    "vi": {"title": "Dịch vụ cảnh sát", "keywords": ["cảnh sát", "báo cảnh sát", "trình báo", "công an", "báo công an", "gọi cảnh sát", "đồn cảnh sát"]},
    "id": {"title": "Layanan polisi", "keywords": ["polisi", "lapor polisi", "kepolisian", "layanan kepolisian", "kantor polisi"]},
-   "th": {"title": "บริการตำรวจ", "keywords": ["ตำรวจ", "แจ้งความ"]}
+   "tl": {"title": "Serbisyo ng pulis", "keywords": ["pulis", "pulisya", "magsumbong sa pulis", "tumawag ng pulis", "mag-report sa pulis"]}
   },
   "neighborhood": {
    "en": {"title": "Neighbourhood office", "keywords": ["neighborhood office", "village chief"]},
    "ja": {"title": "里の事務所", "keywords": ["里長", "里の事務所"]},
    "vi": {"title": "Văn phòng phường", "keywords": ["văn phòng phường", "trưởng khu phố"]},
    "id": {"title": "Kantor lingkungan", "keywords": ["kantor lingkungan", "ketua lingkungan"]},
-   "th": {"title": "สำนักงานชุมชน", "keywords": ["สำนักงานชุมชน", "ผู้ใหญ่บ้าน"]}
+   "tl": {"title": "Opisina ng kapitbahayan", "keywords": ["opisina ng kapitbahayan", "pinuno ng kapitbahayan", "barangay", "kapitan ng barangay"]}
   },
   "disasterReport": {
    "en": {"title": "Disaster report", "keywords": ["disaster report", "flooding", "landslide", "fallen tree"]},
    "ja": {"title": "災害通報", "keywords": ["災害通報", "浸水", "土砂崩れ", "倒木"]},
    "vi": {"title": "Báo cáo thiên tai", "keywords": ["báo cáo thiên tai", "ngập nước", "sạt lở", "cây đổ", "thiên tai", "lũ lụt", "ngập lụt", "thiệt hại do bão"]},
    "id": {"title": "Laporan bencana", "keywords": ["laporan bencana", "banjir", "tanah longsor", "pohon tumbang", "topan", "angin topan", "badai", "bencana alam", "kerusakan akibat banjir", "kerusakan akibat topan"]},
-   "th": {"title": "แจ้งภัยพิบัติ", "keywords": ["แจ้งภัยพิบัติ", "น้ำท่วม", "ดินถล่ม", "ต้นไม้ล้ม"]}
+   "tl": {"title": "Ulat ng sakuna", "keywords": ["ulat ng sakuna", "mag-ulat ng sakuna", "baha", "bumabaha", "pagguho ng lupa", "natumbang puno", "bumagsak na puno"]}
   },
   "vaccineAppointment": {
    "en": {"title": "Vaccine appointment", "keywords": ["vaccine", "vaccination"]},
    "ja": {"title": "ワクチン予約", "keywords": ["ワクチン", "予防接種"]},
    "vi": {"title": "Đặt lịch tiêm vắc-xin", "keywords": ["vắc-xin", "tiêm chủng"]},
    "id": {"title": "Janji vaksin", "keywords": ["vaksin", "vaksinasi"]},
-   "th": {"title": "จองวัคซีน", "keywords": ["วัคซีน", "ฉีดวัคซีน"]}
+   "tl": {"title": "Appointment sa bakuna", "keywords": ["bakuna", "pagbabakuna", "magpabakuna"]}
   },
   "medicalAppointment": {
    "en": {"title": "City hospital appointment", "keywords": ["doctor appointment", "hospital registration", "see a doctor"]},
    "ja": {"title": "市立病院の受診予約", "keywords": ["受診予約", "病院の予約", "診察"]},
    "vi": {"title": "Đăng ký khám bệnh", "keywords": ["đăng ký khám", "khám bệnh", "đặt lịch khám"]},
    "id": {"title": "Pendaftaran rumah sakit", "keywords": ["daftar berobat", "periksa dokter", "rumah sakit"]},
-   "th": {"title": "นัดหมายโรงพยาบาล", "keywords": ["นัดหมอ", "ลงทะเบียนโรงพยาบาล", "พบแพทย์"]}
+   "tl": {"title": "Appointment sa ospital ng lungsod", "keywords": ["magpatingin sa doktor", "appointment sa doktor", "magpa-appointment sa ospital", "magpatingin"]}
   },
   "cityRadio": {
    "en": {"title": "Taipei radio", "keywords": ["radio", "broadcast"]},
    "ja": {"title": "台北ラジオ", "keywords": ["ラジオ", "放送"]},
    "vi": {"title": "Đài phát thanh Đài Bắc", "keywords": ["đài phát thanh", "radio"]},
    "id": {"title": "Radio Taipei", "keywords": ["radio", "siaran"]},
-   "th": {"title": "วิทยุไทเป", "keywords": ["วิทยุ", "สถานีวิทยุ"]}
+   "tl": {"title": "Taipei radio", "keywords": ["radyo", "broadcast"]}
   },
   "familyCenter": {
    "en": {"title": "Parent-child centre", "keywords": ["parent child center", "kids activities"]},
    "ja": {"title": "親子館", "keywords": ["親子館", "親子イベント"]},
    "vi": {"title": "Trung tâm cha mẹ và trẻ em", "keywords": ["trung tâm cha mẹ và con", "hoạt động cho trẻ"]},
    "id": {"title": "Pusat orang tua dan anak", "keywords": ["pusat anak", "kegiatan anak"]},
-   "th": {"title": "ศูนย์พ่อแม่ลูก", "keywords": ["ศูนย์พ่อแม่ลูก", "กิจกรรมเด็ก"]}
+   "tl": {"title": "Parent-child center", "keywords": ["parent child center", "aktibidad ng mga bata", "palaruan ng bata"]}
   },
   "greenMap": {
    "en": {"title": "Green spaces map", "keywords": ["park", "green space", "green map"]},
    "ja": {"title": "緑地マップ", "keywords": ["公園", "緑地"]},
    "vi": {"title": "Bản đồ mảng xanh", "keywords": ["công viên", "mảng xanh"]},
    "id": {"title": "Peta ruang hijau", "keywords": ["taman", "ruang hijau"]},
-   "th": {"title": "แผนที่พื้นที่สีเขียว", "keywords": ["สวนสาธารณะ", "พื้นที่สีเขียว"]}
+   "tl": {"title": "Mapa ng luntiang lugar", "keywords": ["parke", "luntiang lugar", "green map"]}
   },
   "petFriendlyMap": {
    "en": {"title": "Pet-friendly map", "keywords": ["pet", "walk the dog", "dog"]},
    "ja": {"title": "ペット同伴マップ", "keywords": ["ペット", "犬の散歩"]},
    "vi": {"title": "Bản đồ thân thiện thú cưng", "keywords": ["thú cưng", "dắt chó"]},
    "id": {"title": "Peta ramah hewan", "keywords": ["hewan peliharaan", "jalan anjing"]},
-   "th": {"title": "แผนที่สำหรับสัตว์เลี้ยง", "keywords": ["สัตว์เลี้ยง", "พาหมาเดิน"]}
+   "tl": {"title": "Mapa para sa alagang hayop", "keywords": ["alagang hayop", "ipasyal ang aso", "aso"]}
   },
   "waterMeter": {
    "en": {"title": "Water usage", "keywords": ["water usage", "water meter", "meter reading"]},
    "ja": {"title": "水道使用量", "keywords": ["水道使用量", "水道メーター"]},
    "vi": {"title": "Dịch vụ nước", "keywords": ["lượng nước", "đồng hồ nước"]},
    "id": {"title": "Pemakaian air", "keywords": ["pemakaian air", "meteran air"]},
-   "th": {"title": "การใช้น้ำ", "keywords": ["การใช้น้ำ", "มิเตอร์น้ำ"]}
+   "tl": {"title": "Paggamit ng tubig", "keywords": ["paggamit ng tubig", "metro ng tubig", "basa ng metro"]}
   },
   "essentialGoods": {
    "en": {"title": "Essential goods", "keywords": ["essential goods", "supplies"]},
    "ja": {"title": "生活物資", "keywords": ["生活物資", "物資"]},
    "vi": {"title": "Hàng thiết yếu", "keywords": ["hàng thiết yếu", "vật tư"]},
    "id": {"title": "Kebutuhan pokok", "keywords": ["kebutuhan pokok", "persediaan"]},
-   "th": {"title": "สินค้าจำเป็น", "keywords": ["สินค้าจำเป็น", "สิ่งของ"]}
+   "tl": {"title": "Pangunahing bilihin", "keywords": ["pangunahing bilihin", "mga suplay"]}
   },
   "library": {
    "en": {"title": "Library", "keywords": ["library", "borrow a book", "borrow books", "lend a book", "lend books", "find a book", "read a book", "a book", "books"]},
    "ja": {"title": "図書貸出", "keywords": ["図書館", "本を借りる", "本を探す", "本"]},
    "vi": {"title": "Mượn sách thư viện", "keywords": ["thư viện", "mượn sách", "tìm sách", "sách", "mượn truyện", "đọc sách", "mượn sách thư viện", "tìm sách ở thư viện"]},
    "id": {"title": "Peminjaman buku", "keywords": ["perpustakaan", "pinjam buku", "cari buku", "buku", "baca buku", "ke perpustakaan", "perpustakaan kota", "carikan buku", "buku novel"]},
-   "th": {"title": "ยืมหนังสือห้องสมุด", "keywords": ["ห้องสมุด", "ยืมหนังสือ", "หาหนังสือ", "หนังสือ"]}
+   "tl": {"title": "Aklatan", "keywords": ["aklatan", "humiram ng libro", "manghiram ng libro", "hihiram ng libro", "humiram ng aklat", "maghanap ng libro", "magbasa ng libro", "libro", "aklat", "mga libro"]}
   },
   "locationSearch": {
    "en": {"title": "Find a place", "keywords": ["find a place", "nearby", "places near me"]},
    "ja": {"title": "場所を探す", "keywords": ["場所を探す", "近く", "周辺"]},
    "vi": {"title": "Tìm địa điểm", "keywords": ["tìm địa điểm", "gần đây", "xung quanh"]},
    "id": {"title": "Cari tempat", "keywords": ["cari tempat", "terdekat", "sekitar"]},
-   "th": {"title": "ค้นหาสถานที่", "keywords": ["ค้นหาสถานที่", "ใกล้ฉัน", "แถวนี้"]}
+   "tl": {"title": "Maghanap ng lugar", "keywords": ["maghanap ng lugar", "malapit dito", "mga lugar na malapit"]}
   },
   "zoo": {
    "en": {"title": "Zoo", "keywords": ["zoo", "zoo guide"]},
    "ja": {"title": "動物園", "keywords": ["動物園"]},
    "vi": {"title": "Sở thú", "keywords": ["sở thú", "vườn thú"]},
    "id": {"title": "Kebun binatang", "keywords": ["kebun binatang"]},
-   "th": {"title": "สวนสัตว์", "keywords": ["สวนสัตว์"]}
+   "tl": {"title": "Zoo", "keywords": ["zoo", "gabay sa zoo"]}
   },
   "library.ranking": {
    "en": {"title": "Popular books", "keywords": ["popular books", "book ranking", "most borrowed", "bestsellers"]},
    "ja": {"title": "人気の本ランキング", "keywords": ["人気の本", "ランキング", "よく借りられている本"]},
    "vi": {"title": "Sách được xem nhiều", "keywords": ["sách phổ biến", "bảng xếp hạng sách", "sách hot", "sách được mượn nhiều", "sách bán chạy", "sách nổi tiếng"]},
    "id": {"title": "Buku populer", "keywords": ["buku populer", "peringkat buku", "paling banyak dipinjam", "buku paling populer", "buku terlaris", "buku favorit", "paling populer"]},
-   "th": {"title": "หนังสือยอดนิยม", "keywords": ["หนังสือยอดนิยม", "อันดับหนังสือ"]}
+   "tl": {"title": "Mga sikat na libro", "keywords": ["sikat na libro", "mga sikat na libro", "ranking ng libro", "pinakamaraming hiniram", "pinakabinabasang libro"]}
   },
   "library.notices": {
    "en": {"title": "Library notices", "keywords": ["library notices", "library news", "announcements"]},
    "ja": {"title": "図書館のお知らせ", "keywords": ["図書館のお知らせ", "お知らせ"]},
    "vi": {"title": "Thông báo thư viện", "keywords": ["thông báo thư viện", "tin thư viện"]},
    "id": {"title": "Pengumuman perpustakaan", "keywords": ["pengumuman perpustakaan", "berita perpustakaan", "pengumuman dari perpustakaan", "info perpustakaan", "kabar perpustakaan"]},
-   "th": {"title": "ประกาศห้องสมุด", "keywords": ["ประกาศห้องสมุด", "ข่าวห้องสมุด"]}
+   "tl": {"title": "Mga abiso ng aklatan", "keywords": ["abiso ng aklatan", "balita ng aklatan", "anunsiyo ng aklatan"]}
   },
   "library.records": {
    "en": {"title": "My borrowing records", "keywords": ["borrowing records", "my loans", "due date", "books i borrowed", "return date"]},
    "ja": {"title": "貸出履歴", "keywords": ["貸出履歴", "借りた本", "返却日"]},
    "vi": {"title": "Lịch sử mượn sách", "keywords": ["lịch sử mượn", "sách đã mượn", "ngày trả sách", "sách đang mượn", "hạn trả sách", "sách chưa trả", "khi nào trả sách"]},
    "id": {"title": "Riwayat peminjaman", "keywords": ["riwayat peminjaman", "buku yang dipinjam", "tanggal kembali", "riwayat pinjam", "riwayat pinjam buku", "buku yang sedang dipinjam", "sedang saya pinjam", "pengembalian buku", "tanggal pengembalian", "harus dikembalikan", "batas pengembalian"]},
-   "th": {"title": "ประวัติการยืม", "keywords": ["ประวัติการยืม", "หนังสือที่ยืม", "วันคืนหนังสือ"]}
+   "tl": {"title": "Kasaysayan ng paghiram ko", "keywords": ["kasaysayan ng paghiram", "mga hiniram ko", "librong hiniram ko", "mga nahiram ko", "takdang petsa", "kailan ibabalik", "petsa ng pagbabalik", "ibalik ang libro", "isauli ang libro"]}
   },
   "library.reservations": {
    "en": {"title": "Book reservations", "keywords": ["book reservations", "reserved books"]},
    "ja": {"title": "予約一覧", "keywords": ["予約一覧", "予約した本"]},
    "vi": {"title": "Danh sách đặt trước", "keywords": ["sách đặt trước", "danh sách đặt trước", "sách đã đặt", "đặt trước sách"]},
    "id": {"title": "Daftar reservasi buku", "keywords": ["reservasi buku", "buku dipesan", "buku yang saya pesan", "pesan buku", "booking buku", "buku yang saya booking", "buku yang dipesan", "pemesanan buku", "reservasi"]},
-   "th": {"title": "รายการจองหนังสือ", "keywords": ["จองหนังสือ", "รายการจอง"]}
+   "tl": {"title": "Listahan ng reserbasyon ng libro", "keywords": ["mga nireserba kong libro", "nakareserbang libro"]}
   },
   "library.map": {
    "en": {"title": "Library map", "keywords": ["library map", "find a library", "nearest library"]},
    "ja": {"title": "図書館マップ", "keywords": ["図書館マップ", "近くの図書館"]},
    "vi": {"title": "Bản đồ thư viện", "keywords": ["bản đồ thư viện", "thư viện gần nhất"]},
    "id": {"title": "Peta perpustakaan", "keywords": ["peta perpustakaan", "perpustakaan terdekat"]},
-   "th": {"title": "แผนที่ห้องสมุด", "keywords": ["แผนที่ห้องสมุด", "ห้องสมุดใกล้"]}
+   "tl": {"title": "Mapa ng aklatan", "keywords": ["mapa ng aklatan", "maghanap ng aklatan", "pinakamalapit na aklatan"]}
   },
   "library.prefill": {
    "en": {"title": "Copy and pickup library selection", "keywords": ["choose pickup library", "choose a copy"]},
    "ja": {"title": "受取館の選択", "keywords": ["受取館", "冊の選択"]},
    "vi": {"title": "Chọn bản sách và nơi nhận", "keywords": ["chọn nơi nhận sách"]},
    "id": {"title": "Pilih eksemplar dan perpustakaan", "keywords": ["pilih perpustakaan pengambilan"]},
-   "th": {"title": "เลือกเล่มและห้องสมุดรับ", "keywords": ["เลือกห้องสมุดรับหนังสือ"]}
+   "tl": {"title": "Pagpili ng kopya at aklatang kukunan", "keywords": ["pumili ng aklatang kukunan", "pumili ng kopya"]}
   },
   "coupon.list": {
    "en": {"title": "Deal list", "keywords": ["deal list", "find deals", "coupons"]},
    "ja": {"title": "特典一覧", "keywords": ["特典一覧", "クーポン一覧"]},
    "vi": {"title": "Danh sách ưu đãi", "keywords": ["danh sách ưu đãi", "tìm ưu đãi", "tìm mã giảm giá"]},
    "id": {"title": "Daftar promo", "keywords": ["daftar promo", "cari promo"]},
-   "th": {"title": "รายการสิทธิพิเศษ", "keywords": ["รายการส่วนลด", "หาส่วนลด"]}
+   "tl": {"title": "Listahan ng promo", "keywords": ["listahan ng promo", "maghanap ng promo", "mga kupon"]}
   },
   "wallet": {
    "en": {"title": "Ticket wallet", "keywords": ["ticket wallet", "my tickets", "wallet"]},
    "ja": {"title": "チケットホルダー", "keywords": ["チケット", "マイチケット"]},
    "vi": {"title": "Ví vé", "keywords": ["ví vé", "vé của tôi", "vé điện tử", "lấy vé"]},
    "id": {"title": "Dompet tiket", "keywords": ["dompet tiket", "tiket saya"]},
-   "th": {"title": "กระเป๋าตั๋ว", "keywords": ["ตั๋วของฉัน", "กระเป๋าตั๋ว"]}
+   "tl": {"title": "Ticket wallet", "keywords": ["lalagyan ng tiket", "mga tiket ko"]}
   },
   "subscription": {
    "en": {"title": "Subscriptions", "keywords": ["subscriptions", "subscribe"]},
    "ja": {"title": "購読一覧", "keywords": ["購読", "サブスクリプション"]},
    "vi": {"title": "Đăng ký theo dõi", "keywords": ["đăng ký theo dõi", "theo dõi"]},
    "id": {"title": "Langganan", "keywords": ["langganan", "berlangganan"]},
-   "th": {"title": "การสมัครรับ", "keywords": ["การสมัครรับ", "ติดตาม"]}
+   "tl": {"title": "Mga subscription", "keywords": ["subscription", "mag-subscribe", "mga subscription"]}
   },
   "subscription.items": {
    "en": {"title": "Subscription items", "keywords": ["subscription items", "what i subscribed"]},
    "ja": {"title": "購読項目", "keywords": ["購読項目", "購読内容"]},
    "vi": {"title": "Mục đã theo dõi", "keywords": ["mục theo dõi", "nội dung theo dõi"]},
    "id": {"title": "Item langganan", "keywords": ["item langganan", "isi langganan"]},
-   "th": {"title": "รายการที่สมัครรับ", "keywords": ["รายการที่ติดตาม"]}
+   "tl": {"title": "Mga item ng subscription", "keywords": ["item ng subscription", "mga naka-subscribe ko"]}
   },
   "fees.history": {
    "en": {"title": "Payment history", "keywords": ["payment history", "payment records", "what i paid", "bills i paid"]},
    "ja": {"title": "支払い履歴", "keywords": ["支払い履歴", "払った記録"]},
    "vi": {"title": "Lịch sử thanh toán", "keywords": ["lịch sử thanh toán", "đã thanh toán", "lịch sử đóng tiền", "các khoản đã trả", "đã đóng tiền", "hóa đơn đã trả"]},
    "id": {"title": "Riwayat pembayaran", "keywords": ["riwayat pembayaran", "yang sudah dibayar", "histori pembayaran", "riwayat bayar", "sudah dibayar", "sudah saya bayar", "bukti pembayaran", "riwayat tagihan", "history pembayaran", "riwayat transaksi"]},
-   "th": {"title": "ประวัติการชำระเงิน", "keywords": ["ประวัติการชำระ", "จ่ายอะไรไปแล้ว"]}
+   "tl": {"title": "Kasaysayan ng pagbabayad", "keywords": ["kasaysayan ng pagbabayad", "rekord ng pagbabayad", "mga binayaran ko", "nabayaran ko na", "mga bill na binayaran ko"]}
   },
   "fees.scan": {
    "en": {"title": "Scan to pay", "keywords": ["scan to pay", "scan a bill", "scan bill"]},
    "ja": {"title": "スキャン払い", "keywords": ["スキャンして支払う", "請求書をスキャン"]},
    "vi": {"title": "Quét để thanh toán", "keywords": ["quét mã thanh toán", "quét hóa đơn", "quét mã", "quét mã vạch"]},
    "id": {"title": "Pindai untuk bayar", "keywords": ["pindai tagihan", "scan bayar", "scan tagihan", "scan barcode", "pindai barcode", "scan qr", "pindai kode"]},
-   "th": {"title": "สแกนจ่าย", "keywords": ["สแกนจ่าย", "สแกนบิล"]}
+   "tl": {"title": "I-scan para magbayad", "keywords": ["i-scan para magbayad", "i-scan ang bill", "i-scan ang barcode"]}
   },
   "fees.parking": {
    "en": {"title": "Parking fees", "keywords": ["parking fee", "parking fees", "pay for parking", "street parking"]},
    "ja": {"title": "駐車料金", "keywords": ["駐車料金", "駐車代", "路上駐車"]},
    "vi": {"title": "Phí đỗ xe", "keywords": ["phí đỗ xe", "tiền gửi xe", "đóng phí đỗ xe", "phí gửi xe", "tiền giữ xe", "tiền đỗ xe", "tiền đậu xe", "phí đậu xe", "phí giữ xe", "vé gửi xe"]},
    "id": {"title": "Biaya parkir", "keywords": ["biaya parkir", "bayar parkir", "parkir", "karcis parkir", "tagihan parkir", "parkir mobil", "parkir motor", "parkir di jalan", "parkir pinggir jalan", "tarif parkir", "retribusi parkir"]},
-   "th": {"title": "ค่าจอดรถ", "keywords": ["ค่าจอดรถ", "จ่ายค่าจอดรถ", "จอดรถริมถนน"]}
+   "tl": {"title": "Bayad sa paradahan", "keywords": ["bayad sa paradahan", "bayad sa parking", "magbayad ng paradahan", "magbayad ng parking", "paradahan", "parking"]}
   },
   "fees.water": {
    "en": {"title": "Water bill", "keywords": ["water bill", "pay water", "water fee"]},
    "ja": {"title": "水道料金", "keywords": ["水道料金", "水道代"]},
    "vi": {"title": "Tiền nước", "keywords": ["tiền nước", "hóa đơn nước", "đóng tiền nước", "trả tiền nước", "phí nước", "tiền nước máy", "nộp tiền nước"]},
    "id": {"title": "Tagihan air", "keywords": ["tagihan air", "bayar air", "rekening air", "tagihan pam", "air pam", "pdam", "air ledeng", "tagihan air ledeng", "bayar tagihan air", "tagihan air bersih"]},
-   "th": {"title": "ค่าน้ำ", "keywords": ["ค่าน้ำ", "จ่ายค่าน้ำ", "บิลค่าน้ำ"]}
+   "tl": {"title": "Bayarin sa tubig", "keywords": ["bayarin sa tubig", "bill sa tubig", "bayad sa tubig", "magbayad ng tubig", "bayaran ang tubig", "singil sa tubig"]}
   },
   "fees.tax": {
    "en": {"title": "Local taxes", "keywords": ["local tax", "pay tax", "taxes"]},
    "ja": {"title": "地方税", "keywords": ["地方税", "税金"]},
    "vi": {"title": "Thuế địa phương", "keywords": ["thuế địa phương", "nộp thuế", "thuế", "đóng thuế", "tiền thuế", "thuế nhà đất"]},
    "id": {"title": "Pajak daerah", "keywords": ["pajak daerah", "bayar pajak", "pajak", "pajak rumah", "pajak bumi dan bangunan", "pbb", "pajak kendaraan", "pajak tanah", "pajak motor", "pajak mobil"]},
-   "th": {"title": "ภาษีท้องถิ่น", "keywords": ["ภาษีท้องถิ่น", "จ่ายภาษี", "ภาษี"]}
+   "tl": {"title": "Lokal na buwis", "keywords": ["lokal na buwis", "magbayad ng buwis", "buwis", "buwis sa bahay", "amilyar"]}
   },
   "fees.tuition": {
    "en": {"title": "School fees", "keywords": ["school fees", "tuition", "registration fee"]},
    "ja": {"title": "学費", "keywords": ["学費", "授業料"]},
    "vi": {"title": "Học phí", "keywords": ["học phí", "tiền học", "đóng học phí", "tiền học của con", "tiền trường"]},
    "id": {"title": "Biaya sekolah", "keywords": ["biaya sekolah", "uang sekolah", "spp", "bayar sekolah", "iuran sekolah"]},
-   "th": {"title": "ค่าเล่าเรียน", "keywords": ["ค่าเล่าเรียน", "ค่าเทอม"]}
+   "tl": {"title": "Bayarin sa paaralan", "keywords": ["bayarin sa paaralan", "matrikula", "bayad sa eskuwela", "bayad sa school"]}
   },
   "fees.housing": {
    "en": {"title": "Public housing rent", "keywords": ["public housing rent", "social housing rent", "rent"]},
    "ja": {"title": "公営住宅の家賃", "keywords": ["公営住宅", "家賃"]},
    "vi": {"title": "Tiền thuê nhà ở xã hội", "keywords": ["nhà ở xã hội", "tiền thuê nhà"]},
    "id": {"title": "Sewa rumah susun", "keywords": ["sewa rumah susun", "sewa", "rusun", "sewa rusun", "apartemen sosial", "rumah sosial", "perumahan sosial", "sewa apartemen sosial"]},
-   "th": {"title": "ค่าเช่าบ้านพักรัฐ", "keywords": ["ค่าเช่าบ้านพักรัฐ", "ค่าเช่า"]}
+   "tl": {"title": "Upa sa pampublikong pabahay", "keywords": ["upa sa pampublikong pabahay", "upa sa social housing", "upa", "renta", "bayad sa upa"]}
   },
   "fees.hospital": {
    "en": {"title": "City hospital fees", "keywords": ["hospital bill", "medical fees", "medical bill"]},
    "ja": {"title": "市立病院の医療費", "keywords": ["医療費", "病院の支払い"]},
    "vi": {"title": "Viện phí", "keywords": ["viện phí", "tiền khám bệnh", "tiền viện phí", "tiền bệnh viện", "tiền thuốc"]},
    "id": {"title": "Biaya rumah sakit", "keywords": ["biaya rumah sakit", "biaya berobat", "biaya pengobatan", "tagihan rumah sakit", "tagihan berobat", "bayar rumah sakit", "biaya perawatan"]},
-   "th": {"title": "ค่ารักษาพยาบาล", "keywords": ["ค่ารักษาพยาบาล", "ค่าโรงพยาบาล"]}
+   "tl": {"title": "Bayarin sa ospital ng lungsod", "keywords": ["bayarin sa ospital", "bill sa ospital", "bayad sa ospital", "gastos sa pagpapagamot"]}
   },
   "fees.maintenance": {
    "en": {"title": "Low-cost housing maintenance fee", "keywords": ["housing maintenance fee"]},
    "ja": {"title": "低家賃住宅の維持費", "keywords": ["住宅維持費"]},
    "vi": {"title": "Phí bảo trì nhà ở giá rẻ", "keywords": ["phí bảo trì nhà"]},
    "id": {"title": "Biaya pemeliharaan rumah murah", "keywords": ["biaya pemeliharaan rumah"]},
-   "th": {"title": "ค่าบำรุงที่อยู่อาศัยราคาประหยัด", "keywords": ["ค่าบำรุงที่อยู่อาศัย"]}
+   "tl": {"title": "Bayad sa maintenance ng murang pabahay", "keywords": ["bayad sa maintenance ng pabahay"]}
   },
   "fees.course": {
    "en": {"title": "Civil service training courses", "keywords": ["training course fee", "course fee"]},
    "ja": {"title": "公務研修の自費講座", "keywords": ["講座の費用"]},
    "vi": {"title": "Khóa học đào tạo công vụ", "keywords": ["học phí khóa học"]},
    "id": {"title": "Kursus pelatihan", "keywords": ["biaya kursus", "biaya pelatihan", "pelatihan kerja", "biaya pelatihan kerja"]},
-   "th": {"title": "หลักสูตรฝึกอบรม", "keywords": ["ค่าหลักสูตร"]}
+   "tl": {"title": "Mga kurso ng civil service training", "keywords": ["bayad sa training course", "bayad sa kurso"]}
   },
   "fees.other": {
    "en": {"title": "Other payments", "keywords": ["other payments"]},
    "ja": {"title": "その他の支払い", "keywords": ["その他の支払い"]},
    "vi": {"title": "Thanh toán khác", "keywords": ["thanh toán khác"]},
    "id": {"title": "Pembayaran lain", "keywords": ["pembayaran lain", "tagihan lain", "tagihan lainnya", "pembayaran lainnya"]},
-   "th": {"title": "การชำระอื่น ๆ", "keywords": ["ชำระอื่น ๆ"]}
+   "tl": {"title": "Iba pang bayarin", "keywords": ["iba pang bayarin", "ibang bayarin"]}
   },
   "police.online": {
    "en": {"title": "Report to the police online", "keywords": ["online police report", "report online", "file a police report"]},
    "ja": {"title": "オンライン通報", "keywords": ["オンライン通報", "ネットで被害届"]},
    "vi": {"title": "Trình báo trực tuyến", "keywords": ["trình báo trực tuyến", "báo án trực tuyến", "báo án online", "trình báo online", "báo công an trực tuyến"]},
    "id": {"title": "Lapor polisi online", "keywords": ["lapor polisi online", "laporan online", "laporan polisi online", "lapor ke polisi", "lapor kehilangan", "laporan kehilangan", "lapor pencurian", "laporkan pencurian", "bikin laporan polisi", "buat laporan polisi"]},
-   "th": {"title": "แจ้งความออนไลน์", "keywords": ["แจ้งความออนไลน์"]}
+   "tl": {"title": "Mag-report sa pulis online", "keywords": ["mag-report sa pulis online", "online na ulat sa pulis", "mag-report online", "magsampa ng ulat sa pulis"]}
   },
   "police.records": {
    "en": {"title": "My police reports", "keywords": ["my police reports", "police report records"]},
    "ja": {"title": "通報の記録", "keywords": ["通報の記録", "被害届の記録"]},
    "vi": {"title": "Hồ sơ trình báo", "keywords": ["hồ sơ trình báo", "lịch sử báo án", "hồ sơ báo án"]},
    "id": {"title": "Riwayat laporan polisi", "keywords": ["riwayat laporan polisi", "daftar laporan polisi", "riwayat laporan"]},
-   "th": {"title": "ประวัติการแจ้งความ", "keywords": ["ประวัติการแจ้งความ"]}
+   "tl": {"title": "Aking mga ulat sa pulis", "keywords": ["mga ulat ko sa pulis", "rekord ng ulat sa pulis", "aking mga ulat sa pulis"]}
   },
   "districtOffice.progress": {
    "en": {"title": "Application progress", "keywords": ["application status", "application progress", "case status", "track my application"]},
    "ja": {"title": "申請の進捗", "keywords": ["申請の進捗", "申請状況", "進捗"]},
    "vi": {"title": "Tiến độ hồ sơ", "keywords": ["tiến độ hồ sơ", "tình trạng hồ sơ", "tra cứu hồ sơ", "hồ sơ tới đâu", "hồ sơ đến đâu rồi", "kiểm tra hồ sơ"]},
    "id": {"title": "Status permohonan", "keywords": ["status permohonan", "cek permohonan", "progres", "status pengajuan", "proses permohonan", "permohonan sudah diproses"]},
-   "th": {"title": "สถานะคำร้อง", "keywords": ["สถานะคำร้อง", "ติดตามคำร้อง"]}
+   "tl": {"title": "Progreso ng aplikasyon", "keywords": ["status ng aplikasyon", "progreso ng aplikasyon", "status ng kaso", "subaybayan ang aplikasyon ko"]}
   },
   "reportIssue.progress": {
    "en": {"title": "Complaint progress", "keywords": ["complaint status", "complaint progress"]},
    "ja": {"title": "陳情の進捗", "keywords": ["陳情の進捗"]},
    "vi": {"title": "Tiến độ phản ánh", "keywords": ["tiến độ phản ánh"]},
    "id": {"title": "Status keluhan", "keywords": ["status keluhan", "keluhan sudah ditanggapi", "tanggapan keluhan"]},
-   "th": {"title": "สถานะเรื่องร้องเรียน", "keywords": ["สถานะเรื่องร้องเรียน"]}
+   "tl": {"title": "Progreso ng reklamo", "keywords": ["status ng reklamo", "progreso ng reklamo"]}
   },
   "disasterReport.progress": {
    "en": {"title": "Disaster report progress", "keywords": ["disaster report status"]},
    "ja": {"title": "災害通報の進捗", "keywords": ["災害通報の進捗"]},
    "vi": {"title": "Tiến độ báo cáo thiên tai", "keywords": ["tiến độ báo cáo thiên tai"]},
    "id": {"title": "Status laporan bencana", "keywords": ["status laporan bencana"]},
-   "th": {"title": "สถานะการแจ้งภัยพิบัติ", "keywords": ["สถานะการแจ้งภัย"]}
+   "tl": {"title": "Progreso ng ulat ng sakuna", "keywords": ["status ng ulat ng sakuna"]}
   },
   "police.progress": {
    "en": {"title": "Police case progress", "keywords": ["police case status", "police case progress"]},
    "ja": {"title": "警察案件の進捗", "keywords": ["警察案件の進捗"]},
    "vi": {"title": "Tiến độ vụ việc cảnh sát", "keywords": ["tiến độ vụ việc"]},
    "id": {"title": "Status kasus polisi", "keywords": ["status kasus polisi", "perkembangan kasus", "status laporan polisi", "perkembangan laporan polisi", "proses laporan polisi"]},
-   "th": {"title": "สถานะคดีตำรวจ", "keywords": ["สถานะคดี"]}
+   "tl": {"title": "Progreso ng kaso sa pulis", "keywords": ["status ng kaso sa pulis", "progreso ng kaso sa pulis"]}
   },
   "reportIssue.prefill": {
    "en": {"title": "Complaint form prefill", "keywords": ["street light", "road problem"]},
    "ja": {"title": "陳情フォームの事前入力", "keywords": ["街灯", "道路の問題"]},
    "vi": {"title": "Điền sẵn đơn phản ánh", "keywords": ["đèn đường", "hư hỏng đường"]},
    "id": {"title": "Isi otomatis formulir keluhan", "keywords": ["lampu jalan", "jalan rusak"]},
-   "th": {"title": "กรอกแบบฟอร์มร้องเรียนล่วงหน้า", "keywords": ["ไฟถนน", "ถนนชำรุด"]}
+   "tl": {"title": "Pre-fill ng form ng reklamo", "keywords": ["ilaw sa kalye", "sirang kalsada", "problema sa kalsada"]}
   },
   "qna": {
    "en": {"title": "FAQ", "keywords": ["faq", "frequently asked questions", "common questions", "q&a"]},
    "ja": {"title": "よくある質問", "keywords": ["よくある質問", "質問", "Q&A"]},
    "vi": {"title": "Câu hỏi thường gặp", "keywords": ["câu hỏi thường gặp", "hỏi đáp", "câu hỏi hay gặp", "giải đáp thắc mắc"]},
    "id": {"title": "Pertanyaan umum", "keywords": ["pertanyaan umum", "tanya jawab", "faq"]},
-   "th": {"title": "คำถามที่พบบ่อย", "keywords": ["คำถามที่พบบ่อย", "ถามตอบ"]}
+   "tl": {"title": "FAQ", "keywords": ["faq", "mga madalas itanong", "karaniwang tanong", "tanong at sagot"]}
   },
   "qna.categories": {
    "en": {"title": "FAQ categories", "keywords": ["faq categories", "all questions"]},
    "ja": {"title": "質問のカテゴリ", "keywords": ["質問のカテゴリ", "すべての質問"]},
    "vi": {"title": "Danh mục câu hỏi", "keywords": ["danh mục câu hỏi", "tất cả câu hỏi"]},
    "id": {"title": "Kategori pertanyaan", "keywords": ["kategori pertanyaan", "semua pertanyaan"]},
-   "th": {"title": "หมวดคำถาม", "keywords": ["หมวดคำถาม", "คำถามทั้งหมด"]}
+   "tl": {"title": "Mga kategorya ng FAQ", "keywords": ["kategorya ng faq", "lahat ng tanong"]}
   },
   "fees.search": {
    "en": {"title": "Payment search", "keywords": ["search payments", "find a payment", "payment search"]},
    "ja": {"title": "支払い検索", "keywords": ["支払い検索", "支払いを探す"]},
    "vi": {"title": "Tìm khoản thanh toán", "keywords": ["tìm khoản thanh toán", "tra cứu thanh toán", "tìm hóa đơn", "tra cứu hóa đơn"]},
    "id": {"title": "Cari pembayaran", "keywords": ["cari pembayaran", "pencarian pembayaran", "cari tagihan", "cek tagihan", "tagihan yang belum dibayar", "tagihan belum dibayar", "cek pembayaran"]},
-   "th": {"title": "ค้นหาการชำระเงิน", "keywords": ["ค้นหาการชำระเงิน"]}
+   "tl": {"title": "Paghahanap ng bayarin", "keywords": ["hanapin ang bayarin", "maghanap ng bayarin", "paghahanap ng bayarin"]}
   },
   "districtOffice.form.a-1": {
    "en": {"title": "Traffic ticket appeal (Taipei)", "keywords": ["traffic ticket appeal", "appeal a ticket"]},
    "ja": {"title": "交通違反の申し立て（台北市）", "keywords": ["交通違反の申し立て（台北市）"]},
    "vi": {"title": "Khiếu nại vé phạt giao thông (Đài Bắc)", "keywords": ["khiếu nại vé phạt giao thông (đài bắc)"]},
    "id": {"title": "Banding tilang lalu lintas (Taipei)", "keywords": ["banding tilang lalu lintas (taipei)"]},
-   "th": {"title": "อุทธรณ์ใบสั่งจราจร (ไทเป)", "keywords": ["อุทธรณ์ใบสั่งจราจร (ไทเป)"]}
+   "tl": {"title": "Apela sa multa sa trapiko (Lungsod ng Taipei)", "keywords": ["apela sa multa sa trapiko", "iapela ang multa sa trapiko"]}
   },
   "districtOffice.form.a-2": {
    "en": {"title": "Traffic ticket appeal (other cities)", "keywords": ["ticket from another city"]},
    "ja": {"title": "交通違反の申し立て（他県市）", "keywords": ["交通違反の申し立て（他県市）"]},
    "vi": {"title": "Khiếu nại vé phạt giao thông (tỉnh khác)", "keywords": ["khiếu nại vé phạt giao thông (tỉnh khác)"]},
    "id": {"title": "Banding tilang lalu lintas (kota lain)", "keywords": ["banding tilang lalu lintas (kota lain)"]},
-   "th": {"title": "อุทธรณ์ใบสั่งจราจร (เมืองอื่น)", "keywords": ["อุทธรณ์ใบสั่งจราจร (เมืองอื่น)"]}
+   "tl": {"title": "Apela sa multa sa trapiko (ibang lungsod)", "keywords": ["multa sa trapiko mula sa ibang lungsod"]}
   },
   "districtOffice.form.a-3": {
    "en": {"title": "Parking ticket appeal", "keywords": ["parking ticket appeal", "parking fine appeal"]},
    "ja": {"title": "駐車違反の申し立て", "keywords": ["駐車違反の申し立て"]},
    "vi": {"title": "Khiếu nại phạt đỗ xe", "keywords": ["khiếu nại phạt đỗ xe"]},
    "id": {"title": "Banding tilang parkir", "keywords": ["banding tilang parkir"]},
-   "th": {"title": "อุทธรณ์ใบสั่งจอดรถ", "keywords": ["อุทธรณ์ใบสั่งจอดรถ"]}
+   "tl": {"title": "Apela sa multa sa paradahan", "keywords": ["iapela ang multa sa paradahan"]}
   },
   "districtOffice.form.b-1": {
    "en": {"title": "Police violation appeal", "keywords": ["police ticket appeal"]},
    "ja": {"title": "警察の違反の申し立て", "keywords": ["警察の違反の申し立て"]},
    "vi": {"title": "Khiếu nại vi phạm do cảnh sát lập", "keywords": ["khiếu nại vi phạm do cảnh sát lập"]},
    "id": {"title": "Banding pelanggaran dari polisi", "keywords": ["banding pelanggaran dari polisi"]},
-   "th": {"title": "อุทธรณ์การกระทำผิดจากตำรวจ", "keywords": ["อุทธรณ์การกระทำผิดจากตำรวจ"]}
+   "tl": {"title": "Apela sa paglabag sa trapiko na hawak ng pulisya ng lungsod", "keywords": ["iapela ang tiket sa trapiko mula sa pulisya"]}
   },
   "districtOffice.form.c-1": {
    "en": {"title": "Senior health insurance premium subsidy", "keywords": ["senior health insurance subsidy"]},
    "ja": {"title": "高齢者の健康保険料補助", "keywords": ["高齢者の健康保険料補助"]},
    "vi": {"title": "Trợ cấp phí bảo hiểm y tế cho người cao tuổi", "keywords": ["trợ cấp phí bảo hiểm y tế cho người cao tuổi"]},
    "id": {"title": "Subsidi premi asuransi kesehatan lansia", "keywords": ["subsidi premi asuransi kesehatan lansia", "subsidi asuransi kesehatan", "asuransi kesehatan lansia"]},
-   "th": {"title": "เงินอุดหนุนเบี้ยประกันสุขภาพผู้สูงอายุ", "keywords": ["เงินอุดหนุนเบี้ยประกันสุขภาพผู้สูงอายุ"]}
+   "tl": {"title": "Subsidy sa premium ng health insurance ng senior", "keywords": ["subsidy sa health insurance ng senior"]}
   },
   "districtOffice.form.c-2": {
    "en": {"title": "Sexual assault victim subsidy", "keywords": ["sexual assault victim support"]},
    "ja": {"title": "性暴力被害者への補助", "keywords": ["性暴力被害者への補助"]},
    "vi": {"title": "Trợ cấp nạn nhân xâm hại tình dục", "keywords": ["trợ cấp nạn nhân xâm hại tình dục"]},
    "id": {"title": "Subsidi korban kekerasan seksual", "keywords": ["subsidi korban kekerasan seksual"]},
-   "th": {"title": "เงินช่วยเหลือผู้เสียหายจากการล่วงละเมิดทางเพศ", "keywords": ["เงินช่วยเหลือผู้เสียหายจากการล่วงละเมิดทางเพศ"]}
+   "tl": {"title": "Tulong para sa biktima ng sekswal na pang-aabuso", "keywords": ["tulong sa biktima ng sekswal na pang-aabuso"]}
   },
   "districtOffice.form.c-3": {
    "en": {"title": "Domestic violence victim subsidy", "keywords": ["domestic violence support"]},
    "ja": {"title": "家庭内暴力被害者への補助", "keywords": ["家庭内暴力被害者への補助"]},
    "vi": {"title": "Trợ cấp nạn nhân bạo lực gia đình", "keywords": ["trợ cấp nạn nhân bạo lực gia đình"]},
    "id": {"title": "Subsidi korban kekerasan dalam rumah tangga", "keywords": ["subsidi korban kekerasan dalam rumah tangga"]},
-   "th": {"title": "เงินช่วยเหลือผู้เสียหายจากความรุนแรงในครอบครัว", "keywords": ["เงินช่วยเหลือผู้เสียหายจากความรุนแรงในครอบครัว"]}
+   "tl": {"title": "Tulong para sa biktima ng karahasan sa tahanan", "keywords": ["tulong sa biktima ng karahasan sa tahanan"]}
   },
   "districtOffice.form.c-4": {
    "en": {"title": "Special-circumstances family aid (domestic violence)", "keywords": ["special circumstances family aid"]},
    "ja": {"title": "特別な事情のある家庭への援助（家庭内暴力）", "keywords": ["特別な事情のある家庭への援助（家庭内暴力）"]},
    "vi": {"title": "Hỗ trợ gia đình hoàn cảnh đặc biệt (bạo lực gia đình)", "keywords": ["hỗ trợ gia đình hoàn cảnh đặc biệt (bạo lực gia đình)"]},
    "id": {"title": "Bantuan keluarga keadaan khusus (KDRT)", "keywords": ["bantuan keluarga keadaan khusus (kdrt)"]},
-   "th": {"title": "ความช่วยเหลือครอบครัวที่มีสถานการณ์พิเศษ (ความรุนแรงในครอบครัว)", "keywords": ["ความช่วยเหลือครอบครัวที่มีสถานการณ์พิเศษ (ความรุนแรงในครอบครัว)"]}
+   "tl": {"title": "Tulong sa pamilyang nasa espesyal na kalagayan (karahasan sa tahanan)", "keywords": ["tulong sa pamilyang nasa espesyal na kalagayan"]}
   },
   "districtOffice.form.c-5": {
    "en": {"title": "Disability social insurance subsidy change", "keywords": ["disability insurance subsidy"]},
    "ja": {"title": "障害者の社会保険料補助の変更", "keywords": ["障害者の社会保険料補助の変更"]},
    "vi": {"title": "Thay đổi trợ cấp bảo hiểm xã hội cho người khuyết tật", "keywords": ["thay đổi trợ cấp bảo hiểm xã hội cho người khuyết tật"]},
    "id": {"title": "Perubahan subsidi asuransi sosial penyandang disabilitas", "keywords": ["perubahan subsidi asuransi sosial penyandang disabilitas"]},
-   "th": {"title": "เปลี่ยนวิธีรับเงินอุดหนุนประกันสังคมผู้พิการ", "keywords": ["เปลี่ยนวิธีรับเงินอุดหนุนประกันสังคมผู้พิการ"]}
+   "tl": {"title": "Pagbabago sa subsidy ng social insurance ng may kapansanan", "keywords": ["subsidy sa insurance ng may kapansanan"]}
   },
   "districtOffice.form.d-1": {
    "en": {"title": "Indigenous emergency relief", "keywords": ["indigenous emergency relief"]},
    "ja": {"title": "原住民族緊急見舞金", "keywords": ["原住民族緊急見舞金"]},
    "vi": {"title": "Tiền hỗ trợ khẩn cấp cho người bản địa", "keywords": ["tiền hỗ trợ khẩn cấp cho người bản địa"]},
    "id": {"title": "Bantuan darurat masyarakat adat", "keywords": ["bantuan darurat masyarakat adat"]},
-   "th": {"title": "เงินช่วยเหลือฉุกเฉินชนพื้นเมือง", "keywords": ["เงินช่วยเหลือฉุกเฉินชนพื้นเมือง"]}
+   "tl": {"title": "Tulong pang-emergency para sa katutubo", "keywords": ["tulong pang-emergency para sa katutubo"]}
   },
   "districtOffice.form.d-2": {
    "en": {"title": "Indigenous skills certification award", "keywords": ["indigenous certification award"]},
    "ja": {"title": "原住民族技能検定奨励金", "keywords": ["原住民族技能検定奨励金"]},
    "vi": {"title": "Tiền thưởng chứng chỉ kỹ năng cho người bản địa", "keywords": ["tiền thưởng chứng chỉ kỹ năng cho người bản địa"]},
    "id": {"title": "Insentif sertifikasi keahlian masyarakat adat", "keywords": ["insentif sertifikasi keahlian masyarakat adat"]},
-   "th": {"title": "เงินรางวัลการสอบวัดทักษะชนพื้นเมือง", "keywords": ["เงินรางวัลการสอบวัดทักษะชนพื้นเมือง"]}
+   "tl": {"title": "Gantimpala sa sertipikasyon ng kasanayan ng katutubo", "keywords": ["gantimpala sa sertipikasyon ng katutubo"]}
   },
   "reportIssue.list": {
    "en": {"title": "Complaint categories", "keywords": ["complaint categories", "all complaint types"]},
    "ja": {"title": "陳情の分類", "keywords": ["陳情の分類", "陳情の種類"]},
    "vi": {"title": "Danh mục phản ánh", "keywords": ["danh mục phản ánh", "loại phản ánh"]},
    "id": {"title": "Kategori keluhan", "keywords": ["kategori keluhan", "jenis keluhan"]},
-   "th": {"title": "หมวดเรื่องร้องเรียน", "keywords": ["หมวดเรื่องร้องเรียน", "ประเภทเรื่องร้องเรียน"]}
+   "tl": {"title": "Mga kategorya ng reklamo", "keywords": ["kategorya ng reklamo", "lahat ng uri ng reklamo"]}
   },
   "disasterReport.form.D-1-1": {
    "en": {"title": "Damaged power line or pole", "keywords": ["damaged power line or pole"]},
    "ja": {"title": "電線・電柱の損傷", "keywords": ["電線・電柱の損傷"]},
    "vi": {"title": "Dây điện hoặc cột điện hư hỏng", "keywords": ["dây điện hoặc cột điện hư hỏng"]},
    "id": {"title": "Kabel atau tiang listrik rusak", "keywords": ["kabel atau tiang listrik rusak", "kabel listrik putus", "tiang listrik rusak", "tiang listrik roboh"]},
-   "th": {"title": "สายไฟหรือเสาไฟเสียหาย", "keywords": ["สายไฟหรือเสาไฟเสียหาย"]}
+   "tl": {"title": "Sirang linya o poste ng kuryente", "keywords": ["sirang linya ng kuryente", "sirang poste ng kuryente", "natumbang poste"]}
   },
   "disasterReport.form.D-1-2": {
    "en": {"title": "Substation or power plant damage", "keywords": ["substation or power plant damage"]},
    "ja": {"title": "変電所・発電所の被害", "keywords": ["変電所・発電所の被害"]},
    "vi": {"title": "Trạm biến áp hoặc nhà máy điện bị hư hại", "keywords": ["trạm biến áp hoặc nhà máy điện bị hư hại"]},
    "id": {"title": "Gardu atau pembangkit listrik rusak", "keywords": ["gardu atau pembangkit listrik rusak"]},
-   "th": {"title": "สถานีไฟฟ้าย่อยหรือโรงไฟฟ้าเสียหาย", "keywords": ["สถานีไฟฟ้าย่อยหรือโรงไฟฟ้าเสียหาย"]}
+   "tl": {"title": "Pinsala sa substation o planta ng kuryente", "keywords": ["pinsala sa substation", "planta ng kuryente"]}
   },
   "disasterReport.form.D-1-3": {
    "en": {"title": "Broken street light", "keywords": ["broken street light"]},
    "ja": {"title": "街灯の故障", "keywords": ["街灯の故障"]},
    "vi": {"title": "Đèn đường bị hỏng", "keywords": ["đèn đường bị hỏng"]},
    "id": {"title": "Lampu jalan rusak", "keywords": ["lampu jalan rusak", "lampu jalan mati", "lampu jalan padam", "lampu jalan tidak menyala"]},
-   "th": {"title": "ไฟถนนเสีย", "keywords": ["ไฟถนนเสีย"]}
+   "tl": {"title": "Sirang ilaw sa kalye", "keywords": ["sirang ilaw sa kalye", "patay na ilaw sa kalye", "ilaw sa kalye", "poste ng ilaw"]}
   },
   "disasterReport.form.D-1-4": {
    "en": {"title": "Power outage", "keywords": ["power outage"]},
    "ja": {"title": "停電", "keywords": ["停電"]},
    "vi": {"title": "Mất điện", "keywords": ["mất điện"]},
    "id": {"title": "Listrik padam", "keywords": ["listrik padam", "mati listrik", "listrik mati", "pemadaman listrik"]},
-   "th": {"title": "ไฟฟ้าดับ", "keywords": ["ไฟฟ้าดับ"]}
+   "tl": {"title": "Pagkawala ng kuryente", "keywords": ["pagkawala ng kuryente", "brownout", "walang kuryente", "nawalan ng kuryente"]}
   },
   "disasterReport.form.D-2-1": {
    "en": {"title": "Bridge foundation scour", "keywords": ["bridge foundation scour"]},
    "ja": {"title": "橋の基礎の洗掘", "keywords": ["橋の基礎の洗掘"]},
    "vi": {"title": "Xói lở móng cầu", "keywords": ["xói lở móng cầu"]},
    "id": {"title": "Gerusan fondasi jembatan", "keywords": ["gerusan fondasi jembatan"]},
-   "th": {"title": "ฐานสะพานถูกกัดเซาะ", "keywords": ["ฐานสะพานถูกกัดเซาะ"]}
+   "tl": {"title": "Pag-agnas ng pundasyon ng tulay", "keywords": ["pag-agnas ng pundasyon ng tulay"]}
   },
   "disasterReport.form.D-2-2": {
    "en": {"title": "Broken bridge", "keywords": ["broken bridge"]},
    "ja": {"title": "橋の破断", "keywords": ["橋の破断"]},
    "vi": {"title": "Cầu bị gãy", "keywords": ["cầu bị gãy"]},
    "id": {"title": "Jembatan putus", "keywords": ["jembatan putus", "jembatan ambruk", "jembatan runtuh"]},
-   "th": {"title": "สะพานขาด", "keywords": ["สะพานขาด"]}
+   "tl": {"title": "Sirang tulay", "keywords": ["sirang tulay", "bumagsak na tulay", "putol na tulay"]}
   },
   "disasterReport.form.D-2-3": {
    "en": {"title": "Other bridge damage", "keywords": ["other bridge damage"]},
    "ja": {"title": "その他の橋の被害", "keywords": ["その他の橋の被害"]},
    "vi": {"title": "Hư hại cầu khác", "keywords": ["hư hại cầu khác"]},
    "id": {"title": "Kerusakan jembatan lainnya", "keywords": ["kerusakan jembatan lainnya", "jembatan rusak"]},
-   "th": {"title": "ความเสียหายของสะพานอื่น ๆ", "keywords": ["ความเสียหายของสะพานอื่น ๆ"]}
+   "tl": {"title": "Iba pang pinsala sa tulay", "keywords": ["iba pang pinsala sa tulay", "pinsala sa tulay"]}
   },
   "disasterReport.form.D-3-1": {
    "en": {"title": "Debris flow", "keywords": ["debris flow"]},
    "ja": {"title": "土石流", "keywords": ["土石流"]},
    "vi": {"title": "Lũ bùn đá", "keywords": ["lũ bùn đá"]},
    "id": {"title": "Aliran debris", "keywords": ["aliran debris"]},
-   "th": {"title": "โคลนถล่ม", "keywords": ["โคลนถล่ม"]}
+   "tl": {"title": "Pag-agos ng putik at bato", "keywords": ["pag-agos ng putik", "putik at bato"]}
   },
   "disasterReport.form.D-3-2": {
    "en": {"title": "Landslide or rockfall", "keywords": ["landslide or rockfall"]},
    "ja": {"title": "土砂崩れ・落石", "keywords": ["土砂崩れ・落石"]},
    "vi": {"title": "Sạt lở đất đá", "keywords": ["sạt lở đất đá"]},
    "id": {"title": "Longsor atau batu jatuh", "keywords": ["longsor atau batu jatuh"]},
-   "th": {"title": "ดินถล่มหรือหินร่วง", "keywords": ["ดินถล่มหรือหินร่วง"]}
+   "tl": {"title": "Pagguho ng lupa o bato", "keywords": ["pagguho ng lupa o bato", "gumuhong bato", "nahulog na bato"]}
   },
   "disasterReport.form.D-3-3": {
    "en": {"title": "Landslide dam lake", "keywords": ["landslide dam lake"]},
    "ja": {"title": "せき止め湖", "keywords": ["せき止め湖"]},
    "vi": {"title": "Hồ chắn do sạt lở", "keywords": ["hồ chắn do sạt lở"]},
    "id": {"title": "Danau bendungan longsor", "keywords": ["danau bendungan longsor"]},
-   "th": {"title": "ทะเลสาบจากดินถล่มปิดกั้น", "keywords": ["ทะเลสาบจากดินถล่มปิดกั้น"]}
+   "tl": {"title": "Lawang nabuo dahil sa pagguho", "keywords": ["lawang nabuo dahil sa pagguho"]}
   },
   "disasterReport.form.D-4-1": {
    "en": {"title": "Building fire", "keywords": ["building fire"]},
    "ja": {"title": "建物火災", "keywords": ["建物火災"]},
    "vi": {"title": "Cháy nhà/công trình", "keywords": ["cháy nhà/công trình"]},
    "id": {"title": "Kebakaran bangunan", "keywords": ["kebakaran bangunan"]},
-   "th": {"title": "ไฟไหม้อาคาร", "keywords": ["ไฟไหม้อาคาร"]}
+   "tl": {"title": "Sunog sa gusali", "keywords": ["nasusunog na gusali", "may sunog sa isang gusali"]}
   },
   "disasterReport.form.D-4-2": {
    "en": {"title": "Hazardous material fire", "keywords": ["hazardous material fire"]},
    "ja": {"title": "危険物火災", "keywords": ["危険物火災"]},
    "vi": {"title": "Cháy vật liệu nguy hiểm", "keywords": ["cháy vật liệu nguy hiểm"]},
    "id": {"title": "Kebakaran bahan berbahaya", "keywords": ["kebakaran bahan berbahaya"]},
-   "th": {"title": "ไฟไหม้วัตถุอันตราย", "keywords": ["ไฟไหม้วัตถุอันตราย"]}
+   "tl": {"title": "Sunog dahil sa mapanganib na materyales", "keywords": ["sunog sa mapanganib na materyales"]}
   },
   "disasterReport.form.D-4-3": {
    "en": {"title": "Factory fire", "keywords": ["factory fire"]},
    "ja": {"title": "工場火災", "keywords": ["工場火災"]},
    "vi": {"title": "Cháy nhà máy", "keywords": ["cháy nhà máy"]},
    "id": {"title": "Kebakaran pabrik", "keywords": ["kebakaran pabrik"]},
-   "th": {"title": "ไฟไหม้โรงงาน", "keywords": ["ไฟไหม้โรงงาน"]}
+   "tl": {"title": "Sunog sa pabrika", "keywords": ["sunog sa pabrika"]}
   },
   "disasterReport.form.D-4-4": {
    "en": {"title": "Other fire", "keywords": ["other fire"]},
    "ja": {"title": "その他の火災", "keywords": ["その他の火災"]},
    "vi": {"title": "Đám cháy khác", "keywords": ["đám cháy khác"]},
    "id": {"title": "Kebakaran lainnya", "keywords": ["kebakaran lainnya"]},
-   "th": {"title": "ไฟไหม้อื่น ๆ", "keywords": ["ไฟไหม้อื่น ๆ"]}
+   "tl": {"title": "Iba pang sunog", "keywords": ["iba pang sunog"]}
   },
   "reservation.c-1-1": {
    "en": {"title": "Guting Land Office", "keywords": ["guting land office queue"]},
    "ja": {"title": "古亭地政事務所", "keywords": ["古亭地政事務所"]},
    "vi": {"title": "Văn phòng địa chính Cổ Đình", "keywords": ["văn phòng địa chính cổ đình"]},
    "id": {"title": "Kantor Pertanahan Guting", "keywords": ["kantor pertanahan guting"]},
-   "th": {"title": "สำนักงานที่ดินกู่ถิง", "keywords": ["สำนักงานที่ดินกู่ถิง"]}
+   "tl": {"title": "Guting Land Office", "keywords": ["pila sa guting land office"]}
   },
   "reservation.c-1-2": {
    "en": {"title": "Zhongshan Land Office", "keywords": ["zhongshan land office queue"]},
    "ja": {"title": "中山地政事務所", "keywords": ["中山地政事務所"]},
    "vi": {"title": "Văn phòng địa chính Trung Sơn", "keywords": ["văn phòng địa chính trung sơn"]},
    "id": {"title": "Kantor Pertanahan Zhongshan", "keywords": ["kantor pertanahan zhongshan"]},
-   "th": {"title": "สำนักงานที่ดินจงซาน", "keywords": ["สำนักงานที่ดินจงซาน"]}
+   "tl": {"title": "Zhongshan Land Office", "keywords": ["pila sa zhongshan land office"]}
   },
   "reservation.c-2-1": {
    "en": {"title": "Wanhua Household Registration Office", "keywords": ["wanhua household registration office queue"]},
    "ja": {"title": "萬華区戸政事務所", "keywords": ["萬華区戸政事務所"]},
    "vi": {"title": "Văn phòng hộ tịch Vạn Hoa", "keywords": ["văn phòng hộ tịch vạn hoa"]},
    "id": {"title": "Kantor Catatan Sipil Wanhua", "keywords": ["kantor catatan sipil wanhua"]},
-   "th": {"title": "สำนักงานทะเบียนราษฎร์ว่านหัว", "keywords": ["สำนักงานทะเบียนราษฎร์ว่านหัว"]}
+   "tl": {"title": "Wanhua Household Registration Office", "keywords": ["pila sa wanhua household registration office"]}
   },
   "reservation.c-2-2": {
    "en": {"title": "Zhongzheng Household Registration Office", "keywords": ["zhongzheng household registration office queue"]},
    "ja": {"title": "中正区戸政事務所", "keywords": ["中正区戸政事務所"]},
    "vi": {"title": "Văn phòng hộ tịch Trung Chính", "keywords": ["văn phòng hộ tịch trung chính"]},
    "id": {"title": "Kantor Catatan Sipil Zhongzheng", "keywords": ["kantor catatan sipil zhongzheng"]},
-   "th": {"title": "สำนักงานทะเบียนราษฎร์จงเจิ้ง", "keywords": ["สำนักงานทะเบียนราษฎร์จงเจิ้ง"]}
+   "tl": {"title": "Zhongzheng Household Registration Office", "keywords": ["pila sa zhongzheng household registration office"]}
   },
   "reservation.c-3-1": {
    "en": {"title": "Wanhua District Office", "keywords": ["wanhua district office queue"]},
    "ja": {"title": "萬華区役所", "keywords": ["萬華区役所"]},
    "vi": {"title": "Văn phòng quận Vạn Hoa", "keywords": ["văn phòng quận vạn hoa"]},
    "id": {"title": "Kantor Distrik Wanhua", "keywords": ["kantor distrik wanhua"]},
-   "th": {"title": "สำนักงานเขตว่านหัว", "keywords": ["สำนักงานเขตว่านหัว"]}
+   "tl": {"title": "Wanhua District Office", "keywords": ["pila sa wanhua district office"]}
   },
   "reservation.c-3-2": {
    "en": {"title": "Zhongzheng District Office", "keywords": ["zhongzheng district office queue"]},
    "ja": {"title": "中正区役所", "keywords": ["中正区役所"]},
    "vi": {"title": "Văn phòng quận Trung Chính", "keywords": ["văn phòng quận trung chính"]},
    "id": {"title": "Kantor Distrik Zhongzheng", "keywords": ["kantor distrik zhongzheng"]},
-   "th": {"title": "สำนักงานเขตจงเจิ้ง", "keywords": ["สำนักงานเขตจงเจิ้ง"]}
+   "tl": {"title": "Zhongzheng District Office", "keywords": ["pila sa zhongzheng district office"]}
   },
   "reservation.c-4-1": {
    "en": {"title": "Revenue Service Wanhua Branch", "keywords": ["revenue service wanhua branch queue"]},
    "ja": {"title": "税務署萬華分署", "keywords": ["税務署萬華分署"]},
    "vi": {"title": "Chi cục thuế Vạn Hoa", "keywords": ["chi cục thuế vạn hoa"]},
    "id": {"title": "Kantor Pajak Cabang Wanhua", "keywords": ["kantor pajak cabang wanhua"]},
-   "th": {"title": "สำนักงานภาษีสาขาว่านหัว", "keywords": ["สำนักงานภาษีสาขาว่านหัว"]}
+   "tl": {"title": "Revenue Service Wanhua Branch", "keywords": ["pila sa revenue service wanhua branch"]}
   },
   "reservation.c-4-2": {
    "en": {"title": "Revenue Service Datong Branch", "keywords": ["revenue service datong branch queue"]},
    "ja": {"title": "税務署大同分署", "keywords": ["税務署大同分署"]},
    "vi": {"title": "Chi cục thuế Đại Đồng", "keywords": ["chi cục thuế đại đồng"]},
    "id": {"title": "Kantor Pajak Cabang Datong", "keywords": ["kantor pajak cabang datong"]},
-   "th": {"title": "สำนักงานภาษีสาขาต้าถง", "keywords": ["สำนักงานภาษีสาขาต้าถง"]}
+   "tl": {"title": "Revenue Service Datong Branch", "keywords": ["pila sa revenue service datong branch"]}
   },
   "reservation.c-5-1": {
    "en": {"title": "Bangka Employment Service Station", "keywords": ["bangka employment service station queue"]},
    "ja": {"title": "艋舺就業サービスステーション", "keywords": ["艋舺就業サービスステーション"]},
    "vi": {"title": "Trạm dịch vụ việc làm Manh Giáp", "keywords": ["trạm dịch vụ việc làm manh giáp"]},
    "id": {"title": "Pos Layanan Kerja Bangka", "keywords": ["pos layanan kerja bangka"]},
-   "th": {"title": "สถานีบริการจัดหางานเมิ่งเจี่ย", "keywords": ["สถานีบริการจัดหางานเมิ่งเจี่ย"]}
+   "tl": {"title": "Bangka Employment Service Station", "keywords": ["pila sa bangka employment service station"]}
   },
   "reservation.c-5-2": {
    "en": {"title": "Ximen Employment Service Station", "keywords": ["ximen employment service station queue"]},
    "ja": {"title": "西門就業サービスステーション", "keywords": ["西門就業サービスステーション"]},
    "vi": {"title": "Trạm dịch vụ việc làm Tây Môn", "keywords": ["trạm dịch vụ việc làm tây môn"]},
    "id": {"title": "Pos Layanan Kerja Ximen", "keywords": ["pos layanan kerja ximen"]},
-   "th": {"title": "สถานีบริการจัดหางานซีเหมิน", "keywords": ["สถานีบริการจัดหางานซีเหมิน"]}
+   "tl": {"title": "Ximen Employment Service Station", "keywords": ["pila sa ximen employment service station"]}
   }
  }
 }

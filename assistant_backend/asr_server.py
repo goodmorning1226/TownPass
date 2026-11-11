@@ -44,8 +44,12 @@ HYPOTHESES = 5
 
 
 # Speech languages (docs/AI_MULTILINGUAL_PLAN.md): code -> whisper.cpp's full name.
+# Filipino replaced Thai on 2026-11-11 (docs/AI_FILIPINO.md); Whisper calls it Tagalog,
+# "tl", and so does the App.
 LANGUAGES = {"zh": "chinese", "en": "english", "ja": "japanese", "vi": "vietnamese",
-             "id": "indonesian", "th": "thai"}
+             "id": "indonesian", "tl": "tagalog"}
+# Other names for our languages: Android and BCP 47 call Filipino "fil".
+ALIASES = {"fil": "tl", "filipino": "tl"}
 # Taiwanese (Hokkien, docs/AI_TAIWANESE_SPEECH_PLAN.md section 10): only when chosen.
 # Whisper has no Taiwanese tag, so detection never returns it; a Taiwanese model
 # (Breeze-ASR-26) writes Mandarin characters, and the turn then is Chinese.
@@ -104,12 +108,14 @@ VIETNAMESE_MIN_AUDIO_CTX = 1500
 
 
 # Sentences in each language's own script (see WhisperCppRecognizer._fields).
-SCRIPT_PROMPTS = {"ja": "こんにちは。台北市のサービスについて質問します。",
-                  "th": "สวัสดีครับ ขอสอบถามบริการของเมืองไทเป"}
+# Vietnamese and Filipino get none: Latin letters need no nudge, and a Vietnamese prompt
+# made Whisper worse (docs/AI_VIETNAMESE.md section 3).
+SCRIPT_PROMPTS = {"ja": "こんにちは。台北市のサービスについて質問します。"}
 # A transcript in the detected language should contain its script. Vietnamese is
 # written in Latin letters, but a Vietnamese transcript always has its own letters or
-# tone marks (ă â đ ê ô ơ ư, ạ ả ã …), which Indonesian text never has.
-SCRIPTS = {"ja": re.compile(r"[぀-ヿ一-鿿]"), "th": re.compile(r"[฀-๿]"),
+# tone marks (ă â đ ê ô ơ ư, ạ ả ã …), which Indonesian text never has. Filipino has no
+# letters of its own (Latin script; RIVALS tells it from Indonesian).
+SCRIPTS = {"ja": re.compile(r"[぀-ヿ一-鿿]"),
            "vi": re.compile(r"[àáảãạăằắẳẵặâầấẩẫậđèéẻẽẹêềếểễệìíỉĩịòóỏõọôồốổỗộơờớởỡợùúủũụưừứửữựỳýỷỹỵ]", re.I)}
 
 
@@ -127,7 +133,7 @@ SCRIPTS = {"ja": re.compile(r"[぀-ヿ一-鿿]"), "th": re.compile(r"[฀-๿]")
 CLEAR_LANGUAGE = 0.6
 CANDIDATE_MIN = 0.1
 # whisper.cpp language names (and codes) outside ours -> the nearest of ours.
-NEAREST = {"lao": "th", "lo": "th", "malay": "id", "ms": "id", "javanese": "id", "jw": "id",
+NEAREST = {"malay": "id", "ms": "id", "javanese": "id", "jw": "id",
            "sundanese": "id", "su": "id", "cantonese": "zh", "yue": "zh"}
 # Chinese chosen, no language gate: the Chinese pass runs first (fast path) and its text
 # is checked instead. A short clear Chinese text may be a translation of another language
@@ -167,9 +173,10 @@ STATUS_RANK = {"clear": 2, "unsure": 1, "unclear": 0}
 # the rival is decoded too and the better transcript is kept (_choose: a Vietnamese one
 # must contain Vietnamese letters, SCRIPTS). The menu language alone is no reason: on
 # FLEURS clips a decode forced into the menu language turned 8 of 24 Indonesian clips
-# into Vietnamese (docs/AI_LANGUAGE_GATE.md). Tagalog can be added here once it is one
-# of our languages (it is to replace Thai).
-RIVALS = {"id": ("vi",), "vi": ("id",)}
+# into Vietnamese (docs/AI_LANGUAGE_GATE.md). Filipino (Tagalog) and Indonesian share
+# sounds and many words, and neither has letters of its own; they are rivals the same
+# way (docs/AI_FILIPINO.md).
+RIVALS = {"id": ("vi", "tl"), "vi": ("id",), "tl": ("id",)}
 # 0.1: on FLEURS vi/id clips 0.05 found one more right language but decoded the rival
 # twice as often (22 vs 10 of 436 clip-menu pairs).
 RIVAL_CHANCE = 0.1
@@ -217,7 +224,7 @@ def script_fits(text, language):
         return cjk_ratio(text) >= 0.5
     if language in SCRIPTS:
         return bool(SCRIPTS[language].search(text))
-    # Latin-script languages (en, vi, id): Latin letters, Vietnamese marks included.
+    # Latin-script languages (en, vi, id, tl): Latin letters, Vietnamese marks included.
     latin = sum(c.isascii() or "\u00c0" <= c <= "\u024f" or "\u1e00" <= c <= "\u1eff" for c in letters)
     return latin / len(letters) >= 0.8
 
@@ -235,6 +242,7 @@ def language_code(value, default="zh"):
     if value in ("auto", ""):
         return "auto" if value else default
     value = value.split("-")[0].split("_")[0]
+    value = ALIASES.get(value, value)
     if value in TAIWANESE_NAMES:
         return TAIWANESE
     if value in LANGUAGES:
@@ -418,7 +426,7 @@ class WhisperCppRecognizer:
     Standard library only.
 
     Languages: url serves Chinese; multi_url, when given, serves a multilingual
-    Whisper for en/ja/vi/id/th and language detection (both may be the same
+    Whisper for en/ja/vi/id/tl and language detection (both may be the same
     model, e.g. Whisper small for everything). gate_url, when given, is a small
     whisper-server (Whisper tiny) used only to detect the language before any
     decode (docs/AI_LANGUAGE_GATE.md). The result's language is the one the
@@ -513,8 +521,8 @@ class WhisperCppRecognizer:
 
     def _fields(self, seconds=30, language="zh", fallback=True, prompt=True, minimum_ctx=256):
         # The catalogue vocabulary prompt is Chinese: only for Chinese decoding.
-        # Japanese and Thai get a sentence in their own script, so Whisper writes
-        # kana/kanji or Thai instead of romanising ("nani ka dekiru"). "auto" gets
+        # Japanese gets a sentence in its own script, so Whisper writes kana/kanji
+        # instead of romanising ("nani ka dekiru"). "auto" gets
         # no prompt: a Chinese prompt would make Whisper write other languages in
         # Chinese. (It would not bias whisper.cpp's detection itself, which reads
         # only the start-of-transcript token: whisper_lang_auto_detect_internal.)
@@ -804,9 +812,9 @@ class WhisperCppRecognizer:
                         and not (detected == "vi" and self.vietnamese and self.vietnamese_url()[0])
                         and (detected not in SCRIPTS or SCRIPTS[detected].search(self.summarize(auto)[0] or ""))):
                     # Not reused: Chinese when a separate Chinese model exists,
-                    # Vietnamese when there is a Vietnamese model, and Japanese or
-                    # Thai written in Latin letters (redone with a prompt in their
-                    # own script).
+                    # Vietnamese when there is a Vietnamese model, and Japanese
+                    # written in Latin letters (redone with a prompt in its own
+                    # script).
                     decodes[detected] = auto
                 reply, used, confidence = self._decide(wav, seconds, language, language_scores(auto), decodes)
             if detectable and not taiwanese:

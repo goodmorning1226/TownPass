@@ -1011,7 +1011,10 @@ void main() {
   test('Without a saved choice the phone language is the default', () async {
     expect(AssistantSpeechLanguage.systemDefault('zh'), 'zh');
     expect(AssistantSpeechLanguage.systemDefault('en'), 'en');
-    expect(AssistantSpeechLanguage.systemDefault('th'), 'th');
+    // Filipino is 'tl' in the App; Android names it 'fil'. Thai is no longer offered.
+    expect(AssistantSpeechLanguage.systemDefault('tl'), 'tl');
+    expect(AssistantSpeechLanguage.systemDefault('fil'), 'tl');
+    expect(AssistantSpeechLanguage.systemDefault('th'), 'auto');
     expect(AssistantSpeechLanguage.systemDefault('fr'), 'auto');
     SharedPreferences.setMockInitialValues({});
     expect(
@@ -1456,6 +1459,8 @@ void main() {
 
     test('Each launch starts in the phone language', () {
       expect(PageTranslation.systemLanguage('vi'), 'vi');
+      expect(PageTranslation.systemLanguage('fil'), 'tl');
+      expect(PageTranslation.systemLanguage('th'), 'zh');
       expect(PageTranslation.systemLanguage('zh'), 'zh');
       expect(
         PageTranslation.systemLanguage('fr'),
@@ -1680,15 +1685,15 @@ void main() {
         find.text(AssistantTexts.text('holdToTalk', 'zh')),
         findsOneWidget,
       );
-      controller.setSpeechLanguage('th');
+      controller.setSpeechLanguage('tl');
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 60)); // batch timer
       await tester.pump();
       expect(
-        find.text(AssistantTexts.text('holdToTalk', 'th')),
+        find.text(AssistantTexts.text('holdToTalk', 'tl')),
         findsOneWidget,
       );
-      expect(find.text('[th] 首頁'), findsOneWidget);
+      expect(find.text('[tl] 首頁'), findsOneWidget);
       // From one translation to another.
       controller.setSpeechLanguage('ja');
       await tester.pump();

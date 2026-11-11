@@ -98,7 +98,7 @@ App：原生頁（TPRoute）／網頁（TPWebView，必要時網頁內換頁）
 ## 3. 一輪對話的步驟（`Workflow.handle()`）
 
 `/v1/assistant/turns` 的請求為 `{request_id, session_id?, text, resolution_id?, choice_id?, context?, language?}`（契約 3；`language` 為選填新增）。
-`text` 最多 500 字。`language` 沒帶或為 `auto` 時，由文字判定：假名→日、泰文字母→泰、漢字→中、越南文聲調字母→越；只有拉丁字母時以常見詞分英文／印尼文。
+`text` 最多 500 字。`language` 沒帶或為 `auto` 時，由文字判定：假名→日、漢字→中、越南文聲調字母→越；只有拉丁字母時以常見詞分英文／印尼文／菲律賓文（2026-11-11 起菲律賓文 `tl` 取代泰文，`fil` 也當成 `tl`；本文其他提到泰文的地方是當時的紀錄，現行規則見 `docs/AI_CURRENT_RULES.md`）。
 
 下表依程式順序。每一層有結果就回覆，不再往下。
 

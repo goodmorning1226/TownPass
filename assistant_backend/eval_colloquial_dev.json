@@ -78,7 +78,7 @@
 {"id": "cd077", "language": "zh", "text": "我要掛聯醫的號", "intent": "service", "expected_ids": ["medicalAppointment"], "note": "report lang_zh_tw-37 (CONCERN)"},
 {"id": "cd078", "language": "zh", "text": "我欲掛號看醫生", "intent": "service", "expected_ids": ["medicalAppointment"], "note": "report lang_zh_tw-38 (CONCERN)"},
 {"id": "cd079", "language": "en", "text": "Can you book me an appointment at the city hospital?", "intent": "service", "expected_ids": ["medicalAppointment"], "note": "report lang_en_ja-en-15 (FAIL)"},
-{"id": "cd080", "language": "th", "text": "อยากจองคิวหาหมอที่โรงพยาบาลค่ะ", "intent": "service", "expected_ids": ["medicalAppointment"], "note": "report lang_sea-52 (FAIL)"},
+{"id": "cd080", "language": "tl", "text": "Pwede po ba akong magpa-appointment sa doktor sa ospital?", "intent": "service", "expected_ids": ["medicalAppointment"], "note": "book a hospital doctor appointment; po politeness"},
 {"id": "cd081", "language": "zh", "text": "我想聽台北電台", "intent": "service", "expected_ids": ["cityRadio"], "note": "report daily_app-58 (CONCERN)"},
 {"id": "cd082", "language": "zh", "text": "附近有親子館嗎", "intent": "service", "expected_ids": ["familyCenter"], "note": "report daily_app-59 (CONCERN)"},
 {"id": "cd083", "language": "zh", "text": "帶小孩去哪裡有室內遊戲空間", "intent": "service", "expected_ids": ["familyCenter"], "note": "report nav-022 (CONCERN)"},

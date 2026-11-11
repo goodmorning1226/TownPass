@@ -93,10 +93,10 @@
 {"id": "c092", "language": "id", "text": "Dompet saya dicopet di pasar malam, mau lapor ke polisi", "intent": "service", "expected_ids": ["police", "police.online"], "note": "theft report"},
 {"id": "c093", "language": "id", "text": "Ada taman yang adem buat jalan-jalan sore dekat sini?", "intent": "service", "expected_ids": ["greenMap", "locationSearch"], "note": "disabled; green spaces, nearby search also acceptable (also disabled)"},
 {"id": "c094", "language": "id", "text": "Tolong kirim uang ke keluarga saya di Indonesia", "intent": "out_of_scope", "expected_ids": [], "note": "remittance"},
-{"id": "c095", "language": "th", "text": "แอปนี้ทำอะไรได้บ้างคะ", "intent": "listing", "expected_ids": [], "note": "polite capability question"},
-{"id": "c096", "language": "th", "text": "ช่วยเล่าหน่อยว่าน้องช่วยอะไรพี่ได้บ้าง", "intent": "listing", "expected_ids": [], "note": "familiar register"},
-{"id": "c097", "language": "th", "text": "อยากจ่ายค่าห้องของบ้านที่รัฐให้เช่า เดือนนี้ยังไม่ได้จ่าย", "intent": "service", "expected_ids": ["fees.housing", "app.bills"], "note": "public housing rent"},
-{"id": "c098", "language": "th", "text": "อยากยืมนิยายไปอ่านช่วงวันหยุด ต้องทำยังไง", "intent": "service", "expected_ids": ["library"], "note": "borrow a novel"},
-{"id": "c099", "language": "th", "text": "อยากติดต่อหัวหน้าชุมชนแถวที่พัก มีเบอร์ไหม", "intent": "service", "expected_ids": ["neighborhood"], "note": "disabled; neighbourhood chief"},
-{"id": "c100", "language": "th", "text": "จองตั๋วรถไฟไปไถจงให้หน่อย", "intent": "out_of_scope", "expected_ids": [], "note": "train booking"}
+{"id": "c095", "language": "tl", "text": "Ano-ano po ang mga serbisyong maibibigay ninyo sa akin?", "intent": "listing", "expected_ids": [], "note": "polite capability question with po"},
+{"id": "c096", "language": "tl", "text": "Uy, ano ba kaya mong gawin?", "intent": "listing", "expected_ids": [], "note": "casual/familiar capability question"},
+{"id": "c097", "language": "tl", "text": "Di ko pa nababayaran yung renta ngayong buwan sa pabahay ng gobyerno, pano magbayad?", "intent": "service", "expected_ids": ["fees.housing", "app.bills"], "note": "unpaid monthly rent for government public housing; informal di/pano"},
+{"id": "c098", "language": "tl", "text": "Gusto ko humiram ng nobela pambasa ngayong holiday, paano po gawin?", "intent": "service", "expected_ids": ["library"], "note": "borrow a novel for the holidays, how; Taglish with po"},
+{"id": "c099", "language": "tl", "text": "Ano po number ng barangay chief dito sa lugar namin? Gusto ko siya makausap.", "intent": "service", "expected_ids": ["neighborhood"], "note": "neighbourhood chief expressed as Filipino 'barangay chief'; two short sentences"},
+{"id": "c100", "language": "tl", "text": "Pa-book naman ng train ticket papuntang Taichung bukas.", "intent": "out_of_scope", "expected_ids": [], "note": "book a train ticket to Taichung, out of scope; Taglish"}
 ]

@@ -498,6 +498,8 @@ class Assistant:
         requested = payload.get("language")
         if requested == "nan":
             requested = "zh"  # Taiwanese speech is transcribed into Chinese (asr_server.TAIWANESE)
+        if requested == "fil":
+            requested = "tl"  # Filipino: the App and Whisper call it tl (docs/AI_FILIPINO.md)
         if requested is not None and requested not in (*i18n.LANGUAGES, "auto"):
             raise AssistantError("語言欄位不正確。")
         language = requested if requested in i18n.LANGUAGES else i18n.detect_text_language(text)

@@ -67,7 +67,7 @@ GuidedAssistantController _controller() {
   );
 }
 
-const _languages = ['en', 'ja', 'vi', 'id', 'th'];
+const _languages = ['en', 'ja', 'vi', 'id', 'tl'];
 final _placeholder = RegExp(r'\{(\w+)\}');
 final _pageWord = RegExp(r'\{page:([^{}]+)\}');
 final _chinese = RegExp(r'[㐀-鿿]');

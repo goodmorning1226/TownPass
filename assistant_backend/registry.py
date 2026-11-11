@@ -180,10 +180,10 @@ class Registry:
         found = []
         for entry in self.entries:
             local = self.i18n.get(entry["id"], {})
-            # Long enough to be distinctive: two words, or (ja / th) six sound characters.
+            # Long enough to be distinctive: two words, or (ja) six sound characters.
             terms = [(lang, term) for lang in dict.fromkeys((language, "en"))
                      for term in (local.get(lang) or {}).get("keywords", [])
-                     if len(term.split()) >= 2 or (lang in ("ja", "th") and len(sound_key(term, lang)) >= 6)]
+                     if len(term.split()) >= 2 or (lang == "ja" and len(sound_key(term, lang)) >= 6)]
             scored = [(similarity(text, term, lang), term) for lang, term in terms]
             score, term = max(scored, default=(0.0, None))
             if score >= SIMILAR_KEYWORD:

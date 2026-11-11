@@ -141,7 +141,7 @@ void main() {
       PageTranslation.instance.translator = null;
     });
 
-    const languages = ['en', 'ja', 'vi', 'id', 'th'];
+    const languages = ['en', 'ja', 'vi', 'id', 'tl'];
     final chinese = RegExp(r'[㐀-鿿]');
 
     WebPageState at(String path, [Map<String, Object> flags = const {}]) =>

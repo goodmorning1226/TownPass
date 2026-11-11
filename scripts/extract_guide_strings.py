@@ -3,11 +3,11 @@
 The guided assistant (lib/page/guided_assistant/) is written in Chinese; every
 text it shows goes through `gt()` (model/guide_i18n.dart), which looks the
 Chinese text up in assets/i18n/guide/<section>.json and shows it in the
-conversation language (zh, en, ja, vi, id, th). Chinese stays the source and the
+conversation language (zh, en, ja, vi, id, tl = Filipino). Chinese stays the source and the
 fallback. docs/AI_GUIDED_MERGE_PLAN.md section 8.
 
 Each section file is {"version", "status", "section", "strings": {zh: {en, ja,
-vi, id, th}}}. Existing translations are kept, new texts get empty
+vi, id, tl}}}. Existing translations are kept, new texts get empty
 translations to fill in, texts no longer in the code are dropped (listed).
 
 What counts as a display text: a Chinese string literal in the guided
@@ -31,12 +31,12 @@ import sys
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 SOURCE = ROOT / "lib" / "page" / "guided_assistant"
 OUT = ROOT / "assets" / "i18n" / "guide"
-LANGUAGES = ("en", "ja", "vi", "id", "th")
+LANGUAGES = ("en", "ja", "vi", "id", "tl")
 # Han characters and the full-width punctuation used between them.
 CHINESE = re.compile(r"[㐀-鿿　-〿！-～]")
 STATUS = (
-    "DRAFT translations (machine-assisted, 2026-11-08), pending native-speaker "
-    "review. Keys are the Chinese source texts in lib/page/guided_assistant/; "
+    "DRAFT translations (machine-assisted, 2026-11-08; Filipino tl AI drafts "
+    "2026-11-11), pending native-speaker review. Keys are the Chinese source texts in lib/page/guided_assistant/; "
     "keep {name} placeholders; {page:X} shows the page's own word X as the page "
     "shows it (translated by PageTranslation)."
 )

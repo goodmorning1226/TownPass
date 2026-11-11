@@ -12,7 +12,7 @@ import 'package:town_pass/service/page_translation.dart';
 /// lib/page/guided_assistant/ keeps the Chinese source). Every text it shows
 /// goes through [gt], which looks the Chinese text up in the pre-translated
 /// tables assets/i18n/guide/`<section>.json` (one file per guide plus `ui`
-/// and `content`; zh -> en, ja, vi, id, th) and falls back to the Chinese.
+/// and `content`; zh -> en, ja, vi, id, tl) and falls back to the Chinese.
 /// scripts/extract_guide_strings.py lists the texts of the code and keeps the
 /// files in step. The translations are drafts pending native review.
 ///
