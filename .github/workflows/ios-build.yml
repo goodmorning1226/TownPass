@@ -31,9 +31,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # device_info_plus 13.3 uses iOS 26 SDK APIs (isiOSAppOnVision): build with the
+      # newest Xcode 26 on the image, not the image's default Xcode 16.
       - name: Versions
         run: |
           sw_vers
+          ls -d /Applications/Xcode*.app
+          XCODE=$(ls -d /Applications/Xcode_26*.app 2>/dev/null | sort -V | tail -1)
+          if [ -z "$XCODE" ]; then echo "::error::no Xcode 26 on this runner"; exit 1; fi
+          sudo xcode-select -s "$XCODE/Contents/Developer"
           xcodebuild -version
           FLUTTER=$(python3 -c "import json; print(json.load(open('.fvmrc'))['flutter'])")
           echo "FLUTTER_VERSION=$FLUTTER" >> "$GITHUB_ENV"
