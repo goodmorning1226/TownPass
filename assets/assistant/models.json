@@ -137,23 +137,23 @@
    "name": "ggml-whisper-taiwanese.bin",
    "part": "taiwanese",
    "size": 888932908,
-   "sha256": "747896198b388e1ab77397cb82136dd3bd5fc1823f7e0c60757166b20ff9abbe",
-   "path": "taiwanese/ggml-breeze-asr-26-q4_k.bin",
+   "sha256": "0e08c5a2d3a5ba4bae7f85d02212e887537f78d7e623d8694313e2dd65de22ec",
+   "path": "taiwanese/ggml-breeze-asr-26-q4_0.bin",
    "tiers": [
     "standard"
    ],
    "platforms": [
     "android"
    ],
-   "license": "Apache-2.0 (MediaTek Research Breeze-ASR-26; ggml q4_K by this project)"
+   "license": "Apache-2.0 (MediaTek Research Breeze-ASR-26; ggml q4_0 by this project)"
   },
   {
    "id": "taiwanese-q4-ios",
    "name": "ggml-whisper-taiwanese.bin",
    "part": "taiwanese",
    "size": 888932908,
-   "sha256": "747896198b388e1ab77397cb82136dd3bd5fc1823f7e0c60757166b20ff9abbe",
-   "path": "taiwanese/ggml-breeze-asr-26-q4_k.bin",
+   "sha256": "0e08c5a2d3a5ba4bae7f85d02212e887537f78d7e623d8694313e2dd65de22ec",
+   "path": "taiwanese/ggml-breeze-asr-26-q4_0.bin",
    "tiers": [
     "full",
     "standard"
@@ -161,7 +161,7 @@
    "platforms": [
     "ios"
    ],
-   "license": "Apache-2.0 (MediaTek Research Breeze-ASR-26; ggml q4_K by this project)"
+   "license": "Apache-2.0 (MediaTek Research Breeze-ASR-26; ggml q4_0 by this project)"
   }
  ]
 }

@@ -149,7 +149,7 @@ Android 不受影響：`AssistantOnDevice.start` 在 Android 不啟用，`settle
    超過 App 的 150 秒。修正：`assistant_backend/liveness.py`，回應過的模型連不上只等 3 秒，失敗後 30 秒內直接略過，並請 App 重啟它。
 3. **台語閃退**：`taiwanese speech: needs 2179 MB; app budget 2247 MB`，載入到一半 `ggml_aligned_malloc: insufficient memory (78.91 MB)`
    → `GGML_ASSERT` → `abort()`，整個 App 結束（crash log `Runner-2026-11-13-*.ips`，faulting thread `whisper-taiwanese`）。
-   q8_0 在電腦上量到 2,551 MB（檔案 1,579 MB）。修正：iPhone 改用 q4_K（約 1,819 MB），載入前要「檔案＋1,000 MB＋256 MB 餘裕」，
+   q8_0 在電腦上量到 2,551 MB（檔案 1,579 MB）。修正：iPhone 改用 q4_0（同樣 848 MB 檔案、電腦上約 1.8 GB；台語消融顯示比 q4_K 準，`docs/AI_TAIWANESE_ABLATION.md`），載入前要「檔案＋1,000 MB＋256 MB 餘裕」，
    另外用 `mmap(PROT_NONE)` 試保留位址空間；不夠就回 `memory`，台語片段當中文聽，不閃退。
 4. **一段台語片段讓所有語音都等**：辨識器整段持有鎖，台語模型的啟動（Swift 最多等 300＋60 秒）在鎖裡面；
    修正：`device_main.BoundedStarter`，一段錄音最多等 20 秒，失敗後 5 分鐘不重試。
@@ -159,7 +159,7 @@ Android 不受影響：`AssistantOnDevice.start` 在 Android 不啟用，`settle
 `restartServer`（後端在模型不回應時呼叫）、`appActiveFlag`（背景中語音不送 GPU 工作）。`Runner.entitlements` 加了
 `com.apple.developer.kernel.increased-memory-limit`（App 沒有它也要能用）。
 
-**實測步驟**：同上一節 1–5，再加：6. 下載台語（iPhone 會是 q4_K，849 MB），說一句台語，看 `taiwanese speech: needs … address space ok`、
+**實測步驟**：同上一節 1–5，再加：6. 下載台語（iPhone 會是 q4_0，848 MB），說一句台語，看 `taiwanese speech: needs … address space ok`、
 `taiwanese speech loaded`；不夠時應看到 `memory`、App 不閃退。7. 鎖定 1 分鐘再解鎖，紀錄應有 `bound again`，
 問一句話 3 秒內有回應。
 

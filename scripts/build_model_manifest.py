@@ -66,18 +66,21 @@ FILES = [
      "taiwanese/ggml-breeze-asr-26-q8_0.bin", None,
      {"tiers": ["full"], "platforms": ["android"],
       "license": "Apache-2.0 (MediaTek Research Breeze-ASR-26; ggml q8_0 by this project)"}),
-    ("taiwanese-q4", "ggml-whisper-taiwanese.bin", "taiwanese", rf"{MODELS}\taiwanese\ggml-breeze-asr-26-q4_k.bin",
-     "taiwanese/ggml-breeze-asr-26-q4_k.bin", None,
+    # 7-10.5 GB phones: q4_0, not q4_K (2026-11-13 ablation, docs/AI_TAIWANESE_ABLATION.md):
+    # the same 848 MB and as accurate as q8_0 on the public held-out clips (q4_K kept fewer
+    # service words). The q4_K file stays on the team Hugging Face for older Apps.
+    ("taiwanese-q4", "ggml-whisper-taiwanese.bin", "taiwanese", rf"{MODELS}\taiwanese\ggml-breeze-asr-26-q4_0.bin",
+     "taiwanese/ggml-breeze-asr-26-q4_0.bin", None,
      {"tiers": ["standard"], "platforms": ["android"],
-      "license": "Apache-2.0 (MediaTek Research Breeze-ASR-26; ggml q4_K by this project)"}),
-    # iPhone: q4_K on every tier (2026-11-13). The limit there is the App's own memory
+      "license": "Apache-2.0 (MediaTek Research Breeze-ASR-26; ggml q4_0 by this project)"}),
+    # iPhone: q4_0 on every tier (2026-11-13; q4_0 rather than q4_K as above). The limit there is the App's own memory
     # budget, not the phone's RAM: q8_0 (~2.5 GB with its buffers) ran out of it on a
     # 12 GB iPhone 17 Pro Max and whisper.cpp aborted the App. Swap the file here (and
     # in OnDeviceAssistant.swift's taiwaneseOverhead if it is not a Whisper large model).
-    ("taiwanese-q4-ios", "ggml-whisper-taiwanese.bin", "taiwanese", rf"{MODELS}\taiwanese\ggml-breeze-asr-26-q4_k.bin",
-     "taiwanese/ggml-breeze-asr-26-q4_k.bin", None,
+    ("taiwanese-q4-ios", "ggml-whisper-taiwanese.bin", "taiwanese", rf"{MODELS}\taiwanese\ggml-breeze-asr-26-q4_0.bin",
+     "taiwanese/ggml-breeze-asr-26-q4_0.bin", None,
      {"tiers": ["full", "standard"], "platforms": ["ios"],
-      "license": "Apache-2.0 (MediaTek Research Breeze-ASR-26; ggml q4_K by this project)"}),
+      "license": "Apache-2.0 (MediaTek Research Breeze-ASR-26; ggml q4_0 by this project)"}),
 ]
 
 
