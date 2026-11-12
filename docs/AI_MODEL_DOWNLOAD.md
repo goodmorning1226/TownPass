@@ -29,7 +29,7 @@
 | decision | Gemma 4 E2B Q4_0（`-DecisionModel gemma` 的 Android 建置） | 2.6 GB | ggml-org/gemma-4-E2B-it-GGUF |
 | decision | 決策分類器 q8_0（`-DecisionModel classifier`，Android 與 iPhone；取代決策模型，2026-11-12） | 126 MB（132,441,120 bytes） | 團隊訓練（Microsoft multilingual-e5-small 微調，MIT）；**還沒上傳**到團隊 Hugging Face |
 | taiwanese | Breeze-ASR-26 q8_0（12 GB 手機） | 1.5 GB | 團隊轉檔 |
-| taiwanese | Breeze-ASR-26 q4_K（8 GB 手機） | 848 MB | 團隊轉檔 |
+| taiwanese | Breeze-ASR-26 q4_0（8 GB 手機與所有 iPhone；2026-11-13 起取代 q4_K） | 848 MB | 團隊轉檔 |
 
 上游四個檔案（Whisper tiny／small、Ministral、Gemma）的大小與 SHA-256 在 2026-11-10 和 Hugging Face 的 LFS 紀錄逐一比對過，完全相同。
 
@@ -38,7 +38,7 @@
 | 總記憶體 | 等級 | 下載 |
 | --- | --- | --- |
 | ≥ 10,500 MB（12 GB 機型回報約 11,200–11,700） | full | 核心＋決策＋台語 q8_0（預設勾選） |
-| 7,000–10,500 MB（8 GB 機型回報約 7,300–7,700） | standard | 核心＋決策；台語 q4_K 可選，載入前仍檢查可用記憶體 |
+| 7,000–10,500 MB（8 GB 機型回報約 7,300–7,700） | standard | 核心＋決策；台語 q4_0 可選，載入前仍檢查可用記憶體 |
 | < 7,000 MB | lite | 只有核心（精簡版，沒有決策模型） |
 
 分類器模式（`-DecisionModel classifier`，`docs/AI_DECISION_CLASSIFIER.md` 第 12 節）的 decision 批次只有分類器一個檔案（126 MB），
@@ -113,5 +113,5 @@ adb -s <id> shell rm -r /sdcard/Android/data/com.example.townpass/files/models  
 1. ~~在團隊 Hugging Face 開 repo 並上傳~~（2026-11-11 完成）。換檔案時重新上傳，再 `python -X utf8 scripts/build_model_manifest.py --team-url https://huggingface.co/allensung1226/townpass-assistant-models/resolve/main`。
    分類器（`decision/townpass-decision-e5-ce-v1-q8_0.gguf`）還要擁有者同意後上傳到同一個 repo 的這個路徑，清單已經寫好大小與 SHA-256。
 2. 和市府討論：是否改由市府伺服器當鏡像（`ASSISTANT_MODEL_BASE_URL`），或改用 Apple Background Assets／Google Play Asset Delivery（要經過商店發布，可在背景下載）。
-3. 用 8 GB 的 iPhone 17 和 12 GB 的手機實測分級門檻與台語 q4_K 是否載得進去。
+3. 用 8 GB 的 iPhone 17 和 12 GB 的手機實測分級門檻與台語 q4_0 是否載得進去。
 4. FAQ 資料更新時重建索引，並重跑 `build_model_manifest.py`；舊索引的手機會因大小或雜湊值不同而重新下載。

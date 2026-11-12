@@ -10,8 +10,8 @@
 #   device/Ministral-3-3B-Instruct-2512-Q4_K_M.gguf   decision model (required)
 #   ios/ggml-small-q8_0.bin   -> ggml-whisper-multilingual.bin  (speech, optional)
 #   ios/ggml-tiny-q8_0.bin    -> ggml-whisper-langid.bin        (language gate, optional)
-#   ios/ggml-breeze-asr-26-q4_k.bin -> ggml-whisper-taiwanese.bin (Taiwanese, optional, 0.85 GB;
-#                                q4_K on iPhone: q8_0 ran out of the App's memory budget, 2026-11-13;
+#   ios/ggml-breeze-asr-26-q4_0.bin -> ggml-whisper-taiwanese.bin (Taiwanese, optional, 0.85 GB;
+#                                q4_0 on iPhone: q8_0 ran out of the App's memory budget, 2026-11-13;
 #                                converted from MediaTek-Research/Breeze-ASR-26 with whisper.cpp)
 #   device/multilingual-e5-small-q8_0.gguf + faq_rag/           (FAQ + semantic, optional)
 # The phone must be unlocked. Unchanged files are copied again (devicectl has no sync).
@@ -32,7 +32,7 @@ push() {
 push "$MODELS/device/Ministral-3-3B-Instruct-2512-Q4_K_M.gguf" Ministral-3-3B-Instruct-2512-Q4_K_M.gguf
 push "$MODELS/ios/ggml-small-q8_0.bin" ggml-whisper-multilingual.bin
 push "$MODELS/ios/ggml-tiny-q8_0.bin" ggml-whisper-langid.bin
-push "$MODELS/ios/ggml-breeze-asr-26-q4_k.bin" ggml-whisper-taiwanese.bin
+push "$MODELS/ios/ggml-breeze-asr-26-q4_0.bin" ggml-whisper-taiwanese.bin
 push "$MODELS/device/multilingual-e5-small-q8_0.gguf" multilingual-e5-small-q8_0.gguf
 for file in embeddings.bin metadata.json model_info.json; do
   push "$MODELS/faq_rag/$file" "faq_rag/$file"
