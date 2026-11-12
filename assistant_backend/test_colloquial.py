@@ -32,7 +32,7 @@ class FillerTests(unittest.TestCase):
                  ("すみません、水道料金を払いたいんですが", "ja", "水道料金を払い"),
                  ("Làm ơn cho tôi xem lịch sử mượn sách nhé", "vi", "xem lịch sử mượn sách"),
                  ("Tolong saya mau bayar parkir dong", "id", "bayar parkir"),
-                 ("ช่วยจ่ายค่าน้ำหน่อยครับ", "th", "จ่ายค่าน้ำ")]
+                 ("Pwede po bang magbayad ng tubig, salamat po", "tl", "magbayad ng tubig")]
         for text, language, expected in cases:
             self.assertEqual(i18n.strip_fillers(text, language), expected, text)
 

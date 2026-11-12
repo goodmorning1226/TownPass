@@ -18,7 +18,7 @@ concurrency:
 
 jobs:
   ipa:
-    runs-on: macos-15
+    runs-on: macos-15-intel
     timeout-minutes: 90
     defaults:
       run:
@@ -97,7 +97,7 @@ jobs:
           mkdir -p "$LOGS"; exec > >(tee "$LOGS/flutter-build.log") 2>&1
           flutter build ios --release --no-codesign \
             --dart-define=ASSISTANT_ENABLED=true --dart-define=ASSISTANT_ON_DEVICE=true \
-            --dart-define=ASSISTANT_DECISION_MODEL=ministral --dart-define=ASSISTANT_GUIDED=true
+            --dart-define=ASSISTANT_DECISION_MODEL=classifier --dart-define=ASSISTANT_GUIDED=true
           APP=build/ios/iphoneos/Runner.app
           test -d "$APP/Frameworks/LlamaServer.framework"
           test -d "$APP/Frameworks/WhisperServer.framework"

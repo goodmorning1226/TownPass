@@ -65,12 +65,23 @@ class Registry:
         Same result shape as search(); the more specific page wins over its parent."""
         from i18n import contains
         matches = []
+        # Indonesian chat and informal spellings ("sy mau byr tagihan aer", "pinjem buku")
+        # are also read in their standard form (indonesian.normalize): the same words.
+        readings = [text]
+        if language == "id":
+            from indonesian import normalize
+            readings.append(normalize(text))
         for entry in self.entries:
             local = self.i18n.get(entry["id"], {})
             terms = [term for lang in dict.fromkeys((language, "en"))
                      for term in [(local.get(lang) or {}).get("title", ""), *(local.get(lang) or {}).get("keywords", [])]
                      if term]
-            hits = [term for term in terms if contains(text, term, language)]
+            hits = [term for term in terms if any(contains(reading, term, language) for reading in readings)]
+            if not hits and language == "id":
+                # Words heard joined or split differently ("sewarusun", "perpus takaan"):
+                # the same whole words, so the word itself.
+                from indonesian import contains_joined
+                hits = [term for term in terms if contains_joined(text, term)]
             hits += [term for term in [entry["title"], *entry["keywords"]] if normalized(term) and normalized(term) in normalized(text)]
             if not hits and language == "vi":
                 hits = self._vietnamese_bare(entry, text)
@@ -82,7 +93,7 @@ class Registry:
         if not matches and language == "vi":
             matches = self._vietnamese_sound(text)
         if not matches:
-            matches = self._similar_language(text, language)
+            matches = self._similar_language(readings[-1], language)
         if not matches:
             return []
         best = max(item["score"] for item in matches)
@@ -169,10 +180,10 @@ class Registry:
         found = []
         for entry in self.entries:
             local = self.i18n.get(entry["id"], {})
-            # Long enough to be distinctive: two words, or (ja / th) six sound characters.
+            # Long enough to be distinctive: two words, or (ja) six sound characters.
             terms = [(lang, term) for lang in dict.fromkeys((language, "en"))
                      for term in (local.get(lang) or {}).get("keywords", [])
-                     if len(term.split()) >= 2 or (lang in ("ja", "th") and len(sound_key(term, lang)) >= 6)]
+                     if len(term.split()) >= 2 or (lang == "ja" and len(sound_key(term, lang)) >= 6)]
             scored = [(similarity(text, term, lang), term) for lang, term in terms]
             score, term = max(scored, default=(0.0, None))
             if score >= SIMILAR_KEYWORD:

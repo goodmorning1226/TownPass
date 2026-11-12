@@ -1,6 +1,6 @@
 {
  "version": 1,
- "status": "DRAFT translations (machine-assisted, 2026-11-08), pending native-speaker review. Keys are the Chinese source texts in lib/page/guided_assistant/; keep {name} placeholders; {page:X} shows the page's own word X as the page shows it (translated by PageTranslation).",
+ "status": "DRAFT translations (machine-assisted, 2026-11-08; Filipino tl AI drafts 2026-11-11), pending native-speaker review. Keys are the Chinese source texts in lib/page/guided_assistant/; keep {name} placeholders; {page:X} shows the page's own word X as the page shows it (translated by PageTranslation).",
  "section": "coupon_wallet",
  "strings": {
   "{coupon}本來就在你的票夾裡了，不用再加。這是示範資料喔。": {
@@ -8,735 +8,735 @@
    "ja": "{coupon}はもうチケットホルダーに入っているので、追加しなくて大丈夫です。これはデモデータです。",
    "vi": "{coupon} đã có sẵn trong ví vé của bạn, không cần thêm nữa. Đây là dữ liệu mẫu.",
    "id": "{coupon} sudah ada di dompet tiket Anda, jadi tidak perlu ditambahkan lagi. Ini data demo.",
-   "th": "{coupon} อยู่ในกระเป๋าตั๋วของคุณอยู่แล้ว ไม่ต้องเพิ่มอีก นี่เป็นข้อมูลสาธิต"
+   "tl": "Hindi na kailangang idagdag: nasa ticket wallet mo na ang {coupon}. Demo data lang ito."
   },
   "{ruleText}想留著之後用，按下面的「加入票夾」。{below}": {
    "en": "{ruleText}To keep it for later, tap “{page:加入票夾}” below. {below}",
    "ja": "{ruleText}あとで使うために取っておくなら、下の「{page:加入票夾}」を押してください。{below}",
    "vi": "{ruleText}Muốn giữ lại để dùng sau, hãy bấm “{page:加入票夾}” ở bên dưới. {below}",
    "id": "{ruleText}Untuk menyimpannya dan dipakai nanti, ketuk “{page:加入票夾}” di bawah. {below}",
-   "th": "{ruleText}ถ้าอยากเก็บไว้ใช้ทีหลัง ให้แตะ “{page:加入票夾}” ด้านล่าง {below}"
+   "tl": "{ruleText}Para maitabi ito para sa susunod, i-tap ang “{page:加入票夾}” sa ibaba. {below}"
   },
   "「未兌換」是還沒用的，「已兌換」是用過的，「已過期」是過了期限的。": {
    "en": "“{page:未兌換}” are not used yet, “{page:已兌換}” are used, and “{page:已過期}” are past their deadline.",
    "ja": "「{page:未兌換}」はまだ使っていないもの、「{page:已兌換}」は使ったもの、「{page:已過期}」は期限が過ぎたものです。",
    "vi": "“{page:未兌換}” là phiếu chưa dùng, “{page:已兌換}” là đã dùng, “{page:已過期}” là đã quá hạn.",
    "id": "“{page:未兌換}” belum dipakai, “{page:已兌換}” sudah dipakai, dan “{page:已過期}” sudah lewat batas waktunya.",
-   "th": "“{page:未兌換}” คือยังไม่ได้ใช้ “{page:已兌換}” คือใช้แล้ว “{page:已過期}” คือหมดอายุแล้ว"
+   "tl": "Ang “{page:未兌換}” ay hindi pa nagagamit, ang “{page:已兌換}” ay nagamit na, at ang “{page:已過期}” ay lampas na sa deadline."
   },
   "上面有「入場券」和「優惠券」。點一下「優惠券」，看看店家的優惠。": {
    "en": "At the top there are “{page:入場券}” and “{page:優惠券}”. Tap “{page:優惠券}” to see the shops’ deals.",
    "ja": "上に「{page:入場券}」と「{page:優惠券}」があります。「{page:優惠券}」を押して、お店の特典を見てみましょう。",
    "vi": "Ở trên có “{page:入場券}” và “{page:優惠券}”. Bấm “{page:優惠券}” để xem ưu đãi của các cửa hàng.",
    "id": "Di atas ada “{page:入場券}” dan “{page:優惠券}”. Ketuk “{page:優惠券}” untuk melihat promo dari toko.",
-   "th": "ด้านบนมี “{page:入場券}” และ “{page:優惠券}” แตะ “{page:優惠券}” เพื่อดูสิทธิพิเศษของร้านค้า"
+   "tl": "Sa itaas ay may “{page:入場券}” at “{page:優惠券}”. I-tap ang “{page:優惠券}” para makita ang mga promo ng mga tindahan."
   },
   "之後要用，到票夾的「優惠券」就找得到。想現在用，可以按「使用優惠」。": {
    "en": "When you want to use it later, you will find it under “{page:優惠券}” in your ticket wallet. To use it now, tap “{page:使用優惠}”.",
    "ja": "あとで使うときは、チケットホルダーの「{page:優惠券}」にあります。今すぐ使うなら「{page:使用優惠}」を押してください。",
    "vi": "Khi muốn dùng sau, bạn sẽ tìm thấy nó ở mục “{page:優惠券}” trong ví vé. Muốn dùng ngay, hãy bấm “{page:使用優惠}”.",
    "id": "Kalau mau dipakai nanti, Anda bisa menemukannya di “{page:優惠券}” pada dompet tiket. Untuk memakainya sekarang, ketuk “{page:使用優惠}”.",
-   "th": "ถ้าจะใช้ทีหลัง หาได้ที่ “{page:優惠券}” ในกระเป๋าตั๋ว ถ้าอยากใช้ตอนนี้ ให้แตะ “{page:使用優惠}”"
+   "tl": "Kapag gusto mo itong gamitin mamaya, makikita mo ito sa “{page:優惠券}” ng iyong ticket wallet. Para gamitin ngayon, i-tap ang “{page:使用優惠}”."
   },
   "什麼是票夾？": {
    "en": "What is the ticket wallet?",
    "ja": "チケットホルダーとは？",
    "vi": "Ví vé là gì?",
    "id": "Apa itu dompet tiket?",
-   "th": "กระเป๋าตั๋วคืออะไร"
+   "tl": "Ano ang ticket wallet?"
   },
   "你的票夾裡有 {n} 張還沒用的優惠券，下面寫著截止日期。這是示範資料喔。": {
    "en": "Your ticket wallet has {n} unused coupons. Their deadlines are shown below. This is demo data.",
    "ja": "チケットホルダーにまだ使っていないクーポンが {n} 枚あります。下に期限が書いてあります。これはデモデータです。",
    "vi": "Ví vé của bạn có {n} phiếu giảm giá chưa dùng, hạn dùng ghi ở bên dưới. Đây là dữ liệu mẫu.",
    "id": "Dompet tiket Anda berisi {n} kupon yang belum dipakai. Batas waktunya tertulis di bawah. Ini data demo.",
-   "th": "กระเป๋าตั๋วของคุณมีคูปองที่ยังไม่ได้ใช้ {n} ใบ วันหมดเขตเขียนไว้ด้านล่าง นี่เป็นข้อมูลสาธิต"
+   "tl": "May {n} hindi pa nagagamit na coupon sa iyong ticket wallet. Nakalagay sa ibaba ang mga deadline nito. Demo data lang ito."
   },
   "你的票夾裡目前沒有還沒用的優惠券。": {
    "en": "There are no unused coupons in your ticket wallet right now.",
    "ja": "今、チケットホルダーにまだ使っていないクーポンはありません。",
    "vi": "Hiện trong ví vé của bạn không có phiếu giảm giá nào chưa dùng.",
    "id": "Saat ini tidak ada kupon yang belum dipakai di dompet tiket Anda.",
-   "th": "ตอนนี้ในกระเป๋าตั๋วของคุณไม่มีคูปองที่ยังไม่ได้ใช้"
+   "tl": "Walang hindi pa nagagamit na coupon sa iyong ticket wallet ngayon."
   },
   "你的票夾裡目前沒有還沒用的優惠券。可以到優惠首頁找一張加入票夾。": {
    "en": "There are no unused coupons in your ticket wallet right now. You can find one on the deals home page and add it to your wallet.",
    "ja": "今、チケットホルダーにまだ使っていないクーポンはありません。特典のトップページで探して、チケットホルダーに追加できます。",
    "vi": "Hiện trong ví vé của bạn không có phiếu giảm giá nào chưa dùng. Bạn có thể vào trang chủ ưu đãi tìm một phiếu và thêm vào ví vé.",
    "id": "Saat ini tidak ada kupon yang belum dipakai di dompet tiket Anda. Anda bisa mencari satu di halaman utama promo dan menambahkannya ke dompet tiket.",
-   "th": "ตอนนี้ในกระเป๋าตั๋วของคุณไม่มีคูปองที่ยังไม่ได้ใช้ ไปหาคูปองที่หน้าแรกสิทธิพิเศษแล้วเพิ่มเข้ากระเป๋าตั๋วได้"
+   "tl": "Walang hindi pa nagagamit na coupon sa iyong ticket wallet ngayon. Puwede kang maghanap ng isa sa home page ng mga promo at idagdag ito sa iyong wallet."
   },
   "你目前沒有可以用的入場券。": {
    "en": "You have no admission tickets to use right now.",
    "ja": "今、使える入場券はありません。",
    "vi": "Hiện bạn không có vé vào cửa nào dùng được.",
    "id": "Saat ini Anda tidak punya tiket masuk yang bisa dipakai.",
-   "th": "ตอนนี้คุณไม่มีบัตรเข้าชมที่ใช้ได้"
+   "tl": "Wala kang magagamit na tiket sa pagpasok ngayon."
   },
   "你自己按": {
    "en": "You tap",
    "ja": "自分で押す",
    "vi": "Bạn tự bấm",
    "id": "Anda yang ketuk",
-   "th": "คุณแตะเอง"
+   "tl": "Ikaw ang mag-tap"
   },
   "你離開票夾了。按畫面最上面的「‹」回到票夾。": {
    "en": "You left the ticket wallet. Tap “‹” at the very top to go back to it.",
    "ja": "チケットホルダーから離れました。画面のいちばん上の「‹」を押して戻りましょう。",
    "vi": "Bạn đã rời khỏi ví vé. Bấm “‹” trên cùng màn hình để quay lại ví vé.",
    "id": "Anda keluar dari dompet tiket. Ketuk “‹” di bagian paling atas untuk kembali.",
-   "th": "คุณออกจากกระเป๋าตั๋วแล้ว แตะ “‹” ที่ด้านบนสุดของหน้าจอเพื่อกลับไปที่กระเป๋าตั๋ว"
+   "tl": "Umalis ka sa ticket wallet. I-tap ang “‹” sa pinakaitaas para bumalik dito."
   },
   "使用優惠券": {
    "en": "Use a coupon",
    "ja": "クーポンを使う",
    "vi": "Dùng phiếu giảm giá",
    "id": "Pakai kupon",
-   "th": "ใช้คูปอง"
+   "tl": "Gumamit ng coupon"
   },
   "優惠票夾": {
    "en": "Deals & ticket wallet",
    "ja": "特典とチケットホルダー",
    "vi": "Ưu đãi và ví vé",
    "id": "Promo & dompet tiket",
-   "th": "สิทธิพิเศษและกระเป๋าตั๋ว"
+   "tl": "Mga promo at ticket wallet"
   },
   "先點一下上面的「優惠券」。": {
    "en": "First tap “{page:優惠券}” at the top.",
    "ja": "まず上の「{page:優惠券}」を押してください。",
    "vi": "Trước tiên, bấm “{page:優惠券}” ở trên.",
    "id": "Pertama, ketuk “{page:優惠券}” di atas.",
-   "th": "ก่อนอื่นแตะ “{page:優惠券}” ด้านบน"
+   "tl": "I-tap muna ang “{page:優惠券}” sa itaas."
   },
   "先點上面左邊的「入場券」。": {
    "en": "First tap “{page:入場券}” at the top left.",
    "ja": "まず左上の「{page:入場券}」を押してください。",
    "vi": "Trước tiên, bấm “{page:入場券}” ở phía trên bên trái.",
    "id": "Pertama, ketuk “{page:入場券}” di kiri atas.",
-   "th": "ก่อนอื่นแตะ “{page:入場券}” ด้านบนซ้าย"
+   "tl": "I-tap muna ang “{page:入場券}” sa kaliwang itaas."
   },
   "先點上面的「優惠券」。": {
    "en": "First tap “{page:優惠券}” at the top.",
    "ja": "まず上の「{page:優惠券}」を押してください。",
    "vi": "Trước tiên, bấm “{page:優惠券}” ở trên.",
    "id": "Pertama, ketuk “{page:優惠券}” di atas.",
-   "th": "ก่อนอื่นแตะ “{page:優惠券}” ด้านบน"
+   "tl": "I-tap muna ang “{page:優惠券}” sa itaas."
   },
   "兌換好了！畫面寫「優惠已兌換」，{coupon}算是用掉了。這是示範網站，不是真的優惠券喔。": {
    "en": "Redeemed! The screen says “{page:優惠已兌換}”, so {coupon} has been used. This is a demo site, not a real coupon.",
    "ja": "引き換えできました！画面に「{page:優惠已兌換}」と出て、{coupon}は使用済みになりました。これはデモサイトで、本物のクーポンではありません。",
    "vi": "Đổi xong rồi! Màn hình ghi “{page:優惠已兌換}”, {coupon} xem như đã dùng. Đây là trang web mẫu, không phải phiếu giảm giá thật.",
    "id": "Sudah ditukar! Layar menampilkan “{page:優惠已兌換}”, jadi {coupon} sudah terpakai. Ini situs demo, bukan kupon sungguhan.",
-   "th": "แลกเรียบร้อย! หน้าจอขึ้นว่า “{page:優惠已兌換}” {coupon} ถือว่าใช้ไปแล้ว นี่เป็นเว็บไซต์สาธิต ไม่ใช่คูปองจริง"
+   "tl": "Na-redeem na! Nakasulat sa screen ang “{page:優惠已兌換}”, kaya nagamit na ang {coupon}. Demo site lang ito, hindi totoong coupon."
   },
   "兌換好了！畫面寫「優惠已兌換」，這張優惠券算是用掉了。這是示範網站，不是真的優惠券喔。": {
    "en": "Redeemed! The screen says “{page:優惠已兌換}”, so this coupon has been used. This is a demo site, not a real coupon.",
    "ja": "引き換えできました！画面に「{page:優惠已兌換}」と出て、このクーポンは使用済みになりました。これはデモサイトで、本物のクーポンではありません。",
    "vi": "Đổi xong rồi! Màn hình ghi “{page:優惠已兌換}”, phiếu giảm giá này xem như đã dùng. Đây là trang web mẫu, không phải phiếu giảm giá thật.",
    "id": "Sudah ditukar! Layar menampilkan “{page:優惠已兌換}”, jadi kupon ini sudah terpakai. Ini situs demo, bukan kupon sungguhan.",
-   "th": "แลกเรียบร้อย! หน้าจอขึ้นว่า “{page:優惠已兌換}” คูปองนี้ถือว่าใช้ไปแล้ว นี่เป็นเว็บไซต์สาธิต ไม่ใช่คูปองจริง"
+   "tl": "Na-redeem na! Nakasulat sa screen ang “{page:優惠已兌換}”, kaya nagamit na ang coupon na ito. Demo site lang ito, hindi totoong coupon."
   },
   "出示入場券": {
    "en": "Show an admission ticket",
    "ja": "入場券を見せる",
    "vi": "Xuất trình vé vào cửa",
    "id": "Tunjukkan tiket masuk",
-   "th": "แสดงบัตรเข้าชม"
+   "tl": "Ipakita ang tiket sa pagpasok"
   },
   "切到「優惠券」": {
    "en": "Switch to “{page:優惠券}”",
    "ja": "「{page:優惠券}」に切り替える",
    "vi": "Chuyển sang “{page:優惠券}”",
    "id": "Pindah ke “{page:優惠券}”",
-   "th": "สลับไปที่ “{page:優惠券}”"
+   "tl": "Lumipat sa “{page:優惠券}”"
   },
   "到店家要結帳時，按下面的「{button}」。按了還會再問你一次。{below}": {
    "en": "When you pay at the shop, tap “{button}” below. You will be asked once more after tapping it. {below}",
    "ja": "お店で会計するときに、下の「{button}」を押してください。押したあと、もう一度確認されます。{below}",
    "vi": "Khi thanh toán ở cửa hàng, hãy bấm “{button}” bên dưới. Bấm xong sẽ được hỏi lại một lần nữa. {below}",
    "id": "Saat membayar di toko, ketuk “{button}” di bawah. Setelah diketuk, Anda akan ditanya sekali lagi. {below}",
-   "th": "ตอนจ่ายเงินที่ร้าน ให้แตะ “{button}” ด้านล่าง แตะแล้วจะมีถามยืนยันอีกครั้ง {below}"
+   "tl": "Kapag magbabayad ka na sa tindahan, i-tap ang “{button}” sa ibaba. Tatanungin ka ulit pagka-tap mo. {below}"
   },
   "可以看店家的優惠券，喜歡的按「加入票夾」存起來，到店家結帳時再按「立即使用」兌換。票夾裡有你存的優惠券和買好的入場券。": {
    "en": "You can see shops’ coupons. Save the ones you like with “{page:加入票夾}”, then tap “{page:立即使用}” to redeem one when you pay at the shop. Your ticket wallet holds your saved coupons and the admission tickets you bought.",
    "ja": "お店のクーポンを見られます。気に入ったものは「{page:加入票夾}」で保存し、お店で会計するときに「{page:立即使用}」を押して引き換えます。チケットホルダーには保存したクーポンと購入した入場券が入っています。",
    "vi": "Bạn có thể xem phiếu giảm giá của các cửa hàng, thích phiếu nào thì bấm “{page:加入票夾}” để lưu, khi thanh toán ở cửa hàng thì bấm “{page:立即使用}” để đổi. Ví vé chứa các phiếu bạn đã lưu và vé vào cửa đã mua.",
    "id": "Anda bisa melihat kupon dari toko. Simpan yang Anda suka dengan “{page:加入票夾}”, lalu ketuk “{page:立即使用}” untuk menukarnya saat membayar di toko. Dompet tiket berisi kupon yang Anda simpan dan tiket masuk yang sudah dibeli.",
-   "th": "ดูคูปองของร้านค้าได้ ชอบใบไหนก็แตะ “{page:加入票夾}” เก็บไว้ ตอนจ่ายเงินที่ร้านค่อยแตะ “{page:立即使用}” เพื่อแลก ในกระเป๋าตั๋วมีคูปองที่คุณเก็บไว้และบัตรเข้าชมที่ซื้อแล้ว"
+   "tl": "Makikita mo ang mga coupon ng mga tindahan. I-save ang mga gusto mo gamit ang “{page:加入票夾}”, at i-tap ang “{page:立即使用}” para i-redeem ang isa kapag nagbabayad ka sa tindahan. Nasa iyong ticket wallet ang mga na-save mong coupon at ang mga biniling tiket sa pagpasok."
   },
   "回到優惠": {
    "en": "Back to deals",
    "ja": "特典に戻る",
    "vi": "Quay lại ưu đãi",
    "id": "Kembali ke promo",
-   "th": "กลับไปที่สิทธิพิเศษ"
+   "tl": "Bumalik sa mga promo"
   },
   "回到優惠畫面": {
    "en": "Back to the deals screen",
    "ja": "特典の画面に戻る",
    "vi": "Quay lại màn hình ưu đãi",
    "id": "Kembali ke layar promo",
-   "th": "กลับไปที่หน้าสิทธิพิเศษ"
+   "tl": "Bumalik sa screen ng mga promo"
   },
   "回到優惠首頁": {
    "en": "Go back to the deals home page",
    "ja": "特典のトップページに戻る",
    "vi": "Quay lại trang chủ ưu đãi",
    "id": "Kembali ke halaman utama promo",
-   "th": "กลับไปที่หน้าแรกสิทธิพิเศษ"
+   "tl": "Bumalik sa home page ng mga promo"
   },
   "回到票夾": {
    "en": "Back to the ticket wallet",
    "ja": "チケットホルダーに戻る",
    "vi": "Quay lại ví vé",
    "id": "Kembali ke dompet tiket",
-   "th": "กลับไปที่กระเป๋าตั๋ว"
+   "tl": "Bumalik sa ticket wallet"
   },
   "回到票夾畫面": {
    "en": "Back to the ticket wallet screen",
    "ja": "チケットホルダーの画面に戻る",
    "vi": "Quay lại màn hình ví vé",
    "id": "Kembali ke layar dompet tiket",
-   "th": "กลับไปที่หน้ากระเป๋าตั๋ว"
+   "tl": "Bumalik sa screen ng ticket wallet"
   },
   "在「優惠券」清單點一張，就能看優惠內容和截止日期。": {
    "en": "Tap a coupon in the “{page:優惠券}” list to see its details and deadline.",
    "ja": "「{page:優惠券}」の一覧で1枚押すと、特典の内容と期限が見られます。",
    "vi": "Bấm một phiếu trong danh sách “{page:優惠券}” để xem nội dung ưu đãi và hạn dùng.",
    "id": "Ketuk satu kupon di daftar “{page:優惠券}” untuk melihat isi promo dan batas waktunya.",
-   "th": "แตะคูปองหนึ่งใบในรายการ “{page:優惠券}” เพื่อดูรายละเอียดและวันหมดเขต"
+   "tl": "I-tap ang isang coupon sa listahan ng “{page:優惠券}” para makita ang detalye at deadline nito."
   },
   "在票夾的「優惠券」→「未兌換」，點要用的那一張。": {
    "en": "In the ticket wallet, go to “{page:優惠券}” → “{page:未兌換}” and tap the one you want to use.",
    "ja": "チケットホルダーの「{page:優惠券}」→「{page:未兌換}」で、使いたいものを押してください。",
    "vi": "Trong ví vé, vào “{page:優惠券}” → “{page:未兌換}”, bấm vào phiếu bạn muốn dùng.",
    "id": "Di dompet tiket, buka “{page:優惠券}” → “{page:未兌換}”, lalu ketuk kupon yang ingin dipakai.",
-   "th": "ในกระเป๋าตั๋ว ไปที่ “{page:優惠券}” → “{page:未兌換}” แล้วแตะใบที่จะใช้"
+   "tl": "Sa ticket wallet, pumunta sa “{page:優惠券}” → “{page:未兌換}” at i-tap ang gusto mong gamitin."
   },
   "在票夾的「優惠券」裡，點中間的「已兌換」。": {
    "en": "In “{page:優惠券}” of the ticket wallet, tap “{page:已兌換}” in the middle.",
    "ja": "チケットホルダーの「{page:優惠券}」で、真ん中の「{page:已兌換}」を押してください。",
    "vi": "Trong mục “{page:優惠券}” của ví vé, bấm “{page:已兌換}” ở giữa.",
    "id": "Di “{page:優惠券}” dompet tiket, ketuk “{page:已兌換}” di tengah.",
-   "th": "ใน “{page:優惠券}” ของกระเป๋าตั๋ว แตะ “{page:已兌換}” ตรงกลาง"
+   "tl": "Sa “{page:優惠券}” ng ticket wallet, i-tap ang “{page:已兌換}” sa gitna."
   },
   "在票夾的「入場券」→「我的訂單」，點要用的那張票。": {
    "en": "In the ticket wallet, go to “{page:入場券}” → “{page:我的訂單}” and tap the ticket you want to use.",
    "ja": "チケットホルダーの「{page:入場券}」→「{page:我的訂單}」で、使いたいチケットを押してください。",
    "vi": "Trong ví vé, vào “{page:入場券}” → “{page:我的訂單}”, bấm vào vé bạn muốn dùng.",
    "id": "Di dompet tiket, buka “{page:入場券}” → “{page:我的訂單}”, lalu ketuk tiket yang ingin dipakai.",
-   "th": "ในกระเป๋าตั๋ว ไปที่ “{page:入場券}” → “{page:我的訂單}” แล้วแตะตั๋วที่จะใช้"
+   "tl": "Sa ticket wallet, pumunta sa “{page:入場券}” → “{page:我的訂單}” at i-tap ang tiket na gusto mong gamitin."
   },
   "在票夾點畫面上方右邊的「優惠券」。": {
    "en": "In the ticket wallet, tap “{page:優惠券}” at the top right.",
    "ja": "チケットホルダーで、画面の右上の「{page:優惠券}」を押してください。",
    "vi": "Trong ví vé, bấm “{page:優惠券}” ở phía trên bên phải.",
    "id": "Di dompet tiket, ketuk “{page:優惠券}” di kanan atas.",
-   "th": "ในกระเป๋าตั๋ว แตะ “{page:優惠券}” ด้านบนขวา"
+   "tl": "Sa ticket wallet, i-tap ang “{page:優惠券}” sa kanang itaas."
   },
   "好的！優惠打開了，我們一起來{task}。": {
    "en": "OK! The deals page is open. Let’s do this together: {task}.",
    "ja": "わかりました！特典を開きました。一緒に「{task}」をやってみましょう。",
    "vi": "Được rồi! Trang ưu đãi đã mở, mình cùng làm nhé: {task}.",
    "id": "Baik! Halaman promo sudah terbuka. Ayo kita lakukan bersama: {task}.",
-   "th": "ได้เลย! เปิดหน้าสิทธิพิเศษแล้ว มาทำด้วยกัน: {task}"
+   "tl": "OK! Bukas na ang page ng mga promo. Sabay nating gawin ito: {task}."
   },
   "好的！已經幫你打開優惠。我們先找到優惠券，最後要兌換時由你自己按「使用」。我會在畫面上一步一步帶你做。": {
    "en": "OK! I opened the deals page for you. First we find the coupon; at the end, you tap “{page:使用}” yourself to redeem it. I will guide you step by step on the screen.",
    "ja": "わかりました！特典を開きました。まずクーポンを探して、最後に引き換えるときは自分で「{page:使用}」を押してください。画面で一歩ずつご案内します。",
    "vi": "Được rồi! Mình đã mở trang ưu đãi cho bạn. Trước tiên mình tìm phiếu giảm giá, cuối cùng khi đổi thì bạn tự bấm “{page:使用}”. Mình sẽ hướng dẫn từng bước trên màn hình.",
    "id": "Baik! Halaman promo sudah saya buka. Kita cari kuponnya dulu; terakhir, saat menukar, Anda sendiri yang mengetuk “{page:使用}”. Saya akan memandu langkah demi langkah di layar.",
-   "th": "ได้เลย! เปิดหน้าสิทธิพิเศษให้แล้ว เราจะหาคูปองก่อน ตอนสุดท้ายที่จะแลก คุณต้องแตะ “{page:使用}” เอง จะพาทำทีละขั้นบนหน้าจอ"
+   "tl": "OK! Binuksan ko ang page ng mga promo para sa iyo. Hahanapin muna natin ang coupon; sa dulo, ikaw mismo ang mag-tap ng “{page:使用}” para i-redeem ito. Gagabayan kita nang hakbang-hakbang sa screen."
   },
   "好的！已經幫你打開優惠，我會在畫面上一步一步帶你做。": {
    "en": "OK! I opened the deals page for you. I will guide you step by step on the screen.",
    "ja": "わかりました！特典を開きました。画面で一歩ずつご案内します。",
    "vi": "Được rồi! Mình đã mở trang ưu đãi cho bạn, mình sẽ hướng dẫn từng bước trên màn hình.",
    "id": "Baik! Halaman promo sudah saya buka. Saya akan memandu langkah demi langkah di layar.",
-   "th": "ได้เลย! เปิดหน้าสิทธิพิเศษให้แล้ว จะพาทำทีละขั้นบนหน้าจอ"
+   "tl": "OK! Binuksan ko ang page ng mga promo para sa iyo. Gagabayan kita nang hakbang-hakbang sa screen."
   },
   "好的！已經幫你打開票夾。我們先找到優惠券，最後要兌換時由你自己按「使用」。我會在畫面上一步一步帶你做。": {
    "en": "OK! I opened the ticket wallet for you. First we find the coupon; at the end, you tap “{page:使用}” yourself to redeem it. I will guide you step by step on the screen.",
    "ja": "わかりました！チケットホルダーを開きました。まずクーポンを探して、最後に引き換えるときは自分で「{page:使用}」を押してください。画面で一歩ずつご案内します。",
    "vi": "Được rồi! Mình đã mở ví vé cho bạn. Trước tiên mình tìm phiếu giảm giá, cuối cùng khi đổi thì bạn tự bấm “{page:使用}”. Mình sẽ hướng dẫn từng bước trên màn hình.",
    "id": "Baik! Dompet tiket sudah saya buka. Kita cari kuponnya dulu; terakhir, saat menukar, Anda sendiri yang mengetuk “{page:使用}”. Saya akan memandu langkah demi langkah di layar.",
-   "th": "ได้เลย! เปิดกระเป๋าตั๋วให้แล้ว เราจะหาคูปองก่อน ตอนสุดท้ายที่จะแลก คุณต้องแตะ “{page:使用}” เอง จะพาทำทีละขั้นบนหน้าจอ"
+   "tl": "OK! Binuksan ko ang ticket wallet para sa iyo. Hahanapin muna natin ang coupon; sa dulo, ikaw mismo ang mag-tap ng “{page:使用}” para i-redeem ito. Gagabayan kita nang hakbang-hakbang sa screen."
   },
   "好的！已經幫你打開票夾，我會在畫面上一步一步帶你做。": {
    "en": "OK! I opened the ticket wallet for you. I will guide you step by step on the screen.",
    "ja": "わかりました！チケットホルダーを開きました。画面で一歩ずつご案内します。",
    "vi": "Được rồi! Mình đã mở ví vé cho bạn, mình sẽ hướng dẫn từng bước trên màn hình.",
    "id": "Baik! Dompet tiket sudah saya buka. Saya akan memandu langkah demi langkah di layar.",
-   "th": "ได้เลย! เปิดกระเป๋าตั๋วให้แล้ว จะพาทำทีละขั้นบนหน้าจอ"
+   "tl": "OK! Binuksan ko ang ticket wallet para sa iyo. Gagabayan kita nang hakbang-hakbang sa screen."
   },
   "好的！票夾打開了，我們一起來{task}。": {
    "en": "OK! The ticket wallet is open. Let’s do this together: {task}.",
    "ja": "わかりました！チケットホルダーを開きました。一緒に「{task}」をやってみましょう。",
    "vi": "Được rồi! Ví vé đã mở, mình cùng làm nhé: {task}.",
    "id": "Baik! Dompet tiket sudah terbuka. Ayo kita lakukan bersama: {task}.",
-   "th": "ได้เลย! เปิดกระเป๋าตั๋วแล้ว มาทำด้วยกัน: {task}"
+   "tl": "OK! Bukas na ang ticket wallet. Sabay nating gawin ito: {task}."
   },
   "存好了！{coupon}已經放進票夾。這是示範網站，資料是假的喔。": {
    "en": "Saved! {coupon} is now in your ticket wallet. This is a demo site; the data is not real.",
    "ja": "保存できました！{coupon}をチケットホルダーに入れました。これはデモサイトで、データは本物ではありません。",
    "vi": "Lưu xong rồi! {coupon} đã được đưa vào ví vé. Đây là trang web mẫu, dữ liệu không phải thật.",
    "id": "Tersimpan! {coupon} sudah masuk ke dompet tiket. Ini situs demo, datanya bukan data asli.",
-   "th": "เก็บแล้ว! {coupon} อยู่ในกระเป๋าตั๋วแล้ว นี่เป็นเว็บไซต์สาธิต ข้อมูลไม่ใช่ของจริง"
+   "tl": "Na-save na! Nasa iyong ticket wallet na ang {coupon}. Demo site lang ito; hindi totoo ang data."
   },
   "存好了！這張優惠券已經放進票夾。這是示範網站，資料是假的喔。": {
    "en": "Saved! This coupon is now in your ticket wallet. This is a demo site; the data is not real.",
    "ja": "保存できました！このクーポンをチケットホルダーに入れました。これはデモサイトで、データは本物ではありません。",
    "vi": "Lưu xong rồi! Phiếu giảm giá này đã được đưa vào ví vé. Đây là trang web mẫu, dữ liệu không phải thật.",
    "id": "Tersimpan! Kupon ini sudah masuk ke dompet tiket. Ini situs demo, datanya bukan data asli.",
-   "th": "เก็บแล้ว! คูปองนี้อยู่ในกระเป๋าตั๋วแล้ว นี่เป็นเว็บไซต์สาธิต ข้อมูลไม่ใช่ของจริง"
+   "tl": "Na-save na! Nasa iyong ticket wallet na ang coupon na ito. Demo site lang ito; hindi totoo ang data."
   },
   "已經存進票夾了。現在就要用的話，按「使用優惠」，會打開你的票夾。": {
    "en": "It is saved in your ticket wallet. To use it now, tap “{page:使用優惠}”; it opens your ticket wallet.",
    "ja": "チケットホルダーに保存しました。今すぐ使うなら「{page:使用優惠}」を押すと、チケットホルダーが開きます。",
    "vi": "Đã lưu vào ví vé rồi. Muốn dùng ngay thì bấm “{page:使用優惠}”, ví vé của bạn sẽ mở ra.",
    "id": "Sudah tersimpan di dompet tiket. Untuk memakainya sekarang, ketuk “{page:使用優惠}”, dompet tiket Anda akan terbuka.",
-   "th": "เก็บเข้ากระเป๋าตั๋วแล้ว ถ้าจะใช้ตอนนี้ แตะ “{page:使用優惠}” กระเป๋าตั๋วของคุณจะเปิดขึ้น"
+   "tl": "Naka-save na ito sa iyong ticket wallet. Para gamitin ngayon, i-tap ang “{page:使用優惠}”; bubuksan nito ang iyong ticket wallet."
   },
   "想看哪一張優惠？點一下那張優惠券。": {
    "en": "Which deal would you like to see? Tap that coupon.",
    "ja": "どの特典を見たいですか？そのクーポンを押してください。",
    "vi": "Bạn muốn xem ưu đãi nào? Bấm vào phiếu giảm giá đó.",
    "id": "Promo mana yang ingin dilihat? Ketuk kupon itu.",
-   "th": "อยากดูสิทธิพิเศษใบไหน แตะที่คูปองใบนั้น"
+   "tl": "Aling promo ang gusto mong tingnan? I-tap ang coupon na iyon."
   },
   "想看哪一張優惠？點一下那張優惠券。下面還有，可以往下滑看看。": {
    "en": "Which deal would you like to see? Tap that coupon. There are more below; you can scroll down.",
    "ja": "どの特典を見たいですか？そのクーポンを押してください。下にもまだあるので、スクロールして見られます。",
    "vi": "Bạn muốn xem ưu đãi nào? Bấm vào phiếu giảm giá đó. Bên dưới còn nữa, có thể kéo xuống xem.",
    "id": "Promo mana yang ingin dilihat? Ketuk kupon itu. Masih ada lagi di bawah, Anda bisa menggulir ke bawah.",
-   "th": "อยากดูสิทธิพิเศษใบไหน แตะที่คูปองใบนั้น ด้านล่างยังมีอีก เลื่อนลงดูได้"
+   "tl": "Aling promo ang gusto mong tingnan? I-tap ang coupon na iyon. Marami pa sa ibaba; puwede kang mag-scroll pababa."
   },
   "想看還沒用的，點左邊的「未兌換」。": {
    "en": "To see the unused ones, tap “{page:未兌換}” on the left.",
    "ja": "まだ使っていないものを見るなら、左の「{page:未兌換}」を押してください。",
    "vi": "Muốn xem phiếu chưa dùng, bấm “{page:未兌換}” bên trái.",
    "id": "Untuk melihat yang belum dipakai, ketuk “{page:未兌換}” di sebelah kiri.",
-   "th": "ถ้าอยากดูใบที่ยังไม่ได้ใช้ แตะ “{page:未兌換}” ทางซ้าย"
+   "tl": "Para makita ang mga hindi pa nagagamit, i-tap ang “{page:未兌換}” sa kaliwa."
   },
   "打開入場券的 QR code": {
    "en": "Open an admission ticket’s QR code",
    "ja": "入場券の QR コードを開く",
    "vi": "Mở mã QR của vé vào cửa",
    "id": "Buka kode QR tiket masuk",
-   "th": "เปิด QR code ของบัตรเข้าชม"
+   "tl": "Buksan ang QR code ng tiket sa pagpasok"
   },
   "打開票夾的「優惠券」": {
    "en": "Open “{page:優惠券}” in the ticket wallet",
    "ja": "チケットホルダーの「{page:優惠券}」を開く",
    "vi": "Mở “{page:優惠券}” trong ví vé",
    "id": "Buka “{page:優惠券}” di dompet tiket",
-   "th": "เปิด “{page:優惠券}” ในกระเป๋าตั๋ว"
+   "tl": "Buksan ang “{page:優惠券}” sa ticket wallet"
   },
   "打開票夾的優惠券": {
    "en": "Open a coupon in the ticket wallet",
    "ja": "チケットホルダーのクーポンを開く",
    "vi": "Mở phiếu giảm giá trong ví vé",
    "id": "Buka kupon di dompet tiket",
-   "th": "เปิดคูปองในกระเป๋าตั๋ว"
+   "tl": "Magbukas ng coupon sa ticket wallet"
   },
   "打開要用的優惠券": {
    "en": "Open the coupon you want to use",
    "ja": "使いたいクーポンを開く",
    "vi": "Mở phiếu giảm giá bạn muốn dùng",
    "id": "Buka kupon yang ingin dipakai",
-   "th": "เปิดคูปองที่จะใช้"
+   "tl": "Buksan ang coupon na gusto mong gamitin"
   },
   "把優惠券存進票夾": {
    "en": "Save a coupon to the ticket wallet",
    "ja": "クーポンをチケットホルダーに保存する",
    "vi": "Lưu phiếu giảm giá vào ví vé",
    "id": "Simpan kupon ke dompet tiket",
-   "th": "เก็บคูปองเข้ากระเป๋าตั๋ว"
+   "tl": "I-save ang coupon sa ticket wallet"
   },
   "按「加入票夾」存起來": {
    "en": "Tap “{page:加入票夾}” to save it",
    "ja": "「{page:加入票夾}」を押して保存する",
    "vi": "Bấm “{page:加入票夾}” để lưu lại",
    "id": "Ketuk “{page:加入票夾}” untuk menyimpan",
-   "th": "แตะ “{page:加入票夾}” เพื่อเก็บไว้"
+   "tl": "I-tap ang “{page:加入票夾}” para i-save ito"
   },
   "按「確定」關掉視窗。用過的優惠券會出現在票夾的「已兌換」。": {
    "en": "Tap “{page:確定}” to close the window. Used coupons appear under “{page:已兌換}” in the ticket wallet.",
    "ja": "「{page:確定}」を押して画面を閉じてください。使ったクーポンはチケットホルダーの「{page:已兌換}」に出ます。",
    "vi": "Bấm “{page:確定}” để đóng cửa sổ. Phiếu đã dùng sẽ hiện ở mục “{page:已兌換}” trong ví vé.",
    "id": "Ketuk “{page:確定}” untuk menutup jendela. Kupon yang sudah dipakai akan muncul di “{page:已兌換}” pada dompet tiket.",
-   "th": "แตะ “{page:確定}” เพื่อปิดหน้าต่าง คูปองที่ใช้แล้วจะอยู่ใน “{page:已兌換}” ของกระเป๋าตั๋ว"
+   "tl": "I-tap ang “{page:確定}” para isara ang window. Lalabas ang mga nagamit na coupon sa “{page:已兌換}” ng ticket wallet."
   },
   "按優惠券下面左邊的「加入票夾」，畫面問你的時候，再按「存入票夾」。": {
    "en": "Tap “{page:加入票夾}” at the bottom left of the coupon. When the screen asks you, tap “{page:存入票夾}”.",
    "ja": "クーポンの下の左にある「{page:加入票夾}」を押し、確認されたら「{page:存入票夾}」を押してください。",
    "vi": "Bấm “{page:加入票夾}” ở bên trái phía dưới phiếu giảm giá, khi màn hình hỏi thì bấm “{page:存入票夾}”.",
    "id": "Ketuk “{page:加入票夾}” di kiri bawah kupon. Saat layar bertanya, ketuk “{page:存入票夾}”.",
-   "th": "แตะ “{page:加入票夾}” ด้านล่างซ้ายของคูปอง เมื่อหน้าจอถาม ให้แตะ “{page:存入票夾}”"
+   "tl": "I-tap ang “{page:加入票夾}” sa kaliwang ibaba ng coupon. Kapag nagtanong ang screen, i-tap ang “{page:存入票夾}”."
   },
   "按優惠券下面的「立即使用」（從票夾打開的叫「兌換」），畫面問你的時候，確定要用再自己按「使用」。": {
    "en": "Tap “{page:立即使用}” below the coupon (it is called “{page:兌換}” when opened from the ticket wallet). When the screen asks you, tap “{page:使用}” yourself only if you are sure.",
    "ja": "クーポンの下の「{page:立即使用}」を押してください（チケットホルダーから開いた場合は「{page:兌換}」）。確認されたら、本当に使うときだけ自分で「{page:使用}」を押してください。",
    "vi": "Bấm “{page:立即使用}” bên dưới phiếu giảm giá (nếu mở từ ví vé thì nút tên là “{page:兌換}”). Khi màn hình hỏi, chắc chắn muốn dùng thì bạn tự bấm “{page:使用}”.",
    "id": "Ketuk “{page:立即使用}” di bawah kupon (jika dibuka dari dompet tiket, namanya “{page:兌換}”). Saat layar bertanya, ketuk “{page:使用}” sendiri hanya jika Anda yakin.",
-   "th": "แตะ “{page:立即使用}” ใต้คูปอง (ถ้าเปิดจากกระเป๋าตั๋วจะเป็น “{page:兌換}”) เมื่อหน้าจอถาม ถ้าแน่ใจว่าจะใช้ ให้แตะ “{page:使用}” เอง"
+   "tl": "I-tap ang “{page:立即使用}” sa ibaba ng coupon (“{page:兌換}” ang tawag dito kapag binuksan mula sa ticket wallet). Kapag nagtanong ang screen, ikaw mismo ang mag-tap ng “{page:使用}” kung sigurado ka lang."
   },
   "按鈕在最下面，可以往下滑一點。": {
    "en": "The button is at the bottom, so scroll down a little.",
    "ja": "ボタンはいちばん下にあるので、少しスクロールしてください。",
    "vi": "Nút ở dưới cùng, bạn kéo xuống một chút nhé.",
    "id": "Tombolnya ada di paling bawah, gulir ke bawah sedikit.",
-   "th": "ปุ่มอยู่ด้านล่างสุด เลื่อนลงอีกนิด"
+   "tl": "Nasa pinakaibaba ang button, kaya mag-scroll pababa nang kaunti."
   },
   "注意！按下「使用」就會馬上兌換，{coupon}會變成「已使用」，不能再用一次。請在店家結帳、給店員看的時候，再自己按「使用」；還不用就按「取消」。": {
    "en": "Careful! Tapping “{page:使用}” redeems it right away: {coupon} becomes used and cannot be used again. Tap “{page:使用}” yourself only when you pay at the shop and show it to the staff. If not yet, tap “{page:取消}”.",
    "ja": "注意！「{page:使用}」を押すとすぐに引き換えられ、{coupon}は「使用済み」になり、もう一度は使えません。お店で会計して店員に見せるときに、自分で「{page:使用}」を押してください。まだ使わないなら「{page:取消}」を押してください。",
    "vi": "Chú ý! Bấm “{page:使用}” là đổi ngay, {coupon} sẽ thành “đã dùng” và không dùng lại được. Hãy tự bấm “{page:使用}” khi thanh toán ở cửa hàng và đưa cho nhân viên xem; chưa dùng thì bấm “{page:取消}”.",
    "id": "Perhatian! Mengetuk “{page:使用}” langsung menukarnya: {coupon} menjadi “sudah dipakai” dan tidak bisa dipakai lagi. Ketuk “{page:使用}” sendiri saat membayar di toko dan menunjukkannya ke petugas. Kalau belum mau dipakai, ketuk “{page:取消}”.",
-   "th": "ระวัง! แตะ “{page:使用}” แล้วจะแลกทันที {coupon} จะกลายเป็น “ใช้แล้ว” และใช้ซ้ำไม่ได้ ให้แตะ “{page:使用}” เองตอนจ่ายเงินที่ร้านและให้พนักงานดู ถ้ายังไม่ใช้ ให้แตะ “{page:取消}”"
+   "tl": "Mag-ingat! Kapag na-tap ang “{page:使用}”, mare-redeem ito agad: magiging nagamit na ang {coupon} at hindi na ito magagamit ulit. Ikaw mismo ang mag-tap ng “{page:使用}” kapag nagbabayad ka na sa tindahan at ipinapakita ito sa staff. Kung hindi pa, i-tap ang “{page:取消}”."
   },
   "活動日期是 {period}。": {
    "en": "The event dates are {period}. ",
    "ja": "期間は {period} です。",
    "vi": "Thời gian chương trình là {period}. ",
    "id": "Tanggal acaranya {period}. ",
-   "th": "ช่วงเวลากิจกรรมคือ {period} "
+   "tl": "Ang petsa ng event ay {period}. "
   },
   "畫面問「領取本優惠?」。要把{coupon}存進票夾，就自己按「存入票夾」；不要就按「取消」。": {
    "en": "The screen asks “{page:領取本優惠?}”. To save {coupon} to your ticket wallet, tap “{page:存入票夾}” yourself. If you don’t want it, tap “{page:取消}”.",
    "ja": "画面に「{page:領取本優惠?}」と出ています。{coupon}をチケットホルダーに保存するなら、自分で「{page:存入票夾}」を押してください。いらなければ「{page:取消}」を押してください。",
    "vi": "Màn hình hỏi “{page:領取本優惠?}”. Muốn lưu {coupon} vào ví vé thì bạn tự bấm “{page:存入票夾}”; không muốn thì bấm “{page:取消}”.",
    "id": "Layar bertanya “{page:領取本優惠?}”. Untuk menyimpan {coupon} ke dompet tiket, ketuk “{page:存入票夾}” sendiri. Kalau tidak mau, ketuk “{page:取消}”.",
-   "th": "หน้าจอถามว่า “{page:領取本優惠?}” ถ้าจะเก็บ{coupon}เข้ากระเป๋าตั๋ว ให้แตะ “{page:存入票夾}” เอง ถ้าไม่เอา ให้แตะ “{page:取消}”"
+   "tl": "Nagtatanong ang screen ng “{page:領取本優惠?}”. Para i-save ang {coupon} sa iyong ticket wallet, ikaw mismo ang mag-tap ng “{page:存入票夾}”. Kung ayaw mo, i-tap ang “{page:取消}”."
   },
   "畫面寫「請出示此QRCode兌換」。看完按左上角的「‹」回到票夾。": {
    "en": "The screen says “{page:請出示此QRCode兌換}”. When you are done, tap “‹” at the top left to go back to the ticket wallet.",
    "ja": "画面に「{page:請出示此QRCode兌換}」と書いてあります。見終わったら左上の「‹」を押して、チケットホルダーに戻ってください。",
    "vi": "Màn hình ghi “{page:請出示此QRCode兌換}”. Xem xong, bấm “‹” ở góc trên bên trái để quay lại ví vé.",
    "id": "Layar menampilkan “{page:請出示此QRCode兌換}”. Setelah selesai, ketuk “‹” di kiri atas untuk kembali ke dompet tiket.",
-   "th": "หน้าจอเขียนว่า “{page:請出示此QRCode兌換}” ดูเสร็จแล้ว แตะ “‹” มุมบนซ้ายเพื่อกลับไปที่กระเป๋าตั๋ว"
+   "tl": "Nakasulat sa screen ang “{page:請出示此QRCode兌換}”. Kapag tapos ka na, i-tap ang “‹” sa kaliwang itaas para bumalik sa ticket wallet."
   },
   "目前沒有用過的優惠券。這是示範資料喔。": {
    "en": "There are no used coupons yet. This is demo data.",
    "ja": "今のところ、使ったクーポンはありません。これはデモデータです。",
    "vi": "Hiện chưa có phiếu giảm giá nào đã dùng. Đây là dữ liệu mẫu.",
    "id": "Belum ada kupon yang sudah dipakai. Ini data demo.",
-   "th": "ตอนนี้ยังไม่มีคูปองที่ใช้แล้ว นี่เป็นข้อมูลสาธิต"
+   "tl": "Wala pang nagamit na coupon. Demo data lang ito."
   },
   "看「已兌換」的優惠券": {
    "en": "See “{page:已兌換}” coupons",
    "ja": "「{page:已兌換}」のクーポンを見る",
    "vi": "Xem phiếu “{page:已兌換}”",
    "id": "Lihat kupon “{page:已兌換}”",
-   "th": "ดูคูปอง “{page:已兌換}”"
+   "tl": "Tingnan ang mga coupon na “{page:已兌換}”"
   },
   "看優惠內容": {
    "en": "See coupon details",
    "ja": "特典の内容を見る",
    "vi": "Xem nội dung ưu đãi",
    "id": "Lihat isi promo",
-   "th": "ดูรายละเอียดสิทธิพิเศษ"
+   "tl": "Tingnan ang detalye ng coupon"
   },
   "看店家優惠": {
    "en": "See shop deals",
    "ja": "お店の特典を見る",
    "vi": "Xem ưu đãi của cửa hàng",
    "id": "Lihat promo toko",
-   "th": "ดูสิทธิพิเศษของร้านค้า"
+   "tl": "Tingnan ang mga promo ng tindahan"
   },
   "看用過的優惠券": {
    "en": "See used coupons",
    "ja": "使ったクーポンを見る",
    "vi": "Xem phiếu giảm giá đã dùng",
    "id": "Lihat kupon yang sudah dipakai",
-   "th": "ดูคูปองที่ใช้แล้ว"
+   "tl": "Tingnan ang mga nagamit na coupon"
   },
   "看票夾的優惠券": {
    "en": "See coupons in the ticket wallet",
    "ja": "チケットホルダーのクーポンを見る",
    "vi": "Xem phiếu giảm giá trong ví vé",
    "id": "Lihat kupon di dompet tiket",
-   "th": "ดูคูปองในกระเป๋าตั๋ว"
+   "tl": "Tingnan ang mga coupon sa ticket wallet"
   },
   "確認後按「使用」兌換": {
    "en": "Check, then tap “{page:使用}” to redeem",
    "ja": "確認してから「{page:使用}」を押して引き換える",
    "vi": "Kiểm tra rồi bấm “{page:使用}” để đổi",
    "id": "Periksa, lalu ketuk “{page:使用}” untuk menukar",
-   "th": "ตรวจดูแล้วแตะ “{page:使用}” เพื่อแลก"
+   "tl": "Suriin, at i-tap ang “{page:使用}” para i-redeem"
   },
   "立即使用": {
    "en": "Use now",
    "ja": "今すぐ使う",
    "vi": "Dùng ngay",
    "id": "Pakai sekarang",
-   "th": "ใช้ทันที"
+   "tl": "Gamitin ngayon"
   },
   "要用的時候，按下面的「兌換」。按了就算用掉了喔。": {
    "en": "When you want to use it, tap “{page:兌換}” below. Once you tap it, the coupon counts as used.",
    "ja": "使うときは、下の「{page:兌換}」を押してください。押すと使用済みになります。",
    "vi": "Khi muốn dùng, bấm “{page:兌換}” bên dưới. Bấm rồi là xem như đã dùng.",
    "id": "Saat ingin memakainya, ketuk “{page:兌換}” di bawah. Begitu diketuk, kupon dianggap sudah terpakai.",
-   "th": "เมื่อจะใช้ แตะ “{page:兌換}” ด้านล่าง แตะแล้วถือว่าใช้ไปแล้ว"
+   "tl": "Kapag gusto mo itong gamitin, i-tap ang “{page:兌換}” sa ibaba. Kapag na-tap mo ito, ituturing nang nagamit ang coupon."
   },
   "這些是你存起來的優惠券！": {
    "en": "These are the coupons you saved!",
    "ja": "これが保存したクーポンです！",
    "vi": "Đây là các phiếu giảm giá bạn đã lưu!",
    "id": "Ini kupon yang Anda simpan!",
-   "th": "นี่คือคูปองที่คุณเก็บไว้!"
+   "tl": "Ito ang mga coupon na na-save mo!"
   },
   "這些是你存起來的優惠券！這是示範資料喔。": {
    "en": "These are the coupons you saved! This is demo data.",
    "ja": "これが保存したクーポンです！これはデモデータです。",
    "vi": "Đây là các phiếu giảm giá bạn đã lưu! Đây là dữ liệu mẫu.",
    "id": "Ini kupon yang Anda simpan! Ini data demo.",
-   "th": "นี่คือคูปองที่คุณเก็บไว้! นี่เป็นข้อมูลสาธิต"
+   "tl": "Ito ang mga coupon na na-save mo! Demo data lang ito."
   },
   "這些是你用過的優惠券，下面寫著兌換的時間。": {
    "en": "These are the coupons you used. The time each was redeemed is shown below.",
    "ja": "これが使ったクーポンです。下に引き換えた日時が書いてあります。",
    "vi": "Đây là các phiếu giảm giá bạn đã dùng, thời gian đổi ghi ở bên dưới.",
    "id": "Ini kupon yang sudah Anda pakai. Waktu penukarannya tertulis di bawah.",
-   "th": "นี่คือคูปองที่คุณใช้แล้ว เวลาที่แลกเขียนไว้ด้านล่าง"
+   "tl": "Ito ang mga coupon na nagamit mo. Nakalagay sa ibaba ang oras ng pag-redeem ng bawat isa."
   },
   "這些是店家的優惠券！每張都有寫截止日期。": {
    "en": "These are the shops’ coupons! Each one shows its deadline.",
    "ja": "これがお店のクーポンです！どれにも期限が書いてあります。",
    "vi": "Đây là phiếu giảm giá của các cửa hàng! Phiếu nào cũng ghi hạn dùng.",
    "id": "Ini kupon dari toko! Setiap kupon ada batas waktunya.",
-   "th": "นี่คือคูปองของร้านค้า! ทุกใบมีวันหมดเขตเขียนไว้"
+   "tl": "Ito ang mga coupon ng mga tindahan! May nakalagay na deadline sa bawat isa."
   },
   "這就是{coupon}的內容！這是示範資料喔。": {
    "en": "Here are the details of {coupon}! This is demo data.",
    "ja": "これが{coupon}の内容です！これはデモデータです。",
    "vi": "Đây là nội dung của {coupon}! Đây là dữ liệu mẫu.",
    "id": "Ini isi dari {coupon}! Ini data demo.",
-   "th": "นี่คือรายละเอียดของ{coupon}! นี่เป็นข้อมูลสาธิต"
+   "tl": "Narito ang detalye ng {coupon}! Demo data lang ito."
   },
   "這就是{coupon}：「{desc}」。{when}這是示範資料喔。": {
    "en": "This is {coupon}: “{desc}”. {when}This is demo data.",
    "ja": "これが{coupon}です：「{desc}」。{when}これはデモデータです。",
    "vi": "Đây là {coupon}: “{desc}”. {when}Đây là dữ liệu mẫu.",
    "id": "Ini {coupon}: “{desc}”. {when}Ini data demo.",
-   "th": "นี่คือ{coupon}: “{desc}” {when}นี่เป็นข้อมูลสาธิต"
+   "tl": "Ito ang {coupon}: “{desc}”. {when}Demo data lang ito."
   },
   "這就是你存起來的優惠券！": {
    "en": "This is the coupon you saved!",
    "ja": "これが保存したクーポンです！",
    "vi": "Đây là phiếu giảm giá bạn đã lưu!",
    "id": "Ini kupon yang Anda simpan!",
-   "th": "นี่คือคูปองที่คุณเก็บไว้!"
+   "tl": "Ito ang coupon na na-save mo!"
   },
   "這就是入場券的 QR code！到了場館，把這個畫面給工作人員掃就可以入場。這是示範票券喔。": {
    "en": "This is the admission ticket’s QR code! At the venue, let the staff scan this screen to get in. This is a demo ticket.",
    "ja": "これが入場券の QR コードです！会場でこの画面をスタッフに読み取ってもらうと入場できます。これはデモのチケットです。",
    "vi": "Đây là mã QR của vé vào cửa! Đến nơi, đưa màn hình này cho nhân viên quét là vào được. Đây là vé mẫu.",
    "id": "Ini kode QR tiket masuk! Di lokasi, minta petugas memindai layar ini untuk masuk. Ini tiket demo.",
-   "th": "นี่คือ QR code ของบัตรเข้าชม! ถึงสถานที่แล้ว ให้พนักงานสแกนหน้าจอนี้เพื่อเข้างาน นี่เป็นตั๋วสาธิต"
+   "tl": "Ito ang QR code ng tiket sa pagpasok! Pagdating sa venue, ipa-scan ang screen na ito sa staff para makapasok. Demo na tiket lang ito."
   },
   "這就是這張優惠券的內容！": {
    "en": "Here are the details of this coupon!",
    "ja": "これがこのクーポンの内容です！",
    "vi": "Đây là nội dung của phiếu giảm giá này!",
    "id": "Ini isi dari kupon ini!",
-   "th": "นี่คือรายละเอียดของคูปองนี้!"
+   "tl": "Narito ang detalye ng coupon na ito!"
   },
   "這張優惠券": {
    "en": "this coupon",
    "ja": "このクーポン",
    "vi": "phiếu giảm giá này",
    "id": "kupon ini",
-   "th": "คูปองนี้"
+   "tl": "ang coupon na ito"
   },
   "這是「優惠」和「票夾」": {
    "en": "These are “Deals” and the “Ticket wallet”",
    "ja": "これは「特典」と「チケットホルダー」です",
    "vi": "Đây là “Ưu đãi” và “Ví vé”",
    "id": "Ini “Promo” dan “Dompet tiket”",
-   "th": "นี่คือ “สิทธิพิเศษ” และ “กระเป๋าตั๋ว”"
+   "tl": "Ito ang “Mga promo” at ang “Ticket wallet”"
   },
   "這是「入場券」（門票），不是優惠券。按左上角的「‹」回去，點上面的「優惠券」。": {
    "en": "This is an “{page:入場券}” (admission ticket), not a coupon. Tap “‹” at the top left to go back, then tap “{page:優惠券}” at the top.",
    "ja": "これは「{page:入場券}」（チケット）で、クーポンではありません。左上の「‹」で戻って、上の「{page:優惠券}」を押してください。",
    "vi": "Đây là “{page:入場券}” (vé vào cửa), không phải phiếu giảm giá. Bấm “‹” ở góc trên bên trái để quay lại, rồi bấm “{page:優惠券}” ở trên.",
    "id": "Ini “{page:入場券}” (tiket masuk), bukan kupon. Ketuk “‹” di kiri atas untuk kembali, lalu ketuk “{page:優惠券}” di atas.",
-   "th": "นี่คือ “{page:入場券}” (บัตรเข้าชม) ไม่ใช่คูปอง แตะ “‹” มุมบนซ้ายเพื่อกลับ แล้วแตะ “{page:優惠券}” ด้านบน"
+   "tl": "Ito ay “{page:入場券}” (tiket sa pagpasok), hindi coupon. I-tap ang “‹” sa kaliwang itaas para bumalik, at i-tap ang “{page:優惠券}” sa itaas."
   },
   "這是你的票夾。點上面的「優惠券」。": {
    "en": "This is your ticket wallet. Tap “{page:優惠券}” at the top.",
    "ja": "これがあなたのチケットホルダーです。上の「{page:優惠券}」を押してください。",
    "vi": "Đây là ví vé của bạn. Bấm “{page:優惠券}” ở trên.",
    "id": "Ini dompet tiket Anda. Ketuk “{page:優惠券}” di atas.",
-   "th": "นี่คือกระเป๋าตั๋วของคุณ แตะ “{page:優惠券}” ด้านบน"
+   "tl": "Ito ang iyong ticket wallet. I-tap ang “{page:優惠券}” sa itaas."
   },
   "這是你的票夾。點上面的「優惠券」，看你存起來的優惠。": {
    "en": "This is your ticket wallet. Tap “{page:優惠券}” at the top to see the deals you saved.",
    "ja": "これがあなたのチケットホルダーです。上の「{page:優惠券}」を押して、保存した特典を見てみましょう。",
    "vi": "Đây là ví vé của bạn. Bấm “{page:優惠券}” ở trên để xem các ưu đãi bạn đã lưu.",
    "id": "Ini dompet tiket Anda. Ketuk “{page:優惠券}” di atas untuk melihat promo yang Anda simpan.",
-   "th": "นี่คือกระเป๋าตั๋วของคุณ แตะ “{page:優惠券}” ด้านบนเพื่อดูสิทธิพิเศษที่เก็บไว้"
+   "tl": "Ito ang iyong ticket wallet. I-tap ang “{page:優惠券}” sa itaas para makita ang mga promo na na-save mo."
   },
   "這是優惠首頁！上面可以切換「入場券」和「優惠券」。": {
    "en": "This is the deals home page! At the top you can switch between “{page:入場券}” and “{page:優惠券}”.",
    "ja": "これが特典のトップページです！上で「{page:入場券}」と「{page:優惠券}」を切り替えられます。",
    "vi": "Đây là trang chủ ưu đãi! Ở trên có thể chuyển giữa “{page:入場券}” và “{page:優惠券}”.",
    "id": "Ini halaman utama promo! Di atas Anda bisa beralih antara “{page:入場券}” dan “{page:優惠券}”.",
-   "th": "นี่คือหน้าแรกสิทธิพิเศษ! ด้านบนสลับระหว่าง “{page:入場券}” กับ “{page:優惠券}” ได้"
+   "tl": "Ito ang home page ng mga promo! Sa itaas, puwede kang lumipat sa pagitan ng “{page:入場券}” at “{page:優惠券}”."
   },
   "這是票夾裡還沒用的優惠券（示範的票夾內容是固定的，可能和剛剛那張不一樣）。點一張打開它。": {
    "en": "These are the unused coupons in your ticket wallet (the demo wallet’s contents are fixed, so they may differ from the one you just saw). Tap one to open it.",
    "ja": "これはチケットホルダーのまだ使っていないクーポンです（デモのチケットホルダーの内容は固定なので、さっきのものと違うことがあります）。1枚押して開いてください。",
    "vi": "Đây là các phiếu chưa dùng trong ví vé (nội dung ví vé mẫu là cố định, có thể khác với phiếu vừa rồi). Bấm một phiếu để mở.",
    "id": "Ini kupon yang belum dipakai di dompet tiket (isi dompet demo selalu sama, jadi mungkin berbeda dengan kupon tadi). Ketuk satu untuk membukanya.",
-   "th": "นี่คือคูปองที่ยังไม่ได้ใช้ในกระเป๋าตั๋ว (เนื้อหากระเป๋าตั๋วสาธิตเป็นแบบตายตัว อาจไม่ตรงกับใบเมื่อกี้) แตะหนึ่งใบเพื่อเปิด"
+   "tl": "Ito ang mga hindi pa nagagamit na coupon sa iyong ticket wallet (nakapirmi ang laman ng demo wallet, kaya maaaring iba ito sa kakatingin mo lang). I-tap ang isa para buksan ito."
   },
   "這裡是票夾。我們先去優惠首頁挑優惠，點左上角的「‹」。": {
    "en": "This is the ticket wallet. Let’s first go to the deals home page to pick a deal: tap “‹” at the top left.",
    "ja": "ここはチケットホルダーです。まず特典のトップページで特典を選びましょう。左上の「‹」を押してください。",
    "vi": "Đây là ví vé. Mình qua trang chủ ưu đãi chọn ưu đãi trước nhé, bấm “‹” ở góc trên bên trái.",
    "id": "Ini dompet tiket. Kita ke halaman utama promo dulu untuk memilih promo: ketuk “‹” di kiri atas.",
-   "th": "นี่คือกระเป๋าตั๋ว ไปเลือกสิทธิพิเศษที่หน้าแรกสิทธิพิเศษกันก่อน แตะ “‹” มุมบนซ้าย"
+   "tl": "Ito ang ticket wallet. Pumunta muna tayo sa home page ng mga promo para pumili ng promo: i-tap ang “‹” sa kaliwang itaas."
   },
   "這裡有 {n} 張用過的優惠券，下面寫著兌換的時間。這是示範資料喔。": {
    "en": "Here are {n} used coupons. The time each was redeemed is shown below. This is demo data.",
    "ja": "ここに使ったクーポンが {n} 枚あります。下に引き換えた日時が書いてあります。これはデモデータです。",
    "vi": "Ở đây có {n} phiếu giảm giá đã dùng, thời gian đổi ghi ở bên dưới. Đây là dữ liệu mẫu.",
    "id": "Ada {n} kupon yang sudah dipakai. Waktu penukarannya tertulis di bawah. Ini data demo.",
-   "th": "ที่นี่มีคูปองที่ใช้แล้ว {n} ใบ เวลาที่แลกเขียนไว้ด้านล่าง นี่เป็นข้อมูลสาธิต"
+   "tl": "Narito ang {n} nagamit na coupon. Nakalagay sa ibaba ang oras ng pag-redeem ng bawat isa. Demo data lang ito."
   },
   "這裡有 {n} 張用過的優惠券，例如「{first}」，下面寫著兌換的時間。這是示範資料喔。": {
    "en": "Here are {n} used coupons, for example “{first}”. The time each was redeemed is shown below. This is demo data.",
    "ja": "ここに使ったクーポンが {n} 枚あります（例：「{first}」）。下に引き換えた日時が書いてあります。これはデモデータです。",
    "vi": "Ở đây có {n} phiếu giảm giá đã dùng, ví dụ “{first}”, thời gian đổi ghi ở bên dưới. Đây là dữ liệu mẫu.",
    "id": "Ada {n} kupon yang sudah dipakai, misalnya “{first}”. Waktu penukarannya tertulis di bawah. Ini data demo.",
-   "th": "ที่นี่มีคูปองที่ใช้แล้ว {n} ใบ เช่น “{first}” เวลาที่แลกเขียนไว้ด้านล่าง นี่เป็นข้อมูลสาธิต"
+   "tl": "Narito ang {n} nagamit na coupon, halimbawa ang “{first}”. Nakalagay sa ibaba ang oras ng pag-redeem ng bawat isa. Demo data lang ito."
   },
   "這裡有 {n} 張票，寫著張數和「限當日使用」。要入場時，點那張票打開 QR code。": {
    "en": "Here are {n} tickets, showing the number of tickets and “{page:限當日使用}”. When you go in, tap the ticket to open its QR code.",
    "ja": "ここにチケットが {n} 件あります。枚数と「{page:限當日使用}」が書いてあります。入場するときは、そのチケットを押して QR コードを開いてください。",
    "vi": "Ở đây có {n} vé, có ghi số lượng và “{page:限當日使用}”. Khi vào cửa, bấm vào vé đó để mở mã QR.",
    "id": "Ada {n} tiket, tertulis jumlah tiket dan “{page:限當日使用}”. Saat mau masuk, ketuk tiketnya untuk membuka kode QR.",
-   "th": "ที่นี่มีตั๋ว {n} รายการ เขียนจำนวนใบและ “{page:限當日使用}” ตอนจะเข้างาน แตะตั๋วนั้นเพื่อเปิด QR code"
+   "tl": "Narito ang {n} tiket, na may bilang ng tiket at “{page:限當日使用}”. Kapag papasok ka na, i-tap ang tiket para buksan ang QR code nito."
   },
   "這裡有一張「{first}」。點一下打開它。": {
    "en": "There is one here: “{first}”. Tap it to open it.",
    "ja": "ここに「{first}」が1枚あります。押して開いてください。",
    "vi": "Ở đây có một phiếu “{first}”. Bấm vào để mở.",
    "id": "Ada satu di sini: “{first}”. Ketuk untuk membukanya.",
-   "th": "ที่นี่มี “{first}” หนึ่งใบ แตะเพื่อเปิด"
+   "tl": "May isa rito: “{first}”. I-tap ito para buksan."
   },
   "這裡目前沒有優惠券。可以晚一點再來看看。": {
    "en": "There are no coupons here right now. Please check again later.",
    "ja": "今ここにクーポンはありません。あとでまた見てみてください。",
    "vi": "Hiện ở đây chưa có phiếu giảm giá nào. Bạn có thể quay lại xem sau.",
    "id": "Saat ini belum ada kupon di sini. Silakan lihat lagi nanti.",
-   "th": "ตอนนี้ที่นี่ยังไม่มีคูปอง ลองกลับมาดูใหม่ทีหลัง"
+   "tl": "Walang coupon dito ngayon. Pakitingnan ulit mamaya."
   },
   "這頁寫著活動日期、領取規則和優惠說明。想留著用，可以按下面的「加入票夾」。": {
    "en": "This page shows the event dates, the rules for getting it, and the deal details. To keep it, tap “{page:加入票夾}” below.",
    "ja": "このページには期間、受け取りのルール、特典の説明が書いてあります。取っておくなら、下の「{page:加入票夾}」を押してください。",
    "vi": "Trang này ghi thời gian chương trình, quy định nhận và mô tả ưu đãi. Muốn giữ lại thì bấm “{page:加入票夾}” bên dưới.",
    "id": "Halaman ini berisi tanggal acara, aturan pengambilan, dan keterangan promo. Untuk menyimpannya, ketuk “{page:加入票夾}” di bawah.",
-   "th": "หน้านี้มีช่วงเวลากิจกรรม กติกาการรับ และรายละเอียดสิทธิพิเศษ ถ้าอยากเก็บไว้ แตะ “{page:加入票夾}” ด้านล่าง"
+   "tl": "Makikita sa page na ito ang mga petsa ng event, ang mga patakaran sa pagkuha nito, at ang detalye ng promo. Para maitabi ito, i-tap ang “{page:加入票夾}” sa ibaba."
   },
   "這頁是用店家名稱搜尋的。我們先回優惠首頁看看有哪些優惠，點左上角的「‹」。": {
    "en": "This page searches by shop name. Let’s first go back to the deals home page to see what deals there are: tap “‹” at the top left.",
    "ja": "このページはお店の名前で探すページです。まず特典のトップページに戻って、どんな特典があるか見てみましょう。左上の「‹」を押してください。",
    "vi": "Trang này dùng để tìm theo tên cửa hàng. Mình quay lại trang chủ ưu đãi xem có những ưu đãi nào trước nhé, bấm “‹” ở góc trên bên trái.",
    "id": "Halaman ini untuk mencari berdasarkan nama toko. Kita kembali dulu ke halaman utama promo untuk melihat promo yang ada: ketuk “‹” di kiri atas.",
-   "th": "หน้านี้ใช้ค้นหาด้วยชื่อร้าน กลับไปดูที่หน้าแรกสิทธิพิเศษก่อนว่ามีอะไรบ้าง แตะ “‹” มุมบนซ้าย"
+   "tl": "Naghahanap ang page na ito ayon sa pangalan ng tindahan. Bumalik muna tayo sa home page ng mga promo para makita kung anong mga promo ang mayroon: i-tap ang “‹” sa kaliwang itaas."
   },
   "這頁的資料沒有出來。按左上角的「‹」回上一頁，再點一次那張優惠券就會出現。": {
    "en": "This page’s data did not load. Tap “‹” at the top left to go back, then tap that coupon again and it will appear.",
    "ja": "このページのデータが表示されませんでした。左上の「‹」で前のページに戻り、もう一度そのクーポンを押すと表示されます。",
    "vi": "Dữ liệu của trang này chưa hiện ra. Bấm “‹” ở góc trên bên trái để quay lại trang trước, bấm lại phiếu giảm giá đó là sẽ hiện.",
    "id": "Data halaman ini tidak muncul. Ketuk “‹” di kiri atas untuk kembali, lalu ketuk kupon itu sekali lagi dan datanya akan muncul.",
-   "th": "ข้อมูลของหน้านี้ไม่ขึ้น แตะ “‹” มุมบนซ้ายเพื่อกลับหน้าก่อน แล้วแตะคูปองใบนั้นอีกครั้ง ข้อมูลจะขึ้นมา"
+   "tl": "Hindi nag-load ang data ng page na ito. I-tap ang “‹” sa kaliwang itaas para bumalik, at i-tap ulit ang coupon na iyon para lumabas ito."
   },
   "選一張": {
    "en": "Pick one",
    "ja": "1枚選ぶ",
    "vi": "Chọn một",
    "id": "Pilih satu",
-   "th": "เลือกหนึ่งใบ"
+   "tl": "Pumili ng isa"
   },
   "選一張優惠券": {
    "en": "Pick a coupon",
    "ja": "クーポンを1枚選ぶ",
    "vi": "Chọn một phiếu giảm giá",
    "id": "Pilih satu kupon",
-   "th": "เลือกคูปองหนึ่งใบ"
+   "tl": "Pumili ng coupon"
   },
   "開啟優惠頁面": {
    "en": "Open the deals page",
    "ja": "特典のページを開く",
    "vi": "Mở trang ưu đãi",
    "id": "Buka halaman promo",
-   "th": "เปิดหน้าสิทธิพิเศษ"
+   "tl": "Buksan ang page ng mga promo"
   },
   "領取規則是「{rule}」。": {
    "en": "The rule for getting it: “{rule}”. ",
    "ja": "受け取りのルールは「{rule}」です。",
    "vi": "Quy định nhận: “{rule}”. ",
    "id": "Aturan pengambilannya: “{rule}”. ",
-   "th": "กติกาการรับคือ “{rule}” "
+   "tl": "Ang patakaran sa pagkuha nito: “{rule}”. "
   },
   "點一張優惠券，可以看詳細的優惠內容。": {
    "en": "Tap a coupon to see the full details of the deal.",
    "ja": "クーポンを1枚押すと、特典の詳しい内容が見られます。",
    "vi": "Bấm một phiếu giảm giá để xem chi tiết ưu đãi.",
    "id": "Ketuk satu kupon untuk melihat detail promonya.",
-   "th": "แตะคูปองหนึ่งใบเพื่อดูรายละเอียดสิทธิพิเศษ"
+   "tl": "I-tap ang isang coupon para makita ang buong detalye ng promo."
   },
   "點上面的「優惠券」，就能看到店家的優惠。": {
    "en": "Tap “{page:優惠券}” at the top to see the shops’ deals.",
    "ja": "上の「{page:優惠券}」を押すと、お店の特典が見られます。",
    "vi": "Bấm “{page:優惠券}” ở trên là thấy ưu đãi của các cửa hàng.",
    "id": "Ketuk “{page:優惠券}” di atas untuk melihat promo dari toko.",
-   "th": "แตะ “{page:優惠券}” ด้านบนเพื่อดูสิทธิพิเศษของร้านค้า"
+   "tl": "I-tap ang “{page:優惠券}” sa itaas para makita ang mga promo ng mga tindahan."
   },
   "點中間的「已兌換」，看你用過的優惠券。": {
    "en": "Tap “{page:已兌換}” in the middle to see the coupons you used.",
    "ja": "真ん中の「{page:已兌換}」を押して、使ったクーポンを見てみましょう。",
    "vi": "Bấm “{page:已兌換}” ở giữa để xem các phiếu bạn đã dùng.",
    "id": "Ketuk “{page:已兌換}” di tengah untuk melihat kupon yang sudah Anda pakai.",
-   "th": "แตะ “{page:已兌換}” ตรงกลางเพื่อดูคูปองที่คุณใช้แล้ว"
+   "tl": "I-tap ang “{page:已兌換}” sa gitna para makita ang mga coupon na nagamit mo."
   },
   "點你要用的那張優惠券。": {
    "en": "Tap the coupon you want to use.",
    "ja": "使いたいクーポンを押してください。",
    "vi": "Bấm vào phiếu giảm giá bạn muốn dùng.",
    "id": "Ketuk kupon yang ingin Anda pakai.",
-   "th": "แตะคูปองที่คุณจะใช้"
+   "tl": "I-tap ang coupon na gusto mong gamitin."
   },
   "點左邊的「我的訂單」，這裡是還能用的票。": {
    "en": "Tap “{page:我的訂單}” on the left; these are the tickets you can still use.",
    "ja": "左の「{page:我的訂單}」を押してください。ここにはまだ使えるチケットがあります。",
    "vi": "Bấm “{page:我的訂單}” bên trái, đây là các vé còn dùng được.",
    "id": "Ketuk “{page:我的訂單}” di sebelah kiri; di sini ada tiket yang masih bisa dipakai.",
-   "th": "แตะ “{page:我的訂單}” ทางซ้าย ตรงนี้คือตั๋วที่ยังใช้ได้"
+   "tl": "I-tap ang “{page:我的訂單}” sa kaliwa; ito ang mga tiket na magagamit mo pa."
   },
   "點左邊的「未兌換」，這裡是還沒用的優惠券。": {
    "en": "Tap “{page:未兌換}” on the left; these are the coupons you have not used yet.",
    "ja": "左の「{page:未兌換}」を押してください。ここにはまだ使っていないクーポンがあります。",
    "vi": "Bấm “{page:未兌換}” bên trái, đây là các phiếu chưa dùng.",
    "id": "Ketuk “{page:未兌換}” di sebelah kiri; di sini ada kupon yang belum dipakai.",
-   "th": "แตะ “{page:未兌換}” ทางซ้าย ตรงนี้คือคูปองที่ยังไม่ได้ใช้"
+   "tl": "I-tap ang “{page:未兌換}” sa kaliwa; ito ang mga coupon na hindi mo pa nagagamit."
   },
   "點畫面上方右邊的「優惠券」。": {
    "en": "Tap “{page:優惠券}” at the top right.",
    "ja": "画面の右上の「{page:優惠券}」を押してください。",
    "vi": "Bấm “{page:優惠券}” ở phía trên bên phải.",
    "id": "Ketuk “{page:優惠券}” di kanan atas.",
-   "th": "แตะ “{page:優惠券}” ด้านบนขวา"
+   "tl": "I-tap ang “{page:優惠券}” sa kanang itaas."
   },
   "點畫面左上角的「‹」，回到優惠首頁。": {
    "en": "Tap “‹” at the top left to go back to the deals home page.",
    "ja": "画面の左上の「‹」を押して、特典のトップページに戻ってください。",
    "vi": "Bấm “‹” ở góc trên bên trái để quay lại trang chủ ưu đãi.",
    "id": "Ketuk “‹” di kiri atas untuk kembali ke halaman utama promo.",
-   "th": "แตะ “‹” มุมบนซ้ายเพื่อกลับไปที่หน้าแรกสิทธิพิเศษ"
+   "tl": "I-tap ang “‹” sa kaliwang itaas para bumalik sa home page ng mga promo."
   }
  }
 }

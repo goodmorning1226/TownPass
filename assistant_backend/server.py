@@ -21,11 +21,14 @@ import uuid
 import sys
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
+import classifier  # noqa: E402  (TOWNPASS_DECISION_BACKEND: the decision classifier, opt-in)
+import liveness  # noqa: E402  (which local model servers answer; no long waits for a dead one)
 import decision  # noqa: E402  (TOWNPASS_DECISION_MODEL: Ministral by default, or Gemma)
 
 # Ollama tag and the reported model name; llama-server (the phone) serves the file
-# OnDeviceAssistant.kt loaded for the same TOWNPASS_DECISION_MODEL.
-MODEL = "gemma4:e2b" if decision.GEMMA else "ministral-3:3b"
+# OnDeviceAssistant.kt loaded for the same TOWNPASS_DECISION_MODEL. With no decision
+# model at all (classifier_only, option B'), the classifier's name.
+MODEL = classifier.MODEL_NAME if classifier.ONLY else "gemma4:e2b" if decision.GEMMA else "ministral-3:3b"
 CATALOG_URL = "https://taipei-pass-service.vercel.app/mock/library/library_book_list.json"
 CATALOG_VERSION = "570531a9244c3dba1e1f09907468ca55875ccc4b1af6fe1e5115cfdb2252f4ac"
 CONTRACT = 3  # 3: optional request "context" (page/last action hint)
@@ -74,10 +77,11 @@ def _answers(url, timeout=0.5):
 def readiness(assistant):
     """What the App shows while models load (AssistantReadiness): the decision model
     (None: none on this phone, or Ollama on the computer) and speech (None: no
-    speech service). True once each answers."""
+    speech service). True once each answers. In classifier_only mode (option B')
+    "decision" is the classifier's llama-server: there is no decision LLM to wait for."""
     decision = None
     if MODEL_API == "openai" and assistant.model_available:
-        decision = _answers(MODEL_URL + "/health")[0]
+        decision = _answers((classifier.URL if classifier.ONLY else MODEL_URL) + "/health")[0]
     speech = None
     asr = os.environ.get("TOWNPASS_ASR_URL")
     if asr and asr.endswith("/v1/transcribe"):
@@ -99,14 +103,22 @@ def loading(exc):
 
 
 def model_reply(payload, wait_s=None, pause_s=1.0):
-    """llama-server's chat completion, waiting up to wait_s for a loading model."""
-    deadline = time.monotonic() + (MODEL_READY_WAIT_S if wait_s is None else wait_s)
+    """llama-server's chat completion, waiting up to wait_s for a loading model.
+    Only while the model has never answered; after that a short wait, and a model
+    that just failed is skipped (liveness.py, 2026-11-13)."""
+    if liveness.down(MODEL_URL):
+        raise urllib.error.URLError(ConnectionRefusedError("the decision model is not answering"))
+    deadline = time.monotonic() + liveness.wait_s(MODEL_URL, MODEL_READY_WAIT_S if wait_s is None else wait_s)
     while True:
         try:
-            return fetch_json(MODEL_URL + "/v1/chat/completions", payload, timeout=MODEL_TIMEOUT)
-        except (urllib.error.URLError, ConnectionRefusedError) as exc:
+            reply = fetch_json(MODEL_URL + "/v1/chat/completions", payload, timeout=MODEL_TIMEOUT)
+            liveness.answered(MODEL_URL)
+            return reply
+        except (urllib.error.URLError, ConnectionRefusedError, TimeoutError) as exc:
             refused = isinstance(exc, ConnectionRefusedError)
             if not (refused or loading(exc)) or time.monotonic() + pause_s > deadline:
+                if refused or loading(exc) or liveness.is_timeout(exc):
+                    liveness.failed(MODEL_URL, "timeout" if liveness.is_timeout(exc) else "refused")
                 raise
         time.sleep(pause_s)
 
@@ -498,6 +510,8 @@ class Assistant:
         requested = payload.get("language")
         if requested == "nan":
             requested = "zh"  # Taiwanese speech is transcribed into Chinese (asr_server.TAIWANESE)
+        if requested == "fil":
+            requested = "tl"  # Filipino: the App and Whisper call it tl (docs/AI_FILIPINO.md)
         if requested is not None and requested not in (*i18n.LANGUAGES, "auto"):
             raise AssistantError("語言欄位不正確。")
         language = requested if requested in i18n.LANGUAGES else i18n.detect_text_language(text)
@@ -513,19 +527,24 @@ class Assistant:
         started = time.monotonic()
         self.usage.calls, self.usage.timings = [], []
         self.usage.route, self.usage.candidates, self.usage.semantic = None, [], None
+        self.usage.classifier = []  # TOWNPASS_DECISION_BACKEND=classifier decisions (classifier.py)
         result = self.workflow.handle(payload)
         tokens = [count for count in self.usage.calls if count is not None]
         result["metrics"] = {"elapsed_ms": round((time.monotonic() - started) * 1000),
             "model_calls": len(self.usage.calls), "prompt_tokens": sum(tokens) if tokens else None,
             "model": MODEL if self.usage.calls else None, "page_capability": self._page_id(context),
             "route": self.usage.route, "candidates": self.usage.candidates, "semantic": self.usage.semantic,
-            "model_timings": [timing for timing in self.usage.timings if timing]}
+            "model_timings": [timing for timing in self.usage.timings if timing],
+            **({"classifier": self.usage.classifier} if self.usage.classifier else {})}
         if TIMING_LOG:
             # Numbers only (never the request text), for measuring a phone's speed.
             calls = " ".join(f"[prompt {t['prompt_tokens']} tok cached {t['cached_tokens']} {t['prompt_ms']} ms"
                              f" | gen {t['generated_tokens']} tok {t['generate_ms']} ms]"
                              for t in result["metrics"]["model_timings"])
-            print(f"timing turn total={result['metrics']['elapsed_ms']} ms route={self.usage.route} {calls}",
+            # Classifier decisions (classifier.py): how many and how many candidates in total.
+            scored = f" cls {len(self.usage.classifier)} x {sum(len(c['scores']) for c in self.usage.classifier)}" \
+                if self.usage.classifier else ""
+            print(f"timing turn total={result['metrics']['elapsed_ms']} ms route={self.usage.route} {calls}{scored}",
                   flush=True)
         return result
 
@@ -624,6 +643,8 @@ TAIWANESE_NOTICES = {
     "missing": "還沒有安裝台語語音模型，這次先用中文聽。",
     "memory": "手機記憶體不夠載入台語語音模型，這次先用中文聽。",
     "failed": "台語語音模型沒有啟動成功，這次先用中文聽。",
+    # Still loading after device_main.BoundedStarter.WAIT_S: the next clips use it once it is up.
+    "loading": "台語語音模型還在載入，這次先用中文聽，等一下再說一次。",
 }
 
 

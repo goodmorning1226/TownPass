@@ -1,6 +1,6 @@
 """Collect the App's own Chinese display strings for the bundled page translations.
 
-Writes assets/i18n/app_strings.json: {"version", "source", "strings": {zh: {en, ja, vi, id, th}}}.
+Writes assets/i18n/app_strings.json: {"version", "source", "strings": {zh: {en, ja, vi, id, tl}}} (tl = Filipino).
 Existing translations are kept; new strings get empty translations to fill in;
 strings no longer in the App are dropped. Interpolated Dart strings ('$x') and
 the assistant's own texts (already in the reply language) are skipped.
@@ -13,7 +13,7 @@ import re
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 OUT = ROOT / "assets" / "i18n" / "app_strings.json"
-LANGUAGES = ("en", "ja", "vi", "id", "th")
+LANGUAGES = ("en", "ja", "vi", "id", "tl")
 CHINESE = re.compile(r"[一-鿿]")
 # Assistant texts are not page content (PageTranslationScope disabled there).
 SKIP = ("lib/gen/", "lib/page/assistant/", "lib/service/assistant_", "lib/service/page_translation.dart")
@@ -61,7 +61,7 @@ def main():
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(json.dumps({
         "version": 1,
-        "source": "TownPass App strings (lib/, assets/mock_data/); translations reviewed by speakers pending",
+        "source": "TownPass App strings (lib/, assets/mock_data/); translations reviewed by speakers pending (Filipino tl: AI drafts 2026-11-11)",
         "strings": strings,
     }, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
     missing = sum(1 for value in strings.values() for code in LANGUAGES if not value[code])

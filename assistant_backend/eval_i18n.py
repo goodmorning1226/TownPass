@@ -1,4 +1,5 @@
-"""HTTP evaluation of requests in en / ja / vi / id / th (docs/AI_MULTILINGUAL_PLAN.md).
+"""HTTP evaluation of requests in en / ja / vi / id / tl (docs/AI_MULTILINGUAL_PLAN.md; Filipino
+replaced Thai on 2026-11-11, docs/AI_FILIPINO.md).
 
 Same judge and outcome classes as evaluate.py; the sentences are drafts written
 for this evaluation (to be reviewed by speakers, then extended with held-out
@@ -55,10 +56,29 @@ CASES = {
            ("Saya mau pinjam buku", HOME), ("Lihat riwayat peminjaman", cap("library.records")),
            ("Saya mau lapor polisi online", cap("police.online")), ("Saya mau janji vaksin", FAQ_OR_UNSUPPORTED),
            ("Halo", REPLY), ("Bisa apa saja", LISTING), ("Saya tidak mau pinjam buku", NONE)],
-    "th": [("อยากจ่ายค่าน้ำ", cap("fees.water")), ("อยากจ่ายค่าจอดรถ", cap("fees.parking")),
-           ("อยากยืมหนังสือ", HOME), ("ดูประวัติการยืม", cap("library.records")),
-           ("อยากแจ้งความออนไลน์", cap("police.online")), ("อยากจองวัคซีน", FAQ_OR_UNSUPPORTED),
-           ("สวัสดีครับ", REPLY), ("ทำอะไรได้บ้าง", LISTING), ("ไม่อยากยืมหนังสือ", NONE)],
+    # Everyday and chat-style Indonesian (docs/AI_INDONESIAN.md); written for this set,
+    # a dev set like the lines above.
+    "id_variants": [
+        ("mau bayar air", cap("fees.water")), ("tolong bayarin tagihan aer", cap("fees.water")),
+        ("sy mau bayar tagihan air yg bln ini", cap("fees.water")), ("gmn caranya bayar parkr mobil", offer("fees.parking")),
+        ("mw ke perpus", HOME), ("pinjem buku dong", HOME), ("ambil no antrian", cap("reservation")),
+        ("ganti no hp sy", cap("profile")), ("buka pengaturan notif", cap("notification_settings")),
+        ("Ada pesan baru nggak?", cap("messages")), ("Ada promo apa?", cap("app.perks")),
+        ("Lihat buku yang saya pesan", cap("library.reservations")), ("Cek histori pembayaran saya", cap("fees.history")),
+        ("Layanan pengajuan online", cap("districtOffice")), ("Bayar SPP anak saya", cap("fees.tuition")),
+        ("Bukan bayar air, tapi bayar parkir", cap("fees.parking")), ("sy ga mau pinjem buku", NONE),
+        ("gak jadi deh", NONE), ("makasih ya", REPLY), ("aplikasi ini bisa bantu apa?", LISTING)],
+    # Filipino (Tagalog), with the English Filipinos often mix in; written for this set (dev).
+    "tl": [("Gusto kong magbayad ng tubig", cap("fees.water")), ("Gusto kong magbayad ng parking", cap("fees.parking")),
+           ("Gusto kong humiram ng libro", HOME), ("Tingnan ang kasaysayan ng paghiram ko", cap("library.records")),
+           ("Gusto kong mag-report sa pulis online", cap("police.online")), ("Gusto kong magpabakuna", FAQ_OR_UNSUPPORTED),
+           ("Kumusta po", REPLY), ("Ano ang kaya mong gawin?", LISTING), ("Ayokong humiram ng libro", NONE)],
+    "tl_variants": [
+        ("gusto ko mag-pay ng water bill", cap("fees.water")), ("pano magbayad ng bill sa tubig", cap("fees.water")),
+        ("magkuwento ka ng nakakatawa", NONE), ("hindi tubig, buwis ang babayaran ko", cap("fees.tax")),
+        ("hindi ko kailangan ng libro", NONE), ("hindi gumagana ang ilaw sa kalye", offer("disasterReport.form.D-1-3")),
+        ("kumuha ng numero sa counter", cap("reservation")), ("salamat po", REPLY),
+        ("ano-ano ang mga serbisyo dito", LISTING), ("gawing Filipino ang wika ng app", cap("language"))],
 }
 
 

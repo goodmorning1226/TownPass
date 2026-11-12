@@ -40,7 +40,9 @@ class AssistantModelStatus {
   /// "full", "standard" or "lite" (the phone's total memory).
   final String tier;
 
-  /// "full", "lite" (no decision model) or "unavailable".
+  /// "full", "lite" (no decision model) or "unavailable". A lite-tier phone
+  /// with the decision classifier (ASSISTANT_DECISION_MODEL=classifier, 132 MB
+  /// on every tier) is "full": its decision part is allowed.
   final String assistant;
   final int? freeBytes;
   final Map<String, AssistantModelPart> parts;

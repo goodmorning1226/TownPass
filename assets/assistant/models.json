@@ -103,6 +103,21 @@
    "license": "Gemma Terms of Use (Google)"
   },
   {
+   "id": "classifier",
+   "name": "townpass-decision-e5-ce-v1-q8_0.gguf",
+   "part": "decision",
+   "size": 132441120,
+   "sha256": "ae1745a7a24c1217271f08e53f140df1ea9e3c50f098362045625290d6b6e22f",
+   "path": "decision/townpass-decision-e5-ce-v1-q8_0.gguf",
+   "server": "classifier",
+   "decision_model": "classifier",
+   "platforms": [
+    "android",
+    "ios"
+   ],
+   "license": "MIT (cross-encoder fine-tuned by this project from Microsoft multilingual-e5-small; GGUF q8_0)"
+  },
+  {
    "id": "taiwanese",
    "name": "ggml-whisper-taiwanese.bin",
    "part": "taiwanese",
@@ -111,6 +126,9 @@
    "path": "taiwanese/ggml-breeze-asr-26-q8_0.bin",
    "tiers": [
     "full"
+   ],
+   "platforms": [
+    "android"
    ],
    "license": "Apache-2.0 (MediaTek Research Breeze-ASR-26; ggml q8_0 by this project)"
   },
@@ -123,6 +141,25 @@
    "path": "taiwanese/ggml-breeze-asr-26-q4_k.bin",
    "tiers": [
     "standard"
+   ],
+   "platforms": [
+    "android"
+   ],
+   "license": "Apache-2.0 (MediaTek Research Breeze-ASR-26; ggml q4_K by this project)"
+  },
+  {
+   "id": "taiwanese-q4-ios",
+   "name": "ggml-whisper-taiwanese.bin",
+   "part": "taiwanese",
+   "size": 888932908,
+   "sha256": "747896198b388e1ab77397cb82136dd3bd5fc1823f7e0c60757166b20ff9abbe",
+   "path": "taiwanese/ggml-breeze-asr-26-q4_k.bin",
+   "tiers": [
+    "full",
+    "standard"
+   ],
+   "platforms": [
+    "ios"
    ],
    "license": "Apache-2.0 (MediaTek Research Breeze-ASR-26; ggml q4_K by this project)"
   }

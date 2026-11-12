@@ -1,6 +1,6 @@
 {
  "version": 1,
- "status": "DRAFT translations (machine-assisted, 2026-11-08), pending native-speaker review. Keys are the Chinese source texts in lib/page/guided_assistant/; keep {name} placeholders; {page:X} shows the page's own word X as the page shows it (translated by PageTranslation).",
+ "status": "DRAFT translations (machine-assisted, 2026-11-08; Filipino tl AI drafts 2026-11-11), pending native-speaker review. Keys are the Chinese source texts in lib/page/guided_assistant/; keep {name} placeholders; {page:X} shows the page's own word X as the page shows it (translated by PageTranslation).",
  "section": "fees",
  "strings": {
   "{fee}，{amount}": {
@@ -8,658 +8,658 @@
    "ja": "{fee}、{amount}",
    "vi": "{fee}, {amount}",
    "id": "{fee}, {amount}",
-   "th": "{fee} {amount}"
+   "tl": "{fee}, {amount}"
   },
   "{said}。先按「確認」關掉，再檢查一下號碼有沒有打錯、有沒有多打空白。": {
    "en": "{said}. First tap “{page:確認}” to close it, then check that the number has no typos or extra spaces.",
    "ja": "{said}。まず「{page:確認}」を押して閉じてから、番号の打ち間違いや余計なスペースがないか確認してください。",
    "vi": "{said}. Trước tiên chạm “{page:確認}” để đóng, rồi kiểm tra xem số có gõ sai hay thừa khoảng trắng không.",
    "id": "{said}. Ketuk “{page:確認}” dulu untuk menutup, lalu periksa apakah nomornya salah ketik atau ada spasi lebih.",
-   "th": "{said} กด “{page:確認}” เพื่อปิดก่อน แล้วตรวจว่าพิมพ์หมายเลขผิดหรือมีช่องว่างเกินไหม"
+   "tl": "{said}. I-tap muna ang “{page:確認}” para isara ito, saka tingnan kung walang mali o sobrang espasyo sa numero."
   },
   "{said}。號碼還沒打好喔，先按「確認」關掉，再把帳單上的號碼打進框框。": {
    "en": "{said}. The number isn’t filled in yet. First tap “{page:確認}” to close it, then type the number from your bill into the box.",
    "ja": "{said}。番号がまだ入力されていません。まず「{page:確認}」を押して閉じてから、請求書の番号を欄に入力してください。",
    "vi": "{said}. Số vẫn chưa được gõ. Trước tiên chạm “{page:確認}” để đóng, rồi gõ số trên hóa đơn vào ô.",
    "id": "{said}. Nomornya belum diisi. Ketuk “{page:確認}” dulu untuk menutup, lalu ketik nomor dari tagihan ke kotaknya.",
-   "th": "{said} ยังไม่ได้พิมพ์หมายเลข กด “{page:確認}” เพื่อปิดก่อน แล้วพิมพ์หมายเลขบนบิลลงในช่อง"
+   "tl": "{said}. Hindi pa napupunan ang numero. I-tap muna ang “{page:確認}” para isara ito, saka i-type sa kahon ang numero mula sa iyong bill."
   },
   "{where}印在帳單上。點一下亮起來的框框，照帳單打進去。": {
    "en": "{where} is printed on your bill. Tap the highlighted box and type it in from the bill.",
    "ja": "{where}は請求書に印刷されています。光っている欄をタップして、請求書のとおりに入力してください。",
    "vi": "{where} được in trên hóa đơn. Chạm vào ô đang sáng và gõ theo hóa đơn.",
    "id": "{where} tercetak di tagihan. Ketuk kotak yang menyala, lalu ketik sesuai tagihan.",
-   "th": "{where} พิมพ์อยู่บนบิล แตะช่องที่สว่างอยู่ แล้วพิมพ์ตามบิล"
+   "tl": "{where} ay nakalimbag sa iyong bill. I-tap ang naka-highlight na kahon at i-type ito ayon sa bill."
   },
   "{where}印在帳單上（{hint}）。點一下亮起來的框框，照帳單打進去。": {
    "en": "{where} is printed on your bill ({hint}). Tap the highlighted box and type it in from the bill.",
    "ja": "{where}は請求書に印刷されています（{hint}）。光っている欄をタップして、請求書のとおりに入力してください。",
    "vi": "{where} được in trên hóa đơn ({hint}). Chạm vào ô đang sáng và gõ theo hóa đơn.",
    "id": "{where} tercetak di tagihan ({hint}). Ketuk kotak yang menyala, lalu ketik sesuai tagihan.",
-   "th": "{where} พิมพ์อยู่บนบิล ({hint}) แตะช่องที่สว่างอยู่ แล้วพิมพ์ตามบิล"
+   "tl": "{where} ay nakalimbag sa iyong bill ({hint}). I-tap ang naka-highlight na kahon at i-type ito ayon sa bill."
   },
   "{where}要在月曆上選：點框框，點月曆最上面的月份和年份換到你出生的年和月，再點那一天。": {
    "en": "{where} is picked on a calendar: tap the box, tap the month and year at the top of the calendar to go to the year and month you were born, then tap the day.",
    "ja": "{where}はカレンダーで選びます。欄をタップし、カレンダーのいちばん上の月と年をタップして生まれた年と月に切り替え、その日をタップしてください。",
    "vi": "{where} được chọn trên lịch: chạm vào ô, chạm vào tháng và năm ở trên cùng của lịch để chuyển sang năm và tháng bạn sinh, rồi chạm vào ngày đó.",
    "id": "{where} dipilih di kalender: ketuk kotaknya, ketuk bulan dan tahun di atas kalender untuk pindah ke tahun dan bulan lahir Anda, lalu ketuk tanggalnya.",
-   "th": "{where} ต้องเลือกในปฏิทิน: แตะช่อง แตะเดือนและปีด้านบนของปฏิทินเพื่อเปลี่ยนไปที่ปีและเดือนที่คุณเกิด แล้วแตะวันนั้น"
+   "tl": "{where} ay pinipili sa kalendaryo: i-tap ang kahon, i-tap ang buwan at taon sa itaas ng kalendaryo para pumunta sa taon at buwan ng iyong kapanganakan, saka i-tap ang araw."
   },
   "不要打 - 或空白。": {
    "en": "Don’t type - or spaces.",
    "ja": "「-」やスペースは入力しないでください。",
    "vi": "Đừng gõ dấu - hay khoảng trắng.",
    "id": "Jangan ketik tanda - atau spasi.",
-   "th": "ไม่ต้องพิมพ์ - หรือช่องว่าง"
+   "tl": "Huwag mag-type ng - o espasyo."
   },
   "中間的符號也要打。": {
    "en": "Type the symbols in between too.",
    "ja": "間の記号も入力してください。",
    "vi": "Gõ cả các ký hiệu ở giữa.",
    "id": "Simbol di tengahnya juga diketik.",
-   "th": "พิมพ์เครื่องหมายตรงกลางด้วย"
+   "tl": "I-type din ang mga simbolo sa gitna."
   },
   "什麼是水號？": {
    "en": "What is a water account number?",
    "ja": "水道番号とは何ですか？",
    "vi": "Số danh bộ nước là gì?",
    "id": "Apa itu nomor pelanggan air?",
-   "th": "หมายเลขผู้ใช้น้ำคืออะไร"
+   "tl": "Ano ang water account number?"
   },
   "付款方式選好了！": {
    "en": "Payment method chosen!",
    "ja": "お支払い方法を選びました！",
    "vi": "Đã chọn cách thanh toán!",
    "id": "Metode pembayaran sudah dipilih!",
-   "th": "เลือกวิธีชำระเงินแล้ว!"
+   "tl": "Napili na ang paraan ng pagbabayad!"
   },
   "你要繳哪一種費用？先點一個大類打開來看，例如「規費」。": {
    "en": "Which fee do you want to pay? First tap a category to open it, e.g. “{page:規費}”.",
    "ja": "どの料金を払いますか？まず大きな分類をタップして開いてください。例：「{page:規費}」。",
    "vi": "Bạn muốn đóng loại phí nào? Trước tiên chạm vào một nhóm lớn để mở ra, ví dụ “{page:規費}”.",
    "id": "Biaya apa yang ingin Anda bayar? Ketuk dulu satu kategori untuk membukanya, misalnya “{page:規費}”.",
-   "th": "คุณจะจ่ายค่าอะไร แตะหมวดใหญ่เพื่อเปิดดูก่อน เช่น “{page:規費}”"
+   "tl": "Anong bayarin ang gusto mong bayaran? I-tap muna ang isang kategorya para buksan ito, hal. “{page:規費}”."
   },
   "先選一個：點「{choices}」。": {
    "en": "Pick one first: tap “{choices}”.",
    "ja": "まず1つ選んでください：「{choices}」をタップします。",
    "vi": "Chọn một trước: chạm “{choices}”.",
    "id": "Pilih satu dulu: ketuk “{choices}”.",
-   "th": "เลือกหนึ่งอย่างก่อน: แตะ “{choices}”"
+   "tl": "Pumili muna ng isa: i-tap ang “{choices}”."
   },
   "先點月曆最上面的「{title}」，換到你出生的年和月，再點那一天。": {
    "en": "First tap “{title}” at the very top of the calendar to go to the year and month you were born, then tap the day.",
    "ja": "まずカレンダーのいちばん上の「{title}」をタップして生まれた年と月に切り替え、その日をタップしてください。",
    "vi": "Trước tiên chạm “{title}” ở trên cùng của lịch để chuyển sang năm và tháng bạn sinh, rồi chạm vào ngày đó.",
    "id": "Ketuk dulu “{title}” di bagian paling atas kalender untuk pindah ke tahun dan bulan lahir Anda, lalu ketuk tanggalnya.",
-   "th": "แตะ “{title}” ที่ด้านบนสุดของปฏิทินก่อน เพื่อเปลี่ยนไปที่ปีและเดือนที่คุณเกิด แล้วแตะวันนั้น"
+   "tl": "I-tap muna ang “{title}” sa pinakaitaas ng kalendaryo para pumunta sa taon at buwan ng iyong kapanganakan, saka i-tap ang araw."
   },
   "先點月曆最上面的「月份 年份」，換到你出生的年和月，再點那一天。": {
    "en": "First tap the month and year at the very top of the calendar to go to the year and month you were born, then tap the day.",
    "ja": "まずカレンダーのいちばん上の「月 年」をタップして生まれた年と月に切り替え、その日をタップしてください。",
    "vi": "Trước tiên chạm vào tháng và năm ở trên cùng của lịch để chuyển sang năm và tháng bạn sinh, rồi chạm vào ngày đó.",
    "id": "Ketuk dulu bulan dan tahun di bagian paling atas kalender untuk pindah ke tahun dan bulan lahir Anda, lalu ketuk tanggalnya.",
-   "th": "แตะเดือนและปีที่ด้านบนสุดของปฏิทินก่อน เพื่อเปลี่ยนไปที่ปีและเดือนที่คุณเกิด แล้วแตะวันนั้น"
+   "tl": "I-tap muna ang buwan at taon sa pinakaitaas ng kalendaryo para pumunta sa taon at buwan ng iyong kapanganakan, saka i-tap ang araw."
   },
   "到付款頁了！選一個付款方式。": {
    "en": "You’re on the payment page! Pick a payment method.",
    "ja": "支払いページに来ました！お支払い方法を1つ選んでください。",
    "vi": "Đã đến trang thanh toán! Chọn một cách thanh toán.",
    "id": "Sudah di halaman pembayaran! Pilih satu metode pembayaran.",
-   "th": "มาถึงหน้าชำระเงินแล้ว! เลือกวิธีชำระเงินหนึ่งวิธี"
+   "tl": "Nasa pahina ka na ng pagbabayad! Pumili ng paraan ng pagbabayad."
   },
   "前往繳費": {
    "en": "Go to payment",
    "ja": "支払いへ進む",
    "vi": "Đi đến thanh toán",
    "id": "Lanjut ke pembayaran",
-   "th": "ไปที่การชำระเงิน"
+   "tl": "Pumunta sa pagbabayad"
   },
   "勾選要繳的帳單": {
    "en": "Tick the bills to pay",
    "ja": "支払う請求書にチェック",
    "vi": "Đánh dấu hóa đơn cần đóng",
    "id": "Centang tagihan yang akan dibayar",
-   "th": "ติ๊กบิลที่จะจ่าย"
+   "tl": "I-tick ang mga bill na babayaran"
   },
   "可以繳水費、停車費、學雜費等費用：先輸入帳單上的號碼查帳單，勾選要繳的，再選付款方式。也可以看繳費紀錄。": {
    "en": "You can pay water bills, parking fees, school fees and more: first enter the number on your bill to find it, tick the bills to pay, then choose how to pay. You can also see your payment history.",
    "ja": "水道料金、駐車料金、学費などを支払えます。まず請求書の番号を入力して請求書を調べ、支払うものにチェックして、お支払い方法を選びます。支払い履歴も見られます。",
    "vi": "Bạn có thể đóng tiền nước, phí đỗ xe, học phí và các khoản khác: trước tiên gõ số trên hóa đơn để tra hóa đơn, đánh dấu khoản cần đóng, rồi chọn cách thanh toán. Bạn cũng có thể xem lịch sử thanh toán.",
    "id": "Anda bisa membayar tagihan air, biaya parkir, biaya sekolah, dan lainnya: masukkan dulu nomor di tagihan untuk mencarinya, centang yang akan dibayar, lalu pilih metode pembayaran. Anda juga bisa melihat riwayat pembayaran.",
-   "th": "จ่ายค่าน้ำ ค่าจอดรถ ค่าเล่าเรียน และค่าอื่นๆ ได้: พิมพ์หมายเลขบนบิลเพื่อค้นหาบิลก่อน ติ๊กบิลที่จะจ่าย แล้วเลือกวิธีชำระเงิน ดูประวัติการชำระเงินได้ด้วย"
+   "tl": "Puwede kang magbayad ng bayarin sa tubig, bayad sa paradahan, bayarin sa paaralan at iba pa: ilagay muna ang numero sa iyong bill para mahanap ito, i-tick ang mga bill na babayaran, saka piliin kung paano magbabayad. Makikita mo rin ang iyong kasaysayan ng pagbabayad."
   },
   "回到繳費": {
    "en": "Back to Payments",
    "ja": "支払いに戻る",
    "vi": "Quay lại Thanh toán",
    "id": "Kembali ke Pembayaran",
-   "th": "กลับไปที่ชำระเงิน"
+   "tl": "Bumalik sa Pagbabayad"
   },
   "回到繳費畫面": {
    "en": "Back to the payment screen",
    "ja": "支払い画面に戻る",
    "vi": "Quay lại màn hình thanh toán",
    "id": "Kembali ke layar pembayaran",
-   "th": "กลับไปหน้าจอชำระเงิน"
+   "tl": "Bumalik sa screen ng pagbabayad"
   },
   "在「請選擇繳費方式」點一個你常用的付款方式。": {
    "en": "Under “{page:請選擇繳費方式}”, tap a payment method you usually use.",
    "ja": "「{page:請選擇繳費方式}」で、いつも使うお支払い方法をタップしてください。",
    "vi": "Trong “{page:請選擇繳費方式}”, chạm vào cách thanh toán bạn hay dùng.",
    "id": "Di “{page:請選擇繳費方式}”, ketuk metode pembayaran yang biasa Anda pakai.",
-   "th": "ใน “{page:請選擇繳費方式}” แตะวิธีชำระเงินที่คุณใช้บ่อย"
+   "tl": "Sa ilalim ng “{page:請選擇繳費方式}”, i-tap ang paraan ng pagbabayad na karaniwan mong ginagamit."
   },
   "在上面的框框打費用名稱，按放大鏡，再點下面的結果。": {
    "en": "Type the fee’s name in the box at the top, tap the magnifying glass, then tap the result below.",
    "ja": "上の欄に料金の名前を入力し、虫めがねを押してから、下の結果をタップしてください。",
    "vi": "Gõ tên khoản phí vào ô ở trên, chạm vào kính lúp, rồi chạm vào kết quả bên dưới.",
    "id": "Ketik nama biaya di kotak atas, ketuk kaca pembesar, lalu ketuk hasil di bawah.",
-   "th": "พิมพ์ชื่อค่าใช้จ่ายในช่องด้านบน กดแว่นขยาย แล้วแตะผลลัพธ์ด้านล่าง"
+   "tl": "I-type ang pangalan ng bayarin sa kahon sa itaas, i-tap ang magnifying glass, saka i-tap ang resulta sa ibaba."
   },
   "在帳單右邊的小方框打勾。沒有帳單的話，回上一頁檢查號碼。": {
    "en": "Tick the small box on the right of the bill. If there’s no bill, go back and check the number.",
    "ja": "請求書の右にある小さな四角にチェックを入れてください。請求書がなければ、前のページに戻って番号を確認してください。",
    "vi": "Đánh dấu vào ô vuông nhỏ bên phải hóa đơn. Nếu không có hóa đơn, quay lại trang trước để kiểm tra số.",
    "id": "Centang kotak kecil di kanan tagihan. Kalau tidak ada tagihan, kembali dan periksa nomornya.",
-   "th": "ติ๊กช่องสี่เหลี่ยมเล็กทางขวาของบิล ถ้าไม่มีบิล ย้อนกลับไปตรวจหมายเลข"
+   "tl": "I-tick ang maliit na kahon sa kanan ng bill. Kung walang bill, bumalik at tingnan ang numero."
   },
   "在帳單右邊的小方框打勾，就是要繳這一張。": {
    "en": "Ticking the small box on the right of a bill means you’ll pay that one.",
    "ja": "請求書の右にある小さな四角にチェックを入れると、その請求書を支払います。",
    "vi": "Đánh dấu vào ô vuông nhỏ bên phải hóa đơn nghĩa là bạn sẽ đóng hóa đơn đó.",
    "id": "Mencentang kotak kecil di kanan tagihan berarti Anda akan membayar tagihan itu.",
-   "th": "ติ๊กช่องสี่เหลี่ยมเล็กทางขวาของบิล หมายถึงจะจ่ายบิลนั้น"
+   "tl": "Kapag na-tick mo ang maliit na kahon sa kanan ng bill, iyon ang babayaran mo."
   },
   "在清單點你要繳的費用。找不到可以按上面的搜尋框打名稱。": {
    "en": "Tap the fee you want to pay in the list. Can’t find it? Tap the search box at the top and type its name.",
    "ja": "一覧から支払う料金をタップしてください。見つからないときは、上の検索欄をタップして名前を入力してください。",
    "vi": "Chạm vào khoản phí bạn muốn đóng trong danh sách. Không tìm thấy thì chạm vào ô tìm kiếm phía trên và gõ tên.",
    "id": "Ketuk biaya yang ingin dibayar di daftar. Tidak ketemu? Ketuk kotak pencarian di atas dan ketik namanya.",
-   "th": "แตะค่าที่จะจ่ายในรายการ ถ้าหาไม่เจอ แตะช่องค้นหาด้านบนแล้วพิมพ์ชื่อ"
+   "tl": "I-tap sa listahan ang bayaring gusto mong bayaran. Hindi mo makita? I-tap ang search box sa itaas at i-type ang pangalan nito."
   },
   "地方稅要用相機掃描帳單，這裡沒辦法一步一步帶你。按左上角「‹」回去選別的費用。": {
    "en": "Local taxes are paid by scanning the bill with the camera, so I can’t guide you step by step here. Tap “‹” at the top left to go back and choose another fee.",
    "ja": "地方税はカメラで請求書をスキャンする必要があるため、ここでは一歩ずつご案内できません。左上の「‹」を押して戻り、別の料金を選んでください。",
    "vi": "Thuế địa phương phải quét hóa đơn bằng máy ảnh, nên ở đây tôi không thể hướng dẫn từng bước. Chạm “‹” ở góc trên bên trái để quay lại chọn khoản phí khác.",
    "id": "Pajak daerah harus dibayar dengan memindai tagihan pakai kamera, jadi di sini saya tidak bisa memandu langkah demi langkah. Ketuk “‹” di kiri atas untuk kembali dan pilih biaya lain.",
-   "th": "ภาษีท้องถิ่นต้องใช้กล้องสแกนบิล ตรงนี้จึงพาทำทีละขั้นไม่ได้ กด “‹” ที่มุมซ้ายบนเพื่อกลับไปเลือกค่าใช้จ่ายอื่น"
+   "tl": "Ang local tax ay binabayaran sa pag-scan ng bill gamit ang camera, kaya hindi kita magagabayan nang hakbang-hakbang dito. I-tap ang “‹” sa kaliwang itaas para bumalik at pumili ng ibang bayarin."
   },
   "好的！已經幫你打開繳費頁面。我們先用帳單上的號碼查帳單，再選付款方式，最後由你自己確認付款。我會在畫面上一步一步帶你做。": {
    "en": "OK! I opened the payment page for you. First we look up the bill with the number on it, then choose how to pay, and at the end you confirm the payment yourself. I’ll guide you step by step on the screen.",
    "ja": "はい！支払いページを開きました。まず請求書の番号で請求書を調べ、次にお支払い方法を選び、最後にご自分で支払いを確認します。画面で一つずつご案内します。",
    "vi": "Được rồi! Mình đã mở trang thanh toán cho bạn. Trước tiên mình tra hóa đơn bằng số trên hóa đơn, rồi chọn cách thanh toán, cuối cùng bạn tự xác nhận thanh toán. Mình sẽ hướng dẫn từng bước trên màn hình.",
    "id": "Baik! Halaman pembayaran sudah saya bukakan. Kita cari tagihan dengan nomor di tagihan dulu, lalu pilih metode pembayaran, dan terakhir Anda sendiri yang mengonfirmasi pembayaran. Saya akan memandu langkah demi langkah di layar.",
-   "th": "ได้เลย! เปิดหน้าชำระเงินให้แล้ว เราจะค้นหาบิลด้วยหมายเลขบนบิลก่อน แล้วเลือกวิธีชำระเงิน สุดท้ายคุณยืนยันการชำระเงินเอง จะพาทำทีละขั้นบนหน้าจอ"
+   "tl": "OK po! Binuksan ko na ang pahina ng pagbabayad para sa iyo. Una, hahanapin natin ang bill gamit ang numero nito, saka pipiliin kung paano magbabayad, at sa huli ikaw mismo ang magkukumpirma ng bayad. Gagabayan kita nang hakbang-hakbang sa screen."
   },
   "好的！已經幫你打開繳費頁面，我會在畫面上一步一步帶你做。": {
    "en": "OK! I opened the payment page for you. I’ll guide you step by step on the screen.",
    "ja": "はい！支払いページを開きました。画面で一つずつご案内します。",
    "vi": "Được rồi! Mình đã mở trang thanh toán cho bạn. Mình sẽ hướng dẫn từng bước trên màn hình.",
    "id": "Baik! Halaman pembayaran sudah saya bukakan. Saya akan memandu langkah demi langkah di layar.",
-   "th": "ได้เลย! เปิดหน้าชำระเงินให้แล้ว จะพาทำทีละขั้นบนหน้าจอ"
+   "tl": "OK po! Binuksan ko na ang pahina ng pagbabayad para sa iyo. Gagabayan kita nang hakbang-hakbang sa screen."
   },
   "好的！繳費頁面打開了，我們一起來{task}。": {
    "en": "OK! The payment page is open. Let’s do this together: {task}.",
    "ja": "はい！支払いページを開きました。一緒に「{task}」をしましょう。",
    "vi": "Được rồi! Trang thanh toán đã mở. Mình cùng làm nhé: {task}.",
    "id": "Baik! Halaman pembayaran sudah terbuka. Ayo kita lakukan bersama: {task}.",
-   "th": "ได้เลย! เปิดหน้าชำระเงินแล้ว มาทำด้วยกัน: {task}"
+   "tl": "OK! Bukas na ang pahina ng pagbabayad. Sabay nating gawin ito: {task}."
   },
   "好的！繳費頁面打開了，我們先查帳單吧。": {
    "en": "OK! The payment page is open. Let’s look up your bill first.",
    "ja": "はい！支払いページを開きました。まず請求書を調べましょう。",
    "vi": "Được rồi! Trang thanh toán đã mở. Mình tra hóa đơn trước nhé.",
    "id": "Baik! Halaman pembayaran sudah terbuka. Ayo cari tagihannya dulu.",
-   "th": "ได้เลย! เปิดหน้าชำระเงินแล้ว มาค้นหาบิลกันก่อน"
+   "tl": "OK! Bukas na ang pahina ng pagbabayad. Hanapin muna natin ang iyong bill."
   },
   "左邊選時間，中間選費用，右邊選成功或失敗。": {
    "en": "Left: choose the time period. Middle: choose the fee. Right: choose successful or failed.",
    "ja": "左で期間、真ん中で料金、右で成功か失敗かを選びます。",
    "vi": "Bên trái chọn thời gian, ở giữa chọn khoản phí, bên phải chọn thành công hay thất bại.",
    "id": "Kiri pilih waktu, tengah pilih biaya, kanan pilih berhasil atau gagal.",
-   "th": "ทางซ้ายเลือกช่วงเวลา ตรงกลางเลือกค่าใช้จ่าย ทางขวาเลือกสำเร็จหรือไม่สำเร็จ"
+   "tl": "Kaliwa: piliin ang panahon. Gitna: piliin ang bayarin. Kanan: piliin ang matagumpay o nabigo."
   },
   "帳單選好了！": {
    "en": "Bills chosen!",
    "ja": "請求書を選びました！",
    "vi": "Đã chọn hóa đơn!",
    "id": "Tagihan sudah dipilih!",
-   "th": "เลือกบิลแล้ว!"
+   "tl": "Napili na ang mga bill!"
   },
   "想看別的，再點上面的選單換一個。": {
    "en": "To see something else, tap a menu at the top and pick another option.",
    "ja": "ほかのものを見たいときは、上のメニューをタップして選び直してください。",
    "vi": "Muốn xem cái khác thì chạm vào menu phía trên để đổi.",
    "id": "Mau lihat yang lain? Ketuk menu di atas dan ganti pilihannya.",
-   "th": "อยากดูอย่างอื่น แตะเมนูด้านบนแล้วเปลี่ยนตัวเลือก"
+   "tl": "Para makakita ng iba, i-tap ang isang menu sa itaas at pumili ng ibang opsyon."
   },
   "打好了！按下面的「查詢」，看看{fee}要繳多少錢。": {
    "en": "Done! Tap “{page:查詢}” below to see how much you owe for {fee}.",
    "ja": "できました！下の「{page:查詢}」を押して、{fee}がいくらか見てみましょう。",
    "vi": "Xong rồi! Chạm “{page:查詢}” bên dưới để xem {fee} cần đóng bao nhiêu tiền.",
    "id": "Selesai! Ketuk “{page:查詢}” di bawah untuk melihat berapa yang harus dibayar untuk {fee}.",
-   "th": "เรียบร้อย! กด “{page:查詢}” ข้างล่าง เพื่อดูว่า{fee}ต้องจ่ายเท่าไร"
+   "tl": "Tapos na! I-tap ang “{page:查詢}” sa ibaba para makita kung magkano ang babayaran mo para sa {fee}."
   },
   "打費用名稱，例如「水費」，按放大鏡，再點下面的結果。": {
    "en": "Type the fee’s name, e.g. “{page:水費}”, tap the magnifying glass, then tap the result below.",
    "ja": "料金の名前（例：「{page:水費}」）を入力し、虫めがねを押してから、下の結果をタップしてください。",
    "vi": "Gõ tên khoản phí, ví dụ “{page:水費}”, chạm vào kính lúp, rồi chạm vào kết quả bên dưới.",
    "id": "Ketik nama biayanya, misalnya “{page:水費}”, ketuk kaca pembesar, lalu ketuk hasil di bawah.",
-   "th": "พิมพ์ชื่อค่าใช้จ่าย เช่น “{page:水費}” กดแว่นขยาย แล้วแตะผลลัพธ์ด้านล่าง"
+   "tl": "I-type ang pangalan ng bayarin, hal. “{page:水費}”, i-tap ang magnifying glass, saka i-tap ang resulta sa ibaba."
   },
   "按「前往繳費」": {
    "en": "Tap “{page:前往繳費}”",
    "ja": "「{page:前往繳費}」を押す",
    "vi": "Chạm “{page:前往繳費}”",
    "id": "Ketuk “{page:前往繳費}”",
-   "th": "กด “{page:前往繳費}”"
+   "tl": "I-tap ang “{page:前往繳費}”"
   },
   "按「查詢」找帳單": {
    "en": "Tap “{page:查詢}” to find the bill",
    "ja": "「{page:查詢}」を押して請求書を探す",
    "vi": "Chạm “{page:查詢}” để tìm hóa đơn",
    "id": "Ketuk “{page:查詢}” untuk mencari tagihan",
-   "th": "กด “{page:查詢}” เพื่อหาบิล"
+   "tl": "I-tap ang “{page:查詢}” para hanapin ang bill"
   },
   "按下面的「前往繳費」，選付款方式。": {
    "en": "Tap “{page:前往繳費}” below and choose how to pay.",
    "ja": "下の「{page:前往繳費}」を押して、お支払い方法を選んでください。",
    "vi": "Chạm “{page:前往繳費}” bên dưới rồi chọn cách thanh toán.",
    "id": "Ketuk “{page:前往繳費}” di bawah lalu pilih metode pembayaran.",
-   "th": "กด “{page:前往繳費}” ข้างล่าง แล้วเลือกวิธีชำระเงิน"
+   "tl": "I-tap ang “{page:前往繳費}” sa ibaba at piliin kung paano magbabayad."
   },
   "按下面的「查詢」，看看要繳多少錢。": {
    "en": "Tap “{page:查詢}” below to see how much to pay.",
    "ja": "下の「{page:查詢}」を押して、いくら払うか見てみましょう。",
    "vi": "Chạm “{page:查詢}” bên dưới để xem cần đóng bao nhiêu tiền.",
    "id": "Ketuk “{page:查詢}” di bawah untuk melihat berapa yang harus dibayar.",
-   "th": "กด “{page:查詢}” ข้างล่าง เพื่อดูว่าต้องจ่ายเท่าไร"
+   "tl": "I-tap ang “{page:查詢}” sa ibaba para makita kung magkano ang babayaran."
   },
   "按左右的箭頭換年份，點中間的年份可以看更多年。選好年，點你出生的月份，再點那一天。": {
    "en": "Use the left and right arrows to change the year; tap the year in the middle to see more years. Once the year is right, tap the month you were born, then tap the day.",
    "ja": "左右の矢印で年を切り替えます。真ん中の年をタップするともっと多くの年が見られます。年を選んだら生まれた月をタップし、その日をタップしてください。",
    "vi": "Dùng mũi tên trái phải để đổi năm; chạm vào năm ở giữa để xem nhiều năm hơn. Chọn xong năm, chạm vào tháng bạn sinh, rồi chạm vào ngày đó.",
    "id": "Pakai panah kiri dan kanan untuk mengganti tahun; ketuk tahun di tengah untuk melihat lebih banyak tahun. Setelah tahunnya benar, ketuk bulan lahir Anda, lalu ketuk tanggalnya.",
-   "th": "กดลูกศรซ้ายขวาเพื่อเปลี่ยนปี แตะปีตรงกลางเพื่อดูปีอื่นเพิ่ม เลือกปีได้แล้ว แตะเดือนที่คุณเกิด แล้วแตะวันนั้น"
+   "tl": "Gamitin ang kaliwa at kanang arrow para palitan ang taon; i-tap ang taon sa gitna para makakita ng mas maraming taon. Kapag tama na ang taon, i-tap ang buwan ng iyong kapanganakan, saka i-tap ang araw."
   },
   "按畫面最下面的「前往繳費」。": {
    "en": "Tap “{page:前往繳費}” at the very bottom of the screen.",
    "ja": "画面のいちばん下にある「{page:前往繳費}」を押してください。",
    "vi": "Chạm “{page:前往繳費}” ở dưới cùng màn hình.",
    "id": "Ketuk “{page:前往繳費}” di bagian paling bawah layar.",
-   "th": "กด “{page:前往繳費}” ที่ล่างสุดของหน้าจอ"
+   "tl": "I-tap ang “{page:前往繳費}” sa pinakaibaba ng screen."
   },
   "按畫面最下面的「查詢」。": {
    "en": "Tap “{page:查詢}” at the very bottom of the screen.",
    "ja": "画面のいちばん下にある「{page:查詢}」を押してください。",
    "vi": "Chạm “{page:查詢}” ở dưới cùng màn hình.",
    "id": "Ketuk “{page:查詢}” di bagian paling bawah layar.",
-   "th": "กด “{page:查詢}” ที่ล่างสุดของหน้าจอ"
+   "tl": "I-tap ang “{page:查詢}” sa pinakaibaba ng screen."
   },
   "最後確認一下：要繳的是{what}。畫面提醒要在 10 分鐘內付完。沒問題就自己按「是」喔。這是示範網站，不會真的扣款。": {
    "en": "One last check: you are paying {what}. The screen says to finish paying within 10 minutes. If it looks right, tap “{page:是}” yourself. This is a demo site, so no money will really be charged.",
    "ja": "最後の確認です：支払うのは{what}です。画面に 10 分以内に支払うよう書いてあります。問題なければ、ご自分で「{page:是}」を押してください。これはデモサイトなので、実際には引き落とされません。",
    "vi": "Kiểm tra lần cuối: khoản cần đóng là {what}. Màn hình nhắc phải trả xong trong 10 phút. Nếu đúng, bạn tự chạm “{page:是}” nhé. Đây là trang web mẫu, sẽ không thực sự trừ tiền.",
    "id": "Cek terakhir: yang akan dibayar adalah {what}. Layar mengingatkan untuk menyelesaikan pembayaran dalam 10 menit. Kalau sudah benar, ketuk sendiri “{page:是}”. Ini situs demo, jadi uang tidak benar-benar dipotong.",
-   "th": "ตรวจสอบครั้งสุดท้าย: ที่จะจ่ายคือ {what} หน้าจอเตือนให้จ่ายให้เสร็จภายใน 10 นาที ถ้าถูกต้องแล้ว กด “{page:是}” เองได้เลย นี่เป็นเว็บไซต์สาธิต จะไม่ตัดเงินจริง"
+   "tl": "Huling pagsusuri: babayaran mo ang {what}. Sabi ng screen, tapusin ang pagbabayad sa loob ng 10 minuto. Kung tama ito, ikaw mismo ang mag-tap ng “{page:是}”. Demo site ito, kaya walang talagang sisingiling pera."
   },
   "查到 1 張帳單！看一下繳費期限和金額，點右邊的小方框打勾。": {
    "en": "Found 1 bill! Check the due date and amount, then tick the small box on the right.",
    "ja": "請求書が 1 件見つかりました！支払期限と金額を確認して、右の小さな四角にチェックを入れてください。",
    "vi": "Tìm thấy 1 hóa đơn! Xem hạn đóng và số tiền, rồi đánh dấu vào ô vuông nhỏ bên phải.",
    "id": "Ditemukan 1 tagihan! Lihat batas waktu dan jumlahnya, lalu centang kotak kecil di kanan.",
-   "th": "พบบิล 1 ใบ! ดูวันครบกำหนดและจำนวนเงิน แล้วติ๊กช่องสี่เหลี่ยมเล็กทางขวา"
+   "tl": "May nakitang 1 bill! Tingnan ang due date at halaga, saka i-tick ang maliit na kahon sa kanan."
   },
   "查到 {n} 張帳單。上下滑動看看，在要繳的帳單右邊打勾；全部都要繳，可以按「全部繳清」。": {
    "en": "Found {n} bills. Scroll up and down, and tick the box on the right of each bill you want to pay. To pay them all, tap “{page:全部繳清}”.",
    "ja": "請求書が {n} 件見つかりました。上下にスクロールして、支払う請求書の右にチェックを入れてください。全部支払うなら「{page:全部繳清}」を押せます。",
    "vi": "Tìm thấy {n} hóa đơn. Kéo lên xuống để xem, đánh dấu bên phải hóa đơn cần đóng; muốn đóng hết thì chạm “{page:全部繳清}”.",
    "id": "Ditemukan {n} tagihan. Gulir ke atas dan bawah, centang di kanan tagihan yang akan dibayar; kalau mau bayar semua, ketuk “{page:全部繳清}”.",
-   "th": "พบบิล {n} ใบ เลื่อนขึ้นลงดู แล้วติ๊กทางขวาของบิลที่จะจ่าย ถ้าจะจ่ายทั้งหมด กด “{page:全部繳清}” ได้"
+   "tl": "May nakitang {n} bill. Mag-scroll pataas at pababa, at i-tick ang kahon sa kanan ng bawat bill na gusto mong bayaran. Para bayaran lahat, i-tap ang “{page:全部繳清}”."
   },
   "查到了！這些是要繳的帳單。": {
    "en": "Found it! These are the bills to pay.",
    "ja": "見つかりました！これが支払う請求書です。",
    "vi": "Tìm thấy rồi! Đây là các hóa đơn cần đóng.",
    "id": "Ketemu! Ini tagihan yang harus dibayar.",
-   "th": "เจอแล้ว! นี่คือบิลที่ต้องจ่าย"
+   "tl": "Nakita na! Ito ang mga bill na babayaran."
   },
   "查帳單": {
    "en": "Look up the bill",
    "ja": "請求書を調べる",
    "vi": "Tra hóa đơn",
    "id": "Cari tagihan",
-   "th": "ค้นหาบิล"
+   "tl": "Hanapin ang bill"
   },
   "沒有待繳帳單": {
    "en": "No bills to pay",
    "ja": "未払いの請求なし",
    "vi": "Không có hóa đơn cần nộp",
    "id": "Tidak ada tagihan",
-   "th": "ไม่มีบิลค้างชำระ"
+   "tl": "Walang bill na babayaran"
   },
   "照畫面上的欄位，把帳單上的號碼打進去，再按「查詢」。": {
    "en": "Fill in the boxes on the screen with the numbers on your bill, then tap “{page:查詢}”.",
    "ja": "画面の欄に合わせて請求書の番号を入力し、「{page:查詢}」を押してください。",
    "vi": "Theo các ô trên màn hình, gõ số trên hóa đơn vào, rồi chạm “{page:查詢}”.",
    "id": "Isi kotak di layar dengan nomor di tagihan, lalu ketuk “{page:查詢}”.",
-   "th": "พิมพ์หมายเลขบนบิลลงในช่องบนหน้าจอ แล้วกด “{page:查詢}”"
+   "tl": "Punan ang mga kahon sa screen ng mga numero sa iyong bill, saka i-tap ang “{page:查詢}”."
   },
   "畫面寫「目前查無待繳帳單」，可能已經繳過或還沒出帳。可以按左上角「‹」檢查號碼，或按「回到城市通」。": {
    "en": "The screen says “no bills to pay right now”. It may already be paid, or the bill isn’t out yet. You can tap “‹” at the top left to check the number, or tap “{page:回到城市通}”.",
    "ja": "画面に「現在、未払いの請求はありません」と表示されています。すでに支払い済みか、まだ請求が出ていない可能性があります。左上の「‹」で番号を確認するか、「{page:回到城市通}」を押してください。",
    "vi": "Màn hình ghi “hiện không có hóa đơn cần nộp”. Có thể bạn đã nộp rồi hoặc hóa đơn chưa ra. Bạn có thể chạm “‹” ở góc trên bên trái để kiểm tra số, hoặc chạm “{page:回到城市通}”.",
    "id": "Layar menulis “saat ini tidak ada tagihan yang harus dibayar”. Mungkin sudah dibayar atau tagihannya belum terbit. Ketuk “‹” di kiri atas untuk memeriksa nomornya, atau ketuk “{page:回到城市通}”.",
-   "th": "หน้าจอเขียนว่า “ขณะนี้ไม่มีบิลค้างชำระ” อาจจ่ายไปแล้วหรือบิลยังไม่ออก กด “‹” ที่มุมซ้ายบนเพื่อตรวจหมายเลข หรือกด “{page:回到城市通}”"
+   "tl": "Sabi ng screen, “walang bill na babayaran sa ngayon”. Maaaring bayad na ito, o hindi pa lumalabas ang bill. Puwede mong i-tap ang “‹” sa kaliwang itaas para tingnan ang numero, o i-tap ang “{page:回到城市通}”."
   },
   "畫面說「{text}」": {
    "en": "The screen says “{text}”",
    "ja": "画面に「{text}」と出ています",
    "vi": "Màn hình ghi “{text}”",
    "id": "Layar menulis “{text}”",
-   "th": "หน้าจอเขียนว่า “{text}”"
+   "tl": "Sabi ng screen: “{text}”"
   },
   "畫面跳出提醒": {
    "en": "A reminder popped up on the screen",
    "ja": "画面にお知らせが出ました",
    "vi": "Màn hình hiện lời nhắc",
    "id": "Ada pengingat muncul di layar",
-   "th": "หน้าจอขึ้นข้อความเตือน"
+   "tl": "May lumabas na paalala sa screen"
   },
   "看一下提醒，沒問題就自己按「是」。": {
    "en": "Read the reminder. If it’s fine, tap “{page:是}” yourself.",
    "ja": "お知らせを読んで、問題なければご自分で「{page:是}」を押してください。",
    "vi": "Đọc lời nhắc, nếu không có vấn đề gì thì bạn tự chạm “{page:是}”.",
    "id": "Baca pengingatnya. Kalau tidak ada masalah, ketuk sendiri “{page:是}”.",
-   "th": "อ่านข้อความเตือน ถ้าไม่มีปัญหา กด “{page:是}” เอง"
+   "tl": "Basahin ang paalala. Kung ayos ito, ikaw mismo ang mag-tap ng “{page:是}”."
   },
   "看一下費用和金額對不對，沒問題就自己按「是」；不想繳就按「否」。": {
    "en": "Check that the fee and amount are right. If so, tap “{page:是}” yourself; if you don’t want to pay, tap “{page:否}”.",
    "ja": "料金と金額が正しいか確認して、問題なければご自分で「{page:是}」を押してください。支払わないときは「{page:否}」を押します。",
    "vi": "Xem khoản phí và số tiền có đúng không, nếu đúng thì bạn tự chạm “{page:是}”; không muốn đóng thì chạm “{page:否}”.",
    "id": "Periksa apakah biaya dan jumlahnya benar. Kalau benar, ketuk sendiri “{page:是}”; kalau tidak mau bayar, ketuk “{page:否}”.",
-   "th": "ดูว่าค่าใช้จ่ายและจำนวนเงินถูกต้องไหม ถ้าถูกแล้ว กด “{page:是}” เอง ถ้าไม่อยากจ่าย กด “{page:否}”"
+   "tl": "Tingnan kung tama ang bayarin at halaga. Kung tama, ikaw mismo ang mag-tap ng “{page:是}”; kung ayaw mong magbayad, i-tap ang “{page:否}”."
   },
   "看繳費紀錄": {
    "en": "See payment history",
    "ja": "支払い履歴を見る",
    "vi": "Xem lịch sử thanh toán",
    "id": "Lihat riwayat pembayaran",
-   "th": "ดูประวัติการชำระเงิน"
+   "tl": "Tingnan ang kasaysayan ng pagbabayad"
   },
   "確認後按「是」付款": {
    "en": "Check, then tap “{page:是}” to pay",
    "ja": "確認してから「{page:是}」を押して支払う",
    "vi": "Kiểm tra rồi chạm “{page:是}” để trả tiền",
    "id": "Periksa, lalu ketuk “{page:是}” untuk membayar",
-   "th": "ตรวจสอบแล้วกด “{page:是}” เพื่อจ่าย"
+   "tl": "Suriin, saka i-tap ang “{page:是}” para magbayad"
   },
   "篩選好了！下面就是符合的繳費紀錄。": {
    "en": "Filtered! The matching payment records are below.",
    "ja": "絞り込みました！下が条件に合う支払い履歴です。",
    "vi": "Đã lọc xong! Bên dưới là lịch sử thanh toán phù hợp.",
    "id": "Sudah difilter! Di bawah ini riwayat pembayaran yang sesuai.",
-   "th": "กรองแล้ว! ข้างล่างคือประวัติการชำระเงินที่ตรงกัน"
+   "tl": "Na-filter na! Nasa ibaba ang mga tugmang tala ng pagbabayad."
   },
   "篩選繳費紀錄": {
    "en": "Filter payment history",
    "ja": "支払い履歴を絞り込む",
    "vi": "Lọc lịch sử thanh toán",
    "id": "Filter riwayat pembayaran",
-   "th": "กรองประวัติการชำระเงิน"
+   "tl": "I-filter ang kasaysayan ng pagbabayad"
   },
   "繳好了。這是示範網站，沒有真的扣款。": {
    "en": "Paid. This is a demo site, so no money was really charged.",
    "ja": "支払いました。これはデモサイトなので、実際には引き落とされていません。",
    "vi": "Đã thanh toán. Đây là trang web mẫu, không thực sự trừ tiền.",
    "id": "Sudah dibayar. Ini situs demo, jadi uang tidak benar-benar dipotong.",
-   "th": "จ่ายแล้ว นี่เป็นเว็บไซต์สาธิต ไม่ได้ตัดเงินจริง"
+   "tl": "Bayad na. Demo site ito, kaya walang talagang sinisingil na pera."
   },
   "繳好了！用「{method}」繳了 {amount}。這是示範網站，沒有真的扣款喔。": {
    "en": "Paid! You paid {amount} with “{method}”. This is a demo site, so no money was really charged.",
    "ja": "支払いました！「{method}」で {amount} を支払いました。これはデモサイトなので、実際には引き落とされていません。",
    "vi": "Đã thanh toán! Bạn đã trả {amount} bằng “{method}”. Đây là trang web mẫu, không thực sự trừ tiền.",
    "id": "Sudah dibayar! Anda membayar {amount} dengan “{method}”. Ini situs demo, jadi uang tidak benar-benar dipotong.",
-   "th": "จ่ายแล้ว! จ่าย {amount} ด้วย “{method}” นี่เป็นเว็บไซต์สาธิต ไม่ได้ตัดเงินจริง"
+   "tl": "Bayad na! Nagbayad ka ng {amount} gamit ang “{method}”. Demo site ito, kaya walang talagang sinisingil na pera."
   },
   "繳好了！畫面寫「繳費完成」。這是示範網站，沒有真的扣款喔。": {
    "en": "Paid! The screen says “{page:繳費完成}”. This is a demo site, so no money was really charged.",
    "ja": "支払いました！画面に「{page:繳費完成}」と出ています。これはデモサイトなので、実際には引き落とされていません。",
    "vi": "Đã thanh toán! Màn hình ghi “{page:繳費完成}”. Đây là trang web mẫu, không thực sự trừ tiền.",
    "id": "Sudah dibayar! Layar menulis “{page:繳費完成}”. Ini situs demo, jadi uang tidak benar-benar dipotong.",
-   "th": "จ่ายแล้ว! หน้าจอเขียนว่า “{page:繳費完成}” นี่เป็นเว็บไซต์สาธิต ไม่ได้ตัดเงินจริง"
+   "tl": "Bayad na! Nakasulat sa screen ang “{page:繳費完成}”. Demo site ito, kaya walang talagang sinisingil na pera."
   },
   "繳好了！這是示範網站，沒有真的扣款喔。": {
    "en": "Paid! This is a demo site, so no money was really charged.",
    "ja": "支払いました！これはデモサイトなので、実際には引き落とされていません。",
    "vi": "Đã thanh toán! Đây là trang web mẫu, không thực sự trừ tiền.",
    "id": "Sudah dibayar! Ini situs demo, jadi uang tidak benar-benar dipotong.",
-   "th": "จ่ายแล้ว! นี่เป็นเว็บไซต์สาธิต ไม่ได้ตัดเงินจริง"
+   "tl": "Bayad na! Demo site ito, kaya walang talagang sinisingil na pera."
   },
   "繳費": {
    "en": "Payments",
    "ja": "支払い",
    "vi": "Thanh toán",
    "id": "Pembayaran",
-   "th": "ชำระเงิน"
+   "tl": "Pagbabayad"
   },
   "號碼": {
    "en": "The number",
    "ja": "番号",
    "vi": "Số",
    "id": "Nomornya",
-   "th": "หมายเลข"
+   "tl": "Ang numero"
   },
   "號碼打好了！按「查詢」就能看到要繳的帳單。": {
    "en": "Number entered! Tap “{page:查詢}” to see the bills to pay.",
    "ja": "番号を入力できました！「{page:查詢}」を押すと、支払う請求書が見られます。",
    "vi": "Đã gõ số xong! Chạm “{page:查詢}” để xem hóa đơn cần đóng.",
    "id": "Nomor sudah diisi! Ketuk “{page:查詢}” untuk melihat tagihan yang harus dibayar.",
-   "th": "พิมพ์หมายเลขแล้ว! กด “{page:查詢}” เพื่อดูบิลที่ต้องจ่าย"
+   "tl": "Nailagay na ang numero! I-tap ang “{page:查詢}” para makita ang mga bill na babayaran."
   },
   "費用選好了！接下來輸入帳單上的號碼。": {
    "en": "Fee chosen! Next, enter the number on your bill.",
    "ja": "料金を選びました！次に請求書の番号を入力します。",
    "vi": "Đã chọn khoản phí! Tiếp theo, gõ số trên hóa đơn.",
    "id": "Biaya sudah dipilih! Selanjutnya, masukkan nomor di tagihan.",
-   "th": "เลือกค่าใช้จ่ายแล้ว! ต่อไปพิมพ์หมายเลขบนบิล"
+   "tl": "Napili na ang bayarin! Susunod, ilagay ang numero sa iyong bill."
   },
   "輸入帳單號碼": {
    "en": "Enter the bill number",
    "ja": "請求書の番号を入力",
    "vi": "Gõ số hóa đơn",
    "id": "Masukkan nomor tagihan",
-   "th": "พิมพ์หมายเลขบิล"
+   "tl": "Ilagay ang numero ng bill"
   },
   "輸入資料": {
    "en": "Enter details",
    "ja": "データ入力",
    "vi": "Nhập thông tin",
    "id": "Isi data",
-   "th": "กรอกข้อมูล"
+   "tl": "Ilagay ang detalye"
   },
   "這一項要用相機掃描帳單。按左上角「‹」回去選別的費用。": {
    "en": "This one needs the bill scanned with the camera. Tap “‹” at the top left to go back and choose another fee.",
    "ja": "この項目はカメラで請求書をスキャンする必要があります。左上の「‹」を押して戻り、別の料金を選んでください。",
    "vi": "Mục này phải quét hóa đơn bằng máy ảnh. Chạm “‹” ở góc trên bên trái để quay lại chọn khoản phí khác.",
    "id": "Yang ini harus memindai tagihan pakai kamera. Ketuk “‹” di kiri atas untuk kembali dan pilih biaya lain.",
-   "th": "รายการนี้ต้องใช้กล้องสแกนบิล กด “‹” ที่มุมซ้ายบนเพื่อกลับไปเลือกค่าใช้จ่ายอื่น"
+   "tl": "Kailangang i-scan ang bill na ito gamit ang camera. I-tap ang “‹” sa kaliwang itaas para bumalik at pumili ng ibang bayarin."
   },
   "這個條件下沒有繳費紀錄。可以換一個時間或費用再看看。": {
    "en": "There are no payment records for this filter. Try another time period or fee.",
    "ja": "この条件では支払い履歴がありません。期間や料金を変えて見てみましょう。",
    "vi": "Không có lịch sử thanh toán với điều kiện này. Hãy thử đổi thời gian hoặc khoản phí khác.",
    "id": "Tidak ada riwayat pembayaran untuk filter ini. Coba ganti waktu atau biaya lain.",
-   "th": "ไม่มีประวัติการชำระเงินตามเงื่อนไขนี้ ลองเปลี่ยนช่วงเวลาหรือค่าใช้จ่ายอื่นดู"
+   "tl": "Walang tala ng pagbabayad para sa filter na ito. Subukan ang ibang panahon o bayarin."
   },
   "這是「繳費」": {
    "en": "This is “Payments”",
    "ja": "これは「支払い」です",
    "vi": "Đây là “Thanh toán”",
    "id": "Ini “Pembayaran”",
-   "th": "นี่คือ “ชำระเงิน”"
+   "tl": "Ito ang “Pagbabayad”"
   },
   "這是你的繳費紀錄。想只看一種費用，點中間的「所有項目」選一個。": {
    "en": "This is your payment history. To see only one kind of fee, tap “{page:所有項目}” in the middle and pick one.",
    "ja": "これがあなたの支払い履歴です。1種類の料金だけ見たいときは、真ん中の「{page:所有項目}」をタップして選んでください。",
    "vi": "Đây là lịch sử thanh toán của bạn. Muốn chỉ xem một loại phí, chạm “{page:所有項目}” ở giữa rồi chọn một.",
    "id": "Ini riwayat pembayaran Anda. Kalau mau lihat satu jenis biaya saja, ketuk “{page:所有項目}” di tengah dan pilih satu.",
-   "th": "นี่คือประวัติการชำระเงินของคุณ ถ้าอยากดูค่าใช้จ่ายประเภทเดียว แตะ “{page:所有項目}” ตรงกลางแล้วเลือก"
+   "tl": "Ito ang iyong kasaysayan ng pagbabayad. Para isang uri lang ng bayarin ang makita, i-tap ang “{page:所有項目}” sa gitna at pumili ng isa."
   },
   "這是你的繳費紀錄，目前是空的。想看更早的，點左邊的「近1年」改成「近3年」。": {
    "en": "This is your payment history. It’s empty for now. To see older records, tap “{page:近1年}” on the left and change it to “{page:近3年}”.",
    "ja": "これがあなたの支払い履歴で、今は空です。もっと前のものを見たいときは、左の「{page:近1年}」をタップして「{page:近3年}」に変えてください。",
    "vi": "Đây là lịch sử thanh toán của bạn, hiện đang trống. Muốn xem xa hơn, chạm “{page:近1年}” bên trái và đổi thành “{page:近3年}”.",
    "id": "Ini riwayat pembayaran Anda, saat ini masih kosong. Untuk melihat yang lebih lama, ketuk “{page:近1年}” di kiri dan ubah menjadi “{page:近3年}”.",
-   "th": "นี่คือประวัติการชำระเงินของคุณ ตอนนี้ยังว่างอยู่ ถ้าอยากดูย้อนหลังกว่านี้ แตะ “{page:近1年}” ทางซ้ายแล้วเปลี่ยนเป็น “{page:近3年}”"
+   "tl": "Ito ang iyong kasaysayan ng pagbabayad. Wala pa itong laman. Para makita ang mas lumang tala, i-tap ang “{page:近1年}” sa kaliwa at palitan ito ng “{page:近3年}”."
   },
   "這次沒有查到要繳的帳單。按左上角的「‹」回上一頁，檢查號碼再查一次。": {
    "en": "No bills to pay were found this time. Tap “‹” at the top left to go back, check the number and try again.",
    "ja": "今回は支払う請求書が見つかりませんでした。左上の「‹」を押して前のページに戻り、番号を確認してもう一度調べてください。",
    "vi": "Lần này không tìm thấy hóa đơn cần đóng. Chạm “‹” ở góc trên bên trái để quay lại, kiểm tra số rồi tra lại.",
    "id": "Kali ini tidak ada tagihan yang ditemukan. Ketuk “‹” di kiri atas untuk kembali, periksa nomornya, lalu cari lagi.",
-   "th": "ครั้งนี้ไม่พบบิลที่ต้องจ่าย กด “‹” มุมซ้ายบนเพื่อย้อนกลับ ตรวจหมายเลขแล้วค้นหาอีกครั้ง"
+   "tl": "Walang nakitang bill na babayaran ngayon. I-tap ang “‹” sa kaliwang itaas para bumalik, tingnan ang numero at subukan ulit."
   },
   "這筆費用": {
    "en": "this fee",
    "ja": "この料金",
    "vi": "khoản phí này",
    "id": "biaya ini",
-   "th": "ค่าใช้จ่ายนี้"
+   "tl": "bayaring ito"
   },
   "這裡是用相機掃描的。點上面的「{tab}」，改用打字的。": {
    "en": "This tab scans with the camera. Tap “{tab}” at the top to type instead.",
    "ja": "ここはカメラでスキャンする画面です。上の「{tab}」をタップして、入力に切り替えてください。",
    "vi": "Đây là chỗ quét bằng camera. Chạm “{tab}” ở phía trên để chuyển sang gõ chữ.",
    "id": "Ini untuk memindai dengan kamera. Ketuk “{tab}” di atas untuk mengetik saja.",
-   "th": "ตรงนี้ใช้กล้องสแกน แตะ “{tab}” ด้านบน เพื่อเปลี่ยนเป็นพิมพ์เอง"
+   "tl": "Nag-i-scan gamit ang camera ang tab na ito. I-tap ang “{tab}” sa itaas para mag-type na lang."
   },
   "選一個你平常用的付款方式，例如「悠遊付」。": {
    "en": "Pick the payment method you usually use, e.g. “{page:悠遊付}”.",
    "ja": "いつも使うお支払い方法を1つ選んでください。例：「{page:悠遊付}」。",
    "vi": "Chọn cách thanh toán bạn hay dùng, ví dụ “{page:悠遊付}”.",
    "id": "Pilih metode pembayaran yang biasa Anda pakai, misalnya “{page:悠遊付}”.",
-   "th": "เลือกวิธีชำระเงินที่คุณใช้เป็นประจำ เช่น “{page:悠遊付}”"
+   "tl": "Piliin ang paraan ng pagbabayad na karaniwan mong ginagamit, hal. “{page:悠遊付}”."
   },
   "選一個你平常用的付款方式，例如「悠遊付」。下面還有，可以往下滑看看。": {
    "en": "Pick the payment method you usually use, e.g. “{page:悠遊付}”. There are more below; scroll down to see them.",
    "ja": "いつも使うお支払い方法を1つ選んでください。例：「{page:悠遊付}」。下にもまだあるので、スクロールして見てみましょう。",
    "vi": "Chọn cách thanh toán bạn hay dùng, ví dụ “{page:悠遊付}”. Bên dưới còn nữa, có thể kéo xuống để xem.",
    "id": "Pilih metode pembayaran yang biasa Anda pakai, misalnya “{page:悠遊付}”. Masih ada lagi di bawah, gulir ke bawah untuk melihat.",
-   "th": "เลือกวิธีชำระเงินที่คุณใช้เป็นประจำ เช่น “{page:悠遊付}” ข้างล่างยังมีอีก เลื่อนลงดูได้"
+   "tl": "Piliin ang paraan ng pagbabayad na karaniwan mong ginagamit, hal. “{page:悠遊付}”. May iba pa sa ibaba; mag-scroll pababa para makita."
   },
   "選付款方式": {
    "en": "Choose how to pay",
    "ja": "お支払い方法を選ぶ",
    "vi": "Chọn cách thanh toán",
    "id": "Pilih metode pembayaran",
-   "th": "เลือกวิธีชำระเงิน"
+   "tl": "Piliin kung paano magbabayad"
   },
   "選好了！按下面的「前往繳費」。": {
    "en": "Done! Tap “{page:前往繳費}” below.",
    "ja": "選べました！下の「{page:前往繳費}」を押してください。",
    "vi": "Chọn xong rồi! Chạm “{page:前往繳費}” bên dưới.",
    "id": "Sudah dipilih! Ketuk “{page:前往繳費}” di bawah.",
-   "th": "เลือกแล้ว! กด “{page:前往繳費}” ข้างล่าง"
+   "tl": "Tapos na! I-tap ang “{page:前往繳費}” sa ibaba."
   },
   "選好了！總金額是 {total}。按下面的「前往繳費」。": {
    "en": "Done! The total is {total}. Tap “{page:前往繳費}” below.",
    "ja": "選べました！合計金額は {total} です。下の「{page:前往繳費}」を押してください。",
    "vi": "Chọn xong rồi! Tổng số tiền là {total}. Chạm “{page:前往繳費}” bên dưới.",
    "id": "Sudah dipilih! Totalnya {total}. Ketuk “{page:前往繳費}” di bawah.",
-   "th": "เลือกแล้ว! ยอดรวมคือ {total} กด “{page:前往繳費}” ข้างล่าง"
+   "tl": "Tapos na! Ang kabuuan ay {total}. I-tap ang “{page:前往繳費}” sa ibaba."
   },
   "選帳單": {
    "en": "Choose bills",
    "ja": "請求書を選ぶ",
    "vi": "Chọn hóa đơn",
    "id": "Pilih tagihan",
-   "th": "เลือกบิล"
+   "tl": "Pumili ng mga bill"
   },
   "選擇": {
    "en": "Select",
    "ja": "選択",
    "vi": "Chọn",
    "id": "Pilih",
-   "th": "เลือก"
+   "tl": "Piliin"
   },
   "選繳費項目": {
    "en": "Choose the fee type",
    "ja": "支払う項目を選ぶ",
    "vi": "Chọn loại phí",
    "id": "Pilih jenis biaya",
-   "th": "เลือกรายการที่จะจ่าย"
+   "tl": "Piliin ang uri ng bayarin"
   },
   "選要繳的費用": {
    "en": "Choose the fee to pay",
    "ja": "支払う料金を選ぶ",
    "vi": "Chọn khoản phí cần đóng",
    "id": "Pilih biaya yang akan dibayar",
-   "th": "เลือกค่าใช้จ่ายที่จะจ่าย"
+   "tl": "Piliin ang bayaring babayaran"
   },
   "開啟繳費頁面": {
    "en": "Open the payment page",
    "ja": "支払いページを開く",
    "vi": "Mở trang thanh toán",
    "id": "Buka halaman pembayaran",
-   "th": "เปิดหน้าชำระเงิน"
+   "tl": "Buksan ang pahina ng pagbabayad"
   },
   "點一下「{name}」的框框，會跳出月曆。先點月曆最上面的「月份 年份」，換到你出生的年和月，再點日期。": {
    "en": "Tap the “{name}” box and a calendar pops up. First tap the month and year at the very top of the calendar to go to the year and month you were born, then tap the day.",
    "ja": "「{name}」の欄をタップするとカレンダーが出ます。まずカレンダーのいちばん上の「月 年」をタップして生まれた年と月に切り替え、日付をタップしてください。",
    "vi": "Chạm vào ô “{name}”, lịch sẽ hiện ra. Trước tiên chạm vào tháng và năm ở trên cùng của lịch để chuyển sang năm và tháng bạn sinh, rồi chạm vào ngày.",
    "id": "Ketuk kotak “{name}”, kalender akan muncul. Ketuk dulu bulan dan tahun di bagian paling atas kalender untuk pindah ke tahun dan bulan lahir Anda, lalu ketuk tanggalnya.",
-   "th": "แตะช่อง “{name}” จะมีปฏิทินขึ้นมา แตะเดือนและปีที่ด้านบนสุดของปฏิทินก่อน เพื่อเปลี่ยนไปที่ปีและเดือนที่คุณเกิด แล้วแตะวันที่"
+   "tl": "I-tap ang kahon na “{name}” at lalabas ang kalendaryo. I-tap muna ang buwan at taon sa pinakaitaas ng kalendaryo para pumunta sa taon at buwan ng iyong kapanganakan, saka i-tap ang araw."
   },
   "點一下「{name}」的框框，照這個樣子打：「{sample}」，{dash}": {
    "en": "Tap the “{name}” box and type it like this: “{sample}”. {dash}",
    "ja": "「{name}」の欄をタップして、このように入力してください：「{sample}」。{dash}",
    "vi": "Chạm vào ô “{name}” và gõ giống thế này: “{sample}”. {dash}",
    "id": "Ketuk kotak “{name}” dan ketik seperti ini: “{sample}”. {dash}",
-   "th": "แตะช่อง “{name}” แล้วพิมพ์ตามแบบนี้: “{sample}” {dash}"
+   "tl": "I-tap ang kahon na “{name}” at i-type ito nang ganito: “{sample}”. {dash}"
   },
   "點一下「{name}」，選一個。": {
    "en": "Tap “{name}” and pick one.",
    "ja": "「{name}」をタップして、1つ選んでください。",
    "vi": "Chạm “{name}” rồi chọn một.",
    "id": "Ketuk “{name}” lalu pilih satu.",
-   "th": "แตะ “{name}” แล้วเลือกหนึ่งอย่าง"
+   "tl": "I-tap ang “{name}” at pumili ng isa."
   },
   "點一下亮起來的框框，照帳單上的號碼打進去。": {
    "en": "Tap the highlighted box and type in the number from your bill.",
    "ja": "光っている欄をタップして、請求書の番号を入力してください。",
    "vi": "Chạm vào ô đang sáng và gõ số trên hóa đơn vào.",
    "id": "Ketuk kotak yang menyala, lalu ketik nomor dari tagihan.",
-   "th": "แตะช่องที่สว่างอยู่ แล้วพิมพ์หมายเลขตามบิล"
+   "tl": "I-tap ang naka-highlight na kahon at i-type ang numero mula sa iyong bill."
   },
   "點一下框框，打上帳單上的「{name}」。": {
    "en": "Tap the box and type the “{name}” from your bill.",
    "ja": "欄をタップして、請求書にある「{name}」を入力してください。",
    "vi": "Chạm vào ô và gõ “{name}” trên hóa đơn.",
    "id": "Ketuk kotaknya dan ketik “{name}” dari tagihan.",
-   "th": "แตะช่องแล้วพิมพ์ “{name}” ตามบิล"
+   "tl": "I-tap ang kahon at i-type ang “{name}” mula sa iyong bill."
   },
   "點一下框框，照這個樣子打：「{sample}」，{dash}": {
    "en": "Tap the box and type it like this: “{sample}”. {dash}",
    "ja": "欄をタップして、このように入力してください：「{sample}」。{dash}",
    "vi": "Chạm vào ô và gõ giống thế này: “{sample}”. {dash}",
    "id": "Ketuk kotaknya dan ketik seperti ini: “{sample}”. {dash}",
-   "th": "แตะช่องแล้วพิมพ์ตามแบบนี้: “{sample}” {dash}"
+   "tl": "I-tap ang kahon at i-type ito nang ganito: “{sample}”. {dash}"
   },
   "點下面你要繳的那一項，例如「水費」。": {
    "en": "Tap the one below that you want to pay, e.g. “{page:水費}”.",
    "ja": "下から支払いたい項目をタップしてください。例：「{page:水費}」。",
    "vi": "Chạm vào mục bạn muốn nộp ở bên dưới, ví dụ “{page:水費}”.",
    "id": "Ketuk yang ingin Anda bayar di bawah, misalnya “{page:水費}”.",
-   "th": "แตะรายการที่จะจ่ายด้านล่าง เช่น “{page:水費}”"
+   "tl": "I-tap sa ibaba ang gusto mong bayaran, hal. “{page:水費}”."
   },
   "點你要繳的那一項，例如「水費」或「停車費」。": {
    "en": "Tap the one you want to pay, e.g. “{page:水費}” or “{page:停車費}”.",
    "ja": "支払う項目をタップしてください。例：「{page:水費}」や「{page:停車費}」。",
    "vi": "Chạm vào khoản bạn muốn đóng, ví dụ “{page:水費}” hoặc “{page:停車費}”.",
    "id": "Ketuk yang ingin Anda bayar, misalnya “{page:水費}” atau “{page:停車費}”.",
-   "th": "แตะรายการที่จะจ่าย เช่น “{page:水費}” หรือ “{page:停車費}”"
+   "tl": "I-tap ang gusto mong bayaran, hal. “{page:水費}” o “{page:停車費}”."
   }
  }
 }

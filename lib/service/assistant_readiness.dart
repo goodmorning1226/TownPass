@@ -10,7 +10,9 @@ import 'package:town_pass/service/assistant_service.dart';
 ///
 /// [watch] asks GET /health until `ready` says both the decision model and
 /// speech answer (null for either: not on this phone). Only in on-device
-/// builds (main.dart); elsewhere [loading] stays false.
+/// builds (main.dart); elsewhere [loading] stays false. In classifier builds
+/// (ASSISTANT_DECISION_MODEL=classifier) the backend reports the decision
+/// classifier as `decision`: there is no decision LLM to wait for.
 class AssistantReadiness {
   static final ValueNotifier<bool> loading = ValueNotifier(false);
   static Timer? _timer;

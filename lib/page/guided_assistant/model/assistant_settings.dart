@@ -42,7 +42,7 @@ extension AssistantLanguageChoice on AssistantSpeechLanguage {
     'ja' => '日文',
     'vi' => '越南文',
     'id' => '印尼文',
-    'th' => '泰文',
+    'tl' => '菲律賓文',
     'nan' => '用台語說，助理用中文回答（測試中）',
     _ => '聽你說的話，自動判斷是哪一種語言',
   });
@@ -87,7 +87,7 @@ abstract class TutorialTexts {
 
   static final greeting = RegExp(
     r'你好|您好|哈囉|嗨|早安|午安|晚安|hello|hi\b|hey|こんにちは|おはよう|'
-    r'chào|halo|hai\b|selamat|สวัสดี',
+    r'chào|halo|hai\b|selamat|kumusta|kamusta|magandang (?:umaga|hapon|gabi)',
     caseSensitive: false,
   );
   static final taskLike = RegExp(

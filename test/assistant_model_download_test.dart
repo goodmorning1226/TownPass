@@ -25,6 +25,8 @@ Map<String, dynamic> status({
   bool decision = false,
   bool taiwanese = false,
   bool downloadable = true,
+  bool? decisionAllowed,
+  int decisionMb = 2048,
   String state = 'idle',
   String? error,
   int done = 0,
@@ -43,10 +45,10 @@ Map<String, dynamic> status({
       'downloadable': downloadable,
     },
     'decision': {
-      'allowed': tier != 'lite',
+      'allowed': decisionAllowed ?? tier != 'lite',
       'ready': decision,
-      'bytes': 2048 * mb,
-      'missing_bytes': decision ? 0 : 2048 * mb,
+      'bytes': decisionMb * mb,
+      'missing_bytes': decision ? 0 : decisionMb * mb,
       'downloadable': downloadable,
     },
     'taiwanese': {
@@ -206,6 +208,24 @@ void main() {
       expect(d.unavailable, isFalse);
     });
 
+    test(
+      'with the decision classifier a lite phone gets it too (132 MB)',
+      () async {
+        final d = await controller(
+          FakeService(
+            status(
+              tier: 'lite',
+              assistant: 'full',
+              decisionAllowed: true,
+              decisionMb: 127,
+            ),
+          ),
+        );
+        expect(d.offerParts, ['core', 'decision']);
+        expect(d.offerBytes, (540 + 127) * mb);
+      },
+    );
+
     test('a phone that cannot run it says so', () async {
       final d = await controller(
         FakeService(status(tier: 'lite', assistant: 'unavailable')),
@@ -305,6 +325,34 @@ void main() {
       await tester.tap(find.byKey(const Key('model-download-pause')));
       await tester.pump();
       expect(find.byKey(const Key('model-download-resume')), findsOneWidget);
+    });
+
+    testWidgets('the classifier build: its size, and no lite notice', (
+      tester,
+    ) async {
+      final classifier = await controller(
+        FakeService(
+          status(
+            tier: 'lite',
+            assistant: 'full',
+            decisionAllowed: true,
+            decisionMb: 127,
+          ),
+        ),
+      );
+      await pumpCard(tester, classifier);
+      expect(find.textContaining('667 MB'), findsOneWidget);
+      expect(find.textContaining('精簡版'), findsNothing);
+    });
+
+    testWidgets('a lite phone without a decision model says so', (
+      tester,
+    ) async {
+      await pumpCard(
+        tester,
+        await controller(FakeService(status(tier: 'lite', assistant: 'lite'))),
+      );
+      expect(find.textContaining('精簡版'), findsOneWidget);
     });
 
     testWidgets('稍後 leaves without downloading', (tester) async {

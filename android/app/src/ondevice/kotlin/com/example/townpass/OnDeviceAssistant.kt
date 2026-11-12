@@ -23,6 +23,8 @@ import kotlin.concurrent.thread
  *  - whisper.cpp whisper-server (Vietnamese, PhoWhisper-small) 127.0.0.1:8777, started on first use
  *  - llama-server --embedding (multilingual-e5-small) 127.0.0.1:8774, optional FAQ layer
  *  - whisper-server (Whisper tiny, language detection only) 127.0.0.1:8775, optional
+ *  - llama-server --reranking (decision classifier) 127.0.0.1:8778, instead of the
+ *    decision model when built with ASSISTANT_DECISION_MODEL=classifier
  *  - Python backend via Chaquopy (device_main.py)   127.0.0.1:8765 and :8770
  *
  * so the Flutter side and the HTTP contract do not change. Model files are not
@@ -36,12 +38,18 @@ object OnDeviceAssistant {
      *  push_assistant_models.ps1 -DecisionModel gemma). The backend then uses its
      *  Gemma prompt variant (decision.py); Ministral stays the default. */
     const val GEMMA_MODEL_FILE = "gemma-4-E2B-it-Q4_0.gguf"
+    /** Opt-in option B' (build with ASSISTANT_DECISION_MODEL=classifier,
+     *  docs/AI_DECISION_CLASSIFIER.md): no decision model at all. A cross-encoder
+     *  fine-tuned from Microsoft multilingual-e5-small (MIT, 132 MB q8_0) scores the
+     *  candidate pages; library and guide decisions follow rules. Downloaded by the
+     *  App like the decision model (models.json "classifier"). */
+    const val CLASSIFIER_MODEL_FILE = "townpass-decision-e5-ce-v1-q8_0.gguf"
     /** Optional separate Chinese model (e.g. Breeze-ASR-25 q8_0, branch
      *  feat/asr-breeze-q8). Without it the multilingual model serves Chinese too. */
     const val ASR_FILE = "ggml-whisper-chinese.bin"  // push_assistant_models.ps1 -Chinese
 
     /** Multilingual Whisper (default Whisper small q8_0: 1.4 s a clip) for Chinese
-     *  when no separate model is pushed, en/ja/vi/id/th and language detection. */
+     *  when no separate model is pushed, en/ja/vi/id/tl and language detection. */
     const val MULTI_ASR_FILE = "ggml-whisper-multilingual.bin"  // push_assistant_models.ps1 -Multilingual
     /** Optional Taiwanese model (Breeze-ASR-26 q8_0: Taiwanese speech -> Mandarin
      *  characters, docs/AI_TAIWANESE_SPEECH_PLAN.md section 10). Loaded only when
@@ -69,6 +77,7 @@ object OnDeviceAssistant {
     private const val TAIWANESE_WHISPER_PORT = 8776
     private const val VIETNAMESE_WHISPER_PORT = 8777
     private const val GATE_WHISPER_PORT = 8775
+    private const val CLASSIFIER_PORT = 8778  // device_main.PORTS["classifier"]
     /** The decision model's server arguments (start-up and [ensureServer]): three
      *  slots of 2048 tokens, one each keeps the service, library and guide policy in
      *  the prompt cache (requests are <= ~1000 tokens; the backend sends one request
@@ -82,11 +91,20 @@ object OnDeviceAssistant {
      *  finished, one short query at a time: two threads, one 512-token slot (~130 MB). */
     private val EMBEDDING_ARGS = listOf("--embedding", "--pooling", "mean", "-c", "512", "-b", "512", "-ub", "512",
         "-np", "1", "-t", "2", "--no-webui")
+    /** The decision classifier (option B'): one score per (request, candidate page)
+     *  pair, ~50 tokens each, a decision scores up to ~5 pairs. --pooling rank: the
+     *  GGUF does not say its pooling. Four 512-token slots score a decision's pairs in
+     *  one batch; two threads, like e5 (it runs only between other steps). */
+    private val CLASSIFIER_ARGS = listOf("--reranking", "--pooling", "rank", "-c", "2048", "-np", "4",
+        "-b", "512", "-ub", "512", "-t", "2", "--no-webui")
     private val processes = mutableListOf<Process>()
     private val serverLock = Any()
     /** The decision model file chosen in [start] (Ministral, or Gemma when built for it and present). */
     @Volatile
     private var decisionFileName = MODEL_FILE
+    /** Built with ASSISTANT_DECISION_MODEL=classifier: no decision model is started. */
+    @Volatile
+    private var classifierMode = false
 
     /** Set by [start]; [startTaiwanese] launches the Taiwanese server with them. */
     @Volatile
@@ -134,6 +152,10 @@ object OnDeviceAssistant {
                         "(run scripts/push_assistant_models.ps1 -DecisionModel gemma)")
                     decisionModel = "ministral"
                 }
+                // Option B': the classifier instead of a decision model. Not replaced by
+                // Ministral when its file is missing: the App downloads it (132 MB).
+                classifierMode = decisionModel == "classifier"
+                val classifierFile = File(models, CLASSIFIER_MODEL_FILE)
                 val decisionFile = File(models, if (decisionModel == "gemma") GEMMA_MODEL_FILE else MODEL_FILE)
                 decisionFileName = decisionFile.name
                 // The phone's total memory picks which models it downloads (tier,
@@ -191,7 +213,15 @@ object OnDeviceAssistant {
                 // thinking channel closed).
                 // Stops leftover llama-server copies first, even when the model is not on
                 // the phone yet (then nothing starts; ensureServer starts it once downloaded).
-                if (decisionFile.isFile) {
+                if (classifierMode) {
+                    // No decision model in this mode, even if its file is on the phone.
+                    if (classifierFile.isFile) {
+                        launch(app, "libllama_server.so", classifierFile, CLASSIFIER_PORT, CLASSIFIER_ARGS)
+                    } else {
+                        stopStale("libllama_server.so")
+                        Log.i(TAG, "no $CLASSIFIER_MODEL_FILE yet; the App downloads it (docs/AI_MODEL_DOWNLOAD.md)")
+                    }
+                } else if (decisionFile.isFile) {
                     launch(app, "libllama_server.so", decisionFile, MODEL_PORT, llamaCpuArgs() + DECISION_ARGS)
                 } else {
                     stopStale("libllama_server.so")
@@ -239,7 +269,7 @@ object OnDeviceAssistant {
      * Starts a model server whose file arrived after start-up: the App downloads the
      * models (docs/AI_MODEL_DOWNLOAD.md) and device_main.Activator calls this on a
      * backend thread once a file is in place. [name]: "decision", "multilingual",
-     * "gate" or "embedding". Waits until the model has loaded. Returns "ready"
+     * "gate", "embedding" or "classifier" (option B' builds only). Waits until the model has loaded. Returns "ready"
      * (also when it was already running), "missing" (no file), "memory" (not enough
      * free memory now; tried again later) or "failed".
      */
@@ -252,9 +282,12 @@ object OnDeviceAssistant {
             "multilingual" -> MULTI_ASR_FILE to MULTI_WHISPER_PORT
             "gate" -> GATE_ASR_FILE to GATE_WHISPER_PORT
             "embedding" -> FAQ_MODEL_FILE to FAQ_EMBED_PORT
+            "classifier" -> CLASSIFIER_MODEL_FILE to CLASSIFIER_PORT
             else -> return "failed"
         }
-        val llama = name == "decision" || name == "embedding"
+        // One kind of decision server per build: no decision model in classifier mode.
+        if ((name == "decision" && classifierMode) || (name == "classifier" && !classifierMode)) return "failed"
+        val llama = name == "decision" || name == "embedding" || name == "classifier"
         fun loaded() = if (llama) healthy(port) else listening(port)
         fun waitLoaded(process: Process?): String {
             val deadline = System.currentTimeMillis() + 180_000
@@ -284,6 +317,7 @@ object OnDeviceAssistant {
             "decision" -> launch(app, "libllama_server.so", model, port, llamaCpuArgs() + DECISION_ARGS,
                 stopLeftovers = false)
             "embedding" -> launch(app, "libllama_server.so", model, port, EMBEDDING_ARGS, stopLeftovers = false)
+            "classifier" -> launch(app, "libllama_server.so", model, port, CLASSIFIER_ARGS, stopLeftovers = false)
             "gate" -> launch(app, "libwhisper_server.so", model, port,
                 listOf("-t", whisperThreads.toInt().coerceAtMost(4).toString(), "-l", "auto"), stopLeftovers = false)
             else -> launch(app, "libwhisper_server.so", model, port, listOf("-t", whisperThreads, "-l", "auto"),

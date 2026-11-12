@@ -83,12 +83,24 @@ def band(score):
 
 def embed_texts(url, texts, timeout=EMBED_TIMEOUT):
     """L2-normalised vectors for texts from llama-server's /v1/embeddings."""
+    import liveness
     texts = list(texts)
+    # A server that answered and then hung or lost its socket is skipped for a while
+    # instead of costing every FAQ, semantic and known-text lookup its full timeout
+    # (liveness.py, 2026-11-13). One still loading (never answered) only refuses.
+    if liveness.down(url):
+        raise ConnectionRefusedError("embedding server not answering")
     request = urllib.request.Request(
         url + "/v1/embeddings", json.dumps({"input": texts}).encode("utf-8"),
         {"Content-Type": "application/json", "User-Agent": "TownPass-Assistant/1"})
-    with urllib.request.urlopen(request, timeout=timeout) as response:
-        data = json.loads(response.read())["data"]
+    try:
+        with urllib.request.urlopen(request, timeout=timeout) as response:
+            data = json.loads(response.read())["data"]
+    except OSError as exc:
+        if liveness.is_timeout(exc) or liveness.has_answered(url):
+            liveness.failed(url, "timeout" if liveness.is_timeout(exc) else "refused")
+        raise
+    liveness.answered(url)
     vectors = []
     for item in sorted(data, key=lambda item: item["index"]):
         vector = [float(x) for x in item["embedding"]]

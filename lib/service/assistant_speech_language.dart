@@ -31,7 +31,7 @@ class AssistantSpeechLanguage {
     AssistantSpeechLanguage('ja', '日本語', '日本語'),
     AssistantSpeechLanguage('vi', 'Tiếng Việt', 'VI'),
     AssistantSpeechLanguage('id', 'Bahasa Indonesia', 'ID'),
-    AssistantSpeechLanguage('th', 'ไทย', 'ไทย'),
+    AssistantSpeechLanguage('tl', 'Filipino', 'FIL'),
   ];
 
   /// Chinese by default: "auto" runs detection first, which adds a second pass
@@ -47,12 +47,12 @@ class AssistantSpeechLanguage {
   static const _key = 'assistant_speech_language';
 
   /// The phone's own language when it is one we offer ('zh-Hant-TW' -> 'zh',
-  /// 'en-US' -> 'en'); other system languages detect ('auto'). Taiwanese is
-  /// never a default, only a choice.
+  /// 'en-US' -> 'en', Android's Filipino 'fil' -> 'tl'); other system
+  /// languages detect ('auto'). Taiwanese is never a default, only a choice.
   static String systemDefault([String? languageCode]) {
-    final code =
-        (languageCode ?? PlatformDispatcher.instance.locale.languageCode)
-            .toLowerCase();
+    var code = (languageCode ?? PlatformDispatcher.instance.locale.languageCode)
+        .toLowerCase();
+    if (code == 'fil') code = 'tl';
     return all.any(
           (l) => l.code == code && l.code != 'auto' && l.code != taiwanese.code,
         )

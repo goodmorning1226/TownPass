@@ -6,7 +6,7 @@
 
 <p align="center">
   <b>TownPass 地端 AI 助理：全部在手機上跑，說一句話，就幫你打開對的台北通服務。</b><br>
-  中文 · 台語 · 英文 · 日文 · 越南文 · 印尼文 · 泰文 ｜ 沒有雲端模型，錄音不離開手機。
+  中文 · 台語 · 英文 · 日文 · 越南文 · 印尼文 · 菲律賓文 ｜ 沒有雲端模型，錄音不離開手機。
 </p>
 
 <p align="center">
@@ -23,7 +23,7 @@
 
 **English summary.** This fork of Taipei City Government's open-source TownPass app adds a municipal-service
 assistant that runs entirely on the phone: no cloud model, and recordings never leave the device. You speak
-(Mandarin, Taiwanese Hokkien, English, Japanese, Vietnamese, Indonesian or Thai) or type; a 0.2-second language
+(Mandarin, Taiwanese Hokkien, English, Japanese, Vietnamese, Indonesian or Filipino) or type; a 0.2-second language
 gate (Whisper tiny) picks the recogniser (Whisper small, Breeze-ASR-26 for Taiwanese, PhoWhisper for Vietnamese);
 a rule-first pipeline (emergency words, commands, keyword search, a grammar-constrained Ministral 3B / Gemma 4 E2B
 choice, phonetic and e5 semantic matching, then 8,121 Taipei City FAQ entries) opens the right TownPass service
@@ -186,7 +186,7 @@ flowchart LR
         subgraph speech["語音：whisper-server"]
             direction TB
             tiny[":8775 Whisper tiny<br/>語言判斷，約 0.2 秒"]
-            small[":8773 Whisper small<br/>中、英、日、越、印、泰"]
+            small[":8773 Whisper small<br/>中、英、日、越、印、菲"]
             breeze[":8776 Breeze-ASR-26<br/>台語，第一次用到才啟動"]
             pho[":8777 PhoWhisper-base<br/>越南文，第一次用到才啟動"]
         end
@@ -372,7 +372,7 @@ Flutter App 維持在 repo 根目錄，官方目錄不搬動（見 [AGENTS.md](A
 | 官方與同步 | [UPSTREAM_README.md](docs/UPSTREAM_README.md)（官方專案說明）、[DEVELOPMENT.md](docs/DEVELOPMENT.md)、[UPSTREAM_SYNC_20261103.md](docs/UPSTREAM_SYNC_20261103.md)、[AGENTS.md](AGENTS.md) |
 
 目前狀態與限制（2026-11-10）：外語介面與教學文字是 AI 翻譯草稿，待母語者校對；台語只有辨識、朗讀用中文；
-待辦有泰文換成菲律賓文、印尼文優化、台語朗讀、iPhone 的 Gemma 與越南文模型，Android Release 未驗證。詳見 [docs/TEAM_TASKS_AFTER_MERGE.md](docs/TEAM_TASKS_AFTER_MERGE.md)。
+泰文已換成菲律賓文（2026-11-11，翻譯是 AI 草稿，待母語者審閱，[docs/AI_FILIPINO.md](docs/AI_FILIPINO.md)）。待辦有印尼文優化、台語朗讀、iPhone 的 Gemma 與越南文模型，Android Release 未驗證。詳見 [docs/TEAM_TASKS_AFTER_MERGE.md](docs/TEAM_TASKS_AFTER_MERGE.md)。
 
 ## 授權
 

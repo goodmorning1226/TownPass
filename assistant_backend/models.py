@@ -11,9 +11,10 @@ only, so it is tested on the computer.
   in the repository) lists every file: its name on the phone, size, SHA-256,
   which part it belongs to and where it comes from.
 - Parts: "core" (language gate, speech, e5 and the FAQ index, Vietnamese; the
-  assistant works once they are there), "decision" (the decision model), and
+  assistant works once they are there), "decision" (the decision model, or the
+  132 MB decision classifier with ASSISTANT_DECISION_MODEL=classifier), and
   "taiwanese" (optional). Which files a phone gets depends on its total memory
-  (tier) and platform.
+  (tier), platform and decision model.
 - A file is present when it has the manifest's size (files pushed with adb or
   devicectl count). A download goes to <name>.part, resumes with an HTTP Range
   request, and is renamed only after its size and SHA-256 match.
@@ -44,6 +45,9 @@ STANDARD_RAM_MB = 7_000   # 8 GB phones report ~7,300-7,700 MB
 # Phones under STANDARD_RAM_MB get only the core files (no decision model),
 # allowed only while the no-model evaluation opens no wrong page.
 LITE_ALLOWED = True
+# Decision models small enough for every tier, lite included (rules sections 6-7,
+# 2026-11-12): the decision classifier is 132 MB, so lite phones get it too.
+EVERY_TIER = ("classifier",)
 # Free space kept on the phone after a download.
 SPARE_BYTES = 300 << 20
 CHUNK = 1 << 20
@@ -119,8 +123,10 @@ class Downloads:
         return tier(self.ram_mb)
 
     def parts_for_phone(self):
-        """The parts this phone can have: no decision model on lite phones."""
-        return [p for p in PARTS if not (p == "decision" and self.tier == "lite")]
+        """The parts this phone can have: no decision model on lite phones, except
+        the decision classifier (EVERY_TIER)."""
+        return [p for p in PARTS if not (p == "decision" and self.tier == "lite"
+                                         and self.decision_model not in EVERY_TIER)]
 
     def wanted(self, part):
         """This phone's files of part (platform, tier and decision model)."""
@@ -182,7 +188,8 @@ class Downloads:
             free = self._free_bytes()
         except OSError:
             free = None
-        lite = self.tier == "lite"
+        # Lite: no decision model at all (a lite phone with the classifier is not lite).
+        lite = "decision" not in self.parts_for_phone()
         return {
             "managed": True,
             "platform": self.platform,

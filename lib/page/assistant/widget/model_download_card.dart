@@ -108,7 +108,8 @@ class ModelDownloadCard extends StatelessWidget {
     final tw = s.part('taiwanese');
     return [
       _line(_t('modelsBody', {'size': formatModelBytes(downloads.offerBytes)})),
-      if (s.tier == 'lite') ...[
+      // Lite: no decision model (a lite phone with the decision classifier is not).
+      if (s.assistant == 'lite') ...[
         const SizedBox(height: 8),
         _line(_t('modelsLite')),
       ],

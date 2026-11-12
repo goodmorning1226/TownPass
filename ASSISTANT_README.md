@@ -1,6 +1,6 @@
 # 台北一點就通！微服務入口整合助理：開發者 README
 
-這是 TownPass（台北通）fork 加上的**全程在手機上執行**的 AI 助理：聽懂你說的話（中文、台語、英文、日文、越南文、印尼文、泰文），
+這是 TownPass（台北通）fork 加上的**全程在手機上執行**的 AI 助理：聽懂你說的話（中文、台語、英文、日文、越南文、印尼文、菲律賓文），
 幫你打開對的市政服務頁面、回答市府 FAQ，並在服務頁面上一步步教你操作。沒有雲端模型，錄音不離開手機。
 
 - 分支：`main`（team fork `goodmorning1226/TownPass`；含 iPhone 版 `feat/ios-on-device`）。Android 與 iPhone 都全程在手機上跑。
@@ -172,4 +172,5 @@ scripts/run_assistant_on_device.sh --chat            # 聊天面板
 - 台語：只有辨識，朗讀用中文；自動判斷約抓到 7–9 成台語，華語偶爾會多跑一次台語模型（慢 3 秒）。
 - 外語介面與教學文字是 AI 翻譯草稿，待母語者校對。
 - App 內下載模型（branch `feat/model-download`）：電腦上的測試與實際下載都過了，**還沒在手機上走過完整流程**；全部模型都可以直接下載（自己轉檔的放在 Hugging Face `allensung1226/townpass-assistant-models`）。
-- 待辦：泰文換成菲律賓文、印尼文優化、台語朗讀、iPhone 的 Gemma 與越南文模型、Android Release 未驗證。詳見 `docs/TEAM_TASKS_AFTER_MERGE.md`。
+- 泰文已換成菲律賓文（2026-11-11，App 代碼 `tl`；翻譯是 AI 草稿，待母語者審閱，`docs/AI_FILIPINO.md`）。
+- 待辦：印尼文優化、台語朗讀、iPhone 的 Gemma 與越南文模型、Android Release 未驗證。詳見 `docs/TEAM_TASKS_AFTER_MERGE.md`。

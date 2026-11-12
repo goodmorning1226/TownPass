@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -44,6 +46,37 @@ void main() {
       'started python :8765',
     );
     expect(calls, ['start']);
+  });
+
+  test("the build's decision model goes to the native side", () async {
+    final arguments = <Object?>[];
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(channel, (call) async {
+          arguments.add(call.arguments);
+          return 'started python :8765';
+        });
+    // Tests run without --dart-define=ASSISTANT_DECISION_MODEL: the default.
+    expect(AssistantOnDevice.decisionModelDefine, 'ministral');
+    await AssistantOnDevice.start(isIOS: true, build: true, channel: channel);
+    AssistantOnDevice.reset();
+    await AssistantOnDevice.start(
+      isIOS: true,
+      build: true,
+      channel: channel,
+      model: 'classifier',
+    );
+    AssistantOnDevice.reset();
+    await AssistantOnDevice.start(
+      isIOS: true,
+      build: true,
+      channel: channel,
+      model: 'unknown',
+    );
+    expect(arguments, [
+      {'decision_model': 'ministral'},
+      {'decision_model': 'classifier'},
+      {'decision_model': 'ministral'},
+    ]);
   });
 
   test('a native failure is reported, not thrown', () async {
@@ -152,6 +185,24 @@ void main() {
       await resume.settle();
       expect(watch.elapsed, lessThan(const Duration(seconds: 2)));
       expect(calls.length, greaterThan(1));
+      expect(reconnecting.value, isFalse);
+    });
+
+    test('a "status" call that never returns does not hold the request', () async {
+      // The native side asks every server GET /health; one that hangs must not
+      // keep the request waiting past the limit (2026-11-13).
+      final never = Completer<Object?>();
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(channel, (call) {
+            calls.add(call.method);
+            return never.future;
+          });
+      away();
+      resume.didChangeAppLifecycleState(AppLifecycleState.resumed);
+      final watch = Stopwatch()..start();
+      await resume.settle();
+      expect(watch.elapsed, lessThan(const Duration(seconds: 2)));
+      expect(calls, ['status']);
       expect(reconnecting.value, isFalse);
     });
 

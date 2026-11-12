@@ -134,6 +134,35 @@ Android 不受影響：`AssistantOnDevice.start` 在 Android 不啟用，`settle
 有任何一項失敗，先**不要重開 App**，把 `on_device_assistant.log` 拉出來；已經重開就拉 `.prev.log`。
 看 `exited with`、`keeps exiting`、`started again`、`foreground:` 這幾行。
 
+## 回到前景卡住、台語閃退（2026-11-13，branch `fix/ios-resume-hang`，Swift 與 native 尚待 Mac／CI 編譯與 iPhone 實測）
+
+**現象**（擁有者，iPhone 17 Pro Max，分類器模式 375fc35）：鎖定或切到背景再回來，「助理連線中」很久，接著「正在幫你找」一直沒有回答；
+下載台語模型後，台語片段每次都讓 App 閃退。
+
+**原因**
+
+1. **rebind patch 沒有作用**（在電腦上用同一版 cpp-httplib 重現，`D:\TownPassAssistant\ios-resume\rebind\harness.cpp`）：
+   iOS 收回 socket 後 `accept()` 失敗，cpp-httplib 把 server 標成 `is_decommissioned`；之後 `bind_to_port()` 一進去就因為這個旗標失敗，
+   patch 每秒重試、共 3,600 次，**port 關一小時**，執行緒又沒有結束，`runServer` 也不會重跑。llama.cpp b12182（cpp-httplib 0.65）與 whisper.cpp v1.9.5（0.20）都一樣。
+   修正：重新 bind 前先 `stop()`（只清掉旗標，socket 已經關了）；重現程式改了以後第 1 秒就 bound again。
+2. **後端把「連不上」當成「還在載入」**：分類器每次呼叫等 75 秒、語音每次等 60 秒（第 5 節的開機等待），一個請求可能呼叫好幾次，
+   超過 App 的 150 秒。修正：`assistant_backend/liveness.py`，回應過的模型連不上只等 3 秒，失敗後 30 秒內直接略過，並請 App 重啟它。
+3. **台語閃退**：`taiwanese speech: needs 2179 MB; app budget 2247 MB`，載入到一半 `ggml_aligned_malloc: insufficient memory (78.91 MB)`
+   → `GGML_ASSERT` → `abort()`，整個 App 結束（crash log `Runner-2026-11-13-*.ips`，faulting thread `whisper-taiwanese`）。
+   q8_0 在電腦上量到 2,551 MB（檔案 1,579 MB）。修正：iPhone 改用 q4_K（約 1,819 MB），載入前要「檔案＋1,000 MB＋256 MB 餘裕」，
+   另外用 `mmap(PROT_NONE)` 試保留位址空間；不夠就回 `memory`，台語片段當中文聽，不閃退。
+4. **一段台語片段讓所有語音都等**：辨識器整段持有鎖，台語模型的啟動（Swift 最多等 300＋60 秒）在鎖裡面；
+   修正：`device_main.BoundedStarter`，一段錄音最多等 20 秒，失敗後 5 分鐘不重試。
+
+**App 端（Swift，未編譯）**：回到前景時對每個已啟動的 server 送 `GET /health`，沒回應的：放棄的重跑；whisper-server 用新的
+`townpass_whisper_server_stop(port)` 停掉（釋放模型）讓 `runServer` 重跑；llama-server 在 App 裡無法單獨停止，只記錄。
+`restartServer`（後端在模型不回應時呼叫）、`appActiveFlag`（背景中語音不送 GPU 工作）。`Runner.entitlements` 加了
+`com.apple.developer.kernel.increased-memory-limit`（App 沒有它也要能用）。
+
+**實測步驟**：同上一節 1–5，再加：6. 下載台語（iPhone 會是 q4_K，849 MB），說一句台語，看 `taiwanese speech: needs … address space ok`、
+`taiwanese speech loaded`；不夠時應看到 `memory`、App 不閃退。7. 鎖定 1 分鐘再解鎖，紀錄應有 `bound again`，
+問一句話 3 秒內有回應。
+
 ## 與 Android 的差別
 
 - 還沒有的：Gemma 4 E2B 決策模型（只有 Ministral）、越南文 PhoWhisper（越南文由 Whisper small 解碼）。後端已支援，
