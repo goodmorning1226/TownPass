@@ -133,4 +133,12 @@ jobs:
             [ -f "$log" ] || continue
             text=$(tail -n 60 "$log" | sed -e 's/%/%25/g' -e 's/\r//g' | awk '{printf "%s%%0A", $0}')
             echo "::error title=$(basename "$log" .log)::$text"
+            # Compiler errors scroll away behind warnings: list them separately.
+            errors=$(grep -n -E "error:|Error \(Xcode\)|: error|Failed to build" "$log" | grep -v "warning:" | head -n 40 \
+              | sed -e 's/%/%25/g' -e 's/\r//g' | awk '{printf "%s%%0A", $0}')
+            [ -n "$errors" ] && echo "::error title=$(basename "$log" .log) errors::$errors"
           done
+          # The Xcode build's own log has the full compiler messages.
+          find "$HOME/Library/Developer/Xcode/DerivedData" -name "*.xcactivitylog" -newer "$LOGS" 2>/dev/null | head -n 1 \
+            | while read -r f; do gunzip -c "$f" | tr '\r' '\n' | grep -E "error:" | head -n 30 \
+              | sed -e 's/%/%25/g' | awk '{printf "%s%%0A", $0}' | xargs -0 -I{} echo "::error title=xcode errors::{}"; done || true
