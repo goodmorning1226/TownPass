@@ -3,7 +3,8 @@
 # (docs/AI_ON_DEVICE_IOS.md): whisper.cpp v1.9.5's whisper-server as a framework
 # whose main() is exported as townpass_whisper_server, with
 # ios/native/whisper-server-ios.patch (no shell on iOS; bind the port again
-# after iOS reclaims a suspended App's listening socket, keeping the model loaded).
+# after iOS reclaims a suspended App's listening socket, keeping the model loaded;
+# townpass_whisper_server_stop(port) stops one server, which frees its model).
 #
 #   scripts/build_ios_whisper_server.sh [whisper.cpp-dir] [out-dir]
 #
@@ -16,6 +17,9 @@ OUT="${2:-$SRC/../ios-out}"
 BUILD="$SRC/build-ios"
 
 if ! git -C "$SRC" apply --check --reverse "$ROOT/ios/native/whisper-server-ios.patch" 2>/dev/null; then
+  # An older version of the patch may be applied (this checkout only builds the
+  # framework): put the files back first, then apply the current patch.
+  git -C "$SRC" checkout -- examples/server/server.cpp examples/common-whisper.cpp
   git -C "$SRC" apply "$ROOT/ios/native/whisper-server-ios.patch"
 fi
 if [ ! -f "$BUILD/build.ninja" ]; then
@@ -32,7 +36,8 @@ SDK="$(xcrun --sdk iphoneos --show-sdk-path)"
 cd "$BUILD"
 xcrun --sdk iphoneos clang++ -target arm64-apple-ios16.4 -isysroot "$SDK" -std=c++17 -O2 -dynamiclib \
   -install_name @rpath/WhisperServer.framework/WhisperServer \
-  -Wl,-alias,_main,_townpass_whisper_server -Wl,-exported_symbol,_townpass_whisper_server -Wl,-dead_strip \
+  -Wl,-alias,_main,_townpass_whisper_server -Wl,-exported_symbol,_townpass_whisper_server \
+  -Wl,-exported_symbol,_townpass_whisper_server_stop -Wl,-dead_strip \
   "$ROOT/ios/native/whisper_entry.cpp" examples/server/CMakeFiles/whisper-server.dir/server.cpp.o \
   examples/libcommon.a src/libwhisper.a ggml/src/libggml.a ggml/src/ggml-metal/libggml-metal.a \
   ggml/src/ggml-blas/libggml-blas.a ggml/src/libggml-cpu.a ggml/src/libggml-base.a \
@@ -52,5 +57,6 @@ cat > "$FRAMEWORK/Info.plist" <<'PLIST'
 <key>MinimumOSVersion</key><string>16.4</string>
 </dict></plist>
 PLIST
-nm -gU "$FRAMEWORK/WhisperServer" | grep -q townpass_whisper_server
+nm -gU "$FRAMEWORK/WhisperServer" | grep -q " _townpass_whisper_server$"
+nm -gU "$FRAMEWORK/WhisperServer" | grep -q " _townpass_whisper_server_stop$"
 echo "built $FRAMEWORK; run scripts/setup_ios_on_device.sh next"

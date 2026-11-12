@@ -50,6 +50,10 @@ final class OnDeviceAssistant {
   private static let taiwaneseWhisperPort = 8776
   private static let classifierPort = 8778  // device_main.PORTS["classifier"]
   private static let taiwaneseName = "whisper-taiwanese"
+  /// Breeze-ASR-26 (Whisper large) besides its file, and what must stay free after it
+  /// (startTaiwanese; measured 2026-11-13, see memoryAllows).
+  private static let taiwaneseOverhead: UInt64 = 1000 << 20
+  private static let taiwaneseMargin: UInt64 = 256 << 20
 
   private let lock = NSLock()
   private var state: String?
@@ -86,6 +90,15 @@ final class OnDeviceAssistant {
   /// Signalled when every start-up server has loaded (or given up): the
   /// Taiwanese model never loads while another model is still loading.
   private let startupDone = DispatchSemaphore(value: 0)
+  /// Whether the App is in the foreground. iOS refuses GPU work from the background, and
+  /// a failed Metal command buffer leaves ggml's Metal backend broken until that server
+  /// restarts; the backend asks before each speech pass (appActiveFlag, device_main.native_flag).
+  private let activeLock = NSLock()
+  private var activeNow = true
+  /// townpass_whisper_server_stop(port) (ios/native/whisper-server-ios.patch, frameworks
+  /// built from 2026-11-13): stops one whisper-server, whose main() then frees its model
+  /// and returns; runServer's loop runs it again. Older frameworks do not have it.
+  private typealias WhisperStop = @convention(c) (Int32) -> Int32
 
   private typealias ServerMain = @convention(c) (
     Int32, UnsafeMutablePointer<UnsafeMutablePointer<CChar>?>?
@@ -120,9 +133,34 @@ final class OnDeviceAssistant {
     // when every server is running.
     for name in [UIApplication.didBecomeActiveNotification, UIScene.didActivateNotification] {
       NotificationCenter.default.addObserver(forName: name, object: nil, queue: nil) { [weak self] _ in
+        self?.setActive(true)
         DispatchQueue.global(qos: .userInitiated).async { self?.recover() }
       }
     }
+    for name in [UIApplication.willEnterForegroundNotification, UIScene.willEnterForegroundNotification] {
+      NotificationCenter.default.addObserver(forName: name, object: nil, queue: nil) { [weak self] _ in
+        self?.setActive(true)
+      }
+    }
+    for name in [UIApplication.didEnterBackgroundNotification, UIScene.didEnterBackgroundNotification] {
+      NotificationCenter.default.addObserver(forName: name, object: nil, queue: nil) { [weak self] _ in
+        self?.setActive(false)
+      }
+    }
+  }
+
+  /// Whether the App is in the foreground (kept by the notifications above, so the
+  /// backend's threads never wait for the main thread to ask UIKit).
+  func isActive() -> Bool {
+    activeLock.lock()
+    defer { activeLock.unlock() }
+    return activeNow
+  }
+
+  private func setActive(_ value: Bool) {
+    activeLock.lock()
+    activeNow = value
+    activeLock.unlock()
   }
 
   /// Which servers answer now ("status" from Dart, which waits for ready after the
@@ -140,7 +178,9 @@ final class OnDeviceAssistant {
     let python = listening(Self.assistantPort) && listening(Self.asrPort)
     var answering: [String: Bool] = [:]
     for server in list {
-      answering[server.name] = server.llama ? healthy(server.port) : listening(server.port)
+      // GET /health (llama-server and whisper-server both have it), not only a
+      // connect: a server must also answer.
+      answering[server.name] = healthy(server.port)
     }
     let ready = !started || list.isEmpty
       || (python && list.allSatisfy { $0.name == Self.taiwaneseName || answering[$0.name] == true })
@@ -148,21 +188,31 @@ final class OnDeviceAssistant {
   }
 
   /// After the App comes back to the foreground: a server whose thread gave up (it
-  /// kept exiting, e.g. while iOS had the App suspended) is run again, then which
-  /// servers answer is logged. Servers that only exited once restart by themselves
-  /// (runServer); Python re-opens its own listeners (device_main.watch).
+  /// kept exiting, e.g. while iOS had the App suspended) is run again, then every
+  /// started server is asked GET /health and one that does not answer is restarted
+  /// (restart; 2026-11-13: after unlocking, servers whose socket iOS had reclaimed
+  /// stayed silent and turns waited for minutes), then which servers answer is logged.
+  /// Servers that only exited once restart by themselves (runServer); Python re-opens
+  /// its own listeners (device_main.watch).
   private func recover() {
     guard recoverLock.try() else { return }
     defer { recoverLock.unlock() }
     serversLock.lock()
     let again = servers.filter { stopped.contains($0.name) }
     stopped.subtract(again.map(\.name))
-    let any = !servers.isEmpty
+    let list = servers
     serversLock.unlock()
-    guard any else { return }
+    guard !list.isEmpty else { return }
     for server in again {
       note("\(server.name) started again after the App came back")
       _ = runServer(server)
+    }
+    // Not while start-up models still load (they do not answer yet by design).
+    if startupDone.wait(timeout: .now()) == .success {
+      startupDone.signal()
+      for server in list where !again.contains(where: { $0.name == server.name }) {
+        if !healthy(server.port) { note("\(server.name): \(restart(server)) after the App came back") }
+      }
     }
     let now = status()
     let answering = (now["servers"] as? [String: Bool] ?? [:])
@@ -257,6 +307,10 @@ final class OnDeviceAssistant {
         "ram_mb=\(ProcessInfo.processInfo.physicalMemory >> 20)",
         "platform='ios'",
         "server_starter=device_main.native_server_starter(\(UInt(bitPattern: unsafeBitCast(serverStarter, to: Int.self))))",
+        // A server that stopped answering is started again (restartServer), and speech
+        // passes wait while the App is in the background (isActive): 2026-11-13.
+        "server_restarter=device_main.native_server_starter(\(UInt(bitPattern: unsafeBitCast(serverRestarter, to: Int.self))))",
+        "app_active=device_main.native_flag(\(UInt(bitPattern: unsafeBitCast(appActiveFlag, to: Int.self))))",
       ])
     if let pythonInfo { return "failed: \(pythonInfo)" }
 
@@ -449,7 +503,14 @@ final class OnDeviceAssistant {
     defer { loadLock.unlock() }
     let began = Date()
     if !taiwaneseStarted {
-      guard memoryAllows(size, for: "taiwanese speech") else { return "memory" }
+      // A large Whisper model needs about 1 GB besides its weights (kv cache 344 MB, four
+      // compute buffers ~200 MB, four scheduler contexts 4 x 79 MB; 2026-11-13: Breeze q8_0
+      // took 2,551 MB on the computer for a 1,579 MB file). The App's budget must keep
+      // taiwaneseMargin on top: with 68 MB to spare the load ran out of memory, whisper.cpp
+      // aborted and the whole App closed (iPhone 17 Pro Max, budget 2,247 MB, 2026-11-13).
+      guard memoryAllows(size, for: "taiwanese speech", overhead: Self.taiwaneseOverhead,
+                         margin: Self.taiwaneseMargin)
+      else { return "memory" }
       guard
         runServer(
           Server(
@@ -480,15 +541,41 @@ final class OnDeviceAssistant {
   /// on the GPU are wired memory that the App's budget does not count: on an 8 GB
   /// iPhone 17 the budget said 4.5 GB free while the phone had 54 MB left, and iOS
   /// killed the App for page shortage (vm-pageshortage) as Breeze loaded (2026-11-08).
-  private func memoryAllows(_ size: UInt64, for label: String) -> Bool {
-    let needed = size + 600 * 1024 * 1024
+  /// overhead: what the model needs besides its file (default the earlier 600 MB);
+  /// margin: what must stay free in the App's budget after it (an allocation that
+  /// fails inside whisper.cpp or llama.cpp aborts the whole App). The address space
+  /// is checked too (addressSpaceAllows): the two crashes on 2026-11-13 both stopped
+  /// at 10.4 GB of used address space.
+  private func memoryAllows(
+    _ size: UInt64, for label: String, overhead: UInt64 = 600 << 20, margin: UInt64 = 0
+  ) -> Bool {
+    let needed = size + overhead
     let budget = UInt64(os_proc_available_memory())
     let physical = reclaimableMemory()
     let reserve: UInt64 = 400 * 1024 * 1024  // iOS and its services
+    let space = addressSpaceAllows(file: size, rest: overhead + margin)
     note(
-      "\(label): needs \(needed >> 20) MB; app budget \(budget >> 20) MB, "
-        + "phone free \(physical >> 20) MB (keeps \(reserve >> 20) MB)")
-    return budget >= needed && physical >= needed + reserve
+      "\(label): needs \(needed >> 20) MB + \(margin >> 20) MB margin; app budget \(budget >> 20) MB, "
+        + "phone free \(physical >> 20) MB (keeps \(reserve >> 20) MB), address space \(space ? "ok" : "short")")
+    return budget >= needed + margin && physical >= needed + reserve && space
+  }
+
+  /// Whether the address space has room for the model now: reserves (without using
+  /// memory: PROT_NONE) one block of the file's size, as its weights buffer is one
+  /// allocation, plus the rest in 64 MB blocks, then releases them all.
+  private func addressSpaceAllows(file: UInt64, rest: UInt64) -> Bool {
+    var blocks: [(UnsafeMutableRawPointer, Int)] = []
+    defer { for (pointer, length) in blocks { munmap(pointer, length) } }
+    var sizes = [Int(file)]
+    let block = 64 << 20
+    sizes += Array(repeating: block, count: Int((rest + UInt64(block) - 1) / UInt64(block)))
+    for length in sizes {
+      guard let pointer = mmap(nil, length, PROT_NONE, MAP_PRIVATE | MAP_ANON, -1, 0),
+        pointer != UnsafeMutableRawPointer(bitPattern: -1)
+      else { return false }
+      blocks.append((pointer, length))
+    }
+    return true
   }
 
   /// Starts a start-up server whose model file arrived after launch: the App downloads
@@ -530,6 +617,71 @@ final class OnDeviceAssistant {
       Thread.sleep(forTimeInterval: 0.25)
     }
     return "failed"
+  }
+
+  /// The backend's call when a server stopped answering (device_main.Restarter through
+  /// serverRestarter): name is an ensureServer name or "taiwanese", with ":error" when the
+  /// server answers /health but fails requests (restarted anyway). Returns "ready" (it
+  /// answers), "restarted", "busy" (a model is loading; asked again later) or "failed".
+  func restartServer(_ request: String) -> String {
+    guard isActive() else { return "failed" }  // runServer would only wait for the foreground
+    let parts = request.split(separator: ":", maxSplits: 1).map(String.init)
+    let name = parts.first ?? ""
+    let failing = parts.count > 1 && parts[1] == "error"
+    serversLock.lock()
+    let wanted: String? = name == "taiwanese" ? Self.taiwaneseName : planned[name]?.name
+    let server = servers.first { $0.name == wanted }
+    serversLock.unlock()
+    guard let server else { return "failed" }  // never started: nothing to restart
+    return restart(server, failing: failing)
+  }
+
+  /// Gets a started server that does not answer GET /health going again. The patched
+  /// servers bind a reclaimed port again within about a second, so first a short wait;
+  /// then a server whose thread gave up is run again, and a whisper-server is stopped
+  /// (townpass_whisper_server_stop, which frees its model) so that runServer's loop runs
+  /// it again. A llama-server cannot be stopped inside the App (its shutdown hook is
+  /// process-wide): it is reported, and the backend keeps not waiting for it (liveness.py)
+  /// until the App is started again. Running a second copy on the same port was left out:
+  /// the old copy's memory would stay allocated.
+  private func restart(_ server: Server, failing: Bool = false) -> String {
+    let began = Date()
+    while !failing && Date().timeIntervalSince(began) < 3 {
+      if healthy(server.port) { return "ready" }
+      Thread.sleep(forTimeInterval: 0.25)
+    }
+    // One model load at a time; a load in progress is not interrupted.
+    guard loadLock.try() else { return "busy" }
+    defer { loadLock.unlock() }
+    serversLock.lock()
+    let gaveUp = stopped.remove(server.name) != nil
+    serversLock.unlock()
+    if gaveUp {
+      guard runServer(server) else { return "failed" }
+    } else if !server.llama, let stop = whisperStop() {
+      note("\(server.name) does not answer; stopping it to run it again")
+      guard stop(Int32(server.port)) == 1 else { return "failed" }
+    } else {
+      note("\(server.name) does not answer and cannot be restarted inside the App; \(memoryNote())")
+      return "failed"
+    }
+    let restarted = Date()
+    while Date().timeIntervalSince(restarted) < 60 {
+      if healthy(server.port) {
+        note(String(format: "%@ answers again after %.1f s; %@", server.name,
+                    Date().timeIntervalSince(restarted), memoryNote()))
+        return "restarted"
+      }
+      Thread.sleep(forTimeInterval: 0.25)
+    }
+    return "failed"
+  }
+
+  private func whisperStop() -> WhisperStop? {
+    guard let library = whisperLibrary, let handle = dlopen(library, RTLD_NOW | RTLD_LOCAL),
+      let address = dlsym(handle, "townpass_whisper_server_stop")
+    else { return nil }
+    return unsafeBitCast(address, to: WhisperStop.self)
   }
 
   /// To the system log and to on_device_assistant.log (stderr, once redirected).
@@ -657,4 +809,16 @@ private let taiwaneseStarter: @convention(c) () -> UnsafeMutablePointer<CChar>? 
 /// returned text (a few bytes per downloaded file are not freed).
 private let serverStarter: @convention(c) (UnsafePointer<CChar>?) -> UnsafeMutablePointer<CChar>? = { name in
   strdup(OnDeviceAssistant.shared.ensureServer(name.map { String(cString: $0) } ?? ""))
+}
+
+/// The C function the backend calls when a server stopped answering
+/// (device_main.Restarter -> OnDeviceAssistant.restartServer); same shape as serverStarter.
+private let serverRestarter: @convention(c) (UnsafePointer<CChar>?) -> UnsafeMutablePointer<CChar>? = { name in
+  strdup(OnDeviceAssistant.shared.restartServer(name.map { String(cString: $0) } ?? ""))
+}
+
+/// 1 while the App is in the foreground (device_main.native_flag; asr_server waits before
+/// a speech pass otherwise).
+private let appActiveFlag: @convention(c) () -> Int32 = {
+  OnDeviceAssistant.shared.isActive() ? 1 : 0
 }

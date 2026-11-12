@@ -30,6 +30,9 @@ SAMPLE_RATE = 16000
 # (whisper-server refuses connections until loaded), asking every READY_PAUSE_S.
 READY_WAIT_S = 60
 READY_PAUSE_S = 1.0
+# iOS: a clip whose App went to the background waits this long for it to come back
+# before its next speech-model pass (no GPU work in the background; WhisperCppRecognizer._post).
+ACTIVE_WAIT_S = 20
 # Hold-to-talk bounds the clip, so a VAD pass mostly adds latency (~1 s on CPU).
 # Near-silent audio is rejected instead, which stops Whisper inventing text.
 MIN_RMS = 0.003
@@ -57,7 +60,7 @@ TAIWANESE = "nan"
 TAIWANESE_NAMES = ("nan", "taiwanese", "hokkien", "taigi")
 SPEECH_LANGUAGES = ("auto", *LANGUAGES, TAIWANESE)
 # Why Taiwanese was not used (reply field "notice"); the clip was heard as Chinese.
-TAIWANESE_UNAVAILABLE = ("missing", "memory", "failed")
+TAIWANESE_UNAVAILABLE = ("missing", "memory", "failed", "loading")
 # Encoder frames at least for the Taiwanese model (10 s). With the usual 256 (5 s)
 # Breeze-ASR-26 repeated short clips ("大西洋 大西洋 大西洋…"), whisper.cpp then
 # retried warmer and wrote noise for up to 2 minutes; 500 stopped it on the same
@@ -472,6 +475,9 @@ class WhisperCppRecognizer:
         self.prompt = vocabulary_prompt()  # conservative estimate: no tokenizer here
         self.prompt_tokens = None
         self.lock = threading.Lock()
+        # active() -> bool: whether the App is in the foreground (iOS, device_main.native_flag);
+        # None: always (Android, the computer).
+        self.active = None
 
     @property
     def taiwanese_model(self):
@@ -572,19 +578,55 @@ class WhisperCppRecognizer:
         instead of failing (2026-11-11: the first spoken question after launch)."""
         import urllib.error
         import urllib.request
+        import liveness
+        # Only a model that never answered is "still loading": once it has, a refused
+        # connection (iOS reclaimed its socket while the App was away) or a timeout gets
+        # a short wait, and a model that just failed is skipped (liveness.py, 2026-11-13).
+        if liveness.down(url):
+            raise urllib.error.URLError(ConnectionRefusedError("speech model not answering"))
+        # A decode may legitimately take many seconds, so a hung whisper-server cost the
+        # whole request timeout (the App gave up at 40 s): ask /health first (2 s).
+        if liveness.has_answered(url) and not liveness.probe(url):
+            liveness.failed(url, "timeout")
+            raise urllib.error.URLError(TimeoutError("speech model not answering"))
         body, content_type = self.multipart(fields, wav)
-        deadline = time.monotonic() + READY_WAIT_S
+        deadline = time.monotonic() + liveness.wait_s(url, READY_WAIT_S)
         while True:
+            self._wait_until_active()
             request = urllib.request.Request(url + "/inference", data=body, headers={"Content-Type": content_type})
             try:
                 with urllib.request.urlopen(request, timeout=self.timeout) as response:
-                    return json.loads(response.read(2_000_000))
-            except urllib.error.URLError as exc:
-                refused = not isinstance(exc, urllib.error.HTTPError) and isinstance(exc.reason, ConnectionRefusedError)
+                    reply = json.loads(response.read(2_000_000))
+                liveness.answered(url)
+                return reply
+            except (urllib.error.URLError, TimeoutError) as exc:
+                refused = (isinstance(exc, urllib.error.URLError) and not isinstance(exc, urllib.error.HTTPError)
+                           and isinstance(exc.reason, ConnectionRefusedError))
                 if not refused or time.monotonic() + READY_PAUSE_S > deadline:
+                    if refused or liveness.is_timeout(exc):
+                        liveness.failed(url, "timeout" if liveness.is_timeout(exc) else "refused")
+                    elif isinstance(exc, urllib.error.HTTPError) and exc.code >= 500 and exc.code != 503:
+                        # whisper-server could not process the clip: after a failed GPU
+                        # command buffer it fails every clip until it restarts.
+                        liveness.failed(url, "error", hold=False)
                     raise
             self.waited_for_model = True
             time.sleep(READY_PAUSE_S)
+
+    def _wait_until_active(self):
+        """iOS: no GPU work while the App is not active (iOS refuses it, and a failed
+        Metal command buffer leaves ggml's Metal backend in an error state until the
+        server restarts). active() comes from the App (device_main.native_flag); a clip
+        whose App went to the background waits for it to come back, at most
+        ACTIVE_WAIT_S, then fails like a model that does not answer."""
+        active = self.active
+        if active is None or active():
+            return
+        deadline = time.monotonic() + ACTIVE_WAIT_S
+        while not active():
+            if time.monotonic() >= deadline:
+                raise OSError("the App is in the background")
+            time.sleep(0.25)
 
     def ready(self):
         """Whether the speech model this recogniser decodes with answers (GET /health)."""

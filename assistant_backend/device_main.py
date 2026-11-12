@@ -158,12 +158,78 @@ def taiwanese_provider(port, starter=None):
         from java import jclass  # Chaquopy, on the phone only
         return str(jclass("com.example.townpass.OnDeviceAssistant").startTaiwanese())
 
-    starter = starter or start_in_app
+    starter = BoundedStarter(starter or start_in_app, port)
 
     def provide():
         state = starter()
         return (f"http://127.0.0.1:{port}", None) if state == "ready" else (None, state)
     return provide
+
+
+class BoundedStarter:
+    """Starts an on-demand speech server (Taiwanese, Vietnamese) without holding up speech.
+
+    The App's starter blocks until the model has loaded (seconds; on an iPhone also
+    behind the start-up models, up to minutes) and is called while the recogniser holds
+    its lock, so every clip waited for it: with a Taiwanese model that could not load,
+    each clip waited about a minute and the clips behind it timed out, and no speech
+    worked at all (iPhone, 2026-11-13). Now:
+
+    - the App's starter (which answers at once when the server already runs) runs on
+      its own thread; a clip waits for it at most
+      wait_s, counted from when the start began (later clips do not wait again), and
+      then gets "loading" (the clip is heard as Chinese; the next ones use the model
+      once it is up);
+    - "failed" (the slow failure): no new start for retry_s; "missing" and "memory"
+      are quick answers from the App and are asked again on the next clip.
+    """
+
+    WAIT_S = 20.0
+    RETRY_S = 300.0
+
+    def __init__(self, starter, port, wait_s=None, retry_s=None, clock=None):
+        import time
+        self.starter = starter
+        self.port = port
+        self.wait_s = self.WAIT_S if wait_s is None else wait_s
+        self.retry_s = self.RETRY_S if retry_s is None else retry_s
+        self.clock = clock or time.monotonic
+        self.lock = threading.Lock()
+        self.thread = None
+        self.began = 0.0
+        self.result = None
+        self.failed_at = None
+
+    def _run(self):
+        try:
+            state = str(self.starter())
+        except Exception:
+            state = "failed"
+        with self.lock:
+            self.result = state
+            if state == "failed":
+                self.failed_at = self.clock()
+
+    def __call__(self):
+        with self.lock:
+            if self.thread is None or not self.thread.is_alive():
+                if self.thread is not None and self.result is not None:
+                    done, self.thread = self.result, None
+                    if done != "failed":
+                        return done
+                if self.failed_at is not None and self.clock() - self.failed_at < self.retry_s:
+                    return "failed"
+                self.result = None
+                self.began = self.clock()
+                self.thread = threading.Thread(target=self._run, name=f"speech-start-{self.port}", daemon=True)
+                self.thread.start()
+            thread, began = self.thread, self.began
+        thread.join(max(0.0, began + self.wait_s - self.clock()))
+        with self.lock:
+            if thread.is_alive():
+                return "loading"
+            self.thread = None
+            return self.result or "failed"
 
 
 def vietnamese_provider(port, starter=None):
@@ -202,6 +268,68 @@ def native_server_starter(address):
         state = function(name.encode("ascii"))
         return state.decode("utf-8", "replace") if state else "failed"
     return ensure
+
+
+def native_flag(address):
+    """A yes/no question the iOS App answers: a C function at address returning 1 or 0
+    (OnDeviceAssistant.swift appActive: whether the App is in the foreground)."""
+    import ctypes
+    function = ctypes.CFUNCTYPE(ctypes.c_int)(address)
+    return lambda: bool(function())
+
+
+class Restarter:
+    """Asks the App to start a model server again once it stops answering.
+
+    liveness.failed() (a server that answered before refuses or times out) calls
+    this with the server's address; restart(name) is the App's native call
+    (OnDeviceAssistant.swift restartServer: health-checks the server and runs it
+    again when it does not answer) and returns "ready", "restarted" or "failed".
+    One request per server at a time, on its own thread: the request that noticed
+    goes on at once with its usual "no answer" path.
+    """
+
+    def __init__(self, restart, ports=None):
+        self.restart = restart
+        self.names = {f"http://127.0.0.1:{port}": name for name, port in (ports or PORTS).items()}
+        self.lock = threading.Lock()
+        self.busy = set()
+        self.errors = {}  # name -> when a restart for server errors was last asked
+
+    # A server that answers with errors is restarted at most this often.
+    ERROR_EVERY_S = 60.0
+
+    def __call__(self, server, reason):
+        import time
+        name = self.names.get(server)
+        if name is None:
+            return
+        with self.lock:
+            if name in self.busy:
+                return
+            if reason == "error":
+                if time.monotonic() - self.errors.get(name, -self.ERROR_EVERY_S) < self.ERROR_EVERY_S:
+                    return
+                self.errors[name] = time.monotonic()
+            self.busy.add(name)
+        threading.Thread(target=self._run, args=(name, reason), name=f"restart-{name}", daemon=True).start()
+
+    def _run(self, name, reason):
+        try:
+            # "<name>:error": it answers /health but fails requests; restart it anyway.
+            state = self.restart(f"{name}:error" if reason == "error" else name)
+        except Exception:
+            state = "failed"
+        finally:
+            with self.lock:
+                self.busy.discard(name)
+        print(f"models: {name} not answering ({reason}); restart {state}", flush=True)
+        if state in ("ready", "restarted"):
+            import liveness
+            liveness.answered(self.names_by_name(name))
+
+    def names_by_name(self, name):
+        return next(server for server, value in self.names.items() if value == name)
 
 
 def java_server_starter(name):
@@ -391,7 +519,8 @@ def watch(listeners, interval=2.0, stop=None):
 def start(model_port=8771, whisper_port=8772, assistant_port=8765, asr_port=8770, whisper=True,
           multi_port=None, chinese_model=True, faq_port=None, faq_dir=None, taiwanese_port=None,
           decision_model="ministral", gate_port=None, vietnamese_port=None, taiwanese_starter=None,
-          models_dir=None, ram_mb=None, platform="android", server_starter=None):
+          models_dir=None, ram_mb=None, platform="android", server_starter=None, server_restarter=None,
+          app_active=None):
     """Start both HTTP servers once; returns immediately after they listen.
 
     The native model servers may still be loading: until they answer, requests
@@ -421,6 +550,11 @@ def start(model_port=8771, whisper_port=8772, assistant_port=8765, asr_port=8770
     phone's total memory) picks the tier; server_starter(name) starts a native
     server once its file arrives (default Android's Java bridge). Without
     models_dir nothing is downloaded, as before.
+    server_restarter(name) (iOS, native_server_starter of restartServer): asked to
+    start a server again when it stopped answering (Restarter); None: nobody is
+    asked, requests only stop waiting for it (liveness.py).
+    app_active() (iOS, native_flag): whether the App is in the foreground; speech
+    passes wait for it (asr_server ACTIVE_WAIT_S). None: always active.
     """
     with _lock:
         if _started.is_set():
@@ -443,6 +577,10 @@ def start(model_port=8771, whisper_port=8772, assistant_port=8765, asr_port=8770
         recognizer = asr_server.WhisperCppRecognizer(chinese_url, multi_url=multi_url, taiwanese=taiwanese,
                                                      gate_url=gate_url, vietnamese=vietnamese,
                                                      known_text=known_text(backend))
+        recognizer.active = app_active
+        if server_restarter is not None:
+            import liveness
+            liveness.watch(Restarter(server_restarter))
         activator = None
         if models_dir:
             import models

@@ -64,10 +64,20 @@ FILES = [
       "license": "MIT (cross-encoder fine-tuned by this project from Microsoft multilingual-e5-small; GGUF q8_0)"}),
     ("taiwanese", "ggml-whisper-taiwanese.bin", "taiwanese", rf"{MODELS}\taiwanese\ggml-breeze-asr-26-q8_0.bin",
      "taiwanese/ggml-breeze-asr-26-q8_0.bin", None,
-     {"tiers": ["full"], "license": "Apache-2.0 (MediaTek Research Breeze-ASR-26; ggml q8_0 by this project)"}),
+     {"tiers": ["full"], "platforms": ["android"],
+      "license": "Apache-2.0 (MediaTek Research Breeze-ASR-26; ggml q8_0 by this project)"}),
     ("taiwanese-q4", "ggml-whisper-taiwanese.bin", "taiwanese", rf"{MODELS}\taiwanese\ggml-breeze-asr-26-q4_k.bin",
      "taiwanese/ggml-breeze-asr-26-q4_k.bin", None,
-     {"tiers": ["standard"], "license": "Apache-2.0 (MediaTek Research Breeze-ASR-26; ggml q4_K by this project)"}),
+     {"tiers": ["standard"], "platforms": ["android"],
+      "license": "Apache-2.0 (MediaTek Research Breeze-ASR-26; ggml q4_K by this project)"}),
+    # iPhone: q4_K on every tier (2026-11-13). The limit there is the App's own memory
+    # budget, not the phone's RAM: q8_0 (~2.5 GB with its buffers) ran out of it on a
+    # 12 GB iPhone 17 Pro Max and whisper.cpp aborted the App. Swap the file here (and
+    # in OnDeviceAssistant.swift's taiwaneseOverhead if it is not a Whisper large model).
+    ("taiwanese-q4-ios", "ggml-whisper-taiwanese.bin", "taiwanese", rf"{MODELS}\taiwanese\ggml-breeze-asr-26-q4_k.bin",
+     "taiwanese/ggml-breeze-asr-26-q4_k.bin", None,
+     {"tiers": ["full", "standard"], "platforms": ["ios"],
+      "license": "Apache-2.0 (MediaTek Research Breeze-ASR-26; ggml q4_K by this project)"}),
 ]
 
 

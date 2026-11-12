@@ -147,7 +147,10 @@ class OnDeviceResume with WidgetsBindingObserver {
   Future<void> _wait(int generation) async {
     final watch = Stopwatch()..start();
     try {
-      while (!await _ready()) {
+      // Each "status" call gets only what is left of [limit]: the native side asks
+      // every server GET /health, and a server that hangs could otherwise hold the
+      // request past the limit (2026-11-13).
+      while (!await _ready(limit - watch.elapsed)) {
         if (watch.elapsed >= limit || generation != _generation) return;
         reconnecting.value = true;
         await Future<void>.delayed(poll);
@@ -161,10 +164,15 @@ class OnDeviceResume with WidgetsBindingObserver {
     }
   }
 
-  Future<bool> _ready() async {
+  Future<bool> _ready(Duration timeout) async {
+    if (timeout <= Duration.zero) return false;
     try {
-      final status = await _channel.invokeMapMethod<String, Object?>('status');
+      final status = await _channel
+          .invokeMapMethod<String, Object?>('status')
+          .timeout(timeout);
       return status == null || status['ready'] == true;
+    } on TimeoutException {
+      return false;
     } on PlatformException {
       return true;
     } on MissingPluginException {

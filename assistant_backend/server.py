@@ -22,6 +22,7 @@ import sys
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 import classifier  # noqa: E402  (TOWNPASS_DECISION_BACKEND: the decision classifier, opt-in)
+import liveness  # noqa: E402  (which local model servers answer; no long waits for a dead one)
 import decision  # noqa: E402  (TOWNPASS_DECISION_MODEL: Ministral by default, or Gemma)
 
 # Ollama tag and the reported model name; llama-server (the phone) serves the file
@@ -102,14 +103,22 @@ def loading(exc):
 
 
 def model_reply(payload, wait_s=None, pause_s=1.0):
-    """llama-server's chat completion, waiting up to wait_s for a loading model."""
-    deadline = time.monotonic() + (MODEL_READY_WAIT_S if wait_s is None else wait_s)
+    """llama-server's chat completion, waiting up to wait_s for a loading model.
+    Only while the model has never answered; after that a short wait, and a model
+    that just failed is skipped (liveness.py, 2026-11-13)."""
+    if liveness.down(MODEL_URL):
+        raise urllib.error.URLError(ConnectionRefusedError("the decision model is not answering"))
+    deadline = time.monotonic() + liveness.wait_s(MODEL_URL, MODEL_READY_WAIT_S if wait_s is None else wait_s)
     while True:
         try:
-            return fetch_json(MODEL_URL + "/v1/chat/completions", payload, timeout=MODEL_TIMEOUT)
-        except (urllib.error.URLError, ConnectionRefusedError) as exc:
+            reply = fetch_json(MODEL_URL + "/v1/chat/completions", payload, timeout=MODEL_TIMEOUT)
+            liveness.answered(MODEL_URL)
+            return reply
+        except (urllib.error.URLError, ConnectionRefusedError, TimeoutError) as exc:
             refused = isinstance(exc, ConnectionRefusedError)
             if not (refused or loading(exc)) or time.monotonic() + pause_s > deadline:
+                if refused or loading(exc) or liveness.is_timeout(exc):
+                    liveness.failed(MODEL_URL, "timeout" if liveness.is_timeout(exc) else "refused")
                 raise
         time.sleep(pause_s)
 
@@ -634,6 +643,8 @@ TAIWANESE_NOTICES = {
     "missing": "還沒有安裝台語語音模型，這次先用中文聽。",
     "memory": "手機記憶體不夠載入台語語音模型，這次先用中文聽。",
     "failed": "台語語音模型沒有啟動成功，這次先用中文聽。",
+    # Still loading after device_main.BoundedStarter.WAIT_S: the next clips use it once it is up.
+    "loading": "台語語音模型還在載入，這次先用中文聽，等一下再說一次。",
 }
 
 

@@ -16,6 +16,9 @@ OUT="${2:-$SRC/../ios-out}"
 BUILD="$SRC/build-ios"
 
 if ! git -C "$SRC" apply --check --reverse "$ROOT/ios/native/llama-server-rebind.patch" 2>/dev/null; then
+  # An older version of the patch may be applied (this checkout only builds the
+  # framework): put the file back first, then apply the current patch.
+  git -C "$SRC" checkout -- tools/server/server-http.cpp
   git -C "$SRC" apply "$ROOT/ios/native/llama-server-rebind.patch"
 fi
 if [ ! -f "$BUILD/build.ninja" ]; then

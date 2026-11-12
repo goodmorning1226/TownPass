@@ -43,6 +43,8 @@ import time
 import urllib.error
 import urllib.request
 
+import liveness
+
 BACKEND = os.environ.get("TOWNPASS_DECISION_BACKEND", "llm").strip().lower()
 ENABLED = BACKEND in ("classifier", "classifier_only")
 # Option B (docs/AI_DECISION_CLASSIFIER.md section 10): no decision LLM at all. Library
@@ -135,10 +137,16 @@ def rerank(query, documents, url=None, timeout=None, wait_s=None, pause_s=0.5):
     wait_s (default WAIT_S): how long to wait for a server that is still loading."""
     if not documents:
         return []
+    url = url or URL
+    # A server that answered before and then stopped (iOS reclaimed its socket while
+    # the App was away) is not "still loading": a short wait only, and one that just
+    # failed is skipped (liveness.py; a turn used to wait 75 s per call, 2026-11-13).
+    if liveness.down(url):
+        raise ClassifierUnavailable("not answering")
     body = json.dumps({"query": query, "documents": documents}, ensure_ascii=False).encode("utf-8")
-    deadline = time.monotonic() + (WAIT_S if wait_s is None else wait_s)
+    deadline = time.monotonic() + liveness.wait_s(url, WAIT_S if wait_s is None else wait_s)
     while True:
-        request = urllib.request.Request((url or URL) + "/v1/rerank", data=body,
+        request = urllib.request.Request(url + "/v1/rerank", data=body,
                                          headers={"Content-Type": "application/json"})
         try:
             with urllib.request.urlopen(request, timeout=timeout or TIMEOUT) as response:
@@ -148,9 +156,12 @@ def rerank(query, documents, url=None, timeout=None, wait_s=None, pause_s=0.5):
                 scores[row["index"]] = float(row["relevance_score"])
             if any(score is None for score in scores):
                 raise ValueError("missing scores")
+            liveness.answered(url)
             return scores
         except (OSError, ValueError, KeyError, TypeError, IndexError) as exc:
             if not loading(exc) or time.monotonic() + pause_s > deadline:
+                if isinstance(exc, OSError) and (loading(exc) or liveness.is_timeout(exc)):
+                    liveness.failed(url, "timeout" if liveness.is_timeout(exc) else "refused")
                 raise ClassifierUnavailable(str(exc)) from exc
         time.sleep(pause_s)
 

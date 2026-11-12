@@ -17,15 +17,47 @@ index b12481c..5a750de 100644
              fprintf(stderr, "%s: failed to speak\n", __func__);
              return false;
 diff --git a/examples/server/server.cpp b/examples/server/server.cpp
-index b745f4d..fe1b931 100644
+index b745f4d..edea0d1 100644
 --- a/examples/server/server.cpp
 +++ b/examples/server/server.cpp
-@@ -1,3 +1,4 @@
+@@ -1,4 +1,7 @@
 +extern "C" int townpass_system_unavailable(const char *); // iOS: no shell (TownPass on-device patch)
  #include "common.h"
++#include <map>   // TownPass on-device patch
++#include <mutex> // TownPass on-device patch
  #include "common-whisper.h"
  
-@@ -283,7 +284,7 @@ struct whisper_print_user_data {
+ #include "whisper.h"
+@@ -41,6 +44,28 @@ const std::string vjson_format  = "verbose_json";
+ const std::string vtt_format    = "vtt";
+ 
+ std::function<void(int)> shutdown_handler;
++// TownPass iOS: several whisper-servers run in one App process (no child
++// processes on iOS), so one of them is stopped by its port, not by a signal.
++// townpass_whisper_server_stop(port) stops the listener; main() then frees the
++// model (whisper_free) and returns, as after Ctrl+C. Returns 1 if a server on
++// that port was running. OnDeviceAssistant.swift looks the symbol up with dlsym.
++struct townpass_server_entry {
++    httplib::Server * server;
++    std::atomic<bool> * stopping;
++};
++static std::mutex townpass_servers_mutex;
++static std::map<int, townpass_server_entry> townpass_servers;
++extern "C" __attribute__((visibility("default"))) int townpass_whisper_server_stop(int port) {
++    std::lock_guard<std::mutex> lock(townpass_servers_mutex);
++    auto it = townpass_servers.find(port);
++    if (it == townpass_servers.end()) {
++        return 0;
++    }
++    it->second.stopping->store(true);
++    it->second.server->stop();
++    return 1;
++}
++
+ std::atomic_flag is_terminating = ATOMIC_FLAG_INIT;
+ 
+ inline void signal_handler(int signal) {
+@@ -283,7 +308,7 @@ struct whisper_print_user_data {
  };
  
  void check_ffmpeg_availibility() {
@@ -34,7 +66,7 @@ index b745f4d..fe1b931 100644
  
      if (result == 0) {
          std::cout << "ffmpeg is available." << std::endl;
-@@ -321,7 +322,7 @@ bool convert_to_wav(const std::string & temp_filename, std::string & error_resp,
+@@ -321,7 +346,7 @@ bool convert_to_wav(const std::string & temp_filename, std::string & error_resp,
      cmd_stream << "ffmpeg -i \"" << temp_filename << "\" -y -ar 16000 -ac " << (stereo ? 2 : 1) << " -c:a pcm_s16le \"" << converted_filename_temp << "\" 2>&1";
      std::string cmd = cmd_stream.str();
  
@@ -43,7 +75,20 @@ index b745f4d..fe1b931 100644
      if (status != 0) {
          error_resp = "{\"error\":\"FFmpeg conversion failed.\"}";
          return false;
-@@ -1294,8 +1295,21 @@ int main(int argc, char ** argv) {
+@@ -1266,6 +1291,12 @@ int main(int argc, char ** argv) {
+     // to make it ctrl+clickable:
+     printf("\nwhisper server listening at http://%s:%d\n\n", sparams.hostname.c_str(), sparams.port);
+ 
++    std::atomic<bool> townpass_stopping{false};
++    {
++        std::lock_guard<std::mutex> lock(townpass_servers_mutex);
++        townpass_servers[sparams.port] = {svr.get(), &townpass_stopping};
++    }
++
+     shutdown_handler = [&](int signal) {
+         printf("\nCaught signal %d, shutting down gracefully...\n", signal);
+         if (svr) {
+@@ -1294,8 +1325,29 @@ int main(int argc, char ** argv) {
      };
  
      std::thread t([&] {
@@ -54,9 +99,17 @@ index b745f4d..fe1b931 100644
 +        // loaded. stop() makes listen_after_bind() return true, which ends this loop.
 +        while (!svr->listen_after_bind()) {
              fprintf(stderr, "error: server listen failed\n");
++            // A failed listen leaves cpp-httplib "decommissioned" and bind_to_port()
++            // then refuses at once: stop() first clears that (the dead socket is
++            // already closed), otherwise the port stayed closed for the hour of
++            // attempts (2026-11-13, reproduced on a computer with this cpp-httplib).
 +            bool bound = false;
-+            for (int attempt = 0; !bound && attempt < 3600; attempt++) {
++            for (int attempt = 0; !bound && !townpass_stopping.load() && attempt < 3600; attempt++) {
 +                std::this_thread::sleep_for(std::chrono::seconds(1));
++                if (townpass_stopping.load()) {
++                    break;
++                }
++                svr->stop();
 +                bound = svr->bind_to_port(sparams.hostname, sparams.port);
 +            }
 +            if (!bound) {
@@ -65,4 +118,15 @@ index b745f4d..fe1b931 100644
 +            fprintf(stderr, "whisper-server: listener on %s:%d bound again\n", sparams.hostname.c_str(), sparams.port);
          }
      });
+ 
+@@ -1303,6 +1355,10 @@ int main(int argc, char ** argv) {
+ 
+     t.join();
+ 
++    {
++        std::lock_guard<std::mutex> lock(townpass_servers_mutex);
++        townpass_servers.erase(sparams.port);
++    }
+ 
+     clean_up();
  
