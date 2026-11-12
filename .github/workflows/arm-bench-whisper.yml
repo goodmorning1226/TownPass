@@ -1,0 +1,66 @@
+# Taiwanese speech-model speed and memory on an ARM64 CPU, without a phone
+# (docs/AI_DECISION_MODEL_ARM_BENCH.md, section "Whisper"; docs/AI_TAIWANESE_ABLATION.md).
+# Runs on pushes to the ci/arm-bench-whisper branch only (and by hand); changes nothing in the App.
+name: ARM Taiwanese speech-model speed
+
+on:
+  push:
+    branches: [ci/arm-bench-whisper]
+  workflow_dispatch:
+
+jobs:
+  bench:
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: CPU, memory and disk
+        run: |
+          lscpu | grep -E "Model name|^CPU\(s\)|Flags" | cut -c1-300
+          free -m
+          df -h "$RUNNER_TEMP"
+
+      # Breeze-ASR-26's weights are 6.2 GB and its f16 file 3.1 GB: make room.
+      - name: Free disk space
+        run: |
+          sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc /opt/hostedtoolcache/CodeQL || true
+          df -h "$RUNNER_TEMP"
+
+      # whisper.cpp v1.9.5 with the App's Android flags (scripts/build_assistant_native.ps1).
+      - name: Build whisper-cli and whisper-quantize
+        run: |
+          sudo apt-get update -q && sudo apt-get install -yq ninja-build cmake ffmpeg time > /dev/null
+          git clone --depth 1 --branch v1.9.5 https://github.com/ggml-org/whisper.cpp "$RUNNER_TEMP/whisper.cpp"
+          cmake -S "$RUNNER_TEMP/whisper.cpp" -B "$RUNNER_TEMP/build" -G Ninja -DCMAKE_BUILD_TYPE=Release \
+            -DBUILD_SHARED_LIBS=OFF -DGGML_NATIVE=OFF -DGGML_OPENMP=OFF -DGGML_LLAMAFILE=OFF \
+            -DGGML_CPU_ARM_ARCH=armv8.6-a+dotprod+i8mm+fp16 -DWHISPER_BUILD_TESTS=OFF -DWHISPER_SDL2=OFF
+          ninja -C "$RUNNER_TEMP/build" whisper-cli whisper-quantize
+
+      # convert-h5-to-ggml.py needs torch and transformers (CPU wheels only).
+      - name: Python for the conversion
+        run: |
+          python3 -m pip install --quiet --break-system-packages --index-url https://download.pytorch.org/whl/cpu torch
+          python3 -m pip install --quiet --break-system-packages transformers safetensors huggingface_hub numpy
+
+      - name: Measure the candidates
+        env:
+          HF_HUB_DISABLE_TELEMETRY: "1"
+        run: |
+          bash scripts/arm_bench_whisper.sh "$RUNNER_TEMP/whisper.cpp" "$RUNNER_TEMP/build/bin" \
+            "$RUNNER_TEMP/models" results-whisper.jsonl
+
+      - name: Report
+        if: always()
+        run: |
+          python3 scripts/arm_bench_whisper_report.py results-whisper.jsonl report-whisper.md
+          cat report-whisper.md >> "$GITHUB_STEP_SUMMARY"
+          cat report-whisper.md
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: arm-bench-whisper
+          path: |
+            results-whisper.jsonl
+            report-whisper.md
