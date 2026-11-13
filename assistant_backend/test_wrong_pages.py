@@ -70,6 +70,25 @@ class NamedOfficeTests(Base):
         self.assertIsNone(places.named_office("我要去區公所辦事"))
         self.assertEqual(places.named_place_spans("淡水區公所號碼牌抽到幾號"), [(0, 2)])
 
+    def test_the_official_list_and_names_shared_by_counties(self):
+        # 內政部 list (places.TOWNS): 22 counties, 368 townships and districts, Taipei's 12.
+        self.assertEqual((len(places.TOWNS), sum(map(len, places.TOWNS.values()))), (22, 368))
+        self.assertEqual(sorted(places.TAIPEI), sorted(("中正", "大同", "中山", "松山", "大安", "萬華",
+                                                         "信義", "士林", "北投", "內湖", "南港", "文山")))
+        for text in ("中正區公所叫號", "臺北市中正區公所", "台北大安區戶政事務所", "信義區公所"):
+            self.assertTrue(places.named_office(text)["taipei"], text)  # bare, or with Taipei first
+        for text in ("基隆市中正區公所", "基隆中山區公所", "台中市大安區公所", "南投縣信義鄉公所",
+                     "信義鄉公所", "大同鄉戶政事務所", "臺西鄉公所", "台西鄉公所", "霧台鄉公所"):
+            self.assertFalse(places.named_office(text)["taipei"], text)  # another county, or a 鄉
+        for text, name in (("台中市北區區公所叫號", "北"), ("臺南市東區戶政事務所", "東"),
+                           ("嘉義市西區戶政事務所", "西"), ("新竹市東區區公所", "東"), ("東區區公所叫號", "東"),
+                           ("我在北區戶政事務所", "北"), ("臺南市中西區公所", "中西")):
+            office = places.named_office(text)
+            self.assertEqual((office["name"], office["taipei"]), (name, False), text)
+        for text in ("台北區公所", "城中區公所", "臺北市東區公所", "嘉義縣東區戶政", "我要去區公所辦事"):
+            self.assertIsNone(places.named_office(text), text)
+        self.assertEqual(places.named_place_spans("台中市北區區公所"), [(3, 4)])
+
     def test_its_own_page_still_opens(self):
         self.assertEqual(self.opened(self.turn("我要去中正區公所抽號碼牌")), "reservation.c-3-2")
         self.assertEqual(self.opened(self.turn("萬華區公所現在排到幾號", heard=True)), "reservation.c-3-1")
@@ -88,7 +107,8 @@ class NamedOfficeTests(Base):
 
     def test_outside_taipei_opens_nothing(self):
         for text in ("板橋區公所現在叫到幾號", "中和區公所要等多久", "我在左營區公所排隊，現在幾號",
-                     "竹北市公所抽號碼牌", "台中市大安區公所叫號", "三民區公所人多不多", "桃園市中壢區公所抽號碼牌"):
+                     "竹北市公所抽號碼牌", "台中市大安區公所叫號", "三民區公所人多不多", "桃園市中壢區公所抽號碼牌",
+                     "信義鄉公所現在叫到幾號", "台中市北區區公所叫號", "臺南市東區戶政事務所現在叫到幾號"):
             for heard in (False, True):
                 reply = self.turn(text, heard)
                 self.assertIsNone(reply["destination"], (text, heard))
