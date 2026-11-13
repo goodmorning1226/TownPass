@@ -67,6 +67,11 @@ CONFIRM_ONE = want("confirm_candidates", choices=1)
 # The library overview is reachable through the book pipeline or the catalogue entry.
 HOME = want("navigate", [{"kind": "home"}, {"kind": "capability", "id": "library"}])
 REJECT = {"status": 422}                        # stale, foreign or replayed selection
+# A named district office (2026-11-13): another Taipei district lists the counter-calling
+# overview and the existing pages; outside Taipei an honest "not in the service"; neither opens.
+OTHER_DISTRICT = want("confirm_candidates", choices=2, first="臨櫃叫號", target=("reservation",))
+OUTSIDE_TAIPEI = want("unsupported")
+NO_PAGE = want(("reply", "unsupported", "confirm_candidates"))
 
 
 def cap(capability_id):
@@ -85,6 +90,32 @@ def say(text, expect, bound=False, context=None):
     """A typed turn. bound=True: typed while the candidate panel is still open.
     context: the App's page/last-action state (contract 3), sent as-is."""
     return {"text": text, "expect": expect, "bound": bound, "context": context}
+
+
+def heard(text, expect):
+    """A spoken turn whose transcript is text: it goes through the backend's speech
+    resolution (clean-up and sound-alike rewrite, server.speech_resolution) and, as the App
+    does (assistant_view_controller / guided _bestReading), the best other reading is sent
+    without asking. The App is not involved; the rewrite runs in this process with the
+    same code as the backend under test."""
+    return {"text": text, "expect": expect, "bound": False, "context": None, "heard": True}
+
+
+_SPEECH = None
+
+
+def app_reading(text):
+    """What the App sends for a recognised transcript (see heard)."""
+    global _SPEECH
+    if _SPEECH is None:
+        from server import Assistant
+        _SPEECH = Assistant().workflow
+    from server import clean_transcript, speech_resolution
+    decided = speech_resolution(clean_transcript(text), [], "clear", _SPEECH.recognizes, None, [],
+                                sound=_SPEECH.sound_corrections)
+    if decided["confirm"]:
+        return next((o for o in decided["options"] if o.strip() and o != decided["text"]), decided["text"])
+    return decided["text"]
 
 
 def page(**fields):
@@ -292,6 +323,50 @@ CASES = [
     ("context", [say("我要繳水費", cap("fees.water"), context={"page": {"type": "web", "path": "javascript:alert(1)"},
                                                             "capability_id": "medicalAppointment"})]),
     ("context", [say("我要繳水費", cap("fees.water"), context={"page": {"type": "native", "route": "/x", "id": "evil"}})]),
+    # 2026-11-13 wrong pages (docs/AI_CURRENT_RULES.md section 2). Written for this change, not
+    # taken from the Taiwanese ablation's held-out clips. heard: through the speech rewrite first.
+    # A named district office: its own page (萬華, 中正); another Taipei district lists the
+    # counter-calling overview and the pages that exist; outside Taipei no page.
+    one("district_office", "我要去中正區公所抽號碼牌", cap("reservation.c-3-2")),
+    ("district_office", [heard("萬華區公所現在排到幾號", cap("reservation.c-3-1"))]),
+    one("district_office", "萬華區戶政事務所現在人多嗎", cap("reservation.c-2-1")),
+    one("district_office", "大安區公所現在叫到幾號", OTHER_DISTRICT),
+    ("district_office", [heard("大安區公所現在叫到幾號", OTHER_DISTRICT)]),
+    one("district_office", "我等一下要去信義區公所，要排很久嗎", OTHER_DISTRICT),
+    one("district_office", "士林區公所的號碼牌", OTHER_DISTRICT),
+    ("district_office", [heard("內湖區公所那邊人多嗎", OTHER_DISTRICT)]),
+    ("district_office", [heard("文山區公所叫號到哪了", OTHER_DISTRICT)]),
+    ("district_office", [heard("北投區戶政事務所現在幾號", OTHER_DISTRICT)]),
+    ("district_office", [heard("南港區公所要等多久", OTHER_DISTRICT)]),
+    one("district_office", "板橋區公所現在叫到幾號", OUTSIDE_TAIPEI),
+    ("district_office", [heard("板橋區公所現在叫到幾號", OUTSIDE_TAIPEI)]),
+    ("district_office", [heard("中和區公所要等多久", OUTSIDE_TAIPEI)]),
+    ("district_office", [heard("我在左營區公所排隊，現在幾號", OUTSIDE_TAIPEI)]),
+    one("district_office", "竹北市公所抽號碼牌", OUTSIDE_TAIPEI),
+    one("district_office", "台中市大安區公所叫號", OUTSIDE_TAIPEI),
+    ("district_office", [heard("淡水區公所號碼牌抽到幾號", OUTSIDE_TAIPEI)]),
+    ("district_office", [heard("三民區公所人多不多", OUTSIDE_TAIPEI)]),
+    one("district_office", "大安區公所的地址在哪裡", NO_PAGE),
+    # 書 or 借 inside a fixed word is not a book request; real book requests still are.
+    one("book_word", "找不到洗衣機的說明書", NONE), one("book_word", "幫我找一下保證書放哪裡了", NONE),
+    one("book_word", "我在找結婚證書的影本", NONE), ("book_word", [heard("我在找結婚證書的影本", NONE)]),
+    one("book_word", "秘書說會議改到明天", NONE), one("book_word", "他以前當過書記", NONE),
+    one("book_word", "書法課每週二晚上", NONE), one("book_word", "請用書面方式回覆我", NONE),
+    ("book_word", [heard("我要寫一份企劃書", NONE)]), one("book_word", "我看不懂這份同意書", NONE),
+    ("book_word", [heard("我孩子的書包壞了", NONE)]), one("book_word", "我想找人教書法", NONE),
+    one("book_word", "我弟弟還在念書", NONE), one("book_word", "幫我找書記官的電話", NONE),
+    ("book_word", [heard("幫我找書記官的電話", NONE)]), one("book_word", "借我看一下你的計畫書", NONE),
+    one("book_word", "找一份切結書的範本", NONE), ("book_word", [heard("找一份切結書的範本", NONE)]),
+    one("book_word", "附近有沒有書店", NONE), one("book_word", "醫生開的診斷書要多少錢", NONE),
+    one("book_word", "我要借書法的書", HOME), one("book_word", "幫我找跟書法有關的書", HOME),
+    one("book_word", "我想借幾本書", HOME), one("book_word", "找一本關於恐龍的書", HOME),
+    # Idioms and unrelated phrases that sound partly like a service word.
+    ("idiom", [heard("井底之蛙", NONE)]), ("idiom", [heard("一舉兩得", NONE)]),
+    ("idiom", [heard("停車坐愛楓林晚", NONE)]), ("idiom", [heard("飽讀詩書", NONE)]),
+    ("idiom", [heard("他總是借題發揮", NONE)]), one("idiom", "借花獻佛", NONE),
+    one("idiom", "借題發揮", NONE), ("idiom", [heard("改頭換面", NONE)]),
+    ("idiom", [heard("語重心長", NONE)]), ("idiom", [heard("叫苦連天", NONE)]),
+    ("idiom", [heard("我們借助大家的力量", NONE)]),
 ]
 
 
@@ -300,6 +375,8 @@ def label(step):
         return f"[pick {step['pick']}]"
     if "replay" in step:
         return f"[replay choice {step['replay']}{' from another session' if step['session'] else ''}]"
+    if step.get("heard"):
+        return f"[heard] {step['text']}"
     return step["text"]
 
 
@@ -440,8 +517,8 @@ def run_case(base, token, enabled, number, steps):
     session = f"eval-{number}-{time.time_ns()}"
     resolution, choices, rows = None, [], []
     for index, step in enumerate(steps):
-        payload = {"text": step.get("text", ""), "request_id": f"eval-{number}-{index}-{time.time_ns()}",
-                   "session_id": session}
+        payload = {"text": app_reading(step["text"]) if step.get("heard") else step.get("text", ""),
+                   "request_id": f"eval-{number}-{index}-{time.time_ns()}", "session_id": session}
         row = {"input": label(step), "expected": step["expect"]}
         if "pick" in step:
             chosen = next((c["id"] for c in choices if step["pick"] in c["title"]), None)
@@ -474,6 +551,8 @@ def run_case(base, token, enabled, number, steps):
         retrieval_hit = bool(wanted & seen) if wanted and status == 200 and "pick" not in step else None
         if status == 200 and data.get("resolution_id"):
             resolution, choices = data["resolution_id"], data.get("choices") or []
+        if step.get("heard"):
+            row["sent"] = payload["text"]
         rows.append({**row, "passed": not reasons, "reasons": reasons, "status": status,
                      "retrieval_hit": retrieval_hit, "route": metrics.get("route"),
                      "seconds": round(time.monotonic() - started, 3), "kind": data.get("kind"),

@@ -10,6 +10,28 @@ import unicodedata
 # A sentence about paying: any of these plus a bill's subject (its pay_words).
 PAY_CUE = re.compile(r"繳|付|交|帳|錢|費")
 
+# Fixed words with 書 or 借 that do not ask for a book or the library (docs/AI_CURRENT_RULES.md
+# section 2, 2026-11-13): 證書, 說明書, 申請書, 書面, 秘書, 書記, 書法, 書包, 念書, 借題發揮,
+# 借助... "我在找結婚證書的影本" or "幫我找書記官的電話" is not a borrow request; "借書法的書"
+# still is (的書). library_view masks them with a word character of the same length, so
+# indices stay and no two words around a mask join into a keyword.
+NOT_LIBRARY = re.compile(
+    r"證書|證明書|說明書|申請書|同意書|切結書|委託書|委任書|授權書|計畫書|計劃書|企劃書|企畫書|報告書|診斷書|"
+    r"協議書|合約書|契約書|保證書|承諾書|聲明書|陳情書|訴願書|起訴書|判決書|裁定書|通知書|繳款書|處分書|決定書|"
+    r"意見書|推薦書|邀請書|申訴書|悔過書|遺書|情書|家書|聘書|(?<!圖)文書|白皮書|背書|"
+    r"[秘祕]書|書記(?![錄載])|書面|書法|書信|書寫|書包|書桌|書櫃|書架|書房|書店|書局|書籤|書香|詩書|"
+    r"[念唸]書|讀書(?!會)|教書|"
+    r"借題發揮|借花獻佛|借刀殺人|借屍還魂|借酒澆愁|借古諷今|借[鏡鑑鑒]|借助|借口|借據|借貸|借殼|借東風")
+LIBRARY_MASK = "〇"
+# Book evidence that survives the mask: the request still names books.
+BOOK_EVIDENCE = re.compile(r"的書|書籍|本書|圖書|書名")
+
+
+def library_view(text):
+    """text with NOT_LIBRARY words masked (same length), for library and book evidence only."""
+    return NOT_LIBRARY.sub(lambda m: LIBRARY_MASK * len(m[0]), text or "")
+
+
 # Spelling variants that mean the same thing in everyday Traditional Chinese.
 VARIANTS = (("臺", "台"), ("記錄", "紀錄"))
 
@@ -234,10 +256,16 @@ class Registry:
         return sorted(terms)
 
     def search(self, text):
-        n = normalized(text)
+        # Only library words contain 書 or 借: "幫我找書記官的電話" no longer finds 找書, unless
+        # the sentence still names books without the fixed words ("借書法的書").
+        # Other pages see the request as it is ("申請書" still says 申請). Same length either way.
+        masked = library_view(text)
+        plain = normalized(text)
+        n_library = normalized(text if BOOK_EVIDENCE.search(masked) else masked)
         matches = []
         for entry in self.entries:
             root = self.by_id.get(entry["id"].split(".")[0])
+            n = n_library if entry["id"].split(".")[0] == "library" else plain
             # Domain + inner operation vocabulary participate in the same index.
             own = [entry["title"], *entry["keywords"]]
             direct = [term for term in own if normalized(term) and normalized(term) in n]
@@ -257,6 +285,7 @@ class Registry:
             if score:
                 matches.append({"entry": entry, "score": score, "fuzzy": False, "evidence": direct + inner,
                                 "span": _span(normalized(longest), n) if longest else None})
+        n = plain
         if matches:
             best = max(item["score"] for item in matches)
             # Several requests at once ("借書順便繳停車費", "水費跟地方稅"): different
