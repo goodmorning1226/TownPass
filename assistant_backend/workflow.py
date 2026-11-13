@@ -27,7 +27,8 @@ from decision import decide
 from faq import SCOPE_NOTE
 from guide import GuidePlanner
 from page_context import current_root, model_view
-from phonetic import exact_homophone, rank_books, term_matches
+from phonetic import each_near, exact_homophone, rank_books, term_matches
+from places import named_office, named_place_spans
 from registry import Registry, book_fuzzy, primary_title, single_substitution
 
 # A cheap superset of the library signals retrieve() looks for; the book
@@ -66,6 +67,16 @@ REQUEST_ONLY = re.compile(r"(?:請|我|想|要|幫|我們|給|去|打開|開啟|
 # 0.51, "烏鴉借"~"我要借" 0.59; unrelated openings ("早安你", "天氣好") 0.2-0.3.
 REQUEST_OPENINGS = ("我想借", "我要借", "我想找", "我要找")
 OPENING_SOUND_CONFIRM = 0.5
+# A named office asked about its queue (places.named_office, workflow._named_office).
+QUEUE_CUE = re.compile(r"叫號|叫到|號碼|抽號|候號|排|等多久|要等|等很久|人多|多少人|幾號|櫃[台檯]|臨櫃|現在幾")
+# Words that make what follows a misheard opening the rest of a clause, not a borrowed
+# object (沒想到你會… is not 我想找你會…): pronouns, 被, 會, 了, 是, 在, 很, 都, 也, 就, 沒, 不.
+# Catalogue titles never reach this (sound_corrections leaves them alone).
+CLAUSE_WORDS = re.compile(r"[你我他她它妳]|被|會|了|是|在|很|都|也|就|沒|不")
+# A four-character sentence with a two-character service word in its middle (井底之蛙 ~
+# 井地址蛙) has the shape of an idiom: not rewritten unless it asks for something
+# (rules 2026-11-13).
+REQUEST_CUE = re.compile(r"我要|我想|想要|要|幫我|幫忙|請|麻煩|打開|開啟|查|看|繳|付|申請|預約|找|借|換|改|設定|去")
 # Menu commands heard as sound-alikes, lengths may differ ("下夜"/"夏夜" ~ 下一頁 0.8,
 # "弟二個" ~ 第二個 1.0; "下雨天" 0.47, "打開" 0.2). Next page and numbers only while a
 # list is open; cancel (which does nothing) needs a homophone and a short sentence.
@@ -235,7 +246,7 @@ class Workflow:
         # and empty lists. unique_exact_id stays, even when null: dropping it made the
         # model open the library for "借ABC123".
         if (context["library"] and not context["query"] and not context["books"] and not context["other"]
-                and len(text) <= 14 and PLAIN_BORROW.search(text)):
+                and len(text) <= 14 and PLAIN_BORROW.search(matching.library_view(text))):
             self._trace("library_plain", ["library"])
             return self.reply(payload, "請在圖書借閱頁搜尋想看的書。這裡使用示範資料。", kind="navigate",
                               action="open_library", destination={"kind": "home"})
@@ -300,7 +311,7 @@ class Workflow:
         if "open_library" in names:
             if "unsupported" not in names:
                 return "open_library"
-            if self.BOOKISH.search(context.get("action_object") or context.get("query") or ""):
+            if self.BOOKISH.search(matching.library_view(context.get("action_object") or context.get("query") or "")):
                 return "open_library"
         return "request_clarification"
 
@@ -390,7 +401,7 @@ class Workflow:
         from server import positive_text
         if self.registry.search(positive_text(text)):
             return True
-        return bool(re.search(r"借.{0,6}書|找.{0,6}書|ISBN|圖書|館藏", text, re.I))
+        return bool(re.search(r"借.{0,6}書|找.{0,6}書|ISBN|圖書|館藏", matching.library_view(text), re.I))
 
     def known_text(self, text):
         """Whether an unsure Chinese transcript matches anything the App knows, by word
@@ -457,11 +468,28 @@ class Workflow:
         from server import positive_text
         # service id -> best score and every stretch of the sentence one of its words matches
         services = {}
+        places = named_place_spans(text)
+        masked = matching.library_view(text)
         for score, start, end, term in term_matches(text, self.registry.sound_terms()):
             if score < SERVICE_SOUND_CONFIRM:
                 break
-            if len(term) == 2 and score < SERVICE_SOUND_AUTO and not REQUEST_ONLY.fullmatch(
-                    text[:start] + "□" + text[end:]):
+            only_request = REQUEST_ONLY.fullmatch(text[:start] + "□" + text[end:])
+            if len(term) == 2 and score < SERVICE_SOUND_AUTO and not only_request:
+                continue
+            # The App applies these rewrites without asking (rules section 2), so each replaced
+            # character must itself sound near its replacement: a shared suffix (新店區公所 /
+            # 萬華區公所) or a shifted match (呼風喚雨 / 換語言) is not a mishearing; a place name
+            # is never turned into another place, nor a character of a fixed non-book word
+            # (切結書); a two-character word in the middle of a four-character sentence that
+            # asks for nothing is an idiom (井底之蛙 stays). Rules 2026-11-13.
+            if not each_near(text[start:end], term):
+                continue
+            if any(text[i] != term[i - start] and any(a <= i < b for a, b in places) for i in range(start, end)):
+                continue
+            if any(text[i] != term[i - start] and masked[i] == matching.LIBRARY_MASK for i in range(start, end)):
+                continue  # inside 切結書, 書記...: not 借書
+            if (len(term) == 2 and len(text) == 4 and (start, end) == (1, 3)
+                    and not REQUEST_CUE.search(text)):
                 continue
             found = self.registry.search(positive_text(text[:start] + term + text[end:]))
             if not found or found[0].get("fuzzy"):
@@ -469,7 +497,7 @@ class Workflow:
             item = services.setdefault(found[0]["entry"]["id"], {"score": score, "spans": []})
             item["spans"].append((start, end, term, score, exact_homophone(text[start:end], term)))
         if not services:
-            return None, self._opening_suggestions(text)
+            return None, self._opening_suggestions(text, object_only=True)
 
         def coverage(item):
             """Characters of the sentence this service's homophone-level words account for:
@@ -510,16 +538,21 @@ class Workflow:
                    if item["score"] >= lead["score"] - 0.1]
         if auto is None:
             # A misheard opening ("佛小姐…" for 我想借…) comes before word-level guesses.
-            options = list(dict.fromkeys([*self._opening_suggestions(text), *options]))[:2]
+            options = list(dict.fromkeys([*self._opening_suggestions(text, object_only=True), *options]))[:2]
         return auto, options
 
-    def _opening_suggestions(self, text):
+    def _opening_suggestions(self, text, object_only=False):
         """"我想借原子習慣" for "佛小姐原子習慣": the sentence's first three characters
-        sound like a borrow/find opening and something follows it. Offered only."""
+        sound like a borrow/find opening and something follows it. Offered only.
+        object_only (the speech rewrite, which the App applies): what follows must read as
+        the borrowed object, not as the rest of a clause ("沒想到你會…", "我快要被…書壓扁了",
+        rules 2026-11-13)."""
         from phonetic import similarity, syllables
         head, rest = text[:3], text[3:].strip()
         if len(rest) < 2 or len(syllables(head)) != 3:
             return []
+        if object_only and (CLAUSE_WORDS.search(rest) or matching.library_view(text) != text):
+            return []  # also 我想學書法 is not 我想借書法: the object is a fixed non-book word
         scored = sorted(((similarity(syllables(head), syllables(opening)), opening) for opening in REQUEST_OPENINGS),
                         reverse=True)
         score, opening = scored[0]
@@ -528,7 +561,53 @@ class Workflow:
         # The opening itself says borrow / find; the library step decides what the object is.
         return [opening + rest]
 
+    def _office_pages(self, office):
+        """Connected counter-calling pages of the same kind as a named office (區公所 / 戶政)."""
+        return [e for e in self.registry.entries if e["enabled"] and e["id"].startswith("reservation.")
+                and office["kind"] in e["title"]]
+
+    @staticmethod
+    def _other_place_page(entry, office):
+        """Whether entry is a page named after a Taipei district that is not the named office's."""
+        from places import TAIPEI
+        named = [name for name in TAIPEI if name in entry["title"]]
+        return bool(named) and (not office["taipei"] or office["name"] not in named)
+
+    def _named_office(self, payload, text, office, force=False):
+        """A named district office or household registration office (places.named_office).
+        Its own page (萬華, 中正): None, the usual flow opens it. Another Taipei district: the
+        counter-calling overview and the existing pages of that kind are listed; outside
+        Taipei: no page. Only when the request is about the queue or just names the office
+        (force: a page of another district was about to open); otherwise None, and the
+        usual flow goes on, kept from other districts' pages by _navigate."""
+        pages = self._office_pages(office)
+        own = [e for e in pages if office["taipei"] and office["name"] in e["title"]]
+        if own and not force:
+            return None
+        if own:  # its own page exists but another district's was chosen: let the user pick
+            self._trace("named_office", [e["id"] for e in own])
+            return self._offer(payload, self._cap_items([*own, self.registry.by_id["reservation"]]),
+                               "你想使用哪個功能？請先確認。")
+        rest = text.replace(office["text"], "")
+        rest = re.sub(r"我要|我想|想要|請問|請|幫我|一下|去|到|在|查|看|打開|開啟|的|呢|嗎|啊|喔|吧|[\W_]", "", rest)
+        if not force and len(rest) > 2 and not QUEUE_CUE.search(text):
+            return None
+        label = office["text"]
+        if office["taipei"]:
+            self._trace("named_office", ["reservation", *(e["id"] for e in pages)])
+            names = "、".join(e["title"] for e in pages)
+            items = [self.registry.by_id["reservation"], *pages]
+            return self._offer(payload, self._cap_items(items),
+                               f"臨櫃叫號目前只有{names}的頁面，{label}還沒有。可以從下面選，或打開「臨櫃叫號」看全部單位。")
+        self._trace("named_office_outside", [])
+        return self.reply(payload, f"臨櫃叫號只有臺北市的單位，{label}不在服務範圍內，沒有開啟頁面。",
+                          kind="unsupported", action="unsupported")
+
     def _navigate(self, payload, entry):
+        office = payload.get("named_office")
+        if office and self._other_place_page(entry, office):
+            # Typed or decided, a named office never opens another district's page.
+            return self._named_office(payload, payload.get("text", ""), office, force=True)
         language = payload.get("language", "zh")
         if language != "zh":
             title = self.registry.title(entry, language)
@@ -909,6 +988,13 @@ class Workflow:
                 "先在圖書借閱搜尋書籍，再查看館藏、冊次與取書館；預約由你在原頁面確認。這裡使用示範資料。", kind="reply")
 
         from server import positive_text
+        office = named_office(positive_text(text))
+        if office:
+            # "大安區公所現在叫到幾號": never another district's page (rules 2026-11-13).
+            payload = {**payload, "named_office": office}
+            handled = self._named_office(payload, text, office)
+            if handled:
+                return handled
         matches = self.registry.search(positive_text(text))
         # Book-specific ambiguity is resolved before any navigation.
         if not any(m["entry"]["id"] not in ("library",) for m in matches):
@@ -1000,7 +1086,8 @@ class Workflow:
             if name == "select_capability":
                 return self._navigate(payload, self.registry.by_id[args["capability_id"]])
             return self._faq(payload, text) or self.reply(payload, "請補充想使用的服務或操作，也可以問「有哪些功能」。")
-        if (LIBRARY_NOUN if T2_GENERIC else LIBRARY_CUE).search(text):
+        # 證書, 秘書, 書法, 借題發揮... do not send a sentence to the library (rules 2026-11-13).
+        if (LIBRARY_NOUN if T2_GENERIC else LIBRARY_CUE).search(matching.library_view(text)):
             return self._library(payload, text, self.owner.catalog.books())
         sounded = self._sound_fallback(payload, text)
         if sounded:
@@ -1104,6 +1191,8 @@ class Workflow:
                 break
             if text[start:end] == term or (len(term) == 2 and score < SERVICE_SOUND_AUTO):
                 continue  # heard as written; or two syllables, too easy to match by chance
+            if matching.LIBRARY_MASK in matching.library_view(text)[start:end]:
+                continue  # inside 切結書, 書記...: not 借書 (rules 2026-11-13)
             hits = self.registry.search(positive_text(text[:start] + term + text[end:]))
             if hits and not hits[0].get("fuzzy"):
                 entry = hits[0]["entry"]

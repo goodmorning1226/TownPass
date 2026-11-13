@@ -106,6 +106,36 @@ def term_matches(text, terms):
     return sorted(found, key=lambda match: -match[0])
 
 
+_INITIAL_LIST = ("zh", "ch", "sh", "z", "c", "s", "b", "p", "m", "f", "d", "t", "n", "l", "g", "k", "h",
+                 "j", "q", "x", "r", "y", "w")
+
+
+def _split(syllable):
+    initial = next((p for p in _INITIAL_LIST if syllable.startswith(p)), "")
+    return initial, syllable[len(initial):]
+
+
+def near_syllable(a, b):
+    """Whether one character could be the other misheard: the same folded syllable, the same
+    initial (shu / shi) or the same final (fo / wo). 新店 / 萬華 (xin-wan, dian-hua) or a match
+    shifted by a character (風喚雨 / 換語言) has a replaced character that is neither."""
+    table = readings()
+    if a == b:
+        return True
+    if a not in table or b not in table:
+        return False
+    x, y = fold(table[a]), fold(table[b])
+    if x == y:
+        return True
+    (xi, xf), (yi, yf) = _split(x), _split(y)
+    return bool(xi and xi == yi) or bool(xf and xf == yf)
+
+
+def each_near(heard, term):
+    """Every character of a same-length stretch sounds near the term's character in its place."""
+    return len(heard) == len(term) and all(near_syllable(a, b) for a, b in zip(heard, term))
+
+
 def exact_homophone(a, b):
     """Same toneless syllables before the accent fold (交號/叫號, not 偷書/投訴)."""
     table = readings()

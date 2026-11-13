@@ -276,13 +276,17 @@ def positive_text(text):
 
 
 def retrieve(text, books, previous=()):
+    from registry import library_view
     clean = positive_text(text)
     n = normalize(clean)
     other = [key for key, words in OTHER_SERVICES.items() if any(w in clean for w in words)]
     # Independent domain/action evidence tolerates filler without enumerating
-    # individual utterances or quantifier spellings.
-    library = any(w in n for w in LIBRARY_WORDS) or (
-        "書" in n and any(verb in n for verb in ("借", "找", "閱讀", "搜尋"))
+    # individual utterances or quantifier spellings. 證書, 說明書, 書法, 借題發揮... are
+    # not book evidence (registry.NOT_LIBRARY, rules 2026-11-13).
+    masked = library_view(clean)
+    m = normalize(masked)
+    library = any(w in m for w in LIBRARY_WORDS) or (
+        "書" in m and any(verb in m for verb in ("借", "找", "閱讀", "搜尋"))
     )
     query, search_type = "", "book_name"
     selected = None
@@ -312,10 +316,12 @@ def retrieve(text, books, previous=()):
     if not query:
         # "<author>寫的(書)" names an author without a search verb; checked first so
         # "找廣嶋玲子寫的書" does not capture "廣嶋玲子寫" as the author.
-        author_match = re.search(r"(?:作者(?:是)?|找|搜尋|查|借|看)?([^，。！？\s]{2,24}?)寫(?:的|過)(?:什麼)?(?:書|作品)?", clean) \
-            or re.search(r"(?:作者(?:是)?|找|搜尋|查)([^，。！？]{1,24}?)(?:的書|的作品)", clean)
+        # Found in the masked text ("找我的書包" names no author 我), taken from the request.
+        author_match = re.search(r"(?:作者(?:是)?|找|搜尋|查|借|看)?([^，。！？\s]{2,24}?)寫(?:的|過)(?:什麼)?(?:書|作品)?", masked) \
+            or re.search(r"(?:作者(?:是)?|找|搜尋|查)([^，。！？]{1,24}?)(?:的書|的作品)", masked)
         if author_match:
-            query = re.sub(r"^(?:我要|我想|幫我|請|找|看|借)+", "", author_match[1].strip())
+            query = re.sub(r"^(?:我要|我想|幫我|請|找|看|借)+", "",
+                           clean[author_match.start(1):author_match.end(1)].strip())
             search_type = "author"
             library = True
     # Extract an action's object before requiring a service classification.
@@ -323,12 +329,16 @@ def retrieve(text, books, previous=()):
     action_object = ""
     if not query:
         # The object ends at the clause: "借原親子館，你能幫我借到嗎" -> "原親子館".
-        title_match = re.search(r"(?:借|找|搜尋|看)(?:一下|一本|一部|這本)?\s*([^，,。！？!?；;]+)", clean)
+        # The verb is found in the masked text (借題發揮 is not 借 + 題發揮); the object is
+        # taken from the same place in the request.
+        title_match = re.search(r"(?:借|找|搜尋|看)(?:一下|一本|一部|這本)?\s*([^，,。！？!?；;]+)", masked)
         if title_match:
             value = re.sub(r"(?:這本書|的書|這本|好嗎|謝謝|就好)?[了吧啦喔哦呢嗎耶]*[。！？!？?]*$", "",
-                           title_match[1]).strip()
+                           clean[title_match.start(1):title_match.end(1)]).strip()
             value = re.sub(r"(?:這本書|的書|這本|好嗎|謝謝|就好)$", "", value).strip()
-            if value and value not in ("書", "書籍", "圖書", "閱"):
+            # An object whose only 書 is a non-book word (說明書, 計畫書) is clearly not a book.
+            not_book = "書" in value and "書" not in library_view(value)
+            if value and value not in ("書", "書籍", "圖書", "閱") and not not_book:
                 action_object = value
                 query = value
     if not query:
