@@ -121,16 +121,16 @@
    "id": "taiwanese",
    "name": "ggml-whisper-taiwanese.bin",
    "part": "taiwanese",
-   "size": 1656129708,
-   "sha256": "e878f611bf3ef407cff3c1e2ecf5f60dc92bc6dd09a85b22166731c0d92764a1",
-   "path": "taiwanese/ggml-breeze-asr-26-q8_0.bin",
+   "size": 888932908,
+   "sha256": "0e08c5a2d3a5ba4bae7f85d02212e887537f78d7e623d8694313e2dd65de22ec",
+   "path": "taiwanese/ggml-breeze-asr-26-q4_0.bin",
    "tiers": [
     "full"
    ],
    "platforms": [
     "android"
    ],
-   "license": "Apache-2.0 (MediaTek Research Breeze-ASR-26; ggml q8_0 by this project)"
+   "license": "Apache-2.0 (MediaTek Research Breeze-ASR-26; ggml q4_0 by this project)"
   },
   {
    "id": "taiwanese-q4",
