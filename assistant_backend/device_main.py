@@ -284,7 +284,9 @@ class Restarter:
     liveness.failed() (a server that answered before refuses or times out) calls
     this with the server's address; restart(name) is the App's native call
     (OnDeviceAssistant.swift restartServer: health-checks the server and runs it
-    again when it does not answer) and returns "ready", "restarted" or "failed".
+    again when it does not answer; Android: OnDeviceAssistant.kt restartServer, the same
+    contract, through java_server_restarter) and returns "ready", "restarted" or "failed"
+    ("busy" / "missing": not restarted now).
     One request per server at a time, on its own thread: the request that noticed
     goes on at once with its usual "no answer" path.
     """
@@ -336,6 +338,18 @@ def java_server_starter(name):
     """Android's server starter (OnDeviceAssistant.ensureServer, Kotlin)."""
     from java import jclass  # Chaquopy, on the phone only
     return str(jclass("com.example.townpass.OnDeviceAssistant").ensureServer(name))
+
+
+def java_server_restarter(name):
+    """Android's server restarter for Restarter (OnDeviceAssistant.restartServer, Kotlin;
+    2026-11-13: Android did not restart a server that stopped answering, e.g. one the
+    system killed in the background). The App passes it as start(server_restarter=...).
+    "failed" when the App is older and has no restartServer."""
+    from java import jclass  # Chaquopy, on the phone only
+    assistant = jclass("com.example.townpass.OnDeviceAssistant")
+    if not hasattr(assistant, "restartServer"):
+        return "failed"
+    return str(assistant.restartServer(name))
 
 
 # The native servers' loopback ports, the same on Android and iOS
@@ -550,9 +564,10 @@ def start(model_port=8771, whisper_port=8772, assistant_port=8765, asr_port=8770
     phone's total memory) picks the tier; server_starter(name) starts a native
     server once its file arrives (default Android's Java bridge). Without
     models_dir nothing is downloaded, as before.
-    server_restarter(name) (iOS, native_server_starter of restartServer): asked to
-    start a server again when it stopped answering (Restarter); None: nobody is
-    asked, requests only stop waiting for it (liveness.py).
+    server_restarter(name) (iOS: native_server_starter of restartServer; Android:
+    java_server_restarter, OnDeviceAssistant.kt restartServer): asked to start a server
+    again when it stopped answering (Restarter); None (an older App): nobody is asked,
+    requests only stop waiting for it (liveness.py).
     app_active() (iOS, native_flag): whether the App is in the foreground; speech
     passes wait for it (asr_server ACTIVE_WAIT_S). None: always active.
     """

@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
+import io.flutter.plugin.common.BinaryMessenger
 
 class MainActivity: FlutterActivity() {
     private var systemSpeech: SystemSpeech? = null
@@ -25,5 +26,14 @@ class MainActivity: FlutterActivity() {
         // The phone's own speech recogniser for the assistant (used only when the
         // App is built with ASSISTANT_SPEECH=system).
         systemSpeech = SystemSpeech(this, flutterEngine.dartExecutor.binaryMessenger)
+        // On-device builds: the "status" channel the App asks after coming back from the
+        // background (lib/service/assistant_on_device.dart OnDeviceResume).
+        try {
+            Class.forName("com.example.townpass.OnDeviceAssistant")
+                .getMethod("register", BinaryMessenger::class.java)
+                .invoke(null, flutterEngine.dartExecutor.binaryMessenger)
+        } catch (_: ClassNotFoundException) {
+        } catch (_: NoSuchMethodException) {
+        }
     }
 }

@@ -10,6 +10,12 @@ or it exited) and a timeout means it hangs: waiting 75 s per call then made a tu
 
 - wait_s(url, startup): how long a call may wait for url to come up: startup until
   it has answered once, AFTER_READY_WAIT_S after that.
+- hung(url): a server that answered before and now accepts without answering GET
+  /health within PROBE_S (stopped, e.g. SIGSTOP): reported failed, and the call gives
+  up in seconds instead of its full timeout (the classifier's 10 s, Android emulator
+  test 2026-11-13). Asked before each classifier, e5 and whisper call. A busy server
+  still answers /health, so a slow reply keeps its usual timeout: a bounded read
+  timeout (3 s) cut off real classifier decisions that took 6 s on a loaded emulator.
 - down(url): url failed recently (HOLD_S); callers skip it at once and use their
   usual "no answer" path (list the candidates, "please say it again", no FAQ).
 - answered(url) / failed(url): what callers report. failed() also tells the
@@ -112,6 +118,16 @@ def probe(url, timeout=None):
         return True
     except OSError as exc:
         return not is_timeout(exc)
+
+
+def hung(url):
+    """Whether url answered before and does not answer GET /health now (probe); it is
+    then reported (failed: skipped for HOLD_S, the App asked to restart it). False for a
+    server that never answered: it may still be loading, and its caller waits as before."""
+    if not has_answered(url) or probe(url):
+        return False
+    failed(url, "timeout")
+    return True
 
 
 def is_timeout(exc):

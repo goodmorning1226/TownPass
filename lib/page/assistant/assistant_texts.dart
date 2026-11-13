@@ -432,6 +432,15 @@ abstract final class AssistantTexts {
       'id': 'Memori ponsel ini tidak cukup untuk menjalankan asisten offline.',
       'tl': 'Kulang ang memory ng teleponong ito para sa offline na assistant.',
     },
+    'modelsRetrying': {
+      'zh': '網路中斷，連上網路後會自動繼續下載…',
+      'en': 'The connection dropped; the download continues by itself once you are online…',
+      'ja': '通信が切れました。接続が戻ると自動でダウンロードを続けます…',
+      'vi': 'Mất kết nối; việc tải sẽ tự tiếp tục khi có mạng lại…',
+      'id':
+          'Koneksi terputus; unduhan berlanjut sendiri setelah terhubung lagi…',
+      'tl': 'Naputol ang koneksiyon; kusang itutuloy ang download kapag online ka na ulit…',
+    },
     'modelsRetry': {
       'zh': '再試一次',
       'en': 'Try again',

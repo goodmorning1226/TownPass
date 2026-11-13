@@ -86,12 +86,37 @@ class WorkflowClassifierTests(unittest.TestCase):
         self.assertEqual(self.turn(self.app(close, open_best=True), "案件進度")["kind"], "confirm_candidates")
 
     def test_server_down_lists_candidates_never_guesses(self):
+        # Rules section 6 (2026-11-13): a single connected candidate is listed too, never
+        # opened (the emulator test opened 停車費 while the classifier was stopped).
         app = self.app(FakeScores(fail=True))
-        result = self.turn(app, "我要繳水費")
-        # The single candidate is offered as a choice route (rule decision), never a different page.
-        self.assertIn(result["kind"], ("navigate", "confirm_candidates"))
-        if result["kind"] == "navigate":
-            self.assertEqual(result["destination"]["id"], "fees.water")
+        for text, page in (("我要繳水費", "fees.water"), ("我要繳停車費", "fees.parking")):
+            result = self.turn(app, text)
+            self.assertEqual(result["kind"], "confirm_candidates", text)
+            self.assertIsNone(result["destination"], text)
+            self.assertEqual(len(result["choices"]), 1, text)
+            self.assertEqual(result["choices"][0]["title"], app.workflow.registry.by_id[page]["title"], text)
+            self.assertEqual(result["metrics"]["route"], "classifier_unavailable", text)
+        self.assertEqual(self.model_calls, [])
+
+    def test_server_down_lists_several_candidates(self):
+        app = self.app(FakeScores(fail=True))
+        result = self.turn(app, "案件進度")
+        self.assertEqual(result["kind"], "confirm_candidates")
+        self.assertIsNone(result["destination"])
+        self.assertGreaterEqual(len(result["choices"]), 2)
+        # A listed page still opens once chosen.
+        chosen = self.turn(app, "", choice_id="1", resolution_id=result["resolution_id"])
+        self.assertEqual(chosen["kind"], "navigate")
+        self.assertEqual(self.model_calls, [])
+
+    def test_server_down_lists_a_single_candidate_in_other_languages(self):
+        app = self.app(FakeScores(fail=True))
+        # (A sure Indonesian or Vietnamese single keyword opens without any decision, as
+        # before: those direct rules do not ask the classifier.)
+        for text, language in (("I want to pay my water bill", "en"), ("where can I see my library loans", "en")):
+            result = self.turn(app, text, language=language)
+            self.assertNotEqual(result["kind"], "navigate", text)
+            self.assertIsNone(result["destination"], text)
         self.assertEqual(self.model_calls, [])
 
     def test_intent_fallback_uses_the_pseudo_candidates(self):

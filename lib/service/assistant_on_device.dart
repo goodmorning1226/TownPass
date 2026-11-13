@@ -50,17 +50,30 @@ class AssistantOnDevice {
   static bool enabled({bool? isIOS, bool build = requested}) =>
       build && (isIOS ?? (!kIsWeb && Platform.isIOS));
 
+  /// Whether this build waits for the phone's servers after a resume: both
+  /// on-device builds. Android starts its servers natively (MainActivity) and
+  /// answers "status" since 2026-11-13 (OnDeviceAssistant.kt); an older Android
+  /// side without it answers MissingPluginException, which does not wait.
+  static bool resumes({bool? isIOS, bool? isAndroid, bool build = requested}) =>
+      build &&
+      ((isIOS ?? (!kIsWeb && Platform.isIOS)) ||
+          (isAndroid ?? (!kIsWeb && Platform.isAndroid)));
+
   /// Starts the local servers once (the native side ignores repeats) and
   /// returns what was started, or why not; null when not enabled. Never throws:
   /// the assistant then answers as it does when the backend is unreachable.
   static Future<String?> start({
     bool? isIOS,
+    bool? isAndroid,
     bool build = requested,
     MethodChannel? channel,
     String model = decisionModelDefine,
   }) async {
+    if (resumes(isIOS: isIOS, isAndroid: isAndroid, build: build)) {
+      _resume ??= OnDeviceResume(channel ?? _channel)..attach();
+    }
+    // Android starts its own copy natively: nothing to ask it here.
     if (!enabled(isIOS: isIOS, build: build)) return null;
-    _resume ??= OnDeviceResume(channel ?? _channel)..attach();
     try {
       final info = await (channel ?? _channel).invokeMethod<String>('start', {
         'decision_model': decisionModel(model),
@@ -77,7 +90,7 @@ class AssistantOnDevice {
   /// Called before every request: after the App came back from the background
   /// (phone locked, another App), waits until the phone's servers answer again,
   /// at most [OnDeviceResume.limit]; at once otherwise, and always at once in
-  /// builds without the local assistant (Android, LAN backend).
+  /// builds without the local assistant (LAN backend).
   static Future<void> settle() => _resume?.settle() ?? Future<void>.value();
 
   /// Forgets [start]'s observer (tests).
@@ -90,8 +103,10 @@ class AssistantOnDevice {
 }
 
 /// iOS takes a suspended App's sockets and may stop a model server while the
-/// App is away (docs/AI_ON_DEVICE_IOS.md, 鎖定與背景). The native side restarts
-/// them when the App is active again (OnDeviceAssistant.swift); a request sent
+/// App is away (docs/AI_ON_DEVICE_IOS.md, 鎖定與背景); Android may kill the model
+/// servers (child processes) in the background. The native side restarts them
+/// when the App is active again (OnDeviceAssistant.swift, OnDeviceAssistant.kt
+/// since 2026-11-13); a request sent
 /// before they answer would fail, so the first requests after coming back wait
 /// for the "status" call to say ready (2026-11-10: the decision model stayed
 /// down after locking the phone until the App was killed).
