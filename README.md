@@ -25,13 +25,16 @@
 assistant that runs entirely on the phone: no cloud model, and recordings never leave the device. You speak
 (Mandarin, Taiwanese Hokkien, English, Japanese, Vietnamese, Indonesian or Filipino) or type; a 0.2-second language
 gate (Whisper tiny) picks the recogniser (Whisper small, Breeze-ASR-26 for Taiwanese, PhoWhisper for Vietnamese);
-a rule-first pipeline (emergency words, commands, keyword search, a grammar-constrained Ministral 3B / Gemma 4 E2B
-choice, phonetic and e5 semantic matching, then 8,121 Taipei City FAQ entries) opens the right TownPass service
-page, lists options or answers; and a guided mode (penguin, task cards, highlight halos, hold-to-speak form filling)
-walks you through the real service page, which is translated on the fly. On the computer evaluation sets it scores
-187–188/190 (dev), 97/102 (held-out) and 46/46 (five foreign languages) with zero wrong pages opened.
+a rule-first pipeline (emergency words, commands, keyword search, phonetic and e5 semantic matching scored by a
+132 MB decision classifier fine-tuned from Microsoft multilingual-e5-small, rules for library requests and guides,
+then 8,121 Taipei City FAQ entries) opens the right TownPass service page, lists options or answers. By default no
+decision LLM is loaded; Ministral 3B (and Gemma 4 E2B on Android) remain build options. A guided mode (penguin, task
+cards, highlight halos, hold-to-speak form filling) walks you through the real service page, which is translated on
+the fly. Model files are downloaded in the App after the user agrees. On the computer evaluation sets the default
+classifier scores 95/102 (held-out; Ministral 97) and 96/96 (five foreign languages) with zero wrong pages, and on four
+colloquial sets it opens a wrong page 3 times against 16 for Ministral.
 Built with Flutter 3.47.6, an embedded Python backend (Chaquopy on Android, CPython on iPhone), llama.cpp and whisper.cpp,
-running on both Android and iPhone from one code base; GPL-3.0.
+running on both Android and iPhone from one code base (iPhone verified on an iPhone 17 Pro Max on 2026-11-13); GPL-3.0.
 Developer guide: [ASSISTANT_README.md](ASSISTANT_README.md).
 
 ## 目錄
@@ -58,7 +61,7 @@ Developer guide: [ASSISTANT_README.md](ASSISTANT_README.md).
 所以我們把助理做成「用講的」：按住說一句話，助理直接打開對的頁面，必要時一步步教你在**真正的服務頁面**上操作，
 頁面文字也翻成你講的語言。而且全部在手機上跑：
 
-- **離線**：決策模型、語音辨識、向量檢索、頁面翻譯都在裝置上；網路只用來抓資料（圖書館藏、台北通常見問答）和第一次下載 ML Kit 翻譯檔。
+- **離線**：決策分類器、語音辨識、向量檢索、頁面翻譯都在裝置上；網路只用來抓資料（圖書館藏、台北通常見問答）、第一次下載 ML Kit 翻譯檔，以及使用者同意後下載模型。
 - **隱私**：錄音不存檔、不上傳；填欄位時講的內容不進對話紀錄、不送決策模型。
 - **不越權**：不自動送出、付款、撥號、預約；開頁只是打開原本的頁面，模型輸出一律經驗證才會變成動作。
 
@@ -75,7 +78,8 @@ Developer guide: [ASSISTANT_README.md](ASSISTANT_README.md).
         <li>每個畫面都有「<b>按住提問</b>」：按住說、放開送出、往上滑取消，有音量條。</li>
         <li>「我要繳水費」「我家前面路燈壞了」「我欲借冊」→ 直接打開對應的服務頁面；<b>只有一個明確的選項就直接開，有多個才讓你選</b>。</li>
         <li>「有哪些功能」→ 列出可用服務，◀ ▶ 換頁，說「第二個」就選。</li>
-        <li>聽不清楚時直接用最可能的讀法，不再反問「是這句嗎？」。</li>
+        <li>聽不清楚時直接用最可能的讀法，不再反問「是這句嗎？」；但只有每個被換掉的字讀音都相近才改寫，地名、成語、「證書／申請書」這類固定詞不會被改成服務詞。</li>
+        <li>說了沒有頁面的區公所（例如「大安區公所」）不會開到別區的頁面；「借書」只認真正的書，「借花獻佛」「秘書」不算。</li>
         <li>也可以打字；建議句會換成你最近真的用過的請求。</li>
       </ul>
     </td>
@@ -96,7 +100,7 @@ Developer guide: [ASSISTANT_README.md](ASSISTANT_README.md).
 - 預設介面就是引導模式：企鵝的**任務卡**寫這一步要做什麼、**光圈**標出要按的地方、可以朗讀或暫停，在**真實的官方服務頁面**上教學（頁面不修改、不打包，用網頁自己的換頁機制在頁內切換）。
 - 教學要填欄位時，「按住提問」變成「**按住輸入**」：用講的說電話號碼，就轉成數字填進欄位，依欄位型別轉格式（電話、Email、金額、日期、時間、身分證、車牌、文字），可以「復原」，**不會按送出**。
 - 最後一步永遠是使用者自己按；完成後企鵝會說明「這是示範網站，沒有真的送出」。
-- 教學流程以 `tool/guide_audit/` 在示範網站錄製 177 條重播驗證；教學文字 1,132 句，6 種語言。
+- 教學流程以 `tool/guide_audit/` 在示範網站錄製 177 條重播驗證；教學文字 1,134 句，6 種語言（中、英、日、越、印、菲）。
 
 <details>
 <summary>完整的圖書借閱 5 步驟（7 張截圖）</summary>
@@ -125,8 +129,9 @@ Developer guide: [ASSISTANT_README.md](ASSISTANT_README.md).
       <ul>
         <li>台語<b>不用切選單</b>：語言判斷模型（Whisper tiny）回傳 99 種語言的機率，台語的分布和華語不一樣，我們在上面加了一個 104 個係數的小分類器；分數夠高就交給台語模型。</li>
         <li>閘門漏掉的，用文字再補：中文結果<b>不像華語</b>（台灣華語字元 bigram 模型）或 <b>App 認不出那句話</b>，就交給台語模型再聽一次，留比較好的那份。</li>
-        <li>台語模型是聯發科技研究中心＋陽明交大的 <b>Breeze-ASR-26</b>（Apache-2.0），第一次用到才載入；輸出中文字，之後走原本的中文流程。</li>
-        <li>手動「台語（測試）」選項保留；第一次在中文手機打開助理時會大字問「您是否為台語用戶？」。</li>
+        <li>台語模型是聯發科技研究中心＋陽明交大的 <b>Breeze-ASR-26</b>（Apache-2.0），每支手機都用 q4_0（848 MB，iPhone 的 Metal 上約 1.43 GB），第一次用到才載入；輸出中文字，之後走原本的中文流程。</li>
+        <li>iPhone 載入前先對照 iOS 給單一 App 的記憶體額度（檔案＋1,000 MB，再留 256 MB），不夠就不載入、台語片段當中文聽，不會閃退；iPhone 17 Pro Max 實機載入約 0.8 秒。</li>
+        <li>手動「台語（測試）」選項保留；說過一次台語後 5 分鐘內門檻降到 0.3。</li>
         <li>限制：目前只有辨識，朗讀用中文。</li>
       </ul>
     </td>
@@ -145,7 +150,9 @@ Developer guide: [ASSISTANT_README.md](ASSISTANT_README.md).
         <li>頁面翻譯：預翻好的字串直接用（<code>assets/i18n/app_strings.json</code>），其餘用 Google ML Kit 離線翻譯，一次 20 句；翻譯時保留原文，教學光圈用原文找按鈕。</li>
         <li><b>不強制用使用者沒講的語言解碼</b>（強制會讓 Whisper 把日文「翻」成中文）；不確定時把最可能的兩、三種語言各聽一次，留字體符合、清楚、分數高的那份。</li>
         <li>越南文專用 <b>PhoWhisper</b>（VinAI，BSD-3）；比對不打聲調、聲調聽錯、南北口音（d/gi/r/v、ch/tr、s/x、字尾 n/ng）都能對到。</li>
-        <li>外語標題與關鍵字 5 種語言、口語例句 464 句；外語 FAQ 先翻成中文再查，答案再翻回來。</li>
+        <li><b>印尼文</b>（2026-11-11 優化）：聊天縮寫與口語寫法（sy、yg、gmn、pinjem…）先換成標準寫法再比對，句尾「…nggak?」是問句不是拒絕。</li>
+        <li><b>菲律賓文</b>（2026-11-11 取代泰文，代碼 <code>tl</code>）：夾英文（Taglish）照樣比對，e／i、o／u 與西班牙拼法不分；翻譯是 AI 草稿，待母語者審閱。</li>
+        <li>外語標題與關鍵字 5 種語言（英、日、越、印、菲）、口語例句 602 句（含中文）；外語 FAQ 先翻成中文再查，答案再翻回來。</li>
       </ul>
     </td>
   </tr>
@@ -168,35 +175,38 @@ Developer guide: [ASSISTANT_README.md](ASSISTANT_README.md).
 
 ### 6. 緊急回應
 
-- 失火、冒煙、受困、倒地、沒呼吸、自殺、家暴、性侵、跟蹤等詞表（6 種語言），**在所有檢索、FAQ、模型之前**直接回 119／1925／1995／113／110（上面第 3 點的截圖就是「我家失火了」）。
+- 失火、冒煙、受困、倒地、沒呼吸、自殺、家暴、性侵、跟蹤等詞表（6 種語言：中、英、日、越、印、菲），**在所有檢索、FAQ、模型之前**直接回 119／1925／1995／113／110（上面第 3 點的截圖就是「我家失火了」）。
 - 失火只**列出**災情表單讓使用者選，不自己打開；「防火宣導、火災保險、演習、以前…」排除。
 - 不經模型，所以不會慢、不會被模型想歪。
 
 ## 架構
 
-手機（Android 建議 12 GB 記憶體；iPhone 也可以）上有一個 Flutter App、一個 Python 後端和六個模型伺服器，全部綁在 `127.0.0.1`。
+手機（Android 或 iPhone，依記憶體分級下載模型）上有一個 Flutter App、一個 Python 後端和六個模型伺服器（iPhone 沒有 PhoWhisper，是五個），全部綁在 `127.0.0.1`。
 App 只直接連後端 `:8765`。Android 與 iPhone 是同一份 App、後端與規則，只有啟動模型伺服器的原生程式不同（Kotlin／Swift）。
+**預設的決策是決策分類器**（2026-11-13 起）：頁面由分類器打分、圖書請求（含只說書名的）用規則、教學用關鍵字規則，**不載入決策 LLM**；
+Ministral 3B（`-DecisionModel ministral`）與 Gemma 4 E2B（只有 Android，`-DecisionModel gemma`）仍是建置選項，選了 LLM 就不啟動分類器。
 
 ```mermaid
 flowchart LR
     subgraph phone["手機（Android／iPhone）：全部在裝置上執行"]
         direction TB
         app["Flutter App（GetX）<br/>引導助理／聊天面板、按住提問<br/>WebView 服務頁＋ML Kit 頁面翻譯"]
-        backend["Python 後端（Android：Chaquopy；iPhone：內嵌 CPython）:8765<br/>緊急 → 指令 → 關鍵字 → 決策模型 → 讀音 → 語意 → 意圖 → FAQ"]
+        backend["Python 後端（Android：Chaquopy；iPhone：內嵌 CPython）:8765<br/>緊急 → 指令 → 關鍵字 → 決策（分類器打分／圖書規則）→ 讀音 → 語意 → 意圖 → FAQ"]
         subgraph speech["語音：whisper-server"]
             direction TB
             tiny[":8775 Whisper tiny<br/>語言判斷，約 0.2 秒"]
             small[":8773 Whisper small<br/>中、英、日、越、印、菲"]
-            breeze[":8776 Breeze-ASR-26<br/>台語，第一次用到才啟動"]
-            pho[":8777 PhoWhisper-base<br/>越南文，第一次用到才啟動"]
+            breeze[":8776 Breeze-ASR-26 q4_0<br/>台語，第一次用到才啟動"]
+            pho[":8777 PhoWhisper-base<br/>越南文，只有 Android，第一次用到才啟動"]
         end
         subgraph llm["文字：llama-server"]
             direction TB
-            decide[":8771 Ministral 3B 或 Gemma 4 E2B<br/>決策（GBNF 文法限制）"]
+            cls[":8778 決策分類器（預設）<br/>e5 微調的 cross-encoder，--reranking"]
             e5[":8774 multilingual-e5-small<br/>語意檢索、FAQ 向量"]
+            decide[":8771 Ministral 3B 或 Gemma 4 E2B<br/>選項：決策 LLM（GBNF 文法限制），預設不載入"]
         end
     end
-    net[("網路只抓資料：<br/>圖書館藏、台北通問答、ML Kit 翻譯檔")]
+    net[("網路只抓資料與模型：<br/>圖書館藏、台北通問答、ML Kit 翻譯檔、<br/>使用者同意後下載模型（Hugging Face）")]
 
     app -->|"錄音／文字"| backend
     backend -->|"開頁、選項或回答"| app
@@ -204,8 +214,9 @@ flowchart LR
     tiny -->|"選單語言 ≥ 0.6 或別的語言 ≥ 0.8"| small
     tiny -->|"台語分類器 ≥ 0.5，或中文不像華語／App 不認得"| breeze
     tiny -->|"越南文"| pho
-    backend --> decide
+    backend --> cls
     backend --> e5
+    backend -.->|"-DecisionModel ministral／gemma"| decide
     net -.-> app
 ```
 
@@ -213,12 +224,14 @@ flowchart LR
 
 ```mermaid
 flowchart LR
-    a["按住說話<br/>錄音不存檔"] --> b["語言判斷<br/>tiny，0.2 秒"] --> c["用該語言聽成文字<br/>small／Breeze／PhoWhisper"] --> d["規則優先，模型只選選項<br/>緊急 → 指令 → 關鍵字 → A/B/C → 讀音 → 語意 → 意圖 → FAQ"] --> e["開頁／列選項／回答<br/>介面與頁面跟著語言換"]
+    a["按住說話<br/>錄音不存檔"] --> b["語言判斷<br/>tiny，0.2 秒"] --> c["用該語言聽成文字<br/>small／Breeze／PhoWhisper"] --> d["規則優先，分類器只替候選打分<br/>緊急 → 指令 → 關鍵字 → 分類器／圖書規則 → 讀音 → 語意 → 意圖 → FAQ"] --> e["開頁／列選項／回答<br/>介面與頁面跟著語言換"]
 ```
 
 1. **錄音 → 語言判斷 → 辨識**：tiny 先判斷語言（0.2 秒），再用該語言的模型聽成文字。台語不用切選單：閘門分類器、或「中文不像華語／App 認不出」時交給 Breeze 再聽一次。
-2. **文字 → 決定**：後端依序找：緊急詞 → 取消／換頁／第幾個 → 功能關鍵字 → 決策模型在 A／B／C 候選中選一個（GBNF 文法硬性限制，只能輸出 `{"choice":"X"}`，6 個 token）→ 讀音相似（Unihan 台灣讀音，折疊 zh/z、l/n、ing/in 等）→ 語意相似（e5 ＋ 464 句口語例句）→ 問模型意圖 → FAQ。都沒有就說沒找到，**不開頁**。
-3. **決定 → 畫面**：App 打開頁面、列出選項或回答；模型選項之外的任何輸出都被 `validate_call` 擋下，候選 ID 與選項綁定、5 分鐘過期。
+2. **文字 → 決定**：後端依序找：緊急詞 → 取消／換頁／第幾個 → 指名但沒有頁面的區公所／戶政 → 功能關鍵字 → 決策 → 讀音相似（Unihan 台灣讀音，折疊 zh/z、l/n、ing/in 等）→ 語意相似（e5 ＋ 602 句口語例句）→ 意圖 → FAQ。都沒有就說沒找到，**不開頁**。
+   預設的「決策」與「意圖」由**決策分類器**替每個候選頁打分：只有一個已串接頁面、分數夠高、沒有別的服務接近時才直接開，其餘列出讓使用者選；圖書（確定的書、館藏、只說作品名的「借小王子」）用規則，教學用教學自己的關鍵字規則；分類器沒回應時一律列出候選，不猜。
+   選 Ministral／Gemma 時改由決策 LLM 在 A／B／C 候選中選一個（GBNF 文法硬性限制，只能輸出 `{"choice":"X"}`，6 個 token）。
+3. **決定 → 畫面**：App 打開頁面、列出選項或回答；決策 LLM 選項之外的任何輸出都被 `validate_call` 擋下，候選 ID 與選項綁定、5 分鐘過期。
 
 更細的流程與每層門檻在 [docs/AI_TECHNICAL_OVERVIEW.md](docs/AI_TECHNICAL_OVERVIEW.md)，行為規則的唯一準則是 [docs/AI_CURRENT_RULES.md](docs/AI_CURRENT_RULES.md)。
 
@@ -226,12 +239,13 @@ flowchart LR
 
 | 用途 | 模型 | 量化／大小 | 開發者、授權 | 手機速度 |
 | --- | --- | --- | --- | --- |
-| 決策（預設） | Ministral-3-3B-Instruct-2512 | Q4_K_M，約 2.1 GB | Mistral AI（法國），Apache-2.0 | 讀提示約 50 tok/s、生成約 5 tok/s，每次決策約 4.7 秒 |
-| 決策（選項） | Gemma 4 E2B | Q4_0，2.84 GB | Google，Gemma 授權 | 約 114／7.8 tok/s，每次約 2.3 秒；口語集開錯頁略多 |
+| 決策（預設） | 決策分類器（cross-encoder，由 multilingual-e5-small 微調） | q8_0，132 MB | 本專案訓練（基底 Microsoft），MIT；llama-server `--reranking`，port 8778 | 每輪決策約 0.1–0.2 秒（電腦評估換算的**估計**，手機還沒量） |
+| 決策（選項，`-DecisionModel ministral`） | Ministral-3-3B-Instruct-2512 | Q4_K_M，約 2.1 GB | Mistral AI（法國），Apache-2.0 | 讀提示約 50 tok/s、生成約 5 tok/s，每次決策約 4.7 秒（Android 實測） |
+| 決策（選項，只有 Android，`-DecisionModel gemma`） | Gemma 4 E2B | Q4_0，2.84 GB | Google，Gemma 授權 | 約 114／7.8 tok/s，每次約 2.3 秒（Android 實測）；口語集開錯頁略多 |
 | 語音辨識 | Whisper small | q8_0，264 MB | OpenAI，MIT | 3 秒句約 0.8–1.2 秒 |
 | 語言判斷 | Whisper tiny | q8_0，44 MB | OpenAI，MIT | 約 0.19 秒 |
-| 台語辨識 | Breeze-ASR-26 | q8_0，1.66 GB | 聯發科技研究中心＋陽明交大，Apache-2.0 | 約 3.4–4.4 秒 |
-| 越南文辨識 | PhoWhisper-base | q8_0，82 MB | VinAI（越南），BSD-3 | 手機上還沒量；電腦上每段約 1.4 秒 |
+| 台語辨識 | Breeze-ASR-26 | q4_0，848 MB（iPhone Metal 上約 1.43 GB） | 聯發科技研究中心＋陽明交大，Apache-2.0 | 雲端 ARM 測速推估每段 3.6–4.2 秒；iPhone 17 Pro Max 實機載入約 0.8 秒 |
+| 越南文辨識（只有 Android） | PhoWhisper-base | q8_0，82 MB | VinAI（越南），BSD-3 | 手機上還沒量；電腦上每段約 1.4 秒 |
 | 向量檢索 | multilingual-e5-small | q8_0，132 MB，384 維 | Microsoft，MIT | 一次查詢數十毫秒 |
 | 頁面翻譯 | ML Kit on-device translation | 每語言約 30 MB | Google | 預翻字串直接用，剩下才即時翻 |
 
@@ -239,27 +253,42 @@ flowchart LR
 
 - **App**：Flutter 3.47.6／Dart 3.13.5（`.fvmrc` 鎖定）、GetX，沿用官方 `TPRoute`／`TPWebView`／WebView bridge（`{name, data}` 契約只新增欄位）。
 - **後端**：Python（Android 用 Chaquopy、iPhone 用 BeeWare CPython 3.13 內嵌），`assistant_backend/`；電腦開發時同一份程式配 Ollama。
-- **模型執行**：llama.cpp b12182 `llama-server`（決策、e5）、whisper.cpp v1.9.5 `whisper-server`（四個語音伺服器）。
+- **模型執行**：llama.cpp b12182 `llama-server`（決策分類器、e5、選用的決策 LLM）、whisper.cpp v1.9.5 `whisper-server`（四個語音伺服器）。
   Android 由 Kotlin 負責啟動、CPU 綁定（提示用 5 核、生成用 3 核）、第一次用到才載入台語／越南文模型並先檢查可用記憶體；
   iPhone 由 Swift 在 App 內以執行緒啟動（iOS 不能開子行程）、用 Metal GPU 計算，鎖定手機後自動重新 bind 埠號（[AI_ON_DEVICE_IOS.md](docs/AI_ON_DEVICE_IOS.md)）。
-- **檢索資料**：`capabilities.json` 109 項功能（86 項可開）、5 種外語的標題與關鍵字、464 句口語例句、Unihan 台灣讀音表（2 萬多字）、市府 FAQ 8,121 筆的 e5 索引。
-- **原則**：**不用中國開發的模型與工具**（CosyVoice、sherpa-onnx、GPT-SoVITS、FunASR 等一律不用）；**官方 TownPass-Services 網頁不修改、不複製、不打包**，App 透過網頁自己的換頁機制（History API）在頁面內切換；模型檔不放進 repo 也不放進 APK，由開發者自己推到手機。
-- 評估過但不採用：Breeze-ASR-25（中文，5.4 秒太慢）、Whisper medium／large-turbo（太慢）、bge 向量模型（換成 e5）、ViWhisper（訓練資料授權不明）、alexachang 台語模型（訓練資料不明，只當對照）。
+- **切到背景再回來**（兩個平台，2026-11-13）：回到前景時用真正的 HTTP 請求（`/health`）檢查每個模型，沒回應的重新啟動（Android 的重新啟動是 2026-11-13 加的）；
+  模型回應過以後才連不上或停住時只等幾秒（`liveness`），這一句先列出候選或請使用者再說一次，不再一直等。iPhone 17 Pro Max 實機上，iOS 收回的埠約 1 秒內重新 bind。
+- **模型下載**：模型不包在 App 裡；第一次打開助理時問「下載離線助理（約 X GB）」，使用者同意才下載，可暫停、續傳、檢查 SHA-256。
+  Whisper、Ministral、Gemma 從原作者的 Hugging Face 下載；我們自己轉檔或訓練的檔案（決策分類器、e5、FAQ 索引、Breeze、PhoWhisper）放團隊的 Hugging Face [`allensung1226/townpass-assistant-models`](https://huggingface.co/allensung1226/townpass-assistant-models)。
+  依手機總記憶體分級：7 GB 以上全部（台語 q4_0 可選）；7 GB 以下只有核心；**決策分類器每個等級都下載**，所以預設的決策模型只要 0.13 GB（Ministral 2.15 GB）。開發者用 adb／devicectl 推的檔案照樣有效（[AI_MODEL_DOWNLOAD.md](docs/AI_MODEL_DOWNLOAD.md)）。
+- **檢索資料**：`capabilities.json` 109 項功能（86 項可開）、5 種外語的標題與關鍵字、602 句口語例句、Unihan 台灣讀音表（2 萬多字）、市府 FAQ 8,121 筆的 e5 索引、內政部的全國 368 個鄉鎮市區名稱（區公所不開到別區）。
+- **原則**：**不用中國開發的模型與工具**（CosyVoice、sherpa-onnx、GPT-SoVITS、FunASR 等一律不用）；**官方 TownPass-Services 網頁不修改、不複製、不打包**，App 透過網頁自己的換頁機制（History API）在頁面內切換；模型檔不放進 repo 也不放進 APK，由 App 在使用者同意後下載，或由開發者自己推到手機。
+- 評估過但不採用：Breeze-ASR-25（中文，5.4 秒太慢）、Breeze-ASR-26 q8_0／q4_K（換成 q4_0：和 q8_0 一樣準、檔案約一半，ARM 上三種裡最快）、Whisper medium／large-turbo（太慢）、bge 向量模型（換成 e5）、ViWhisper（訓練資料授權不明）、alexachang 台語模型（訓練資料不明，只當對照）。
 
-速度上做過的事（詳見技術總覽第 6 節）：字母選項＋精確文法讓每次決策只生成 6 個 token（省約 1 秒）；系統提示 KV 快取、3 個快取槽；tiny 語言判斷讓中文每句約 2.0 → 1.5 秒；`audio_ctx` 依句長縮短讓 3 秒句編碼從約 2 秒降到 0.4 秒；清楚的語意命中與單一候選不問模型（省約 4 秒）。
+速度上做過的事（詳見技術總覽第 6 節）：預設的決策分類器不生成文字，每輪決策估計約 0.1–0.2 秒（同樣方法估計 Ministral 約 3–5 秒）；決策 LLM 模式下，字母選項＋精確文法讓每次決策只生成 6 個 token（省約 1 秒）、系統提示 KV 快取、3 個快取槽；tiny 語言判斷讓中文每句約 2.0 → 1.5 秒；`audio_ctx` 依句長縮短讓 3 秒句編碼從約 2 秒降到 0.4 秒；清楚的語意命中與單一候選不問模型（省約 4 秒）。
 
 ## 數字
 
 以下全部來自 `docs/` 的紀錄；保留集（held-out）只用來報告，不拿來調規則，**開錯頁必須維持不增加**。
+每個標題都寫了是**電腦評估**還是**手機實測**；電腦評估的秒數是換算出來的估計，不是手機量到的。
 
-### 決策（電腦，Ollama ministral-3:3b，2026-11-08）
+### 決策：預設分類器對 Ministral（電腦評估，2026-11-13）
 
-| 評估集 | 結果 | 開錯頁 |
+分類器用手機同一份 q8_0 檔案（llama-server `--reranking`）、App 的分類器模式設定；Ministral 用 Ollama `ministral-3:3b`。數字來自 [AI_DECISION_CLASSIFIER.md](docs/AI_DECISION_CLASSIFIER.md) 第 10、12、13 節。
+
+| 評估集 | 決策分類器（預設） | Ministral 3B |
 | --- | --- | --- |
-| dev（190 句） | 187–188／190 | **0** |
-| held-out（102 句） | 97／102 | **0** |
-| 多語 eval_i18n（5 種外語 46 句） | 46／46 | **0** |
-| 越南文 vi_variants（20 句：不打聲調、口音、問句、否定） | 11／20 → **19／20**（比對層），加上端到端修正後 20／20 | 0 |
+| held-out（102 案例，只報告） | 95，開錯頁 **0**（作品名規則之前 93） | 97，開錯頁 **0** |
+| dev 原本的 245 案例 | 242，開錯頁 **0** | 241，開錯頁 **0** |
+| dev 新增的作品名 18 題（「借魯冰花」與「借露營燈」這類） | 18 題全部照預期，開錯頁 **0** | 15，開錯頁 3（遊戲、夜市、煙火開成圖書） |
+| 多語 eval_i18n（5 種外語 96 句，有／無指定語言） | 96／96，開錯頁 **0** | 96／96，開錯頁 **0** |
+| 口語四組（中文口語 100、外語 held-out 125、口語 dev 216、報告 held-out 80）開錯頁合計 | **3** | 16 |
+| 每輪決策時間（手機秒數估計） | 約 0.1–0.2 秒 | 約 3–5 秒 |
+| 要下載的決策模型 | 0.13 GB | 2.15 GB |
+
+- 代價：分類器比較常把候選列出來讓使用者多按一下，held-out 少約 2 句；擁有者 2026-11-13 決定接受，改成 App 的預設。
+- 每輪秒數：決策 LLM 用手機實測的讀提示／生成速度換算；分類器**假設**每個候選 0.10 秒（約電腦單執行緒的 3 倍），**手機上還沒量**。
+- 越南文 vi_variants（20 句：不打聲調、口音、問句、否定；2026-11-08，Ministral）：11／20 → **19／20**（比對層），加上端到端修正後 20／20，開錯頁 0。
 
 ### 語音與語言
 
@@ -273,21 +302,23 @@ flowchart LR
 | 越南文：PhoWhisper 對 Whisper small（合成越南文指令 168 句） | 答對 113 → **158**；字錯率 32.5% → **7.8%**；只看擁有者的測法（Google 翻譯語音、越南文選單）**28／42 → 40／42**；開錯頁 0 | [AI_VIETNAMESE.md](docs/AI_VIETNAMESE.md) §7 |
 | 越南文朗讀句（FLEURS 60 段） | 字錯率 32.4%（small）→ 13.9%（PhoWhisper-small） | 同上 §3 |
 
-### 手機速度（vivo V2511，Android）
+### 手機速度（Android 實測，vivo V2511）
 
-- 中文一句：約 **1.5 秒**辨識 ＋ 決策 **2–5 秒**（Gemma 快、Ministral 準）。
-- 台語：約 **4 秒**（Breeze 3.4–4.4 秒）；華語偶爾會多跑一次台語模型，慢約 3 秒。
+- 中文一句：約 **1.5 秒**辨識。決策 LLM 模式下決策 **2–5 秒**（Gemma 快、Ministral 準）；預設的分類器模式**還沒在實機上量**（電腦評估估計每輪 0.1–0.2 秒，見上）。
+- 台語：Breeze q8_0 實測約 **4 秒**（3.4–4.4 秒）；現在用的 q4_0 在雲端 ARM 測速（`ci/arm-bench-whisper` 分支）推估每段 3.6–4.2 秒，是三種量化裡最快的，手機上還沒量。華語偶爾會多跑一次台語模型，慢約 3 秒。
 - 越南文：PhoWhisper-base 在手機上還沒量，電腦上約 1.4 秒。
 - 第一次啟動要載模型約 1–2 分鐘，並在背景建語意索引約 1 分鐘（之後有快取）。
+- 分類器模式在 Android 上到 2026-11-13 只在模擬器上跑過端到端（下載分類器、開頁；找到的 5 個問題已修正並在模擬器上重現驗證），模擬器的秒數不能代表手機。
 
-### 手機速度（iPhone 17，iOS）
+### 手機實測（iPhone）
 
-- 決策模型用 Metal GPU：讀提示 282–505 tok/s（Android 約 50），一次決策約 **0.9 秒**。
-- 8 GB 機型載不下台語模型，會當中文處理並提示；12 GB 的 Pro Max 可以載。
+- **iPhone 17 Pro Max（2026-11-13，分類器模式，雲端 CI 建置後側載）**：App 內下載模型、中文語音、鎖定與切到背景再回來（iOS 收回的埠約 1 秒內重新 bind）、台語 q4_0 載入約 **0.8 秒**，沒有閃退。
+  台語的記憶體很緊（載入要約 2.1 GB，iOS 給這個 App 約 2.2 GB），所以載入前一律檢查，不夠就當中文聽。
+- **iPhone 17（2026-11-08，Ministral）**：決策模型用 Metal GPU，讀提示 282–505 tok/s（Android 約 50），一次決策約 **0.9 秒**。
 
 ### 測試
 
-Python 約 350 個單元測試、Flutter 568 個；教學流程 177 條重播；`extract_guide_strings.py --check` 檢查 6 語教學文字缺漏。
+Python 517 個單元測試、Flutter 611 個（2026-11-13）；教學流程 177 條重播；`extract_guide_strings.py --check` 檢查 6 語（中、英、日、越、印、菲）教學文字缺漏。
 
 ## 怎麼跑
 
@@ -298,9 +329,9 @@ Python 約 350 個單元測試、Flutter 568 個；教學流程 177 條重播；
 | Android | Windows（adb） | `scripts\run_assistant_on_device.ps1 -DeviceId <id>` |
 | iPhone | Mac＋Xcode | `scripts/run_assistant_on_device.sh --push-models`（第一次；之後不加） |
 
-兩邊都要 FVM（Flutter 3.47.6 鎖在 `.fvmrc`），模型檔放在 repo 外，由開發者推到手機。
+兩邊都要 FVM（Flutter 3.47.6 鎖在 `.fvmrc`），模型檔放在 repo 外：由開發者推到手機，或讓 App 第一次打開助理時下載（使用者同意才下載）。
 
-**Android**：Windows、Android SDK（Platform 36、NDK 29）、JDK 17、Python 3.11+、adb，建議 12 GB 記憶體的手機；
+**Android**：Windows、Android SDK（Platform 36、NDK 29）、JDK 17、Python 3.11+、adb；手機 7 GB 以上記憶體可以下載全部模型（7 GB 以下只有核心＋分類器）；
 模型預設在 `D:\TownPassAssistant\models\...`（見 `scripts/prepare_assistant_models.ps1`）。
 
 ```powershell
@@ -310,14 +341,15 @@ fvm dart run build_runner build --delete-conflicting-outputs   # 產生檔不在
 
 .\scripts\build_assistant_native.ps1                           # llama-server、whisper-server 的 .so（不在 Git）
 
-# 第一次或換模型時推模型；預設推 Ministral、Whisper small、tiny、e5 與 FAQ 索引
+# 第一次或換模型時推模型（也可以不推，讓 App 自己下載）；預設推決策分類器、Ministral、Whisper small、tiny、e5 與 FAQ 索引
 .\scripts\push_assistant_models.ps1 -DeviceId <id> `
-    -Taiwanese  D:\TownPassAssistant\models\taiwanese\ggml-breeze-asr-26-q8_0.bin `
+    -Taiwanese  D:\TownPassAssistant\models\taiwanese\ggml-breeze-asr-26-q4_0.bin `
     -Vietnamese D:\TownPassAssistant\models\vietnamese\ggml-phowhisper-base-q8_0.bin
 
-.\scripts\run_assistant_on_device.ps1 -DeviceId <id>                       # 引導介面、Ministral
-.\scripts\run_assistant_on_device.ps1 -DeviceId <id> -DecisionModel gemma  # 用 Gemma 決策
-.\scripts\run_assistant_on_device.ps1 -DeviceId <id> -Chat                 # 聊天面板
+.\scripts\run_assistant_on_device.ps1 -DeviceId <id>                           # 引導介面、決策分類器（預設）
+.\scripts\run_assistant_on_device.ps1 -DeviceId <id> -DecisionModel ministral  # 用 Ministral 決策
+.\scripts\run_assistant_on_device.ps1 -DeviceId <id> -DecisionModel gemma      # 用 Gemma 決策
+.\scripts\run_assistant_on_device.ps1 -DeviceId <id> -Chat                     # 聊天面板
 ```
 
 **iPhone**：Mac＋Xcode；模型放在 `~/Library/Application Support/TownPassAssistant/models`（見 `scripts/push_assistant_models_ios.sh`）。
@@ -330,13 +362,14 @@ scripts/run_assistant_on_device.sh --push-models     # 第一次：建置、安�
 scripts/run_assistant_on_device.sh --chat            # 聊天面板
 ```
 
-iPhone 目前只有 Ministral（沒有 Gemma），越南文用 Whisper small。一鍵腳本是 2026-11-10 新加的、還沒在 Mac 上實跑；手動步驟見 [docs/AI_ON_DEVICE_IOS.md](docs/AI_ON_DEVICE_IOS.md)。
+iPhone 有決策分類器（預設）與 Ministral（`--decision-model ministral`），沒有 Gemma，越南文用 Whisper small。一鍵腳本是 2026-11-10 新加的、還沒在 Mac 上實跑；手動步驟見 [docs/AI_ON_DEVICE_IOS.md](docs/AI_ON_DEVICE_IOS.md)。
+沒有 Mac 時：`ci/ios-build` 分支用 GitHub Actions 建置未簽章的 iPhone App，再自己側載（說明在該分支的 `docs/IOS_BUILD_WITHOUT_MAC.md`）；2026-11-13 的 iPhone 實測就是這樣建置的。
 
 - 完整的開發者指南（目錄、模型清單、改東西的流程、評估指令、目前限制）：[ASSISTANT_README.md](ASSISTANT_README.md)。
 - 電腦上開發（Ollama ＋ Python，模擬器，不用手機）：[docs/TEAM_LOCAL_SETUP.md](docs/TEAM_LOCAL_SETUP.md)。
 - 看記錄：`adb logcat -s TownPassAssistant python.stdout`；`timing speech` 行有語言判斷結果與耗時，`timing turn` 行有決策耗時。
 - 完全關掉助理：`--dart-define=ASSISTANT_ENABLED=false`。
-- iPhone 版已在 iPhone 17 上以 release 實機驗證（2026-11-08–09）；Android 以 Debug APK 實機驗證，Release 尚未驗證。
+- iPhone 版已在 iPhone 17 上以 release 實機驗證（2026-11-08–09，Ministral），2026-11-13 在 iPhone 17 Pro Max 上驗證分類器模式（雲端 CI 建置）；Android 以 Debug APK 實機驗證（決策 LLM 模式；分類器預設還沒上實機），Release 尚未驗證。
 
 ## 專案結構
 
@@ -349,10 +382,11 @@ Flutter App 維持在 repo 根目錄，官方目錄不搬動（見 [AGENTS.md](A
 | **`lib/page/assistant/`** | 聊天面板、`assistant_texts.dart`（介面文字 6 語） |
 | **`lib/service/`**（新增部分） | 後端連線、頁面翻譯、語言選單、建議句、動作執行 |
 | **`lib/util/tp_web_view.dart`** | WebView：翻譯注入、頁內換頁 |
-| **`assistant_backend/`** | Python 後端：`workflow.py`（流程）、`server.py`（HTTP、檢索、模型呼叫）、`decision.py`（文法限制）、`asr_server.py`（語音、語言判斷、台語／越南文路徑）、`registry.py`／`phonetic.py`／`semantic.py`／`faq.py`／`emergency.py`／`i18n.py`／`vietnamese.py`／`taiwanese_gate.py`／`plausibility.py`、`device_main.py`（手機啟動）、`evaluate.py` 等評估、`test_*.py` |
-| **`assets/assistant/`** | `capabilities.json`、`capabilities_i18n.json`、`capability_examples.json`、`guide_*.json` |
+| **`assistant_backend/`** | Python 後端：`workflow.py`（流程）、`server.py`（HTTP、檢索、模型呼叫）、`classifier.py`（決策分類器）、`book_title.py`（只說作品名的借書）、`decision.py`（文法限制、沒有決策模型時的規則）、`asr_server.py`（語音、語言判斷、台語／越南文路徑）、`registry.py`／`phonetic.py`／`semantic.py`／`faq.py`／`emergency.py`／`i18n.py`／`vietnamese.py`／`indonesian.py`／`places.py`／`taiwanese_gate.py`／`plausibility.py`、`models.py`（模型下載與分級）、`liveness.py`（模型沒回應時不久等）、`device_main.py`（手機啟動）、`evaluate.py` 等評估、`test_*.py` |
+| **`assets/assistant/`** | `capabilities.json`、`capabilities_i18n.json`、`capability_examples.json`、`guide_*.json`、`models.json`（下載清單：大小、SHA-256、來源、授權） |
 | **`assets/i18n/`** | `app_strings.json`（App 文字預翻）、`guide/*.json`（教學文字 6 語） |
-| **`android/app/src/ondevice/`** | Kotlin：啟動各模型伺服器、CPU 綁定、Gemma／台語／越南文選項 |
+| **`android/app/src/ondevice/`** | Kotlin：啟動各模型伺服器、CPU 綁定、分類器／Gemma／台語／越南文、停住或結束時重新啟動 |
+| **`ios/Runner/OnDeviceAssistant.swift`、`ios/native/`、`ios/scripts/`** | iPhone：在 App 內以執行緒啟動各模型伺服器、鎖定後重新 bind、記憶體額度檢查、Xcode 內嵌階段 |
 | **`scripts/`** | 建置原生程式庫、推模型、評估、抽字串 |
 | **`tool/guide_audit/`** | 教學流程錄製與重播（Node ＋ Chrome） |
 | **`docs/`** | 規則、技術總覽、各實驗紀錄、團隊待辦；`docs/images/` 是本頁的截圖 |
@@ -363,26 +397,27 @@ Flutter App 維持在 repo 根目錄，官方目錄不搬動（見 [AGENTS.md](A
 | --- | --- |
 | 先讀 | [ASSISTANT_README.md](ASSISTANT_README.md)（開發指南）、[AI_CURRENT_RULES.md](docs/AI_CURRENT_RULES.md)（行為規則唯一準則）、[AI_TECHNICAL_OVERVIEW.md](docs/AI_TECHNICAL_OVERVIEW.md)（技術總覽）、[AI_DECISION_FLOW.md](docs/AI_DECISION_FLOW.md)（從語音／打字到回覆） |
 | 語音 | [AI_LANGUAGE_GATE.md](docs/AI_LANGUAGE_GATE.md)（語言閘門）、[AI_ASR_ABLATION.md](docs/AI_ASR_ABLATION.md)（語音辨識消融）、[AI_TAIWANESE_SPEECH_PLAN.md](docs/AI_TAIWANESE_SPEECH_PLAN.md)（台語辨識與朗讀）、[AI_TAIWANESE_RECORDING_SCRIPT.md](docs/AI_TAIWANESE_RECORDING_SCRIPT.md)（台語錄音稿）、[AI_VIETNAMESE.md](docs/AI_VIETNAMESE.md)（越南文） |
-| 多語 | [AI_MULTILINGUAL_PLAN.md](docs/AI_MULTILINGUAL_PLAN.md) |
-| 檢索與決策 | [AI_FAQ_RAG.md](docs/AI_FAQ_RAG.md)（市府 FAQ 檢索）、[AI_COLLOQUIAL_MATCHING_EXPERIMENT.md](docs/AI_COLLOQUIAL_MATCHING_EXPERIMENT.md)（口語對頁面）、[AI_DECISION_MODEL_ABLATION_PLAN.md](docs/AI_DECISION_MODEL_ABLATION_PLAN.md)、[SPEED_LIBRARY_EXPERIMENT.md](docs/SPEED_LIBRARY_EXPERIMENT.md)、[AI_TOOL_CALLING_PLAN.md](docs/AI_TOOL_CALLING_PLAN.md) |
+| 多語 | [AI_MULTILINGUAL_PLAN.md](docs/AI_MULTILINGUAL_PLAN.md)、[AI_INDONESIAN.md](docs/AI_INDONESIAN.md)（印尼文）、[AI_FILIPINO.md](docs/AI_FILIPINO.md)（菲律賓文） |
+| 檢索與決策 | [AI_DECISION_CLASSIFIER.md](docs/AI_DECISION_CLASSIFIER.md)（決策分類器，預設）、[AI_FAQ_RAG.md](docs/AI_FAQ_RAG.md)（市府 FAQ 檢索）、[AI_COLLOQUIAL_MATCHING_EXPERIMENT.md](docs/AI_COLLOQUIAL_MATCHING_EXPERIMENT.md)（口語對頁面）、[AI_DECISION_MODEL_ABLATION_PLAN.md](docs/AI_DECISION_MODEL_ABLATION_PLAN.md)、[SPEED_LIBRARY_EXPERIMENT.md](docs/SPEED_LIBRARY_EXPERIMENT.md)、[AI_TOOL_CALLING_PLAN.md](docs/AI_TOOL_CALLING_PLAN.md) |
 | 介面與教學 | [AI_GUIDED_MERGE_PLAN.md](docs/AI_GUIDED_MERGE_PLAN.md)（引導式助理）、[AI_FORM_PREFILL_PLAN.md](docs/AI_FORM_PREFILL_PLAN.md)（表單預填）、[AI_VOICE_UI_PLAN.md](docs/AI_VOICE_UI_PLAN.md)、[GUIDE_AUDIT_TEAM_REQUESTS.md](docs/GUIDE_AUDIT_TEAM_REQUESTS.md) |
-| 裝置端與服務覆蓋 | [AI_ON_DEVICE_PLAN.md](docs/AI_ON_DEVICE_PLAN.md)、[AI_SERVICE_COVERAGE_PLAN.md](docs/AI_SERVICE_COVERAGE_PLAN.md)、[AI_ALL_FEATURES_ROLLOUT_PLAN.md](docs/AI_ALL_FEATURES_ROLLOUT_PLAN.md)、[AI_EXPANSION_IMPLEMENTATION.md](docs/AI_EXPANSION_IMPLEMENTATION.md)、[FEATURE_AVAILABILITY_20261104.md](docs/FEATURE_AVAILABILITY_20261104.md) |
+| 裝置端與服務覆蓋 | [AI_ON_DEVICE_PLAN.md](docs/AI_ON_DEVICE_PLAN.md)、[AI_ON_DEVICE_IOS.md](docs/AI_ON_DEVICE_IOS.md)（iPhone）、[AI_MODEL_DOWNLOAD.md](docs/AI_MODEL_DOWNLOAD.md)（App 內下載與分級）、[AI_SERVICE_COVERAGE_PLAN.md](docs/AI_SERVICE_COVERAGE_PLAN.md)、[AI_ALL_FEATURES_ROLLOUT_PLAN.md](docs/AI_ALL_FEATURES_ROLLOUT_PLAN.md)、[AI_EXPANSION_IMPLEMENTATION.md](docs/AI_EXPANSION_IMPLEMENTATION.md)、[FEATURE_AVAILABILITY_20261104.md](docs/FEATURE_AVAILABILITY_20261104.md) |
 | 圖書助理（第一階段） | [AI_PHASE1_IMPLEMENTATION.md](docs/AI_PHASE1_IMPLEMENTATION.md)、[AI_LIBRARY_IMPLEMENTATION_STEPS.md](docs/AI_LIBRARY_IMPLEMENTATION_STEPS.md) |
 | 進度、測試與團隊 | [AI_ASSISTANT_PROGRESS.md](docs/AI_ASSISTANT_PROGRESS.md)、[AI_ASSISTANT_TEST_REPORT_20261107.md](docs/AI_ASSISTANT_TEST_REPORT_20261107.md)、[TEAM_TASKS_AFTER_MERGE.md](docs/TEAM_TASKS_AFTER_MERGE.md)、[AI_AGENT_HANDOFF.md](docs/AI_AGENT_HANDOFF.md)、[TEAM_LOCAL_SETUP.md](docs/TEAM_LOCAL_SETUP.md) |
 | 官方與同步 | [UPSTREAM_README.md](docs/UPSTREAM_README.md)（官方專案說明）、[DEVELOPMENT.md](docs/DEVELOPMENT.md)、[UPSTREAM_SYNC_20261103.md](docs/UPSTREAM_SYNC_20261103.md)、[AGENTS.md](AGENTS.md) |
 
-目前狀態與限制（2026-11-10）：外語介面與教學文字是 AI 翻譯草稿，待母語者校對；台語只有辨識、朗讀用中文；
-泰文已換成菲律賓文（2026-11-11，翻譯是 AI 草稿，待母語者審閱，[docs/AI_FILIPINO.md](docs/AI_FILIPINO.md)）。待辦有印尼文優化、台語朗讀、iPhone 的 Gemma 與越南文模型，Android Release 未驗證。詳見 [docs/TEAM_TASKS_AFTER_MERGE.md](docs/TEAM_TASKS_AFTER_MERGE.md)。
+目前狀態與限制（2026-11-13）：外語介面與教學文字是 AI 翻譯草稿，待母語者校對；台語只有辨識、朗讀用中文；
+泰文已換成菲律賓文（2026-11-11，翻譯是 AI 草稿，待母語者審閱，[docs/AI_FILIPINO.md](docs/AI_FILIPINO.md)）；印尼文的比對已優化（2026-11-11），印尼文專用語音模型尚未接進 App。
+預設的決策分類器還沒在 Android 實機上量速度與記憶體。待辦有台語朗讀、iPhone 的 Gemma 與越南文模型，Android Release 未驗證。詳見 [docs/TEAM_TASKS_AFTER_MERGE.md](docs/TEAM_TASKS_AFTER_MERGE.md)。
 
 ## 授權
 
 - 本 repository 的程式沿用上游 TownPass 的 [GPL-3.0](LICENSE)；保留原作者與來源聲明，對外散布時依 GPL-3.0 條款處理。
-- 模型檔**不在 repo、不在 APK**，由開發者自行下載並推到手機，授權依各模型：Ministral（Apache-2.0）、Gemma（Gemma 授權）、Whisper（MIT）、Breeze-ASR-26（Apache-2.0；散布時要附授權全文與「轉成 ggml、量化成 q8_0」的說明）、PhoWhisper（BSD-3，保留著作權聲明）、multilingual-e5-small（MIT）、ML Kit（Google 條款）。
+- 模型檔**不在 repo、不在 APK**，由 App 在使用者同意後從原作者與團隊的 Hugging Face 下載，或由開發者推到手機，授權依各模型：決策分類器（MIT，本專案由 multilingual-e5-small 微調）、Ministral（Apache-2.0）、Gemma（Gemma 授權）、Whisper（MIT）、Breeze-ASR-26（Apache-2.0；散布時要附授權全文與「轉成 ggml、量化成 q4_0」的說明）、PhoWhisper（BSD-3，保留著作權聲明）、multilingual-e5-small（MIT）、ML Kit（Google 條款）。
 - 示範用的網頁服務、mock 帳號與 JSON 不代表已取得正式台北通登入或政府 API 的授權。
 
 ## 致謝
 
 - 臺北市政府資訊局開源的 [TownPass](https://github.com/taipei-doit/TownPass) 與 [TownPass-Services](https://github.com/taipei-doit/TownPass-Services)：本專案建立在官方 App 架構與示範網頁服務之上，網頁服務未修改、未打包。
 - 資料：臺北市資料大平台〈[臺北市市政網站整合平台之常見問答](https://data.taipei/dataset/detail?id=203f1657-bb4a-45a7-b25f-279b63136645)〉（市府 FAQ 8,121 筆的來源）。
-- 模型與工具：Mistral AI（Ministral 3）、Google（Gemma 4、ML Kit）、OpenAI（Whisper）、聯發科技研究中心與陽明交通大學（Breeze-ASR-26）、VinAI（PhoWhisper）、Microsoft（multilingual-e5-small）、[llama.cpp](https://github.com/ggml-org/llama.cpp)、[whisper.cpp](https://github.com/ggml-org/whisper.cpp)、[Chaquopy](https://chaquo.com/chaquopy/)、Unihan 資料庫。
+- 模型與工具：Mistral AI（Ministral 3）、Google（Gemma 4、ML Kit）、OpenAI（Whisper）、聯發科技研究中心與陽明交通大學（Breeze-ASR-26）、VinAI（PhoWhisper）、Microsoft（multilingual-e5-small，也是決策分類器的基底）、[llama.cpp](https://github.com/ggml-org/llama.cpp)、[whisper.cpp](https://github.com/ggml-org/whisper.cpp)、[Chaquopy](https://chaquo.com/chaquopy/)、Unihan 資料庫。
 - README 的版面參考了 taipei-doit 2025 年作品 [Carbon Notebook](https://github.com/taipei-doit/townpass2025-carbon-notebook) 的結構；內容與設計為本專案自行撰寫。

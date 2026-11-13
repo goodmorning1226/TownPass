@@ -9,11 +9,13 @@
 手機（Android，全部在裝置上執行，不連雲端模型）
 ├─ Flutter App（GetX）：引導助理（預設）／聊天面板、按住提問、WebView 服務頁、ML Kit 頁面翻譯
 ├─ Chaquopy Python 後端 :8765（assistant_backend/）：對話流程、檢索、決策、FAQ
-├─ llama-server b12182 :8771：決策模型（Ministral 3B，或 Gemma 4 E2B）
+├─ llama-server b12182 :8778：決策分類器（2026-11-13 起預設，`--reranking`；docs/AI_DECISION_CLASSIFIER.md）
+├─ llama-server :8771：決策 LLM（選項：Ministral 3B，或 Gemma 4 E2B；預設不載入）
 ├─ llama-server :8774：e5 向量模型（FAQ 與語意檢索）
 ├─ whisper-server v1.9.5 :8773：Whisper small（6 種語言辨識：中、英、日、越、印尼、菲律賓）
 ├─ whisper-server :8775：Whisper tiny（語言判斷，約 0.2 秒）
-└─ whisper-server :8776：Breeze-ASR-26（台語，第一次用到才啟動）
+├─ whisper-server :8776：Breeze-ASR-26 q4_0（台語，第一次用到才啟動）
+└─ whisper-server :8777：PhoWhisper-base（越南文，第一次用到才啟動）
 ```
 
 - 網路只用來抓資料：圖書館藏清單、台北通常見問答（示範網站），以及第一次下載 ML Kit 翻譯檔。
@@ -25,11 +27,12 @@
 
 | 用途 | 模型 | 量化／大小 | 開發者、授權 | 執行方式 | 手機速度 |
 | --- | --- | --- | --- | --- | --- |
-| 決策（預設） | Ministral-3-3B-Instruct-2512 | Q4_K_M，約 2.1 GB | Mistral AI（法國），Apache-2.0 | llama.cpp，`-c 6144 -np 3 --cache-ram 0 --reasoning off`；提示用 5 核、生成用 3 核 | 讀提示約 50 tok/s、生成約 5 tok/s，每次決策約 4.7 秒 |
+| 決策（預設，2026-11-13 起） | 決策分類器（cross-encoder，由 multilingual-e5-small 微調） | q8_0，132 MB | 本專案訓練（基底 Microsoft），MIT | llama-server `--reranking --pooling rank -c 2048 -np 4 -t 2`，port 8778；不載入決策 LLM | 手機未量；電腦評估估計每輪約 0.1–0.2 秒 |
+| 決策（選項，`-DecisionModel ministral`） | Ministral-3-3B-Instruct-2512 | Q4_K_M，約 2.1 GB | Mistral AI（法國），Apache-2.0 | llama.cpp，`-c 6144 -np 3 --cache-ram 0 --reasoning off`；提示用 5 核、生成用 3 核 | 讀提示約 50 tok/s、生成約 5 tok/s，每次決策約 4.7 秒 |
 | 決策（選項） | Gemma 4 E2B | Q4_0，2.84 GB | Google，Gemma 授權 | 同上，`-DecisionModel gemma` | 約 114／7.8 tok/s，每次約 2.3 秒；口語集開錯頁略多 |
 | 語音辨識 | Whisper small | q8_0，264 MB | OpenAI，MIT | whisper.cpp，`audio_ctx` 依句長縮短（256–1500） | 3 秒句約 0.8–1.2 秒 |
 | 語言判斷 | Whisper tiny | q8_0，44 MB | OpenAI，MIT | 只偵測語言（`detect_language`），`audio_ctx` 256，4 核 | 約 0.19 秒 |
-| 台語辨識 | Breeze-ASR-26 | q8_0，1.66 GB | 聯發科技研究中心＋陽明交大，Apache-2.0 | 以 `-l zh`、不給提示、`audio_ctx ≥ 500` 解碼，輸出中文字 | 約 3.4–4.4 秒 |
+| 台語辨識 | Breeze-ASR-26 | q4_0，848 MB（2026-11-13 起每支手機；原本 q8_0 1.66 GB） | 聯發科技研究中心＋陽明交大，Apache-2.0 | 以 `-l zh`、不給提示、`audio_ctx ≥ 500` 解碼，輸出中文字 | q8_0 實測約 3.4–4.4 秒；q4_0 雲端 ARM 推估 3.6–4.2 秒 |
 | 向量檢索 | multilingual-e5-small | q8_0，132 MB，384 維 | Microsoft，MIT | llama-server embedding，`query:`／`passage:` 前綴 | 一次查詢數十毫秒 |
 | 頁面翻譯 | ML Kit on-device translation | 每語言約 30 MB | Google | 第一次下載後離線 | 預翻好的字串直接用，剩下才即時翻 |
 | 越南文 | PhoWhisper-base（small 另有 264 MB 版） | q8_0，82 MB | VinAI（越南），BSD-3 | 需完整 `audio_ctx` 1500，第一次用到才啟動 | 手機未量（電腦約 1.4 秒）；字錯誤率 32% → 8%（合成語音請求） |

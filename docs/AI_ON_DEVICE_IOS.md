@@ -41,7 +41,7 @@ scripts/run_assistant_on_device.sh --chat          # 聊天面板（ASSISTANT_GU
 ```
 
 腳本會先檢查是 Mac、`ios/OnDevice/` 三個框架都在、裝置是 iPhone 實機（給 Android 裝置 ID 會提示改用 `.ps1`，模擬器直接拒絕）。
-`--decision-model` 只接受 `ministral`（iOS 還沒有 Gemma）。
+`--decision-model` 接受 `classifier`（預設，2026-11-13 起）與 `ministral`（iOS 還沒有 Gemma）。
 
 手動（同樣效果）：
 
@@ -59,10 +59,11 @@ Android 從 2026-11-10 起也認 `--dart-define=ASSISTANT_ON_DEVICE=true`（`and
 
 | 手機上的檔名 | 來源 | 大小 | 必要 |
 | --- | --- | --- | --- |
-| `Ministral-3-3B-Instruct-2512-Q4_K_M.gguf` | Mistral AI，Apache-2.0 | 2.1 GB | 是 |
+| `townpass-decision-e5-ce-v1-q8_0.gguf` | 決策分類器（本專案由 Microsoft multilingual-e5-small 微調），MIT | 132 MB | 分類器模式（預設）；`push_assistant_models_ios.sh` 還沒有這個檔，由 App 下載 |
+| `Ministral-3-3B-Instruct-2512-Q4_K_M.gguf` | Mistral AI，Apache-2.0 | 2.1 GB | `--decision-model ministral`（`push_assistant_models_ios.sh` 一律要它） |
 | `ggml-whisper-multilingual.bin` | Whisper small q8_0（ggerganov/whisper.cpp），MIT | 253 MB | 語音 |
 | `ggml-whisper-langid.bin` | Whisper tiny q8_0，MIT | 42 MB | 選用 |
-| `ggml-whisper-taiwanese.bin` | Breeze-ASR-26（MediaTek Research＋陽明交大），Apache-2.0；官方權重以 whisper.cpp `convert-h5-to-ggml.py` 轉換、`whisper-quantize` q8_0 | 1.66 GB | 台語（選用） |
+| `ggml-whisper-taiwanese.bin` | Breeze-ASR-26（MediaTek Research＋陽明交大），Apache-2.0；官方權重以 whisper.cpp `convert-h5-to-ggml.py` 轉換、`whisper-quantize` q4_0（2026-11-13 起；原本 q8_0 1.66 GB） | 848 MB | 台語（選用） |
 | `multilingual-e5-small-q8_0.gguf`＋`faq_rag/` | Microsoft，MIT（`prepare_assistant_models.ps1`、`build_faq_index.py`） | 132 MB＋22 MB | 選用 |
 
 紀錄：`Library/Caches/on_device_assistant.log`（Python 與各 server 的輸出，只有數字與檔名），可用
@@ -162,6 +163,10 @@ Android 不受影響：`AssistantOnDevice.start` 在 Android 不啟用，`settle
 **實測步驟**：同上一節 1–5，再加：6. 下載台語（iPhone 會是 q4_0，848 MB），說一句台語，看 `taiwanese speech: needs … address space ok`、
 `taiwanese speech loaded`；不夠時應看到 `memory`、App 不閃退。7. 鎖定 1 分鐘再解鎖，紀錄應有 `bound again`，
 問一句話 3 秒內有回應。
+
+**實測結果（2026-11-13，iPhone 17 Pro Max，分類器模式，雲端 CI 建置後側載）**：App 內下載模型、中文語音、鎖定與切到背景再回來都正常
+（紀錄顯示 iOS 收回 :8774／:8778 後約 1 秒內 `bound again`）；台語 q4_0 載入約 0.8 秒、沒有閃退，但記憶體很緊（需要約 1,847＋256 MB，額度約 2,204 MB）。
+這次的建置沒有 `increased-memory-limit` entitlement。
 
 ## 與 Android 的差別
 
