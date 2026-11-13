@@ -17,13 +17,13 @@ import 'package:flutter/widgets.dart';
 class AssistantOnDevice {
   static const requested = bool.fromEnvironment('ASSISTANT_ON_DEVICE');
 
-  /// `--dart-define=ASSISTANT_DECISION_MODEL`: "ministral" (default), "gemma"
-  /// (Android only) or "classifier" (option B': no decision model, the 132 MB
-  /// decision classifier instead; docs/AI_DECISION_CLASSIFIER.md section 12).
+  /// `--dart-define=ASSISTANT_DECISION_MODEL`: "classifier" (the default since
+  /// 2026-11-13, option B': no decision model, the 132 MB decision classifier;
+  /// docs/AI_DECISION_CLASSIFIER.md section 12), "ministral" or "gemma" (Android only).
   /// Android reads it in its Gradle build; iOS gets it with "start".
   static const decisionModelDefine = String.fromEnvironment(
     'ASSISTANT_DECISION_MODEL',
-    defaultValue: 'ministral',
+    defaultValue: 'classifier',
   );
 
   /// [value] (default [decisionModelDefine]) as one of the known values; an
@@ -32,7 +32,7 @@ class AssistantOnDevice {
     final name = value.trim().toLowerCase();
     return const ['ministral', 'gemma', 'classifier'].contains(name)
         ? name
-        : 'ministral';
+        : 'classifier';
   }
 
   static const _channel = MethodChannel('townpass/on_device_assistant');

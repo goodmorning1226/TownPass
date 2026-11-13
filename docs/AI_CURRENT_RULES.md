@@ -121,13 +121,14 @@
 
 ## 6. 模型與資料
 
-- 全部在手機上跑：決策 Ministral 3B（預設）或 Gemma 4 E2B（`-DecisionModel gemma`）、Whisper small（語音）、Whisper tiny（語言判斷）、Breeze-ASR-26（台語）、PhoWhisper-base（越南文）、e5（檢索）。
+- 全部在手機上跑：決策分類器（預設，見下）、或 Ministral 3B（`-DecisionModel ministral`）、Gemma 4 E2B（`-DecisionModel gemma`，只有 Android）、Whisper small（語音）、Whisper tiny（語言判斷）、Breeze-ASR-26（台語）、PhoWhisper-base（越南文）、e5（檢索）。
   網路只用來抓資料（圖書館藏、台北通問答）、第一次下載 ML Kit 翻譯檔，以及使用者同意後下載模型（第 7 節）。
 - Android 和 iPhone 用同一份後端與規則、同一個開關 `--dart-define=ASSISTANT_ON_DEVICE=true`；Android 在 Windows 用 `scripts/run_assistant_on_device.ps1`，
   iPhone 在 Mac 用 `scripts/run_assistant_on_device.sh`（`docs/AI_ON_DEVICE_IOS.md`）。iPhone 目前只有 Ministral 與分類器模式（第 6 節；分類器模式還沒在 Mac 上編譯驗證），沒有 Gemma 與越南文模型（越南文用 Whisper small）。
 - 不用中國開發的模型與工具；不複製、打包官方 TownPass-Services 的程式或內容。
-- **決策分類器（選項 B′，2026-11-12，可選，預設仍是 Ministral）**：`-DecisionModel classifier`（`--dart-define=ASSISTANT_DECISION_MODEL=classifier`，
-  Android 與 iPhone 同一個值）**不載入任何決策 LLM**。原因：電腦評估四組口語集開錯頁 24→2（Ministral 用手機同一份檔案與參數）、
+- **決策分類器（選項 B′；2026-11-12 做成選項，2026-11-13 起是 App 的預設）**：不給 `-DecisionModel` 或給 `-DecisionModel classifier`（`--dart-define=ASSISTANT_DECISION_MODEL=classifier`，
+  Android 與 iPhone 同一個值）**不載入任何決策 LLM**；要用 LLM 時給 `-DecisionModel ministral`（或 `gemma`）。
+  改成預設的原因（擁有者 2026-11-13）：開錯頁少很多、記憶體與下載小很多（見下）；代價是 held-out 少約 4 句、較多請使用者多按一下，接受。電腦上的後端（`server.py`、評估）預設仍是 LLM，`TOWNPASS_DECISION_BACKEND=classifier_only` 才是這個模式。原因：電腦評估四組口語集開錯頁 24→2（Ministral 用手機同一份檔案與參數）、
   held-out 98→93（少的多半是只說作品名的借書），而且不用下載 2 GB 的決策模型（分類器 0.13 GB）。本分支（含印尼文、菲律賓文）重測：開錯頁 16（Ministral，Ollama）→3，held-out 97→93。擁有者同意做成 App 選項給手機實測。（`docs/AI_DECISION_CLASSIFIER.md` 第 10–12 節）
   - 頁面決策（關鍵字、語意、讀音、通用詞、意圖、書的候選確認）由分類器打分決定（Microsoft multilingual-e5-small 微調的 cross-encoder，MIT；
     llama-server `--reranking --pooling rank`，手機 port 8778）：只有一個已串接頁面而且分數夠高、沒有別的服務接近時才直接開，其餘列出讓使用者選，或請使用者補充。

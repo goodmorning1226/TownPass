@@ -56,14 +56,14 @@ void main() {
           return 'started python :8765';
         });
     // Tests run without --dart-define=ASSISTANT_DECISION_MODEL: the default.
-    expect(AssistantOnDevice.decisionModelDefine, 'ministral');
+    expect(AssistantOnDevice.decisionModelDefine, 'classifier');
     await AssistantOnDevice.start(isIOS: true, build: true, channel: channel);
     AssistantOnDevice.reset();
     await AssistantOnDevice.start(
       isIOS: true,
       build: true,
       channel: channel,
-      model: 'classifier',
+      model: 'ministral',
     );
     AssistantOnDevice.reset();
     await AssistantOnDevice.start(
@@ -73,9 +73,9 @@ void main() {
       model: 'unknown',
     );
     expect(arguments, [
-      {'decision_model': 'ministral'},
       {'decision_model': 'classifier'},
       {'decision_model': 'ministral'},
+      {'decision_model': 'classifier'},
     ]);
   });
 

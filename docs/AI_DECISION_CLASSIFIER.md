@@ -336,6 +336,8 @@ v3 的修正來自兩句 dev：「有沒有比較多人借的書」原本開到�
 ## 12. App 選項：選項 B′ 給手機實測（2026-11-12，分支 `feat/classifier-decision`）
 
 擁有者同意把選項 B′ 做成 App 的選項。預設不變（Ministral）；規則寫在 `AI_CURRENT_RULES.md` 第 6–7 節。
+
+**2026-11-13 起是 App 的預設**（擁有者決定：開錯頁少、記憶體與下載小）：不給 `-DecisionModel` 就是分類器模式；要用 LLM 給 `-DecisionModel ministral`（或 Android 的 `gemma`）。電腦上的後端與評估預設仍是 LLM。下面第 12.x 節的「預設 Ministral」是當時的情形。
 分支從 `feat/assistant-languages`（`da2f8a5`：main、模型下載、iOS 回復、第一句就緒、印尼文＋菲律賓文）開出，`git merge --no-commit exp/decision-classifier`（`94bdc10`）沒有衝突；
 `workflow.py` 裡語言規則（印尼文、菲律賓文「模型只回請補充就列出」）和分類器的掛勾都在，逐段看過。
 
