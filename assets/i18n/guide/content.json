@@ -241,12 +241,12 @@
    "id": "Baik, panduan sudah selesai. Sekarang Anda bisa melakukannya sendiri. Kalau mau saya pandu lagi, bilang saja.",
    "tl": "OK, tapos na ang gabay. Puwede ka nang magpatuloy nang mag-isa. Kung gusto mong gabayan kita ulit, sabihin mo lang sa akin."
   },
-  "好，你可以自己操作。需要我帶你做的時候，點「助理」再按「繼續引導」就可以。": {
-   "en": "OK, you can do it yourself. When you want me to guide you, tap “Assistant”, then “Resume guide”.",
-   "ja": "はい、ご自分で操作できます。案内が必要なときは、「アシスタント」をタップして「ガイドを再開」を押してください。",
-   "vi": "Được rồi, bạn có thể tự thao tác. Khi cần mình hướng dẫn, chạm “Trợ lý” rồi chạm “Tiếp tục hướng dẫn” là được.",
-   "id": "Baik, Anda bisa melakukannya sendiri. Kalau perlu saya pandu, ketuk “Asisten” lalu “Lanjutkan panduan”.",
-   "tl": "OK, puwede mo itong gawin nang mag-isa. Kapag gusto mong gabayan kita, i-tap ang “Assistant”, saka ang “Ituloy ang gabay”."
+  "好，你可以自己操作，這次的引導結束了。想再請我帶你做，跟我說一聲就好。": {
+   "en": "OK, you can do it yourself; this guide has ended. If you want me to guide you again, just tell me.",
+   "ja": "はい、ご自分で操作できます。今回のガイドは終了しました。また案内してほしいときは、声をかけてください。",
+   "vi": "Được rồi, bạn có thể tự thao tác, lần hướng dẫn này đã kết thúc. Muốn mình hướng dẫn lại thì cứ nói với mình.",
+   "id": "Baik, Anda bisa melakukannya sendiri; panduan kali ini sudah selesai. Kalau mau saya pandu lagi, bilang saja.",
+   "tl": "OK, puwede mo itong gawin nang mag-isa; tapos na ang gabay na ito. Kung gusto mong gabayan kita ulit, sabihin mo lang sa akin."
   },
   "好，想預約的時候再叫我。": {
    "en": "OK, call me when you want to reserve.",

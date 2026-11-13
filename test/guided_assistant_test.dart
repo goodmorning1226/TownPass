@@ -743,17 +743,30 @@ void main() {
       expect(c.locked, isFalse);
     });
 
-    test('我自己來 leaves the page free and can be resumed later', () {
+    // 2026-11-13 (docs/AI_CURRENT_RULES.md section 5): 我自己來 ends the
+    // guide like 結束引導; it used to stay as an ended task with 繼續引導.
+    test('我自己來 leaves the page free and ends the guide (no resume)', () {
       c.startGuide('library');
       onPage(home);
       c.goAlone();
       expect(c.card, isNull);
       expect(c.highlightTarget, isNull);
       expect(c.messages.last.text, Replies.goAlone);
-      expect(c.taskSecondaryLabel, '繼續引導');
+      expect(Replies.goAlone, isNot(contains('繼續引導')));
+      // No task left to resume: no 繼續引導, nothing restarts the steps.
+      expect(c.task.value, isNull);
+      expect(c.guiding, isFalse);
+      expect(c.taskTag, isEmpty);
+      expect(c.taskSecondaryLabel, isNot('繼續引導'));
       c.taskSecondary();
-      expect(c.task.value?.status, TaskStatus.on);
-      expect(c.highlightTarget, 'library.search_entry');
+      c.resume();
+      expect(c.task.value, isNull);
+      expect(c.highlightTarget, isNull);
+      // Asking again starts the guide afresh, at its opened card.
+      c.startGuide('library');
+      onPage(home);
+      expect(c.task.value?.status, TaskStatus.opened);
+      expect(c.card?.variant, CardVariant.opened);
     });
 
     test('leaving the page pauses; resuming opens it again', () {

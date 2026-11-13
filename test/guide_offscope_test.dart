@@ -5,9 +5,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:town_pass/page/guided_assistant/guide_target.dart';
 import 'package:town_pass/page/guided_assistant/guided_assistant_controller.dart';
 import 'package:town_pass/page/guided_assistant/model/assistant_settings.dart';
+import 'package:town_pass/page/guided_assistant/model/guide_content.dart';
+import 'package:town_pass/page/guided_assistant/model/guides/guide_registry.dart';
 import 'package:town_pass/page/guided_assistant/web/web_guide_probe.dart';
 import 'package:town_pass/page/guided_assistant/web/web_page_state.dart';
 import 'package:town_pass/page/guided_assistant/widget/guided_assistant_host.dart';
+import 'package:town_pass/page/perk/perk_view.dart';
 import 'package:town_pass/service/assistant_action_executor.dart';
 import 'package:town_pass/service/assistant_page_tracker.dart';
 import 'package:town_pass/service/assistant_speaker.dart';
@@ -56,6 +59,55 @@ class _FakeExecutor extends AssistantActionExecutor {
     opened.add(destination);
     onLoaded(null);
   }
+}
+
+/// The page is still loading: the load callbacks wait in [pending] until
+/// the test lets them through.
+class _HeldExecutor extends _FakeExecutor {
+  final pending = <void Function(String? error)>[];
+  @override
+  void open(
+    Map<String, dynamic> destination,
+    void Function(String? error) onLoaded, {
+    bool Function()? beforeBack,
+    bool Function()? isCurrent,
+  }) {
+    opened.add(destination);
+    pending.add(onLoaded);
+  }
+}
+
+/// The library guide with one submit step (確認送出卡, 好，我自己按／先不要):
+/// no shipped guide has one, but the card and its buttons still exist.
+Guide _commitGuide() {
+  final g = guideFromId('library')!;
+  return Guide(
+    id: 'test-commit',
+    title: g.title,
+    texts: g.texts,
+    route: g.route,
+    destination: g.destination,
+    spec: g.spec,
+    onPage: g.onPage,
+    pageName: g.pageName,
+    steps: [
+      GuideStep(
+        target: (_) => 'library.search_entry',
+        label: (_) => '步驟 1 / 1・確認',
+        card: (_) => '要送出嗎？',
+        detail: (_) => '要送出嗎？',
+        isDone: (_) => false,
+        commit: true,
+      ),
+    ],
+    todos: g.todos,
+    doneTodo: g.doneTodo,
+    stepCount: 1,
+    doneLabel: g.doneLabel,
+    doneText: g.doneText,
+    doneDetail: g.doneDetail,
+    components: const ['commit'],
+  );
 }
 
 void show(WebPageState s, String path) {
@@ -436,7 +488,10 @@ void main() {
     late ScrollController list;
     late TextEditingController field;
 
-    Future<GuidedAssistantController> pumpHost(WidgetTester tester) async {
+    Future<GuidedAssistantController> pumpHost(
+      WidgetTester tester, {
+      _FakeExecutor? executor,
+    }) async {
       tester.view.physicalSize = const Size(402, 874);
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.reset);
@@ -447,7 +502,7 @@ void main() {
       field = TextEditingController();
       addTearDown(list.dispose);
       addTearDown(field.dispose);
-      final c = _makeController(_FakeExecutor());
+      final c = _makeController(executor ?? _FakeExecutor());
       await tester.pumpWidget(
         MaterialApp(
           home: GuidedAssistantHost(
@@ -654,6 +709,451 @@ void main() {
       expect(slot('offScope:library'), findsNothing);
       expect(find.text('你離開了圖書借閱'), findsNothing, reason: 'not the bar');
       await finish(tester, c);
+    });
+
+    // ------------------------------------------------------------------
+    // docs/AI_CURRENT_RULES.md section 5 (2026-11-13): a guide the user
+    // ends is gone everywhere; leaving without ending pauses it.
+
+    const pace = Duration(milliseconds: 600);
+
+    /// Goes home (the App's first page) and opens the chat there.
+    Future<void> homeAndChat(
+      WidgetTester tester,
+      GuidedAssistantController c,
+    ) async {
+      c.routeChanged(TPRoute.main);
+      await frames(tester, pace);
+      c.fabPressed();
+      await frames(tester, pace);
+      expect(c.sheetOpen.value, isTrue);
+    }
+
+    /// The guide the user ended: nothing on the page or in the chat offers
+    /// it again, and a new request starts without the switch question.
+    Future<void> expectEnded(
+      WidgetTester tester,
+      GuidedAssistantController c,
+    ) async {
+      expect(c.task.value, isNull);
+      expect(c.guiding, isFalse);
+      await homeAndChat(tester, c);
+      expect(c.task.value, isNull, reason: 'nothing brought it back');
+      expect(slot('paused'), findsNothing);
+      expect(find.text('引導已暫停'), findsNothing);
+      expect(find.textContaining('目前任務'), findsNothing, reason: 'no card');
+      expect(find.text('繼續引導'), findsNothing);
+      expect(find.textContaining('結束引導'), findsNothing);
+      expect(find.textContaining('要回去接著'), findsNothing);
+      // The default suggestions, not the guide's help chips.
+      for (final chip in starterChips) {
+        expect(c.chips, contains(chip));
+      }
+      expect(c.chips, isNot(contains('下一步要做什麼？')));
+      expect(find.text(starterChips.first), findsWidgets);
+      // A new request starts at once.
+      final before = c.messages.length;
+      c.submit('我要繳水費');
+      await frames(tester, pace);
+      expect(
+        c.messages.skip(before).where((m) => m.options != null),
+        isEmpty,
+        reason: 'no switch question',
+      );
+      expect(find.textContaining('要先暫停'), findsNothing);
+      expect(c.task.value?.guide.id, startsWith('fees'));
+      expect(c.task.value?.status, TaskStatus.opened);
+    }
+
+    /// Left without ending: paused, the page shows 引導已暫停 with 回到〇〇
+    /// and the chat's task card offers 繼續引導, which picks it up again.
+    Future<void> expectPaused(
+      WidgetTester tester,
+      GuidedAssistantController c,
+    ) async {
+      await frames(tester, pace);
+      final t = c.task.value!;
+      expect(t.status, TaskStatus.paused);
+      expect(t.left, isTrue);
+      expect(slot('paused'), findsOneWidget);
+      expect(find.text('引導已暫停'), findsOneWidget);
+      expect(find.text(t.guide.resumeLabel), findsOneWidget);
+      c.fabPressed();
+      await frames(tester, pace);
+      expect(find.textContaining('目前任務'), findsOneWidget);
+      expect(find.text('已暫停'), findsOneWidget);
+      await tester.tap(find.text('看全部'));
+      await frames(tester, pace);
+      expect(find.text('繼續引導'), findsOneWidget);
+      await tester.tap(find.text('繼續引導'));
+      await frames(tester, pace);
+      expect(c.task.value?.status, TaskStatus.on);
+      expect(c.task.value?.guide.id, t.guide.id);
+      expect(c.sheetOpen.value, isFalse);
+    }
+
+    group('explicit end', () {
+      testWidgets('結束引導 on the paused card (on the page)', (tester) async {
+        final c = await pumpHost(tester);
+        await startSteps(tester, c);
+        await tester.tap(find.text('暫停'));
+        await frames(tester, pace);
+        expect(find.text('引導已暫停'), findsOneWidget);
+        await tester.tap(find.text('結束引導'));
+        await frames(tester, pace);
+        expect(c.messages.last.text, Replies.ended);
+        await expectEnded(tester, c);
+        await finish(tester, c);
+      });
+
+      testWidgets('結束引導 on the paused card after leaving the page', (
+        tester,
+      ) async {
+        final c = await pumpHost(tester);
+        await startSteps(tester, c);
+        c.routeChanged(TPRoute.main);
+        await frames(tester, pace);
+        expect(find.text('引導已暫停'), findsOneWidget);
+        await tester.tap(find.text('結束引導'));
+        await frames(tester, pace);
+        await expectEnded(tester, c);
+        await finish(tester, c);
+      });
+
+      testWidgets('結束引導 on the 你離開了 bar', (tester) async {
+        final c = await pumpHost(tester);
+        await startSteps(tester, c);
+        show(c.web, otherService);
+        await frames(tester, const Duration(milliseconds: 1200));
+        expect(find.text('你離開了圖書借閱'), findsOneWidget);
+        await tester.tap(find.text('結束引導'));
+        await frames(tester, pace);
+        expect(c.offScope.value, isFalse);
+        await expectEnded(tester, c);
+        await finish(tester, c);
+      });
+
+      testWidgets('結束引導，自己操作 on the chat task card', (tester) async {
+        final c = await pumpHost(tester);
+        await startSteps(tester, c);
+        c.fabPressed();
+        await frames(tester, pace);
+        await tester.tap(find.text('結束引導，自己操作'));
+        await frames(tester, pace);
+        expect(find.textContaining('目前任務'), findsNothing);
+        await expectEnded(tester, c);
+        await finish(tester, c);
+      });
+
+      testWidgets('結束引導 under 看全部 on the chat task card', (tester) async {
+        final c = await pumpHost(tester);
+        await startSteps(tester, c);
+        c.routeChanged(TPRoute.main); // paused, from home
+        await frames(tester, pace);
+        c.fabPressed();
+        await frames(tester, pace);
+        await tester.tap(find.text('看全部'));
+        await frames(tester, pace);
+        await tester.tap(find.text('結束引導'));
+        await frames(tester, pace);
+        await expectEnded(tester, c);
+        await finish(tester, c);
+      });
+
+      testWidgets('我自己來 on the opened card', (tester) async {
+        final c = await pumpHost(tester);
+        c.startGuide('library');
+        c.routeChanged(TPRoute.webView);
+        show(c.web, home);
+        await frames(tester, pace);
+        await tester.tap(find.text('我自己來'));
+        await frames(tester, pace);
+        expect(c.messages.last.text, Replies.goAlone);
+        expect(find.textContaining('繼續引導'), findsNothing);
+        await expectEnded(tester, c);
+        await finish(tester, c);
+      });
+
+      testWidgets('先不要 on the submit card', (tester) async {
+        final c = await pumpHost(tester);
+        c.routeChanged(TPRoute.webView);
+        show(c.web, home);
+        c.task.value = GuideTask(_commitGuide(), status: TaskStatus.on);
+        await frames(tester, pace);
+        expect(c.card?.variant, CardVariant.commit);
+        await tester.tap(find.text('先不要'));
+        await frames(tester, pace);
+        expect(c.messages.last.text, Replies.commitLater);
+        await expectEnded(tester, c);
+        await finish(tester, c);
+      });
+
+      testWidgets('知道了 on the done card', (tester) async {
+        final c = await pumpHost(tester);
+        await startSteps(tester, c);
+        c.task.value = c.task.value!.copyWith(stepsDone: true);
+        await frames(tester, pace);
+        expect(c.card?.variant, CardVariant.done);
+        await tester.tap(find.text('知道了'));
+        await frames(tester, pace);
+        await expectEnded(tester, c);
+        await finish(tester, c);
+      });
+
+      testWidgets('先不用 on the done card offering a follow-up', (tester) async {
+        final c = await pumpHost(tester);
+        c.startGuide(
+          'library',
+          followUpGuideId: 'fees@fees.history:filter_history',
+        );
+        c.routeChanged(TPRoute.webView);
+        show(c.web, home);
+        await frames(tester, pace);
+        await tester.tap(find.text('開始'));
+        c.task.value = c.task.value!.copyWith(stepsDone: true);
+        await frames(tester, pace);
+        expect(c.card?.text, contains('要接著做嗎'));
+        await tester.tap(find.text('先不用'));
+        await frames(tester, pace);
+        await expectEnded(tester, c);
+        await finish(tester, c);
+      });
+    });
+
+    group('leaving without ending', () {
+      testWidgets('another App screen', (tester) async {
+        final c = await pumpHost(tester);
+        await startSteps(tester, c);
+        c.routeChanged(TPRoute.setting);
+        await expectPaused(tester, c);
+        await finish(tester, c);
+      });
+
+      testWidgets('back (or swipe-back) to the first page', (tester) async {
+        final c = await pumpHost(tester);
+        await startSteps(tester, c);
+        c.routeChanged(TPRoute.main);
+        await expectPaused(tester, c);
+        await finish(tester, c);
+      });
+
+      testWidgets('another tab, for a guide on the 優惠 tab', (tester) async {
+        final c = await pumpHost(tester);
+        c.routeChanged(TPRoute.main);
+        c.tabChanged(PerkView.tabIndex);
+        final perks = {'kind': 'capability', 'id': 'app.perks'};
+        c.startGuide(GuidedAssistantController.guideFor(perks, null, '優惠')!.id);
+        c.web.snapshot.value = const WebSnapshot(
+          path: '/coupon',
+          flags: {'tab': '入場券', 'cards': 3},
+          visible: {'coupon.tab_coupons'},
+        );
+        await frames(tester, pace);
+        await tester.tap(find.text('開始'));
+        await frames(tester, pace);
+        expect(c.task.value?.status, TaskStatus.on);
+        c.tabChanged(0);
+        await expectPaused(tester, c);
+        await finish(tester, c);
+      });
+
+      testWidgets('the page leaves the guide, then home', (tester) async {
+        final c = await pumpHost(tester);
+        await startSteps(tester, c);
+        show(c.web, otherService);
+        await frames(tester, const Duration(milliseconds: 1200));
+        // On the page: the 你離開了 bar leads back; nothing ended.
+        expect(find.text('你離開了圖書借閱'), findsOneWidget);
+        expect(find.text(c.task.value!.guide.resumeLabel), findsOneWidget);
+        expect(c.task.value?.status, TaskStatus.on);
+        c.routeChanged(TPRoute.main);
+        await expectPaused(tester, c);
+        await finish(tester, c);
+      });
+    });
+
+    group('explicit end races', () {
+      testWidgets('結束引導, then back at once (and forth again)', (tester) async {
+        final c = await pumpHost(tester);
+        await startSteps(tester, c);
+        await tester.tap(find.text('暫停'));
+        await frames(tester, pace);
+        await tester.tap(find.text('結束引導'));
+        c.routeChanged(TPRoute.main);
+        c.routeChanged(TPRoute.webView);
+        c.routeChanged(TPRoute.main);
+        await frames(tester, pace);
+        expect(c.task.value, isNull);
+        await expectEnded(tester, c);
+        await finish(tester, c);
+      });
+
+      testWidgets('back first, then 結束引導 on the paused card', (tester) async {
+        final c = await pumpHost(tester);
+        await startSteps(tester, c);
+        c.routeChanged(TPRoute.main);
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 100));
+        await tester.tap(find.text('結束引導'));
+        await frames(tester, pace);
+        await expectEnded(tester, c);
+        await finish(tester, c);
+      });
+
+      testWidgets('late taps on a card that is fading out', (tester) async {
+        final c = await pumpHost(tester);
+        c.startGuide('library');
+        c.routeChanged(TPRoute.webView);
+        show(c.web, home);
+        await frames(tester, pace);
+        await tester.tap(find.text('我自己來'));
+        await tester.pump();
+        // 開始 is still on screen while the card fades.
+        await tester.tap(find.text('開始'), warnIfMissed: false);
+        await tester.pump();
+        expect(c.task.value, isNull);
+        await frames(tester, pace);
+        // The same on the paused card: 結束引導, then 繼續 at once.
+        c.startGuide('library');
+        c.routeChanged(TPRoute.webView);
+        show(c.web, home);
+        await frames(tester, pace);
+        await tester.tap(find.text('開始'));
+        await frames(tester, pace);
+        await tester.tap(find.text('暫停'));
+        await frames(tester, pace);
+        await tester.tap(find.text('結束引導'));
+        await tester.pump();
+        await tester.tap(find.text('繼續'), warnIfMissed: false);
+        await tester.pump();
+        expect(c.task.value, isNull);
+        await expectEnded(tester, c);
+        await finish(tester, c);
+      });
+
+      testWidgets('結束引導 in the chat while the page is still loading', (
+        tester,
+      ) async {
+        final executor = _HeldExecutor();
+        final c = await pumpHost(tester, executor: executor);
+        c.startGuide('library');
+        await frames(tester, pace);
+        c.fabPressed();
+        await frames(tester, pace);
+        await tester.tap(find.text('結束引導，自己操作'));
+        await frames(tester, pace);
+        expect(c.task.value, isNull);
+        c.closeSheet();
+        // The page arrives after the end.
+        c.routeChanged(TPRoute.webView);
+        show(c.web, home);
+        executor.pending.removeAt(0)(null);
+        await frames(tester, pace);
+        expect(c.task.value, isNull);
+        expect(c.card, isNull);
+        expect(find.text('我自己來'), findsNothing);
+        await expectEnded(tester, c);
+        await finish(tester, c);
+      });
+
+      testWidgets('我自己來 before the load finishes; the load then fails', (
+        tester,
+      ) async {
+        final executor = _HeldExecutor();
+        final c = await pumpHost(tester, executor: executor);
+        c.startGuide('library');
+        c.routeChanged(TPRoute.webView);
+        show(c.web, home);
+        await frames(tester, pace);
+        await tester.tap(find.text('我自己來'));
+        await frames(tester, pace);
+        executor.pending.removeAt(0)('failed');
+        await frames(tester, pace);
+        expect(c.messages.last.text, Replies.pageFailed);
+        expect(c.task.value, isNull, reason: 'not kept as an ended task');
+        await expectEnded(tester, c);
+        await finish(tester, c);
+      });
+
+      testWidgets('回到〇〇, then 結束引導 in the chat before the page is back', (
+        tester,
+      ) async {
+        final executor = _HeldExecutor();
+        final c = await pumpHost(tester, executor: executor);
+        await startSteps(tester, c);
+        // The first load finished (a load under way keeps the bar away).
+        executor.pending.removeAt(0)(null);
+        show(c.web, otherService);
+        await frames(tester, const Duration(milliseconds: 1200));
+        await tester.tap(find.text(c.task.value!.guide.resumeLabel));
+        await tester.pump();
+        expect(executor.pending, hasLength(1), reason: 'reopening the page');
+        c.fabPressed();
+        await frames(tester, pace);
+        await tester.tap(find.text('結束引導，自己操作'));
+        await frames(tester, pace);
+        c.closeSheet();
+        show(c.web, home);
+        executor.pending.removeAt(0)(null);
+        await frames(tester, const Duration(seconds: 4));
+        expect(c.task.value, isNull);
+        expect(c.offScope.value, isFalse);
+        await expectEnded(tester, c);
+        await finish(tester, c);
+      });
+
+      testWidgets('結束引導, then the chat opened again (twice)', (tester) async {
+        final c = await pumpHost(tester);
+        await startSteps(tester, c);
+        c.fabPressed();
+        await frames(tester, pace);
+        await tester.tap(find.text('結束引導，自己操作'));
+        await frames(tester, pace);
+        for (var i = 0; i < 2; i++) {
+          c.closeSheet();
+          await frames(tester, pace);
+          expect(slot('paused'), findsNothing);
+          expect(c.card, isNull);
+          c.fabPressed();
+          await frames(tester, pace);
+          expect(find.textContaining('目前任務'), findsNothing);
+          expect(find.text('繼續引導'), findsNothing);
+        }
+        await expectEnded(tester, c);
+        await finish(tester, c);
+      });
+
+      testWidgets('an unanswered switch question dies with its guide', (
+        tester,
+      ) async {
+        final c = await pumpHost(tester);
+        await startSteps(tester, c);
+        c.fabPressed();
+        await frames(tester, pace);
+        c.submit('我要繳水費');
+        await frames(tester, pace);
+        final ask = c.messages.last;
+        expect(ask.options?.options, hasLength(2), reason: 'switch question');
+        expect(c.optionsLive(ask), isTrue);
+        c.closeSheet();
+        // The guide is done; 知道了 ends it (no new chat message).
+        c.task.value = c.task.value!.copyWith(stepsDone: true);
+        await frames(tester, pace);
+        await tester.tap(find.text('知道了'));
+        await frames(tester, pace);
+        expect(c.messages.last.id, ask.id);
+        expect(c.optionsLive(ask), isFalse);
+        c.fabPressed();
+        await frames(tester, pace);
+        final before = c.messages.length;
+        await tester.tap(find.textContaining('先繼續'), warnIfMissed: false);
+        await frames(tester, pace);
+        c.choose(ask, ask.options!.options.first);
+        expect(c.messages.length, before, reason: '先繼續借書 does nothing');
+        expect(c.task.value, isNull);
+        await expectEnded(tester, c);
+        await finish(tester, c);
+      });
     });
   });
 }
