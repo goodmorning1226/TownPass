@@ -39,8 +39,19 @@ done
 # Python's standard library, with each extension module (.so) turned into a
 # framework as iOS requires (Python-Apple-support's own helper).
 # shellcheck source=/dev/null
+# Unsigned builds (CI, flutter build ios --no-codesign) have no signing identity, but
+# BeeWare's utils.sh signs every extension module with it: sign those ad hoc then
+# (Sideloadly/AltStore re-sign the whole App when installing it).
+if [ -z "${EXPANDED_CODE_SIGN_IDENTITY:-}" ]; then
+  export EXPANDED_CODE_SIGN_IDENTITY="-"
+  export EXPANDED_CODE_SIGN_IDENTITY_NAME="ad hoc"
+fi
+export EXPANDED_CODE_SIGN_IDENTITY_NAME="${EXPANDED_CODE_SIGN_IDENTITY_NAME:-$EXPANDED_CODE_SIGN_IDENTITY}"
+# utils.sh is BeeWare's and not written for `set -u`.
+set +u
 source "$ON_DEVICE/Python.xcframework/build/utils.sh"
 install_python OnDevice/Python.xcframework
+set -u
 # Not needed on the phone; keeps the App smaller.
 for unused in test idlelib tkinter turtledemo ensurepip lib2to3 pydoc_data; do
   rm -rf "$APP/python/lib/python3."*/"$unused"
