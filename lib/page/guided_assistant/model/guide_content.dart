@@ -395,7 +395,7 @@ abstract class Replies {
   static const notConnected = '這個 App 還沒串好這項服務，可以打 1999 問。';
   static const micDemo = '（示範版）語音辨識還沒接上，請點上面的選項，或按右邊的鍵盤打字。';
   static const cancelled = '好的，已經取消。';
-  static const goAlone = '好，你可以自己操作。需要我帶你做的時候，點「助理」再按「繼續引導」就可以。';
+  static const goAlone = '好，你可以自己操作，這次的引導結束了。想再請我帶你做，跟我說一聲就好。';
   static const ended = '好的，引導先結束了，接下來你可以自己操作。想再請我帶你做，跟我說一聲就好。';
   static const commitLater = '好，想預約的時候再叫我。';
 
