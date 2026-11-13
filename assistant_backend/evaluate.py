@@ -263,6 +263,20 @@ CASES = [
     one("weak_object", "借一台印表機", NONE), one("weak_object", "借雨傘", NONE),
     one("weak_object", "借未知代號ABC123", NONE), one("weak_object", "找附近餐廳", NONE),
     one("weak_object", "借錢", NONE),
+    # Only a work's title, no 書 or 故事 (rules 2026-11-13, book_title.py): the library home;
+    # a three-character title after 找 / 看 may be listed instead. Things, places, people,
+    # films and games named after 借 / 找 / 看 open nothing.
+    one("title_only", "借一本小王子", HOME), one("title_only", "幫我借魯冰花", HOME),
+    one("title_only", "借三隻小豬", HOME), one("title_only", "我要借伊索寓言", HOME),
+    one("title_only", "幫我找長襪皮皮", HOME), one("title_only", "我想看好餓的毛毛蟲", HOME),
+    one("title_only", "找丁丁歷險記", HOME), ("title_only", [heard("幫我借小王子", HOME)]),
+    one("title_only", "我想找西遊記", want(("confirm_candidates", "navigate"), HOME["dest"] + [None],
+                                         target=("library",))),
+    one("title_only", "幫我借露營燈", NONE), one("title_only", "幫我借烤肉架", NONE),
+    one("title_only", "我想借瑪利歐賽車", NONE), one("title_only", "我想看蜘蛛人電影", NONE),
+    one("title_only", "幫我找動物森友會的遊戲", NONE), one("title_only", "借嬰兒推車", NONE),
+    one("title_only", "找饒河夜市", NONE), one("title_only", "幫我找陳小姐", NONE),
+    one("title_only", "我想看跨年煙火", NONE),
     # Reviewed capabilities: native pages, web services and inner operations.
     one("capability", "我要繳水費", cap("fees.water")), one("capability", "停車費", cap("fees.parking")),
     one("capability", "繳費紀錄", cap("fees.history")),
