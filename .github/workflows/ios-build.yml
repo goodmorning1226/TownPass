@@ -146,6 +146,10 @@ jobs:
               for i, line in enumerate(text):
                   if pattern.search(line) and "warning:" not in line:
                       lines.append(f"{log.stem}:{i + 1}: " + " | ".join(l.strip() for l in text[i:i + 3])[:600])
+                  if "PhaseScriptExecution failed" in line:
+                      # A failed build script prints its reason before this line.
+                      context = [l.strip() for l in text[max(0, i - 25):i] if l.strip() and "warning:" not in l]
+                      lines.append(f"{log.stem}:{i + 1} preceded by: " + " | ".join(context)[-3000:])
           chunk = ""
           for line in lines[:60] or ["no error lines found"]:
               line = line.replace("%", "%25").replace("\r", "")

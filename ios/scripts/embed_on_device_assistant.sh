@@ -7,7 +7,9 @@
 # backend's Python sources (assistant_backend/). Without ios/OnDevice/, or for
 # the simulator (the frameworks are iPhone-only), it does nothing and the App is
 # built exactly as before; the assistant then uses ASSISTANT_BASE_URL as usual.
-set -euo pipefail
+set -Eeuo pipefail
+# Name the failing command in Xcode's output (a failed build phase shows only its exit code).
+trap 'echo "error: On-device assistant: line $LINENO failed: $BASH_COMMAND" >&2' ERR
 
 ON_DEVICE="$PROJECT_DIR/OnDevice"
 if [ ! -d "$ON_DEVICE/Python.xcframework" ] || [ ! -d "$ON_DEVICE/LlamaServer.xcframework" ] \
@@ -31,6 +33,7 @@ sign() {
   fi
 }
 
+echo "On-device assistant: frameworks"
 for name in LlamaServer WhisperServer Python; do
   rsync -a --delete "$ON_DEVICE/$name.xcframework/ios-arm64/$name.framework/" "$FRAMEWORKS/$name.framework/"
   sign "$FRAMEWORKS/$name.framework"
@@ -39,6 +42,7 @@ done
 # Python's standard library, with each extension module (.so) turned into a
 # framework as iOS requires (Python-Apple-support's own helper).
 # shellcheck source=/dev/null
+echo "On-device assistant: python standard library"
 source "$ON_DEVICE/Python.xcframework/build/utils.sh"
 install_python OnDevice/Python.xcframework
 # Not needed on the phone; keeps the App smaller.
@@ -49,11 +53,13 @@ done
 # Python on iOS has no CA certificates: the backend's HTTPS downloads (library
 # catalogue, Q&A list) verify against Apple's root certificates, exported from
 # this Mac; OnDeviceAssistant.swift points SSL_CERT_FILE at them.
+echo "On-device assistant: certificates"
 /usr/bin/security find-certificate -a -p /System/Library/Keychains/SystemRootCertificates.keychain \
   > "$APP/python/cacert.pem"
 
 # The backend, as Android packages it (android/app/build.gradle, chaquopy):
 # assistant_backend/ and assets/assistant/ without tests and evaluation data.
+echo "On-device assistant: backend"
 BACKEND="$APP/assistant_backend"
 rm -rf "$BACKEND"
 mkdir -p "$BACKEND"
