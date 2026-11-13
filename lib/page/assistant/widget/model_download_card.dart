@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:town_pass/page/assistant/assistant_texts.dart';
@@ -7,6 +9,31 @@ import 'package:town_pass/util/tp_text.dart';
 
 String _t(String key, [Map<String, Object> values = const {}]) =>
     AssistantTexts.page(key, values);
+
+/// What went wrong with the last download, or null: a failed request
+/// ([AssistantModelDownload.failure]) or the backend's error code.
+String? modelDownloadError(AssistantModelDownload downloads) {
+  final s = downloads.status.value;
+  final failure = downloads.failure.value;
+  if (failure != null) return failure;
+  if (s == null || s.downloading || s.error == null) return null;
+  return switch (s.error) {
+    'storage' => _t('modelsErrorStorage', {
+      'size': formatModelBytes(_shortBy(downloads, s)),
+    }),
+    'checksum' => _t('modelsErrorChecksum'),
+    'source' => _t('modelsErrorSource'),
+    _ => _t('modelsErrorNetwork'),
+  };
+}
+
+/// How much more space the last download needs than the phone has.
+int _shortBy(AssistantModelDownload downloads, AssistantModelStatus s) {
+  final free = s.freeBytes ?? 0;
+  final bytes = downloads.lastBytes;
+  final need = bytes + (300 << 20) - free;
+  return need > 0 ? need : bytes;
+}
 
 /// Shown instead of the conversation while the phone's core models are missing
 /// (docs/AI_CURRENT_RULES.md section 7): what the download is, its size and a
@@ -54,10 +81,11 @@ class ModelDownloadCard extends StatelessWidget {
     if (downloads.unavailable) {
       return [_line(_t('modelsUnavailable')), _later()];
     }
-    final failure = downloads.failure.value;
     if (s.downloading) {
       return [
         _progress(s),
+        // The network dropped: it tries again by itself for about a minute.
+        if (s.retrying) _line(_t('modelsRetrying'), color: TPColors.orange700),
         const SizedBox(height: 20),
         _outlined(
           _t('modelsPause'),
@@ -69,24 +97,14 @@ class ModelDownloadCard extends StatelessWidget {
     if (!downloads.downloadable('core')) {
       return [_line(_t('modelsErrorSource')), _later()];
     }
-    final error = s.error;
-    if (failure != null || error != null) {
-      final text =
-          failure ??
-          switch (error) {
-            'storage' => _t('modelsErrorStorage', {
-              'size': formatModelBytes(_shortBy(s)),
-            }),
-            'checksum' => _t('modelsErrorChecksum'),
-            'source' => _t('modelsErrorSource'),
-            _ => _t('modelsErrorNetwork'),
-          };
+    final text = modelDownloadError(downloads);
+    if (text != null) {
       return [
         _line(text, color: TPColors.red600),
         const SizedBox(height: 20),
         _filled(
           _t('modelsRetry'),
-          _startOrNull(),
+          downloads.busy.value ? null : downloads.retry,
           key: const Key('model-download-retry'),
         ),
         _later(),
@@ -139,13 +157,6 @@ class ModelDownloadCard extends StatelessWidget {
       ),
       _later(),
     ];
-  }
-
-  /// How much more space the download needs than the phone has.
-  int _shortBy(AssistantModelStatus s) {
-    final free = s.freeBytes ?? 0;
-    final need = downloads.offerBytes + (300 << 20) - free;
-    return need > 0 ? need : downloads.offerBytes;
   }
 
   VoidCallback? _startOrNull() =>
@@ -275,11 +286,26 @@ class ModelDownloadBanner extends StatelessWidget {
 }
 
 /// AI 助理設定 > 離線模型: what is on the phone, the optional Taiwanese model,
-/// resuming a download and deleting the models.
-class ModelDownloadSettings extends StatelessWidget {
+/// resuming, pausing and retrying a download, and deleting the models.
+class ModelDownloadSettings extends StatefulWidget {
   final AssistantModelDownload downloads;
 
   const ModelDownloadSettings({super.key, required this.downloads});
+
+  @override
+  State<ModelDownloadSettings> createState() => _ModelDownloadSettingsState();
+}
+
+class _ModelDownloadSettingsState extends State<ModelDownloadSettings> {
+  AssistantModelDownload get downloads => widget.downloads;
+
+  @override
+  void initState() {
+    super.initState();
+    // What is on the phone now: a download may have stopped (or a file gone)
+    // since the status was last asked (2026-11-13).
+    unawaited(downloads.refreshStatus());
+  }
 
   @override
   Widget build(BuildContext context) => Obx(() {
@@ -294,6 +320,7 @@ class ModelDownloadSettings extends StatelessWidget {
     final tw = s.part('taiwanese');
     final missingRequired =
         (!core.ready && core.allowed) || (!decision.ready && decision.allowed);
+    final error = modelDownloadError(downloads);
     return Padding(
       key: const Key('model-download-settings'),
       padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
@@ -328,10 +355,58 @@ class ModelDownloadSettings extends StatelessWidget {
               style: TPTextStyles.bodyRegular,
               color: TPColors.grayscale700,
             ),
+            if (s.retrying)
+              KeyedSubtree(
+                key: const Key('model-download-settings-retrying'),
+                child: TPText(
+                  _t('modelsRetrying'),
+                  style: TPTextStyles.bodyRegular,
+                  color: TPColors.orange700,
+                ),
+              ),
+            const SizedBox(height: 8),
+            // The download (Taiwanese, too) can be paused here: what arrived stays.
+            _outlined(
+              _t('modelsPause'),
+              downloads.busy.value ? null : downloads.pause,
+              key: const Key('model-download-settings-pause'),
+            ),
+          ] else if (error != null) ...[
+            // A failed download (e.g. the optional Taiwanese one) says why, with a
+            // retry of the same parts (rules section 7, 2026-11-13).
+            const SizedBox(height: 8),
+            KeyedSubtree(
+              key: const Key('model-download-settings-error'),
+              child: TPText(
+                error,
+                style: TPTextStyles.bodyRegular,
+                color: TPColors.red600,
+              ),
+            ),
+            if (s.error != 'source') ...[
+              const SizedBox(height: 8),
+              _filled(
+                _t('modelsRetry'),
+                downloads.busy.value ? null : downloads.retry,
+                key: const Key('model-download-settings-retry'),
+              ),
+            ],
+          ] else if (s.state == 'paused') ...[
+            const SizedBox(height: 8),
+            KeyedSubtree(
+              key: const Key('model-download-settings-paused'),
+              child: TPText(
+                _t('modelsPaused'),
+                style: TPTextStyles.bodyRegular,
+                color: TPColors.grayscale700,
+              ),
+            ),
           ],
           const SizedBox(height: 12),
+          // After a failure the retry above takes the place of these.
           if (missingRequired &&
               !s.downloading &&
+              error == null &&
               downloads.downloadable('core'))
             _filled(
               _t('modelsResume'),
@@ -340,6 +415,7 @@ class ModelDownloadSettings extends StatelessWidget {
           if (tw.allowed &&
               !tw.ready &&
               !s.downloading &&
+              error == null &&
               downloads.downloadable('taiwanese')) ...[
             const SizedBox(height: 8),
             _outlined(

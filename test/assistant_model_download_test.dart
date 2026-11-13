@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:town_pass/page/assistant/assistant_texts.dart';
 import 'package:town_pass/page/assistant/widget/model_download_card.dart';
 import 'package:town_pass/page/guided_assistant/guided_assistant_controller.dart';
 import 'package:town_pass/page/guided_assistant/web/web_guide_probe.dart';
@@ -29,6 +30,7 @@ Map<String, dynamic> status({
   int decisionMb = 2048,
   String state = 'idle',
   String? error,
+  bool retrying = false,
   int done = 0,
   int total = 0,
 }) => {
@@ -61,6 +63,7 @@ Map<String, dynamic> status({
   },
   'state': state,
   'error': error,
+  'retrying': retrying,
   'progress': {'done': done, 'total': total},
 };
 
@@ -380,6 +383,205 @@ void main() {
       );
       expect(find.byKey(const Key('model-download-start')), findsNothing);
       expect(find.textContaining('ASSISTANT_MODEL_BASE_URL'), findsOneWidget);
+    });
+  });
+
+  group('settings (rules section 7, 2026-11-13)', () {
+    Future<void> pumpSettings(WidgetTester tester, AssistantModelDownload d) =>
+        tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: SingleChildScrollView(
+                child: ModelDownloadSettings(downloads: d),
+              ),
+            ),
+          ),
+        );
+
+    testWidgets('a failed Taiwanese download says why; 再試一次 retries it', (
+      tester,
+    ) async {
+      final service = FakeService(status(core: true, decision: true));
+      final d = await controller(service);
+      await pumpSettings(tester, d);
+      service.replies.add(
+        status(
+          core: true,
+          decision: true,
+          state: 'downloading',
+          total: 1580 * mb,
+        ),
+      );
+      await tester.tap(find.byKey(const Key('model-download-taiwanese-add')));
+      await tester.pump();
+      expect(service.parts, ['taiwanese']);
+      // The network went away for good: the download stopped with an error.
+      service.now = status(
+        core: true,
+        decision: true,
+        state: 'error',
+        error: 'network',
+      );
+      await d.refreshStatus();
+      await tester.pump();
+      expect(
+        find.byKey(const Key('model-download-settings-error')),
+        findsOneWidget,
+      );
+      expect(find.textContaining('網路中斷'), findsOneWidget);
+      // The retry takes the place of the add button, and asks for Taiwanese again.
+      expect(
+        find.byKey(const Key('model-download-taiwanese-add')),
+        findsNothing,
+      );
+      service.parts = null;
+      service.replies.add(
+        status(
+          core: true,
+          decision: true,
+          state: 'downloading',
+          total: 1580 * mb,
+        ),
+      );
+      await tester.tap(find.byKey(const Key('model-download-settings-retry')));
+      await tester.pump();
+      expect(service.parts, ['taiwanese']);
+      expect(
+        find.byKey(const Key('model-download-settings-error')),
+        findsNothing,
+      );
+      d.onClose();
+    });
+
+    testWidgets('opening Settings asks for the current status', (tester) async {
+      final service = FakeService(status(core: true, decision: true));
+      final d = await controller(service);
+      // The download stopped while Settings was closed.
+      service.now = status(
+        core: true,
+        decision: true,
+        state: 'error',
+        error: 'network',
+      );
+      await pumpSettings(tester, d);
+      await tester.pump();
+      expect(
+        find.byKey(const Key('model-download-settings-error')),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('a download can be paused from Settings', (tester) async {
+      final service = FakeService(
+        status(
+          core: true,
+          decision: true,
+          state: 'downloading',
+          done: 100 * mb,
+          total: 1580 * mb,
+        ),
+      );
+      final d = await controller(service);
+      await pumpSettings(tester, d);
+      expect(find.textContaining('（6%）'), findsOneWidget);
+      service.replies.add(
+        status(
+          core: true,
+          decision: true,
+          state: 'paused',
+          done: 100 * mb,
+          total: 1580 * mb,
+        ),
+      );
+      await tester.tap(find.byKey(const Key('model-download-settings-pause')));
+      await tester.pump();
+      expect(service.calls, contains('pause'));
+      expect(
+        find.byKey(const Key('model-download-settings-paused')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const Key('model-download-taiwanese-add')),
+        findsOneWidget,
+      );
+      d.onClose();
+    });
+
+    testWidgets('a brief network loss shows that it continues by itself', (
+      tester,
+    ) async {
+      final service = FakeService(
+        status(
+          core: true,
+          decision: true,
+          state: 'downloading',
+          retrying: true,
+          total: 1580 * mb,
+        ),
+      );
+      final d = await controller(service);
+      expect(d.status.value!.retrying, isTrue);
+      await pumpSettings(tester, d);
+      expect(
+        find.byKey(const Key('model-download-settings-retrying')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const Key('model-download-settings-error')),
+        findsNothing,
+      );
+      d.onClose();
+    });
+
+    testWidgets('the Taiwanese size leaves out what already arrived', (
+      tester,
+    ) async {
+      final json = status(core: true, decision: true);
+      ((json['parts'] as Map)['taiwanese'] as Map)['missing_bytes'] = 580 * mb;
+      await pumpSettings(tester, await controller(FakeService(json)));
+      expect(find.textContaining('580 MB'), findsOneWidget);
+      expect(find.textContaining('1.5 GB'), findsNothing);
+    });
+
+    testWidgets('the new texts exist in every language', (tester) async {
+      // Each language has its own text (a missing one would fall back to Chinese);
+      // Taiwanese ('nan') follows Chinese.
+      final zh = AssistantTexts.text('modelsRetrying', 'zh');
+      expect(zh, contains('自動繼續'));
+      for (final language in AssistantTexts.languages.where((l) => l != 'zh')) {
+        expect(
+          AssistantTexts.text('modelsRetrying', language),
+          isNot(zh),
+          reason: language,
+        );
+      }
+    });
+  });
+
+  group('card while the network is down', () {
+    testWidgets('retrying is shown, then the error with a retry', (
+      tester,
+    ) async {
+      final service = FakeService(
+        status(state: 'downloading', retrying: true, total: 2588 * mb),
+      );
+      final d = await controller(service);
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(body: ModelDownloadCard(downloads: d)),
+        ),
+      );
+      expect(find.textContaining('自動繼續'), findsOneWidget);
+      service.now = status(state: 'error', error: 'network');
+      await d.refreshStatus();
+      await tester.pump();
+      expect(find.textContaining('自動繼續'), findsNothing);
+      expect(find.byKey(const Key('model-download-retry')), findsOneWidget);
+      service.replies.add(status(state: 'downloading', total: 2588 * mb));
+      await tester.tap(find.byKey(const Key('model-download-retry')));
+      await tester.pump();
+      expect(service.calls.where((c) => c == 'download'), hasLength(1));
+      d.onClose();
     });
   });
 

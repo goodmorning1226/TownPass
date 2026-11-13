@@ -105,6 +105,27 @@ class WorkflowTests(unittest.TestCase):
         with self.assertRaises(AssistantError):
             self.turn(resolution_id=result['resolution_id'], choice_id='1')
 
+    def test_compound_chinese_cancels_cancel(self):
+        # Rules section 3 (2026-11-13): cancel words repeated or with particles cancel too
+        # (the emulator test: 算了吧 and 算了不用了 were not cancels), and say so (action).
+        for text in ('取消', '請取消', '算了', '算了吧', '算了不用了', '不用了謝謝', '好，取消', '算了算了',
+                     '不要了啦', '那算了', '取消。', '算了吧！'):
+            listing = self.turn('有哪些功能')
+            calls = len(self.calls)
+            result = self.turn(text, resolution_id=listing['resolution_id'])
+            self.assertEqual(result['metrics']['route'], 'cancel', text)
+            self.assertEqual(result['action'], 'cancel', text)
+            self.assertIsNone(result['destination'], text)
+            self.assertEqual(len(self.calls), calls, text)  # no model call
+            with self.assertRaises(AssistantError):
+                self.turn(resolution_id=listing['resolution_id'], choice_id='1')
+            self.assertTrue(self.app.workflow.known_text(text), text)
+
+    def test_a_cancel_word_followed_by_a_request_is_the_request(self):
+        for text in ('不用了，我要繳水費', '算了我要繳水費', '取消預約', '不用了解', '謝謝', '吧'):
+            self.assertNotEqual(self.turn(text)['metrics']['route'], 'cancel', text)
+        self.assertEqual(self.turn('不用了，我要繳水費')['destination'], {'kind': 'capability', 'id': 'fees.water'})
+
     def test_unavailable_never_navigates(self):
         result = self.app.workflow._navigate({'request_id': 'test', 'session_id': 'test'}, Registry().by_id['medicalAppointment'])
         self.assertEqual(result['kind'], 'unsupported')

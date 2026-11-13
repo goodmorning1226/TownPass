@@ -5,6 +5,7 @@ import json
 import pathlib
 import tempfile
 import threading
+import time
 import unittest
 import unittest.mock
 
@@ -173,6 +174,102 @@ class DownloadTests(unittest.TestCase):
         self.assertEqual(downloads.status()["state"], "paused")
         self.assertFalse(downloads.ready("decision"))
         self.assertEqual(self.ready, [])
+
+    def flaky(self, downloads, failures):
+        """The opener fails the first `failures` calls (no network), then works."""
+        import urllib.error
+        real, calls = downloads.opener, []
+
+        def opener(request, timeout):
+            calls.append(request.headers.get("Range"))
+            if len(calls) <= failures:
+                raise urllib.error.URLError(OSError(7, "No address associated with hostname"))
+            return real(request, timeout=timeout)
+        downloads.opener = opener
+        return calls
+
+    def fast_backoff(self, seconds=0.05):
+        patcher = unittest.mock.patch.object(models, "BACKOFF_MAX_S", seconds)
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
+    def test_the_size_still_to_download_leaves_out_what_arrived(self):
+        # Rules section 7 (2026-11-13): the Taiwanese size shown ignored the .part file.
+        (self.dir / "tw.bin.part").write_bytes(self.tw_full[:5000])
+        part = self.downloads().status()["parts"]["taiwanese"]
+        self.assertEqual(part["missing_bytes"], len(self.tw_full) - 5000)
+        self.assertEqual(part["bytes"], len(self.tw_full))
+        (self.dir / "decision.gguf.part").write_bytes(self.decision[:400_000])
+        self.assertEqual(self.downloads().status()["parts"]["decision"]["missing_bytes"], len(self.decision) - 400_000)
+        self.assertFalse(part["ready"])
+
+    def test_a_brief_network_loss_is_retried_without_an_error(self):
+        self.fast_backoff()
+        downloads = self.downloads()
+        calls = self.flaky(downloads, models.ATTEMPTS - 1)
+        with unittest.mock.patch("builtins.print") as log:
+            downloads.start(["decision"])
+            downloads.wait(20)
+        self.assertEqual(downloads.status()["state"], "done")
+        self.assertEqual(len(calls), models.ATTEMPTS)
+        self.assertEqual((self.dir / "decision.gguf").read_bytes(), self.decision)
+        # The log says why (the socket error), not only "URLError".
+        self.assertTrue(any("No address associated with hostname" in str(c) for c in log.call_args_list))
+
+    def test_retrying_is_reported_while_it_waits(self):
+        downloads = self.downloads()
+        self.flaky(downloads, 1)
+        downloads.start(["decision"])  # the first pause is one second
+        deadline = time.monotonic() + 5
+        while not downloads.status()["retrying"] and time.monotonic() < deadline:
+            time.sleep(0.02)
+        status = downloads.status()
+        self.assertTrue(status["retrying"])
+        self.assertEqual((status["state"], status["error"]), ("downloading", None))
+        downloads.wait(20)
+        self.assertEqual(downloads.status()["state"], "done")
+        self.assertFalse(downloads.status()["retrying"])
+
+    def test_a_long_network_loss_stops_with_a_network_error_and_retry_works(self):
+        self.fast_backoff()
+        downloads = self.downloads()
+        self.flaky(downloads, models.ATTEMPTS)
+        downloads.start(["decision"])
+        downloads.wait(20)
+        status = downloads.status()
+        self.assertEqual((status["state"], status["error"]), ("error", "network"))
+        self.assertTrue(downloads.start(["decision"]))  # the App's 再試一次
+        downloads.wait(20)
+        self.assertEqual(downloads.status()["state"], "done")
+        self.assertIsNone(downloads.status()["error"])
+
+    def test_the_attempts_start_again_after_data_arrived(self):
+        self.fast_backoff()
+        # Dropped connections with data each time, then no network for a while: more
+        # failures than ATTEMPTS in all, but never ATTEMPTS in a row.
+        Files.cut["/m/decision.gguf"] = 300_000
+        downloads = self.downloads()
+        import urllib.error
+        real, calls = downloads.opener, []
+
+        n = models.ATTEMPTS
+
+        def opener(request, timeout):
+            calls.append(request.headers.get("Range"))
+            call = len(calls)
+            # 1: cut after 300 KB; 2..n: offline (n - 1 in a row); n + 1: cut again
+            # (data); n + 2..2n: offline again; then the rest.
+            if 1 < call <= n or n + 1 < call <= 2 * n:
+                raise urllib.error.URLError(OSError(101, "Network is unreachable"))
+            if call == n + 1:
+                Files.cut["/m/decision.gguf"] = 300_000
+            return real(request, timeout=timeout)
+        downloads.opener = opener
+        downloads.start(["decision"])
+        downloads.wait(20)
+        self.assertEqual(downloads.status()["state"], "done")
+        self.assertEqual(len(calls), 2 * n + 1)  # 2 * (n - 1) failures in all, more than n
+        self.assertEqual((self.dir / "decision.gguf").read_bytes(), self.decision)
 
     def test_a_wrong_checksum_is_never_put_in_place(self):
         Files.FILES["/m/decision.gguf"] = b"x" * len(self.decision)  # same size, other bytes

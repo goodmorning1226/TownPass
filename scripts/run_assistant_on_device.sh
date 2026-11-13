@@ -12,9 +12,9 @@
 #                     (models-dir as there); the App must be installed first, the
 #                     models go into its Documents folder. Needed once, or when a
 #                     model changes.
-#   --decision-model  ministral (default) or classifier: no decision model at all,
-#                     the 132 MB decision classifier instead (option B', opt-in,
-#                     docs/AI_DECISION_CLASSIFIER.md section 12; not yet built on a Mac).
+#   --decision-model  classifier (default since 2026-11-13): no decision model at all,
+#                     the 132 MB decision classifier (option B', docs/AI_DECISION_CLASSIFIER.md
+#                     section 12), or ministral (Ministral 3B as the decision model).
 #                     Gemma runs on Android only.
 #
 # Always a release build: a debug App on an iPhone does not start again from the
@@ -24,7 +24,7 @@
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 BUNDLE="${TOWNPASS_BUNDLE_ID:-com.example.townpass}"
-DEVICE="" GUIDED="true" PUSH="" MODELS="" DECISION="ministral"
+DEVICE="" GUIDED="true" PUSH="" MODELS="" DECISION="classifier"
 while [ $# -gt 0 ]; do
   case "$1" in
     --device) DEVICE="${2:?--device needs an id}"; shift 2 ;;

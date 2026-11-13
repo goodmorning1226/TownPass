@@ -9,8 +9,8 @@
 #   highlights), which is the default (ASSISTANT_GUIDED; docs/AI_GUIDED_MERGE_PLAN.md)
 # -DecisionModel gemma: Gemma 4 E2B instead of Ministral 3B as the decision model
 #   (opt-in; push it first with push_assistant_models.ps1 -DecisionModel gemma;
-#   docs/AI_DECISION_MODEL_ABLATION_PLAN.md section 8). Default ministral.
-# -DecisionModel classifier: no decision model at all (option B', opt-in,
+#   docs/AI_DECISION_MODEL_ABLATION_PLAN.md section 8). -DecisionModel ministral: Ministral 3B.
+# -DecisionModel classifier (the default since 2026-11-13): no decision model at all (option B',
 #   docs/AI_DECISION_CLASSIFIER.md section 12): the 132 MB decision classifier decides
 #   pages, rules decide library requests and guides. The App downloads it (use
 #   -ModelBaseUrl with serve_assistant_models.py until it is on the team's Hugging
@@ -20,7 +20,7 @@
 #   for scripts/serve_assistant_models.py through adb reverse (set up here).
 #   Without it, models pushed with push_assistant_models.ps1 work as before.
 param([string]$DeviceId, [switch]$Release, [ValidateSet("whisper", "system")][string]$Speech = "whisper",
-      [switch]$Chat, [ValidateSet("ministral", "gemma", "classifier")][string]$DecisionModel = "ministral",
+      [switch]$Chat, [ValidateSet("ministral", "gemma", "classifier")][string]$DecisionModel = "classifier",
       [string]$ModelBaseUrl = "")
 # Native tools write progress to stderr; Windows PowerShell 5.1 would treat that as
 # an error when output is redirected, so failures are detected by exit codes instead.

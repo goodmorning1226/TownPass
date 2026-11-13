@@ -2,7 +2,7 @@
 (docs/AI_CURRENT_RULES.md section 5, 2026-11-13: after unlocking an iPhone, turns
 "looked for the answer" for minutes and speech stopped working).
 
-Real loopback HTTP servers on ports 9001-9019 stand in for llama-server / whisper-server:
+Real loopback HTTP servers on ports 9001-9029 stand in for llama-server / whisper-server:
 answering, then closed (connection refused, as after iOS reclaims the socket), or
 accepting without ever answering (a server that hangs).
 """
@@ -33,6 +33,7 @@ class Fake(http.server.BaseHTTPRequestHandler):
 
     def do_POST(self):
         self.rfile.read(int(self.headers.get("Content-Length") or 0))
+        time.sleep(getattr(self.server, "delay", 0.0))  # a busy server that still answers
         if self.server.status != 200:
             return self.reply({"error": "failed"}, self.server.status)
         if self.path == "/v1/rerank":
@@ -183,6 +184,84 @@ class ClassifierAfterResumeTest(unittest.TestCase):
         with self.assertRaises(classifier.ClassifierUnavailable):
             classifier.rerank("繳水費", ["水費"], url="http://127.0.0.1:9007", wait_s=1.0, pause_s=0.2)
         self.assertGreaterEqual(time.monotonic() - started, 0.8)
+
+
+class HungAfterAnsweringTest(unittest.TestCase):
+    """A server that answered, then accepts connections without answering (SIGSTOP on
+    the Android emulator, 2026-11-13): the first request waited the classifier's full
+    10 s. Once a server has answered, GET /health is asked first (PROBE_S); a busy
+    server answers it and keeps its full timeout (a 6 s decision on a loaded emulator
+    is not cut off), the first load keeps the long timeout."""
+
+    def setUp(self):
+        liveness.reset()
+        self.addCleanup(liveness.reset)
+        # Shorter than the real 2 s / 10 s / 5 s so that the tests run quickly; the
+        # relation between them is what is tested.
+        for owner, name, value in ((liveness, "PROBE_S", 0.5), (classifier, "TIMEOUT", 2.0)):
+            self.addCleanup(setattr, owner, name, getattr(owner, name))
+            setattr(owner, name, value)
+
+    def test_hung_only_after_the_first_answer(self):
+        silent = Silent(9020)
+        self.addCleanup(silent.close)
+        self.assertFalse(liveness.hung(silent.url))  # never answered: maybe still loading
+        self.assertFalse(liveness.down(silent.url))
+        liveness.answered(silent.url)
+        self.assertTrue(liveness.hung(silent.url))
+        self.assertTrue(liveness.down(silent.url))
+
+    def test_a_hung_classifier_fails_in_seconds_once_it_has_answered(self):
+        server = Server(9021)
+        self.assertEqual(classifier.rerank("繳水費", ["水費"], url=server.url, wait_s=75), [2.0])
+        server.close()
+        silent = Silent(9021)  # same port, now silent: the stopped llama-server
+        self.addCleanup(silent.close)
+        heard = []
+        liveness.watch(lambda url, reason: heard.append(reason))
+        started = time.monotonic()
+        with self.assertRaises(classifier.ClassifierUnavailable):
+            classifier.rerank("繳水費", ["水費"], url=silent.url, wait_s=75)
+        self.assertLess(time.monotonic() - started, liveness.PROBE_S + 0.8)
+        self.assertEqual(heard, ["timeout"])  # the App is asked to restart it
+        started = time.monotonic()
+        with self.assertRaises(classifier.ClassifierUnavailable):  # the next decision: at once
+            classifier.rerank("繳水費", ["水費"], url=silent.url, wait_s=75)
+        self.assertLess(time.monotonic() - started, 0.2)
+
+    def test_the_first_load_keeps_the_long_timeout(self):
+        silent = Silent(9022)
+        self.addCleanup(silent.close)
+        started = time.monotonic()
+        with self.assertRaises(classifier.ClassifierUnavailable):
+            classifier.rerank("繳水費", ["水費"], url=silent.url)
+        self.assertGreaterEqual(time.monotonic() - started, classifier.TIMEOUT - 0.2)
+
+    def test_a_busy_classifier_is_not_taken_for_a_hung_one(self):
+        server = Server(9023)
+        self.addCleanup(server.close)
+        classifier.rerank("繳水費", ["水費"], url=server.url)
+        server.http.delay = 1.0  # longer than PROBE_S: it still answers /health at once
+        self.assertEqual(classifier.rerank("繳水費", ["水費"], url=server.url), [2.0])
+        self.assertFalse(liveness.down(server.url))
+
+    def test_a_hung_e5_fails_in_seconds_once_it_has_answered(self):
+        server = Server(9024)
+        self.assertEqual(faq.embed_texts(server.url, ["query: 水費"]), [[1.0, 0.0]])
+        server.close()
+        silent = Silent(9024)
+        self.addCleanup(silent.close)
+        started = time.monotonic()
+        with self.assertRaises(OSError):
+            faq.embed_texts(silent.url, ["query: 水費"], timeout=30)
+        self.assertLess(time.monotonic() - started, liveness.PROBE_S + 0.8)
+
+    def test_a_busy_e5_keeps_its_timeout(self):
+        server = Server(9025)
+        self.addCleanup(server.close)
+        faq.embed_texts(server.url, ["query: 水費"])
+        server.http.delay = 1.0
+        self.assertEqual(faq.embed_texts(server.url, ["query: 水費"]), [[1.0, 0.0]])
 
 
 class EmbeddingAfterResumeTest(unittest.TestCase):
@@ -378,6 +457,28 @@ class RestarterTest(unittest.TestCase):
         device_main.Restarter(asked.append)("http://127.0.0.1:9017", "refused")
         time.sleep(0.1)
         self.assertEqual(asked, [])
+
+    def test_android_restarter_calls_the_kotlin_side(self):
+        # Android passes device_main.java_server_restarter (2026-11-13); an older App
+        # without OnDeviceAssistant.restartServer answers "failed", never raises.
+        import sys
+        import types
+        asked = []
+
+        class Assistant:
+            @staticmethod
+            def restartServer(name):
+                asked.append(name)
+                return "restarted"
+        fake = types.ModuleType("java")
+        fake.jclass = lambda name: Assistant
+        old = sys.modules.get("java")
+        sys.modules["java"] = fake
+        self.addCleanup(lambda: sys.modules.__setitem__("java", old) if old else sys.modules.pop("java", None))
+        self.assertEqual(device_main.java_server_restarter("classifier"), "restarted")
+        self.assertEqual(asked, ["classifier"])
+        fake.jclass = lambda name: object
+        self.assertEqual(device_main.java_server_restarter("classifier"), "failed")
 
     def test_native_flag_reads_a_c_function(self):
         import ctypes

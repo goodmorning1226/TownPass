@@ -52,6 +52,10 @@ class AssistantModelStatus {
 
   /// "network", "storage", "checksum" or "source" after a failed download.
   final String? error;
+
+  /// The network dropped and the download waits to try again by itself
+  /// (models.py: about a minute before it stops with "network").
+  final bool retrying;
   final int done;
   final int total;
 
@@ -63,6 +67,7 @@ class AssistantModelStatus {
     this.parts = const {},
     this.state = 'idle',
     this.error,
+    this.retrying = false,
     this.done = 0,
     this.total = 0,
   });
@@ -85,6 +90,7 @@ class AssistantModelStatus {
       },
       state: text(json['state'], 'idle'),
       error: json['error'] is String ? json['error'] as String : null,
+      retrying: json['retrying'] == true,
       done: progress is Map ? number(progress['done']) : 0,
       total: progress is Map ? number(progress['total']) : 0,
     );
@@ -228,12 +234,32 @@ class AssistantModelDownload extends GetxService {
     return offerParts.fold(0, (sum, p) => sum + s.part(p).missingBytes);
   }
 
-  Future<void> start([List<String>? parts]) => _act(
-    () => service.downloadModels(
-      parts ?? offerParts,
-      baseUrl: mirror.isEmpty ? null : mirror,
-    ),
-  );
+  /// The parts of the last download asked for (null: none yet this launch),
+  /// so that 再試一次 retries what failed, e.g. only Taiwanese from Settings.
+  List<String>? lastParts;
+
+  Future<void> start([List<String>? parts]) {
+    final asked = parts ?? offerParts;
+    lastParts = asked;
+    return _act(
+      () => service.downloadModels(
+        asked,
+        baseUrl: mirror.isEmpty ? null : mirror,
+      ),
+    );
+  }
+
+  /// 再試一次 after a failed download: the same parts again (each file
+  /// resumes from what arrived), or the offer when nothing was asked yet.
+  Future<void> retry() => start(lastParts);
+
+  /// What the last download asked for and still misses, in bytes.
+  int get lastBytes {
+    final s = _s;
+    final parts = lastParts;
+    if (s == null || parts == null) return offerBytes;
+    return parts.fold(0, (sum, p) => sum + s.part(p).missingBytes);
+  }
 
   Future<void> pause() => _act(service.pauseModelDownload);
 

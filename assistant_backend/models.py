@@ -51,7 +51,13 @@ EVERY_TIER = ("classifier",)
 # Free space kept on the phone after a download.
 SPARE_BYTES = 300 << 20
 CHUNK = 1 << 20
-ATTEMPTS = 4
+# A brief network loss must not stop a download (rules section 7, 2026-11-13: four
+# attempts with ~7 s of pauses stopped on the emulator's network switch): the pause
+# doubles up to BACKOFF_MAX_S, about a minute in all (1+2+4+8+16+16+16 s), and the
+# count starts again whenever an attempt received data. The App shows "retrying"
+# while it waits, and the error with a retry only after the last attempt.
+ATTEMPTS = 8
+BACKOFF_MAX_S = 16
 TIMEOUT_S = 30
 
 
@@ -113,6 +119,7 @@ class Downloads:
         self.state = "idle"      # idle, downloading, paused, error, done
         self.error = None        # DownloadError.code of the last failure
         self.current = None      # id of the file being downloaded
+        self.retrying = False    # waiting to try again after a network failure
         self.plan = []           # entries of the current or last download
         self.dir.mkdir(parents=True, exist_ok=True)
 
@@ -178,11 +185,14 @@ class Downloads:
                 "allowed": part in self.parts_for_phone() and bool(files),
                 "ready": bool(files) and not missing,
                 "bytes": sum(e["size"] for e in files),
-                "missing_bytes": sum(e["size"] for e in missing),
+                # What is still to come: a .part already here (a pause, a dropped
+                # connection) is not downloaded again (rules section 7, 2026-11-13).
+                "missing_bytes": sum(e["size"] - self._have(e) for e in missing),
                 "downloadable": all(self.source(e) for e in missing),
             }
         with self.lock:
             plan, state, error, current = list(self.plan), self.state, self.error, self.current
+            retrying = self.retrying and state == "downloading"
         total = sum(e["size"] for e in plan)
         try:
             free = self._free_bytes()
@@ -202,6 +212,7 @@ class Downloads:
             "state": state,
             "error": error,
             "current": current,
+            "retrying": retrying,
             "progress": {"done": sum(self._have(e) for e in plan), "total": total},
         }
 
@@ -297,7 +308,7 @@ class Downloads:
             print(f"models: download stopped ({exc})", flush=True)
             state, error = "error", exc.code
         with self.lock:
-            self.state, self.error, self.current = state, error, None
+            self.state, self.error, self.current, self.retrying = state, error, None, False
 
     def _fetch(self, entry):
         target = self.path(entry)
@@ -305,8 +316,10 @@ class Downloads:
         target.parent.mkdir(parents=True, exist_ok=True)
         url = self.source(entry)
         size = entry["size"]
-        for attempt in range(ATTEMPTS):
+        attempt = 0
+        while attempt < ATTEMPTS:
             have = part.stat().st_size if part.exists() else 0
+            before = have
             if have > size:
                 part.unlink()
                 have = 0
@@ -333,6 +346,7 @@ class Downloads:
                                 break
                 if part.stat().st_size >= size:
                     break
+                detail = "connection closed early"
             except _Paused:
                 raise
             except urllib.error.HTTPError as exc:
@@ -340,14 +354,24 @@ class Downloads:
                     break
                 if exc.code in (401, 403, 404):
                     raise DownloadError("source", f"{entry['id']} HTTP {exc.code}") from exc
-                if attempt == ATTEMPTS - 1:
-                    raise DownloadError("network", f"{entry['id']} HTTP {exc.code}") from exc
+                detail = f"HTTP {exc.code}"
             except (OSError, http.client.HTTPException) as exc:  # IncompleteRead: the connection dropped
                 if self.stop.is_set():
                     raise _Paused() from exc
-                if attempt == ATTEMPTS - 1:
-                    raise DownloadError("network", f"{entry['id']} {type(exc).__name__}") from exc
-            if self.stop.wait(min(2 ** attempt, 8)):
+                detail = failure(exc)
+            # Data arrived in this attempt: the network works, so the count starts again.
+            got = (part.stat().st_size if part.exists() else 0) > before
+            attempt = 0 if got else attempt + 1
+            if attempt >= ATTEMPTS:
+                raise DownloadError("network", f"{entry['id']} {detail}")
+            pause = min(2 ** max(attempt - 1, 0), BACKOFF_MAX_S)  # 1, 1, 2, 4, 8, 16, 16...
+            print(f"models: {entry['id']} attempt failed ({detail}); trying again in {pause} s", flush=True)
+            with self.lock:
+                self.retrying = not got
+            stopped = self.stop.wait(pause)
+            with self.lock:
+                self.retrying = False
+            if stopped:
                 raise _Paused()
         if not part.exists() or part.stat().st_size != size:
             if part.exists():
@@ -357,6 +381,15 @@ class Downloads:
             part.unlink()
             raise DownloadError("checksum", entry["id"])
         os.replace(part, target)
+
+
+def failure(exc):
+    """What went wrong, for the log: the exception and its reason (URLError wraps the
+    socket error: "URLError: [Errno 7] No address associated with hostname"). Nothing
+    about the user; the URL is not included."""
+    reason = getattr(exc, "reason", None)
+    text = f"{type(exc).__name__}: {reason if reason is not None else exc}"
+    return text[:200]
 
 
 def valid_base_url(url):

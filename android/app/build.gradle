@@ -96,13 +96,13 @@ if (assistantOnDevice) {
     def assistantWhisper = (project.findProperty("townpass.speech") ?: System.getenv("TOWNPASS_SPEECH")
         ?: dartDefines["ASSISTANT_SPEECH"] ?: "whisper").toString() != "system"
     // TOWNPASS_DECISION_MODEL=gemma (or ASSISTANT_DECISION_MODEL=gemma): Gemma 4 E2B
-    // instead of Ministral 3B as the decision model (opt-in,
-    // docs/AI_DECISION_MODEL_ABLATION_PLAN.md section 8); default ministral.
-    // classifier: no decision model at all, the decision classifier instead
-    // (option B', opt-in, docs/AI_DECISION_CLASSIFIER.md section 12).
+    // instead of Ministral 3B as the decision model (docs/AI_DECISION_MODEL_ABLATION_PLAN.md
+    // section 8); ministral: Ministral 3B. Default classifier (since 2026-11-13): no decision
+    // model at all, the decision classifier instead (option B', docs/AI_DECISION_CLASSIFIER.md
+    // section 12; docs/AI_CURRENT_RULES.md section 6).
     def assistantDecisionModel = (project.findProperty("townpass.decisionModel")
         ?: System.getenv("TOWNPASS_DECISION_MODEL") ?: dartDefines["ASSISTANT_DECISION_MODEL"]
-        ?: "ministral").toString().trim().toLowerCase()
+        ?: "classifier").toString().trim().toLowerCase()
     if (!["ministral", "gemma", "classifier"].contains(assistantDecisionModel)) {
         throw new GradleException("TOWNPASS_DECISION_MODEL must be ministral, gemma or classifier, not $assistantDecisionModel")
     }

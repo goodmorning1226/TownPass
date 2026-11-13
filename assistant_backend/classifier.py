@@ -143,6 +143,10 @@ def rerank(query, documents, url=None, timeout=None, wait_s=None, pause_s=0.5):
     # failed is skipped (liveness.py; a turn used to wait 75 s per call, 2026-11-13).
     if liveness.down(url):
         raise ClassifierUnavailable("not answering")
+    # One that answered and now accepts without answering /health hangs (stopped): seconds,
+    # not TIMEOUT (2026-11-13). A busy one answers /health and keeps the full timeout.
+    if liveness.hung(url):
+        raise ClassifierUnavailable("not answering /health")
     body = json.dumps({"query": query, "documents": documents}, ensure_ascii=False).encode("utf-8")
     deadline = time.monotonic() + liveness.wait_s(url, WAIT_S if wait_s is None else wait_s)
     while True:

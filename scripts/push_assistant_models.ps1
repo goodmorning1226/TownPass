@@ -43,7 +43,7 @@ param(
     [string]$LanguageGate = "D:\TownPassAssistant\models\asr-ablation\ggml-tiny-q8_0.bin",
     [string]$FaqModel = "D:\TownPassAssistant\models\device\multilingual-e5-small-q8_0.gguf",
     [string]$FaqIndex = (Join-Path $env:LOCALAPPDATA "TownPassAssistant\faq_rag"),
-    [ValidateSet("ministral", "gemma", "classifier")][string]$DecisionModel = "ministral",
+    [ValidateSet("ministral", "gemma", "classifier")][string]$DecisionModel = "classifier",
     [string]$GemmaModel = "D:\TownPassAssistant\model-study\dl-gemma4-e2b-q4_0\gemma-4-E2B-it-Q4_0.gguf",
     [switch]$RemoveGemma,
     [string]$ClassifierModel = "D:\TownPassAssistant\decision-classifier\models\townpass-decision-e5-ce-v1-q8_0.gguf"

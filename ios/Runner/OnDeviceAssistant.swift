@@ -113,7 +113,7 @@ final class OnDeviceAssistant {
       case "start":
         // The build's ASSISTANT_DECISION_MODEL, sent by lib/service/assistant_on_device.dart.
         let arguments = call.arguments as? [String: Any]
-        let decisionModel = arguments?["decision_model"] as? String ?? "ministral"
+        let decisionModel = arguments?["decision_model"] as? String ?? "classifier"
         DispatchQueue.global(qos: .userInitiated).async {
           let info = self.start(decisionModel: decisionModel)
           DispatchQueue.main.async { result(info) }
@@ -223,9 +223,10 @@ final class OnDeviceAssistant {
   /// Starts everything once; returns what was started (or why not), numbers and
   /// file names only. The models load behind the listening Python servers:
   /// requests get the usual "not ready yet" replies until they answer.
-  /// decisionModel: "ministral" (default) or "classifier" (option B': no decision
-  /// model, the decision classifier instead); anything else counts as "ministral".
-  func start(decisionModel: String = "ministral") -> String {
+  /// decisionModel: "classifier" (default since 2026-11-13, option B': no decision
+  /// model, the decision classifier instead) or "ministral"; anything else counts as
+  /// "ministral" (Dart sends only known values: lib/service/assistant_on_device.dart).
+  func start(decisionModel: String = "classifier") -> String {
     lock.lock()
     defer { lock.unlock() }
     if let state { return state }
