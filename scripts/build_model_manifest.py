@@ -62,10 +62,13 @@ FILES = [
      "decision/townpass-decision-e5-ce-v1-q8_0.gguf", None,
      {"server": "classifier", "decision_model": "classifier", "platforms": ["android", "ios"],
       "license": "MIT (cross-encoder fine-tuned by this project from Microsoft multilingual-e5-small; GGUF q8_0)"}),
-    ("taiwanese", "ggml-whisper-taiwanese.bin", "taiwanese", rf"{MODELS}\taiwanese\ggml-breeze-asr-26-q8_0.bin",
-     "taiwanese/ggml-breeze-asr-26-q8_0.bin", None,
+    # 10.5 GB+ Android phones: q4_0 as well (2026-11-13): as accurate as q8_0 and the
+    # fastest Breeze file on ARM (ci/arm-bench-whisper: est. 3.6-4.2 s a clip on the
+    # phone vs 4.1-4.7 s for q8_0). The q8_0 file stays on the team Hugging Face.
+    ("taiwanese", "ggml-whisper-taiwanese.bin", "taiwanese", rf"{MODELS}\taiwanese\ggml-breeze-asr-26-q4_0.bin",
+     "taiwanese/ggml-breeze-asr-26-q4_0.bin", None,
      {"tiers": ["full"], "platforms": ["android"],
-      "license": "Apache-2.0 (MediaTek Research Breeze-ASR-26; ggml q8_0 by this project)"}),
+      "license": "Apache-2.0 (MediaTek Research Breeze-ASR-26; ggml q4_0 by this project)"}),
     # 7-10.5 GB phones: q4_0, not q4_K (2026-11-13 ablation, docs/AI_TAIWANESE_ABLATION.md):
     # the same 848 MB and as accurate as q8_0 on the public held-out clips (q4_K kept fewer
     # service words). The q4_K file stays on the team Hugging Face for older Apps.

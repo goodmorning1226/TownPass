@@ -28,8 +28,7 @@
 | decision | Ministral 3B Q4_K_M | 2.0 GB | mistralai/Ministral-3-3B-Instruct-2512-GGUF |
 | decision | Gemma 4 E2B Q4_0（`-DecisionModel gemma` 的 Android 建置） | 2.6 GB | ggml-org/gemma-4-E2B-it-GGUF |
 | decision | 決策分類器 q8_0（`-DecisionModel classifier`，Android 與 iPhone；取代決策模型，2026-11-12） | 126 MB（132,441,120 bytes） | 團隊訓練（Microsoft multilingual-e5-small 微調，MIT）；**還沒上傳**到團隊 Hugging Face |
-| taiwanese | Breeze-ASR-26 q8_0（12 GB 手機） | 1.5 GB | 團隊轉檔 |
-| taiwanese | Breeze-ASR-26 q4_0（8 GB 手機與所有 iPhone；2026-11-13 起取代 q4_K） | 848 MB | 團隊轉檔 |
+| taiwanese | Breeze-ASR-26 q4_0（所有手機；2026-11-13 起取代 q8_0 與 q4_K） | 848 MB | 團隊轉檔 |
 
 上游四個檔案（Whisper tiny／small、Ministral、Gemma）的大小與 SHA-256 在 2026-11-10 和 Hugging Face 的 LFS 紀錄逐一比對過，完全相同。
 
