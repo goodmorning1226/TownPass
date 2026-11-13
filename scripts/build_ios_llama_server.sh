@@ -16,13 +16,20 @@ OUT="${2:-$SRC/../ios-out}"
 BUILD="$SRC/build-ios"
 
 if ! git -C "$SRC" apply --check --reverse "$ROOT/ios/native/llama-server-rebind.patch" 2>/dev/null; then
+  # An older version of the patch may be applied (this checkout only builds the
+  # framework): put the file back first, then apply the current patch.
+  git -C "$SRC" checkout -- tools/server/server-http.cpp
   git -C "$SRC" apply "$ROOT/ios/native/llama-server-rebind.patch"
 fi
+# CMAKE_MACOSX_BUNDLE=OFF: for iOS, CMake makes every executable an App bundle, and
+# newer CMake refuses the server's install rule without a bundle destination
+# (GitHub's macos-26 runner, 2026-11-11). Only the libraries are used here.
 if [ ! -f "$BUILD/build.ninja" ]; then
   cmake -S "$SRC" -B "$BUILD" -G Ninja -DCMAKE_SYSTEM_NAME=iOS -DCMAKE_OSX_SYSROOT=iphoneos \
     -DCMAKE_OSX_ARCHITECTURES=arm64 -DCMAKE_OSX_DEPLOYMENT_TARGET=16.4 -DCMAKE_BUILD_TYPE=Release \
     -DBUILD_SHARED_LIBS=OFF -DGGML_METAL=ON -DGGML_METAL_EMBED_LIBRARY=ON -DGGML_ACCELERATE=ON \
-    -DGGML_BLAS=ON -DGGML_BLAS_VENDOR=Apple -DLLAMA_BUILD_TESTS=OFF -DLLAMA_BUILD_EXAMPLES=OFF
+    -DGGML_BLAS=ON -DGGML_BLAS_VENDOR=Apple -DLLAMA_BUILD_TESTS=OFF -DLLAMA_BUILD_EXAMPLES=OFF \
+    -DCMAKE_MACOSX_BUNDLE=OFF
 fi
 ninja -C "$BUILD" llama-server-impl
 

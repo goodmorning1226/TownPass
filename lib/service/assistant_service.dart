@@ -79,6 +79,8 @@ class AssistantService {
   }) async {
     assert(pageStep == null || pageStep == 1 || pageStep == -1);
     cancel();
+    // Just back from the background on an iPhone: the phone's servers first.
+    await AssistantOnDevice.settle();
     final client = HttpClient()..connectionTimeout = const Duration(seconds: 8);
     _active = client;
     try {
@@ -93,7 +95,9 @@ class AssistantService {
         language,
         faqText,
         pageStep,
-      ).timeout(const Duration(seconds: 85));
+        // Long enough for a model still loading right after launch (the backend
+        // waits up to 75 s for it, server.MODEL_READY_WAIT_S).
+      ).timeout(const Duration(seconds: 150));
     } on TimeoutException {
       throw _error('turnTimeout', language);
     } on SocketException {
@@ -171,7 +175,7 @@ class AssistantService {
   /// returns the recognised text. Nothing is stored on the device or server.
   ///
   /// [language] is 'auto' (detect) or a speech language code ('zh', 'en', 'ja',
-  /// 'vi', 'id', 'th'); the backend falls back to Chinese without a
+  /// 'vi', 'id', 'tl'); the backend falls back to Chinese without a
   /// multilingual model.
   Future<AssistantTranscript> transcribe(
     Uint8List wav, {
@@ -211,6 +215,7 @@ class AssistantService {
     String? language,
   }) async {
     cancel();
+    await AssistantOnDevice.settle();
     final client = HttpClient()..connectionTimeout = const Duration(seconds: 8);
     _active = client;
     try {
@@ -228,7 +233,9 @@ class AssistantService {
       request.add(payload);
       // Detection plus the Chinese model for Chinese can take two passes.
       final response = await request.close().timeout(
-        Duration(seconds: language == null || language == 'zh' ? 45 : 70),
+        // Two passes for some clips, plus up to 60 s for a speech model still
+        // loading right after launch (asr_server.READY_WAIT_S).
+        Duration(seconds: language == null || language == 'zh' ? 110 : 130),
       );
       final body = await response
           .transform(utf8.decoder)
@@ -292,5 +299,85 @@ class AssistantService {
   void cancel() {
     _active?.close(force: true);
     _active = null;
+  }
+
+  // ------------------------------------------------- model downloads (phone)
+
+  /// GET /health: catalogue, FAQ and `ready` (whether the phone's models
+  /// answer yet; AssistantReadiness).
+  Future<Map<String, dynamic>> health() => _models('GET', '/health');
+
+  /// The phone's model files and their download (docs/AI_MODEL_DOWNLOAD.md).
+  /// `{"managed": false}` on the computer backend.
+  Future<Map<String, dynamic>> modelStatus() => _models('GET', '/v1/models');
+
+  /// Downloads the missing files of [parts] ("core", "decision", "taiwanese");
+  /// [baseUrl]: a mirror for every file (ASSISTANT_MODEL_BASE_URL).
+  Future<Map<String, dynamic>> downloadModels(
+    List<String> parts, {
+    String? baseUrl,
+  }) => _models('POST', '/v1/models/download', {
+    'parts': parts,
+    if (baseUrl != null && baseUrl.isNotEmpty) 'base_url': baseUrl,
+  });
+
+  /// Pauses the download; what arrived is kept and resumed later.
+  Future<Map<String, dynamic>> pauseModelDownload() =>
+      _models('POST', '/v1/models/cancel', const {});
+
+  Future<Map<String, dynamic>> deleteModels(List<String> parts) =>
+      _models('POST', '/v1/models/delete', {'parts': parts});
+
+  /// Its own connection: a model request never cancels a turn ([cancel]).
+  Future<Map<String, dynamic>> _models(
+    String method,
+    String path, [
+    Map<String, dynamic>? body,
+  ]) async {
+    final client = HttpClient()..connectionTimeout = const Duration(seconds: 5);
+    try {
+      final request = await client.openUrl(
+        method,
+        Uri.parse(endpoint).resolve(path),
+      );
+      const token = String.fromEnvironment('ASSISTANT_TOKEN');
+      if (token.isNotEmpty) {
+        request.headers.set(HttpHeaders.authorizationHeader, 'Bearer $token');
+      }
+      if (body != null) {
+        final data = utf8.encode(jsonEncode(body));
+        request.headers.contentType = ContentType.json;
+        request.contentLength = data.length;
+        request.add(data);
+      }
+      final response = await request.close().timeout(
+        const Duration(seconds: 15),
+      );
+      final text = await response
+          .transform(utf8.decoder)
+          .join()
+          .timeout(const Duration(seconds: 10));
+      final json = jsonDecode(text);
+      if (json is! Map<String, dynamic>) throw _error('modelsFailed');
+      if (response.statusCode != HttpStatus.ok) {
+        throw FormatException(
+          json['error'] is String
+              ? json['error'] as String
+              : AssistantTexts.text(
+                  'modelsFailed',
+                  AssistantTexts.resolve(null),
+                ),
+        );
+      }
+      return json;
+    } on TimeoutException {
+      throw _error('turnTimeout');
+    } on SocketException {
+      throw _error(_unreachable);
+    } on HttpException {
+      throw _error('turnDisconnected');
+    } finally {
+      client.close(force: true);
+    }
   }
 }

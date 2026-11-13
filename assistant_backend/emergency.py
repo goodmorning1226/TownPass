@@ -13,15 +13,19 @@ import re
 # kind -> (Chinese patterns, other languages' patterns)
 PATTERNS = {
     "fire": (r"失火|火災|著火|起火|燒起來|冒(?:黑)?煙|火燒厝",
-             r"\bfire\b|on fire|burning|smoke|火事|燃えて|cháy|kebakaran|terbakar|ไฟไหม้"),
+             r"\bfire\b|on fire|burning|smoke|火事|燃えて|cháy|kebakaran|terbakar|\bsunog\b|nasusunog|nagliliyab|"
+             r"may usok"),
     "medical": (r"(?:倒地|昏倒|昏迷|沒有?呼吸|不能呼吸|沒反應|叫不醒|心臟病發|中風|大量出血|流很多血|受困|被困|出不來|壓在下面)",
                 r"unconscious|not breathing|collapsed|trapped|heart attack|bleeding badly|倒れ|意識がない|"
-                r"bất tỉnh|không thở|bị kẹt|pingsan|tidak bernapas|terjebak|หมดสติ|ไม่หายใจ|ติดอยู่"),
+                r"bất tỉnh|không thở|bị kẹt|pingsan|tidak bernapas|terjebak|walang malay|nawalan ng malay|nahimatay|"
+                r"hindi (?:na )?humihinga|hindi makahinga|naipit|na-?trap|inatake sa puso|dumudugo nang (?:malakas|husto)"),
     "suicide": (r"自殺|想死|不想活|輕生|結束(?:我的)?生命|活不下去",
-                r"suicid|kill myself|want to die|end my life|死にたい|自殺|muốn chết|tự tử|bunuh diri|ingin mati|ฆ่าตัวตาย|อยากตาย"),
+                r"suicid|kill myself|want to die|end my life|死にたい|自殺|muốn chết|tự tử|bunuh diri|ingin mati|"
+                r"magpakamatay|magpapakamatay|gusto ko nang mamatay|ayoko nang mabuhay|patayin ang sarili ko"),
     "violence": (r"家暴|被打|被毆|性侵|性騷擾|被跟蹤|有人要殺|被威脅|強暴",
                  r"domestic violence|being beaten|raped|sexual assault|stalk|threaten|暴力|レイプ|ストーカー|"
-                 r"bạo lực|bị đánh|hiếp|kekerasan|diperkosa|dipukul|ความรุนแรง|ข่มขืน|ถูกทำร้าย"),
+                 r"bạo lực|bị đánh|hiếp|kekerasan|diperkosa|dipukul|karahasan|binubugbog|sinasaktan ako|ginahasa|"
+                 r"pinagsamantalahan|sinusundan ako|binabantaan ako"),
 }
 
 # Negated or second-hand mentions that are not an emergency now.
@@ -34,7 +38,7 @@ MESSAGES = {
         "ja": "火事の場合は、すぐに避難して 119 に電話してください。安全になってから、下のフォームで通報できます。",
         "vi": "Nếu có cháy, hãy rời khỏi nơi đó ngay và gọi 119. Khi đã an toàn, bạn có thể báo cáo bằng biểu mẫu bên dưới.",
         "id": "Jika terjadi kebakaran, segera keluar dan telepon 119. Setelah aman, Anda bisa melapor dengan formulir di bawah.",
-        "th": "หากเกิดไฟไหม้ ให้ออกจากที่นั่นทันทีและโทร 119 เมื่อปลอดภัยแล้ว แจ้งเหตุได้ด้วยแบบฟอร์มด้านล่าง",
+        "tl": "Kung may sunog, umalis agad at tumawag sa 119. Kapag ligtas ka na, puwede mo itong i-ulat sa form sa ibaba.",
     },
     "medical": {
         "zh": "請立刻撥打 119 叫救護車，並留在安全的地方等候。",
@@ -42,7 +46,7 @@ MESSAGES = {
         "ja": "すぐに 119 に電話して救急車を呼び、安全な場所で待ってください。",
         "vi": "Hãy gọi ngay 119 để gọi xe cứu thương và chờ ở nơi an toàn.",
         "id": "Segera telepon 119 untuk ambulans, dan tunggu di tempat yang aman.",
-        "th": "โทร 119 เรียกรถพยาบาลทันที และรออยู่ในที่ปลอดภัย",
+        "tl": "Tumawag agad sa 119 para sa ambulansiya, at maghintay sa ligtas na lugar.",
     },
     "suicide": {
         "zh": "你不是一個人。請撥打安心專線 1925（24 小時、免費），或生命線 1995；有立即危險請撥 119。",
@@ -50,7 +54,7 @@ MESSAGES = {
         "ja": "あなたは一人ではありません。相談ダイヤル 1925（24 時間・無料）か 1995 に電話してください。危険が迫っていたら 119 へ。",
         "vi": "Bạn không đơn độc. Hãy gọi đường dây 1925 (24 giờ, miễn phí) hoặc 1995; nếu nguy hiểm ngay lúc này, gọi 119.",
         "id": "Anda tidak sendiri. Telepon layanan 1925 (24 jam, gratis) atau 1995; jika dalam bahaya segera, telepon 119.",
-        "th": "คุณไม่ได้อยู่คนเดียว โทรสายด่วน 1925 (24 ชั่วโมง ฟรี) หรือ 1995 หากอยู่ในอันตรายทันที โทร 119",
+        "tl": "Hindi ka nag-iisa. Tumawag sa support line na 1925 (24 oras, libre) o sa Lifeline 1995; kung nasa agarang panganib ka, tumawag sa 119.",
     },
     "violence": {
         "zh": "如果有立即危險，請撥打 110 報警。家暴或性侵可撥 113 保護專線（24 小時）。",
@@ -58,7 +62,7 @@ MESSAGES = {
         "ja": "危険が迫っていたら 110 に通報してください。DV や性暴力は 113（24 時間）に相談できます。",
         "vi": "Nếu nguy hiểm ngay lúc này, hãy gọi cảnh sát 110. Bạo lực gia đình hoặc xâm hại tình dục: gọi 113 (24 giờ).",
         "id": "Jika dalam bahaya segera, telepon polisi 110. Untuk KDRT atau kekerasan seksual, telepon 113 (24 jam).",
-        "th": "หากอยู่ในอันตรายทันที โทรแจ้งตำรวจ 110 ความรุนแรงในครอบครัวหรือทางเพศ โทร 113 (24 ชั่วโมง)",
+        "tl": "Kung nasa agarang panganib ka, tumawag sa pulis sa 110. Para sa karahasan sa tahanan o sekswal na pang-aabuso, tumawag sa 113 protection line (24 oras).",
     },
 }
 

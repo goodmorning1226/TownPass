@@ -9,7 +9,9 @@ import difflib
 import hashlib
 import json
 import os
+import pathlib
 import re
+import tempfile
 import threading
 import time
 import unicodedata
@@ -19,14 +21,19 @@ import uuid
 import sys
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
+import classifier  # noqa: E402  (TOWNPASS_DECISION_BACKEND: the decision classifier, opt-in)
+import liveness  # noqa: E402  (which local model servers answer; no long waits for a dead one)
 import decision  # noqa: E402  (TOWNPASS_DECISION_MODEL: Ministral by default, or Gemma)
 
 # Ollama tag and the reported model name; llama-server (the phone) serves the file
-# OnDeviceAssistant.kt loaded for the same TOWNPASS_DECISION_MODEL.
-MODEL = "gemma4:e2b" if decision.GEMMA else "ministral-3:3b"
+# OnDeviceAssistant.kt loaded for the same TOWNPASS_DECISION_MODEL. With no decision
+# model at all (classifier_only, option B'), the classifier's name.
+MODEL = classifier.MODEL_NAME if classifier.ONLY else "gemma4:e2b" if decision.GEMMA else "ministral-3:3b"
 CATALOG_URL = "https://taipei-pass-service.vercel.app/mock/library/library_book_list.json"
 CATALOG_VERSION = "570531a9244c3dba1e1f09907468ca55875ccc4b1af6fe1e5115cfdb2252f4ac"
 CONTRACT = 3  # 3: optional request "context" (page/last action hint)
+# Model downloads on the phone (models.py; GET /v1/models is the status).
+MODEL_ACTIONS = {"/v1/models/download": "download", "/v1/models/cancel": "cancel", "/v1/models/delete": "delete"}
 # Avoid a multi-second model reload after a short idle period during a demo.
 # The model keeps ~3 GB of VRAM while loaded; override with an Ollama duration.
 KEEP_ALIVE = os.environ.get("TOWNPASS_ASSISTANT_KEEP_ALIVE", "30m")
@@ -47,6 +54,73 @@ if __name__ == "__main__":
 
 class AssistantError(Exception):
     pass
+
+
+# The phone's model servers load after the App starts (decision model ~2 GB): a request
+# that arrives first waits for them instead of failing at once (2026-11-11, the first
+# spoken question after launch failed on Android and iPhone). llama-server answers 503
+# while loading; a server not started yet refuses the connection.
+MODEL_READY_WAIT_S = 75
+# When the user last asked (turns and speech): the warm-up gives way (device_main.warm_up).
+USER_REQUEST_AT = 0.0
+
+
+def _answers(url, timeout=0.5):
+    """GET url answers 200 (a llama-server that has loaded, the speech service)."""
+    try:
+        with urllib.request.urlopen(url, timeout=timeout) as response:
+            return response.status == 200, json.loads(response.read(65536) or b"{}")
+    except (OSError, ValueError):
+        return False, {}
+
+
+def readiness(assistant):
+    """What the App shows while models load (AssistantReadiness): the decision model
+    (None: none on this phone, or Ollama on the computer) and speech (None: no
+    speech service). True once each answers. In classifier_only mode (option B')
+    "decision" is the classifier's llama-server: there is no decision LLM to wait for."""
+    decision = None
+    if MODEL_API == "openai" and assistant.model_available:
+        decision = _answers((classifier.URL if classifier.ONLY else MODEL_URL) + "/health")[0]
+    speech = None
+    asr = os.environ.get("TOWNPASS_ASR_URL")
+    if asr and asr.endswith("/v1/transcribe"):
+        up, body = _answers(asr[: -len("/v1/transcribe")] + "/health")
+        speech = bool(up and body.get("ready", True))
+    return {"decision": decision, "speech": speech}
+
+
+def note_user_request():
+    global USER_REQUEST_AT
+    USER_REQUEST_AT = time.monotonic()
+
+
+def loading(exc):
+    """Whether exc means a local model server is still loading (not a real failure)."""
+    if isinstance(exc, urllib.error.HTTPError):
+        return exc.code == 503
+    return isinstance(exc, urllib.error.URLError) and isinstance(exc.reason, ConnectionRefusedError)
+
+
+def model_reply(payload, wait_s=None, pause_s=1.0):
+    """llama-server's chat completion, waiting up to wait_s for a loading model.
+    Only while the model has never answered; after that a short wait, and a model
+    that just failed is skipped (liveness.py, 2026-11-13)."""
+    if liveness.down(MODEL_URL):
+        raise urllib.error.URLError(ConnectionRefusedError("the decision model is not answering"))
+    deadline = time.monotonic() + liveness.wait_s(MODEL_URL, MODEL_READY_WAIT_S if wait_s is None else wait_s)
+    while True:
+        try:
+            reply = fetch_json(MODEL_URL + "/v1/chat/completions", payload, timeout=MODEL_TIMEOUT)
+            liveness.answered(MODEL_URL)
+            return reply
+        except (urllib.error.URLError, ConnectionRefusedError, TimeoutError) as exc:
+            refused = isinstance(exc, ConnectionRefusedError)
+            if not (refused or loading(exc)) or time.monotonic() + pause_s > deadline:
+                if refused or loading(exc) or liveness.is_timeout(exc):
+                    liveness.failed(MODEL_URL, "timeout" if liveness.is_timeout(exc) else "refused")
+                raise
+        time.sleep(pause_s)
 
 
 def fetch_json(url, payload=None, timeout=15):
@@ -112,24 +186,73 @@ def normalize(text):
     return re.sub(r"[\s：:，,。.!！?？《》「」\"'·]", "", unicodedata.normalize("NFKC", text)).lower()
 
 
+def catalog_cache():
+    """Where the last verified catalogue is kept on this device (the phone: the App's
+    support folder, LOCALAPPDATA; elsewhere the temporary folder)."""
+    configured = os.environ.get("TOWNPASS_CATALOG_CACHE")
+    if configured:
+        return pathlib.Path(configured)
+    base = os.environ.get("LOCALAPPDATA") or tempfile.gettempdir()
+    return pathlib.Path(base) / "TownPassAssistant" / "library_catalog.json"
+
+
+def _verified(data):
+    canonical = json.dumps(data, sort_keys=True, ensure_ascii=True, separators=(",", ":"))
+    return hashlib.sha256(canonical.encode()).hexdigest() == CATALOG_VERSION
+
+
 class Catalog:
-    def __init__(self):
+    """The demo library catalogue (CATALOG_URL), checked against CATALOG_VERSION and
+    fetched again after 60 s.
+
+    Offline (airplane mode, 2026-11-11) the last copy is kept: the one in memory,
+    else the one saved on this device after the last successful fetch. Without
+    any copy only book requests fail; the workflow carries on without books
+    otherwise (docs/AI_CURRENT_RULES.md section 5). The copy is the downloaded
+    data, not packaged in the App."""
+
+    def __init__(self, fetch=None, cache=None):
         self._data = None
         self._time = 0
         self._lock = threading.Lock()
+        self._fetch = fetch or (lambda: fetch_json(CATALOG_URL))
+        self._cache = cache
+
+    @property
+    def cache(self):
+        return self._cache or catalog_cache()
+
+    def _read_cache(self):
+        try:
+            data = json.loads(self.cache.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            return None
+        return data["data"] if isinstance(data, dict) and _verified(data) else None
+
+    def _write_cache(self, data):
+        try:
+            self.cache.parent.mkdir(parents=True, exist_ok=True)
+            self.cache.write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
+        except OSError:
+            pass
 
     def books(self, force=False):
         with self._lock:
             if force or self._data is None or time.monotonic() - self._time > 60:
                 try:
-                    data = fetch_json(CATALOG_URL)
+                    data = self._fetch()
                 except (OSError, ValueError) as exc:
-                    raise AssistantError("無法載入示範書目，請稍後重試或從原圖書頁面搜尋。") from exc
-                canonical = json.dumps(data, sort_keys=True, ensure_ascii=True, separators=(",", ":"))
-                if hashlib.sha256(canonical.encode()).hexdigest() != CATALOG_VERSION:
+                    if self._data is None:
+                        self._data = self._read_cache()
+                    if self._data is None:
+                        raise AssistantError("無法載入示範書目，請稍後重試或從原圖書頁面搜尋。") from exc
+                    self._time = time.monotonic()  # offline: the kept copy, asked again in 60 s
+                    return self._data
+                if not _verified(data):
                     raise AssistantError("圖書服務資料已更新，請先從原圖書頁面搜尋；助理需要重新核對版本。")
                 self._data = data["data"]
                 self._time = time.monotonic()
+                self._write_cache(data)
             return self._data
 
 
@@ -153,13 +276,17 @@ def positive_text(text):
 
 
 def retrieve(text, books, previous=()):
+    from registry import library_view
     clean = positive_text(text)
     n = normalize(clean)
     other = [key for key, words in OTHER_SERVICES.items() if any(w in clean for w in words)]
     # Independent domain/action evidence tolerates filler without enumerating
-    # individual utterances or quantifier spellings.
-    library = any(w in n for w in LIBRARY_WORDS) or (
-        "書" in n and any(verb in n for verb in ("借", "找", "閱讀", "搜尋"))
+    # individual utterances or quantifier spellings. 證書, 說明書, 書法, 借題發揮... are
+    # not book evidence (registry.NOT_LIBRARY, rules 2026-11-13).
+    masked = library_view(clean)
+    m = normalize(masked)
+    library = any(w in m for w in LIBRARY_WORDS) or (
+        "書" in m and any(verb in m for verb in ("借", "找", "閱讀", "搜尋"))
     )
     query, search_type = "", "book_name"
     selected = None
@@ -189,10 +316,12 @@ def retrieve(text, books, previous=()):
     if not query:
         # "<author>寫的(書)" names an author without a search verb; checked first so
         # "找廣嶋玲子寫的書" does not capture "廣嶋玲子寫" as the author.
-        author_match = re.search(r"(?:作者(?:是)?|找|搜尋|查|借|看)?([^，。！？\s]{2,24}?)寫(?:的|過)(?:什麼)?(?:書|作品)?", clean) \
-            or re.search(r"(?:作者(?:是)?|找|搜尋|查)([^，。！？]{1,24}?)(?:的書|的作品)", clean)
+        # Found in the masked text ("找我的書包" names no author 我), taken from the request.
+        author_match = re.search(r"(?:作者(?:是)?|找|搜尋|查|借|看)?([^，。！？\s]{2,24}?)寫(?:的|過)(?:什麼)?(?:書|作品)?", masked) \
+            or re.search(r"(?:作者(?:是)?|找|搜尋|查)([^，。！？]{1,24}?)(?:的書|的作品)", masked)
         if author_match:
-            query = re.sub(r"^(?:我要|我想|幫我|請|找|看|借)+", "", author_match[1].strip())
+            query = re.sub(r"^(?:我要|我想|幫我|請|找|看|借)+", "",
+                           clean[author_match.start(1):author_match.end(1)].strip())
             search_type = "author"
             library = True
     # Extract an action's object before requiring a service classification.
@@ -200,12 +329,16 @@ def retrieve(text, books, previous=()):
     action_object = ""
     if not query:
         # The object ends at the clause: "借原親子館，你能幫我借到嗎" -> "原親子館".
-        title_match = re.search(r"(?:借|找|搜尋|看)(?:一下|一本|一部|這本)?\s*([^，,。！？!?；;]+)", clean)
+        # The verb is found in the masked text (借題發揮 is not 借 + 題發揮); the object is
+        # taken from the same place in the request.
+        title_match = re.search(r"(?:借|找|搜尋|看)(?:一下|一本|一部|這本)?\s*([^，,。！？!?；;]+)", masked)
         if title_match:
             value = re.sub(r"(?:這本書|的書|這本|好嗎|謝謝|就好)?[了吧啦喔哦呢嗎耶]*[。！？!？?]*$", "",
-                           title_match[1]).strip()
+                           clean[title_match.start(1):title_match.end(1)]).strip()
             value = re.sub(r"(?:這本書|的書|這本|好嗎|謝謝|就好)$", "", value).strip()
-            if value and value not in ("書", "書籍", "圖書", "閱"):
+            # An object whose only 書 is a non-book word (說明書, 計畫書) is clearly not a book.
+            not_book = "書" in value and "書" not in library_view(value)
+            if value and value not in ("書", "書籍", "圖書", "閱") and not not_book:
                 action_object = value
                 query = value
     if not query:
@@ -326,6 +459,12 @@ class Assistant:
         # Version C: semantic retrieval over the catalogue (semantic.CatalogIndex); None runs without it.
         self.semantic = semantic
         self.model_lock = threading.Lock()
+        # False while the phone has no decision model (still downloading, or the lite
+        # tier; docs/AI_CURRENT_RULES.md section 7): decisions follow decision.rule_decision.
+        # TOWNPASS_NO_DECISION_MODEL=1 evaluates that mode on the computer.
+        self.model_available = os.environ.get("TOWNPASS_NO_DECISION_MODEL") != "1"
+        # Model downloads on the phone (models.Downloads); None on the computer.
+        self.downloads = None
         self.usage = threading.local()  # per-request model call log for metrics
         self.workflow = Workflow(self, retrieve, tool, validate_call, AssistantError)
 
@@ -340,10 +479,10 @@ class Assistant:
             schema = proposal_schema(tools)
             if MODEL_API == "openai":
                 # Same messages and limits; the output constraint comes from the schema.
-                reply = fetch_json(MODEL_URL + "/v1/chat/completions", {
+                reply = model_reply({
                     "model": MODEL, "messages": alternating(messages), "temperature": 0, "max_tokens": 180,
                     **output_constraint(schema),
-                }, timeout=MODEL_TIMEOUT)
+                })
                 content = reply["choices"][0]["message"]["content"]
                 result = {"prompt_eval_count": (reply.get("usage") or {}).get("prompt_tokens"),
                           "timing": llama_timing(reply.get("timings"))}
@@ -363,6 +502,7 @@ class Assistant:
             raise AssistantError("決策模型未回應，請確認電腦上的 Ollama 正在執行，再重試。") from exc
 
     def turn(self, payload):
+        note_user_request()
         request_id = payload.get("request_id")
         session = payload.get("session_id") or str(uuid.uuid4())
         text = payload.get("text", "")
@@ -380,6 +520,8 @@ class Assistant:
         requested = payload.get("language")
         if requested == "nan":
             requested = "zh"  # Taiwanese speech is transcribed into Chinese (asr_server.TAIWANESE)
+        if requested == "fil":
+            requested = "tl"  # Filipino: the App and Whisper call it tl (docs/AI_FILIPINO.md)
         if requested is not None and requested not in (*i18n.LANGUAGES, "auto"):
             raise AssistantError("語言欄位不正確。")
         language = requested if requested in i18n.LANGUAGES else i18n.detect_text_language(text)
@@ -395,19 +537,24 @@ class Assistant:
         started = time.monotonic()
         self.usage.calls, self.usage.timings = [], []
         self.usage.route, self.usage.candidates, self.usage.semantic = None, [], None
+        self.usage.classifier = []  # TOWNPASS_DECISION_BACKEND=classifier decisions (classifier.py)
         result = self.workflow.handle(payload)
         tokens = [count for count in self.usage.calls if count is not None]
         result["metrics"] = {"elapsed_ms": round((time.monotonic() - started) * 1000),
             "model_calls": len(self.usage.calls), "prompt_tokens": sum(tokens) if tokens else None,
             "model": MODEL if self.usage.calls else None, "page_capability": self._page_id(context),
             "route": self.usage.route, "candidates": self.usage.candidates, "semantic": self.usage.semantic,
-            "model_timings": [timing for timing in self.usage.timings if timing]}
+            "model_timings": [timing for timing in self.usage.timings if timing],
+            **({"classifier": self.usage.classifier} if self.usage.classifier else {})}
         if TIMING_LOG:
             # Numbers only (never the request text), for measuring a phone's speed.
             calls = " ".join(f"[prompt {t['prompt_tokens']} tok cached {t['cached_tokens']} {t['prompt_ms']} ms"
                              f" | gen {t['generated_tokens']} tok {t['generate_ms']} ms]"
                              for t in result["metrics"]["model_timings"])
-            print(f"timing turn total={result['metrics']['elapsed_ms']} ms route={self.usage.route} {calls}",
+            # Classifier decisions (classifier.py): how many and how many candidates in total.
+            scored = f" cls {len(self.usage.classifier)} x {sum(len(c['scores']) for c in self.usage.classifier)}" \
+                if self.usage.classifier else ""
+            print(f"timing turn total={result['metrics']['elapsed_ms']} ms route={self.usage.route} {calls}{scored}",
                   flush=True)
         return result
 
@@ -506,6 +653,8 @@ TAIWANESE_NOTICES = {
     "missing": "還沒有安裝台語語音模型，這次先用中文聽。",
     "memory": "手機記憶體不夠載入台語語音模型，這次先用中文聽。",
     "failed": "台語語音模型沒有啟動成功，這次先用中文聽。",
+    # Still loading after device_main.BoundedStarter.WAIT_S: the next clips use it once it is up.
+    "loading": "台語語音模型還在載入，這次先用中文聽，等一下再說一次。",
 }
 
 
@@ -587,7 +736,13 @@ def make_handler(assistant, token=""):
                     "catalog": [{k: v for k, v in e.items() if k != "navigation"} for e in registry.entries],
                     "faq_entries": assistant.faq.count if assistant.faq else 0,
                     "semantic_ready": bool(assistant.semantic and assistant.semantic.ready),
+                    "decision_model": assistant.model_available,
+                    "ready": readiness(assistant),
                     "data_mode": "demo"})
+            if self.path == "/v1/models":
+                # Model downloads (docs/AI_MODEL_DOWNLOAD.md); not managed on the computer.
+                downloads = assistant.downloads
+                return self.reply(200, downloads.status() if downloads else {"managed": False})
             self.reply(404, {"error": "找不到此功能。"})
 
         def drain(self, limit):
@@ -610,6 +765,8 @@ def make_handler(assistant, token=""):
                 return self.reply(401, {"error": "連線授權失敗。"})
             if self.path == "/v1/assistant/transcriptions":
                 return self.transcription()
+            if self.path in MODEL_ACTIONS:
+                return self.models(MODEL_ACTIONS[self.path])
             if self.path != "/v1/assistant/turns":
                 return self.reply(404, {"error": "找不到此功能。"})
             if self.headers.get("Origin"):
@@ -637,12 +794,58 @@ def make_handler(assistant, token=""):
             except Exception:
                 self.reply(500, {"error": "助理暫時無法處理，請使用原服務入口。"})
 
+        def models(self, action):
+            """Start, pause or delete model downloads (docs/AI_MODEL_DOWNLOAD.md).
+            Body: {"parts": [...], "base_url": mirror} for download, {"parts": [...]}
+            for delete (models.PARTS); the reply is the new status. Only the App on
+            this phone calls it (no Origin)."""
+            downloads = assistant.downloads
+            if self.headers.get("Origin"):
+                self.drain(8192)
+                return self.reply(403, {"error": "此測試服務僅接受 App 或本機 API 呼叫。"})
+            try:
+                self.connection.settimeout(10)
+                length = int(self.headers.get("Content-Length") or "0")
+                if not 0 <= length <= 2048:
+                    return self.reply(413, {"error": "請求內容過長。"})
+                body = json.loads(self.rfile.read(length)) if length else {}
+                if not isinstance(body, dict) or set(body) - {"parts", "base_url"}:
+                    raise AssistantError("請求欄位不正確。")
+                if downloads is None:
+                    return self.reply(409, {"error": "這個版本的模型不是由 App 下載。", "managed": False})
+                parts = body.get("parts")
+                if parts is not None and (not isinstance(parts, list) or not all(isinstance(p, str) for p in parts)):
+                    raise AssistantError("請求欄位不正確。")
+                base_url = body.get("base_url")
+                if base_url is not None and not isinstance(base_url, str):
+                    raise AssistantError("請求欄位不正確。")
+                if action == "download":
+                    try:
+                        downloads.start(parts, base_url=base_url)
+                    except ValueError as exc:
+                        raise AssistantError(str(exc)) from exc
+                elif action == "cancel":
+                    downloads.cancel()
+                else:
+                    try:
+                        downloads.delete(parts)
+                    except ValueError as exc:
+                        raise AssistantError(str(exc)) from exc
+                    if not downloads.ready("decision"):
+                        assistant.model_available = False
+                self.reply(200, downloads.status())
+            except (ValueError, UnicodeError):
+                self.reply(400, {"error": "請使用正確的 JSON 格式。"})
+            except AssistantError as exc:
+                self.reply(422, {"error": str(exc)})
+
         def transcription(self):
             """Validate in-memory WAV audio and forward it to the loopback ASR service.
 
             Audio is never stored or logged. The text goes back to the App, which
             shows it as the user's message and sends it as a normal turn.
             """
+            note_user_request()
             from asr_server import MAX_BYTES, read_wav
             if self.headers.get("Transfer-Encoding") or self.headers.get("Content-Length") is None:
                 return self.reply(411, {"error": "App 傳送格式不符，請更新 App 後重試。"})

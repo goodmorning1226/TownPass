@@ -29,6 +29,9 @@
 # for an App built with run_assistant_on_device.ps1 -DecisionModel gemma
 # (docs/AI_DECISION_MODEL_ABLATION_PLAN.md section 8). Ministral stays on the phone,
 # so switching back only needs a default build. -RemoveGemma deletes the Gemma file.
+# -DecisionModel classifier also pushes the decision classifier (-ClassifierModel, 132 MB)
+# for an App built with run_assistant_on_device.ps1 -DecisionModel classifier (option B',
+# docs/AI_DECISION_CLASSIFIER.md section 12); Ministral stays on the phone as well.
 param(
     [string]$DeviceId,
     [string]$Models = "D:\TownPassAssistant\models\device",
@@ -40,9 +43,10 @@ param(
     [string]$LanguageGate = "D:\TownPassAssistant\models\asr-ablation\ggml-tiny-q8_0.bin",
     [string]$FaqModel = "D:\TownPassAssistant\models\device\multilingual-e5-small-q8_0.gguf",
     [string]$FaqIndex = (Join-Path $env:LOCALAPPDATA "TownPassAssistant\faq_rag"),
-    [ValidateSet("ministral", "gemma")][string]$DecisionModel = "ministral",
+    [ValidateSet("ministral", "gemma", "classifier")][string]$DecisionModel = "classifier",
     [string]$GemmaModel = "D:\TownPassAssistant\model-study\dl-gemma4-e2b-q4_0\gemma-4-E2B-it-Q4_0.gguf",
-    [switch]$RemoveGemma
+    [switch]$RemoveGemma,
+    [string]$ClassifierModel = "D:\TownPassAssistant\decision-classifier\models\townpass-decision-e5-ce-v1-q8_0.gguf"
 )
 # Native tools write progress to stderr; Windows PowerShell 5.1 would treat that as
 # an error when output is redirected, so failures are detected by exit codes instead.
@@ -71,6 +75,7 @@ if ($DecisionModel -eq "gemma") {
 } elseif ($RemoveGemma) {
     & $adb -s $DeviceId shell rm -f "$target/gemma-4-E2B-it-Q4_0.gguf"
 }
+if ($DecisionModel -eq "classifier") { Push-Model $ClassifierModel "townpass-decision-e5-ce-v1-q8_0.gguf" }
 if ($Multilingual) { Push-Model $Multilingual "ggml-whisper-multilingual.bin" }
 if ($Chinese) {
     Push-Model $Chinese "ggml-whisper-chinese.bin"

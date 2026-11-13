@@ -14,6 +14,9 @@ side, the HTTP contract and the decision path are unchanged:
     (detection only, docs/AI_LANGUAGE_GATE.md)
   llama-server --embedding on faq_port for the optional FAQ layer (faq.py)
     and the catalogue's semantic retrieval (semantic.py)
+  llama-server --reranking on 8778 with the decision classifier, in place of
+    the decision model when the App is built with ASSISTANT_DECISION_MODEL=classifier
+    (option B', docs/AI_DECISION_CLASSIFIER.md)
 """
 from __future__ import annotations
 
@@ -24,11 +27,24 @@ _started = threading.Event()
 _lock = threading.Lock()
 
 
+# The App's ASSISTANT_DECISION_MODEL values (OnDeviceAssistant.kt / .swift).
+DECISION_MODELS = ("ministral", "gemma", "classifier")
+
+
 def configure(model_port, whisper_port, model_timeout=70, faq_port=None, faq_dir=None, decision_model="ministral"):
     """Point server.py at llama-server before it is imported (its settings are module constants).
     decision_model: "ministral" (default) or "gemma", the GGUF the App loaded into
-    llama-server; selects decision.py's prompt variant."""
+    llama-server, which selects decision.py's prompt variant; or "classifier" (option B',
+    docs/AI_DECISION_CLASSIFIER.md sections 10-12): no decision LLM at all, the decision
+    classifier on PORTS["classifier"], library rules and the guides' keyword rules."""
     os.environ["TOWNPASS_DECISION_MODEL"] = "gemma" if decision_model == "gemma" else "ministral"
+    if decision_model == "classifier":
+        os.environ["TOWNPASS_DECISION_BACKEND"] = "classifier_only"
+        os.environ["TOWNPASS_CLASSIFIER_ONLY_GUIDE"] = "keywords"
+        os.environ["TOWNPASS_CLASSIFIER_URL"] = _url("classifier")
+        # A decision right after launch waits for the loading classifier, as for the
+        # decision model (server.MODEL_READY_WAIT_S; server is not imported yet).
+        os.environ["TOWNPASS_CLASSIFIER_WAIT"] = "75"
     if faq_port and faq_dir:
         os.environ["TOWNPASS_FAQ_EMBED_URL"] = f"http://127.0.0.1:{faq_port}"
         os.environ["TOWNPASS_FAQ_DIR"] = faq_dir
@@ -56,38 +72,63 @@ def _retry(action, deadline):
     return None
 
 
-def warm_up(recognizer, model_url, limit_s=900):
+def warm_up(recognizer, model_url, limit_s=900, decision=True, classifier_url=None):
     """Load both models and prepare the fixed start of a decision before the user asks.
 
     A first request otherwise pays for reading the model files into memory
     (23-49 s on a vivo V2511 instead of ~17 s). The decision prompt's fixed
     system policy is processed once here; llama-server keeps it in its prompt
     cache, so a real request only processes what follows it. Numbers only are logged.
+    classifier_url (option B', no decision LLM; decision is then False): one
+    scoring call reads the classifier into memory instead.
     """
     import array
     import math
     import time
+    import server
     from decision import system_prompt
     from server import fetch_json
     started = time.monotonic()
     deadline = started + limit_s
+
+    def user_first():
+        """The user asked since the warm-up began: their request warms the models
+        itself, and the warm-up would only compete with it (2026-11-11)."""
+        return server.USER_REQUEST_AT > started
+
     speech = None
-    if recognizer is not None:  # None: the phone's own recogniser, no Whisper
+    if recognizer is not None and not user_first():  # None: the phone's own recogniser, no Whisper
         tone = array.array("h", (int(3000 * math.sin(i * 0.05)) for i in range(16000))).tobytes()
         # No Taiwanese for the tone: it passed the Taiwanese gate and loaded Breeze at idle.
         speech = _retry(lambda: recognizer.transcribe(tone, automatic_taiwanese=False), deadline)
     speech_s = time.monotonic() - started
     # The same fixed system messages decision.decide sends, one per task, so each
     # of llama-server's two slots keeps one of them in its prompt cache.
-    decision = True
+    # decision=False: no decision model on the phone yet (models.py); Activator
+    # warms it once it has been downloaded.
     from decision import POLICIES
-    for task in POLICIES:  # library, capability, guide: one llama-server slot each
+    warmed = True
+    for task in (POLICIES if decision else ()):  # library, capability, guide: one llama-server slot each
+        if user_first():
+            print("timing warm-up stopped: the user asked first", flush=True)
+            decision = False
+            break
         messages = [{"role": "system", "content": system_prompt(task)}, {"role": "user", "content": "{}"}]
-        decision = _retry(lambda: fetch_json(model_url + "/v1/chat/completions", {
-            "messages": messages, "temperature": 0, "max_tokens": 1}, timeout=300), deadline) and decision
+        warmed = _retry(lambda: fetch_json(model_url + "/v1/chat/completions", {
+            "messages": messages, "temperature": 0, "max_tokens": 1}, timeout=300), deadline) and warmed
+    scored = ""
+    if classifier_url and not user_first():
+        import classifier
+        try:
+            classifier.rerank("你好", [classifier.GREETING_DOC], url=classifier_url,
+                              wait_s=max(0.0, min(180.0, deadline - time.monotonic())))
+            scored = " classifier=ok"
+        except classifier.ClassifierUnavailable:
+            scored = " classifier=failed"
     state = "skipped" if recognizer is None else "ok" if speech else "failed"
+    decided = "skipped" if not decision else "ok" if warmed else "failed"
     print(f"timing warm-up speech={state} {speech_s:.1f}s "
-          f"decision={'ok' if decision else 'failed'} {time.monotonic() - started:.1f}s", flush=True)
+          f"decision={decided}{scored} {time.monotonic() - started:.1f}s", flush=True)
 
 
 def _load_faq(backend):
@@ -117,12 +158,78 @@ def taiwanese_provider(port, starter=None):
         from java import jclass  # Chaquopy, on the phone only
         return str(jclass("com.example.townpass.OnDeviceAssistant").startTaiwanese())
 
-    starter = starter or start_in_app
+    starter = BoundedStarter(starter or start_in_app, port)
 
     def provide():
         state = starter()
         return (f"http://127.0.0.1:{port}", None) if state == "ready" else (None, state)
     return provide
+
+
+class BoundedStarter:
+    """Starts an on-demand speech server (Taiwanese, Vietnamese) without holding up speech.
+
+    The App's starter blocks until the model has loaded (seconds; on an iPhone also
+    behind the start-up models, up to minutes) and is called while the recogniser holds
+    its lock, so every clip waited for it: with a Taiwanese model that could not load,
+    each clip waited about a minute and the clips behind it timed out, and no speech
+    worked at all (iPhone, 2026-11-13). Now:
+
+    - the App's starter (which answers at once when the server already runs) runs on
+      its own thread; a clip waits for it at most
+      wait_s, counted from when the start began (later clips do not wait again), and
+      then gets "loading" (the clip is heard as Chinese; the next ones use the model
+      once it is up);
+    - "failed" (the slow failure): no new start for retry_s; "missing" and "memory"
+      are quick answers from the App and are asked again on the next clip.
+    """
+
+    WAIT_S = 20.0
+    RETRY_S = 300.0
+
+    def __init__(self, starter, port, wait_s=None, retry_s=None, clock=None):
+        import time
+        self.starter = starter
+        self.port = port
+        self.wait_s = self.WAIT_S if wait_s is None else wait_s
+        self.retry_s = self.RETRY_S if retry_s is None else retry_s
+        self.clock = clock or time.monotonic
+        self.lock = threading.Lock()
+        self.thread = None
+        self.began = 0.0
+        self.result = None
+        self.failed_at = None
+
+    def _run(self):
+        try:
+            state = str(self.starter())
+        except Exception:
+            state = "failed"
+        with self.lock:
+            self.result = state
+            if state == "failed":
+                self.failed_at = self.clock()
+
+    def __call__(self):
+        with self.lock:
+            if self.thread is None or not self.thread.is_alive():
+                if self.thread is not None and self.result is not None:
+                    done, self.thread = self.result, None
+                    if done != "failed":
+                        return done
+                if self.failed_at is not None and self.clock() - self.failed_at < self.retry_s:
+                    return "failed"
+                self.result = None
+                self.began = self.clock()
+                self.thread = threading.Thread(target=self._run, name=f"speech-start-{self.port}", daemon=True)
+                self.thread.start()
+            thread, began = self.thread, self.began
+        thread.join(max(0.0, began + self.wait_s - self.clock()))
+        with self.lock:
+            if thread.is_alive():
+                return "loading"
+            self.thread = None
+            return self.result or "failed"
 
 
 def vietnamese_provider(port, starter=None):
@@ -148,6 +255,190 @@ def native_starter(address):
         state = function()
         return state.decode("utf-8", "replace") if state else "failed"
     return start_in_app
+
+
+def native_server_starter(address):
+    """The iOS App's server starter (OnDeviceAssistant.swift ensureServer): a C
+    function at address taking a server name (SERVERS) and returning "ready",
+    "missing", "memory" or "failed", like Android's OnDeviceAssistant.ensureServer."""
+    import ctypes
+    function = ctypes.CFUNCTYPE(ctypes.c_char_p, ctypes.c_char_p)(address)
+
+    def ensure(name):
+        state = function(name.encode("ascii"))
+        return state.decode("utf-8", "replace") if state else "failed"
+    return ensure
+
+
+def native_flag(address):
+    """A yes/no question the iOS App answers: a C function at address returning 1 or 0
+    (OnDeviceAssistant.swift appActive: whether the App is in the foreground)."""
+    import ctypes
+    function = ctypes.CFUNCTYPE(ctypes.c_int)(address)
+    return lambda: bool(function())
+
+
+class Restarter:
+    """Asks the App to start a model server again once it stops answering.
+
+    liveness.failed() (a server that answered before refuses or times out) calls
+    this with the server's address; restart(name) is the App's native call
+    (OnDeviceAssistant.swift restartServer: health-checks the server and runs it
+    again when it does not answer; Android: OnDeviceAssistant.kt restartServer, the same
+    contract, through java_server_restarter) and returns "ready", "restarted" or "failed"
+    ("busy" / "missing": not restarted now).
+    One request per server at a time, on its own thread: the request that noticed
+    goes on at once with its usual "no answer" path.
+    """
+
+    def __init__(self, restart, ports=None):
+        self.restart = restart
+        self.names = {f"http://127.0.0.1:{port}": name for name, port in (ports or PORTS).items()}
+        self.lock = threading.Lock()
+        self.busy = set()
+        self.errors = {}  # name -> when a restart for server errors was last asked
+
+    # A server that answers with errors is restarted at most this often.
+    ERROR_EVERY_S = 60.0
+
+    def __call__(self, server, reason):
+        import time
+        name = self.names.get(server)
+        if name is None:
+            return
+        with self.lock:
+            if name in self.busy:
+                return
+            if reason == "error":
+                if time.monotonic() - self.errors.get(name, -self.ERROR_EVERY_S) < self.ERROR_EVERY_S:
+                    return
+                self.errors[name] = time.monotonic()
+            self.busy.add(name)
+        threading.Thread(target=self._run, args=(name, reason), name=f"restart-{name}", daemon=True).start()
+
+    def _run(self, name, reason):
+        try:
+            # "<name>:error": it answers /health but fails requests; restart it anyway.
+            state = self.restart(f"{name}:error" if reason == "error" else name)
+        except Exception:
+            state = "failed"
+        finally:
+            with self.lock:
+                self.busy.discard(name)
+        print(f"models: {name} not answering ({reason}); restart {state}", flush=True)
+        if state in ("ready", "restarted"):
+            import liveness
+            liveness.answered(self.names_by_name(name))
+
+    def names_by_name(self, name):
+        return next(server for server, value in self.names.items() if value == name)
+
+
+def java_server_starter(name):
+    """Android's server starter (OnDeviceAssistant.ensureServer, Kotlin)."""
+    from java import jclass  # Chaquopy, on the phone only
+    return str(jclass("com.example.townpass.OnDeviceAssistant").ensureServer(name))
+
+
+def java_server_restarter(name):
+    """Android's server restarter for Restarter (OnDeviceAssistant.restartServer, Kotlin;
+    2026-11-13: Android did not restart a server that stopped answering, e.g. one the
+    system killed in the background). The App passes it as start(server_restarter=...).
+    "failed" when the App is older and has no restartServer."""
+    from java import jclass  # Chaquopy, on the phone only
+    assistant = jclass("com.example.townpass.OnDeviceAssistant")
+    if not hasattr(assistant, "restartServer"):
+        return "failed"
+    return str(assistant.restartServer(name))
+
+
+# The native servers' loopback ports, the same on Android and iOS
+# (OnDeviceAssistant.kt, OnDeviceAssistant.swift). "classifier": the decision
+# classifier (llama-server --reranking), only with ASSISTANT_DECISION_MODEL=classifier.
+PORTS = {"decision": 8771, "chinese": 8772, "multilingual": 8773, "embedding": 8774, "gate": 8775,
+         "taiwanese": 8776, "vietnamese": 8777, "classifier": 8778}
+# Names the native side's ensureServer starts once their model file is there.
+SERVERS = ("decision", "multilingual", "gate", "embedding", "classifier")
+# The optional separate Chinese model (Android only, never downloaded).
+CHINESE_ASR_FILE = "ggml-whisper-chinese.bin"
+
+
+def _url(name):
+    return f"http://127.0.0.1:{PORTS[name]}"
+
+
+class Activator:
+    """Puts newly downloaded models to work without restarting the App
+    (docs/AI_MODEL_DOWNLOAD.md): models.Downloads calls it after each file;
+    refresh() asks the native side to start each server whose files are now
+    all there and points the recognizer, the FAQ, semantic retrieval and the
+    decision path at it. Idempotent: what already runs is left alone.
+
+    starter(name) -> "ready" | "missing" | "memory" | "failed" (SERVERS).
+    """
+
+    def __init__(self, backend, recognizer, downloads, starter, whisper=True, platform="android",
+                 taiwanese_starter=None):
+        self.backend = backend
+        self.recognizer = recognizer
+        self.downloads = downloads
+        self.starter = starter
+        self.whisper = whisper
+        self.platform = platform
+        self.taiwanese_starter = taiwanese_starter
+        self.lock = threading.Lock()
+        self.faq_started = False
+
+    def __call__(self, entry):
+        threading.Thread(target=self.refresh, name="model-activate", daemon=True).start()
+
+    def has(self, file_id):
+        files = [e for part in ("core", "decision", "taiwanese") for e in self.downloads.wanted(part)
+                 if e["id"] == file_id]
+        return bool(files) and all(self.downloads.present(e) for e in files)
+
+    def _start(self, name):
+        state = self.starter(name)
+        print(f"models: {name} server {state}", flush=True)
+        return state == "ready"
+
+    def refresh(self):
+        with self.lock:
+            recognizer, backend = self.recognizer, self.backend
+            if recognizer is not None and self.whisper:
+                if recognizer.multi_url is None and self.has("speech") and self._start("multilingual"):
+                    recognizer.multi_url = _url("multilingual")
+                    if recognizer.url == _url("chinese") and not (self.downloads.dir / CHINESE_ASR_FILE).exists():
+                        # No separate Chinese model: the multilingual one serves Chinese too.
+                        recognizer.url = recognizer.multi_url
+                    if recognizer.taiwanese is None:
+                        recognizer.taiwanese = taiwanese_provider(PORTS["taiwanese"], self.taiwanese_starter)
+                    if recognizer.vietnamese is None and self.platform == "android":
+                        recognizer.vietnamese = vietnamese_provider(PORTS["vietnamese"])
+                if (recognizer.multi_url and recognizer.gate_url is None and self.has("langid")
+                        and self._start("gate")):
+                    recognizer.gate_url = _url("gate")
+                    recognizer.gate_primed = False
+            faq_files = ("embedding", "faq-embeddings", "faq-metadata", "faq-model-info")
+            if not self.faq_started and backend.faq is None and all(self.has(f) for f in faq_files) \
+                    and self._start("embedding"):
+                self.faq_started = True
+                os.environ["TOWNPASS_FAQ_EMBED_URL"] = _url("embedding")
+                os.environ["TOWNPASS_FAQ_DIR"] = str(self.downloads.dir / "faq_rag")
+                _load_faq(backend)
+                if backend.semantic is None:
+                    import semantic
+                    backend.semantic = semantic.load_default(backend.workflow.registry)
+            decision = [e["id"] for e in self.downloads.wanted("decision")]
+            # The decision part's server: the decision model, or the classifier (option B').
+            name = "classifier" if self.downloads.decision_model == "classifier" else "decision"
+            if not backend.model_available and decision and self.has(decision[0]) and self._start(name):
+                backend.model_available = True
+                if name == "decision":
+                    # The decision policies into llama-server's prompt cache, as at start-up.
+                    threading.Thread(target=warm_up,
+                                     args=(None, os.environ.get("TOWNPASS_MODEL_URL", _url("decision"))),
+                                     name="assistant-warm-up", daemon=True).start()
 
 
 # A FAQ question is known text when its best FAQ score reaches this (faq.MEDIUM_CONF:
@@ -241,7 +532,9 @@ def watch(listeners, interval=2.0, stop=None):
 
 def start(model_port=8771, whisper_port=8772, assistant_port=8765, asr_port=8770, whisper=True,
           multi_port=None, chinese_model=True, faq_port=None, faq_dir=None, taiwanese_port=None,
-          decision_model="ministral", gate_port=None, vietnamese_port=None, taiwanese_starter=None):
+          decision_model="ministral", gate_port=None, vietnamese_port=None, taiwanese_starter=None,
+          models_dir=None, ram_mb=None, platform="android", server_starter=None, server_restarter=None,
+          app_active=None):
     """Start both HTTP servers once; returns immediately after they listen.
 
     The native model servers may still be loading: until they answer, requests
@@ -257,7 +550,8 @@ def start(model_port=8771, whisper_port=8772, assistant_port=8765, asr_port=8770
     taiwanese_port: where the App starts the Taiwanese whisper-server on first
     use (docs/AI_TAIWANESE_SPEECH_PLAN.md section 10); None: Taiwanese clips are
     heard as Chinese, with a notice.
-    decision_model: "ministral" (default) or "gemma" (OnDeviceAssistant.kt, opt-in build).
+    decision_model: "ministral" (default), "gemma" or "classifier" (OnDeviceAssistant.kt,
+    opt-in builds; "classifier": no decision LLM, configure).
     vietnamese_port: where the App starts the Vietnamese whisper-server on the
     first Vietnamese decode (docs/AI_VIETNAMESE.md); None, or the file not on the
     phone: Vietnamese is decoded by the multilingual model as before.
@@ -265,10 +559,24 @@ def start(model_port=8771, whisper_port=8772, assistant_port=8765, asr_port=8770
     None: Android's Java bridge.
     gate_port: the language gate (Whisper tiny, detection only) that decides the
     speech language before any decode; None (not pushed) works as before.
+    models_dir, ram_mb, platform, server_starter: the App downloads the models
+    into models_dir (docs/AI_MODEL_DOWNLOAD.md; GET /v1/models); ram_mb (the
+    phone's total memory) picks the tier; server_starter(name) starts a native
+    server once its file arrives (default Android's Java bridge). Without
+    models_dir nothing is downloaded, as before.
+    server_restarter(name) (iOS: native_server_starter of restartServer; Android:
+    java_server_restarter, OnDeviceAssistant.kt restartServer): asked to start a server
+    again when it stopped answering (Restarter); None (an older App): nobody is asked,
+    requests only stop waiting for it (liveness.py).
+    app_active() (iOS, native_flag): whether the App is in the foreground; speech
+    passes wait for it (asr_server ACTIVE_WAIT_S). None: always active.
     """
     with _lock:
         if _started.is_set():
             return "already running"
+        if decision_model not in DECISION_MODELS:
+            decision_model = "ministral"
+        classifier_mode = decision_model == "classifier"
         configure(model_port, whisper_port, faq_port=faq_port, faq_dir=faq_dir, decision_model=decision_model)
         import asr_server
         import server
@@ -284,6 +592,23 @@ def start(model_port=8771, whisper_port=8772, assistant_port=8765, asr_port=8770
         recognizer = asr_server.WhisperCppRecognizer(chinese_url, multi_url=multi_url, taiwanese=taiwanese,
                                                      gate_url=gate_url, vietnamese=vietnamese,
                                                      known_text=known_text(backend))
+        recognizer.active = app_active
+        if server_restarter is not None:
+            import liveness
+            liveness.watch(Restarter(server_restarter))
+        activator = None
+        if models_dir:
+            import models
+            activator = Activator(backend, recognizer, None, server_starter or java_server_starter,
+                                  whisper=whisper, platform=platform, taiwanese_starter=taiwanese_starter)
+            activator.faq_started = bool(faq_port and faq_dir)
+            downloads = models.Downloads(models_dir, platform=platform, ram_mb=ram_mb,
+                                         decision_model=decision_model, on_file=activator)
+            activator.downloads = downloads
+            backend.downloads = downloads
+            # No decision model on the phone yet (still to download, or the lite tier):
+            # decisions follow decision.rule_decision until it is there.
+            backend.model_available = downloads.ready("decision")
         asr = Listener(asr_port, asr_server.make_handler(recognizer, "whisper.cpp"))
         assistant = Listener(assistant_port, server.make_handler(backend), timeout=150)
         asr.open()
@@ -295,9 +620,18 @@ def start(model_port=8771, whisper_port=8772, assistant_port=8765, asr_port=8770
             # from models/semantic_cache) in the background once the server answers.
             import semantic
             backend.semantic = semantic.load_default(backend.workflow.registry)
+        # Option B' has no decision LLM to warm: one classifier call instead (when it is here).
         threading.Thread(target=warm_up, args=(recognizer if whisper else None, os.environ["TOWNPASS_MODEL_URL"]),
+                         kwargs={"decision": backend.model_available and not classifier_mode,
+                                 "classifier_url": _url("classifier")
+                                 if classifier_mode and backend.model_available else None},
                          name="assistant-warm-up", daemon=True).start()
         _started.set()
+        downloads_state = ""
+        if activator is not None:
+            downloads_state = (f", models {activator.downloads.tier} tier, "
+                               f"{'classifier' if classifier_mode else 'decision'} "
+                               f"{'on the phone' if backend.model_available else 'not downloaded'}")
         speech = "speech: phone recogniser"
         if whisper:
             speech = (f"chinese whisper :{whisper_port}" if chinese_url != multi_url else "chinese = multilingual") + (
@@ -306,5 +640,6 @@ def start(model_port=8771, whisper_port=8772, assistant_port=8765, asr_port=8770
                 f", language gate :{gate_port}" if gate_url else "") + (
                 f", vietnamese whisper :{vietnamese_port} on first use" if vietnamese else "")
         faq_state = f", faq embed :{faq_port}" if faq_port and faq_dir else ", faq off"
-        return (f"assistant :{assistant_port}, asr :{asr_port}, model :{model_port} ({server.MODEL}), "
-                f"{speech}{faq_state}")
+        model = f"classifier :{PORTS['classifier']}" if classifier_mode else f"model :{model_port}"
+        return (f"assistant :{assistant_port}, asr :{asr_port}, {model} ({server.MODEL}), "
+                f"{speech}{faq_state}{downloads_state}")

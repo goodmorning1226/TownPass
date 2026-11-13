@@ -1,4 +1,4 @@
-"""Requests in en / ja / vi / id / th (docs/AI_MULTILINGUAL_PLAN.md, version 2)."""
+"""Requests in en / ja / vi / id / tl (docs/AI_MULTILINGUAL_PLAN.md, version 2; Filipino since 2026-11-11)."""
 import json
 import unittest
 
@@ -38,7 +38,8 @@ def chooser(name="select_capability"):
 class LanguageDetectionTests(unittest.TestCase):
     def test_script_and_common_words(self):
         cases = {"I want to pay my water bill": "en", "水道料金を払いたい": "ja", "Tôi muốn đóng tiền nước": "vi",
-                 "Saya mau bayar tagihan air": "id", "อยากจ่ายค่าน้ำ": "th", "我要繳水費": "zh",
+                 "Saya mau bayar tagihan air": "id", "Gusto kong magbayad ng tubig": "tl", "我要繳水費": "zh",
+                 "gusto ko mag-pay ng water bill": "tl", "salamat po": "tl", "I want to pay the bill": "en",
                  "ISBN 9786263350717": "zh", "???": "zh", "hello": "en",
                  "Lihat riwayat peminjaman": "id", "Halo": "id", "Xin chào": "vi"}
         for text, language in cases.items():
@@ -49,18 +50,33 @@ class LanguageDetectionTests(unittest.TestCase):
         self.assertEqual(i18n.choice_number("2番目", "ja"), 2)
         self.assertEqual(i18n.choice_number("số 3", "vi"), 3)
         self.assertEqual(i18n.choice_number("nomor 2", "id"), 2)
-        self.assertEqual(i18n.choice_number("อันที่สอง", "th"), 2)
+        self.assertEqual(i18n.choice_number("yung pangalawa po", "tl"), 2)
+        self.assertEqual(i18n.choice_number("ika-3", "tl"), 3)
         self.assertIsNone(i18n.choice_number("pay the water bill", "en"))
         self.assertEqual(i18n.positive_text("I don't want books, pay the water bill", "en"), "pay the water bill")
         self.assertEqual(i18n.positive_text("I don't want to borrow books", "en"), "")
-        self.assertTrue(i18n.searches(i18n.LISTING, "ทำอะไรได้บ้าง", "th"))  # SARA AM survives folding
+        self.assertTrue(i18n.searches(i18n.LISTING, "Ano ang mga kaya mong gawin?", "tl"))
+        # "ano ang mga serbisyo para sa buwis" asks about one service, not the list.
+        self.assertFalse(i18n.searches(i18n.LISTING, "ano ang mga serbisyo para sa buwis", "tl"))
+
+    def test_filipino_negation(self):
+        # A refusal drops the clause; a state ("hindi gumagana", not working) does not.
+        self.assertEqual(i18n.positive_text("Ayokong humiram ng libro", "tl"), "")
+        self.assertEqual(i18n.positive_text("Hindi ko kailangan ng libro, magbabayad ako ng tubig", "tl"),
+                         "magbabayad ako ng tubig")
+        self.assertEqual(i18n.positive_text("hindi gumagana ang ilaw sa kalye", "tl"), "hindi gumagana ang ilaw sa kalye")
+        self.assertEqual(i18n.positive_text("hindi pa bayad ang tubig namin", "tl"), "hindi pa bayad ang tubig namin")
+        # Not X but Y.
+        self.assertEqual(i18n.positive_text("hindi bayad sa tubig kundi bayad sa kuryente", "tl"), "bayad sa kuryente")
+        self.assertEqual(i18n.positive_text("gusto kong magbayad ng tubig, hindi ng tuition", "tl"),
+                         "gusto kong magbayad ng tubig")
 
 
 class CatalogueNamesTests(unittest.TestCase):
     def test_every_enabled_service_has_a_name_in_every_language(self):
         registry = Registry()
         for entry in registry.entries:
-            for language in ("en", "ja", "vi", "id", "th"):
+            for language in ("en", "ja", "vi", "id", "tl"):
                 names = registry.i18n.get(entry["id"], {}).get(language)
                 self.assertTrue(names and names["title"] and names["keywords"], (entry["id"], language))
 
@@ -68,7 +84,8 @@ class CatalogueNamesTests(unittest.TestCase):
         registry = Registry()
         cases = [("I want to pay my water bill", "en", "fees.water"), ("水道料金を払いたい", "ja", "fees.water"),
                  ("Tôi muốn mượn sách", "vi", "library"), ("Saya mau bayar parkir", "id", "fees.parking"),
-                 ("อยากแจ้งความออนไลน์", "th", "police.online"), ("show my borrowing records", "en", "library.records")]
+                 ("Gusto kong mag-report sa pulis online", "tl", "police.online"),
+                 ("gusto ko mag-pay ng water bill", "tl", "fees.water"), ("show my borrowing records", "en", "library.records")]
         for text, language, expected in cases:
             found = registry.search_language(text, language)
             self.assertEqual(found[0]["entry"]["id"] if found else None, expected, text)
@@ -90,7 +107,8 @@ class ForeignTurnTests(unittest.TestCase):
 
     def test_language_field_and_each_language_replies_in_itself(self):
         for text, language, word in (("水道料金を払いたい", "ja", "水道料金"), ("Tôi muốn đóng tiền nước", "vi", "Tiền nước"),
-                                     ("Saya mau bayar tagihan air", "id", "Tagihan air"), ("อยากจ่ายค่าน้ำ", "th", "ค่าน้ำ")):
+                                     ("Saya mau bayar tagihan air", "id", "Tagihan air"),
+                                     ("Gusto kong magbayad ng tubig", "tl", "Bayarin sa tubig")):
             self.app = None
             result = self.turn(text, language)
             self.assertEqual((result["destination"], result["language"]), ({"kind": "capability", "id": "fees.water"}, language))
@@ -178,9 +196,9 @@ class SoundKeyTests(unittest.TestCase):
         self.assertFalse(i18n.similar(i18n.LISTING_PHRASES, "nanika taberu", "ja"))
         self.assertFalse(i18n.similar(i18n.LISTING_PHRASES, "kyou wa ii tenki", "ja"))
 
-    def test_vietnamese_without_tones_and_thai_tone_slips(self):
+    def test_vietnamese_without_tones_and_filipino_slips(self):
         self.assertTrue(i18n.similar(i18n.LISTING_PHRASES, "ban lam duoc gi", "vi"))
-        self.assertTrue(i18n.similar(i18n.LISTING_PHRASES, "ทำอะไรใด้บ้าง", "th"))
+        self.assertTrue(i18n.similar(i18n.LISTING_PHRASES, "ano ang kaya mung gawin", "tl"))
 
     def test_a_romaji_listing_question_lists_the_services(self):
         from test_server import first
@@ -200,7 +218,8 @@ class PanelExampleTests(unittest.TestCase):
             "ja": ["どんな機能がありますか", "本を借りたい", "水道料金を払いたい", "窓口の順番待ち"],
             "vi": ["Bạn có những chức năng gì?", "Tôi muốn mượn sách", "Tôi muốn trả tiền nước", "Lấy số thứ tự tại quầy"],
             "id": ["Ada fitur apa saja?", "Saya mau pinjam buku", "Bayar tagihan air", "Nomor antrean loket"],
-            "th": ["มีฟังก์ชันอะไรบ้าง", "ฉันอยากยืมหนังสือ", "จ่ายค่าน้ำ", "บัตรคิวที่เคาน์เตอร์"],
+            "tl": ["Ano ang mga kaya mong gawin?", "Gusto kong humiram ng libro", "Magbayad ng bill sa tubig",
+                   "Numero ng pila sa counter"],
         }
         for language, (listing, library, water, counter) in examples.items():
             turn = lambda text: app.turn({"text": text, "request_id": "r", "session_id": "s", "language": language})
@@ -217,3 +236,62 @@ class JapaneseNegationTests(unittest.TestCase):
         for text in ("やっぱり水道代は払わなくていいです", "水道代はもう結構です"):
             result = app.turn({"text": text, "request_id": "r", "session_id": "s", "language": "ja"})
             self.assertIsNone(result["destination"], text)
+
+
+class FilipinoMatchingTests(unittest.TestCase):
+    """Filipino (tl) since 2026-11-11 (docs/AI_FILIPINO.md)."""
+
+    def turn(self, text, model):
+        app = Assistant(FakeCatalog(), model)
+        return app.turn({"text": text, "request_id": "r", "session_id": "s", "language": "tl"})
+
+    def test_spelling_variants_are_the_same_word(self):
+        # e/i, o/u, Spanish c/v, split or hyphenated prefixes: Whisper and people write them freely.
+        self.assertEqual(i18n.sound_key("Mga nereserva kung libro", "tl"), i18n.sound_key("mga nireserba kong libro", "tl"))
+        self.assertTrue(i18n.contains("gusto kong mag report sa pulis online", "mag-report sa pulis online", "tl"))
+        self.assertFalse(i18n.contains("kupal", "upa", "tl"))  # still whole words
+
+    def test_sure_keyword(self):
+        self.assertTrue(i18n.filipino_sure("Tingnan ang kasaysayan ng paghiram ko", ["kasaysayan ng paghiram"]))
+        self.assertTrue(i18n.filipino_sure("May mga promo ba ngayon", ["promo"]))
+        self.assertFalse(i18n.filipino_sure("ano ang address ng city hall", ["address"]))
+
+    def test_a_sure_keyword_opens_without_the_model(self):
+        def no_model(messages, tools):
+            raise AssertionError("the model was asked")
+        result = self.turn("Tingnan ang kasaysayan ng paghiram ko", no_model)
+        self.assertEqual(result["destination"], {"kind": "capability", "id": "library.records"})
+
+    def test_a_clarifying_model_lists_the_named_page_and_opens_nothing(self):
+        # One page named by a single word among other words: the model decides; when it
+        # only asks for more, the page is offered instead.
+        def clarify(messages, tools):
+            from test_server import first, response
+            options = json.loads(messages[-1]["content"]).get("options", [])
+            option = next((o for o in options if o["tool"] == "request_clarification"), None)
+            return response("choose", {"choice": option["choice"]}) if option else first(tools)
+        result = self.turn("nawala ang susi ko gusto kong tumawag ng police ngayon din", clarify)
+        self.assertIsNone(result["destination"])
+        self.assertEqual(result["kind"], "confirm_candidates")
+        self.assertIn("Serbisyo ng pulis", [choice["title"] for choice in result["choices"]])
+
+
+class FilipinoSemanticTests(unittest.TestCase):
+    def test_filipino_passages_count_only_for_filipino_requests(self):
+        # Filipino names are close to English in e5; scored for everyone they drew English
+        # requests away (semantic.OWN_LANGUAGE_ONLY).
+        import tempfile
+        import faq
+        import semantic
+        registry = Registry()
+        local = registry.i18n["districtOffice.form.a-1"]["tl"]
+        target = faq.PASSAGE_PREFIX + ", ".join([local["title"], *local["keywords"]])
+
+        def embed(texts):
+            return [[1.0, 0.0] if text in (target, faq.QUERY_PREFIX + "QUERY") else [0.0, 1.0] for text in texts]
+        with tempfile.TemporaryDirectory() as folder:
+            index = semantic.CatalogIndex(registry, embed_many=embed, cache_dir=folder, with_examples=False)
+            index.build()
+            self.assertGreater(index.scores("QUERY", "tl")["districtOffice.form.a-1"], 0.9)
+            self.assertLess(index.scores("QUERY", "en")["districtOffice.form.a-1"], 0.1)
+            self.assertLess(index.scores("QUERY")["districtOffice.form.a-1"], 0.1)

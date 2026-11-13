@@ -28,7 +28,7 @@ class PageTranslation {
     'ja': '日本語',
     'vi': 'Tiếng Việt',
     'id': 'Bahasa Indonesia',
-    'th': 'ไทย',
+    'tl': 'Filipino',
   };
 
   static const _mlKit = {
@@ -37,7 +37,9 @@ class PageTranslation {
     'ja': TranslateLanguage.japanese,
     'vi': TranslateLanguage.vietnamese,
     'id': TranslateLanguage.indonesian,
-    'th': TranslateLanguage.thai,
+    // Filipino is 'tl' everywhere in the App (Whisper, ML Kit and gTTS all
+    // call it Tagalog, tl); docs/AI_FILIPINO.md.
+    'tl': TranslateLanguage.tagalog,
   };
 
   static const _key = 'page_language';
@@ -89,11 +91,13 @@ class PageTranslation {
   }
 
   /// The phone's language when it is one of [languages], else Chinese.
+  /// Android names Filipino 'fil'; the App calls it 'tl'.
   static String systemLanguage([String? languageCode]) {
-    final code =
+    var code =
         (languageCode ??
                 WidgetsBinding.instance.platformDispatcher.locale.languageCode)
             .toLowerCase();
+    if (code == 'fil') code = 'tl';
     return languages.containsKey(code) ? code : original;
   }
 

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- On-device assistant (docs/AI_ON_DEVICE_IOS.md, 2026-11-13): a larger per-App
+	     memory budget on the devices that offer one. The App must work without it
+	     (OnDeviceAssistant.swift checks os_proc_available_memory before each load). -->
+	<key>com.apple.developer.kernel.increased-memory-limit</key>
+	<true/>
+</dict>
+</plist>

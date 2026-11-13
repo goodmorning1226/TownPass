@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:town_pass/page/assistant/widget/model_download_card.dart';
 import 'package:town_pass/page/guided_assistant/guided_assistant_controller.dart';
 import 'package:town_pass/page/guided_assistant/model/assistant_settings.dart';
 import 'package:town_pass/page/guided_assistant/model/guide_i18n.dart';
 import 'package:town_pass/page/guided_assistant/widget/guide_highlight.dart';
 import 'package:town_pass/util/tp_app_bar.dart';
 import 'package:town_pass/util/tp_colors.dart';
+import 'package:town_pass/service/assistant_model_download.dart';
 import 'package:town_pass/service/assistant_speech_language.dart';
 import 'package:town_pass/service/page_translation.dart';
 import 'package:town_pass/util/tp_text.dart';
@@ -96,6 +98,11 @@ class AssistantSettingsView extends StatelessWidget {
                     ],
                   ),
                 ),
+                // On-device builds: the downloaded models (docs/AI_MODEL_DOWNLOAD.md).
+                if (AssistantModelDownload.maybe != null)
+                  ModelDownloadSettings(
+                    downloads: AssistantModelDownload.maybe!,
+                  ),
               ],
             ),
           ),

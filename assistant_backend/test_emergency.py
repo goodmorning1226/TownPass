@@ -33,7 +33,8 @@ class EmergencyTests(unittest.TestCase):
 
     def test_other_languages(self):
         for text, language in (("My house is on fire", "en"), ("火事です", "ja"), ("Nhà tôi bị cháy", "vi"),
-                               ("Rumah saya kebakaran", "id"), ("บ้านไฟไหม้", "th")):
+                               ("Rumah saya kebakaran", "id"), ("May sunog sa bahay namin", "tl"),
+                               ("Nawalan ng malay ang lola ko", "tl")):
             result = self.turn(text, language)
             self.assertEqual(result["action"], "emergency", text)
             self.assertIn("119", result["message"], text)

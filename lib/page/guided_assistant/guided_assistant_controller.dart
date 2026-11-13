@@ -19,6 +19,8 @@ import 'package:town_pass/util/tp_route.dart';
 import 'package:town_pass/bean/assistant_result.dart';
 import 'package:town_pass/page/main/main_view_controller.dart';
 import 'package:town_pass/service/assistant_action_executor.dart';
+import 'package:town_pass/service/assistant_model_download.dart';
+import 'package:town_pass/service/assistant_on_device.dart';
 import 'package:town_pass/service/assistant_page_tracker.dart';
 import 'package:town_pass/service/assistant_recent_inputs.dart';
 import 'package:town_pass/service/assistant_recorder.dart';
@@ -202,11 +204,18 @@ class GuidedAssistantController extends GetxController {
   final AssistantRecorder? recorder;
   final AssistantPageTracker pageTracker;
 
+  /// When the backend fails, answer from the pre-written demo replies (a
+  /// computer backend that is not running). Off in on-device builds: the
+  /// phone's own assistant says what went wrong instead, since a demo reply
+  /// was taken for an FAQ answer in airplane mode (2026-11-11).
+  final bool demoFallback;
+
   GuidedAssistantController({
     this.engine = const MockAssistantEngine(),
     this.thinkDelay = const Duration(milliseconds: 1200),
     this.runOnboarding = false,
     this.service,
+    this.demoFallback = !AssistantOnDevice.requested,
     this.recorder,
     AssistantActionExecutor? executor,
     AssistantPageTracker? pageTracker,
@@ -587,6 +596,12 @@ class GuidedAssistantController extends GetxController {
       if (generation != _generation || isClosed) return;
       loading.value = false;
       if (choiceId != null || pageStep != null) {
+        _say(
+          _bot(error is FormatException ? error.message : Replies.pageFailed),
+        );
+        return;
+      }
+      if (!demoFallback) {
         _say(
           _bot(error is FormatException ? error.message : Replies.pageFailed),
         );
@@ -1652,8 +1667,17 @@ class GuidedAssistantController extends GetxController {
     if (!readAloud.value) speaker.stop();
   }
 
+  /// No core models on the phone yet (docs/AI_CURRENT_RULES.md section 7):
+  /// the assistant sheet shows the download instead of listening.
+  bool _downloadFirst() {
+    if (!(AssistantModelDownload.maybe?.needsCore ?? false)) return false;
+    openSheet();
+    return true;
+  }
+
   Future<void> micDown() async {
     if (loading.value || listening.value) return;
+    if (_downloadFirst()) return;
     final rec = recorder;
     if (rec == null || service == null) {
       listening.value = true;
@@ -1826,6 +1850,7 @@ class GuidedAssistantController extends GetxController {
   /// go into.
   Future<void> fieldMicDown() async {
     if (loading.value || listening.value || !dictating) return;
+    if (_downloadFirst()) return;
     _fieldTimer?.cancel();
     fieldNotice.value = null;
     fieldTarget.value = null;
@@ -1964,6 +1989,7 @@ class GuidedAssistantController extends GetxController {
   /// home tab); elsewhere it opens the assistant and problems are toasts.
   Future<void> homeMicDown({bool card = true}) async {
     if (loading.value || homeAsk.value == HomeAsk.listening) return;
+    if (_downloadFirst()) return;
     _homeCard = card;
     _homeHeldAt = DateTime.now();
     homeAsk.value = HomeAsk.listening;

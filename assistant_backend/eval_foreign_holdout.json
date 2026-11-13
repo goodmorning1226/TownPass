@@ -966,244 +966,244 @@
  },
  {
   "id": "f101",
-  "language": "th",
-  "text": "แอปนี้ทำอะไรได้บ้างคะ",
+  "language": "tl",
+  "text": "Ano po ang mga kaya ninyong gawin dito sa app na ito?",
   "intent": "listing",
   "expected_ids": [],
-  "note": "polite listing"
+  "note": "polite capability question with po"
  },
  {
   "id": "f102",
-  "language": "th",
-  "text": "มีบริการอะไรให้ใช้บ้างครับ",
+  "language": "tl",
+  "text": "Anong mga services ang meron dito sa TownPass?",
   "intent": "listing",
   "expected_ids": [],
-  "note": "polite listing"
+  "note": "Taglish question asking which services are offered"
  },
  {
   "id": "f103",
-  "language": "th",
-  "text": "เพิ่งมาทำงานที่ไทเป แอปนี้ช่วยอะไรผมได้บ้าง",
+  "language": "tl",
+  "text": "Bago lang po ako dito sa Taiwan, ano po ba maitutulong ng app na to sa akin?",
   "intent": "listing",
   "expected_ids": [],
-  "note": "new worker listing"
+  "note": "newly arrived worker asking what the app helps with; po politeness"
  },
  {
   "id": "f104",
-  "language": "th",
-  "text": "คาน้ำประปาเดือนนี้ยังไม่ได้จ่ายเลย จ่ายตรงไหน",
+  "language": "tl",
+  "text": "pano mag bayad ng bill sa tubig dito",
   "intent": "service",
   "expected_ids": [
    "fees.water",
    "app.bills"
   ],
-  "note": "dropped tone mark on ค่า"
+  "note": "texting spelling (pano, mag bayad) for paying the water bill"
  },
  {
   "id": "f105",
-  "language": "th",
-  "text": "จะจ่ายเงินที่จอดมอเตอร์ไซค์ข้างถนนยังไง",
+  "language": "tl",
+  "text": "May iniwang papel ng singil sa paradahan sa motor ko sa kalsada, saan ko ito babayaran?",
   "intent": "service",
   "expected_ids": [
    "fees.parking",
    "app.bills"
   ],
-  "note": "street parking fee paraphrase"
+  "note": "paraphrased street parking fee via a payment slip left on the motorbike; mostly Filipino wording"
  },
  {
   "id": "f106",
-  "language": "th",
-  "text": "ไฟดับทั้งซอยเลยครับ",
+  "language": "tl",
+  "text": "Brownout dito sa amin ngayon, gusto ko sana i-report.",
   "intent": "service",
   "expected_ids": [
    "disasterReport.form.D-1-4",
    "disasterReport"
   ],
-  "note": "power outage"
+  "note": "power outage using Filipino-English 'brownout'; report intent"
  },
  {
   "id": "f107",
-  "language": "th",
-  "text": "ไฟข้างทางหน้าหอพักไม่ติดมาหลายวันแล้ว",
+  "language": "tl",
+  "text": "Patay yung ilaw sa poste sa kanto namin, pwede ba i-report?",
   "intent": "service",
   "expected_ids": [
    "disasterReport.form.D-1-3",
    "disasterReport",
    "reportIssue"
   ],
-  "note": "broken street light paraphrase"
+  "note": "paraphrased broken street light ('ilaw sa poste'); informal yung/pwede"
  },
  {
   "id": "f108",
-  "language": "th",
-  "text": "กระเป๋าตังค์หาย อยากแจ้งตำรวจ",
+  "language": "tl",
+  "text": "Nawala ko po yung wallet at cellphone ko, paano po mag-report sa pulis?",
   "intent": "service",
   "expected_ids": [
    "police.online",
    "police"
   ],
-  "note": "lost wallet report"
+  "note": "lost wallet and phone, report to police; po politeness"
  },
  {
   "id": "f109",
-  "language": "th",
-  "text": "อยากหาหนังสือภาษาไทยอาน มีที่ให้ยืมไหม",
+  "language": "tl",
+  "text": "gusto q humiram ng libro na mababasa, pano po",
   "intent": "service",
   "expected_ids": [
    "library"
   ],
-  "note": "dropped tone mark on อ่าน"
+  "note": "texting spelling (gusto q, pano) for borrowing books"
  },
  {
   "id": "f110",
-  "language": "th",
-  "text": "หนังสือที่ยืมไว ต้องเอาไปคืนวันไหน",
+  "language": "tl",
+  "text": "pano q makikita yung mga librong hiniram q at kelan ang due date",
   "intent": "service",
   "expected_ids": [
    "library.records"
   ],
-  "note": "dropped tone mark on ไว้"
+  "note": "texting spelling for borrowed-books records and due date; Taglish 'due date'"
  },
  {
   "id": "f111",
-  "language": "th",
-  "text": "อยากกดคิวที่สำนักงานทะเบียนราษฎร์เขตจงเจิ้ง",
+  "language": "tl",
+  "text": "Gusto ko pong kumuha ng queue number sa household registration office sa Zhongzheng.",
   "intent": "service",
   "expected_ids": [
    "reservation.c-2-2",
    "reservation"
   ],
-  "note": "queue at Zhongzheng household registration"
+  "note": "queue number at Zhongzheng household registration office; Taglish with po"
  },
  {
   "id": "f112",
-  "language": "th",
-  "text": "อยากแจ้งเรื่องเสียงดังจากไซต์ก่อสร้างตอนกลางคืน",
+  "language": "tl",
+  "text": "Sobrang ingay ng kapitbahay namin gabi-gabi, saan po pwede magreklamo?",
   "intent": "service",
   "expected_ids": [
    "reportIssue"
   ],
-  "note": "noise complaint"
+  "note": "noise complaint about neighbours; po politeness"
  },
  {
   "id": "f113",
-  "language": "th",
-  "text": "เรื่องที่ยื่นไปที่เขตเมื่อวาน ถึงไหนแล้ว",
+  "language": "tl",
+  "text": "Gusto ko i-check kung ano na status ng application na sinubmit ko sa district office.",
   "intent": "service",
   "expected_ids": [
    "districtOffice.progress",
    "districtOffice"
   ],
-  "note": "application progress"
+  "note": "Taglish check application progress (i-check, sinubmit)"
  },
  {
   "id": "f114",
-  "language": "th",
-  "text": "เปลี่ยนหน้าจอเป็นภาษาไทยได้ไหม",
+  "language": "tl",
+  "text": "Pwede bang palitan yung language ng app, gawing English?",
   "intent": "service",
   "expected_ids": [
    "language"
   ],
-  "note": "change display language"
+  "note": "change display language; Taglish"
  },
  {
   "id": "f115",
-  "language": "th",
-  "text": "มีคูปองสวนลดไหม",
+  "language": "tl",
+  "text": "may mga discount o promo b dito? hanap aq ng mura",
   "intent": "service",
   "expected_ids": [
    "app.perks",
    "coupon.list"
   ],
-  "note": "dropped tone mark on ส่วน"
+  "note": "texting spelling (b, aq) looking for discounts/promos"
  },
  {
   "id": "f116",
-  "language": "th",
-  "text": "อยากดูคำถามที่คนชอบถามกัน",
+  "language": "tl",
+  "text": "Saan ko makikita yung mga madalas itanong ng ibang gumagamit?",
   "intent": "service",
   "expected_ids": [
    "qna",
    "qna.categories"
   ],
-  "note": "FAQ paraphrase"
+  "note": "paraphrased FAQ without saying 'FAQ'"
  },
  {
   "id": "f117",
-  "language": "th",
-  "text": "อยากพาหมาไปเดินเล่น มีที่ไหนให้พาไปได้บ้าง",
+  "language": "tl",
+  "text": "Saan po may lugar na pwedeng ipasyal ang aso ko, yung pet-friendly?",
   "intent": "service",
   "expected_ids": [
    "petFriendlyMap"
   ],
-  "note": "disabled: pet map"
+  "note": "places to walk a dog / pet-friendly spots; po politeness"
  },
  {
   "id": "f118",
-  "language": "th",
-  "text": "อยากดูแผนที่ในสวนสัตว์ไทเป",
+  "language": "tl",
+  "text": "Pupunta kami sa zoo bukas, anong oras po bukas at magkano entrance?",
   "intent": "service",
   "expected_ids": [
    "zoo"
   ],
-  "note": "disabled: zoo entry missing"
+  "note": "zoo info (hours, entrance fee); Taglish"
  },
  {
   "id": "f119",
-  "language": "th",
-  "text": "ไม่เอาแล้ว ไม่ต้องจ่ายค่าจอดรถ",
+  "language": "tl",
+  "text": "Ayoko magbayad ng parking, huwag na.",
   "intent": "negation",
   "expected_ids": [],
-  "note": "decline parking payment"
+  "note": "declines paying parking; negation 'ayoko'"
  },
  {
   "id": "f120",
-  "language": "th",
-  "text": "ไม่ใช่ค่าน้ำนะ เป็นค่าเช่าห้องในอาคารที่พักของรัฐ",
+  "language": "tl",
+  "text": "Hindi yung bill sa tubig, yung upa sa public housing ang babayaran ko.",
   "intent": "negation",
   "expected_ids": [
    "fees.housing"
   ],
-  "note": "not X but Y"
+  "note": "'not X but Y': not water bill but public housing rent; Taglish"
  },
  {
   "id": "f121",
-  "language": "th",
-  "text": "ยกเลิก ๆ ไม่ต้องเปิดอะไรทั้งนั้น",
+  "language": "tl",
+  "text": "Ay wag na lang pala, cancel na.",
   "intent": "negation",
   "expected_ids": [],
-  "note": "cancel, open nothing"
+  "note": "cancel / never mind; informal 'wag' and Taglish 'cancel'"
  },
  {
   "id": "f122",
-  "language": "th",
-  "text": "สวัสดีค่ะ",
+  "language": "tl",
+  "text": "Hello po, magandang umaga!",
   "intent": "greeting",
   "expected_ids": [],
-  "note": "greeting"
+  "note": "greeting with po"
  },
  {
   "id": "f123",
-  "language": "th",
-  "text": "พรุ่งนี้ฝนจะตกไหม",
+  "language": "tl",
+  "text": "Uulan ba bukas dito sa Taipei?",
   "intent": "out_of_scope",
   "expected_ids": [],
-  "note": "weather not offered"
+  "note": "weather question, out of scope"
  },
  {
   "id": "f124",
-  "language": "th",
-  "text": "แลกเงินบาทเป็นเงินไต้หวันที่ไหนเรทดี",
+  "language": "tl",
+  "text": "Magkano na po ang palitan ng peso sa NT dollar ngayon?",
   "intent": "out_of_scope",
   "expected_ids": [],
-  "note": "currency exchange"
+  "note": "currency exchange peso/NT dollar, out of scope"
  },
  {
   "id": "f125",
-  "language": "th",
-  "text": "ตลาดกลางคืนไหนอร่อยสุด",
+  "language": "tl",
+  "text": "Ano masarap kainin malapit dito? May ma-recommend ka ba?",
   "intent": "out_of_scope",
   "expected_ids": [],
-  "note": "food recommendation"
+  "note": "food recommendation, out of scope; Taglish"
  }
 ]

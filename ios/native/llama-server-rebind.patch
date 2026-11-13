@@ -1,8 +1,8 @@
 diff --git a/tools/server/server-http.cpp b/tools/server/server-http.cpp
-index cf147c7..1c36fa8 100644
+index cf147c7..b7cf2fe 100644
 --- a/tools/server/server-http.cpp
 +++ b/tools/server/server-http.cpp
-@@ -529,9 +529,26 @@ bool server_http_context::start() {
+@@ -529,9 +529,30 @@ bool server_http_context::start() {
      pimpl->pool = std::make_unique<httplib::ThreadPool>(pimpl->n_threads_http, pimpl->n_threads_http + 1024);
      for (size_t i = 0; i < pimpl->servers.size(); ++i) {
          const auto & srv = pimpl->servers[i];
@@ -14,6 +14,9 @@ index cf147c7..1c36fa8 100644
 +            // reclaims them); listen_after_bind() then fails although nobody called
 +            // stop(). Bind the same port again and keep serving, with the model still
 +            // loaded. stop() makes listen_after_bind() return true, which ends this loop.
++            // A failed listen leaves cpp-httplib "decommissioned" and bind_to_port() then
++            // refuses at once: stop() first clears that, otherwise the port stayed closed for
++            // the hour of attempts (2026-11-13, reproduced on a computer with this cpp-httplib).
 +            while (!srv->listen_after_bind()) {
                  SRV_ERR("listener on %s stopped unexpectedly\n", addr.c_str());
 +                if (!rebind) {
@@ -22,6 +25,7 @@ index cf147c7..1c36fa8 100644
 +                bool bound = false;
 +                for (int attempt = 0; !bound && attempt < 3600; attempt++) {
 +                    std::this_thread::sleep_for(std::chrono::seconds(1));
++                    srv->stop(); // clears is_decommissioned (the dead socket is already closed)
 +                    bound = srv->bind_to_port(host, bind_port);
 +                }
 +                if (!bound) {

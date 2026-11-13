@@ -11,7 +11,7 @@ typedef AssistantSuggestion = ({String text, String? capability});
 /// and status lines around them. `{name}` marks a placeholder.
 abstract final class AssistantTexts {
   /// Languages with a full set of texts; 'zh' is the original and fallback.
-  static const languages = ['zh', 'en', 'ja', 'vi', 'id', 'th'];
+  static const languages = ['zh', 'en', 'ja', 'vi', 'id', 'tl'];
 
   /// The language of the current conversation: the menu choice, or the
   /// language last spoken or typed (set through [follow]).
@@ -114,11 +114,11 @@ abstract final class AssistantTexts {
       (text: 'Bayar tagihan air', capability: 'fees.water'),
       (text: 'Nomor antrean loket', capability: 'reservation'),
     ],
-    'th': [
-      (text: 'มีฟังก์ชันอะไรบ้าง', capability: null),
-      (text: 'ฉันอยากยืมหนังสือ', capability: 'library'),
-      (text: 'จ่ายค่าน้ำ', capability: 'fees.water'),
-      (text: 'บัตรคิวที่เคาน์เตอร์', capability: 'reservation'),
+    'tl': [
+      (text: 'Ano ang mga kaya mong gawin?', capability: null),
+      (text: 'Gusto kong humiram ng libro', capability: 'library'),
+      (text: 'Magbayad ng bill sa tubig', capability: 'fees.water'),
+      (text: 'Numero ng pila sa counter', capability: 'reservation'),
     ],
   };
 
@@ -130,7 +130,7 @@ abstract final class AssistantTexts {
       'ja': 'アシスタント',
       'vi': 'Trợ lý',
       'id': 'Asisten',
-      'th': 'ผู้ช่วย',
+      'tl': 'Assistant',
     },
     'openHint': {
       'zh': '開啟助理對話',
@@ -138,7 +138,7 @@ abstract final class AssistantTexts {
       'ja': 'アシスタントとの会話を開く',
       'vi': 'Mở cuộc trò chuyện với trợ lý',
       'id': 'Buka percakapan asisten',
-      'th': 'เปิดการสนทนากับผู้ช่วย',
+      'tl': 'Buksan ang usapan sa assistant',
     },
     'openTooltip': {
       'zh': '開啟助理，長按可移到另一側',
@@ -146,7 +146,7 @@ abstract final class AssistantTexts {
       'ja': 'アシスタントを開く（長押しで反対側へ移動）',
       'vi': 'Mở trợ lý; nhấn giữ để chuyển sang bên kia',
       'id': 'Buka asisten; tekan lama untuk memindahkannya ke sisi lain',
-      'th': 'เปิดผู้ช่วย กดค้างเพื่อย้ายไปอีกด้าน',
+      'tl': 'Buksan ang assistant; pindutin nang matagal para ilipat sa kabilang gilid',
     },
     'readAloudOn': {
       'zh': '朗讀回覆：開（點一下關閉）',
@@ -154,7 +154,7 @@ abstract final class AssistantTexts {
       'ja': '返信の読み上げ：オン（タップでオフ）',
       'vi': 'Đọc to câu trả lời: bật (chạm để tắt)',
       'id': 'Bacakan balasan: aktif (ketuk untuk menonaktifkan)',
-      'th': 'อ่านคำตอบออกเสียง: เปิด (แตะเพื่อปิด)',
+      'tl': 'Basahin nang malakas ang sagot: naka-on (i-tap para i-off)',
     },
     'readAloudOff': {
       'zh': '朗讀回覆：關（點一下開啟）',
@@ -162,7 +162,7 @@ abstract final class AssistantTexts {
       'ja': '返信の読み上げ：オフ（タップでオン）',
       'vi': 'Đọc to câu trả lời: tắt (chạm để bật)',
       'id': 'Bacakan balasan: nonaktif (ketuk untuk mengaktifkan)',
-      'th': 'อ่านคำตอบออกเสียง: ปิด (แตะเพื่อเปิด)',
+      'tl': 'Basahin nang malakas ang sagot: naka-off (i-tap para i-on)',
     },
     'close': {
       'zh': '關閉助理',
@@ -170,7 +170,7 @@ abstract final class AssistantTexts {
       'ja': 'アシスタントを閉じる',
       'vi': 'Đóng trợ lý',
       'id': 'Tutup asisten',
-      'th': 'ปิดผู้ช่วย',
+      'tl': 'Isara ang assistant',
     },
     'youCanSay': {
       'zh': '你可以說…',
@@ -178,7 +178,7 @@ abstract final class AssistantTexts {
       'ja': 'こんなふうに話せます…',
       'vi': 'Bạn có thể nói…',
       'id': 'Anda bisa bilang…',
-      'th': 'คุณพูดได้ว่า…',
+      'tl': 'Puwede mong sabihin…',
     },
     'quoted': {
       'zh': '「{text}」',
@@ -186,7 +186,7 @@ abstract final class AssistantTexts {
       'ja': '「{text}」',
       'vi': '“{text}”',
       'id': '“{text}”',
-      'th': '“{text}”',
+      'tl': '“{text}”',
     },
     'intro': {
       'zh': '我會帶你到原本的服務頁面。示範與未串接功能會標示，送出與付款由你自己確認。',
@@ -200,9 +200,7 @@ abstract final class AssistantTexts {
       'id':
           'Saya akan membawa Anda ke halaman layanan aslinya. Fitur demo dan yang '
           'belum terhubung akan ditandai; pengiriman dan pembayaran Anda konfirmasi sendiri.',
-      'th':
-          'ฉันจะพาคุณไปยังหน้าบริการเดิม ฟีเจอร์สาธิตและที่ยังไม่เชื่อมต่อจะมีป้ายกำกับ '
-          'การส่งและการชำระเงินคุณต้องยืนยันเอง',
+      'tl': 'Dadalhin kita sa orihinal na pahina ng serbisyo. May marka ang mga demo at hindi pa nakakonektang feature; ikaw mismo ang magkukumpirma ng anumang pagsumite o pagbabayad.',
     },
     'youSaid': {
       'zh': '你說',
@@ -210,7 +208,7 @@ abstract final class AssistantTexts {
       'ja': 'あなた',
       'vi': 'Bạn nói',
       'id': 'Anda',
-      'th': 'คุณพูด',
+      'tl': 'Sinabi mo',
     },
     'assistantReply': {
       'zh': '助理回覆',
@@ -218,7 +216,7 @@ abstract final class AssistantTexts {
       'ja': 'アシスタントの返信',
       'vi': 'Trợ lý trả lời',
       'id': 'Balasan asisten',
-      'th': 'คำตอบของผู้ช่วย',
+      'tl': 'Sagot ng assistant',
     },
     'chooseHint': {
       'zh': '可以點選，或說出／打出編號，例如「第 1 個」。',
@@ -226,7 +224,7 @@ abstract final class AssistantTexts {
       'ja': 'タップするか、番号を話すか入力してください（例：「1」）。',
       'vi': 'Chạm để chọn, hoặc nói hay gõ số, ví dụ “1”.',
       'id': 'Ketuk salah satu, atau ucapkan/ketik nomornya, misalnya “1”.',
-      'th': 'แตะเพื่อเลือก หรือพูด/พิมพ์หมายเลข เช่น “1”',
+      'tl': 'I-tap ang isa, o sabihin o i-type ang numero nito, hal. “1”.',
     },
     'optionNumber': {
       'zh': '第 {n} 項',
@@ -234,7 +232,7 @@ abstract final class AssistantTexts {
       'ja': '{n} 番目',
       'vi': 'Mục {n}',
       'id': 'Opsi {n}',
-      'th': 'ตัวเลือกที่ {n}',
+      'tl': 'Opsiyon {n}',
     },
     'previousPage': {
       'zh': '上一頁',
@@ -242,7 +240,7 @@ abstract final class AssistantTexts {
       'ja': '前のページ',
       'vi': 'Trang trước',
       'id': 'Halaman sebelumnya',
-      'th': 'หน้าก่อนหน้า',
+      'tl': 'Nakaraang pahina',
     },
     'nextPage': {
       'zh': '下一頁',
@@ -250,7 +248,7 @@ abstract final class AssistantTexts {
       'ja': '次のページ',
       'vi': 'Trang sau',
       'id': 'Halaman berikutnya',
-      'th': 'หน้าถัดไป',
+      'tl': 'Susunod na pahina',
     },
     'pageOf': {
       'zh': '第 {current}／{count} 頁',
@@ -258,7 +256,7 @@ abstract final class AssistantTexts {
       'ja': '{current}／{count} ページ',
       'vi': 'Trang {current}/{count}',
       'id': 'Halaman {current} dari {count}',
-      'th': 'หน้า {current}/{count}',
+      'tl': 'Pahina {current} ng {count}',
     },
     'processing': {
       'zh': '正在處理…',
@@ -266,7 +264,259 @@ abstract final class AssistantTexts {
       'ja': '処理中…',
       'vi': 'Đang xử lý…',
       'id': 'Sedang diproses…',
-      'th': 'กำลังดำเนินการ…',
+      'tl': 'Ginagawa na…',
+    },
+    // Model downloads on the phone (AssistantModelDownload, docs/AI_MODEL_DOWNLOAD.md).
+    'modelsTitle': {
+      'zh': '下載離線助理',
+      'en': 'Download the offline assistant',
+      'ja': 'オフラインアシスタントをダウンロード',
+      'vi': 'Tải trợ lý ngoại tuyến',
+      'id': 'Unduh asisten offline',
+      'tl': 'I-download ang offline na assistant',
+    },
+    'modelsBody': {
+      'zh':
+          '助理全部在這支手機上執行，錄音不會上傳。第一次使用要先下載模型，約 {size}。'
+          '建議連上 Wi-Fi；下載只在 App 開著時進行，可以隨時暫停。',
+      'en':
+          'The assistant runs entirely on this phone; recordings are never '
+          'uploaded. Before the first use it needs its models, about {size}. '
+          'Wi-Fi is recommended; the download runs while the App is open and '
+          'can be paused at any time.',
+      'ja':
+          'アシスタントはすべてこの端末で動き、録音はアップロードされません。'
+          '初回はモデル（約 {size}）のダウンロードが必要です。Wi-Fi をおすすめします。'
+          'ダウンロードはアプリを開いている間に行われ、いつでも一時停止できます。',
+      'vi':
+          'Trợ lý chạy hoàn toàn trên điện thoại này, bản ghi âm không được tải lên. '
+          'Lần đầu cần tải mô hình, khoảng {size}. Nên dùng Wi-Fi; việc tải chỉ chạy '
+          'khi ứng dụng đang mở và có thể tạm dừng bất cứ lúc nào.',
+      'id':
+          'Asisten berjalan sepenuhnya di ponsel ini; rekaman tidak pernah diunggah. '
+          'Sebelum dipakai pertama kali, modelnya perlu diunduh, sekitar {size}. '
+          'Disarankan memakai Wi-Fi; unduhan berjalan saat aplikasi terbuka dan bisa '
+          'dijeda kapan saja.',
+      'tl': 'Buong tumatakbo sa teleponong ito ang assistant; hindi kailanman ina-upload ang mga recording. Bago ang unang gamit, kailangan nito ang mga model, mga {size}. Mas mainam ang Wi-Fi; tumatakbo ang download habang bukas ang App at puwedeng i-pause anumang oras.',
+    },
+    'modelsLite': {
+      'zh': '這支手機的記憶體較小，會使用精簡版：多數需求會列出選項讓你選。',
+      'en':
+          'This phone has less memory, so it gets the lite version: most '
+          'requests show options for you to choose from.',
+      'ja': 'この端末はメモリが少ないため、ライト版になります。多くの依頼は選択肢から選んでいただきます。',
+      'vi': 'Điện thoại này ít bộ nhớ nên dùng bản rút gọn: hầu hết yêu cầu sẽ hiện các lựa chọn để bạn chọn.',
+      'id':
+          'Memori ponsel ini lebih kecil, jadi memakai versi ringan: sebagian besar '
+          'permintaan menampilkan pilihan untuk Anda pilih.',
+      'tl': 'Mas maliit ang memory ng teleponong ito, kaya lite na bersyon ang gagamitin: sa karamihan ng request, may mga opsiyong pagpipilian mo.',
+    },
+    'modelsTaiwanese': {
+      'zh': '台語辨識（另外 {size}）',
+      'en': 'Taiwanese speech (another {size})',
+      'ja': '台湾語の認識（追加 {size}）',
+      'vi': 'Nhận dạng tiếng Đài (thêm {size})',
+      'id': 'Pengenalan bahasa Taiwan (tambahan {size})',
+      'tl': 'Pagkilala sa Taiwanese (dagdag na {size})',
+    },
+    'modelsDownload': {
+      'zh': '下載',
+      'en': 'Download',
+      'ja': 'ダウンロード',
+      'vi': 'Tải xuống',
+      'id': 'Unduh',
+      'tl': 'I-download',
+    },
+    'modelsLater': {
+      'zh': '稍後',
+      'en': 'Later',
+      'ja': 'あとで',
+      'vi': 'Để sau',
+      'id': 'Nanti',
+      'tl': 'Mamaya na',
+    },
+    'modelsProgress': {
+      'zh': '已下載 {done} / {total}（{percent}%）',
+      'en': '{done} of {total} downloaded ({percent}%)',
+      'ja': '{done} / {total} ダウンロード済み（{percent}%）',
+      'vi': 'Đã tải {done} / {total} ({percent}%)',
+      'id': '{done} dari {total} terunduh ({percent}%)',
+      'tl': 'Na-download ang {done} sa {total} ({percent}%)',
+    },
+    'modelsPause': {
+      'zh': '暫停',
+      'en': 'Pause',
+      'ja': '一時停止',
+      'vi': 'Tạm dừng',
+      'id': 'Jeda',
+      'tl': 'I-pause',
+    },
+    'modelsResume': {
+      'zh': '繼續下載',
+      'en': 'Resume download',
+      'ja': 'ダウンロードを再開',
+      'vi': 'Tiếp tục tải',
+      'id': 'Lanjutkan unduhan',
+      'tl': 'Ituloy ang download',
+    },
+    'modelsPaused': {
+      'zh': '已暫停，下次會從中斷的地方繼續。',
+      'en': 'Paused. It continues from where it stopped.',
+      'ja': '一時停止しました。次回は中断したところから続けます。',
+      'vi': 'Đã tạm dừng. Lần sau sẽ tiếp tục từ chỗ dừng.',
+      'id': 'Dijeda. Nanti dilanjutkan dari titik berhenti.',
+      'tl': 'Naka-pause. Itutuloy ito mula sa huminto.',
+    },
+    'modelsDecisionPending': {
+      'zh': '理解模型下載中（{percent}%）；在那之前，多數需求會先列出選項讓你選。',
+      'en':
+          'The understanding model is downloading ({percent}%); until then most '
+          'requests show options to choose from.',
+      'ja': '理解モデルをダウンロード中（{percent}%）。それまでは多くの依頼で選択肢を表示します。',
+      'vi': 'Đang tải mô hình hiểu yêu cầu ({percent}%); trước đó hầu hết yêu cầu sẽ hiện các lựa chọn.',
+      'id':
+          'Model pemahaman sedang diunduh ({percent}%); sampai selesai, sebagian besar '
+          'permintaan menampilkan pilihan.',
+      'tl': 'Dina-download pa ang model na umiintindi ({percent}%); habang hindi pa tapos, sa karamihan ng request ay may mga opsiyong pagpipilian.',
+    },
+    'modelsErrorNetwork': {
+      'zh': '網路中斷，下載停止了。已下載的部分會保留，連上網路後再試一次。',
+      'en':
+          'The connection dropped and the download stopped. What arrived is '
+          'kept; try again once you are online.',
+      'ja': '通信が切れてダウンロードが止まりました。取得済みの分は残ります。接続後にもう一度お試しください。',
+      'vi': 'Mất kết nối nên việc tải đã dừng. Phần đã tải được giữ lại; hãy thử lại khi có mạng.',
+      'id':
+          'Koneksi terputus dan unduhan berhenti. Bagian yang sudah ada disimpan; '
+          'coba lagi setelah terhubung.',
+      'tl': 'Naputol ang koneksiyon at huminto ang download. Nakatabi ang nakuha na; subukan ulit kapag online ka na.',
+    },
+    'modelsErrorStorage': {
+      'zh': '手機空間不足：還需要 {size}。清出空間後再試一次。',
+      'en': 'Not enough space on the phone: {size} more is needed. Free some space and try again.',
+      'ja': '端末の空き容量が足りません。あと {size} 必要です。空きを作ってからもう一度お試しください。',
+      'vi': 'Điện thoại không đủ dung lượng: cần thêm {size}. Hãy giải phóng bộ nhớ rồi thử lại.',
+      'id': 'Ruang ponsel tidak cukup: perlu {size} lagi. Kosongkan ruang lalu coba lagi.',
+      'tl': 'Kulang ang espasyo sa telepono: kailangan pa ng {size}. Magbakante ng espasyo at subukan ulit.',
+    },
+    'modelsErrorChecksum': {
+      'zh': '下載的檔案沒有通過檢查，已經刪除，請再試一次。',
+      'en': 'A downloaded file failed its check and was deleted. Please try again.',
+      'ja': 'ダウンロードしたファイルが検証に通らなかったため削除しました。もう一度お試しください。',
+      'vi': 'Một tệp tải về không qua kiểm tra và đã bị xóa. Vui lòng thử lại.',
+      'id': 'Berkas yang diunduh gagal diperiksa dan sudah dihapus. Silakan coba lagi.',
+      'tl': 'Hindi pumasa sa pagsusuri ang isang na-download na file kaya binura ito. Pakisubukan ulit.',
+    },
+    'modelsErrorSource': {
+      'zh': '這個版本還沒有設定模型的下載來源（開發版）。請用 adb／devicectl 推模型，或建置時設定 ASSISTANT_MODEL_BASE_URL。',
+      'en':
+          'This build has no download source for the models yet (development '
+          'build). Push them with adb/devicectl, or build with '
+          'ASSISTANT_MODEL_BASE_URL.',
+      'ja':
+          'このビルドにはモデルのダウンロード元がまだ設定されていません（開発版）。'
+          'adb／devicectl で転送するか、ASSISTANT_MODEL_BASE_URL を指定してビルドしてください。',
+      'vi':
+          'Bản này chưa có nguồn tải mô hình (bản phát triển). Hãy chép bằng adb/devicectl '
+          'hoặc build với ASSISTANT_MODEL_BASE_URL.',
+      'id':
+          'Build ini belum punya sumber unduhan model (build pengembangan). Salin dengan '
+          'adb/devicectl, atau build dengan ASSISTANT_MODEL_BASE_URL.',
+      'tl': 'Wala pang mapagkukunan ng download ng mga model ang build na ito (development build). I-push ang mga ito gamit ang adb/devicectl, o mag-build gamit ang ASSISTANT_MODEL_BASE_URL.',
+    },
+    'modelsUnavailable': {
+      'zh': '這支手機的記憶體不足，無法執行離線助理。',
+      'en': 'This phone does not have enough memory for the offline assistant.',
+      'ja': 'この端末はメモリが足りないため、オフラインアシスタントを使えません。',
+      'vi': 'Điện thoại này không đủ bộ nhớ để chạy trợ lý ngoại tuyến.',
+      'id': 'Memori ponsel ini tidak cukup untuk menjalankan asisten offline.',
+      'tl': 'Kulang ang memory ng teleponong ito para sa offline na assistant.',
+    },
+    'modelsRetrying': {
+      'zh': '網路中斷，連上網路後會自動繼續下載…',
+      'en': 'The connection dropped; the download continues by itself once you are online…',
+      'ja': '通信が切れました。接続が戻ると自動でダウンロードを続けます…',
+      'vi': 'Mất kết nối; việc tải sẽ tự tiếp tục khi có mạng lại…',
+      'id':
+          'Koneksi terputus; unduhan berlanjut sendiri setelah terhubung lagi…',
+      'tl': 'Naputol ang koneksiyon; kusang itutuloy ang download kapag online ka na ulit…',
+    },
+    'modelsRetry': {
+      'zh': '再試一次',
+      'en': 'Try again',
+      'ja': 'もう一度',
+      'vi': 'Thử lại',
+      'id': 'Coba lagi',
+      'tl': 'Subukan ulit',
+    },
+    'modelsFailed': {
+      'zh': '目前無法取得模型下載的狀態，請稍後再試。',
+      'en': 'The model download status is not available right now. Try again shortly.',
+      'ja': '現在モデルのダウンロード状況を取得できません。しばらくしてからお試しください。',
+      'vi': 'Hiện không lấy được trạng thái tải mô hình. Hãy thử lại sau.',
+      'id': 'Status unduhan model belum bisa diambil. Coba lagi sebentar lagi.',
+      'tl': 'Hindi makuha ngayon ang status ng download ng model. Subukan ulit mamaya.',
+    },
+    'modelsSettingsHeader': {
+      'zh': '離線模型',
+      'en': 'Offline models',
+      'ja': 'オフラインモデル',
+      'vi': 'Mô hình ngoại tuyến',
+      'id': 'Model offline',
+      'tl': 'Mga offline na model',
+    },
+    'modelsSettingsState': {
+      'zh': '這支手機已下載 {have}，還有 {missing} 未下載。',
+      'en': '{have} on this phone, {missing} not downloaded yet.',
+      'ja': 'この端末に {have}、未ダウンロード {missing}。',
+      'vi': 'Đã có {have} trên máy, còn {missing} chưa tải.',
+      'id': '{have} sudah ada di ponsel, {missing} belum diunduh.',
+      'tl':
+          '{have} ang nasa teleponong ito, {missing} ang hindi pa na-download.',
+    },
+    'modelsTaiwaneseAdd': {
+      'zh': '下載台語辨識（{size}）',
+      'en': 'Download Taiwanese speech ({size})',
+      'ja': '台湾語の認識をダウンロード（{size}）',
+      'vi': 'Tải nhận dạng tiếng Đài ({size})',
+      'id': 'Unduh pengenalan bahasa Taiwan ({size})',
+      'tl': 'I-download ang pagkilala sa Taiwanese ({size})',
+    },
+    'modelsDelete': {
+      'zh': '刪除已下載的模型',
+      'en': 'Delete the downloaded models',
+      'ja': 'ダウンロードしたモデルを削除',
+      'vi': 'Xóa các mô hình đã tải',
+      'id': 'Hapus model yang sudah diunduh',
+      'tl': 'Burahin ang mga na-download na model',
+    },
+    'modelsDeleteConfirm': {
+      'zh': '刪除後要重新下載才能使用助理。確定刪除嗎？',
+      'en':
+          'The assistant needs them downloaded again afterwards. Delete them?',
+      'ja': '削除すると、アシスタントを使うには再ダウンロードが必要です。削除しますか？',
+      'vi': 'Sau khi xóa phải tải lại mới dùng được trợ lý. Xóa không?',
+      'id': 'Setelah dihapus, asisten perlu diunduh lagi. Hapus sekarang?',
+      'tl': 'Kailangang i-download ulit ang mga ito bago magamit ang assistant. Burahin?',
+    },
+    // Right after launch the phone's models are still loading (AssistantReadiness).
+    'modelsLoading': {
+      'zh': '模型載入中，好了會自動回答…',
+      'en': 'The models are loading; the answer follows by itself…',
+      'ja': 'モデルを読み込み中です。終わりしだい自動で答えます…',
+      'vi': 'Đang tải mô hình, xong sẽ tự trả lời…',
+      'id': 'Model sedang dimuat; jawaban menyusul otomatis…',
+      'tl': 'Naglo-load ang mga model; kusang lalabas ang sagot…',
+    },
+    // The iPhone's own assistant after the App came back from the background
+    // (AssistantOnDevice.reconnecting).
+    'reconnecting': {
+      'zh': '助理重新連線中…',
+      'en': 'Reconnecting the assistant…',
+      'ja': 'アシスタントに再接続しています…',
+      'vi': 'Đang kết nối lại trợ lý…',
+      'id': 'Menghubungkan ulang asisten…',
+      'tl': 'Kumokonekta ulit ang assistant…',
     },
     'cancel': {
       'zh': '取消',
@@ -274,7 +524,7 @@ abstract final class AssistantTexts {
       'ja': 'キャンセル',
       'vi': 'Hủy',
       'id': 'Batal',
-      'th': 'ยกเลิก',
+      'tl': 'Kanselahin',
     },
     'inputHint': {
       'zh': '輸入想做的事，例如：我要借書',
@@ -282,7 +532,7 @@ abstract final class AssistantTexts {
       'ja': 'やりたいことを入力（例：本を借りたい）',
       'vi': 'Nhập việc bạn muốn làm, ví dụ: Tôi muốn mượn sách',
       'id': 'Ketik yang ingin dilakukan, misalnya: Saya mau pinjam buku',
-      'th': 'พิมพ์สิ่งที่ต้องการทำ เช่น ฉันอยากยืมหนังสือ',
+      'tl': 'I-type ang gusto mong gawin, hal. Gusto kong humiram ng libro',
     },
     'send': {
       'zh': '送出',
@@ -290,7 +540,7 @@ abstract final class AssistantTexts {
       'ja': '送信',
       'vi': 'Gửi',
       'id': 'Kirim',
-      'th': 'ส่ง',
+      'tl': 'Ipadala',
     },
     'useVoice': {
       'zh': '改用語音',
@@ -298,7 +548,7 @@ abstract final class AssistantTexts {
       'ja': '音声入力に切り替え',
       'vi': 'Dùng giọng nói',
       'id': 'Pakai suara',
-      'th': 'ใช้เสียง',
+      'tl': 'Gumamit ng boses',
     },
     'useKeyboard': {
       'zh': '改用鍵盤',
@@ -306,7 +556,7 @@ abstract final class AssistantTexts {
       'ja': 'キーボードに切り替え',
       'vi': 'Dùng bàn phím',
       'id': 'Pakai keyboard',
-      'th': 'ใช้แป้นพิมพ์',
+      'tl': 'Gumamit ng keyboard',
     },
     'releaseToCancel': {
       'zh': '放開取消',
@@ -314,7 +564,7 @@ abstract final class AssistantTexts {
       'ja': '離すとキャンセル',
       'vi': 'Thả ra để hủy',
       'id': 'Lepaskan untuk membatalkan',
-      'th': 'ปล่อยเพื่อยกเลิก',
+      'tl': 'Bitawan para kanselahin',
     },
     'tooQuiet': {
       'zh': '聲音有點小，請靠近麥克風說',
@@ -322,7 +572,7 @@ abstract final class AssistantTexts {
       'ja': '声が小さめです。マイクに近づいて話してください',
       'vi': 'Giọng hơi nhỏ, hãy nói gần micrô hơn',
       'id': 'Suara agak pelan, bicaralah lebih dekat ke mikrofon',
-      'th': 'เสียงเบาไป โปรดพูดใกล้ไมโครโฟน',
+      'tl': 'Medyo mahina. Magsalita nang mas malapit sa mikropono',
     },
     'releaseToSend': {
       'zh': '放開送出，往上滑可取消',
@@ -330,7 +580,7 @@ abstract final class AssistantTexts {
       'ja': '離すと送信、上にスライドでキャンセル',
       'vi': 'Thả ra để gửi, vuốt lên để hủy',
       'id': 'Lepaskan untuk kirim, geser ke atas untuk batal',
-      'th': 'ปล่อยเพื่อส่ง ปัดขึ้นเพื่อยกเลิก',
+      'tl': 'Bitawan para ipadala, i-slide pataas para kanselahin',
     },
     'busyCaption': {
       'zh': '處理中，可在上方取消',
@@ -338,7 +588,7 @@ abstract final class AssistantTexts {
       'ja': '処理中です。上でキャンセルできます',
       'vi': 'Đang xử lý, có thể hủy ở phía trên',
       'id': 'Sedang diproses, bisa dibatalkan di atas',
-      'th': 'กำลังดำเนินการ ยกเลิกได้ด้านบน',
+      'tl': 'Ginagawa na; puwedeng kanselahin sa itaas',
     },
     'holdToTalk': {
       'zh': '按住說話',
@@ -346,7 +596,7 @@ abstract final class AssistantTexts {
       'ja': '押したまま話す',
       'vi': 'Nhấn giữ để nói',
       'id': 'Tekan tahan untuk bicara',
-      'th': 'กดค้างเพื่อพูด',
+      'tl': 'Pindutin nang matagal para magsalita',
     },
     'listeningSemantics': {
       'zh': '正在聽，點兩下送出',
@@ -354,7 +604,7 @@ abstract final class AssistantTexts {
       'ja': '聞いています。ダブルタップで送信',
       'vi': 'Đang nghe, chạm hai lần để gửi',
       'id': 'Mendengarkan, ketuk dua kali untuk kirim',
-      'th': 'กำลังฟัง แตะสองครั้งเพื่อส่ง',
+      'tl': 'Nakikinig; i-double tap para ipadala',
     },
     'speechDownloading': {
       'zh': '正在下載中文（台灣）離線語音…',
@@ -362,7 +612,7 @@ abstract final class AssistantTexts {
       'ja': '中国語（台湾）のオフライン音声をダウンロード中…',
       'vi': 'Đang tải giọng nói ngoại tuyến tiếng Trung (Đài Loan)…',
       'id': 'Mengunduh suara offline bahasa Mandarin (Taiwan)…',
-      'th': 'กำลังดาวน์โหลดเสียงออฟไลน์ภาษาจีน (ไต้หวัน)…',
+      'tl': 'Dina-download ang offline na pagkilala sa Chinese (Taiwan)…',
     },
     'speechDownloadingPercent': {
       'zh': '正在下載中文（台灣）離線語音 {percent}%',
@@ -370,7 +620,7 @@ abstract final class AssistantTexts {
       'ja': '中国語（台湾）のオフライン音声をダウンロード中 {percent}%',
       'vi': 'Đang tải giọng nói ngoại tuyến tiếng Trung (Đài Loan) {percent}%',
       'id': 'Mengunduh suara offline bahasa Mandarin (Taiwan) {percent}%',
-      'th': 'กำลังดาวน์โหลดเสียงออฟไลน์ภาษาจีน (ไต้หวัน) {percent}%',
+      'tl': 'Dina-download ang offline na pagkilala sa Chinese (Taiwan) {percent}%',
     },
     'speechLanguage': {
       'zh': '說話的語言：{language}',
@@ -378,7 +628,7 @@ abstract final class AssistantTexts {
       'ja': '話す言語：{language}',
       'vi': 'Ngôn ngữ nói: {language}',
       'id': 'Bahasa bicara: {language}',
-      'th': 'ภาษาที่พูด: {language}',
+      'tl': 'Wika ng pagsasalita: {language}',
     },
     'autoDetect': {
       'zh': '自動偵測',
@@ -386,7 +636,7 @@ abstract final class AssistantTexts {
       'ja': '自動検出',
       'vi': 'Tự động nhận biết',
       'id': 'Deteksi otomatis',
-      'th': 'ตรวจจับอัตโนมัติ',
+      'tl': 'Awtomatikong tukuyin',
     },
     'autoShort': {
       'zh': '自動',
@@ -394,7 +644,7 @@ abstract final class AssistantTexts {
       'ja': '自動',
       'vi': 'Tự động',
       'id': 'Otomatis',
-      'th': 'อัตโนมัติ',
+      'tl': 'Auto',
     },
     'downloadingTranslation': {
       'zh': '正在下載頁面翻譯模型（約 30 MB），完成後頁面會自動翻譯…',
@@ -402,7 +652,7 @@ abstract final class AssistantTexts {
       'ja': 'ページ翻訳モデルをダウンロード中（約 30 MB）。完了するとページが翻訳されます…',
       'vi': 'Đang tải mô hình dịch trang (khoảng 30 MB); trang sẽ được dịch khi tải xong…',
       'id': 'Mengunduh model terjemahan halaman (sekitar 30 MB); halaman akan diterjemahkan setelah selesai…',
-      'th': 'กำลังดาวน์โหลดโมเดลแปลหน้า (ประมาณ 30 MB) หน้าจะถูกแปลเมื่อเสร็จ…',
+      'tl': 'Dina-download ang model sa pagsasalin ng pahina (mga 30 MB); isasalin ang mga pahina kapag handa na ito…',
     },
 
     // Status and error lines (assistant_view_controller.dart).
@@ -412,7 +662,7 @@ abstract final class AssistantTexts {
       'ja': 'サービスページを開いています…',
       'vi': 'Đang mở trang dịch vụ…',
       'id': 'Membuka halaman layanan…',
-      'th': 'กำลังเปิดหน้าบริการ…',
+      'tl': 'Binubuksan ang pahina ng serbisyo…',
     },
     'pageFailed': {
       'zh': '服務頁面載入失敗，請檢查網路或重新開啟。',
@@ -421,7 +671,7 @@ abstract final class AssistantTexts {
       'ja': 'サービスページを読み込めませんでした。ネットワークを確認するか、もう一度開いてください。',
       'vi': 'Không tải được trang dịch vụ. Hãy kiểm tra mạng hoặc mở lại.',
       'id': 'Halaman layanan gagal dimuat. Periksa jaringan atau buka lagi.',
-      'th': 'โหลดหน้าบริการไม่สำเร็จ โปรดตรวจสอบเครือข่ายหรือเปิดใหม่อีกครั้ง',
+      'tl': 'Hindi nag-load ang pahina ng serbisyo. Suriin ang network o buksan ulit.',
     },
     'onlyCount': {
       'zh': '目前只有 {count} 個選項，請說 1 到 {count}，或直接點選。',
@@ -429,7 +679,7 @@ abstract final class AssistantTexts {
       'ja': '選択肢は {count} 個だけです。1～{count} の番号を言うか、タップしてください。',
       'vi': 'Chỉ có {count} lựa chọn. Hãy nói từ 1 đến {count}, hoặc chạm để chọn.',
       'id': 'Hanya ada {count} pilihan. Ucapkan 1 sampai {count}, atau ketuk salah satu.',
-      'th': 'มีเพียง {count} ตัวเลือก โปรดพูด 1 ถึง {count} หรือแตะเลือก',
+      'tl': '{count} lang ang opsiyon. Sabihin ang 1 hanggang {count}, o i-tap ang isa.',
     },
     'optionUnavailable': {
       'zh': '第 {n} 項「{title}」目前無法使用，請選其他項目。',
@@ -437,8 +687,7 @@ abstract final class AssistantTexts {
       'ja': '{n} 番目の「{title}」は現在利用できません。ほかの項目を選んでください。',
       'vi': 'Mục {n} “{title}” hiện không dùng được. Hãy chọn mục khác.',
       'id': 'Opsi {n} “{title}” belum bisa digunakan. Silakan pilih yang lain.',
-      'th':
-          'ตัวเลือกที่ {n} “{title}” ยังใช้ไม่ได้ในขณะนี้ โปรดเลือกรายการอื่น',
+      'tl': 'Hindi available ngayon ang opsiyon {n}, “{title}”. Pumili ng iba.',
     },
     'numbered': {
       'zh': '第 {n} 項：{text}',
@@ -446,7 +695,7 @@ abstract final class AssistantTexts {
       'ja': '{n}. {text}',
       'vi': '{n}. {text}',
       'id': '{n}. {text}',
-      'th': '{n}. {text}',
+      'tl': '{n}. {text}',
     },
     'speechScheduled': {
       'zh': '離線語音下載已排入系統，可能會等連上 Wi-Fi 才開始。',
@@ -454,7 +703,7 @@ abstract final class AssistantTexts {
       'ja': 'オフライン音声のダウンロードを予約しました。Wi-Fi に接続するまで始まらない場合があります。',
       'vi': 'Đã xếp lịch tải giọng nói ngoại tuyến; có thể phải chờ đến khi có Wi-Fi.',
       'id': 'Unduhan suara offline sudah dijadwalkan; mungkin menunggu Wi-Fi.',
-      'th': 'จัดคิวดาวน์โหลดเสียงออฟไลน์แล้ว อาจรอจนกว่าจะเชื่อมต่อ Wi-Fi',
+      'tl': 'Nakapila na ang download ng offline na pagkilala sa boses; baka hintayin muna nito ang Wi-Fi.',
     },
     'speechReady': {
       'zh': '中文（台灣）離線語音已下載完成，可以按住麥克風說話了。',
@@ -462,7 +711,7 @@ abstract final class AssistantTexts {
       'ja': '中国語（台湾）のオフライン音声のダウンロードが完了しました。マイクを押したまま話せます。',
       'vi': 'Đã tải xong giọng nói ngoại tuyến tiếng Trung (Đài Loan). Hãy nhấn giữ micrô để nói.',
       'id': 'Suara offline bahasa Mandarin (Taiwan) sudah siap. Tekan tahan mikrofon untuk bicara.',
-      'th': 'ดาวน์โหลดเสียงออฟไลน์ภาษาจีน (ไต้หวัน) เสร็จแล้ว กดไมโครโฟนค้างไว้เพื่อพูดได้เลย',
+      'tl': 'Handa na ang offline na pagkilala sa Chinese (Taiwan). Pindutin nang matagal ang mikropono para magsalita.',
     },
     'speechDownloadFailed': {
       'zh': '離線語音下載失敗。請確認網路後再按一次麥克風重試，或先用鍵盤。',
@@ -476,7 +725,7 @@ abstract final class AssistantTexts {
       'id':
           'Unduhan suara offline gagal. Periksa jaringan lalu tekan mikrofon lagi, '
           'atau pakai keyboard dulu.',
-      'th': 'ดาวน์โหลดเสียงออฟไลน์ไม่สำเร็จ โปรดตรวจสอบเครือข่ายแล้วกดไมโครโฟนอีกครั้ง หรือใช้แป้นพิมพ์ไปก่อน',
+      'tl': 'Hindi natapos ang download ng offline na pagkilala sa boses. Suriin ang network at pindutin ulit ang mikropono, o gamitin muna ang keyboard.',
     },
     'cancelled': {
       'zh': '已取消，未開啟新的頁面。',
@@ -484,7 +733,7 @@ abstract final class AssistantTexts {
       'ja': 'キャンセルしました。新しいページは開いていません。',
       'vi': 'Đã hủy, không mở trang mới.',
       'id': 'Dibatalkan. Tidak ada halaman baru yang dibuka.',
-      'th': 'ยกเลิกแล้ว ไม่ได้เปิดหน้าใหม่',
+      'tl': 'Kinansela. Walang bagong pahinang binuksan.',
     },
     'micPermission': {
       'zh': '需要麥克風權限才能用語音。可以到手機設定開啟，或點右下角鍵盤改用打字。',
@@ -498,7 +747,7 @@ abstract final class AssistantTexts {
       'id':
           'Input suara memerlukan izin mikrofon. Aktifkan di pengaturan ponsel, '
           'atau ketuk keyboard di kanan bawah untuk mengetik.',
-      'th': 'ต้องอนุญาตไมโครโฟนจึงจะใช้เสียงได้ เปิดได้ในการตั้งค่าโทรศัพท์ หรือแตะแป้นพิมพ์ที่มุมขวาล่างเพื่อพิมพ์',
+      'tl': 'Kailangan ng pahintulot sa mikropono para sa boses. I-on ito sa settings ng telepono, o i-tap ang keyboard sa kanang ibaba para mag-type.',
     },
     'noAudio': {
       'zh': '沒有錄到聲音，請按住麥克風再說話，說完放開。',
@@ -506,7 +755,7 @@ abstract final class AssistantTexts {
       'ja': '録音されませんでした。マイクを押したまま話し、話し終えたら離してください。',
       'vi': 'Không ghi được âm thanh. Hãy nhấn giữ micrô khi nói, nói xong thì thả ra.',
       'id': 'Tidak ada suara yang terekam. Tekan tahan mikrofon sambil bicara, lalu lepaskan.',
-      'th': 'ไม่ได้บันทึกเสียง โปรดกดไมโครโฟนค้างไว้ขณะพูด แล้วปล่อยเมื่อพูดจบ',
+      'tl': 'Walang na-record. Pindutin nang matagal ang mikropono habang nagsasalita, saka bitawan.',
     },
     'silentMic': {
       'zh': '麥克風沒有收到任何聲音。請確認麥克風沒被其他程式占用；用模擬器時請重新開啟它的麥克風設定，或改用鍵盤。',
@@ -523,7 +772,7 @@ abstract final class AssistantTexts {
           'Mikrofon tidak menangkap suara apa pun. Pastikan tidak sedang dipakai '
           'aplikasi lain; di emulator, aktifkan lagi pengaturan mikrofonnya, atau '
           'pakai keyboard.',
-      'th': 'ไมโครโฟนไม่ได้รับเสียงใดเลย โปรดตรวจสอบว่าไม่มีแอปอื่นใช้อยู่ หากใช้อีมูเลเตอร์ให้เปิดการตั้งค่าไมโครโฟนอีกครั้ง หรือใช้แป้นพิมพ์',
+      'tl': 'Walang anumang tunog na nakuha ang mikropono. Tiyaking walang ibang app na gumagamit nito; sa emulator, i-on ulit ang setting ng mikropono nito, o gamitin ang keyboard.',
     },
     'listening': {
       'zh': '正在聽你說的話…',
@@ -531,7 +780,7 @@ abstract final class AssistantTexts {
       'ja': 'お話を聞き取っています…',
       'vi': 'Đang nghe bạn nói…',
       'id': 'Mendengarkan ucapan Anda…',
-      'th': 'กำลังฟังสิ่งที่คุณพูด…',
+      'tl': 'Pinakikinggan ang sinabi mo…',
     },
     'recognitionFailed': {
       'zh': '語音辨識沒有成功，請再說一次，或點右下角鍵盤改用打字。',
@@ -545,7 +794,7 @@ abstract final class AssistantTexts {
       'id':
           'Pengenalan suara gagal. Silakan ucapkan lagi, atau ketuk keyboard di '
           'kanan bawah untuk mengetik.',
-      'th': 'จดจำเสียงไม่สำเร็จ โปรดพูดอีกครั้ง หรือแตะแป้นพิมพ์ที่มุมขวาล่างเพื่อพิมพ์',
+      'tl': 'Hindi gumana ang pagkilala sa boses. Pakisabi ulit, o i-tap ang keyboard sa kanang ibaba para mag-type.',
     },
     'confirmHeard': {
       'zh': '我聽到「{text}」，是這句嗎？也可以選下面的說法，或再說一次。',
@@ -553,7 +802,7 @@ abstract final class AssistantTexts {
       'ja': '「{text}」と聞こえました。合っていますか？下の候補から選ぶか、もう一度話してください。',
       'vi': 'Tôi nghe được “{text}”, đúng không? Bạn cũng có thể chọn bên dưới, hoặc nói lại.',
       'id': 'Saya mendengar “{text}”, benar? Anda juga bisa memilih di bawah, atau ucapkan lagi.',
-      'th': 'ฉันได้ยินว่า “{text}” ใช่ไหม เลือกจากด้านล่างหรือพูดอีกครั้งก็ได้',
+      'tl': 'Narinig ko ang “{text}”. Tama ba? Puwede ka ring pumili sa ibaba, o sabihin ulit.',
     },
     'corrected': {
       'zh': '我聽到「{heard}」，當作「{text}」處理；不對的話請再說一次。',
@@ -562,7 +811,7 @@ abstract final class AssistantTexts {
       'vi':
           'Tôi nghe được “{heard}” và hiểu là “{text}”; nếu sai, hãy nói lại.',
       'id': 'Saya mendengar “{heard}” dan menganggapnya “{text}”; jika salah, silakan ucapkan lagi.',
-      'th': 'ฉันได้ยินว่า “{heard}” และเข้าใจว่า “{text}” ถ้าไม่ถูก โปรดพูดอีกครั้ง',
+      'tl': 'Narinig ko ang “{heard}” at inunawa ko itong “{text}”. Kung mali, pakisabi ulit.',
     },
     'searching': {
       'zh': '正在找合適的頁面，你可以隨時取消。',
@@ -570,7 +819,7 @@ abstract final class AssistantTexts {
       'ja': 'ぴったりのページを探しています。いつでもキャンセルできます。',
       'vi': 'Đang tìm trang phù hợp, bạn có thể hủy bất cứ lúc nào.',
       'id': 'Mencari halaman yang sesuai; Anda bisa membatalkan kapan saja.',
-      'th': 'กำลังหาหน้าที่เหมาะสม ยกเลิกได้ทุกเมื่อ',
+      'tl': 'Hinahanap ang tamang pahina; puwede mong kanselahin anumang oras.',
     },
     'unavailable': {
       'zh': '助理暫時無法處理，請重試或使用原服務入口。',
@@ -580,7 +829,7 @@ abstract final class AssistantTexts {
       'ja': 'アシスタントは現在処理できません。もう一度試すか、通常のサービス入口をご利用ください。',
       'vi': 'Trợ lý tạm thời không xử lý được. Hãy thử lại hoặc dùng lối vào dịch vụ thông thường.',
       'id': 'Asisten sedang tidak bisa memproses. Coba lagi atau gunakan menu layanan biasa.',
-      'th': 'ผู้ช่วยยังดำเนินการไม่ได้ในขณะนี้ โปรดลองอีกครั้งหรือใช้ทางเข้าบริการปกติ',
+      'tl': 'Hindi ito magagawa ng assistant ngayon. Subukan ulit o gamitin ang karaniwang pasukan ng serbisyo.',
     },
 
     // Connection and format errors (assistant_service.dart).
@@ -591,7 +840,8 @@ abstract final class AssistantTexts {
       'ja': '処理に時間がかかっています。もう一度試すか、図書館のページから検索してください。',
       'vi': 'Việc xử lý mất nhiều thời gian. Hãy thử lại hoặc tìm từ trang thư viện.',
       'id': 'Prosesnya cukup lama. Coba lagi atau cari dari halaman perpustakaan.',
-      'th': 'ใช้เวลาประมวลผลนาน โปรดลองอีกครั้งหรือค้นหาจากหน้าห้องสมุด',
+      'tl':
+          'Natatagalan ito. Subukan ulit o maghanap mula sa pahina ng aklatan.',
     },
     'unreachable': {
       'zh': '連不到電腦上的助理，請確認後端與裝置連線。',
@@ -601,7 +851,7 @@ abstract final class AssistantTexts {
       'ja': 'コンピューター上のアシスタントに接続できません。バックエンドと端末の接続を確認してください。',
       'vi': 'Không kết nối được với trợ lý trên máy tính. Hãy kiểm tra backend và kết nối thiết bị.',
       'id': 'Tidak dapat terhubung ke asisten di komputer. Periksa backend dan koneksi perangkat.',
-      'th': 'เชื่อมต่อผู้ช่วยบนคอมพิวเตอร์ไม่ได้ โปรดตรวจสอบแบ็กเอนด์และการเชื่อมต่อของอุปกรณ์',
+      'tl': 'Hindi maabot ang assistant sa computer. Suriin ang backend at ang koneksiyon ng device.',
     },
     // On-device builds (ASSISTANT_ON_DEVICE): the assistant runs on the phone.
     'unreachableOnDevice': {
@@ -612,7 +862,7 @@ abstract final class AssistantTexts {
       'ja': 'この端末のアシスタントは起動中か、バックグラウンドから戻ったところです。数秒待ってからもう一度お試しください。',
       'vi': 'Trợ lý trên điện thoại đang khởi động hoặc vừa quay lại từ nền. Hãy đợi vài giây rồi thử lại.',
       'id': 'Asisten di ponsel ini masih dimulai atau baru kembali dari latar belakang. Tunggu beberapa detik lalu coba lagi.',
-      'th': 'ผู้ช่วยในโทรศัพท์กำลังเริ่มทำงานหรือเพิ่งกลับจากเบื้องหลัง โปรดรอสักครู่แล้วลองอีกครั้ง',
+      'tl': 'Nagsisimula pa ang assistant sa teleponong ito o kababalik lang mula sa background. Maghintay ng ilang segundo at subukan ulit.',
     },
     'turnDisconnected': {
       'zh': '助理連線中斷，請重試或使用原服務入口。',
@@ -622,7 +872,7 @@ abstract final class AssistantTexts {
       'ja': 'アシスタントとの接続が切れました。もう一度試すか、通常のサービス入口をご利用ください。',
       'vi': 'Mất kết nối với trợ lý. Hãy thử lại hoặc dùng lối vào dịch vụ thông thường.',
       'id': 'Koneksi ke asisten terputus. Coba lagi atau gunakan menu layanan biasa.',
-      'th': 'การเชื่อมต่อกับผู้ช่วยขาดหาย โปรดลองอีกครั้งหรือใช้ทางเข้าบริการปกติ',
+      'tl': 'Naputol ang koneksiyon sa assistant. Subukan ulit o gamitin ang karaniwang pasukan ng serbisyo.',
     },
     'replyTooLong': {
       'zh': '助理回覆過長，未執行操作。',
@@ -630,7 +880,7 @@ abstract final class AssistantTexts {
       'ja': 'アシスタントの返信が長すぎるため、操作は実行していません。',
       'vi': 'Câu trả lời của trợ lý quá dài, chưa thực hiện thao tác nào.',
       'id': 'Balasan asisten terlalu panjang; tidak ada tindakan yang dijalankan.',
-      'th': 'คำตอบของผู้ช่วยยาวเกินไป จึงไม่ได้ดำเนินการใด',
+      'tl': 'Masyadong mahaba ang sagot ng assistant; walang ginawa.',
     },
     'cannotProcess': {
       'zh': '助理暫時無法處理。',
@@ -638,7 +888,7 @@ abstract final class AssistantTexts {
       'ja': 'アシスタントは現在処理できません。',
       'vi': 'Trợ lý tạm thời không xử lý được.',
       'id': 'Asisten sedang tidak bisa memproses.',
-      'th': 'ผู้ช่วยยังดำเนินการไม่ได้ในขณะนี้',
+      'tl': 'Hindi ito magagawa ng assistant ngayon.',
     },
     'replyMismatch': {
       'zh': '助理回覆與本次需求不一致，未執行操作。',
@@ -647,7 +897,7 @@ abstract final class AssistantTexts {
       'ja': 'アシスタントの返信が今回の依頼と一致しないため、操作は実行していません。',
       'vi': 'Câu trả lời của trợ lý không khớp với yêu cầu này, chưa thực hiện thao tác nào.',
       'id': 'Balasan asisten tidak sesuai dengan permintaan ini; tidak ada tindakan yang dijalankan.',
-      'th': 'คำตอบของผู้ช่วยไม่ตรงกับคำขอนี้ จึงไม่ได้ดำเนินการใด',
+      'tl': 'Hindi tugma ang sagot ng assistant sa request na ito; walang ginawa.',
     },
     'transcriptionFailed': {
       'zh': '語音辨識沒有成功。',
@@ -655,7 +905,7 @@ abstract final class AssistantTexts {
       'ja': '音声を認識できませんでした。',
       'vi': 'Nhận dạng giọng nói không thành công.',
       'id': 'Pengenalan suara gagal.',
-      'th': 'จดจำเสียงไม่สำเร็จ',
+      'tl': 'Hindi gumana ang pagkilala sa boses.',
     },
     'transcriptionInvalid': {
       'zh': '語音辨識回覆不正確，請再說一次或改用鍵盤。',
@@ -663,7 +913,7 @@ abstract final class AssistantTexts {
       'ja': '音声認識の応答が正しくありません。もう一度話すか、キーボードを使ってください。',
       'vi': 'Kết quả nhận dạng giọng nói không hợp lệ. Hãy nói lại hoặc dùng bàn phím.',
       'id': 'Hasil pengenalan suara tidak valid. Silakan ucapkan lagi atau pakai keyboard.',
-      'th': 'ผลการจดจำเสียงไม่ถูกต้อง โปรดพูดอีกครั้งหรือใช้แป้นพิมพ์',
+      'tl': 'Hindi wasto ang resulta ng pagkilala sa boses. Pakisabi ulit o gamitin ang keyboard.',
     },
     'transcriptionTimeout': {
       'zh': '語音辨識時間較長，請再說一次或改用鍵盤。',
@@ -671,7 +921,7 @@ abstract final class AssistantTexts {
       'ja': '音声認識に時間がかかっています。もう一度話すか、キーボードを使ってください。',
       'vi': 'Nhận dạng giọng nói mất nhiều thời gian. Hãy nói lại hoặc dùng bàn phím.',
       'id': 'Pengenalan suara cukup lama. Silakan ucapkan lagi atau pakai keyboard.',
-      'th': 'การจดจำเสียงใช้เวลานาน โปรดพูดอีกครั้งหรือใช้แป้นพิมพ์',
+      'tl': 'Natatagalan ang pagkilala sa boses. Pakisabi ulit o gamitin ang keyboard.',
     },
     'transcriptionDisconnected': {
       'zh': '助理連線中斷，請再說一次或改用鍵盤。',
@@ -679,7 +929,7 @@ abstract final class AssistantTexts {
       'ja': 'アシスタントとの接続が切れました。もう一度話すか、キーボードを使ってください。',
       'vi': 'Mất kết nối với trợ lý. Hãy nói lại hoặc dùng bàn phím.',
       'id': 'Koneksi ke asisten terputus. Silakan ucapkan lagi atau pakai keyboard.',
-      'th': 'การเชื่อมต่อกับผู้ช่วยขาดหาย โปรดพูดอีกครั้งหรือใช้แป้นพิมพ์',
+      'tl': 'Naputol ang koneksiyon sa assistant. Pakisabi ulit o gamitin ang keyboard.',
     },
   };
 }

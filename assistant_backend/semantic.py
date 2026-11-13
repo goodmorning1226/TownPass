@@ -66,6 +66,12 @@ EXAMPLE_PREFIX = faq.QUERY_PREFIX
 # leave-one-out, a sentence never sees its own text). Tuned on
 # eval_colloquial_dev.json and semantic_tuning.json only.
 EXAMPLE_OFFSET = float(os.environ.get("TOWNPASS_SEMANTIC_EXAMPLE_OFFSET", "0.05"))
+# Languages whose own passages (names, keywords, examples) are scored only for requests
+# in that language. Filipino (2026-11-11, docs/AI_FILIPINO.md) mixes in English words and
+# e5 reads it well, so its short form names drew English and Indonesian requests away
+# ("book me a cab to Taoyuan airport" opened the traffic-ticket appeal through "Apela sa
+# traffic ticket (Taipei)"); the Thai names it replaced, in Thai script, never did.
+OWN_LANGUAGE_ONLY = ("tl",)
 
 
 def examples(registry):
@@ -80,6 +86,30 @@ def examples(registry):
         raise ValueError(f"capability_examples.json names unknown capabilities: {sorted(unknown)}")
     return [(entry_id, text) for entry_id, languages in data.items()
             for _, texts in sorted(languages.items()) for text in texts]
+
+
+def passage_languages(registry, with_examples=None):
+    """{passage text: language} for passages only an OWN_LANGUAGE_ONLY language produced
+    (a text another language also produced stays for everyone)."""
+    made = {}
+    for entry in registry.entries:
+        for language, local in registry.i18n.get(entry["id"], {}).items():
+            if local and local.get("title"):
+                text = faq.PASSAGE_PREFIX + ", ".join([local["title"], *local.get("keywords", [])])
+                made.setdefault(text, set()).add(language)
+    if EXAMPLES if with_examples is None else with_examples:
+        path = getattr(registry, "path", None)
+        path = path.with_name("capability_examples.json") if path else None
+        if path is not None and path.exists():
+            for languages in json.loads(path.read_text(encoding="utf-8"))["examples"].values():
+                for language, texts in languages.items():
+                    for text in texts:
+                        made.setdefault(EXAMPLE_PREFIX + text, set()).add(language)
+    for entry in registry.entries:  # the Chinese texts are everyone's
+        made.setdefault(faq.PASSAGE_PREFIX + entry["title"], set()).add("zh")
+        made.setdefault(faq.PASSAGE_PREFIX + "，".join([entry["title"], *entry["keywords"]]), set()).add("zh")
+    return {text: next(iter(languages)) for text, languages in made.items()
+            if len(languages) == 1 and next(iter(languages)) in OWN_LANGUAGE_ONLY}
 
 
 def passages(registry, with_examples=None):
@@ -117,6 +147,8 @@ class CatalogIndex:
         self._embed_many = embed_many
         self.cache_dir = pathlib.Path(cache_dir) if cache_dir else default_cache_dir()
         self.texts = passages(registry, with_examples)
+        own = passage_languages(registry, with_examples)
+        self.own_language = [own.get(text) for _, text in self.texts]  # None: scored for everyone
         self.rows = None          # one array("f") per passage once built
         self.lock = threading.Lock()
         self.last_attempt = None
@@ -190,8 +222,9 @@ class CatalogIndex:
             except OSError:
                 continue
 
-    def scores(self, text):
-        """{entry id: best cosine over its passages}; {} when not ready or the server fails."""
+    def scores(self, text, language=None):
+        """{entry id: best cosine over its passages}; {} when not ready or the server fails.
+        Passages of an OWN_LANGUAGE_ONLY language count only when language is that one."""
         if not self.ready:
             return {}
         try:
@@ -201,7 +234,9 @@ class CatalogIndex:
             return {}
         best = {}
         dot = getattr(math, "sumprod", None) or (lambda a, b: math.fsum(x * y for x, y in zip(a, b)))
-        for (entry_id, passage), row in zip(self.texts, self.rows):
+        for (entry_id, passage), row, own in zip(self.texts, self.rows, self.own_language):
+            if own is not None and own != language:
+                continue
             score = dot(row, vector)
             if passage.startswith(EXAMPLE_PREFIX):
                 score -= EXAMPLE_OFFSET  # query-to-query cosines run higher (see EXAMPLE_OFFSET)
@@ -209,11 +244,12 @@ class CatalogIndex:
                 best[entry_id] = score
         return best
 
-    def search(self, text, threshold=None, margin=MARGIN, limit=LIMIT):
+    def search(self, text, threshold=None, margin=MARGIN, limit=LIMIT, language=None):
         """[(lift, entry)] best first: lift at least threshold and within margin of the best.
-        lift = the entry's cosine minus the mean over all entries (see THRESHOLD)."""
+        lift = the entry's cosine minus the mean over all entries (see THRESHOLD).
+        language: the request's language (OWN_LANGUAGE_ONLY)."""
         threshold = THRESHOLD if threshold is None else threshold
-        scores = self.scores(text)
+        scores = self.scores(text, language)
         if not scores:
             return []
         mean = math.fsum(scores.values()) / len(scores)

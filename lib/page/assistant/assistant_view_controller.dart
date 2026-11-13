@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:town_pass/bean/assistant_result.dart';
 import 'package:town_pass/page/assistant/assistant_texts.dart';
 import 'package:town_pass/page/main/main_view_controller.dart';
+import 'package:town_pass/service/assistant_model_download.dart';
 import 'package:town_pass/service/assistant_action_executor.dart';
 import 'package:town_pass/service/assistant_recent_inputs.dart';
 import 'package:town_pass/service/page_translation.dart';
@@ -443,6 +444,8 @@ class AssistantViewController extends GetxController {
   /// [scrollTo] opens the conversation at a specific message (corner hint).
   void openPanel({int? scrollTo}) {
     hideCorner();
+    // Pushed or deleted models since the App started (docs/AI_MODEL_DOWNLOAD.md).
+    AssistantModelDownload.maybe?.refreshStatus();
     scrollTarget.value = scrollTo;
     expanded.value = true;
     if (_panelHistory == null && activeRoute != null) {
@@ -498,6 +501,11 @@ class AssistantViewController extends GetxController {
   /// e.g. the microphone permission was refused (a reply explains why).
   Future<bool> startListening() async {
     if (busy.value || listening.value) return false;
+    // No core models yet: the panel shows the download (rules section 7).
+    if (AssistantModelDownload.maybe?.needsCore ?? false) {
+      openPanel();
+      return false;
+    }
     speaker.stop(); // never record the assistant's own voice
     final generation = _generation;
     final system = systemSpeech;
