@@ -91,18 +91,22 @@ void main() {
     );
   });
 
-  test('never on Android, which starts its own copy natively', () async {
-    expect(AssistantOnDevice.enabled(isIOS: false, build: true), isFalse);
-    expect(
-      await AssistantOnDevice.start(
-        isIOS: false,
-        build: true,
-        channel: channel,
-      ),
-      isNull,
-    );
-    expect(calls, isEmpty);
-  });
+  test(
+    'never "start" on Android, which starts its own copy natively',
+    () async {
+      expect(AssistantOnDevice.enabled(isIOS: false, build: true), isFalse);
+      expect(
+        await AssistantOnDevice.start(
+          isIOS: false,
+          isAndroid: true,
+          build: true,
+          channel: channel,
+        ),
+        isNull,
+      );
+      expect(calls, isEmpty);
+    },
+  );
 
   test('without a computer address the assistant uses the phone itself', () {
     // On-device builds always do (AssistantService.baseUrl); here no
@@ -233,15 +237,50 @@ void main() {
       expect(calls.length, asked);
     });
 
-    test('Android and LAN builds never wait', () async {
-      // start() is not enabled there, so no observer is installed.
+    test('LAN builds never wait', () async {
+      // Not an on-device build: no observer is installed.
+      expect(
+        AssistantOnDevice.resumes(isIOS: true, isAndroid: true, build: false),
+        isFalse,
+      );
       await AssistantOnDevice.start(
         isIOS: false,
-        build: true,
+        isAndroid: true,
+        build: false,
         channel: channel,
       );
       await AssistantOnDevice.settle();
       expect(calls, isEmpty);
     });
+
+    test(
+      'an on-device Android build waits for "status" after a resume',
+      () async {
+        // 2026-11-13: Android answers "status" (OnDeviceAssistant.kt) and restarts a
+        // server the system killed in the background; until then requests wait.
+        answers = [false, true];
+        await AssistantOnDevice.start(
+          isIOS: false,
+          isAndroid: true,
+          build: true,
+          channel: channel,
+        );
+        expect(calls, isEmpty, reason: 'no "start": Android starts natively');
+        // Before any resume nothing waits.
+        await AssistantOnDevice.settle();
+        expect(calls, isEmpty);
+        final binding = TestWidgetsFlutterBinding.instance;
+        binding.handleAppLifecycleStateChanged(AppLifecycleState.inactive);
+        binding.handleAppLifecycleStateChanged(AppLifecycleState.hidden);
+        binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
+        binding.handleAppLifecycleStateChanged(AppLifecycleState.hidden);
+        binding.handleAppLifecycleStateChanged(AppLifecycleState.inactive);
+        binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+        await AssistantOnDevice.settle();
+        expect(calls, ['status', 'status']);
+        await AssistantOnDevice.settle();
+        expect(calls.length, 2);
+      },
+    );
   });
 }

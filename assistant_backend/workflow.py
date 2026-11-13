@@ -111,6 +111,12 @@ LIST_SIZE = 8
 # App's start pages, which rarely help: home, all services, start page, pinned.
 LIST_LAST = ("app.home", "app.services", "start_page", "pinned")
 CANCEL_WORDS = ("取消", "返回", "算了", "不用了", "不要了")
+# A whole sentence of cancel words, repeated or with particles ("算了吧", "算了不用了",
+# "不用了謝謝", "好，取消"; rules section 3, 2026-11-13). Anything else after them
+# ("不用了，我要繳水費", "取消預約") is a request, not a cancel. Leading 請 is allowed.
+_CANCEL_WORD = "|".join(CANCEL_WORDS)
+CANCEL_ZH = re.compile(r"(?:請)?(?:(?:那|好|唉|欸|喔)[，,、\s]*)?(?:" + _CANCEL_WORD + ")"
+                       r"(?:[，,、\s]*(?:" + _CANCEL_WORD + r"|吧|啦|啊|喔|哦|謝謝|好了))*[。！!～~.\s]*")
 _ORDINAL_SYLLABLES = {"yi": 1, "er": 2, "san": 3, "si": 4, "wu": 5, "liu": 6, "qi": 7, "ba": 8}
 
 
@@ -215,9 +221,10 @@ class Workflow:
                 return self.classifier.capability(self.owner, text, entries, confirmation,
                                                   getattr(self.owner.usage, "language", "zh"), sound, note, extra)
             except classifier.ClassifierUnavailable:
-                # Never guess: list the candidates (or ask), as without a decision model.
+                # Never guess: list the candidates, even a single connected one, as without
+                # a decision model (rules section 6, 2026-11-13: a lone candidate used to open).
                 self._trace("classifier_unavailable", [e["id"] for e in entries])
-                return "confirm_candidates", {}
+                return "confirm_candidates", {"keep_choice": True}
         if confirmation:
             tools = [self.tool("confirm_candidates", "Show these candidates and wait for user selection; do not navigate.")]
         else:
@@ -419,7 +426,7 @@ class Workflow:
         executes anything by itself.
         """
         text = text.strip()
-        if (re.fullmatch(r"(?:請)?(?:取消|返回|算了|不用了|不要了)[。！!]*", text)
+        if (CANCEL_ZH.fullmatch(text)
                 or re.fullmatch(r"(?:嗨|你好|您好|哈囉|謝謝|感謝)[！!。\s]*", text)):
             return True
         if re.search(r"有哪些功能|有什麼功能|功能(?:列表|有哪些)|(?:能|可以|會)做(?:什麼|哪些)|有(?:什麼|哪些)服務", text):
@@ -966,12 +973,13 @@ class Workflow:
         if payload.get("language", "zh") != "zh":
             return self._handle_language(payload, text, pending, resolution)
         bare = re.sub(r"^請", "", text)
-        if re.fullmatch(r"(?:取消|返回|算了|不用了|不要了)", bare) or (
+        if CANCEL_ZH.fullmatch(text) or (
                 len(bare) <= 3 and sounds_like(bare, CANCEL_WORDS, CANCEL_SOUND)):
             with self.lock:
                 self.pending.pop(session, None)
             self._trace("cancel")
-            return self.reply(payload, "已取消，未執行任何操作。")
+            # action "cancel", as the other languages' cancel (the App does not rely on it).
+            return self.reply(payload, "已取消，未執行任何操作。", action="cancel")
         if pending and resolution == pending["id"]:
             self._trace("pending")
             if pending.get("page") and (text in PREV_PAGE_WORDS or (

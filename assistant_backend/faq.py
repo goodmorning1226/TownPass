@@ -90,6 +90,9 @@ def embed_texts(url, texts, timeout=EMBED_TIMEOUT):
     # (liveness.py, 2026-11-13). One still loading (never answered) only refuses.
     if liveness.down(url):
         raise ConnectionRefusedError("embedding server not answering")
+    # Answered before, now silent on /health (stopped): seconds, not the timeout (2026-11-13).
+    if liveness.hung(url):
+        raise TimeoutError("embedding server not answering /health")
     request = urllib.request.Request(
         url + "/v1/embeddings", json.dumps({"input": texts}).encode("utf-8"),
         {"Content-Type": "application/json", "User-Agent": "TownPass-Assistant/1"})

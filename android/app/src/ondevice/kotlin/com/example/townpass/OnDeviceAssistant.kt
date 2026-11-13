@@ -1,15 +1,24 @@
 package com.example.townpass
 
+import android.app.Activity
 import android.app.ActivityManager
+import android.app.Application
 import android.content.Context
 import android.content.pm.ApplicationInfo
+import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import com.chaquo.python.Kwarg
 import com.chaquo.python.Python
 import com.chaquo.python.android.AndroidPlatform
+import io.flutter.plugin.common.BinaryMessenger
+import io.flutter.plugin.common.MethodChannel
 import java.io.File
 import java.net.InetSocketAddress
 import java.net.Socket
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.concurrent.thread
 
 /**
@@ -99,6 +108,21 @@ object OnDeviceAssistant {
         "-b", "512", "-ub", "512", "-t", "2", "--no-webui")
     private val processes = mutableListOf<Process>()
     private val serverLock = Any()
+    private const val ASSISTANT_PORT = 8765  // device_main: the backend and the speech endpoint
+    private const val ASR_PORT = 8770
+
+    /** A model server this App process launched ([launch] with a name): [status] reports
+     *  it and [restartServer] runs it again when it stops answering. */
+    private class Running(val name: String, val port: Int, val llama: Boolean, val process: Process) {
+        val launchedAt = System.currentTimeMillis()
+        /** It answered GET /health at least once since it was launched. */
+        @Volatile
+        var answered = false
+    }
+    private val running = ConcurrentHashMap<String, Running>()
+    /** First-use servers: listed by [status] but not waited for. */
+    private val optionalServers = setOf("taiwanese", "vietnamese")
+    private val recovering = AtomicBoolean(false)
     /** The decision model file chosen in [start] (Ministral, or Gemma when built for it and present). */
     @Volatile
     private var decisionFileName = MODEL_FILE
@@ -127,6 +151,19 @@ object OnDeviceAssistant {
         }
         val app = context.applicationContext
         appContext = app
+        // Back in the foreground: run again any server that stopped while the App was
+        // away (as iOS's recover() does on didBecomeActive).
+        (app as? Application)?.registerActivityLifecycleCallbacks(object : Application.ActivityLifecycleCallbacks {
+            override fun onActivityResumed(activity: Activity) {
+                thread(name = "assistant-recover", isDaemon = true) { recover() }
+            }
+            override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {}
+            override fun onActivityStarted(activity: Activity) {}
+            override fun onActivityPaused(activity: Activity) {}
+            override fun onActivityStopped(activity: Activity) {}
+            override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {}
+            override fun onActivityDestroyed(activity: Activity) {}
+        })
         thread(name = "assistant-start", isDaemon = true) {
             try {
                 // The Python servers listen at once; the models load behind them and
@@ -162,7 +199,13 @@ object OnDeviceAssistant {
                 // docs/AI_MODEL_DOWNLOAD.md); 12 GB phones report ~11,200 MB.
                 val memory = ActivityManager.MemoryInfo()
                 (app.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager).getMemoryInfo(memory)
-                val info = Python.getInstance().getModule("device_main")
+                val deviceMain = Python.getInstance().getModule("device_main")
+                // A server that stops answering (Android may kill child processes while the
+                // App is in the background) is started again: device_main.Restarter calls
+                // [restartServer] through device_main.java_server_restarter, as iOS does
+                // through its native restarter (2026-11-13).
+                val restarter = deviceMain["java_server_restarter"]
+                val info = deviceMain
                     .callAttr("start", MODEL_PORT, WHISPER_PORT, Kwarg("whisper", whisper),
                         Kwarg("multi_port", if (multilingual) MULTI_WHISPER_PORT else null),
                         Kwarg("chinese_model", chinese || !multilingual),
@@ -178,7 +221,8 @@ object OnDeviceAssistant {
                         // then starts their servers.
                         Kwarg("models_dir", models.absolutePath),
                         Kwarg("ram_mb", memory.totalMem shr 20),
-                        Kwarg("platform", "android")).toString()
+                        Kwarg("platform", "android"),
+                        Kwarg("server_restarter", restarter)).toString()
                 Log.i(TAG, "backend: $info")
                 // Recent 8-core phone SoCs have 6-8 performance cores; leave two for
                 // the UI. Speech and decision run one after the other, never together.
@@ -191,19 +235,19 @@ object OnDeviceAssistant {
                 if (whisper) {
                     if (chinese || !multilingual) {
                         launch(app, "libwhisper_server.so", File(models, ASR_FILE), WHISPER_PORT,
-                            listOf("-t", threads, "-l", "zh"))
+                            listOf("-t", threads, "-l", "zh"), name = "chinese")
                     }
                     if (multilingual) {
                         // Same binary; a second instance keeps the Chinese one just started.
                         launch(app, "libwhisper_server.so", File(models, MULTI_ASR_FILE), MULTI_WHISPER_PORT,
-                            listOf("-t", threads, "-l", "auto"), stopLeftovers = !chinese)
+                            listOf("-t", threads, "-l", "auto"), stopLeftovers = !chinese, name = "multilingual")
                     }
                     if (gate) {
                         // Detection only (encoder + one step, ~130 MB): 4 threads were faster
                         // than 6 for Whisper tiny on a vivo V2511 (0.18 s vs 0.27 s a clip).
                         launch(app, "libwhisper_server.so", File(models, GATE_ASR_FILE), GATE_WHISPER_PORT,
                             listOf("-t", threads.toInt().coerceAtMost(4).toString(), "-l", "auto"),
-                            stopLeftovers = false)
+                            stopLeftovers = false, name = "gate")
                     }
                 } else {
                     stopStale("libwhisper_server.so")
@@ -216,13 +260,15 @@ object OnDeviceAssistant {
                 if (classifierMode) {
                     // No decision model in this mode, even if its file is on the phone.
                     if (classifierFile.isFile) {
-                        launch(app, "libllama_server.so", classifierFile, CLASSIFIER_PORT, CLASSIFIER_ARGS)
+                        launch(app, "libllama_server.so", classifierFile, CLASSIFIER_PORT, CLASSIFIER_ARGS,
+                            name = "classifier")
                     } else {
                         stopStale("libllama_server.so")
                         Log.i(TAG, "no $CLASSIFIER_MODEL_FILE yet; the App downloads it (docs/AI_MODEL_DOWNLOAD.md)")
                     }
                 } else if (decisionFile.isFile) {
-                    launch(app, "libllama_server.so", decisionFile, MODEL_PORT, llamaCpuArgs() + DECISION_ARGS)
+                    launch(app, "libllama_server.so", decisionFile, MODEL_PORT, llamaCpuArgs() + DECISION_ARGS,
+                        name = "decision")
                 } else {
                     stopStale("libllama_server.so")
                     Log.i(TAG, "no ${decisionFile.name} yet; the App downloads it (docs/AI_MODEL_DOWNLOAD.md)")
@@ -231,7 +277,7 @@ object OnDeviceAssistant {
                     // Same binary, started after the decision model (whose launch stops
                     // leftover copies).
                     launch(app, "libllama_server.so", File(models, FAQ_MODEL_FILE), FAQ_EMBED_PORT,
-                        EMBEDDING_ARGS, stopLeftovers = false)
+                        EMBEDDING_ARGS, stopLeftovers = false, name = "embedding")
                 }
             } catch (error: Throwable) {
                 Log.e(TAG, "on-device assistant failed to start", error)
@@ -313,34 +359,240 @@ object OnDeviceAssistant {
         // Forked from the foreground CPU group, like the servers started at launch.
         waitForForeground()
         val started = System.currentTimeMillis()
-        val process = when (name) {
-            "decision" -> launch(app, "libllama_server.so", model, port, llamaCpuArgs() + DECISION_ARGS,
-                stopLeftovers = false)
-            "embedding" -> launch(app, "libllama_server.so", model, port, EMBEDDING_ARGS, stopLeftovers = false)
-            "classifier" -> launch(app, "libllama_server.so", model, port, CLASSIFIER_ARGS, stopLeftovers = false)
-            "gate" -> launch(app, "libwhisper_server.so", model, port,
-                listOf("-t", whisperThreads.toInt().coerceAtMost(4).toString(), "-l", "auto"), stopLeftovers = false)
-            else -> launch(app, "libwhisper_server.so", model, port, listOf("-t", whisperThreads, "-l", "auto"),
-                stopLeftovers = false)
-        } ?: return "failed"
+        val process = launchServer(app, name, model, port) ?: return "failed"
         val state = waitLoaded(process)
         Log.i(TAG, "$name started after download: $state in ${System.currentTimeMillis() - started} ms")
         if (state != "ready") process.destroy()
         state
     }
 
+    /** [ensureServer]'s and [restartServer]'s launch: the same arguments as at start-up. */
+    private fun launchServer(app: Context, name: String, model: File, port: Int): Process? = when (name) {
+        "decision" -> launch(app, "libllama_server.so", model, port, llamaCpuArgs() + DECISION_ARGS,
+            stopLeftovers = false, name = name)
+        "embedding" -> launch(app, "libllama_server.so", model, port, EMBEDDING_ARGS, stopLeftovers = false, name = name)
+        "classifier" -> launch(app, "libllama_server.so", model, port, CLASSIFIER_ARGS, stopLeftovers = false,
+            name = name)
+        "gate" -> launch(app, "libwhisper_server.so", model, port,
+            listOf("-t", whisperThreads.toInt().coerceAtMost(4).toString(), "-l", "auto"), stopLeftovers = false,
+            name = name)
+        "chinese" -> launch(app, "libwhisper_server.so", model, port, listOf("-t", whisperThreads, "-l", "zh"),
+            stopLeftovers = false, name = name)
+        else -> launch(app, "libwhisper_server.so", model, port, listOf("-t", whisperThreads, "-l", "auto"),
+            stopLeftovers = false, name = name)
+    }
+
+    /** The model file of a server [restartServer] can start again ([ensureServer]'s, and "chinese"). */
+    private fun serverFile(name: String): String? = when (name) {
+        "decision" -> decisionFileName
+        "multilingual" -> MULTI_ASR_FILE
+        "gate" -> GATE_ASR_FILE
+        "embedding" -> FAQ_MODEL_FILE
+        "classifier" -> CLASSIFIER_MODEL_FILE
+        "chinese" -> ASR_FILE
+        else -> null
+    }
+
+    /**
+     * The backend's call when a model server stopped answering (device_main.Restarter
+     * through device_main.java_server_restarter; iOS: OnDeviceAssistant.swift
+     * restartServer). [request]: a server name ("decision", "chinese", "multilingual",
+     * "gate", "embedding", "classifier", "taiwanese", "vietnamese"), with ":error" when it
+     * answers /health but fails requests (restarted anyway). Asks GET /health first
+     * (up to 3 s); one that does not answer is ended if its process is still there (also
+     * when stopped with SIGSTOP) and started again like [ensureServer], from the
+     * foreground CPU group, one at a time. Returns "ready" (it answers), "restarted",
+     * "busy" (still loading after its launch; asked again later), "missing" or "failed"
+     * (also while the App is in the background: forked there it would stay on the little
+     * cores; the next resume runs it again, [recover]).
+     */
+    @JvmStatic
+    fun restartServer(request: String): String {
+        val name = request.substringBefore(':')
+        val failing = request.substringAfter(':', "") == "error"
+        val server = running[name] ?: return "failed"  // never started: nothing to restart
+        if (!failing) {
+            val deadline = System.currentTimeMillis() + 3_000
+            while (System.currentTimeMillis() < deadline) {
+                if (answers(server)) return "ready"
+                Thread.sleep(250)
+            }
+        }
+        // A whisper-server listens only once loaded: a live one launched shortly before
+        // that never answered is still loading, not stuck.
+        if (!failing && server.process.isAlive && !server.answered &&
+            System.currentTimeMillis() - server.launchedAt < 120_000) return "busy"
+        if (!inForeground()) {
+            Log.i(TAG, "$name does not answer; it is started again once the App is in the foreground")
+            return "failed"
+        }
+        if (name in optionalServers) return restartFirstUse(name, server)
+        return synchronized(serverLock) {
+            val current = running[name] ?: return@synchronized "failed"
+            // Restarted by another call meanwhile.
+            if (current !== server && answers(current)) return@synchronized "ready"
+            val app = appContext ?: return@synchronized "failed"
+            val fileName = serverFile(name) ?: return@synchronized "failed"
+            val model = File(app.getExternalFilesDir("models") ?: File(app.filesDir, "models"), fileName)
+            if (!model.isFile) return@synchronized "missing"
+            Log.i(TAG, "$name does not answer${if (failing) " (server errors)" else ""}; starting it again")
+            stopServer(current)
+            val began = System.currentTimeMillis()
+            val process = launchServer(app, name, model, current.port) ?: return@synchronized "failed"
+            val restarted = running[name]
+            var state = "failed"
+            while (System.currentTimeMillis() - began < 180_000) {
+                if (!process.isAlive) break
+                if (restarted != null && answers(restarted)) {
+                    state = "restarted"
+                    break
+                }
+                Thread.sleep(250)
+            }
+            Log.i(TAG, "$name restart: $state in ${System.currentTimeMillis() - began} ms")
+            if (state != "restarted") process.destroy()
+            state
+        }
+    }
+
+    /** The Taiwanese / Vietnamese server: ended, then loaded again by its first-use starter. */
+    private fun restartFirstUse(name: String, server: Running): String {
+        synchronized(if (name == "taiwanese") taiwaneseLock else vietnameseLock) {
+            stopServer(server)
+            if (name == "taiwanese") taiwanese = null else vietnamese = null
+        }
+        val state = if (name == "taiwanese") startTaiwanese() else startVietnamese()
+        return if (state == "ready") "restarted" else state
+    }
+
+    /** Ends a server's process (SIGKILL when it does not exit, e.g. stopped) and any
+     *  other copy still holding its port, then waits until the port is free. */
+    private fun stopServer(server: Running) {
+        val process = server.process
+        if (process.isAlive) {
+            process.destroy()
+            val deadline = System.currentTimeMillis() + 2_000
+            while (process.isAlive && System.currentTimeMillis() < deadline) Thread.sleep(100)
+            if (process.isAlive) process.destroyForcibly()
+        }
+        stopOnPort(if (server.llama) "libllama_server.so" else "libwhisper_server.so", server.port)
+        val deadline = System.currentTimeMillis() + 5_000
+        while (listening(server.port) && System.currentTimeMillis() < deadline) Thread.sleep(100)
+    }
+
+    /** Kills this App's (same user id) copies of [binary] serving [port]. */
+    private fun stopOnPort(binary: String, port: Int) {
+        val self = android.os.Process.myPid()
+        File("/proc").listFiles().orEmpty().forEach { dir ->
+            val pid = dir.name.toIntOrNull() ?: return@forEach
+            if (pid == self) return@forEach
+            val args = try {
+                File(dir, "cmdline").readText().split('\u0000')
+            } catch (_: Exception) {
+                return@forEach
+            }
+            val at = args.indexOf("--port")
+            if (args.firstOrNull()?.endsWith("/$binary") == true && at >= 0 &&
+                args.getOrNull(at + 1) == port.toString()) {
+                android.os.Process.killProcess(pid)
+                Log.i(TAG, "stopped $binary on $port (pid $pid)")
+            }
+        }
+    }
+
+    /** Whether a started server answers now: llama-server GET /health 200 (503: still
+     *  loading); whisper-server any HTTP answer. Remembers that it answered. */
+    private fun answers(server: Running): Boolean {
+        val code = healthCode(server.port)
+        val ok = if (server.llama) code == 200 else code > 0
+        if (ok) server.answered = true
+        return ok
+    }
+
+    /** After the App comes back to the foreground: every started server that does not
+     *  answer is started again ([restartServer]), one at a time, one recovery at a time.
+     *  A first-use server (Taiwanese, Vietnamese) that is gone is left to its next use. */
+    private fun recover() {
+        if (!recovering.compareAndSet(false, true)) return
+        try {
+            for (server in running.values.toList()) {
+                if (answers(server)) continue
+                if (server.name in optionalServers && !server.process.isAlive) continue
+                Log.i(TAG, "resume: ${server.name} ${restartServer(server.name)}")
+            }
+        } catch (error: Exception) {
+            Log.w(TAG, "resume recovery failed", error)
+        } finally {
+            recovering.set(false)
+        }
+    }
+
+    /**
+     * Which servers answer now, for Dart's OnDeviceResume (lib/service/assistant_on_device.dart),
+     * which waits for "ready" before the first request after the App comes back. The same
+     * shape as iOS (OnDeviceAssistant.swift status): started, python (the backend's two
+     * loopback ports), servers (name -> answers GET /health) and ready (python and every
+     * start-up server answer; the Taiwanese and Vietnamese servers are listed, not
+     * required). Nothing launched (not started yet, no model files) is ready too.
+     */
+    @JvmStatic
+    fun status(): Map<String, Any> {
+        val python = listening(ASSISTANT_PORT) && listening(ASR_PORT)
+        val servers = running.values.associate { it.name to answers(it) }
+        val ready = !started || servers.isEmpty() ||
+            (python && servers.all { (name, ok) -> ok || name in optionalServers })
+        if (!ready) Log.i(TAG, "status: not ready yet (python $python, servers $servers)")
+        return mapOf("started" to started, "python" to python, "servers" to servers, "ready" to ready)
+    }
+
+    /** The Dart channel (MainActivity.configureFlutterEngine registers it by reflection):
+     *  "status"; "start" answers at once (Android starts the assistant natively, onCreate). */
+    @JvmStatic
+    fun register(messenger: BinaryMessenger) {
+        val main = Handler(Looper.getMainLooper())
+        MethodChannel(messenger, "townpass/on_device_assistant").setMethodCallHandler { call, result ->
+            when (call.method) {
+                "status" -> thread(name = "assistant-status", isDaemon = true) {
+                    val info = try {
+                        status()
+                    } catch (error: Exception) {
+                        Log.w(TAG, "status failed", error)
+                        mapOf("ready" to true)  // nothing known: do not hold requests
+                    }
+                    main.post { result.success(info) }
+                }
+                "start" -> result.success("android: started with the App")
+                else -> result.notImplemented()
+            }
+        }
+    }
+
     /** Whether llama-server on [port] has loaded its model (GET /health answers 200). */
-    private fun healthy(port: Int) = try {
+    private fun healthy(port: Int) = healthCode(port, readMs = 1000) == 200
+
+    /** GET /health's status code on [port]; -1 when refused or silent (a stopped server). */
+    private fun healthCode(port: Int, readMs: Int = 2000): Int = try {
         val connection = java.net.URL("http://127.0.0.1:$port/health").openConnection() as java.net.HttpURLConnection
         connection.connectTimeout = 500
-        connection.readTimeout = 1000
+        connection.readTimeout = readMs
         try {
-            connection.responseCode == 200
+            connection.responseCode
         } finally {
             connection.disconnect()
         }
     } catch (_: Exception) {
-        false
+        -1
+    }
+
+    /** Whether this thread is in the foreground CPU group within 2 s (unknown counts as yes). */
+    private fun inForeground(): Boolean {
+        val deadline = System.currentTimeMillis() + 2_000
+        while (true) {
+            val group = cpuGroup()
+            if (group == null || group == "/top-app") return true
+            if (System.currentTimeMillis() >= deadline) return false
+            Thread.sleep(200)
+        }
     }
 
     /** Starts (or keeps) a whisper-server loaded on first use; returns the state and its process. */
@@ -362,7 +614,7 @@ object OnDeviceAssistant {
         current?.destroy()
         val started = System.currentTimeMillis()
         val process = launch(app, "libwhisper_server.so", model, port,
-            listOf("-t", whisperThreads, "-l", language), stopLeftovers = false) ?: return "failed" to null
+            listOf("-t", whisperThreads, "-l", language), stopLeftovers = false, name = label) ?: return "failed" to null
         // whisper-server listens only after the model has loaded.
         while (System.currentTimeMillis() - started < 60_000) {
             if (!process.isAlive) return "failed" to null
@@ -377,7 +629,7 @@ object OnDeviceAssistant {
     }
 
     private fun launch(app: Context, binary: String, model: File, port: Int, extra: List<String>,
-                       stopLeftovers: Boolean = true): Process? {
+                       stopLeftovers: Boolean = true, name: String? = null): Process? {
         if (!model.isFile) {
             Log.w(TAG, "missing model ${model.absolutePath}; run scripts/push_assistant_models.ps1")
             return null
@@ -399,6 +651,7 @@ object OnDeviceAssistant {
         builder.redirectOutput(File(if (debuggable) "${app.cacheDir}/$binary-$port.log" else "/dev/null"))
         val process = builder.start()
         synchronized(processes) { processes += process }
+        if (name != null) running[name] = Running(name, port, binary == "libllama_server.so", process)
         Log.i(TAG, "started $binary on $port")
         return process
     }

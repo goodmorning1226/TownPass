@@ -586,8 +586,7 @@ class WhisperCppRecognizer:
             raise urllib.error.URLError(ConnectionRefusedError("speech model not answering"))
         # A decode may legitimately take many seconds, so a hung whisper-server cost the
         # whole request timeout (the App gave up at 40 s): ask /health first (2 s).
-        if liveness.has_answered(url) and not liveness.probe(url):
-            liveness.failed(url, "timeout")
+        if liveness.hung(url):
             raise urllib.error.URLError(TimeoutError("speech model not answering"))
         body, content_type = self.multipart(fields, wav)
         deadline = time.monotonic() + liveness.wait_s(url, READY_WAIT_S)
