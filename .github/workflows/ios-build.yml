@@ -133,12 +133,25 @@ jobs:
             [ -f "$log" ] || continue
             text=$(tail -n 60 "$log" | sed -e 's/%/%25/g' -e 's/\r//g' | awk '{printf "%s%%0A", $0}')
             echo "::error title=$(basename "$log" .log)::$text"
-            # Compiler errors scroll away behind warnings: list them separately.
-            errors=$(grep -n -E "error:|Error \(Xcode\)|: error|Failed to build" "$log" | grep -v "warning:" | head -n 40 \
-              | sed -e 's/%/%25/g' -e 's/\r//g' | awk '{printf "%s%%0A", $0}')
-            [ -n "$errors" ] && echo "::error title=$(basename "$log" .log) errors::$errors"
           done
-          # The Xcode build's own log has the full compiler messages.
-          find "$HOME/Library/Developer/Xcode/DerivedData" -name "*.xcactivitylog" -newer "$LOGS" 2>/dev/null | head -n 1 \
-            | while read -r f; do gunzip -c "$f" | tr '\r' '\n' | grep -E "error:" | head -n 30 \
-              | sed -e 's/%/%25/g' | awk '{printf "%s%%0A", $0}' | xargs -0 -I{} echo "::error title=xcode errors::{}"; done || true
+          # Compiler errors scroll away behind plugin warnings, and one annotation holds at
+          # most 4,096 characters: list the error lines (Flutter prints Xcode's as
+          # "<Kind> (Xcode): ...", clang/swiftc as "error:") in several annotations.
+          python3 - "$LOGS" <<'PY'
+          import pathlib, re, sys
+          pattern = re.compile(r"\(Xcode\)|\berror:|fatal error|Command \w+ failed|Undefined symbol|ld: ")
+          lines = []
+          for log in sorted(pathlib.Path(sys.argv[1]).glob("*.log")):
+              text = log.read_text(errors="replace").splitlines()
+              for i, line in enumerate(text):
+                  if pattern.search(line) and "warning:" not in line:
+                      lines.append(f"{log.stem}:{i + 1}: " + " | ".join(l.strip() for l in text[i:i + 3])[:600])
+          chunk = ""
+          for line in lines[:60] or ["no error lines found"]:
+              line = line.replace("%", "%25").replace("\r", "")
+              if chunk and len(chunk) + len(line) > 3500:
+                  print("::error title=compiler errors::" + chunk)
+                  chunk = ""
+              chunk += line + "%0A"
+          print("::error title=compiler errors::" + chunk)
+          PY
