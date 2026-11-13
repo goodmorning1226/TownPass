@@ -18,6 +18,7 @@ import threading
 import time
 import uuid
 
+import book_title
 import classifier
 import emergency
 import i18n
@@ -172,6 +173,7 @@ class Workflow:
         # TOWNPASS_DECISION_BACKEND=classifier (experiment, docs/AI_DECISION_CLASSIFIER.md):
         # capability and intent decisions scored by a cross-encoder instead of the LLM.
         self.classifier = classifier.Classifier(self.registry) if classifier.ENABLED else None
+        self._city_words = None  # book_title.CityWords, built when the FAQ is there
 
     def reply(self, payload, message, **extra):
         from server import CATALOG_VERSION, CONTRACT
@@ -271,6 +273,12 @@ class Workflow:
         else:
             name, _ = decide(self.owner, "library", {"original_text": text, "retrieval": view}, tools,
                              self.validate, self.error)
+        if name == "offer_library":
+            # A three-character title after 找 / 看 (book_title.judge): the FAQ first, then the
+            # library page as a choice; nothing opens by itself.
+            return self._faq(payload, text) or self._offer_services(
+                payload, [self.registry.by_id["library"]],
+                f"要在圖書借閱找「{context['action_object']}」嗎？請先確認。", keep_choice=True)
         if name == "open_library" or (name in ("locate_library_book", "open_library_book") and not context["books"]):
             return self.reply(payload, "請在圖書借閱頁搜尋想看的書。這裡使用示範資料。", kind="navigate",
                               action="open_library", destination={"kind": "home"})
@@ -302,8 +310,9 @@ class Workflow:
         """The library decision without a model (docs/AI_DECISION_CLASSIFIER.md section 10),
         from decision.rule_decision: cancel; a verified book; matching catalogue books;
         the library home when the evidence is clear and no other service is named; for a
-        weak "borrow/find <object>" only when the object names a kind of book; otherwise a
-        clarification (the caller then tries the FAQ)."""
+        weak "borrow/find <object>" only when the object names a kind of book or reads as a
+        work's title (book_title.judge: "open_library", or "offer_library" to list the library
+        page); otherwise a clarification (the caller then tries the FAQ)."""
         names = [t["function"]["name"] for t in tools]
         for name in ("cancel", "open_library_book", "locate_library_book"):
             if name in names:
@@ -313,7 +322,24 @@ class Workflow:
                 return "open_library"
             if self.BOOKISH.search(matching.library_view(context.get("action_object") or context.get("query") or "")):
                 return "open_library"
+            # Only a work's title ("借龜兔賽跑", rules 2026-11-13): an object shaped like a name
+            # that the city's vocabulary (FAQ, catalogue, places) does not know.
+            judged = book_title.judge(context.get("action_object") or "",
+                                      book_title.verb(matching.library_view(context.get("text") or text)),
+                                      self.city_words(), context.get("text") or text)
+            if judged:
+                self._trace("library_title", ["library"])
+                return "open_library" if judged == "open" else "offer_library"
         return "request_clarification"
+
+    def city_words(self):
+        """book_title.CityWords from the loaded FAQ, or None while there is none."""
+        rows = book_title.faq_entries(getattr(self.owner, "faq", None))
+        if not rows:
+            return None
+        if self._city_words is None or self._city_words[0] is not rows:
+            self._city_words = (rows, book_title.CityWords(self.registry, rows))
+        return self._city_words[1]
 
     @staticmethod
     def _faq_text(entry):
