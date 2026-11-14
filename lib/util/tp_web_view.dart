@@ -858,6 +858,21 @@ const _translationScript = r'''
   var coverTimer = null;
   var styled = false;
   var scheduled = false;
+  // Whole sentences (docs/AI_CURRENT_RULES.md section 4, 服務頁翻譯的品質):
+  // a block holding only text and these non-interactive inline elements is
+  // translated as one sentence per BR-separated part, written into its first
+  // text node; the others are emptied. Emphasis inside it is lost (accepted).
+  var blockTags = { P: 1, LI: 1, TD: 1, TH: 1, LABEL: 1, DT: 1, DD: 1, H1: 1, H2: 1, H3: 1,
+    H4: 1, H5: 1, H6: 1, DIV: 1, CAPTION: 1, FIGCAPTION: 1, SUMMARY: 1, LEGEND: 1 };
+  var inlineTags = { SPAN: 1, B: 1, STRONG: 1, EM: 1, I: 1, U: 1, S: 1, SMALL: 1, MARK: 1,
+    SUB: 1, SUP: 1, FONT: 1, BR: 1 };
+  var blockSelector = Object.keys(blockTags).join(',');
+  // Text node -> { block, nodes, originals } of the sentence written in it.
+  var sentenceOf = new WeakMap();
+  var waitingBlock = new WeakMap();
+  // Per scan or observer pass: blocks already looked at (shape, sentences).
+  var pass = 0;
+  var blockSeen = new WeakMap();
   function add(entries) {
     if (!entries) return;
     for (var key in entries) {
@@ -883,7 +898,7 @@ const _translationScript = r'''
   // page; the element stays laid out and visible to the guide probes' `shown`.
   function style() {
     if (styled) return;
-    var css = '[data-tp-pending]{color:transparent!important;-webkit-text-fill-color:transparent!important;text-shadow:none!important}' +
+    var css = '[data-tp-pending],[data-tp-pending-sentence],[data-tp-pending-sentence] *{color:transparent!important;-webkit-text-fill-color:transparent!important;text-shadow:none!important}' +
       '[data-tp-pending-placeholder]::placeholder{color:transparent!important;-webkit-text-fill-color:transparent!important}';
     try {
       var sheet = new CSSStyleSheet();
@@ -902,7 +917,8 @@ const _translationScript = r'''
   function cover(item) {
     var name = item.node ? 'data-tp-pending' : 'data-tp-pending-placeholder';
     var el = item.node ? item.node.parentElement : item.el;
-    if (!el || (!item.node && item.attribute !== 'placeholder' && item.attribute !== 'value')) return;
+    if (item.nodes) { name = 'data-tp-pending-sentence'; el = item.block; }
+    if (!el || (!item.node && !item.nodes && item.attribute !== 'placeholder' && item.attribute !== 'value')) return;
     if (item.attribute === 'value') name = 'data-tp-pending';
     style();
     var count = covers.get(el) || {};
@@ -947,16 +963,149 @@ const _translationScript = r'''
     writtenAttributes.set(el, done);
     el.setAttribute(name, translated);
   }
+  // The sentence block a text node belongs to: the nearest element above its
+  // inline parents, when it is a block tag whose descendants are all
+  // non-interactive inline elements laid out inline (a flex or grid row puts
+  // its spans apart, so it is not one sentence).
+  function sentenceBlock(node) {
+    var el = node.parentElement, depth = 0;
+    while (el && inlineTags[el.tagName] && depth < 8) { el = el.parentElement; depth++; }
+    if (!el || !blockTags[el.tagName]) return null;
+    var seen = blockSeen.get(el);
+    if (!seen || seen.pass !== pass) {
+      seen = { pass: pass, ok: sentenceShape(el), handled: null };
+      blockSeen.set(el, seen);
+    }
+    return seen.ok ? el : null;
+  }
+  function sentenceShape(el) {
+    if (el.isContentEditable || excluded(el)) return false;
+    var all = el.getElementsByTagName('*');
+    if (!all.length || all.length > 40) return false;
+    for (var i = 0; i < all.length; i++) {
+      var c = all[i];
+      if (!inlineTags[c.tagName] || c.hasAttribute('tabindex') || c.hasAttribute('role') ||
+          c.hasAttribute('onclick') || c.hasAttribute('translate') || c.classList.contains('notranslate')) return false;
+    }
+    if (/flex|grid|table-row/.test(getComputedStyle(el).display)) return false;
+    for (var j = 0; j < all.length; j++) {
+      if (all[j].tagName === 'BR') continue;
+      var d = getComputedStyle(all[j]).display;
+      if (d !== 'inline' && d !== 'contents') return false;
+    }
+    return true;
+  }
+  // Text nodes of a block, split at BR.
+  function segments(block) {
+    var out = [[]];
+    var walker = document.createTreeWalker(block, NodeFilter.SHOW_TEXT | NodeFilter.SHOW_ELEMENT, null);
+    var n;
+    while ((n = walker.nextNode())) {
+      if (n.nodeType === 1) { if (n.tagName === 'BR') out.push([]); continue; }
+      out[out.length - 1].push(n);
+    }
+    return out;
+  }
+  function intact(rec) {
+    for (var i = 0; i < rec.nodes.length; i++) {
+      var n = rec.nodes[i];
+      if (!n.isConnected || written.get(n) !== n.nodeValue) return false;
+    }
+    return true;
+  }
+  // A sentence the page changed under us: the parts we wrote get their own
+  // Chinese back, so it can be translated again as a whole.
+  function restore(rec) {
+    for (var i = 0; i < rec.nodes.length; i++) {
+      var n = rec.nodes[i];
+      if (sentenceOf.get(n) !== rec) continue;
+      sentenceOf.delete(n);
+      if (written.get(n) === n.nodeValue) n.nodeValue = rec.originals[i];
+      written.delete(n);
+      original.delete(n);
+    }
+  }
+  function sameNodes(a, b) {
+    if (a.length !== b.length) return false;
+    for (var i = 0; i < a.length; i++) if (a[i] !== b[i]) return false;
+    return true;
+  }
+  function writeSentence(block, nodes, values, translated) {
+    var text = values.join('');
+    var lead = text.match(/^\s*/)[0];
+    var tail = text.match(/\s*$/)[0];
+    var head = null;
+    for (var i = 0; i < nodes.length; i++) if (values[i].trim()) { head = nodes[i]; break; }
+    var rec = { block: block, nodes: nodes, originals: values };
+    for (var j = 0; j < nodes.length; j++) {
+      var n = nodes[j];
+      var value = n === head ? lead + translated + tail : '';
+      sentenceOf.set(n, rec);
+      // The head keeps the whole sentence as its original, so
+      // __townpassOriginal(block) and the probes' orig() read it in Chinese.
+      original.set(n, n === head ? text : '');
+      written.set(n, value);
+      n.nodeValue = value;
+    }
+  }
+  // Translates the block's sentences (once per pass). Returns whether [node]
+  // is part of a sentence (else it is translated on its own).
+  function visitBlock(block, node) {
+    var seen = blockSeen.get(block);
+    if (!seen.handled) {
+      seen.handled = new Set();
+      var parts = segments(block);
+      for (var i = 0; i < parts.length; i++) visitSentence(block, parts[i], seen.handled);
+    }
+    return seen.handled.has(node);
+  }
+  function visitSentence(block, nodes, handled) {
+    var recs = [];
+    for (var i = 0; i < nodes.length; i++) {
+      var r = sentenceOf.get(nodes[i]);
+      if (r && recs.indexOf(r) < 0) recs.push(r);
+    }
+    if (recs.length === 1 && sameNodes(recs[0].nodes, nodes) && intact(recs[0])) {
+      for (var k = 0; k < nodes.length; k++) handled.add(nodes[k]);
+      return;
+    }
+    for (var j = 0; j < recs.length; j++) restore(recs[j]);
+    var values = nodes.map(function (n) { return n.nodeValue; });
+    var parts = 0;
+    for (var v = 0; v < values.length; v++) if (chinese.test(values[v])) parts++;
+    // Two Chinese parts at least: 「水號<span>*</span>」 stays as it was.
+    if (parts < 2) return;
+    for (var h = 0; h < nodes.length; h++) handled.add(nodes[h]);
+    var text = values.join('');
+    var key = text.replace(/\s+/g, ' ').trim();
+    var translated = dictionary[key];
+    if (translated) { writeSentence(block, nodes, values, translated); return; }
+    if (untranslated[key] || waitingBlock.get(block) === key) return;
+    waitingBlock.set(block, key);
+    var item = { block: block, nodes: nodes, values: values, text: text, key: key };
+    waiting.push(item);
+    cover(item);
+    ask(key);
+  }
   function ask(key) {
     if (asked[key] || untranslated[key]) return;
     asked[key] = true;
     outbox.push(key);
   }
   function visitText(node) {
+    var rec = sentenceOf.get(node);
+    if (rec) {
+      if (written.get(node) === node.nodeValue) return;
+      if (rec.block.isConnected && sentenceBlock(node) === rec.block) visitBlock(rec.block, node);
+      else restore(rec);
+      return;
+    }
     var value = node.nodeValue;
     if (!value || !chinese.test(value) || written.get(node) === value) return;
     var parent = node.parentElement;
     if (!parent || skip[parent.tagName] || parent.isContentEditable || excluded(parent)) return;
+    var block = sentenceBlock(node);
+    if (block && visitBlock(block, node)) return;
     var key = value.trim();
     var translated = dictionary[key];
     if (translated) { writeNode(node, value, translated); return; }
@@ -1004,8 +1153,16 @@ const _translationScript = r'''
     var still = [];
     for (var i = 0; i < waiting.length; i++) {
       var item = waiting[i];
-      var current = item.node ? item.node.nodeValue : item.el.getAttribute(item.attribute);
       var translated = dictionary[item.key];
+      if (item.nodes) {
+        var same = item.nodes.every(function (n, k) { return n.isConnected && n.nodeValue === item.values[k] && !sentenceOf.get(n); });
+        if (same && !translated && !untranslated[item.key]) { still.push(item); continue; }
+        uncover(item);
+        if (waitingBlock.get(item.block) === item.key) waitingBlock.delete(item.block);
+        if (same && translated) writeSentence(item.block, item.nodes, item.values, translated);
+        continue;
+      }
+      var current = item.node ? item.node.nodeValue : item.el.getAttribute(item.attribute);
       if (current === item.text && !translated && !untranslated[item.key]) { still.push(item); continue; }
       uncover(item);
       if (item.node) {
@@ -1057,13 +1214,21 @@ const _translationScript = r'''
     Promise.resolve().then(function () { scheduled = false; scan(); });
   }
   function scan() {
+    pass++;
     if (document.body) visitElement(document.body);
     flush();
   }
   // Runs before the page paints what changed: cached texts are written here.
   function observed(records) {
+    pass++;
     for (var i = 0; i < records.length; i++) {
       var r = records[i];
+      if (r.type === 'childList' && r.removedNodes.length && r.target.nodeType === 1) {
+        // A part of a sentence removed: the block is looked at again.
+        var block = r.target.closest && r.target.closest(blockSelector);
+        var first = block && document.createTreeWalker(block, NodeFilter.SHOW_TEXT, null).nextNode();
+        if (first && sentenceBlock(first) === block) visitBlock(block, null);
+      }
       if (r.type === 'characterData') visitText(r.target);
       else if (r.type === 'attributes') {
         if (r.target.nodeType === 1 && attributes.indexOf(r.attributeName) >= 0) visitAttribute(r.target, r.attributeName);

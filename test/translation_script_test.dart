@@ -76,7 +76,7 @@ void main() {
     () {
       // A transparent text colour on the waiting element; never visibility,
       // opacity or the whole body (the guide probes' `shown` stays true).
-      expect(script, contains('[data-tp-pending]{color:transparent!important'));
+      expect(script, contains('[data-tp-pending],[data-tp-pending-sentence],[data-tp-pending-sentence] *{color:transparent!important'));
       expect(script, isNot(contains('visibility')));
       expect(script, isNot(contains('opacity')));
       expect(script, isNot(contains('document.body.style')));
@@ -154,6 +154,43 @@ void main() {
     expect(script, isNot(contains('.trim().length')));
     expect(script, isNot(contains('text.length')));
     expect(script, isNot(contains('value.length')));
+  });
+
+  test('translation script translates whole sentences', () {
+    // docs/AI_CURRENT_RULES.md section 4 (服務頁翻譯的品質): a block of only
+    // text and non-interactive inline elements is one sentence per BR part.
+    expect(
+      script,
+      contains(
+        "var inlineTags = { SPAN: 1, B: 1, STRONG: 1, EM: 1, I: 1, U: 1, S: 1, SMALL: 1, MARK: 1,",
+      ),
+    );
+    expect(script, contains('P: 1, LI: 1, TD: 1, TH: 1, LABEL: 1'));
+    expect(script, isNot(contains('BUTTON: 1')));
+    // Interactive or excluded inline elements, and flex/grid rows, are not.
+    expect(
+      script,
+      contains("c.hasAttribute('tabindex') || c.hasAttribute('role')"),
+    );
+    expect(
+      script,
+      contains(
+        "if (/flex|grid|table-row/.test(getComputedStyle(el).display)) return false;",
+      ),
+    );
+    expect(script, contains("if (n.tagName === 'BR') out.push([]);"));
+    // Two Chinese parts at least, so 水號<span>*</span> keeps its marker.
+    expect(script, contains('if (parts < 2) return;'));
+    // Written into the first text node, others emptied; the head keeps the
+    // whole Chinese sentence for __townpassOriginal.
+    expect(
+      script,
+      contains("var value = n === head ? lead + translated + tail : '';"),
+    );
+    expect(script, contains("original.set(n, n === head ? text : '');"));
+    // A sentence the page changed is restored and translated again.
+    expect(script, contains('function restore(rec)'));
+    expect(script, contains('[data-tp-pending-sentence] *{color:transparent'));
   });
 
   test('translation script sends a page larger than one pass in turns', () {

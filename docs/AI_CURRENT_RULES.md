@@ -89,6 +89,27 @@
   - 不變：輸入框的值、有 name 的按鈕、`translate="no"`、可編輯的字不翻；教學用的原文查詢（`__townpassOriginal`、`data-tp-*`）
     與 `townpassTranslate` 的名稱與格式（字串陣列進、同順序的字串陣列出）不變。
   - iOS 沒有在實機上驗證過（這台電腦不能編 iOS）。（`tp_web_view.dart` 的 `_translationScript`、`PageTranslation.dictionary`；前後量測：`docs/AI_PAGE_TRANSLATION.md`）
+- **服務頁翻譯的品質**（2026-11-13，擁有者同意；原因：ML Kit 一次只翻一個文字節點，句子被紅字、粗體切開後每段各翻各的
+  （水費頁「即日起」「電子帳單」「用戶，以」「行動支付繳費(含本網站信用卡支付)」分開翻，三個字以內的片段常被翻成不相干的字），
+  市府用詞也常翻錯或翻成不存在的字（「超商」被翻成一個不存在、而且不雅的英文字）；檢查工具 `scripts/review_translations.py` 的前後對照見 `docs/AI_PAGE_TRANSLATION.md`）：
+  - **查詢順序**（`PageTranslation.translateAll`、`display`、注入頁面的字典都一樣）：
+    1. 預翻字串：`assets/i18n/app_strings.json`（App 自己的字）、`assets/i18n/service_strings.json`（已串接的服務頁）；
+    2. 整串就是詞彙表的詞或樣式（`assets/i18n/glossary.json`：「區公所」「0001號」）；
+    3. 手機存過的翻譯——**只用同一版詞彙表時存的**：存檔的名稱帶詞彙表版本，詞彙表改版後，舊存檔裡含詞彙表用詞的翻譯作廢、其他保留；
+    4. ML Kit，並**保護詞彙表用詞**：翻譯前把句子裡的用詞換成目標語言的寫法（長的詞先換，數字樣式如「6碼」一起換），
+       翻完檢查每個用詞都還在；有用詞不見時改用代號再翻一次、翻完換回；還是不見就用沒有保護的 ML Kit 結果，並在 debug log 記下
+       （`page translation: glossary miss`），給人檢查、補詞彙表或預翻。
+  - **整句翻譯**：區塊元素（P、LI、TD、TH、LABEL、DT、DD、H1–H6、DIV、CAPTION、FIGCAPTION、SUMMARY、LEGEND）裡只有文字和
+    不能互動的行內元素（SPAN、B、STRONG、EM、I、U、S、SMALL、MARK、SUB、SUP、FONT、BR）時，整句一起翻，BR 當作分句；
+    譯文寫在第一個有字的文字節點，其他節點清空。原文留在腳本裡：`__townpassOriginal(區塊)` 仍回傳整句中文，教學的 `orig`／`txt` 照常比對中文。
+    句子裡的一段被頁面改掉（Vue 重畫）時，整句先還原成中文再重新翻。有按鈕、連結、輸入框、圖片或 `translate="no"` 的區塊照舊逐節點翻。
+    **擁有者接受的代價：這種句子裡的紅字、粗體等強調在翻譯後不見了**（整句變成第一段的樣式）；被清空的行內元素裡的原文只能從整個區塊查。
+  - **服務頁預翻**：`scripts/extract_service_strings.py` 用 Playwright 打開 `assets/assistant/capabilities.json` 裡已串接功能的網頁，
+    注入 App 同一份翻譯腳本、用同樣的切法（文字節點＋整句）收集要翻的字，寫進 `service_strings.json`（已有的翻譯保留、新字留空、不見的字刪掉）。
+    翻譯是 **AI 草稿，要請母語者審過**；**服務網站改版後要重新抽取**（同一頁的字變了，舊的預翻就對不到）。
+  - **檢查工具** `scripts/review_translations.py`：列出可疑的翻譯——還是中文或沒變、詞彙表用詞不見、英文裡有字典沒有的字（例如「超商」的錯譯）、
+    回譯成中文和原文差很多、長度比例怪、三個字以內的片段單獨翻。ML Kit 的實際結果用 debug 版的 `tool/page_translation_review/mlkit_review.dart`
+    在模擬器上產生（只在開發時用，不包進 App）。
 - **越南文**（2026-11-08，`docs/AI_VIETNAMESE.md`）：手機上有 `ggml-whisper-vietnamese.bin`（建議 PhoWhisper-base，選用）時，判定為越南文的錄音改由它聽（不加提示句、編碼器用完整 30 秒窗口、只解一次不重試）；第一次用到才載入，沒有檔案就跟原本一樣用 Whisper small。越南文不加提示句（實測反而變差）。
   選單選越南文時，閘門說「中文」一律不算數，改由 Whisper small 只偵測語言再決定；small 也說中文但把握不到九成、而且中文很短或不清楚時，再用越南文模型聽一次取較好的（`asr_server.MENU_OVER_CHINESE`）。閘門的台語判定在越南文選單下也要等這次偵測沒選到越南文才採用。
   比對：不打聲調、聲調聽錯、南北口音（d/gi/r/v、ch/tr、s/x、字尾 n/ng、c/t）都能對到；只靠口音合併或單音節沒聲調對到的，一律列出來讓使用者選；只對到**一個**已串接頁面而且不是靠口音時直接開，不問模型（`assistant_backend/vietnamese.py`、`workflow._handle_language`）。
