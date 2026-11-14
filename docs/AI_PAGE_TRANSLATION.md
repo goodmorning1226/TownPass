@@ -4,6 +4,7 @@
 
 - 第 1～5 節：不先閃中文，分支 `fix/page-translation-no-flash`（從 main `9757438`）。
 - 第 6～10 節：翻譯品質，分支 `fix/page-translation-quality`（建在第一階段之上）。
+- 第 11 節：語言名稱不翻、頁面標題與短標籤先查表，分支 `fix/page-translation-names`（從 main `0c4288d`，2026-11-15）。
 
 iOS 沒有在實機上驗證過（這台電腦不能編 iOS）。
 
@@ -200,8 +201,8 @@ App 用 `scripts/run_assistant_on_device.ps1` 裝第二階段的版本（debug�
   第一階段（沒有預翻）的第一次開是：先遮 1.5 秒，ML Kit 翻好前會看到中文（第 3.4 節）。
 - 整句翻譯後，說明裡原本紅字的部分（超商、電子帳單、行動支付…）和其他字同一個顏色——擁有者接受的代價。
 - App 上方標題「繳費項目」來自網頁的標題（`<title>`），由 App 的標題列（TPText）用 ML Kit 翻，沒有預翻，也沒被抽取工具收集
-  （腳本不翻 `<title>`）。英文「Payment project」、越南文「Dự án thanh toán」、日文「支払いプロジェクト」不太自然，這次沒改，
-  可以補進 `app_strings.json`，列入母語者審查。
+  （腳本不翻 `<title>`）。英文「Payment project」、越南文「Dự án thanh toán」、日文「支払いプロジェクト」不太自然，這次沒改
+  ——2026-11-15 已補進預翻，見第 11 節。
 - 非服務網域不注入、第一次用某語言的下載橫幅：見第 3.4 節與第 4 節（同一次模擬器驗證）。
 
 ## 9. 要請母語者審的東西
@@ -221,3 +222,123 @@ App 用 `scripts/run_assistant_on_device.ps1` 裝第二階段的版本（debug�
 - 字典（預翻＋詞彙表＋手機存過的翻譯）隨腳本注入每個服務頁，預翻越多注入越大（目前一種語言幾百句）。
 - ML Kit 的中→日／越／印尼／菲經過英文轉，品質受英文那一步影響；這也是「超商的錯譯」會擴散到其他語言的原因。
 - iOS 沒有在實機上驗證過。
+
+## 11. 語言名稱不翻、頁面標題與短標籤先查表（2026-11-15）
+
+規則：`docs/AI_CURRENT_RULES.md` 第 4 節「語言名稱不翻、頁面標題與短標籤先查表」。分支 `fix/page-translation-names`（從 main `0c4288d`）。
+
+### 11.1 語言名稱
+
+問題：設定 → 語言 的清單用 `TPText` 顯示 `PageTranslation.languages` 的名稱（`language_view.dart` → `TPSettingListTile.selectionList`）。
+名稱裡有漢字的「日本語」「繁體中文」被當成中文頁面文字，經過 `PageTranslation.display` 送 ML Kit，英文變成「Japanese language」
+（沒有漢字的 English、Tiếng Việt、Bahasa Indonesia、Filipino 本來就不翻）。服務網頁上如果有語言選單，注入的腳本也會照翻。
+
+做法（一個地方、整串比對、排在查詢順序最前面）：
+
+| 位置 | 做法 |
+| --- | --- |
+| `PageTranslation.keeps(text)` | 整串（去掉前後空白）是 `PageTranslation.languages` 的名稱、或 `glossary.json` 的 `keep` 清單（「繁體中文」「正體中文」「简体中文」「日本語」）時為真 |
+| App 畫面 | `preset()`／`_known()` 先問 `keeps`，是就回傳原字：`display`、`label`、`TPText`、`translateAll` 都不翻、不送 ML Kit；手機以前存過的錯誤翻譯（「Japanese language」）不再使用 |
+| 服務網頁 | `dictionary()` 不含這些字；`TPWebView.translationSource(..., keep: translation.keptTexts)` 把清單交給腳本（`config.keep`），腳本把它們記成「永遠不翻」：不寫入、不遮、不問 App，App 回了翻譯也不用 |
+| 範圍 | 只比對整串。句子裡提到語言名稱（「本頁提供日本語版」）照常整句翻 |
+
+沒有在 widget 上做記號：任何地方（設定清單、網頁、之後新增的畫面）只要整串是語言名稱就不翻，不用每個畫面各自記得。
+
+### 11.2 服務頁的標題
+
+標題怎麼來：`TPWebView` 的 `onTitleChanged` 把網頁的 `<title>` 放進 `TPAppBarController.title`，`TPAppBar` 用 `TPText` 顯示，
+所以走 App 這邊的查詢順序（腳本不翻 `<title>`，抽取工具原本也收不到）。沒有預翻的標題由 ML Kit 翻，結果不自然。
+（有 `forceTitle` 的入口用 App 自己的字，已在 `app_strings.json`。）
+
+做法：`scripts/extract_service_strings.py` 多收兩種字，寫進 `service_strings.json`：
+
+- 每個已串接頁面開起來後的 `document.title`；
+- 服務網站路由表裡的標題（網站腳本裡的 `meta:{title:"…"}`，站內點進去才出現的頁面，例如「帳單明細」「周邊服務」「詳細內容」）。
+
+路由表共 22 個標題，14 個本來就有預翻，這次新增 8 個（AI 草稿，要母語者審）：
+
+| 標題 | ML Kit 原本的英文 | 現在（英／日／越／印尼／菲） |
+| --- | --- | --- |
+| 繳費項目 | Payment project | Payment items／お支払い項目／Khoản thanh toán／Item pembayaran／Mga bayarin |
+| 搜尋繳費項目 | Search for payment project | Search payment items／お支払い項目を検索／Tìm khoản thanh toán／Cari item pembayaran／Maghanap ng bayarin |
+| 帳務紀錄 | Account record | Payment history／支払い履歴／Lịch sử thanh toán／Riwayat pembayaran／Kasaysayan ng bayad |
+| 帳單明細 | Billing | Bill details／請求明細／Chi tiết hóa đơn／Rincian tagihan／Detalye ng bill |
+| 周邊服務 | Peripheral service | Nearby services／周辺サービス／Dịch vụ lân cận／Layanan sekitar／Mga serbisyo sa malapit |
+| 詳細內容 | Detailed description | Details／詳細／Chi tiết／Detail／Mga detalye |
+| 功能教學 • 城市通 | Functional Teaching • City Tong | Tutorial • TownPass／機能ガイド • TownPass／Hướng dẫn tính năng • TownPass／Panduan fitur • TownPass／Tutorial • TownPass |
+| 常見問題 • 城市通 | FAQ • City Tong | FAQ • TownPass／よくある質問 • TownPass／Câu hỏi thường gặp • TownPass／Pertanyaan umum • TownPass／Mga madalas itanong • TownPass |
+
+其他 14 個標題（申辦服務、有話要說、臨櫃叫號、優惠、災情通報、掃描、其他、圖書借閱、警政報案、訂閱、票夾、重要訊息、點閱排行、關鍵字搜尋）
+原本就在 `app_strings.json`／`service_strings.json`；順便看到 ML Kit 自己翻會是「Bidding service」（申辦服務）、「Cardroom」（臨櫃叫號）、
+「Invoice」（票夾）這類錯字，預翻擋掉了。`test/page_translation_names_test.dart` 檢查 22 個標題在五種語言都有預翻、不送 ML Kit。
+
+### 11.3 短標籤（`glossary.json` 的 `labels`）
+
+抽取工具只讀每頁的第一個畫面，對話框與點進去才有的畫面上的字還是 ML Kit 翻。這次從服務網站的腳本裡找出 10 個字以內、
+沒有預翻的標題／標籤／按鈕／提示字（`title`、`label`、`positiveText`、`negativeText`、`placeholder`，92 個），
+在模擬器上用 ML Kit 實際翻（`tool/page_translation_review/mlkit_review.dart`，詞彙表保護模式），再用 `scripts/review_translations.py` 檢查並逐筆看：
+
+| 檢查（92 個 × 語言） | 英 | 日 | 越 | 印尼 |
+| --- | --- | --- | --- | --- |
+| 被標記的筆數 | 28 | 43 | 35 | 36 |
+| 其中回譯和原文差很多 | 26 | 36 | 34 | 36 |
+
+（這次模擬器沒有產生菲律賓文的 ML Kit 結果——工具裡 tl 全部是空的，原因沒查；判斷依英／日／越／印尼四種語言。）
+
+明顯錯的例子（ML Kit 的英文）：預約失敗 → Make an appointment、離我最近 → Recently、統編 → Unchecked、著者 → Written、
+火舌竄出 → Tongue、壓倒民宅 → Overwhelm、變電箱 → Substrate、優惠已兌換 → Offer、使用優惠 → Offer discounts、
+整區不亮 → The whole area is not bright、店家資訊（日）→ 情報を保存します、失蹤（日）→ 不足している、週二至週六（日）→ 土曜日土曜日に。
+
+修法：新的 `labels` 表——**整串剛好是這個字才用，不保護句子裡的用詞**（所以「提醒」「使用」「開啟」這種字放進來不會影響句子；
+詞彙表的 `terms` 會被寫進句子裡，不適合放按鈕用字）。共 72 個（AI 草稿，五種語言，要母語者審）：
+
+- 優惠／票券對話框（22）：使用優惠、優惠已兌換、優惠說明、確認使用本優惠?、領取本優惠?、更多優惠、我再想想、前往查看、存入票夾、店家資訊、
+  使用、開啟、等級、預約成功、預約失敗、取消預約、查看預約清單、延長兩日成功、搜尋票券或場館名稱、日期篩選、重新掃描、讀取失敗
+- 周邊服務（8）：離我最近、依行政區選擇、可借車輛、可停空位、更新時間、依臺北市政府開放時間、週二至週六、週日、週一
+- 報案／申辦（14）：通報成功、案件已完成受理、案件已完成申辦、案件主旨、案件內容、請輸入主旨、輸入關鍵字、同通訊地址、被害人Victim、
+  統編、車號、車型車色不符、車禍案件申訴、描述
+- 圖書（3）：書名、著者、出版項
+- 災情通報表單（25）：受困、失蹤、火災狀況、火災狀況(工廠)、火災狀況(於幾樓)、火舌竄出、冒出大量濃煙、延燒至鄰棟建物、壓倒民宅、影響交通、
+  巷弄、停電範圍、附近全面停電、整區不亮、整排巷弄不亮、整棟大樓不亮、變電箱、電廠受災、電纜線掉落、土石流(範圍約多寬)、土石流(範圍約多深)、
+  土石流(範圍約多長)、路燈傾倒(傾倒盞)、路燈傾倒(失明盞)、車子落水(輛)
+
+沒有改的（ML Kit 的結果可以接受，或意思不確定）：主題、人員傷亡、傷亡、人行道、道路、停車日期、停車時間、手機號碼、繳費金額、選擇帳單、
+回覆、提醒、概況、費率、變電所、請輸入完整地址、請輸入詳細地址、訂閱通知、快閃購帳號、建成地政事務所。
+「可借車輛／可停空位」猜是公共自行車的站點資訊，翻成中性的 Available vehicles／Available spaces，請審的人確認。
+
+`labels` 是手動維護的（不像 `service_strings.json` 會跟著抽取工具增減），服務網站改掉這些字時不會自動發現。
+詞彙表版本 1 → 2：手機上存過、含詞彙表用詞的翻譯作廢重翻一次（第 10 節）。
+
+已預翻的字用檢查工具再看一次（`--bundled`，`service_strings.json` 376 句、`app_strings.json` 272 句）：八個字以內被標記的都是誤報
+（地名的拼音不在英文字典、日文的漢字名稱被當成「還是中文」），沒有要改的。
+
+### 11.4 檢查
+
+- 測試：`test/page_translation_names_test.dart`（11 個）——語言名稱在六種頁面語言下 `display`／`label`／`translateAll`／`TPText`／設定清單都維持原樣、
+  不送 ML Kit；手機存過的錯誤翻譯不用、不進注入的字典；`keep` 清單；腳本拿到 `keep`；22 個標題五種語言都有預翻；`TPAppBar` 顯示預翻的標題；
+  `labels` 只比對整串、不進 `touches`／`protect`；`glossary.json` 版本 2。`translation_script_test.dart` 兩處改成新的 `add(config.dictionary, config.keep)`。
+  `fvm flutter test` 665 個全過（main 654 個＋這次 11 個）；`fvm flutter analyze` 23 issues＝7 個上游 warning＋16 info（和 main 一樣）。
+- 電腦（Chromium，開發用，不在 repo；`D:\TownPassAssistant\page-translation\`）：
+  - `names\check_keep.py`（新）：水費頁上加入「日本語」「 繁體中文 」文字、按鈕、`title` 屬性，並故意在字典裡放錯誤的翻譯——全部維持原樣、
+    沒有遮罩、沒有單獨送給 App；旁邊的字照常翻；「本頁提供<b>日本語</b>版」整句照常翻。7 項全過。
+  - `check_behaviour.py`：ALL OK。`measure_flash.py`：第一次與第二次開、站內換頁、返回，顯示中文的幀都是 0；第二次開送 App 0 次（`names\after_names.json`）。
+- Android 模擬器（`TownPass_API_35`，debug APK，2026-11-15；截圖在 `D:\TownPassAssistant\page-translation\emu\names_*.png`）：
+  - 英文：設定 → 語言 的清單是 繁體中文／English／日本語／Tiếng Việt／Bahasa Indonesia／Filipino，標題「Language」（`names_lang_en.png`）；
+    越南文下清單一樣、標題「Ngôn ngữ」。
+  - 帳單 → 水費：上方標題英文「Payment items」、越南文「Khoản thanh toán」（`names_title_vi.png`），頁面內容和第 8.4 節一樣全部翻好。
+  - 沒有在模擬器上逐一打開 `labels` 涵蓋的對話框與表單；日文、印尼文、菲律賓文沒有在模擬器上看（單元測試有涵蓋）。iOS 未驗證。
+
+### 11.5 「優惠」分頁的網頁為什麼不翻（只記錄，沒改）
+
+- 原因：翻譯的接線全部在 `TPWebView` 的 State（`_TPWebViewState`）裡——document start 的 user script、`townpassTranslate` handler、
+  換語言時重建腳本／重新載入（`_languageWorker`）、`onLoadStop` 的後備注入。「優惠」分頁（`lib/page/perk/perk_view.dart`）直接用底層的
+  `TPInAppWebView` 載入 `/coupon/`，沒有經過 `TPWebView`，所以沒有腳本、也沒有 handler。main 一直是這樣（上游的寫法）。
+  分頁上方的標題「優惠」是 App 自己的 `TPAppBar`，有翻。
+- 要做的話：
+  1. 把 `_TPWebViewState` 裡的翻譯接線抽成兩邊共用的東西（mixin 或小類別：user scripts、handler、網址檢查、換語言），`PerkView` 也接上；
+  2. 這個分頁是首頁的常駐頁（不像 `TPWebView` 每次新開）：換語言時要就地翻譯或重新載入，使用者不在這個分頁時也要處理；
+     App 啟動時就建立 WebView，字典（`dictionaryVersion`）可能還沒載完，要補一次；
+  3. 把 `/coupon/` 加進 `extract_service_strings.py` 的頁面（目前只有 `capabilities.json` 裡的 `/coupon/list`），補預翻；
+     優惠內容是資料（店名、優惠說明），大多還是要 ML Kit 翻，品質要另外看；
+  4. 驗證：這個分頁有教學探測（`AssistantPageTracker.attachTab`），要重跑 `check_guides_translated.py`、`measure_flash.py`、模擬器。
+- 不是一行能安全改完的事，所以這次只記錄。

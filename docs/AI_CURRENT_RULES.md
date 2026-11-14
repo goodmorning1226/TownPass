@@ -125,6 +125,19 @@
   - **檢查工具** `scripts/review_translations.py`：列出可疑的翻譯——還是中文或沒變、詞彙表用詞不見、英文裡有字典沒有的字（例如「超商」的錯譯）、
     回譯成中文和原文差很多、長度比例怪、三個字以內的片段單獨翻。ML Kit 的實際結果用 debug 版的 `tool/page_translation_review/mlkit_review.dart`
     在模擬器上產生（只在開發時用，不包進 App）。
+- **語言名稱不翻、頁面標題與短標籤先查表**（2026-11-15，擁有者指示；原因：模擬器檢查時，設定 → 語言 的清單裡「日本語」「繁體中文」
+  被翻成目前的語言（英文變成「Japanese language」）；服務頁上方的標題「繳費項目」沒有預翻，由 ML Kit 翻成「Payment project」這類不自然的字）：
+  - **不翻的字**：語言自己的名稱（`PageTranslation.languages` 的每個名稱：繁體中文、English、日本語、Tiếng Việt、Bahasa Indonesia、Filipino），
+    加上 `assets/i18n/glossary.json` 的 `keep` 清單（其他語言名稱的寫法，例如「正體中文」「简体中文」），**整串剛好是這個字時永遠維持原樣**——
+    不管目前是哪種語言、是 App 自己的畫面（`TPText`、`PageTranslation.display`／`label`）還是服務網頁（`translateAll`、注入的腳本）。
+    這個檢查排在查詢順序的**最前面**（在預翻、詞彙表、手機存過的翻譯、ML Kit 之前）：手機以前存過的錯誤翻譯不會再用，
+    注入頁面的字典不含這些字，腳本拿到 `keep` 清單後不遮、不問 App。只比對整串；句子裡提到語言名稱（「本頁提供日本語版」）照常翻。
+  - **服務頁的標題**：App 上方的標題是網頁的 `<title>`（`onTitleChanged` → `TPAppBar` 的 `TPText`），腳本不翻 `<title>`，所以走 App 這邊的查詢順序。
+    `scripts/extract_service_strings.py` 現在也收集**每一頁的標題**與**服務網站路由表裡的標題**（站內換頁後才出現的標題），一起寫進 `service_strings.json`；
+    標題先查預翻，不送 ML Kit。
+  - **短標籤**（`glossary.json` 的 `labels`）：抽取工具到不了的畫面（對話框、點進去才有的頁）上的短標題、按鈕，整串剛好是這個字時用表裡的翻譯；
+    **只比對整串，不保護句子裡的用詞**（「使用」當按鈕是 Use，句子裡的「使用」照常翻）。詞彙表版本改成 2。
+  - 以上翻譯都是 **AI 草稿，要請母語者審**。（`PageTranslation.keeps`、`PageGlossary.keeps`／`whole`、`tp_web_view.dart` 的 `config.keep`；`docs/AI_PAGE_TRANSLATION.md` 第 11 節）
 - **越南文**（2026-11-08，`docs/AI_VIETNAMESE.md`）：手機上有 `ggml-whisper-vietnamese.bin`（建議 PhoWhisper-base，選用）時，判定為越南文的錄音改由它聽（不加提示句、編碼器用完整 30 秒窗口、只解一次不重試）；第一次用到才載入，沒有檔案就跟原本一樣用 Whisper small。越南文不加提示句（實測反而變差）。
   選單選越南文時，閘門說「中文」一律不算數，改由 Whisper small 只偵測語言再決定；small 也說中文但把握不到九成、而且中文很短或不清楚時，再用越南文模型聽一次取較好的（`asr_server.MENU_OVER_CHINESE`）。閘門的台語判定在越南文選單下也要等這次偵測沒選到越南文才採用。
   比對：不打聲調、聲調聽錯、南北口音（d/gi/r/v、ch/tr、s/x、字尾 n/ng、c/t）都能對到；只靠口音合併或單音節沒聲調對到的，一律列出來讓使用者選；只對到**一個**已串接頁面而且不是靠口音時直接開，不問模型（`assistant_backend/vietnamese.py`、`workflow._handle_language`）。

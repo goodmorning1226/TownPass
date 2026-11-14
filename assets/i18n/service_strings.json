@@ -1,6 +1,6 @@
 {
  "version": 1,
- "source": "TownPass service pages (scripts/extract_service_strings.py, 2026-11-14); translations are AI drafts (en, ja, vi, id, tl), to be reviewed by native speakers",
+ "source": "TownPass service pages and their page titles (scripts/extract_service_strings.py, 2026-11-14; titles 2026-11-15); translations are AI drafts (en, ja, vi, id, tl), to be reviewed by native speakers",
  "strings": {
   "0筆結果": {
    "en": "0 results",
@@ -464,6 +464,13 @@
    "id": "Kerusakan jembatan lainnya",
    "tl": "Ibang pinsala sa tulay na hindi nabanggit sa itaas"
   },
+  "功能教學 • 城市通": {
+   "en": "Tutorial • TownPass",
+   "ja": "機能ガイド • TownPass",
+   "vi": "Hướng dẫn tính năng • TownPass",
+   "id": "Panduan fitur • TownPass",
+   "tl": "Tutorial • TownPass"
+  },
   "加入常用": {
    "en": "Add to Favorites",
    "ja": "よく使う項目に追加",
@@ -596,6 +603,13 @@
    "vi": "Thành viên TaipeiPASS gồm thành viên thường và thành viên Vàng (thành viên đã xác thực danh tính); bạn nên đăng ký thành viên Vàng để sử dụng đầy đủ dịch vụ.",
    "id": "Anggota TaipeiPASS terdiri dari anggota biasa dan anggota Emas (anggota dengan verifikasi nama asli). Kami sarankan Anda mendaftar sebagai anggota Emas untuk menikmati layanan lengkap.",
    "tl": "May dalawang uri ng miyembro ang TaipeiPASS: ordinaryong miyembro at Gold member (may real-name verification). Inirerekomendang mag-apply bilang Gold member para sa buong serbisyo."
+  },
+  "周邊服務": {
+   "en": "Nearby services",
+   "ja": "周辺サービス",
+   "vi": "Dịch vụ lân cận",
+   "id": "Layanan sekitar",
+   "tl": "Mga serbisyo sa malapit"
   },
   "和平": {
    "en": "Heping",
@@ -905,12 +919,33 @@
    "id": "Sudah kedaluwarsa",
    "tl": "Expired na"
   },
+  "帳務紀錄": {
+   "en": "Payment history",
+   "ja": "支払い履歴",
+   "vi": "Lịch sử thanh toán",
+   "id": "Riwayat pembayaran",
+   "tl": "Kasaysayan ng bayad"
+  },
   "帳單": {
    "en": "Bills",
    "ja": "請求書",
    "vi": "Hóa đơn",
    "id": "Tagihan",
    "tl": "Bill"
+  },
+  "帳單明細": {
+   "en": "Bill details",
+   "ja": "請求明細",
+   "vi": "Chi tiết hóa đơn",
+   "id": "Rincian tagihan",
+   "tl": "Detalye ng bill"
+  },
+  "常見問題 • 城市通": {
+   "en": "FAQ • TownPass",
+   "ja": "よくある質問 • TownPass",
+   "vi": "Câu hỏi thường gặp • TownPass",
+   "id": "Pertanyaan umum • TownPass",
+   "tl": "Mga madalas itanong • TownPass"
   },
   "底層邏輯 : 看清這個世界的底牌 = The underlying logic : how to see the essence of things": {
    "en": "The Underlying Logic: How to See the Essence of Things",
@@ -1128,6 +1163,13 @@
    "vi": "Tìm theo từ khóa thanh toán",
    "id": "Cari kata kunci pembayaran",
    "tl": "Maghanap ng keyword ng bayarin"
+  },
+  "搜尋繳費項目": {
+   "en": "Search payment items",
+   "ja": "お支払い項目を検索",
+   "vi": "Tìm khoản thanh toán",
+   "id": "Cari item pembayaran",
+   "tl": "Maghanap ng bayarin"
   },
   "搜尋項目名稱": {
    "en": "Search item name",
@@ -1752,6 +1794,13 @@
    "id": "Nomor pembayaran",
    "tl": "Numero ng bayarin"
   },
+  "繳費項目": {
+   "en": "Payment items",
+   "ja": "お支払い項目",
+   "vi": "Khoản thanh toán",
+   "id": "Item pembayaran",
+   "tl": "Mga bayarin"
+  },
   "罰鍰": {
    "en": "Fines",
    "ja": "過料",
@@ -2045,6 +2094,13 @@
    "vi": "Đăng ký nhận tin mới nhất từ Chính quyền Thành phố Đài Bắc",
    "id": "Berlangganan berita terbaru Pemerintah Kota Taipei",
    "tl": "Mag-subscribe sa pinakabagong balita ng Pamahalaang Lungsod ng Taipei"
+  },
+  "詳細內容": {
+   "en": "Details",
+   "ja": "詳細",
+   "vi": "Chi tiết",
+   "id": "Detail",
+   "tl": "Mga detalye"
   },
   "說給兒童的臺灣歷史": {
    "en": "Taiwan History for Children",
