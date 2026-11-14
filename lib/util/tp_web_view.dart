@@ -57,6 +57,20 @@ class TPWebView extends StatefulWidget {
   static bool reloadsFor(String shown, String next) =>
       next != shown && shown != PageTranslation.original;
 
+  /// The page translation script called with its configuration: the service
+  /// host it may run on, the page language, the dictionary (Chinese ->
+  /// translation) it applies before the page paints, and how long a text
+  /// waiting for a translation stays transparent.
+  static String translationSource(
+    String language,
+    Map<String, String> dictionary,
+  ) =>
+      ';${_translationScript.trim()}(${jsonEncode({'host': AssistantPageTracker.serviceHost, 'language': language, 'dictionary': dictionary, 'coverMs': translationCoverMs})});';
+
+  /// How long (ms) an untranslated text is hidden before it is shown in
+  /// Chinese while its translation is still on the way.
+  static const translationCoverMs = 1500;
+
   @override
   State<TPWebView> createState() => _TPWebViewState();
 }
@@ -103,6 +117,8 @@ class _TPWebViewState extends State<TPWebView> {
       _shownLanguage = language;
       final controller = webViewController.value;
       if (controller == null) return;
+      // The next document starts with this language's script and dictionary.
+      await _refreshUserScripts(controller);
       if (TPWebView.reloadsFor(shown, language)) {
         // Back to the page's own Chinese, or from one translation to
         // another: the page holds no Chinese left to translate, so it is
@@ -174,15 +190,22 @@ class _TPWebViewState extends State<TPWebView> {
       url.scheme == 'https' &&
       url.host == AssistantPageTracker.serviceHost;
 
+  /// The main frame's URL, kept from the navigation callbacks so the
+  /// translation handler does not ask the WebView for it on every batch.
+  Uri? _pageUri;
+
+  void _pageAt(WebUri? url) {
+    if (url != null) _pageUri = Uri.tryParse(url.toString());
+  }
+
   void _addTranslationHandler(InAppWebViewController controller) {
     _languageWorker; // start listening for language changes
     controller.addJavaScriptHandler(
       handlerName: 'townpassTranslate',
       callback: (arguments) async {
-        final current = await controller.getUrl();
-        if (!_translatable(Uri.tryParse(current?.toString() ?? ''))) {
-          return null;
-        }
+        final page =
+            _pageUri ?? Uri.tryParse((await controller.getUrl()).toString());
+        if (!_translatable(page)) return null;
         final texts = arguments.isNotEmpty && arguments.first is List
             ? (arguments.first as List).whereType<String>().take(400).toList()
             : <String>[];
@@ -191,12 +214,70 @@ class _TPWebViewState extends State<TPWebView> {
     );
   }
 
+  static const _scriptGroup = 'townpass_page_translation';
+  String? _scriptLanguage;
+  int _scriptVersion = -1;
+
+  /// The translation script for documents that start in this WebView: only
+  /// the service host (Android: allowedOriginRules; iOS has no origin rules,
+  /// the script checks location itself), at document start, with the current
+  /// language's dictionary. None while the pages are in Chinese.
+  List<UserScript> _userScripts() {
+    final translation = PageTranslation.instance;
+    _scriptLanguage = translation.language.value;
+    _scriptVersion = translation.dictionaryVersion;
+    if (!translation.active) return const [];
+    return [
+      UserScript(
+        groupName: _scriptGroup,
+        source: TPWebView.translationSource(
+          translation.language.value,
+          translation.dictionary(),
+        ),
+        injectionTime: UserScriptInjectionTime.AT_DOCUMENT_START,
+        allowedOriginRules: {'https://${AssistantPageTracker.serviceHost}'},
+        forMainFrameOnly: true,
+      ),
+    ];
+  }
+
+  late final _initialUserScripts = UnmodifiableListView(_userScripts());
+
+  /// Replaces the document-start script when the language changed or the
+  /// dictionary grew since it was built (it applies from the next document).
+  Future<void> _refreshUserScripts(InAppWebViewController controller) async {
+    final translation = PageTranslation.instance;
+    if (_scriptLanguage == translation.language.value &&
+        _scriptVersion == translation.dictionaryVersion) {
+      return;
+    }
+    try {
+      await controller.removeUserScriptsByGroupName(groupName: _scriptGroup);
+      for (final script in _userScripts()) {
+        await controller.addUserScript(userScript: script);
+      }
+    } catch (_) {}
+  }
+
+  /// Fallback at onLoadStop (and for switching a Chinese page in place): a
+  /// page whose document-start script ran is only rescanned; otherwise the
+  /// script is injected now.
   Future<void> _translatePage(InAppWebViewController controller) async {
     if (!PageTranslation.instance.active) return;
     final current = await controller.getUrl();
     if (!_translatable(Uri.tryParse(current?.toString() ?? ''))) return;
     try {
-      await controller.evaluateJavascript(source: _translationScript);
+      final injected = await controller.evaluateJavascript(
+        source: 'window.__townpassTranslate ? (window.__townpassTranslate.scan(), true) : false',
+      );
+      if (injected == true) return;
+      final translation = PageTranslation.instance;
+      await controller.evaluateJavascript(
+        source: TPWebView.translationSource(
+          translation.language.value,
+          translation.dictionary(),
+        ),
+      );
     } catch (_) {}
   }
 
@@ -253,10 +334,16 @@ class _TPWebViewState extends State<TPWebView> {
         ),
         body: TPInAppWebView(
           key: trackedPage.viewKey,
+          initialUserScripts: _initialUserScripts,
+          onLoadStart: (_, startedUrl) => _pageAt(startedUrl),
           onLoadStop: (controller, loadedUrl) async {
             if (!mounted) return;
+            _pageAt(loadedUrl);
             _track(loadedUrl);
-            unawaited(_translatePage(controller));
+            unawaited(
+              _translatePage(controller)
+                  .then((_) => _refreshUserScripts(controller)),
+            );
             if (navigationCompleted) return;
             if (pageArgument?.isAssistantActionCurrent?.call() == false) return;
             if (loadedUrl.toString() != navigation[navigationIndex]) return;
@@ -274,6 +361,7 @@ class _TPWebViewState extends State<TPWebView> {
             if (!assistantLoadFailed &&
                 navigationIndex + 1 < navigation.length) {
               navigationIndex++;
+              await _refreshUserScripts(controller);
               await controller.loadUrl(
                 urlRequest: URLRequest(
                   url: WebUri(navigation[navigationIndex]),
@@ -314,6 +402,7 @@ class _TPWebViewState extends State<TPWebView> {
             }
           },
           onUpdateVisitedHistory: (_, visitedUrl, _) async {
+            _pageAt(visitedUrl);
             _track(visitedUrl);
             canGoBack.value =
                 await webViewController.value?.canGoBack() ?? false;
@@ -698,45 +787,106 @@ String _failedToLoadUrlData({String? url}) {
   ''';
 }
 
-/// Injected into a service page (see _TPWebViewState._translatePage). Runs
-/// once per document; later calls rescan. Each Chinese text node and visible
-/// attribute (`placeholder`, `title`, `aria-label`, `alt`, and the `value` of
-/// button-like inputs that are not form data) is replaced by its translation,
-/// remembering what was written so Vue re-rendering the Chinese text gets
-/// translated again. Subtrees marked `translate="no"` (or `.notranslate`),
-/// scripts, styles and editable text are left alone. The original Chinese
-/// stays queryable for the guided assistant's probes:
+/// Injected into a service page (see _TPWebViewState._userScripts and
+/// _translatePage): `(function (config) {...})` called with
+/// `{host, language, dictionary, coverMs}`. It only runs in the main frame of
+/// `https://<host>` and once per document (a second injection adds its
+/// dictionary and rescans).
+///
+/// Each Chinese text node and visible attribute (`placeholder`, `title`,
+/// `aria-label`, `alt`, and the `value` of button-like inputs that are not
+/// form data) is replaced by its translation, remembering what was written so
+/// Vue re-rendering the Chinese text gets translated again. Subtrees marked
+/// `translate="no"` (or `.notranslate`), scripts, styles and editable text
+/// are left alone.
+///
+/// Injected at document start, it watches the document with a
+/// MutationObserver and writes translations found in `config.dictionary`
+/// inside the observer callback, before the page paints them: a cached text
+/// is never shown in Chinese. Texts the dictionary lacks are sent to the App
+/// at once (batches of 20, all in flight together) and their element's text
+/// is made transparent until the translation arrives, for at most
+/// `config.coverMs`; then the Chinese is shown until it is translated.
+/// docs/AI_CURRENT_RULES.md section 4 (服務頁翻譯).
+///
+/// The original Chinese stays queryable for the guided assistant's probes:
 /// `window.__townpassOriginal(el)`, `window.__townpassOriginalPlaceholder(el)`,
 /// `window.__townpassOriginalAttribute(el, name)` and the `data-tp-<attribute>`
-/// attributes (e.g. `data-tp-placeholder`). What the user sees is unchanged.
+/// attributes (e.g. `data-tp-placeholder`).
 const _translationScript = r'''
-(function () {
-  if (window.__townpassTranslate) { window.__townpassTranslate.scan(); return; }
+(function (config) {
+  if (location.protocol !== 'https:' || location.host !== config.host) return;
+  if (window.top !== window) return;
+  if (window.__townpassTranslate) {
+    window.__townpassTranslate.add(config.dictionary);
+    return;
+  }
   var chinese = /[㐀-鿿]/;
-  var skip = { SCRIPT: 1, STYLE: 1, NOSCRIPT: 1, TEXTAREA: 1, CODE: 1 };
+  // The document <title> stays as it was (the App bar shows it), as when
+  // only the body was translated.
+  var skip = { SCRIPT: 1, STYLE: 1, NOSCRIPT: 1, TEXTAREA: 1, CODE: 1, TITLE: 1 };
   // Attributes shown to the user. An input's value is only translated for
   // button-like inputs without a name: a named one is sent with the form.
   var attributes = ['placeholder', 'title', 'aria-label', 'alt', 'value'];
   var attributeSelector = '[placeholder], [title], [aria-label], [alt], ' +
     'input[type=button][value]:not([name]), input[type=submit][value]:not([name]), ' +
     'input[type=reset][value]:not([name])';
+  // At most this many texts are waiting for the App at a time; the rest are
+  // sent when answers come back.
   var limit = 400;
+  var batch = 20;
+  var coverMs = config.coverMs || 1500;
+  // Chinese (trimmed) -> translation: the App's dictionary plus what the App
+  // translated for this page.
+  var dictionary = Object.create(null);
+  // Texts the App could not translate (kept in Chinese, not asked again).
+  var untranslated = Object.create(null);
+  // Texts sent to the App and not answered yet.
+  var asked = Object.create(null);
+  var outbox = [];
+  var inFlight = 0;
+  // Nodes and attributes waiting for a translation.
+  var waiting = [];
+  var waitingNode = new WeakMap();
+  var waitingAttribute = new WeakMap();
   var written = new WeakMap();
   // Text node -> the Chinese it held before we wrote the translation.
   var original = new WeakMap();
   // Element -> { attribute: translation we wrote }.
   var writtenAttributes = new WeakMap();
-  var timer = null;
-  var busy = false;
+  var covers = new WeakMap();
+  var coverTimer = null;
+  var styled = false;
+  var scheduled = false;
+  // Whole sentences (docs/AI_CURRENT_RULES.md section 4, 服務頁翻譯的品質):
+  // a block holding only text and these non-interactive inline elements is
+  // translated as one sentence per BR-separated part, written into its first
+  // text node; the others are emptied. Emphasis inside it is lost (accepted).
+  var blockTags = { P: 1, LI: 1, TD: 1, TH: 1, LABEL: 1, DT: 1, DD: 1, H1: 1, H2: 1, H3: 1,
+    H4: 1, H5: 1, H6: 1, DIV: 1, CAPTION: 1, FIGCAPTION: 1, SUMMARY: 1, LEGEND: 1 };
+  var inlineTags = { SPAN: 1, B: 1, STRONG: 1, EM: 1, I: 1, U: 1, S: 1, SMALL: 1, MARK: 1,
+    SUB: 1, SUP: 1, FONT: 1, BR: 1 };
+  var blockSelector = Object.keys(blockTags).join(',');
+  // Text node -> { block, nodes, originals } of the sentence written in it.
+  var sentenceOf = new WeakMap();
+  var waitingBlock = new WeakMap();
+  // Per scan or observer pass: blocks already looked at (shape, sentences).
+  var pass = 0;
+  var blockSeen = new WeakMap();
+  function add(entries) {
+    if (!entries) return;
+    for (var key in entries) {
+      var value = entries[key];
+      if (typeof value === 'string' && value && value !== key && chinese.test(key)) {
+        dictionary[key] = value;
+        delete untranslated[key];
+      }
+    }
+    resolve();
+    schedule();
+  }
   function excluded(el) {
     return !el || (el.closest && el.closest('[translate="no"], .notranslate') !== null);
-  }
-  function wanted(value, target) {
-    return value && chinese.test(value) && written.get(target) !== value;
-  }
-  function wantedAttribute(el, name, value) {
-    var done = writtenAttributes.get(el);
-    return value && chinese.test(value) && !(done && done[name] === value);
   }
   function translatesAttribute(el, name) {
     if (name !== 'value') return true;
@@ -744,71 +894,353 @@ const _translationScript = r'''
     var type = (el.getAttribute('type') || '').toLowerCase();
     return type === 'button' || type === 'submit' || type === 'reset';
   }
-  function collect() {
-    var items = [];
-    var walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null);
+  // A transparent text colour on the waiting element only, never the whole
+  // page; the element stays laid out and visible to the guide probes' `shown`.
+  function style() {
+    if (styled) return;
+    var css = '[data-tp-pending],[data-tp-pending-sentence],[data-tp-pending-sentence] *{color:transparent!important;-webkit-text-fill-color:transparent!important;text-shadow:none!important}' +
+      '[data-tp-pending-placeholder]::placeholder{color:transparent!important;-webkit-text-fill-color:transparent!important}';
+    try {
+      var sheet = new CSSStyleSheet();
+      sheet.replaceSync(css);
+      document.adoptedStyleSheets = document.adoptedStyleSheets.concat([sheet]);
+      styled = true;
+    } catch (_) {
+      var root = document.head || document.documentElement;
+      if (!root) return;
+      var el = document.createElement('style');
+      el.textContent = css;
+      root.appendChild(el);
+      styled = true;
+    }
+  }
+  function cover(item) {
+    var name = item.node ? 'data-tp-pending' : 'data-tp-pending-placeholder';
+    var el = item.node ? item.node.parentElement : item.el;
+    if (item.nodes) { name = 'data-tp-pending-sentence'; el = item.block; }
+    if (!el || (!item.node && !item.nodes && item.attribute !== 'placeholder' && item.attribute !== 'value')) return;
+    if (item.attribute === 'value') name = 'data-tp-pending';
+    style();
+    var count = covers.get(el) || {};
+    count[name] = (count[name] || 0) + 1;
+    covers.set(el, count);
+    el.setAttribute(name, '');
+    item.cover = { el: el, name: name, until: Date.now() + coverMs };
+    if (!coverTimer) coverTimer = setTimeout(expire, coverMs);
+  }
+  function uncover(item) {
+    var c = item.cover;
+    if (!c) return;
+    item.cover = null;
+    var count = covers.get(c.el);
+    if (!count) return;
+    count[c.name] = (count[c.name] || 1) - 1;
+    if (count[c.name] <= 0) { delete count[c.name]; c.el.removeAttribute(c.name); }
+  }
+  // After coverMs the Chinese is shown; it is still replaced when translated.
+  function expire() {
+    coverTimer = null;
+    var now = Date.now(), next = Infinity;
+    for (var i = 0; i < waiting.length; i++) {
+      var c = waiting[i].cover;
+      if (!c) continue;
+      if (c.until <= now) uncover(waiting[i]); else next = Math.min(next, c.until);
+    }
+    if (next !== Infinity) coverTimer = setTimeout(expire, next - now);
+  }
+  function writeNode(node, text, translated) {
+    var lead = text.match(/^\s*/)[0];
+    var tail = text.match(/\s*$/)[0];
+    var value = lead + translated + tail;
+    original.set(node, text);
+    written.set(node, value);
+    node.nodeValue = value;
+  }
+  function writeAttribute(el, name, text, translated) {
+    el.setAttribute('data-tp-' + name, text);
+    var done = writtenAttributes.get(el) || {};
+    done[name] = translated;
+    writtenAttributes.set(el, done);
+    el.setAttribute(name, translated);
+  }
+  // The sentence block a text node belongs to: the nearest element above its
+  // inline parents, when it is a block tag whose descendants are all
+  // non-interactive inline elements laid out inline (a flex or grid row puts
+  // its spans apart, so it is not one sentence).
+  function sentenceBlock(node) {
+    var el = node.parentElement, depth = 0;
+    while (el && inlineTags[el.tagName] && depth < 8) { el = el.parentElement; depth++; }
+    if (!el || !blockTags[el.tagName]) return null;
+    var seen = blockSeen.get(el);
+    if (!seen || seen.pass !== pass) {
+      seen = { pass: pass, ok: sentenceShape(el), handled: null };
+      blockSeen.set(el, seen);
+    }
+    return seen.ok ? el : null;
+  }
+  function sentenceShape(el) {
+    if (el.isContentEditable || excluded(el)) return false;
+    var all = el.getElementsByTagName('*');
+    if (!all.length || all.length > 40) return false;
+    for (var i = 0; i < all.length; i++) {
+      var c = all[i];
+      if (!inlineTags[c.tagName] || c.hasAttribute('tabindex') || c.hasAttribute('role') ||
+          c.hasAttribute('onclick') || c.hasAttribute('translate') || c.classList.contains('notranslate')) return false;
+    }
+    if (/flex|grid|table-row/.test(getComputedStyle(el).display)) return false;
+    for (var j = 0; j < all.length; j++) {
+      if (all[j].tagName === 'BR') continue;
+      var d = getComputedStyle(all[j]).display;
+      if (d !== 'inline' && d !== 'contents') return false;
+    }
+    return true;
+  }
+  // Text nodes of a block, split at BR.
+  function segments(block) {
+    var out = [[]];
+    var walker = document.createTreeWalker(block, NodeFilter.SHOW_TEXT | NodeFilter.SHOW_ELEMENT, null);
+    var n;
+    while ((n = walker.nextNode())) {
+      if (n.nodeType === 1) { if (n.tagName === 'BR') out.push([]); continue; }
+      out[out.length - 1].push(n);
+    }
+    return out;
+  }
+  function intact(rec) {
+    for (var i = 0; i < rec.nodes.length; i++) {
+      var n = rec.nodes[i];
+      if (!n.isConnected || written.get(n) !== n.nodeValue) return false;
+    }
+    return true;
+  }
+  // A sentence the page changed under us: the parts we wrote get their own
+  // Chinese back, so it can be translated again as a whole.
+  function restore(rec) {
+    for (var i = 0; i < rec.nodes.length; i++) {
+      var n = rec.nodes[i];
+      if (sentenceOf.get(n) !== rec) continue;
+      sentenceOf.delete(n);
+      if (written.get(n) === n.nodeValue) n.nodeValue = rec.originals[i];
+      written.delete(n);
+      original.delete(n);
+    }
+  }
+  function sameNodes(a, b) {
+    if (a.length !== b.length) return false;
+    for (var i = 0; i < a.length; i++) if (a[i] !== b[i]) return false;
+    return true;
+  }
+  function writeSentence(block, nodes, values, translated) {
+    var text = values.join('');
+    var lead = text.match(/^\s*/)[0];
+    var tail = text.match(/\s*$/)[0];
+    var head = null;
+    for (var i = 0; i < nodes.length; i++) if (values[i].trim()) { head = nodes[i]; break; }
+    var rec = { block: block, nodes: nodes, originals: values };
+    for (var j = 0; j < nodes.length; j++) {
+      var n = nodes[j];
+      var value = n === head ? lead + translated + tail : '';
+      sentenceOf.set(n, rec);
+      // The head keeps the whole sentence as its original, so
+      // __townpassOriginal(block) and the probes' orig() read it in Chinese.
+      original.set(n, n === head ? text : '');
+      written.set(n, value);
+      n.nodeValue = value;
+    }
+  }
+  // Translates the block's sentences (once per pass). Returns whether [node]
+  // is part of a sentence (else it is translated on its own).
+  function visitBlock(block, node) {
+    var seen = blockSeen.get(block);
+    if (!seen.handled) {
+      seen.handled = new Set();
+      var parts = segments(block);
+      for (var i = 0; i < parts.length; i++) visitSentence(block, parts[i], seen.handled);
+    }
+    return seen.handled.has(node);
+  }
+  function visitSentence(block, nodes, handled) {
+    var recs = [];
+    for (var i = 0; i < nodes.length; i++) {
+      var r = sentenceOf.get(nodes[i]);
+      if (r && recs.indexOf(r) < 0) recs.push(r);
+    }
+    if (recs.length === 1 && sameNodes(recs[0].nodes, nodes) && intact(recs[0])) {
+      for (var k = 0; k < nodes.length; k++) handled.add(nodes[k]);
+      return;
+    }
+    for (var j = 0; j < recs.length; j++) restore(recs[j]);
+    var values = nodes.map(function (n) { return n.nodeValue; });
+    var parts = 0;
+    for (var v = 0; v < values.length; v++) if (chinese.test(values[v])) parts++;
+    // Two Chinese parts at least: 「水號<span>*</span>」 stays as it was.
+    if (parts < 2) return;
+    for (var h = 0; h < nodes.length; h++) handled.add(nodes[h]);
+    var text = values.join('');
+    var key = text.replace(/\s+/g, ' ').trim();
+    var translated = dictionary[key];
+    if (translated) { writeSentence(block, nodes, values, translated); return; }
+    if (untranslated[key] || waitingBlock.get(block) === key) return;
+    waitingBlock.set(block, key);
+    var item = { block: block, nodes: nodes, values: values, text: text, key: key };
+    waiting.push(item);
+    cover(item);
+    ask(key);
+  }
+  function ask(key) {
+    if (asked[key] || untranslated[key]) return;
+    asked[key] = true;
+    outbox.push(key);
+  }
+  function visitText(node) {
+    var rec = sentenceOf.get(node);
+    if (rec) {
+      if (written.get(node) === node.nodeValue) return;
+      if (rec.block.isConnected && sentenceBlock(node) === rec.block) visitBlock(rec.block, node);
+      else restore(rec);
+      return;
+    }
+    var value = node.nodeValue;
+    if (!value || !chinese.test(value) || written.get(node) === value) return;
+    var parent = node.parentElement;
+    if (!parent || skip[parent.tagName] || parent.isContentEditable || excluded(parent)) return;
+    var block = sentenceBlock(node);
+    if (block && visitBlock(block, node)) return;
+    var key = value.trim();
+    var translated = dictionary[key];
+    if (translated) { writeNode(node, value, translated); return; }
+    if (untranslated[key] || waitingNode.get(node) === value) return;
+    var item = { node: node, text: value, key: key };
+    waitingNode.set(node, value);
+    waiting.push(item);
+    cover(item);
+    ask(key);
+  }
+  function visitAttribute(el, name) {
+    if (!el.hasAttribute(name) || !translatesAttribute(el, name)) return;
+    var value = el.getAttribute(name);
+    var done = writtenAttributes.get(el);
+    if (!value || !chinese.test(value) || (done && done[name] === value)) return;
+    if (excluded(el)) return;
+    var key = value.trim();
+    var translated = dictionary[key];
+    if (translated) { writeAttribute(el, name, value, translated); return; }
+    var pending = waitingAttribute.get(el) || {};
+    if (untranslated[key] || pending[name] === value) return;
+    pending[name] = value;
+    waitingAttribute.set(el, pending);
+    var item = { el: el, attribute: name, text: value, key: key };
+    waiting.push(item);
+    cover(item);
+    ask(key);
+  }
+  function visitElement(root) {
+    if (root.nodeType === 3) { visitText(root); return; }
+    if (root.nodeType !== 1 && root.nodeType !== 9 && root.nodeType !== 11) return;
+    if (root.nodeType === 1 && skip[root.tagName]) return;
+    var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
     var node;
-    while ((node = walker.nextNode())) {
-      var parent = node.parentElement;
-      if (!parent || skip[parent.tagName] || parent.isContentEditable) continue;
-      if (!wanted(node.nodeValue, node) || excluded(parent)) continue;
-      items.push({ node: node, text: node.nodeValue });
+    while ((node = walker.nextNode())) visitText(node);
+    var elements = root.querySelectorAll ? root.querySelectorAll(attributeSelector) : [];
+    var all = root.nodeType === 1 && root.matches(attributeSelector) ? [root] : [];
+    for (var i = 0; i < elements.length; i++) all.push(elements[i]);
+    for (var e = 0; e < all.length; e++) {
+      for (var a = 0; a < attributes.length; a++) visitAttribute(all[e], attributes[a]);
     }
-    var elements = document.body.querySelectorAll(attributeSelector);
-    for (var i = 0; i < elements.length; i++) {
-      var el = elements[i];
-      if (excluded(el)) continue;
-      for (var a = 0; a < attributes.length; a++) {
-        var name = attributes[a];
-        if (!el.hasAttribute(name) || !translatesAttribute(el, name)) continue;
-        var value = el.getAttribute(name);
-        if (wantedAttribute(el, name, value)) items.push({ el: el, attribute: name, text: value });
+  }
+  // Writes what was translated meanwhile; drops entries the page changed.
+  function resolve() {
+    var still = [];
+    for (var i = 0; i < waiting.length; i++) {
+      var item = waiting[i];
+      var translated = dictionary[item.key];
+      if (item.nodes) {
+        var same = item.nodes.every(function (n, k) { return n.isConnected && n.nodeValue === item.values[k] && !sentenceOf.get(n); });
+        if (same && !translated && !untranslated[item.key]) { still.push(item); continue; }
+        uncover(item);
+        if (waitingBlock.get(item.block) === item.key) waitingBlock.delete(item.block);
+        if (same && translated) writeSentence(item.block, item.nodes, item.values, translated);
+        continue;
       }
+      var current = item.node ? item.node.nodeValue : item.el.getAttribute(item.attribute);
+      if (current === item.text && !translated && !untranslated[item.key]) { still.push(item); continue; }
+      uncover(item);
+      if (item.node) {
+        if (waitingNode.get(item.node) === item.text) waitingNode.delete(item.node);
+      } else {
+        var pending = waitingAttribute.get(item.el);
+        if (pending && pending[item.attribute] === item.text) delete pending[item.attribute];
+      }
+      if (current !== item.text || !translated) continue; // changed meanwhile / not translated
+      if (item.node) writeNode(item.node, item.text, translated);
+      else writeAttribute(item.el, item.attribute, item.text, translated);
     }
-    return items.slice(0, limit);
+    waiting = still;
+  }
+  function answer(texts, out) {
+    for (var i = 0; i < texts.length; i++) {
+      delete asked[texts[i]];
+      var translated = Array.isArray(out) ? out[i] : null;
+      if (typeof translated === 'string' && translated && translated !== texts[i]) dictionary[texts[i]] = translated;
+      else untranslated[texts[i]] = true;
+    }
+    resolve();
+  }
+  // Sends what is waiting at once: batches of 20, all in flight together
+  // (the App answers them in order, so the first batch is written first).
+  function flush() {
+    var bridge = window.flutter_inappwebview;
+    if (!outbox.length || !bridge || typeof bridge.callHandler !== 'function') return;
+    while (outbox.length && inFlight < limit) {
+      var texts = outbox.splice(0, Math.min(batch, limit - inFlight));
+      inFlight += texts.length;
+      (function (texts) {
+        var done = function (out) {
+          inFlight -= texts.length;
+          answer(texts, out);
+          flush();
+        };
+        try {
+          bridge.callHandler('townpassTranslate', texts).then(done, function () { done(null); });
+        } catch (_) { done(null); }
+      })(texts);
+    }
+  }
+  window.addEventListener('flutterInAppWebViewPlatformReady', flush);
+  // Coalesces rescans and sends within the current task (no delay).
+  function schedule() {
+    if (scheduled) return;
+    scheduled = true;
+    Promise.resolve().then(function () { scheduled = false; scan(); });
   }
   function scan() {
-    if (busy) { schedule(); return; }
-    var all = collect();
-    if (!all.length) return;
-    busy = true;
-    // Batches of 20, each written as soon as it is translated. A page with
-    // more nodes than one scan takes is scanned again for the rest.
-    var next = function (start) {
-      if (start >= all.length) {
-        busy = false;
-        if (all.length >= limit) schedule();
-        return;
-      }
-      apply(all.slice(start, start + 20)).finally(function () { next(start + 20); });
-    };
-    next(0);
+    pass++;
+    if (document.body) visitElement(document.body);
+    flush();
   }
-  function apply(items) {
-    var texts = items.map(function (item) { return item.text.trim(); });
-    return window.flutter_inappwebview.callHandler('townpassTranslate', texts).then(function (out) {
-      if (!Array.isArray(out)) return;
-      items.forEach(function (item, i) {
-        var translated = out[i];
-        if (typeof translated !== 'string' || !translated || translated === texts[i]) return;
-        if (item.node) {
-          if (item.node.nodeValue !== item.text) return; // changed meanwhile
-          var lead = item.text.match(/^\s*/)[0];
-          var tail = item.text.match(/\s*$/)[0];
-          var value = lead + translated + tail;
-          original.set(item.node, item.text);
-          written.set(item.node, value);
-          item.node.nodeValue = value;
-        } else {
-          if (item.el.getAttribute(item.attribute) !== item.text) return;
-          item.el.setAttribute('data-tp-' + item.attribute, item.text);
-          var done = writtenAttributes.get(item.el) || {};
-          done[item.attribute] = translated;
-          writtenAttributes.set(item.el, done);
-          item.el.setAttribute(item.attribute, translated);
+  // Runs before the page paints what changed: cached texts are written here.
+  function observed(records) {
+    pass++;
+    for (var i = 0; i < records.length; i++) {
+      var r = records[i];
+      if (r.type === 'childList' && r.removedNodes.length && r.target.nodeType === 1) {
+        // A part of a sentence removed: the block is looked at again.
+        var block = r.target.closest && r.target.closest(blockSelector);
+        var first = block && document.createTreeWalker(block, NodeFilter.SHOW_TEXT, null).nextNode();
+        if (first && sentenceBlock(first) === block) visitBlock(block, null);
+      }
+      if (r.type === 'characterData') visitText(r.target);
+      else if (r.type === 'attributes') {
+        if (r.target.nodeType === 1 && attributes.indexOf(r.attributeName) >= 0) visitAttribute(r.target, r.attributeName);
+      } else {
+        for (var n = 0; n < r.addedNodes.length; n++) {
+          var added = r.addedNodes[n];
+          if (added.isConnected) visitElement(added);
         }
-      });
-    });
+      }
+    }
+    if (waiting.length) resolve();
+    flush();
   }
   // Read-only lookups. A value the page changed after we wrote it (e.g. Vue
   // re-rendered new Chinese) is its own original, so stale entries are ignored.
@@ -842,14 +1274,15 @@ const _translationScript = r'''
     return originalAttribute(el, 'placeholder');
   };
   window.__townpassOriginalAttribute = originalAttribute;
-  function schedule() { clearTimeout(timer); timer = setTimeout(scan, 300); }
-  new MutationObserver(schedule).observe(document.body, {
+  window.__townpassTranslate = { scan: scan, add: add, language: config.language };
+  add(config.dictionary);
+  // The whole document from its start (no body yet at document start).
+  new MutationObserver(observed).observe(document, {
     childList: true, subtree: true, characterData: true,
     attributes: true, attributeFilter: attributes
   });
-  window.__townpassTranslate = { scan: scan };
   scan();
-})();
+})
 ''';
 
 /// The injected page script, exposed only so tests can check its contract.

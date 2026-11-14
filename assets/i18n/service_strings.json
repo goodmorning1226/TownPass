@@ -1,0 +1,2582 @@
+{
+ "version": 1,
+ "source": "TownPass service pages (scripts/extract_service_strings.py, 2026-11-14); translations are AI drafts (en, ja, vi, id, tl), to be reviewed by native speakers",
+ "strings": {
+  "0筆結果": {
+   "en": "0 results",
+   "ja": "0件の結果",
+   "vi": "0 kết quả",
+   "id": "0 hasil",
+   "tl": "0 resulta"
+  },
+  "1.本局辦理網路報案，回覆時間以5日為基準（例假日順延），緊急事件，並不適合網路報案，仍請撥打110報案，為最快之處理方式，本局將有專人為您即時服務處理。": {
+   "en": "1. Online police reports are answered within 5 days (extended for weekends and holidays). Online reporting is not suitable for emergencies; please call 110, the fastest way to get help, and our staff will assist you immediately.",
+   "ja": "1.当局のオンライン通報は、回答まで5日を目安としています（休日は順延）。緊急の事案はオンライン通報に適していませんので、最も迅速な方法として110番へお電話ください。当局の担当者が直ちに対応いたします。",
+   "vi": "1. Sở Cảnh sát tiếp nhận báo án trực tuyến, thời gian phản hồi tiêu chuẩn là 5 ngày (lùi lại nếu gặp ngày nghỉ, lễ). Sự việc khẩn cấp không phù hợp để báo án trực tuyến, vui lòng gọi 110 để được xử lý nhanh nhất; Sở sẽ có nhân viên chuyên trách hỗ trợ bạn ngay.",
+   "id": "1. Kepolisian ini menerima laporan polisi online; waktu balasan maksimal 5 hari (diperpanjang jika hari libur). Keadaan darurat tidak cocok dilaporkan secara online; tetap hubungi 110 karena itu cara penanganan tercepat, dan petugas kami akan segera melayani Anda.",
+   "tl": "1. Ang online na pag-uulat sa pulis ng aming tanggapan ay sinasagot sa loob ng 5 araw (iniuurong kapag holiday). Hindi angkop ang online na pag-uulat sa mga emergency; tumawag pa rin sa 110 para sa pinakamabilis na tugon, at may tauhan kaming agad na tutulong sa iyo."
+  },
+  "1.竊盜、恐嚇、詐欺、網路遊戲犯罪等刑事案件": {
+   "en": "1. Criminal cases such as theft, intimidation, fraud and online game crimes",
+   "ja": "1.窃盗、恐喝、詐欺、オンラインゲーム犯罪などの刑事事件",
+   "vi": "1. Các vụ án hình sự như trộm cắp, đe dọa, lừa đảo, tội phạm trò chơi trực tuyến",
+   "id": "1. Kasus pidana seperti pencurian, ancaman, penipuan, dan kejahatan game online",
+   "tl": "1. Mga kasong kriminal gaya ng pagnanakaw, pananakot, panloloko at krimen sa online games"
+  },
+  "1.網路報案性質如同110，為報案管道之一種，如有緊急事件，請撥打110，將有專人為您受理。": {
+   "en": "1. Online police reporting is a reporting channel just like 110. In an emergency, please call 110 and staff will handle your case.",
+   "ja": "1.オンライン通報は110番と同様に通報手段の一つです。緊急の場合は110番へお電話ください。担当者が受け付けます。",
+   "vi": "1. Báo án trực tuyến cũng giống như 110, là một trong các kênh báo án. Nếu có sự việc khẩn cấp, vui lòng gọi 110 để được nhân viên chuyên trách tiếp nhận.",
+   "id": "1. Laporan polisi online sama seperti 110, yaitu salah satu saluran pelaporan. Jika ada keadaan darurat, hubungi 110 dan petugas akan menerima laporan Anda.",
+   "tl": "1. Ang online na pag-uulat sa pulis ay katulad ng 110 at isa sa mga paraan ng pag-uulat. Kung may emergency, tumawag sa 110 at may tauhang tatanggap ng iyong ulat."
+  },
+  "101國慶煙火交管，10/10 19：40至20：20 信義路、市府路、松智路管制。 「台北101大樓施放國慶煙火」安全管制措施，請見市府資訊網：\n<a href='https://pto.gov.taipei/News_Content.aspx?n=D065CCB1467288C8&s=38C541A6FB02530E&sms=72544237BBE4C5F6' target='_blank'>https://pto.gov.taipei/News_Content.aspx?n=D065CCB1467288C8&s=38C541A6FB02530E&sms=72544237BBE4C5F6</a>": {
+   "en": "Taipei 101 National Day fireworks traffic control: Xinyi Rd., Shifu Rd. and Songzhi Rd. are closed on 10/10 from 19：40 to 20：20. For safety control measures for the “Taipei 101 National Day Fireworks”, see the City Government website:\n<a href='https://pto.gov.taipei/News_Content.aspx?n=D065CCB1467288C8&s=38C541A6FB02530E&sms=72544237BBE4C5F6' target='_blank'>https://pto.gov.taipei/News_Content.aspx?n=D065CCB1467288C8&s=38C541A6FB02530E&sms=72544237BBE4C5F6</a>",
+   "ja": "101国慶節花火に伴う交通規制：10/10 19：40～20：20 信義路、市府路、松智路で規制を実施します。「台北101ビル国慶節花火打ち上げ」の安全規制措置については、市政府情報サイトをご覧ください：\n<a href='https://pto.gov.taipei/News_Content.aspx?n=D065CCB1467288C8&s=38C541A6FB02530E&sms=72544237BBE4C5F6' target='_blank'>https://pto.gov.taipei/News_Content.aspx?n=D065CCB1467288C8&s=38C541A6FB02530E&sms=72544237BBE4C5F6</a>",
+   "vi": "Kiểm soát giao thông bắn pháo hoa Quốc khánh tại Taipei 101: ngày 10/10 từ 19：40 đến 20：20 cấm lưu thông trên đường Xinyi, đường Shifu, đường Songzhi. Về các biện pháp kiểm soát an toàn khi “Tòa nhà Taipei 101 bắn pháo hoa Quốc khánh”, vui lòng xem trang thông tin của chính quyền thành phố:\n<a href='https://pto.gov.taipei/News_Content.aspx?n=D065CCB1467288C8&s=38C541A6FB02530E&sms=72544237BBE4C5F6' target='_blank'>https://pto.gov.taipei/News_Content.aspx?n=D065CCB1467288C8&s=38C541A6FB02530E&sms=72544237BBE4C5F6</a>",
+   "id": "Pengaturan lalu lintas kembang api Hari Nasional di 101, 10/10 19：40 sampai 20：20 pembatasan di Jalan Xinyi, Jalan Shifu, dan Jalan Songzhi. Untuk langkah pengamanan “Kembang api Hari Nasional di Gedung Taipei 101”, lihat situs informasi pemerintah kota:\n<a href='https://pto.gov.taipei/News_Content.aspx?n=D065CCB1467288C8&s=38C541A6FB02530E&sms=72544237BBE4C5F6' target='_blank'>https://pto.gov.taipei/News_Content.aspx?n=D065CCB1467288C8&s=38C541A6FB02530E&sms=72544237BBE4C5F6</a>",
+   "tl": "Kontrol sa trapiko para sa National Day fireworks ng 101: 10/10 19：40 hanggang 20：20, sarado ang Xinyi Rd., Shifu Rd. at Songzhi Rd. Para sa mga hakbang pangkaligtasan sa “National Day fireworks sa Taipei 101”, tingnan ang website ng pamahalaang lungsod:\n<a href='https://pto.gov.taipei/News_Content.aspx?n=D065CCB1467288C8&s=38C541A6FB02530E&sms=72544237BBE4C5F6' target='_blank'>https://pto.gov.taipei/News_Content.aspx?n=D065CCB1467288C8&s=38C541A6FB02530E&sms=72544237BBE4C5F6</a>"
+  },
+  "108220 臺北市萬華區和平西路三段120號6樓": {
+   "en": "6F, No. 120, Sec. 3, Heping W. Rd., Wanhua Dist., Taipei City 108220",
+   "ja": "108220 台北市萬華区和平西路三段120号6階",
+   "vi": "108220 Tầng 6, Số 120, Đoạn 3, Đường Heping Tây, Quận Wanhua, Thành phố Đài Bắc",
+   "id": "108220 Lt. 6, No. 120, Bagian 3, Jalan Heping Barat, Distrik Wanhua, Kota Taipei",
+   "tl": "6F, No. 120, Sec. 3, Heping W. Rd., Wanhua Dist., Lungsod ng Taipei 108220"
+  },
+  "10855 臺北市萬華區和平西路三段120號10~13樓": {
+   "en": "10~13F, No. 120, Sec. 3, Heping W. Rd., Wanhua Dist., Taipei City 10855",
+   "ja": "10855 台北市萬華区和平西路三段120号10~13階",
+   "vi": "10855 Tầng 10~13, Số 120, Đoạn 3, Đường Heping Tây, Quận Wanhua, Thành phố Đài Bắc",
+   "id": "10855 Lt. 10~13, No. 120, Bagian 3, Jalan Heping Barat, Distrik Wanhua, Kota Taipei",
+   "tl": "10~13F, No. 120, Sec. 3, Heping W. Rd., Wanhua Dist., Lungsod ng Taipei 10855"
+  },
+  "113年「禮貌服務人員選拔」抽獎活動獲獎名單": {
+   "en": "2024 “Courteous Service Staff Selection” Lucky Draw Winners",
+   "ja": "113年「接客マナー優秀職員選考」抽選イベント当選者リスト",
+   "vi": "Danh sách trúng thưởng bốc thăm “Bình chọn nhân viên phục vụ lịch sự” năm Dân quốc 113",
+   "id": "Daftar pemenang undian “Pemilihan Petugas Layanan Ramah” tahun 113",
+   "tl": "Listahan ng mga nanalo sa raffle ng “Pagpili ng Magalang na Kawani” ng taong 113"
+  },
+  "116057 臺北市文山區萬隆街47之12號2至4樓": {
+   "en": "2F-4F, No. 47-12, Wanlong St., Wenshan Dist., Taipei City 116057",
+   "ja": "116057 台北市文山区萬隆街47之12号2～4階",
+   "vi": "116057 Tầng 2 đến 4, Số 47-12, Phố Wanlong, Quận Wenshan, Thành phố Đài Bắc",
+   "id": "116057 Lt. 2 sampai 4, No. 47-12, Jalan Wanlong, Distrik Wenshan, Kota Taipei",
+   "tl": "2F hanggang 4F, No. 47-12, Wanlong St., Wenshan Dist., Lungsod ng Taipei 116057"
+  },
+  "1張": {
+   "en": "1 ticket",
+   "ja": "1枚",
+   "vi": "1 phiếu",
+   "id": "1 lembar",
+   "tl": "1 piraso"
+  },
+  "2.於填寫報案人資料時，請您務必留下正確聯絡資料（本局對報案人身分及資料嚴予保密），否則若無具體事證，本局將不予處理，並提醒您切勿提供不實之事證，以免觸犯刑法『誣告』罪。": {
+   "en": "2. When filling in your details, please be sure to provide correct contact information (we keep reporters' identities and information strictly confidential). Otherwise, without concrete evidence, the case will not be processed. Please do not provide false evidence, to avoid committing the criminal offense of false accusation.",
+   "ja": "2.通報者情報を入力する際は、必ず正確な連絡先をご記入ください（当局は通報者の身元および情報を厳重に秘匿します）。具体的な証拠がない場合、当局は対応いたしません。また、虚偽の証拠を提供すると刑法の「虚偽告訴罪」に問われるおそれがありますので、ご注意ください。",
+   "vi": "2. Khi điền thông tin người báo án, vui lòng để lại thông tin liên lạc chính xác (Sở giữ bí mật nghiêm ngặt danh tính và thông tin người báo án); nếu không có bằng chứng cụ thể, Sở sẽ không xử lý. Xin lưu ý không cung cấp bằng chứng sai sự thật để tránh phạm tội “vu khống” theo Bộ luật Hình sự.",
+   "id": "2. Saat mengisi data pelapor, pastikan Anda memberikan informasi kontak yang benar (identitas dan data pelapor kami rahasiakan). Tanpa bukti yang jelas, laporan tidak akan diproses. Jangan memberikan bukti palsu agar tidak melanggar pasal “laporan palsu” dalam hukum pidana.",
+   "tl": "2. Sa pagsagot ng impormasyon ng nag-uulat, siguraduhing tama ang iyong contact details (mahigpit na kumpidensyal ang pagkakakilanlan at impormasyon ng nag-uulat). Kung walang kongkretong ebidensya, hindi ito ipoproseso. Huwag magbigay ng maling ebidensya upang hindi makagawa ng krimeng “maling paratang” sa ilalim ng Criminal Code."
+  },
+  "2.網路報案與110電話報案均為報案之管道，若已選擇其中一種管道報案，請勿再重複報案。": {
+   "en": "2. Online reporting and calling 110 are both reporting channels. If you have already reported through one, please do not report again.",
+   "ja": "2.オンライン通報と110番通報はいずれも通報手段です。いずれかの手段ですでに通報した場合は、重複して通報しないでください。",
+   "vi": "2. Báo án trực tuyến và báo án qua điện thoại 110 đều là kênh báo án; nếu đã chọn một kênh để báo án, vui lòng không báo án trùng lặp.",
+   "id": "2. Laporan polisi online dan laporan telepon 110 sama-sama saluran pelaporan. Jika sudah melapor melalui salah satunya, jangan melapor ulang.",
+   "tl": "2. Parehong paraan ng pag-uulat ang online na pag-uulat sa pulis at ang pagtawag sa 110. Kung nakapili ka na ng isa, huwag nang mag-ulat ulit."
+  },
+  "2.遺失案件Lost Property 依據現行法律規定，您的網路報案，尚無法完成正式報案程序，於網路報案後仍須請您至派出所製作相關文件，造成您的不便，敬請見諒。如您要報案，歡迎您使用110或逕赴鄰近警察單位舉報。": {
+   "en": "2. Lost Property: Under current law, an online report cannot complete the formal reporting procedure. After reporting online, you still need to go to a police station to complete the relevant documents. We apologize for the inconvenience. To report, please call 110 or go directly to a nearby police unit.",
+   "ja": "2.遺失物の案件：現行法の規定により、オンライン通報では正式な届出手続きを完了できません。オンライン通報後も派出所で関連書類を作成していただく必要があります。ご不便をおかけしますが、ご了承ください。届出をご希望の場合は、110番をご利用いただくか、最寄りの警察機関へ直接お越しください。",
+   "vi": "2. Vụ việc mất đồ: Theo quy định pháp luật hiện hành, báo án trực tuyến của bạn chưa thể hoàn tất thủ tục báo án chính thức; sau khi báo án trực tuyến, bạn vẫn cần đến đồn công an để lập các giấy tờ liên quan. Xin lỗi vì sự bất tiện này. Nếu muốn báo án, bạn có thể gọi 110 hoặc đến trực tiếp đơn vị cảnh sát gần nhất để trình báo.",
+   "id": "2. Kasus kehilangan barang: Berdasarkan hukum yang berlaku, laporan polisi online Anda belum menyelesaikan prosedur pelaporan resmi. Setelah melapor online, Anda tetap harus datang ke kantor polisi untuk membuat dokumen terkait. Mohon maaf atas ketidaknyamanannya. Jika ingin melapor, silakan hubungi 110 atau langsung datang ke unit kepolisian terdekat.",
+   "tl": "2. Nawawalang gamit: Ayon sa kasalukuyang batas, hindi pa makukumpleto ng iyong online na ulat ang pormal na proseso ng pag-uulat. Pagkatapos mag-ulat online, kailangan mo pa ring pumunta sa istasyon ng pulis para gawin ang mga kaugnay na dokumento. Paumanhin sa abala. Para mag-ulat, tumawag sa 110 o pumunta nang direkta sa pinakamalapit na himpilan ng pulis."
+  },
+  "2024 CTC CUP 世界杯國際標準舞公開賽💃 - 7/6 在小巨蛋": {
+   "en": "2024 CTC CUP World Cup International Standard Dance Open💃 - 7/6 at Taipei Arena",
+   "ja": "2024 CTC CUP ワールドカップ国際スタンダードダンスオープン大会💃 - 7/6 台北アリーナにて",
+   "vi": "Giải khiêu vũ thể thao quốc tế mở rộng 2024 CTC CUP World Cup💃 - 7/6 tại Taipei Arena",
+   "id": "2024 CTC CUP Kompetisi Terbuka Dansa Standar Internasional Piala Dunia💃 - 7/6 di Taipei Arena",
+   "tl": "2024 CTC CUP World Cup na Open Competition sa International Standard Dance💃 - 7/6 sa Taipei Arena"
+  },
+  "2024/01/01 網路報案": {
+   "en": "2024/01/01 Online Police Report",
+   "ja": "2024/01/01 オンライン通報",
+   "vi": "2024/01/01 Báo án trực tuyến",
+   "id": "2024/01/01 Laporan polisi online",
+   "tl": "2024/01/01 Online na pag-uulat sa pulis"
+  },
+  "2024/02/02 網路報案": {
+   "en": "2024/02/02 Online Police Report",
+   "ja": "2024/02/02 オンライン通報",
+   "vi": "2024/02/02 Báo án trực tuyến",
+   "id": "2024/02/02 Laporan polisi online",
+   "tl": "2024/02/02 Online na pag-uulat sa pulis"
+  },
+  "3.110為緊急報案電話，無故撥打110報案專線，經勸阻報聽者，依社會秩序維護法裁處拘留或新臺幣1萬2千元以下罰緩。": {
+   "en": "3. 110 is the emergency reporting line. Anyone who calls the 110 hotline without reason and ignores warnings may be detained or fined up to NT$12,000 under the Social Order Maintenance Act.",
+   "ja": "3.110番は緊急通報用の電話です。正当な理由なく110番通報専用回線に電話をかけ、制止されても従わない場合は、社会秩序維護法により拘留またはNT$1万2千以下の過料に処されます。",
+   "vi": "3. 110 là số điện thoại báo án khẩn cấp; gọi đường dây 110 vô cớ và không nghe khuyên can sẽ bị xử phạt tạm giữ hoặc phạt tiền đến NT$12.000 theo Luật Duy trì trật tự xã hội.",
+   "id": "3. 110 adalah nomor darurat untuk melapor. Menelepon 110 tanpa alasan dan tetap melakukannya setelah diperingatkan dapat dikenai penahanan atau denda hingga NT$12.000 berdasarkan Undang-Undang Ketertiban Sosial.",
+   "tl": "3. Ang 110 ay hotline para sa emergency. Ang pagtawag sa 110 nang walang dahilan at hindi pagtigil kahit pinagsabihan ay maaaring parusahan ng detensyon o multang hanggang NT$12,000 ayon sa Social Order Maintenance Act."
+  },
+  "3.汽機車（含車牌）失竊、遺失案件": {
+   "en": "3. Theft or loss of cars and motorcycles (including license plates)",
+   "ja": "3.自動車・バイク（ナンバープレートを含む）の盗難・紛失案件",
+   "vi": "3. Vụ việc ô tô, xe máy (kể cả biển số) bị trộm, bị mất",
+   "id": "3. Kasus pencurian atau kehilangan mobil/motor (termasuk pelat nomor)",
+   "tl": "3. Pagnanakaw o pagkawala ng kotse/motorsiklo (kasama ang plaka)"
+  },
+  "3個檔案": {
+   "en": "3 files",
+   "ja": "ファイル3件",
+   "vi": "3 tệp",
+   "id": "3 file",
+   "tl": "3 file"
+  },
+  "3張": {
+   "en": "3 tickets",
+   "ja": "3枚",
+   "vi": "3 phiếu",
+   "id": "3 lembar",
+   "tl": "3 piraso"
+  },
+  "4.檢舉、申訴等案件Complaint本局對報案人身分及資料嚴予保密，並將依據您所提供、舉報內容逕行處理、追查，請您務必留下正確聯絡資料。": {
+   "en": "4. Reports and Complaints: We keep reporters' identities and information strictly confidential and will process and investigate based on the information you provide. Please be sure to provide correct contact information.",
+   "ja": "4.通報・苦情などの案件：当局は通報者の身元および情報を厳重に秘匿し、ご提供いただいた通報内容に基づき直接対応・調査します。必ず正確な連絡先をご記入ください。",
+   "vi": "4. Các vụ tố giác, khiếu nại: Sở giữ bí mật nghiêm ngặt danh tính và thông tin người báo án, và sẽ trực tiếp xử lý, truy tra theo nội dung bạn cung cấp, tố giác; vui lòng để lại thông tin liên lạc chính xác.",
+   "id": "4. Kasus laporan pelanggaran dan pengaduan: Identitas dan data pelapor kami rahasiakan, dan kami akan langsung menangani serta menyelidiki sesuai isi laporan Anda. Pastikan Anda memberikan informasi kontak yang benar.",
+   "tl": "4. Pagsusumbong, reklamo at iba pang kaso: Mahigpit na kumpidensyal ang pagkakakilanlan at impormasyon ng nag-uulat, at direktang ipoproseso at iimbestigahan ang iyong ibinigay at isinumbong. Siguraduhing tama ang iyong contact details."
+  },
+  "BFB臺北市政府借書站(取書期限3日，無法申請請預約延長2日)": {
+   "en": "BFB Taipei City Hall Book Station (pickup within 3 days; 2-day hold extension not available)",
+   "ja": "BFB台北市政府図書貸出ステーション(受取期限3日、予約の2日延長は申請できません)",
+   "vi": "Trạm mượn sách BFB Chính quyền Thành phố Đài Bắc (hạn nhận sách 3 ngày, không thể đăng ký gia hạn đặt trước thêm 2 ngày)",
+   "id": "BFB Stasiun Peminjaman Buku Pemerintah Kota Taipei (batas pengambilan 3 hari, tidak dapat mengajukan perpanjangan reservasi 2 hari)",
+   "tl": "BFB Book Station ng Pamahalaang Lungsod ng Taipei (3 araw ang palugit sa pagkuha ng libro; kung hindi makakuha, mag-request ng 2 araw na extension)"
+  },
+  "C21延吉": {
+   "en": "C21 Yanji",
+   "ja": "C21延吉",
+   "vi": "C21 Yanji",
+   "id": "C21 Yanji",
+   "tl": "C21 Yanji"
+  },
+  "Hi ，請填寫以下申辦資料": {
+   "en": "Hi , please fill in the application details below",
+   "ja": "こんにちは、以下の申請情報をご入力ください",
+   "vi": "Xin chào, vui lòng điền thông tin đăng ký dưới đây",
+   "id": "Hai, silakan isi data permohonan berikut",
+   "tl": "Hi, pakisagutan ang sumusunod na impormasyon ng aplikasyon"
+  },
+  "Q & A • 常見問題": {
+   "en": "Q & A • FAQ",
+   "ja": "Q & A • よくある質問",
+   "vi": "Q & A • Câu hỏi thường gặp",
+   "id": "Q & A • Pertanyaan Umum",
+   "tl": "Q & A • Mga Madalas Itanong"
+  },
+  "一定需要實名認證才能加入台北通會員？Does signing up for TaipeiPASS membership require real name verification?": {
+   "en": "Does signing up for TaipeiPASS membership require real-name verification?",
+   "ja": "TaipeiPASS会員になるには、必ず実名認証が必要ですか？",
+   "vi": "Có bắt buộc xác thực danh tính mới được gia nhập thành viên TaipeiPASS không?",
+   "id": "Apakah verifikasi nama asli wajib untuk menjadi anggota TaipeiPASS?",
+   "tl": "Kailangan ba ng real-name verification para maging miyembro ng TaipeiPASS?"
+  },
+  "下載台北通App，方能使用優惠，點選「優惠」主題，點選「優惠券」即可查看所有優惠商家。看到喜歡的優惠，可以按「+我的票夾」領取優惠或直接點立即使用票券。詳細操作請查看操作步驟。": {
+   "en": "Download the TaipeiPASS app to use the offers. Tap the “Offers” topic, then “Coupons” to see all participating merchants. When you find an offer you like, tap “+My Ticket Wallet” to claim it, or tap Use Now to use the ticket right away. See the step-by-step guide for details.",
+   "ja": "TaipeiPASSアプリをダウンロードすると特典をご利用いただけます。「特典」をタップし、「クーポン」を選ぶと、すべての特典加盟店を確認できます。気に入った特典があれば「+マイチケットホルダー」をタップして受け取るか、そのままチケットを今すぐ使用できます。詳しい操作は操作手順をご確認ください。",
+   "vi": "Tải ứng dụng TaipeiPASS để sử dụng ưu đãi: chọn chủ đề “Ưu đãi”, chọn “Phiếu giảm giá” để xem tất cả cửa hàng có ưu đãi. Thấy ưu đãi yêu thích, bạn có thể nhấn “+Ví vé của tôi” để nhận hoặc nhấn dùng vé ngay. Xem hướng dẫn chi tiết tại các bước thao tác.",
+   "id": "Unduh aplikasi TaipeiPASS untuk menggunakan promo. Pilih tema “Promo”, lalu pilih “Kupon” untuk melihat semua toko yang memberi promo. Jika ada promo yang Anda suka, tekan “+Dompet tiket saya” untuk mengambilnya atau langsung gunakan tiketnya. Untuk detailnya, lihat langkah-langkah penggunaan.",
+   "tl": "I-download ang TaipeiPASS App para magamit ang mga diskwento. Piliin ang “Diskwento”, pagkatapos ang “Kupon” para makita ang lahat ng tindahang may diskwento. Kung may gusto kang alok, pindutin ang “+ Aking ticket wallet” para kunin ito, o gamitin agad ang tiket. Para sa detalye, tingnan ang mga hakbang."
+  },
+  "下載安裝": {
+   "en": "Download",
+   "ja": "ダウンロード・インストール",
+   "vi": "Tải và cài đặt",
+   "id": "Unduh & instal",
+   "tl": "I-download at i-install"
+  },
+  "中山地政事務所": {
+   "en": "Zhongshan Land Office",
+   "ja": "中山地政事務所",
+   "vi": "Văn phòng địa chính Zhongshan",
+   "id": "Kantor Pertanahan Zhongshan",
+   "tl": "Zhongshan Land Office"
+  },
+  "中正區戶政事務所": {
+   "en": "Zhongzheng District Household Registration Office",
+   "ja": "中正区戸政事務所",
+   "vi": "Văn phòng hộ tịch quận Zhongzheng",
+   "id": "Kantor Pencatatan Kependudukan Distrik Zhongzheng",
+   "tl": "Zhongzheng District Household Registration Office"
+  },
+  "中興": {
+   "en": "Zhongxing",
+   "ja": "中興",
+   "vi": "Zhongxing",
+   "id": "Zhongxing",
+   "tl": "Zhongxing"
+  },
+  "交通事件裁決所": {
+   "en": "Traffic Adjudication Office",
+   "ja": "交通事件裁決所",
+   "vi": "Văn phòng Xét xử Vi phạm Giao thông",
+   "id": "Kantor Adjudikasi Pelanggaran Lalu Lintas",
+   "tl": "Traffic Adjudication Office"
+  },
+  "交通局": {
+   "en": "Department of Transportation",
+   "ja": "交通局",
+   "vi": "Sở Giao thông",
+   "id": "Dinas Perhubungan",
+   "tl": "Kagawaran ng Transportasyon"
+  },
+  "人、事、時、地、物 4000字以內": {
+   "en": "Who, what, when, where and objects (up to 4000 characters)",
+   "ja": "人物・事柄・日時・場所・物 4000字以内",
+   "vi": "Người, việc, thời gian, địa điểm, vật; tối đa 4000 ký tự",
+   "id": "Orang, kejadian, waktu, tempat, barang (maks. 4000 karakter)",
+   "tl": "Tao, pangyayari, oras, lugar, bagay — hanggang 4000 character"
+  },
+  "仁愛": {
+   "en": "Ren'ai",
+   "ja": "仁愛",
+   "vi": "Ren'ai",
+   "id": "Ren'ai",
+   "tl": "Ren'ai"
+  },
+  "以E-MAIL寄發": {
+   "en": "Send by email",
+   "ja": "メールで送付",
+   "vi": "Gửi qua E-MAIL",
+   "id": "Kirim lewat email",
+   "tl": "Ipadala sa e-mail"
+  },
+  "使用須知說明": {
+   "en": "Terms of Use",
+   "ja": "利用上の注意",
+   "vi": "Hướng dẫn sử dụng",
+   "id": "Petunjuk penggunaan",
+   "tl": "Paalala sa paggamit"
+  },
+  "依據刑事訴訟法規定，告訴、告發應以書狀或製作筆錄為之，執行上必須確保報案人身分，因此在失竊、恐嚇、詐欺、網路遊戲犯罪或其他刑案案件中，您的報案，尚未完成正式報案程序，於網路報案後仍須請您致派出所製作筆錄，造成您的不便，敬請見諒。如您要報案，歡迎您使用110或逕赴鄰近警察單位舉報製作報案筆錄。": {
+   "en": "Under the Code of Criminal Procedure, complaints and accusations must be made in writing or by recorded statement, and the reporter's identity must be verified. Therefore, for theft, intimidation, fraud, online game crimes or other criminal cases, an online report does not complete the formal reporting procedure; after reporting online, you still need to go to a police station to give a statement. We apologize for the inconvenience. To report, please call 110 or go directly to a nearby police unit to give a statement.",
+   "ja": "刑事訴訟法の規定により、告訴・告発は書面または調書の作成によって行う必要があり、通報者の身元を確認しなければなりません。そのため、窃盗、恐喝、詐欺、オンラインゲーム犯罪その他の刑事事件については、オンライン通報だけでは正式な届出手続きは完了しません。オンライン通報後も派出所で調書を作成していただく必要があります。ご不便をおかけしますが、ご了承ください。届出をご希望の場合は、110番をご利用いただくか、最寄りの警察機関へ直接お越しのうえ調書を作成してください。",
+   "vi": "Theo quy định của Luật Tố tụng Hình sự, việc tố cáo, tố giác phải được thực hiện bằng văn bản hoặc lập biên bản, và phải xác nhận danh tính người báo án. Vì vậy, đối với các vụ trộm cắp, đe dọa, lừa đảo, tội phạm trò chơi trực tuyến hoặc các vụ án hình sự khác, báo án của bạn chưa hoàn tất thủ tục báo án chính thức; sau khi báo án trực tuyến, bạn vẫn cần đến đồn công an để lập biên bản. Xin lỗi vì sự bất tiện này. Nếu muốn báo án, bạn có thể gọi 110 hoặc đến trực tiếp đơn vị cảnh sát gần nhất để trình báo và lập biên bản.",
+   "id": "Berdasarkan Hukum Acara Pidana, pengaduan dan laporan harus dibuat secara tertulis atau melalui berita acara, dan identitas pelapor harus dipastikan. Oleh karena itu, untuk kasus pencurian, ancaman, penipuan, kejahatan game online, atau kasus pidana lainnya, laporan Anda belum menyelesaikan prosedur pelaporan resmi. Setelah melapor online, Anda tetap harus datang ke kantor polisi untuk membuat berita acara. Mohon maaf atas ketidaknyamanannya. Jika ingin melapor, silakan hubungi 110 atau langsung datang ke unit kepolisian terdekat untuk membuat berita acara laporan.",
+   "tl": "Ayon sa Code of Criminal Procedure, ang reklamo o sumbong ay dapat gawin sa nakasulat na dokumento o opisyal na salaysay, at kailangang matiyak ang pagkakakilanlan ng nag-uulat. Kaya sa mga kaso ng pagnanakaw, pananakot, panloloko, krimen sa online games o iba pang kasong kriminal, hindi pa kumpleto ang pormal na proseso ng iyong ulat. Pagkatapos mag-ulat online, kailangan mo pa ring pumunta sa istasyon ng pulis para magbigay ng salaysay. Paumanhin sa abala. Para mag-ulat, tumawag sa 110 o pumunta nang direkta sa pinakamalapit na himpilan ng pulis para gumawa ng salaysay."
+  },
+  "依據現行法律規定，您的網路報案，尚無法完成正式報案程序，於網路報案後仍須請您至派出所製作相關文件、開具四聯單後，再行輸入電腦協尋，造成您的不便，敬請見諒。如您要報案，歡迎您使用110或逕赴鄰近警察單位舉報。": {
+   "en": "Under current law, an online report cannot complete the formal reporting procedure. After reporting online, you still need to go to a police station to complete the relevant documents and obtain a four-part report form before the case is entered into the system for search. We apologize for the inconvenience. To report, please call 110 or go directly to a nearby police unit.",
+   "ja": "現行法の規定により、オンライン通報では正式な届出手続きを完了できません。オンライン通報後も派出所で関連書類を作成し、四聯単（受理証明書）が発行された後にコンピューターへ登録して捜索を行います。ご不便をおかけしますが、ご了承ください。届出をご希望の場合は、110番をご利用いただくか、最寄りの警察機関へ直接お越しください。",
+   "vi": "Theo quy định pháp luật hiện hành, báo án trực tuyến của bạn chưa thể hoàn tất thủ tục báo án chính thức; sau khi báo án trực tuyến, bạn vẫn cần đến đồn công an để lập các giấy tờ liên quan, nhận biên nhận bốn liên, sau đó mới được nhập vào máy tính để hỗ trợ tìm kiếm. Xin lỗi vì sự bất tiện này. Nếu muốn báo án, bạn có thể gọi 110 hoặc đến trực tiếp đơn vị cảnh sát gần nhất để trình báo.",
+   "id": "Berdasarkan hukum yang berlaku, laporan polisi online Anda belum menyelesaikan prosedur pelaporan resmi. Setelah melapor online, Anda tetap harus datang ke kantor polisi untuk membuat dokumen terkait dan mendapatkan formulir empat rangkap, lalu data akan dimasukkan ke komputer untuk pencarian. Mohon maaf atas ketidaknyamanannya. Jika ingin melapor, silakan hubungi 110 atau langsung datang ke unit kepolisian terdekat.",
+   "tl": "Ayon sa kasalukuyang batas, hindi pa makukumpleto ng iyong online na ulat ang pormal na proseso. Pagkatapos mag-ulat online, kailangan mo pa ring pumunta sa istasyon ng pulis para gawin ang mga kaugnay na dokumento at kumuha ng four-copy report form bago ito maipasok sa computer para sa paghahanap. Paumanhin sa abala. Para mag-ulat, tumawag sa 110 o pumunta nang direkta sa pinakamalapit na himpilan ng pulis."
+  },
+  "借閱中(2)": {
+   "en": "Borrowed (2)",
+   "ja": "貸出中(2)",
+   "vi": "Đang mượn (2)",
+   "id": "Sedang dipinjam (2)",
+   "tl": "Hiniram (2)"
+  },
+  "借閱歷史紀錄(2)": {
+   "en": "Borrowing History (2)",
+   "ja": "貸出履歴(2)",
+   "vi": "Lịch sử mượn (2)",
+   "id": "Riwayat peminjaman (2)",
+   "tl": "Kasaysayan ng paghiram (2)"
+  },
+  "停管處受理之申訴案件": {
+   "en": "Complaints Handled by the Parking Management Office",
+   "ja": "駐車管理処が受け付ける異議申立案件",
+   "vi": "Khiếu nại do Phòng Quản lý Bãi đỗ xe tiếp nhận",
+   "id": "Pengaduan yang ditangani Kantor Manajemen Parkir",
+   "tl": "Mga reklamong tinanggap ng Parking Management Office"
+  },
+  "停管處受理之申訴案件(舉發單位為臺北市停車管理工程處-停車費催(追)繳及舉發違規停車案件)": {
+   "en": "Complaints Handled by the Parking Management Office (issued by the Taipei City Parking Management and Development Office: overdue parking fee collection and illegal parking tickets)",
+   "ja": "駐車管理処が受け付ける異議申立案件(摘発機関：台北市駐車管理工程処－駐車料金の督促・追徴および違法駐車の摘発案件)",
+   "vi": "Khiếu nại do Phòng Quản lý Bãi đỗ xe tiếp nhận (đơn vị lập biên bản là Phòng Quản lý Bãi đỗ xe Thành phố Đài Bắc - các vụ nhắc nộp/truy thu phí đỗ xe và lập biên bản đỗ xe trái phép)",
+   "id": "Pengaduan yang ditangani Kantor Manajemen Parkir (unit penindak: Kantor Manajemen Parkir Kota Taipei — penagihan tunggakan biaya parkir dan penindakan pelanggaran parkir)",
+   "tl": "Mga reklamong tinanggap ng Parking Management Office (nag-isyu: Parking Management and Development Office ng Lungsod ng Taipei – paniningil ng hindi nabayarang parking fee at pag-uulat ng ilegal na pagparada)"
+  },
+  "停車管理及收費問題": {
+   "en": "Parking Management and Fee Issues",
+   "ja": "駐車管理と料金に関する問題",
+   "vi": "Vấn đề quản lý và thu phí đỗ xe",
+   "id": "Masalah pengelolaan dan biaya parkir",
+   "tl": "Pamamahala ng paradahan at bayad sa parking"
+  },
+  "停車費代繳金額，以停管處回覆之即時結果為準。": {
+   "en": "The parking fee amount for payment on your behalf is subject to the real-time result from the Parking Management Office.",
+   "ja": "駐車料金の代理納付金額は、駐車管理処からのリアルタイムの回答結果に準じます。",
+   "vi": "Số tiền nộp thay phí đỗ xe căn cứ theo kết quả tức thời do Phòng Quản lý Bãi đỗ xe phản hồi.",
+   "id": "Jumlah pembayaran atas nama Anda untuk biaya parkir mengikuti hasil real-time dari Kantor Manajemen Parkir.",
+   "tl": "Ang halaga ng pagbabayad para sa iyo ng parking fee ay batay sa real-time na resulta mula sa Parking Management Office."
+  },
+  "停車費通知": {
+   "en": "Parking Fee Notices",
+   "ja": "駐車料金のお知らせ",
+   "vi": "Thông báo phí đỗ xe",
+   "id": "Pemberitahuan biaya parkir",
+   "tl": "Abiso sa parking fee"
+  },
+  "健康報報": {
+   "en": "Health News",
+   "ja": "健康ニュース",
+   "vi": "Tin sức khỏe",
+   "id": "Info Kesehatan",
+   "tl": "Balitang Pangkalusugan"
+  },
+  "優惠券": {
+   "en": "Coupons",
+   "ja": "クーポン",
+   "vi": "Phiếu giảm giá",
+   "id": "Kupon",
+   "tl": "Kupon"
+  },
+  "優惠券搜尋": {
+   "en": "Coupon Search",
+   "ja": "クーポン検索",
+   "vi": "Tìm phiếu giảm giá",
+   "id": "Cari kupon",
+   "tl": "Maghanap ng kupon"
+  },
+  "兒童新樂園": {
+   "en": "Taipei Children's Amusement Park",
+   "ja": "児童新楽園",
+   "vi": "Công viên giải trí thiếu nhi",
+   "id": "Taman Bermain Anak Taipei",
+   "tl": "Taipei Children's Amusement Park"
+  },
+  "入場券": {
+   "en": "Admission Ticket",
+   "ja": "入場券",
+   "vi": "Vé vào cửa",
+   "id": "Tiket masuk",
+   "tl": "Tiket sa pagpasok"
+  },
+  "全功能服務|46號": {
+   "en": "Full Service|No. 46",
+   "ja": "全機能サービス|46番",
+   "vi": "Dịch vụ trọn gói|Số 46",
+   "id": "Layanan lengkap|No. 46",
+   "tl": "Buong Serbisyo|Blg. 46"
+  },
+  "全功能櫃檯|2001號": {
+   "en": "Full-Service Counter|No. 2001",
+   "ja": "全機能窓口|2001番",
+   "vi": "Quầy dịch vụ trọn gói|Số 2001",
+   "id": "Loket layanan lengkap|No. 2001",
+   "tl": "Counter ng Buong Serbisyo|Blg. 2001"
+  },
+  "公司登記費": {
+   "en": "Company Registration Fee",
+   "ja": "会社登記料",
+   "vi": "Phí đăng ký công ty",
+   "id": "Biaya pendaftaran perusahaan",
+   "tl": "Bayad sa pagrehistro ng kumpanya"
+  },
+  "公車、計程車、復康巴士問題": {
+   "en": "Bus, Taxi and Rehabus Issues",
+   "ja": "バス・タクシー・福祉送迎バスに関する問題",
+   "vi": "Vấn đề xe buýt, taxi, xe buýt cho người khuyết tật (Rehabus)",
+   "id": "Masalah bus, taksi, dan bus difabel",
+   "tl": "Problema sa bus, taxi at Rehabus"
+  },
+  "共3筆": {
+   "en": "3 in total",
+   "ja": "全3件",
+   "vi": "Tổng cộng 3 mục",
+   "id": "Total 3 data",
+   "tl": "Kabuuang 3"
+  },
+  "兵役服務|703號": {
+   "en": "Military Service|No. 703",
+   "ja": "兵役サービス|703番",
+   "vi": "Nghĩa vụ quân sự|Số 703",
+   "id": "Layanan wajib militer|No. 703",
+   "tl": "Serbisyong Militar|Blg. 703"
+  },
+  "其他(前述以外火災)": {
+   "en": "Other (fires not listed above)",
+   "ja": "その他（上記以外の火災）",
+   "vi": "Khác (hỏa hoạn ngoài các loại trên)",
+   "id": "Lainnya (kebakaran selain di atas)",
+   "tl": "Iba pa (sunog na hindi nabanggit sa itaas)"
+  },
+  "其他查詢或退費相關事宜，請洽北市停管處02-2726-9600(服務時間週一至週五08:30~17:30)辦理。": {
+   "en": "For other inquiries or refunds, please contact the Taipei City Parking Management Office at 02-2726-9600 (Mon-Fri 08:30~17:30).",
+   "ja": "その他の照会や返金に関するお問い合わせは、台北市駐車管理処 02-2726-9600（受付時間：月～金曜日 08:30~17:30）までご連絡ください。",
+   "vi": "Các vấn đề tra cứu khác hoặc hoàn tiền, vui lòng liên hệ Phòng Quản lý Bãi đỗ xe Thành phố Đài Bắc 02-2726-9600 (giờ phục vụ thứ Hai đến thứ Sáu 08:30~17:30).",
+   "id": "Untuk pertanyaan lain atau pengembalian dana, hubungi Kantor Manajemen Parkir Kota Taipei 02-2726-9600 (jam layanan Senin–Jumat 08:30~17:30).",
+   "tl": "Para sa iba pang tanong o refund, makipag-ugnayan sa Parking Management Office ng Taipei sa 02-2726-9600 (Lunes hanggang Biyernes 08:30~17:30)."
+  },
+  "其他縣市網路報案系統": {
+   "en": "Online Police Report Systems of Other Cities/Counties",
+   "ja": "他県市のオンライン通報システム",
+   "vi": "Hệ thống báo án trực tuyến của các huyện/thành phố khác",
+   "id": "Sistem laporan polisi online kota/kabupaten lain",
+   "tl": "Online na pag-uulat sa pulis ng ibang lungsod/county"
+  },
+  "出現此錯誤訊息，多數是您留存於電信公司的生日資料有錯誤或缺漏。請您先致電電信公司客服查詢相關會員資料。若和電信公司比對資料無誤，請您來電1999(外縣市02-27208889)轉8585將有專人為您服務。": {
+   "en": "This error message usually means the birth date on file with your telecom provider is incorrect or missing. Please first call your telecom provider's customer service to check your member information. If the information matches, please call 1999 (02-27208889 from outside Taipei City) ext. 8585 for assistance.",
+   "ja": "このエラーメッセージが表示される場合、多くは通信会社に登録されている生年月日に誤りや欠落があります。まず通信会社のカスタマーサービスに会員情報をご確認ください。通信会社の情報と一致している場合は、1999（台北市外からは02-27208889）にお電話のうえ、内線8585へおつなぎください。担当者が対応いたします。",
+   "vi": "Thông báo lỗi này phần lớn là do dữ liệu ngày sinh bạn lưu tại công ty viễn thông bị sai hoặc thiếu. Vui lòng gọi tổng đài chăm sóc khách hàng của công ty viễn thông để kiểm tra thông tin thành viên. Nếu đối chiếu với công ty viễn thông mà thông tin không sai, vui lòng gọi 1999 (từ huyện/thành phố khác gọi 02-27208889) nhánh 8585 để được nhân viên chuyên trách hỗ trợ.",
+   "id": "Pesan kesalahan ini biasanya muncul karena data tanggal lahir Anda di operator seluler salah atau tidak lengkap. Silakan hubungi layanan pelanggan operator seluler untuk memeriksa data Anda. Jika data sudah sesuai dengan operator, hubungi 1999 (dari luar Kota Taipei 02-27208889) ekstensi 8585 dan petugas akan membantu Anda.",
+   "tl": "Kapag lumabas ang error na ito, kadalasan ay mali o kulang ang petsa ng kapanganakan mo na nakatala sa telecom company. Tawagan muna ang customer service ng telecom company para suriin ang iyong impormasyon. Kung tama ang datos, tumawag sa 1999 (mula sa labas ng Taipei: 02-27208889) ext. 8585 at may tutulong sa iyo."
+  },
+  "出生日期": {
+   "en": "Date of Birth",
+   "ja": "生年月日",
+   "vi": "Ngày sinh",
+   "id": "Tanggal lahir",
+   "tl": "Petsa ng kapanganakan"
+  },
+  "分館地圖": {
+   "en": "Branch Map",
+   "ja": "分館マップ",
+   "vi": "Bản đồ chi nhánh",
+   "id": "Peta cabang",
+   "tl": "Mapa ng mga sangay"
+  },
+  "分館整修服務調整公告": {
+   "en": "Notice of Service Changes During Branch Renovation",
+   "ja": "分館改修に伴うサービス変更のお知らせ",
+   "vi": "Thông báo điều chỉnh dịch vụ do chi nhánh sửa chữa",
+   "id": "Pengumuman penyesuaian layanan selama renovasi cabang",
+   "tl": "Abiso sa pagbabago ng serbisyo dahil sa renovasyon ng sangay"
+  },
+  "分館與站點": {
+   "en": "Branches and Stations",
+   "ja": "分館とステーション",
+   "vi": "Chi nhánh và trạm",
+   "id": "Cabang dan stasiun",
+   "tl": "Mga sangay at istasyon"
+  },
+  "前述以外之橋梁災情": {
+   "en": "Other bridge damage not listed above",
+   "ja": "上記以外の橋梁被害",
+   "vi": "Thiệt hại cầu khác ngoài các loại trên",
+   "id": "Kerusakan jembatan lainnya",
+   "tl": "Ibang pinsala sa tulay na hindi nabanggit sa itaas"
+  },
+  "加入常用": {
+   "en": "Add to Favorites",
+   "ja": "よく使う項目に追加",
+   "vi": "Thêm vào mục thường dùng",
+   "id": "Tambah ke favorit",
+   "tl": "Idagdag sa madalas gamitin"
+  },
+  "區公所": {
+   "en": "District Office",
+   "ja": "区役所",
+   "vi": "Văn phòng quận",
+   "id": "Kantor distrik",
+   "tl": "District office"
+  },
+  "南投縣": {
+   "en": "Nantou County",
+   "ja": "南投県",
+   "vi": "Huyện Nam Đầu",
+   "id": "Kabupaten Nantou",
+   "tl": "Nantou County"
+  },
+  "博愛櫃檯|903號": {
+   "en": "Bo'ai Counter|No. 903",
+   "ja": "博愛窓口|903番",
+   "vi": "Quầy Bo'ai|Số 903",
+   "id": "Loket Bo'ai|No. 903",
+   "tl": "Bo'ai Counter|Blg. 903"
+  },
+  "卡證": {
+   "en": "Cards",
+   "ja": "カード・証明書",
+   "vi": "Thẻ/giấy tờ",
+   "id": "Kartu",
+   "tl": "Mga card at ID"
+  },
+  "危險物品火災": {
+   "en": "Hazardous Materials Fire",
+   "ja": "危険物火災",
+   "vi": "Hỏa hoạn do vật phẩm nguy hiểm",
+   "id": "Kebakaran bahan berbahaya",
+   "tl": "Sunog sa mapanganib na materyales"
+  },
+  "即日起電子帳單用戶，以行動支付繳費(含本網站信用卡支付)，下期水費減收10元(不限次數)。立即申辦享優惠！": {
+   "en": "Starting today, e-bill users who pay by mobile payment (including credit card payment on this website) get NT$10 off their next water bill (no limit on times). Apply now to enjoy the discount!",
+   "ja": "本日より、電子請求書をご利用の方がモバイル決済（本サイトのクレジットカード決済を含む）でお支払いいただくと、次回の水道料金が10台湾ドル割引になります（回数制限なし）。今すぐお申し込みのうえ、特典をお受けください！",
+   "vi": "Kể từ hôm nay, người dùng hóa đơn điện tử thanh toán bằng thanh toán di động (bao gồm thẻ tín dụng trên trang web này) sẽ được giảm NT$10 tiền nước kỳ sau (không giới hạn số lần). Đăng ký ngay để nhận ưu đãi!",
+   "id": "Mulai hari ini, pengguna tagihan elektronik yang membayar dengan pembayaran seluler (termasuk kartu kredit di situs ini) mendapat potongan NT$10 untuk tagihan air berikutnya (tanpa batas). Daftar sekarang dan nikmati promonya!",
+   "tl": "Simula ngayon, ang mga user ng e-bill na magbabayad gamit ang mobile payment (kasama ang credit card sa website na ito) ay may NT$10 bawas sa susunod na water bill (walang limit). Mag-apply na para sa diskwento!"
+  },
+  "原住民參加技術士技能檢定獎勵金申請": {
+   "en": "Reward Application for Indigenous Peoples Taking Technician Skills Tests",
+   "ja": "原住民の技能検定受検奨励金申請",
+   "vi": "Đăng ký tiền thưởng cho người dân tộc bản địa tham gia kỳ kiểm tra kỹ năng nghề",
+   "id": "Permohonan insentif bagi masyarakat adat yang mengikuti uji keterampilan teknisi",
+   "tl": "Aplikasyon ng gantimpala para sa mga katutubo (Indigenous) na kumuha ng technician skills certification"
+  },
+  "原住民急難關懷慰問金": {
+   "en": "Emergency Relief Payment for Indigenous Peoples",
+   "ja": "原住民緊急見舞金",
+   "vi": "Tiền thăm hỏi hỗ trợ khẩn cấp cho người dân tộc bản địa",
+   "id": "Dana santunan darurat bagi masyarakat adat",
+   "tl": "Tulong pinansyal sa emergency para sa mga katutubo (Indigenous)"
+  },
+  "原民會": {
+   "en": "Indigenous Peoples Commission",
+   "ja": "原住民族委員会",
+   "vi": "Ủy ban Dân tộc bản địa",
+   "id": "Komisi Masyarakat Adat",
+   "tl": "Council of Indigenous Peoples"
+  },
+  "取書期限：2024/09/08": {
+   "en": "Pickup deadline: 2024/09/08",
+   "ja": "受取期限：2024/09/08",
+   "vi": "Hạn nhận sách: 2024/09/08",
+   "id": "Batas waktu pengambilan buku: 2024/09/08",
+   "tl": "Takdang pagkuha ng libro: 2024/09/08"
+  },
+  "取書編號：080": {
+   "en": "Pickup No.: 080",
+   "ja": "受取番号：080",
+   "vi": "Mã nhận sách: 080",
+   "id": "Nomor pengambilan buku: 080",
+   "tl": "Numero sa pagkuha ng libro: 080"
+  },
+  "取書館：": {
+   "en": "Pickup library:",
+   "ja": "受取館：",
+   "vi": "Thư viện nhận sách:",
+   "id": "Perpustakaan pengambilan:",
+   "tl": "Aklatang kukunan:"
+  },
+  "古亭地政事務所": {
+   "en": "Guting Land Office",
+   "ja": "古亭地政事務所",
+   "vi": "Văn phòng địa chính Guting",
+   "id": "Kantor Pertanahan Guting",
+   "tl": "Guting Land Office"
+  },
+  "可取書(1)": {
+   "en": "Ready for Pickup (1)",
+   "ja": "受取可能(1)",
+   "vi": "Có thể nhận sách (1)",
+   "id": "Siap diambil (1)",
+   "tl": "Puwede nang kunin (1)"
+  },
+  "可直接定位或輸入完整地址": {
+   "en": "Use your current location or enter a full address",
+   "ja": "現在地を取得するか、完全な住所を入力してください",
+   "vi": "Có thể định vị trực tiếp hoặc nhập địa chỉ đầy đủ",
+   "id": "Gunakan lokasi saat ini atau masukkan alamat lengkap",
+   "tl": "Gamitin ang lokasyon mo o ilagay ang buong address"
+  },
+  "台北通官方網站": {
+   "en": "TaipeiPASS Official Website",
+   "ja": "TaipeiPASS公式サイト",
+   "vi": "Trang web chính thức TaipeiPASS",
+   "id": "Situs resmi TaipeiPASS",
+   "tl": "Opisyal na website ng TaipeiPASS"
+  },
+  "台北通帳號授權使用市府其他數位平台，可以取消使用授權嗎？'ve authorized my TaipeiPASS account to access other digital platforms of the city government. Can I cancel the authorization?": {
+   "en": "I've authorized my TaipeiPASS account to access other digital platforms of the city government. Can I cancel the authorization?",
+   "ja": "TaipeiPASSアカウントで市政府の他のデジタルプラットフォームの利用を許可した場合、その許可を取り消すことはできますか？",
+   "vi": "Tài khoản TaipeiPASS đã được ủy quyền sử dụng các nền tảng số khác của chính quyền thành phố, có thể hủy ủy quyền không?",
+   "id": "Akun TaipeiPASS saya telah diberi izin untuk digunakan di platform digital lain milik pemerintah kota. Bisakah izin tersebut dibatalkan?",
+   "tl": "Maaari ko bang kanselahin ang awtorisasyon ng TaipeiPASS account ko sa ibang digital platform ng pamahalaang lungsod?"
+  },
+  "台北通會員分為一般會員與金質會員（實名認證會員），建議您申請金質會員享有完整服務。": {
+   "en": "TaipeiPASS members are either general members or Gold members (real-name verified members). We recommend applying for Gold membership to enjoy the full range of services.",
+   "ja": "TaipeiPASS会員には一般会員とゴールド会員（実名認証会員）があります。すべてのサービスをご利用いただけるゴールド会員へのお申し込みをおすすめします。",
+   "vi": "Thành viên TaipeiPASS gồm thành viên thường và thành viên Vàng (thành viên đã xác thực danh tính); bạn nên đăng ký thành viên Vàng để sử dụng đầy đủ dịch vụ.",
+   "id": "Anggota TaipeiPASS terdiri dari anggota biasa dan anggota Emas (anggota dengan verifikasi nama asli). Kami sarankan Anda mendaftar sebagai anggota Emas untuk menikmati layanan lengkap.",
+   "tl": "May dalawang uri ng miyembro ang TaipeiPASS: ordinaryong miyembro at Gold member (may real-name verification). Inirerekomendang mag-apply bilang Gold member para sa buong serbisyo."
+  },
+  "和平": {
+   "en": "Heping",
+   "ja": "和平",
+   "vi": "Heping",
+   "id": "Heping",
+   "tl": "Heping"
+  },
+  "商業登記費": {
+   "en": "Business Registration Fee",
+   "ja": "商業登記料",
+   "vi": "Phí đăng ký kinh doanh",
+   "id": "Biaya pendaftaran usaha",
+   "tl": "Bayad sa pagrehistro ng negosyo"
+  },
+  "單據號碼": {
+   "en": "Receipt Number",
+   "ja": "伝票番号",
+   "vi": "Số chứng từ",
+   "id": "Nomor tagihan",
+   "tl": "Numero ng bill"
+  },
+  "嘉義市": {
+   "en": "Chiayi City",
+   "ja": "嘉義市",
+   "vi": "Thành phố Gia Nghĩa",
+   "id": "Kota Chiayi",
+   "tl": "Chiayi City"
+  },
+  "嘉義縣": {
+   "en": "Chiayi County",
+   "ja": "嘉義県",
+   "vi": "Huyện Gia Nghĩa",
+   "id": "Kabupaten Chiayi",
+   "tl": "Chiayi County"
+  },
+  "因應113年10月11日至10月27日每週末寧波西街施工交通管制，公車配合調整措施，詳情請見公運處新聞稿\n<a href='https://pto.gov.taipei/News_Content.aspx?n=D065CCB1467288C8&s=38C541A6FB02530E&sms=72544237BBE4C5F6' target='_blank'>https://pto.gov.taipei/News_Content.aspx?n=D065CCB1467288C8&s=38C541A6FB02530E&sms=72544237BBE4C5F6</a>": {
+   "en": "Due to traffic control for construction on Ningbo W. St. every weekend from October 11 to October 27, 2024, bus services have been adjusted. For details, see the Public Transportation Office press release:\n<a href='https://pto.gov.taipei/News_Content.aspx?n=D065CCB1467288C8&s=38C541A6FB02530E&sms=72544237BBE4C5F6' target='_blank'>https://pto.gov.taipei/News_Content.aspx?n=D065CCB1467288C8&s=38C541A6FB02530E&sms=72544237BBE4C5F6</a>",
+   "ja": "113年10月11日から10月27日までの毎週末、寧波西街の工事に伴う交通規制により、バスの運行を調整します。詳しくは公共運輸処のプレスリリースをご覧ください\n<a href='https://pto.gov.taipei/News_Content.aspx?n=D065CCB1467288C8&s=38C541A6FB02530E&sms=72544237BBE4C5F6' target='_blank'>https://pto.gov.taipei/News_Content.aspx?n=D065CCB1467288C8&s=38C541A6FB02530E&sms=72544237BBE4C5F6</a>",
+   "vi": "Do thi công và kiểm soát giao thông trên phố Ningbo Tây vào mỗi cuối tuần từ ngày 11 tháng 10 đến ngày 27 tháng 10 năm Dân quốc 113, xe buýt điều chỉnh tương ứng; chi tiết vui lòng xem thông cáo báo chí của Phòng Vận tải Công cộng\n<a href='https://pto.gov.taipei/News_Content.aspx?n=D065CCB1467288C8&s=38C541A6FB02530E&sms=72544237BBE4C5F6' target='_blank'>https://pto.gov.taipei/News_Content.aspx?n=D065CCB1467288C8&s=38C541A6FB02530E&sms=72544237BBE4C5F6</a>",
+   "id": "Terkait pengaturan lalu lintas akibat konstruksi di Jalan Ningbo Barat setiap akhir pekan dari 11 Oktober sampai 27 Oktober tahun 113, bus melakukan penyesuaian. Detailnya lihat siaran pers Kantor Transportasi Umum\n<a href='https://pto.gov.taipei/News_Content.aspx?n=D065CCB1467288C8&s=38C541A6FB02530E&sms=72544237BBE4C5F6' target='_blank'>https://pto.gov.taipei/News_Content.aspx?n=D065CCB1467288C8&s=38C541A6FB02530E&sms=72544237BBE4C5F6</a>",
+   "tl": "Dahil sa kontrol sa trapiko tuwing weekend mula 10/11 hanggang 10/27 ng taong 113 para sa konstruksyon sa Ningbo W. St., inayos ang mga ruta ng bus. Para sa detalye, tingnan ang press release ng Public Transportation Office:\n<a href='https://pto.gov.taipei/News_Content.aspx?n=D065CCB1467288C8&s=38C541A6FB02530E&sms=72544237BBE4C5F6' target='_blank'>https://pto.gov.taipei/News_Content.aspx?n=D065CCB1467288C8&s=38C541A6FB02530E&sms=72544237BBE4C5F6</a>"
+  },
+  "圖書到期通知": {
+   "en": "Book Due Notices",
+   "ja": "図書返却期限のお知らせ",
+   "vi": "Thông báo sách đến hạn",
+   "id": "Pemberitahuan jatuh tempo buku",
+   "tl": "Abiso sa due date ng libro"
+  },
+  "圖書館網站": {
+   "en": "Library Website",
+   "ja": "図書館ウェブサイト",
+   "vi": "Trang web thư viện",
+   "id": "Situs perpustakaan",
+   "tl": "Website ng aklatan"
+  },
+  "土石崩落": {
+   "en": "Rockfall",
+   "ja": "土砂崩落",
+   "vi": "Sạt lở đất đá",
+   "id": "Longsoran batu dan tanah",
+   "tl": "Pagguho ng lupa at bato"
+  },
+  "土石流": {
+   "en": "Debris Flow",
+   "ja": "土石流",
+   "vi": "Lũ bùn đá",
+   "id": "Banjir bandang lumpur",
+   "tl": "Debris flow"
+  },
+  "土石災情": {
+   "en": "Landslide Damage",
+   "ja": "土砂災害",
+   "vi": "Thiệt hại do đất đá",
+   "id": "Bencana tanah dan batu",
+   "tl": "Pinsala dulot ng lupa at bato"
+  },
+  "在台北通特約商家消費時，出示APP優惠券畫面即可享有專屬優惠。超簡單使用方式，請參考操作步驟。": {
+   "en": "When shopping at TaipeiPASS partner merchants, show the coupon screen in the app to enjoy exclusive offers. It's easy: see the step-by-step guide.",
+   "ja": "TaipeiPASS提携店でお買い物の際、アプリのクーポン画面を提示すると専用特典を受けられます。簡単な使い方は操作手順をご覧ください。",
+   "vi": "Khi mua sắm tại các cửa hàng đối tác của TaipeiPASS, chỉ cần xuất trình màn hình phiếu giảm giá trên ứng dụng là được hưởng ưu đãi riêng. Cách dùng rất đơn giản, vui lòng xem các bước thao tác.",
+   "id": "Saat berbelanja di toko mitra TaipeiPASS, tunjukkan layar kupon di aplikasi untuk mendapatkan promo khusus. Cara pakainya sangat mudah, lihat langkah-langkah penggunaan.",
+   "tl": "Kapag bumili sa partner store ng TaipeiPASS, ipakita ang kupon sa APP para makuha ang espesyal na diskwento. Para sa madaling paraan ng paggamit, tingnan ang mga hakbang."
+  },
+  "地政事務所": {
+   "en": "Land Office",
+   "ja": "地政事務所",
+   "vi": "Văn phòng địa chính",
+   "id": "Kantor pertanahan",
+   "tl": "Land office"
+  },
+  "地政登記規費": {
+   "en": "Land Registration Fee",
+   "ja": "地政登記手数料",
+   "vi": "Lệ phí đăng ký địa chính",
+   "id": "Biaya pendaftaran pertanahan",
+   "tl": "Bayad sa land registration"
+  },
+  "地政罰鍰": {
+   "en": "Land Administration Fine",
+   "ja": "地政過料",
+   "vi": "Tiền phạt địa chính",
+   "id": "Denda pertanahan",
+   "tl": "Multa sa land administration"
+  },
+  "地點位置補充說明": {
+   "en": "Additional Location Details",
+   "ja": "場所の補足説明",
+   "vi": "Mô tả bổ sung về vị trí",
+   "id": "Keterangan tambahan lokasi",
+   "tl": "Karagdagang paliwanag sa lokasyon"
+  },
+  "地點描述": {
+   "en": "Location Description",
+   "ja": "場所の説明",
+   "vi": "Mô tả địa điểm",
+   "id": "Deskripsi lokasi",
+   "tl": "Paglalarawan ng lugar"
+  },
+  "基隆市": {
+   "en": "Keelung City",
+   "ja": "基隆市",
+   "vi": "Thành phố Cơ Long",
+   "id": "Kota Keelung",
+   "tl": "Keelung City"
+  },
+  "堰塞湖": {
+   "en": "Landslide Dam",
+   "ja": "堰止湖",
+   "vi": "Hồ chắn do sạt lở",
+   "id": "Danau bendungan longsor",
+   "tl": "Lawang nabuo dahil sa landslide"
+  },
+  "報案類別：當事人": {
+   "en": "Report type: Party involved",
+   "ja": "通報区分：当事者",
+   "vi": "Loại báo án: Đương sự",
+   "id": "Kategori laporan: Pihak yang bersangkutan",
+   "tl": "Uri ng ulat: Mismong sangkot"
+  },
+  "報案類別：關係人": {
+   "en": "Report type: Related party",
+   "ja": "通報区分：関係者",
+   "vi": "Loại báo án: Người liên quan",
+   "id": "Kategori laporan: Pihak terkait",
+   "tl": "Uri ng ulat: Kaugnay na tao"
+  },
+  "大區為1碼，中區為2碼，戶號為6碼，檢核號為1碼": {
+   "en": "Major area: 1 digit, sub-area: 2 digits, customer number: 6 digits, check digit: 1 digit",
+   "ja": "大区は1桁、中区は2桁、お客様番号は6桁、チェックディジットは1桁です",
+   "vi": "Mã khu lớn 1 chữ số, mã khu trung 2 chữ số, số khách hàng 6 chữ số, số kiểm tra 1 chữ số",
+   "id": "Wilayah besar 1 digit, wilayah tengah 2 digit, nomor pelanggan 6 digit, digit pemeriksa 1 digit",
+   "tl": "Malaking zone: 1 digit, gitnang zone: 2 digit, customer number: 6 digit, check digit: 1 digit"
+  },
+  "大同分處": {
+   "en": "Datong Branch Office",
+   "ja": "大同分処",
+   "vi": "Chi nhánh Datong",
+   "id": "Kantor Cabang Datong",
+   "tl": "Datong Branch"
+  },
+  "太陽圖書館暫停對外服務": {
+   "en": "Sun Library Closed to the Public",
+   "ja": "太陽図書館は一般向けサービスを休止しています",
+   "vi": "Thư viện Mặt Trời tạm ngừng phục vụ",
+   "id": "Perpustakaan Surya berhenti sementara melayani umum",
+   "tl": "Pansamantalang sarado sa publiko ang Solar Library"
+  },
+  "失敗": {
+   "en": "Failed",
+   "ja": "失敗",
+   "vi": "Thất bại",
+   "id": "Gagal",
+   "tl": "Nabigo"
+  },
+  "如何使用優惠券？How can I access the coupons?": {
+   "en": "How can I access the coupons?",
+   "ja": "クーポンの使い方は？",
+   "vi": "Làm thế nào để sử dụng phiếu giảm giá?",
+   "id": "Bagaimana cara menggunakan kupon?",
+   "tl": "Paano gamitin ang kupon?"
+  },
+  "如何獲得優惠券？ How can I obtain the discount coupons?": {
+   "en": "How can I obtain the discount coupons?",
+   "ja": "クーポンの入手方法は？",
+   "vi": "Làm thế nào để nhận phiếu giảm giá?",
+   "id": "Bagaimana cara mendapatkan kupon?",
+   "tl": "Paano makakuha ng kupon?"
+  },
+  "如尚有其他問題，請洽臺北e大客服專線(02)2932-0212分機341": {
+   "en": "For other questions, please contact the Taipei e-University customer service line at (02)2932-0212 ext. 341",
+   "ja": "その他のご質問は、台北e大カスタマーサービス(02)2932-0212 内線341までお問い合わせください",
+   "vi": "Nếu còn thắc mắc khác, vui lòng liên hệ đường dây hỗ trợ Taipei e-University (02)2932-0212 nhánh 341",
+   "id": "Jika masih ada pertanyaan, hubungi layanan pelanggan Taipei e-University (02)2932-0212 ekstensi 341",
+   "tl": "Kung may iba pang tanong, tumawag sa customer service ng Taipei e-University sa (02)2932-0212 ext. 341"
+  },
+  "如需了解更多消息，請前往": {
+   "en": "For more information, please visit",
+   "ja": "詳しい情報は、次のページをご覧ください：",
+   "vi": "Để biết thêm thông tin, vui lòng truy cập",
+   "id": "Untuk info lebih lanjut, silakan kunjungi",
+   "tl": "Para sa karagdagang impormasyon, pumunta sa"
+  },
+  "婦幼": {
+   "en": "Women and Children",
+   "ja": "女性・子ども",
+   "vi": "Phụ nữ và trẻ em",
+   "id": "Perempuan dan Anak",
+   "tl": "Kababaihan at kabataan"
+  },
+  "宜蘭縣": {
+   "en": "Yilan County",
+   "ja": "宜蘭県",
+   "vi": "Huyện Nghi Lan",
+   "id": "Kabupaten Yilan",
+   "tl": "Yilan County"
+  },
+  "容量限制為10MB ，最多3個檔案": {
+   "en": "Size limit 10MB, up to 3 files",
+   "ja": "容量上限は10MB、最大3ファイルまでです",
+   "vi": "Dung lượng tối đa 10MB, tối đa 3 tệp",
+   "id": "Batas ukuran 10MB, maksimal 3 file",
+   "tl": "Hanggang 10MB, maximum na 3 file"
+  },
+  "就業服務站": {
+   "en": "Employment Service Station",
+   "ja": "就業サービスステーション",
+   "vi": "Trạm dịch vụ việc làm",
+   "id": "Pos layanan ketenagakerjaan",
+   "tl": "Employment Service Station"
+  },
+  "屏東縣": {
+   "en": "Pingtung County",
+   "ja": "屏東県",
+   "vi": "Huyện Bình Đông",
+   "id": "Kabupaten Pingtung",
+   "tl": "Pingtung County"
+  },
+  "展開列表": {
+   "en": "Expand List",
+   "ja": "一覧を展開",
+   "vi": "Mở rộng danh sách",
+   "id": "Tampilkan daftar",
+   "tl": "Ipakita ang listahan"
+  },
+  "工廠火災": {
+   "en": "Factory Fire",
+   "ja": "工場火災",
+   "vi": "Hỏa hoạn nhà xưởng",
+   "id": "Kebakaran pabrik",
+   "tl": "Sunog sa pabrika"
+  },
+  "已兌換": {
+   "en": "Redeemed",
+   "ja": "引き換え済み",
+   "vi": "Đã đổi",
+   "id": "Sudah ditukar",
+   "tl": "Na-redeem na"
+  },
+  "已看完所有重要訊息": {
+   "en": "You've seen all important messages",
+   "ja": "すべての重要なお知らせを確認しました",
+   "vi": "Đã xem hết tất cả thông báo quan trọng",
+   "id": "Anda sudah membaca semua pesan penting",
+   "tl": "Nabasa mo na lahat ng mahalagang mensahe"
+  },
+  "已結束": {
+   "en": "Ended",
+   "ja": "終了",
+   "vi": "Đã kết thúc",
+   "id": "Sudah berakhir",
+   "tl": "Tapos na"
+  },
+  "已結案": {
+   "en": "Closed",
+   "ja": "結案済み",
+   "vi": "Đã đóng hồ sơ",
+   "id": "Kasus selesai",
+   "tl": "Sarado na ang kaso"
+  },
+  "已結案(1)": {
+   "en": "Closed (1)",
+   "ja": "結案済み(1)",
+   "vi": "Đã đóng hồ sơ (1)",
+   "id": "Kasus selesai (1)",
+   "tl": "Sarado na ang kaso (1)"
+  },
+  "已透過市民服務大平台或身分驗證申請註冊加入會員，超過時間沒有收到審核通知，怎麼辦？What should I do if I applied for membership through Citizen Grand Platform or Identity Verification Procedure but have not received the results of evaluation by the expected deadline?": {
+   "en": "What should I do if I applied for membership through the Citizen Grand Platform or identity verification but have not received the review result by the expected deadline?",
+   "ja": "市民サービスプラットフォームまたは本人確認手続きで会員登録を申請しましたが、期限を過ぎても審査結果の通知が届きません。どうすればよいですか？",
+   "vi": "Tôi đã đăng ký thành viên qua Nền tảng Dịch vụ Thị dân hoặc xác minh danh tính nhưng quá thời gian vẫn chưa nhận được thông báo xét duyệt, phải làm sao?",
+   "id": "Saya sudah mendaftar menjadi anggota melalui Platform Layanan Warga atau verifikasi identitas, tetapi belum menerima pemberitahuan hasil peninjauan setelah batas waktu. Apa yang harus saya lakukan?",
+   "tl": "Nag-apply ako bilang miyembro sa Citizen Service Platform o sa identity verification pero lampas na sa takdang oras at wala pa akong natatanggap na resulta. Ano ang dapat kong gawin?"
+  },
+  "已透過悠遊付註冊台北通會員，請問如何登入？I have signed up for EasyWallet. How do I log in?": {
+   "en": "I signed up for TaipeiPASS through EasyWallet. How do I log in?",
+   "ja": "EasyWalletでTaipeiPASS会員に登録しました。どのようにログインすればよいですか？",
+   "vi": "Tôi đã đăng ký thành viên TaipeiPASS qua EasyWallet, làm thế nào để đăng nhập?",
+   "id": "Saya sudah mendaftar sebagai anggota TaipeiPASS melalui EasyWallet. Bagaimana cara masuk?",
+   "tl": "Nakapag-sign up na ako sa TaipeiPASS gamit ang EasyWallet. Paano ako mag-log in?"
+  },
+  "已過期": {
+   "en": "Expired",
+   "ja": "期限切れ",
+   "vi": "Đã hết hạn",
+   "id": "Sudah kedaluwarsa",
+   "tl": "Expired na"
+  },
+  "帳單": {
+   "en": "Bills",
+   "ja": "請求書",
+   "vi": "Hóa đơn",
+   "id": "Tagihan",
+   "tl": "Bill"
+  },
+  "底層邏輯 : 看清這個世界的底牌 = The underlying logic : how to see the essence of things": {
+   "en": "The Underlying Logic: How to See the Essence of Things",
+   "ja": "底層ロジック : この世界の本質を見抜く",
+   "vi": "Logic nền tảng: Nhìn thấu bản chất của thế giới",
+   "id": "Logika Dasar: Cara Melihat Hakikat Segala Hal",
+   "tl": "Pinagbabatayang Lohika: Paano makita ang esensya ng mga bagay"
+  },
+  "延長兩日": {
+   "en": "Extend 2 Days",
+   "ja": "2日間延長",
+   "vi": "Gia hạn hai ngày",
+   "id": "Perpanjang 2 hari",
+   "tl": "Palawigin nang 2 araw"
+  },
+  "建築物使用管理、違建查報及拆除": {
+   "en": "Building Use Management, Illegal Construction Reporting and Demolition",
+   "ja": "建築物の使用管理、違法建築の通報・撤去",
+   "vi": "Quản lý sử dụng công trình, báo cáo và phá dỡ công trình xây dựng trái phép",
+   "id": "Pengelolaan penggunaan bangunan, pelaporan dan pembongkaran bangunan ilegal",
+   "tl": "Pamamahala sa paggamit ng gusali, pag-uulat at pag-demolish ng ilegal na konstruksyon"
+  },
+  "建築物火災": {
+   "en": "Building Fire",
+   "ja": "建物火災",
+   "vi": "Hỏa hoạn tòa nhà",
+   "id": "Kebakaran bangunan",
+   "tl": "Sunog sa gusali"
+  },
+  "彰化縣": {
+   "en": "Changhua County",
+   "ja": "彰化県",
+   "vi": "Huyện Chương Hóa",
+   "id": "Kabupaten Changhua",
+   "tl": "Changhua County"
+  },
+  "待審核": {
+   "en": "Pending Review",
+   "ja": "審査待ち",
+   "vi": "Chờ xét duyệt",
+   "id": "Menunggu peninjauan",
+   "tl": "Naghihintay ng pagsusuri"
+  },
+  "快閃購繳款": {
+   "en": "Flash Sale Payment",
+   "ja": "タイムセール購入代金の支払い",
+   "vi": "Thanh toán đơn Mua nhanh",
+   "id": "Pembayaran Flash Buy",
+   "tl": "Pagbabayad sa Flash Sale"
+  },
+  "您已訂閱 0 項": {
+   "en": "You have subscribed to 0 items",
+   "ja": "0 件を購読中です",
+   "vi": "Bạn đã đăng ký nhận 0 mục",
+   "id": "Anda telah berlangganan 0 item",
+   "tl": "Naka-subscribe ka sa 0 item"
+  },
+  "您遇到哪些問題?": {
+   "en": "What problem are you having?",
+   "ja": "どのような問題がありますか？",
+   "vi": "Bạn gặp vấn đề gì?",
+   "id": "Masalah apa yang Anda alami?",
+   "tl": "Anong problema ang naranasan mo?"
+  },
+  "想知道新移民大小事嗎？提供您各項活動和課程訊息哦！": {
+   "en": "Want to know about life as a new immigrant? Get information on events and courses here!",
+   "ja": "新住民に関するさまざまな情報を知りたいですか？各種イベントや講座の情報をお届けします！",
+   "vi": "Bạn muốn biết mọi điều về di dân mới? Chúng tôi cung cấp thông tin các hoạt động và khóa học!",
+   "id": "Ingin tahu seputar kehidupan imigran baru? Kami sediakan info berbagai kegiatan dan kursus!",
+   "tl": "Gusto mo bang malaman ang lahat tungkol sa mga bagong imigrante? Narito ang impormasyon sa iba't ibang aktibidad at kurso!"
+  },
+  "成功": {
+   "en": "Success",
+   "ja": "成功",
+   "vi": "Thành công",
+   "id": "Berhasil",
+   "tl": "Tagumpay"
+  },
+  "我的第一本滑塊書 : 顏色配對": {
+   "en": "My First Slider Book: Color Matching",
+   "ja": "はじめてのスライドえほん : いろあわせ",
+   "vi": "Cuốn sách thanh trượt đầu tiên của tôi: Ghép màu",
+   "id": "Buku Geser Pertamaku: Mencocokkan Warna",
+   "tl": "Ang Una Kong Slider Book: Pagtutugma ng Kulay"
+  },
+  "我的紀錄": {
+   "en": "My Records",
+   "ja": "マイ記録",
+   "vi": "Lịch sử của tôi",
+   "id": "Catatan saya",
+   "tl": "Aking mga rekord"
+  },
+  "我的訂單": {
+   "en": "My Orders",
+   "ja": "注文履歴",
+   "vi": "Đơn hàng của tôi",
+   "id": "Pesanan saya",
+   "tl": "Aking mga order"
+  },
+  "戶政事務所": {
+   "en": "Household Registration Office",
+   "ja": "戸政事務所",
+   "vi": "Văn phòng hộ tịch",
+   "id": "Kantor pencatatan kependudukan",
+   "tl": "Household registration office"
+  },
+  "所有狀態": {
+   "en": "All Statuses",
+   "ja": "すべてのステータス",
+   "vi": "Tất cả trạng thái",
+   "id": "Semua status",
+   "tl": "Lahat ng status"
+  },
+  "所有院區": {
+   "en": "All Branches",
+   "ja": "すべての院区",
+   "vi": "Tất cả cơ sở",
+   "id": "Semua cabang",
+   "tl": "Lahat ng sangay"
+  },
+  "所有項目": {
+   "en": "All Items",
+   "ja": "すべての項目",
+   "vi": "Tất cả hạng mục",
+   "id": "Semua item",
+   "tl": "Lahat ng item"
+  },
+  "手機門號驗證出現身分證字號正確，生日錯誤的錯誤訊息。這是什麼意思?During mobile phone verification, it says that my ID number is correct but my birth date info is wrong. What does this mean?": {
+   "en": "During mobile phone verification, it says my ID number is correct but my birth date is wrong. What does this mean?",
+   "ja": "携帯電話番号の認証で「身分証番号は正しいが、生年月日が誤っている」というエラーメッセージが表示されます。どういう意味ですか？",
+   "vi": "Khi xác minh số điện thoại di động, xuất hiện thông báo lỗi số thẻ căn cước đúng nhưng ngày sinh sai. Điều này có nghĩa là gì?",
+   "id": "Saat verifikasi nomor ponsel, muncul pesan bahwa nomor identitas benar tetapi tanggal lahir salah. Apa artinya?",
+   "tl": "Sa mobile number verification, sinasabing tama ang ID number ko pero mali ang petsa ng kapanganakan. Ano ang ibig sabihin nito?"
+  },
+  "打開定位服務來允許“城市通”確認您的位置": {
+   "en": "Turn on location services to allow “TownPass” to confirm your location",
+   "ja": "位置情報サービスをオンにして、“城市通”による現在地の確認を許可してください",
+   "vi": "Bật dịch vụ định vị để cho phép “TownPass” xác định vị trí của bạn",
+   "id": "Aktifkan layanan lokasi agar “TownPass” dapat mengetahui lokasi Anda",
+   "tl": "Buksan ang location services para payagan ang “TownPass” na malaman ang iyong lokasyon"
+  },
+  "承辦員如有執行法定職務之需求，仍可透過申請程序，並經機關業務分層負責階級人員同意後，取得個人資料": {
+   "en": "If a case officer needs it to perform statutory duties, they may still obtain personal data through an application process with the approval of the authorized supervisor.",
+   "ja": "担当者が法定職務の執行上必要な場合は、申請手続きを経て、機関の業務分掌に基づく責任者の同意を得たうえで、個人情報を取得できます",
+   "vi": "Khi cần thực thi nhiệm vụ theo luật định, nhân viên phụ trách vẫn có thể lấy thông tin cá nhân thông qua thủ tục xin phép và được cấp có thẩm quyền của cơ quan đồng ý",
+   "id": "Jika petugas perlu menjalankan tugas sesuai hukum, data pribadi tetap dapat diperoleh melalui prosedur permohonan dengan persetujuan pejabat berwenang di instansi tersebut",
+   "tl": "Kung kailangan ng kawani para sa pagganap ng tungkuling itinakda ng batas, maaari pa rin niyang makuha ang personal na impormasyon sa pamamagitan ng aplikasyon at pag-apruba ng awtorisadong opisyal ng ahensya."
+  },
+  "承辦機關": {
+   "en": "Responsible Agency",
+   "ja": "担当機関",
+   "vi": "Cơ quan phụ trách",
+   "id": "Instansi penanggung jawab",
+   "tl": "Ahensyang humahawak"
+  },
+  "排序中(0)": {
+   "en": "Queued (0)",
+   "ja": "予約順番待ち(0)",
+   "vi": "Đang xếp hàng (0)",
+   "id": "Dalam antrean (0)",
+   "tl": "Nakapila (0)"
+  },
+  "提供個人資料給承辦人員": {
+   "en": "Provide personal data to case officers",
+   "ja": "担当者に個人情報を提供する",
+   "vi": "Cung cấp thông tin cá nhân cho nhân viên phụ trách",
+   "id": "Berikan data pribadi kepada petugas",
+   "tl": "Ibigay ang personal na impormasyon sa kawaning humahawak"
+  },
+  "提供健康撇步及市民篩檢通知。": {
+   "en": "Health tips and citizen screening notices.",
+   "ja": "健康のヒントと市民向け検診のお知らせをお届けします。",
+   "vi": "Cung cấp mẹo sức khỏe và thông báo tầm soát cho người dân.",
+   "id": "Menyediakan tips kesehatan dan pemberitahuan skrining untuk warga.",
+   "tl": "Mga tip sa kalusugan at abiso sa health screening para sa mga mamamayan."
+  },
+  "提供用路人臺北市交通管制訊息。": {
+   "en": "Taipei City traffic control information for road users.",
+   "ja": "道路利用者に台北市の交通規制情報をお届けします。",
+   "vi": "Cung cấp thông tin kiểm soát giao thông tại Thành phố Đài Bắc cho người tham gia giao thông.",
+   "id": "Menyediakan informasi pengaturan lalu lintas Kota Taipei bagi pengguna jalan.",
+   "tl": "Impormasyon sa traffic control sa Lungsod ng Taipei para sa mga motorista at naglalakad."
+  },
+  "提供臺北市最新體育賽事活動資訊及運動場館租借服務。": {
+   "en": "The latest Taipei City sports events and sports venue rental services.",
+   "ja": "台北市の最新スポーツイベント情報と運動施設の貸出サービスをご提供します。",
+   "vi": "Cung cấp thông tin sự kiện thể thao mới nhất tại Thành phố Đài Bắc và dịch vụ thuê địa điểm thể thao.",
+   "id": "Menyediakan informasi acara olahraga terbaru di Kota Taipei dan layanan sewa fasilitas olahraga.",
+   "tl": "Pinakabagong impormasyon sa mga sports event sa Lungsod ng Taipei at pag-renta ng mga sports venue."
+  },
+  "提供臺北旅遊網最新消息，特別推薦給玩臺北APP用戶。": {
+   "en": "The latest news from Taipei Travel, especially recommended for Travel Taipei app users.",
+   "ja": "台北旅遊網の最新ニュースをお届けします。「玩台北」アプリのユーザーに特におすすめです。",
+   "vi": "Cung cấp tin mới nhất từ trang Du lịch Đài Bắc, đặc biệt dành cho người dùng ứng dụng Play Taipei.",
+   "id": "Menyediakan berita terbaru dari Taipei Travel, khusus direkomendasikan untuk pengguna aplikasi Play Taipei.",
+   "tl": "Pinakabagong balita mula sa Taipei Travel website, espesyal para sa mga user ng Taipei Travel APP."
+  },
+  "提供銀髮多元福利資訊，幫助長者依各自需求做選擇。": {
+   "en": "Diverse welfare information for seniors, helping them choose what fits their needs.",
+   "ja": "高齢者向けの多様な福祉情報をご提供し、一人ひとりのニーズに合った選択をサポートします。",
+   "vi": "Cung cấp thông tin phúc lợi đa dạng cho người cao tuổi, giúp người cao tuổi lựa chọn theo nhu cầu riêng.",
+   "id": "Menyediakan beragam informasi kesejahteraan lansia untuk membantu lansia memilih sesuai kebutuhan.",
+   "tl": "Iba't ibang impormasyon sa benepisyo para sa senior citizen, para makapili ang bawat isa ayon sa pangangailangan."
+  },
+  "搜尋案號關鍵字": {
+   "en": "Search by case number",
+   "ja": "案件番号のキーワードで検索",
+   "vi": "Tìm theo từ khóa số hồ sơ",
+   "id": "Cari kata kunci nomor kasus",
+   "tl": "Maghanap ng case number o keyword"
+  },
+  "搜尋繳費關鍵字": {
+   "en": "Search payments",
+   "ja": "支払いのキーワードで検索",
+   "vi": "Tìm theo từ khóa thanh toán",
+   "id": "Cari kata kunci pembayaran",
+   "tl": "Maghanap ng keyword ng bayarin"
+  },
+  "搜尋項目名稱": {
+   "en": "Search item name",
+   "ja": "項目名で検索",
+   "vi": "Tìm tên hạng mục",
+   "id": "Cari nama item",
+   "tl": "Maghanap ng pangalan ng item"
+  },
+  "撥打1999專線": {
+   "en": "Call 1999",
+   "ja": "1999に電話する",
+   "vi": "Gọi đường dây 1999",
+   "id": "Hubungi 1999",
+   "tl": "Tumawag sa 1999 hotline"
+  },
+  "教育事務": {
+   "en": "Education Affairs",
+   "ja": "教育関連",
+   "vi": "Giáo dục",
+   "id": "Urusan pendidikan",
+   "tl": "Edukasyon"
+  },
+  "新住民心服務": {
+   "en": "New Immigrant Services",
+   "ja": "新住民ハートサービス",
+   "vi": "Dịch vụ tận tâm cho cư dân mới",
+   "id": "Layanan Imigran Baru",
+   "tl": "Serbisyo para sa mga Bagong Imigrante"
+  },
+  "新北市": {
+   "en": "New Taipei City",
+   "ja": "新北市",
+   "vi": "Thành phố Tân Bắc",
+   "id": "Kota New Taipei",
+   "tl": "New Taipei City"
+  },
+  "新增附件": {
+   "en": "Add Attachment",
+   "ja": "添付ファイルを追加",
+   "vi": "Thêm tệp đính kèm",
+   "id": "Tambah lampiran",
+   "tl": "Magdagdag ng attachment"
+  },
+  "新書介紹": {
+   "en": "New Books",
+   "ja": "新着図書紹介",
+   "vi": "Giới thiệu sách mới",
+   "id": "Buku baru",
+   "tl": "Mga bagong libro"
+  },
+  "新竹市": {
+   "en": "Hsinchu City",
+   "ja": "新竹市",
+   "vi": "Thành phố Tân Trúc",
+   "id": "Kota Hsinchu",
+   "tl": "Hsinchu City"
+  },
+  "新竹縣": {
+   "en": "Hsinchu County",
+   "ja": "新竹県",
+   "vi": "Huyện Tân Trúc",
+   "id": "Kabupaten Hsinchu",
+   "tl": "Hsinchu County"
+  },
+  "於颱風期間提供水情、災情、紅黃線停車、淹水警示、水閘門啟閉等資訊。": {
+   "en": "Water conditions, disaster reports, red/yellow-line parking, flood alerts, floodgate status and more during typhoons.",
+   "ja": "台風期間中、水位情報、被害情報、赤・黄線区間の駐車、浸水警報、水門の開閉などの情報をご提供します。",
+   "vi": "Cung cấp thông tin trong mùa bão như tình hình nước, thiệt hại, đỗ xe ở vạch đỏ vàng, cảnh báo ngập lụt, đóng mở cửa cống.",
+   "id": "Menyediakan informasi kondisi air, bencana, parkir di garis merah/kuning, peringatan banjir, dan buka-tutup pintu air selama topan.",
+   "tl": "Sa panahon ng bagyo, nagbibigay ng impormasyon sa tubig, pinsala, pagparada sa red/yellow line, babala sa baha, at pagbukas/pagsara ng floodgate."
+  },
+  "更多項目": {
+   "en": "More Items",
+   "ja": "その他の項目",
+   "vi": "Xem thêm",
+   "id": "Item lainnya",
+   "tl": "Higit pang item"
+  },
+  "最多上傳": {
+   "en": "Upload up to",
+   "ja": "最大アップロード数",
+   "vi": "Tải lên tối đa",
+   "id": "Unggah maksimal",
+   "tl": "Mag-upload nang hanggang"
+  },
+  "有關行天宮、敦煌、萬隆、新興、大龍峒、景文、金龍、洲美、大橋頭等社宅已委由臺北市住宅及都市更新中心管理，繳費請至「社宅租金及管理費-住都中心」項目操作。": {
+   "en": "Social housing at Xingtian Temple, Dunhuang, Wanlong, Xinxing, Dalongdong, Jingwen, Jinlong, Zhoumei, Daqiaotou and others is managed by the Taipei City Housing and Urban Regeneration Center. To pay, please use the “Social Housing Rent and Management Fee - Housing and Urban Regeneration Center” item.",
+   "ja": "行天宮、敦煌、萬隆、新興、大龍峒、景文、金龍、洲美、大橋頭などの社会住宅は、台北市住宅・都市再生センターに管理を委託しています。お支払いは「社会住宅家賃・管理費－住都センター」の項目から行ってください。",
+   "vi": "Các khu nhà ở xã hội Xingtiangong, Dunhuang, Wanlong, Xinxing, Dalongdong, Jingwen, Jinlong, Zhoumei, Daqiaotou... đã được ủy thác cho Trung tâm Nhà ở và Tái thiết Đô thị Thành phố Đài Bắc quản lý; để thanh toán, vui lòng thực hiện tại mục “Tiền thuê và phí quản lý nhà ở xã hội - Trung tâm Nhà ở và Đô thị”.",
+   "id": "Perumahan sosial Xingtiangong, Dunhuang, Wanlong, Xinxing, Dalongdong, Jingwen, Jinlong, Zhoumei, Daqiaotou, dan lainnya telah diserahkan pengelolaannya ke Pusat Perumahan dan Pembaruan Kota Taipei. Untuk pembayaran, gunakan item “Sewa dan Biaya Pengelolaan Perumahan Sosial - Pusat Perumahan”.",
+   "tl": "Ang mga social housing sa Xingtian Temple, Dunhuang, Wanlong, Xinxing, Dalongdong, Jingwen, Jinlong, Zhoumei, Daqiaotou at iba pa ay pinamamahalaan na ng Housing and Urban Regeneration Center ng Lungsod ng Taipei. Para magbayad, pumunta sa item na “Renta at Management Fee ng Social Housing - Housing Center”."
+  },
+  "未兌換": {
+   "en": "Not Redeemed",
+   "ja": "未引き換え",
+   "vi": "Chưa đổi",
+   "id": "Belum ditukar",
+   "tl": "Hindi pa na-redeem"
+  },
+  "本人已詳閱須知並同意繼續": {
+   "en": "I have read the notice and agree to continue",
+   "ja": "注意事項を確認し、同意のうえ続行します",
+   "vi": "Tôi đã đọc kỹ hướng dẫn và đồng ý tiếp tục",
+   "id": "Saya telah membaca petunjuk dan setuju untuk melanjutkan",
+   "tl": "Nabasa ko na ang paalala at sumasang-ayon akong magpatuloy"
+  },
+  "本市警察局受理之違規申訴案件": {
+   "en": "Violation Complaints Handled by the Taipei City Police Department",
+   "ja": "台北市警察局が受け付ける違反の異議申立案件",
+   "vi": "Khiếu nại vi phạm do Sở Cảnh sát thành phố tiếp nhận",
+   "id": "Pengaduan pelanggaran yang ditangani Departemen Kepolisian Kota Taipei",
+   "tl": "Mga reklamo sa paglabag na tinanggap ng Kagawaran ng Pulisya ng lungsod"
+  },
+  "本市警察局受理之違規申訴案件（舉發單位為臺北市政府警察局所屬各分局）": {
+   "en": "Violation Complaints Handled by the Taipei City Police Department (issued by precincts of the Taipei City Police Department)",
+   "ja": "台北市警察局が受け付ける違反の異議申立案件（摘発機関は台北市政府警察局所属の各分局）",
+   "vi": "Khiếu nại vi phạm do Sở Cảnh sát thành phố tiếp nhận (đơn vị lập biên bản là các phân cục thuộc Sở Cảnh sát Thành phố Đài Bắc)",
+   "id": "Pengaduan pelanggaran yang ditangani Departemen Kepolisian Kota Taipei (unit penindak: kantor-kantor cabang Departemen Kepolisian Pemerintah Kota Taipei)",
+   "tl": "Mga reklamo sa paglabag na tinanggap ng Kagawaran ng Pulisya ng lungsod (nag-isyu: mga presinto ng Kagawaran ng Pulisya ng Lungsod ng Taipei)"
+  },
+  "本服務讓您輕鬆獲得逾期催還、預約書到館、借閱資料即將到期通知，掌握圖書資料借閱狀況。": {
+   "en": "Get notices for overdue items, reserved books ready for pickup and loans about to expire, so you can keep track of your borrowing.",
+   "ja": "本サービスでは、延滞の督促、予約図書の到着、貸出資料の返却期限が近いことのお知らせを簡単に受け取れ、図書の貸出状況を把握できます。",
+   "vi": "Dịch vụ này giúp bạn dễ dàng nhận thông báo nhắc trả sách quá hạn, sách đặt trước đã về thư viện, tài liệu mượn sắp đến hạn, nắm rõ tình trạng mượn sách.",
+   "id": "Layanan ini memudahkan Anda menerima pengingat keterlambatan, pemberitahuan buku reservasi sudah tiba, dan peminjaman yang akan jatuh tempo, sehingga Anda bisa memantau status peminjaman.",
+   "tl": "Sa serbisyong ito, madali kang makakatanggap ng paalala sa overdue na libro, pagdating ng nireserbang libro, at malapit nang mag-due na hiniram, para alam mo ang status ng paghiram mo."
+  },
+  "本館將於11月7日（星期四）休館日上午8時至下午8時進行資訊軟硬體設備更新維護作業，各服務系統偶有斷線或連線不穩情形": {
+   "en": "The library will carry out IT hardware and software maintenance on its closing day, Thursday, November 7, from 8 a.m. to 8 p.m. Service systems may occasionally disconnect or be unstable",
+   "ja": "当館は11月7日（木）の休館日、午前8時から午後8時まで情報システム機器の更新・メンテナンス作業を行います。各サービスシステムで接続が途切れたり不安定になったりする場合があります",
+   "vi": "Thư viện sẽ bảo trì, nâng cấp thiết bị phần cứng và phần mềm vào ngày nghỉ 7 tháng 11 (thứ Năm) từ 8 giờ sáng đến 8 giờ tối; các hệ thống dịch vụ đôi khi có thể bị ngắt kết nối hoặc kết nối không ổn định",
+   "id": "Perpustakaan akan melakukan pembaruan dan pemeliharaan perangkat keras dan lunak pada hari tutup 7 November (Kamis) pukul 8 pagi hingga 8 malam; sistem layanan mungkin sesekali terputus atau tidak stabil",
+   "tl": "Sa 11/7 (Huwebes), araw ng pagsasara, mula 8 AM hanggang 8 PM, magkakaroon ng maintenance at update ng IT hardware at software ng aklatan. Maaaring paminsan-minsang mawalan ng koneksyon o maging unstable ang mga system."
+  },
+  "本館館藏查詢系統即日起開放Google、LINE登入服務": {
+   "en": "Starting today, the library catalog system supports Google and LINE login",
+   "ja": "当館の蔵書検索システムは、本日よりGoogle・LINEでのログインに対応しました",
+   "vi": "Kể từ hôm nay, hệ thống tra cứu tài liệu của thư viện hỗ trợ đăng nhập bằng Google, LINE",
+   "id": "Mulai hari ini, sistem pencarian koleksi perpustakaan menyediakan login dengan Google dan LINE",
+   "tl": "Simula ngayon, puwede nang mag-log in gamit ang Google at LINE sa catalog search system ng aklatan"
+  },
+  "本館館藏查詢系統於深夜凌晨時間進行資料庫重整作業，期間偶有反應速度過慢情形": {
+   "en": "The library catalog system reorganizes its database late at night, so response may occasionally be slow during that time",
+   "ja": "当館の蔵書検索システムは深夜・早朝にデータベースの再構築作業を行うため、その間は応答が遅くなる場合があります",
+   "vi": "Hệ thống tra cứu tài liệu của thư viện sắp xếp lại cơ sở dữ liệu vào đêm khuya, rạng sáng; trong thời gian này đôi khi phản hồi chậm",
+   "id": "Sistem pencarian koleksi perpustakaan melakukan penataan ulang database pada dini hari; selama itu respons kadang sangat lambat",
+   "tl": "Nagsasagawa ng database reorganization ang catalog search system ng aklatan mula hatinggabi hanggang madaling-araw; maaaring paminsan-minsang bumagal ang sistema."
+  },
+  "查無任何申辦相關項目": {
+   "en": "No related application items found",
+   "ja": "該当する申請項目はありません",
+   "vi": "Không tìm thấy hạng mục đăng ký nào",
+   "id": "Tidak ditemukan item permohonan terkait",
+   "tl": "Walang nahanap na kaugnay na aplikasyon"
+  },
+  "查看其他常見問題": {
+   "en": "View other FAQs",
+   "ja": "その他のよくある質問を見る",
+   "vi": "Xem các câu hỏi thường gặp khác",
+   "id": "Lihat pertanyaan umum lainnya",
+   "tl": "Tingnan ang iba pang madalas itanong"
+  },
+  "桃園市": {
+   "en": "Taoyuan City",
+   "ja": "桃園市",
+   "vi": "Thành phố Đào Viên",
+   "id": "Kota Taoyuan",
+   "tl": "Taoyuan City"
+  },
+  "案件分類處理流程": {
+   "en": "Case Classification and Handling Process",
+   "ja": "案件分類と処理の流れ",
+   "vi": "Quy trình xử lý theo loại vụ việc",
+   "id": "Alur penanganan menurut kategori kasus",
+   "tl": "Proseso ng paghawak ayon sa uri ng kaso"
+  },
+  "標注災情發生地點": {
+   "en": "Mark the disaster location",
+   "ja": "被害の発生場所を指定",
+   "vi": "Đánh dấu vị trí xảy ra thiệt hại",
+   "id": "Tandai lokasi terjadinya bencana",
+   "tl": "Markahan ang lugar ng pinsala"
+  },
+  "橋梁災情": {
+   "en": "Bridge Damage",
+   "ja": "橋梁被害",
+   "vi": "Thiệt hại cầu",
+   "id": "Kerusakan jembatan",
+   "tl": "Pinsala sa tulay"
+  },
+  "橋樑基礎沖刷": {
+   "en": "Bridge Foundation Scour",
+   "ja": "橋梁基礎の洗掘",
+   "vi": "Xói lở móng cầu",
+   "id": "Gerusan fondasi jembatan",
+   "tl": "Pagguho ng pundasyon ng tulay dahil sa agos"
+  },
+  "橋樑斷裂": {
+   "en": "Bridge Collapse",
+   "ja": "橋梁の断裂",
+   "vi": "Gãy cầu",
+   "id": "Jembatan patah",
+   "tl": "Pagkaputol ng tulay"
+  },
+  "機車": {
+   "en": "Motorcycle",
+   "ja": "バイク",
+   "vi": "Xe máy",
+   "id": "Motor",
+   "tl": "Motorsiklo"
+  },
+  "檔案大小超過限制": {
+   "en": "File size exceeds the limit",
+   "ja": "ファイルサイズが上限を超えています",
+   "vi": "Kích thước tệp vượt quá giới hạn",
+   "id": "Ukuran file melebihi batas",
+   "tl": "Lampas sa limit ang laki ng file"
+  },
+  "櫃檯等候狀況": {
+   "en": "Counter Waiting Status",
+   "ja": "窓口の待ち状況",
+   "vi": "Tình trạng chờ tại quầy",
+   "id": "Status antrean loket",
+   "tl": "Status ng pila sa counter"
+  },
+  "櫃檯等待人數查詢": {
+   "en": "Counter Queue Inquiry",
+   "ja": "窓口待ち人数の確認",
+   "vi": "Tra cứu số người chờ tại quầy",
+   "id": "Cek jumlah antrean loket",
+   "tl": "Tingnan ang bilang ng naghihintay sa counter"
+  },
+  "欲使用 Linepay 繳費，請改用其 APP 查繳。": {
+   "en": "To pay with Linepay, please use its app instead.",
+   "ja": "Linepayでお支払いの場合は、Linepayアプリから照会・お支払いください。",
+   "vi": "Để thanh toán bằng Linepay, vui lòng tra cứu và thanh toán qua ứng dụng của Linepay.",
+   "id": "Untuk membayar dengan Linepay, silakan cek dan bayar melalui aplikasinya.",
+   "tl": "Para magbayad gamit ang Linepay, gamitin ang APP nito."
+  },
+  "欲使用 Linepay、發票存摺、蝦皮購物、遠通電收繳費，請改用其 APP 查繳。": {
+   "en": "To pay with Linepay, Invoice Passbook, Shopee or FETC, please use their apps instead.",
+   "ja": "Linepay、発票存摺、Shopee、遠通電収（FETC）でお支払いの場合は、各アプリから照会・お支払いください。",
+   "vi": "Để thanh toán bằng Linepay, Invoice Passbook, Shopee, Far Eastern ETC, vui lòng tra cứu và thanh toán qua ứng dụng tương ứng.",
+   "id": "Untuk membayar dengan Linepay, Invoice Passbook, Shopee, atau FETC (eTag), silakan cek dan bayar melalui aplikasinya masing-masing.",
+   "tl": "Para magbayad gamit ang Linepay, Invoice Passbook, Shopee o FETC, gamitin ang kani-kanilang APP."
+  },
+  "歡迎光臨錢天堂 : 神奇柑仔店大圖鑑": {
+   "en": "Welcome to Zenitendo: The Big Illustrated Guide to the Mysterious Candy Shop",
+   "ja": "ようこそ銭天堂へ : ふしぎ駄菓子屋大図鑑",
+   "vi": "Chào mừng đến Zenitendo: Đại bách khoa Tiệm kẹo kỳ diệu",
+   "id": "Selamat Datang di Zenitendo: Ensiklopedia Besar Toko Permen Ajaib",
+   "tl": "Maligayang Pagdating sa Zenitendo: Malaking Ensiklopedya ng Mahiwagang Tindahan ng Kendi"
+  },
+  "歷史紀錄": {
+   "en": "History",
+   "ja": "履歴",
+   "vi": "Lịch sử",
+   "id": "Riwayat",
+   "tl": "Kasaysayan"
+  },
+  "每天早上8點提供區域內之空氣品質動態變化，幫助您規劃日常生活。": {
+   "en": "Air quality changes in your area every morning at 8 a.m. to help you plan your day.",
+   "ja": "毎朝8時に地域の大気質の変化をお届けし、日常生活の計画をサポートします。",
+   "vi": "Cung cấp diễn biến chất lượng không khí trong khu vực lúc 8 giờ sáng mỗi ngày, giúp bạn lên kế hoạch sinh hoạt hằng ngày.",
+   "id": "Setiap pagi pukul 8 menyediakan perubahan kualitas udara di wilayah Anda untuk membantu merencanakan kegiatan sehari-hari.",
+   "tl": "Araw-araw sa 8 AM, ibinibigay ang pagbabago ng kalidad ng hangin sa iyong lugar para matulungan kang magplano ng araw."
+  },
+  "每日早上5:15~6:15為停管處系統資料更新時間，此期間暫不提供查繳服務。": {
+   "en": "The Parking Management Office system updates its data daily from 5:15~6:15 a.m.; inquiry and payment services are unavailable during this time.",
+   "ja": "毎朝5:15~6:15は駐車管理処のシステムデータ更新時間のため、この間は照会・支払いサービスをご利用いただけません。",
+   "vi": "Hằng ngày từ 5:15~6:15 sáng là thời gian cập nhật dữ liệu hệ thống của Phòng Quản lý Bãi đỗ xe, trong thời gian này tạm ngừng dịch vụ tra cứu và thanh toán.",
+   "id": "Setiap hari pukul 5:15~6:15 pagi adalah waktu pembaruan data sistem Kantor Manajemen Parkir; selama waktu ini layanan cek dan bayar tidak tersedia.",
+   "tl": "Araw-araw 5:15~6:15 AM ay oras ng pag-update ng data ng Parking Management Office; pansamantalang hindi available ang paghahanap at pagbabayad sa oras na ito."
+  },
+  "民生、基礎設施災情": {
+   "en": "Utilities and Infrastructure Damage",
+   "ja": "生活・インフラの被害",
+   "vi": "Thiệt hại dân sinh, cơ sở hạ tầng",
+   "id": "Bencana kebutuhan warga dan infrastruktur",
+   "tl": "Pinsala sa kabuhayan at imprastraktura"
+  },
+  "水號": {
+   "en": "Water Account Number",
+   "ja": "水道お客様番号",
+   "vi": "Số danh bộ nước",
+   "id": "Nomor pelanggan air",
+   "tl": "Water account number"
+  },
+  "汽車": {
+   "en": "Car",
+   "ja": "自動車",
+   "vi": "Ô tô",
+   "id": "Mobil",
+   "tl": "Kotse"
+  },
+  "注意事項": {
+   "en": "Notes",
+   "ja": "注意事項",
+   "vi": "Lưu ý",
+   "id": "Perhatian",
+   "tl": "Mga paalala"
+  },
+  "澎湖縣": {
+   "en": "Penghu County",
+   "ja": "澎湖県",
+   "vi": "Huyện Bành Hồ",
+   "id": "Kabupaten Penghu",
+   "tl": "Penghu County"
+  },
+  "火災": {
+   "en": "Fire",
+   "ja": "火災",
+   "vi": "Hỏa hoạn",
+   "id": "Kebakaran",
+   "tl": "Sunog"
+  },
+  "災情分類": {
+   "en": "Disaster Category",
+   "ja": "被害の分類",
+   "vi": "Loại thiệt hại",
+   "id": "Kategori bencana",
+   "tl": "Uri ng pinsala"
+  },
+  "災情描述(至少勾選一項)": {
+   "en": "Disaster Description (select at least one)",
+   "ja": "被害内容（1つ以上選択）",
+   "vi": "Mô tả thiệt hại (chọn ít nhất một mục)",
+   "id": "Deskripsi bencana (pilih minimal satu)",
+   "tl": "Paglalarawan ng pinsala (pumili ng kahit isa)"
+  },
+  "災情細節說明": {
+   "en": "Disaster Details",
+   "ja": "被害の詳細説明",
+   "vi": "Mô tả chi tiết thiệt hại",
+   "id": "Rincian bencana",
+   "tl": "Detalye ng pinsala"
+  },
+  "為推廣智慧停車，智慧停車收費區停車錢10分鐘免費，": {
+   "en": "To promote smart parking, the first 10 minutes of parking in smart parking fee zones are free,",
+   "ja": "スマートパーキング推進のため、スマートパーキング料金区域では駐車料金が10分間無料となり、",
+   "vi": "Để thúc đẩy đỗ xe thông minh, khu thu phí đỗ xe thông minh miễn phí 10 phút đầu,",
+   "id": "Untuk mendorong parkir pintar, parkir di area tarif parkir pintar gratis 10 menit pertama,",
+   "tl": "Para itaguyod ang smart parking, libre ang unang 10 minuto ng parking sa mga smart parking zone,"
+  },
+  "無紀錄": {
+   "en": "No records",
+   "ja": "記録なし",
+   "vi": "Không có dữ liệu",
+   "id": "Tidak ada catatan",
+   "tl": "Walang rekord"
+  },
+  "特殊境遇家庭扶助之家庭暴力被害人補助": {
+   "en": "Domestic Violence Victim Subsidy for Families in Special Circumstances",
+   "ja": "特殊境遇家庭支援における家庭内暴力被害者補助",
+   "vi": "Trợ cấp nạn nhân bạo lực gia đình thuộc diện hỗ trợ gia đình có hoàn cảnh đặc biệt",
+   "id": "Bantuan untuk korban kekerasan dalam rumah tangga dari keluarga dalam keadaan khusus",
+   "tl": "Tulong sa mga biktima ng karahasan sa tahanan sa ilalim ng Special Circumstances Family Assistance"
+  },
+  "現場圖": {
+   "en": "Scene Diagram",
+   "ja": "現場図",
+   "vi": "Sơ đồ hiện trường",
+   "id": "Denah lokasi",
+   "tl": "Diagram ng lugar"
+  },
+  "現場照片": {
+   "en": "Scene Photos",
+   "ja": "現場写真",
+   "vi": "Ảnh hiện trường",
+   "id": "Foto lokasi",
+   "tl": "Larawan ng lugar"
+  },
+  "產業局資料使用費": {
+   "en": "Department of Economic Development Data Usage Fee",
+   "ja": "産業局データ使用料",
+   "vi": "Phí sử dụng dữ liệu Sở Phát triển Kinh tế",
+   "id": "Biaya penggunaan data Dinas Pembangunan Ekonomi",
+   "tl": "Bayad sa paggamit ng data ng Department of Economic Development"
+  },
+  "申報日期：2024/06/12": {
+   "en": "Report date: 2024/06/12",
+   "ja": "申告日：2024/06/12",
+   "vi": "Ngày khai báo: 2024/06/12",
+   "id": "Tanggal pelaporan: 2024/06/12",
+   "tl": "Petsa ng pag-file: 2024/06/12"
+  },
+  "申報日期：2024/06/13": {
+   "en": "Report date: 2024/06/13",
+   "ja": "申告日：2024/06/13",
+   "vi": "Ngày khai báo: 2024/06/13",
+   "id": "Tanggal pelaporan: 2024/06/13",
+   "tl": "Petsa ng pag-file: 2024/06/13"
+  },
+  "申訴內容": {
+   "en": "Complaint Details",
+   "ja": "異議申立内容",
+   "vi": "Nội dung khiếu nại",
+   "id": "Isi pengaduan",
+   "tl": "Nilalaman ng reklamo"
+  },
+  "申訴項目": {
+   "en": "Complaint Item",
+   "ja": "異議申立項目",
+   "vi": "Hạng mục khiếu nại",
+   "id": "Item pengaduan",
+   "tl": "Item ng reklamo"
+  },
+  "申訴類": {
+   "en": "Complaints",
+   "ja": "異議申立関連",
+   "vi": "Loại khiếu nại",
+   "id": "Kategori pengaduan",
+   "tl": "Reklamo"
+  },
+  "申請表單": {
+   "en": "Application Form",
+   "ja": "申請フォーム",
+   "vi": "Mẫu đơn đăng ký",
+   "id": "Formulir permohonan",
+   "tl": "Application form"
+  },
+  "申辦": {
+   "en": "Apply",
+   "ja": "申請",
+   "vi": "Đăng ký",
+   "id": "Ajukan",
+   "tl": "Mag-apply"
+  },
+  "申辦中(2)": {
+   "en": "In Progress (2)",
+   "ja": "申請中(2)",
+   "vi": "Đang đăng ký (2)",
+   "id": "Permohonan diproses (2)",
+   "tl": "Kasalukuyang aplikasyon (2)"
+  },
+  "申辦服務資料": {
+   "en": "Application Information",
+   "ja": "申請サービス情報",
+   "vi": "Thông tin dịch vụ đăng ký",
+   "id": "Data layanan permohonan",
+   "tl": "Impormasyon ng aplikasyon"
+  },
+  "登入註冊": {
+   "en": "Log In / Sign Up",
+   "ja": "ログイン・登録",
+   "vi": "Đăng nhập / Đăng ký",
+   "id": "Masuk / Daftar",
+   "tl": "Mag-log in / Mag-register"
+  },
+  "登入註冊常見問題": {
+   "en": "Login & Sign-up FAQ",
+   "ja": "ログイン・登録に関するよくある質問",
+   "vi": "Câu hỏi thường gặp về đăng nhập, đăng ký",
+   "id": "Pertanyaan umum masuk / daftar",
+   "tl": "FAQ sa pag-log in at pag-register"
+  },
+  "目前無繳費紀錄": {
+   "en": "No payment records",
+   "ja": "支払い記録はありません",
+   "vi": "Hiện chưa có lịch sử thanh toán",
+   "id": "Belum ada riwayat pembayaran",
+   "tl": "Wala pang rekord ng bayad"
+  },
+  "社會局": {
+   "en": "Department of Social Welfare",
+   "ja": "社会局",
+   "vi": "Sở Xã hội",
+   "id": "Dinas Sosial",
+   "tl": "Department of Social Welfare"
+  },
+  "神奇柑仔店. 15, 冒牌的長髮公主餅乾": {
+   "en": "Zenitendo 15: The Fake Rapunzel Cookie",
+   "ja": "ふしぎ駄菓子屋 銭天堂. 15, にせものラプンツェルクッキー",
+   "vi": "Tiệm kẹo kỳ diệu. 15, Bánh quy công chúa tóc dài giả mạo",
+   "id": "Toko Permen Ajaib 15: Kue Rapunzel Palsu",
+   "tl": "Mahiwagang Tindahan ng Kendi. 15, Ang Pekeng Rapunzel na Cookie"
+  },
+  "移工業務|2029號": {
+   "en": "Migrant Workers|No. 2029",
+   "ja": "外国人労働者業務|2029番",
+   "vi": "Nghiệp vụ lao động di trú|Số 2029",
+   "id": "Layanan pekerja migran|No. 2029",
+   "tl": "Serbisyo sa Migrant Worker|Blg. 2029"
+  },
+  "稅捐處": {
+   "en": "Revenue Service Office",
+   "ja": "税捐処",
+   "vi": "Phòng Thuế vụ",
+   "id": "Kantor Pajak",
+   "tl": "Tanggapan ng Buwis"
+  },
+  "稅費": {
+   "en": "Taxes and Fees",
+   "ja": "税・手数料",
+   "vi": "Thuế phí",
+   "id": "Pajak dan biaya",
+   "tl": "Buwis at bayarin"
+  },
+  "空品資訊": {
+   "en": "Air Quality",
+   "ja": "大気質情報",
+   "vi": "Thông tin chất lượng không khí",
+   "id": "Info kualitas udara",
+   "tl": "Kalidad ng hangin"
+  },
+  "等候": {
+   "en": "Waiting",
+   "ja": "待ち",
+   "vi": "Đang chờ",
+   "id": "Menunggu",
+   "tl": "Naghihintay"
+  },
+  "範例：1912-01-01(含分隔符號)": {
+   "en": "Example: 1912-01-01 (with separators)",
+   "ja": "例：1912-01-01（区切り記号を含む）",
+   "vi": "Ví dụ: 1912-01-01 (có dấu phân cách)",
+   "id": "Contoh: 1912-01-01 (dengan tanda pemisah)",
+   "tl": "Halimbawa: 1912-01-01 (kasama ang gitling)"
+  },
+  "系統送出成功確認": {
+   "en": "Submission confirmed",
+   "ja": "送信完了の確認",
+   "vi": "Xác nhận gửi thành công",
+   "id": "Konfirmasi pengiriman berhasil",
+   "tl": "Kumpirmasyon: matagumpay na naipadala"
+  },
+  "索書號：": {
+   "en": "Call No.:",
+   "ja": "請求記号：",
+   "vi": "Ký hiệu xếp giá:",
+   "id": "Nomor panggil buku:",
+   "tl": "Call number:"
+  },
+  "索書號：V. 1": {
+   "en": "Call No.: V. 1",
+   "ja": "請求記号：V. 1",
+   "vi": "Ký hiệu xếp giá: V. 1",
+   "id": "Nomor panggil buku: V. 1",
+   "tl": "Call number: V. 1"
+  },
+  "綁定身分證字號，即可快速查詢代繳租金與維管費。": {
+   "en": "Link your ID number to quickly check rent and maintenance fees for payment on your behalf.",
+   "ja": "身分証番号を連携すると、代理納付の家賃と維持管理費をすばやく照会できます。",
+   "vi": "Liên kết số thẻ căn cước để tra cứu nhanh tiền thuê nhà và phí quản lý bảo trì nộp thay.",
+   "id": "Hubungkan nomor identitas Anda untuk cepat mengecek pembayaran atas nama Anda untuk sewa dan biaya pemeliharaan.",
+   "tl": "I-link ang iyong ID number para mabilis na makita ang renta at maintenance fee na pagbabayad para sa iyo."
+  },
+  "綜合受理|0379號": {
+   "en": "General Services|No. 0379",
+   "ja": "総合受付|0379番",
+   "vi": "Tiếp nhận tổng hợp|Số 0379",
+   "id": "Penerimaan umum|No. 0379",
+   "tl": "Pangkalahatang Pagtanggap|Blg. 0379"
+  },
+  "綜合業務|0103號": {
+   "en": "General Affairs|No. 0103",
+   "ja": "総合業務|0103番",
+   "vi": "Nghiệp vụ tổng hợp|Số 0103",
+   "id": "Layanan umum|No. 0103",
+   "tl": "Pangkalahatang Serbisyo|Blg. 0103"
+  },
+  "綜合櫃檯|23號": {
+   "en": "General Counter|No. 23",
+   "ja": "総合窓口|23番",
+   "vi": "Quầy tổng hợp|Số 23",
+   "id": "Loket umum|No. 23",
+   "tl": "Pangkalahatang Counter|Blg. 23"
+  },
+  "網路報案使用限制": {
+   "en": "Online Police Report Restrictions",
+   "ja": "オンライン通報の利用制限",
+   "vi": "Giới hạn sử dụng báo án trực tuyến",
+   "id": "Batasan penggunaan laporan polisi online",
+   "tl": "Limitasyon sa online na pag-uulat sa pulis"
+  },
+  "網路報案使用須知": {
+   "en": "Online Police Report Notice",
+   "ja": "オンライン通報の利用上の注意",
+   "vi": "Hướng dẫn sử dụng báo án trực tuyến",
+   "id": "Petunjuk penggunaan laporan polisi online",
+   "tl": "Paalala sa online na pag-uulat sa pulis"
+  },
+  "網路申辦|1001號": {
+   "en": "Online Applications|No. 1001",
+   "ja": "オンライン申請|1001番",
+   "vi": "Đăng ký trực tuyến|Số 1001",
+   "id": "Permohonan online|No. 1001",
+   "tl": "Online na Aplikasyon|Blg. 1001"
+  },
+  "縣市": {
+   "en": "City/County",
+   "ja": "県市",
+   "vi": "Huyện/Thành phố",
+   "id": "Kota/Kabupaten",
+   "tl": "Lungsod/County"
+  },
+  "繳費到期前3天收到台北市路邊停車費通知。": {
+   "en": "Get Taipei City roadside parking fee notices 3 days before the payment deadline.",
+   "ja": "支払期限の3日前に台北市路上駐車料金のお知らせを受け取ります。",
+   "vi": "Nhận thông báo phí đỗ xe ven đường Thành phố Đài Bắc 3 ngày trước hạn thanh toán.",
+   "id": "Terima pemberitahuan biaya parkir pinggir jalan Kota Taipei 3 hari sebelum jatuh tempo pembayaran.",
+   "tl": "Makatanggap ng abiso sa on-street parking fee ng Lungsod ng Taipei 3 araw bago ang takdang petsa ng pagbabayad."
+  },
+  "繳費後第 10 個工作天，可登入臺北e大在在[課程報名狀況]頁面檢視繳費審核結果。": {
+   "en": "On the 10th working day after payment, you can log in to Taipei e-University and check the payment review result on the [Course Registration Status] page.",
+   "ja": "お支払い後10営業日目から、台北e大にログインし［講座申込状況］ページで支払い審査結果を確認できます。",
+   "vi": "Từ ngày làm việc thứ 10 sau khi thanh toán, bạn có thể đăng nhập Taipei e-University và xem kết quả xét duyệt thanh toán tại trang [Tình trạng đăng ký khóa học].",
+   "id": "Pada hari kerja ke-10 setelah pembayaran, Anda dapat masuk ke Taipei e-University dan melihat hasil verifikasi pembayaran di halaman [Status Pendaftaran Kursus].",
+   "tl": "Sa ika-10 araw ng trabaho pagkatapos magbayad, mag-log in sa Taipei e-University at tingnan ang resulta ng pagsusuri ng bayad sa page na [Status ng Pag-enroll sa Kurso]."
+  },
+  "繳費紀錄": {
+   "en": "Payment Records",
+   "ja": "支払い記録",
+   "vi": "Lịch sử thanh toán",
+   "id": "Riwayat pembayaran",
+   "tl": "Rekord ng bayad"
+  },
+  "繳費編號": {
+   "en": "Payment Number",
+   "ja": "支払い番号",
+   "vi": "Mã thanh toán",
+   "id": "Nomor pembayaran",
+   "tl": "Numero ng bayarin"
+  },
+  "罰鍰": {
+   "en": "Fines",
+   "ja": "過料",
+   "vi": "Tiền phạt",
+   "id": "Denda",
+   "tl": "Multa"
+  },
+  "老人全民健康保險保險費自付額補助": {
+   "en": "National Health Insurance Premium Co-payment Subsidy for Seniors",
+   "ja": "高齢者の全民健康保険料自己負担分の補助",
+   "vi": "Trợ cấp phần tự chi trả phí bảo hiểm y tế toàn dân cho người cao tuổi",
+   "id": "Subsidi biaya mandiri premi asuransi kesehatan nasional untuk lansia",
+   "tl": "Subsidiya sa sariling bahagi ng National Health Insurance premium ng mga senior citizen"
+  },
+  "聯絡資訊": {
+   "en": "Contact Information",
+   "ja": "連絡先情報",
+   "vi": "Thông tin liên hệ",
+   "id": "Informasi kontak",
+   "tl": "Impormasyon sa pakikipag-ugnayan"
+  },
+  "肇事日期": {
+   "en": "Accident Date",
+   "ja": "事故発生日",
+   "vi": "Ngày xảy ra tai nạn",
+   "id": "Tanggal kecelakaan",
+   "tl": "Petsa ng aksidente"
+  },
+  "自然人憑證|2023號": {
+   "en": "Citizen Digital Certificate|No. 2023",
+   "ja": "自然人証明書|2023番",
+   "vi": "Chứng thư số cá nhân|Số 2023",
+   "id": "Sertifikat Digital Warga|No. 2023",
+   "tl": "Citizen Digital Certificate|Blg. 2023"
+  },
+  "至少勾選一項": {
+   "en": "Select at least one",
+   "ja": "1つ以上選択してください",
+   "vi": "Chọn ít nhất một mục",
+   "id": "Pilih minimal satu",
+   "tl": "Pumili ng kahit isa"
+  },
+  "臺中市": {
+   "en": "Taichung City",
+   "ja": "台中市",
+   "vi": "Thành phố Đài Trung",
+   "id": "Kota Taichung",
+   "tl": "Taichung City"
+  },
+  "臺北市中正區公所": {
+   "en": "Zhongzheng District Office, Taipei City",
+   "ja": "台北市中正区役所",
+   "vi": "Văn phòng quận Zhongzheng, Thành phố Đài Bắc",
+   "id": "Kantor Distrik Zhongzheng Kota Taipei",
+   "tl": "Zhongzheng District Office, Lungsod ng Taipei"
+  },
+  "臺北市家庭暴力被害人補助": {
+   "en": "Taipei City Domestic Violence Victim Subsidy",
+   "ja": "台北市家庭内暴力被害者補助",
+   "vi": "Trợ cấp nạn nhân bạo lực gia đình Thành phố Đài Bắc",
+   "id": "Subsidi korban kekerasan dalam rumah tangga Kota Taipei",
+   "tl": "Tulong sa mga biktima ng karahasan sa tahanan sa Lungsod ng Taipei"
+  },
+  "臺北市性侵害被害人補助": {
+   "en": "Taipei City Sexual Assault Victim Subsidy",
+   "ja": "台北市性暴力被害者補助",
+   "vi": "Trợ cấp nạn nhân xâm hại tình dục Thành phố Đài Bắc",
+   "id": "Subsidi korban kekerasan seksual Kota Taipei",
+   "tl": "Tulong sa mga biktima ng sexual assault sa Lungsod ng Taipei"
+  },
+  "臺北市立美術館": {
+   "en": "Taipei Fine Arts Museum",
+   "ja": "台北市立美術館",
+   "vi": "Bảo tàng Mỹ thuật Thành phố Đài Bắc",
+   "id": "Museum Seni Rupa Taipei",
+   "tl": "Fine Arts Museum ng Lungsod ng Taipei"
+  },
+  "臺北市萬華區公所": {
+   "en": "Wanhua District Office, Taipei City",
+   "ja": "台北市萬華区役所",
+   "vi": "Văn phòng quận Wanhua, Thành phố Đài Bắc",
+   "id": "Kantor Distrik Wanhua Kota Taipei",
+   "tl": "Wanhua District Office, Lungsod ng Taipei"
+  },
+  "臺北市萬華區和平西路三段120號4樓": {
+   "en": "4F, No. 120, Sec. 3, Heping W. Rd., Wanhua Dist., Taipei City",
+   "ja": "台北市萬華区和平西路三段120号4階",
+   "vi": "Tầng 4, Số 120, Đoạn 3, Đường Heping Tây, Quận Wanhua, Thành phố Đài Bắc",
+   "id": "Lt. 4, No. 120, Bagian 3, Jalan Heping Barat, Distrik Wanhua, Kota Taipei",
+   "tl": "4F, No. 120, Sec. 3, Heping W. Rd., Wanhua Dist., Lungsod ng Taipei"
+  },
+  "臺北市萬華區艋舺大道101號3樓": {
+   "en": "3F, No. 101, Mengjia Blvd., Wanhua Dist., Taipei City",
+   "ja": "台北市萬華区艋舺大道101号3階",
+   "vi": "Tầng 3, Số 101, Đại lộ Mengjia, Quận Wanhua, Thành phố Đài Bắc",
+   "id": "Lt. 3, No. 101, Jalan Raya Bangka, Distrik Wanhua, Kota Taipei",
+   "tl": "3F, No. 101, Bangka Blvd., Wanhua Dist., Lungsod ng Taipei"
+  },
+  "臺北市路邊停車費重複繳費申請退費": {
+   "en": "Refund Application for Duplicate Payment of Taipei City Roadside Parking Fees",
+   "ja": "台北市路上駐車料金の重複支払いに対する返金申請",
+   "vi": "Đăng ký hoàn tiền phí đỗ xe ven đường nộp trùng tại Thành phố Đài Bắc",
+   "id": "Permohonan pengembalian dana untuk pembayaran ganda biaya parkir pinggir jalan Kota Taipei",
+   "tl": "Pag-apply ng refund sa dobleng bayad ng on-street parking fee sa Lungsod ng Taipei"
+  },
+  "臺北市身心障礙者參加社會保險保險費補助方式變更": {
+   "en": "Change to the Social Insurance Premium Subsidy Method for People with Disabilities in Taipei City",
+   "ja": "台北市障がい者の社会保険料補助方法の変更",
+   "vi": "Thay đổi phương thức trợ cấp phí bảo hiểm xã hội cho người khuyết tật tại Thành phố Đài Bắc",
+   "id": "Perubahan cara subsidi premi asuransi sosial bagi penyandang disabilitas Kota Taipei",
+   "tl": "Pagbabago sa paraan ng subsidiya sa social insurance premium para sa mga taong may kapansanan sa Lungsod ng Taipei"
+  },
+  "臺北旅遊網最新消息": {
+   "en": "Taipei Travel Latest News",
+   "ja": "台北旅遊網の最新ニュース",
+   "vi": "Tin mới nhất trang Du lịch Đài Bắc",
+   "id": "Berita terbaru Taipei Travel",
+   "tl": "Pinakabagong balita ng Taipei Travel"
+  },
+  "臺南市": {
+   "en": "Tainan City",
+   "ja": "台南市",
+   "vi": "Thành phố Đài Nam",
+   "id": "Kota Tainan",
+   "tl": "Tainan City"
+  },
+  "臺東縣": {
+   "en": "Taitung County",
+   "ja": "台東県",
+   "vi": "Huyện Đài Đông",
+   "id": "Kabupaten Taitung",
+   "tl": "Taitung County"
+  },
+  "艋舺就業服務站": {
+   "en": "Mengjia Employment Service Station",
+   "ja": "艋舺就業サービスステーション",
+   "vi": "Trạm dịch vụ việc làm Mengjia",
+   "id": "Pos Layanan Ketenagakerjaan Bangka",
+   "tl": "Bangka Employment Service Station"
+  },
+  "花蓮縣": {
+   "en": "Hualien County",
+   "ja": "花蓮県",
+   "vi": "Huyện Hoa Liên",
+   "id": "Kabupaten Hualien",
+   "tl": "Hualien County"
+  },
+  "苗栗縣": {
+   "en": "Miaoli County",
+   "ja": "苗栗県",
+   "vi": "Huyện Miêu Lật",
+   "id": "Kabupaten Miaoli",
+   "tl": "Miaoli County"
+  },
+  "若已在超商繳費、其他繳費平台或與銀行約定自動扣繳，請勿重複繳費。": {
+   "en": "If you have already paid at a convenience store or on another payment platform, or have set up automatic debit with your bank, please do not pay again.",
+   "ja": "すでにコンビニやその他の支払いプラットフォームで支払った場合、または銀行と口座自動引き落としを契約している場合は、重複して支払わないでください。",
+   "vi": "Nếu đã thanh toán tại cửa hàng tiện lợi, nền tảng thanh toán khác hoặc đã đăng ký ghi nợ tự động với ngân hàng, vui lòng không thanh toán trùng.",
+   "id": "Jika Anda sudah membayar di minimarket, platform pembayaran lain, atau melalui debit otomatis dengan bank, jangan membayar lagi.",
+   "tl": "Kung nakapagbayad ka na sa convenience store, ibang payment platform, o may automatic debit ka sa bangko, huwag nang magbayad ulit."
+  },
+  "萬華分處": {
+   "en": "Wanhua Branch Office",
+   "ja": "萬華分処",
+   "vi": "Chi nhánh Wanhua",
+   "id": "Kantor Cabang Wanhua",
+   "tl": "Wanhua Branch"
+  },
+  "萬華區戶政事務所": {
+   "en": "Wanhua District Household Registration Office",
+   "ja": "萬華区戸政事務所",
+   "vi": "Văn phòng hộ tịch quận Wanhua",
+   "id": "Kantor Pencatatan Kependudukan Distrik Wanhua",
+   "tl": "Wanhua District Household Registration Office"
+  },
+  "著者：Anton Poitier文 ; Maria Neradova圖": {
+   "en": "Author: Text by Anton Poitier ; illustrated by Maria Neradova",
+   "ja": "著者：Anton Poitier 文 ; Maria Neradova 絵",
+   "vi": "Tác giả: Anton Poitier lời ; Maria Neradova tranh",
+   "id": "Penulis: teks Anton Poitier ; ilustrasi Maria Neradova",
+   "tl": "May-akda: teksto ni Anton Poitier ; larawan ni Maria Neradova"
+  },
+  "著者：Fredrik Backman ; [translated by Neil Smith].": {
+   "en": "Author: Fredrik Backman ; [translated by Neil Smith].",
+   "ja": "著者：Fredrik Backman ; [translated by Neil Smith].",
+   "vi": "Tác giả: Fredrik Backman ; [translated by Neil Smith].",
+   "id": "Penulis: Fredrik Backman ; [diterjemahkan oleh Neil Smith].",
+   "tl": "May-akda: Fredrik Backman ; [isinalin ni Neil Smith]."
+  },
+  "著者：[天衛文化圖書製作] ; 林秋滿撰文": {
+   "en": "Author: [Produced by Tien-Wei Publishing] ; text by Lin Chiu-man",
+   "ja": "著者：[天衛文化 図書制作] ; 林秋滿 文",
+   "vi": "Tác giả: [Tianwei Culture biên soạn] ; Lin Qiuman viết lời",
+   "id": "Penulis: [Produksi Buku Tianwei Culture] ; teks oleh Lin Qiuman",
+   "tl": "May-akda: [Ginawa ng Tien Wei Publishing] ; isinulat ni Lin Qiuman"
+  },
+  "著者：劉潤著": {
+   "en": "Author: Liu Run",
+   "ja": "著者：劉潤 著",
+   "vi": "Tác giả: Liu Run",
+   "id": "Penulis: Liu Run",
+   "tl": "May-akda: Liu Run"
+  },
+  "著者：廣嶋玲子文 ; jyajya圖 ; 王蘊潔譯": {
+   "en": "Author: Text by Reiko Hiroshima ; illustrated by jyajya ; translated by Wang Yun-chieh",
+   "ja": "著者：廣嶋玲子 文 ; jyajya 絵 ; 王蘊潔 訳",
+   "vi": "Tác giả: Hiroshima Reiko lời ; jyajya tranh ; Wang Yunjie dịch",
+   "id": "Penulis: teks Reiko Hiroshima ; ilustrasi jyajya ; terjemahan Wang Yunjie",
+   "tl": "May-akda: teksto ni Reiko Hiroshima ; larawan ni jyajya ; isinalin ni Wang Yunjie"
+  },
+  "處理中(1)": {
+   "en": "Processing (1)",
+   "ja": "処理中(1)",
+   "vi": "Đang xử lý (1)",
+   "id": "Sedang diproses (1)",
+   "tl": "Pinoproseso (1)"
+  },
+  "處理完成": {
+   "en": "Completed",
+   "ja": "処理完了",
+   "vi": "Đã xử lý xong",
+   "id": "Selesai diproses",
+   "tl": "Tapos na ang pagproseso"
+  },
+  "裁決所受理之申訴案件(外縣市)": {
+   "en": "Complaints Handled by the Traffic Adjudication Office (Other Cities/Counties)",
+   "ja": "裁決所が受け付ける異議申立案件(他県市)",
+   "vi": "Khiếu nại do Văn phòng Xét xử tiếp nhận (huyện/thành phố khác)",
+   "id": "Pengaduan yang ditangani Kantor Adjudikasi (luar kota)",
+   "tl": "Mga reklamong tinanggap ng Traffic Adjudication Office (ibang lungsod/county)"
+  },
+  "裁決所受理之申訴案件(本市)": {
+   "en": "Complaints Handled by the Traffic Adjudication Office (Taipei City)",
+   "ja": "裁決所が受け付ける異議申立案件(台北市)",
+   "vi": "Khiếu nại do Văn phòng Xét xử tiếp nhận (Thành phố Đài Bắc)",
+   "id": "Pengaduan yang ditangani Kantor Adjudikasi (Kota Taipei)",
+   "tl": "Mga reklamong tinanggap ng Traffic Adjudication Office (Lungsod ng Taipei)"
+  },
+  "裁決所受理之申訴案件（應到案處所為臺北市交通事件裁決所）-外縣市舉發案件（屬免書證、免謄本）": {
+   "en": "Complaints Handled by the Traffic Adjudication Office (venue: Taipei City Traffic Adjudication Office) - Tickets Issued by Other Cities/Counties (no documents or transcripts required)",
+   "ja": "裁決所が受け付ける異議申立案件（出頭先：台北市交通事件裁決所）－他県市の摘発案件（書類証明・謄本不要）",
+   "vi": "Khiếu nại do Văn phòng Xét xử tiếp nhận (nơi phải trình diện là Văn phòng Xét xử Vi phạm Giao thông Thành phố Đài Bắc) - vụ lập biên bản tại huyện/thành phố khác (miễn giấy tờ chứng minh, miễn bản sao)",
+   "id": "Pengaduan yang ditangani Kantor Adjudikasi (tempat menghadap: Kantor Adjudikasi Pelanggaran Lalu Lintas Kota Taipei) - kasus penindakan dari kota/kabupaten lain (tanpa dokumen bukti dan salinan)",
+   "tl": "Mga reklamong tinanggap ng Traffic Adjudication Office (dapat humarap sa Traffic Adjudication Office ng Lungsod ng Taipei) - kasong inisyu ng ibang lungsod/county (hindi kailangan ng dokumento o kopya)"
+  },
+  "裁決所受理之申訴案件（應到案處所為臺北市交通事件裁決所）-本市舉發案件（屬免書證、免謄本）": {
+   "en": "Complaints Handled by the Traffic Adjudication Office (venue: Taipei City Traffic Adjudication Office) - Tickets Issued in Taipei City (no documents or transcripts required)",
+   "ja": "裁決所が受け付ける異議申立案件（出頭先：台北市交通事件裁決所）－台北市の摘発案件（書類証明・謄本不要）",
+   "vi": "Khiếu nại do Văn phòng Xét xử tiếp nhận (nơi phải trình diện là Văn phòng Xét xử Vi phạm Giao thông Thành phố Đài Bắc) - vụ lập biên bản tại Thành phố Đài Bắc (miễn giấy tờ chứng minh, miễn bản sao)",
+   "id": "Pengaduan yang ditangani Kantor Adjudikasi (tempat menghadap: Kantor Adjudikasi Pelanggaran Lalu Lintas Kota Taipei) - kasus penindakan di Kota Taipei (tanpa dokumen bukti dan salinan)",
+   "tl": "Mga reklamong tinanggap ng Traffic Adjudication Office (dapat humarap sa Traffic Adjudication Office ng Lungsod ng Taipei) - kasong inisyu ng Lungsod ng Taipei (hindi kailangan ng dokumento o kopya)"
+  },
+  "補充描述：": {
+   "en": "Additional description:",
+   "ja": "補足説明：",
+   "vi": "Mô tả bổ sung:",
+   "id": "Keterangan tambahan:",
+   "tl": "Karagdagang paglalarawan:"
+  },
+  "補助類": {
+   "en": "Subsidies",
+   "ja": "補助関連",
+   "vi": "Loại trợ cấp",
+   "id": "Kategori subsidi",
+   "tl": "Subsidiya"
+  },
+  "西門就業服務站": {
+   "en": "Ximen Employment Service Station",
+   "ja": "西門就業サービスステーション",
+   "vi": "Trạm dịch vụ việc làm Ximen",
+   "id": "Pos Layanan Ketenagakerjaan Ximen",
+   "tl": "Ximen Employment Service Station"
+  },
+  "規費": {
+   "en": "Fees",
+   "ja": "手数料",
+   "vi": "Lệ phí",
+   "id": "Biaya administrasi",
+   "tl": "Administrative fee"
+  },
+  "訂閱服務將不定期發布": {
+   "en": "Subscription updates are published from time to time",
+   "ja": "購読サービスは不定期に配信されます",
+   "vi": "Dịch vụ đăng ký nhận tin sẽ được gửi không định kỳ",
+   "id": "Info langganan akan dikirim sewaktu-waktu",
+   "tl": "Paminsan-minsang maglalabas ng balita ang subscription service"
+  },
+  "訂閱臺北市政府最新消息": {
+   "en": "Subscribe to Taipei City Government News",
+   "ja": "台北市政府の最新ニュースを購読",
+   "vi": "Đăng ký nhận tin mới nhất từ Chính quyền Thành phố Đài Bắc",
+   "id": "Berlangganan berita terbaru Pemerintah Kota Taipei",
+   "tl": "Mag-subscribe sa pinakabagong balita ng Pamahalaang Lungsod ng Taipei"
+  },
+  "說給兒童的臺灣歷史": {
+   "en": "Taiwan History for Children",
+   "ja": "子どもに語る台湾の歴史",
+   "vi": "Lịch sử Đài Loan kể cho thiếu nhi",
+   "id": "Sejarah Taiwan untuk Anak-anak",
+   "tl": "Kasaysayan ng Taiwan para sa mga Bata"
+  },
+  "調出日期：2024/11/10": {
+   "en": "Checkout date: 2024/11/10",
+   "ja": "取り出し日：2024/11/10",
+   "vi": "Ngày điều chuyển: 2024/11/10",
+   "id": "Tanggal diambil dari rak: 2024/11/10",
+   "tl": "Petsa ng pagkuha mula sa imbakan: 2024/11/10"
+  },
+  "請啟用定位服務": {
+   "en": "Please enable location services",
+   "ja": "位置情報サービスを有効にしてください",
+   "vi": "Vui lòng bật dịch vụ định vị",
+   "id": "Aktifkan layanan lokasi",
+   "tl": "Paki-enable ang location service"
+  },
+  "請您登入": {
+   "en": "Please log in",
+   "ja": "ログインしてください",
+   "vi": "Vui lòng đăng nhập",
+   "id": "Silakan masuk",
+   "tl": "Paki-log in"
+  },
+  "請至現場確認申辦櫃檯並抽號碼牌": {
+   "en": "Please confirm the application counter on site and take a queue number",
+   "ja": "現地で申請窓口を確認し、整理券をお取りください",
+   "vi": "Vui lòng đến trực tiếp để xác nhận quầy làm thủ tục và bốc số thứ tự",
+   "id": "Silakan cek loket permohonan di lokasi dan ambil nomor antrean",
+   "tl": "Pumunta sa lugar para kumpirmahin ang counter ng aplikasyon at kumuha ng queue number"
+  },
+  "請詳閱以下須知內容後繼續網路投案程序。": {
+   "en": "Please read the following notice carefully before continuing with your online report.",
+   "ja": "以下の注意事項をよくお読みのうえ、オンライン通報の手続きにお進みください。",
+   "vi": "Vui lòng đọc kỹ nội dung hướng dẫn dưới đây trước khi tiếp tục thủ tục báo án trực tuyến.",
+   "id": "Silakan baca petunjuk berikut sebelum melanjutkan proses laporan online.",
+   "tl": "Basahing mabuti ang sumusunod na paalala bago magpatuloy sa online na pag-uulat sa pulis."
+  },
+  "請輸入單據號碼": {
+   "en": "Enter receipt number",
+   "ja": "伝票番号を入力してください",
+   "vi": "Vui lòng nhập số chứng từ",
+   "id": "Masukkan nomor tagihan",
+   "tl": "Ilagay ang numero ng bill"
+  },
+  "請輸入水號": {
+   "en": "Enter water account number",
+   "ja": "水道お客様番号を入力してください",
+   "vi": "Vui lòng nhập số danh bộ nước",
+   "id": "Masukkan nomor pelanggan air",
+   "tl": "Ilagay ang water account number"
+  },
+  "請輸入繳費編號": {
+   "en": "Enter payment number",
+   "ja": "支払い番号を入力してください",
+   "vi": "Vui lòng nhập mã thanh toán",
+   "id": "Masukkan nomor pembayaran",
+   "tl": "Ilagay ang numero ng bayarin"
+  },
+  "請輸入證件號碼": {
+   "en": "Enter ID document number",
+   "ja": "証明書番号を入力してください",
+   "vi": "Vui lòng nhập số giấy tờ",
+   "id": "Masukkan nomor dokumen identitas",
+   "tl": "Ilagay ang numero ng dokumento"
+  },
+  "請輸入身分證字號": {
+   "en": "Enter ID number",
+   "ja": "身分証番号を入力してください",
+   "vi": "Vui lòng nhập số thẻ căn cước",
+   "id": "Masukkan nomor identitas",
+   "tl": "Ilagay ang ID number"
+  },
+  "請輸入通訊地址": {
+   "en": "Enter mailing address",
+   "ja": "連絡先住所を入力してください",
+   "vi": "Vui lòng nhập địa chỉ liên lạc",
+   "id": "Masukkan alamat surat-menyurat",
+   "tl": "Ilagay ang mailing address"
+  },
+  "請輸入違規駕駛人姓名": {
+   "en": "Enter the violating driver's name",
+   "ja": "違反運転者の氏名を入力してください",
+   "vi": "Vui lòng nhập họ tên người lái xe vi phạm",
+   "id": "Masukkan nama pengemudi pelanggar",
+   "tl": "Ilagay ang pangalan ng driver na lumabag"
+  },
+  "請輸入電子信箱": {
+   "en": "Enter email",
+   "ja": "メールアドレスを入力してください",
+   "vi": "Vui lòng nhập email",
+   "id": "Masukkan email",
+   "tl": "Ilagay ang e-mail"
+  },
+  "請透過登入市民服務大平台-線上進度查詢服務進度，或致電客服(1999外縣市02-27208889)轉8585。\n身分證驗證：致電客服(1999外縣市02-27208889)轉8585。": {
+   "en": "Please check the progress by logging in to the Citizen Grand Platform's online progress inquiry, or call customer service (1999, or 02-27208889 from outside Taipei City) ext. 8585.\nID verification: call customer service (1999, or 02-27208889 from outside Taipei City) ext. 8585.",
+   "ja": "市民サービスプラットフォームにログインし「オンライン進捗照会」で進捗をご確認いただくか、カスタマーサービス（1999、台北市外からは02-27208889）にお電話のうえ内線8585へおつなぎください。\n身分証認証：カスタマーサービス（1999、台北市外からは02-27208889）にお電話のうえ内線8585へおつなぎください。",
+   "vi": "Vui lòng đăng nhập Nền tảng Dịch vụ Thị dân - Tra cứu tiến độ trực tuyến để kiểm tra tiến độ, hoặc gọi tổng đài (1999, từ huyện/thành phố khác gọi 02-27208889) nhánh 8585.\nXác minh thẻ căn cước: gọi tổng đài (1999, từ huyện/thành phố khác gọi 02-27208889) nhánh 8585.",
+   "id": "Silakan masuk ke Platform Layanan Warga - Cek Progres Online untuk melihat progres layanan, atau hubungi layanan pelanggan (1999, dari luar Kota Taipei 02-27208889) ekstensi 8585.\nVerifikasi kartu identitas: hubungi layanan pelanggan (1999, dari luar Kota Taipei 02-27208889) ekstensi 8585.",
+   "tl": "Tingnan ang progreso sa pamamagitan ng pag-log in sa Citizen Service Platform - Online Progress Inquiry, o tumawag sa customer service (1999; mula sa labas ng Taipei 02-27208889) ext. 8585.\nID verification: tumawag sa customer service (1999; mula sa labas ng Taipei 02-27208889) ext. 8585."
+  },
+  "請選擇地點": {
+   "en": "Select a location",
+   "ja": "場所を選択してください",
+   "vi": "Vui lòng chọn địa điểm",
+   "id": "Pilih lokasi",
+   "tl": "Pumili ng lokasyon"
+  },
+  "請選擇機關": {
+   "en": "Select an agency",
+   "ja": "機関を選択してください",
+   "vi": "Vui lòng chọn cơ quan",
+   "id": "Pilih instansi",
+   "tl": "Pumili ng ahensya"
+  },
+  "請選擇縣市": {
+   "en": "Select a city/county",
+   "ja": "県市を選択してください",
+   "vi": "Vui lòng chọn huyện/thành phố",
+   "id": "Pilih kota/kabupaten",
+   "tl": "Pumili ng lungsod/county"
+  },
+  "請選擇要申請的項目": {
+   "en": "Select the item to apply for",
+   "ja": "申請する項目を選択してください",
+   "vi": "Vui lòng chọn hạng mục muốn đăng ký",
+   "id": "Pilih item yang ingin diajukan",
+   "tl": "Piliin ang item na gusto mong i-apply"
+  },
+  "請選擇車種": {
+   "en": "Select vehicle type",
+   "ja": "車種を選択してください",
+   "vi": "Vui lòng chọn loại xe",
+   "id": "Pilih jenis kendaraan",
+   "tl": "Pumili ng uri ng sasakyan"
+  },
+  "請選擇鄉鎮區": {
+   "en": "Select a township/district",
+   "ja": "郷鎮区を選択してください",
+   "vi": "Vui lòng chọn xã/thị trấn/quận",
+   "id": "Pilih kecamatan/distrik",
+   "tl": "Pumili ng distrito/bayan"
+  },
+  "請選擇院區": {
+   "en": "Select a branch",
+   "ja": "院区を選択してください",
+   "vi": "Vui lòng chọn cơ sở",
+   "id": "Pilih cabang",
+   "tl": "Pumili ng sangay"
+  },
+  "謄本櫃檯|0001號": {
+   "en": "Transcript Counter|No. 0001",
+   "ja": "謄本窓口|0001番",
+   "vi": "Quầy bản sao|Số 0001",
+   "id": "Loket salinan dokumen|No. 0001",
+   "tl": "Counter ng Kopya ng Dokumento|Blg. 0001"
+  },
+  "證件號碼": {
+   "en": "ID Document Number",
+   "ja": "証明書番号",
+   "vi": "Số giấy tờ",
+   "id": "Nomor dokumen identitas",
+   "tl": "Numero ng dokumento"
+  },
+  "警察局": {
+   "en": "Police Department",
+   "ja": "警察局",
+   "vi": "Sở Cảnh sát",
+   "id": "Departemen Kepolisian",
+   "tl": "Kagawaran ng Pulisya"
+  },
+  "護照一站式|3004號": {
+   "en": "Passport One-Stop|No. 3004",
+   "ja": "パスポートワンストップ|3004番",
+   "vi": "Hộ chiếu một cửa|Số 3004",
+   "id": "Paspor satu atap|No. 3004",
+   "tl": "Passport One-Stop|Blg. 3004"
+  },
+  "變更": {
+   "en": "Change",
+   "ja": "変更",
+   "vi": "Thay đổi",
+   "id": "Ubah",
+   "tl": "Baguhin"
+  },
+  "變電所、電廠受災": {
+   "en": "Substation or Power Plant Damage",
+   "ja": "変電所・発電所の被害",
+   "vi": "Trạm biến áp, nhà máy điện bị thiệt hại",
+   "id": "Gardu listrik atau pembangkit listrik terdampak",
+   "tl": "Pinsala sa substation o power plant"
+  },
+  "路燈故障": {
+   "en": "Streetlight Outage",
+   "ja": "街灯の故障",
+   "vi": "Đèn đường hỏng",
+   "id": "Lampu jalan rusak",
+   "tl": "Sirang ilaw sa kalye"
+  },
+  "路邊停車費九五折優惠僅限於繳納一般停車單，平信、催繳、追繳單號將無法享有此項優惠。": {
+   "en": "The 5% discount on roadside parking fees applies only to regular parking bills; regular-mail, reminder and recovery notice bill numbers are not eligible.",
+   "ja": "路上駐車料金の5%割引は、一般の駐車料金通知書のお支払いのみが対象です。普通郵便・督促・追徴の通知書番号は対象外です。",
+   "vi": "Ưu đãi giảm 5% phí đỗ xe ven đường chỉ áp dụng khi nộp phiếu đỗ xe thông thường; phiếu gửi qua thư thường, phiếu nhắc nộp, phiếu truy thu không được hưởng ưu đãi này.",
+   "id": "Diskon 5% biaya parkir pinggir jalan hanya berlaku untuk tagihan parkir biasa; tagihan surat biasa, tagihan pengingat, dan tagihan tunggakan tidak mendapat diskon ini.",
+   "tl": "Ang 5% diskwento sa on-street parking fee ay para lamang sa ordinaryong parking ticket; hindi kasama ang mga numero ng notice na ipinadala sa ordinaryong koreo, reminder notice at final collection notice."
+  },
+  "身分證字號": {
+   "en": "ID Number",
+   "ja": "身分証番号",
+   "vi": "Số thẻ căn cước",
+   "id": "Nomor identitas",
+   "tl": "ID number"
+  },
+  "輸入店家名稱": {
+   "en": "Enter store name",
+   "ja": "店舗名を入力",
+   "vi": "Nhập tên cửa hàng",
+   "id": "Masukkan nama toko",
+   "tl": "Ilagay ang pangalan ng tindahan"
+  },
+  "輸入資料": {
+   "en": "Enter Information",
+   "ja": "情報を入力",
+   "vi": "Nhập dữ liệu",
+   "id": "Masukkan data",
+   "tl": "Ilagay ang datos"
+  },
+  "近1年": {
+   "en": "Past 1 year",
+   "ja": "過去1年",
+   "vi": "1 năm gần đây",
+   "id": "1 tahun terakhir",
+   "tl": "Nakaraang 1 taon"
+  },
+  "近2年": {
+   "en": "Past 2 years",
+   "ja": "過去2年",
+   "vi": "2 năm gần đây",
+   "id": "2 tahun terakhir",
+   "tl": "Nakaraang 2 taon"
+  },
+  "近3年": {
+   "en": "Past 3 years",
+   "ja": "過去3年",
+   "vi": "3 năm gần đây",
+   "id": "3 tahun terakhir",
+   "tl": "Nakaraang 3 taon"
+  },
+  "透過悠遊付APP註冊完成的台北通會員將取得一組帳號及密碼，如您忘記當初設定的密碼，請透過「忘記密碼」功能進行密碼變更。": {
+   "en": "TaipeiPASS members who registered through the EasyWallet app receive an account and password. If you forgot the password you set, please use the “Forgot Password” function to change it.",
+   "ja": "EasyWalletアプリで登録したTaipeiPASS会員には、アカウントとパスワードが発行されます。設定したパスワードをお忘れの場合は、「パスワードを忘れた場合」機能からパスワードを変更してください。",
+   "vi": "Thành viên TaipeiPASS đăng ký qua ứng dụng EasyWallet sẽ có một tài khoản và mật khẩu; nếu bạn quên mật khẩu đã đặt, vui lòng đổi mật khẩu bằng chức năng “Quên mật khẩu”.",
+   "id": "Anggota TaipeiPASS yang mendaftar melalui aplikasi EasyWallet akan mendapatkan akun dan kata sandi. Jika Anda lupa kata sandi, gunakan fitur “Lupa kata sandi” untuk mengubahnya.",
+   "tl": "Ang mga miyembro ng TaipeiPASS na nag-register sa EasyWallet APP ay may account at password. Kung nakalimutan mo ang password, gamitin ang “Nakalimutan ang Password” para palitan ito."
+  },
+  "通報": {
+   "en": "Report",
+   "ja": "通報",
+   "vi": "Báo cáo",
+   "id": "Laporkan",
+   "tl": "Mag-ulat"
+  },
+  "通報日期：": {
+   "en": "Report date:",
+   "ja": "通報日：",
+   "vi": "Ngày báo cáo:",
+   "id": "Tanggal laporan:",
+   "tl": "Petsa ng ulat:"
+  },
+  "連江縣": {
+   "en": "Lienchiang County",
+   "ja": "連江県",
+   "vi": "Huyện Liên Giang",
+   "id": "Kabupaten Lienchiang",
+   "tl": "Lienchiang County"
+  },
+  "進入作業系統報案，送出成功後，頁面將顯示出您的報案編號及查詢密碼，若未顯示，則表示送出未成功！您可以再檢視您填入的資料，重報一次; 或撥打110直接報案。": {
+   "en": "Enter the system to file your report. After it is submitted, the page will show your report number and inquiry password. If they are not shown, the submission failed! You can review the information you entered and report again, or call 110 to report directly.",
+   "ja": "システムから通報し、送信に成功すると、画面に通報番号と照会用パスワードが表示されます。表示されない場合は送信に失敗しています。入力内容をご確認のうえ再度通報するか、110番へ直接お電話ください。",
+   "vi": "Vào hệ thống để báo án; sau khi gửi thành công, trang sẽ hiển thị mã báo án và mật khẩu tra cứu của bạn. Nếu không hiển thị nghĩa là gửi chưa thành công! Bạn có thể kiểm tra lại thông tin đã nhập và báo lại lần nữa; hoặc gọi 110 để báo án trực tiếp.",
+   "id": "Masuk ke sistem untuk melapor. Setelah berhasil dikirim, halaman akan menampilkan nomor laporan dan kata sandi pencarian Anda. Jika tidak muncul, berarti pengiriman gagal! Anda dapat memeriksa kembali data yang diisi dan melapor ulang, atau langsung hubungi 110 untuk melapor.",
+   "tl": "Pumasok sa sistema para mag-ulat. Kapag matagumpay na naipadala, makikita sa page ang iyong report number at password para sa pagtingin. Kung hindi ito lumabas, hindi matagumpay ang pagpapadala! Suriin muli ang inilagay mong datos at mag-ulat ulit; o tumawag sa 110 para direktang mag-ulat."
+  },
+  "逾期請至學校辦理繳納，並依校規辦理。": {
+   "en": "If overdue, please pay at the school and follow school regulations.",
+   "ja": "期限を過ぎた場合は、学校で納付手続きを行い、校則に従って対応してください。",
+   "vi": "Nếu quá hạn, vui lòng đến trường để nộp và xử lý theo quy định của trường.",
+   "id": "Jika terlambat, silakan bayar di sekolah dan ikuti peraturan sekolah.",
+   "tl": "Kung lampas na sa takdang petsa, magbayad sa paaralan at sundin ang patakaran ng paaralan."
+  },
+  "逾繳費期限，不提供查詢繳費功能": {
+   "en": "The payment deadline has passed; inquiry and payment are not available",
+   "ja": "支払期限を過ぎているため、照会・支払い機能はご利用いただけません",
+   "vi": "Đã quá hạn thanh toán, không hỗ trợ tra cứu và thanh toán",
+   "id": "Batas waktu pembayaran telah lewat; fitur cek dan bayar tidak tersedia",
+   "tl": "Lampas na sa takdang petsa ng pagbabayad; hindi na maaaring maghanap at magbayad"
+  },
+  "逾繳費期限，請先洽班期承辦人員確認能否受理繳費。": {
+   "en": "The payment deadline has passed; please contact the course officer first to confirm whether payment can still be accepted.",
+   "ja": "支払期限を過ぎています。支払いを受け付けられるか、まず講座の担当者にご確認ください。",
+   "vi": "Đã quá hạn thanh toán, vui lòng liên hệ nhân viên phụ trách khóa học để xác nhận có thể nhận thanh toán hay không.",
+   "id": "Batas waktu pembayaran telah lewat; silakan hubungi petugas kelas untuk memastikan apakah pembayaran masih bisa diterima.",
+   "tl": "Lampas na sa takdang petsa ng pagbabayad; makipag-ugnayan muna sa namamahala ng klase kung maaari pang tanggapin ang bayad."
+  },
+  "違規駕駛人姓名": {
+   "en": "Violating Driver's Name",
+   "ja": "違反運転者の氏名",
+   "vi": "Họ tên người lái xe vi phạm",
+   "id": "Nama pengemudi pelanggar",
+   "tl": "Pangalan ng driver na lumabag"
+  },
+  "選擇地點": {
+   "en": "Select Location",
+   "ja": "場所を選択",
+   "vi": "Chọn địa điểm",
+   "id": "Pilih lokasi",
+   "tl": "Pumili ng lokasyon"
+  },
+  "選擇要通報項目": {
+   "en": "Select an item to report",
+   "ja": "通報する項目を選択",
+   "vi": "Chọn hạng mục cần báo cáo",
+   "id": "Pilih item yang ingin dilaporkan",
+   "tl": "Piliin ang iuulat"
+  },
+  "鄉鎮(市)區": {
+   "en": "Township/District",
+   "ja": "郷鎮(市)区",
+   "vi": "Xã/thị trấn (thành phố)/quận",
+   "id": "Kecamatan/Kota/Distrik",
+   "tl": "Bayan/Lungsod/Distrito"
+  },
+  "重型機車車種請選擇機車。": {
+   "en": "For heavy motorcycles, please select Motorcycle.",
+   "ja": "大型二輪車の車種は「バイク」を選択してください。",
+   "vi": "Xe mô tô phân khối lớn vui lòng chọn loại xe máy.",
+   "id": "Untuk motor besar, pilih jenis Motor.",
+   "tl": "Para sa heavy motorcycle, piliin ang Motorsiklo."
+  },
+  "重要訊息": {
+   "en": "Important Messages",
+   "ja": "重要なお知らせ",
+   "vi": "Thông báo quan trọng",
+   "id": "Pesan penting",
+   "tl": "Mahalagang mensahe"
+  },
+  "金門縣": {
+   "en": "Kinmen County",
+   "ja": "金門県",
+   "vi": "Huyện Kim Môn",
+   "id": "Kabupaten Kinmen",
+   "tl": "Kinmen County"
+  },
+  "金門縣政府": {
+   "en": "Kinmen County Government",
+   "ja": "金門県政府",
+   "vi": "Chính quyền huyện Kim Môn",
+   "id": "Pemerintah Kabupaten Kinmen",
+   "tl": "Pamahalaan ng Kinmen County"
+  },
+  "金門縣水費": {
+   "en": "Kinmen County Water Bill",
+   "ja": "金門県水道料金",
+   "vi": "Tiền nước huyện Kim Môn",
+   "id": "Tagihan air Kabupaten Kinmen",
+   "tl": "Water bill ng Kinmen County"
+  },
+  "銀髮資訊": {
+   "en": "Senior Information",
+   "ja": "高齢者情報",
+   "vi": "Thông tin người cao tuổi",
+   "id": "Info lansia",
+   "tl": "Impormasyon para sa senior"
+  },
+  "開啟地圖": {
+   "en": "Open Map",
+   "ja": "地図を開く",
+   "vi": "Mở bản đồ",
+   "id": "Buka peta",
+   "tl": "Buksan ang mapa"
+  },
+  "關鍵字搜尋": {
+   "en": "Keyword Search",
+   "ja": "キーワード検索",
+   "vi": "Tìm theo từ khóa",
+   "id": "Cari kata kunci",
+   "tl": "Maghanap ayon sa keyword"
+  },
+  "防汛資訊": {
+   "en": "Flood Prevention Information",
+   "ja": "水防情報",
+   "vi": "Thông tin phòng chống lũ",
+   "id": "Info pencegahan banjir",
+   "tl": "Impormasyon sa baha"
+  },
+  "限當日使用": {
+   "en": "Same-day use only",
+   "ja": "当日のみ有効",
+   "vi": "Chỉ dùng trong ngày",
+   "id": "Hanya berlaku pada hari yang sama",
+   "tl": "Magagamit lamang sa araw ding iyon"
+  },
+  "院區": {
+   "en": "Branch",
+   "ja": "院区",
+   "vi": "Cơ sở",
+   "id": "Cabang",
+   "tl": "Sangay"
+  },
+  "除了本局網路報案系統之外，您可選擇交由居住地最近之縣市警察局受理，除方便您報案後程序的進行，亦可加速案件受理之時效。": {
+   "en": "Besides our online reporting system, you may choose to have the police department of the city/county nearest your residence handle your case, which makes the follow-up process easier and speeds up case handling.",
+   "ja": "当局のオンライン通報システムのほか、お住まいに最も近い県市の警察局に受理を依頼することもできます。通報後の手続きが便利になるうえ、案件の受理も迅速になります。",
+   "vi": "Ngoài hệ thống báo án trực tuyến của Sở, bạn có thể chọn để Sở Cảnh sát huyện/thành phố gần nơi cư trú nhất tiếp nhận, vừa thuận tiện cho các thủ tục sau khi báo án, vừa giúp đẩy nhanh việc tiếp nhận vụ việc.",
+   "id": "Selain sistem laporan polisi online kami, Anda dapat melapor ke kepolisian kota/kabupaten terdekat dari tempat tinggal Anda, agar proses setelah pelaporan lebih mudah dan kasus ditangani lebih cepat.",
+   "tl": "Bukod sa online na pag-uulat sa pulis ng aming tanggapan, maaari mo ring ipahawak ito sa police department ng lungsod/county na pinakamalapit sa tirahan mo, para mas madali ang susunod na proseso at mas mabilis matanggap ang kaso."
+  },
+  "雲林縣": {
+   "en": "Yunlin County",
+   "ja": "雲林県",
+   "vi": "Huyện Vân Lâm",
+   "id": "Kabupaten Yunlin",
+   "tl": "Yunlin County"
+  },
+  "電力停電": {
+   "en": "Power Outage",
+   "ja": "停電",
+   "vi": "Mất điện",
+   "id": "Pemadaman listrik",
+   "tl": "Pagkawala ng kuryente"
+  },
+  "電線(桿)或纜線受損": {
+   "en": "Damaged Power Lines (Poles) or Cables",
+   "ja": "電線（電柱）またはケーブルの損傷",
+   "vi": "Dây điện (cột điện) hoặc cáp bị hư hỏng",
+   "id": "Kerusakan kabel listrik, tiang listrik, atau kabel",
+   "tl": "Sirang kawad (poste) o cable"
+  },
+  "預約未取紀錄": {
+   "en": "Unclaimed Reservations",
+   "ja": "予約未受取記録",
+   "vi": "Lịch sử đặt trước chưa nhận",
+   "id": "Riwayat reservasi tidak diambil",
+   "tl": "Rekord ng reserbang hindi kinuha"
+  },
+  "預約清單": {
+   "en": "Reservations",
+   "ja": "予約リスト",
+   "vi": "Danh sách đặt trước",
+   "id": "Daftar reservasi",
+   "tl": "Listahan ng reserba"
+  },
+  "館藏查詢": {
+   "en": "Catalog Search",
+   "ja": "蔵書検索",
+   "vi": "Tra cứu tài liệu thư viện",
+   "id": "Cari koleksi",
+   "tl": "Paghahanap sa koleksyon"
+  },
+  "館藏查詢系統定期於每月休館日(第一個星期四)上午8時至10時進行維護": {
+   "en": "The catalog system undergoes regular maintenance on the monthly closing day (first Thursday) from 8 to 10 a.m.",
+   "ja": "蔵書検索システムは毎月の休館日（第1木曜日）午前8時から10時まで定期メンテナンスを行います",
+   "vi": "Hệ thống tra cứu tài liệu định kỳ bảo trì vào ngày nghỉ hằng tháng (thứ Năm đầu tiên) từ 8 giờ đến 10 giờ sáng",
+   "id": "Sistem pencarian koleksi dipelihara rutin setiap hari tutup bulanan perpustakaan (Kamis pertama) pukul 8 hingga 10 pagi",
+   "tl": "Regular na maintenance ng catalog search system tuwing araw ng pagsasara bawat buwan (unang Huwebes), 8 AM hanggang 10 AM"
+  },
+  "體育樂園": {
+   "en": "Sports Park",
+   "ja": "スポーツランド",
+   "vi": "Công viên thể thao",
+   "id": "Taman Olahraga",
+   "tl": "Sports Park"
+  },
+  "高雄市": {
+   "en": "Kaohsiung City",
+   "ja": "高雄市",
+   "vi": "Thành phố Cao Hùng",
+   "id": "Kota Kaohsiung",
+   "tl": "Kaohsiung City"
+  },
+  "點閱排行": {
+   "en": "Most Viewed",
+   "ja": "閲覧ランキング",
+   "vi": "Xếp hạng lượt xem",
+   "id": "Paling banyak dilihat",
+   "tl": "Pinakamaraming tiningnan"
+  },
+  "點閱次數：14829585": {
+   "en": "Views: 14829585",
+   "ja": "閲覧数：14829585",
+   "vi": "Lượt xem: 14829585",
+   "id": "Jumlah dilihat: 14829585",
+   "tl": "Bilang ng pagtingin: 14829585"
+  },
+  "點閱次數：20400": {
+   "en": "Views: 20400",
+   "ja": "閲覧数：20400",
+   "vi": "Lượt xem: 20400",
+   "id": "Jumlah dilihat: 20400",
+   "tl": "Bilang ng pagtingin: 20400"
+  },
+  "點閱次數：2327424": {
+   "en": "Views: 2327424",
+   "ja": "閲覧数：2327424",
+   "vi": "Lượt xem: 2327424",
+   "id": "Jumlah dilihat: 2327424",
+   "tl": "Bilang ng pagtingin: 2327424"
+  },
+  "點閱次數：3450": {
+   "en": "Views: 3450",
+   "ja": "閲覧数：3450",
+   "vi": "Lượt xem: 3450",
+   "id": "Jumlah dilihat: 3450",
+   "tl": "Bilang ng pagtingin: 3450"
+  },
+  "點閱次數：500": {
+   "en": "Views: 500",
+   "ja": "閲覧数：500",
+   "vi": "Lượt xem: 500",
+   "id": "Jumlah dilihat: 500",
+   "tl": "Bilang ng pagtingin: 500"
+  },
+  "，就可以在會員中心的「安全性」-「授權第三方應用」列表中，選擇取消特定服務的授權。": {
+   "en": ", you can cancel the authorization of a specific service in the “Authorized Third-Party Apps” list under “Security” in the Member Center.",
+   "ja": "、会員センターの「セキュリティ」-「サードパーティアプリの認可」一覧から、特定サービスの認可を取り消すことができます。",
+   "vi": ", bạn có thể vào danh sách “Bảo mật” - “Ủy quyền ứng dụng bên thứ ba” trong Trung tâm thành viên để hủy ủy quyền cho từng dịch vụ.",
+   "id": ", lalu Anda dapat membatalkan izin layanan tertentu di daftar “Keamanan” - “Otorisasi Aplikasi Pihak Ketiga” di Pusat Anggota.",
+   "tl": ", maaari mo nang kanselahin ang awtorisasyon ng partikular na serbisyo sa listahang “Seguridad” - “Mga Awtorisadong Third-party App” sa Member Center."
+  }
+ }
+}

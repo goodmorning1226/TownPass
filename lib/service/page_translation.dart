@@ -7,6 +7,7 @@ import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:google_mlkit_translation/google_mlkit_translation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:town_pass/service/page_glossary.dart';
 
 /// Shows the App's pages (native TPText and the service WebViews) in the
 /// language of the assistant's last navigation, or the one chosen in
@@ -57,7 +58,20 @@ class PageTranslation {
   /// Replaces ML Kit in tests: translates [text] into [language].
   Future<String> Function(String text, String language)? translator;
 
+  /// Translations made on this phone (ML Kit, kept in [_learned] too).
   final _cache = <String, Map<String, String>>{};
+
+  /// Translated in advance: the App's strings and the connected service
+  /// pages' (assets/i18n/app_strings.json, service_strings.json).
+  final _bundled = <String, Map<String, String>>{};
+
+  /// The service pages' fixed words (assets/i18n/glossary.json).
+  PageGlossary get glossary => _glossary;
+  PageGlossary _glossary = PageGlossary.empty;
+
+  /// Sentences whose glossary words ML Kit lost even with placeholders
+  /// (the unprotected result was used): for review, newest last.
+  final glossaryMisses = <String>[];
   final _reported = <String>{};
   final _waiting = <String>{};
   Timer? _flush;
@@ -71,9 +85,50 @@ class PageTranslation {
   final _learnedLoaded = <String>{};
   Timer? _save;
   static const _learnedLimit = 4000;
-  static const _bundle = 'assets/i18n/app_strings.json';
+  static const _bundles = [
+    'assets/i18n/app_strings.json',
+    'assets/i18n/service_strings.json',
+  ];
+  static const _glossaryAsset = 'assets/i18n/glossary.json';
 
   bool get active => language.value != original;
+
+  /// Bumped whenever a language gains translations (bundled, learned or
+  /// new), so service pages know when to rebuild their injected dictionary.
+  int get dictionaryVersion => _dictionaryVersion;
+  int _dictionaryVersion = 0;
+
+  /// Every translation known for [code] (default: the page language), in
+  /// the lookup order of [translateAll]: pre-translated strings, glossary
+  /// terms, then what ML Kit translated on this phone. Injected into service
+  /// pages so cached texts are written before they are painted
+  /// (tp_web_view.dart).
+  Map<String, String> dictionary([String? code]) {
+    final target = code ?? language.value;
+    if (target == original) return const {};
+    return {
+      ...?_cache[target],
+      ..._glossary.wholeTerms(target),
+      ...?_bundled[target],
+    }..removeWhere((source, _) => !_chinese.hasMatch(source));
+  }
+
+  /// The known translation of [text] into [code]: pre-translated, then a
+  /// whole glossary term or pattern, then learned on this phone.
+  /// docs/AI_CURRENT_RULES.md section 4 (服務頁翻譯的品質).
+  String? _known(String text, String code) =>
+      preset(text, code) ?? _cache[code]?[text];
+
+  /// [text] in [code] from the App's own files only: pre-translated, or a
+  /// whole glossary term or pattern (no learned or ML Kit translation).
+  String? preset(String text, String code) =>
+      _bundled[code]?[text] ?? _glossary.whole(text, code);
+
+  /// Tests only: use [glossary] (the real one is loaded by [load]).
+  set glossaryForTest(PageGlossary glossary) {
+    _glossary = glossary;
+    _dictionaryVersion++;
+  }
 
   /// Every launch starts in the phone's own language (owner, 2026-11-08:
   /// e.g. a migrant caregiver using a grandparent's Chinese phone switches it
@@ -82,6 +137,7 @@ class PageTranslation {
   /// App's strings translated in advance (assets/i18n/app_strings.json) and
   /// what ML Kit translated earlier on this phone.
   Future<void> load() async {
+    await _loadGlossary();
     await _loadBundled();
     final system = systemLanguage();
     if (system != original) {
@@ -101,35 +157,76 @@ class PageTranslation {
     return languages.containsKey(code) ? code : original;
   }
 
-  Future<void> _loadBundled() async {
+  Future<void> _loadGlossary() async {
     try {
-      final data = jsonDecode(await rootBundle.loadString(_bundle)) as Map;
-      final strings = data['strings'] as Map;
-      strings.forEach((source, translations) {
-        if (source is! String || translations is! Map) return;
-        translations.forEach((code, text) {
-          if (code is String && text is String && text.trim().isNotEmpty) {
-            _cache.putIfAbsent(code, () => {})[source] = text;
-          }
-        });
-      });
+      _glossary = PageGlossary.fromJson(
+        jsonDecode(await rootBundle.loadString(_glossaryAsset)) as Map,
+      );
+      _dictionaryVersion++;
     } catch (error) {
-      debugPrint('page translation: no bundled strings ($error)');
+      debugPrint('page translation: no glossary ($error)');
     }
   }
+
+  Future<void> _loadBundled() async {
+    for (final bundle in _bundles) {
+      try {
+        final data = jsonDecode(await rootBundle.loadString(bundle)) as Map;
+        final strings = data['strings'] as Map;
+        strings.forEach((source, translations) {
+          if (source is! String || translations is! Map) return;
+          translations.forEach((code, text) {
+            if (code is String && text is String && text.trim().isNotEmpty) {
+              _bundled.putIfAbsent(code, () => {})[source] = text;
+            }
+          });
+        });
+        _dictionaryVersion++;
+      } catch (error) {
+        debugPrint('page translation: no bundled strings in $bundle ($error)');
+      }
+    }
+  }
+
+  /// Learned translations are kept per glossary version: one made with
+  /// another glossary may have guessed a word the glossary now fixes.
+  String _learnedKey(String code) =>
+      '${_key}_cache_g${_glossary.version}_$code';
 
   Future<void> _loadLearned(String code) async {
     if (code == original || !_learnedLoaded.add(code)) return;
     try {
-      final saved = (await SharedPreferences.getInstance()).getString(
-        '${_key}_cache_$code',
-      );
+      final prefs = await SharedPreferences.getInstance();
+      final saved =
+          prefs.getString(_learnedKey(code)) ??
+          await _migrateLearned(prefs, code);
       if (saved == null) return;
       final learned = (jsonDecode(saved) as Map).cast<String, String>();
       _learned[code] = learned;
       final cache = _cache.putIfAbsent(code, () => {});
       learned.forEach((source, text) => cache.putIfAbsent(source, () => text));
+      _dictionaryVersion++;
     } catch (_) {}
+  }
+
+  /// Translations saved with another glossary version (or before the
+  /// glossary): those using a glossary word are dropped, the rest kept under
+  /// the current version's key.
+  Future<String?> _migrateLearned(SharedPreferences prefs, String code) async {
+    final old = RegExp('^${_key}_cache_(g\\d+_)?$code\$');
+    final kept = <String, String>{};
+    for (final key in prefs.getKeys().where(old.hasMatch).toList()) {
+      try {
+        (jsonDecode(prefs.getString(key) ?? '{}') as Map).forEach((s, t) {
+          if (s is String && t is String && !_glossary.touches(s)) kept[s] = t;
+        });
+      } catch (_) {}
+      await prefs.remove(key);
+    }
+    if (kept.isEmpty) return null;
+    final saved = jsonEncode(kept);
+    await prefs.setString(_learnedKey(code), saved);
+    return saved;
   }
 
   void _remember(String code, String source, String text) {
@@ -142,7 +239,7 @@ class PageTranslation {
         final prefs = await SharedPreferences.getInstance();
         for (final entry in _learned.entries) {
           await prefs.setString(
-            '${_key}_cache_${entry.key}',
+            _learnedKey(entry.key),
             jsonEncode(entry.value),
           );
         }
@@ -166,7 +263,7 @@ class PageTranslation {
   String display(String text) {
     if (!active || !_chinese.hasMatch(text)) return text;
     final target = language.value;
-    final cached = _cache[target]?[text];
+    final cached = _known(text, target);
     if (cached != null) return cached;
     if (_waiting.add(text)) {
       _flush ??= Timer(const Duration(milliseconds: 50), () {
@@ -190,6 +287,17 @@ class PageTranslation {
   /// returned unchanged (also when the language model is unavailable).
   Future<List<String>> translateAll(List<String> texts) {
     final target = language.value;
+    // Nothing new to translate: answered at once, not behind texts that are
+    // waiting for ML Kit.
+    if (target == original ||
+        texts.every(
+          (t) => !_chinese.hasMatch(t) || _known(t, target) != null,
+        )) {
+      return Future.value([
+        for (final t in texts)
+          target == original || !_chinese.hasMatch(t) ? t : _known(t, target)!,
+      ]);
+    }
     final done = Completer<List<String>>();
     // One at a time: ML Kit translates sequentially anyway.
     _running = _running.then((_) async {
@@ -200,10 +308,10 @@ class PageTranslation {
           out.add(text);
           continue;
         }
-        var translated = cache[text];
+        var translated = _known(text, target);
         if (translated == null) {
           try {
-            translated = await _translate(text, target);
+            translated = await translateFresh(text, target);
           } catch (error) {
             translated = null;
             // Shown once per language; the page stays in Chinese.
@@ -213,6 +321,7 @@ class PageTranslation {
           }
           if (translated != null && translated.trim().isNotEmpty) {
             cache[text] = translated;
+            _dictionaryVersion++;
             _remember(target, text, translated);
           }
         }
@@ -221,6 +330,30 @@ class PageTranslation {
       done.complete(out);
     });
     return done.future;
+  }
+
+  /// [text] translated into [target] now, without any stored translation:
+  /// ML Kit with the glossary's words protected (or without, [protect]
+  /// false). docs/AI_CURRENT_RULES.md section 4 (服務頁翻譯的品質). Also used
+  /// by the review tool (tool/page_translation_review/).
+  Future<String?> translateFresh(
+    String text,
+    String target, {
+    bool protect = true,
+  }) async {
+    final plan = protect ? _glossary.protect(text, target) : null;
+    if (plan == null) return _translate(text, target);
+    final inline = await _translate(plan.inline, target);
+    if (inline != null && plan.kept(inline)) return inline;
+    final tokens = await _translate(plan.tokens, target);
+    final restored = tokens == null ? null : plan.restore(tokens);
+    if (restored != null) return restored;
+    final plain = await _translate(text, target);
+    final miss = '[$target] $text -> $plain (inline: $inline)';
+    if (glossaryMisses.length >= 200) glossaryMisses.removeAt(0);
+    glossaryMisses.add(miss);
+    debugPrint('page translation: glossary miss $miss');
+    return plain;
   }
 
   Future<String?> _translate(String text, String target) async {
@@ -300,6 +433,9 @@ class PageTranslation {
   /// Tests only: forget translations and return to Chinese.
   void reset() {
     _cache.clear();
+    _bundled.clear();
+    _glossary = PageGlossary.empty;
+    glossaryMisses.clear();
     _waiting.clear();
     _flush?.cancel();
     _flush = null;
@@ -307,6 +443,7 @@ class PageTranslation {
     _learned.clear();
     _learnedLoaded.clear();
     _running = Future.value();
+    _dictionaryVersion++;
     language.value = original;
     translator = null;
     pairTranslator = null;
