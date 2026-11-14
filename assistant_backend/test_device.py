@@ -372,26 +372,95 @@ class MultilingualSpeechTests(unittest.TestCase):
         recognizer.transcribe(loud_frames(), "ja")  # agrees with the menu: trusted
         self.assertEqual(self.requests(), [("gate", "auto", True), ("multi", "ja", False)])
         self.calls.clear()
-        # Another language at that level: Whisper small decides (here: clear long
-        # Chinese, kept as is), since tiny is wrongly sure for some short Chinese clips.
+        # Another language at that level: not followed, since tiny is wrongly sure for
+        # some short Chinese clips. The gate leans to it (FOREIGN_LEAD, 2026-11-13), so
+        # Whisper small detects first; it hears Chinese, and the clip takes the usual
+        # Chinese path (here: clear long Chinese, kept as is).
         result = recognizer.transcribe(loud_frames(), "zh")
-        self.assertEqual((self.requests(), result["language"]), ([("gate", "auto", True), ("multi", "zh", False)], "zh"))
+        self.assertEqual((self.requests(), result["language"]),
+                         ([("gate", "auto", True), ("multi", "auto", True), ("multi", "zh", False)], "zh"))
 
     def test_unsure_gate_lets_whisper_small_decide(self):
-        # Short Japanese: tiny unsure. The Chinese pass runs first (as without a gate),
-        # small detects zh/ja unsure, Japanese is decoded too and its better score wins
-        # over the Chinese translation.
+        # Short Japanese: tiny unsure and leaning to Chinese. The Chinese pass runs first
+        # (as without a gate), small detects zh/ja unsure, Japanese is decoded too and its
+        # better score wins over the Chinese translation.
         self.speech["ja"], self.speech["zh"] = ("こんにちは", -0.25), ("你好", -0.7)
         self.probabilities["multi"] = {"zh": 0.5, "ja": 0.4}
-        recognizer = self.with_gate({"en": 0.45, "ja": 0.3, "zh": 0.2})
+        recognizer = self.with_gate({"zh": 0.45, "ja": 0.3, "en": 0.2})
         result = recognizer.transcribe(loud_frames(), "zh")
         self.assertEqual(self.requests(), [("gate", "auto", True), ("multi", "zh", False),
                                            ("multi", "auto", False), ("multi", "ja", False)])
         self.assertEqual((result["language"], result["text"], result["candidates"]), ("ja", "こんにちは", ["zh", "ja"]))
-        self.assertEqual(result["gate_language"], "en")  # logged, not followed
-        # Short Chinese, equally unsure: the Chinese decode scores better and is kept.
+        # Leaning to another of our languages under FOREIGN_LEAD: still Chinese first.
+        self.calls.clear()
+        recognizer = self.with_gate({"en": 0.25, "zh": 0.2, "ja": 0.2})
+        recognizer.transcribe(loud_frames(), "zh")
+        self.assertEqual(self.requests()[1], ("multi", "zh", False))
+        # Another menu, the gate leaning to English (unsure): Whisper small detects and
+        # decodes as before; short Chinese, equally unsure, scores better and is kept.
         self.speech["zh"], self.speech["ja"] = ("你好", -0.15), ("ニーハオ", -0.9)
-        self.assertEqual(recognizer.transcribe(loud_frames(), "ja")["language"], "zh")
+        recognizer = self.with_gate({"en": 0.45, "ja": 0.3, "zh": 0.2})
+        result = recognizer.transcribe(loud_frames(), "ja")
+        self.assertEqual((result["language"], result["gate_language"]), ("zh", "en"))  # logged, not followed
+
+    def test_unsure_gate_leaning_to_another_language_lets_whisper_small_detect_first(self):
+        # 2026-11-13, menu 中文: a short foreign clip with the gate leaning to its language
+        # (unsure) was decoded in Chinese first and the "translation" kept. Now Whisper
+        # small detects first; sure of a foreign language, that language is decoded, not Chinese.
+        self.speech["zh"], self.speech["en"] = ("黑貓怎麼行", -0.6), ("all nouns", -0.3)
+        self.detected["multi"], self.probabilities["multi"] = "english", {"en": 0.9, "zh": 0.05}
+        recognizer = self.with_gate({"en": 0.655, "zh": 0.2})
+        result = recognizer.transcribe(loud_frames(), "zh")
+        self.assertEqual(self.requests(), [("gate", "auto", True), ("multi", "auto", True), ("multi", "en", False)])
+        self.assertEqual((result["language"], result["text"], result["language_confidence"]), ("en", "all nouns", 0.9))
+        self.assertIn(field("temperature_inc", "0") + CRLF, self.calls[-1][3])  # after a detection: no retries
+        # Small sure of another foreign language than the gate's: small's language only
+        # (decoding the gate's too let "Xin chào" come out as English on the tuning clips).
+        self.speech["ja"] = ("こんにちは", -0.2)
+        self.detected["multi"], self.probabilities["multi"] = "japanese", {"ja": 0.8, "en": 0.1}
+        self.calls.clear()
+        result = recognizer.transcribe(loud_frames(), "zh")
+        self.assertEqual(self.requests()[1:], [("multi", "auto", True), ("multi", "ja", False)])
+        self.assertEqual((result["language"], result["candidates"]), ("ja", ["ja"]))
+        # Small hears Chinese, or is not sure of a foreign language (under CLEAR_LANGUAGE):
+        # the usual Chinese path (Chinese first, then its check), as before. On the tuning
+        # clips such clips were mostly Mandarin or Taiwanese (docs/AI_LANGUAGE_GATE.md section 11).
+        for detected, probabilities in (("chinese", {"zh": 0.646, "en": 0.2}), ("english", {"en": 0.45, "es": 0.3})):
+            self.detected["multi"], self.probabilities["multi"] = detected, probabilities
+            self.speech["zh"] = ("我要借這個月新到的書", -0.1)
+            self.calls.clear()
+            result = recognizer.transcribe(loud_frames(), "zh")
+            self.assertEqual((self.requests()[1:], result["language"]),
+                             ([("multi", "auto", True), ("multi", "zh", False)], "zh"), detected)
+
+    def test_unclear_chinese_that_does_not_read_like_mandarin_is_checked_once(self):
+        # iPhone, 2026-11-13: gate zh 0.993, the Chinese decode unsure with plausibility
+        # -6.19. Such a decode gets one detection-only pass; small hears English.
+        self.speech["zh"], self.speech["en"] = ("溫刀揮袖促", -0.8), ("one two three", -0.3)
+        self.detected["multi"], self.probabilities["multi"] = "english", {"en": 0.85, "zh": 0.1}
+        recognizer = self.with_gate({"zh": 0.993})
+        result = recognizer.transcribe(loud_frames(), "zh")
+        self.assertEqual(self.requests(), [("gate", "auto", True), ("multi", "zh", False),
+                                           ("multi", "auto", True), ("multi", "en", False)])
+        self.assertEqual((result["language"], result["text"]), ("en", "one two three"))
+        # Small hears Chinese: the Chinese decode stays, nothing more is decoded.
+        self.calls.clear()
+        self.detected["multi"], self.probabilities["multi"] = "chinese", {"zh": 0.9}
+        result = recognizer.transcribe(loud_frames(), "zh")
+        self.assertEqual((result["language"], result["text"], result["language_confidence"]), ("zh", "溫刀揮袖促", 0.993))
+        self.assertEqual(self.requests()[1:], [("multi", "zh", False), ("multi", "auto", True)])
+        # Clear, or reading like Mandarin (short commands too): no extra pass.
+        for text, logprob in (("溫刀揮袖促", -0.1), ("我要借這個月新到的書", -0.7), ("借書", -0.7)):
+            self.speech["zh"] = (text, logprob)
+            self.calls.clear()
+            recognizer.transcribe(loud_frames(), "zh")
+            self.assertEqual(self.requests()[1:], [("multi", "zh", False)], text)
+        for name, value in (("PLAUSIBILITY_UNSURE", None), ("DOUBTFUL_CHINESE_CHECK", False)):  # off
+            with patch(f"asr_server.{name}", value):
+                self.speech["zh"] = ("溫刀揮袖促", -0.8)
+                self.calls.clear()
+                recognizer.transcribe(loud_frames(), "zh")
+                self.assertEqual(self.requests()[1:], [("multi", "zh", False)], name)
 
     def test_extra_passes_have_no_temperature_fallback(self):
         self.speech["zh"] = ("你好", -0.7)  # unsure: checked further
@@ -817,7 +886,14 @@ class AutoTaiwaneseTests(unittest.TestCase):
         self.addCleanup(scorer.stop)
 
     with_gate = MultilingualSpeechTests.with_gate
+    requests = MultilingualSpeechTests.requests
     models = TaiwaneseSpeechTests.models
+
+    def gate_says(self, probabilities):
+        self.probabilities["gate"], self.detected["gate"] = probabilities, max(probabilities, key=probabilities.get)
+
+    def small_says(self, detected, probabilities):
+        self.detected["multi"], self.probabilities["multi"] = detected, probabilities
 
     def provider(self, port=None):
         from device_main import taiwanese_provider
@@ -889,6 +965,21 @@ class AutoTaiwaneseTests(unittest.TestCase):
         self.score = 0.9
         result = self.heard("vi")
         self.assertEqual((self.decodes(), result["language"], result["taiwanese_route"]), (["multi"], "vi", None))
+        # "Picked" includes a gate only leaning to another of our languages (2026-11-13):
+        # Whisper small detects first under every menu, and picks English here.
+        self.speech["zh"] = ("我要借這個月新到的書", -0.1)
+        self.gate_says({"en": 0.6, "zh": 0.2})
+        self.small_says("english", {"en": 0.9})
+        for menu in ("zh", "ja", "auto", "vi"):
+            self.recognizer.taiwanese_until = 0.0
+            result = self.heard(menu)
+            self.assertEqual((result["language"], result["taiwanese_route"]), ("en", None), menu)
+            self.assertNotIn("nan", self.models(), menu)
+        # Small does not pick another of ours (Korean): the Taiwanese verdict applies.
+        self.small_says("korean", {"ko": 0.8, "en": 0.1})
+        for menu in ("zh", "ja", "auto", "vi"):
+            self.recognizer.taiwanese_until = 0.0
+            self.assertEqual(self.heard(menu)["taiwanese_route"], "gate", menu)
         # A tuple restricts the menus; () turns the automatic part off.
         self.probabilities["gate"], self.detected["gate"] = {"zh": 0.7, "ko": 0.2}, "chinese"
         with patch("asr_server.AUTO_TAIWANESE_MENUS", ("zh", "auto")):
@@ -950,6 +1041,61 @@ class AutoTaiwaneseTests(unittest.TestCase):
         self.recognizer.taiwanese_until -= 10_000  # long ago
         self.score = 0.4
         self.assertIsNone(self.heard()["taiwanese_route"])
+
+    def test_sticky_rule_ends_with_a_clip_the_gate_is_sure_is_another_language(self):
+        # 2026-11-13: Taiwanese, then English the gate is sure of (no Taiwanese rule ran,
+        # so the lower threshold stayed), then English the gate only leans to: Breeze.
+        self.assertEqual(self.heard()["taiwanese_route"], "gate")
+        self.assertGreater(self.recognizer.taiwanese_until, time.monotonic())
+        self.gate_says({"en": 0.95})
+        self.score = 0.4
+        result = self.heard()
+        self.assertEqual((result["language"], self.decodes()), ("en", ["multi"]))
+        self.assertEqual(self.recognizer.taiwanese_until, 0.0)  # someone else
+        self.gate_says({"en": 0.6, "zh": 0.3})
+        self.small_says("english", {"en": 0.9})
+        result = self.heard()
+        self.assertEqual((result["language"], result["taiwanese_route"]), ("en", None))
+        self.assertNotIn("nan", self.models())
+
+    def test_sticky_rule_only_when_the_gate_leans_to_chinese_or_a_language_outside_ours(self):
+        self.assertEqual(self.heard()["taiwanese_route"], "gate")  # the lower threshold starts
+        self.score = 0.4
+        self.gate_says({"ko": 0.5, "zh": 0.3})  # outside ours: the lower threshold
+        self.assertEqual(self.heard()["taiwanese_route"], "sticky")
+        self.gate_says({"en": 0.6, "zh": 0.3})  # leaning to English: 0.4 is under TAIWANESE_GATE_SCORE
+        self.small_says("korean", {"ko": 0.9})  # even when small then hears no language of ours
+        result = self.heard()
+        self.assertNotIn("nan", self.models())
+        self.assertIsNone(result["taiwanese_route"])
+        self.assertEqual(result["language"], "zh")  # small picked no language of ours: the usual Chinese path
+
+    def test_a_gate_leaning_to_another_language_lets_whisper_small_detect_before_taiwanese(self):
+        # 2026-11-13, menu 中文: "Hello" with the gate at en 0.505 and a Taiwanese score of
+        # 0.83 went straight to Breeze, which wrote 哈囉.
+        self.gate_says({"en": 0.6, "zh": 0.2})
+        self.score = 0.8
+        self.small_says("english", {"en": 0.9, "zh": 0.05})
+        result = self.heard()
+        self.assertEqual(self.requests(), [("gate", "auto", True), ("multi", "auto", True), ("multi", "en", False)])
+        self.assertEqual((result["language"], result["text"], result["taiwanese_route"]),
+                         ("en", "I want to borrow a new book", None))
+        self.assertEqual(self.starts, [])  # the Taiwanese model was not even started
+        # Small hears Korean or Chinese (not another of ours), or English but not sure of it
+        # (under CLEAR_LANGUAGE; on the tuning clips such clips were mostly Taiwanese): Breeze, as before.
+        for detected, probabilities in (("korean", {"ko": 0.7, "en": 0.1}), ("chinese", {"zh": 0.8, "en": 0.1}),
+                                        ("english", {"en": 0.45, "es": 0.3})):
+            self.small_says(detected, probabilities)
+            self.recognizer.taiwanese_until = 0.0
+            result = self.heard()
+            self.assertEqual(self.requests(), [("gate", "auto", True), ("multi", "auto", True), ("nan", "zh", False)],
+                             detected)
+            self.assertEqual((result["taiwanese_route"], result["speech_model"], result["text"]),
+                             ("gate", "taiwanese", "我要繳水費"), detected)
+        # Under FOREIGN_LEAD the gate's verdict is taken directly, as before.
+        self.gate_says({"en": 0.25, "zh": 0.2, "ko": 0.2})
+        self.recognizer.taiwanese_until = 0.0
+        self.assertEqual((self.heard()["taiwanese_route"], self.decodes()), ("gate", ["nan"]))
 
     def test_threshold_constant_is_the_one_used(self):
         self.score = 0.6

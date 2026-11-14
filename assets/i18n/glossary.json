@@ -1,0 +1,40 @@
+{
+ "version": 1,
+ "source": "Terms of the TownPass service pages that ML Kit mistranslates (2026-11-13). AI drafts: every translation needs review by a native speaker. docs/AI_CURRENT_RULES.md section 4.",
+ "terms": {
+  "超商": {"en": "convenience store", "ja": "コンビニ", "vi": "cửa hàng tiện lợi", "id": "minimarket", "tl": "convenience store"},
+  "電子帳單": {"en": "e-bill", "ja": "電子請求書", "vi": "hóa đơn điện tử", "id": "tagihan elektronik", "tl": "e-bill"},
+  "代收": {"en": "payment collection", "ja": "収納代行", "vi": "thu hộ", "id": "penerimaan pembayaran", "tl": "pangongolekta ng bayad"},
+  "代繳": {"en": "payment on your behalf", "ja": "代理納付", "vi": "nộp thay", "id": "pembayaran atas nama Anda", "tl": "pagbabayad para sa iyo"},
+  "悠遊卡": {"en": "EasyCard", "ja": "EasyCard", "vi": "EasyCard", "id": "EasyCard", "tl": "EasyCard"},
+  "悠遊付": {"en": "EasyWallet", "ja": "EasyWallet", "vi": "EasyWallet", "id": "EasyWallet", "tl": "EasyWallet"},
+  "一卡通": {"en": "iPASS", "ja": "iPASS", "vi": "iPASS", "id": "iPASS", "tl": "iPASS"},
+  "臺北通": {"en": "TaipeiPASS", "ja": "TaipeiPASS", "vi": "TaipeiPASS", "id": "TaipeiPASS", "tl": "TaipeiPASS"},
+  "台北通": {"en": "TaipeiPASS", "ja": "TaipeiPASS", "vi": "TaipeiPASS", "id": "TaipeiPASS", "tl": "TaipeiPASS"},
+  "即日起": {"en": "starting today", "ja": "本日より", "vi": "kể từ hôm nay", "id": "mulai hari ini", "tl": "simula ngayon"},
+  "檢核號": {"en": "check digit", "ja": "チェックディジット", "vi": "số kiểm tra", "id": "digit pemeriksa", "tl": "check digit"},
+  "行動支付": {"en": "mobile payment", "ja": "モバイル決済", "vi": "thanh toán di động", "id": "pembayaran seluler", "tl": "mobile payment"},
+  "水號": {"en": "water account number", "ja": "水道お客様番号", "vi": "số danh bộ nước", "id": "nomor pelanggan air", "tl": "water account number"},
+  "戶號": {"en": "customer number", "ja": "お客様番号", "vi": "số khách hàng", "id": "nomor pelanggan", "tl": "customer number"},
+  "繳費期限": {"en": "payment deadline", "ja": "支払期限", "vi": "hạn thanh toán", "id": "batas waktu pembayaran", "tl": "takdang petsa ng pagbabayad"},
+  "自動扣繳": {"en": "automatic debit", "ja": "口座自動引き落とし", "vi": "ghi nợ tự động", "id": "debit otomatis", "tl": "automatic debit"},
+  "區公所": {"en": "district office", "ja": "区役所", "vi": "văn phòng quận", "id": "kantor distrik", "tl": "district office"},
+  "戶政事務所": {"en": "household registration office", "ja": "戸政事務所", "vi": "văn phòng hộ tịch", "id": "kantor pencatatan kependudukan", "tl": "household registration office"},
+  "地政事務所": {"en": "land office", "ja": "地政事務所", "vi": "văn phòng địa chính", "id": "kantor pertanahan", "tl": "land office"},
+  "停管處": {"en": "Parking Management Office", "ja": "駐車管理処", "vi": "Phòng Quản lý Bãi đỗ xe", "id": "Kantor Manajemen Parkir", "tl": "Parking Management Office"},
+  "金質會員": {"en": "Gold member", "ja": "ゴールド会員", "vi": "thành viên Vàng", "id": "anggota Emas", "tl": "Gold member"},
+  "實名認證": {"en": "real-name verification", "ja": "実名認証", "vi": "xác thực danh tính", "id": "verifikasi nama asli", "tl": "real-name verification"},
+  "優惠券": {"en": "coupon", "ja": "クーポン", "vi": "phiếu giảm giá", "id": "kupon", "tl": "kupon"},
+  "票夾": {"en": "ticket wallet", "ja": "チケットホルダー", "vi": "ví vé", "id": "dompet tiket", "tl": "ticket wallet"},
+  "派出所": {"en": "police station", "ja": "派出所", "vi": "đồn công an", "id": "kantor polisi", "tl": "istasyon ng pulis"},
+  "網路報案": {"en": "online police report", "ja": "オンライン通報", "vi": "báo án trực tuyến", "id": "laporan polisi online", "tl": "online na pag-uulat sa pulis"},
+  "新臺幣": {"en": "NT$", "ja": "NT$", "vi": "NT$", "id": "NT$", "tl": "NT$"},
+  "臺北市": {"en": "Taipei City", "ja": "台北市", "vi": "Thành phố Đài Bắc", "id": "Kota Taipei", "tl": "Lungsod ng Taipei"},
+  "台北市": {"en": "Taipei City", "ja": "台北市", "vi": "Thành phố Đài Bắc", "id": "Kota Taipei", "tl": "Lungsod ng Taipei"}
+ },
+ "patterns": [
+  {"zh": "(\\d+)碼", "en": "{1} digits", "en_one": "{1} digit", "ja": "{1}桁", "vi": "{1} chữ số", "id": "{1} digit", "tl": "{1} digit"},
+  {"zh": "^(\\d+)號$", "en": "No. {1}", "ja": "{1}番", "vi": "Số {1}", "id": "No. {1}", "tl": "Blg. {1}"},
+  {"zh": "^共(\\d+)筆$", "en": "{1} in total", "ja": "全{1}件", "vi": "Tổng cộng {1}", "id": "Total {1}", "tl": "Kabuuang {1}"}
+ ]
+}

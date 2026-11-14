@@ -116,9 +116,13 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
                     ),
                   )
                 else ...[
-                  // An ended task (我自己來, 結束引導) keeps its card so 繼續引導
-                  // can pick it up again. While typing it folds away so the chat
-                  // and the text box keep their room.
+                  // The task in progress or paused (left without ending: 繼續
+                  // 引導 picks it up). An ended task is one the user did not
+                  // end (一般模式, a page that did not open), so its card offers
+                  // 繼續引導 too. A guide the user ended (結束引導, 我自己來,
+                  // 先不要, 知道了 / 先不用) has no task, so no card
+                  // (docs/AI_CURRENT_RULES.md section 5). While typing it folds
+                  // away so the chat and the text box keep their room.
                   if (!typingOpen &&
                       c.task.value != null &&
                       c.task.value!.status != TaskStatus.finished)

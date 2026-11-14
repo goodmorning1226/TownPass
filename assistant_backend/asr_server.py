@@ -83,8 +83,9 @@ TAIWANESE_GATE_SCORE = 0.5
 # of the two is kept. None: off.
 TAIWANESE_RECHECK_SCORE = 0.3
 # Same speaker: after a clip went to the Taiwanese model, the next clips use this
-# lower threshold until one decodes as clear Mandarin or another language, or
-# TAIWANESE_STICKY_SECONDS pass. None: off.
+# lower threshold until one decodes as clear Mandarin or another language (also a clip the
+# gate is sure is another of ours, 2026-11-13), or TAIWANESE_STICKY_SECONDS pass; it never
+# applies when the gate leans to another of our languages (FOREIGN_LEAD). None: off.
 TAIWANESE_STICKY_SCORE = 0.3
 TAIWANESE_STICKY_SECONDS = 300
 # "Very strange Chinese is Taiwanese" (owner, 2026-11-08; section 13): a clip decoded as
@@ -96,6 +97,11 @@ TAIWANESE_STICKY_SECONDS = 300
 # FLEURS Mandarin, ~3 % of our request sentences (mostly book titles). None: off.
 PLAUSIBILITY_LOW = -8.5
 PLAUSIBILITY_UNSURE = -6.0
+# The gate sure of Chinese but the Chinese decode not clear, under PLAUSIBILITY_UNSURE and not
+# known to the App: one detection-only pass (iPhone, 2026-11-13: English at gate zh 0.993).
+# Tuning clips (docs/AI_LANGUAGE_GATE.md section 11): one more pass for 18 % of Common Voice
+# Mandarin and 3 % of our request sentences, nothing changed. False: off.
+DOUBTFUL_CHINESE_CHECK = True
 # "Strange to the App is Taiwanese" (owner, 2026-11-08; section 13): a Chinese decode that
 # matches nothing the App knows (known_text, from Workflow.known_text: no service,
 # keyword, command, option number, book, greeting or sound-alike; optionally no FAQ
@@ -148,6 +154,19 @@ SHORT_TEXT = 6
 # Whisper small decides as without a gate (tiny is often unsure about 1-2 s clips,
 # and wrongly sure of another language for ~1 % of short Chinese clips).
 GATE_SWITCH = 0.8
+# The gate leaning to another of our languages without being sure of it (its top language
+# among ours is one of FOREIGN at FOREIGN_LEAD or more, under GATE_SWITCH), 2026-11-13:
+# with the menu on Chinese, first English sentences were heard as Chinese ("Hello" ->
+# 哈囉 by the Taiwanese model; 1.5 s of English -> 黑貓怎麼行). Then Whisper small detects
+# first (a detection-only pass, before the Taiwanese verdict and, with the menu on Chinese,
+# instead of Chinese first). Small sure of one of FOREIGN (CLEAR_LANGUAGE, NEAREST folded in,
+# the most likely of all its languages): small's candidates and the leaning language are
+# decoded and the better transcript kept. Otherwise the Taiwanese gate score applies (the
+# same-speaker lower threshold does not) or the usual path runs. Tuning clips: when small
+# also decoded the leaning language while hearing Chinese, or picked a foreign language
+# unsure, Mandarin and Taiwanese clips came out as English or Japanese. docs/AI_LANGUAGE_GATE.md section 11.
+FOREIGN = tuple(code for code in LANGUAGES if code != "zh")
+FOREIGN_LEAD = 0.3
 # Vietnamese chosen (docs/AI_VIETNAMESE.md section 7): tiny hears short Vietnamese
 # as Chinese, even at 0.99 (owner's phone, 2026-11-08: gate zh 0.993 for 1.4 s of
 # Vietnamese, then a 4-character Chinese "translation" after a 32 s retry loop), far
@@ -203,6 +222,30 @@ def language_scores(reply):
     detected = language_code(name, default=None) if name else None
     detected = detected if detected in LANGUAGES else NEAREST.get(name)
     return {detected: 1.0} if detected else {}
+
+
+def leading_language(reply):
+    """Detection's most likely language over all of Whisper's, as (code, probability):
+    one of ours (NEAREST folded in) or the code of another one (ko); (None, 0.0) without
+    a detection. language_scores keeps only ours, so it cannot tell "English at 5 %"
+    from "English first"."""
+    if not isinstance(reply, dict):
+        return None, 0.0
+    probabilities = reply.get("language_probabilities")
+    if isinstance(probabilities, dict) and probabilities:
+        folded = {}
+        for code, value in probabilities.items():
+            if isinstance(value, (int, float)):
+                key = code if code in LANGUAGES else NEAREST.get(code, code)
+                folded[key] = folded.get(key, 0.0) + float(value)
+        if folded:
+            top = max(folded, key=folded.get)
+            return top, round(folded[top], 3)
+    name = str(reply.get("language") or "").strip().lower()
+    if not name:
+        return None, 0.0
+    code = language_code(name, default=None)
+    return (code if code in LANGUAGES else NEAREST.get(name, name)), 1.0
 
 
 def candidate_languages(scores, chosen):
@@ -773,6 +816,8 @@ class WhisperCppRecognizer:
             sure = top if top and heard[top] >= (CLEAR_LANGUAGE if top == menu else GATE_SWITCH) else None
             if sure == "zh" and menu in MENU_OVER_CHINESE:
                 sure = None  # tiny mistakes Vietnamese for Chinese: let Whisper small detect
+            # Leaning to another of our languages, not sure of it (FOREIGN_LEAD).
+            lead = top if sure is None and top in FOREIGN and heard[top] >= FOREIGN_LEAD else None
             route = "chosen" if taiwanese else None
             score = None
             # The gate picked another of our languages (sure of it): that language is
@@ -786,13 +831,16 @@ class WhisperCppRecognizer:
                 import taiwanese_gate
                 score = taiwanese_gate.score(self.taiwanese_model, gate.get("language_probabilities"), seconds)
                 threshold = TAIWANESE_GATE_SCORE
-                if TAIWANESE_STICKY_SCORE is not None and time.monotonic() < self.taiwanese_until:
+                # The same-speaker lower threshold only when the gate leans to Chinese or
+                # to a language outside ours, not to another of ours (FOREIGN_LEAD).
+                if TAIWANESE_STICKY_SCORE is not None and time.monotonic() < self.taiwanese_until and not lead:
                     threshold = min(threshold, TAIWANESE_STICKY_SCORE)
                 taiwanese_by_gate = score >= threshold
                 # Menu on Vietnamese (MENU_OVER_CHINESE): the gate's Chinese side is not
                 # trusted for this menu, so its Taiwanese verdict waits for Whisper
                 # small's detection below (Vietnamese speech then goes to its own model).
-                if taiwanese_by_gate and menu not in MENU_OVER_CHINESE:
+                # The same when the gate leans to another of our languages (FOREIGN_LEAD).
+                if taiwanese_by_gate and menu not in MENU_OVER_CHINESE and not lead:
                     taiwanese = self.taiwanese_url()[0]
                     if taiwanese:
                         route = "gate" if score >= TAIWANESE_GATE_SCORE else "sticky"
@@ -807,12 +855,41 @@ class WhisperCppRecognizer:
                     if route == "chosen":
                         raise
                     taiwanese, route = None, None  # heard automatically: the usual path instead
+            if reply is None and lead and language not in MENU_OVER_CHINESE and (taiwanese_by_gate or language == "zh"):
+                # The gate leans to another of our languages (FOREIGN_LEAD): Whisper small
+                # detects first (detection only: cannot loop). When small picks one of FOREIGN
+                # at CLEAR_LANGUAGE or more (NEAREST folded in, the most likely of all its
+                # languages), that language is decoded without retries (and its RIVALS as
+                # usual). Otherwise the Taiwanese verdict applies, or the usual path below runs
+                # as before 2026-11-13. Tuning clips: small unsure or hearing Chinese was mostly
+                # Taiwanese or Mandarin, and decoding the gate's language as well let English
+                # or Japanese win over Breeze or Chinese (docs/AI_LANGUAGE_GATE.md section 11).
+                probe = self._infer(self.multi_url, wav, seconds, "auto", detect_only=True)
+                leader, chance = leading_language(probe)
+                if leader in FOREIGN and chance >= CLEAR_LANGUAGE:
+                    reply, used, confidence = self._decide(wav, seconds, language, language_scores(probe), self.decodes)
+                elif taiwanese_by_gate:
+                    taiwanese = self.taiwanese_url()[0]
+                    if taiwanese:
+                        route = "gate" if score >= TAIWANESE_GATE_SCORE else "sticky"
+                        try:
+                            reply, used = self._infer(taiwanese, wav, seconds, "zh", prompt=False,
+                                                      minimum_ctx=TAIWANESE_MIN_AUDIO_CTX, fallback=False), "zh"
+                        except (OSError, ValueError):
+                            taiwanese, route = None, None
             if reply is not None:
                 pass
             elif sure:
                 # The gate is sure: one decode, in the language spoken, whatever the menu.
                 reply, used, confidence = self._decode(wav, seconds, sure), sure, heard[sure]
                 self.candidates = [sure]
+                if sure == "zh" and self._doubtful_chinese(reply):
+                    # Not clear and not reading like Mandarin (iPhone, 2026-11-13: gate zh
+                    # 0.993, unsure, plausibility -6.19): one detection-only pass checks it.
+                    self.decodes["zh"] = reply
+                    probe = self._infer(self.multi_url, wav, seconds, "auto", detect_only=True)
+                    reply, used, confidence = self._decide(wav, seconds, "zh", language_scores(probe), self.decodes)
+                    confidence = heard[sure] if used == "zh" else confidence
             elif not detectable or language == "zh":
                 # (Also when the gate is unsure: tiny cannot tell many 1-2 s clips, and
                 # Whisper small then decides as without a gate.)
@@ -830,9 +907,10 @@ class WhisperCppRecognizer:
                 # reused as before.
                 probe = self._infer(self.multi_url, wav, seconds, "auto", detect_only=True)
                 probed = language_scores(probe)
-                probe_top = max(probed, key=probed.get) if probed else None
-                if taiwanese_by_gate and (probe_top is None or probe_top not in LANGUAGES or probe_top == "zh"):
-                    # Not another of our languages: the gate's Taiwanese verdict applies.
+                if taiwanese_by_gate and leading_language(probe)[0] not in FOREIGN:
+                    # Not another of our languages (Chinese, or one outside ours such as
+                    # Korean; 2026-11-13: the most likely overall, not the most likely of
+                    # ours): the gate's Taiwanese verdict applies.
                     taiwanese = self.taiwanese_url()[0]
                     if taiwanese:
                         route = "gate" if score >= TAIWANESE_GATE_SCORE else "sticky"
@@ -860,6 +938,8 @@ class WhisperCppRecognizer:
                 reply, used, confidence = self._decide(wav, seconds, language, language_scores(auto), decodes)
             if detectable and not taiwanese:
                 reply, used, confidence = self._rivals(wav, seconds, reply, used, confidence)
+            if other_language and used != "zh":
+                self.taiwanese_until = 0.0  # another of our languages, the gate sure of it: someone else
             if automatic:
                 reply, taiwanese, route, confidence = self._taiwanese_after(
                     wav, seconds, score, reply, used, taiwanese, route, confidence)
@@ -905,6 +985,22 @@ class WhisperCppRecognizer:
         # Not when the App knows the text: a book title such as 借龜兔賽跑 reads strangely
         # to the bigram model but is a request the App handles.
         return strange and not known
+
+    def _doubtful_chinese(self, reply):
+        """A Chinese decode (the gate sure of Chinese) that is not clear, does not read
+        like Mandarin (PLAUSIBILITY_UNSURE) and is not text the App knows: worth one
+        detection-only pass (transcribe)."""
+        if not DOUBTFUL_CHINESE_CHECK or PLAUSIBILITY_UNSURE is None or not self.multi_url:
+            return False
+        import plausibility
+        text, logprob, no_speech = self.summarize(reply)
+        text = traditional(text)
+        if judge(text, logprob, no_speech) == "clear":
+            return False
+        if self.mandarin is None and getattr(self, "_bigrams", None) is None:
+            self._bigrams = plausibility.load()  # no Taiwanese hook: the same model, read once
+        read = plausibility.score(self.mandarin or self._bigrams, text)
+        return read is not None and read < PLAUSIBILITY_UNSURE and not self._known(reply)
 
     def _known(self, reply):
         """known_text on the decode's Traditional text; False without a callback."""

@@ -76,6 +76,10 @@ class ChatMessage {
   String get shown => user ? text : gt(text);
 }
 
+/// [ended]: the page is open without steps although the user did not end
+/// the guide (一般模式, or the page did not open); 繼續引導 can still start
+/// the steps. A guide the user ends (結束引導, 我自己來, 先不要, 知道了 /
+/// 先不用) leaves no task at all, see GuidedAssistantController._dropTask.
 enum TaskStatus { opened, on, paused, ended, finished }
 
 class GuideTask {
@@ -873,9 +877,21 @@ class GuidedAssistantController extends GetxController {
     }
   }
 
-  /// Only the newest message's options can be chosen.
-  bool optionsLive(ChatMessage m) =>
-      messages.isNotEmpty && messages.last.id == m.id;
+  /// Only the newest message's options can be chosen. A switch question
+  /// ([_requestGuide]) only while the task it asked about still runs: once
+  /// that guide is ended or done, 先繼續〇〇 would offer a guide that is gone.
+  bool optionsLive(ChatMessage m) {
+    if (messages.isEmpty || messages.last.id != m.id) return false;
+    final about = m.followUpOf;
+    if (about != null && about.startsWith(_switchOf)) {
+      return _activeTask?.guide.id == about.substring(_switchOf.length);
+    }
+    return true;
+  }
+
+  /// [ChatMessage.followUpOf] of a switch question: this plus the id of the
+  /// guide in progress when it was asked.
+  static const _switchOf = 'switch:';
 
   void choose(ChatMessage message, CandidateOption? option) {
     if (!optionsLive(message) || loading.value) return;
@@ -961,7 +977,7 @@ class GuidedAssistantController extends GetxController {
             action: 'switch:$guideId',
           ),
         ]),
-        followUpOf: 'switch',
+        followUpOf: '$_switchOf${g.id}',
       ),
     );
   }
@@ -978,7 +994,9 @@ class GuidedAssistantController extends GetxController {
     if (found == null) return;
     // Resuming keeps the task's own page (and progress).
     final guide = resuming ? found : _onShowingTab(found);
-    // 一般模式: the page opens, the steps do not start (as after 我自己來).
+    // 一般模式: the page opens, the steps do not start. The task stays
+    // (ended) so 繼續引導 in the chat can still start them: the user did not
+    // end anything (unlike 我自己來, which removes the task, [goAlone]).
     // [guided] overrides the mode (教我 asks for the steps).
     final alone = !resuming && !(guided ?? mode.value == AssistantMode.teach);
     // A task asked during the tutorial ends it (no "tutorial ended" toast).
@@ -1028,14 +1046,10 @@ class GuidedAssistantController extends GetxController {
     );
   }
 
-  /// 我自己來 on the opened card: no steps; the task stays so 繼續引導 can
-  /// still start them later.
+  /// 我自己來 on the opened card: the user ends the guide, as 結束引導 does
+  /// ([_dropTask]). It cannot be resumed; asking again starts it afresh.
   void goAlone() {
-    final t = task.value;
-    if (t == null) return;
-    task.value = t.copyWith(status: TaskStatus.ended, left: false);
-    todoOpen.value = false;
-    _say(_bot(Replies.goAlone));
+    if (_dropTask()) _say(_bot(Replies.goAlone));
   }
 
   void beginSteps() {
@@ -1458,13 +1472,32 @@ class GuidedAssistantController extends GetxController {
     task.value = t.copyWith(status: TaskStatus.on, left: false);
   }
 
-  /// 結束引導: the task is gone, so the assistant is a plain chat again
-  /// (no task card, 繼續引導 or step list). Asking again starts a new guide.
-  void endGuide() {
-    if (task.value == null) return;
+  /// The user ended the guide: 結束引導 (paused card, 「你離開了…」 bar, task
+  /// card in the chat), 我自己來, 先不要, or 知道了 / 先不用 on the done card
+  /// (docs/AI_CURRENT_RULES.md section 5, 2026-11-13). The task is gone
+  /// everywhere: the chat is a plain chat again (no task card, 繼續引導,
+  /// step chips, live switch question) and a new request starts at once.
+  /// Asking again starts the guide afresh. Leaving without ending pauses
+  /// instead ([_screenChanged]). Late taps on a card still fading out, a
+  /// page that finishes loading, back and route changes all read [task] and
+  /// so find nothing to resume. False when there was no task.
+  bool _dropTask() {
+    if (task.value == null) return false;
+    _offScopeTimer?.cancel();
+    _offScopeTimer = null;
+    _nudgeTimer?.cancel();
+    _returningUntil = null;
+    _measureOnly = false;
     task.value = null;
+    offScope.value = false;
+    nudge.value = '';
     todoOpen.value = false;
-    _say(_bot(Replies.ended));
+    return true;
+  }
+
+  /// 結束引導: see [_dropTask].
+  void endGuide() {
+    if (_dropTask()) _say(_bot(Replies.ended));
   }
 
   void acceptCommit() {
@@ -1473,20 +1506,14 @@ class GuidedAssistantController extends GetxController {
     task.value = t.copyWith(commitAccepted: true);
   }
 
+  /// 先不要 on the submit card: the user ends the guide ([_dropTask]).
   void commitLater() {
-    final t = task.value;
-    if (t == null) return;
-    task.value = t.copyWith(status: TaskStatus.ended);
-    _say(_bot(Replies.commitLater));
+    if (_dropTask()) _say(_bot(Replies.commitLater));
   }
 
   /// 知道了 / 先不用 on the done card: the guide is over, so the task and
   /// its to-do leave the chat (a plain chat again, like 結束引導).
-  void ackDone() {
-    if (task.value == null) return;
-    task.value = null;
-    todoOpen.value = false;
-  }
+  void ackDone() => _dropTask();
 
   void acceptFollowUp() {
     final t = task.value;
