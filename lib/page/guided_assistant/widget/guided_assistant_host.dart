@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
+import 'package:town_pass/page/assistant/assistant_texts.dart';
 import 'package:town_pass/page/guided_assistant/guide_target.dart';
 import 'package:town_pass/page/guided_assistant/guided_assistant_controller.dart';
 import 'package:town_pass/page/guided_assistant/model/assistant_settings.dart';
@@ -215,6 +216,47 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
             }),
           ),
         ),
+        // First use of a page language downloads its translation model
+        // (tens of seconds): said on top of every page, as in the chat
+        // assistant's host. docs/AI_CURRENT_RULES.md section 4.
+        Obx(() {
+          final translation = PageTranslation.instance;
+          if (!translation.preparing.value) return const SizedBox.shrink();
+          return Positioned(
+            left: 16,
+            right: 16,
+            top: MediaQuery.of(context).padding.top + 8,
+            child: IgnorePointer(
+              child: PageTranslationScope(
+                enabled: false,
+                // Above the pages' Material: without one the text gets the
+                // debug "missing Material" underline.
+                child: Material(
+                  type: MaterialType.transparency,
+                  child: Container(
+                    key: const ValueKey('translation-download-banner'),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
+                    decoration: BoxDecoration(
+                      color: TPColors.grayscale900.withValues(alpha: 0.9),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: TPText(
+                      AssistantTexts.text(
+                        'downloadingTranslation',
+                        translation.language.value,
+                      ),
+                      style: TPTextStyles.bodyRegular,
+                      color: TPColors.white,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          );
+        }),
       ],
     );
   }

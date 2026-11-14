@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:town_pass/service/assistant_page_tracker.dart';
 import 'package:town_pass/util/tp_web_view.dart';
 
 // No JS engine is available in unit tests, so these check the script's
@@ -17,10 +18,8 @@ void main() {
     () {
       // Written generically for every translated attribute, so the placeholder
       // probe still finds data-tp-placeholder.
-      final keep = script.indexOf("setAttribute('data-tp-' + item.attribute");
-      final replace = script.indexOf(
-        'item.el.setAttribute(item.attribute, translated)',
-      );
+      final keep = script.indexOf("el.setAttribute('data-tp-' + name, text)");
+      final replace = script.indexOf('el.setAttribute(name, translated)');
       expect(keep, greaterThan(-1));
       expect(replace, greaterThan(keep));
       expect(script, contains("originalAttribute(el, 'placeholder')"));
@@ -29,22 +28,87 @@ void main() {
   );
 
   test('translation script remembers original text before writing', () {
-    final remember = script.indexOf('original.set(item.node, item.text)');
-    final write = script.indexOf('item.node.nodeValue = value');
+    final remember = script.indexOf('original.set(node, text)');
+    final write = script.indexOf('node.nodeValue = value');
     expect(remember, greaterThan(-1));
     expect(write, greaterThan(remember));
   });
 
-  test('translation script keeps its batching and observer', () {
-    expect(script, contains('all.slice(start, start + 20)'));
-    expect(script, contains('new MutationObserver(schedule)'));
-    // Re-rendered nodes and attributes are picked up after a short debounce.
+  test('translation script writes cached texts before the page paints', () {
+    // docs/AI_CURRENT_RULES.md section 4 (2026-11-13): injected at document
+    // start, it observes the whole document (there is no body yet) and
+    // writes dictionary hits inside the observer callback.
+    expect(
+      script,
+      contains('new MutationObserver(observed).observe(document,'),
+    );
     expect(
       script,
       contains('childList: true, subtree: true, characterData: true'),
     );
     expect(script, contains('attributeFilter: attributes'));
-    expect(script, contains('setTimeout(scan, 300)'));
+    final lookup = script.indexOf('var translated = dictionary[key];');
+    final write = script.indexOf(
+      'if (translated) { writeNode(node, value, translated); return; }',
+    );
+    expect(lookup, greaterThan(-1));
+    expect(write, greaterThan(lookup));
+    expect(script, contains('add(config.dictionary);'));
+  });
+
+  test('translation script sends new texts at once, batches in parallel', () {
+    // No 300 ms debounce for the first pass or route changes; rescans are
+    // coalesced in a microtask.
+    expect(script, isNot(contains('setTimeout(scan')));
+    expect(script, contains('Promise.resolve().then(function () {'));
+    expect(script, contains('var batch = 20;'));
+    expect(
+      script,
+      contains('outbox.splice(0, Math.min(batch, limit - inFlight))'),
+    );
+    // Every batch is sent before any answer is awaited.
+    expect(script, contains('while (outbox.length && inFlight < limit)'));
+    expect(script, contains("bridge.callHandler('townpassTranslate', texts)"));
+  });
+
+  test(
+    'translation script hides only waiting elements, for a limited time',
+    () {
+      // A transparent text colour on the waiting element; never visibility,
+      // opacity or the whole body (the guide probes' `shown` stays true).
+      expect(script, contains('[data-tp-pending]{color:transparent!important'));
+      expect(script, isNot(contains('visibility')));
+      expect(script, isNot(contains('opacity')));
+      expect(script, isNot(contains('document.body.style')));
+      expect(script, contains('until: Date.now() + coverMs'));
+      expect(script, contains('if (c.until <= now) uncover(waiting[i]);'));
+      expect(TPWebView.translationCoverMs, 1500);
+    },
+  );
+
+  test('translation script runs only on the service host main frame', () {
+    expect(
+      script,
+      contains(
+        "if (location.protocol !== 'https:' || location.host !== config.host) return;",
+      ),
+    );
+    expect(script, contains('if (window.top !== window) return;'));
+    // A second injection (onLoadStop fallback) adds and rescans only.
+    expect(
+      script,
+      contains('window.__townpassTranslate.add(config.dictionary);'),
+    );
+  });
+
+  test('translation source passes the host, language and dictionary', () {
+    final source = TPWebView.translationSource('en', {'水費': 'Water bill'});
+    expect(source, startsWith(';'));
+    expect(source, contains('"host":"${AssistantPageTracker.serviceHost}"'));
+    expect(source, contains('"language":"en"'));
+    expect(source, contains('"dictionary":{"水費":"Water bill"}'));
+    expect(source, contains('"coverMs":1500'));
+    expect(source, endsWith('});'));
   });
 
   test('translation script translates visible attributes, not form data', () {
@@ -79,7 +143,7 @@ void main() {
       expect(script, contains('parent.isContentEditable'));
       // The exclusion applies to text nodes and to attributes.
       expect(script, contains('excluded(parent)'));
-      expect(script, contains('if (excluded(el)) continue;'));
+      expect(script, contains('if (excluded(el)) return;'));
     },
   );
 
@@ -92,9 +156,13 @@ void main() {
     expect(script, isNot(contains('value.length')));
   });
 
-  test('translation script rescans a page larger than one pass', () {
+  test('translation script sends a page larger than one pass in turns', () {
+    // At most 400 texts wait for the App; the rest go when answers return.
     expect(script, contains('var limit = 400;'));
-    expect(script, contains('items.slice(0, limit)'));
-    expect(script, contains('if (all.length >= limit) schedule();'));
+    expect(script, contains('inFlight -= texts.length;'));
+    final answer = script.indexOf('answer(texts, out);');
+    final more = script.indexOf('flush();', answer);
+    expect(answer, greaterThan(-1));
+    expect(more, greaterThan(answer));
   });
 }

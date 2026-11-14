@@ -75,6 +75,22 @@ class PageTranslation {
 
   bool get active => language.value != original;
 
+  /// Bumped whenever a language gains translations (bundled, learned or
+  /// new), so service pages know when to rebuild their injected dictionary.
+  int get dictionaryVersion => _dictionaryVersion;
+  int _dictionaryVersion = 0;
+
+  /// Every translation known for [code] (default: the page language):
+  /// pre-translated strings, then what ML Kit translated on this phone.
+  /// Injected into service pages so cached texts are written before they are
+  /// painted (tp_web_view.dart).
+  Map<String, String> dictionary([String? code]) {
+    final target = code ?? language.value;
+    if (target == original) return const {};
+    return Map.of(_cache[target] ?? const {})
+      ..removeWhere((source, _) => !_chinese.hasMatch(source));
+  }
+
   /// Every launch starts in the phone's own language (owner, 2026-11-08:
   /// e.g. a migrant caregiver using a grandparent's Chinese phone switches it
   /// by speaking, and the next launch is the phone's language again). A
@@ -113,6 +129,7 @@ class PageTranslation {
           }
         });
       });
+      _dictionaryVersion++;
     } catch (error) {
       debugPrint('page translation: no bundled strings ($error)');
     }
@@ -129,6 +146,7 @@ class PageTranslation {
       _learned[code] = learned;
       final cache = _cache.putIfAbsent(code, () => {});
       learned.forEach((source, text) => cache.putIfAbsent(source, () => text));
+      _dictionaryVersion++;
     } catch (_) {}
   }
 
@@ -190,6 +208,16 @@ class PageTranslation {
   /// returned unchanged (also when the language model is unavailable).
   Future<List<String>> translateAll(List<String> texts) {
     final target = language.value;
+    // Nothing new to translate: answered at once, not behind texts that are
+    // waiting for ML Kit.
+    final known = _cache[target];
+    if (target == original ||
+        texts.every((t) => !_chinese.hasMatch(t) || known?[t] != null)) {
+      return Future.value([
+        for (final t in texts)
+          target == original || !_chinese.hasMatch(t) ? t : known![t]!,
+      ]);
+    }
     final done = Completer<List<String>>();
     // One at a time: ML Kit translates sequentially anyway.
     _running = _running.then((_) async {
@@ -213,6 +241,7 @@ class PageTranslation {
           }
           if (translated != null && translated.trim().isNotEmpty) {
             cache[text] = translated;
+            _dictionaryVersion++;
             _remember(target, text, translated);
           }
         }
@@ -307,6 +336,7 @@ class PageTranslation {
     _learned.clear();
     _learnedLoaded.clear();
     _running = Future.value();
+    _dictionaryVersion++;
     language.value = original;
     translator = null;
     pairTranslator = null;
