@@ -53,7 +53,8 @@ void main() {
     );
     expect(lookup, greaterThan(-1));
     expect(write, greaterThan(lookup));
-    expect(script, contains('add(config.dictionary);'));
+    // 2026-11-15: with the texts that are never translated (language names).
+    expect(script, contains('add(config.dictionary, config.keep);'));
   });
 
   test('translation script sends new texts at once, batches in parallel', () {
@@ -97,7 +98,9 @@ void main() {
     // A second injection (onLoadStop fallback) adds and rescans only.
     expect(
       script,
-      contains('window.__townpassTranslate.add(config.dictionary);'),
+      contains(
+        'window.__townpassTranslate.add(config.dictionary, config.keep);',
+      ),
     );
   });
 
@@ -107,6 +110,7 @@ void main() {
     expect(source, contains('"host":"${AssistantPageTracker.serviceHost}"'));
     expect(source, contains('"language":"en"'));
     expect(source, contains('"dictionary":{"水費":"Water bill"}'));
+    expect(source, contains('"keep":[]'));
     expect(source, contains('"coverMs":1500'));
     expect(source, endsWith('});'));
   });

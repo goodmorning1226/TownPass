@@ -7,24 +7,41 @@
 /// translations are only trusted for the glossary [version] they were made
 /// with; and before ML Kit translates a sentence its terms are replaced by
 /// the target language's words ([protect]), and the result is checked.
+///
+/// Two more lists only ever match a whole text (section 4, 語言名稱不翻、
+/// 頁面標題與短標籤先查表): `keep` holds texts that are never translated
+/// (names of languages in their own language), `labels` the short titles and
+/// buttons of screens the extraction script cannot reach.
 class PageGlossary {
-  PageGlossary._(this.version, this._terms, this._patterns)
-    : _byLength = (_terms.keys.toList()
-        ..sort((a, b) => b.length.compareTo(a.length)));
+  PageGlossary._(
+    this.version,
+    this._terms,
+    this._patterns, [
+    this._labels = const {},
+    this._keep = const {},
+  ]) : _byLength = (_terms.keys.toList()
+         ..sort((a, b) => b.length.compareTo(a.length)));
 
   static final empty = PageGlossary._(0, const {}, const []);
 
-  /// Parses the asset's JSON ({version, terms: {zh: {code: text}}, patterns}).
+  /// Parses the asset's JSON ({version, terms: {zh: {code: text}}, patterns,
+  /// labels: {zh: {code: text}}, keep: [text]}).
   factory PageGlossary.fromJson(Map<dynamic, dynamic> json) {
-    final terms = <String, Map<String, String>>{};
-    (json['terms'] as Map? ?? const {}).forEach((zh, byLanguage) {
-      if (zh is! String || zh.isEmpty || byLanguage is! Map) return;
-      terms[zh] = {
-        for (final e in byLanguage.entries)
-          if (e.key is String && e.value is String && '${e.value}'.isNotEmpty)
-            e.key as String: e.value as String,
-      };
-    });
+    Map<String, Map<String, String>> table(Object? raw) {
+      final out = <String, Map<String, String>>{};
+      if (raw is! Map) return out;
+      raw.forEach((zh, byLanguage) {
+        if (zh is! String || zh.isEmpty || byLanguage is! Map) return;
+        out[zh] = {
+          for (final e in byLanguage.entries)
+            if (e.key is String && e.value is String && '${e.value}'.isNotEmpty)
+              e.key as String: e.value as String,
+        };
+      });
+      return out;
+    }
+
+    final terms = table(json['terms']);
     final patterns = <_Pattern>[];
     for (final raw in json['patterns'] as List? ?? const []) {
       if (raw is! Map || raw['zh'] is! String) continue;
@@ -39,6 +56,11 @@ class PageGlossary {
       (json['version'] as num?)?.toInt() ?? 0,
       terms,
       patterns,
+      table(json['labels']),
+      {
+        for (final text in json['keep'] as List? ?? const [])
+          if (text is String && text.trim().isNotEmpty) text.trim(),
+      },
     );
   }
 
@@ -46,6 +68,17 @@ class PageGlossary {
   final Map<String, Map<String, String>> _terms;
   final List<_Pattern> _patterns;
   final List<String> _byLength;
+
+  /// Whole-text translations written as they are shown (never used inside
+  /// a sentence, so they do not count for [touches] or [protect]).
+  final Map<String, Map<String, String>> _labels;
+  final Set<String> _keep;
+
+  /// Texts shown as they are in every language (the `keep` list).
+  Set<String> get kept => _keep;
+
+  /// Whether [text] as a whole is on the `keep` list: never translated.
+  bool keeps(String text) => _keep.contains(text.trim());
 
   /// Languages without letter case or spaces between words.
   static const _caseless = {'ja'};
@@ -64,6 +97,8 @@ class PageGlossary {
     if (trimmed.isEmpty) return null;
     final term = _terms[trimmed]?[code];
     if (term != null) return _pad(text, _capitalized(term, code));
+    final label = _labels[trimmed]?[code];
+    if (label != null) return _pad(text, label);
     for (final pattern in _patterns) {
       final match = pattern.regex.firstMatch(trimmed);
       if (match == null || match.start != 0 || match.end != trimmed.length) {
@@ -77,6 +112,8 @@ class PageGlossary {
 
   /// Terms of [code] for the injected page dictionary (whole-string hits).
   Map<String, String> wholeTerms(String code) => {
+    for (final e in _labels.entries)
+      if (e.value[code] != null) e.key: e.value[code]!,
     for (final e in _terms.entries)
       if (e.value[code] != null) e.key: _capitalized(e.value[code]!, code),
   };
