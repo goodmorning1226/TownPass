@@ -43,6 +43,19 @@ class PageTranslation {
     'tl': TranslateLanguage.tagalog,
   };
 
+  /// The languages' own names: never translated, whatever the page language
+  /// (docs/AI_CURRENT_RULES.md section 4, 語言名稱不翻).
+  static final _ownNames = languages.values.toSet();
+
+  /// Whether [text] as a whole is always shown as it is: a language's own
+  /// name (日本語, 繁體中文 …) or a text on the glossary's `keep` list. Checked
+  /// before every other lookup, in native screens and service pages alike.
+  bool keeps(String text) =>
+      _ownNames.contains(text.trim()) || _glossary.keeps(text);
+
+  /// Every text of [keeps], for the script injected into service pages.
+  List<String> get keptTexts => {..._ownNames, ..._glossary.kept}.toList();
+
   static const _key = 'page_language';
   static final _chinese = RegExp(r'[㐀-鿿]');
 
@@ -110,19 +123,21 @@ class PageTranslation {
       ...?_cache[target],
       ..._glossary.wholeTerms(target),
       ...?_bundled[target],
-    }..removeWhere((source, _) => !_chinese.hasMatch(source));
+    }..removeWhere((source, _) => !_chinese.hasMatch(source) || keeps(source));
   }
 
-  /// The known translation of [text] into [code]: pre-translated, then a
-  /// whole glossary term or pattern, then learned on this phone.
+  /// The known translation of [text] into [code]: a text that is never
+  /// translated ([keeps]) is itself; then pre-translated, then a whole
+  /// glossary term, label or pattern, then learned on this phone.
   /// docs/AI_CURRENT_RULES.md section 4 (服務頁翻譯的品質).
   String? _known(String text, String code) =>
       preset(text, code) ?? _cache[code]?[text];
 
-  /// [text] in [code] from the App's own files only: pre-translated, or a
-  /// whole glossary term or pattern (no learned or ML Kit translation).
+  /// [text] in [code] from the App's own files only: kept as it is
+  /// ([keeps]), pre-translated, or a whole glossary term, label or pattern
+  /// (no learned or ML Kit translation).
   String? preset(String text, String code) =>
-      _bundled[code]?[text] ?? _glossary.whole(text, code);
+      keeps(text) ? text : _bundled[code]?[text] ?? _glossary.whole(text, code);
 
   /// Tests only: use [glossary] (the real one is loaded by [load]).
   set glossaryForTest(PageGlossary glossary) {

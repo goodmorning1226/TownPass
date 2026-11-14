@@ -59,13 +59,15 @@ class TPWebView extends StatefulWidget {
 
   /// The page translation script called with its configuration: the service
   /// host it may run on, the page language, the dictionary (Chinese ->
-  /// translation) it applies before the page paints, and how long a text
+  /// translation) it applies before the page paints, the texts it never
+  /// translates ([keep]: the languages' own names), and how long a text
   /// waiting for a translation stays transparent.
   static String translationSource(
     String language,
-    Map<String, String> dictionary,
-  ) =>
-      ';${_translationScript.trim()}(${jsonEncode({'host': AssistantPageTracker.serviceHost, 'language': language, 'dictionary': dictionary, 'coverMs': translationCoverMs})});';
+    Map<String, String> dictionary, {
+    List<String> keep = const [],
+  }) =>
+      ';${_translationScript.trim()}(${jsonEncode({'host': AssistantPageTracker.serviceHost, 'language': language, 'dictionary': dictionary, 'keep': keep, 'coverMs': translationCoverMs})});';
 
   /// How long (ms) an untranslated text is hidden before it is shown in
   /// Chinese while its translation is still on the way.
@@ -233,6 +235,7 @@ class _TPWebViewState extends State<TPWebView> {
         source: TPWebView.translationSource(
           translation.language.value,
           translation.dictionary(),
+          keep: translation.keptTexts,
         ),
         injectionTime: UserScriptInjectionTime.AT_DOCUMENT_START,
         allowedOriginRules: {'https://${AssistantPageTracker.serviceHost}'},
@@ -276,6 +279,7 @@ class _TPWebViewState extends State<TPWebView> {
         source: TPWebView.translationSource(
           translation.language.value,
           translation.dictionary(),
+          keep: translation.keptTexts,
         ),
       );
     } catch (_) {}
@@ -789,7 +793,7 @@ String _failedToLoadUrlData({String? url}) {
 
 /// Injected into a service page (see _TPWebViewState._userScripts and
 /// _translatePage): `(function (config) {...})` called with
-/// `{host, language, dictionary, coverMs}`. It only runs in the main frame of
+/// `{host, language, dictionary, keep, coverMs}`. It only runs in the main frame of
 /// `https://<host>` and once per document (a second injection adds its
 /// dictionary and rescans).
 ///
@@ -798,7 +802,8 @@ String _failedToLoadUrlData({String? url}) {
 /// form data) is replaced by its translation, remembering what was written so
 /// Vue re-rendering the Chinese text gets translated again. Subtrees marked
 /// `translate="no"` (or `.notranslate`), scripts, styles and editable text
-/// are left alone.
+/// are left alone, and so is a text that is exactly one of `config.keep`
+/// (a language's own name such as 日本語: never translated, covered or sent).
 ///
 /// Injected at document start, it watches the document with a
 /// MutationObserver and writes translations found in `config.dictionary`
@@ -818,7 +823,7 @@ const _translationScript = r'''
   if (location.protocol !== 'https:' || location.host !== config.host) return;
   if (window.top !== window) return;
   if (window.__townpassTranslate) {
-    window.__townpassTranslate.add(config.dictionary);
+    window.__townpassTranslate.add(config.dictionary, config.keep);
     return;
   }
   var chinese = /[㐀-鿿]/;
@@ -841,6 +846,9 @@ const _translationScript = r'''
   var dictionary = Object.create(null);
   // Texts the App could not translate (kept in Chinese, not asked again).
   var untranslated = Object.create(null);
+  // Texts never translated: the languages' own names (日本語, 繁體中文 …).
+  // They count as untranslated for good; no dictionary entry replaces them.
+  var keep = Object.create(null);
   // Texts sent to the App and not answered yet.
   var asked = Object.create(null);
   var outbox = [];
@@ -873,10 +881,17 @@ const _translationScript = r'''
   // Per scan or observer pass: blocks already looked at (shape, sentences).
   var pass = 0;
   var blockSeen = new WeakMap();
-  function add(entries) {
+  function add(entries, kept) {
+    for (var k = 0; kept && k < kept.length; k++) {
+      if (typeof kept[k] !== 'string') continue;
+      keep[kept[k]] = true;
+      untranslated[kept[k]] = true;
+      delete dictionary[kept[k]];
+    }
     if (!entries) return;
     for (var key in entries) {
       var value = entries[key];
+      if (keep[key]) continue;
       if (typeof value === 'string' && value && value !== key && chinese.test(key)) {
         dictionary[key] = value;
         delete untranslated[key];
@@ -1181,7 +1196,7 @@ const _translationScript = r'''
     for (var i = 0; i < texts.length; i++) {
       delete asked[texts[i]];
       var translated = Array.isArray(out) ? out[i] : null;
-      if (typeof translated === 'string' && translated && translated !== texts[i]) dictionary[texts[i]] = translated;
+      if (typeof translated === 'string' && translated && translated !== texts[i] && !keep[texts[i]]) dictionary[texts[i]] = translated;
       else untranslated[texts[i]] = true;
     }
     resolve();
@@ -1275,7 +1290,7 @@ const _translationScript = r'''
   };
   window.__townpassOriginalAttribute = originalAttribute;
   window.__townpassTranslate = { scan: scan, add: add, language: config.language };
-  add(config.dictionary);
+  add(config.dictionary, config.keep);
   // The whole document from its start (no body yet at document start).
   new MutationObserver(observed).observe(document, {
     childList: true, subtree: true, characterData: true,

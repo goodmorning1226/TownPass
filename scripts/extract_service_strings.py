@@ -9,6 +9,12 @@ bridge in place of the App: the texts are cut exactly as the App sends them
 (text nodes, attributes and whole sentences; docs/AI_CURRENT_RULES.md
 section 4, 服務頁翻譯的品質).
 
+Page titles are collected too (section 4, 語言名稱不翻、頁面標題與短標籤先查表):
+the App bar shows the page's <title>, which the injected script leaves alone
+and the App translates itself. Both the title of every opened page and the
+titles in the site's route table (`meta:{title:"…"}` in its script: pages
+reached by tapping) are added, so no title goes to ML Kit.
+
 Writes {"version", "source", "strings": {zh: {en, ja, vi, id, tl}}}.
 Existing translations are kept; new texts get empty translations to fill in
 (AI drafts, to be reviewed by native speakers); texts no longer on the pages
@@ -34,6 +40,9 @@ OUT = ROOT / "assets" / "i18n" / "service_strings.json"
 APP = ROOT / "assets" / "i18n" / "app_strings.json"
 LANGUAGES = ("en", "ja", "vi", "id", "tl")
 HOST = "taipei-pass-service.vercel.app"
+HAN = re.compile(r"[\u3400-\u9fff]")
+# The site's route table as built by Vite: {path:…,meta:{title:"繳費項目"}}.
+ROUTE_TITLE = re.compile(r'meta:\{[^{}]*?title:"([^"\\]+)"')
 SOURCE = ("TownPass service pages (scripts/extract_service_strings.py); "
           "translations are AI drafts, to be reviewed by native speakers")
 BRIDGE = ("window.__asked = []; window.flutter_inappwebview = { callHandler: (n, texts) => {"
@@ -53,20 +62,41 @@ def collect(paths):
     body = re.search(r"const _translationScript = r'''(.*?)''';", src, re.S).group(1).strip()
     config = {"host": HOST, "language": "en", "dictionary": {}, "coverMs": 1500}
     found = {}
+    scripts = []
+
+    def keep_script(response):
+        if response.url.startswith(f"https://{HOST}/") and response.url.split("?")[0].endswith(".js"):
+            try:
+                scripts.append(response.text())
+            except Exception:
+                pass
+
     with sync_playwright() as p:
         browser = p.chromium.launch()
         context = browser.new_context(viewport={"width": 390, "height": 844}, is_mobile=True, has_touch=True)
         context.add_init_script(BRIDGE + body + "(" + json.dumps(config) + ");")
+        context.on("response", keep_script)
         for path in paths:
             page = context.new_page()
             page.goto(f"https://{HOST}{path}", wait_until="networkidle")
             page.wait_for_timeout(800)
             for text in page.evaluate("() => window.__asked"):
                 found.setdefault(text, set()).add(path)
+            title = page.title().strip()
+            if HAN.search(title):
+                found.setdefault(title, set()).add(path + " <title>")
             page.close()
             print(path, file=sys.stderr)
         browser.close()
+    for title in route_titles(scripts):
+        found.setdefault(title, set()).add("route <title>")
     return found
+
+
+def route_titles(scripts):
+    """Chinese page titles in the site's route table (its built scripts)."""
+    return sorted({title.strip() for script in scripts for title in ROUTE_TITLE.findall(script)
+                   if HAN.search(title)})
 
 
 def main():
