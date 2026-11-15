@@ -26,8 +26,9 @@ assistant that runs entirely on the phone: no cloud model, and recordings never 
 (Mandarin, Taiwanese Hokkien, English, Japanese, Vietnamese, Indonesian or Filipino) or type; a 0.2-second language
 gate (Whisper tiny) picks the recogniser (Whisper small, Breeze-ASR-26 for Taiwanese, PhoWhisper for Vietnamese);
 a rule-first pipeline (emergency words, commands, keyword search, phonetic and e5 semantic matching scored by a
-132 MB decision classifier fine-tuned from Microsoft multilingual-e5-small, rules for library requests and guides,
-then 8,121 Taipei City FAQ entries) opens the right TownPass service page, lists options or answers. By default no
+132 MB decision classifier (v2) fine-tuned from Microsoft multilingual-e5-small, rules for library requests and guides,
+then 8,121 Taipei City FAQ entries ranked together with the pages) opens the right TownPass service page, lists options or answers;
+when nothing fits it lists 2-4 likely pages or shows a 12-category function catalogue instead of saying "not found". By default no
 decision LLM is loaded; Ministral 3B (and Gemma 4 E2B on Android) remain build options. A guided mode (penguin, task
 cards, highlight halos, hold-to-speak form filling) walks you through the real service page, which is translated on
 the fly. Model files are downloaded in the App after the user agrees. On the computer evaluation sets the default
@@ -228,8 +229,8 @@ flowchart LR
 ```
 
 1. **錄音 → 語言判斷 → 辨識**：tiny 先判斷語言（0.2 秒），再用該語言的模型聽成文字。台語不用切選單：閘門分類器、或「中文不像華語／App 認不出」時交給 Breeze 再聽一次。
-2. **文字 → 決定**：後端依序找：緊急詞 → 取消／換頁／第幾個 → 指名但沒有頁面的區公所／戶政 → 功能關鍵字 → 決策 → 讀音相似（Unihan 台灣讀音，折疊 zh/z、l/n、ing/in 等）→ 語意相似（e5 ＋ 602 句口語例句）→ 意圖 → FAQ。都沒有就說沒找到，**不開頁**。
-   預設的「決策」與「意圖」由**決策分類器**替每個候選頁打分：只有一個已串接頁面、分數夠高、沒有別的服務接近時才直接開，其餘列出讓使用者選；圖書（確定的書、館藏、只說作品名的「借小王子」）用規則，教學用教學自己的關鍵字規則；分類器沒回應時一律列出候選，不猜。
+2. **文字 → 決定**：後端依序找：緊急詞 → 取消／換頁／第幾個 → 指名但沒有頁面的區公所／戶政 → 功能關鍵字 → 決策 → 讀音相似（Unihan 台灣讀音，折疊 zh/z、l/n、ing/in 等）→ 語意相似（e5 ＋ 602 句口語例句）→ 意圖 → FAQ。都沒有時**不開頁**：有線索就列 2–4 個可能的頁面＋「看全部功能」，沒有線索（模糊、打招呼、閒聊）就給 12 類的功能目錄（第一列是常用），謝謝只回一句（2026-11-16）。
+   預設的「決策」與「意圖」由**決策分類器**替每個候選頁打分：只有一個已串接頁面、分數夠高、沒有別的服務接近時才直接開（沒有關鍵字、只靠語意的清楚需求也一樣），其餘列出讓使用者選，常見問答和服務頁混在同一個清單；圖書（確定的書、館藏、只說作品名的「借小王子」）用規則，教學用教學自己的關鍵字規則；分類器沒回應時一律列出候選，不猜。
    選 Ministral／Gemma 時改由決策 LLM 在 A／B／C 候選中選一個（GBNF 文法硬性限制，只能輸出 `{"choice":"X"}`，6 個 token）。
 3. **決定 → 畫面**：App 打開頁面、列出選項或回答；決策 LLM 選項之外的任何輸出都被 `validate_call` 擋下，候選 ID 與選項綁定、5 分鐘過期。
 
@@ -239,7 +240,7 @@ flowchart LR
 
 | 用途 | 模型 | 量化／大小 | 開發者、授權 | 手機速度 |
 | --- | --- | --- | --- | --- |
-| 決策（預設） | 決策分類器（cross-encoder，由 multilingual-e5-small 微調） | q8_0，132 MB | 本專案訓練（基底 Microsoft），MIT；llama-server `--reranking`，port 8778 | 每輪決策約 0.1–0.2 秒（電腦評估換算的**估計**，手機還沒量） |
+| 決策（預設） | 決策分類器 v2（cross-encoder，由 multilingual-e5-small 微調；2026-11-16 起，用需求型說法與常見問答訓練） | q8_0，132 MB | 本專案訓練（基底 Microsoft），MIT；llama-server `--reranking`，port 8778 | 每輪決策約 0.1–0.2 秒（電腦評估換算的**估計**，手機還沒量） |
 | 決策（選項，`-DecisionModel ministral`） | Ministral-3-3B-Instruct-2512 | Q4_K_M，約 2.1 GB | Mistral AI（法國），Apache-2.0 | 讀提示約 50 tok/s、生成約 5 tok/s，每次決策約 4.7 秒（Android 實測） |
 | 決策（選項，只有 Android，`-DecisionModel gemma`） | Gemma 4 E2B | Q4_0，2.84 GB | Google，Gemma 授權 | 約 114／7.8 tok/s，每次約 2.3 秒（Android 實測）；口語集開錯頁略多 |
 | 語音辨識 | Whisper small | q8_0，264 MB | OpenAI，MIT | 3 秒句約 0.8–1.2 秒 |
@@ -289,6 +290,25 @@ flowchart LR
 - 代價：分類器比較常把候選列出來讓使用者多按一下，held-out 少約 2 句；擁有者 2026-11-13 決定接受，改成 App 的預設。
 - 每輪秒數：決策 LLM 用手機實測的讀提示／生成速度換算；分類器**假設**每個候選 0.10 秒（約電腦單執行緒的 3 倍），**手機上還沒量**。
 - 越南文 vi_variants（20 句：不打聲調、口音、問句、否定；2026-11-08，Ministral）：11／20 → **19／20**（比對層），加上端到端修正後 20／20，開錯頁 0。
+
+### 需求型說法（電腦評估，分類器模式，2026-11-16）
+
+「我家門口的燈晚上不會亮」「手頭有點緊想找補助」這類只說情況、不說服務名稱的句子。開發集 `eval_need_dev.json`；封存保留集由另一位撰寫者寫好封存（v2，只報告、不拿來調）。
+數字來自 [AI_CURRENT_RULES.md](docs/AI_CURRENT_RULES.md) 第 2、3、8 節與 [AI_DECISION_CLASSIFIER.md](docs/AI_DECISION_CLASSIFIER.md) 第 14 節。
+
+| 評估集 | 改版前（main d857dd4） | 現在 |
+| --- | --- | --- |
+| need 開發集：服務請求到得了正確頁面（開或列出，125 句） | 約 48% | **87.2%**（109） |
+| need 開發集：需求清楚的句子直接開對（37 句） | 18 | **26** |
+| need 開發集：開錯頁 | 3 | **0** |
+| 封存單句集：到得了（104 句服務請求） | 56 | **85** |
+| 封存單句集：開錯頁 | 15 | **9** |
+| 封存多輪（70 輪）通過 | 23 | **37** |
+| 封存 FAQ 題（60 題）：給了 FAQ／相關 | 29／24 | **35／30** |
+| 既有各評估集（dev、held-out、多語、口語四組） | — | 新的開錯頁 0（報告 held-out 多 1 頁：「我要去區公所辦東西」開到臨櫃叫號，擁有者接受） |
+
+- 代價：教學頁判斷 dev 104 → 98、held-out 47 → 39（少的只變成列出，不開錯；擁有者 2026-11-16 接受）；電腦上每句分類 47 → 61 ms，手機還沒量。
+- Android 模擬器端對端（2026-11-16）：App 從 HF 下載 v2 並通過 SHA-256 驗證，回覆都在 1.8 秒內，分類器模式總記憶體約 1.7 GB。
 
 ### 語音與語言
 
