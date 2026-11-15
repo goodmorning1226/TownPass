@@ -60,15 +60,26 @@ class AssistantRecorder {
     }
   }
 
+  /// True while [start] waits for the system's permission prompt, and after
+  /// a [start] that did not get the permission: releasing the button then is
+  /// not "too quick" (docs/AI_CURRENT_RULES.md section 5, 2026-11-16).
+  bool permissionPending = false;
+
   /// Starts capturing; false when the microphone permission is not granted.
   ///
   /// Each recording uses a fresh platform recorder: reusing one across
   /// sessions risked the next session delivering silence.
   Future<bool> start() async {
+    permissionPending = false;
     await cancel();
     await _recorder?.dispose();
     final recorder = _recorder = AudioRecorder();
-    if (!await recorder.hasPermission()) return false;
+    if (!await recorder.hasPermission(request: false)) {
+      // Not allowed yet: the system asks now (or refuses at once).
+      permissionPending = true;
+      if (!await recorder.hasPermission()) return false;
+      permissionPending = false;
+    }
     final pcm = BytesBuilder(copy: false);
     final done = Completer<void>();
     _pcm = pcm;

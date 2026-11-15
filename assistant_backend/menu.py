@@ -16,8 +16,9 @@ import registry as matching
 PAGE_SIZE = 8  # categories or pages per screen; more than this goes to the next page
 OTHER = "other"
 # The 常用 row: pages the user opened recently on this phone (the App sends their ids,
-# newest first), then these defaults (繳水費, 借書, 臨櫃叫號); at most FREQUENT_SIZE.
-FREQUENT_DEFAULT = ("fees.water", "library", "reservation")
+# newest first), then these defaults (繳水費, 借書, 臨櫃叫號; 停車費 only fills in when a page
+# named like a category is left out, 2026-11-16); at most FREQUENT_SIZE.
+FREQUENT_DEFAULT = ("fees.water", "library", "reservation", "fees.parking")
 FREQUENT_SIZE = 3
 # The App's start pages come last inside their category, as in the old flat list.
 LAST = ("app.home", "app.services", "start_page", "pinned")
@@ -62,16 +63,33 @@ class Menu:
         names = self.by_id[group]["names"]
         return names.get(language) or names.get("en") or names["zh"]
 
-    def frequent(self, recent=()):
-        """The 常用 row: recent connected pages first, then the defaults, no repeats."""
+    def frequent(self, recent=(), language="zh"):
+        """The 常用 row: recent connected pages first, then the defaults, no repeats; a page
+        named like a category in this language is left out (rules section 3, 2026-11-16: the
+        page 臨櫃叫號 beside the category 臨櫃叫號 could not be told apart, and saying the name
+        picks the category), so the row may have fewer than FREQUENT_SIZE."""
         chosen = []
         for entry_id in [*(recent or ()), *FREQUENT_DEFAULT]:
             entry = self.registry.by_id.get(entry_id) if isinstance(entry_id, str) else None
-            if entry and entry["enabled"] and entry_id not in chosen:
+            if (entry and entry["enabled"] and entry_id not in chosen
+                    and not self.names_category(self.registry.title(entry, language), language)):
                 chosen.append(entry_id)
             if len(chosen) == FREQUENT_SIZE:
                 break
         return [self.registry.by_id[entry_id] for entry_id in chosen]
+
+    def names_category(self, title, language="zh"):
+        """Whether a page title is a visible category's name, or one part of it, in this
+        language (as match() would read it: 繳費與帳單 -> 繳費, 帳單)."""
+        said = matching.normalized(title or "")
+        if not said:
+            return False
+        for group in self.visible():
+            name = group["names"].get(language) or group["names"].get("en") or group["names"]["zh"]
+            if any(said == matching.normalized(part) for part in [name, *_SPLIT.split(name)]
+                   if matching.normalized(part)):
+                return True
+        return False
 
     def match(self, text, language="zh", all_entries=False):
         """The visible category a short text names ("圖書館", "繳費", "Library"), or None.

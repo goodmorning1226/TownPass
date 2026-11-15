@@ -7,6 +7,7 @@ from unittest.mock import patch
 
 import classifier
 import faq
+import i18n
 import workflow
 from registry import Registry
 from server import Assistant, AssistantError
@@ -223,6 +224,54 @@ class RankedTests(unittest.TestCase):
             result = turn(app, "郵差送來的那張紙不見了怎麼辦")
         self.assertEqual(result["metrics"]["route"], "semantic_model")
         self.assertEqual([c["title"] for c in result["choices"]], ["水費"])
+
+
+class SingleWeakTests(unittest.TestCase):
+    """A list left with ONE page the classifier is not sure of gives the catalogue (rules section 3,
+    2026-11-16; the emulator's 「我家附近有東西壞掉了」 listed only 電力停電, scored 0.058)."""
+
+    setUp = RankedTests.setUp
+    app = RankedTests.app
+
+    def test_one_weak_page_gives_the_catalogue(self):
+        self.assertEqual(classifier.DEFAULT_THRESHOLDS_V2["single"], 0.06)
+        self.assertEqual(classifier.DEFAULT_THRESHOLDS["single"], 0.0)  # v1: off
+        app = self.app(FakeScores({"電力停電": 0.058}), found=[(0.045, "disasterReport.form.D-1-4")])
+        result = turn(app, "我家附近有東西壞掉了")
+        self.assertEqual((result["kind"], result["level"]), ("capability_list", 1))
+        self.assertIsNone(result["destination"])
+        self.assertEqual(result["metrics"]["route"], "fallback_catalog")
+        self.assertEqual(result["metrics"]["semantic"]["single_dropped"], "disasterReport.form.D-1-4")
+        # A neutral message without 1999 (not "I can't help with that"); a second miss in a row adds 1999.
+        self.assertEqual(result["message"], i18n.t("fallback_single", "zh"))
+        self.assertNotIn("1999", [c.get("nav") for c in result["choices"]])
+        second = turn(app, "我家附近有東西壞掉了")
+        self.assertEqual((second["message"], second["choices"][-1]["nav"]), (i18n.t("second_miss", "zh"), "1999"))
+
+    def test_a_sure_single_two_weak_pages_or_a_page_with_an_faq_are_still_listed(self):
+        sure = self.app(FakeScores({"電力停電": 0.30}), found=[(0.045, "disasterReport.form.D-1-4")])
+        self.assertEqual([c["title"] for c in turn(sure, "我家附近有東西壞掉了")["choices"]], ["電力停電", "看全部功能"])
+        two = self.app(FakeScores({"電力停電": 0.058, "路燈故障": 0.055}),
+                       found=[(0.045, "disasterReport.form.D-1-4"), (0.044, "disasterReport.form.D-1-3")])
+        self.assertEqual([c["title"] for c in turn(two, "我家附近有東西壞掉了")["choices"]],
+                         ["電力停電", "路燈故障", "看全部功能"])
+        hits = [hit("f1", MEDIUM, "停電了要找誰")]
+        mixed = self.app(FakeScores({"電力停電": 0.058, "常見問答：停電": 0.7}),
+                         found=[(0.045, "disasterReport.form.D-1-4")], hits=hits)
+        self.assertEqual([c["title"] for c in turn(mixed, "我家附近有東西壞掉了")["choices"]],
+                         ["停電了要找誰", "電力停電", "看全部功能"])
+
+    def test_a_weak_single_clue_with_the_classifier_gives_the_catalogue(self):
+        # The fallback tier's clue (kept by its lift although the classifier scored it low).
+        app = self.app(FakeScores(default=0.02), found=[(0.035, "fees.water")], intent=False)
+        result = turn(app, "家裡那張單子不知道怎麼處理")
+        self.assertEqual((result["kind"], result["level"]), ("capability_list", 1))
+        self.assertEqual(result["metrics"]["semantic"]["single_dropped"], "fees.water")
+
+    def test_switched_off(self):
+        app = self.app(FakeScores({"電力停電": 0.058}), found=[(0.045, "disasterReport.form.D-1-4")],
+                       thresholds={"single": 0.0})
+        self.assertEqual([c["title"] for c in turn(app, "我家附近有東西壞掉了")["choices"]], ["電力停電", "看全部功能"])
 
 
 class PendingExpiryTests(unittest.TestCase):

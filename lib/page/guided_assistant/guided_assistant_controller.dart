@@ -432,6 +432,9 @@ class GuidedAssistantController extends GetxController {
   DateTime? _resolutionAt;
   List<String> _resolutionTitles = const [];
 
+  /// The list's option titles by choice id (a tapped option's page title).
+  Map<String, String> _resolutionChoices = const {};
+
   /// This turn's speech notice ([_sayNotice]), said after the list.
   int? _noticeId;
 
@@ -464,6 +467,7 @@ class GuidedAssistantController extends GetxController {
     _resolutionMessage = null;
     _resolutionAt = null;
     _resolutionTitles = const [];
+    _resolutionChoices = const {};
   }
 
   bool _offlineNoted = false;
@@ -652,6 +656,13 @@ class GuidedAssistantController extends GetxController {
     if (choiceId == null && raw.trim().isNotEmpty) _lastRequest = raw.trim();
     final text = raw.trim();
     if ((text.isEmpty && choiceId == null) || loading.value) return;
+    if (choiceId == null && !voice) {
+      final page = AssistantRecentInputs.instance.pageOf(text);
+      if (page != null) {
+        _openRecentPage(text, page);
+        return;
+      }
+    }
     // Before the user's bubble: can this turn answer the backend's list?
     final followUp = choiceId == null ? _liveResolution() : null;
     _noticeId = null;
@@ -728,6 +739,7 @@ class GuidedAssistantController extends GetxController {
     // list is the latest reply (rules section 5, 2026-11-16): the backend
     // then resolves 第 2 個, a category, 下一頁 or 取消 against it.
     final offered = followUp == null ? const <String>[] : _resolutionTitles;
+    final listed = _resolutionChoices;
     AssistantResult result;
     try {
       result = await service!.decide(
@@ -779,18 +791,34 @@ class GuidedAssistantController extends GetxController {
     final destination = result.destination;
     if (destination != null) {
       // 第 2 個 (typed or said) opened one of the list's pages, as a tap
-      // would: the request is the one that brought the list.
-      final picked = _pickedFromList(text, result.message, offered);
+      // would.
+      final pickedTitle = choiceId == null && pageStep == null
+          ? _pickedTitle(text, result.message, offered)
+          : null;
+      final picked = pickedTitle != null;
       if (picked) _lastRequest = earlier;
-      // A request that opened a page becomes a suggestion next time.
-      final asked = choiceId == null && pageStep == null && !picked
-          ? text
-          : _lastRequest;
-      if (asked != null) {
+      // Opened from a list (tapped, or 第 2 個): the page itself becomes the
+      // suggestion and opens at once next time (docs/AI_CURRENT_RULES.md
+      // section 5, owner 2026-11-16: after 看全部功能 > 圖書館 > 第二個 the
+      // first request only brought the list back). A request that opened a
+      // page by itself is remembered as said.
+      final fromList = choiceId != null ? listed[choiceId] : pickedTitle;
+      if (fromList != null && fromList.trim().isNotEmpty) {
         AssistantRecentInputs.instance.remember(
-          asked,
+          fromList,
           language: result.language,
+          page: RecentPage(destination, result.message),
         );
+      } else {
+        final asked = choiceId == null && pageStep == null
+            ? text
+            : _lastRequest;
+        if (asked != null) {
+          AssistantRecentInputs.instance.remember(
+            asked,
+            language: result.language,
+          );
+        }
       }
       AssistantRecentPages.instance.remember(destination);
       final guide = guideFor(destination, result.guide, picked ? '' : text);
@@ -835,6 +863,7 @@ class GuidedAssistantController extends GetxController {
         _resolutionMessage = reply.id;
         _resolutionAt = clock();
         _resolutionTitles = [for (final c in result.choices) c.title];
+        _resolutionChoices = {for (final c in result.choices) c.id: c.title};
       }
       return;
     }
@@ -845,17 +874,44 @@ class GuidedAssistantController extends GetxController {
   /// titles) opened one of its pages: the reply names the page and the words
   /// did not (第 2 個, the second one). 我要繳水費 after a list with 水費 is a
   /// request of its own.
-  static bool _pickedFromList(
+  static String? _pickedTitle(
     String text,
     String message,
     List<String> offered,
   ) {
     final said = text.toLowerCase();
     final reply = message.toLowerCase();
-    return offered.any((title) {
+    String? picked;
+    for (final title in offered) {
       final t = title.trim().toLowerCase();
-      return t.isNotEmpty && reply.contains(t) && !said.contains(t);
-    });
+      if (t.isNotEmpty &&
+          reply.contains(t) &&
+          !said.contains(t) &&
+          t.length > (picked?.trim().length ?? 0)) {
+        picked = title.trim(); // the longest named title (水費帳單 over 水費)
+      }
+    }
+    return picked;
+  }
+
+  /// A remembered page's suggestion (or its exact title typed): opens that
+  /// page at once, without the backend (docs/AI_CURRENT_RULES.md section 5,
+  /// owner 2026-11-16), with the line the backend said when it opened it.
+  void _openRecentPage(String title, RecentPage page) {
+    _noticeId = null;
+    messages.add(ChatMessage(id: _nextId++, user: true, text: title));
+    _dropResolution();
+    final recent = AssistantRecentInputs.instance;
+    recent.remember(title, language: recent.languageOf(title), page: page);
+    final destination = page.destination;
+    AssistantRecentPages.instance.remember(destination);
+    final guide = guideFor(destination, null, '');
+    if (guide != null) {
+      _guides[guide.id] = guide;
+      _requestGuide(guide.id);
+    } else {
+      _openReal(destination, page.message);
+    }
   }
 
   /// The newest capability list's previous (-1) or next (1) page button: the
@@ -1928,17 +1984,21 @@ class GuidedAssistantController extends GetxController {
     }
     speaker.stop(); // never record the assistant's own voice
     listening.value = true;
-    _micDiscarded = false;
+    final fieldPress = _fieldMode;
     final started = await rec.start();
-    if (started && _micDiscarded && !listening.value) {
-      // Slid up and released before the microphone had started.
+    if (started && !listening.value) {
+      // Released (or slid up) before the microphone had started, e.g. while
+      // the system asked for the permission: nothing to record.
       await rec.cancel();
       return;
     }
     if (!started && !isClosed) {
       listening.value = false;
-      final field = _fieldMode;
+      // A release during the permission prompt already ended the press
+      // (micUp): the notice still goes where the press was made.
+      final field = _fieldMode || fieldPress;
       _fieldMode = false;
+      if (field) fieldMic.value = FieldMicPhase.idle;
       _micProblem(Replies.noMic, field: field);
     }
   }
@@ -1993,10 +2053,6 @@ class GuidedAssistantController extends GetxController {
     }
   }
 
-  /// The press was discarded (slide up to cancel, or a cancelled pointer)
-  /// while the microphone was still starting.
-  bool _micDiscarded = false;
-
   /// Releasing the microphone sends the recording; [send] false (slid up to
   /// cancel, or the pointer was cancelled) discards it: nothing is
   /// transcribed or sent.
@@ -2009,7 +2065,6 @@ class GuidedAssistantController extends GetxController {
     final rec = recorder;
     final svc = service;
     if (!send) {
-      _micDiscarded = true;
       level.value = 0;
       if (field) fieldMic.value = FieldMicPhase.idle;
       await rec?.cancel();
@@ -2017,6 +2072,14 @@ class GuidedAssistantController extends GetxController {
     }
     if (rec == null || svc == null) {
       _micProblem(Replies.micDemo, field: field);
+      return;
+    }
+    if (rec.permissionPending) {
+      // This press brought up the system's permission prompt, or the
+      // microphone is not allowed: not "too quick" (docs/AI_CURRENT_RULES.md
+      // section 5, 2026-11-16). micDown says what came of it.
+      level.value = 0;
+      if (field) fieldMic.value = FieldMicPhase.idle;
       return;
     }
     if (field) fieldMic.value = FieldMicPhase.working;
@@ -2311,6 +2374,20 @@ class GuidedAssistantController extends GetxController {
       if (starting != null && await starting) await rec?.cancel();
       return;
     }
+    if (rec != null && rec.permissionPending) {
+      // This press brought up the system's permission prompt, or the
+      // microphone is not allowed: not "too quick" (docs/AI_CURRENT_RULES.md
+      // section 5, 2026-11-16); only the permission's notice, if refused.
+      homeAsk.value = HomeAsk.idle;
+      level.value = 0;
+      final allowed = starting != null && await starting;
+      if (allowed) {
+        await rec.cancel(); // allowed meanwhile: the next press talks
+      } else if (!isClosed && homeAsk.value == HomeAsk.idle) {
+        _showHomeNotice(HomeAskTexts.noMic);
+      }
+      return;
+    }
     if (held < const Duration(milliseconds: 400)) {
       if (_homeCard) {
         homeAsk.value = HomeAsk.tooShort;
@@ -2326,7 +2403,13 @@ class GuidedAssistantController extends GetxController {
       return;
     }
     homeAsk.value = HomeAsk.working;
-    if (starting != null && !await starting) return; // no permission
+    if (starting != null && !await starting) {
+      // No permission found only now: say so instead of staying "working".
+      if (!isClosed && homeAsk.value == HomeAsk.working) {
+        _showHomeNotice(HomeAskTexts.noMic);
+      }
+      return;
+    }
     final Uint8List? audio = await rec.stop();
     if (isClosed || homeAsk.value != HomeAsk.working) return;
     if (audio == null || AssistantRecorder.seconds(audio) < 0.5) {

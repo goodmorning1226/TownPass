@@ -93,6 +93,9 @@ DEFAULT_THRESHOLDS = {
     "clear_margin": 0.60,     # and every other candidate at least this much lower
     "open_best": 0.90,        # TOWNPASS_CLASSIFIER_OPEN_BEST=1 only
     "runner_up": 0.20,
+    # A fallback / ranked list left with ONE page (no FAQ) scored below this gives the catalogue
+    # instead (rules section 3, 2026-11-16). Off for v1 (0): not measured, no longer the App's model.
+    "single": 0.0,
 }
 # Classifier v2 (townpass-decision-e5-ce-v2-q8_0.gguf), recalibrated on the dev sets only (step 7):
 # the v1 names, and for what only v2 does (A4, chitchat):
@@ -119,6 +122,10 @@ DEFAULT_THRESHOLDS_V2 = {
     "semantic_open": 0.60,
     "semantic_open_lift": 0.05,
     "semantic_open_margin": 0.30,
+    # Emulator end-to-end (2026-11-16): 「我家附近有東西壞掉了」 listed only 電力停電. On the dev sets
+    # (tools/sweep8.py) such single lists were the right page 15 of 55 times and no request at all 34
+    # times; 0.06 is the highest value that loses no more right pages than 0.05 (1, scored 0.011).
+    "single": 0.06,
 }
 CACHE_SIZE = 256
 

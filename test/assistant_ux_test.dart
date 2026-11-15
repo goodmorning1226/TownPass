@@ -3,6 +3,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -62,6 +63,7 @@ class _AskingRecorder extends AssistantRecorder {
     requests++;
     return allowed = true;
   }
+
   @override
   Future<bool> start() async {
     starts++;
@@ -70,6 +72,26 @@ class _AskingRecorder extends AssistantRecorder {
 
   @override
   Future<void> cancel() async {}
+}
+
+/// The microphone was refused before: each start brings up the system's
+/// prompt again ([permissionPending]) until [answer] says allowed or not.
+class _PromptRecorder extends AssistantRecorder {
+  Completer<bool> answer = Completer<bool>();
+  int cancels = 0;
+  @override
+  Future<bool> start() async {
+    permissionPending = true;
+    if (!await answer.future) return false;
+    permissionPending = false;
+    return true;
+  }
+
+  @override
+  Future<Uint8List?> stop() async => null;
+
+  @override
+  Future<void> cancel() async => cancels++;
 }
 
 /// Remembers what was read aloud and the speed asked for.
@@ -398,6 +420,107 @@ void main() {
         expect(prefs.getBool('assistant_mic_explained'), isTrue);
       },
     );
+
+    group('a press that brings up the permission prompt (2026-11-16)', () {
+      // Emulator end-to-end: after a refusal the system asks again; releasing
+      // during its prompt said "too quick" before "needs the microphone".
+      Future<(GuidedAssistantController, _PromptRecorder)> make() async {
+        SharedPreferences.setMockInitialValues({
+          'assistant_mic_explained': true,
+        });
+        final recorder = _PromptRecorder();
+        final web = Get.put<WebPageState>(WebPageState());
+        final c = Get.put(
+          GuidedAssistantController(
+            thinkDelay: Duration.zero,
+            runOnboarding: false,
+            speaker: SilentSpeaker(),
+            service: FakeService([]),
+            recorder: recorder,
+            executor: FakeExecutor(),
+            probeOverride: FakeProbe(web),
+          ),
+        );
+        await Future<void>.delayed(Duration.zero);
+        await Future<void>.delayed(Duration.zero);
+        return (c, recorder);
+      }
+
+      List<String> said(GuidedAssistantController c) => [
+        for (final m in c.messages)
+          if (!m.user) m.text,
+      ];
+
+      test('refused: only the permission line, never "too quick"', () async {
+        final (c, recorder) = await make();
+        final before = said(c).length;
+        final down = c.micDown();
+        await Future<void>.delayed(Duration.zero);
+        expect(c.listening.value, isTrue);
+        await c.micUp(); // released while the system asks
+        expect(said(c).skip(before), isEmpty);
+        recorder.answer.complete(false);
+        await down;
+        expect(said(c).skip(before), [Replies.noMic]);
+        expect(c.listening.value, isFalse);
+      });
+
+      test(
+        'allowed in the prompt: no line and nothing left recording',
+        () async {
+          final (c, recorder) = await make();
+          final before = said(c).length;
+          final down = c.micDown();
+          await Future<void>.delayed(Duration.zero);
+          await c.micUp();
+          recorder.answer.complete(true);
+          await down;
+          expect(said(c).skip(before), isEmpty);
+          expect(recorder.cancels, greaterThanOrEqualTo(1));
+          expect(c.listening.value, isFalse);
+        },
+      );
+
+      test(
+        'a quick release with the permission is still "too quick"',
+        () async {
+          final (c, recorder) = await make();
+          recorder.answer.complete(true);
+          await c.micDown();
+          await c.micUp();
+          expect(said(c).last, Replies.tooShort);
+        },
+      );
+
+      test('按住提問 on the home card: the permission notice only', () async {
+        for (final held in [Duration.zero, const Duration(milliseconds: 500)]) {
+          final (c, recorder) = await make();
+          final down = c.homeMicDown();
+          await Future<void>.delayed(held);
+          final up = c.homeMicUp(); // released while the system asks
+          expect(c.homeAsk.value, isNot(HomeAsk.tooShort));
+          recorder.answer.complete(false);
+          await up;
+          await down;
+          expect(c.homeAsk.value, HomeAsk.notice, reason: '$held');
+          expect(c.homeNotice.value, HomeAskTexts.noMic);
+          Get.reset();
+        }
+      });
+
+      test('按住提問 allowed in the prompt: back to idle, not recording', () async {
+        final (c, recorder) = await make();
+        final down = c.homeMicDown();
+        await Future<void>.delayed(Duration.zero);
+        await Future<void>.delayed(Duration.zero);
+        final up = c.homeMicUp();
+        recorder.answer.complete(true);
+        await up;
+        await down;
+        expect(c.homeAsk.value, HomeAsk.idle);
+        expect(recorder.cancels, greaterThanOrEqualTo(1));
+      });
+    });
 
     test('once explained, a new assistant does not explain again', () async {
       SharedPreferences.setMockInitialValues({'assistant_mic_explained': true});

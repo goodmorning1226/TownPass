@@ -104,8 +104,127 @@ void main() {
     expect(service.calls.last, ('第2個', null));
     expect(service.resolutionIds.last, 'r1');
     expect(executor.opened.single, {'kind': 'capability', 'id': 'fees.tax'});
-    // As a tap: the request that brought the list is remembered, not 第2個.
-    expect(AssistantRecentInputs.instance.items, ['我想知道案子辦到哪']);
+    // As a tap: the page opened is remembered, not 第2個 (owner 2026-11-16;
+    // before, the request that brought the list).
+    expect(AssistantRecentInputs.instance.items, ['陳情案件進度']);
+  });
+
+  group('recent page (owner 2026-11-16)', () {
+    test(
+      'its suggestion opens the page at once, without the backend',
+      () async {
+        final service = FakeService([
+          (_, _) => candidates(),
+          (_, _) => opened('fees.tax', '陳情案件進度'),
+        ]);
+        final c = makeController(service: service, executor: executor);
+        c.submit('我想知道案子辦到哪');
+        await settle();
+        c.submit('第2個');
+        await settle();
+        final page = AssistantRecentInputs.instance.pageOf('陳情案件進度');
+        expect(page?.destination, {'kind': 'capability', 'id': 'fees.tax'});
+        expect(c.chips, contains('陳情案件進度'));
+        final asked = service.calls.length;
+        c.submit('陳情案件進度'); // the suggestion tapped
+        await settle();
+        expect(service.calls.length, asked, reason: 'no backend turn, no list');
+        expect(executor.opened, [
+          {'kind': 'capability', 'id': 'fees.tax'},
+          {'kind': 'capability', 'id': 'fees.tax'},
+        ]);
+        expect(c.messages.any((m) => m.user && m.text == '陳情案件進度'), isTrue);
+        expect(
+          c.messages.where((m) => !m.user).last.text,
+          '請在原本的「陳情案件進度」頁面繼續操作。',
+        );
+        expect(AssistantRecentInputs.instance.items.first, '陳情案件進度');
+      },
+    );
+
+    test(
+      'through the catalogue: the last page opened, not the first request',
+      () async {
+        // Emulator end-to-end: 我想處理一下家裡的事 > 看全部功能 > 圖書館 > 第二個.
+        final service = FakeService([
+          (_, _) => AssistantResult(
+            sessionId: 's',
+            message: '我不太確定你要哪一個，是這些嗎？',
+            kind: 'confirm_candidates',
+            resolutionId: 'r0',
+            choices: const [
+              AssistantBookChoice('1', '水費'),
+              AssistantBookChoice('2', '帳務'),
+              AssistantBookChoice('3', '看全部功能', nav: 'catalog'),
+            ],
+          ),
+          (_, _) => categories(),
+          (_, _) => libraryPages(),
+          (_, _) => opened('library.records', '我的借閱紀錄'),
+        ]);
+        final c = makeController(service: service, executor: executor);
+        c.submit('我想處理一下家裡的事');
+        await settle();
+        c.choose(c.messages.last, c.messages.last.options!.options[2]);
+        await settle();
+        expect(service.calls.last, ('', '3'));
+        c.choose(c.messages.last, c.messages.last.options!.options[3]);
+        await settle();
+        expect(c.messages.last.catalogLevel, 2);
+        c.submit('第二個');
+        await settle();
+        expect(service.calls.last, ('第二個', null));
+        expect(AssistantRecentInputs.instance.items, ['我的借閱紀錄']);
+        expect(AssistantRecentInputs.instance.pageOf('我的借閱紀錄')?.destination, {
+          'kind': 'capability',
+          'id': 'library.records',
+        });
+      },
+    );
+
+    test('a tapped option is remembered as its page', () async {
+      final service = FakeService([
+        (_, _) => candidates(),
+        (_, _) => opened('districtOffice.progress', '申辦案件進度'),
+      ]);
+      final c = makeController(service: service, executor: executor);
+      c.submit('我想知道案子辦到哪');
+      await settle();
+      c.choose(c.messages.last, c.messages.last.options!.options.first);
+      await settle();
+      expect(service.calls.last, ('', '1'));
+      expect(AssistantRecentInputs.instance.items, ['申辦案件進度']);
+      expect(AssistantRecentInputs.instance.pageOf('申辦案件進度'), isNotNull);
+      // A request said by itself is still remembered as said, and sent again.
+      expect(AssistantRecentInputs.instance.pageOf('我想知道案子辦到哪'), isNull);
+    });
+
+    test('kept on the phone across restarts; old saves are requests', () async {
+      SharedPreferences.setMockInitialValues({
+        'assistant_recent_inputs': ['陳情案件進度', '我要繳水費'],
+        'assistant_recent_inputs_languages': ['zh', 'zh'],
+        'assistant_recent_inputs_pages': [
+          '{"destination":{"kind":"capability","id":"fees.tax"},"message":"好。"}',
+          '',
+        ],
+      });
+      final recent = AssistantRecentInputs.instance..reset();
+      await recent.load();
+      expect(recent.pageOf('陳情案件進度')?.destination['id'], 'fees.tax');
+      expect(recent.pageOf('陳情案件進度')?.message, '好。');
+      expect(recent.pageOf('我要繳水費'), isNull);
+      // Saved before pages were kept (no pages list): all requests.
+      SharedPreferences.setMockInitialValues({
+        'assistant_recent_inputs': ['陳情案件進度'],
+      });
+      recent.reset();
+      await recent.load();
+      expect(recent.items, ['陳情案件進度']);
+      expect(recent.pageOf('陳情案件進度'), isNull);
+      // Remembered again as a request: no longer opens directly.
+      await recent.remember('陳情案件進度', language: 'zh');
+      expect(recent.pageOf('陳情案件進度'), isNull);
+    });
   });
 
   testWidgets('the hint holds: 第2個 typed in the sheet opens the option', (

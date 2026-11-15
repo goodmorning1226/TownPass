@@ -175,6 +175,12 @@ CLUE_LIFT = 0.02
 CLUE_LIST_LIFT = 0.03
 CLUE_SCORE = 0.05
 CLUE_LIMIT = 4
+# A clue left with ONE page is listed only when it is fairly sure (rules section 3, 2026-11-16, the
+# emulator's 「我家附近有東西壞掉了」 -> 電力停電 alone): with the classifier its score reaches the
+# thresholds' "single" (v2 0.06); without it (or when it does not answer) a lift of CLUE_SINGLE_LIFT or a
+# keyword match. Otherwise the catalogue. Dev sets only (tools/sweep8.py): the right page 2 of 24 times
+# without the classifier, at lifts 0.034 and 0.063; no request reached more than 0.047. 0 = off.
+CLUE_SINGLE_LIFT = float(os.environ.get("TOWNPASS_CLUE_SINGLE_LIFT", "0.05"))
 MISS_MEMORY_S = 600
 # A list's options stay answerable this long (seconds; the App sends the list's resolution_id
 # only within it, GuidedAssistantController._liveResolution). Since 2026-11-16 (step 7) a
@@ -818,7 +824,7 @@ class Workflow:
             items = []
             if offset == 0 and not all_entries:
                 items += [{**item, "subtitle": i18n.t("frequent", language), "group_id": "frequent"}
-                          for item in self._cap_items(self.menu.frequent(recent), language)]
+                          for item in self._cap_items(self.menu.frequent(recent, language), language)]
             items += [{"title": self.menu.name(g["id"], language), "subtitle": "", "enabled": True,
                        "group": g["id"], "group_id": g["id"]} for g in shown[offset:offset + LIST_SIZE]]
             message = message or i18n.t("catalog_title", language)
@@ -1424,8 +1430,13 @@ class Workflow:
             self._trace("fallback_list", [e["id"] for e in candidates])
             return self._with_see_all(payload, self._cap_items(candidates, language),
                                       i18n.t("fallback_unsure", language))
+        usage = getattr(self.owner, "usage", None)
+        single = bool((getattr(usage, "semantic", None) or {}).get("single_dropped"))
         if count >= 2:
             message, hotline = i18n.t("second_miss", language), True
+        elif single:
+            # A clue that was only one unsure page (rules section 3, 2026-11-16): neutral, no 1999.
+            message, hotline = i18n.t("fallback_single", language), False
         elif language == "zh" and not ASKS_ZH.search(text):
             message, hotline = i18n.t("out_of_scope", language), True
         else:
@@ -1482,7 +1493,26 @@ class Workflow:
         chosen = [e for e in found if kept(e)]
         if scores is not None:
             chosen.sort(key=lambda e: -scores[e["id"]])
+        if len(chosen) == 1 and not self._sure_single(chosen[0], scores, lifts, keyword):
+            # One page the assistant is not sure of is no clue (rules section 3, 2026-11-16).
+            self._note_single(chosen[0])
+            return []
         return chosen[:CLUE_LIMIT]
+
+    def _note_single(self, entry):
+        """For metrics only: the single page that gave way to the catalogue."""
+        usage = getattr(self.owner, "usage", None)
+        if usage is not None:
+            usage.semantic = {**(getattr(usage, "semantic", None) or {}), "single_dropped": entry["id"]}
+
+    def _sure_single(self, entry, scores=None, lifts=None, keyword=()):
+        """Whether ONE page left in a list is sure enough to be listed alone (rules section 3,
+        2026-11-16): the classifier's score at least its "single" threshold; without scores a
+        semantic lift of CLUE_SINGLE_LIFT or a keyword match. Otherwise the catalogue."""
+        if scores is not None and self.classifier is not None:
+            return scores[entry["id"]] >= self.classifier.thresholds.get("single", 0.0)
+        return (not CLUE_SINGLE_LIFT or entry["id"] in keyword
+                or (lifts or {}).get(entry["id"], -1.0) >= CLUE_SINGLE_LIFT)
 
     def _semantic_fallback(self, payload, text, positive, chat=None):
         """Version C (semantic.py): keyword retrieval found nothing, so services
@@ -1584,6 +1614,12 @@ class Workflow:
             items = items[:RANKED_LIMIT - 1] + [max(admitted, key=lambda item: item[0])]
         if not items:
             return None
+        if (len(items) == 1 and items[0][1] == "page"
+                and not self._sure_single(items[0][2], {items[0][2]["id"]: items[0][0]})):
+            # One page alone, not sure enough: the catalogue, not a list of one (rules section 3,
+            # 2026-11-16; the emulator's 「我家附近有東西壞掉了」 -> 電力停電 0.058).
+            self._note_single(items[0][2])
+            return self._fallback(payload, text, no_clue=True)
         has_page = any(kind == "page" for _, kind, _ in items)
         has_faq = any(kind == "faq" for _, kind, _ in items)
         options = []

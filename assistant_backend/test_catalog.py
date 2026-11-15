@@ -101,7 +101,8 @@ class CatalogueTests(unittest.TestCase):
         self.assertEqual(result["listing"], {"offset": 0, "size": 8, "total": 12})
         choices = result["choices"]
         self.assertEqual([c.get("group_id") for c in choices[:3]], ["frequent"] * 3)
-        self.assertEqual(titles(result)[:3], ["水費", "圖書借閱", "臨櫃叫號"])  # the defaults
+        # The defaults; the page 臨櫃叫號 is named like its category, so 停車費 fills in (2026-11-16).
+        self.assertEqual(titles(result)[:3], ["水費", "圖書借閱", "停車費"])
         self.assertEqual(titles(result)[3:11], ["繳費與帳單", "圖書館", "臨櫃叫號", "申辦與補助", "陳情與反映",
                                                 "災情通報", "警政報案", "查案件進度"])
         self.assertEqual(choices[-1]["nav"], "more")
@@ -161,6 +162,29 @@ class CatalogueTests(unittest.TestCase):
         result = turn(self.app, "有哪些功能", recent_pages=["fees.parking", "nope", "1999", "fees.parking"])
         self.assertEqual(titles(result)[:3], ["停車費", "水費", "圖書借閱"])
 
+    def test_the_frequent_row_never_repeats_a_category_name_in_any_language(self):
+        # Emulator end-to-end (rules section 3, 2026-11-16): the page 臨櫃叫號 stood beside the
+        # category 臨櫃叫號. A page named like a category (or one part of its name) is left out.
+        recent = ["reservation", "qna", "disasterReport", "library", "app.bills"]
+        for language in ("zh", "en", "ja", "vi", "id", "tl"):
+            for pages in ([], recent):
+                result = turn(self.app, "有哪些功能" if language == "zh" else "what can you do", language=language,
+                              recent_pages=pages)
+                frequent = [c["title"] for c in result["choices"] if c.get("group_id") == "frequent"]
+                categories = [c["title"] for c in result["choices"] if c.get("group")]
+                self.assertEqual(len(frequent), 3, (language, pages))
+                self.assertEqual(set(frequent) & set(categories), set(), (language, pages))
+                menu_ = self.app.workflow.menu
+                self.assertFalse(any(menu_.names_category(t, language) for t in frequent), (language, pages))
+        # The page itself is still in its category, first.
+        first = turn(self.app, "有哪些功能")
+        counter = turn(self.app, "臨櫃叫號", resolution_id=first["resolution_id"])
+        self.assertEqual((counter["level"], titles(counter)[0]), (2, "臨櫃叫號"))
+        # Per language: 圖書借閱 is "Library" in English, the category's name; in Chinese it stays.
+        english = turn(self.app, "what can you do", language="en")
+        self.assertNotIn("Library", [c["title"] for c in english["choices"] if c.get("group_id") == "frequent"])
+        self.assertIn("圖書借閱", titles(first)[:3])
+
     def test_all_entries_shows_other_and_disconnected_pages(self):
         result = turn(self.app, "App 有哪些功能")
         self.assertEqual(result["listing"]["total"], 13)
@@ -209,16 +233,34 @@ class FallbackTests(unittest.TestCase):
         self.assertEqual(turn(assistant, "幫我一下", session="v")["message"], i18n.t("fallback_unclear", "zh"))
 
     def test_a_clue_is_listed_never_opened_with_see_everything_last(self):
-        # One semantic page between the old threshold (0.04) and the clue's lift (0.03).
-        assistant = app(index=FakeIndex([(0.035, "fees.water")]))
+        # Two semantic pages between the old threshold (0.04) and the clue's lift (0.03).
+        assistant = app(index=FakeIndex([(0.035, "fees.water"), (0.034, "fees.parking")]))
         result = turn(assistant, "家裡那張單子不知道怎麼處理")
         self.assertEqual(result["kind"], "confirm_candidates")
         self.assertIsNone(result["destination"])
         self.assertEqual(result["message"], i18n.t("fallback_unsure", "zh"))
-        self.assertEqual(titles(result), ["水費", "看全部功能"])
+        self.assertEqual(titles(result), ["水費", "停車費", "看全部功能"])
         self.assertEqual(result["metrics"]["route"], "fallback_list")
-        everything = turn(assistant, "", choice_id="2", resolution_id=result["resolution_id"])
+        everything = turn(assistant, "", choice_id="3", resolution_id=result["resolution_id"])
         self.assertEqual((everything["kind"], everything["level"]), ("capability_list", 1))
+        # A single clue is listed alone only when fairly sure: a lift of CLUE_SINGLE_LIFT (no classifier).
+        sure = turn(app(index=FakeIndex([(0.055, "fees.water")])), "家裡那張單子不知道怎麼處理")
+        self.assertEqual((sure["kind"], titles(sure)), ("confirm_candidates", ["水費", "看全部功能"]))
+        self.assertIsNone(sure["destination"])
+
+    def test_one_clue_the_assistant_is_not_sure_of_gives_the_catalogue(self):
+        # Emulator end-to-end (rules section 3, 2026-11-16): 「我家附近有東西壞掉了」 listed only 電力停電.
+        assistant = app(index=FakeIndex([(0.035, "fees.water")]))
+        result = turn(assistant, "家裡那張單子不知道怎麼處理")
+        self.assertEqual((result["kind"], result["level"]), ("capability_list", 1))
+        self.assertIsNone(result["destination"])
+        self.assertEqual(result["metrics"]["route"], "fallback_catalog")
+        self.assertEqual(result["metrics"]["semantic"]["single_dropped"], "fees.water")
+        self.assertNotIn("水費", [c["title"] for c in result["choices"] if c.get("group_id") != "frequent"])
+        # Switched off: listed alone as before.
+        with mock.patch.object(workflow, "CLUE_SINGLE_LIFT", 0):
+            old = turn(app(index=FakeIndex([(0.035, "fees.water")])), "家裡那張單子不知道怎麼處理")
+        self.assertEqual(titles(old), ["水費", "看全部功能"])
 
     def test_a_weak_clue_gives_the_catalogue(self):
         assistant = app(index=FakeIndex([(0.025, "fees.water")]))

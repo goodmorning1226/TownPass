@@ -587,6 +587,14 @@ MESSAGES = {
         "id": "Saya belum paham. Pilih dari sini, atau katakan dengan cara lain.",
         "tl": "Hindi ko po naintindihan. Pumili rito, o sabihin sa ibang paraan.",
     },
+    "fallback_single": {
+        "zh": "我不確定你要辦哪一項，可以從這些功能找：",
+        "en": "I'm not sure which one you need. You can find it among these:",
+        "ja": "どの手続きかはっきりしませんでした。こちらから探せます：",
+        "vi": "Tôi chưa chắc bạn cần việc nào. Bạn có thể tìm trong các mục này:",
+        "id": "Saya belum yakin mana yang Anda perlukan. Anda bisa mencarinya di sini:",
+        "tl": "Hindi ako sigurado kung alin ang kailangan mo. Mahahanap mo ito rito:",
+    },
     "out_of_scope": {
         "zh": "這個我幫不上忙。我能做的是這些：",
         "en": "I can't help with that. Here is what I can do:",

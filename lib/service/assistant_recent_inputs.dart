@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -9,6 +11,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// Each request keeps the language it was made in, so the suggestions show
 /// only the ones in the current language (docs/AI_CURRENT_RULES.md section 5,
 /// 2026-11-16: Chinese requests among English chips).
+///
+/// A page opened from a list is kept as that page (its title, destination
+/// and the backend's line), so its suggestion opens it at once
+/// (docs/AI_CURRENT_RULES.md section 5, owner 2026-11-16).
 class AssistantRecentInputs {
   AssistantRecentInputs._();
 
@@ -19,6 +25,10 @@ class AssistantRecentInputs {
   /// The language of each saved request, in the same order as [_key]
   /// ('' when not known). Older versions saved only [_key].
   static const _languageKey = 'assistant_recent_inputs_languages';
+
+  /// The page of each saved item, in the same order as [_key]: JSON
+  /// `{"destination": {...}, "message": "..."}`, '' for a request.
+  static const _pageKey = 'assistant_recent_inputs_pages';
   static const limit = 4;
 
   /// Newest first; at most [limit].
@@ -26,6 +36,9 @@ class AssistantRecentInputs {
 
   /// Request -> the language it was made in (absent when not known).
   final _languages = <String, String>{};
+
+  /// Page title -> the page it opens (absent for a request).
+  final _pages = <String, RecentPage>{};
 
   bool _loaded = false;
 
@@ -36,9 +49,14 @@ class AssistantRecentInputs {
       final prefs = await SharedPreferences.getInstance();
       final saved = prefs.getStringList(_key);
       final languages = prefs.getStringList(_languageKey) ?? const [];
+      final pages = prefs.getStringList(_pageKey) ?? const [];
       if (saved != null) {
         for (var i = 0; i < saved.length && i < languages.length; i++) {
           if (languages[i].isNotEmpty) _languages[saved[i]] = languages[i];
+        }
+        for (var i = 0; i < saved.length && i < pages.length; i++) {
+          final page = RecentPage.decode(pages[i]);
+          if (page != null) _pages[saved[i]] = page;
         }
         items.assignAll(saved.where(_usable).take(limit));
       }
@@ -47,19 +65,40 @@ class AssistantRecentInputs {
 
   /// [text] opened a page: put it first (once) and keep it, with the
   /// [language] it was made in ('zh', 'en', ...; null: guessed from the text).
-  Future<void> remember(String text, {String? language}) async {
+  /// With [page], [text] is that page's title and its suggestion opens it
+  /// directly; without, it is the user's request (sent again when tapped).
+  Future<void> remember(
+    String text, {
+    String? language,
+    RecentPage? page,
+  }) async {
     final value = text.trim();
     if (!_usable(value)) return;
     final next = [value, ...items.where((item) => item != value)];
     items.assignAll(next.take(limit));
     if (language != null && language.isNotEmpty) _languages[value] = language;
+    if (page != null) {
+      _pages[value] = page;
+    } else {
+      _pages.remove(value);
+    }
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setStringList(_key, items);
       await prefs.setStringList(_languageKey, [
         for (final item in items) _languages[item] ?? '',
       ]);
+      await prefs.setStringList(_pageKey, [
+        for (final item in items) _pages[item]?.encode() ?? '',
+      ]);
     } catch (_) {}
+  }
+
+  /// The page [text] opens directly when it is a remembered page's title
+  /// among the suggestions; null for a request.
+  RecentPage? pageOf(String text) {
+    final value = text.trim();
+    return items.contains(value) ? _pages[value] : null;
   }
 
   /// The language [text] was made in: the one saved with it, else a guess
@@ -108,6 +147,37 @@ class AssistantRecentInputs {
   void reset() {
     items.clear();
     _languages.clear();
+    _pages.clear();
     _loaded = false;
+  }
+}
+
+/// A page remembered as a suggestion: the backend [destination] that opened
+/// it and the [message] it said then (in the suggestion's language).
+class RecentPage {
+  const RecentPage(this.destination, this.message);
+
+  final Map<String, dynamic> destination;
+  final String message;
+
+  String encode() =>
+      jsonEncode({'destination': destination, 'message': message});
+
+  /// Null for '' (a request) or anything unreadable.
+  static RecentPage? decode(String saved) {
+    if (saved.isEmpty) return null;
+    try {
+      final value = jsonDecode(saved);
+      if (value is Map &&
+          value['destination'] is Map &&
+          value['message'] is String) {
+        final destination = Map<String, dynamic>.from(
+          value['destination'] as Map,
+        );
+        if (destination['kind'] is! String) return null;
+        return RecentPage(destination, value['message'] as String);
+      }
+    } catch (_) {}
+    return null;
   }
 }
