@@ -55,8 +55,8 @@ class ManifestTests(unittest.TestCase):
         self.assertEqual(len(found), 1)
         e = found[0]
         self.assertEqual((e["part"], e["decision_model"], e["server"]), ("decision", "classifier", "classifier"))
-        self.assertEqual(e["name"], "townpass-decision-e5-ce-v1-q8_0.gguf")
-        self.assertEqual(e["path"], "decision/townpass-decision-e5-ce-v1-q8_0.gguf")
+        self.assertEqual(e["name"], "townpass-decision-e5-ce-v2-q8_0.gguf")
+        self.assertEqual(e["path"], "decision/townpass-decision-e5-ce-v2-q8_0.gguf")
         self.assertEqual(sorted(e["platforms"]), ["android", "ios"])
         self.assertLess(e["size"], 150 << 20)
         self.assertNotIn("url", e)  # ours: from team_url (or a mirror), like e5

@@ -62,7 +62,7 @@ TIMEOUT = float(os.environ.get("TOWNPASS_CLASSIFIER_TIMEOUT", "10"))
 # (device_main.configure), as for the decision model (server.MODEL_READY_WAIT_S).
 WAIT_S = float(os.environ.get("TOWNPASS_CLASSIFIER_WAIT", "0"))
 # The model the App downloads for this mode (assets/assistant/models.json "classifier").
-MODEL_NAME = "townpass-decision-e5-ce-v1-q8_0"
+MODEL_NAME = "townpass-decision-e5-ce-v2-q8_0"
 # Which classifier the server runs (2026-11-16, need-style step 7): "1" townpass-decision-e5-ce-v1,
 # "2" townpass-decision-e5-ce-v2 (trained with the need texts in the candidate documents, need-style
 # examples, hard negatives, FAQ questions as candidates and the "chitchat" pseudo-candidate).

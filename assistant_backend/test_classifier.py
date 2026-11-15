@@ -28,7 +28,23 @@ class FakeScores:
                 for d in documents]
 
 
+
+def pin_v1(test):
+    """Runs test with classifier v1's module settings. The App downloads v2 since 2026-11-16
+    (need-style step 7b), so the version is no longer v1 by default; these tests keep v1's
+    behaviour covered (TOWNPASS_CLASSIFIER_VERSION=1 still selects it)."""
+    for name, value in (("VERSION", "1"), ("NEED", False),
+                        ("NAME_LANGUAGES", ("en", "ja", "vi", "id", "th")),
+                        ("INTENT_DOCS", (classifier.LISTING_DOC, classifier.GREETING_DOC))):
+        patcher = patch.object(classifier, name, value)
+        patcher.start()
+        test.addCleanup(patcher.stop)
+
+
 class DocumentTests(unittest.TestCase):
+    def setUp(self):
+        pin_v1(self)
+
     def test_chinese_and_foreign_candidate_texts(self):
         registry = Registry()
         water = registry.by_id["fees.water"]
@@ -39,7 +55,7 @@ class DocumentTests(unittest.TestCase):
         self.assertTrue(classifier.document(water, registry.i18n["fees.water"], "fil").startswith("Water bill"))
 
     def test_need_is_appended_only_when_switched_on(self):
-        # The current model was trained without the need texts (rules section 6, 2026-11-16).
+        # v1 was trained without the need texts (rules section 6, 2026-11-16).
         water = Registry().by_id["fees.water"]
         self.assertFalse(classifier.NEED)
         with patch.object(classifier, "NEED", True):
@@ -178,6 +194,7 @@ class RuleOrderTests(unittest.TestCase):
         self._only = patch.object(classifier, "ONLY", True)
         self._only.start()
         self.addCleanup(self._only.stop)
+        pin_v1(self)
 
     def app(self, scores, found=(), thresholds=None):
         from test_catalog import FakeIndex

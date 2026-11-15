@@ -1,6 +1,7 @@
 """Need-style step 7 (rules sections 2, 3, 5 and 6, 2026-11-16): classifier v2's documents,
 the FAQ questions ranked with the pages (A4), the chitchat pseudo-candidate, and lists that
 expire after workflow.PENDING_S seconds in the backend too. The classifier server is a fake."""
+import os
 import unittest
 from unittest.mock import patch
 
@@ -10,7 +11,7 @@ import workflow
 from registry import Registry
 from server import Assistant, AssistantError
 from test_catalog import FakeIndex
-from test_classifier import FakeScores
+from test_classifier import pin_v1, FakeScores
 from test_server import FakeCatalog, response
 
 HIGH = faq.HIGH_CONF + 0.01
@@ -54,19 +55,21 @@ class DocumentV2Tests(unittest.TestCase):
             self.assertTrue(filipino.startswith(names["tl"]["title"]), filipino)
             self.assertIn(" — " + names["tl"]["need"] + " | 水費", filipino)
             self.assertNotIn(water["need"], filipino)  # the Chinese need only for Chinese
-        # v1 (the App's model today) is unchanged.
-        self.assertEqual(classifier.VERSION, "1")
+        # v1 (still selectable with TOWNPASS_CLASSIFIER_VERSION=1) is unchanged.
+        pin_v1(self)
         self.assertEqual(classifier.document(water), "水費：水錢、繳水")
         self.assertEqual(classifier.faq_document(hit("1", 0.9, "如何 申請\n補助")), "常見問答：如何 申請 補助（測試）")
 
     def test_the_version_follows_the_apps_model_unless_overridden(self):
-        self.assertIn("-v1-", classifier.MODEL_NAME)
-        self.assertEqual(classifier.VERSION, "1")
+        # The App downloads v2 since 2026-11-16 (step 7b).
+        self.assertIn("-v2-", classifier.MODEL_NAME)
+        if not os.environ.get("TOWNPASS_CLASSIFIER_VERSION"):
+            self.assertEqual(classifier.VERSION, "2")
         self.assertEqual(set(classifier.DEFAULT_THRESHOLDS) - set(classifier.DEFAULT_THRESHOLDS_V2), set())
         v2 = classifier.Classifier(Registry(), score_fn=FakeScores(), version="2")
         self.assertTrue(v2.v2)
         self.assertEqual(v2.intent_docs()[1], classifier.CHITCHAT_DOC)
-        self.assertEqual(classifier.Classifier(Registry(), score_fn=FakeScores()).intent_docs()[1],
+        self.assertEqual(classifier.Classifier(Registry(), score_fn=FakeScores(), version="1").intent_docs()[1],
                          classifier.GREETING_DOC)
 
 
@@ -214,7 +217,9 @@ class RankedTests(unittest.TestCase):
         app = Assistant(FakeCatalog(), lambda messages, tools: response("request_clarification"),
                         faq=FakeFaq(hits), semantic=FakeIndex([(0.05, "fees.water")]))
         with patch.object(classifier, "ONLY", True), patch("workflow.INTENT_FALLBACK", True):
-            app.workflow.classifier = classifier.Classifier(app.workflow.registry, score_fn=FakeScores(default=0.6))
+            pin_v1(self)
+            app.workflow.classifier = classifier.Classifier(app.workflow.registry, score_fn=FakeScores(default=0.6),
+                                                            version="1")
             result = turn(app, "郵差送來的那張紙不見了怎麼辦")
         self.assertEqual(result["metrics"]["route"], "semantic_model")
         self.assertEqual([c["title"] for c in result["choices"]], ["水費"])

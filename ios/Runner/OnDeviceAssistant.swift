@@ -39,7 +39,7 @@ final class OnDeviceAssistant {
   /// --dart-define=ASSISTANT_DECISION_MODEL=classifier): no decision model at all; this
   /// cross-encoder (fine-tuned from Microsoft multilingual-e5-small, MIT, 132 MB) scores
   /// the candidate pages. Same file and port as Android's OnDeviceAssistant.kt.
-  static let classifierModelFile = "townpass-decision-e5-ce-v1-q8_0.gguf"
+  static let classifierModelFile = "townpass-decision-e5-ce-v2-q8_0.gguf"
 
   private static let assistantPort = 8765
   private static let asrPort = 8770
