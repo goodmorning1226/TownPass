@@ -40,17 +40,24 @@ EMBED_TIMEOUT = 5
 # answers directly. Specific to multilingual-e5-small and this index (e5
 # scores sit in a narrow, high band); re-tune if either changes.
 # Everyday words -> the wording the FAQ uses, appended before embedding (e5 does
-# not connect "大包垃圾" with "巨大垃圾(大型廢棄物)").
-# Each entry: a regular expression over the request, and the FAQ words to append.
-COLLOQUIAL = (
-    # 大型家戶垃圾, 大包垃圾, 家裡的大件垃圾, 舊沙發, 粗大垃圾 ... -> the FAQ's 巨大垃圾(大型廢棄物)
-    (r"(?:大型|大件|大包|巨大|粗大|家戶|大的).{0,4}垃圾|垃圾.{0,4}(?:大型|大件|大包|巨大|粗大)|舊(?:家具|沙發|床墊|衣櫃|桌子|椅子)|"
-     r"(?:家具|沙發|床墊|衣櫃)(?:要|怎麼|如何|可以)?.{0,3}(?:丟|回收|清運|收)", "巨大垃圾 大型廢棄物 收運"),
-    (r"垃圾車|倒垃圾|丟垃圾|垃圾.{0,3}(?:幾點|時間)", "垃圾車 收運時間 清運"),
-    (r"資源回收|回收物", "資源回收 分類"),
-    (r"身[分份]證.{0,3}(?:掉|不見|遺失|弄丟|丟了)", "身分證 遺失 補發"),
-    (r"敬老卡|老人卡", "敬老悠遊卡 申請"),
-)
+# not connect "大包垃圾" with "巨大垃圾(大型廢棄物)"). Data since 2026-11-16 (need-style
+# step 6, rules section 6; the same five aliases as the regular expressions that were here):
+# assets/assistant/faq_aliases.json, packaged next to these modules on the phone.
+# Each alias: a regular expression over the request, and the FAQ words to append.
+def load_aliases(path=None):
+    """((pattern, words), ...) from faq_aliases.json; () when the file is missing."""
+    here = pathlib.Path(__file__).resolve().parent
+    candidates = [pathlib.Path(path)] if path else [here / "faq_aliases.json",
+                                                    here.parent / "assets/assistant/faq_aliases.json"]
+    for candidate in candidates:
+        if candidate.exists():
+            data = json.loads(candidate.read_text(encoding="utf-8"))
+            return tuple((alias["pattern"], alias["words"]) for alias in data["aliases"])
+    print("faq: faq_aliases.json not found, no FAQ aliases", flush=True)
+    return ()
+
+
+COLLOQUIAL = load_aliases()
 
 
 def expand(text):
@@ -160,18 +167,26 @@ class FaqIndex:
         return [math.sumprod(row, vector) for row in self.embeddings]
 
     def search(self, text, k=3):
-        text = expand(text)
         """(confidence, hits) with hits [{score, id, question, answer, department, category}].
 
         Hits are best first and at least MEDIUM_CONF; none-confidence results
         carry no hits, and so does a failed embedding request (server not
         running or still loading), so the caller keeps its own reply.
         """
+        hits = self.top(text, k)
+        if not hits:
+            return "none", []
+        return band(hits[0]["score"]), [hit for hit in hits if hit["score"] >= MEDIUM_CONF]
+
+    def top(self, text, k=5):
+        """The k closest FAQ entries, best first, whatever their score ([] when the embedding
+        server fails). Classifier v2 ranks these with the service candidates (A4, 2026-11-16)."""
+        text = expand(text)
         try:
             vector = self.embed(text)
         except (OSError, ValueError, KeyError) as exc:
             print(f"FAQ: embedding server unavailable ({type(exc).__name__})", flush=True)
-            return "none", []
+            return []
         scores = self.scores(vector)
         k = min(k, self.count)
         if self.np is not None:
@@ -179,8 +194,7 @@ class FaqIndex:
             top = [int(i) for i in top[self.np.argsort(-scores[top])]]
         else:
             top = heapq.nlargest(k, range(self.count), key=scores.__getitem__)
-        hits = [{"score": round(float(scores[i]), 4), **self.metadata[i]} for i in top]
-        return band(hits[0]["score"]), [hit for hit in hits if hit["score"] >= MEDIUM_CONF]
+        return [{"score": round(float(scores[i]), 4), **self.metadata[i]} for i in top]
 
 
 def load_default():

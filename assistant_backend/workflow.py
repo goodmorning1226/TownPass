@@ -21,9 +21,12 @@ import uuid
 import book_title
 import classifier
 import emergency
+import faq as faq_index
 import i18n
+import menu
 import qna
 import registry as matching
+import semantic
 from decision import decide
 from faq import SCOPE_NOTE
 from guide import GuidePlanner
@@ -103,9 +106,9 @@ FALLBACK_SOUND = 0.8  # misheard words ~1.0 after folding; chance matches <= 0.7
 FALLBACK_LIMIT = 3
 COMMAND_SOUND = 0.8  # "下一個" is 0.78 and stays unmatched
 CANCEL_SOUND = 0.9
-NEXT_PAGE_WORDS = ("下一頁", "更多功能")
+NEXT_PAGE_WORDS = ("下一頁", "更多功能", "更多", "看更多")
 PREV_PAGE_WORDS = ("上一頁", "前一頁")
-LIST_SIZE = 8
+LIST_SIZE = menu.PAGE_SIZE
 # Listing order (owner, 2026-11-08): microservices first (their sub-pages after the
 # main pages), then the App's own pages, then account and settings, and last the
 # App's start pages, which rarely help: home, all services, start page, pinned.
@@ -161,8 +164,40 @@ def sound_ordinal(text):
 FAQ_MIN_CHARS = 4
 FAQ_ANSWER_LIMIT = 600
 QNA_PAGE_NOTE = "更多說明可開啟 App 的「常見問答」頁面。"
-NO_RELATED = ("抱歉，目前沒有找到相關的服務或 FAQ 內容。可以換個說法，或問「有哪些功能」；"
-              "也可以撥打市民熱線 1999（外縣市 02-27208889）。")
+
+# Fallback tiers (rules section 3, 2026-11-16; the study's section C). When nothing
+# decided the turn, a clue (keyword pages the decision turned down, the semantic top
+# semantic.LIMIT with lift >= CLUE_LIFT) is listed for the user to pick, never opened, when one of them
+# scores >= CLUE_SCORE with the classifier or has lift >= CLUE_LIST_LIFT (keyword pages
+# count without the classifier); at most CLUE_LIMIT, then 「看全部功能」. Otherwise the
+# function catalogue. A second miss in a row adds the 1999 hotline.
+CLUE_LIFT = 0.02
+CLUE_LIST_LIFT = 0.03
+CLUE_SCORE = 0.05
+CLUE_LIMIT = 4
+MISS_MEMORY_S = 600
+# A list's options stay answerable this long (seconds; the App sends the list's resolution_id
+# only within it, GuidedAssistantController._liveResolution). Since 2026-11-16 (step 7) a
+# turn that brings an older one is a new request (and a tapped option of it an error),
+# not only the next list's clean-up.
+PENDING_S = 300
+# Classifier v2 (A4, rules section 3): FAQ questions ranked with the pages; at most this
+# many options (pages and FAQ mixed), then 「看全部功能」.
+RANKED_LIMIT = 4
+RANKED_FAQ_K = 5
+# Greeting words alone (one line + the catalogue); thanks / goodbye alone get one line.
+GREETING_ZH = re.compile(r"(?:嗨|你好|您好|哈囉|hello|hi|hey)[！!。\s]*", re.I)
+# Classifier v2's chitchat that starts with a greeting gets the greeting reply (and the catalogue).
+CHAT_GREETING_ZH = re.compile(r"(?:嗨|你好|您好|哈囉|早安|午安|晚安|早上好|晚上好|安安|hello|hi\b|hey)", re.I)
+THANKS_ZH = re.compile(r"(?:謝謝|感謝|多謝|thanks|thank you|再見|掰掰|拜拜|bye)(?:你|您|啦|喔|囉)?[！!。\s]*", re.I)
+# A request-shaped sentence that names nothing ("幫我一下", "我要查東西") gets "I did not
+# understand"; any other sentence nothing matched ("我肚子餓了") is out of scope. Wording only.
+ASKS_ZH = re.compile(r"我要|我想|想要|幫我|幫忙|請|麻煩|怎麼|如何|哪裡|哪個|查|找|辦|申請|用")
+# 回上一層 in the catalogue; ordinals up to 12 (a catalogue screen has up to 12 options).
+UP_LEVEL_ZH = re.compile(i18n.UP_LEVEL["zh"])
+ORDINAL_ZH = re.compile(r"(?:我要|我選|選)?第?(十[一二]?|[一二兩三四五六七八九]|1[0-2]|[1-9])(?:個|本|筆|項)?")
+_ORDINAL_WORDS = {"一": 1, "二": 2, "兩": 2, "三": 3, "四": 4, "五": 5, "六": 6, "七": 7, "八": 8, "九": 9,
+                  "十": 10, "十一": 11, "十二": 12}
 
 
 class Workflow:
@@ -180,6 +215,8 @@ class Workflow:
         # capability and intent decisions scored by a cross-encoder instead of the LLM.
         self.classifier = classifier.Classifier(self.registry) if classifier.ENABLED else None
         self._city_words = None  # book_title.CityWords, built when the FAQ is there
+        self.menu = menu.Menu(self.registry)
+        self.misses = {}  # session -> (fallback turns in a row, last time)
 
     def reply(self, payload, message, **extra):
         from server import CATALOG_VERSION, CONTRACT
@@ -196,6 +233,12 @@ class Workflow:
             return self.owner.catalog.books()
         except self.error:
             return []
+
+    @property
+    def _v2(self):
+        """Classifier v2 is deciding (rules sections 2-3, step 7): FAQ questions ranked with
+        the pages (A4) and the chitchat pseudo-candidate."""
+        return self.classifier is not None and self.classifier.v2 and not self.no_model
 
     @property
     def no_model(self):
@@ -219,7 +262,8 @@ class Workflow:
                                                             limit=classifier.EXPAND_LIMIT)]
             try:
                 return self.classifier.capability(self.owner, text, entries, confirmation,
-                                                  getattr(self.owner.usage, "language", "zh"), sound, note, extra)
+                                                  getattr(self.owner.usage, "language", "zh"), sound, note, extra,
+                                                  semantic_top=extra[0]["id"] if extra else None)
             except classifier.ClassifierUnavailable:
                 # Never guess: list the candidates, even a single connected one, as without
                 # a decision model (rules section 6, 2026-11-13: a lone candidate used to open).
@@ -239,10 +283,12 @@ class Workflow:
                     **({"page_hint": model_view(context)} if context else {})}
         return decide(self.owner, "capability", evidence, tools, self.validate, self.error)
 
-    def _library(self, payload, text, books):
+    def _library(self, payload, text, books, clue=()):
         """Library decision: overview, verified book detail or explicit search.
 
-        The model sees the retrieval evidence and only this turn's book IDs.
+        The model sees the retrieval evidence and only this turn's book IDs. When it
+        resolves nothing, the turn goes on as an unmatched one (_unmatched; clue: the
+        keyword pages found, for the fallback tiers).
         """
         from server import tools_for
         context = self.retrieve(text, books)
@@ -301,12 +347,15 @@ class Workflow:
                                            "search_type": context["search_type"]})
         if name == "cancel":
             return self.reply(payload, "已取消，沒有開啟頁面或預約書籍。", action="cancel")
-        if name == "unsupported":
-            return self._faq(payload, text) or self.reply(
-                payload, "目前沒有支援這項操作，可以輸入「有哪些功能」查看可用服務。",
-                kind="unsupported", action="unsupported")
-        return self._faq(payload, text) or self.reply(
-            payload, "你想先使用哪個服務？可以描述想做的事，或問「有哪些功能」。", action="request_clarification")
+        if name == "unsupported" and (context["library"] or context["other"]):
+            return self._faq(payload, text) or self._with_see_all(
+                payload, [], "目前沒有支援這項操作。", kind="unsupported", action="unsupported")
+        # Unresolved (no book, no library, no work's title; or "unsupported" for a sentence that
+        # only borrows / finds / looks at something): not a library request after all, so the
+        # usual path goes on, as for a sentence that never came here (rules section 3,
+        # 2026-11-16: 「找工作的那個站現在忙不忙」, 「橋看起來裂開了很危險」).
+        self._trace("library_unresolved")
+        return self._unmatched(payload, text, clue)
 
     # Option B (TOWNPASS_DECISION_BACKEND=classifier_only): a borrowed / searched object
     # that names a kind of book (dev: 幫我借一部童話選集; eval_colloquial_dev: 我欲借冊, Taiwanese
@@ -366,8 +415,40 @@ class Workflow:
             return self._cap_items([page], payload["language"])
         return [{"title": f"開啟「{page['title']}」頁面", "subtitle": qna.DEPARTMENT, "entry_id": page["id"]}]
 
-    def _faq(self, payload, text):
-        """Second layer: Taipei FAQ when tool calling found no service.
+    def _faq(self, payload, text, strict=False):
+        """Second layer: Taipei FAQ when tool calling found no service. With classifier v2 the
+        FAQ top 5 are ranked by the classifier (_ranked; rules section 3, 2026-11-16, A4);
+        otherwise (and when it does not answer) the e5 bands below. strict: before a "not
+        connected" reason (a disconnected page was named), the e5 bands as before: on the dev
+        set the classifier's extra FAQ questions replaced the reason for 「我要登出」-like requests."""
+        if self._v2 and not strict:
+            hits = self._faq_top(text)
+            if not hits:
+                return None
+            return self._ranked(payload, text, text, [], hits=hits, route="faq_ranked")
+        return self._faq_e5(payload, text)
+
+    def _faq_top(self, text):
+        """The FAQ's closest RANKED_FAQ_K entries with an e5 cosine of at least faq_floor."""
+        index = self.owner.faq
+        if index is None or not hasattr(index, "top") or len(re.findall(r"[\w一-鿿]", text)) < FAQ_MIN_CHARS:
+            return []
+        floor = self.classifier.thresholds["faq_floor"]
+        return [hit for hit in index.top(text, RANKED_FAQ_K) if hit["score"] >= floor]
+
+    def _faq_direct(self, payload, hit, related=()):
+        """One FAQ answer shown at once; related: more FAQ questions offered under it."""
+        message = self._faq_text(hit)
+        choices = [{"title": h["question"].strip(), "subtitle": h["department"], "faq_id": h["id"]} for h in related]
+        if choices:
+            message += "\n\n也可以查看以下相關問答："
+        choices += self._qna_page(payload, hit)
+        if not choices:
+            return self.reply(payload, message, action="faq_answer")
+        return self._offer(payload, choices, message, kind="reply", action="faq_answer")
+
+    def _faq_e5(self, payload, text):
+        """The FAQ by the e5 bands (high: answered; medium: questions to choose from).
 
         Returns None when the index is off, the text is too short, or no FAQ is
         close enough, so the caller keeps its own reply. A near-verbatim match
@@ -394,6 +475,9 @@ class Workflow:
         else:
             scope = qna.SCOPE_NOTE if any(qna.is_qna(hit) for hit in hits) else SCOPE_NOTE
             message = f"你是不是想問以下的問題？請選擇一題，我再顯示答案。{scope}"
+            # None of them: 看全部功能 (rules section 3, 2026-11-16). Chinese like the FAQ
+            # content (the App translates it with the rest for another language).
+            choices.append(self._nav("catalog", "zh"))
         return self._offer(payload, choices, message, kind="reply", action="faq_answer")
 
     def _foreign_faq(self, payload):
@@ -645,13 +729,14 @@ class Workflow:
         if language != "zh":
             title = self.registry.title(entry, language)
             if not entry["enabled"]:
-                return self.reply(payload, i18n.t("unsupported", language, title=title), kind="unsupported")
+                return self._with_see_all(payload, [], i18n.t("unsupported", language, title=title),
+                                          kind="unsupported")
             limited = " " + i18n.t("limited", language) if entry.get("limited") else ""
             return self.reply(payload, i18n.t("navigate", language, title=title) + limited + " "
                               + i18n.t("page_language", language),
                               kind="navigate", action="open_capability", destination={"kind": "capability", "id": entry["id"]})
         if not entry["enabled"]:
-            return self.reply(payload, f"{entry['title']}：{entry['reason']}", kind="unsupported")
+            return self._with_see_all(payload, [], f"{entry['title']}：{entry['reason']}", kind="unsupported")
         # A page that opens while its action is not connected says so ("limited").
         return self.reply(payload, f"請在原本的「{entry['title']}」頁面繼續操作。" + entry.get("limited", "")
                           + ("目前為示範資料，尚未送出或交易。" if entry["mode"] == "demo" else ""),
@@ -659,12 +744,18 @@ class Workflow:
 
     def _offer(self, payload, items, message, kind="confirm_candidates", page=None, **extra):
         resolution = str(uuid.uuid4())
+        # group_id / nav (2026-11-16): the option's catalogue category, or a navigation
+        # option (more, prev, up, catalog, 1999); older Apps ignore them.
         public = [{"id": str(index), "title": item["title"],
-                   "subtitle": item.get("subtitle", ""), "enabled": item.get("enabled", True)}
+                   "subtitle": item.get("subtitle", ""), "enabled": item.get("enabled", True),
+                   **({"group_id": item["group_id"]} if item.get("group_id") else {}),
+                   **({"nav": item["nav"]} if item.get("nav") else {}),
+                   # An FAQ question (2026-11-16, step 7: a list may mix FAQ questions and pages).
+                   **({"type": "faq"} if item.get("faq_id") else {})}
                   for index, item in enumerate(items, 1)]
         with self.lock:
             now = time.monotonic()
-            self.pending = {k: v for k, v in self.pending.items() if now - v["created"] < 300}
+            self.pending = {k: v for k, v in self.pending.items() if now - v["created"] < PENDING_S}
             if len(self.pending) >= 128:
                 self.pending.pop(next(iter(self.pending)))
             self.pending[payload["session_id"]] = {"id": resolution, "created": now, "items": items,
@@ -672,40 +763,83 @@ class Workflow:
                 "language": payload.get("language", "zh")}
         return self.reply(payload, message, kind=kind, resolution_id=resolution, choices=public, **extra)
 
-    def _cap_items(self, entries, language="zh"):
+    def _cap_items(self, entries, language="zh", group=False):
+        """Options that open these pages; group: each carries its catalogue category."""
+        def category(e):
+            return {"group_id": self.menu.group_of(e)} if group else {}
         if language != "zh":
             return [{"title": self.registry.title(e, language),
                      "subtitle": (i18n.t("demo_page", language) if e["mode"] == "demo" else i18n.t("opens", language))
                      if e["enabled"] else i18n.t("not_connected", language),
-                     "enabled": e["enabled"], "entry_id": e["id"]} for e in entries]
+                     "enabled": e["enabled"], "entry_id": e["id"], **category(e)} for e in entries]
         return [{"title": e["title"], "subtitle": ("示範頁面" if e["mode"] == "demo" else "可開啟")
                  if e["enabled"] else "尚未串接：" + e["reason"],
-                 "enabled": e["enabled"], "entry_id": e["id"]} for e in entries]
+                 "enabled": e["enabled"], "entry_id": e["id"], **category(e)} for e in entries]
+
+    @staticmethod
+    def _nav(nav, language):
+        """A navigation option: more / prev (pages), up (to the categories), catalog
+        (看全部功能), 1999 (the hotline's number; nothing is dialled)."""
+        key = {"more": "page_more", "prev": "page_prev", "up": "level_up", "catalog": "see_all",
+               "1999": "call_1999"}[nav]
+        return {"title": i18n.t(key, language), "nav": nav, "enabled": True,
+                "subtitle": i18n.t("call_1999_note", language) if nav == "1999" else ""}
+
+    def _with_see_all(self, payload, items, message, kind="confirm_candidates", **extra):
+        """A list whose last option is 「看全部功能」 (rules section 3, 2026-11-16)."""
+        return self._offer(payload, [*items, self._nav("catalog", payload.get("language", "zh"))], message,
+                           kind=kind, **extra)
 
     def _list(self, payload, all_entries=False, root=None, offset=0):
-        entries = self.registry.entries
-        if root:
-            entries = [e for e in entries if e["id"] == root or e["id"].startswith(root + ".")]
-        if not all_entries:
-            entries = [e for e in entries if e["enabled"]]
-        entries = sorted(entries, key=self._list_rank)
-        page = entries[offset:offset + LIST_SIZE]
+        """The function catalogue (rules section 3, 2026-11-16): the categories, or with
+        root the category of that page (圖書館 for "圖書有哪些功能")."""
+        if root and root in self.registry.by_id:
+            return self._catalog(payload, level=2, group=self.menu.group_of(self.registry.by_id[root]),
+                                 all_entries=all_entries)
+        return self._catalog(payload, all_entries=all_entries, offset=offset)
+
+    def _catalog(self, payload, level=1, group=None, offset=0, all_entries=False, message=None, hotline=False,
+                 recent=None):
+        """One screen of the function catalogue (menu.py). Level 1: the 常用 row (first
+        screen only) and up to 8 categories, then 更多 / 上一頁; level 2: up to 8 pages of
+        one category (hub first), 更多 / 上一頁, and 回上一層. The message is one line: the
+        options are not repeated in it. hotline: 1999 at the bottom. Old Apps still show
+        the message and the options; `level`, `group` and the options' `group_id` / `nav`
+        are new, `listing` is as before (the App's page arrows)."""
         language = payload.get("language", "zh")
-        if language != "zh":
-            title = i18n.t("list_all" if all_entries else "list_enabled", language)
-            mark = f" ({i18n.t('not_connected', language)})"
-            message = title + ":\n" + "\n".join(f"• {self.registry.title(e, language)}" + ("" if e["enabled"] else mark)
-                                                for e in page)
-            if offset + LIST_SIZE < len(entries):
-                message += "\n" + i18n.t("list_more", language)
+        if recent is None:
+            recent = [r for r in payload.get("recent_pages") or [] if isinstance(r, str)][:menu.FREQUENT_SIZE + 2]
+        if level == 2 and not self.menu.items(group, all_entries):
+            level, group = 1, None
+        if level == 1:
+            shown = self.menu.visible(all_entries)
+            total = len(shown)
+            offset = min(max(0, offset), max(0, (total - 1) // LIST_SIZE * LIST_SIZE))
+            items = []
+            if offset == 0 and not all_entries:
+                items += [{**item, "subtitle": i18n.t("frequent", language), "group_id": "frequent"}
+                          for item in self._cap_items(self.menu.frequent(recent), language)]
+            items += [{"title": self.menu.name(g["id"], language), "subtitle": "", "enabled": True,
+                       "group": g["id"], "group_id": g["id"]} for g in shown[offset:offset + LIST_SIZE]]
+            message = message or i18n.t("catalog_title", language)
         else:
-            title = "App 功能（未串接項目會標示）" if all_entries else "目前助理可以開啟的功能"
-            message = title + "：\n" + "\n".join(f"• {e['title']}" + ("【未串接】" if not e["enabled"] else "") for e in page)
-            if offset + LIST_SIZE < len(entries):
-                message += "\n可輸入「下一頁」或「上一頁」切換。"
-        return self._offer(payload, self._cap_items(page, language), message, kind="capability_list",
-                           page={"all_entries": all_entries, "root": root, "offset": offset, "total": len(entries)},
-                           listing={"offset": offset, "size": LIST_SIZE, "total": len(entries)})
+            entries = self.menu.items(group, all_entries)
+            total = len(entries)
+            offset = min(max(0, offset), max(0, (total - 1) // LIST_SIZE * LIST_SIZE))
+            items = self._cap_items(entries[offset:offset + LIST_SIZE], language, group=True)
+            message = message or i18n.t("catalog_group", language, group=self.menu.name(group, language))
+        if offset + LIST_SIZE < total:
+            items.append(self._nav("more", language))
+        if offset > 0:
+            items.append(self._nav("prev", language))
+        if level == 2:
+            items.append(self._nav("up", language))
+        if hotline:
+            items.append(self._nav("1999", language))
+        return self._offer(payload, items, message, kind="capability_list",
+                           page={"catalog": True, "level": level, "group": group, "all_entries": all_entries,
+                                 "offset": offset, "total": total, "recent": recent, "hotline": hotline},
+                           listing={"offset": offset, "size": LIST_SIZE, "total": total}, level=level, group=group)
 
     def _emergency(self, payload, kind):
         """The emergency number first, before retrieval, FAQ or the model (T1). A
@@ -729,24 +863,36 @@ class Workflow:
             return self._navigate(payload, entries[0])
         return self._offer(payload, self._cap_items(entries, language or payload.get("language", "zh")), message)
 
-    def _list_rank(self, entry):
-        if entry["id"] in LIST_LAST:
-            return 4
-        kind = (entry.get("navigation") or {}).get("type")
-        root = entry["id"].split(".")[0]
-        if kind == "web" or root == "police":
-            return 1 if root != entry["id"] and root in self.registry.by_id else 0
-        return 3 if entry.get("category") == "帳號設定" else 2
-
     def _turn_page(self, payload, pending, step):
         """Another page of a listing: step 1 forward, -1 back, wrapping around."""
         state = pending["page"]
         pages = max(1, -(-state["total"] // LIST_SIZE))
         offset = ((state["offset"] // LIST_SIZE + step) % pages) * LIST_SIZE
-        return self._list(payload, state["all_entries"], state["root"], offset)
+        if state.get("catalog"):
+            return self._catalog(payload, state["level"], state["group"], offset, state["all_entries"],
+                                 hotline=state.get("hotline", False), recent=state.get("recent"))
+        return self._list(payload, state["all_entries"], state.get("root"), offset)
+
+    def _catalog_step(self, payload, pending, nav=None, group=None):
+        """A catalogue command (an option, or said): a category, more / previous, up,
+        看全部功能, or the 1999 hotline's number."""
+        state = pending.get("page") or {}
+        language = pending.get("language", payload.get("language", "zh"))
+        payload = {**payload, "language": language}
+        self._trace("catalog", [group] if group else [nav])
+        if group:
+            return self._catalog(payload, 2, group, all_entries=state.get("all_entries", False),
+                                 recent=state.get("recent"))
+        if nav in ("more", "prev") and state.get("catalog"):
+            return self._turn_page(payload, pending, 1 if nav == "more" else -1)
+        if nav == "up":
+            return self._catalog(payload, all_entries=state.get("all_entries", False), recent=state.get("recent"))
+        if nav == "1999":
+            return self.reply(payload, i18n.t("call_1999_reply", language))
+        return self._catalog(payload, recent=state.get("recent"))
 
     def _select(self, payload, pending, choice):
-        if time.monotonic() - pending["created"] >= 300 or pending["registry_version"] != self.registry.version:
+        if time.monotonic() - pending["created"] >= PENDING_S or pending["registry_version"] != self.registry.version:
             raise self.error("候選已過期，請重新描述需求。")
         if not isinstance(choice, str) or not choice.isdigit() or not 0 < int(choice) <= len(pending["items"]):
             raise self.error("選項不在本輪候選中，請重新選擇。")
@@ -755,6 +901,8 @@ class Workflow:
             if self.pending.get(payload["session_id"]) is not pending:
                 raise self.error("候選已失效，請重新選擇。")
             del self.pending[payload["session_id"]]
+        if "group" in item or "nav" in item:
+            return self._catalog_step(payload, pending, item.get("nav"), item.get("group"))
         if "entry_id" in item:
             return self._navigate(payload, self.registry.by_id[item["entry_id"]])
         if "faq_id" in item:
@@ -791,6 +939,13 @@ class Workflow:
                 return self._turn_page(payload, pending, -1)
             if i18n.matches(i18n.NEXT_PAGE, text, language) and pending.get("page"):
                 return self._turn_page(payload, pending, 1)
+            state = pending.get("page") or {}
+            if state.get("catalog"):
+                if state.get("level") == 2 and i18n.matches(i18n.UP_LEVEL, text, language):
+                    return self._catalog_step(payload, pending, "up")
+                group = self.menu.match(text, language, state.get("all_entries")) if state.get("level") == 1 else None
+                if group:
+                    return self._catalog_step(payload, pending, group=group)
             number = i18n.choice_number(text, language)
             if number:
                 return self._select(payload, pending, str(number))
@@ -803,25 +958,23 @@ class Workflow:
         with self.lock:
             self.pending.pop(session, None)
         if i18n.matches(i18n.GREETING, text, language):
-            self._trace("greeting")
-            return self.reply(payload, i18n.t("greeting", language))
+            return self._greeting(payload, text)
         if not re.search(r"\w", text):
             self._trace("empty")
-            return self.reply(payload, i18n.t("empty", language))
+            return self._catalog(payload, message=i18n.t("fallback_unclear", language))
         if i18n.searches(i18n.LISTING, text, language) or i18n.similar(i18n.LISTING_PHRASES, text, language):
             self._trace("listing")
             return self._list(payload)
         matches = self.registry.search_language(i18n.positive_text(text, language), language)
         if not matches:
-            decided = (self._semantic_fallback(payload, text, i18n.positive_text(text, language))
-                       or self._intent_fallback(payload, text))
+            decided = self._semantic_then_intent(payload, text, i18n.positive_text(text, language))
             if decided:
                 return decided
             faq = self._foreign_faq(payload)
             if faq:
                 return faq
             self._trace("no_match")
-            return self.reply(payload, i18n.t("no_match", language))
+            return self._fallback(payload, text)
         entries = [m["entry"] for m in matches]
         if len(matches) == 1 and not entries[0]["enabled"]:
             offered = T2_GENERIC and self._generic_unavailable(payload, text, i18n.positive_text(text, language),
@@ -837,7 +990,7 @@ class Workflow:
             if (T2_GENERIC and self._says_more_than_common_word(payload, positive, matches[0])
                     and self._not_what_is_meant(positive, entries[0], language)):
                 self._trace("generic_no_match", [entries[0]["id"]])
-                return self.reply(payload, i18n.t("no_match", language))
+                return self._fallback(payload, text)
             self._trace("unavailable_direct", [entries[0]["id"]])
             return self._navigate(payload, entries[0])
         if language == "tl" and all(m["fuzzy"] for m in matches):
@@ -897,7 +1050,8 @@ class Workflow:
             # (docs/AI_INDONESIAN.md).
             self._trace("indonesian_offer" if language == "id" else "filipino_offer", [e["id"] for e in entries])
             return self._offer(payload, self._cap_items(entries, language), i18n.t("confirm_capability", language))
-        return self.reply(payload, i18n.t("clarify", language))
+        # Asked to clarify: the pages found are a clue (rules section 3, 2026-11-16).
+        return self._fallback(payload, text, entries)
 
     def _indonesian_sure(self, text, match):
         """A single Indonesian keyword match sure enough to open without the model: a
@@ -921,6 +1075,9 @@ class Workflow:
         if usage is not None:
             usage.language = payload.get("language", "zh")  # the classifier's candidate texts
         reply = self._handle(payload)
+        if usage is not None and getattr(usage, "route", None) not in ("fallback_list", "fallback_catalog"):
+            with self.lock:
+                self.misses.pop(payload.get("session_id"), None)  # not a miss: the next one is the first
         page = self.guides.page_for(reply.get("destination")) if reply.get("kind") == "navigate" else None
         if page:
             if reply.get("language", "zh") != "zh":
@@ -950,9 +1107,16 @@ class Workflow:
     def _handle(self, payload):
         text = payload.get("text", "").strip()
         session = payload["session_id"]
+        resolution = payload.get("resolution_id")
         with self.lock:
             pending = self.pending.get(session)
-        resolution = payload.get("resolution_id")
+            if pending and time.monotonic() - pending["created"] >= PENDING_S:
+                # Expired (rules section 5): its options no longer answer anything.
+                del self.pending[session]
+                if resolution == pending["id"] and (payload.get("choice_id") is not None
+                                                    or payload.get("page_step") in (1, -1)):
+                    raise self.error("候選已過期，請重新描述需求。")
+                pending = None
         if payload.get("page_step") in (1, -1):
             # The listing's arrow buttons: no text, no model.
             if not pending or pending["id"] != resolution or not pending.get("page"):
@@ -988,8 +1152,18 @@ class Workflow:
             if pending.get("page") and (text in NEXT_PAGE_WORDS or (
                     len(text) <= 4 and sounds_like(text, NEXT_PAGE_WORDS, COMMAND_SOUND))):
                 return self._turn_page(payload, pending, 1)
-            match = re.fullmatch(r"第?([一二三四五六七八1-8])(?:個|本|筆|項)?", text)
-            index = (str("一二三四五六七八".find(match[1]) + 1) if not match[1].isdigit() else match[1]) if match else None
+            state = pending.get("page") or {}
+            if state.get("catalog"):
+                # The catalogue (rules section 3, 2026-11-16): 回上一層, or a category's name.
+                if state.get("level") == 2 and UP_LEVEL_ZH.fullmatch(text):
+                    return self._catalog_step(payload, pending, "up")
+                group = self.menu.match(text, "zh", state.get("all_entries")) if state.get("level") == 1 else None
+                if group:
+                    return self._catalog_step(payload, pending, group=group)
+            match = re.fullmatch(r"第?(十[一二]?|[一二兩三四五六七八九]|1[0-2]|[1-9])(?:個|本|筆|項)?", text)
+            index = str(_ORDINAL_WORDS.get(match[1]) or int(match[1])) if match else None
+            if index is not None and int(index) > max(8, len(pending["items"])):
+                index = None  # 第十個 for two books is a sentence, as before (only 1-8 were numbers)
             if index is None and len(text) <= 3:
                 spoken = sound_ordinal(text)
                 index = str(spoken) if spoken else None
@@ -1003,19 +1177,21 @@ class Workflow:
         # A new subject or a client that discarded its panel cannot reuse an old resolution.
         with self.lock:
             self.pending.pop(session, None)
-        if re.fullmatch(r"(?:嗨|你好|您好|哈囉|hello|hi|謝謝|感謝|thanks)[！!。\s]*", text, re.I):
-            self._trace("greeting")
-            return self.reply(payload, "嗨，我是 TownPass 助手，可以幫你找服務、開啟原頁面。你可以描述想做的事，或問「有哪些功能」。")
+        if GREETING_ZH.fullmatch(text) or THANKS_ZH.fullmatch(text):
+            return self._greeting(payload, text)
         if not re.search(r"[\w\u4e00-\u9fff]", text):
             self._trace("empty")
-            return self.reply(payload, "請輸入想使用的服務，或問「有哪些功能」。")
+            return self._catalog(payload, message=i18n.t("fallback_unclear", "zh"))
         listing = re.search(r"有哪些功能|有什麼功能|功能(?:列表|有哪些)|(?:所有|全部)功能|查看全部功能|"
                             r"(?:能|可以|會)做(?:什麼|哪些)|(?:能|可以|會)幫(?:我)?(?:什麼|哪些)|"
                             r"有(?:什麼|哪些)服務|介紹.{0,4}功能|(?:能|可以)?辦(?:什麼|哪些)事?", text)
         if listing:
             root = "library" if any(word in text for word in ("圖書", "借書")) else None
             self._trace("listing")
-            return self._list(payload, all_entries="App" in text or "app" in text or "全部" in text or bool(root), root=root)
+            # 看全部功能 / 全部功能 is the catalogue of what opens; "App" or 未串接 also shows the
+            # pages that are not connected (rules section 3, 2026-11-16).
+            return self._list(payload, all_entries=bool(re.search(r"app|未串接", text, re.I)) or bool(root),
+                              root=root)
         if re.search(r"怎麼|如何|教我", text) and any(word in text for word in ("借書", "借閱", "圖書")):
             self._trace("howto", ["library"])
             return self._offer(payload, self._cap_items([self.registry.by_id["library"]]),
@@ -1076,7 +1252,7 @@ class Workflow:
                             return self._offer(payload, [{"title": b["book_name"], "book_id": b["id"]} for b in candidates],
                                                "你要找的是哪一本？請先確認，我再開啟原頁面。")
                         return self.reply(payload, "請再描述想找的書，或查看圖書總覽。")
-                    return self._library(payload, text, books)
+                    return self._library(payload, text, books, [m["entry"] for m in matches])
         if matches:
             entries = [m["entry"] for m in matches]
             if len(matches) == 1 and not matches[0]["fuzzy"] and not entries[0]["enabled"]:
@@ -1088,7 +1264,7 @@ class Workflow:
                     return offered
                 # A disconnected page does not stop the FAQ ("我要預約打流感疫苗" may be a
                 # question the FAQ answers): its "not connected" reason is the last answer.
-                faq = self._faq(payload, text)
+                faq = self._faq(payload, text, strict=True)
                 if faq:
                     return faq
                 if (T2_GENERIC and self._says_more_than_common_word(payload, positive_text(text), matches[0])
@@ -1098,12 +1274,12 @@ class Workflow:
                     # answer the question (owner, 2026-11-08). "我要預約打流感疫苗"
                     # (the page is what is meant) keeps the reason.
                     self._trace("generic_no_match", [entries[0]["id"]])
-                    return self.reply(payload, NO_RELATED, action="no_related")
+                    return self._fallback(payload, text)
                 self._trace("unavailable_direct", [entries[0]["id"]])
                 return self._navigate(payload, entries[0])
             if not any(e["enabled"] for e in entries):
                 # Only disconnected pages: none can open, so the FAQ answers first.
-                faq = self._faq(payload, text)
+                faq = self._faq(payload, text, strict=True)
                 if faq:
                     return faq
             ambiguous = len(entries) > 1 or any(m["fuzzy"] for m in matches)
@@ -1119,10 +1295,19 @@ class Workflow:
                                             keep_choice=self.no_model or args.get("keep_choice", False))
             if name == "select_capability":
                 return self._navigate(payload, self.registry.by_id[args["capability_id"]])
-            return self._faq(payload, text) or self.reply(payload, "請補充想使用的服務或操作，也可以問「有哪些功能」。")
-        # 證書, 秘書, 書法, 借題發揮... do not send a sentence to the library (rules 2026-11-13).
-        if (LIBRARY_NOUN if T2_GENERIC else LIBRARY_CUE).search(matching.library_view(text)):
+            # Asked to clarify: the keyword pages are a clue (rules section 3, 2026-11-16).
+            return self._faq(payload, text) or self._fallback(payload, text, entries)
+        # 證書, 秘書, 書法, 借題發揮... do not send a sentence to the library (rules 2026-11-13);
+        # neither does a refused clause (「我沒有要借書啦」, rules 2026-11-16).
+        if (LIBRARY_NOUN if T2_GENERIC else LIBRARY_CUE).search(matching.library_view(positive_text(text))):
             return self._library(payload, text, self.owner.catalog.books())
+        return self._unmatched(payload, text)
+
+    def _unmatched(self, payload, text, clue=()):
+        """No keyword page decided the turn (or the library decision resolved nothing):
+        sound-alike services, a "what can you do" question, semantic retrieval, the
+        intent fallback, the FAQ, then the fallback tiers (clue: keyword pages found)."""
+        from server import positive_text
         sounded = self._sound_fallback(payload, text)
         if sounded:
             return sounded
@@ -1131,19 +1316,39 @@ class Workflow:
             return self._list(payload)
         # After listing_by_sound: a "what can you do" question worded differently
         # must show the list (no model call), not services that happen to be close.
-        decided = self._semantic_fallback(payload, text, positive_text(text)) or self._intent_fallback(payload, text)
+        decided = self._semantic_then_intent(payload, text, positive_text(text))
         if decided:
             return decided
         self._trace("no_match")
-        return self._faq(payload, text) or self.reply(payload, NO_RELATED, action="no_related")
+        return self._faq(payload, text) or self._fallback(payload, text, clue)
 
-    def _intent_fallback(self, payload, text):
+    def _semantic_then_intent(self, payload, text, positive):
+        """Semantic retrieval, then the intent fallback. With the classifier its "what can you do"
+        pseudo-candidate is scored first (no model call): with the lower semantic thresholds
+        (2026-11-16) a listing question must still get the catalogue, not services that happen
+        to be close (as for listing_by_sound)."""
+        intent = chat = None
+        if INTENT_FALLBACK and self.classifier is not None and not self.no_model and re.search(r"\w", text):
+            try:
+                intent = self.classifier.intent(self.owner, text)
+                if self._v2:
+                    chat = self.classifier.intent_scores(text)[1]  # the same call, cached
+            except classifier.ClassifierUnavailable:
+                intent = "request_clarification"
+            if intent == "list_capabilities":
+                self._trace("intent_listing")
+                return self._list(payload)
+        return (self._semantic_fallback(payload, text, positive, chat)
+                or self._intent_fallback(payload, text, intent))
+
+    def _intent_fallback(self, payload, text, scored=None):
         """Version B (INTENT_FALLBACK): nothing in the catalogue matched, so instead
         of replying "nothing found" straight away the model says what kind of
         message this is. It has no navigation tool: it can only list the
         functions, greet, send a city-information question to the FAQ, or ask
         for clarification (the caller's own reply). Costs one model call, only
-        on misses ("請問你有什麼樣的功能", "你會什麼", "這個App能做什麼")."""
+        on misses ("請問你有什麼樣的功能", "你會什麼", "這個App能做什麼"). scored: the classifier's
+        answer when _semantic_then_intent already asked it."""
         if not INTENT_FALLBACK or not re.search(r"\w", text):
             return None
         tools = [self.tool("list_capabilities", "The user asks what the assistant or the App can do, "
@@ -1156,7 +1361,9 @@ class Workflow:
         evidence = {"original_text": text, "candidates": [],
                     "note": "No catalogue service matched. Decide what kind of message this is."}
         self._trace("intent_model")
-        if self.classifier is not None and not self.no_model:
+        if scored is not None:
+            name = scored
+        elif self.classifier is not None and not self.no_model:
             try:
                 name = self.classifier.intent(self.owner, text)
             except classifier.ClassifierUnavailable:
@@ -1168,14 +1375,116 @@ class Workflow:
             self._trace("intent_listing")
             return self._list(payload)
         if name == "greeting":
-            self._trace("intent_greeting")
-            return self.reply(payload, i18n.t("greeting", language) if language != "zh" else
-                              "嗨，我是 TownPass 助手，可以幫你找服務、開啟原頁面。你可以描述想做的事，或問「有哪些功能」。")
+            return self._greeting(payload, text, "intent_greeting")
+        if name == "chitchat":
+            return self._chitchat(payload, text)
         if name == "city_question":
             return self._faq(payload, text) if language == "zh" else self._foreign_faq(payload)
         return None
 
-    def _semantic_fallback(self, payload, text, positive):
+    def _greeting(self, payload, text, route="greeting"):
+        """A greeting: one line and the catalogue; thanks or goodbye: one line only
+        (rules section 3, 2026-11-16)."""
+        language = payload.get("language", "zh")
+        if re.search(i18n.THANKS.get(language, i18n.THANKS["en"]), text, re.I):
+            self._trace(route.replace("greeting", "thanks"))
+            return self.reply(payload, i18n.t("thanks", language))
+        self._trace(route)
+        return self._catalog(payload, message=i18n.t("greeting_catalog", language))
+
+    def _chitchat(self, payload, text):
+        """Classifier v2's chitchat (small talk, a greeting, thanks, a remark about one's day;
+        rules section 3, 2026-11-16): a greeting or thanks as _greeting, anything else the
+        catalogue without listing pages that only happen to be close ("今天好累喔")."""
+        language = payload.get("language", "zh")
+        folded = i18n.fold(text) if language != "zh" else text
+        if (re.search(i18n.THANKS.get(language, i18n.THANKS["en"]), folded, re.I)
+                or (CHAT_GREETING_ZH.match(text) if language == "zh"
+                    else re.match(i18n.GREETING.get(language, "$^"), folded, re.I))):
+            return self._greeting(payload, text, "chitchat_greeting")
+        return self._fallback(payload, text, no_clue=True, route="chitchat")
+
+    def _fallback(self, payload, text, clue=(), no_clue=False, route="fallback_catalog"):
+        """Nothing decided the turn (rules section 3, 2026-11-16; the study's section C).
+        A clue (_clue) is listed with 「看全部功能」 last, and nothing opens even when there
+        is a single one; without a clue the catalogue: "I did not understand" for a
+        request that names nothing, "I can't help with that" (+ 1999) for anything else,
+        and a second miss in a row says so and adds 1999."""
+        language = payload.get("language", "zh")
+        session = payload["session_id"]
+        now = time.monotonic()
+        with self.lock:
+            count, last = self.misses.get(session, (0, 0.0))
+            count = count + 1 if now - last < MISS_MEMORY_S else 1
+            self.misses[session] = (count, now)
+            while len(self.misses) > 256:
+                self.misses.pop(next(iter(self.misses)))
+        candidates = [] if no_clue else self._clue(payload, text, clue)
+        if candidates:
+            self._trace("fallback_list", [e["id"] for e in candidates])
+            return self._with_see_all(payload, self._cap_items(candidates, language),
+                                      i18n.t("fallback_unsure", language))
+        if count >= 2:
+            message, hotline = i18n.t("second_miss", language), True
+        elif language == "zh" and not ASKS_ZH.search(text):
+            message, hotline = i18n.t("out_of_scope", language), True
+        else:
+            message, hotline = i18n.t("fallback_unclear", language), False
+        self._trace(route, [])
+        return self._catalog(payload, message=message, hotline=hotline)
+
+    def _clue(self, payload, text, clue=()):
+        """Pages the request may mean although nothing decided: the connected pages in
+        clue (keyword matches the decision turned down) and the semantic index's top 3
+        with lift >= CLUE_LIFT. Kept when the lift reaches CLUE_LIST_LIFT or the
+        classifier scores it CLUE_SCORE or more (without the classifier: keyword pages
+        too); best first, at most CLUE_LIMIT."""
+        language = payload.get("language", "zh")
+        from server import positive_text
+        positive = positive_text(text) if language == "zh" else i18n.positive_text(text, language)
+        found = [e for e in clue if e["enabled"]]
+        keyword = {e["id"] for e in found}
+        lifts = {}
+        index = getattr(self.owner, "semantic", None)
+        if index is not None and index.ready and len(re.findall(r"\w", positive or "")) >= SEMANTIC_MIN_CHARS:
+            for lift, entry in index.search(positive, threshold=CLUE_LIFT, margin=1.0, limit=semantic.LIMIT,
+                                            language=language):
+                lifts[entry["id"]] = lift
+                if entry["enabled"] and all(entry["id"] != e["id"] for e in found):
+                    found.append(entry)
+        # For metrics and tuning only: the clue's lifts.
+        usage = getattr(self.owner, "usage", None)
+        if usage is not None and lifts:
+            usage.semantic = {**(getattr(usage, "semantic", None) or {}),
+                              "clue": [[entry_id, lift] for entry_id, lift in lifts.items()]}
+        if not found:
+            return []
+        scores = None
+        if self.classifier is not None and not self.no_model:
+            started = time.monotonic()
+            try:
+                probabilities = self.classifier.probabilities(positive or text, found, language)
+                scores = {e["id"]: p for e, p in zip(found, probabilities)}
+                self.classifier._log(self.owner, "clue", [e["id"] for e in found], probabilities, started, "clue")
+            except classifier.ClassifierUnavailable:
+                scores = None
+
+        # Classifier v2 has its own (dev-calibrated) clue thresholds.
+        clue_lift, clue_score = ((self.classifier.thresholds["clue_lift"], self.classifier.thresholds["clue"])
+                                 if self._v2 else (CLUE_LIST_LIFT, CLUE_SCORE))
+
+        def kept(entry):
+            if lifts.get(entry["id"], -1.0) >= clue_lift:
+                return True
+            if scores is not None:
+                return scores[entry["id"]] >= clue_score
+            return entry["id"] in keyword
+        chosen = [e for e in found if kept(e)]
+        if scores is not None:
+            chosen.sort(key=lambda e: -scores[e["id"]])
+        return chosen[:CLUE_LIMIT]
+
+    def _semantic_fallback(self, payload, text, positive, chat=None):
         """Version C (semantic.py): keyword retrieval found nothing, so services
         whose catalogue texts mean about the same as the request (e5 cosine) go to
         the model, which may only offer them (a list, even when single) or ask to clarify;
@@ -1206,6 +1515,13 @@ class Workflow:
             self._trace("semantic_direct", [e["id"] for e in entries])
             self.owner.usage.semantic["decision"] = "direct"
             return self._offer_services(payload, entries, message, language)
+        if self._v2:
+            # Classifier v2 (rules sections 2-3, 2026-11-16, A4): these pages and the FAQ top 5
+            # ranked together; chitchat, a mixed list, an FAQ answer, or nothing (the turn goes on).
+            ranked = self._ranked(payload, text, positive, entries, lifts=[lift for lift, _ in found], chat=chat,
+                                  route="semantic_ranked")
+            self.owner.usage.semantic["decision"] = getattr(self.owner.usage, "route", None) if ranked else "none"
+            return ranked
         self._trace("semantic_model", [e["id"] for e in entries])
         name, _ = self._decide(text, entries, confirmation=True, context=payload.get("page_context"),
                                note=SEMANTIC_NOTE)
@@ -1214,6 +1530,81 @@ class Workflow:
             return None
         # Weak evidence the model only agreed to offer: kept as a choice even when single.
         return self._offer(payload, self._cap_items(entries, language), message)
+
+    def _ranked(self, payload, text, positive, entries, hits=None, lifts=None, chat=None, route="ranked"):
+        """Classifier v2 (rules sections 2-3, 2026-11-16, A4): pages found by meaning and the FAQ's
+        top 5 (Chinese only; the FAQ is Chinese) scored together. In order:
+        - chitchat at least `chitchat` and above every candidate: _chitchat;
+        - one page found by meaning only (owner 2026-11-16; v2 default 0.60), scored `semantic_open` or more with a
+          lift of `semantic_open_lift` and every other candidate `semantic_open_margin` lower: it opens;
+        - the best FAQ scored `faq_direct` or more, e5 band high and above every page: its answer;
+        - otherwise the pages scoring `semantic` or more and the FAQ questions scoring `faq_list` or
+          more, best first, at most RANKED_LIMIT, then 「看全部功能」: never opened even when single;
+        - none: None (the caller goes on).
+        When the classifier does not answer: the pages are listed (never guessed), an FAQ alone is
+        answered by the e5 bands."""
+        language = payload.get("language", "zh")
+        t = self.classifier.thresholds
+        if hits is None:
+            hits = self._faq_top(positive or text) if language == "zh" else []
+        query = positive or text
+        try:
+            pages, faqs = self.classifier.rank(self.owner, query, entries, hits,
+                                               language if entries else "zh", lifts=lifts, chat=chat, route=route)
+        except classifier.ClassifierUnavailable:
+            if entries:
+                self._trace("classifier_unavailable", [e["id"] for e in entries])
+                return self._offer(payload, self._cap_items(entries, language),
+                                   i18n.t("confirm_capability", language) if language != "zh"
+                                   else "你是不是要用以下服務？請先確認。")
+            return self._faq_e5(payload, text)
+        best = max(pages + faqs, default=0.0)
+        if chat is not None and chat >= t["chitchat"] and chat >= best:
+            return self._chitchat(payload, text)
+        if entries and lifts:
+            i = max(range(len(entries)), key=pages.__getitem__)
+            others = [p for j, p in enumerate(pages + faqs) if j != i]
+            if (entries[i]["enabled"] and pages[i] >= t["semantic_open"] and lifts[i] >= t["semantic_open_lift"]
+                    and all(p <= pages[i] - t["semantic_open_margin"] for p in others)):
+                self._trace("semantic_open", [entries[i]["id"]])
+                return self._navigate(payload, entries[i])
+        if hits:
+            j = max(range(len(hits)), key=faqs.__getitem__)
+            if hits[j]["score"] >= faq_index.HIGH_CONF and faqs[j] >= t["faq_direct"] and faqs[j] >= max(pages, default=0.0):
+                self._trace(route + "_faq_direct", [hits[j]["id"]])
+                return self._faq_direct(payload, hits[j], [h for k, h in enumerate(hits)
+                                                           if k != j and faqs[k] >= t["faq_list"]][:RANKED_LIMIT - 1])
+        # An FAQ question is listed when the classifier scores it faq_list or more, or when e5 alone
+        # is fairly sure (faq_admit_e5, the medium band that listed it before step 7); the best such
+        # question keeps a place even when four pages score higher (faq_reserve).
+        admitted = [(p, "faq", h) for p, h in zip(faqs, hits) if p >= t["faq_list"] or h["score"] >= t["faq_admit_e5"]]
+        items = sorted([(p, "page", e) for p, e in zip(pages, entries) if p >= t["semantic"]] + admitted,
+                       key=lambda item: -item[0])[:RANKED_LIMIT]
+        if admitted and t["faq_reserve"] >= 1 and not any(kind == "faq" for _, kind, _ in items):
+            items = items[:RANKED_LIMIT - 1] + [max(admitted, key=lambda item: item[0])]
+        if not items:
+            return None
+        has_page = any(kind == "page" for _, kind, _ in items)
+        has_faq = any(kind == "faq" for _, kind, _ in items)
+        options = []
+        for _, kind, item in items:
+            if kind == "page":
+                options += self._cap_items([item], language)
+            else:
+                options.append({"title": item["question"].strip(), "subtitle": item["department"], "faq_id": item["id"]})
+        scope = (qna.SCOPE_NOTE if any(qna.is_qna(h) for _, kind, h in items if kind == "faq") else SCOPE_NOTE) \
+            if has_faq else ""
+        if has_page and has_faq:
+            message = "你是不是要找這些？可以選服務，或選一題看答案。" + scope
+        elif has_faq:
+            message = f"你是不是想問以下的問題？請選擇一題，我再顯示答案。{scope}"
+        else:
+            message = i18n.t("confirm_capability", language) if language != "zh" else "你是不是要用以下服務？請先確認。"
+        self._trace(route, [item["id"] if kind == "page" else "faq:" + str(item["id"]) for _, kind, item in items])
+        # FAQ content is Chinese (the App translates it), so its list's last option is too.
+        options.append(self._nav("catalog", "zh" if has_faq else language))
+        return self._offer(payload, options, message, kind="confirm_candidates" if has_page else "reply",
+                           **({"action": "faq_answer"} if has_faq else {}))
 
     def _sound_candidates(self, text):
         """Services one of whose words sounds like a stretch of text the catalogue did

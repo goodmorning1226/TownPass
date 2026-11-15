@@ -542,3 +542,19 @@ before 與第 12 節之後的整合基準（`classifier-app\results\next_compare
 ### 13.6 復原
 
 刪除 `assistant_backend/book_title.py`、`assistant_backend/test_book_title.py`，`git checkout -- assistant_backend/workflow.py assistant_backend/evaluate.py docs/AI_CURRENT_RULES.md docs/AI_DECISION_CLASSIFIER.md`。
+
+## 14. 分類器 v2（2026-11-16，需求型步驟 7、7b；規則見 `AI_CURRENT_RULES.md` 第 2、3、6、8 節）
+
+- **App 從 2026-11-16 起下載 v2**（擁有者決定；團隊 HF `allensung1226/townpass-assistant-models` 的 `decision/`，commit 8c9b9a8f）。採用的模型：`D:\TownPassAssistant\decision-classifier\models\townpass-decision-e5-ce-v2-q8_0.gguf`
+  （＝`townpass-decision-e5-ce-v2-ep2-q8_0.gguf`；132,441,120 bytes，SHA-256 `fd51639891dcdc6f906699a177a316f91c4381ffca00602e24428bd421fe1abd`；
+  HF 格式 `models\e5-ce-v2\epoch2`）。訓練資料 `data\v2\pairs_train.jsonl`（91,804 組），訓練紀錄 `logs\v2\train-e5-v2.log`。
+  v2 的預設門檻在 `classifier.DEFAULT_THRESHOLDS_V2`（關鍵字 0.40、只靠語意直接開 0.60，擁有者 2026-11-16）。
+- 沒有採用的版本：`e5-ce-v2a`（FAQ 只認得幾乎一樣的字）、`e5-ce-v2c`（加「幫我開X」模板句，開發集多開錯頁）；
+  步驟 7b 為教學頁對試的 `e5-ce-v2d`（拿掉 FAQ 題目對頁面的負例＋教學說法，`scripts\augment_guides_v2.py`）、`e5-ce-v2e`（只加教學說法）、
+  `e5-ce-v2f`（只加步驟層級的說法，`scripts\augment_guides_v2f.py`）：教學頁對 106／107／94，但 v2d、v2e 在開發集多開錯 4–8 頁、門檻擋不掉（原因見規則第 2 節），
+  擁有者接受 v2 的教學頁對 −6（104 → 98）。
+- 後端兩版都能跑：`classifier.VERSION` 跟著 `MODEL_NAME`，`TOWNPASS_CLASSIFIER_VERSION=1／2` 可以指定。電腦評估：
+  `llama-server -m townpass-decision-e5-ce-v2-q8_0.gguf --reranking --pooling rank ...`（參數同 v1）＋ `TOWNPASS_CLASSIFIER_VERSION=2`。
+- **換版（2026-11-16 已做，主 session）**：v2 檔已上傳團隊 HF，並改了 7 個位置：`assets/assistant/models.json` classifier 那一筆（name、sha256、path；size 相同）、`assistant_backend/classifier.py` 的 `MODEL_NAME`（`VERSION` 預設因此是 2）、`OnDeviceAssistant.kt` 的 `CLASSIFIER_MODEL_FILE`、`OnDeviceAssistant.swift` 的 `classifierModelFile`、`scripts/build_model_manifest.py`、`scripts/push_assistant_models.ps1` 的預設檔名、`assistant_backend/test_classifier_app.py` 的檔名斷言（v1 專屬的測試用 `test_classifier.pin_v1` 固定成 v1）。手機上已下載 v1 的人會再下載一次 132 MB；舊檔不會自動刪除。
+- **復原**：回到 v1：把 7 個位置改回 v1 的檔名（`assets/assistant/models.json` classifier 那一筆的 name／sha256／path、`assistant_backend/classifier.py` 的 `MODEL_NAME`、`OnDeviceAssistant.kt` 的 `CLASSIFIER_MODEL_FILE`、`OnDeviceAssistant.swift` 的 `classifierModelFile`、`scripts/build_model_manifest.py`、`scripts/push_assistant_models.ps1`、`assistant_backend/test_classifier_app.py`），電腦上也可以設 `TOWNPASS_CLASSIFIER_VERSION=1`，就是 v1 的行為；v2 的程式差異在 `D:\TownPassAssistant\need-impl\step7.patch`
+  與 `step7b.patch`（`git apply -R`）。只想關掉只靠語意直接開：`TOWNPASS_CLASSIFIER_T_SEMANTIC_OPEN=1.01`。

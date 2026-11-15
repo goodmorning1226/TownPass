@@ -1,0 +1,2172 @@
+{
+ "meta": {
+  "name": "need_holdout",
+  "sealed": "2026-11-15",
+  "usage": "report-only; never used for tuning keywords, examples, prompts or thresholds",
+  "intent_values": [
+   "service",
+   "faq",
+   "none",
+   "vague",
+   "listing",
+   "multi",
+   "unsupported",
+   "emergency"
+  ]
+ },
+ "items": [
+  {
+   "id": "H001",
+   "text": "信箱裡塞了一張自來水的催繳單，說上個月的還沒付",
+   "language": "zh",
+   "intent": "service",
+   "expected_ids": [
+    "fees.water"
+   ],
+   "area": "payments",
+   "style": "situation",
+   "faq_topic": "",
+   "note": "水費催繳；未直接說水費二字"
+  },
+  {
+   "id": "H002",
+   "text": "這期的地價睡要繳了，在哪裡繳",
+   "language": "zh",
+   "intent": "service",
+   "expected_ids": [
+    "fees.tax"
+   ],
+   "area": "payments",
+   "style": "goal",
+   "faq_topic": "",
+   "note": "ASR 誤字 稅→睡；地價稅屬地方稅"
+  },
+  {
+   "id": "H003",
+   "text": "女兒下學期的註冊費，學校說可以線上付是嗎",
+   "language": "zh",
+   "intent": "service",
+   "expected_ids": [
+    "fees.tuition"
+   ],
+   "area": "payments",
+   "style": "indirect",
+   "faq_topic": "",
+   "note": "註冊費=學雜費；以問句表達"
+  },
+  {
+   "id": "H004",
+   "text": "才停五分鐘就被開單，這張停車費到底要去哪裡繳啦",
+   "language": "zh",
+   "intent": "service",
+   "expected_ids": [
+    "fees.parking"
+   ],
+   "area": "payments",
+   "style": "complaint",
+   "faq_topic": "",
+   "note": "抱怨語氣；路邊停車繳費單"
+  },
+  {
+   "id": "H005",
+   "text": "我們剛抽到社會住宅搬進來，每個月房租要怎麼付",
+   "language": "zh",
+   "intent": "service",
+   "expected_ids": [
+    "fees.housing"
+   ],
+   "area": "payments",
+   "style": "life_event",
+   "faq_topic": "",
+   "note": "社宅租金；搬家生活事件"
+  },
+  {
+   "id": "H006",
+   "text": "阮阿公頂禮拜去和平醫院看病，錢還沒繳，這裡可以繳嗎",
+   "language": "zh",
+   "intent": "service",
+   "expected_ids": [
+    "fees.hospital"
+   ],
+   "area": "payments",
+   "style": "elderly",
+   "faq_topic": "",
+   "note": "台語混用；和平院區屬聯醫，未說聯醫"
+  },
+  {
+   "id": "H007",
+   "text": "帳單上有一個條碼，我能不能直接用手機掃了付",
+   "language": "zh",
+   "intent": "service",
+   "expected_ids": [
+    "fees.scan"
+   ],
+   "area": "payments",
+   "style": "situation",
+   "faq_topic": "",
+   "note": "掃描繳費"
+  },
+  {
+   "id": "H008",
+   "text": "我好像有些錢還沒繳，不太確定是哪些",
+   "language": "zh",
+   "intent": "service",
+   "expected_ids": [
+    "fees.search",
+    "app.bills"
+   ],
+   "area": "payments",
+   "style": "vague",
+   "faq_topic": "",
+   "note": "模糊的繳費需求；查詢或帳務頁都可"
+  },
+  {
+   "id": "H009",
+   "text": "上禮拜借的那幾本好像快要還了，不知道是哪天",
+   "language": "zh",
+   "intent": "service",
+   "expected_ids": [
+    "library.records",
+    "library"
+   ],
+   "area": "library",
+   "style": "situation",
+   "faq_topic": "",
+   "note": "查到期日→借閱紀錄"
+  },
+  {
+   "id": "H010",
+   "text": "有本小說一直被借走，我想排在下一個",
+   "language": "zh",
+   "intent": "service",
+   "expected_ids": [
+    "library.reservations",
+    "library"
+   ],
+   "area": "library",
+   "style": "goal",
+   "faq_topic": "",
+   "note": "預約；含「排」字但為服務意義"
+  },
+  {
+   "id": "H011",
+   "text": "最近圖書館大家都在借什麼，想找熱門的來看",
+   "language": "zh",
+   "intent": "service",
+   "expected_ids": [
+    "library.ranking"
+   ],
+   "area": "library",
+   "style": "indirect",
+   "faq_topic": "",
+   "note": "熱門書→排行榜"
+  },
+  {
+   "id": "H012",
+   "text": "上次跑去才發現閉館整理，都沒先講，哪裡看得到這種消息",
+   "language": "zh",
+   "intent": "service",
+   "expected_ids": [
+    "library.notices"
+   ],
+   "area": "library",
+   "style": "complaint",
+   "faq_topic": "",
+   "note": "閉館消息→圖書公告；句中未說圖書館"
+  },
+  {
+   "id": "H013",
+   "text": "剛退休時間多了，想用市圖借書來看",
+   "language": "zh",
+   "intent": "service",
+   "expected_ids": [
+    "library"
+   ],
+   "area": "library",
+   "style": "life_event",
+   "faq_topic": "",
+   "note": "退休；市圖=市立圖書館"
+  },
+  {
+   "id": "H014",
+   "text": "我借彼幾本冊，啥物時陣愛還",
+   "language": "zh",
+   "intent": "service",
+   "expected_ids": [
+    "library.records",
+    "library"
+   ],
+   "area": "library",
+   "style": "elderly",
+   "faq_topic": "",
+   "note": "台語：冊=書"
+  },
+  {
+   "id": "H015",
+   "text": "我已經到萬華戶政門口了，可以先在手機上拿號嗎",
+   "language": "zh",
+   "intent": "service",
+   "expected_ids": [
+    "reservation.c-2-1",
+    "reservation"
+   ],
+   "area": "queue",
+   "style": "situation",
+   "faq_topic": "",
+   "note": "萬華區戶政事務所"
+  },
+  {
+   "id": "H016",
+   "text": "等一下要去中正區工所，想知道現在叫到幾號",
+   "language": "zh",
+   "intent": "service",
+   "expected_ids": [
+    "reservation.c-3-2",
+    "reservation"
+   ],
+   "area": "queue",
+   "style": "goal",
+   "faq_topic": "",
+   "note": "ASR 誤字 公所→工所"
+  },
+  {
+   "id": "H017",
+   "text": "古亭地政是不是都要等很久啊，想先看看人多不多",
+   "language": "zh",
+   "intent": "service",
+   "expected_ids": [
+    "reservation.c-1-1",
+    "reservation"
+   ],
+   "area": "queue",
+   "style": "indirect",
+   "faq_topic": "",
+   "note": "古亭地政事務所叫號"
+  },
+  {
+   "id": "H018",
+   "text": "每次去大同的稅捐分處都等超過一小時，煩死了",
+   "language": "zh",
+   "intent": "service",
+   "expected_ids": [
+    "reservation.c-4-2",
+    "reservation"
+   ],
+   "area": "queue",
+   "style": "complaint",
+   "faq_topic": "",
+   "note": "抱怨等待；不是繳稅需求"
+  },
+  {
+   "id": "H019",
+   "text": "工作沒了要去西門那個就業服務站登記，能先抽號嗎",
+   "language": "zh",
+   "intent": "service",
+   "expected_ids": [
+    "reservation.c-5-2",
+    "reservation"
+   ],
+   "area": "queue",
+   "style": "life_event",
+   "faq_topic": "",
+   "note": "失業生活事件"
+  },
+  {
+   "id": "H020",
+   "text": "阮欲去萬華區公所，聽講愛抽號仔",
+   "language": "zh",
+   "intent": "service",
+   "expected_ids": [
+    "reservation.c-3-1",
+    "reservation"
+   ],
+   "area": "queue",
+   "style": "elderly",
+   "faq_topic": "",
+   "note": "台語；號仔=號碼牌"
+  },
+  {
+   "id": "H021",
+   "text": "我媽今年七十二，聽鄰居說她的健保費市政府會幫忙出",
+   "language": "zh",
+   "intent": "service",
+   "expected_ids": [
+    "districtOffice.form.c-1",
+    "districtOffice"
+   ],
+   "area": "applications",
+   "style": "situation",
+   "faq_topic": "",
+   "note": "老人健保自付額補助；也可能先答 FAQ"
+  },
+  {
+   "id": "H022",
+   "text": "我考到丙級技術士，原住民好像有獎金可以領",
+   "language": "zh",
+   "intent": "service",
+   "expected_ids": [
+    "districtOffice.form.d-2"
+   ],
+   "area": "applications",
+   "style": "goal",
+   "faq_topic": "",
+   "note": "原住民技能檢定獎勵金"
+  },
+  {
+   "id": "H023",
+   "text": "部落的家裡突然出事，有沒有給原住民的急難慰問",
+   "language": "zh",
+   "intent": "service",
+   "expected_ids": [
+    "districtOffice.form.d-1"
+   ],
+   "area": "applications",
+   "style": "indirect",
+   "faq_topic": "",
+   "note": "原住民急難關懷慰問金；非緊急事件"
+  },
+  {
+   "id": "H024",
+   "text": "那天開車的根本不是我，超速單卻寄給我，我要申訴",
+   "language": "zh",
+   "intent": "service",
+   "expected_ids": [
+    "districtOffice.form.b-1",
+    "districtOffice.form.a-1"
+   ],
+   "area": "applications",
+   "style": "complaint",
+   "faq_topic": "",
+   "note": "測速照相由警察局舉發，b-1 最貼切；a-1 裁決所亦可接受"
+  },
+  {
+   "id": "H025",
+   "text": "離婚後一個人帶小孩，之前又被前夫打，有什麼補助",
+   "language": "zh",
+   "intent": "service",
+   "expected_ids": [
+    "districtOffice.form.c-4",
+    "districtOffice.form.c-3"
+   ],
+   "area": "applications",
+   "style": "life_event",
+   "faq_topic": "",
+   "note": "特殊境遇家暴補助或家暴被害人補助皆可；敏感情境，非當下緊急"
+  },
+  {
+   "id": "H026",
+   "text": "我七十八歲啊，阮囝講有啥物補助通申請",
+   "language": "zh",
+   "intent": "service",
+   "expected_ids": [
+    "districtOffice.form.c-1",
+    "districtOffice"
+   ],
+   "area": "applications",
+   "style": "elderly",
+   "faq_topic": "",
+   "note": "台語；高齡最可能為健保自付額補助，申辦總覽亦可"
+  },
+  {
+   "id": "H027",
+   "text": "我想看看有哪些東西可以申請",
+   "language": "zh",
+   "intent": "service",
+   "expected_ids": [
+    "districtOffice"
+   ],
+   "area": "applications",
+   "style": "vague",
+   "faq_topic": "",
+   "note": "泛指申辦，開申辦服務總覽"
+  },
+  {
+   "id": "H028",
+   "text": "樓下熱炒店每天開到半夜兩點，吵到全家睡不著",
+   "language": "zh",
+   "intent": "service",
+   "expected_ids": [
+    "reportIssue",
+    "reportIssue.list"
+   ],
+   "area": "petition",
+   "style": "situation",
+   "faq_topic": "",
+   "note": "噪音陳情；只描述情境"
+  },
+  {
+   "id": "H029",
+   "text": "我要跟市府反映，人行道整排都被機車佔滿",
+   "language": "zh",
+   "intent": "service",
+   "expected_ids": [
+    "reportIssue",
+    "reportIssue.list"
+   ],
+   "area": "petition",
+   "style": "goal",
+   "faq_topic": "",
+   "note": "人行道違停陳情"
+  },
+  {
+   "id": "H030",
+   "text": "我們巷口那個坑洞，不知道該跟誰講",
+   "language": "zh",
+   "intent": "service",
+   "expected_ids": [
+    "reportIssue",
+    "reportIssue.list"
+   ],
+   "area": "petition",
+   "style": "indirect",
+   "faq_topic": "",
+   "note": "路面坑洞；非災情表單類別"
+  },
+  {
+   "id": "H031",
+   "text": "隔壁工地早上六點就在敲敲打打，這合法嗎，受不了",
+   "language": "zh",
+   "intent": "service",
+   "expected_ids": [
+    "reportIssue",
+    "reportIssue.list"
+   ],
+   "area": "petition",
+   "style": "complaint",
+   "faq_topic": "",
+   "note": "可能先答施工時段 FAQ，但最終需求為陳情"
+  },
+  {
+   "id": "H032",
+   "text": "搬來新家才發現對面頂樓加蓋擋住防火巷",
+   "language": "zh",
+   "intent": "service",
+   "expected_ids": [
+    "reportIssue",
+    "reportIssue.list"
+   ],
+   "area": "petition",
+   "style": "life_event",
+   "faq_topic": "",
+   "note": "違建陳情"
+  },
+  {
+   "id": "H033",
+   "text": "公園彼个椅仔歹去足久矣，欲予市政府知影",
+   "language": "zh",
+   "intent": "service",
+   "expected_ids": [
+    "reportIssue",
+    "reportIssue.list"
+   ],
+   "area": "petition",
+   "style": "elderly",
+   "faq_topic": "",
+   "note": "台語；公園為服務意義（設施損壞陳情）"
+  },
+  {
+   "id": "H034",
+   "text": "我有些意見想讓市政府知道",
+   "language": "zh",
+   "intent": "service",
+   "expected_ids": [
+    "reportIssue",
+    "reportIssue.list"
+   ],
+   "area": "petition",
+   "style": "vague",
+   "faq_topic": "",
+   "note": "對市政意見；不是 App 意見回饋"
+  },
+  {
+   "id": "H035",
+   "text": "颱風一過，我家巷口那根柱子歪了，上面的黑色線都快垂到機車頭了",
+   "language": "zh",
+   "intent": "service",
+   "expected_ids": [
+    "disasterReport.form.D-1-1",
+    "disasterReport"
+   ],
+   "area": "hazard",
+   "style": "situation",
+   "faq_topic": "",
+   "note": "電線桿受損"
+  },
+  {
+   "id": "H036",
+   "text": "又停電了，這個月第三次，整條街都黑的",
+   "language": "zh",
+   "intent": "service",
+   "expected_ids": [
+    "disasterReport.form.D-1-4",
+    "disasterReport"
+   ],
+   "area": "hazard",
+   "style": "complaint",
+   "faq_topic": "",
+   "note": "停電通報；不是手機沒電"
+  },
+  {
+   "id": "H037",
+   "text": "河堤旁那座橋，橋墩底下好像被水掏空了，看起來怪怪的",
+   "language": "zh",
+   "intent": "service",
+   "expected_ids": [
+    "disasterReport.form.D-2-1",
+    "disasterReport"
+   ],
+   "area": "hazard",
+   "style": "indirect",
+   "faq_topic": "",
+   "note": "橋樑基礎沖刷"
+  },
+  {
+   "id": "H038",
+   "text": "山谷裡的溪被崩下來的土擋住，積成一大池水，要通報",
+   "language": "zh",
+   "intent": "service",
+   "expected_ids": [
+    "disasterReport.form.D-3-3",
+    "disasterReport.form.D-3-2",
+    "disasterReport"
+   ],
+   "area": "hazard",
+   "style": "goal",
+   "faq_topic": "",
+   "note": "描述堰塞湖而未說堰塞湖"
+  },
+  {
+   "id": "H039",
+   "text": "後壁山仔的土石崩落來，路攏予塞牢咧",
+   "language": "zh",
+   "intent": "service",
+   "expected_ids": [
+    "disasterReport.form.D-3-2",
+    "disasterReport.form.D-3-1",
+    "disasterReport"
+   ],
+   "area": "hazard",
+   "style": "elderly",
+   "faq_topic": "",
+   "note": "台語；土石崩落，土石流亦可"
+  },
+  {
+   "id": "H040",
+   "text": "昨天晚上那間工廠燒起來，消防車來過了，我想補報一下",
+   "language": "zh",
+   "intent": "service",
+   "expected_ids": [
+    "disasterReport.form.D-4-3",
+    "disasterReport"
+   ],
+   "area": "hazard",
+   "style": "situation",
+   "faq_topic": "",
+   "note": "火已撲滅，事後通報，非緊急"
+  },
+  {
+   "id": "H041",
+   "text": "外面好像有東西壞掉很危險，要報給誰",
+   "language": "zh",
+   "intent": "service",
+   "expected_ids": [
+    "disasterReport",
+    "reportIssue"
+   ],
+   "area": "hazard",
+   "style": "vague",
+   "faq_topic": "",
+   "note": "模糊危險通報；災情或陳情總覽皆可，宜追問"
+  },
+  {
+   "id": "H042",
+   "text": "機車停在捷運站外面，出來就不見了",
+   "language": "zh",
+   "intent": "service",
+   "expected_ids": [
+    "police.online",
+    "police"
+   ],
+   "area": "police",
+   "style": "situation",
+   "faq_topic": "",
+   "note": "車輛失竊報案"
+  },
+  {
+   "id": "H043",
+   "text": "不想跑派出所，能不能在手機上報案",
+   "language": "zh",
+   "intent": "service",
+   "expected_ids": [
+    "police.online"
+   ],
+   "area": "police",
+   "style": "goal",
+   "faq_topic": "",
+   "note": "線上報案"
+  },
+  {
+   "id": "H044",
+   "text": "我媽接到假檢察官的電話，被騙匯了五萬",
+   "language": "zh",
+   "intent": "service",
+   "expected_ids": [
+    "police.online",
+    "police"
+   ],
+   "area": "police",
+   "style": "indirect",
+   "faq_topic": "",
+   "note": "詐騙已發生；亦應提醒 165"
+  },
+  {
+   "id": "H045",
+   "text": "我的皮包予人偷提去，欲報警",
+   "language": "zh",
+   "intent": "service",
+   "expected_ids": [
+    "police.online",
+    "police"
+   ],
+   "area": "police",
+   "style": "elderly",
+   "faq_topic": "",
+   "note": "台語混用"
+  },
+  {
+   "id": "H046",
+   "text": "以前跟警察報過的那幾件，我想翻出來看",
+   "language": "zh",
+   "intent": "service",
+   "expected_ids": [
+    "police.records"
+   ],
+   "area": "police",
+   "style": "goal",
+   "faq_topic": "",
+   "note": "報案紀錄；進度頁也勉強可"
+  },
+  {
+   "id": "H047",
+   "text": "上個月送的補助申請到底過了沒",
+   "language": "zh",
+   "intent": "service",
+   "expected_ids": [
+    "districtOffice.progress"
+   ],
+   "area": "progress",
+   "style": "goal",
+   "faq_topic": "",
+   "note": "申辦案件進度"
+  },
+  {
+   "id": "H048",
+   "text": "陳情送出去兩個禮拜了都沒人回，是怎樣",
+   "language": "zh",
+   "intent": "service",
+   "expected_ids": [
+    "reportIssue.progress"
+   ],
+   "area": "progress",
+   "style": "complaint",
+   "faq_topic": "",
+   "note": "陳情進度；不是新陳情"
+  },
+  {
+   "id": "H049",
+   "text": "報案到現在一點消息都沒有，警察到底有沒有在處理",
+   "language": "zh",
+   "intent": "service",
+   "expected_ids": [
+    "police.progress",
+    "police.records"
+   ],
+   "area": "progress",
+   "style": "complaint",
+   "faq_topic": "",
+   "note": "警政進度；不是新報案"
+  },
+  {
+   "id": "H050",
+   "text": "我頂擺申請彼个，毋知辦好未",
+   "language": "zh",
+   "intent": "service",
+   "expected_ids": [
+    "districtOffice.progress",
+    "reportIssue.progress",
+    "police.progress"
+   ],
+   "area": "progress",
+   "style": "elderly",
+   "faq_topic": "",
+   "note": "台語；申請→最可能申辦進度，案件類型不明可列候選"
+  },
+  {
+   "id": "H051",
+   "text": "有沒有什麼好康的可以領",
+   "language": "zh",
+   "intent": "service",
+   "expected_ids": [
+    "app.perks",
+    "coupon.list"
+   ],
+   "area": "deals",
+   "style": "goal",
+   "faq_topic": "",
+   "note": "好康=優惠"
+  },
+  {
+   "id": "H052",
+   "text": "之前領的那張展覽門票，現在要入場找不到",
+   "language": "zh",
+   "intent": "service",
+   "expected_ids": [
+    "wallet"
+   ],
+   "area": "deals",
+   "style": "situation",
+   "faq_topic": "",
+   "note": "票夾"
+  },
+  {
+   "id": "H053",
+   "text": "週末要帶兩個小孩出去玩，看看有沒有便宜一點的",
+   "language": "zh",
+   "intent": "service",
+   "expected_ids": [
+    "app.perks",
+    "coupon.list",
+    "activities"
+   ],
+   "area": "deals",
+   "style": "life_event",
+   "faq_topic": "",
+   "note": "優惠或活動皆可接受"
+  },
+  {
+   "id": "H054",
+   "text": "我的票仔是收佇佗位",
+   "language": "zh",
+   "intent": "service",
+   "expected_ids": [
+    "wallet"
+   ],
+   "area": "deals",
+   "style": "elderly",
+   "faq_topic": "",
+   "note": "台語；票放哪"
+  },
+  {
+   "id": "H055",
+   "text": "這週末市府有辦什麼好玩的嗎",
+   "language": "zh",
+   "intent": "service",
+   "expected_ids": [
+    "activities"
+   ],
+   "area": "messages",
+   "style": "goal",
+   "faq_topic": "",
+   "note": "活動資訊"
+  },
+  {
+   "id": "H056",
+   "text": "剛剛手機跳出一則市府的通知，我沒看完就滑掉了",
+   "language": "zh",
+   "intent": "service",
+   "expected_ids": [
+    "messages"
+   ],
+   "area": "messages",
+   "style": "situation",
+   "faq_topic": "",
+   "note": "訊息匣"
+  },
+  {
+   "id": "H057",
+   "text": "停水的時候我想先收到通之",
+   "language": "zh",
+   "intent": "service",
+   "expected_ids": [
+    "subscription.items",
+    "subscription"
+   ],
+   "area": "messages",
+   "style": "goal",
+   "faq_topic": "",
+   "note": "錯字 知→之；訂閱停水通知；也可能為通知設定"
+  },
+  {
+   "id": "H058",
+   "text": "這App一直跳推播，吵死了",
+   "language": "zh",
+   "intent": "service",
+   "expected_ids": [
+    "notification_settings"
+   ],
+   "area": "messages",
+   "style": "complaint",
+   "faq_topic": "",
+   "note": "通知提醒設定"
+  },
+  {
+   "id": "H059",
+   "text": "頭拄仔手機叮一聲，是啥物代誌",
+   "language": "zh",
+   "intent": "service",
+   "expected_ids": [
+    "messages"
+   ],
+   "area": "messages",
+   "style": "elderly",
+   "faq_topic": "",
+   "note": "台語：剛才；看訊息"
+  },
+  {
+   "id": "H060",
+   "text": "下個月搬家，App裡的地址要改",
+   "language": "zh",
+   "intent": "service",
+   "expected_ids": [
+    "profile"
+   ],
+   "area": "account",
+   "style": "life_event",
+   "faq_topic": "",
+   "note": "基本資料；不是戶籍遷入（那是 FAQ）"
+  },
+  {
+   "id": "H061",
+   "text": "這個畫面可以換成英文嗎，給我外國同事用",
+   "language": "zh",
+   "intent": "service",
+   "expected_ids": [
+    "language"
+   ],
+   "area": "account",
+   "style": "goal",
+   "faq_topic": "",
+   "note": "語言設定"
+  },
+  {
+   "id": "H062",
+   "text": "這個帳號一直出問題，我乾脆不要用了，幫我停掉",
+   "language": "zh",
+   "intent": "service",
+   "expected_ids": [
+    "suspend"
+   ],
+   "area": "account",
+   "style": "complaint",
+   "faq_topic": "",
+   "note": "停用帳號；高影響操作宜確認"
+  },
+  {
+   "id": "H063",
+   "text": "我之前好像讓別的服務讀我的資料，想看看授權了哪些",
+   "language": "zh",
+   "intent": "service",
+   "expected_ids": [
+    "authorization"
+   ],
+   "area": "account",
+   "style": "indirect",
+   "faq_topic": "",
+   "note": "歷程與授權"
+  },
+  {
+   "id": "H064",
+   "text": "店員問我要不要存在具，我的條碼在哪",
+   "language": "zh",
+   "intent": "service",
+   "expected_ids": [
+    "invoice"
+   ],
+   "area": "account",
+   "style": "situation",
+   "faq_topic": "",
+   "note": "錯字 載具→在具；手機載具"
+  },
+  {
+   "id": "H065",
+   "text": "阮手機號碼換新的，欲佇佗位改",
+   "language": "zh",
+   "intent": "service",
+   "expected_ids": [
+    "profile",
+    "account"
+   ],
+   "area": "account",
+   "style": "elderly",
+   "faq_topic": "",
+   "note": "台語；基本資料或帳號"
+  },
+  {
+   "id": "H066",
+   "text": "這App一直閃退，要怎麼跟你們說",
+   "language": "zh",
+   "intent": "service",
+   "expected_ids": [
+    "feedback"
+   ],
+   "area": "account",
+   "style": "complaint",
+   "faq_topic": "",
+   "note": "App 意見回饋，不是市政陳情"
+  },
+  {
+   "id": "H067",
+   "text": "對面大樓失火了，好多黑煙，有人在窗戶喊救命",
+   "language": "zh",
+   "intent": "emergency",
+   "expected_ids": [
+    "disasterReport.form.D-4-1"
+   ],
+   "area": "hazard",
+   "style": "situation",
+   "faq_topic": "",
+   "note": "緊急：應先提示撥 119，通報頁為次要"
+  },
+  {
+   "id": "H068",
+   "text": "先幫我繳水費，再看看借的書什麼時候到期",
+   "language": "zh",
+   "intent": "multi",
+   "expected_ids": [
+    "fees.water",
+    "library.records"
+   ],
+   "area": "multi",
+   "style": "goal",
+   "faq_topic": "",
+   "note": "兩個需求"
+  },
+  {
+   "id": "H069",
+   "text": "停車費繳一繳，順便看報案那件跑到哪了",
+   "language": "zh",
+   "intent": "multi",
+   "expected_ids": [
+    "fees.parking",
+    "police.progress"
+   ],
+   "area": "multi",
+   "style": "goal",
+   "faq_topic": "",
+   "note": "繳費＋警政進度"
+  },
+  {
+   "id": "H070",
+   "text": "我要改地址，還有想在停電前收到提醒",
+   "language": "zh",
+   "intent": "multi",
+   "expected_ids": [
+    "profile",
+    "subscription.items"
+   ],
+   "area": "multi",
+   "style": "life_event",
+   "faq_topic": "",
+   "note": "基本資料＋訂閱；含停電但非通報"
+  },
+  {
+   "id": "H071",
+   "text": "路燈壞掉要報，然後上次陳情的那件處理好沒",
+   "language": "zh",
+   "intent": "multi",
+   "expected_ids": [
+    "disasterReport.form.D-1-3",
+    "reportIssue.progress"
+   ],
+   "area": "multi",
+   "style": "complaint",
+   "faq_topic": "",
+   "note": "災情通報（或陳情）＋陳情進度"
+  },
+  {
+   "id": "H072",
+   "text": "查一下我去年繳過哪些錢，還有現在有什麼折扣",
+   "language": "zh",
+   "intent": "multi",
+   "expected_ids": [
+    "fees.history",
+    "coupon.list"
+   ],
+   "area": "multi",
+   "style": "goal",
+   "faq_topic": "",
+   "note": "帳務紀錄＋優惠（app.perks 亦可代替 coupon.list）"
+  },
+  {
+   "id": "H073",
+   "text": "明天要去中正戶政，順便把房屋稅處理掉",
+   "language": "zh",
+   "intent": "multi",
+   "expected_ids": [
+    "reservation.c-2-2",
+    "fees.tax"
+   ],
+   "area": "multi",
+   "style": "situation",
+   "faq_topic": "",
+   "note": "叫號＋地方稅"
+  },
+  {
+   "id": "H074",
+   "text": "圖書館最近有沒有什麼公告，還有排行榜上前幾名是哪些",
+   "language": "zh",
+   "intent": "multi",
+   "expected_ids": [
+    "library.notices",
+    "library.ranking"
+   ],
+   "area": "multi",
+   "style": "indirect",
+   "faq_topic": "",
+   "note": "同一領域兩個子頁"
+  },
+  {
+   "id": "H075",
+   "text": "你能幫我做什麼",
+   "language": "zh",
+   "intent": "listing",
+   "expected_ids": [
+    "app.services"
+   ],
+   "area": "general",
+   "style": "vague",
+   "faq_topic": "",
+   "note": "詢問能力；服務總覽或類別目錄"
+  },
+  {
+   "id": "H076",
+   "text": "嗯……我也不知道要辦什麼",
+   "language": "zh",
+   "intent": "vague",
+   "expected_ids": [],
+   "area": "general",
+   "style": "vague",
+   "faq_topic": "",
+   "note": "應追問或給類別目錄，不直接開頁"
+  },
+  {
+   "id": "H077",
+   "text": "那個……就是上次那個東西啊",
+   "language": "zh",
+   "intent": "vague",
+   "expected_ids": [],
+   "area": "general",
+   "style": "vague",
+   "faq_topic": "",
+   "note": "無上下文不可猜"
+  },
+  {
+   "id": "H078",
+   "text": "把全部的功能列給我看",
+   "language": "zh",
+   "intent": "listing",
+   "expected_ids": [
+    "app.services"
+   ],
+   "area": "general",
+   "style": "goal",
+   "faq_topic": "",
+   "note": "要求列出全部"
+  },
+  {
+   "id": "H079",
+   "text": "市政府的東西",
+   "language": "zh",
+   "intent": "vague",
+   "expected_ids": [],
+   "area": "general",
+   "style": "vague",
+   "faq_topic": "",
+   "note": "極短模糊"
+  },
+  {
+   "id": "H080",
+   "text": "阿伯想欲問一寡代誌",
+   "language": "zh",
+   "intent": "vague",
+   "expected_ids": [],
+   "area": "general",
+   "style": "elderly",
+   "faq_topic": "",
+   "note": "台語：想問一些事；應追問"
+  },
+  {
+   "id": "H081",
+   "text": "幫我叫一台計程車到台北車站",
+   "language": "zh",
+   "intent": "unsupported",
+   "expected_ids": [],
+   "area": "unsupported",
+   "style": "goal",
+   "faq_topic": "",
+   "note": "App 無叫車"
+  },
+  {
+   "id": "H082",
+   "text": "我想申請住進社會住宅，要去哪裡抽籤",
+   "language": "zh",
+   "intent": "unsupported",
+   "expected_ids": [],
+   "area": "unsupported",
+   "style": "life_event",
+   "faq_topic": "",
+   "note": "App 只有社宅租金繳費，無入住申請；以 FAQ 說明可接受，開 fees.housing 為錯"
+  },
+  {
+   "id": "H083",
+   "text": "幫我掛聯醫明天早上的門診",
+   "language": "zh",
+   "intent": "unsupported",
+   "expected_ids": [],
+   "area": "unsupported",
+   "style": "goal",
+   "faq_topic": "",
+   "note": "只有聯醫醫療費繳費，無掛號"
+  },
+  {
+   "id": "H084",
+   "text": "我要借一台YouBike騎回家",
+   "language": "zh",
+   "intent": "unsupported",
+   "expected_ids": [],
+   "area": "unsupported",
+   "style": "goal",
+   "faq_topic": "",
+   "note": "「借」不是圖書借閱"
+  },
+  {
+   "id": "H085",
+   "text": "幫我訂運動中心禮拜三晚上的羽球場",
+   "language": "zh",
+   "intent": "unsupported",
+   "expected_ids": [],
+   "area": "unsupported",
+   "style": "goal",
+   "faq_topic": "",
+   "note": "場地預約不支援；不是臨櫃叫號"
+  },
+  {
+   "id": "H086",
+   "text": "幫我在衛生所排一個打疫苗的時段",
+   "language": "zh",
+   "intent": "unsupported",
+   "expected_ids": [],
+   "area": "unsupported",
+   "style": "indirect",
+   "faq_topic": "",
+   "note": "疫苗預約不支援；「排」不是叫號"
+  },
+  {
+   "id": "H087",
+   "text": "舊沙發太大垃圾車不收，要怎麼丟",
+   "language": "zh",
+   "intent": "faq",
+   "expected_ids": [],
+   "area": "faq",
+   "style": "situation",
+   "faq_topic": "大型廢棄物清運",
+   "note": ""
+  },
+  {
+   "id": "H088",
+   "text": "身分證不見了，要去哪補",
+   "language": "zh",
+   "intent": "faq",
+   "expected_ids": [],
+   "area": "faq",
+   "style": "situation",
+   "faq_topic": "身分證遺失補發",
+   "note": "叫號頁為次要可接受，主答 FAQ"
+  },
+  {
+   "id": "H089",
+   "text": "我們這區的垃圾車晚上幾點來",
+   "language": "zh",
+   "intent": "faq",
+   "expected_ids": [],
+   "area": "faq",
+   "style": "goal",
+   "faq_topic": "垃圾車收運時間",
+   "note": ""
+  },
+  {
+   "id": "H090",
+   "text": "小孩剛出生，報戶口要準備什麼",
+   "language": "zh",
+   "intent": "faq",
+   "expected_ids": [],
+   "area": "faq",
+   "style": "life_event",
+   "faq_topic": "出生登記",
+   "note": ""
+  },
+  {
+   "id": "H091",
+   "text": "養狗是不是一定要植晶片登記",
+   "language": "zh",
+   "intent": "faq",
+   "expected_ids": [],
+   "area": "faq",
+   "style": "indirect",
+   "faq_topic": "寵物登記",
+   "note": "狗為 FAQ 意義，無對應服務"
+  },
+  {
+   "id": "H092",
+   "text": "結婚登記禮拜六可以辦嗎",
+   "language": "zh",
+   "intent": "faq",
+   "expected_ids": [],
+   "area": "faq",
+   "style": "life_event",
+   "faq_topic": "結婚登記",
+   "note": ""
+  },
+  {
+   "id": "H093",
+   "text": "老人卡一個月給的額度有多少，搭公車用得完嗎",
+   "language": "zh",
+   "intent": "faq",
+   "expected_ids": [],
+   "area": "faq",
+   "style": "goal",
+   "faq_topic": "敬老卡點數",
+   "note": ""
+  },
+  {
+   "id": "H094",
+   "text": "機車停騎樓會不會被開罰",
+   "language": "zh",
+   "intent": "faq",
+   "expected_ids": [],
+   "area": "faq",
+   "style": "indirect",
+   "faq_topic": "騎樓停車規定",
+   "note": "不是停車繳費"
+  },
+  {
+   "id": "H095",
+   "text": "瓶瓶罐罐跟紙箱，禮拜幾才能拿出去給車子收",
+   "language": "zh",
+   "intent": "faq",
+   "expected_ids": [],
+   "area": "faq",
+   "style": "goal",
+   "faq_topic": "資源回收日",
+   "note": ""
+  },
+  {
+   "id": "H096",
+   "text": "育兒津貼現在一個月補多少",
+   "language": "zh",
+   "intent": "faq",
+   "expected_ids": [],
+   "area": "faq",
+   "style": "life_event",
+   "faq_topic": "育兒津貼",
+   "note": "無對應申辦表單"
+  },
+  {
+   "id": "H097",
+   "text": "房屋稅一般是幾月開始繳",
+   "language": "zh",
+   "intent": "faq",
+   "expected_ids": [],
+   "area": "faq",
+   "style": "goal",
+   "faq_topic": "房屋稅開徵期間",
+   "note": "問時間而非要繳；附帶 fees.tax 連結可接受"
+  },
+  {
+   "id": "H098",
+   "text": "戶籍謄本能不能在網路上申請",
+   "language": "zh",
+   "intent": "faq",
+   "expected_ids": [],
+   "area": "faq",
+   "style": "indirect",
+   "faq_topic": "戶籍謄本申請",
+   "note": ""
+  },
+  {
+   "id": "H099",
+   "text": "怎樣才算低收入戶",
+   "language": "zh",
+   "intent": "faq",
+   "expected_ids": [],
+   "area": "faq",
+   "style": "indirect",
+   "faq_topic": "低收入戶資格",
+   "note": ""
+  },
+  {
+   "id": "H100",
+   "text": "廚餘到底要分生的熟的嗎",
+   "language": "zh",
+   "intent": "faq",
+   "expected_ids": [],
+   "area": "faq",
+   "style": "complaint",
+   "faq_topic": "廚餘分類",
+   "note": ""
+  },
+  {
+   "id": "H101",
+   "text": "阮欲做假牙，聽講老人有補助，愛按怎申請",
+   "language": "zh",
+   "intent": "faq",
+   "expected_ids": [],
+   "area": "faq",
+   "style": "elderly",
+   "faq_topic": "老人假牙補助",
+   "note": "台語；申辦清單無假牙補助"
+  },
+  {
+   "id": "H102",
+   "text": "車子被拖走了要去哪裡領回來",
+   "language": "zh",
+   "intent": "faq",
+   "expected_ids": [],
+   "area": "faq",
+   "style": "situation",
+   "faq_topic": "拖吊車輛領回",
+   "note": "不是報案（非失竊）"
+  },
+  {
+   "id": "H103",
+   "text": "公費流感疫苗幾歲可以打",
+   "language": "zh",
+   "intent": "faq",
+   "expected_ids": [],
+   "area": "faq",
+   "style": "goal",
+   "faq_topic": "公費流感疫苗資格",
+   "note": ""
+  },
+  {
+   "id": "H104",
+   "text": "印鑑證明可以請家人代辦嗎",
+   "language": "zh",
+   "intent": "faq",
+   "expected_ids": [],
+   "area": "faq",
+   "style": "indirect",
+   "faq_topic": "印鑑證明代辦",
+   "note": ""
+  },
+  {
+   "id": "H105",
+   "text": "我家門口的水溝蓋臭到不行，這種是誰負責清",
+   "language": "zh",
+   "intent": "faq",
+   "expected_ids": [],
+   "area": "faq",
+   "style": "complaint",
+   "faq_topic": "側溝清疏權責",
+   "note": "也可轉陳情；主要是問權責"
+  },
+  {
+   "id": "H106",
+   "text": "今天熱到快融化了",
+   "language": "zh",
+   "intent": "none",
+   "expected_ids": [],
+   "area": "general",
+   "style": "chitchat",
+   "faq_topic": "",
+   "note": "閒聊"
+  },
+  {
+   "id": "H107",
+   "text": "我沒有要繳停車費喔，只是隨口提到而已",
+   "language": "zh",
+   "intent": "none",
+   "expected_ids": [],
+   "area": "general",
+   "style": "negation",
+   "faq_topic": "",
+   "note": "否定，不可開 fees.parking"
+  },
+  {
+   "id": "H108",
+   "text": "排隊買雞排排了快半小時",
+   "language": "zh",
+   "intent": "none",
+   "expected_ids": [],
+   "area": "general",
+   "style": "trap",
+   "faq_topic": "",
+   "note": "陷阱字：排隊"
+  },
+  {
+   "id": "H109",
+   "text": "我手機快沒電了，先這樣",
+   "language": "zh",
+   "intent": "none",
+   "expected_ids": [],
+   "area": "general",
+   "style": "trap",
+   "faq_topic": "",
+   "note": "陷阱字：沒電，非停電"
+  },
+  {
+   "id": "H110",
+   "text": "可以借我一百塊嗎",
+   "language": "zh",
+   "intent": "none",
+   "expected_ids": [],
+   "area": "general",
+   "style": "trap",
+   "faq_topic": "",
+   "note": "陷阱字：借"
+  },
+  {
+   "id": "H111",
+   "text": "這本書的結局好好哭",
+   "language": "zh",
+   "intent": "none",
+   "expected_ids": [],
+   "area": "general",
+   "style": "trap",
+   "faq_topic": "",
+   "note": "陷阱字：書"
+  },
+  {
+   "id": "H112",
+   "text": "我家的狗今天特別乖",
+   "language": "zh",
+   "intent": "none",
+   "expected_ids": [],
+   "area": "general",
+   "style": "trap",
+   "faq_topic": "",
+   "note": "陷阱字：狗"
+  },
+  {
+   "id": "H113",
+   "text": "等一下去公園走走",
+   "language": "zh",
+   "intent": "none",
+   "expected_ids": [],
+   "area": "general",
+   "style": "trap",
+   "faq_topic": "",
+   "note": "陷阱字：公園"
+  },
+  {
+   "id": "H114",
+   "text": "欸，我要怎麼稱呼你",
+   "language": "zh",
+   "intent": "none",
+   "expected_ids": [],
+   "area": "general",
+   "style": "chitchat",
+   "faq_topic": "",
+   "note": "閒聊"
+  },
+  {
+   "id": "H115",
+   "text": "不用了，我不要報案了",
+   "language": "zh",
+   "intent": "none",
+   "expected_ids": [],
+   "area": "general",
+   "style": "negation",
+   "faq_topic": "",
+   "note": "否定，不可開 police.online"
+  },
+  {
+   "id": "H116",
+   "text": "講個笑話來聽聽",
+   "language": "zh",
+   "intent": "none",
+   "expected_ids": [],
+   "area": "general",
+   "style": "chitchat",
+   "faq_topic": "",
+   "note": "閒聊"
+  },
+  {
+   "id": "H117",
+   "text": "別幫我開圖書館的頁面",
+   "language": "zh",
+   "intent": "none",
+   "expected_ids": [],
+   "area": "general",
+   "style": "negation",
+   "faq_topic": "",
+   "note": "否定，不可開 library"
+  },
+  {
+   "id": "H118",
+   "text": "我只是在試麥克風，喂喂",
+   "language": "zh",
+   "intent": "none",
+   "expected_ids": [],
+   "area": "general",
+   "style": "chitchat",
+   "faq_topic": "",
+   "note": "測試語"
+  },
+  {
+   "id": "H119",
+   "text": "麻煩借個路，我要下車了",
+   "language": "zh",
+   "intent": "none",
+   "expected_ids": [],
+   "area": "general",
+   "style": "trap",
+   "faq_topic": "",
+   "note": "陷阱字：借（對旁人說）"
+  },
+  {
+   "id": "H120",
+   "text": "就這樣，多謝啦",
+   "language": "zh",
+   "intent": "none",
+   "expected_ids": [],
+   "area": "general",
+   "style": "chitchat",
+   "faq_topic": "",
+   "note": "結束語"
+  },
+  {
+   "id": "H121",
+   "text": "阮食飽矣，你咧",
+   "language": "zh",
+   "intent": "none",
+   "expected_ids": [],
+   "area": "general",
+   "style": "elderly",
+   "faq_topic": "",
+   "note": "台語寒暄"
+  },
+  {
+   "id": "H122",
+   "text": "家裡遙控器沒電了，要去買電池",
+   "language": "zh",
+   "intent": "none",
+   "expected_ids": [],
+   "area": "general",
+   "style": "trap",
+   "faq_topic": "",
+   "note": "陷阱字：沒電"
+  },
+  {
+   "id": "H123",
+   "text": "看到新聞標題寫大停電嚇一跳，原來是在講別的國家",
+   "language": "zh",
+   "intent": "none",
+   "expected_ids": [],
+   "area": "general",
+   "style": "trap",
+   "faq_topic": "",
+   "note": "陷阱字：停電，非通報"
+  },
+  {
+   "id": "H124",
+   "text": "Got a parking slip stuck on my scooter near Ximen, how do I pay for it?",
+   "language": "en",
+   "intent": "service",
+   "expected_ids": [
+    "fees.parking"
+   ],
+   "area": "payments",
+   "style": "situation",
+   "faq_topic": "",
+   "note": ""
+  },
+  {
+   "id": "H125",
+   "text": "Someone just broke into my apartment and I think they're still inside",
+   "language": "en",
+   "intent": "emergency",
+   "expected_ids": [
+    "police"
+   ],
+   "area": "police",
+   "style": "situation",
+   "faq_topic": "",
+   "note": "緊急：應先提示撥 110"
+  },
+  {
+   "id": "H126",
+   "text": "Is there a way to make all these menus show up in English? Chinese is too hard for me",
+   "language": "en",
+   "intent": "service",
+   "expected_ids": [
+    "language"
+   ],
+   "area": "account",
+   "style": "goal",
+   "faq_topic": "",
+   "note": ""
+  },
+  {
+   "id": "H127",
+   "text": "Anything fun going on around the city this weekend?",
+   "language": "en",
+   "intent": "service",
+   "expected_ids": [
+    "activities"
+   ],
+   "area": "messages",
+   "style": "indirect",
+   "faq_topic": "",
+   "note": ""
+  },
+  {
+   "id": "H128",
+   "text": "I just moved here, how am I supposed to sort my trash?",
+   "language": "en",
+   "intent": "faq",
+   "expected_ids": [],
+   "area": "faq",
+   "style": "life_event",
+   "faq_topic": "垃圾分類與回收",
+   "note": ""
+  },
+  {
+   "id": "H129",
+   "text": "Ugh, long day at work, I'm exhausted",
+   "language": "en",
+   "intent": "none",
+   "expected_ids": [],
+   "area": "general",
+   "style": "chitchat",
+   "faq_topic": "",
+   "note": ""
+  },
+  {
+   "id": "H130",
+   "text": "What kind of stuff can this app actually do?",
+   "language": "en",
+   "intent": "listing",
+   "expected_ids": [
+    "app.services"
+   ],
+   "area": "general",
+   "style": "vague",
+   "faq_topic": "",
+   "note": ""
+  },
+  {
+   "id": "H131",
+   "text": "Seven nights now and the light over our alley is still off, nobody's bothered to fix it",
+   "language": "en",
+   "intent": "service",
+   "expected_ids": [
+    "disasterReport.form.D-1-3",
+    "reportIssue"
+   ],
+   "area": "hazard",
+   "style": "complaint",
+   "faq_topic": "",
+   "note": "dead=壞掉，非沒電陷阱"
+  },
+  {
+   "id": "H132",
+   "text": "図書館で借りた本、返却期限っていつまでだったか確認したい",
+   "language": "ja",
+   "intent": "service",
+   "expected_ids": [
+    "library.records",
+    "library"
+   ],
+   "area": "library",
+   "style": "goal",
+   "faq_topic": "",
+   "note": ""
+  },
+  {
+   "id": "H133",
+   "text": "財布をすられたっぽいんですけど、交番に行かずにネットで届けられますか",
+   "language": "ja",
+   "intent": "service",
+   "expected_ids": [
+    "police.online"
+   ],
+   "area": "police",
+   "style": "situation",
+   "faq_topic": "",
+   "note": ""
+  },
+  {
+   "id": "H134",
+   "text": "観光で使えるお得なクーポンとかありますか",
+   "language": "ja",
+   "intent": "service",
+   "expected_ids": [
+    "coupon.list",
+    "app.perks"
+   ],
+   "area": "deals",
+   "style": "indirect",
+   "faq_topic": "",
+   "note": ""
+  },
+  {
+   "id": "H135",
+   "text": "部屋に水道代の請求書が届いたんですが、ここで払えますか",
+   "language": "ja",
+   "intent": "service",
+   "expected_ids": [
+    "fees.water"
+   ],
+   "area": "payments",
+   "style": "situation",
+   "faq_topic": "",
+   "note": ""
+  },
+  {
+   "id": "H136",
+   "text": "萬華の区役所に行く前に整理券を取っておきたいです",
+   "language": "ja",
+   "intent": "service",
+   "expected_ids": [
+    "reservation.c-3-1",
+    "reservation"
+   ],
+   "area": "queue",
+   "style": "goal",
+   "faq_topic": "",
+   "note": "区役所=區公所"
+  },
+  {
+   "id": "H137",
+   "text": "外国人でも台北で健康保険に入れますか",
+   "language": "ja",
+   "intent": "faq",
+   "expected_ids": [],
+   "area": "faq",
+   "style": "indirect",
+   "faq_topic": "外籍人士加保健保",
+   "note": ""
+  },
+  {
+   "id": "H138",
+   "text": "今日はいい天気ですね",
+   "language": "ja",
+   "intent": "none",
+   "expected_ids": [],
+   "area": "general",
+   "style": "chitchat",
+   "faq_topic": "",
+   "note": ""
+  },
+  {
+   "id": "H139",
+   "text": "駅まで車を一台手配してくれませんか",
+   "language": "ja",
+   "intent": "unsupported",
+   "expected_ids": [],
+   "area": "unsupported",
+   "style": "goal",
+   "faq_topic": "",
+   "note": ""
+  },
+  {
+   "id": "H140",
+   "text": "Tôi muốn lấy số thứ tự ở trạm dịch vụ việc làm Mangka bên Vạn Hoa",
+   "language": "vi",
+   "intent": "service",
+   "expected_ids": [
+    "reservation.c-5-1",
+    "reservation"
+   ],
+   "area": "queue",
+   "style": "goal",
+   "faq_topic": "",
+   "note": "艋舺就業服務站"
+  },
+  {
+   "id": "H141",
+   "text": "Chủ nhà bảo tôi phải tự đóng tiền nước, đóng ở đâu vậy?",
+   "language": "vi",
+   "intent": "service",
+   "expected_ids": [
+    "fees.water"
+   ],
+   "area": "payments",
+   "style": "indirect",
+   "faq_topic": "",
+   "note": ""
+  },
+  {
+   "id": "H142",
+   "text": "Người chủ nơi tôi làm việc hay đánh tôi, tôi muốn trình báo với công an",
+   "language": "vi",
+   "intent": "service",
+   "expected_ids": [
+    "police.online",
+    "police"
+   ],
+   "area": "police",
+   "style": "situation",
+   "faq_topic": "",
+   "note": "移工遭雇主施暴；亦應提示 110／1955；若正在發生則屬緊急"
+  },
+  {
+   "id": "H143",
+   "text": "Điện thoại em sắp hết pin rồi",
+   "language": "vi",
+   "intent": "none",
+   "expected_ids": [],
+   "area": "general",
+   "style": "trap",
+   "faq_topic": "",
+   "note": "陷阱：手機沒電"
+  },
+  {
+   "id": "H144",
+   "text": "Cả khu nhà tôi bị cúp điện từ tối qua tới giờ",
+   "language": "vi",
+   "intent": "service",
+   "expected_ids": [
+    "disasterReport.form.D-1-4",
+    "disasterReport"
+   ],
+   "area": "hazard",
+   "style": "complaint",
+   "faq_topic": "",
+   "note": "停電通報"
+  },
+  {
+   "id": "H145",
+   "text": "Ở Đài Bắc bỏ rác phải dùng túi gì vậy?",
+   "language": "vi",
+   "intent": "faq",
+   "expected_ids": [],
+   "area": "faq",
+   "style": "goal",
+   "faq_topic": "專用垃圾袋",
+   "note": ""
+  },
+  {
+   "id": "H146",
+   "text": "Có ưu đãi gì cho người lao động nước ngoài không?",
+   "language": "vi",
+   "intent": "service",
+   "expected_ids": [
+    "app.perks",
+    "coupon.list"
+   ],
+   "area": "deals",
+   "style": "indirect",
+   "faq_topic": "",
+   "note": ""
+  },
+  {
+   "id": "H147",
+   "text": "Cho mình chỉnh ứng dụng hiển thị bằng tiếng Việt được không?",
+   "language": "vi",
+   "intent": "service",
+   "expected_ids": [
+    "language"
+   ],
+   "area": "account",
+   "style": "goal",
+   "faq_topic": "",
+   "note": "語言頁可能沒有越南文，但仍為正確頁面"
+  },
+  {
+   "id": "H148",
+   "text": "Nenek yang saya rawat mau bayar biaya berobat di RS Kota Taipei",
+   "language": "id",
+   "intent": "service",
+   "expected_ids": [
+    "fees.hospital"
+   ],
+   "area": "payments",
+   "style": "situation",
+   "faq_topic": "",
+   "note": "看護移工；RS Kota=市立聯合醫院"
+  },
+  {
+   "id": "H149",
+   "text": "Tadi di kereta bawah tanah ada yang ambil ponselku dari tas, bisa bikin laporan ke polisi lewat sini?",
+   "language": "id",
+   "intent": "service",
+   "expected_ids": [
+    "police.online"
+   ],
+   "area": "police",
+   "style": "situation",
+   "faq_topic": "",
+   "note": ""
+  },
+  {
+   "id": "H150",
+   "text": "Barusan HP bunyi ada kabar dari aplikasi, mau aku buka lagi",
+   "language": "id",
+   "intent": "service",
+   "expected_ids": [
+    "messages"
+   ],
+   "area": "messages",
+   "style": "goal",
+   "faq_topic": "",
+   "note": ""
+  },
+  {
+   "id": "H151",
+   "text": "Pekerja migran bisa dapat vaksin flu gratis nggak?",
+   "language": "id",
+   "intent": "faq",
+   "expected_ids": [],
+   "area": "faq",
+   "style": "indirect",
+   "faq_topic": "公費流感疫苗資格",
+   "note": ""
+  },
+  {
+   "id": "H152",
+   "text": "Aku cuma pengen ngobrol aja",
+   "language": "id",
+   "intent": "none",
+   "expected_ids": [],
+   "area": "general",
+   "style": "chitchat",
+   "faq_topic": "",
+   "note": ""
+  },
+  {
+   "id": "H153",
+   "text": "Angin kencang semalam bikin tiang kabel di depan rumah tumbang",
+   "language": "id",
+   "intent": "service",
+   "expected_ids": [
+    "disasterReport.form.D-1-1",
+    "disasterReport"
+   ],
+   "area": "hazard",
+   "style": "situation",
+   "faq_topic": "",
+   "note": ""
+  },
+  {
+   "id": "H154",
+   "text": "Bayar parkir dulu, terus cek tiket diskon saya",
+   "language": "id",
+   "intent": "multi",
+   "expected_ids": [
+    "fees.parking",
+    "wallet"
+   ],
+   "area": "multi",
+   "style": "goal",
+   "faq_topic": "",
+   "note": "繳停車費＋票夾"
+  },
+  {
+   "id": "H155",
+   "text": "Saya bingung mau ngurus apa",
+   "language": "id",
+   "intent": "vague",
+   "expected_ids": [],
+   "area": "general",
+   "style": "vague",
+   "faq_topic": "",
+   "note": ""
+  },
+  {
+   "id": "H156",
+   "text": "Ang ingay ng katabi naming unit tuwing hatinggabi, saan ako puwedeng magsumbong?",
+   "language": "fil",
+   "intent": "service",
+   "expected_ids": [
+    "reportIssue",
+    "reportIssue.list"
+   ],
+   "area": "petition",
+   "style": "complaint",
+   "faq_topic": "",
+   "note": ""
+  },
+  {
+   "id": "H157",
+   "text": "Nawala yung wallet ko sa bus, pwede ba mag-report online?",
+   "language": "fil",
+   "intent": "service",
+   "expected_ids": [
+    "police.online"
+   ],
+   "area": "police",
+   "style": "situation",
+   "faq_topic": "",
+   "note": "遺失也可走 FAQ 遺失物，但使用者明確要線上報案"
+  },
+  {
+   "id": "H158",
+   "text": "Nakakabagot nang nakakulong sa dorm kapag day-off ko, anong mga ganap sa Taipei na masasalihan ng tulad ko?",
+   "language": "fil",
+   "intent": "service",
+   "expected_ids": [
+    "activities"
+   ],
+   "area": "messages",
+   "style": "goal",
+   "faq_topic": "",
+   "note": ""
+  },
+  {
+   "id": "H159",
+   "text": "Pupuntahan ko bukas yung tanggapan sa Wanhua na nag-aasikaso ng papeles ng asawa ko, puwede bang magpareserba ng pila mula rito?",
+   "language": "fil",
+   "intent": "service",
+   "expected_ids": [
+    "reservation.c-2-1",
+    "reservation"
+   ],
+   "area": "queue",
+   "style": "goal",
+   "faq_topic": "",
+   "note": ""
+  },
+  {
+   "id": "H160",
+   "text": "Anong araw kinukuha yung recyclables dito?",
+   "language": "fil",
+   "intent": "faq",
+   "expected_ids": [],
+   "area": "faq",
+   "style": "goal",
+   "faq_topic": "資源回收日",
+   "note": ""
+  },
+  {
+   "id": "H161",
+   "text": "Ang ganda ng parke dito sa Daan, ang presko",
+   "language": "fil",
+   "intent": "none",
+   "expected_ids": [],
+   "area": "general",
+   "style": "trap",
+   "faq_topic": "",
+   "note": "陷阱：公園"
+  },
+  {
+   "id": "H162",
+   "text": "Pwede mo ba akong ipa-book ng sasakyan papuntang airport?",
+   "language": "fil",
+   "intent": "unsupported",
+   "expected_ids": [],
+   "area": "unsupported",
+   "style": "goal",
+   "faq_topic": "",
+   "note": ""
+  },
+  {
+   "id": "H163",
+   "text": "Nasaan na kaya yung mga voucher na naitabi ko noong nakaraang buwan?",
+   "language": "fil",
+   "intent": "service",
+   "expected_ids": [
+    "wallet",
+    "coupon.list"
+   ],
+   "area": "deals",
+   "style": "goal",
+   "faq_topic": "",
+   "note": ""
+  },
+  {
+   "id": "H164",
+   "text": "我上禮拜在App上申請了老人健保補助，想知道審到哪了",
+   "language": "zh",
+   "intent": "service",
+   "expected_ids": [
+    "districtOffice.progress"
+   ],
+   "area": "progress",
+   "style": "situation",
+   "faq_topic": "",
+   "note": "申辦進度；非新申請"
+  },
+  {
+   "id": "H165",
+   "text": "不曉得我丟出去的案子到底有沒有人在看",
+   "language": "zh",
+   "intent": "service",
+   "expected_ids": [
+    "districtOffice.progress",
+    "reportIssue.progress",
+    "police.progress"
+   ],
+   "area": "progress",
+   "style": "indirect",
+   "faq_topic": "",
+   "note": "案件類型不明，列三種進度候選"
+  },
+  {
+   "id": "H166",
+   "text": "明明領了折價券，結帳時候怎麼都找不到",
+   "language": "zh",
+   "intent": "service",
+   "expected_ids": [
+    "wallet",
+    "coupon.list"
+   ],
+   "area": "deals",
+   "style": "complaint",
+   "faq_topic": "",
+   "note": "已領取的券→票夾"
+  },
+  {
+   "id": "H167",
+   "text": "剛搬來台北想認識新朋友，市府辦的聚會有哪些",
+   "language": "zh",
+   "intent": "service",
+   "expected_ids": [
+    "activities"
+   ],
+   "area": "messages",
+   "style": "life_event",
+   "faq_topic": "",
+   "note": "活動資訊"
+  },
+  {
+   "id": "H168",
+   "text": "搬進新租屋處第一晚，樓下的腳踏車就被偷了",
+   "language": "zh",
+   "intent": "service",
+   "expected_ids": [
+    "police.online",
+    "police"
+   ],
+   "area": "police",
+   "style": "life_event",
+   "faq_topic": "",
+   "note": "失竊報案；非 YouBike"
+  },
+  {
+   "id": "H169",
+   "text": "派出所說要等很久，我不想等了，自己在網路上報",
+   "language": "zh",
+   "intent": "service",
+   "expected_ids": [
+    "police.online"
+   ],
+   "area": "police",
+   "style": "complaint",
+   "faq_topic": "",
+   "note": "線上報案；「等」非叫號"
+  },
+  {
+   "id": "H170",
+   "text": "不是要抽號碼啦，我是說公司尾牙抽獎",
+   "language": "zh",
+   "intent": "none",
+   "expected_ids": [],
+   "area": "general",
+   "style": "negation",
+   "faq_topic": "",
+   "note": "否定＋陷阱：抽號"
+  }
+ ]
+}

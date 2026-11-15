@@ -58,11 +58,29 @@ class CatalogIndexTests(unittest.TestCase):
 
     def test_passages_cover_titles_keywords_features_and_translations(self):
         texts = [text for entry_id, text in semantic.passages(REGISTRY, False) if entry_id == "fees.water"]
-        self.assertTrue(all(text.startswith("passage: ") for text in texts))
+        # Catalogue texts are passages; the need descriptions (2026-11-16, rules section 6) are
+        # written as a citizen says them and are embedded like the examples, as queries.
+        needs = {semantic.EXAMPLE_PREFIX + n for n in [REGISTRY.by_id["fees.water"]["need"]] +
+                 [local["need"] for local in REGISTRY.i18n["fees.water"].values()]}
+        self.assertTrue(all(text.startswith("passage: ") or text in needs for text in texts))
+        self.assertEqual(needs, {text for text in texts if not text.startswith("passage: ")})
         self.assertIn("passage: 水費", texts)
         self.assertTrue(any("水錢" in text for text in texts))
         self.assertTrue(any(text.isascii() and "ater" in text for text in texts))  # English title/keywords
         self.assertEqual(len(texts), len(set(texts)))
+
+    def test_a_sentence_searched_again_is_not_embedded_again(self):
+        # One turn searches the same sentence several times (2026-11-16, ~2,850 passages).
+        calls = []
+        index = self.index(lambda texts: fake_embed(texts, calls))
+        index.build()
+        calls.clear()
+        first = index.scores("家門口那盞燈晚上都暗暗的")
+        self.assertEqual(index.search("家門口那盞燈晚上都暗暗的")[0][1]["id"], "disasterReport.form.D-1-3")
+        self.assertEqual(index.scores("家門口那盞燈晚上都暗暗的"), first)
+        self.assertEqual(len(calls), 1)
+        index.scores("家門口那盞燈晚上都暗暗的", "en")  # another language: scored again
+        self.assertEqual(len(calls), 2)
 
     def test_finds_the_meant_entry_and_nothing_for_unrelated_text(self):
         index = self.index()
@@ -146,7 +164,11 @@ class SemanticLayerTests(unittest.TestCase):
         self.assertIsNone(result["destination"])
         self.assertEqual(result["metrics"]["semantic"]["decision"], "request_clarification")
         _, result, offered = self.turn("家門口那盞燈晚上都暗暗的", "request_clarification", intent=False)
-        self.assertEqual((result["message"], len(offered)), (workflow.NO_RELATED, 1))
+        # The page the model turned down is a clue (lift 0.04 or more): listed, not opened
+        # (rules section 3, 2026-11-16).
+        self.assertEqual((result["metrics"]["route"], len(offered)), ("fallback_list", 1))
+        self.assertIsNone(result["destination"])
+        self.assertEqual(result["choices"][-1]["nav"], "catalog")
 
     def test_foreign_request_is_offered_in_its_language(self):
         _, result, offered = self.turn("the lamp outside my door stays dark at night", "confirm_candidates",
@@ -163,7 +185,7 @@ class SemanticLayerTests(unittest.TestCase):
         for index in (unreachable, None):
             _, result, offered = self.turn("家門口那盞燈晚上都暗暗的", "confirm_candidates",
                                            index=index, intent=False)
-            self.assertEqual((result["metrics"]["route"], offered), ("no_match", []))
+            self.assertEqual((result["metrics"]["route"], offered), ("fallback_catalog", []))
         app = Assistant(FakeCatalog(), lambda messages, tools: first(tools))
         self.assertIsNone(app.semantic)
 
@@ -176,7 +198,7 @@ class SemanticLayerTests(unittest.TestCase):
 
     def test_unrelated_and_keyword_matched_requests_skip_the_model(self):
         _, result, offered = self.turn("今天心情真好", "confirm_candidates", intent=False)
-        self.assertEqual((result["metrics"]["route"], offered), ("no_match", []))
+        self.assertEqual((result["metrics"]["route"], offered), ("fallback_catalog", []))
         self.assertEqual(result["metrics"]["semantic"]["candidates"], [])
         _, result, _ = self.turn("我要繳水費", "select_capability")
         self.assertEqual(result["destination"], {"kind": "capability", "id": "fees.water"})

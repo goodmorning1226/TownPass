@@ -1,0 +1,882 @@
+{
+ "meta": {
+  "name": "need_multi_turn",
+  "sealed": "2026-11-15",
+  "usage": "report-only; never used for tuning",
+  "outcome_values": {
+   "catalog": "assistant shows the category catalog, opens nothing",
+   "list": "assistant lists candidates; the list must contain at least one id in ids",
+   "open": "assistant opens one of ids",
+   "open_position": "assistant opens the item at `position` in the list it showed on the previous turn (any id from that list); must_be_in, when given, restricts which ids are acceptable",
+   "faq": "assistant answers from the city FAQ about faq_topic, opens nothing",
+   "cancel": "assistant acknowledges cancellation; nothing opened",
+   "nothing": "nothing opened"
+  },
+  "note": "Only user turns are written. Assistant behaviour between turns is implied by the previous turn's expected outcome."
+ },
+ "dialogues": [
+  {
+   "id": "M01",
+   "language": "zh",
+   "pattern": "vague_catalog_category_item",
+   "turns": [
+    {
+     "text": "我想用一下市政府的服務",
+     "expected": {
+      "outcome": "catalog",
+      "ids": []
+     }
+    },
+    {
+     "text": "要繳錢的那一類",
+     "expected": {
+      "outcome": "list",
+      "ids": [
+       "fees.water",
+       "fees.parking",
+       "fees.tax",
+       "fees.search",
+       "app.bills"
+      ]
+     }
+    },
+    {
+     "text": "水的",
+     "expected": {
+      "outcome": "open",
+      "ids": [
+       "fees.water"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "M02",
+   "language": "zh",
+   "pattern": "vague_catalog_category_item",
+   "turns": [
+    {
+     "text": "你們這邊有什麼",
+     "expected": {
+      "outcome": "catalog",
+      "ids": []
+     }
+    },
+    {
+     "text": "看書相關",
+     "expected": {
+      "outcome": "list",
+      "ids": [
+       "library",
+       "library.records",
+       "library.reservations",
+       "library.ranking",
+       "library.notices"
+      ]
+     }
+    },
+    {
+     "text": "手上現在有哪些還沒還",
+     "expected": {
+      "outcome": "open",
+      "ids": [
+       "library.records"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "M03",
+   "language": "zh",
+   "pattern": "vague_catalog_category_item",
+   "turns": [
+    {
+     "text": "阿姨想欲辦一點仔代誌",
+     "expected": {
+      "outcome": "catalog",
+      "ids": []
+     }
+    },
+    {
+     "text": "去櫃台抽號碼彼種",
+     "expected": {
+      "outcome": "list",
+      "ids": [
+       "reservation",
+       "reservation.c-2-1",
+       "reservation.c-3-1"
+      ]
+     }
+    },
+    {
+     "text": "萬華那間管戶籍的",
+     "expected": {
+      "outcome": "open",
+      "ids": [
+       "reservation.c-2-1"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "M04",
+   "language": "zh",
+   "pattern": "vague_catalog_category_item",
+   "turns": [
+    {
+     "text": "嗯不知道耶，有啥可以用",
+     "expected": {
+      "outcome": "catalog",
+      "ids": []
+     }
+    },
+    {
+     "text": "外面設施壞了要報的",
+     "expected": {
+      "outcome": "list",
+      "ids": [
+       "disasterReport",
+       "disasterReport.form.D-1-3",
+       "reportIssue"
+      ]
+     }
+    },
+    {
+     "text": "晚上巷子那支燈都暗暗的",
+     "expected": {
+      "outcome": "open",
+      "ids": [
+       "disasterReport.form.D-1-3"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "M05",
+   "language": "zh",
+   "pattern": "vague_catalog_category_item",
+   "turns": [
+    {
+     "text": "先給我看分類",
+     "expected": {
+      "outcome": "catalog",
+      "ids": []
+     }
+    },
+    {
+     "text": "想領政府的錢那種",
+     "expected": {
+      "outcome": "list",
+      "ids": [
+       "districtOffice",
+       "districtOffice.form.c-1"
+      ]
+     }
+    },
+    {
+     "text": "給阿公阿嬤付健保那個",
+     "expected": {
+      "outcome": "open",
+      "ids": [
+       "districtOffice.form.c-1"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "M06",
+   "language": "zh",
+   "pattern": "vague_catalog_category_item",
+   "turns": [
+    {
+     "text": "我來處理事情",
+     "expected": {
+      "outcome": "catalog",
+      "ids": []
+     }
+    },
+    {
+     "text": "警察局那邊",
+     "expected": {
+      "outcome": "list",
+      "ids": [
+       "police",
+       "police.online",
+       "police.records",
+       "police.progress"
+      ]
+     }
+    },
+    {
+     "text": "我東西被偷了，想讓他們知道",
+     "expected": {
+      "outcome": "open",
+      "ids": [
+       "police.online"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "M07",
+   "language": "en",
+   "pattern": "vague_catalog_category_item",
+   "turns": [
+    {
+     "text": "So what's on offer in this thing?",
+     "expected": {
+      "outcome": "catalog",
+      "ids": []
+     }
+    },
+    {
+     "text": "the paying-bills stuff",
+     "expected": {
+      "outcome": "list",
+      "ids": [
+       "fees.parking",
+       "fees.water",
+       "app.bills",
+       "fees.search"
+      ]
+     }
+    },
+    {
+     "text": "that curbside scooter fee, I guess",
+     "expected": {
+      "outcome": "open",
+      "ids": [
+       "fees.parking"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "M08",
+   "language": "zh",
+   "pattern": "vague_catalog_category_item",
+   "turns": [
+    {
+     "text": "這裡面可以弄什麼",
+     "expected": {
+      "outcome": "catalog",
+      "ids": []
+     }
+    },
+    {
+     "text": "帳號跟設定",
+     "expected": {
+      "outcome": "list",
+      "ids": [
+       "account",
+       "settings",
+       "profile",
+       "language"
+      ]
+     }
+    },
+    {
+     "text": "讓畫面顯示別的語文",
+     "expected": {
+      "outcome": "open",
+      "ids": [
+       "language"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "M09",
+   "language": "zh",
+   "pattern": "none_of_these_rephrase",
+   "turns": [
+    {
+     "text": "我要查進度",
+     "expected": {
+      "outcome": "list",
+      "ids": [
+       "districtOffice.progress",
+       "reportIssue.progress",
+       "police.progress"
+      ]
+     }
+    },
+    {
+     "text": "那些都不對啦，我在等的那本小說可以去拿了沒",
+     "expected": {
+      "outcome": "open",
+      "ids": [
+       "library.reservations"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "M10",
+   "language": "zh",
+   "pattern": "none_of_these_rephrase",
+   "turns": [
+    {
+     "text": "我想付錢",
+     "expected": {
+      "outcome": "list",
+      "ids": [
+       "app.bills",
+       "fees.search",
+       "fees.water",
+       "fees.parking"
+      ]
+     }
+    },
+    {
+     "text": "這些都不對，是公訓處上課的費用",
+     "expected": {
+      "outcome": "open",
+      "ids": [
+       "fees.course"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "M11",
+   "language": "zh",
+   "pattern": "none_of_these_rephrase",
+   "turns": [
+    {
+     "text": "罰單的問題",
+     "expected": {
+      "outcome": "list",
+      "ids": [
+       "fees.parking",
+       "districtOffice.form.a-1",
+       "districtOffice.form.b-1"
+      ]
+     }
+    },
+    {
+     "text": "沒有我要的，我是在台中被開，想申訴",
+     "expected": {
+      "outcome": "open",
+      "ids": [
+       "districtOffice.form.a-2"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "M12",
+   "language": "zh",
+   "pattern": "none_of_these_rephrase",
+   "turns": [
+    {
+     "text": "幫我找有沒有補助",
+     "expected": {
+      "outcome": "list",
+      "ids": [
+       "districtOffice",
+       "districtOffice.form.c-1",
+       "districtOffice.form.d-1"
+      ]
+     }
+    },
+    {
+     "text": "不是啦，我其實是要付社宅房租",
+     "expected": {
+      "outcome": "open",
+      "ids": [
+       "fees.housing"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "M13",
+   "language": "zh",
+   "pattern": "none_of_these_rephrase",
+   "turns": [
+    {
+     "text": "想報火災",
+     "expected": {
+      "outcome": "list",
+      "ids": [
+       "disasterReport.form.D-4-1",
+       "disasterReport.form.D-4-2",
+       "disasterReport.form.D-4-3",
+       "disasterReport.form.D-4-4"
+      ]
+     }
+    },
+    {
+     "text": "選項裡都沒有，是山上整片泥巴衝下來",
+     "expected": {
+      "outcome": "open",
+      "ids": [
+       "disasterReport.form.D-3-1",
+       "disasterReport.form.D-3-2"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "M14",
+   "language": "fil",
+   "pattern": "none_of_these_rephrase",
+   "turns": [
+    {
+     "text": "May problema ako sa ticket",
+     "expected": {
+      "outcome": "list",
+      "ids": [
+       "wallet",
+       "fees.parking",
+       "districtOffice.form.a-1"
+      ]
+     }
+    },
+    {
+     "text": "Hindi 'yan. Yung sinumbong ko sa pulis noong isang linggo, ano na nangyari?",
+     "expected": {
+      "outcome": "open",
+      "ids": [
+       "police.progress"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "M15",
+   "language": "zh",
+   "pattern": "candidates_then_ordinal",
+   "turns": [
+    {
+     "text": "有張單子要付",
+     "expected": {
+      "outcome": "list",
+      "ids": [
+       "app.bills",
+       "fees.search",
+       "fees.water",
+       "fees.parking",
+       "fees.tax"
+      ]
+     }
+    },
+    {
+     "text": "第二個",
+     "expected": {
+      "outcome": "open_position",
+      "position": 2,
+      "ids": []
+     }
+    }
+   ]
+  },
+  {
+   "id": "M16",
+   "language": "zh",
+   "pattern": "candidates_then_ordinal",
+   "turns": [
+    {
+     "text": "市圖的那些",
+     "expected": {
+      "outcome": "list",
+      "ids": [
+       "library",
+       "library.records",
+       "library.reservations"
+      ]
+     }
+    },
+    {
+     "text": "嗯…那就選排第二的",
+     "expected": {
+      "outcome": "open_position",
+      "position": 2,
+      "ids": []
+     }
+    }
+   ]
+  },
+  {
+   "id": "M17",
+   "language": "zh",
+   "pattern": "candidates_then_ordinal",
+   "turns": [
+    {
+     "text": "去機關前先拿個號",
+     "expected": {
+      "outcome": "list",
+      "ids": [
+       "reservation",
+       "reservation.c-1-1",
+       "reservation.c-2-1"
+      ]
+     }
+    },
+    {
+     "text": "二號那個",
+     "expected": {
+      "outcome": "open_position",
+      "position": 2,
+      "ids": []
+     }
+    }
+   ]
+  },
+  {
+   "id": "M18",
+   "language": "zh",
+   "pattern": "candidates_then_ordinal",
+   "turns": [
+    {
+     "text": "我送出去的東西現在處理到哪一步",
+     "expected": {
+      "outcome": "list",
+      "ids": [
+       "districtOffice.progress",
+       "reportIssue.progress",
+       "police.progress"
+      ]
+     }
+    },
+    {
+     "text": "我要第二項",
+     "expected": {
+      "outcome": "open_position",
+      "position": 2,
+      "ids": []
+     }
+    }
+   ]
+  },
+  {
+   "id": "M19",
+   "language": "ja",
+   "pattern": "candidates_then_ordinal",
+   "turns": [
+    {
+     "text": "警察関係のサービスを見たい",
+     "expected": {
+      "outcome": "list",
+      "ids": [
+       "police",
+       "police.online",
+       "police.records",
+       "police.progress"
+      ]
+     }
+    },
+    {
+     "text": "二番目でお願いします",
+     "expected": {
+      "outcome": "open_position",
+      "position": 2,
+      "ids": []
+     }
+    }
+   ]
+  },
+  {
+   "id": "M20",
+   "language": "zh",
+   "pattern": "candidates_then_ordinal",
+   "turns": [
+    {
+     "text": "優惠的東西",
+     "expected": {
+      "outcome": "list",
+      "ids": [
+       "app.perks",
+       "coupon.list",
+       "wallet"
+      ]
+     }
+    },
+    {
+     "text": "呃，挑列表裡排第2的",
+     "expected": {
+      "outcome": "open_position",
+      "position": 2,
+      "ids": []
+     }
+    },
+    {
+     "text": "不對，剛才清單最上面那個才是",
+     "expected": {
+      "outcome": "open_position",
+      "position": 1,
+      "ids": [],
+      "note": "position refers to the list shown in turn 1"
+     }
+    }
+   ]
+  },
+  {
+   "id": "M21",
+   "language": "zh",
+   "pattern": "faq_then_open",
+   "turns": [
+    {
+     "text": "房屋稅大概幾月要繳",
+     "expected": {
+      "outcome": "faq",
+      "faq_topic": "房屋稅開徵期間",
+      "ids": []
+     }
+    },
+    {
+     "text": "那直接幫我打開繳的地方",
+     "expected": {
+      "outcome": "open",
+      "ids": [
+       "fees.tax"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "M22",
+   "language": "zh",
+   "pattern": "faq_then_open",
+   "turns": [
+    {
+     "text": "沙發壞了要怎麼丟",
+     "expected": {
+      "outcome": "faq",
+      "faq_topic": "大型廢棄物清運",
+      "ids": []
+     }
+    },
+    {
+     "text": "那我想跟市府反映垃圾車都不準時",
+     "expected": {
+      "outcome": "open",
+      "ids": [
+       "reportIssue",
+       "reportIssue.list"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "M23",
+   "language": "zh",
+   "pattern": "faq_then_open",
+   "turns": [
+    {
+     "text": "身分證弄丟要準備哪些東西去補",
+     "expected": {
+      "outcome": "faq",
+      "faq_topic": "身分證遺失補發",
+      "ids": []
+     }
+    },
+    {
+     "text": "好，幫我抽中正戶政的號",
+     "expected": {
+      "outcome": "open",
+      "ids": [
+       "reservation.c-2-2"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "M24",
+   "language": "zh",
+   "pattern": "faq_then_open",
+   "turns": [
+    {
+     "text": "老人的健保費市政府有補嗎",
+     "expected": {
+      "outcome": "faq",
+      "faq_topic": "老人健保自付額補助",
+      "ids": [],
+      "note": "direct open of districtOffice.form.c-1 also acceptable"
+     }
+    },
+    {
+     "text": "好，我要申請",
+     "expected": {
+      "outcome": "open",
+      "ids": [
+       "districtOffice.form.c-1"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "M25",
+   "language": "en",
+   "pattern": "faq_then_open",
+   "turns": [
+    {
+     "text": "How do recycling days work in this neighborhood?",
+     "expected": {
+      "outcome": "faq",
+      "faq_topic": "資源回收日",
+      "ids": []
+     }
+    },
+    {
+     "text": "Cool. Oh and the tap water charge for my flat, can I settle that here?",
+     "expected": {
+      "outcome": "open",
+      "ids": [
+       "fees.water"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "M26",
+   "language": "zh",
+   "pattern": "cancel_midway",
+   "turns": [
+    {
+     "text": "這件事我覺得要讓派出所知道",
+     "expected": {
+      "outcome": "list",
+      "ids": [
+       "police",
+       "police.online"
+      ],
+      "note": "opening police.online directly also acceptable"
+     }
+    },
+    {
+     "text": "算了，不用了",
+     "expected": {
+      "outcome": "cancel",
+      "ids": []
+     }
+    }
+   ]
+  },
+  {
+   "id": "M27",
+   "language": "zh",
+   "pattern": "cancel_midway",
+   "turns": [
+    {
+     "text": "幫我看看圖書館",
+     "expected": {
+      "outcome": "list",
+      "ids": [
+       "library",
+       "library.records"
+      ],
+      "note": "opening library directly also acceptable"
+     }
+    },
+    {
+     "text": "呃…先不要好了，等一下再說",
+     "expected": {
+      "outcome": "cancel",
+      "ids": []
+     }
+    }
+   ]
+  },
+  {
+   "id": "M28",
+   "language": "zh",
+   "pattern": "cancel_midway",
+   "turns": [
+    {
+     "text": "我想把帳號停掉",
+     "expected": {
+      "outcome": "open",
+      "ids": [
+       "suspend"
+      ]
+     }
+    },
+    {
+     "text": "啊不要不要，我反悔了",
+     "expected": {
+      "outcome": "cancel",
+      "ids": []
+     }
+    }
+   ]
+  },
+  {
+   "id": "M29",
+   "language": "zh",
+   "pattern": "cancel_midway",
+   "turns": [
+    {
+     "text": "帳單的部分",
+     "expected": {
+      "outcome": "list",
+      "ids": [
+       "app.bills",
+       "fees.search",
+       "fees.parking"
+      ]
+     }
+    },
+    {
+     "text": "路邊停機車那張",
+     "expected": {
+      "outcome": "open",
+      "ids": [
+       "fees.parking"
+      ]
+     }
+    },
+    {
+     "text": "算了，回家再繳",
+     "expected": {
+      "outcome": "cancel",
+      "ids": []
+     }
+    }
+   ]
+  },
+  {
+   "id": "M30",
+   "language": "vi",
+   "pattern": "cancel_midway",
+   "turns": [
+    {
+     "text": "Từ chiều tới giờ cả con hẻm nhà tôi tối om, quạt với đèn đều tắt hết",
+     "expected": {
+      "outcome": "open",
+      "ids": [
+       "disasterReport.form.D-1-4"
+      ]
+     }
+    },
+    {
+     "text": "Thôi khỏi, có điện lại rồi",
+     "expected": {
+      "outcome": "cancel",
+      "ids": []
+     }
+    }
+   ]
+  }
+ ]
+}

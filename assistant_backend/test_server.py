@@ -140,13 +140,22 @@ class RetrievalTests(unittest.TestCase):
 class TurnTests(unittest.TestCase):
     def test_model_must_resolve_weak_candidate_before_any_navigation(self):
         for name in ("request_clarification", "unsupported", "open_library"):
+            library_calls = []
+
             def decide(messages, tools, selected=name):
-                evidence = json.loads(messages[1]["content"])["retrieval"]
+                content = json.loads(messages[1]["content"])
+                if "retrieval" not in content:
+                    # Unresolved, the turn goes on as an unmatched one (rules section 3,
+                    # 2026-11-16): the intent fallback asks the model too.
+                    return response("request_clarification")
+                evidence = content["retrieval"]
+                library_calls.append(selected)
                 self.assertNotIn("library", evidence)
                 self.assertEqual(evidence["service_evidence"], "action_object_only")
                 return response(selected)
             assistant = Assistant(FakeCatalog(), decide)
             result = assistant.turn({"text": "借未知對象", "request_id": "weak-candidate"})
+            self.assertEqual(library_calls, [name])
             self.assertEqual(result["destination"], {"kind": "home"} if name == "open_library" else None)
 
     def test_request_is_not_a_reservation(self):

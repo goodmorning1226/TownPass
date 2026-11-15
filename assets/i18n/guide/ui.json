@@ -157,6 +157,13 @@
    "id": "Bingung atau tidak ketemu?\nKetuk penguin di kanan bawah, ia akan memandu Anda langkah demi langkah.",
    "tl": "Hindi sigurado kung paano, o may hindi mahanap?\nI-tap ang penguin sa kanang ibaba. Gagabayan ka nito nang hakbang-hakbang."
   },
+  "也可以直接說「第 1 個」。": {
+   "en": "You can also just say \"number 1\".",
+   "ja": "「1番」と言うだけでも選べます。",
+   "vi": "Bạn cũng có thể nói \"số 1\".",
+   "id": "Anda juga bisa bilang \"nomor 1\".",
+   "tl": "Puwede mo ring sabihin ang \"numero 1\"."
+  },
   "企鵝的回答": {
    "en": "The penguin’s answer",
    "ja": "ペンギンの答え",
@@ -416,6 +423,13 @@
    "id": "“{page}” sudah saya bukakan. Fiturnya sudah saya temukan, selanjutnya Anda lanjutkan sendiri.\nKalau mau saya pandu, buka “Pengaturan pribadi” dan ganti ke “Mode panduan”.",
    "tl": "Binuksan ko ang “{page}” para sa iyo. Nahanap ko na ang feature; ikaw na ang bahala mula rito.\nKung gusto mong gabayan kita, pumunta sa “Mga setting ng profile” at lumipat sa “Mode na may gabay”."
   },
+  "常用": {
+   "en": "Frequently used",
+   "ja": "よく使う",
+   "vi": "Hay dùng",
+   "id": "Sering dipakai",
+   "tl": "Madalas gamitin"
+  },
   "幫你找到功能，後續由你自行操作。": {
    "en": "Finds the feature for you; then you carry on by yourself.",
    "ja": "機能を見つけたら、その後はご自分で操作します。",
@@ -444,12 +458,26 @@
    "id": "Batalkan",
    "tl": "I-undo"
   },
+  "快": {
+   "en": "Fast",
+   "ja": "速い",
+   "vi": "Nhanh",
+   "id": "Cepat",
+   "tl": "Mabilis"
+  },
   "想打字？點這裡 ↓": {
    "en": "Want to type? Tap here ↓",
    "ja": "入力したいときは、ここをタップ ↓",
    "vi": "Muốn gõ chữ? Chạm vào đây ↓",
    "id": "Mau mengetik? Ketuk di sini ↓",
    "tl": "Gustong mag-type? I-tap dito ↓"
+  },
+  "慢": {
+   "en": "Slow",
+   "ja": "ゆっくり",
+   "vi": "Chậm",
+   "id": "Lambat",
+   "tl": "Mabagal"
   },
   "我可以幫你「{task}」。\n要先做完教學（剩 1 步），還是直接開始？": {
    "en": "I can help you with “{task}”.\nFinish the tutorial first (1 step left), or start right away?",
@@ -507,6 +535,13 @@
    "id": "Setelah fiturnya ketemu, saya akan memandu Anda langkah demi langkah.\nKalau tidak perlu, buka “Pengaturan pribadi” dan ganti ke “Mode biasa”.",
    "tl": "Kapag nahanap ko ang feature, gagabayan kita nang hakbang-hakbang.\nKung hindi mo ito kailangan, pumunta sa “Mga setting ng profile” at lumipat sa “Karaniwang mode”."
   },
+  "把助理的回答和選項唸出來。預設關閉；在公共場所請留意。": {
+   "en": "Reads the assistant’s answers and options aloud. Off by default; take care in public places.",
+   "ja": "アシスタントの回答と選択肢を読み上げます。初期設定はオフです。公共の場所ではご注意ください。",
+   "vi": "Đọc to câu trả lời và các lựa chọn của trợ lý. Mặc định tắt; hãy lưu ý khi ở nơi công cộng.",
+   "id": "Membacakan jawaban dan pilihan asisten. Nonaktif secara bawaan; berhati-hatilah di tempat umum.",
+   "tl": "Binabasa nang malakas ang mga sagot at opsiyon ng assistant. Naka-off bilang default; mag-ingat sa mga pampublikong lugar."
+  },
   "按住提問": {
    "en": "Hold to ask",
    "ja": "押したまま質問",
@@ -528,19 +563,19 @@
    "id": "Tekan tahan untuk bicara",
    "tl": "Pindutin nang matagal para magsalita"
   },
-  "按住說話（示範）": {
-   "en": "Hold to talk (demo)",
-   "ja": "押したまま話す（デモ）",
-   "vi": "Nhấn giữ để nói (mẫu)",
-   "id": "Tekan tahan untuk bicara (demo)",
-   "tl": "Pindutin nang matagal para magsalita (demo)"
-  },
   "按住說話，或點上面的選項": {
    "en": "Hold to talk, or tap an option above",
    "ja": "押したまま話すか、上の選択肢をタップ",
    "vi": "Nhấn giữ để nói, hoặc chạm lựa chọn ở trên",
    "id": "Tekan tahan untuk bicara, atau ketuk pilihan di atas",
    "tl": "Pindutin nang matagal para magsalita, o i-tap ang opsyon sa itaas"
+  },
+  "按住說話，說完放開": {
+   "en": "Hold to talk, release when done",
+   "ja": "押したまま話し、話し終えたら離す",
+   "vi": "Nhấn giữ để nói, nói xong thì thả ra",
+   "id": "Tekan tahan untuk bicara, lepaskan setelah selesai",
+   "tl": "Pindutin nang matagal para magsalita, bitawan kapag tapos na"
   },
   "按住輸入": {
    "en": "Hold to type",
@@ -682,6 +717,20 @@
    "id": "Apa yang berubah?",
    "tl": "Ano ang magbabago?"
   },
+  "朗讀": {
+   "en": "Read aloud",
+   "ja": "読み上げ",
+   "vi": "Đọc to",
+   "id": "Bacakan",
+   "tl": "Pagbasa nang malakas"
+  },
+  "朗讀回覆": {
+   "en": "Read replies aloud",
+   "ja": "返信の読み上げ",
+   "vi": "Đọc to câu trả lời",
+   "id": "Bacakan balasan",
+   "tl": "Basahin nang malakas ang mga sagot"
+  },
   "朗讀已開啟": {
    "en": "Read aloud is on",
    "ja": "読み上げ：オン",
@@ -696,12 +745,26 @@
    "id": "Bacakan: nonaktif",
    "tl": "Naka-off ang pagbasa nang malakas"
   },
+  "朗讀速度": {
+   "en": "Reading speed",
+   "ja": "読み上げの速さ",
+   "vi": "Tốc độ đọc",
+   "id": "Kecepatan membaca",
+   "tl": "Bilis ng pagbasa"
+  },
   "格子已經改過了，沒有復原": {
    "en": "The box was changed since, so nothing was undone",
    "ja": "欄が変更されたため、元に戻しませんでした",
    "vi": "Ô đã được sửa, nên không hoàn tác",
    "id": "Kotak sudah diubah, jadi tidak dibatalkan",
    "tl": "Nabago na ang box mula noon, kaya walang na-undo"
+  },
+  "標準": {
+   "en": "Normal",
+   "ja": "標準",
+   "vi": "Bình thường",
+   "id": "Normal",
+   "tl": "Karaniwan"
   },
   "模型載入中，好了會自動回答…": {
    "en": "The models are loading; the answer follows by itself…",
@@ -878,6 +941,13 @@
    "id": "Halaman {current} dari {count}",
    "tl": "Pahina {current} ng {count}"
   },
+  "第 {n} 個：{label}": {
+   "en": "Option {n}: {label}",
+   "ja": "{n}番目：{label}",
+   "vi": "Mục {n}: {label}",
+   "id": "Pilihan {n}: {label}",
+   "tl": "Opsiyon {n}: {label}"
+  },
   "第一次使用臺北通嗎？": {
    "en": "First time using Taipei Pass?",
    "ja": "台北通を使うのは初めてですか？",
@@ -954,13 +1024,6 @@
    "vi": "Tiếng Philippines",
    "id": "Bahasa Filipina",
    "tl": "Filipino"
-  },
-  "要按住不放才會開始聽喔": {
-   "en": "Keep holding the button so I can start listening",
-   "ja": "押したままにすると聞き取りが始まります",
-   "vi": "Phải nhấn giữ thì mới bắt đầu nghe nhé",
-   "id": "Tekan dan tahan agar mulai mendengarkan",
-   "tl": "Pindutin nang matagal ang button para makapagsimula akong makinig"
   },
   "試著跟我打聲招呼吧！": {
    "en": "Try saying hello to me!",
@@ -1129,6 +1192,13 @@
    "vi": "Đóng trợ lý",
    "id": "Tutup asisten",
    "tl": "Isara ang assistant"
+  },
+  "隱私": {
+   "en": "Privacy",
+   "ja": "プライバシー",
+   "vi": "Quyền riêng tư",
+   "id": "Privasi",
+   "tl": "Privacy"
   },
   "電話 {phone}": {
    "en": "Tel. {phone}",

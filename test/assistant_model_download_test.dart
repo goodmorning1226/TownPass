@@ -185,15 +185,20 @@ void main() {
       expect((d.service as FakeService).calls, everyElement('status'));
     });
 
+    // Taiwanese is a feature in testing: off until chosen, on every phone
+    // (rules section 7, 2026-11-16; it was on by default on full phones).
     test(
-      'a full phone offers core, decision and Taiwanese by default',
+      'a full phone offers core and decision; Taiwanese when chosen',
       () async {
         final d = await controller(FakeService(status()));
-        expect(d.taiwanese.value, isTrue);
+        expect(d.taiwanese.value, isFalse);
+        expect(d.offerParts, ['core', 'decision']);
+        d.chooseTaiwanese(true);
         expect(d.offerParts, ['core', 'decision', 'taiwanese']);
         expect(d.offerBytes, (540 + 2048 + 1580) * mb);
-        d.chooseTaiwanese(false);
-        expect(d.offerParts, ['core', 'decision']);
+        // Asking again keeps the choice.
+        await d.refreshStatus();
+        expect(d.taiwanese.value, isTrue);
       },
     );
 
@@ -308,7 +313,9 @@ void main() {
       final service = FakeService(status(tier: 'standard'));
       final d = await controller(service);
       await pumpCard(tester, d);
-      expect(find.textContaining('2.5 GB'), findsOneWidget);
+      // The size in the text (and again in the mobile-data line, 2026-11-16).
+      expect(find.textContaining('2.5 GB。'), findsOneWidget);
+      expect(find.textContaining('（約 2.5 GB）'), findsOneWidget);
       expect(find.byKey(const Key('model-download-taiwanese')), findsOneWidget);
       service.replies.add(
         status(tier: 'standard', state: 'downloading', total: 2588 * mb),
@@ -344,7 +351,7 @@ void main() {
         ),
       );
       await pumpCard(tester, classifier);
-      expect(find.textContaining('667 MB'), findsOneWidget);
+      expect(find.textContaining('667 MB。'), findsOneWidget);
       expect(find.textContaining('精簡版'), findsNothing);
     });
 
@@ -539,8 +546,9 @@ void main() {
       final json = status(core: true, decision: true);
       ((json['parts'] as Map)['taiwanese'] as Map)['missing_bytes'] = 580 * mb;
       await pumpSettings(tester, await controller(FakeService(json)));
-      expect(find.textContaining('580 MB'), findsOneWidget);
-      expect(find.textContaining('1.5 GB'), findsNothing);
+      // The button and the part's line (one line per part since 2026-11-16).
+      expect(find.text('下載台語辨識（580 MB）'), findsOneWidget);
+      expect(find.text('台語辨識（測試）：還要下載 580 MB（共 1.5 GB）'), findsOneWidget);
     });
 
     testWidgets('the new texts exist in every language', (tester) async {
@@ -631,6 +639,9 @@ void main() {
       await tester.pump();
       expect(find.byKey(const Key('model-download-card')), findsNothing);
       expect(find.byKey(const Key('model-download-banner')), findsOneWidget);
+      // The download is done: said once (rules section 7, 2026-11-16).
+      expect(c.toast.value, AssistantTexts.text('modelsReady', 'zh'));
+      await tester.pump(const Duration(seconds: 4));
       AssistantModelDownload.maybe!.onClose();
     });
 

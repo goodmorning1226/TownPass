@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:town_pass/service/assistant_speech_language.dart';
 import 'package:get/get.dart';
+import 'package:town_pass/page/assistant/assistant_texts.dart';
 import 'package:town_pass/page/guided_assistant/guided_assistant_controller.dart';
 import 'package:town_pass/page/guided_assistant/model/assistant_settings.dart';
 import 'package:town_pass/page/guided_assistant/model/guide_content.dart';
@@ -147,30 +148,59 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
     height: 56,
     child: Row(
       children: [
-        const SizedBox(width: 20),
-        TPText(
-          gt('助理'),
-          style: TPTextStyles.h2SemiBold,
-          color: TPColors.primary700,
+        const SizedBox(width: 16),
+        // Three 48 px buttons share the bar since 2026-11-16 (設定): a long
+        // title (アシスタント at a large text size) shrinks a little instead
+        // of pushing them off the bar.
+        ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 128),
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: TPText(
+              gt('助理'),
+              style: TPTextStyles.h2SemiBold,
+              color: TPColors.primary700,
+            ),
+          ),
         ),
-        const Spacer(),
         // Longer in other languages: it shrinks to two lines, never pushes
         // the buttons off the bar.
-        Flexible(
-          flex: 3,
-          child: TextButton(
-            onPressed: () {
-              GuideMotion.tap();
-              c.replayOnboarding();
-            },
-            child: TPText(
-              gt('重看新手提示'),
-              style: TPTextStyles.bodyRegular.copyWith(height: 1.2),
-              color: TPColors.primary700,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              textAlign: TextAlign.end,
+        Expanded(
+          child: Align(
+            alignment: Alignment.centerRight,
+            child: TextButton(
+              style: TextButton.styleFrom(
+                minimumSize: const Size(48, 48),
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+              ),
+              onPressed: () {
+                GuideMotion.tap();
+                c.replayOnboarding();
+              },
+              child: TPText(
+                gt('重看新手提示'),
+                style: TPTextStyles.bodyRegular.copyWith(height: 1.2),
+                color: TPColors.primary700,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.end,
+              ),
             ),
+          ),
+        ),
+        // AI 助理設定 from the assistant itself; back returns here
+        // (docs/AI_CURRENT_RULES.md section 5, 2026-11-16).
+        IconButton(
+          key: const Key('guided-settings'),
+          tooltip: gt(SettingsTexts.title),
+          onPressed: () {
+            GuideMotion.tap();
+            c.openSettingsPage(backToAssistant: true);
+          },
+          icon: const Icon(
+            Icons.settings_outlined,
+            color: TPColors.grayscale700,
           ),
         ),
         IconButton(
@@ -316,14 +346,17 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
                           ),
                         ),
                       ),
+                      // Full width: a longer language wraps instead of being
+                      // cut off (2026-11-16).
                       Padding(
                         padding: const EdgeInsets.fromLTRB(12, 0, 12, 10),
-                        child: Align(
-                          alignment: Alignment.centerRight,
-                          child: ended
-                              ? _outline(c.taskSecondaryLabel, c.taskSecondary)
-                              : _outline(gt('結束引導，自己操作'), c.endGuide),
-                        ),
+                        child: ended
+                            ? _outline(c.taskSecondaryLabel, c.taskSecondary)
+                            : _outline(
+                                gt('結束引導，自己操作'),
+                                c.endGuide,
+                                key: const Key('guided-task-end'),
+                              ),
                       ),
                     ] else ...[
                       Container(
@@ -371,8 +404,8 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
                     ],
                   ),
                   const SizedBox(height: 8),
-                  SizedBox(
-                    height: 44,
+                  ConstrainedBox(
+                    constraints: const BoxConstraints(minHeight: 48),
                     child: FilledButton(
                       style: FilledButton.styleFrom(
                         backgroundColor: TPColors.primary500,
@@ -388,6 +421,7 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
                         gt(t.guide.backLabel),
                         style: TPTextStyles.h3Regular,
                         color: TPColors.white,
+                        textAlign: TextAlign.center,
                       ),
                     ),
                   ),
@@ -399,26 +433,30 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
     );
   }
 
-  Widget _outline(String label, VoidCallback onTap) => SizedBox(
-    height: 44,
-    child: OutlinedButton(
-      style: OutlinedButton.styleFrom(
-        backgroundColor: TPColors.white,
-        side: const BorderSide(color: TPColors.primary500),
-        padding: const EdgeInsets.symmetric(horizontal: 14),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      ),
-      onPressed: () {
-        GuideMotion.tap();
-        onTap();
-      },
-      child: TPText(
-        label,
-        style: TPTextStyles.h3Regular.copyWith(fontSize: 15),
-        color: TPColors.primary700,
-      ),
-    ),
-  );
+  /// At least 48 px high; a long label wraps onto more lines.
+  Widget _outline(String label, VoidCallback onTap, {Key? key}) =>
+      OutlinedButton(
+        key: key,
+        style: OutlinedButton.styleFrom(
+          minimumSize: const Size(48, 48),
+          backgroundColor: TPColors.white,
+          side: const BorderSide(color: TPColors.primary500),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
+        onPressed: () {
+          GuideMotion.tap();
+          onTap();
+        },
+        child: TPText(
+          label,
+          style: TPTextStyles.h3Regular.copyWith(fontSize: 15),
+          color: TPColors.primary700,
+          textAlign: TextAlign.center,
+        ),
+      );
 
   Widget _todoRow(TodoLine line) {
     final done = line.state == TodoState.done;
@@ -506,6 +544,31 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
       controller: _scroll,
       padding: const EdgeInsets.all(16),
       children: [
+        // Where recordings, typed text and the history stay (on-device
+        // builds; docs/AI_CURRENT_RULES.md section 5, 2026-11-16).
+        if (_downloads != null)
+          Padding(
+            key: const Key('guided-privacy'),
+            padding: const EdgeInsets.only(bottom: 12),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Icon(
+                  Icons.lock_outline,
+                  size: 18,
+                  color: TPColors.grayscale700,
+                ),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: TPText(
+                    AssistantTexts.page('privacy'),
+                    style: TPTextStyles.caption,
+                    color: TPColors.grayscale700,
+                  ),
+                ),
+              ],
+            ),
+          ),
         for (var i = 0; i < c.messages.length; i++)
           _Appear(
             key: ValueKey('guided-msg-${c.messages[i].id}'),
@@ -661,21 +724,72 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
     final options = m.options;
     if (options != null) {
       final live = c.optionsLive(m);
+      // The function catalogue (2026-11-16): the 常用 row as compact buttons
+      // under its label, then the categories or pages; its own 更多 / 上一頁 /
+      // 回上一層 options instead of 都不是. Numbers are the backend's, so
+      // 「第 3 個」 said aloud picks what the screen shows as 3.
+      final catalog = m.catalogLevel != null;
+      final frequent = [
+        for (final o in options.options)
+          if (catalog && o.groupId == 'frequent') o,
+      ];
       var n = 1;
+      String label(CandidateOption o, int number) => o.enabled
+          ? '$number. ${gt(o.label)}'
+          : gt('{n}. {label}（還不能用）', {'n': number, 'label': gt(o.label)});
+      int numberOf(CandidateOption o) => int.tryParse(o.choiceId ?? '') ?? n;
+      if (frequent.isNotEmpty) {
+        parts.add(
+          TPText(
+            gt('常用'),
+            style: TPTextStyles.bodySemiBold,
+            color: TPColors.grayscale700,
+          ),
+        );
+        parts.add(
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              for (final o in frequent)
+                _OptionButton(
+                  label: label(o, numberOf(o)),
+                  enabled: live && o.enabled,
+                  dimmed: !o.enabled,
+                  compact: true,
+                  onTap: live ? () => c.choose(m, o) : null,
+                ),
+            ],
+          ),
+        );
+        n += frequent.length;
+      }
       for (final o in options.options) {
-        final number = n++;
+        if (frequent.contains(o)) continue;
+        final number = numberOf(o);
+        n = number + 1;
         parts.add(
           _OptionButton(
-            label: o.enabled
-                ? '$number. ${gt(o.label)}'
-                : gt('{n}. {label}（還不能用）', {'n': number, 'label': gt(o.label)}),
+            label: label(o, number),
             enabled: live && o.enabled,
             dimmed: !o.enabled,
             onTap: live ? () => c.choose(m, o) : null,
           ),
         );
       }
-      if (m.followUpOf == null) {
+      final backendOptions = options.options
+          .where((o) => o.choiceId != null && o.nav == null)
+          .length;
+      if (!catalog && live && backendOptions >= 2) {
+        parts.add(
+          TPText(
+            gt('也可以直接說「第 1 個」。'),
+            style: TPTextStyles.bodyRegular,
+            color: TPColors.grayscale700,
+          ),
+        );
+      }
+      if (m.followUpOf == null && !catalog) {
         parts.add(
           _OptionButton(
             label: gt('{n}. 都不是，我再說一次', {'n': n}),
@@ -787,7 +901,7 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
   );
 
   Widget _link(String label, VoidCallback onTap) => SizedBox(
-    height: 44,
+    height: 48,
     child: TextButton(
       onPressed: () {
         GuideMotion.tap();
@@ -1007,7 +1121,7 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
                 for (final chip in chips)
                   _Press(
                     child: SizedBox(
-                      height: 44,
+                      height: 48,
                       child: OutlinedButton(
                         style: OutlinedButton.styleFrom(
                           side: const BorderSide(color: TPColors.primary500),
@@ -1105,23 +1219,26 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
                   GuideMotion.tap();
                   menu.isOpen ? menu.close() : menu.open();
                 },
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(
-                  Icons.translate,
-                  size: 22,
-                  color: TPColors.grayscale700,
-                ),
-                const SizedBox(width: 4),
-                TPText(
-                  label,
-                  style: TPTextStyles.bodyRegular,
-                  color: TPColors.grayscale700,
-                ),
-              ],
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(
+                    Icons.translate,
+                    size: 22,
+                    color: TPColors.grayscale700,
+                  ),
+                  const SizedBox(width: 4),
+                  TPText(
+                    label,
+                    style: TPTextStyles.bodyRegular,
+                    color: TPColors.grayscale700,
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -1144,7 +1261,7 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
             if (c.listening.value) const IgnorePointer(child: MicPulse()),
             Semantics(
               button: true,
-              label: gt('按住說話（示範）'),
+              label: gt('按住說話，說完放開'),
               child: HoldToTalk(
                 key: const Key('guided-mic'),
                 onDown: c.micDown,
@@ -1193,7 +1310,7 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
                     boxShadow: _hello ? _ring : null,
                   ),
                   child: SizedBox(
-                    height: 44,
+                    height: 48,
                     child: OutlinedButton.icon(
                       style: OutlinedButton.styleFrom(
                         backgroundColor: TPColors.white,
@@ -1396,11 +1513,15 @@ class _OptionButton extends StatefulWidget {
   final bool enabled;
   final bool dimmed;
   final VoidCallback? onTap;
+
+  /// As wide as its label (the catalogue's 常用 row), not the full width.
+  final bool compact;
   const _OptionButton({
     required this.label,
     required this.enabled,
     this.dimmed = false,
     this.onTap,
+    this.compact = false,
   });
 
   @override
@@ -1423,7 +1544,9 @@ class _OptionButtonState extends State<_OptionButton> {
     return _Press(
       child: OutlinedButton(
         style: OutlinedButton.styleFrom(
-          minimumSize: const Size.fromHeight(48),
+          minimumSize: widget.compact
+              ? const Size(0, 48)
+              : const Size.fromHeight(48),
           alignment: Alignment.centerLeft,
           padding: const EdgeInsets.symmetric(horizontal: 14),
           backgroundColor: _chosen ? TPColors.primary50 : null,

@@ -798,7 +798,9 @@ class AssistantViewController extends GetxController {
         result.message,
         choices: result.choices,
         language: result.language,
-        listing: result.listing,
+        // The function catalogue (result.level) has its own 更多 / 上一頁
+        // options; the page arrows are for older backends' flat list.
+        listing: result.level == null ? result.listing : null,
       );
       choices.assignAll(result.choices);
       if (result.choices.isNotEmpty) choicesMessageId.value = reply.id;
@@ -808,7 +810,12 @@ class AssistantViewController extends GetxController {
         final asked = choiceId == null && pageStep == null
             ? text.trim()
             : _lastRequest;
-        if (asked != null) AssistantRecentInputs.instance.remember(asked);
+        if (asked != null) {
+          AssistantRecentInputs.instance.remember(
+            asked,
+            language: result.language,
+          );
+        }
         busy.value = false;
         _panelHistory?.remove();
         expanded.value = false;

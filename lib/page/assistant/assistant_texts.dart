@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:town_pass/service/assistant_speech_language.dart';
 import 'package:town_pass/service/page_translation.dart';
@@ -50,6 +51,20 @@ abstract final class AssistantTexts {
 
   static final _placeholder = RegExp(r'\{(\w+)\}');
 
+  /// Developer wording (a computer backend, adb / devicectl,
+  /// ASSISTANT_MODEL_BASE_URL, an emulator) is shown in debug and profile
+  /// builds only; release builds show the [_releaseTexts] instead
+  /// (docs/AI_CURRENT_RULES.md section 5, 2026-11-16). Tests may change it.
+  static bool developerTexts = !kReleaseMode;
+
+  /// Key -> its wording for users, used when [developerTexts] is off.
+  static const _releaseTexts = {
+    'unreachable': 'unreachableRelease',
+    'modelsErrorSource': 'modelsErrorSourceRelease',
+    'silentMic': 'silentMicRelease',
+    'versionMismatch': 'versionMismatchRelease',
+  };
+
   /// The text [key] in [language] (Chinese when missing), with each `{name}`
   /// replaced by `values[name]`. Replaced values are not scanned again, so a
   /// heard sentence containing braces stays as it was.
@@ -58,6 +73,7 @@ abstract final class AssistantTexts {
     String? language, [
     Map<String, Object> values = const {},
   ]) {
+    if (!developerTexts) key = _releaseTexts[key] ?? key;
     final entry = _texts[key];
     assert(entry != null, 'Unknown assistant text: $key');
     final template = entry?[language] ?? entry?['zh'] ?? key;
@@ -424,6 +440,162 @@ abstract final class AssistantTexts {
           'adb/devicectl, atau build dengan ASSISTANT_MODEL_BASE_URL.',
       'tl': 'Wala pang mapagkukunan ng download ng mga model ang build na ito (development build). I-push ang mga ito gamit ang adb/devicectl, o mag-build gamit ang ASSISTANT_MODEL_BASE_URL.',
     },
+    // Release builds: the same without developer wording (developerTexts).
+    'modelsErrorSourceRelease': {
+      'zh': '目前還不能下載離線助理，請稍後再試，或更新 App。',
+      'en': 'The offline assistant cannot be downloaded right now. Try again later, or update the App.',
+      'ja': '現在オフラインアシスタントをダウンロードできません。しばらくしてから再度お試しいただくか、アプリを更新してください。',
+      'vi': 'Hiện chưa tải được trợ lý ngoại tuyến. Hãy thử lại sau hoặc cập nhật ứng dụng.',
+      'id': 'Asisten offline belum bisa diunduh sekarang. Coba lagi nanti, atau perbarui aplikasi.',
+      'tl': 'Hindi pa ma-download ngayon ang offline na assistant. Subukan ulit mamaya, o i-update ang App.',
+    },
+    // The download card and settings (2026-11-16, rules section 7). AI drafts.
+    'modelsMobileData': {
+      'zh': '沒有 Wi-Fi 時會用行動數據下載（約 {size}），可能產生費用。',
+      'en': 'Without Wi-Fi it downloads over mobile data (about {size}), which may cost money.',
+      'ja': 'Wi-Fi がない場合はモバイルデータ通信（約 {size}）でダウンロードするため、料金がかかることがあります。',
+      'vi': 'Khi không có Wi-Fi, việc tải sẽ dùng dữ liệu di động (khoảng {size}) và có thể tốn phí.',
+      'id': 'Tanpa Wi-Fi, unduhan memakai data seluler (sekitar {size}) dan bisa dikenai biaya.',
+      'tl': 'Kapag walang Wi-Fi, mobile data ang gagamitin sa download (mga {size}), at puwedeng may bayad.',
+    },
+    'modelsCanClose': {
+      'zh': '可以先關掉助理繼續用 App，下載會繼續；App 要保持開著。',
+      'en': 'You can close the assistant and keep using the App; the download goes on while the App stays open.',
+      'ja': 'アシスタントを閉じてアプリを使い続けても、ダウンロードは続きます（アプリは開いたままにしてください）。',
+      'vi': 'Bạn có thể đóng trợ lý và tiếp tục dùng ứng dụng; việc tải vẫn tiếp tục khi ứng dụng còn mở.',
+      'id': 'Anda bisa menutup asisten dan tetap memakai aplikasi; unduhan berlanjut selama aplikasi tetap terbuka.',
+      'tl': 'Puwede mong isara ang assistant at ituloy ang paggamit ng App; tuloy ang download habang bukas ang App.',
+    },
+    'modelsTimeLeft': {
+      'zh': '大約還要 {time}',
+      'en': 'About {time} left',
+      'ja': '残り約 {time}',
+      'vi': 'Còn khoảng {time}',
+      'id': 'Sekitar {time} lagi',
+      'tl': 'Mga {time} pa',
+    },
+    'modelsAlmostDone': {
+      'zh': '快下載好了，不到 1 分鐘。',
+      'en': 'Almost done: less than a minute left.',
+      'ja': 'まもなく完了します（残り 1 分未満）。',
+      'vi': 'Sắp xong, còn chưa tới 1 phút.',
+      'id': 'Hampir selesai, kurang dari 1 menit lagi.',
+      'tl': 'Halos tapos na, wala pang 1 minuto.',
+    },
+    'timeMinutes': {
+      'zh': '{n} 分鐘',
+      'en': '{n} min',
+      'ja': '{n} 分',
+      'vi': '{n} phút',
+      'id': '{n} menit',
+      'tl': '{n} minuto',
+    },
+    'timeHours': {
+      'zh': '{h} 小時 {m} 分鐘',
+      'en': '{h} h {m} min',
+      'ja': '{h} 時間 {m} 分',
+      'vi': '{h} giờ {m} phút',
+      'id': '{h} jam {m} menit',
+      'tl': '{h} oras at {m} minuto',
+    },
+    'modelsReady': {
+      'zh': '離線助理下載好了，可以開始用了。',
+      'en': 'The offline assistant is downloaded and ready to use.',
+      'ja': 'オフラインアシスタントのダウンロードが完了しました。すぐに使えます。',
+      'vi': 'Đã tải xong trợ lý ngoại tuyến, bạn có thể bắt đầu dùng.',
+      'id': 'Asisten offline sudah terunduh dan siap dipakai.',
+      'tl': 'Na-download na ang offline na assistant at puwede mo na itong gamitin.',
+    },
+    'modelsTaiwaneseNote': {
+      'zh': '測試中的功能：可以用台語說，助理用中文回答。之後也可以在「AI 助理設定」再下載。',
+      'en': 'A feature in testing: you can speak Taiwanese and the assistant answers in Chinese. You can also download it later in “AI assistant settings”.',
+      'ja':
+          'テスト中の機能です。台湾語で話すと、アシスタントは中国語で答えます。あとから「AIアシスタント設定」でダウンロードすることもできます。',
+      'vi': 'Tính năng đang thử nghiệm: bạn có thể nói tiếng Đài, trợ lý sẽ trả lời bằng tiếng Trung. Bạn cũng có thể tải sau trong “Cài đặt trợ lý AI”.',
+      'id': 'Fitur uji coba: Anda bisa bicara bahasa Taiwan, dan asisten menjawab dalam bahasa Mandarin. Anda juga bisa mengunduhnya nanti di “Pengaturan asisten AI”.',
+      'tl': 'Feature na sinusubukan pa: puwede kang magsalita ng Taiwanese at sasagot ang assistant sa Chinese. Puwede mo rin itong i-download mamaya sa “Mga setting ng AI assistant”.',
+    },
+    'modelsCore': {
+      'zh': '基本（語音、檢索）',
+      'en': 'Basics (speech, search)',
+      'ja': '基本（音声・検索）',
+      'vi': 'Cơ bản (giọng nói, tìm kiếm)',
+      'id': 'Dasar (suara, pencarian)',
+      'tl': 'Pangunahin (boses, paghahanap)',
+    },
+    'modelsDecision': {
+      'zh': '理解模型',
+      'en': 'Understanding model',
+      'ja': '理解モデル',
+      'vi': 'Mô hình hiểu yêu cầu',
+      'id': 'Model pemahaman',
+      'tl': 'Model na umiintindi',
+    },
+    'modelsTaiwanesePart': {
+      'zh': '台語辨識（測試）',
+      'en': 'Taiwanese speech (testing)',
+      'ja': '台湾語の認識（テスト中）',
+      'vi': 'Nhận dạng tiếng Đài (thử nghiệm)',
+      'id': 'Pengenalan bahasa Taiwan (uji coba)',
+      'tl': 'Pagkilala sa Taiwanese (sinusubukan)',
+    },
+    'modelsPartLine': {
+      'zh': '{part}：{state}',
+      'en': '{part}: {state}',
+      'ja': '{part}：{state}',
+      'vi': '{part}: {state}',
+      'id': '{part}: {state}',
+      'tl': '{part}: {state}',
+    },
+    'modelsPartReady': {
+      'zh': '已下載（{size}）',
+      'en': 'downloaded ({size})',
+      'ja': 'ダウンロード済み（{size}）',
+      'vi': 'đã tải ({size})',
+      'id': 'sudah diunduh ({size})',
+      'tl': 'na-download na ({size})',
+    },
+    'modelsPartNone': {
+      'zh': '未下載（{size}）',
+      'en': 'not downloaded ({size})',
+      'ja': '未ダウンロード（{size}）',
+      'vi': 'chưa tải ({size})',
+      'id': 'belum diunduh ({size})',
+      'tl': 'hindi pa na-download ({size})',
+    },
+    'modelsPartMissing': {
+      'zh': '還要下載 {missing}（共 {size}）',
+      'en': '{missing} still to download (of {size})',
+      'ja': 'あと {missing}（全 {size}）',
+      'vi': 'còn phải tải {missing} (tổng {size})',
+      'id': 'masih perlu diunduh {missing} (dari {size})',
+      'tl': '{missing} pa ang ida-download (sa {size})',
+    },
+    'modelsTaiwaneseDelete': {
+      'zh': '刪除台語辨識',
+      'en': 'Delete Taiwanese speech',
+      'ja': '台湾語の認識を削除',
+      'vi': 'Xóa nhận dạng tiếng Đài',
+      'id': 'Hapus pengenalan bahasa Taiwan',
+      'tl': 'Burahin ang pagkilala sa Taiwanese',
+    },
+    'modelsTaiwaneseDeleteConfirm': {
+      'zh': '刪除後就不能用台語說，之後可以在這裡再下載。確定刪除嗎？',
+      'en': 'After deleting it you cannot speak Taiwanese; you can download it here again later. Delete it?',
+      'ja': '削除すると台湾語で話せなくなります。あとでここから再ダウンロードできます。削除しますか？',
+      'vi': 'Sau khi xóa sẽ không nói tiếng Đài được; bạn có thể tải lại ở đây sau. Xóa không?',
+      'id': 'Setelah dihapus, Anda tidak bisa bicara bahasa Taiwan; nanti bisa diunduh lagi di sini. Hapus sekarang?',
+      'tl': 'Kapag binura, hindi ka na makakapagsalita ng Taiwanese; puwede mo itong i-download ulit dito mamaya. Burahin?',
+    },
+    // Settings and the assistant panel (on-device builds; rules section 5).
+    'privacy': {
+      'zh': '錄音和打的字都在這支手機上處理，不會上傳。最近的請求和開過的頁面只記在這支手機，用來顯示建議；打開的服務網頁照原本的方式連網。',
+      'en': 'Recordings and what you type are handled on this phone and never uploaded. Recent requests and opened pages are kept only on this phone, for suggestions; service pages you open go online as usual.',
+      'ja': '録音と入力した文字はこの端末で処理され、アップロードされません。最近の依頼と開いたページはこの端末にだけ保存され、候補の表示に使われます。開いたサービスページは通常どおりインターネットに接続します。',
+      'vi': 'Bản ghi âm và nội dung bạn gõ được xử lý trên điện thoại này và không bao giờ được tải lên. Yêu cầu gần đây và các trang đã mở chỉ lưu trên điện thoại này để gợi ý; trang dịch vụ bạn mở vẫn kết nối mạng như bình thường.',
+      'id': 'Rekaman dan yang Anda ketik diproses di ponsel ini dan tidak pernah diunggah. Permintaan terbaru dan halaman yang dibuka hanya disimpan di ponsel ini untuk saran; halaman layanan yang Anda buka tetap terhubung ke internet seperti biasa.',
+      'tl': 'Sa teleponong ito pinoproseso ang mga recording at ang tina-type mo, at hindi kailanman ina-upload. Sa teleponong ito lang nakatabi ang mga kamakailang request at binuksang pahina, para sa mga mungkahi; normal na kumokonekta sa internet ang mga pahina ng serbisyong binubuksan mo.',
+    },
     'modelsUnavailable': {
       'zh': '這支手機的記憶體不足，無法執行離線助理。',
       'en': 'This phone does not have enough memory for the offline assistant.',
@@ -464,15 +636,6 @@ abstract final class AssistantTexts {
       'vi': 'Mô hình ngoại tuyến',
       'id': 'Model offline',
       'tl': 'Mga offline na model',
-    },
-    'modelsSettingsState': {
-      'zh': '這支手機已下載 {have}，還有 {missing} 未下載。',
-      'en': '{have} on this phone, {missing} not downloaded yet.',
-      'ja': 'この端末に {have}、未ダウンロード {missing}。',
-      'vi': 'Đã có {have} trên máy, còn {missing} chưa tải.',
-      'id': '{have} sudah ada di ponsel, {missing} belum diunduh.',
-      'tl':
-          '{have} ang nasa teleponong ito, {missing} ang hindi pa na-download.',
     },
     'modelsTaiwaneseAdd': {
       'zh': '下載台語辨識（{size}）',
@@ -749,13 +912,14 @@ abstract final class AssistantTexts {
           'atau ketuk keyboard di kanan bawah untuk mengetik.',
       'tl': 'Kailangan ng pahintulot sa mikropono para sa boses. I-on ito sa settings ng telepono, o i-tap ang keyboard sa kanang ibaba para mag-type.',
     },
+    // One wording for every too-short press (rules section 5, 2026-11-16).
     'noAudio': {
-      'zh': '沒有錄到聲音，請按住麥克風再說話，說完放開。',
-      'en': 'Nothing was recorded. Hold the microphone while you speak, then release it.',
-      'ja': '録音されませんでした。マイクを押したまま話し、話し終えたら離してください。',
-      'vi': 'Không ghi được âm thanh. Hãy nhấn giữ micrô khi nói, nói xong thì thả ra.',
-      'id': 'Tidak ada suara yang terekam. Tekan tahan mikrofon sambil bicara, lalu lepaskan.',
-      'tl': 'Walang na-record. Pindutin nang matagal ang mikropono habang nagsasalita, saka bitawan.',
+      'zh': '按得太快了，請按住不放，說完再放開。',
+      'en': 'That was too quick. Hold the button down while you speak, then let go.',
+      'ja': '押す時間が短すぎました。押したまま話し、話し終えたら離してください。',
+      'vi': 'Bạn nhấn nhanh quá. Hãy nhấn giữ trong lúc nói, nói xong rồi thả ra.',
+      'id': 'Terlalu cepat. Tekan dan tahan selama bicara, lalu lepaskan.',
+      'tl': 'Masyadong mabilis. Pindutin nang matagal habang nagsasalita, saka bitawan.',
     },
     'silentMic': {
       'zh': '麥克風沒有收到任何聲音。請確認麥克風沒被其他程式占用；用模擬器時請重新開啟它的麥克風設定，或改用鍵盤。',
@@ -773,6 +937,14 @@ abstract final class AssistantTexts {
           'aplikasi lain; di emulator, aktifkan lagi pengaturan mikrofonnya, atau '
           'pakai keyboard.',
       'tl': 'Walang anumang tunog na nakuha ang mikropono. Tiyaking walang ibang app na gumagamit nito; sa emulator, i-on ulit ang setting ng mikropono nito, o gamitin ang keyboard.',
+    },
+    'silentMicRelease': {
+      'zh': '麥克風沒有收到任何聲音。請確認麥克風沒被其他程式占用，或改用鍵盤。',
+      'en': 'The microphone picked up no sound at all. Make sure no other app is using it, or use the keyboard.',
+      'ja': 'マイクに音がまったく届いていません。ほかのアプリがマイクを使っていないか確認するか、キーボードを使ってください。',
+      'vi': 'Micrô không nhận được âm thanh nào. Hãy kiểm tra micrô không bị ứng dụng khác chiếm dụng, hoặc dùng bàn phím.',
+      'id': 'Mikrofon tidak menangkap suara apa pun. Pastikan tidak sedang dipakai aplikasi lain, atau pakai keyboard.',
+      'tl': 'Walang anumang tunog na nakuha ang mikropono. Tiyaking walang ibang app na gumagamit nito, o gamitin ang keyboard.',
     },
     'listening': {
       'zh': '正在聽你說的話…',
@@ -833,15 +1005,23 @@ abstract final class AssistantTexts {
     },
 
     // Connection and format errors (assistant_service.dart).
+    // Generic: not every request is about the library (2026-11-16).
     'turnTimeout': {
-      'zh': '處理時間較長，請重試或從原圖書頁面搜尋。',
-      'en':
-          'This is taking a while. Try again or search from the library page.',
-      'ja': '処理に時間がかかっています。もう一度試すか、図書館のページから検索してください。',
-      'vi': 'Việc xử lý mất nhiều thời gian. Hãy thử lại hoặc tìm từ trang thư viện.',
-      'id': 'Prosesnya cukup lama. Coba lagi atau cari dari halaman perpustakaan.',
-      'tl':
-          'Natatagalan ito. Subukan ulit o maghanap mula sa pahina ng aklatan.',
+      'zh': '處理時間比較長，請再試一次，或從原本的服務入口進入。',
+      'en': 'This is taking a while. Try again, or use the service’s usual entry.',
+      'ja': '処理に時間がかかっています。もう一度試すか、通常のサービス入口をご利用ください。',
+      'vi': 'Việc xử lý mất nhiều thời gian. Hãy thử lại hoặc dùng lối vào dịch vụ thông thường.',
+      'id': 'Prosesnya cukup lama. Coba lagi atau gunakan menu layanan biasa.',
+      'tl': 'Natatagalan ito. Subukan ulit o gamitin ang karaniwang pasukan ng serbisyo.',
+    },
+    // A turn timed out while the phone's models were still loading.
+    'modelsStillLoading': {
+      'zh': '模型還在載入，請稍等一下再試一次。',
+      'en': 'The models are still loading. Wait a moment and try again.',
+      'ja': 'モデルを読み込み中です。少し待ってからもう一度お試しください。',
+      'vi': 'Mô hình vẫn đang tải. Hãy đợi một chút rồi thử lại.',
+      'id': 'Model masih dimuat. Tunggu sebentar lalu coba lagi.',
+      'tl': 'Naglo-load pa ang mga model. Maghintay sandali at subukan ulit.',
     },
     'unreachable': {
       'zh': '連不到電腦上的助理，請確認後端與裝置連線。',
@@ -852,6 +1032,14 @@ abstract final class AssistantTexts {
       'vi': 'Không kết nối được với trợ lý trên máy tính. Hãy kiểm tra backend và kết nối thiết bị.',
       'id': 'Tidak dapat terhubung ke asisten di komputer. Periksa backend dan koneksi perangkat.',
       'tl': 'Hindi maabot ang assistant sa computer. Suriin ang backend at ang koneksiyon ng device.',
+    },
+    'unreachableRelease': {
+      'zh': '助理暫時連不上，請稍後再試，或使用原服務入口。',
+      'en': 'The assistant cannot be reached right now. Try again later, or use the service’s usual entry.',
+      'ja': '現在アシスタントに接続できません。しばらくしてからもう一度試すか、通常のサービス入口をご利用ください。',
+      'vi': 'Hiện không kết nối được với trợ lý. Hãy thử lại sau hoặc dùng lối vào dịch vụ thông thường.',
+      'id': 'Asisten sedang tidak bisa dihubungi. Coba lagi nanti atau gunakan menu layanan biasa.',
+      'tl': 'Hindi maabot ang assistant ngayon. Subukan ulit mamaya o gamitin ang karaniwang pasukan ng serbisyo.',
     },
     // On-device builds (ASSISTANT_ON_DEVICE): the assistant runs on the phone.
     'unreachableOnDevice': {
@@ -889,6 +1077,23 @@ abstract final class AssistantTexts {
       'vi': 'Trợ lý tạm thời không xử lý được.',
       'id': 'Asisten sedang tidak bisa memproses.',
       'tl': 'Hindi ito magagawa ng assistant ngayon.',
+    },
+    // AssistantResult.fromJson refused the reply (another contract or catalogue).
+    'versionMismatch': {
+      'zh': '助理資料版本不符，請更新後端或使用原服務入口。',
+      'en': 'The assistant data version does not match. Update the backend or use the service’s usual entry.',
+      'ja': 'アシスタントのデータのバージョンが一致しません。バックエンドを更新するか、通常のサービス入口をご利用ください。',
+      'vi': 'Phiên bản dữ liệu của trợ lý không khớp. Hãy cập nhật backend hoặc dùng lối vào dịch vụ thông thường.',
+      'id': 'Versi data asisten tidak cocok. Perbarui backend atau gunakan menu layanan biasa.',
+      'tl': 'Hindi tugma ang bersyon ng data ng assistant. I-update ang backend o gamitin ang karaniwang pasukan ng serbisyo.',
+    },
+    'versionMismatchRelease': {
+      'zh': '助理需要更新，請更新 App，或先使用原服務入口。',
+      'en': 'The assistant needs an update. Update the App, or use the service’s usual entry for now.',
+      'ja': 'アシスタントの更新が必要です。アプリを更新するか、当面は通常のサービス入口をご利用ください。',
+      'vi': 'Trợ lý cần được cập nhật. Hãy cập nhật ứng dụng, hoặc tạm dùng lối vào dịch vụ thông thường.',
+      'id': 'Asisten perlu diperbarui. Perbarui aplikasi, atau gunakan menu layanan biasa untuk sementara.',
+      'tl': 'Kailangang i-update ang assistant. I-update ang App, o gamitin muna ang karaniwang pasukan ng serbisyo.',
     },
     'replyMismatch': {
       'zh': '助理回覆與本次需求不一致，未執行操作。',

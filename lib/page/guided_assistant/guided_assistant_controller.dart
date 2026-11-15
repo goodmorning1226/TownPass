@@ -23,6 +23,7 @@ import 'package:town_pass/service/assistant_model_download.dart';
 import 'package:town_pass/service/assistant_on_device.dart';
 import 'package:town_pass/service/assistant_page_tracker.dart';
 import 'package:town_pass/service/assistant_recent_inputs.dart';
+import 'package:town_pass/service/assistant_recent_pages.dart';
 import 'package:town_pass/service/assistant_recorder.dart';
 import 'package:town_pass/service/assistant_service.dart';
 import 'package:town_pass/service/assistant_speaker.dart';
@@ -57,6 +58,11 @@ class ChatMessage {
   /// page the newest list offers previous/next page buttons.
   final AssistantListing? listing;
 
+  /// The backend's function catalogue level (1: categories, 2: one
+  /// category's pages); null for other messages. Its options bring their own
+  /// navigation, so there is no 都不是 button under them.
+  final int? catalogLevel;
+
   const ChatMessage({
     required this.id,
     required this.user,
@@ -69,6 +75,7 @@ class ChatMessage {
     this.voice = false,
     this.tutorialChoice = false,
     this.listing,
+    this.catalogLevel,
   });
 
   /// The text on screen: the assistant's pre-written Chinese texts follow
@@ -214,9 +221,14 @@ class GuidedAssistantController extends GetxController {
   /// was taken for an FAQ answer in airplane mode (2026-11-11).
   final bool demoFallback;
 
+  /// Now; tests move it to expire a pending list.
+  final DateTime Function() clock;
+
   GuidedAssistantController({
     this.engine = const MockAssistantEngine(),
-    this.thinkDelay = const Duration(milliseconds: 1200),
+    // Pre-written replies on the phone answer almost at once; a short pause
+    // keeps it natural (rules section 5, 2026-11-16; was 1.2 s on purpose).
+    this.thinkDelay = const Duration(milliseconds: 300),
     this.runOnboarding = false,
     this.service,
     this.demoFallback = !AssistantOnDevice.requested,
@@ -226,7 +238,9 @@ class GuidedAssistantController extends GetxController {
     AssistantSpeaker? speaker,
     this.probeOverride,
     this.fieldInputOverride,
-  }) : speaker = speaker ?? AssistantSpeaker(),
+    DateTime Function()? clock,
+  }) : clock = clock ?? DateTime.now,
+       speaker = speaker ?? AssistantSpeaker(),
        executor = executor ?? AssistantActionExecutor(),
        pageTracker = pageTracker ?? AssistantPageTracker.instance {
     recorder?.onLevel = _onLevel;
@@ -234,6 +248,7 @@ class GuidedAssistantController extends GetxController {
     // the page language (the phone's) until the user picks one or speaks.
     AssistantTexts.conversation.value = null;
     AssistantRecentInputs.instance.load();
+    AssistantRecentPages.instance.load();
     AssistantSpeechLanguage.load().then((code) {
       if (!isClosed) speechLanguage.value = code;
     });
@@ -364,7 +379,12 @@ class GuidedAssistantController extends GetxController {
   /// guide on a tab ([Guide.tab]) shows only while its tab does.
   final currentTab = RxnInt();
   Worker? _tabWorker;
+  Worker? _readyWorker;
   final readAloud = false.obs;
+
+  /// The read-aloud speed (AI 助理設定 > 朗讀速度), one of
+  /// [AssistantSpeaker.rates].
+  final speechRate = AssistantSpeaker.rate.obs;
   final speaking = false.obs;
   final typing = false.obs;
   final listening = false.obs;
@@ -404,6 +424,48 @@ class GuidedAssistantController extends GetxController {
   String? _session;
   String? _resolutionId;
   int _generation = 0;
+
+  /// The backend list [_resolutionId] belongs to: its message, when it
+  /// arrived and its option titles (docs/AI_CURRENT_RULES.md section 5,
+  /// 2026-11-16).
+  int? _resolutionMessage;
+  DateTime? _resolutionAt;
+  List<String> _resolutionTitles = const [];
+
+  /// This turn's speech notice ([_sayNotice]), said after the list.
+  int? _noticeId;
+
+  /// How long the backend keeps a pending list (workflow._offer: 300 s).
+  static const resolutionLifetime = Duration(seconds: 300);
+
+  /// The pending list's resolution id when a typed or spoken turn can answer
+  /// it (第 2 個, a category's name, 下一頁, 回上一層, 取消): the backend's list
+  /// is still the latest reply, as for tapping its options (only this turn's
+  /// speech notice may follow it), and the backend still keeps it. Null
+  /// otherwise: the turn is a new request.
+  String? _liveResolution() {
+    final id = _resolutionId;
+    final shown = _resolutionMessage;
+    final at = _resolutionAt;
+    if (id == null || shown == null || at == null) return null;
+    if (clock().difference(at) >= resolutionLifetime) return null;
+    final index = messages.lastIndexWhere((m) => m.id == shown);
+    if (index < 0) return null;
+    for (final m in messages.skip(index + 1)) {
+      if (m.id != _noticeId) return null;
+    }
+    return id;
+  }
+
+  /// The backend's list can no longer be answered (a new reply, a page
+  /// opened, a task started, 取消).
+  void _dropResolution() {
+    _resolutionId = null;
+    _resolutionMessage = null;
+    _resolutionAt = null;
+    _resolutionTitles = const [];
+  }
+
   bool _offlineNoted = false;
 
   @override
@@ -419,7 +481,17 @@ class GuidedAssistantController extends GetxController {
     ], (_) => _onProgress());
     _bindTabs();
     speaker.loadEnabled().then((v) => readAloud.value = v);
+    speaker.loadRate().then((v) {
+      if (!isClosed) speechRate.value = v;
+    });
+    // The core models finished downloading while the App was open: say so
+    // (docs/AI_CURRENT_RULES.md section 7, 2026-11-16).
+    final downloads = AssistantModelDownload.maybe;
+    if (downloads != null) {
+      _readyWorker = ever(downloads.coreReady, (_) => _modelsReady());
+    }
     _loadSettings();
+    unawaited(_checkMic());
     if (runOnboarding) _loadOnboarding();
   }
 
@@ -437,6 +509,7 @@ class GuidedAssistantController extends GetxController {
     }
     _stepWorker?.dispose();
     _tabWorker?.dispose();
+    _readyWorker?.dispose();
     probe.stop();
     speaker.stop();
     service?.cancel();
@@ -455,6 +528,7 @@ class GuidedAssistantController extends GetxController {
     String? followUpOf,
     bool tutorialChoice = false,
     AssistantListing? listing,
+    int? catalogLevel,
   }) => ChatMessage(
     id: _nextId++,
     user: false,
@@ -466,11 +540,40 @@ class GuidedAssistantController extends GetxController {
     followUpOf: followUpOf,
     tutorialChoice: tutorialChoice,
     listing: listing,
+    catalogLevel: catalogLevel,
   );
 
   void _say(ChatMessage message) {
     messages.add(message);
-    _speak(message.shown);
+    _speak(spokenText(message));
+  }
+
+  /// What reading [message] aloud says: its text, then its options with
+  /// their numbers (docs/AI_CURRENT_RULES.md section 5, 2026-11-16; the
+  /// catalogue reads the options of its page).
+  static String spokenText(ChatMessage message) {
+    final options = message.options?.options ?? const <CandidateOption>[];
+    if (options.isEmpty) return message.shown;
+    var n = 0;
+    return [
+      message.shown,
+      for (final o in options)
+        gt('第 {n} 個：{label}', {
+          'n': int.tryParse(o.choiceId ?? '') ?? ++n,
+          'label': gt(o.label),
+        }),
+    ].join('\n');
+  }
+
+  /// The core models are on the phone now: a toast, and a line in the chat
+  /// when the assistant is open.
+  void _modelsReady() {
+    final text = AssistantTexts.page('modelsReady');
+    if (sheetOpen.value) {
+      messages.add(_bot(text));
+    } else {
+      _showToast(text);
+    }
   }
 
   void _speak(String text) {
@@ -489,12 +592,23 @@ class GuidedAssistantController extends GetxController {
         (t.status == TaskStatus.on ||
             t.status == TaskStatus.opened ||
             t.status == TaskStatus.paused)) {
-      return _localChips(t.guide.helpChips);
+      return _localChips(t.guide.helpChips).take(maxChips).toList();
     }
-    // The user's own recent requests that worked, then the defaults (in the
-    // conversation language).
-    return AssistantRecentInputs.instance.merged(_localChips(starterChips));
+    // 看全部功能 first, then the user's own recent requests that worked in
+    // the conversation language, then the defaults; at most [maxChips]
+    // (docs/AI_CURRENT_RULES.md section 5, 2026-11-16).
+    return [
+      _chip(seeAllChip),
+      ...AssistantRecentInputs.instance.merged(
+        _localChips(starterChips.skip(1).toList()),
+        max: maxChips - 1,
+        language: GuideI18n.language,
+      ),
+    ];
   }
+
+  /// Six or seven chips took half the screen (2026-11-16).
+  static const maxChips = 4;
 
   List<String> _localChips(List<String> sources) => [
     for (final source in sources) _chip(source),
@@ -514,7 +628,8 @@ class GuidedAssistantController extends GetxController {
     MockReplyKind.pageHelp,
     MockReplyKind.stepHelp,
     MockReplyKind.onboarding,
-    MockReplyKind.greet,
+    // A greeting goes to the backend: one line and the function catalogue
+    // (2026-11-16); Replies.hello stays for when there is no backend.
   };
 
   void submit(
@@ -533,9 +648,13 @@ class GuidedAssistantController extends GetxController {
           : null;
     }
     _voiceTurn = voice;
+    final earlier = _lastRequest;
     if (choiceId == null && raw.trim().isNotEmpty) _lastRequest = raw.trim();
     final text = raw.trim();
     if ((text.isEmpty && choiceId == null) || loading.value) return;
+    // Before the user's bubble: can this turn answer the backend's list?
+    final followUp = choiceId == null ? _liveResolution() : null;
+    _noticeId = null;
     messages.add(
       ChatMessage(
         id: _nextId++,
@@ -546,7 +665,13 @@ class GuidedAssistantController extends GetxController {
     );
     if (note != null) _say(_bot(note));
     if (choiceId == null && _tutorialReply(chipSource ?? text)) return;
-    _answer(text, choiceId: choiceId, understood: chipSource);
+    _answer(
+      text,
+      choiceId: choiceId,
+      understood: chipSource,
+      followUp: followUp,
+      earlier: earlier,
+    );
   }
 
   /// The current turn was spoken (its language is followed from the
@@ -555,7 +680,15 @@ class GuidedAssistantController extends GetxController {
 
   /// [understood] is the Chinese source of a tapped chip, for the
   /// pre-written rules (they read Chinese); the backend gets [text].
-  void _answer(String text, {String? choiceId, String? understood}) {
+  /// [followUp] is the pending list's resolution id when [text] may answer
+  /// it, and [earlier] the request before this one.
+  void _answer(
+    String text, {
+    String? choiceId,
+    String? understood,
+    String? followUp,
+    String? earlier,
+  }) {
     final local = engine.interpret(
       understood ?? text,
       hasTask: _activeTask != null,
@@ -572,7 +705,14 @@ class GuidedAssistantController extends GetxController {
       });
       return;
     }
-    _askModel(text, local, generation, choiceId: choiceId);
+    _askModel(
+      text,
+      local,
+      generation,
+      choiceId: choiceId,
+      followUp: followUp,
+      earlier: earlier,
+    );
   }
 
   Future<void> _askModel(
@@ -581,7 +721,13 @@ class GuidedAssistantController extends GetxController {
     int generation, {
     String? choiceId,
     int? pageStep,
+    String? followUp,
+    String? earlier,
   }) async {
+    // A typed or spoken turn carries the list's resolution only while that
+    // list is the latest reply (rules section 5, 2026-11-16): the backend
+    // then resolves 第 2 個, a category, 下一頁 or 取消 against it.
+    final offered = followUp == null ? const <String>[] : _resolutionTitles;
     AssistantResult result;
     try {
       result = await service!.decide(
@@ -589,7 +735,7 @@ class GuidedAssistantController extends GetxController {
         requestId: '${DateTime.now().microsecondsSinceEpoch}-$generation',
         sessionId: _session,
         resolutionId: choiceId == null && pageStep == null
-            ? null
+            ? followUp
             : _resolutionId,
         choiceId: choiceId,
         context: requestContext(),
@@ -599,16 +745,13 @@ class GuidedAssistantController extends GetxController {
     } catch (error) {
       if (generation != _generation || isClosed) return;
       loading.value = false;
-      if (choiceId != null || pageStep != null) {
-        _say(
-          _bot(error is FormatException ? error.message : Replies.pageFailed),
-        );
-        return;
-      }
-      if (!demoFallback) {
-        _say(
-          _bot(error is FormatException ? error.message : Replies.pageFailed),
-        );
+      // The assistant failed, not the service page (2026-11-16): the
+      // service's own error lines say which (unreachable, timeout, loading).
+      final failed = error is FormatException
+          ? error.message
+          : Replies.assistantFailed;
+      if (choiceId != null || pageStep != null || !demoFallback) {
+        _say(_bot(failed));
         return;
       }
       // No backend (e.g. on an iPhone without the desktop server): fall back
@@ -623,6 +766,7 @@ class GuidedAssistantController extends GetxController {
     if (generation != _generation || isClosed) return;
     loading.value = false;
     _session = result.sessionId;
+    _dropResolution();
     _resolutionId = result.resolutionId;
     // Typed words in another language switch the texts and pages, as speech
     // does (a tapped option or a bare number says nothing about it).
@@ -634,10 +778,22 @@ class GuidedAssistantController extends GetxController {
     }
     final destination = result.destination;
     if (destination != null) {
+      // 第 2 個 (typed or said) opened one of the list's pages, as a tap
+      // would: the request is the one that brought the list.
+      final picked = _pickedFromList(text, result.message, offered);
+      if (picked) _lastRequest = earlier;
       // A request that opened a page becomes a suggestion next time.
-      final asked = choiceId == null && pageStep == null ? text : _lastRequest;
-      if (asked != null) AssistantRecentInputs.instance.remember(asked);
-      final guide = guideFor(destination, result.guide, text);
+      final asked = choiceId == null && pageStep == null && !picked
+          ? text
+          : _lastRequest;
+      if (asked != null) {
+        AssistantRecentInputs.instance.remember(
+          asked,
+          language: result.language,
+        );
+      }
+      AssistantRecentPages.instance.remember(destination);
+      final guide = guideFor(destination, result.guide, picked ? '' : text);
       if (guide != null) {
         _guides[guide.id] = guide;
         _requestGuide(guide.id);
@@ -647,30 +803,59 @@ class GuidedAssistantController extends GetxController {
       return;
     }
     if (result.choices.isNotEmpty) {
-      _say(
-        _bot(
-          result.message,
-          options: CandidateGroup(result.message, [
-            for (final c in result.choices)
-              CandidateOption(
-                // A disabled option's subtitle is the long "not connected"
-                // reason; "（還不能用）" already says it.
-                c.subtitle.isEmpty || !c.enabled
-                    ? c.title
-                    : gt('{title}（{subtitle}）', {
-                        'title': c.title,
-                        'subtitle': c.subtitle,
-                      }),
-                choiceId: c.id,
-                available: c.enabled,
-              ),
-          ]),
-          listing: result.listing,
-        ),
+      final catalog = result.level;
+      final reply = _bot(
+        result.message,
+        options: CandidateGroup(result.message, [
+          for (final c in result.choices)
+            CandidateOption(
+              // A disabled option's subtitle is the long "not connected"
+              // reason; "（還不能用）" already says it. In the catalogue
+              // only the 1999 line keeps its subtitle (the number).
+              c.subtitle.isEmpty ||
+                      !c.enabled ||
+                      (catalog != null && c.nav != '1999')
+                  ? c.title
+                  : gt('{title}（{subtitle}）', {
+                      'title': c.title,
+                      'subtitle': c.subtitle,
+                    }),
+              choiceId: c.id,
+              available: c.enabled,
+              groupId: c.groupId,
+              nav: c.nav,
+            ),
+        ]),
+        // The catalogue's own 更多 / 上一頁 options replace the arrows.
+        listing: catalog == null ? result.listing : null,
+        catalogLevel: catalog,
       );
+      _say(reply);
+      if (result.resolutionId != null) {
+        _resolutionMessage = reply.id;
+        _resolutionAt = clock();
+        _resolutionTitles = [for (final c in result.choices) c.title];
+      }
       return;
     }
     _say(_bot(result.message));
+  }
+
+  /// Whether a typed or spoken follow-up to the list ([offered], its option
+  /// titles) opened one of its pages: the reply names the page and the words
+  /// did not (第 2 個, the second one). 我要繳水費 after a list with 水費 is a
+  /// request of its own.
+  static bool _pickedFromList(
+    String text,
+    String message,
+    List<String> offered,
+  ) {
+    final said = text.toLowerCase();
+    final reply = message.toLowerCase();
+    return offered.any((title) {
+      final t = title.trim().toLowerCase();
+      return t.isNotEmpty && reply.contains(t) && !said.contains(t);
+    });
   }
 
   /// The newest capability list's previous (-1) or next (1) page button: the
@@ -776,6 +961,7 @@ class GuidedAssistantController extends GetxController {
   }
 
   void _openReal(Map<String, dynamic> destination, String message) {
+    _dropResolution();
     final generation = _generation;
     final reply = _bot(message);
     _say(reply);
@@ -818,7 +1004,7 @@ class GuidedAssistantController extends GetxController {
     _generation++;
     service?.cancel();
     loading.value = false;
-    _resolutionId = null;
+    _dropResolution();
     _say(_bot(Replies.cancelled));
   }
 
@@ -897,7 +1083,17 @@ class GuidedAssistantController extends GetxController {
     if (!optionsLive(message) || loading.value) return;
     if (option == null) {
       messages.add(ChatMessage(id: _nextId++, user: true, text: gt('都不是')));
-      _say(_bot(Replies.noneOfThem));
+      // 看全部功能 under it (2026-11-16); its followUpOf keeps a second
+      // 都不是 button away.
+      _say(
+        _bot(
+          Replies.noneOfThem,
+          options: CandidateGroup(Replies.noneOfThem, [
+            CandidateOption(seeAllChip, say: _chip(seeAllChip)),
+          ]),
+          followUpOf: 'none',
+        ),
+      );
       return;
     }
     if (!option.enabled) {
@@ -992,6 +1188,8 @@ class GuidedAssistantController extends GetxController {
   }) {
     final found = _guide(guideId);
     if (found == null) return;
+    // A started task ends any backend list: 第 2 個 is a new request now.
+    _dropResolution();
     // Resuming keeps the task's own page (and progress).
     final guide = resuming ? found : _onShowingTab(found);
     // 一般模式: the page opens, the steps do not start. The task stays
@@ -1688,10 +1886,20 @@ class GuidedAssistantController extends GetxController {
     _removeBackEntry();
   }
 
-  void toggleReadAloud() {
-    readAloud.value = !readAloud.value;
-    speaker.saveEnabled(readAloud.value);
-    if (!readAloud.value) speaker.stop();
+  void toggleReadAloud() => setReadAloud(!readAloud.value);
+
+  /// AI 助理設定 > 朗讀回覆 (and the header's speaker button).
+  void setReadAloud(bool on) {
+    readAloud.value = on;
+    speaker.saveEnabled(on);
+    if (!on) speaker.stop();
+  }
+
+  /// AI 助理設定 > 朗讀速度: one of [AssistantSpeaker.rates].
+  void setSpeechRate(double rate) {
+    if (!AssistantSpeaker.rates.contains(rate)) return;
+    speechRate.value = rate;
+    speaker.saveRate(rate);
   }
 
   /// No core models on the phone yet (docs/AI_CURRENT_RULES.md section 7):
@@ -1710,6 +1918,14 @@ class GuidedAssistantController extends GetxController {
       listening.value = true;
       return;
     }
+    if (_explainMicFirst()) {
+      final field = _fieldMode;
+      _fieldMode = false;
+      if (field) fieldMic.value = FieldMicPhase.idle;
+      _micProblem(Replies.micExplain, field: field);
+      _askMicNow(rec);
+      return;
+    }
     speaker.stop(); // never record the assistant's own voice
     listening.value = true;
     _micDiscarded = false;
@@ -1725,6 +1941,46 @@ class GuidedAssistantController extends GetxController {
       _fieldMode = false;
       _micProblem(Replies.noMic, field: field);
     }
+  }
+
+  static const _kMicExplained = 'assistant_mic_explained';
+
+  /// The microphone is not allowed yet and the assistant has not said why it
+  /// needs it ([_checkMic], at start).
+  bool _micNeedsExplaining = false;
+
+  /// Whether the first press should explain the microphone before the
+  /// system's permission prompt (docs/AI_CURRENT_RULES.md section 5,
+  /// 2026-11-16). Asked once at start, without asking for the permission.
+  Future<void> _checkMic() async {
+    final rec = recorder;
+    if (rec == null) return;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      if (prefs.getBool(_kMicExplained) ?? false) return;
+    } catch (_) {
+      return;
+    }
+    final allowed = await rec.micAllowed();
+    if (!isClosed) _micNeedsExplaining = !allowed;
+  }
+
+  /// Right after the explanation, the system's permission prompt (owner
+  /// 2026-11-16: no extra press just to see the prompt). Nothing is recorded;
+  /// once allowed, the next press talks.
+  void _askMicNow(AssistantRecorder rec) {
+    rec.requestMic().catchError((_) => false);
+  }
+
+  /// True once (remembered on the phone): this press explains instead of
+  /// recording, and the system's permission prompt follows right away.
+  bool _explainMicFirst() {
+    if (!_micNeedsExplaining) return false;
+    _micNeedsExplaining = false;
+    SharedPreferences.getInstance()
+        .then((prefs) => prefs.setBool(_kMicExplained, true))
+        .catchError((_) => false);
+    return true;
   }
 
   /// A microphone problem: in the chat, or by the 按住輸入 button when
@@ -1814,7 +2070,11 @@ class GuidedAssistantController extends GetxController {
   /// 台語 chosen but its model could not be used: this clip was heard as
   /// Chinese, and the backend's reason is said first.
   void _sayNotice(AssistantTranscript heard) {
-    if (heard.notice case final notice?) _say(_bot(notice));
+    if (heard.notice case final notice?) {
+      final said = _bot(notice);
+      _noticeId = said.id;
+      _say(said);
+    }
   }
 
   /// The text to send for [heard]: an unsure transcript uses the backend's
@@ -2022,6 +2282,11 @@ class GuidedAssistantController extends GetxController {
     homeAsk.value = HomeAsk.listening;
     final rec = recorder;
     if (rec == null || service == null) return;
+    if (_explainMicFirst()) {
+      _showHomeNotice(Replies.micExplain);
+      _askMicNow(rec);
+      return;
+    }
     speaker.stop(); // never record the assistant's own voice
     final start = _homeStart = rec.start();
     final started = await start;

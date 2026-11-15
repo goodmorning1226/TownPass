@@ -270,7 +270,9 @@ class TranscriptionTests(unittest.TestCase):
             self.asr_reply = asr_reply
             status, body = self.post(wav_bytes(1.0))
             self.assertEqual(status, expected, asr_reply)
-            self.assertIn("鍵盤" if expected == 503 or asr_reply[1].get("text") == "  " else "", body["error"])
+            self.assertIn("鍵盤" if expected == 503 else "", body["error"])
+            if asr_reply[1].get("text") == "  ":  # nothing heard (rules section 3, 2026-11-16)
+                self.assertEqual(body["error"], "沒有聽到聲音，請按住再說一次。")
         status, body = self.post(wav_bytes(1.0), asr_url="http://127.0.0.1:9/v1/transcribe")
         self.assertEqual(status, 503)
         self.assertIn("語音辨識服務未啟動", body["error"])

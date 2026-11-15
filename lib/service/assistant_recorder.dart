@@ -26,6 +26,40 @@ class AssistantRecorder {
   BytesBuilder? _pcm;
   Completer<void>? _done;
 
+  /// Whether the microphone may be used already, without asking (so the
+  /// assistant can explain why before the system's permission prompt;
+  /// docs/AI_CURRENT_RULES.md section 5). True when it cannot be told.
+  Future<bool> micAllowed() async {
+    AudioRecorder? probe;
+    try {
+      probe = AudioRecorder();
+      return await probe.hasPermission(request: false);
+    } catch (_) {
+      return true;
+    } finally {
+      try {
+        await probe?.dispose();
+      } catch (_) {}
+    }
+  }
+
+  /// Shows the system's microphone permission prompt now, without recording
+  /// (right after the assistant has explained why; docs/AI_CURRENT_RULES.md
+  /// section 5). True when allowed.
+  Future<bool> requestMic() async {
+    AudioRecorder? probe;
+    try {
+      probe = AudioRecorder();
+      return await probe.hasPermission();
+    } catch (_) {
+      return false;
+    } finally {
+      try {
+        await probe?.dispose();
+      } catch (_) {}
+    }
+  }
+
   /// Starts capturing; false when the microphone permission is not granted.
   ///
   /// Each recording uses a fresh platform recorder: reusing one across

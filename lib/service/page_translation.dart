@@ -468,6 +468,12 @@ class PageTranslation {
 /// Marks a subtree whose texts are never translated as page content, such as
 /// the assistant panel (its messages are already in the reply language and
 /// the user's own words stay as they were typed or said).
+/// Where the 「正在下載翻譯…」 banner goes: under the status bar and a title
+/// bar (56 px, Material's toolbar height), so a page's back button and title
+/// stay visible (docs/AI_CURRENT_RULES.md section 5, 2026-11-16).
+double translationBannerTop(BuildContext context) =>
+    MediaQuery.paddingOf(context).top + 56 + 8;
+
 class PageTranslationScope extends InheritedWidget {
   final bool enabled;
 

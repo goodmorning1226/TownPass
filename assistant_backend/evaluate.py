@@ -56,7 +56,10 @@ def targets(expect):
 
 
 REPLY = want("reply")                           # template or clarification
-NONE = want(("reply", "unsupported"))           # any honest answer without navigation
+# Any honest answer without navigation. Since 2026-11-16 (rules section 3, fallback tiers)
+# that may be the function catalogue or a short list of guesses: correct while nothing opens.
+NONE = want(("reply", "unsupported", "capability_list", "confirm_candidates"))
+GREETING = want(("reply", "capability_list"))   # one line and the catalogue (2026-11-16)
 UNSUPPORTED = want("unsupported")               # catalogued capability that is not connected
 # A disconnected capability the FAQ may answer (owner, 2026-11-09; docs/AI_CURRENT_RULES.md
 # section 2): the FAQ answer first, else the "not connected" reason; never navigate.
@@ -142,9 +145,9 @@ def one(category, text, expect):
 
 CASES = [
     # General replies: templates only, never a destination.
-    one("general", "你好", REPLY), one("general", "謝謝", REPLY), one("general", "???", REPLY),
-    one("general", "今天心情真好", REPLY), one("general", "我想辦事情", REPLY),
-    one("general", "幫我查訂單", REPLY), one("general", "第二本", REPLY),
+    one("general", "你好", GREETING), one("general", "謝謝", REPLY), one("general", "???", NONE),
+    one("general", "今天心情真好", NONE), one("general", "我想辦事情", NONE),
+    one("general", "幫我查訂單", NONE), one("general", "第二本", NONE),
     one("general", "怎麼借書", REPLY),
     # Capability lists come from the shared registry and never open a page.
     ("listing", [say("有哪些功能", LISTING), say("下一頁", LISTING, bound=True)]),
@@ -207,7 +210,8 @@ CASES = [
     one("from_holdout", "圖書館的公告", cap("library.notices")), one("from_holdout", "我借了哪些書", cap("library.records")),
     one("from_holdout", "熱門的書有哪些", cap("library.ranking")),
     # Found only by a common word, the sentence asks more: "nothing found" (2026-11-09).
-    one("from_holdout", "可以帶狗去哪裡散步", want(("reply", "unsupported"), target=("petFriendlyMap",))),
+    one("from_holdout", "可以帶狗去哪裡散步", want(("reply", "unsupported", "capability_list", "confirm_candidates"),
+                                                 target=("petFriendlyMap",))),
     one("from_holdout", "改成英文", cap("language")),  # language page works since 2026-11-07
     one("from_holdout", "查案件", CONFIRM), one("from_holdout", "我的案件辦到哪了", CONFIRM),
     one("from_holdout", "進度查詢", CONFIRM),
@@ -248,7 +252,7 @@ CASES = [
     one("book_sound", "我要看說給兒童的台灣力史", detail("lib-book-2")),
     one("book_sound", "借我的第一本滑快書", detail("lib-book-1")),
     one("book_sound", "我要借神奇甘仔店", CONFIRM),
-    one("book_sound", "借低溫冷凍", want(("reply", "unsupported", "navigate"), HOME["dest"] + [None])),
+    one("book_sound", "借低溫冷凍", want(("reply", "unsupported", "navigate", "capability_list"), HOME["dest"] + [None])),
     # An explicit request for the result list may show the original search page.
     one("book_search", "我要找劉潤的書", search("劉潤", "author")),
     one("book_search", "列出神奇柑仔店的搜尋結果", search("神奇柑仔店")),
@@ -313,7 +317,9 @@ CASES = [
     # Cancellation, a new subject and replays invalidate the pending selection.
     one("cancel", "取消", REPLY), one("cancel", "算了", REPLY),
     ("cancel", [say("有哪些功能", LISTING), say("取消", REPLY, bound=True), replay()]),
-    ("cancel", [say("有哪些功能", LISTING), say("你好", REPLY), replay()]),
+    # A new subject invalidates the list. 謝謝, not 你好: since 2026-11-16 a greeting shows the
+    # catalogue, a new list whose first option the replay would rightly pick.
+    ("cancel", [say("有哪些功能", LISTING), say("謝謝", REPLY), replay()]),
     ("cancel", [say("借底邏輯", CONFIRM_ONE), say("取消", REPLY, bound=True), replay()]),
     ("cancel", [say("案件進度", CONFIRM), replay(session="other"), replay(choice="999"),
                 pick("申辦案件進度", cap("districtOffice.progress")), replay()]),
@@ -325,8 +331,8 @@ CASES = [
         want(("navigate", "reply"), [{"kind": "capability", "id": "fees.water"}, None])),
     # Page context is a hint: it orders candidates but never navigates or skips a confirmation.
     ("context", [say("案件進度", want("confirm_candidates", choices=2, first="警政"), context=POLICE)]),
-    ("context", [say("你好", REPLY, context=LIBRARY_DETAIL)]),
-    ("context", [say("我想辦事情", REPLY, context=LIBRARY_DETAIL)]),
+    ("context", [say("你好", GREETING, context=LIBRARY_DETAIL)]),
+    ("context", [say("我想辦事情", NONE, context=LIBRARY_DETAIL)]),
     ("context", [say("排行榜", cap("library.ranking"), context=LIBRARY_DETAIL)]),
     ("context", [say("我要繳水費", cap("fees.water"), context=LIBRARY_DETAIL)]),
     ("context", [say("借底邏輯", CONFIRM_ONE, context=LIBRARY_DETAIL)]),

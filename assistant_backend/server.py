@@ -272,7 +272,15 @@ def positive_text(text):
     if "不是" in text and "是" in text.split("不是", 1)[1]:
         text = text.rsplit("是", 1)[1]
     clauses = re.split(r"[，,。；;]|但是|不過", text)
-    return "，".join(c for c in clauses if not re.match(r"\s*(?:我)?(?:不要|不用|不想)", c))
+    return "，".join(c for c in clauses if not NEGATED_CLAUSE.match(c))
+
+
+# A clause that refuses (rules section 3, 2026-11-16): 不要 / 不用 / 不想, and also
+# 沒有要 / 沒要 / 沒(有)想(要) / 不是要 / 不是想(要) ("我沒有要借書啦" opened the library), after
+# 我 / 我們 and a softener (其實, 並, 也, 根本, 真的...). 沒(有)要到 (did not get) and 沒想到 (did
+# not expect) are not refusals.
+NEGATED_CLAUSE = re.compile(r"\s*(?:我們|我)?(?:其實|並|也|又|根本|真的|就|只是)?"
+                            r"(?:不要|不用|不想|沒有?要(?!到)|沒有?想(?!到)要?|不是要|不是想要?)")
 
 
 def retrieve(text, books, previous=()):
@@ -912,7 +920,13 @@ def make_handler(assistant, token=""):
                       f"chars={len(text) if isinstance(text, str) else None} "
                       f"alternatives={len(result.get('alternatives') or [])} "
                       f"confidence={result.get('confidence')}", flush=True)
-            if not isinstance(text, str) or not text.strip() or status == "unclear":
+            if not isinstance(text, str) or not text.strip():
+                # Nothing heard (rules section 3, 2026-11-16): one line, no list.
+                import i18n
+                from asr_server import language_code
+                asked = language_code(self.headers.get("X-Language"))
+                return self.reply(422, {"error": i18n.t("no_sound", asked if asked in i18n.LANGUAGES else "zh")})
+            if status == "unclear":
                 return self.reply(422, {"error": "沒有聽清楚。請靠近麥克風、說大聲一點再試一次，或改用鍵盤。"})
             if len(text) > 500:
                 return self.reply(422, {"error": "內容過長，請分段說。"})

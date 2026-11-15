@@ -6,10 +6,18 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// in a public place); the choice is remembered on the device.
 class AssistantSpeaker {
   static const _key = 'assistant_read_aloud';
+  static const _rateKey = 'assistant_read_aloud_rate';
   static const language = 'zh-TW';
 
-  /// Slower than the platform default, for older listeners.
+  /// Slower than the platform default, for older listeners: the 標準 speed.
   static const rate = 0.45;
+
+  /// The speeds AI 助理設定 offers (慢, 標準, 快), as flutter_tts rates.
+  static const rates = [0.35, rate, 0.55];
+
+  /// The speed in use (one of [rates]).
+  double _rate = rate;
+  double get currentRate => _rate;
 
   FlutterTts? _tts;
 
@@ -24,6 +32,27 @@ class AssistantSpeaker {
   Future<void> saveEnabled(bool enabled) async {
     try {
       await (await SharedPreferences.getInstance()).setBool(_key, enabled);
+    } catch (_) {}
+  }
+
+  /// The saved speed (AI 助理設定 > 朗讀速度), [rate] when none was saved.
+  Future<double> loadRate() async {
+    try {
+      final saved = (await SharedPreferences.getInstance()).getDouble(_rateKey);
+      if (saved != null && rates.contains(saved)) _rate = saved;
+    } catch (_) {}
+    return _rate;
+  }
+
+  /// Uses and keeps [value] (one of [rates]) from the next sentence on.
+  Future<void> saveRate(double value) async {
+    if (!rates.contains(value)) return;
+    _rate = value;
+    try {
+      await _tts?.setSpeechRate(value);
+    } catch (_) {}
+    try {
+      await (await SharedPreferences.getInstance()).setDouble(_rateKey, value);
     } catch (_) {}
   }
 
@@ -68,7 +97,7 @@ class AssistantSpeaker {
     final tts = FlutterTts();
     await tts.setLanguage(language);
     _locale = language;
-    await tts.setSpeechRate(rate);
+    await tts.setSpeechRate(_rate);
     return tts;
   }
 

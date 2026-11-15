@@ -63,14 +63,15 @@ class _AssistantHostState extends State<AssistantHost> {
             return _corner(context, controller);
           }),
         ),
-        // First use of a page language downloads its translation model.
+        // First use of a page language downloads its translation model:
+        // below the title bar (docs/AI_CURRENT_RULES.md section 5).
         Obx(() {
           final translation = PageTranslation.instance;
           if (!translation.preparing.value) return const SizedBox.shrink();
           return Positioned(
             left: 16,
             right: 16,
-            top: MediaQuery.of(context).padding.top + 8,
+            top: translationBannerTop(context),
             child: IgnorePointer(
               child: Container(
                 padding: const EdgeInsets.symmetric(
@@ -333,12 +334,13 @@ class _AssistantSheetState extends State<AssistantSheet> {
       ),
       const SizedBox(height: 12),
       // The user's own recent requests that worked, then the defaults.
+      // Only the recent requests made in the panel's language (2026-11-16).
       for (final text in AssistantRecentInputs.instance.merged([
         for (final suggestion in AssistantViewController.suggestionsFor(
           AssistantTexts.pageLanguage,
         ))
           suggestion.text,
-      ]))
+      ], language: AssistantTexts.pageLanguage))
         Padding(
           padding: const EdgeInsets.only(bottom: 10),
           child: _OutlinedChoice(
@@ -352,6 +354,17 @@ class _AssistantSheetState extends State<AssistantSheet> {
         style: TPTextStyles.bodyRegular,
         color: TPColors.grayscale600,
       ),
+      // Where recordings, typed text and the history stay (on-device
+      // builds; docs/AI_CURRENT_RULES.md section 5, 2026-11-16).
+      if (AssistantModelDownload.maybe != null) ...[
+        const SizedBox(height: 8),
+        TPText(
+          _t('privacy'),
+          key: const Key('assistant-privacy'),
+          style: TPTextStyles.bodyRegular,
+          color: TPColors.grayscale600,
+        ),
+      ],
     ],
   );
 

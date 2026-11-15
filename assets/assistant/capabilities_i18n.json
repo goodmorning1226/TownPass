@@ -1,770 +1,770 @@
 {
  "version": 1,
- "status": "draft 2026-11-07 (Filipino tl: AI draft 2026-11-11, replaced Thai), to be reviewed by speakers of each language (docs/AI_MULTILINGUAL_PLAN.md, docs/AI_FILIPINO.md)",
+ "status": "draft 2026-11-07 (Filipino tl: AI draft 2026-11-11, replaced Thai), to be reviewed by speakers of each language (docs/AI_MULTILINGUAL_PLAN.md, docs/AI_FILIPINO.md); \"need\" (one sentence: the need the page solves) in every language: AI draft 2026-11-16 (need-style step 6), to be reviewed by speakers",
  "languages": ["en", "ja", "vi", "id", "tl"],
  "capabilities": {
   "app.home": {
-   "en": {"title": "Home", "keywords": ["home", "home page", "main screen", "go home"]},
-   "ja": {"title": "ホーム", "keywords": ["ホーム", "トップ", "ホーム画面"]},
-   "vi": {"title": "Trang chủ", "keywords": ["trang chủ", "màn hình chính", "về trang chủ", "trang đầu", "về màn hình chính"]},
-   "id": {"title": "Beranda", "keywords": ["beranda", "halaman utama", "layar utama"]},
-   "tl": {"title": "Home", "keywords": ["home", "pangunahing pahina", "unang pahina", "bumalik sa home"]}
+   "en": {"title": "Home", "keywords": ["home", "home page", "main screen", "go home"], "need": "I got lost moving around the app and want to get back to the first screen it opens on."},
+   "ja": {"title": "ホーム", "keywords": ["ホーム", "トップ", "ホーム画面"], "need": "アプリの中で迷ってしまったので、起動したときの最初の画面に戻りたい。"},
+   "vi": {"title": "Trang chủ", "keywords": ["trang chủ", "màn hình chính", "về trang chủ", "trang đầu", "về màn hình chính"], "need": "Tôi bị lạc khi bấm qua lại trong ứng dụng, muốn quay về màn hình đầu tiên lúc mới mở."},
+   "id": {"title": "Beranda", "keywords": ["beranda", "halaman utama", "layar utama"], "need": "Saya tersesat saat berpindah-pindah di aplikasi dan ingin kembali ke layar pertama saat dibuka."},
+   "tl": {"title": "Home", "keywords": ["home", "pangunahing pahina", "unang pahina", "bumalik sa home"], "need": "Naligaw ako sa paglipat-lipat sa app at gusto kong bumalik sa unang screen nito."}
   },
   "app.services": {
-   "en": {"title": "All services", "keywords": ["all services", "service list", "services"]},
-   "ja": {"title": "サービス一覧", "keywords": ["サービス一覧", "全サービス", "サービス"]},
-   "vi": {"title": "Tất cả dịch vụ", "keywords": ["tất cả dịch vụ", "danh sách dịch vụ", "dịch vụ"]},
-   "id": {"title": "Semua layanan", "keywords": ["semua layanan", "daftar layanan", "layanan"]},
-   "tl": {"title": "Lahat ng serbisyo", "keywords": ["lahat ng serbisyo", "listahan ng serbisyo", "mga serbisyo"]}
+   "en": {"title": "All services", "keywords": ["all services", "service list", "services"], "need": "I don't know what this app offers and want to see every service laid out so I can look through them."},
+   "ja": {"title": "サービス一覧", "keywords": ["サービス一覧", "全サービス", "サービス"], "need": "このアプリで何ができるのか分からないので、すべてのサービスを一覧で見て探したい。"},
+   "vi": {"title": "Tất cả dịch vụ", "keywords": ["tất cả dịch vụ", "danh sách dịch vụ", "dịch vụ"], "need": "Tôi không biết ứng dụng có những dịch vụ gì, muốn xem toàn bộ để tìm từng cái."},
+   "id": {"title": "Semua layanan", "keywords": ["semua layanan", "daftar layanan", "layanan"], "need": "Saya tidak tahu layanan apa saja yang ada di aplikasi ini dan ingin melihat semuanya untuk dicari satu per satu."},
+   "tl": {"title": "Lahat ng serbisyo", "keywords": ["lahat ng serbisyo", "listahan ng serbisyo", "mga serbisyo"], "need": "Hindi ko alam kung anong mga serbisyo ang nasa app, gusto kong makita lahat para mahanap isa-isa."}
   },
   "app.perks": {
-   "en": {"title": "Deals", "keywords": ["deals", "discount", "discounts", "coupon", "offers"]},
-   "ja": {"title": "特典", "keywords": ["特典", "割引", "クーポン", "お得"]},
-   "vi": {"title": "Ưu đãi", "keywords": ["ưu đãi", "giảm giá", "phiếu giảm giá", "khuyến mãi", "mã giảm giá", "phiếu ưu đãi", "khuyến mại", "voucher"]},
-   "id": {"title": "Promo", "keywords": ["promo", "diskon", "kupon", "penawaran"]},
-   "tl": {"title": "Mga promo", "keywords": ["promo", "mga promo", "diskuwento", "kupon", "alok"]}
+   "en": {"title": "Deals", "keywords": ["deals", "discount", "discounts", "coupon", "offers"], "need": "I want to save a little money and see what discounts, coupons or freebies the city and shops are giving now."},
+   "ja": {"title": "特典", "keywords": ["特典", "割引", "クーポン", "お得"], "need": "少しでも節約したいので、市や店が今出している割引やクーポン、特典を見たい。"},
+   "vi": {"title": "Ưu đãi", "keywords": ["ưu đãi", "giảm giá", "phiếu giảm giá", "khuyến mãi", "mã giảm giá", "phiếu ưu đãi", "khuyến mại", "voucher"], "need": "Tôi muốn tiết kiệm, xem thành phố và cửa hàng đang có giảm giá, phiếu ưu đãi hay quà gì để nhận."},
+   "id": {"title": "Promo", "keywords": ["promo", "diskon", "kupon", "penawaran"], "need": "Saya ingin berhemat dan melihat diskon, kupon, atau hadiah apa yang sedang diberikan kota dan toko."},
+   "tl": {"title": "Mga promo", "keywords": ["promo", "mga promo", "diskuwento", "kupon", "alok"], "need": "Gusto kong makatipid at makita kung anong discount, kupon o libreng alok ang mayroon ang lungsod at mga tindahan ngayon."}
   },
   "app.bills": {
-   "en": {"title": "Bills", "keywords": ["bills", "my bills", "pay a bill", "payments"]},
-   "ja": {"title": "請求", "keywords": ["請求", "支払い", "請求書"]},
-   "vi": {"title": "Hóa đơn", "keywords": ["hóa đơn", "thanh toán", "hóa đơn của tôi", "các hóa đơn", "hóa đơn cần trả"]},
-   "id": {"title": "Tagihan", "keywords": ["tagihan", "bayar tagihan", "pembayaran"]},
-   "tl": {"title": "Mga bayarin", "keywords": ["mga bayarin", "bayarin ko", "magbayad ng bill", "pagbabayad", "mga bill ko"]}
+   "en": {"title": "Bills", "keywords": ["bills", "my bills", "pay a bill", "payments"], "need": "I want to see in one place which of my bills are still unpaid and how much each one is."},
+   "ja": {"title": "請求", "keywords": ["請求", "支払い", "請求書"], "need": "まだ払っていない請求がどれで、それぞれいくらなのかをまとめて確認したい。"},
+   "vi": {"title": "Hóa đơn", "keywords": ["hóa đơn", "thanh toán", "hóa đơn của tôi", "các hóa đơn", "hóa đơn cần trả"], "need": "Tôi muốn xem một lần những hóa đơn nào chưa trả và mỗi cái bao nhiêu tiền."},
+   "id": {"title": "Tagihan", "keywords": ["tagihan", "bayar tagihan", "pembayaran"], "need": "Saya ingin melihat sekaligus tagihan mana yang belum dibayar dan berapa jumlah masing-masing."},
+   "tl": {"title": "Mga bayarin", "keywords": ["mga bayarin", "bayarin ko", "magbayad ng bill", "pagbabayad", "mga bill ko"], "need": "Ipakita ang lahat ng singil na hindi ko pa nababayaran at ang halaga ng bawat isa."}
   },
   "account": {
-   "en": {"title": "Account", "keywords": ["account", "my account"]},
-   "ja": {"title": "アカウント", "keywords": ["アカウント", "マイアカウント"]},
-   "vi": {"title": "Tài khoản", "keywords": ["tài khoản", "tài khoản của tôi", "tài khoản của mình", "thông tin tài khoản"]},
-   "id": {"title": "Akun", "keywords": ["akun", "akun saya"]},
-   "tl": {"title": "Account", "keywords": ["account", "account ko", "aking account"]}
+   "en": {"title": "Account", "keywords": ["account", "my account"], "need": "I want to look at or manage the member account I sign in to TownPass with."},
+   "ja": {"title": "アカウント", "keywords": ["アカウント", "マイアカウント"], "need": "TownPassにログインしている自分の会員アカウントを確認・管理したい。"},
+   "vi": {"title": "Tài khoản", "keywords": ["tài khoản", "tài khoản của tôi", "tài khoản của mình", "thông tin tài khoản"], "need": "Tôi muốn xem hoặc quản lý tài khoản thành viên tôi dùng để đăng nhập TownPass."},
+   "id": {"title": "Akun", "keywords": ["akun", "akun saya"], "need": "Saya ingin melihat atau mengelola akun anggota yang saya pakai untuk masuk ke TownPass."},
+   "tl": {"title": "Account", "keywords": ["account", "account ko", "aking account"], "need": "Gusto kong tingnan o ayusin ang member account na ginagamit ko sa pag-sign in sa TownPass."}
   },
   "settings": {
-   "en": {"title": "Settings", "keywords": ["settings", "preferences", "setting"]},
-   "ja": {"title": "設定", "keywords": ["設定", "せってい"]},
-   "vi": {"title": "Cài đặt", "keywords": ["cài đặt", "thiết lập", "cài đặt ứng dụng", "thiết lập ứng dụng"]},
-   "id": {"title": "Pengaturan", "keywords": ["pengaturan", "setelan"]},
-   "tl": {"title": "Settings", "keywords": ["settings", "mga setting", "setting"]}
+   "en": {"title": "Settings", "keywords": ["settings", "preferences", "setting"], "need": "I want to change the app's options so it works the way I like."},
+   "ja": {"title": "設定", "keywords": ["設定", "せってい"], "need": "自分の使い方に合うように、アプリのいろいろな項目を調整したい。"},
+   "vi": {"title": "Cài đặt", "keywords": ["cài đặt", "thiết lập", "cài đặt ứng dụng", "thiết lập ứng dụng"], "need": "Tôi muốn chỉnh các tùy chọn của ứng dụng cho hợp với thói quen của mình."},
+   "id": {"title": "Pengaturan", "keywords": ["pengaturan", "setelan"], "need": "Saya ingin mengubah pilihan-pilihan di aplikasi supaya sesuai dengan kebiasaan saya."},
+   "tl": {"title": "Settings", "keywords": ["settings", "mga setting", "setting"], "need": "Nais kong iayos ang mga setting ng app ayon sa hilig ko."}
   },
   "profile": {
-   "en": {"title": "Personal details", "keywords": ["personal details", "profile", "my information", "email", "phone number", "address"]},
-   "ja": {"title": "基本情報", "keywords": ["基本情報", "プロフィール", "個人情報", "メールアドレス", "電話番号", "住所"]},
-   "vi": {"title": "Thông tin cá nhân", "keywords": ["thông tin cá nhân", "hồ sơ", "email", "số điện thoại", "địa chỉ", "thông tin của tôi", "đổi số điện thoại", "sửa thông tin", "cập nhật thông tin", "đổi địa chỉ"]},
-   "id": {"title": "Data pribadi", "keywords": ["data pribadi", "profil", "email", "nomor telepon", "alamat", "ubah profil", "alamat email"]},
-   "tl": {"title": "Personal na detalye", "keywords": ["personal na detalye", "personal na impormasyon", "profile", "impormasyon ko", "email", "numero ng telepono", "address", "tirahan"]}
+   "en": {"title": "Personal details", "keywords": ["personal details", "profile", "my information", "email", "phone number", "address"], "need": "I moved or got a new phone number or email, and need to update the personal contact details kept in the app."},
+   "ja": {"title": "基本情報", "keywords": ["基本情報", "プロフィール", "個人情報", "メールアドレス", "電話番号", "住所"], "need": "引っ越しや電話番号・メールアドレスの変更があったので、アプリに登録した連絡先を更新したい。"},
+   "vi": {"title": "Thông tin cá nhân", "keywords": ["thông tin cá nhân", "hồ sơ", "email", "số điện thoại", "địa chỉ", "thông tin của tôi", "đổi số điện thoại", "sửa thông tin", "cập nhật thông tin", "đổi địa chỉ"], "need": "Tôi chuyển nhà hoặc đổi số điện thoại, email, cần cập nhật thông tin liên lạc cá nhân trong ứng dụng."},
+   "id": {"title": "Data pribadi", "keywords": ["data pribadi", "profil", "email", "nomor telepon", "alamat", "ubah profil", "alamat email"], "need": "Saya pindah rumah atau ganti nomor ponsel atau email, jadi perlu memperbarui data kontak pribadi di aplikasi."},
+   "tl": {"title": "Personal na detalye", "keywords": ["personal na detalye", "personal na impormasyon", "profile", "impormasyon ko", "email", "numero ng telepono", "address", "tirahan"], "need": "Lumipat ako o nagpalit ng numero o email, kaya kailangan kong i-update ang personal kong detalye sa app."}
   },
   "start_page": {
-   "en": {"title": "App start page", "keywords": ["start page", "default page", "startup page"]},
-   "ja": {"title": "起動ページ", "keywords": ["起動ページ", "最初のページ", "スタートページ"]},
-   "vi": {"title": "Trang khởi động", "keywords": ["trang khởi động", "trang mặc định"]},
-   "id": {"title": "Halaman awal aplikasi", "keywords": ["halaman awal", "halaman default"]},
-   "tl": {"title": "Panimulang pahina ng App", "keywords": ["panimulang pahina", "start page", "default na pahina"]}
+   "en": {"title": "App start page", "keywords": ["start page", "default page", "startup page"], "need": "I'd like the app to open straight to the screen I use most instead of the usual home page."},
+   "ja": {"title": "起動ページ", "keywords": ["起動ページ", "最初のページ", "スタートページ"], "need": "アプリを開いたら、決まったホームではなく自分がよく使う画面がすぐ出るようにしたい。"},
+   "vi": {"title": "Trang khởi động", "keywords": ["trang khởi động", "trang mặc định"], "need": "Tôi muốn mở ứng dụng là thấy ngay màn hình mình hay dùng nhất, không phải trang chủ cố định."},
+   "id": {"title": "Halaman awal aplikasi", "keywords": ["halaman awal", "halaman default"], "need": "Saya ingin aplikasi langsung membuka layar yang paling sering saya pakai, bukan beranda biasa."},
+   "tl": {"title": "Panimulang pahina ng App", "keywords": ["panimulang pahina", "start page", "default na pahina"], "need": "Gusto kong pagbukas ng app ay ang screen na madalas kong gamitin ang lumabas, hindi ang karaniwang home."}
   },
   "pinned": {
-   "en": {"title": "My services and pinned", "keywords": ["my services", "pinned", "favorite services", "pin"]},
-   "ja": {"title": "マイサービスとピン留め", "keywords": ["マイサービス", "ピン留め", "よく使うサービス"]},
-   "vi": {"title": "Dịch vụ của tôi và ghim", "keywords": ["dịch vụ của tôi", "ghim", "dịch vụ thường dùng"]},
-   "id": {"title": "Layanan saya dan sematan", "keywords": ["layanan saya", "sematkan", "layanan favorit"]},
-   "tl": {"title": "Aking mga serbisyo at naka-pin", "keywords": ["aking mga serbisyo", "mga serbisyo ko", "naka-pin", "paboritong serbisyo", "i-pin"]}
+   "en": {"title": "My services and pinned", "keywords": ["my services", "pinned", "favorite services", "pin"], "need": "It takes me a while to find the few services I use all the time, so I want to pin them at the top."},
+   "ja": {"title": "マイサービスとピン留め", "keywords": ["マイサービス", "ピン留め", "よく使うサービス"], "need": "よく使うサービスを毎回探すのが大変なので、いちばん上に固定しておきたい。"},
+   "vi": {"title": "Dịch vụ của tôi và ghim", "keywords": ["dịch vụ của tôi", "ghim", "dịch vụ thường dùng"], "need": "Mỗi lần tìm mấy dịch vụ hay dùng rất lâu, tôi muốn ghim chúng lên đầu."},
+   "id": {"title": "Layanan saya dan sematan", "keywords": ["layanan saya", "sematkan", "layanan favorit"], "need": "Setiap kali saya lama mencari layanan yang sering dipakai, jadi ingin menyematkannya di bagian atas."},
+   "tl": {"title": "Aking mga serbisyo at naka-pin", "keywords": ["aking mga serbisyo", "mga serbisyo ko", "naka-pin", "paboritong serbisyo", "i-pin"], "need": "Matagal kong hinahanap ang ilang serbisyong lagi kong ginagamit, kaya gusto kong i-pin sila sa itaas."}
   },
   "messages": {
-   "en": {"title": "Messages", "keywords": ["messages", "notifications", "inbox"]},
-   "ja": {"title": "メッセージ", "keywords": ["メッセージ", "通知", "お知らせ"]},
-   "vi": {"title": "Tin nhắn", "keywords": ["tin nhắn", "thông báo", "hộp thư", "hộp thư đến", "thư của tôi", "tin nhắn mới"]},
-   "id": {"title": "Pesan", "keywords": ["pesan", "notifikasi", "kotak masuk", "pesan baru", "pesan masuk", "kotak pesan"]},
-   "tl": {"title": "Mga mensahe", "keywords": ["mensahe", "mga mensahe", "notipikasyon", "inbox", "mensahe ng lungsod"]}
+   "en": {"title": "Messages", "keywords": ["messages", "notifications", "inbox"], "need": "I want to read the notices, reminders and letters the city or the app has sent me."},
+   "ja": {"title": "メッセージ", "keywords": ["メッセージ", "通知", "お知らせ"], "need": "市やアプリから届いたお知らせやリマインダー、メッセージの内容を見たい。"},
+   "vi": {"title": "Tin nhắn", "keywords": ["tin nhắn", "thông báo", "hộp thư", "hộp thư đến", "thư của tôi", "tin nhắn mới"], "need": "Tôi muốn đọc các thông báo, lời nhắc và thư mà thành phố hoặc ứng dụng gửi cho tôi."},
+   "id": {"title": "Pesan", "keywords": ["pesan", "notifikasi", "kotak masuk", "pesan baru", "pesan masuk", "kotak pesan"], "need": "Saya ingin membaca pemberitahuan, pengingat, dan pesan yang dikirim kota atau aplikasi kepada saya."},
+   "tl": {"title": "Mga mensahe", "keywords": ["mensahe", "mga mensahe", "notipikasyon", "inbox", "mensahe ng lungsod"], "need": "Gusto kong basahin ang mga abiso, paalala at sulat na ipinadala sa akin ng lungsod o ng app."}
   },
   "activities": {
-   "en": {"title": "Events", "keywords": ["events", "activities", "latest events", "what's on"]},
-   "ja": {"title": "イベント情報", "keywords": ["イベント", "イベント情報", "催し"]},
-   "vi": {"title": "Sự kiện", "keywords": ["sự kiện", "hoạt động", "sự kiện mới", "sự kiện thành phố", "lễ hội"]},
-   "id": {"title": "Acara", "keywords": ["acara", "kegiatan", "acara terbaru", "event", "acara seru", "event seru"]},
-   "tl": {"title": "Mga event", "keywords": ["mga event", "event", "aktibidad", "mga aktibidad", "pinakabagong event"]}
+   "en": {"title": "Events", "keywords": ["events", "activities", "latest events", "what's on"], "need": "I want to go out on a weekend or holiday and find exhibitions, shows or talks the city is putting on."},
+   "ja": {"title": "イベント情報", "keywords": ["イベント", "イベント情報", "催し"], "need": "週末や休みの日に出かけたいので、市が開く展示や公演、講座などのイベントを探したい。"},
+   "vi": {"title": "Sự kiện", "keywords": ["sự kiện", "hoạt động", "sự kiện mới", "sự kiện thành phố", "lễ hội"], "need": "Cuối tuần hoặc ngày nghỉ tôi muốn đi chơi, tìm triển lãm, biểu diễn, buổi nói chuyện do thành phố tổ chức."},
+   "id": {"title": "Acara", "keywords": ["acara", "kegiatan", "acara terbaru", "event", "acara seru", "event seru"], "need": "Akhir pekan atau hari libur saya ingin keluar dan mencari pameran, pertunjukan, atau seminar yang diadakan kota."},
+   "tl": {"title": "Mga event", "keywords": ["mga event", "event", "aktibidad", "mga aktibidad", "pinakabagong event"], "need": "Gusto kong lumabas sa weekend o bakasyon at maghanap ng eksibit, palabas o talk na inihahanda ng lungsod."}
   },
   "invoice": {
-   "en": {"title": "Mobile barcode carrier", "keywords": ["mobile barcode", "e-invoice", "invoice carrier", "receipt barcode"]},
-   "ja": {"title": "モバイルバーコード", "keywords": ["モバイルバーコード", "電子発票", "発票", "レシート"]},
-   "vi": {"title": "Mã vạch hóa đơn điện tử", "keywords": ["mã vạch điện thoại", "hóa đơn điện tử", "hóa đơn", "mã vạch hóa đơn"]},
-   "id": {"title": "Barcode faktur seluler", "keywords": ["barcode ponsel", "faktur elektronik", "struk", "barcode faktur", "faktur", "kode faktur"]},
-   "tl": {"title": "Mobile barcode carrier", "keywords": ["mobile barcode", "barcode sa telepono", "e-invoice", "barcode ng resibo", "resibo"]}
+   "en": {"title": "Mobile barcode carrier", "keywords": ["mobile barcode", "e-invoice", "invoice carrier", "receipt barcode"], "need": "At the checkout I need to show my phone barcode to save the e-invoice, or I want to see the invoices saved on it."},
+   "ja": {"title": "モバイルバーコード", "keywords": ["モバイルバーコード", "電子発票", "発票", "レシート"], "need": "会計のときにスマホのバーコードを出して電子レシートを保存したい、または保存されたレシートを見たい。"},
+   "vi": {"title": "Mã vạch hóa đơn điện tử", "keywords": ["mã vạch điện thoại", "hóa đơn điện tử", "hóa đơn", "mã vạch hóa đơn"], "need": "Lúc tính tiền tôi cần đưa mã vạch trên điện thoại để lưu hóa đơn điện tử, hoặc muốn xem các hóa đơn đã lưu."},
+   "id": {"title": "Barcode faktur seluler", "keywords": ["barcode ponsel", "faktur elektronik", "struk", "barcode faktur", "faktur", "kode faktur"], "need": "Saat membayar di kasir saya perlu menunjukkan barcode di ponsel untuk menyimpan struk elektronik, atau ingin melihat struk yang tersimpan."},
+   "tl": {"title": "Mobile barcode carrier", "keywords": ["mobile barcode", "barcode sa telepono", "e-invoice", "barcode ng resibo", "resibo"], "need": "Sa pagbabayad kailangan kong ipakita ang barcode sa phone para ma-save ang e-invoice, o gusto kong makita ang mga naka-save na resibo."}
   },
   "feedback": {
-   "en": {"title": "Feedback", "keywords": ["feedback", "app problem", "report an app issue"]},
-   "ja": {"title": "ご意見", "keywords": ["ご意見", "フィードバック", "アプリの問題"]},
-   "vi": {"title": "Góp ý", "keywords": ["góp ý", "phản hồi", "lỗi ứng dụng", "báo lỗi", "góp ý ứng dụng"]},
-   "id": {"title": "Masukan", "keywords": ["masukan", "umpan balik", "masalah aplikasi", "aplikasi error", "aplikasinya error", "aplikasi bermasalah", "kritik dan saran", "saran aplikasi"]},
-   "tl": {"title": "Puna", "keywords": ["puna", "feedback", "problema sa app", "mag-report ng problema sa app"]}
+   "en": {"title": "Feedback", "keywords": ["feedback", "app problem", "report an app issue"], "need": "The app is hard to use or keeps crashing, or I have a suggestion, and I want to tell the people who make it."},
+   "ja": {"title": "ご意見", "keywords": ["ご意見", "フィードバック", "アプリの問題"], "need": "アプリが使いにくい、落ちる、または改善の提案があるので、作っている人に直接伝えたい。"},
+   "vi": {"title": "Góp ý", "keywords": ["góp ý", "phản hồi", "lỗi ứng dụng", "báo lỗi", "góp ý ứng dụng"], "need": "Ứng dụng khó dùng, hay bị treo, hoặc tôi có góp ý, muốn nói thẳng với người làm ra nó."},
+   "id": {"title": "Masukan", "keywords": ["masukan", "umpan balik", "masalah aplikasi", "aplikasi error", "aplikasinya error", "aplikasi bermasalah", "kritik dan saran", "saran aplikasi"], "need": "Aplikasinya susah dipakai atau sering macet, atau saya punya saran, dan ingin memberi tahu pembuatnya."},
+   "tl": {"title": "Puna", "keywords": ["puna", "feedback", "problema sa app", "mag-report ng problema sa app"], "need": "Mahirap gamitin o laging nagha-hang ang app, o may mungkahi ako, at gusto kong sabihin sa gumawa nito."}
   },
   "language": {
-   "en": {"title": "Language", "keywords": ["language", "change language", "english interface"]},
-   "ja": {"title": "言語", "keywords": ["言語", "言語変更", "英語表示"]},
-   "vi": {"title": "Ngôn ngữ", "keywords": ["ngôn ngữ", "đổi ngôn ngữ", "đổi sang tiếng việt", "chuyển sang tiếng việt", "chuyển ngôn ngữ", "cài đặt ngôn ngữ"]},
-   "id": {"title": "Bahasa", "keywords": ["ganti bahasa", "pengaturan bahasa", "ubah bahasa", "bahasa aplikasi"]},
-   "tl": {"title": "Wika", "keywords": ["wika", "palitan ang wika", "baguhin ang wika", "gawing filipino", "gawing tagalog", "filipino na wika"]}
+   "en": {"title": "Language", "keywords": ["language", "change language", "english interface"], "need": "I can't read Chinese and want the app's screens in English, Japanese, Vietnamese, Indonesian or Filipino."},
+   "ja": {"title": "言語", "keywords": ["言語", "言語変更", "英語表示"], "need": "中国語が読めないので、アプリの画面を英語・日本語・ベトナム語・インドネシア語・フィリピン語にしたい。"},
+   "vi": {"title": "Ngôn ngữ", "keywords": ["ngôn ngữ", "đổi ngôn ngữ", "đổi sang tiếng việt", "chuyển sang tiếng việt", "chuyển ngôn ngữ", "cài đặt ngôn ngữ"], "need": "Tôi không đọc được tiếng Trung, muốn đổi màn hình ứng dụng sang tiếng Anh, Nhật, Việt, Indonesia hoặc Philippines."},
+   "id": {"title": "Bahasa", "keywords": ["ganti bahasa", "pengaturan bahasa", "ubah bahasa", "bahasa aplikasi"], "need": "Saya tidak bisa membaca bahasa Mandarin dan ingin tampilan aplikasi dalam bahasa Inggris, Jepang, Vietnam, Indonesia, atau Filipina."},
+   "tl": {"title": "Wika", "keywords": ["wika", "palitan ang wika", "baguhin ang wika", "gawing filipino", "gawing tagalog", "filipino na wika"], "need": "Hindi ako nakakabasa ng Chinese at gusto kong gawing English, Japanese, Vietnamese, Indonesian o Filipino ang app."}
   },
   "notification_settings": {
-   "en": {"title": "Notification settings", "keywords": ["notification settings", "reminder settings"]},
-   "ja": {"title": "通知設定", "keywords": ["通知設定", "リマインダー設定"]},
-   "vi": {"title": "Cài đặt thông báo", "keywords": ["cài đặt thông báo", "nhắc nhở", "tắt thông báo", "bật thông báo"]},
-   "id": {"title": "Pengaturan notifikasi", "keywords": ["pengaturan notifikasi", "pengingat", "atur notifikasi", "matikan notifikasi", "nyalakan notifikasi", "atur pengingat"]},
-   "tl": {"title": "Settings ng notification", "keywords": ["settings ng notification", "setting ng notipikasyon", "settings ng paalala", "paalala"]}
+   "en": {"title": "Notification settings", "keywords": ["notification settings", "reminder settings"], "need": "The app's pop-up alerts are too many, or I'm afraid of missing an important reminder, so I want to choose which notifications I get."},
+   "ja": {"title": "通知設定", "keywords": ["通知設定", "リマインダー設定"], "need": "通知が多すぎてうるさい、または大事なお知らせを見逃したくないので、通知を受けるかどうかを調整したい。"},
+   "vi": {"title": "Cài đặt thông báo", "keywords": ["cài đặt thông báo", "nhắc nhở", "tắt thông báo", "bật thông báo"], "need": "Ứng dụng báo quá nhiều làm phiền, hoặc sợ bỏ lỡ lời nhắc quan trọng, tôi muốn chỉnh việc nhận thông báo."},
+   "id": {"title": "Pengaturan notifikasi", "keywords": ["pengaturan notifikasi", "pengingat", "atur notifikasi", "matikan notifikasi", "nyalakan notifikasi", "atur pengingat"], "need": "Notifikasi aplikasi terlalu banyak, atau saya takut melewatkan pengingat penting, jadi ingin mengatur mau menerima pemberitahuan atau tidak."},
+   "tl": {"title": "Settings ng notification", "keywords": ["settings ng notification", "setting ng notipikasyon", "settings ng paalala", "paalala"], "need": "Sobrang dami ng abiso ng app, o natatakot akong ma-miss ang mahalagang paalala, kaya gusto kong ayusin kung anong notification ang matatanggap ko."}
   },
   "quick_login": {
-   "en": {"title": "Quick login", "keywords": ["quick login", "fingerprint login", "face id"]},
-   "ja": {"title": "クイックログイン", "keywords": ["クイックログイン", "生体認証", "指紋"]},
-   "vi": {"title": "Đăng nhập nhanh", "keywords": ["đăng nhập nhanh", "vân tay", "sinh trắc học"]},
-   "id": {"title": "Login cepat", "keywords": ["login cepat", "sidik jari", "biometrik"]},
-   "tl": {"title": "Mabilis na pag-log in", "keywords": ["mabilis na pag-log in", "fingerprint", "face id"]}
+   "en": {"title": "Quick login", "keywords": ["quick login", "fingerprint login", "face id"], "need": "Typing my password every time I sign in is a hassle; I want to sign in quickly with my fingerprint or face."},
+   "ja": {"title": "クイックログイン", "keywords": ["クイックログイン", "生体認証", "指紋"], "need": "毎回パスワードを入れるのが面倒なので、指紋や顔認証ですぐログインしたい。"},
+   "vi": {"title": "Đăng nhập nhanh", "keywords": ["đăng nhập nhanh", "vân tay", "sinh trắc học"], "need": "Mỗi lần đăng nhập phải gõ mật khẩu rất phiền, tôi muốn đăng nhập nhanh bằng vân tay hoặc khuôn mặt."},
+   "id": {"title": "Login cepat", "keywords": ["login cepat", "sidik jari", "biometrik"], "need": "Mengetik kata sandi setiap kali masuk itu repot, saya ingin masuk cepat dengan sidik jari atau wajah."},
+   "tl": {"title": "Mabilis na pag-log in", "keywords": ["mabilis na pag-log in", "fingerprint", "face id"], "need": "Abala ang pag-type ng password tuwing magla-log in, gusto kong mag-log in agad gamit ang fingerprint o mukha."}
   },
   "authorization": {
-   "en": {"title": "History and authorisations", "keywords": ["authorization", "permissions", "usage history"]},
-   "ja": {"title": "履歴と権限管理", "keywords": ["権限管理", "利用履歴"]},
-   "vi": {"title": "Lịch sử và ủy quyền", "keywords": ["quản lý ủy quyền", "lịch sử sử dụng"]},
-   "id": {"title": "Riwayat dan otorisasi", "keywords": ["otorisasi", "riwayat penggunaan"]},
-   "tl": {"title": "Kasaysayan at mga pahintulot", "keywords": ["pahintulot", "mga pahintulot", "kasaysayan ng paggamit", "awtorisasyon"]}
+   "en": {"title": "History and authorisations", "keywords": ["authorization", "permissions", "usage history"], "need": "I want to know which organisations I've allowed to use my personal data, or take one of those permissions back."},
+   "ja": {"title": "履歴と権限管理", "keywords": ["権限管理", "利用履歴"], "need": "自分の個人情報をどの機関に使わせているのか知りたい、またはその許可を取り消したい。"},
+   "vi": {"title": "Lịch sử và ủy quyền", "keywords": ["quản lý ủy quyền", "lịch sử sử dụng"], "need": "Tôi muốn biết mình đã cho những đơn vị nào dùng dữ liệu cá nhân, hoặc muốn rút lại một quyền đã cho."},
+   "id": {"title": "Riwayat dan otorisasi", "keywords": ["otorisasi", "riwayat penggunaan"], "need": "Saya ingin tahu lembaga mana saja yang saya izinkan memakai data pribadi saya, atau ingin mencabut salah satu izin itu."},
+   "tl": {"title": "Kasaysayan at mga pahintulot", "keywords": ["pahintulot", "mga pahintulot", "kasaysayan ng paggamit", "awtorisasyon"], "need": "Gusto kong malaman kung aling mga ahensya ang pinayagan kong gumamit ng personal kong datos, o bawiin ang isa sa mga pahintulot."}
   },
   "logout": {
-   "en": {"title": "Log out", "keywords": ["log out", "logout", "sign out"]},
-   "ja": {"title": "ログアウト", "keywords": ["ログアウト", "サインアウト"]},
-   "vi": {"title": "Đăng xuất", "keywords": ["đăng xuất", "thoát tài khoản"]},
-   "id": {"title": "Keluar", "keywords": ["keluar akun", "logout"]},
-   "tl": {"title": "Mag-log out", "keywords": ["lumabas sa account", "mag-sign out"]}
+   "en": {"title": "Log out", "keywords": ["log out", "logout", "sign out"], "need": "I'm lending my phone to someone or stopping using it, so I want to sign out of my account first."},
+   "ja": {"title": "ログアウト", "keywords": ["ログアウト", "サインアウト"], "need": "スマホを人に貸す、または使わなくなるので、先にアカウントからログアウトしたい。"},
+   "vi": {"title": "Đăng xuất", "keywords": ["đăng xuất", "thoát tài khoản"], "need": "Tôi sắp cho người khác mượn điện thoại hoặc không dùng nữa, muốn đăng xuất tài khoản trước."},
+   "id": {"title": "Keluar", "keywords": ["keluar akun", "logout"], "need": "Ponsel saya mau dipinjamkan atau tidak dipakai lagi, jadi saya ingin keluar dari akun dulu."},
+   "tl": {"title": "Mag-log out", "keywords": ["lumabas sa account", "mag-sign out"], "need": "Ipapahiram ko ang phone o hindi ko na ito gagamitin, kaya gusto ko munang mag-log out sa account."}
   },
   "suspend": {
-   "en": {"title": "Deactivate account", "keywords": ["deactivate account", "delete account", "close account", "delete my account", "close my account"]},
-   "ja": {"title": "アカウント停止", "keywords": ["アカウント停止", "アカウント削除"]},
-   "vi": {"title": "Ngừng tài khoản", "keywords": ["xóa tài khoản", "ngừng tài khoản"]},
-   "id": {"title": "Nonaktifkan akun", "keywords": ["hapus akun", "nonaktifkan akun"]},
-   "tl": {"title": "I-deactivate ang account", "keywords": ["i-deactivate ang account", "burahin ang account", "isara ang account", "tanggalin ang account ko", "burahin ang account ko"]}
+   "en": {"title": "Deactivate account", "keywords": ["deactivate account", "delete account", "close account", "delete my account", "close my account"], "need": "I don't want to use TownPass any more and want to deactivate or delete my account."},
+   "ja": {"title": "アカウント停止", "keywords": ["アカウント停止", "アカウント削除"], "need": "もうTownPassを使わないので、自分のアカウントを停止または削除したい。"},
+   "vi": {"title": "Ngừng tài khoản", "keywords": ["xóa tài khoản", "ngừng tài khoản"], "need": "Tôi không muốn dùng TownPass nữa, muốn khóa hoặc xóa tài khoản của mình."},
+   "id": {"title": "Nonaktifkan akun", "keywords": ["hapus akun", "nonaktifkan akun"], "need": "Saya tidak mau memakai TownPass lagi dan ingin menonaktifkan atau menghapus akun saya."},
+   "tl": {"title": "I-deactivate ang account", "keywords": ["i-deactivate ang account", "burahin ang account", "isara ang account", "tanggalin ang account ko", "burahin ang account ko"], "need": "Ayaw ko nang gamitin ang TownPass at gusto kong i-deactivate o burahin ang account ko."}
   },
   "news": {
-   "en": {"title": "City news", "keywords": ["city news", "news"]},
-   "ja": {"title": "市政ニュース", "keywords": ["ニュース", "市政ニュース"]},
-   "vi": {"title": "Tin tức thành phố", "keywords": ["tin tức", "tin tức thành phố"]},
-   "id": {"title": "Berita kota", "keywords": ["berita", "berita kota"]},
-   "tl": {"title": "Balita ng lungsod", "keywords": ["balita", "balita ng lungsod"]}
+   "en": {"title": "City news", "keywords": ["city news", "news"], "need": "I want to know what news and policy announcements the city government has put out lately."},
+   "ja": {"title": "市政ニュース", "keywords": ["ニュース", "市政ニュース"], "need": "市役所が最近出したニュースや政策のお知らせを知りたい。"},
+   "vi": {"title": "Tin tức thành phố", "keywords": ["tin tức", "tin tức thành phố"], "need": "Tôi muốn biết gần đây chính quyền thành phố công bố tin tức và chính sách gì."},
+   "id": {"title": "Berita kota", "keywords": ["berita", "berita kota"], "need": "Saya ingin tahu berita dan kebijakan apa yang baru diumumkan pemerintah kota."},
+   "tl": {"title": "Balita ng lungsod", "keywords": ["balita", "balita ng lungsod"], "need": "Nais kong mabasa ang pinakabagong anunsyo at balita ng city hall."}
   },
   "bill_settings": {
-   "en": {"title": "My bill settings", "keywords": ["bill settings", "add a bill"]},
-   "ja": {"title": "請求設定", "keywords": ["請求設定", "請求の追加"]},
-   "vi": {"title": "Cài đặt hóa đơn", "keywords": ["cài đặt hóa đơn", "thêm hóa đơn"]},
-   "id": {"title": "Pengaturan tagihan", "keywords": ["pengaturan tagihan", "tambah tagihan"]},
-   "tl": {"title": "Settings ng aking mga bill", "keywords": ["magdagdag ng bill na susubaybayan"]}
+   "en": {"title": "My bill settings", "keywords": ["bill settings", "add a bill"], "need": "I want to add a bill to keep track of, or set up automatic payment from a credit card or bank account."},
+   "ja": {"title": "請求設定", "keywords": ["請求設定", "請求の追加"], "need": "管理したい請求を追加したり、クレジットカードや銀行口座からの自動引き落としを設定したい。"},
+   "vi": {"title": "Cài đặt hóa đơn", "keywords": ["cài đặt hóa đơn", "thêm hóa đơn"], "need": "Tôi muốn thêm hóa đơn cần theo dõi, hoặc cài tự động trừ tiền qua thẻ tín dụng hay tài khoản ngân hàng."},
+   "id": {"title": "Pengaturan tagihan", "keywords": ["pengaturan tagihan", "tambah tagihan"], "need": "Saya ingin menambah tagihan yang mau dipantau, atau mengatur pembayaran otomatis dari kartu kredit atau rekening bank."},
+   "tl": {"title": "Settings ng aking mga bill", "keywords": ["magdagdag ng bill na susubaybayan"], "need": "Gusto kong magdagdag ng bayaring susubaybayan, o mag-set ng awtomatikong bayad mula sa credit card o bank account."}
   },
   "1999": {
-   "en": {"title": "1999 hotline", "keywords": ["1999", "citizen hotline", "city hotline"]},
-   "ja": {"title": "1999 市民ホットライン", "keywords": ["1999", "市民ホットライン"]},
-   "vi": {"title": "Đường dây nóng 1999", "keywords": ["1999", "đường dây nóng"]},
-   "id": {"title": "Hotline 1999", "keywords": ["1999", "hotline warga"]},
-   "tl": {"title": "1999 hotline", "keywords": ["1999", "hotline ng lungsod", "hotline ng mamamayan"]}
+   "en": {"title": "1999 hotline", "keywords": ["1999", "citizen hotline", "city hotline"], "need": "I have a problem with a city matter and don't know which office handles it, so I want to call the citizen hotline and ask a person."},
+   "ja": {"title": "1999 市民ホットライン", "keywords": ["1999", "市民ホットライン"], "need": "市のことで困っているがどこの部署に聞けばいいか分からないので、市民ホットラインに電話して人に聞きたい。"},
+   "vi": {"title": "Đường dây nóng 1999", "keywords": ["1999", "đường dây nóng"], "need": "Tôi gặp chuyện liên quan đến thành phố mà không biết hỏi cơ quan nào, muốn gọi đường dây nóng để hỏi người thật."},
+   "id": {"title": "Hotline 1999", "keywords": ["1999", "hotline warga"], "need": "Saya punya masalah urusan kota dan tidak tahu harus ke kantor mana, jadi ingin menelepon hotline warga untuk bertanya langsung."},
+   "tl": {"title": "1999 hotline", "keywords": ["1999", "hotline ng lungsod", "hotline ng mamamayan"], "need": "May problema ako sa lungsod at hindi ko alam kung saang opisina lalapit, kaya gusto kong tumawag sa hotline at magtanong sa tao."}
   },
   "districtOffice": {
-   "en": {"title": "Applications", "keywords": ["apply", "application", "city government services", "apply for"]},
-   "ja": {"title": "申請サービス", "keywords": ["申請", "手続き", "市役所のサービス"]},
-   "vi": {"title": "Dịch vụ nộp đơn", "keywords": ["nộp đơn", "đăng ký", "thủ tục", "nộp hồ sơ", "làm thủ tục", "nộp đơn trực tuyến", "làm giấy tờ"]},
-   "id": {"title": "Layanan permohonan", "keywords": ["mengajukan", "permohonan", "layanan pemerintah", "pengajuan", "pengajuan online", "layanan pengajuan", "urus surat", "urus dokumen", "permohonan online", "ajukan permohonan"]},
-   "tl": {"title": "Mga aplikasyon", "keywords": ["mag-apply", "mag-aplay", "aplikasyon", "serbisyo ng pamahalaang lungsod"]}
+   "en": {"title": "Applications", "keywords": ["apply", "application", "city government services", "apply for"], "need": "I need to apply to the city for a benefit, a certificate or another procedure and want to do it online instead of going to the district office."},
+   "ja": {"title": "申請サービス", "keywords": ["申請", "手続き", "市役所のサービス"], "need": "市に補助金や証明書などの手続きを申請したいが、区役所に行かずにネットで出したい。"},
+   "vi": {"title": "Dịch vụ nộp đơn", "keywords": ["nộp đơn", "đăng ký", "thủ tục", "nộp hồ sơ", "làm thủ tục", "nộp đơn trực tuyến", "làm giấy tờ"], "need": "Tôi cần xin trợ cấp, giấy chứng nhận hay làm thủ tục với thành phố, muốn nộp trên mạng khỏi phải lên quận."},
+   "id": {"title": "Layanan permohonan", "keywords": ["mengajukan", "permohonan", "layanan pemerintah", "pengajuan", "pengajuan online", "layanan pengajuan", "urus surat", "urus dokumen", "permohonan online", "ajukan permohonan"], "need": "Saya perlu mengajukan bantuan, surat keterangan, atau urusan lain ke pemerintah kota dan ingin melakukannya online tanpa ke kantor kecamatan."},
+   "tl": {"title": "Mga aplikasyon", "keywords": ["mag-apply", "mag-aplay", "aplikasyon", "serbisyo ng pamahalaang lungsod"], "need": "Kailangan kong mag-apply sa lungsod ng tulong, sertipiko o ibang proseso at gusto kong gawin online nang hindi pumupunta sa district office."}
   },
   "reportIssue": {
-   "en": {"title": "Report an issue", "keywords": ["complaint", "report a problem", "petition", "report an issue"]},
-   "ja": {"title": "ご意見・陳情", "keywords": ["陳情", "苦情", "通報"]},
-   "vi": {"title": "Phản ánh", "keywords": ["phản ánh", "khiếu nại", "báo cáo vấn đề", "phản ánh vấn đề", "báo hư hỏng", "tố cáo", "khiếu nại tiếng ồn"]},
-   "id": {"title": "Sampaikan keluhan", "keywords": ["keluhan", "pengaduan", "laporkan masalah", "lapor ke pemerintah kota", "keluhan ke pemerintah", "jalan berlubang", "sampaikan keluhan"]},
-   "tl": {"title": "Mag-ulat ng isyu", "keywords": ["reklamo", "magreklamo", "mag-ulat ng problema", "mag-ulat ng isyu", "petisyon", "isumbong sa lungsod"]}
+   "en": {"title": "Report an issue", "keywords": ["complaint", "report a problem", "petition", "report an issue"], "need": "Something in daily life bothers me, like a broken road, noise, litter or illegal parking, and I want to complain to the city so they deal with it."},
+   "ja": {"title": "ご意見・陳情", "keywords": ["陳情", "苦情", "通報"], "need": "道路の穴や騒音、ゴミ、違法駐車など身の回りの問題が気になるので、市に陳情・通報して対応してもらいたい。"},
+   "vi": {"title": "Phản ánh", "keywords": ["phản ánh", "khiếu nại", "báo cáo vấn đề", "phản ánh vấn đề", "báo hư hỏng", "tố cáo", "khiếu nại tiếng ồn"], "need": "Tôi bức xúc với chuyện như đường hư, tiếng ồn, rác bẩn, đậu xe sai chỗ, muốn phản ánh với thành phố để họ xử lý."},
+   "id": {"title": "Sampaikan keluhan", "keywords": ["keluhan", "pengaduan", "laporkan masalah", "lapor ke pemerintah kota", "keluhan ke pemerintah", "jalan berlubang", "sampaikan keluhan"], "need": "Ada masalah sehari-hari yang mengganggu, seperti jalan rusak, kebisingan, sampah, atau parkir liar, dan saya ingin mengadu ke pemerintah kota supaya ditangani."},
+   "tl": {"title": "Mag-ulat ng isyu", "keywords": ["reklamo", "magreklamo", "mag-ulat ng problema", "mag-ulat ng isyu", "petisyon", "isumbong sa lungsod"], "need": "May problema sa paligid na nakakainis, gaya ng sirang kalsada, ingay, kalat o ilegal na parking, at gusto kong magreklamo sa lungsod para maayos ito."}
   },
   "reservation": {
-   "en": {"title": "Counter queue number", "keywords": ["queue number", "take a number", "counter", "waiting number"]},
-   "ja": {"title": "窓口の番号札", "keywords": ["番号札", "窓口", "順番待ち"]},
-   "vi": {"title": "Lấy số thứ tự", "keywords": ["lấy số", "số thứ tự", "quầy", "lấy số thứ tự", "bốc số", "xếp hàng", "số đang gọi"]},
-   "id": {"title": "Nomor antrean loket", "keywords": ["nomor antrean", "ambil nomor", "loket", "antrean", "ambil antrean", "antrean loket", "nomor urut"]},
-   "tl": {"title": "Numero ng pila sa counter", "keywords": ["numero ng pila", "kumuha ng numero", "pila sa counter", "numero sa pila", "counter", "pumila"]}
+   "en": {"title": "Counter queue number", "keywords": ["queue number", "take a number", "counter", "waiting number"], "need": "I'm going to a counter at a district, household registration, land, tax or employment office and want to take a number first and see which number is being served and how long the wait is."},
+   "ja": {"title": "窓口の番号札", "keywords": ["番号札", "窓口", "順番待ち"], "need": "区役所や戸籍・地政・税務事務所、就業サービスセンターの窓口に行くので、先に整理券を取り、今何番か、あとどのくらい待つかを知りたい。"},
+   "vi": {"title": "Lấy số thứ tự", "keywords": ["lấy số", "số thứ tự", "quầy", "lấy số thứ tự", "bốc số", "xếp hàng", "số đang gọi"], "need": "Tôi sắp đến quầy ở văn phòng quận, hộ tịch, địa chính, thuế hoặc trạm việc làm, muốn lấy số trước và xem đang gọi số mấy, phải chờ bao lâu."},
+   "id": {"title": "Nomor antrean loket", "keywords": ["nomor antrean", "ambil nomor", "loket", "antrean", "ambil antrean", "antrean loket", "nomor urut"], "need": "Saya mau ke loket kantor kecamatan, catatan sipil, pertanahan, pajak, atau pusat layanan kerja dan ingin ambil nomor dulu serta melihat nomor berapa yang dipanggil dan berapa lama menunggu."},
+   "tl": {"title": "Numero ng pila sa counter", "keywords": ["numero ng pila", "kumuha ng numero", "pila sa counter", "numero sa pila", "counter", "pumila"], "need": "Bago pumila sa tanggapan ng lungsod (district, household registration, land, buwis, employment), nais kong kumuha ng numero at alamin ang haba ng pila."}
   },
   "iVoting": {
-   "en": {"title": "Online voting", "keywords": ["online voting", "vote"]},
-   "ja": {"title": "オンライン投票", "keywords": ["投票", "オンライン投票"]},
-   "vi": {"title": "Bỏ phiếu trực tuyến", "keywords": ["bỏ phiếu", "bỏ phiếu trực tuyến"]},
-   "id": {"title": "Voting online", "keywords": ["voting", "pemungutan suara"]},
-   "tl": {"title": "Online na botohan", "keywords": ["online na botohan", "bumoto", "botohan"]}
+   "en": {"title": "Online voting", "keywords": ["online voting", "vote"], "need": "I want to say yes or no on a city issue by taking part in the city's online vote."},
+   "ja": {"title": "オンライン投票", "keywords": ["投票", "オンライン投票"], "need": "市の議題に賛成か反対かを示すため、市のネット投票に参加したい。"},
+   "vi": {"title": "Bỏ phiếu trực tuyến", "keywords": ["bỏ phiếu", "bỏ phiếu trực tuyến"], "need": "Tôi muốn bày tỏ ủng hộ hay phản đối một vấn đề của thành phố qua bỏ phiếu trực tuyến."},
+   "id": {"title": "Voting online", "keywords": ["voting", "pemungutan suara"], "need": "Saya ingin menyatakan setuju atau tidak pada isu kota dengan ikut pemungutan suara online."},
+   "tl": {"title": "Online na botohan", "keywords": ["online na botohan", "bumoto", "botohan"], "need": "Gusto kong sabihin kung pabor o tutol ako sa isyu ng lungsod sa pagsali sa online na botohan."}
   },
   "dashboard": {
-   "en": {"title": "City data dashboard", "keywords": ["dashboard", "city data"]},
-   "ja": {"title": "市政ダッシュボード", "keywords": ["ダッシュボード", "市政データ"]},
-   "vi": {"title": "Bảng dữ liệu thành phố", "keywords": ["bảng điều khiển", "dữ liệu thành phố"]},
-   "id": {"title": "Dasbor data kota", "keywords": ["dasbor", "data kota"]},
-   "tl": {"title": "Dashboard ng datos ng lungsod", "keywords": ["dashboard", "datos ng lungsod"]}
+   "en": {"title": "City data dashboard", "keywords": ["dashboard", "city data"], "need": "I want to see Taipei's figures and charts on traffic, population, air quality and so on."},
+   "ja": {"title": "市政ダッシュボード", "keywords": ["ダッシュボード", "市政データ"], "need": "台北市の交通や人口、空気の質などの統計や図表を見たい。"},
+   "vi": {"title": "Bảng dữ liệu thành phố", "keywords": ["bảng điều khiển", "dữ liệu thành phố"], "need": "Tôi muốn xem số liệu và biểu đồ của Đài Bắc về giao thông, dân số, chất lượng không khí."},
+   "id": {"title": "Dasbor data kota", "keywords": ["dasbor", "data kota"], "need": "Saya ingin melihat angka dan grafik Taipei tentang lalu lintas, penduduk, kualitas udara, dan lainnya."},
+   "tl": {"title": "Dashboard ng datos ng lungsod", "keywords": ["dashboard", "datos ng lungsod"], "need": "Gusto kong makita ang mga numero at tsart ng Taipei tungkol sa trapiko, populasyon, kalidad ng hangin at iba pa."}
   },
   "survey": {
-   "en": {"title": "Surveys", "keywords": ["survey", "questionnaire"]},
-   "ja": {"title": "アンケート", "keywords": ["アンケート", "意見調査"]},
-   "vi": {"title": "Khảo sát", "keywords": ["khảo sát", "bảng câu hỏi"]},
-   "id": {"title": "Survei", "keywords": ["survei", "kuesioner"]},
-   "tl": {"title": "Mga survey", "keywords": ["survey", "talatanungan"]}
+   "en": {"title": "Surveys", "keywords": ["survey", "questionnaire"], "need": "I want to fill in a city questionnaire and give my opinion on a policy or service."},
+   "ja": {"title": "アンケート", "keywords": ["アンケート", "意見調査"], "need": "市のアンケートに答えて、政策やサービスについて意見を伝えたい。"},
+   "vi": {"title": "Khảo sát", "keywords": ["khảo sát", "bảng câu hỏi"], "need": "Tôi muốn điền phiếu khảo sát của thành phố để nói ý kiến về chính sách hay dịch vụ."},
+   "id": {"title": "Survei", "keywords": ["survei", "kuesioner"], "need": "Saya ingin mengisi kuesioner dari kota dan menyampaikan pendapat tentang kebijakan atau layanan."},
+   "tl": {"title": "Mga survey", "keywords": ["survey", "talatanungan"], "need": "Gusto kong sagutan ang survey ng lungsod at ibigay ang opinyon ko sa isang patakaran o serbisyo."}
   },
   "police": {
-   "en": {"title": "Police services", "keywords": ["police", "report to the police", "call the police"]},
-   "ja": {"title": "警察サービス", "keywords": ["警察", "通報", "被害届"]},
-   "vi": {"title": "Dịch vụ cảnh sát", "keywords": ["cảnh sát", "báo cảnh sát", "trình báo", "công an", "báo công an", "gọi cảnh sát", "đồn cảnh sát"]},
-   "id": {"title": "Layanan polisi", "keywords": ["polisi", "lapor polisi", "kepolisian", "layanan kepolisian", "kantor polisi"]},
-   "tl": {"title": "Serbisyo ng pulis", "keywords": ["pulis", "pulisya", "magsumbong sa pulis", "tumawag ng pulis", "mag-report sa pulis"]}
+   "en": {"title": "Police services", "keywords": ["police", "report to the police", "call the police"], "need": "Something was stolen or lost, I was cheated, or I'm in a dispute, and I need the police's help or want to see their services."},
+   "ja": {"title": "警察サービス", "keywords": ["警察", "通報", "被害届"], "need": "物を盗まれた・なくした、だまされた、トラブルになったので、警察に助けてほしい、または警察のサービスを見たい。"},
+   "vi": {"title": "Dịch vụ cảnh sát", "keywords": ["cảnh sát", "báo cảnh sát", "trình báo", "công an", "báo công an", "gọi cảnh sát", "đồn cảnh sát"], "need": "Tôi bị trộm, mất đồ, bị lừa hoặc xảy ra tranh chấp, cần công an giúp hoặc muốn xem các dịch vụ của cảnh sát."},
+   "id": {"title": "Layanan polisi", "keywords": ["polisi", "lapor polisi", "kepolisian", "layanan kepolisian", "kantor polisi"], "need": "Barang saya dicuri atau hilang, saya ditipu, atau sedang ada perselisihan, dan saya butuh bantuan polisi atau ingin melihat layanannya."},
+   "tl": {"title": "Serbisyo ng pulis", "keywords": ["pulis", "pulisya", "magsumbong sa pulis", "tumawag ng pulis", "mag-report sa pulis"], "need": "Ninakawan o nawalan ako, naloko, o may alitan, at kailangan ko ng tulong ng pulis o gusto kong makita ang mga serbisyo nila."}
   },
   "neighborhood": {
-   "en": {"title": "Neighbourhood office", "keywords": ["neighborhood office", "village chief"]},
-   "ja": {"title": "里の事務所", "keywords": ["里長", "里の事務所"]},
-   "vi": {"title": "Văn phòng phường", "keywords": ["văn phòng phường", "trưởng khu phố"]},
-   "id": {"title": "Kantor lingkungan", "keywords": ["kantor lingkungan", "ketua lingkungan"]},
-   "tl": {"title": "Opisina ng kapitbahayan", "keywords": ["opisina ng kapitbahayan", "pinuno ng kapitbahayan", "barangay", "kapitan ng barangay"]}
+   "en": {"title": "Neighbourhood office", "keywords": ["neighborhood office", "village chief"], "need": "I want to find how to contact the chief or office of the neighbourhood (li) I live in."},
+   "ja": {"title": "里の事務所", "keywords": ["里長", "里の事務所"], "need": "自分が住んでいる里の里長や里事務所の連絡先を知りたい。"},
+   "vi": {"title": "Văn phòng phường", "keywords": ["văn phòng phường", "trưởng khu phố"], "need": "Tôi muốn tìm cách liên lạc với trưởng phường (lý trưởng) hoặc văn phòng nơi tôi ở."},
+   "id": {"title": "Kantor lingkungan", "keywords": ["kantor lingkungan", "ketua lingkungan"], "need": "Saya ingin tahu cara menghubungi kepala atau kantor lingkungan (li) tempat saya tinggal."},
+   "tl": {"title": "Opisina ng kapitbahayan", "keywords": ["opisina ng kapitbahayan", "pinuno ng kapitbahayan", "barangay", "kapitan ng barangay"], "need": "Hinahanap ko ang contact ng village chief o opisina ng li sa tinitirhan namin."}
   },
   "disasterReport": {
-   "en": {"title": "Disaster report", "keywords": ["disaster report", "flooding", "landslide", "fallen tree"]},
-   "ja": {"title": "災害通報", "keywords": ["災害通報", "浸水", "土砂崩れ", "倒木"]},
-   "vi": {"title": "Báo cáo thiên tai", "keywords": ["báo cáo thiên tai", "ngập nước", "sạt lở", "cây đổ", "thiên tai", "lũ lụt", "ngập lụt", "thiệt hại do bão"]},
-   "id": {"title": "Laporan bencana", "keywords": ["laporan bencana", "banjir", "tanah longsor", "pohon tumbang", "topan", "angin topan", "badai", "bencana alam", "kerusakan akibat banjir", "kerusakan akibat topan"]},
-   "tl": {"title": "Ulat ng sakuna", "keywords": ["ulat ng sakuna", "mag-ulat ng sakuna", "baha", "bumabaha", "pagguho ng lupa", "natumbang puno", "bumagsak na puno"]}
+   "en": {"title": "Disaster report", "keywords": ["disaster report", "flooding", "landslide", "fallen tree"], "need": "After a typhoon, heavy rain or an earthquake I see flooding, fallen trees or collapsed ground, and want to report it so the city sends someone."},
+   "ja": {"title": "災害通報", "keywords": ["災害通報", "浸水", "土砂崩れ", "倒木"], "need": "台風や大雨、地震のあとで浸水や倒木、崩れなどの被害を見たので、市に通報して対応してもらいたい。"},
+   "vi": {"title": "Báo cáo thiên tai", "keywords": ["báo cáo thiên tai", "ngập nước", "sạt lở", "cây đổ", "thiên tai", "lũ lụt", "ngập lụt", "thiệt hại do bão"], "need": "Sau bão, mưa lớn hay động đất tôi thấy ngập nước, cây đổ, sạt lở, muốn báo thành phố cử người xử lý."},
+   "id": {"title": "Laporan bencana", "keywords": ["laporan bencana", "banjir", "tanah longsor", "pohon tumbang", "topan", "angin topan", "badai", "bencana alam", "kerusakan akibat banjir", "kerusakan akibat topan"], "need": "Setelah topan, hujan deras, atau gempa saya melihat banjir, pohon tumbang, atau tanah longsor dan ingin melapor supaya kota mengirim petugas."},
+   "tl": {"title": "Ulat ng sakuna", "keywords": ["ulat ng sakuna", "mag-ulat ng sakuna", "baha", "bumabaha", "pagguho ng lupa", "natumbang puno", "bumagsak na puno"], "need": "Pagkatapos ng bagyo, malakas na ulan o lindol ay may nakita akong baha, natumbang puno o guho, at gusto kong i-report para magpadala ang lungsod ng tao."}
   },
   "vaccineAppointment": {
-   "en": {"title": "Vaccine appointment", "keywords": ["vaccine", "vaccination"]},
-   "ja": {"title": "ワクチン予約", "keywords": ["ワクチン", "予防接種"]},
-   "vi": {"title": "Đặt lịch tiêm vắc-xin", "keywords": ["vắc-xin", "tiêm chủng"]},
-   "id": {"title": "Janji vaksin", "keywords": ["vaksin", "vaksinasi"]},
-   "tl": {"title": "Appointment sa bakuna", "keywords": ["bakuna", "pagbabakuna", "magpabakuna"]}
+   "en": {"title": "Vaccine appointment", "keywords": ["vaccine", "vaccination"], "need": "I want to book a flu, COVID or other vaccination for myself or my child."},
+   "ja": {"title": "ワクチン予約", "keywords": ["ワクチン", "予防接種"], "need": "自分や子どものインフルエンザや新型コロナなどのワクチン接種を予約したい。"},
+   "vi": {"title": "Đặt lịch tiêm vắc-xin", "keywords": ["vắc-xin", "tiêm chủng"], "need": "Tôi cần hẹn ngày chích ngừa cúm hay COVID cho bản thân hoặc cho con."},
+   "id": {"title": "Janji vaksin", "keywords": ["vaksin", "vaksinasi"], "need": "Saya ingin memesan vaksin flu, COVID, atau lainnya untuk saya atau anak saya."},
+   "tl": {"title": "Appointment sa bakuna", "keywords": ["bakuna", "pagbabakuna", "magpabakuna"], "need": "Gusto kong magpa-schedule ng bakuna sa trangkaso, COVID o iba pa para sa akin o sa anak ko."}
   },
   "medicalAppointment": {
-   "en": {"title": "City hospital appointment", "keywords": ["doctor appointment", "hospital registration", "see a doctor"]},
-   "ja": {"title": "市立病院の受診予約", "keywords": ["受診予約", "病院の予約", "診察"]},
-   "vi": {"title": "Đăng ký khám bệnh", "keywords": ["đăng ký khám", "khám bệnh", "đặt lịch khám"]},
-   "id": {"title": "Pendaftaran rumah sakit", "keywords": ["daftar berobat", "periksa dokter", "rumah sakit"]},
-   "tl": {"title": "Appointment sa ospital ng lungsod", "keywords": ["magpatingin sa doktor", "appointment sa doktor", "magpa-appointment sa ospital", "magpatingin"]}
+   "en": {"title": "City hospital appointment", "keywords": ["doctor appointment", "hospital registration", "see a doctor"], "need": "I'm not feeling well and want to see a doctor at the Taipei City Hospital, so I need to book an appointment first."},
+   "ja": {"title": "市立病院の受診予約", "keywords": ["受診予約", "病院の予約", "診察"], "need": "体調が悪いので台北市立連合病院で診てもらいたく、先に診察の予約をしたい。"},
+   "vi": {"title": "Đăng ký khám bệnh", "keywords": ["đăng ký khám", "khám bệnh", "đặt lịch khám"], "need": "Tôi thấy không khỏe, muốn đi khám ở Bệnh viện Liên hợp thành phố nên cần đăng ký khám trước."},
+   "id": {"title": "Pendaftaran rumah sakit", "keywords": ["daftar berobat", "periksa dokter", "rumah sakit"], "need": "Saya sedang tidak enak badan dan ingin ke dokter di Rumah Sakit Kota Taipei, jadi perlu daftar dulu."},
+   "tl": {"title": "Appointment sa ospital ng lungsod", "keywords": ["magpatingin sa doktor", "appointment sa doktor", "magpa-appointment sa ospital", "magpatingin"], "need": "Masama ang pakiramdam ko at gusto kong magpatingin sa Taipei City Hospital, kaya kailangan kong magpa-appointment muna."}
   },
   "cityRadio": {
-   "en": {"title": "Taipei radio", "keywords": ["radio", "broadcast"]},
-   "ja": {"title": "台北ラジオ", "keywords": ["ラジオ", "放送"]},
-   "vi": {"title": "Đài phát thanh Đài Bắc", "keywords": ["đài phát thanh", "radio"]},
-   "id": {"title": "Radio Taipei", "keywords": ["radio", "siaran"]},
-   "tl": {"title": "Taipei radio", "keywords": ["radyo", "broadcast"]}
+   "en": {"title": "Taipei radio", "keywords": ["radio", "broadcast"], "need": "I want to listen to Taipei radio station programmes."},
+   "ja": {"title": "台北ラジオ", "keywords": ["ラジオ", "放送"], "need": "台北ラジオの番組や放送を聴きたい。"},
+   "vi": {"title": "Đài phát thanh Đài Bắc", "keywords": ["đài phát thanh", "radio"], "need": "Tôi muốn nghe chương trình của đài phát thanh Đài Bắc."},
+   "id": {"title": "Radio Taipei", "keywords": ["radio", "siaran"], "need": "Saya ingin mendengarkan siaran radio Taipei."},
+   "tl": {"title": "Taipei radio", "keywords": ["radyo", "broadcast"], "need": "Gusto kong makinig sa mga programa ng radyo ng Taipei."}
   },
   "familyCenter": {
-   "en": {"title": "Parent-child centre", "keywords": ["parent child center", "kids activities"]},
-   "ja": {"title": "親子館", "keywords": ["親子館", "親子イベント"]},
-   "vi": {"title": "Trung tâm cha mẹ và trẻ em", "keywords": ["trung tâm cha mẹ và con", "hoạt động cho trẻ"]},
-   "id": {"title": "Pusat orang tua dan anak", "keywords": ["pusat anak", "kegiatan anak"]},
-   "tl": {"title": "Parent-child center", "keywords": ["parent child center", "aktibidad ng mga bata", "palaruan ng bata"]}
+   "en": {"title": "Parent-child centre", "keywords": ["parent child center", "kids activities"], "need": "I want to take my toddler somewhere safe indoors to play, or join an activity at a parent-child centre."},
+   "ja": {"title": "親子館", "keywords": ["親子館", "親子イベント"], "need": "小さい子どもを安全な屋内で遊ばせたい、または親子館のイベントに参加したい。"},
+   "vi": {"title": "Trung tâm cha mẹ và trẻ em", "keywords": ["trung tâm cha mẹ và con", "hoạt động cho trẻ"], "need": "Tôi muốn đưa con nhỏ đến chỗ chơi trong nhà an toàn, hoặc tham gia hoạt động ở trung tâm cha mẹ và con."},
+   "id": {"title": "Pusat orang tua dan anak", "keywords": ["pusat anak", "kegiatan anak"], "need": "Saya ingin membawa balita bermain di tempat dalam ruangan yang aman, atau ikut kegiatan di pusat orang tua dan anak."},
+   "tl": {"title": "Parent-child center", "keywords": ["parent child center", "aktibidad ng mga bata", "palaruan ng bata"], "need": "Gusto kong dalhin ang maliit kong anak sa ligtas na lugar sa loob para maglaro, o sumali sa aktibidad ng parent-child center."}
   },
   "greenMap": {
-   "en": {"title": "Green spaces map", "keywords": ["park", "green space", "green map"]},
-   "ja": {"title": "緑地マップ", "keywords": ["公園", "緑地"]},
-   "vi": {"title": "Bản đồ mảng xanh", "keywords": ["công viên", "mảng xanh"]},
-   "id": {"title": "Peta ruang hijau", "keywords": ["taman", "ruang hijau"]},
-   "tl": {"title": "Mapa ng luntiang lugar", "keywords": ["parke", "luntiang lugar", "green map"]}
+   "en": {"title": "Green spaces map", "keywords": ["park", "green space", "green map"], "need": "I want to find a nearby park or green space with trees and grass for a walk and some fresh air."},
+   "ja": {"title": "緑地マップ", "keywords": ["公園", "緑地"], "need": "近くで木や芝生のある公園や緑地を見つけて、散歩して気分転換したい。"},
+   "vi": {"title": "Bản đồ mảng xanh", "keywords": ["công viên", "mảng xanh"], "need": "Tôi muốn tìm công viên hay khu cây xanh gần đây có cây và cỏ để đi dạo hít thở."},
+   "id": {"title": "Peta ruang hijau", "keywords": ["taman", "ruang hijau"], "need": "Saya ingin mencari taman atau ruang hijau dekat sini yang ada pohon dan rumput untuk jalan-jalan menghirup udara segar."},
+   "tl": {"title": "Mapa ng luntiang lugar", "keywords": ["parke", "luntiang lugar", "green map"], "need": "Gusto kong makahanap ng malapit na parke o luntiang lugar na may puno at damo para maglakad at makalanghap ng sariwang hangin."}
   },
   "petFriendlyMap": {
-   "en": {"title": "Pet-friendly map", "keywords": ["pet", "walk the dog", "dog"]},
-   "ja": {"title": "ペット同伴マップ", "keywords": ["ペット", "犬の散歩"]},
-   "vi": {"title": "Bản đồ thân thiện thú cưng", "keywords": ["thú cưng", "dắt chó"]},
-   "id": {"title": "Peta ramah hewan", "keywords": ["hewan peliharaan", "jalan anjing"]},
-   "tl": {"title": "Mapa para sa alagang hayop", "keywords": ["alagang hayop", "ipasyal ang aso", "aso"]}
+   "en": {"title": "Pet-friendly map", "keywords": ["pet", "walk the dog", "dog"], "need": "I want to take my dog out and find places that welcome pets."},
+   "ja": {"title": "ペット同伴マップ", "keywords": ["ペット", "犬の散歩"], "need": "犬を連れて散歩したいので、ペットが入れる場所を探したい。"},
+   "vi": {"title": "Bản đồ thân thiện thú cưng", "keywords": ["thú cưng", "dắt chó"], "need": "Tôi muốn dắt chó đi dạo, tìm những nơi cho thú cưng vào."},
+   "id": {"title": "Peta ramah hewan", "keywords": ["hewan peliharaan", "jalan anjing"], "need": "Saya ingin mengajak anjing jalan-jalan dan mencari tempat yang ramah hewan peliharaan."},
+   "tl": {"title": "Mapa para sa alagang hayop", "keywords": ["alagang hayop", "ipasyal ang aso", "aso"], "need": "Gusto kong ipasyal ang aso ko at maghanap ng mga lugar na tumatanggap ng alagang hayop."}
   },
   "waterMeter": {
-   "en": {"title": "Water usage", "keywords": ["water usage", "water meter", "meter reading"]},
-   "ja": {"title": "水道使用量", "keywords": ["水道使用量", "水道メーター"]},
-   "vi": {"title": "Dịch vụ nước", "keywords": ["lượng nước", "đồng hồ nước"]},
-   "id": {"title": "Pemakaian air", "keywords": ["pemakaian air", "meteran air"]},
-   "tl": {"title": "Paggamit ng tubig", "keywords": ["paggamit ng tubig", "metro ng tubig", "basa ng metro"]}
+   "en": {"title": "Water usage", "keywords": ["water usage", "water meter", "meter reading"], "need": "I want to check how much water my home has used, or report the reading on my water meter myself."},
+   "ja": {"title": "水道使用量", "keywords": ["水道使用量", "水道メーター"], "need": "家でどれくらい水を使ったか調べたい、または水道メーターの数字を自分で報告したい。"},
+   "vi": {"title": "Dịch vụ nước", "keywords": ["lượng nước", "đồng hồ nước"], "need": "Tôi muốn xem nhà mình đã dùng bao nhiêu nước, hoặc tự báo chỉ số đồng hồ nước."},
+   "id": {"title": "Pemakaian air", "keywords": ["pemakaian air", "meteran air"], "need": "Saya ingin cek berapa banyak air yang dipakai di rumah, atau melaporkan sendiri angka meteran air."},
+   "tl": {"title": "Paggamit ng tubig", "keywords": ["paggamit ng tubig", "metro ng tubig", "basa ng metro"], "need": "Nais kong suriin ang dami ng nakonsumong tubig sa bahay o isumite ang basa sa water meter."}
   },
   "essentialGoods": {
-   "en": {"title": "Essential goods", "keywords": ["essential goods", "supplies"]},
-   "ja": {"title": "生活物資", "keywords": ["生活物資", "物資"]},
-   "vi": {"title": "Hàng thiết yếu", "keywords": ["hàng thiết yếu", "vật tư"]},
-   "id": {"title": "Kebutuhan pokok", "keywords": ["kebutuhan pokok", "persediaan"]},
-   "tl": {"title": "Pangunahing bilihin", "keywords": ["pangunahing bilihin", "mga suplay"]}
+   "en": {"title": "Essential goods", "keywords": ["essential goods", "supplies"], "need": "I want to know recent prices and trading volumes of everyday goods like vegetables, fruit and meat."},
+   "ja": {"title": "生活物資", "keywords": ["生活物資", "物資"], "need": "野菜や果物、肉などの生活物資の最近の価格や取引量を知りたい。"},
+   "vi": {"title": "Hàng thiết yếu", "keywords": ["hàng thiết yếu", "vật tư"], "need": "Tôi muốn biết giá và lượng giao dịch gần đây của rau, trái cây, thịt và hàng thiết yếu."},
+   "id": {"title": "Kebutuhan pokok", "keywords": ["kebutuhan pokok", "persediaan"], "need": "Saya ingin tahu harga dan volume perdagangan terbaru barang kebutuhan seperti sayur, buah, dan daging."},
+   "tl": {"title": "Pangunahing bilihin", "keywords": ["pangunahing bilihin", "mga suplay"], "need": "Gusto kong malaman ang presyo at dami ng bentahan kamakailan ng gulay, prutas, karne at iba pang pangunahing bilihin."}
   },
   "library": {
-   "en": {"title": "Library", "keywords": ["library", "borrow a book", "borrow books", "lend a book", "lend books", "find a book", "read a book", "a book", "books"]},
-   "ja": {"title": "図書貸出", "keywords": ["図書館", "本を借りる", "本を探す", "本"]},
-   "vi": {"title": "Mượn sách thư viện", "keywords": ["thư viện", "mượn sách", "tìm sách", "sách", "mượn truyện", "đọc sách", "mượn sách thư viện", "tìm sách ở thư viện"]},
-   "id": {"title": "Peminjaman buku", "keywords": ["perpustakaan", "pinjam buku", "cari buku", "buku", "baca buku", "ke perpustakaan", "perpustakaan kota", "carikan buku", "buku novel"]},
-   "tl": {"title": "Aklatan", "keywords": ["aklatan", "humiram ng libro", "manghiram ng libro", "hihiram ng libro", "humiram ng aklat", "maghanap ng libro", "magbasa ng libro", "libro", "aklat", "mga libro"]}
+   "en": {"title": "Library", "keywords": ["library", "borrow a book", "borrow books", "lend a book", "lend books", "find a book", "read a book", "a book", "books"], "need": "I want to borrow or look for a book, or check whether the library has a certain title or author."},
+   "ja": {"title": "図書貸出", "keywords": ["図書館", "本を借りる", "本を探す", "本"], "need": "本を借りたい・探したい、または図書館にある本や作家の作品があるか調べたい。"},
+   "vi": {"title": "Mượn sách thư viện", "keywords": ["thư viện", "mượn sách", "tìm sách", "sách", "mượn truyện", "đọc sách", "mượn sách thư viện", "tìm sách ở thư viện"], "need": "Tôi muốn mượn sách, tìm sách, hoặc xem thư viện có cuốn nào hay tác phẩm của tác giả nào không."},
+   "id": {"title": "Peminjaman buku", "keywords": ["perpustakaan", "pinjam buku", "cari buku", "buku", "baca buku", "ke perpustakaan", "perpustakaan kota", "carikan buku", "buku novel"], "need": "Saya ingin meminjam atau mencari buku, atau mengecek apakah perpustakaan punya judul atau penulis tertentu."},
+   "tl": {"title": "Aklatan", "keywords": ["aklatan", "humiram ng libro", "manghiram ng libro", "hihiram ng libro", "humiram ng aklat", "maghanap ng libro", "magbasa ng libro", "libro", "aklat", "mga libro"], "need": "Gusto kong humiram o maghanap ng libro, o alamin kung may partikular na aklat o awtor ang aklatan."}
   },
   "locationSearch": {
-   "en": {"title": "Find a place", "keywords": ["find a place", "nearby", "places near me"]},
-   "ja": {"title": "場所を探す", "keywords": ["場所を探す", "近く", "周辺"]},
-   "vi": {"title": "Tìm địa điểm", "keywords": ["tìm địa điểm", "gần đây", "xung quanh"]},
-   "id": {"title": "Cari tempat", "keywords": ["cari tempat", "terdekat", "sekitar"]},
-   "tl": {"title": "Maghanap ng lugar", "keywords": ["maghanap ng lugar", "malapit dito", "mga lugar na malapit"]}
+   "en": {"title": "Find a place", "keywords": ["find a place", "nearby", "places near me"], "need": "I want to find nearby places such as toilets, car parks or hospitals."},
+   "ja": {"title": "場所を探す", "keywords": ["場所を探す", "近く", "周辺"], "need": "近くのトイレや駐車場、病院などの場所を探したい。"},
+   "vi": {"title": "Tìm địa điểm", "keywords": ["tìm địa điểm", "gần đây", "xung quanh"], "need": "Tôi muốn tìm nhà vệ sinh, bãi đỗ xe, bệnh viện ở gần."},
+   "id": {"title": "Cari tempat", "keywords": ["cari tempat", "terdekat", "sekitar"], "need": "Saya ingin mencari tempat terdekat seperti toilet, tempat parkir, atau rumah sakit."},
+   "tl": {"title": "Maghanap ng lugar", "keywords": ["maghanap ng lugar", "malapit dito", "mga lugar na malapit"], "need": "Gusto kong maghanap ng malapit na lugar tulad ng CR, paradahan o ospital."}
   },
   "zoo": {
-   "en": {"title": "Zoo", "keywords": ["zoo", "zoo guide"]},
-   "ja": {"title": "動物園", "keywords": ["動物園"]},
-   "vi": {"title": "Sở thú", "keywords": ["sở thú", "vườn thú"]},
-   "id": {"title": "Kebun binatang", "keywords": ["kebun binatang"]},
-   "tl": {"title": "Zoo", "keywords": ["zoo", "gabay sa zoo"]}
+   "en": {"title": "Zoo", "keywords": ["zoo", "zoo guide"], "need": "I want to visit Taipei Zoo and look at the map and guide first."},
+   "ja": {"title": "動物園", "keywords": ["動物園"], "need": "台北市立動物園に行きたいので、先に園内マップや案内を見たい。"},
+   "vi": {"title": "Sở thú", "keywords": ["sở thú", "vườn thú"], "need": "Tôi muốn đi Sở thú Đài Bắc, xem bản đồ và hướng dẫn trước."},
+   "id": {"title": "Kebun binatang", "keywords": ["kebun binatang"], "need": "Saya ingin ke Kebun Binatang Taipei dan melihat peta serta panduannya dulu."},
+   "tl": {"title": "Zoo", "keywords": ["zoo", "gabay sa zoo"], "need": "Gusto kong pumunta sa Taipei Zoo at tingnan muna ang mapa at gabay."}
   },
   "library.ranking": {
-   "en": {"title": "Popular books", "keywords": ["popular books", "book ranking", "most borrowed", "bestsellers"]},
-   "ja": {"title": "人気の本ランキング", "keywords": ["人気の本", "ランキング", "よく借りられている本"]},
-   "vi": {"title": "Sách được xem nhiều", "keywords": ["sách phổ biến", "bảng xếp hạng sách", "sách hot", "sách được mượn nhiều", "sách bán chạy", "sách nổi tiếng"]},
-   "id": {"title": "Buku populer", "keywords": ["buku populer", "peringkat buku", "paling banyak dipinjam", "buku paling populer", "buku terlaris", "buku favorit", "paling populer"]},
-   "tl": {"title": "Mga sikat na libro", "keywords": ["sikat na libro", "mga sikat na libro", "ranking ng libro", "pinakamaraming hiniram", "pinakabinabasang libro"]}
+   "en": {"title": "Popular books", "keywords": ["popular books", "book ranking", "most borrowed", "bestsellers"], "need": "I don't know what to read and want to see which books people borrow most right now."},
+   "ja": {"title": "人気の本ランキング", "keywords": ["人気の本", "ランキング", "よく借りられている本"], "need": "何を読めばいいか分からないので、最近いちばん借りられている人気の本を参考にしたい。"},
+   "vi": {"title": "Sách được xem nhiều", "keywords": ["sách phổ biến", "bảng xếp hạng sách", "sách hot", "sách được mượn nhiều", "sách bán chạy", "sách nổi tiếng"], "need": "Tôi không biết đọc gì, muốn tham khảo những cuốn được mượn nhiều nhất gần đây."},
+   "id": {"title": "Buku populer", "keywords": ["buku populer", "peringkat buku", "paling banyak dipinjam", "buku paling populer", "buku terlaris", "buku favorit", "paling populer"], "need": "Saya bingung mau baca apa dan ingin melihat buku yang paling banyak dipinjam belakangan ini."},
+   "tl": {"title": "Mga sikat na libro", "keywords": ["sikat na libro", "mga sikat na libro", "ranking ng libro", "pinakamaraming hiniram", "pinakabinabasang libro"], "need": "Wala akong maisip na babasahin, kaya titingnan ko ang mga librong patok at madalas hiramin."}
   },
   "library.notices": {
-   "en": {"title": "Library notices", "keywords": ["library notices", "library news", "announcements"]},
-   "ja": {"title": "図書館のお知らせ", "keywords": ["図書館のお知らせ", "お知らせ"]},
-   "vi": {"title": "Thông báo thư viện", "keywords": ["thông báo thư viện", "tin thư viện"]},
-   "id": {"title": "Pengumuman perpustakaan", "keywords": ["pengumuman perpustakaan", "berita perpustakaan", "pengumuman dari perpustakaan", "info perpustakaan", "kabar perpustakaan"]},
-   "tl": {"title": "Mga abiso ng aklatan", "keywords": ["abiso ng aklatan", "balita ng aklatan", "anunsiyo ng aklatan"]}
+   "en": {"title": "Library notices", "keywords": ["library notices", "library news", "announcements"], "need": "I want the library's latest notices about closures, changed opening hours or events."},
+   "ja": {"title": "図書館のお知らせ", "keywords": ["図書館のお知らせ", "お知らせ"], "need": "図書館の休館や開館時間の変更、イベントについての最新のお知らせを知りたい。"},
+   "vi": {"title": "Thông báo thư viện", "keywords": ["thông báo thư viện", "tin thư viện"], "need": "Tôi muốn biết thông báo mới của thư viện về ngày nghỉ, đổi giờ mở cửa hay hoạt động."},
+   "id": {"title": "Pengumuman perpustakaan", "keywords": ["pengumuman perpustakaan", "berita perpustakaan", "pengumuman dari perpustakaan", "info perpustakaan", "kabar perpustakaan"], "need": "Saya ingin tahu pengumuman terbaru perpustakaan soal hari tutup, perubahan jam buka, atau acara."},
+   "tl": {"title": "Mga abiso ng aklatan", "keywords": ["abiso ng aklatan", "balita ng aklatan", "anunsiyo ng aklatan"], "need": "Gusto kong malaman ang pinakabagong abiso ng aklatan tungkol sa pagsasara, pagbabago ng oras o mga aktibidad."}
   },
   "library.records": {
-   "en": {"title": "My borrowing records", "keywords": ["borrowing records", "my loans", "due date", "books i borrowed", "return date"]},
-   "ja": {"title": "貸出履歴", "keywords": ["貸出履歴", "借りた本", "返却日"]},
-   "vi": {"title": "Lịch sử mượn sách", "keywords": ["lịch sử mượn", "sách đã mượn", "ngày trả sách", "sách đang mượn", "hạn trả sách", "sách chưa trả", "khi nào trả sách"]},
-   "id": {"title": "Riwayat peminjaman", "keywords": ["riwayat peminjaman", "buku yang dipinjam", "tanggal kembali", "riwayat pinjam", "riwayat pinjam buku", "buku yang sedang dipinjam", "sedang saya pinjam", "pengembalian buku", "tanggal pengembalian", "harus dikembalikan", "batas pengembalian"]},
-   "tl": {"title": "Kasaysayan ng paghiram ko", "keywords": ["kasaysayan ng paghiram", "mga hiniram ko", "librong hiniram ko", "mga nahiram ko", "takdang petsa", "kailan ibabalik", "petsa ng pagbabalik", "ibalik ang libro", "isauli ang libro"]}
+   "en": {"title": "My borrowing records", "keywords": ["borrowing records", "my loans", "due date", "books i borrowed", "return date"], "need": "I want to check the books currently on my card and their due dates so I avoid late returns."},
+   "ja": {"title": "貸出履歴", "keywords": ["貸出履歴", "借りた本", "返却日"], "need": "今借りている本と返却日を確認して、延滞しないようにしたい。"},
+   "vi": {"title": "Lịch sử mượn sách", "keywords": ["lịch sử mượn", "sách đã mượn", "ngày trả sách", "sách đang mượn", "hạn trả sách", "sách chưa trả", "khi nào trả sách"], "need": "Tôi muốn xem mình đang mượn sách gì và khi nào phải trả để khỏi bị quá hạn."},
+   "id": {"title": "Riwayat peminjaman", "keywords": ["riwayat peminjaman", "buku yang dipinjam", "tanggal kembali", "riwayat pinjam", "riwayat pinjam buku", "buku yang sedang dipinjam", "sedang saya pinjam", "pengembalian buku", "tanggal pengembalian", "harus dikembalikan", "batas pengembalian"], "need": "Saya ingin cek buku apa saja yang sedang saya pinjam dan kapan harus dikembalikan supaya tidak telat."},
+   "tl": {"title": "Kasaysayan ng paghiram ko", "keywords": ["kasaysayan ng paghiram", "mga hiniram ko", "librong hiniram ko", "mga nahiram ko", "takdang petsa", "kailan ibabalik", "petsa ng pagbabalik", "ibalik ang libro", "isauli ang libro"], "need": "Gusto kong makita kung anong mga libro ang hawak ko at kailan dapat isauli para hindi ma-late."}
   },
   "library.reservations": {
-   "en": {"title": "Book reservations", "keywords": ["book reservations", "reserved books"]},
-   "ja": {"title": "予約一覧", "keywords": ["予約一覧", "予約した本"]},
-   "vi": {"title": "Danh sách đặt trước", "keywords": ["sách đặt trước", "danh sách đặt trước", "sách đã đặt", "đặt trước sách"]},
-   "id": {"title": "Daftar reservasi buku", "keywords": ["reservasi buku", "buku dipesan", "buku yang saya pesan", "pesan buku", "booking buku", "buku yang saya booking", "buku yang dipesan", "pemesanan buku", "reservasi"]},
-   "tl": {"title": "Listahan ng reserbasyon ng libro", "keywords": ["mga nireserba kong libro", "nakareserbang libro"]}
+   "en": {"title": "Book reservations", "keywords": ["book reservations", "reserved books"], "need": "I've reserved a book and am waiting in line for it; I want to know if it has arrived and where to pick it up."},
+   "ja": {"title": "予約一覧", "keywords": ["予約一覧", "予約した本"], "need": "予約して順番待ちの本が届いたか、どこで受け取れるかを知りたい。"},
+   "vi": {"title": "Danh sách đặt trước", "keywords": ["sách đặt trước", "danh sách đặt trước", "sách đã đặt", "đặt trước sách"], "need": "Tôi đã đặt trước sách và đang chờ, muốn biết sách về chưa và lấy ở đâu."},
+   "id": {"title": "Daftar reservasi buku", "keywords": ["reservasi buku", "buku dipesan", "buku yang saya pesan", "pesan buku", "booking buku", "buku yang saya booking", "buku yang dipesan", "pemesanan buku", "reservasi"], "need": "Saya sudah memesan buku dan sedang antre, ingin tahu bukunya sudah datang belum dan diambil di mana."},
+   "tl": {"title": "Listahan ng reserbasyon ng libro", "keywords": ["mga nireserba kong libro", "nakareserbang libro"], "need": "Nagpa-reserve ako ng libro at naghihintay, gusto kong malaman kung dumating na at saan ko kukunin."}
   },
   "library.map": {
-   "en": {"title": "Library map", "keywords": ["library map", "find a library", "nearest library"]},
-   "ja": {"title": "図書館マップ", "keywords": ["図書館マップ", "近くの図書館"]},
-   "vi": {"title": "Bản đồ thư viện", "keywords": ["bản đồ thư viện", "thư viện gần nhất"]},
-   "id": {"title": "Peta perpustakaan", "keywords": ["peta perpustakaan", "perpustakaan terdekat"]},
-   "tl": {"title": "Mapa ng aklatan", "keywords": ["mapa ng aklatan", "maghanap ng aklatan", "pinakamalapit na aklatan"]}
+   "en": {"title": "Library map", "keywords": ["library map", "find a library", "nearest library"], "need": "I want to find the library or branch closest to me."},
+   "ja": {"title": "図書館マップ", "keywords": ["図書館マップ", "近くの図書館"], "need": "いちばん近い図書館や分館がどこにあるか知りたい。"},
+   "vi": {"title": "Bản đồ thư viện", "keywords": ["bản đồ thư viện", "thư viện gần nhất"], "need": "Tôi muốn tìm thư viện hoặc chi nhánh gần mình nhất."},
+   "id": {"title": "Peta perpustakaan", "keywords": ["peta perpustakaan", "perpustakaan terdekat"], "need": "Saya ingin mencari perpustakaan atau cabang yang paling dekat."},
+   "tl": {"title": "Mapa ng aklatan", "keywords": ["mapa ng aklatan", "maghanap ng aklatan", "pinakamalapit na aklatan"], "need": "Hinahanap ko kung saan ang aklatan o sangay na pinakamalapit sa kinaroroonan ko."}
   },
   "library.prefill": {
-   "en": {"title": "Copy and pickup library selection", "keywords": ["choose pickup library", "choose a copy"]},
-   "ja": {"title": "受取館の選択", "keywords": ["受取館", "冊の選択"]},
-   "vi": {"title": "Chọn bản sách và nơi nhận", "keywords": ["chọn nơi nhận sách"]},
-   "id": {"title": "Pilih eksemplar dan perpustakaan", "keywords": ["pilih perpustakaan pengambilan"]},
-   "tl": {"title": "Pagpili ng kopya at aklatang kukunan", "keywords": ["pumili ng aklatang kukunan", "pumili ng kopya"]}
+   "en": {"title": "Copy and pickup library selection", "keywords": ["choose pickup library", "choose a copy"], "need": "When borrowing I want to choose the copy and the branch where I'll collect it beforehand."},
+   "ja": {"title": "受取館の選択", "keywords": ["受取館", "冊の選択"], "need": "本を借りるときに、どの冊をどの分館で受け取るかを先に選んでおきたい。"},
+   "vi": {"title": "Chọn bản sách và nơi nhận", "keywords": ["chọn nơi nhận sách"], "need": "Khi mượn sách tôi muốn chọn trước cuốn nào và nhận ở chi nhánh nào."},
+   "id": {"title": "Pilih eksemplar dan perpustakaan", "keywords": ["pilih perpustakaan pengambilan"], "need": "Saat meminjam saya ingin memilih dulu eksemplar mana dan cabang tempat mengambilnya."},
+   "tl": {"title": "Pagpili ng kopya at aklatang kukunan", "keywords": ["pumili ng aklatang kukunan", "pumili ng kopya"], "need": "Sa paghiram, gusto kong piliin muna kung aling kopya at saang sangay ko ito kukunin."}
   },
   "coupon.list": {
-   "en": {"title": "Deal list", "keywords": ["deal list", "find deals", "coupons"]},
-   "ja": {"title": "特典一覧", "keywords": ["特典一覧", "クーポン一覧"]},
-   "vi": {"title": "Danh sách ưu đãi", "keywords": ["danh sách ưu đãi", "tìm ưu đãi", "tìm mã giảm giá"]},
-   "id": {"title": "Daftar promo", "keywords": ["daftar promo", "cari promo"]},
-   "tl": {"title": "Listahan ng promo", "keywords": ["listahan ng promo", "maghanap ng promo", "mga kupon"]}
+   "en": {"title": "Deal list", "keywords": ["deal list", "find deals", "coupons"], "need": "I want a list of every coupon and voucher I can use right now so I can pick one."},
+   "ja": {"title": "特典一覧", "keywords": ["特典一覧", "クーポン一覧"], "need": "今使えるクーポンや割引券をすべて一覧にして、ゆっくり選びたい。"},
+   "vi": {"title": "Danh sách ưu đãi", "keywords": ["danh sách ưu đãi", "tìm ưu đãi", "tìm mã giảm giá"], "need": "Tôi muốn xem danh sách tất cả phiếu giảm giá đang dùng được để chọn."},
+   "id": {"title": "Daftar promo", "keywords": ["daftar promo", "cari promo"], "need": "Saya ingin daftar semua kupon dan voucher yang bisa dipakai sekarang supaya bisa memilih."},
+   "tl": {"title": "Listahan ng promo", "keywords": ["listahan ng promo", "maghanap ng promo", "mga kupon"], "need": "Gusto kong makita ang listahan ng lahat ng kupon at voucher na magagamit ngayon para makapili."}
   },
   "wallet": {
-   "en": {"title": "Ticket wallet", "keywords": ["ticket wallet", "my tickets", "wallet"]},
-   "ja": {"title": "チケットホルダー", "keywords": ["チケット", "マイチケット"]},
-   "vi": {"title": "Ví vé", "keywords": ["ví vé", "vé của tôi", "vé điện tử", "lấy vé"]},
-   "id": {"title": "Dompet tiket", "keywords": ["dompet tiket", "tiket saya"]},
-   "tl": {"title": "Ticket wallet", "keywords": ["lalagyan ng tiket", "mga tiket ko"]}
+   "en": {"title": "Ticket wallet", "keywords": ["ticket wallet", "my tickets", "wallet"], "need": "I want to open the tickets, passes or e-tickets I already have so I can use them."},
+   "ja": {"title": "チケットホルダー", "keywords": ["チケット", "マイチケット"], "need": "もう受け取ったチケットや入場券、電子チケットを開いて使いたい。"},
+   "vi": {"title": "Ví vé", "keywords": ["ví vé", "vé của tôi", "vé điện tử", "lấy vé"], "need": "Tôi muốn mở vé, vé vào cửa hoặc vé điện tử đã nhận để dùng."},
+   "id": {"title": "Dompet tiket", "keywords": ["dompet tiket", "tiket saya"], "need": "Saya ingin membuka tiket, tiket masuk, atau e-tiket yang sudah saya dapat untuk dipakai."},
+   "tl": {"title": "Ticket wallet", "keywords": ["lalagyan ng tiket", "mga tiket ko"], "need": "Gusto kong buksan ang mga tiket, pase o e-ticket na nakuha ko na para magamit."}
   },
   "subscription": {
-   "en": {"title": "Subscriptions", "keywords": ["subscriptions", "subscribe"]},
-   "ja": {"title": "購読一覧", "keywords": ["購読", "サブスクリプション"]},
-   "vi": {"title": "Đăng ký theo dõi", "keywords": ["đăng ký theo dõi", "theo dõi"]},
-   "id": {"title": "Langganan", "keywords": ["langganan", "berlangganan"]},
-   "tl": {"title": "Mga subscription", "keywords": ["subscription", "mag-subscribe", "mga subscription"]}
+   "en": {"title": "Subscriptions", "keywords": ["subscriptions", "subscribe"], "need": "I want to see or manage which city news and reminders I've signed up for, such as water cuts, events or bill notices."},
+   "ja": {"title": "購読一覧", "keywords": ["購読", "サブスクリプション"], "need": "断水やイベント、支払いのお知らせなど、自分が登録している市の情報やリマインダーを確認・管理したい。"},
+   "vi": {"title": "Đăng ký theo dõi", "keywords": ["đăng ký theo dõi", "theo dõi"], "need": "Tôi muốn xem hoặc quản lý những tin và lời nhắc của thành phố mình đã đăng ký, như cúp nước, sự kiện, thông báo đóng tiền."},
+   "id": {"title": "Langganan", "keywords": ["langganan", "berlangganan"], "need": "Saya ingin melihat atau mengatur kabar dan pengingat kota yang saya langgani, seperti pemadaman air, acara, atau tagihan."},
+   "tl": {"title": "Mga subscription", "keywords": ["subscription", "mag-subscribe", "mga subscription"], "need": "Gusto kong tingnan o ayusin ang mga balita at paalala ng lungsod na sinalihan ko, gaya ng pagputol ng tubig, event o bayarin."}
   },
   "subscription.items": {
-   "en": {"title": "Subscription items", "keywords": ["subscription items", "what i subscribed"]},
-   "ja": {"title": "購読項目", "keywords": ["購読項目", "購読内容"]},
-   "vi": {"title": "Mục đã theo dõi", "keywords": ["mục theo dõi", "nội dung theo dõi"]},
-   "id": {"title": "Item langganan", "keywords": ["item langganan", "isi langganan"]},
-   "tl": {"title": "Mga item ng subscription", "keywords": ["item ng subscription", "mga naka-subscribe ko"]}
+   "en": {"title": "Subscription items", "keywords": ["subscription items", "what i subscribed"], "need": "I want to know which city updates I can subscribe to for alerts, or what each subscription item covers."},
+   "ja": {"title": "購読項目", "keywords": ["購読項目", "購読内容"], "need": "通知を受け取るために登録できる市の情報にどんなものがあるか、各項目の内容を知りたい。"},
+   "vi": {"title": "Mục đã theo dõi", "keywords": ["mục theo dõi", "nội dung theo dõi"], "need": "Tôi muốn biết có những tin nào của thành phố có thể đăng ký nhận thông báo, hoặc từng mục nói về gì."},
+   "id": {"title": "Item langganan", "keywords": ["item langganan", "isi langganan"], "need": "Saya ingin tahu kabar kota apa saja yang bisa dilanggani untuk pemberitahuan, atau isi tiap item langganan."},
+   "tl": {"title": "Mga item ng subscription", "keywords": ["item ng subscription", "mga naka-subscribe ko"], "need": "Gusto kong malaman kung anong mga balita ng lungsod ang puwedeng i-subscribe para sa abiso, o kung ano ang laman ng bawat item."}
   },
   "fees.history": {
-   "en": {"title": "Payment history", "keywords": ["payment history", "payment records", "what i paid", "bills i paid"]},
-   "ja": {"title": "支払い履歴", "keywords": ["支払い履歴", "払った記録"]},
-   "vi": {"title": "Lịch sử thanh toán", "keywords": ["lịch sử thanh toán", "đã thanh toán", "lịch sử đóng tiền", "các khoản đã trả", "đã đóng tiền", "hóa đơn đã trả"]},
-   "id": {"title": "Riwayat pembayaran", "keywords": ["riwayat pembayaran", "yang sudah dibayar", "histori pembayaran", "riwayat bayar", "sudah dibayar", "sudah saya bayar", "bukti pembayaran", "riwayat tagihan", "history pembayaran", "riwayat transaksi"]},
-   "tl": {"title": "Kasaysayan ng pagbabayad", "keywords": ["kasaysayan ng pagbabayad", "rekord ng pagbabayad", "mga binayaran ko", "nabayaran ko na", "mga bill na binayaran ko"]}
+   "en": {"title": "Payment history", "keywords": ["payment history", "payment records", "what i paid", "bills i paid"], "need": "I want to check which fees I've paid before and how much, or find proof that I paid."},
+   "ja": {"title": "支払い履歴", "keywords": ["支払い履歴", "払った記録"], "need": "以前に払った料金や金額を確認したい、または支払いの証明を探したい。"},
+   "vi": {"title": "Lịch sử thanh toán", "keywords": ["lịch sử thanh toán", "đã thanh toán", "lịch sử đóng tiền", "các khoản đã trả", "đã đóng tiền", "hóa đơn đã trả"], "need": "Tôi muốn xem trước đây mình đã đóng những khoản nào, bao nhiêu tiền, hoặc tìm bằng chứng đã trả."},
+   "id": {"title": "Riwayat pembayaran", "keywords": ["riwayat pembayaran", "yang sudah dibayar", "histori pembayaran", "riwayat bayar", "sudah dibayar", "sudah saya bayar", "bukti pembayaran", "riwayat tagihan", "history pembayaran", "riwayat transaksi"], "need": "Saya ingin cek biaya apa saja yang sudah saya bayar dan berapa, atau mencari bukti pembayaran."},
+   "tl": {"title": "Kasaysayan ng pagbabayad", "keywords": ["kasaysayan ng pagbabayad", "rekord ng pagbabayad", "mga binayaran ko", "nabayaran ko na", "mga bill na binayaran ko"], "need": "Nais kong suriin ang mga nakaraang binayaran ko at halaga nito, o kumuha ng resibo bilang patunay."}
   },
   "fees.scan": {
-   "en": {"title": "Scan to pay", "keywords": ["scan to pay", "scan a bill", "scan bill"]},
-   "ja": {"title": "スキャン払い", "keywords": ["スキャンして支払う", "請求書をスキャン"]},
-   "vi": {"title": "Quét để thanh toán", "keywords": ["quét mã thanh toán", "quét hóa đơn", "quét mã", "quét mã vạch"]},
-   "id": {"title": "Pindai untuk bayar", "keywords": ["pindai tagihan", "scan bayar", "scan tagihan", "scan barcode", "pindai barcode", "scan qr", "pindai kode"]},
-   "tl": {"title": "I-scan para magbayad", "keywords": ["i-scan para magbayad", "i-scan ang bill", "i-scan ang barcode"]}
+   "en": {"title": "Scan to pay", "keywords": ["scan to pay", "scan a bill", "scan bill"], "need": "I have a paper payment slip and want to scan its barcode with my phone camera to pay right away."},
+   "ja": {"title": "スキャン払い", "keywords": ["スキャンして支払う", "請求書をスキャン"], "need": "紙の払込票があるので、スマホのカメラでバーコードを読み取ってすぐ支払いたい。"},
+   "vi": {"title": "Quét để thanh toán", "keywords": ["quét mã thanh toán", "quét hóa đơn", "quét mã", "quét mã vạch"], "need": "Tôi có tờ giấy báo đóng tiền, muốn dùng camera điện thoại quét mã vạch để trả luôn."},
+   "id": {"title": "Pindai untuk bayar", "keywords": ["pindai tagihan", "scan bayar", "scan tagihan", "scan barcode", "pindai barcode", "scan qr", "pindai kode"], "need": "Saya punya slip tagihan kertas dan ingin memindai barcodenya dengan kamera ponsel untuk langsung bayar."},
+   "tl": {"title": "I-scan para magbayad", "keywords": ["i-scan para magbayad", "i-scan ang bill", "i-scan ang barcode"], "need": "May papel akong bayarin at gusto kong i-scan ang barcode nito gamit ang camera ng phone para makabayad agad."}
   },
   "fees.parking": {
-   "en": {"title": "Parking fees", "keywords": ["parking fee", "parking fees", "pay for parking", "street parking"]},
-   "ja": {"title": "駐車料金", "keywords": ["駐車料金", "駐車代", "路上駐車"]},
-   "vi": {"title": "Phí đỗ xe", "keywords": ["phí đỗ xe", "tiền gửi xe", "đóng phí đỗ xe", "phí gửi xe", "tiền giữ xe", "tiền đỗ xe", "tiền đậu xe", "phí đậu xe", "phí giữ xe", "vé gửi xe"]},
-   "id": {"title": "Biaya parkir", "keywords": ["biaya parkir", "bayar parkir", "parkir", "karcis parkir", "tagihan parkir", "parkir mobil", "parkir motor", "parkir di jalan", "parkir pinggir jalan", "tarif parkir", "retribusi parkir"]},
-   "tl": {"title": "Bayad sa paradahan", "keywords": ["bayad sa paradahan", "bayad sa parking", "magbayad ng paradahan", "magbayad ng parking", "paradahan", "parking"]}
+   "en": {"title": "Parking fees", "keywords": ["parking fee", "parking fees", "pay for parking", "street parking"], "need": "I got a parking slip on my car or scooter at the roadside, or a parking charge is due, and I need to pay it."},
+   "ja": {"title": "駐車料金", "keywords": ["駐車料金", "駐車代", "路上駐車"], "need": "路上駐車で駐車料金の紙を挟まれた、または期限が近いので、駐車料金を払いたい。"},
+   "vi": {"title": "Phí đỗ xe", "keywords": ["phí đỗ xe", "tiền gửi xe", "đóng phí đỗ xe", "phí gửi xe", "tiền giữ xe", "tiền đỗ xe", "tiền đậu xe", "phí đậu xe", "phí giữ xe", "vé gửi xe"], "need": "Tôi đậu xe bên đường bị kẹp phiếu thu phí, hoặc tiền đỗ xe sắp hết hạn, cần đóng tiền đỗ xe."},
+   "id": {"title": "Biaya parkir", "keywords": ["biaya parkir", "bayar parkir", "parkir", "karcis parkir", "tagihan parkir", "parkir mobil", "parkir motor", "parkir di jalan", "parkir pinggir jalan", "tarif parkir", "retribusi parkir"], "need": "Mobil atau motor saya diberi slip parkir di pinggir jalan, atau biaya parkir hampir jatuh tempo, jadi harus dibayar."},
+   "tl": {"title": "Bayad sa paradahan", "keywords": ["bayad sa paradahan", "bayad sa parking", "magbayad ng paradahan", "magbayad ng parking", "paradahan", "parking"], "need": "May inipit na parking slip sa sasakyan ko sa kalye, o malapit nang ma-due ang parking, kaya kailangan kong magbayad."}
   },
   "fees.water": {
-   "en": {"title": "Water bill", "keywords": ["water bill", "pay water", "water fee"]},
-   "ja": {"title": "水道料金", "keywords": ["水道料金", "水道代"]},
-   "vi": {"title": "Tiền nước", "keywords": ["tiền nước", "hóa đơn nước", "đóng tiền nước", "trả tiền nước", "phí nước", "tiền nước máy", "nộp tiền nước"]},
-   "id": {"title": "Tagihan air", "keywords": ["tagihan air", "bayar air", "rekening air", "tagihan pam", "air pam", "pdam", "air ledeng", "tagihan air ledeng", "bayar tagihan air", "tagihan air bersih"]},
-   "tl": {"title": "Bayarin sa tubig", "keywords": ["bayarin sa tubig", "bill sa tubig", "bayad sa tubig", "magbayad ng tubig", "bayaran ang tubig", "singil sa tubig"]}
+   "en": {"title": "Water bill", "keywords": ["water bill", "pay water", "water fee"], "need": "The tap water bill has arrived or is nearly due, and I need to pay my home's water bill."},
+   "ja": {"title": "水道料金", "keywords": ["水道料金", "水道代"], "need": "水道料金の請求書が届いた、または期限が近いので、家の水道代を払いたい。"},
+   "vi": {"title": "Tiền nước", "keywords": ["tiền nước", "hóa đơn nước", "đóng tiền nước", "trả tiền nước", "phí nước", "tiền nước máy", "nộp tiền nước"], "need": "Hóa đơn nước máy đã tới hoặc sắp hết hạn, tôi cần đóng tiền nước trong nhà."},
+   "id": {"title": "Tagihan air", "keywords": ["tagihan air", "bayar air", "rekening air", "tagihan pam", "air pam", "pdam", "air ledeng", "tagihan air ledeng", "bayar tagihan air", "tagihan air bersih"], "need": "Tagihan air PAM sudah datang atau hampir jatuh tempo, dan saya perlu membayar air di rumah."},
+   "tl": {"title": "Bayarin sa tubig", "keywords": ["bayarin sa tubig", "bill sa tubig", "bayad sa tubig", "magbayad ng tubig", "bayaran ang tubig", "singil sa tubig"], "need": "Dumating na o malapit nang ma-due ang singil sa tubig, kaya kailangan kong bayaran ang tubig sa bahay."}
   },
   "fees.tax": {
-   "en": {"title": "Local taxes", "keywords": ["local tax", "pay tax", "taxes"]},
-   "ja": {"title": "地方税", "keywords": ["地方税", "税金"]},
-   "vi": {"title": "Thuế địa phương", "keywords": ["thuế địa phương", "nộp thuế", "thuế", "đóng thuế", "tiền thuế", "thuế nhà đất"]},
-   "id": {"title": "Pajak daerah", "keywords": ["pajak daerah", "bayar pajak", "pajak", "pajak rumah", "pajak bumi dan bangunan", "pbb", "pajak kendaraan", "pajak tanah", "pajak motor", "pajak mobil"]},
-   "tl": {"title": "Lokal na buwis", "keywords": ["lokal na buwis", "magbayad ng buwis", "buwis", "buwis sa bahay", "amilyar"]}
+   "en": {"title": "Local taxes", "keywords": ["local tax", "pay tax", "taxes"], "need": "I've received a house tax, land value tax or vehicle licence tax bill and need to pay the local tax."},
+   "ja": {"title": "地方税", "keywords": ["地方税", "税金"], "need": "家屋税や地価税、自動車税の納税通知が届いたので、地方税を納めたい。"},
+   "vi": {"title": "Thuế địa phương", "keywords": ["thuế địa phương", "nộp thuế", "thuế", "đóng thuế", "tiền thuế", "thuế nhà đất"], "need": "Tôi nhận được giấy báo thuế nhà, thuế đất hoặc thuế biển số xe, cần nộp thuế địa phương."},
+   "id": {"title": "Pajak daerah", "keywords": ["pajak daerah", "bayar pajak", "pajak", "pajak rumah", "pajak bumi dan bangunan", "pbb", "pajak kendaraan", "pajak tanah", "pajak motor", "pajak mobil"], "need": "Saya menerima tagihan pajak rumah, pajak tanah, atau pajak kendaraan dan perlu membayar pajak daerah."},
+   "tl": {"title": "Lokal na buwis", "keywords": ["lokal na buwis", "magbayad ng buwis", "buwis", "buwis sa bahay", "amilyar"], "need": "Natanggap ko ang singil sa buwis sa bahay, lupa o sasakyan at kailangan kong bayaran ang lokal na buwis."}
   },
   "fees.tuition": {
-   "en": {"title": "School fees", "keywords": ["school fees", "tuition", "registration fee"]},
-   "ja": {"title": "学費", "keywords": ["学費", "授業料"]},
-   "vi": {"title": "Học phí", "keywords": ["học phí", "tiền học", "đóng học phí", "tiền học của con", "tiền trường"]},
-   "id": {"title": "Biaya sekolah", "keywords": ["biaya sekolah", "uang sekolah", "spp", "bayar sekolah", "iuran sekolah"]},
-   "tl": {"title": "Bayarin sa paaralan", "keywords": ["bayarin sa paaralan", "matrikula", "bayad sa eskuwela", "bayad sa school"]}
+   "en": {"title": "School fees", "keywords": ["school fees", "tuition", "registration fee"], "need": "School is about to start and I need to pay my child's tuition, school fees or registration fee."},
+   "ja": {"title": "学費", "keywords": ["学費", "授業料"], "need": "子どもの新学期が始まるので、授業料や諸費、登録料を払いたい。"},
+   "vi": {"title": "Học phí", "keywords": ["học phí", "tiền học", "đóng học phí", "tiền học của con", "tiền trường"], "need": "Con sắp vào năm học, tôi cần đóng học phí, tạp phí hoặc phí đăng ký."},
+   "id": {"title": "Biaya sekolah", "keywords": ["biaya sekolah", "uang sekolah", "spp", "bayar sekolah", "iuran sekolah"], "need": "Anak saya mau mulai sekolah dan saya perlu membayar uang sekolah, biaya lain, atau uang pendaftaran."},
+   "tl": {"title": "Bayarin sa paaralan", "keywords": ["bayarin sa paaralan", "matrikula", "bayad sa eskuwela", "bayad sa school"], "need": "Magsisimula na ang klase at kailangan kong bayaran ang tuition, miscellaneous o registration fee ng anak ko."}
   },
   "fees.housing": {
-   "en": {"title": "Public housing rent", "keywords": ["public housing rent", "social housing rent", "rent"]},
-   "ja": {"title": "公営住宅の家賃", "keywords": ["公営住宅", "家賃"]},
-   "vi": {"title": "Tiền thuê nhà ở xã hội", "keywords": ["nhà ở xã hội", "tiền thuê nhà"]},
-   "id": {"title": "Sewa rumah susun", "keywords": ["sewa rumah susun", "sewa", "rusun", "sewa rusun", "apartemen sosial", "rumah sosial", "perumahan sosial", "sewa apartemen sosial"]},
-   "tl": {"title": "Upa sa pampublikong pabahay", "keywords": ["upa sa pampublikong pabahay", "upa sa social housing", "upa", "renta", "bayad sa upa"]}
+   "en": {"title": "Public housing rent", "keywords": ["public housing rent", "social housing rent", "rent"], "need": "I live in public or social housing and need to pay the monthly rent or management fee."},
+   "ja": {"title": "公営住宅の家賃", "keywords": ["公営住宅", "家賃"], "need": "公営住宅や社会住宅に住んでいるので、毎月の家賃や管理費を払いたい。"},
+   "vi": {"title": "Tiền thuê nhà ở xã hội", "keywords": ["nhà ở xã hội", "tiền thuê nhà"], "need": "Tôi ở nhà ở xã hội hoặc nhà công, cần đóng tiền thuê và phí quản lý hằng tháng."},
+   "id": {"title": "Sewa rumah susun", "keywords": ["sewa rumah susun", "sewa", "rusun", "sewa rusun", "apartemen sosial", "rumah sosial", "perumahan sosial", "sewa apartemen sosial"], "need": "Saya tinggal di rumah susun umum atau sosial dan perlu membayar sewa bulanan atau biaya pengelolaan."},
+   "tl": {"title": "Upa sa pampublikong pabahay", "keywords": ["upa sa pampublikong pabahay", "upa sa social housing", "upa", "renta", "bayad sa upa"], "need": "Nakatira ako sa public o social housing at kailangan kong bayaran ang buwanang upa o management fee."}
   },
   "fees.hospital": {
-   "en": {"title": "City hospital fees", "keywords": ["hospital bill", "medical fees", "medical bill"]},
-   "ja": {"title": "市立病院の医療費", "keywords": ["医療費", "病院の支払い"]},
-   "vi": {"title": "Viện phí", "keywords": ["viện phí", "tiền khám bệnh", "tiền viện phí", "tiền bệnh viện", "tiền thuốc"]},
-   "id": {"title": "Biaya rumah sakit", "keywords": ["biaya rumah sakit", "biaya berobat", "biaya pengobatan", "tagihan rumah sakit", "tagihan berobat", "bayar rumah sakit", "biaya perawatan"]},
-   "tl": {"title": "Bayarin sa ospital ng lungsod", "keywords": ["bayarin sa ospital", "bill sa ospital", "bayad sa ospital", "gastos sa pagpapagamot"]}
+   "en": {"title": "City hospital fees", "keywords": ["hospital bill", "medical fees", "medical bill"], "need": "After a visit or a stay at the Taipei City Hospital I need to pay the medical bill."},
+   "ja": {"title": "市立病院の医療費", "keywords": ["医療費", "病院の支払い"], "need": "台北市立連合病院で受診・入院したので、医療費を払いたい。"},
+   "vi": {"title": "Viện phí", "keywords": ["viện phí", "tiền khám bệnh", "tiền viện phí", "tiền bệnh viện", "tiền thuốc"], "need": "Sau khi khám hoặc nằm viện ở Bệnh viện Liên hợp thành phố, tôi cần trả viện phí."},
+   "id": {"title": "Biaya rumah sakit", "keywords": ["biaya rumah sakit", "biaya berobat", "biaya pengobatan", "tagihan rumah sakit", "tagihan berobat", "bayar rumah sakit", "biaya perawatan"], "need": "Sesudah periksa atau opname di RS Kota Taipei, saya harus melunasi tagihan perawatannya."},
+   "tl": {"title": "Bayarin sa ospital ng lungsod", "keywords": ["bayarin sa ospital", "bill sa ospital", "bayad sa ospital", "gastos sa pagpapagamot"], "need": "Pagkatapos magpatingin o ma-confine sa Taipei City Hospital, kailangan kong bayaran ang gastos sa pagpapagamot."}
   },
   "fees.maintenance": {
-   "en": {"title": "Low-cost housing maintenance fee", "keywords": ["housing maintenance fee"]},
-   "ja": {"title": "低家賃住宅の維持費", "keywords": ["住宅維持費"]},
-   "vi": {"title": "Phí bảo trì nhà ở giá rẻ", "keywords": ["phí bảo trì nhà"]},
-   "id": {"title": "Biaya pemeliharaan rumah murah", "keywords": ["biaya pemeliharaan rumah"]},
-   "tl": {"title": "Bayad sa maintenance ng murang pabahay", "keywords": ["bayad sa maintenance ng pabahay"]}
+   "en": {"title": "Low-cost housing maintenance fee", "keywords": ["housing maintenance fee"], "need": "I live in low-cost city housing and need to pay the monthly maintenance fee."},
+   "ja": {"title": "低家賃住宅の維持費", "keywords": ["住宅維持費"], "need": "平価住宅に住んでいるので、毎月の維持費を払いたい。"},
+   "vi": {"title": "Phí bảo trì nhà ở giá rẻ", "keywords": ["phí bảo trì nhà"], "need": "Tôi ở nhà giá rẻ của thành phố, cần đóng phí bảo trì hằng tháng."},
+   "id": {"title": "Biaya pemeliharaan rumah murah", "keywords": ["biaya pemeliharaan rumah"], "need": "Saya tinggal di perumahan murah kota dan perlu membayar biaya pemeliharaan bulanan."},
+   "tl": {"title": "Bayad sa maintenance ng murang pabahay", "keywords": ["bayad sa maintenance ng pabahay"], "need": "Nakatira ako sa murang pabahay ng lungsod at kailangan kong bayaran ang buwanang maintenance fee."}
   },
   "fees.course": {
-   "en": {"title": "Civil service training courses", "keywords": ["training course fee", "course fee"]},
-   "ja": {"title": "公務研修の自費講座", "keywords": ["講座の費用"]},
-   "vi": {"title": "Khóa học đào tạo công vụ", "keywords": ["học phí khóa học"]},
-   "id": {"title": "Kursus pelatihan", "keywords": ["biaya kursus", "biaya pelatihan", "pelatihan kerja", "biaya pelatihan kerja"]},
-   "tl": {"title": "Mga kurso ng civil service training", "keywords": ["bayad sa training course", "bayad sa kurso"]}
+   "en": {"title": "Civil service training courses", "keywords": ["training course fee", "course fee"], "need": "I've signed up for a paid course at the civil service training institute and need to pay the fee."},
+   "ja": {"title": "公務研修の自費講座", "keywords": ["講座の費用"], "need": "公務人員研修所の有料講座に申し込んだので、受講料を払いたい。"},
+   "vi": {"title": "Khóa học đào tạo công vụ", "keywords": ["học phí khóa học"], "need": "Tôi đã đăng ký khóa học tự phí của trung tâm đào tạo công chức, cần đóng học phí."},
+   "id": {"title": "Kursus pelatihan", "keywords": ["biaya kursus", "biaya pelatihan", "pelatihan kerja", "biaya pelatihan kerja"], "need": "Saya sudah mendaftar kursus berbayar di lembaga pelatihan pegawai negeri dan perlu membayar biayanya."},
+   "tl": {"title": "Mga kurso ng civil service training", "keywords": ["bayad sa training course", "bayad sa kurso"], "need": "Nag-enroll ako sa bayad na kurso ng civil service training institute at kailangan kong bayaran ito."}
   },
   "fees.other": {
-   "en": {"title": "Other payments", "keywords": ["other payments"]},
-   "ja": {"title": "その他の支払い", "keywords": ["その他の支払い"]},
-   "vi": {"title": "Thanh toán khác", "keywords": ["thanh toán khác"]},
-   "id": {"title": "Pembayaran lain", "keywords": ["pembayaran lain", "tagihan lain", "tagihan lainnya", "pembayaran lainnya"]},
-   "tl": {"title": "Iba pang bayarin", "keywords": ["iba pang bayarin", "ibang bayarin"]}
+   "en": {"title": "Other payments", "keywords": ["other payments"], "need": "The fee I have to pay isn't one of the usual items, so I'm looking for where to pay other charges."},
+   "ja": {"title": "その他の支払い", "keywords": ["その他の支払い"], "need": "払いたい料金がよくある項目にないので、その他の支払い先を探したい。"},
+   "vi": {"title": "Thanh toán khác", "keywords": ["thanh toán khác"], "need": "Khoản tôi phải đóng không nằm trong các mục thường gặp, muốn tìm chỗ đóng khoản khác."},
+   "id": {"title": "Pembayaran lain", "keywords": ["pembayaran lain", "tagihan lain", "tagihan lainnya", "pembayaran lainnya"], "need": "Biaya yang harus saya bayar tidak ada di daftar biasa, jadi saya mencari tempat membayar biaya lainnya."},
+   "tl": {"title": "Iba pang bayarin", "keywords": ["iba pang bayarin", "ibang bayarin"], "need": "Kakaibang singil ito na wala sa karaniwang listahan; saan ito puwedeng bayaran?"}
   },
   "police.online": {
-   "en": {"title": "Report to the police online", "keywords": ["online police report", "report online", "file a police report"]},
-   "ja": {"title": "オンライン通報", "keywords": ["オンライン通報", "ネットで被害届"]},
-   "vi": {"title": "Trình báo trực tuyến", "keywords": ["trình báo trực tuyến", "báo án trực tuyến", "báo án online", "trình báo online", "báo công an trực tuyến"]},
-   "id": {"title": "Lapor polisi online", "keywords": ["lapor polisi online", "laporan online", "laporan polisi online", "lapor ke polisi", "lapor kehilangan", "laporan kehilangan", "lapor pencurian", "laporkan pencurian", "bikin laporan polisi", "buat laporan polisi"]},
-   "tl": {"title": "Mag-report sa pulis online", "keywords": ["mag-report sa pulis online", "online na ulat sa pulis", "mag-report online", "magsampa ng ulat sa pulis"]}
+   "en": {"title": "Report to the police online", "keywords": ["online police report", "report online", "file a police report"], "need": "Something was stolen or lost, I was scammed or my vehicle was hit, and I want to report it to the police online without going to the station."},
+   "ja": {"title": "オンライン通報", "keywords": ["オンライン通報", "ネットで被害届"], "need": "物を盗まれた・なくした、詐欺にあった、車をぶつけられたので、交番に行かずネットで警察に届けたい。"},
+   "vi": {"title": "Trình báo trực tuyến", "keywords": ["trình báo trực tuyến", "báo án trực tuyến", "báo án online", "trình báo online", "báo công an trực tuyến"], "need": "Tôi bị trộm, mất đồ, bị lừa hoặc xe bị đụng, muốn trình báo công an trên mạng khỏi phải lên đồn."},
+   "id": {"title": "Lapor polisi online", "keywords": ["lapor polisi online", "laporan online", "laporan polisi online", "lapor ke polisi", "lapor kehilangan", "laporan kehilangan", "lapor pencurian", "laporkan pencurian", "bikin laporan polisi", "buat laporan polisi"], "need": "Barang saya dicuri atau hilang, saya kena tipu, atau kendaraan saya ditabrak, dan saya ingin lapor polisi online tanpa ke kantor polisi."},
+   "tl": {"title": "Mag-report sa pulis online", "keywords": ["mag-report sa pulis online", "online na ulat sa pulis", "mag-report online", "magsampa ng ulat sa pulis"], "need": "Nanakawan, nawalan ng gamit, naloko o nabangga ako, at nais kong magsampa ng ulat sa pulisya sa internet sa halip na pumunta sa presinto."}
   },
   "police.records": {
-   "en": {"title": "My police reports", "keywords": ["my police reports", "police report records"]},
-   "ja": {"title": "通報の記録", "keywords": ["通報の記録", "被害届の記録"]},
-   "vi": {"title": "Hồ sơ trình báo", "keywords": ["hồ sơ trình báo", "lịch sử báo án", "hồ sơ báo án"]},
-   "id": {"title": "Riwayat laporan polisi", "keywords": ["riwayat laporan polisi", "daftar laporan polisi", "riwayat laporan"]},
-   "tl": {"title": "Aking mga ulat sa pulis", "keywords": ["mga ulat ko sa pulis", "rekord ng ulat sa pulis", "aking mga ulat sa pulis"]}
+   "en": {"title": "My police reports", "keywords": ["my police reports", "police report records"], "need": "I want to see the record of the cases I've reported to the police before."},
+   "ja": {"title": "通報の記録", "keywords": ["通報の記録", "被害届の記録"], "need": "以前に警察に届け出た事件の記録を見たい。"},
+   "vi": {"title": "Hồ sơ trình báo", "keywords": ["hồ sơ trình báo", "lịch sử báo án", "hồ sơ báo án"], "need": "Tôi muốn xem lại những vụ mình từng trình báo với công an."},
+   "id": {"title": "Riwayat laporan polisi", "keywords": ["riwayat laporan polisi", "daftar laporan polisi", "riwayat laporan"], "need": "Saya ingin melihat catatan kasus yang pernah saya laporkan ke polisi."},
+   "tl": {"title": "Aking mga ulat sa pulis", "keywords": ["mga ulat ko sa pulis", "rekord ng ulat sa pulis", "aking mga ulat sa pulis"], "need": "Nais kong balikan ang listahan ng mga ulat na isinampa ko dati sa pulisya."}
   },
   "districtOffice.progress": {
-   "en": {"title": "Application progress", "keywords": ["application status", "application progress", "case status", "track my application"]},
-   "ja": {"title": "申請の進捗", "keywords": ["申請の進捗", "申請状況", "進捗"]},
-   "vi": {"title": "Tiến độ hồ sơ", "keywords": ["tiến độ hồ sơ", "tình trạng hồ sơ", "tra cứu hồ sơ", "hồ sơ tới đâu", "hồ sơ đến đâu rồi", "kiểm tra hồ sơ"]},
-   "id": {"title": "Status permohonan", "keywords": ["status permohonan", "cek permohonan", "progres", "status pengajuan", "proses permohonan", "permohonan sudah diproses"]},
-   "tl": {"title": "Progreso ng aplikasyon", "keywords": ["status ng aplikasyon", "progreso ng aplikasyon", "status ng kaso", "subaybayan ang aplikasyon ko"]}
+   "en": {"title": "Application progress", "keywords": ["application status", "application progress", "case status", "track my application"], "need": "I sent an application or benefit request online and want to know how far the review has got and when it will be done."},
+   "ja": {"title": "申請の進捗", "keywords": ["申請の進捗", "申請状況", "進捗"], "need": "ネットで申請や補助金を出したので、審査がどこまで進んだか、いつ終わるかを知りたい。"},
+   "vi": {"title": "Tiến độ hồ sơ", "keywords": ["tiến độ hồ sơ", "tình trạng hồ sơ", "tra cứu hồ sơ", "hồ sơ tới đâu", "hồ sơ đến đâu rồi", "kiểm tra hồ sơ"], "need": "Tôi đã nộp đơn hoặc xin trợ cấp trên mạng, muốn biết xét duyệt tới đâu, khi nào xong."},
+   "id": {"title": "Status permohonan", "keywords": ["status permohonan", "cek permohonan", "progres", "status pengajuan", "proses permohonan", "permohonan sudah diproses"], "need": "Saya mengirim permohonan atau pengajuan bantuan online dan ingin tahu sudah sampai mana pemeriksaannya dan kapan selesai."},
+   "tl": {"title": "Progreso ng aplikasyon", "keywords": ["status ng aplikasyon", "progreso ng aplikasyon", "status ng kaso", "subaybayan ang aplikasyon ko"], "need": "Tingnan ang kalagayan ng kasong isinumite sa tanggapan ng distrito: nasaan na ang proseso at kailan inaasahang may resulta."}
   },
   "reportIssue.progress": {
-   "en": {"title": "Complaint progress", "keywords": ["complaint status", "complaint progress"]},
-   "ja": {"title": "陳情の進捗", "keywords": ["陳情の進捗"]},
-   "vi": {"title": "Tiến độ phản ánh", "keywords": ["tiến độ phản ánh"]},
-   "id": {"title": "Status keluhan", "keywords": ["status keluhan", "keluhan sudah ditanggapi", "tanggapan keluhan"]},
-   "tl": {"title": "Progreso ng reklamo", "keywords": ["status ng reklamo", "progreso ng reklamo"]}
+   "en": {"title": "Complaint progress", "keywords": ["complaint status", "complaint progress"], "need": "I complained or reported something to the city and want to know how it's going and whether they have replied."},
+   "ja": {"title": "陳情の進捗", "keywords": ["陳情の進捗"], "need": "市に陳情や通報をしたので、対応がどこまで進んだか、返事があったかを知りたい。"},
+   "vi": {"title": "Tiến độ phản ánh", "keywords": ["tiến độ phản ánh"], "need": "Tôi đã phản ánh hoặc tố giác một chuyện với thành phố, muốn biết xử lý tới đâu, đã có trả lời chưa."},
+   "id": {"title": "Status keluhan", "keywords": ["status keluhan", "keluhan sudah ditanggapi", "tanggapan keluhan"], "need": "Saya pernah mengadu atau melaporkan sesuatu ke pemerintah kota dan ingin tahu perkembangannya dan apakah sudah dijawab."},
+   "tl": {"title": "Progreso ng reklamo", "keywords": ["status ng reklamo", "progreso ng reklamo"], "need": "Nagreklamo o nag-report ako sa lungsod at gusto kong malaman kung ano na ang nangyari at kung sumagot na sila."}
   },
   "disasterReport.progress": {
-   "en": {"title": "Disaster report progress", "keywords": ["disaster report status"]},
-   "ja": {"title": "災害通報の進捗", "keywords": ["災害通報の進捗"]},
-   "vi": {"title": "Tiến độ báo cáo thiên tai", "keywords": ["tiến độ báo cáo thiên tai"]},
-   "id": {"title": "Status laporan bencana", "keywords": ["status laporan bencana"]},
-   "tl": {"title": "Progreso ng ulat ng sakuna", "keywords": ["status ng ulat ng sakuna"]}
+   "en": {"title": "Disaster report progress", "keywords": ["disaster report status"], "need": "I reported storm or disaster damage and want to know whether the city has dealt with it."},
+   "ja": {"title": "災害通報の進捗", "keywords": ["災害通報の進捗"], "need": "災害の被害を通報したので、市が対応したかどうか知りたい。"},
+   "vi": {"title": "Tiến độ báo cáo thiên tai", "keywords": ["tiến độ báo cáo thiên tai"], "need": "Tôi đã báo thiệt hại thiên tai, muốn biết thành phố xử lý chưa."},
+   "id": {"title": "Status laporan bencana", "keywords": ["status laporan bencana"], "need": "Saya sudah melaporkan kerusakan bencana dan ingin tahu apakah kota sudah menanganinya."},
+   "tl": {"title": "Progreso ng ulat ng sakuna", "keywords": ["status ng ulat ng sakuna"], "need": "Nag-report ako ng pinsala ng sakuna at gusto kong malaman kung naasikaso na ito ng lungsod."}
   },
   "police.progress": {
-   "en": {"title": "Police case progress", "keywords": ["police case status", "police case progress"]},
-   "ja": {"title": "警察案件の進捗", "keywords": ["警察案件の進捗"]},
-   "vi": {"title": "Tiến độ vụ việc cảnh sát", "keywords": ["tiến độ vụ việc"]},
-   "id": {"title": "Status kasus polisi", "keywords": ["status kasus polisi", "perkembangan kasus", "status laporan polisi", "perkembangan laporan polisi", "proses laporan polisi"]},
-   "tl": {"title": "Progreso ng kaso sa pulis", "keywords": ["status ng kaso sa pulis", "progreso ng kaso sa pulis"]}
+   "en": {"title": "Police case progress", "keywords": ["police case status", "police case progress"], "need": "After reporting to the police I want to know where my case stands now."},
+   "ja": {"title": "警察案件の進捗", "keywords": ["警察案件の進捗"], "need": "警察に届け出たあと、事件の処理がいまどこまで進んでいるか知りたい。"},
+   "vi": {"title": "Tiến độ vụ việc cảnh sát", "keywords": ["tiến độ vụ việc"], "need": "Sau khi trình báo công an, tôi muốn biết vụ việc đang được xử lý tới đâu."},
+   "id": {"title": "Status kasus polisi", "keywords": ["status kasus polisi", "perkembangan kasus", "status laporan polisi", "perkembangan laporan polisi", "proses laporan polisi"], "need": "Setelah melapor ke polisi saya ingin tahu sampai mana kasus saya ditangani."},
+   "tl": {"title": "Progreso ng kaso sa pulis", "keywords": ["status ng kaso sa pulis", "progreso ng kaso sa pulis"], "need": "Matapos kong magsampa ng ulat sa pulisya, nais kong subaybayan ang estado ng imbestigasyon."}
   },
   "reportIssue.prefill": {
-   "en": {"title": "Complaint form prefill", "keywords": ["street light", "road problem"]},
-   "ja": {"title": "陳情フォームの事前入力", "keywords": ["街灯", "道路の問題"]},
-   "vi": {"title": "Điền sẵn đơn phản ánh", "keywords": ["đèn đường", "hư hỏng đường"]},
-   "id": {"title": "Isi otomatis formulir keluhan", "keywords": ["lampu jalan", "jalan rusak"]},
-   "tl": {"title": "Pre-fill ng form ng reklamo", "keywords": ["ilaw sa kalye", "sirang kalsada", "problema sa kalsada"]}
+   "en": {"title": "Complaint form prefill", "keywords": ["street light", "road problem"], "need": "I want to fill in the place and description of my complaint first, then send it to the city."},
+   "ja": {"title": "陳情フォームの事前入力", "keywords": ["街灯", "道路の問題"], "need": "陳情の場所や内容を先に記入してから、市に送りたい。"},
+   "vi": {"title": "Điền sẵn đơn phản ánh", "keywords": ["đèn đường", "hư hỏng đường"], "need": "Tôi muốn điền trước địa điểm và mô tả vấn đề rồi mới gửi phản ánh cho thành phố."},
+   "id": {"title": "Isi otomatis formulir keluhan", "keywords": ["lampu jalan", "jalan rusak"], "need": "Saya ingin mengisi dulu lokasi dan uraian keluhan sebelum mengirimkannya ke kota."},
+   "tl": {"title": "Pre-fill ng form ng reklamo", "keywords": ["ilaw sa kalye", "sirang kalsada", "problema sa kalsada"], "need": "Gusto kong punan muna ang lugar at paglalarawan ng reklamo bago ipadala sa lungsod."}
   },
   "qna": {
-   "en": {"title": "FAQ", "keywords": ["faq", "frequently asked questions", "common questions", "q&a"]},
-   "ja": {"title": "よくある質問", "keywords": ["よくある質問", "質問", "Q&A"]},
-   "vi": {"title": "Câu hỏi thường gặp", "keywords": ["câu hỏi thường gặp", "hỏi đáp", "câu hỏi hay gặp", "giải đáp thắc mắc"]},
-   "id": {"title": "Pertanyaan umum", "keywords": ["pertanyaan umum", "tanya jawab", "faq"]},
-   "tl": {"title": "FAQ", "keywords": ["faq", "mga madalas itanong", "karaniwang tanong", "tanong at sagot"]}
+   "en": {"title": "FAQ", "keywords": ["faq", "frequently asked questions", "common questions", "q&a"], "need": "When I have a question I'd like to first look at what people often ask and how the city answers."},
+   "ja": {"title": "よくある質問", "keywords": ["よくある質問", "質問", "Q&A"], "need": "疑問があるとき、まずはよくある質問と市の回答を見てみたい。"},
+   "vi": {"title": "Câu hỏi thường gặp", "keywords": ["câu hỏi thường gặp", "hỏi đáp", "câu hỏi hay gặp", "giải đáp thắc mắc"], "need": "Khi có thắc mắc tôi muốn xem trước những câu hỏi mọi người hay hỏi và câu trả lời của thành phố."},
+   "id": {"title": "Pertanyaan umum", "keywords": ["pertanyaan umum", "tanya jawab", "faq"], "need": "Kalau ada pertanyaan saya ingin melihat dulu pertanyaan yang sering diajukan dan jawaban dari kota."},
+   "tl": {"title": "FAQ", "keywords": ["faq", "mga madalas itanong", "karaniwang tanong", "tanong at sagot"], "need": "May tanong ako; uunahin kong basahin ang FAQ at mga sagot ng city hall."}
   },
   "qna.categories": {
-   "en": {"title": "FAQ categories", "keywords": ["faq categories", "all questions"]},
-   "ja": {"title": "質問のカテゴリ", "keywords": ["質問のカテゴリ", "すべての質問"]},
-   "vi": {"title": "Danh mục câu hỏi", "keywords": ["danh mục câu hỏi", "tất cả câu hỏi"]},
-   "id": {"title": "Kategori pertanyaan", "keywords": ["kategori pertanyaan", "semua pertanyaan"]},
-   "tl": {"title": "Mga kategorya ng FAQ", "keywords": ["kategorya ng faq", "lahat ng tanong"]}
+   "en": {"title": "FAQ categories", "keywords": ["faq categories", "all questions"], "need": "I want to browse the city's common questions and answers topic by topic."},
+   "ja": {"title": "質問のカテゴリ", "keywords": ["質問のカテゴリ", "すべての質問"], "need": "市のよくある質問をテーマ別に分けて、分類ごとに見たい。"},
+   "vi": {"title": "Danh mục câu hỏi", "keywords": ["danh mục câu hỏi", "tất cả câu hỏi"], "need": "Tôi muốn xem các câu hỏi thường gặp của thành phố theo từng chủ đề."},
+   "id": {"title": "Kategori pertanyaan", "keywords": ["kategori pertanyaan", "semua pertanyaan"], "need": "Saya ingin menjelajah tanya jawab kota per topik."},
+   "tl": {"title": "Mga kategorya ng FAQ", "keywords": ["kategorya ng faq", "lahat ng tanong"], "need": "Gusto kong tingnan ang mga karaniwang tanong at sagot ng lungsod ayon sa paksa."}
   },
   "fees.search": {
-   "en": {"title": "Payment search", "keywords": ["search payments", "find a payment", "payment search"]},
-   "ja": {"title": "支払い検索", "keywords": ["支払い検索", "支払いを探す"]},
-   "vi": {"title": "Tìm khoản thanh toán", "keywords": ["tìm khoản thanh toán", "tra cứu thanh toán", "tìm hóa đơn", "tra cứu hóa đơn"]},
-   "id": {"title": "Cari pembayaran", "keywords": ["cari pembayaran", "pencarian pembayaran", "cari tagihan", "cek tagihan", "tagihan yang belum dibayar", "tagihan belum dibayar", "cek pembayaran"]},
-   "tl": {"title": "Paghahanap ng bayarin", "keywords": ["hanapin ang bayarin", "maghanap ng bayarin", "paghahanap ng bayarin"]}
+   "en": {"title": "Payment search", "keywords": ["search payments", "find a payment", "payment search"], "need": "I don't know what the fee I owe is called and want to search for where I can pay it."},
+   "ja": {"title": "支払い検索", "keywords": ["支払い検索", "支払いを探す"], "need": "払わないといけない料金の名前が分からないので、どこで払えるか検索したい。"},
+   "vi": {"title": "Tìm khoản thanh toán", "keywords": ["tìm khoản thanh toán", "tra cứu thanh toán", "tìm hóa đơn", "tra cứu hóa đơn"], "need": "Tôi không biết khoản tiền phải đóng tên là gì, muốn tìm xem đóng ở đâu."},
+   "id": {"title": "Cari pembayaran", "keywords": ["cari pembayaran", "pencarian pembayaran", "cari tagihan", "cek tagihan", "tagihan yang belum dibayar", "tagihan belum dibayar", "cek pembayaran"], "need": "Saya tidak tahu nama biaya yang harus dibayar dan ingin mencari di mana bisa membayarnya."},
+   "tl": {"title": "Paghahanap ng bayarin", "keywords": ["hanapin ang bayarin", "maghanap ng bayarin", "paghahanap ng bayarin"], "need": "Hindi ko alam ang tawag sa bayaring dapat kong bayaran at gusto kong hanapin kung saan ito mababayaran."}
   },
   "districtOffice.form.a-1": {
-   "en": {"title": "Traffic ticket appeal (Taipei)", "keywords": ["traffic ticket appeal", "appeal a ticket"]},
-   "ja": {"title": "交通違反の申し立て（台北市）", "keywords": ["交通違反の申し立て（台北市）"]},
-   "vi": {"title": "Khiếu nại vé phạt giao thông (Đài Bắc)", "keywords": ["khiếu nại vé phạt giao thông (đài bắc)"]},
-   "id": {"title": "Banding tilang lalu lintas (Taipei)", "keywords": ["banding tilang lalu lintas (taipei)"]},
-   "tl": {"title": "Apela sa multa sa trapiko (Lungsod ng Taipei)", "keywords": ["apela sa multa sa trapiko", "iapela ang multa sa trapiko"]}
+   "en": {"title": "Traffic ticket appeal (Taipei)", "keywords": ["traffic ticket appeal", "appeal a ticket"], "need": "A Taipei traffic fine seems mistaken to me and I want to dispute it with the traffic adjudication office."},
+   "ja": {"title": "交通違反の申し立て（台北市）", "keywords": ["交通違反の申し立て（台北市）"], "need": "台北市で交通違反の切符を切られたが間違いだと思うので、交通事件裁決所に不服を申し立てたい。"},
+   "vi": {"title": "Khiếu nại vé phạt giao thông (Đài Bắc)", "keywords": ["khiếu nại vé phạt giao thông (đài bắc)"], "need": "Tôi bị phạt giao thông ở Đài Bắc mà thấy phạt sai, muốn khiếu nại lên sở xét xử vi phạm giao thông."},
+   "id": {"title": "Banding tilang lalu lintas (Taipei)", "keywords": ["banding tilang lalu lintas (taipei)"], "need": "Saya kena tilang di Taipei yang menurut saya salah dan ingin mengajukan keberatan ke kantor ajudikasi lalu lintas."},
+   "tl": {"title": "Apela sa multa sa trapiko (Lungsod ng Taipei)", "keywords": ["apela sa multa sa trapiko", "iapela ang multa sa trapiko"], "need": "Natiketan ako sa trapiko sa Taipei na sa tingin ko ay mali, at gusto kong umapela sa traffic adjudication office."}
   },
   "districtOffice.form.a-2": {
-   "en": {"title": "Traffic ticket appeal (other cities)", "keywords": ["ticket from another city"]},
-   "ja": {"title": "交通違反の申し立て（他県市）", "keywords": ["交通違反の申し立て（他県市）"]},
-   "vi": {"title": "Khiếu nại vé phạt giao thông (tỉnh khác)", "keywords": ["khiếu nại vé phạt giao thông (tỉnh khác)"]},
-   "id": {"title": "Banding tilang lalu lintas (kota lain)", "keywords": ["banding tilang lalu lintas (kota lain)"]},
-   "tl": {"title": "Apela sa multa sa trapiko (ibang lungsod)", "keywords": ["multa sa trapiko mula sa ibang lungsod"]}
+   "en": {"title": "Traffic ticket appeal (other cities)", "keywords": ["ticket from another city"], "need": "I got a traffic ticket or was caught on camera in another county or city, but I live in Taipei and want to appeal from here."},
+   "ja": {"title": "交通違反の申し立て（他県市）", "keywords": ["交通違反の申し立て（他県市）"], "need": "他の県市で交通違反の切符を切られた・カメラに撮られたが、台北に住んでいるのでここから不服申し立てをしたい。"},
+   "vi": {"title": "Khiếu nại vé phạt giao thông (tỉnh khác)", "keywords": ["khiếu nại vé phạt giao thông (tỉnh khác)"], "need": "Tôi bị phạt hoặc bị chụp vi phạm giao thông ở huyện thị khác nhưng sống ở Đài Bắc, muốn khiếu nại từ đây."},
+   "id": {"title": "Banding tilang lalu lintas (kota lain)", "keywords": ["banding tilang lalu lintas (kota lain)"], "need": "Saya kena tilang atau tertangkap kamera di kota lain, tapi tinggal di Taipei dan ingin mengajukan keberatan dari sini."},
+   "tl": {"title": "Apela sa multa sa trapiko (ibang lungsod)", "keywords": ["multa sa trapiko mula sa ibang lungsod"], "need": "Natiketan o nakunan ako ng camera sa ibang lungsod o county, pero sa Taipei ako nakatira at gusto kong umapela mula rito."}
   },
   "districtOffice.form.a-3": {
-   "en": {"title": "Parking ticket appeal", "keywords": ["parking ticket appeal", "parking fine appeal"]},
-   "ja": {"title": "駐車違反の申し立て", "keywords": ["駐車違反の申し立て"]},
-   "vi": {"title": "Khiếu nại phạt đỗ xe", "keywords": ["khiếu nại phạt đỗ xe"]},
-   "id": {"title": "Banding tilang parkir", "keywords": ["banding tilang parkir"]},
-   "tl": {"title": "Apela sa multa sa paradahan", "keywords": ["iapela ang multa sa paradahan"]}
+   "en": {"title": "Parking ticket appeal", "keywords": ["parking ticket appeal", "parking fine appeal"], "need": "A parking charge or slip is wrong, or I'm being chased for one I already paid, and I want to complain to the parking management office."},
+   "ja": {"title": "駐車違反の申し立て", "keywords": ["駐車違反の申し立て"], "need": "駐車料金や駐車の紙が間違っている、払ったのに督促が来たので、駐車管理処に申し立てたい。"},
+   "vi": {"title": "Khiếu nại phạt đỗ xe", "keywords": ["khiếu nại phạt đỗ xe"], "need": "Phiếu thu phí đỗ xe bị sai, hoặc đã trả rồi mà vẫn bị đòi, tôi muốn khiếu nại với phòng quản lý đỗ xe."},
+   "id": {"title": "Banding tilang parkir", "keywords": ["banding tilang parkir"], "need": "Tagihan atau slip parkir salah, atau sudah dibayar tapi masih ditagih, dan saya ingin mengadu ke kantor pengelola parkir."},
+   "tl": {"title": "Apela sa multa sa paradahan", "keywords": ["iapela ang multa sa paradahan"], "need": "Mali ang singil o slip sa parking, o bayad na pero sinisingil pa rin, at gusto kong magreklamo sa parking management office."}
   },
   "districtOffice.form.b-1": {
-   "en": {"title": "Police violation appeal", "keywords": ["police ticket appeal"]},
-   "ja": {"title": "警察の違反の申し立て", "keywords": ["警察の違反の申し立て"]},
-   "vi": {"title": "Khiếu nại vi phạm do cảnh sát lập", "keywords": ["khiếu nại vi phạm do cảnh sát lập"]},
-   "id": {"title": "Banding pelanggaran dari polisi", "keywords": ["banding pelanggaran dari polisi"]},
-   "tl": {"title": "Apela sa paglabag sa trapiko na hawak ng pulisya ng lungsod", "keywords": ["iapela ang tiket sa trapiko mula sa pulisya"]}
+   "en": {"title": "Police violation appeal", "keywords": ["police ticket appeal"], "need": "A Taipei police officer stopped me and gave me a violation ticket that I think is unfair, and I want to appeal."},
+   "ja": {"title": "警察の違反の申し立て", "keywords": ["警察の違反の申し立て"], "need": "台北市の警察に止められて違反切符を切られたが納得できないので、不服申し立てをしたい。"},
+   "vi": {"title": "Khiếu nại vi phạm do cảnh sát lập", "keywords": ["khiếu nại vi phạm do cảnh sát lập"], "need": "Tôi bị cảnh sát Đài Bắc chặn lại phạt mà thấy không hợp lý, muốn khiếu nại."},
+   "id": {"title": "Banding pelanggaran dari polisi", "keywords": ["banding pelanggaran dari polisi"], "need": "Saya dihentikan polisi Taipei dan diberi surat pelanggaran yang menurut saya tidak adil, dan ingin mengajukan keberatan."},
+   "tl": {"title": "Apela sa paglabag sa trapiko na hawak ng pulisya ng lungsod", "keywords": ["iapela ang tiket sa trapiko mula sa pulisya"], "need": "Pinara ako ng pulis sa Taipei at binigyan ng tiket na sa tingin ko ay hindi makatarungan, at gusto kong umapela."}
   },
   "districtOffice.form.c-1": {
-   "en": {"title": "Senior health insurance premium subsidy", "keywords": ["senior health insurance subsidy"]},
-   "ja": {"title": "高齢者の健康保険料補助", "keywords": ["高齢者の健康保険料補助"]},
-   "vi": {"title": "Trợ cấp phí bảo hiểm y tế cho người cao tuổi", "keywords": ["trợ cấp phí bảo hiểm y tế cho người cao tuổi"]},
-   "id": {"title": "Subsidi premi asuransi kesehatan lansia", "keywords": ["subsidi premi asuransi kesehatan lansia", "subsidi asuransi kesehatan", "asuransi kesehatan lansia"]},
-   "tl": {"title": "Subsidy sa premium ng health insurance ng senior", "keywords": ["subsidy sa health insurance ng senior"]}
+   "en": {"title": "Senior health insurance premium subsidy", "keywords": ["senior health insurance subsidy"], "need": "My elderly parent's monthly health insurance premium is a burden, and I want to apply for the senior premium subsidy."},
+   "ja": {"title": "高齢者の健康保険料補助", "keywords": ["高齢者の健康保険料補助"], "need": "高齢の家族の毎月の健康保険料が負担なので、高齢者の保険料自己負担分の補助を申請したい。"},
+   "vi": {"title": "Trợ cấp phí bảo hiểm y tế cho người cao tuổi", "keywords": ["trợ cấp phí bảo hiểm y tế cho người cao tuổi"], "need": "Người lớn tuổi trong nhà đóng bảo hiểm y tế hằng tháng rất nặng, tôi muốn xin trợ cấp phí bảo hiểm cho người già."},
+   "id": {"title": "Subsidi premi asuransi kesehatan lansia", "keywords": ["subsidi premi asuransi kesehatan lansia", "subsidi asuransi kesehatan", "asuransi kesehatan lansia"], "need": "Iuran asuransi kesehatan bulanan orang tua saya yang sudah lanjut usia terasa berat, dan saya ingin mengajukan subsidi iuran lansia."},
+   "tl": {"title": "Subsidy sa premium ng health insurance ng senior", "keywords": ["subsidy sa health insurance ng senior"], "need": "Mabigat ang buwanang health insurance ng matanda naming magulang, at gusto kong mag-apply ng subsidiya sa premium para sa senior."}
   },
   "districtOffice.form.c-2": {
-   "en": {"title": "Sexual assault victim subsidy", "keywords": ["sexual assault victim support"]},
-   "ja": {"title": "性暴力被害者への補助", "keywords": ["性暴力被害者への補助"]},
-   "vi": {"title": "Trợ cấp nạn nhân xâm hại tình dục", "keywords": ["trợ cấp nạn nhân xâm hại tình dục"]},
-   "id": {"title": "Subsidi korban kekerasan seksual", "keywords": ["subsidi korban kekerasan seksual"]},
-   "tl": {"title": "Tulong para sa biktima ng sekswal na pang-aabuso", "keywords": ["tulong sa biktima ng sekswal na pang-aabuso"]}
+   "en": {"title": "Sexual assault victim subsidy", "keywords": ["sexual assault victim support"], "need": "After a sexual assault I need money for medical care, legal costs or daily living and want to apply for the victim subsidy."},
+   "ja": {"title": "性暴力被害者への補助", "keywords": ["性暴力被害者への補助"], "need": "性暴力の被害にあい、治療や裁判、生活のためにお金が必要なので、被害者への補助を申請したい。"},
+   "vi": {"title": "Trợ cấp nạn nhân xâm hại tình dục", "keywords": ["trợ cấp nạn nhân xâm hại tình dục"], "need": "Sau khi bị xâm hại tình dục, tôi cần tiền đi khám, kiện tụng hoặc sinh hoạt, muốn xin trợ cấp cho nạn nhân."},
+   "id": {"title": "Subsidi korban kekerasan seksual", "keywords": ["subsidi korban kekerasan seksual"], "need": "Setelah mengalami kekerasan seksual saya butuh biaya berobat, hukum, atau hidup, dan ingin mengajukan bantuan korban."},
+   "tl": {"title": "Tulong para sa biktima ng sekswal na pang-aabuso", "keywords": ["tulong sa biktima ng sekswal na pang-aabuso"], "need": "Matapos ang sekswal na pang-aabuso, kailangan ko ng pera para sa gamutan, kaso o pang-araw-araw at gusto kong mag-apply ng tulong para sa biktima."}
   },
   "districtOffice.form.c-3": {
-   "en": {"title": "Domestic violence victim subsidy", "keywords": ["domestic violence support"]},
-   "ja": {"title": "家庭内暴力被害者への補助", "keywords": ["家庭内暴力被害者への補助"]},
-   "vi": {"title": "Trợ cấp nạn nhân bạo lực gia đình", "keywords": ["trợ cấp nạn nhân bạo lực gia đình"]},
-   "id": {"title": "Subsidi korban kekerasan dalam rumah tangga", "keywords": ["subsidi korban kekerasan dalam rumah tangga"]},
-   "tl": {"title": "Tulong para sa biktima ng karahasan sa tahanan", "keywords": ["tulong sa biktima ng karahasan sa tahanan"]}
+   "en": {"title": "Domestic violence victim subsidy", "keywords": ["domestic violence support"], "need": "I was abused by a family member or partner, moved out, and need money for medical care, living or legal costs; I want the domestic violence victim subsidy."},
+   "ja": {"title": "家庭内暴力被害者への補助", "keywords": ["家庭内暴力被害者への補助"], "need": "家族やパートナーから暴力を受けて家を出たが、治療や生活、裁判にお金が必要なので、DV被害者への補助を申請したい。"},
+   "vi": {"title": "Trợ cấp nạn nhân bạo lực gia đình", "keywords": ["trợ cấp nạn nhân bạo lực gia đình"], "need": "Tôi bị người nhà hoặc bạn đời bạo hành, đã dọn ra ngoài và cần tiền chữa trị, sinh hoạt, kiện tụng, muốn xin trợ cấp nạn nhân bạo lực gia đình."},
+   "id": {"title": "Subsidi korban kekerasan dalam rumah tangga", "keywords": ["subsidi korban kekerasan dalam rumah tangga"], "need": "Saya mengalami kekerasan dari keluarga atau pasangan, sudah pindah, dan butuh biaya berobat, hidup, atau hukum; saya ingin bantuan korban KDRT."},
+   "tl": {"title": "Tulong para sa biktima ng karahasan sa tahanan", "keywords": ["tulong sa biktima ng karahasan sa tahanan"], "need": "Inabuso ako ng kapamilya o partner, umalis na ako, at kailangan ko ng pera sa gamutan, pamumuhay o kaso; gusto kong mag-apply ng tulong para sa biktima ng karahasan sa tahanan."}
   },
   "districtOffice.form.c-4": {
-   "en": {"title": "Special-circumstances family aid (domestic violence)", "keywords": ["special circumstances family aid"]},
-   "ja": {"title": "特別な事情のある家庭への援助（家庭内暴力）", "keywords": ["特別な事情のある家庭への援助（家庭内暴力）"]},
-   "vi": {"title": "Hỗ trợ gia đình hoàn cảnh đặc biệt (bạo lực gia đình)", "keywords": ["hỗ trợ gia đình hoàn cảnh đặc biệt (bạo lực gia đình)"]},
-   "id": {"title": "Bantuan keluarga keadaan khusus (KDRT)", "keywords": ["bantuan keluarga keadaan khusus (kdrt)"]},
-   "tl": {"title": "Tulong sa pamilyang nasa espesyal na kalagayan (karahasan sa tahanan)", "keywords": ["tulong sa pamilyang nasa espesyal na kalagayan"]}
+   "en": {"title": "Special-circumstances family aid (domestic violence)", "keywords": ["special circumstances family aid"], "need": "After domestic violence I'm holding the family up on my own and money is very tight, so I want to apply for special-circumstances family aid."},
+   "ja": {"title": "特別な事情のある家庭への援助（家庭内暴力）", "keywords": ["特別な事情のある家庭への援助（家庭内暴力）"], "need": "DVを受けたあと一人で家庭を支えていて生活が苦しいので、特殊境遇家庭への扶助を申請したい。"},
+   "vi": {"title": "Hỗ trợ gia đình hoàn cảnh đặc biệt (bạo lực gia đình)", "keywords": ["hỗ trợ gia đình hoàn cảnh đặc biệt (bạo lực gia đình)"], "need": "Sau khi bị bạo hành gia đình tôi một mình gánh vác gia đình, kinh tế rất khó khăn, muốn xin trợ giúp gia đình hoàn cảnh đặc biệt."},
+   "id": {"title": "Bantuan keluarga keadaan khusus (KDRT)", "keywords": ["bantuan keluarga keadaan khusus (kdrt)"], "need": "Setelah mengalami KDRT saya menanggung keluarga sendirian dan keuangan sangat sulit, jadi ingin mengajukan bantuan keluarga keadaan khusus."},
+   "tl": {"title": "Tulong sa pamilyang nasa espesyal na kalagayan (karahasan sa tahanan)", "keywords": ["tulong sa pamilyang nasa espesyal na kalagayan"], "need": "Matapos ang karahasan sa tahanan, mag-isa kong binubuhay ang pamilya at gipit kami, kaya gusto kong mag-apply ng tulong para sa pamilyang nasa espesyal na kalagayan."}
   },
   "districtOffice.form.c-5": {
-   "en": {"title": "Disability social insurance subsidy change", "keywords": ["disability insurance subsidy"]},
-   "ja": {"title": "障害者の社会保険料補助の変更", "keywords": ["障害者の社会保険料補助の変更"]},
-   "vi": {"title": "Thay đổi trợ cấp bảo hiểm xã hội cho người khuyết tật", "keywords": ["thay đổi trợ cấp bảo hiểm xã hội cho người khuyết tật"]},
-   "id": {"title": "Perubahan subsidi asuransi sosial penyandang disabilitas", "keywords": ["perubahan subsidi asuransi sosial penyandang disabilitas"]},
-   "tl": {"title": "Pagbabago sa subsidy ng social insurance ng may kapansanan", "keywords": ["subsidy sa insurance ng may kapansanan"]}
+   "en": {"title": "Disability social insurance subsidy change", "keywords": ["disability insurance subsidy"], "need": "A family member with a disability gets help with social insurance premiums, and I want to change how that subsidy is given."},
+   "ja": {"title": "障害者の社会保険料補助の変更", "keywords": ["障害者の社会保険料補助の変更"], "need": "障がいのある家族の社会保険料の補助について、補助の方法を変更したい。"},
+   "vi": {"title": "Thay đổi trợ cấp bảo hiểm xã hội cho người khuyết tật", "keywords": ["thay đổi trợ cấp bảo hiểm xã hội cho người khuyết tật"], "need": "Người nhà tôi bị khuyết tật đang được trợ cấp phí bảo hiểm xã hội, tôi muốn đổi cách nhận trợ cấp đó."},
+   "id": {"title": "Perubahan subsidi asuransi sosial penyandang disabilitas", "keywords": ["perubahan subsidi asuransi sosial penyandang disabilitas"], "need": "Anggota keluarga saya penyandang disabilitas mendapat subsidi iuran asuransi sosial, dan saya ingin mengubah cara subsidinya."},
+   "tl": {"title": "Pagbabago sa subsidy ng social insurance ng may kapansanan", "keywords": ["subsidy sa insurance ng may kapansanan"], "need": "May kapansanan ang kapamilya ko at may subsidiya siya sa social insurance, at gusto kong baguhin kung paano ito ibinibigay."}
   },
   "districtOffice.form.d-1": {
-   "en": {"title": "Indigenous emergency relief", "keywords": ["indigenous emergency relief"]},
-   "ja": {"title": "原住民族緊急見舞金", "keywords": ["原住民族緊急見舞金"]},
-   "vi": {"title": "Tiền hỗ trợ khẩn cấp cho người bản địa", "keywords": ["tiền hỗ trợ khẩn cấp cho người bản địa"]},
-   "id": {"title": "Bantuan darurat masyarakat adat", "keywords": ["bantuan darurat masyarakat adat"]},
-   "tl": {"title": "Tulong pang-emergency para sa katutubo", "keywords": ["tulong pang-emergency para sa katutubo"]}
+   "en": {"title": "Indigenous emergency relief", "keywords": ["indigenous emergency relief"], "need": "An Indigenous family hit by an emergency such as an accident, serious illness or a death needs to apply for relief money."},
+   "ja": {"title": "原住民族緊急見舞金", "keywords": ["原住民族緊急見舞金"], "need": "原住民の家庭が事故や重い病気、家族の死などの急な困難にあい、見舞金を申請したい。"},
+   "vi": {"title": "Tiền hỗ trợ khẩn cấp cho người bản địa", "keywords": ["tiền hỗ trợ khẩn cấp cho người bản địa"], "need": "Gia đình người bản địa gặp chuyện khẩn cấp như tai nạn, bệnh nặng, người thân qua đời, cần xin tiền hỗ trợ."},
+   "id": {"title": "Bantuan darurat masyarakat adat", "keywords": ["bantuan darurat masyarakat adat"], "need": "Keluarga masyarakat adat yang tertimpa musibah seperti kecelakaan, sakit berat, atau kematian perlu mengajukan dana santunan."},
+   "tl": {"title": "Tulong pang-emergency para sa katutubo", "keywords": ["tulong pang-emergency para sa katutubo"], "need": "Ang pamilyang katutubo na tinamaan ng biglaang sakuna gaya ng aksidente, malubhang sakit o pagkamatay ay kailangang mag-apply ng tulong pinansyal."}
   },
   "districtOffice.form.d-2": {
-   "en": {"title": "Indigenous skills certification award", "keywords": ["indigenous certification award"]},
-   "ja": {"title": "原住民族技能検定奨励金", "keywords": ["原住民族技能検定奨励金"]},
-   "vi": {"title": "Tiền thưởng chứng chỉ kỹ năng cho người bản địa", "keywords": ["tiền thưởng chứng chỉ kỹ năng cho người bản địa"]},
-   "id": {"title": "Insentif sertifikasi keahlian masyarakat adat", "keywords": ["insentif sertifikasi keahlian masyarakat adat"]},
-   "tl": {"title": "Gantimpala sa sertipikasyon ng kasanayan ng katutubo", "keywords": ["gantimpala sa sertipikasyon ng katutubo"]}
+   "en": {"title": "Indigenous skills certification award", "keywords": ["indigenous certification award"], "need": "As an Indigenous person I passed a skills test or earned a technician certificate and want to apply for the reward."},
+   "ja": {"title": "原住民族技能検定奨励金", "keywords": ["原住民族技能検定奨励金"], "need": "原住民として技能検定に合格・技術士の資格を取ったので、奨励金を申請したい。"},
+   "vi": {"title": "Tiền thưởng chứng chỉ kỹ năng cho người bản địa", "keywords": ["tiền thưởng chứng chỉ kỹ năng cho người bản địa"], "need": "Tôi là người bản địa đã thi đậu kiểm định tay nghề hoặc có chứng chỉ kỹ thuật viên, muốn xin tiền thưởng."},
+   "id": {"title": "Insentif sertifikasi keahlian masyarakat adat", "keywords": ["insentif sertifikasi keahlian masyarakat adat"], "need": "Sebagai warga adat saya lulus uji keterampilan atau dapat sertifikat teknisi dan ingin mengajukan uang penghargaan."},
+   "tl": {"title": "Gantimpala sa sertipikasyon ng kasanayan ng katutubo", "keywords": ["gantimpala sa sertipikasyon ng katutubo"], "need": "Bilang katutubo, pumasa ako sa skills test o nakakuha ng sertipiko bilang technician at gusto kong mag-apply ng gantimpala."}
   },
   "reportIssue.list": {
-   "en": {"title": "Complaint categories", "keywords": ["complaint categories", "all complaint types"]},
-   "ja": {"title": "陳情の分類", "keywords": ["陳情の分類", "陳情の種類"]},
-   "vi": {"title": "Danh mục phản ánh", "keywords": ["danh mục phản ánh", "loại phản ánh"]},
-   "id": {"title": "Kategori keluhan", "keywords": ["kategori keluhan", "jenis keluhan"]},
-   "tl": {"title": "Mga kategorya ng reklamo", "keywords": ["kategorya ng reklamo", "lahat ng uri ng reklamo"]}
+   "en": {"title": "Complaint categories", "keywords": ["complaint categories", "all complaint types"], "need": "I want to make a complaint but don't know which type my problem is, so I'd like to see all the complaint categories first."},
+   "ja": {"title": "陳情の分類", "keywords": ["陳情の分類", "陳情の種類"], "need": "陳情したいが自分の問題がどの分類か分からないので、先に陳情の分類をすべて見たい。"},
+   "vi": {"title": "Danh mục phản ánh", "keywords": ["danh mục phản ánh", "loại phản ánh"], "need": "Tôi muốn phản ánh nhưng không biết vấn đề của mình thuộc loại nào, muốn xem trước tất cả các loại."},
+   "id": {"title": "Kategori keluhan", "keywords": ["kategori keluhan", "jenis keluhan"], "need": "Saya ingin mengadu tapi tidak tahu masalah saya masuk kategori apa, jadi ingin melihat semua kategori dulu."},
+   "tl": {"title": "Mga kategorya ng reklamo", "keywords": ["kategorya ng reklamo", "lahat ng uri ng reklamo"], "need": "Gusto kong magreklamo pero hindi ko alam kung anong uri ang problema ko, kaya gusto ko munang makita lahat ng kategorya."}
   },
   "disasterReport.form.D-1-1": {
-   "en": {"title": "Damaged power line or pole", "keywords": ["damaged power line or pole"]},
-   "ja": {"title": "電線・電柱の損傷", "keywords": ["電線・電柱の損傷"]},
-   "vi": {"title": "Dây điện hoặc cột điện hư hỏng", "keywords": ["dây điện hoặc cột điện hư hỏng"]},
-   "id": {"title": "Kabel atau tiang listrik rusak", "keywords": ["kabel atau tiang listrik rusak", "kabel listrik putus", "tiang listrik rusak", "tiang listrik roboh"]},
-   "tl": {"title": "Sirang linya o poste ng kuryente", "keywords": ["sirang linya ng kuryente", "sirang poste ng kuryente", "natumbang poste"]}
+   "en": {"title": "Damaged power line or pole", "keywords": ["damaged power line or pole"], "need": "I see a utility pole leaning or down, or a power or cable line broken and hanging over the street, and want to report it."},
+   "ja": {"title": "電線・電柱の損傷", "keywords": ["電線・電柱の損傷"], "need": "電柱が傾いたり倒れたり、電線やケーブルが切れて道に垂れているのを見たので通報したい。"},
+   "vi": {"title": "Dây điện hoặc cột điện hư hỏng", "keywords": ["dây điện hoặc cột điện hư hỏng"], "need": "Tôi thấy cột điện nghiêng, đổ, hoặc dây điện, dây cáp đứt rủ xuống đường, muốn báo."},
+   "id": {"title": "Kabel atau tiang listrik rusak", "keywords": ["kabel atau tiang listrik rusak", "kabel listrik putus", "tiang listrik rusak", "tiang listrik roboh"], "need": "Saya melihat tiang listrik miring atau roboh, atau kabel putus menjuntai ke jalan, dan ingin melaporkannya."},
+   "tl": {"title": "Sirang linya o poste ng kuryente", "keywords": ["sirang linya ng kuryente", "sirang poste ng kuryente", "natumbang poste"], "need": "May nakita akong poste ng kuryente na nakahilig o natumba, o kawad na putol at nakalawit sa kalsada, at gusto kong i-report."}
   },
   "disasterReport.form.D-1-2": {
-   "en": {"title": "Substation or power plant damage", "keywords": ["substation or power plant damage"]},
-   "ja": {"title": "変電所・発電所の被害", "keywords": ["変電所・発電所の被害"]},
-   "vi": {"title": "Trạm biến áp hoặc nhà máy điện bị hư hại", "keywords": ["trạm biến áp hoặc nhà máy điện bị hư hại"]},
-   "id": {"title": "Gardu atau pembangkit listrik rusak", "keywords": ["gardu atau pembangkit listrik rusak"]},
-   "tl": {"title": "Pinsala sa substation o planta ng kuryente", "keywords": ["pinsala sa substation", "planta ng kuryente"]}
+   "en": {"title": "Substation or power plant damage", "keywords": ["substation or power plant damage"], "need": "A substation, transformer box or power plant is flooded, smoking or on fire, and I want to report the damage."},
+   "ja": {"title": "変電所・発電所の被害", "keywords": ["変電所・発電所の被害"], "need": "変電所や変圧器、発電所が浸水・発煙・火災などの被害を受けているので通報したい。"},
+   "vi": {"title": "Trạm biến áp hoặc nhà máy điện bị hư hại", "keywords": ["trạm biến áp hoặc nhà máy điện bị hư hại"], "need": "Trạm biến áp, tủ điện hoặc nhà máy điện bị ngập, bốc khói hay cháy, tôi muốn báo."},
+   "id": {"title": "Gardu atau pembangkit listrik rusak", "keywords": ["gardu atau pembangkit listrik rusak"], "need": "Gardu listrik, kotak trafo, atau pembangkit listrik kebanjiran, berasap, atau terbakar, dan saya ingin melaporkannya."},
+   "tl": {"title": "Pinsala sa substation o planta ng kuryente", "keywords": ["pinsala sa substation", "planta ng kuryente"], "need": "Binaha, umuusok o nasusunog ang substation, transformer o planta ng kuryente, at gusto kong i-report."}
   },
   "disasterReport.form.D-1-3": {
-   "en": {"title": "Broken street light", "keywords": ["broken street light"]},
-   "ja": {"title": "街灯の故障", "keywords": ["街灯の故障"]},
-   "vi": {"title": "Đèn đường bị hỏng", "keywords": ["đèn đường bị hỏng"]},
-   "id": {"title": "Lampu jalan rusak", "keywords": ["lampu jalan rusak", "lampu jalan mati", "lampu jalan padam", "lampu jalan tidak menyala"]},
-   "tl": {"title": "Sirang ilaw sa kalye", "keywords": ["sirang ilaw sa kalye", "patay na ilaw sa kalye", "ilaw sa kalye", "poste ng ilaw"]}
+   "en": {"title": "Broken street light", "keywords": ["broken street light"], "need": "A street light is out, flickering or its pole is broken, it's dark walking at night, and I want it reported for repair."},
+   "ja": {"title": "街灯の故障", "keywords": ["街灯の故障"], "need": "街灯がつかない・点滅する・柱が壊れていて夜道が暗いので、修理を通報したい。"},
+   "vi": {"title": "Đèn đường bị hỏng", "keywords": ["đèn đường bị hỏng"], "need": "Đèn đường không sáng, chớp tắt hoặc cột đèn hư, tối đi đường rất tối, muốn báo sửa."},
+   "id": {"title": "Lampu jalan rusak", "keywords": ["lampu jalan rusak", "lampu jalan mati", "lampu jalan padam", "lampu jalan tidak menyala"], "need": "Lampu jalan mati, berkedip, atau tiangnya rusak sehingga gelap saat malam, dan saya ingin melapor agar diperbaiki."},
+   "tl": {"title": "Sirang ilaw sa kalye", "keywords": ["sirang ilaw sa kalye", "patay na ilaw sa kalye", "ilaw sa kalye", "poste ng ilaw"], "need": "Hindi umiilaw o kumikislap ang ilaw-poste sa kalye, kaya madilim sa gabi; nais kong ipaayos ito."}
   },
   "disasterReport.form.D-1-4": {
-   "en": {"title": "Power outage", "keywords": ["power outage"]},
-   "ja": {"title": "停電", "keywords": ["停電"]},
-   "vi": {"title": "Mất điện", "keywords": ["mất điện"]},
-   "id": {"title": "Listrik padam", "keywords": ["listrik padam", "mati listrik", "listrik mati", "pemadaman listrik"]},
-   "tl": {"title": "Pagkawala ng kuryente", "keywords": ["pagkawala ng kuryente", "brownout", "walang kuryente", "nawalan ng kuryente"]}
+   "en": {"title": "Power outage", "keywords": ["power outage"], "need": "My home or the whole neighbourhood suddenly has no electricity, and I want to report the power cut."},
+   "ja": {"title": "停電", "keywords": ["停電"], "need": "家や地域全体が急に停電して電気が使えないので、停電を通報したい。"},
+   "vi": {"title": "Mất điện", "keywords": ["mất điện"], "need": "Nhà tôi hoặc cả khu đột nhiên mất điện, muốn báo bị cúp điện."},
+   "id": {"title": "Listrik padam", "keywords": ["listrik padam", "mati listrik", "listrik mati", "pemadaman listrik"], "need": "Rumah saya atau seluruh lingkungan tiba-tiba mati listrik, dan saya ingin melaporkan pemadaman."},
+   "tl": {"title": "Pagkawala ng kuryente", "keywords": ["pagkawala ng kuryente", "brownout", "walang kuryente", "nawalan ng kuryente"], "need": "Walang kuryente bigla sa bahay o sa buong kapitbahayan, at nais kong iulat ang pagkawala ng kuryente."}
   },
   "disasterReport.form.D-2-1": {
-   "en": {"title": "Bridge foundation scour", "keywords": ["bridge foundation scour"]},
-   "ja": {"title": "橋の基礎の洗掘", "keywords": ["橋の基礎の洗掘"]},
-   "vi": {"title": "Xói lở móng cầu", "keywords": ["xói lở móng cầu"]},
-   "id": {"title": "Gerusan fondasi jembatan", "keywords": ["gerusan fondasi jembatan"]},
-   "tl": {"title": "Pag-agnas ng pundasyon ng tulay", "keywords": ["pag-agnas ng pundasyon ng tulay"]}
+   "en": {"title": "Bridge foundation scour", "keywords": ["bridge foundation scour"], "need": "Floodwater has washed away the soil around a bridge pier or under the bridge, it may be unsafe, and I want to report it."},
+   "ja": {"title": "橋の基礎の洗掘", "keywords": ["橋の基礎の洗掘"], "need": "大水で橋脚や橋の下の土が流されてえぐれ、橋が危ないかもしれないので通報したい。"},
+   "vi": {"title": "Xói lở móng cầu", "keywords": ["xói lở móng cầu"], "need": "Nước lớn cuốn trôi đất quanh trụ cầu hay dưới gầm cầu, cầu có thể nguy hiểm, muốn báo."},
+   "id": {"title": "Gerusan fondasi jembatan", "keywords": ["gerusan fondasi jembatan"], "need": "Banjir menggerus tanah di sekitar tiang atau di bawah jembatan sehingga mungkin berbahaya, dan saya ingin melaporkannya."},
+   "tl": {"title": "Pag-agnas ng pundasyon ng tulay", "keywords": ["pag-agnas ng pundasyon ng tulay"], "need": "Inanod ng baha ang lupa sa paligid ng haligi o ilalim ng tulay, baka delikado ito, at gusto kong i-report."}
   },
   "disasterReport.form.D-2-2": {
-   "en": {"title": "Broken bridge", "keywords": ["broken bridge"]},
-   "ja": {"title": "橋の破断", "keywords": ["橋の破断"]},
-   "vi": {"title": "Cầu bị gãy", "keywords": ["cầu bị gãy"]},
-   "id": {"title": "Jembatan putus", "keywords": ["jembatan putus", "jembatan ambruk", "jembatan runtuh"]},
-   "tl": {"title": "Sirang tulay", "keywords": ["sirang tulay", "bumagsak na tulay", "putol na tulay"]}
+   "en": {"title": "Broken bridge", "keywords": ["broken bridge"], "need": "A bridge has broken or collapsed so cars and people can't cross, and I want to report it."},
+   "ja": {"title": "橋の破断", "keywords": ["橋の破断"], "need": "橋が折れたり崩れたりして車も人も渡れないので通報したい。"},
+   "vi": {"title": "Cầu bị gãy", "keywords": ["cầu bị gãy"], "need": "Cầu bị gãy, sập, xe và người không qua được, muốn báo."},
+   "id": {"title": "Jembatan putus", "keywords": ["jembatan putus", "jembatan ambruk", "jembatan runtuh"], "need": "Jembatan patah atau ambruk sehingga kendaraan dan orang tidak bisa lewat, dan saya ingin melaporkannya."},
+   "tl": {"title": "Sirang tulay", "keywords": ["sirang tulay", "bumagsak na tulay", "putol na tulay"], "need": "Nabali o gumuho ang tulay kaya hindi makatawid ang sasakyan at tao, at gusto kong i-report."}
   },
   "disasterReport.form.D-2-3": {
-   "en": {"title": "Other bridge damage", "keywords": ["other bridge damage"]},
-   "ja": {"title": "その他の橋の被害", "keywords": ["その他の橋の被害"]},
-   "vi": {"title": "Hư hại cầu khác", "keywords": ["hư hại cầu khác"]},
-   "id": {"title": "Kerusakan jembatan lainnya", "keywords": ["kerusakan jembatan lainnya", "jembatan rusak"]},
-   "tl": {"title": "Iba pang pinsala sa tulay", "keywords": ["iba pang pinsala sa tulay", "pinsala sa tulay"]}
+   "en": {"title": "Other bridge damage", "keywords": ["other bridge damage"], "need": "A bridge has cracks, a broken railing, potholes on its deck or another problem, and I want to report it."},
+   "ja": {"title": "その他の橋の被害", "keywords": ["その他の橋の被害"], "need": "橋にひびや手すりの破損、路面の穴などの問題があるので通報したい。"},
+   "vi": {"title": "Hư hại cầu khác", "keywords": ["hư hại cầu khác"], "need": "Cầu bị nứt, lan can hư hoặc mặt cầu có ổ gà và các vấn đề khác, muốn báo."},
+   "id": {"title": "Kerusakan jembatan lainnya", "keywords": ["kerusakan jembatan lainnya", "jembatan rusak"], "need": "Jembatan retak, pagarnya rusak, ada lubang di lantainya, atau masalah lain, dan saya ingin melaporkannya."},
+   "tl": {"title": "Iba pang pinsala sa tulay", "keywords": ["iba pang pinsala sa tulay", "pinsala sa tulay"], "need": "May bitak, sirang barandilya, butas sa daan o ibang problema ang tulay, at gusto kong i-report."}
   },
   "disasterReport.form.D-3-1": {
-   "en": {"title": "Debris flow", "keywords": ["debris flow"]},
-   "ja": {"title": "土石流", "keywords": ["土石流"]},
-   "vi": {"title": "Lũ bùn đá", "keywords": ["lũ bùn đá"]},
-   "id": {"title": "Aliran debris", "keywords": ["aliran debris"]},
-   "tl": {"title": "Pag-agos ng putik at bato", "keywords": ["pag-agos ng putik", "putik at bato"]}
+   "en": {"title": "Debris flow", "keywords": ["debris flow"], "need": "In heavy rain, mud and rocks are rushing down from the hills as a debris flow, and I want to report it."},
+   "ja": {"title": "土石流", "keywords": ["土石流"], "need": "大雨で山から泥と石が流れ落ちて土石流になっているので通報したい。"},
+   "vi": {"title": "Lũ bùn đá", "keywords": ["lũ bùn đá"], "need": "Mưa lớn làm bùn đất lẫn đá từ trên núi đổ xuống thành lũ bùn đá, muốn báo."},
+   "id": {"title": "Aliran debris", "keywords": ["aliran debris"], "need": "Saat hujan deras lumpur bercampur batu meluncur dari bukit menjadi aliran debris, dan saya ingin melaporkannya."},
+   "tl": {"title": "Pag-agos ng putik at bato", "keywords": ["pag-agos ng putik", "putik at bato"], "need": "Sa malakas na ulan, rumaragasa mula sa bundok ang putik at bato, at gusto kong i-report ang debris flow."}
   },
   "disasterReport.form.D-3-2": {
-   "en": {"title": "Landslide or rockfall", "keywords": ["landslide or rockfall"]},
-   "ja": {"title": "土砂崩れ・落石", "keywords": ["土砂崩れ・落石"]},
-   "vi": {"title": "Sạt lở đất đá", "keywords": ["sạt lở đất đá"]},
-   "id": {"title": "Longsor atau batu jatuh", "keywords": ["longsor atau batu jatuh"]},
-   "tl": {"title": "Pagguho ng lupa o bato", "keywords": ["pagguho ng lupa o bato", "gumuhong bato", "nahulog na bato"]}
+   "en": {"title": "Landslide or rockfall", "keywords": ["landslide or rockfall"], "need": "A hillside has slid, rocks have fallen onto the road or a slope has caved in, and I want to report it."},
+   "ja": {"title": "土砂崩れ・落石", "keywords": ["土砂崩れ・落石"], "need": "斜面が崩れた、落石が道に落ちた、のり面が崩落したので通報したい。"},
+   "vi": {"title": "Sạt lở đất đá", "keywords": ["sạt lở đất đá"], "need": "Sườn đồi sạt lở, đá rơi xuống đường hoặc taluy bị sụp, muốn báo."},
+   "id": {"title": "Longsor atau batu jatuh", "keywords": ["longsor atau batu jatuh"], "need": "Lereng longsor, batu jatuh ke jalan, atau tebing runtuh, dan saya ingin melaporkannya."},
+   "tl": {"title": "Pagguho ng lupa o bato", "keywords": ["pagguho ng lupa o bato", "gumuhong bato", "nahulog na bato"], "need": "Gumuho ang gilid ng bundok, may batong nahulog sa daan o bumigay ang slope, at gusto kong i-report."}
   },
   "disasterReport.form.D-3-3": {
-   "en": {"title": "Landslide dam lake", "keywords": ["landslide dam lake"]},
-   "ja": {"title": "せき止め湖", "keywords": ["せき止め湖"]},
-   "vi": {"title": "Hồ chắn do sạt lở", "keywords": ["hồ chắn do sạt lở"]},
-   "id": {"title": "Danau bendungan longsor", "keywords": ["danau bendungan longsor"]},
-   "tl": {"title": "Lawang nabuo dahil sa pagguho", "keywords": ["lawang nabuo dahil sa pagguho"]}
+   "en": {"title": "Landslide dam lake", "keywords": ["landslide dam lake"], "need": "A landslide has blocked a stream and water is building up into a lake, which may endanger people downstream, and I want to report it."},
+   "ja": {"title": "せき止め湖", "keywords": ["せき止め湖"], "need": "山崩れで川がせき止められて水がたまり湖のようになり、下流が危ないかもしれないので通報したい。"},
+   "vi": {"title": "Hồ chắn do sạt lở", "keywords": ["hồ chắn do sạt lở"], "need": "Sạt núi chặn dòng suối, nước dâng thành hồ, hạ lưu có thể nguy hiểm, muốn báo."},
+   "id": {"title": "Danau bendungan longsor", "keywords": ["danau bendungan longsor"], "need": "Longsor membendung sungai hingga air menumpuk jadi danau dan bisa membahayakan hilir, dan saya ingin melaporkannya."},
+   "tl": {"title": "Lawang nabuo dahil sa pagguho", "keywords": ["lawang nabuo dahil sa pagguho"], "need": "Hinarangan ng guho ang ilog at naiipon ang tubig na parang lawa, baka delikado sa ibaba, at gusto kong i-report."}
   },
   "disasterReport.form.D-4-1": {
-   "en": {"title": "Building fire", "keywords": ["building fire"]},
-   "ja": {"title": "建物火災", "keywords": ["建物火災"]},
-   "vi": {"title": "Cháy nhà/công trình", "keywords": ["cháy nhà/công trình"]},
-   "id": {"title": "Kebakaran bangunan", "keywords": ["kebakaran bangunan"]},
-   "tl": {"title": "Sunog sa gusali", "keywords": ["nasusunog na gusali", "may sunog sa isang gusali"]}
+   "en": {"title": "Building fire", "keywords": ["building fire"], "need": "A house or building is on fire and I want to report the damage (if anyone is trapped, call 119 first)."},
+   "ja": {"title": "建物火災", "keywords": ["建物火災"], "need": "住宅やビルなどの建物が火事なので被害を通報したい（閉じ込められた人がいればまず119へ）。"},
+   "vi": {"title": "Cháy nhà/công trình", "keywords": ["cháy nhà/công trình"], "need": "Nhà ở, tòa nhà bị cháy, muốn báo thiệt hại (có người mắc kẹt thì gọi 119 trước)."},
+   "id": {"title": "Kebakaran bangunan", "keywords": ["kebakaran bangunan"], "need": "Rumah atau gedung terbakar dan saya ingin melaporkannya (jika ada yang terjebak, telepon 119 dulu)."},
+   "tl": {"title": "Sunog sa gusali", "keywords": ["nasusunog na gusali", "may sunog sa isang gusali"], "need": "Nasusunog ang bahay o gusali at gusto kong i-report (kung may na-trap, tumawag muna sa 119)."}
   },
   "disasterReport.form.D-4-2": {
-   "en": {"title": "Hazardous material fire", "keywords": ["hazardous material fire"]},
-   "ja": {"title": "危険物火災", "keywords": ["危険物火災"]},
-   "vi": {"title": "Cháy vật liệu nguy hiểm", "keywords": ["cháy vật liệu nguy hiểm"]},
-   "id": {"title": "Kebakaran bahan berbahaya", "keywords": ["kebakaran bahan berbahaya"]},
-   "tl": {"title": "Sunog dahil sa mapanganib na materyales", "keywords": ["sunog sa mapanganib na materyales"]}
+   "en": {"title": "Hazardous material fire", "keywords": ["hazardous material fire"], "need": "Chemicals, gas, fuel or other hazardous materials have caught fire, and I want to report it."},
+   "ja": {"title": "危険物火災", "keywords": ["危険物火災"], "need": "化学薬品やガス、油などの危険物が燃えているので通報したい。"},
+   "vi": {"title": "Cháy vật liệu nguy hiểm", "keywords": ["cháy vật liệu nguy hiểm"], "need": "Hóa chất, ga, xăng dầu hoặc vật nguy hiểm bốc cháy, muốn báo."},
+   "id": {"title": "Kebakaran bahan berbahaya", "keywords": ["kebakaran bahan berbahaya"], "need": "Bahan kimia, gas, bahan bakar, atau barang berbahaya lain terbakar, dan saya ingin melaporkannya."},
+   "tl": {"title": "Sunog dahil sa mapanganib na materyales", "keywords": ["sunog sa mapanganib na materyales"], "need": "Nasusunog ang kemikal, gas, gasolina o ibang mapanganib na bagay, at gusto kong i-report."}
   },
   "disasterReport.form.D-4-3": {
-   "en": {"title": "Factory fire", "keywords": ["factory fire"]},
-   "ja": {"title": "工場火災", "keywords": ["工場火災"]},
-   "vi": {"title": "Cháy nhà máy", "keywords": ["cháy nhà máy"]},
-   "id": {"title": "Kebakaran pabrik", "keywords": ["kebakaran pabrik"]},
-   "tl": {"title": "Sunog sa pabrika", "keywords": ["sunog sa pabrika"]}
+   "en": {"title": "Factory fire", "keywords": ["factory fire"], "need": "A factory is on fire with flames and thick smoke, and I want to report it."},
+   "ja": {"title": "工場火災", "keywords": ["工場火災"], "need": "工場が火事で炎や濃い煙が出ているので通報したい。"},
+   "vi": {"title": "Cháy nhà máy", "keywords": ["cháy nhà máy"], "need": "Nhà xưởng bị cháy, bốc lửa và khói dày, muốn báo."},
+   "id": {"title": "Kebakaran pabrik", "keywords": ["kebakaran pabrik"], "need": "Pabrik terbakar dengan api dan asap tebal, dan saya ingin melaporkannya."},
+   "tl": {"title": "Sunog sa pabrika", "keywords": ["sunog sa pabrika"], "need": "Nasusunog ang pabrika na may apoy at makapal na usok, at gusto kong i-report."}
   },
   "disasterReport.form.D-4-4": {
-   "en": {"title": "Other fire", "keywords": ["other fire"]},
-   "ja": {"title": "その他の火災", "keywords": ["その他の火災"]},
-   "vi": {"title": "Đám cháy khác", "keywords": ["đám cháy khác"]},
-   "id": {"title": "Kebakaran lainnya", "keywords": ["kebakaran lainnya"]},
-   "tl": {"title": "Iba pang sunog", "keywords": ["iba pang sunog"]}
+   "en": {"title": "Other fire", "keywords": ["other fire"], "need": "A vehicle, grass, a rubbish pile or somewhere else is on fire, and I want to report it."},
+   "ja": {"title": "その他の火災", "keywords": ["その他の火災"], "need": "車や草むら、ゴミの山などほかの場所で火が出ているので通報したい。"},
+   "vi": {"title": "Đám cháy khác", "keywords": ["đám cháy khác"], "need": "Xe cộ, bãi cỏ, đống rác hoặc nơi khác bị cháy, muốn báo."},
+   "id": {"title": "Kebakaran lainnya", "keywords": ["kebakaran lainnya"], "need": "Kendaraan, rumput, tumpukan sampah, atau tempat lain terbakar, dan saya ingin melaporkannya."},
+   "tl": {"title": "Iba pang sunog", "keywords": ["iba pang sunog"], "need": "Nasusunog ang sasakyan, damuhan, tambak ng basura o ibang lugar, at gusto kong i-report."}
   },
   "reservation.c-1-1": {
-   "en": {"title": "Guting Land Office", "keywords": ["guting land office queue"]},
-   "ja": {"title": "古亭地政事務所", "keywords": ["古亭地政事務所"]},
-   "vi": {"title": "Văn phòng địa chính Cổ Đình", "keywords": ["văn phòng địa chính cổ đình"]},
-   "id": {"title": "Kantor Pertanahan Guting", "keywords": ["kantor pertanahan guting"]},
-   "tl": {"title": "Guting Land Office", "keywords": ["pila sa guting land office"]}
+   "en": {"title": "Guting Land Office", "keywords": ["guting land office queue"], "need": "I'm going to the Guting Land Office for a land or property registration and want to see the current number and the wait first."},
+   "ja": {"title": "古亭地政事務所", "keywords": ["古亭地政事務所"], "need": "古亭地政事務所で土地や建物の登記をするので、今何番か、どれくらい待つかを先に知りたい。"},
+   "vi": {"title": "Văn phòng địa chính Cổ Đình", "keywords": ["văn phòng địa chính cổ đình"], "need": "Tôi sắp đến văn phòng địa chính Guting làm đăng ký đất hoặc nhà, muốn xem trước đang gọi số mấy, chờ bao lâu."},
+   "id": {"title": "Kantor Pertanahan Guting", "keywords": ["kantor pertanahan guting"], "need": "Saya mau ke kantor pertanahan Guting untuk pendaftaran tanah atau rumah dan ingin melihat dulu nomor yang dipanggil dan lama antrean."},
+   "tl": {"title": "Guting Land Office", "keywords": ["pila sa guting land office"], "need": "Pupunta ako sa Guting Land Office para sa rehistro ng lupa o bahay at gusto ko munang makita ang numero ngayon at tagal ng hintay."}
   },
   "reservation.c-1-2": {
-   "en": {"title": "Zhongshan Land Office", "keywords": ["zhongshan land office queue"]},
-   "ja": {"title": "中山地政事務所", "keywords": ["中山地政事務所"]},
-   "vi": {"title": "Văn phòng địa chính Trung Sơn", "keywords": ["văn phòng địa chính trung sơn"]},
-   "id": {"title": "Kantor Pertanahan Zhongshan", "keywords": ["kantor pertanahan zhongshan"]},
-   "tl": {"title": "Zhongshan Land Office", "keywords": ["pila sa zhongshan land office"]}
+   "en": {"title": "Zhongshan Land Office", "keywords": ["zhongshan land office queue"], "need": "I'm going to the Zhongshan Land Office for a property transfer or a land record copy and want to see the queue first."},
+   "ja": {"title": "中山地政事務所", "keywords": ["中山地政事務所"], "need": "中山地政事務所で不動産の名義変更や謄本の申請をするので、先に呼び出し番号と待ち人数を見たい。"},
+   "vi": {"title": "Văn phòng địa chính Trung Sơn", "keywords": ["văn phòng địa chính trung sơn"], "need": "Tôi sắp đến văn phòng địa chính Zhongshan sang tên nhà đất hoặc xin bản sao, muốn xem số đang gọi và số người chờ."},
+   "id": {"title": "Kantor Pertanahan Zhongshan", "keywords": ["kantor pertanahan zhongshan"], "need": "Saya mau ke kantor pertanahan Zhongshan untuk balik nama atau salinan sertifikat dan ingin melihat antreannya dulu."},
+   "tl": {"title": "Zhongshan Land Office", "keywords": ["pila sa zhongshan land office"], "need": "Pupunta ako sa Zhongshan Land Office para sa paglipat ng titulo o kopya ng rekord at gusto ko munang makita ang pila."}
   },
   "reservation.c-2-1": {
-   "en": {"title": "Wanhua Household Registration Office", "keywords": ["wanhua household registration office queue"]},
-   "ja": {"title": "萬華区戸政事務所", "keywords": ["萬華区戸政事務所"]},
-   "vi": {"title": "Văn phòng hộ tịch Vạn Hoa", "keywords": ["văn phòng hộ tịch vạn hoa"]},
-   "id": {"title": "Kantor Catatan Sipil Wanhua", "keywords": ["kantor catatan sipil wanhua"]},
-   "tl": {"title": "Wanhua Household Registration Office", "keywords": ["pila sa wanhua household registration office"]}
+   "en": {"title": "Wanhua Household Registration Office", "keywords": ["wanhua household registration office queue"], "need": "Heading to Wanhua's civil registry for residence, marriage, birth papers or an ID card; I'd like to check how long the queue is."},
+   "ja": {"title": "萬華区戸政事務所", "keywords": ["萬華区戸政事務所"], "need": "萬華区戸政事務所で戸籍や婚姻・出生届、身分証の手続きをするので、先に呼び出し状況を見たい。"},
+   "vi": {"title": "Văn phòng hộ tịch Vạn Hoa", "keywords": ["văn phòng hộ tịch vạn hoa"], "need": "Tôi sắp đến phòng hộ tịch quận Vạn Hoa làm hộ khẩu, đăng ký kết hôn, khai sinh hay căn cước, muốn xem trước số đang gọi."},
+   "id": {"title": "Kantor Catatan Sipil Wanhua", "keywords": ["kantor catatan sipil wanhua"], "need": "Saya mau ke kantor catatan sipil Wanhua untuk urusan domisili, pernikahan, kelahiran, atau KTP dan ingin melihat antreannya dulu."},
+   "tl": {"title": "Wanhua Household Registration Office", "keywords": ["pila sa wanhua household registration office"], "need": "Papunta ako sa civil registry ng Wanhua para sa tirahan, kasal, birth certificate o ID; sisilipin ko muna ang haba ng pila."}
   },
   "reservation.c-2-2": {
-   "en": {"title": "Zhongzheng Household Registration Office", "keywords": ["zhongzheng household registration office queue"]},
-   "ja": {"title": "中正区戸政事務所", "keywords": ["中正区戸政事務所"]},
-   "vi": {"title": "Văn phòng hộ tịch Trung Chính", "keywords": ["văn phòng hộ tịch trung chính"]},
-   "id": {"title": "Kantor Catatan Sipil Zhongzheng", "keywords": ["kantor catatan sipil zhongzheng"]},
-   "tl": {"title": "Zhongzheng Household Registration Office", "keywords": ["pila sa zhongzheng household registration office"]}
+   "en": {"title": "Zhongzheng Household Registration Office", "keywords": ["zhongzheng household registration office queue"], "need": "Before visiting the Zhongzheng household registration office for residence papers or an ID card, I want to check which number is up."},
+   "ja": {"title": "中正区戸政事務所", "keywords": ["中正区戸政事務所"], "need": "中正区戸政事務所で戸籍や身分証の手続きをするので、今何番かを先に知りたい。"},
+   "vi": {"title": "Văn phòng hộ tịch Trung Chính", "keywords": ["văn phòng hộ tịch trung chính"], "need": "Tôi sắp đến phòng hộ tịch quận Trung Chính làm hộ khẩu, căn cước, muốn xem trước đang gọi số mấy."},
+   "id": {"title": "Kantor Catatan Sipil Zhongzheng", "keywords": ["kantor catatan sipil zhongzheng"], "need": "Saya mau ke kantor catatan sipil Zhongzheng untuk urusan domisili atau KTP dan ingin tahu nomor berapa sekarang."},
+   "tl": {"title": "Zhongzheng Household Registration Office", "keywords": ["pila sa zhongzheng household registration office"], "need": "Papunta ako sa civil registry ng Zhongzheng para sa papeles o ID; sisilipin ko muna kung anong numero na ang tinatawag."}
   },
   "reservation.c-3-1": {
-   "en": {"title": "Wanhua District Office", "keywords": ["wanhua district office queue"]},
-   "ja": {"title": "萬華区役所", "keywords": ["萬華区役所"]},
-   "vi": {"title": "Văn phòng quận Vạn Hoa", "keywords": ["văn phòng quận vạn hoa"]},
-   "id": {"title": "Kantor Distrik Wanhua", "keywords": ["kantor distrik wanhua"]},
-   "tl": {"title": "Wanhua District Office", "keywords": ["pila sa wanhua district office"]}
+   "en": {"title": "Wanhua District Office", "keywords": ["wanhua district office queue"], "need": "I'm going to a counter at the Wanhua District Office and want to see the number being served and how long I'd wait."},
+   "ja": {"title": "萬華区役所", "keywords": ["萬華区役所"], "need": "萬華区役所の窓口に行くので、呼び出し番号とあとどれくらい待つかを先に見たい。"},
+   "vi": {"title": "Văn phòng quận Vạn Hoa", "keywords": ["văn phòng quận vạn hoa"], "need": "Tôi sắp đến quầy ở văn phòng quận Vạn Hoa, muốn xem số đang gọi và phải chờ bao lâu."},
+   "id": {"title": "Kantor Distrik Wanhua", "keywords": ["kantor distrik wanhua"], "need": "Saya mau ke loket kantor distrik Wanhua dan ingin melihat nomor yang dipanggil serta lama menunggu."},
+   "tl": {"title": "Wanhua District Office", "keywords": ["pila sa wanhua district office"], "need": "Pupunta ako sa counter ng Wanhua District Office at gusto kong makita ang numero ngayon at gaano katagal ang hintay."}
   },
   "reservation.c-3-2": {
-   "en": {"title": "Zhongzheng District Office", "keywords": ["zhongzheng district office queue"]},
-   "ja": {"title": "中正区役所", "keywords": ["中正区役所"]},
-   "vi": {"title": "Văn phòng quận Trung Chính", "keywords": ["văn phòng quận trung chính"]},
-   "id": {"title": "Kantor Distrik Zhongzheng", "keywords": ["kantor distrik zhongzheng"]},
-   "tl": {"title": "Zhongzheng District Office", "keywords": ["pila sa zhongzheng district office"]}
+   "en": {"title": "Zhongzheng District Office", "keywords": ["zhongzheng district office queue"], "need": "I'm going to a counter at the Zhongzheng District Office and want to see the number being served and how many are waiting."},
+   "ja": {"title": "中正区役所", "keywords": ["中正区役所"], "need": "中正区役所の窓口に行くので、呼び出し番号と待ち人数を先に見たい。"},
+   "vi": {"title": "Văn phòng quận Trung Chính", "keywords": ["văn phòng quận trung chính"], "need": "Tôi sắp đến quầy ở văn phòng quận Trung Chính, muốn xem số đang gọi và số người chờ."},
+   "id": {"title": "Kantor Distrik Zhongzheng", "keywords": ["kantor distrik zhongzheng"], "need": "Saya mau ke loket kantor distrik Zhongzheng dan ingin melihat nomor yang dipanggil dan jumlah yang menunggu."},
+   "tl": {"title": "Zhongzheng District Office", "keywords": ["pila sa zhongzheng district office"], "need": "Pupunta ako sa counter ng Zhongzheng District Office at gusto kong makita ang numero ngayon at ilan ang naghihintay."}
   },
   "reservation.c-4-1": {
-   "en": {"title": "Revenue Service Wanhua Branch", "keywords": ["revenue service wanhua branch queue"]},
-   "ja": {"title": "税務署萬華分署", "keywords": ["税務署萬華分署"]},
-   "vi": {"title": "Chi cục thuế Vạn Hoa", "keywords": ["chi cục thuế vạn hoa"]},
-   "id": {"title": "Kantor Pajak Cabang Wanhua", "keywords": ["kantor pajak cabang wanhua"]},
-   "tl": {"title": "Revenue Service Wanhua Branch", "keywords": ["pila sa revenue service wanhua branch"]}
+   "en": {"title": "Revenue Service Wanhua Branch", "keywords": ["revenue service wanhua branch queue"], "need": "I'm going to the Wanhua branch of the revenue service about house or land tax and want to see the queue first."},
+   "ja": {"title": "税務署萬華分署", "keywords": ["税務署萬華分署"], "need": "税捐処萬華分処に家屋税や地価税の相談・手続きに行くので、先に呼び出し状況を見たい。"},
+   "vi": {"title": "Chi cục thuế Vạn Hoa", "keywords": ["chi cục thuế vạn hoa"], "need": "Tôi sắp đến chi cục thuế Vạn Hoa hỏi hoặc làm thuế nhà, thuế đất, muốn xem trước số đang gọi."},
+   "id": {"title": "Kantor Pajak Cabang Wanhua", "keywords": ["kantor pajak cabang wanhua"], "need": "Saya mau ke kantor pajak cabang Wanhua untuk urusan pajak rumah atau tanah dan ingin melihat antreannya dulu."},
+   "tl": {"title": "Revenue Service Wanhua Branch", "keywords": ["pila sa revenue service wanhua branch"], "need": "Pupunta ako sa Wanhua branch ng revenue service tungkol sa buwis sa bahay o lupa at gusto ko munang makita ang pila."}
   },
   "reservation.c-4-2": {
-   "en": {"title": "Revenue Service Datong Branch", "keywords": ["revenue service datong branch queue"]},
-   "ja": {"title": "税務署大同分署", "keywords": ["税務署大同分署"]},
-   "vi": {"title": "Chi cục thuế Đại Đồng", "keywords": ["chi cục thuế đại đồng"]},
-   "id": {"title": "Kantor Pajak Cabang Datong", "keywords": ["kantor pajak cabang datong"]},
-   "tl": {"title": "Revenue Service Datong Branch", "keywords": ["pila sa revenue service datong branch"]}
+   "en": {"title": "Revenue Service Datong Branch", "keywords": ["revenue service datong branch queue"], "need": "I'm going to the Datong branch of the revenue service for a tax matter and want to see the current number first."},
+   "ja": {"title": "税務署大同分署", "keywords": ["税務署大同分署"], "need": "税捐処大同分処で税金の手続きをするので、今何番かを先に知りたい。"},
+   "vi": {"title": "Chi cục thuế Đại Đồng", "keywords": ["chi cục thuế đại đồng"], "need": "Tôi sắp đến chi cục thuế Đại Đồng làm thủ tục thuế, muốn xem trước đang gọi số mấy."},
+   "id": {"title": "Kantor Pajak Cabang Datong", "keywords": ["kantor pajak cabang datong"], "need": "Saya mau ke kantor pajak cabang Datong untuk urusan pajak dan ingin tahu nomor berapa sekarang."},
+   "tl": {"title": "Revenue Service Datong Branch", "keywords": ["pila sa revenue service datong branch"], "need": "Pupunta ako sa Datong branch ng revenue service para sa buwis at gusto kong malaman ang numero ngayon."}
   },
   "reservation.c-5-1": {
-   "en": {"title": "Bangka Employment Service Station", "keywords": ["bangka employment service station queue"]},
-   "ja": {"title": "艋舺就業サービスステーション", "keywords": ["艋舺就業サービスステーション"]},
-   "vi": {"title": "Trạm dịch vụ việc làm Manh Giáp", "keywords": ["trạm dịch vụ việc làm manh giáp"]},
-   "id": {"title": "Pos Layanan Kerja Bangka", "keywords": ["pos layanan kerja bangka"]},
-   "tl": {"title": "Bangka Employment Service Station", "keywords": ["pila sa bangka employment service station"]}
+   "en": {"title": "Bangka Employment Service Station", "keywords": ["bangka employment service station queue"], "need": "I lost my job or want a new one and am going to the Bangka employment service station about jobs or training; I want to see the queue first."},
+   "ja": {"title": "艋舺就業サービスステーション", "keywords": ["艋舺就業サービスステーション"], "need": "失業した、または転職したいので艋舺就業サービスセンターで仕事や職業訓練の相談をしたく、先に呼び出し状況を見たい。"},
+   "vi": {"title": "Trạm dịch vụ việc làm Manh Giáp", "keywords": ["trạm dịch vụ việc làm manh giáp"], "need": "Tôi thất nghiệp hoặc muốn đổi việc, sắp đến trạm việc làm Bangka tìm việc, hỏi học nghề, muốn xem trước số đang gọi."},
+   "id": {"title": "Pos Layanan Kerja Bangka", "keywords": ["pos layanan kerja bangka"], "need": "Saya kehilangan pekerjaan atau ingin ganti kerja dan mau ke pusat layanan kerja Bangka soal lowongan atau pelatihan; ingin lihat antreannya dulu."},
+   "tl": {"title": "Bangka Employment Service Station", "keywords": ["pila sa bangka employment service station"], "need": "Nawalan ako ng trabaho o gustong lumipat, at pupunta ako sa Bangka employment station para sa trabaho o training; gusto ko munang makita ang pila."}
   },
   "reservation.c-5-2": {
-   "en": {"title": "Ximen Employment Service Station", "keywords": ["ximen employment service station queue"]},
-   "ja": {"title": "西門就業サービスステーション", "keywords": ["西門就業サービスステーション"]},
-   "vi": {"title": "Trạm dịch vụ việc làm Tây Môn", "keywords": ["trạm dịch vụ việc làm tây môn"]},
-   "id": {"title": "Pos Layanan Kerja Ximen", "keywords": ["pos layanan kerja ximen"]},
-   "tl": {"title": "Ximen Employment Service Station", "keywords": ["pila sa ximen employment service station"]}
+   "en": {"title": "Ximen Employment Service Station", "keywords": ["ximen employment service station queue"], "need": "I'm going to the Ximen employment service station to look for work, claim unemployment benefits or ask about training, and want to see the queue first."},
+   "ja": {"title": "西門就業サービスステーション", "keywords": ["西門就業サービスステーション"], "need": "西門就業サービスセンターで仕事探しや失業給付、職業訓練の相談をするので、先に呼び出し状況を見たい。"},
+   "vi": {"title": "Trạm dịch vụ việc làm Tây Môn", "keywords": ["trạm dịch vụ việc làm tây môn"], "need": "Tôi sắp đến trạm việc làm Tây Môn tìm việc, xin trợ cấp thất nghiệp hoặc hỏi học nghề, muốn xem trước số đang gọi."},
+   "id": {"title": "Pos Layanan Kerja Ximen", "keywords": ["pos layanan kerja ximen"], "need": "Saya mau ke pusat layanan kerja Ximen untuk mencari kerja, mengurus tunjangan pengangguran, atau tanya pelatihan, dan ingin lihat antreannya dulu."},
+   "tl": {"title": "Ximen Employment Service Station", "keywords": ["pila sa ximen employment service station"], "need": "Pupunta ako sa Ximen employment station para maghanap ng trabaho, mag-claim ng unemployment benefit o magtanong sa training, at gusto ko munang makita ang pila."}
   }
  }
 }

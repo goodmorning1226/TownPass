@@ -30,6 +30,13 @@ class AssistantResult {
   /// for the App's previous/next page buttons; null for other replies.
   final AssistantListing? listing;
 
+  /// The function catalogue's level (1: categories, 2: one category's pages)
+  /// and category id; null for other replies (docs/AI_CURRENT_RULES.md
+  /// section 3, 2026-11-16). The catalogue's options then carry their own
+  /// navigation (更多, 上一頁, 回上一層), so no page arrows are needed.
+  final int? level;
+  final String? group;
+
   const AssistantResult({
     required this.sessionId,
     required this.message,
@@ -42,6 +49,8 @@ class AssistantResult {
     this.contentLanguage,
     this.guide,
     this.listing,
+    this.level,
+    this.group,
   });
 
   /// The same reply with [message] and choice titles replaced (translation).
@@ -57,6 +66,8 @@ class AssistantResult {
         contentLanguage: null,
         guide: guide,
         listing: listing,
+        level: level,
+        group: group,
         choices: [
           for (var i = 0; i < choices.length; i++)
             AssistantBookChoice(
@@ -64,6 +75,8 @@ class AssistantResult {
               i < titles.length ? titles[i] : choices[i].title,
               subtitle: choices[i].subtitle,
               enabled: choices[i].enabled,
+              groupId: choices[i].groupId,
+              nav: choices[i].nav,
             ),
         ],
       );
@@ -110,6 +123,14 @@ class AssistantResult {
           : null,
       listing: kind == 'capability_list'
           ? AssistantListing.tryParse(json['listing'])
+          : null,
+      level:
+          kind == 'capability_list' &&
+              (json['level'] == 1 || json['level'] == 2)
+          ? json['level'] as int
+          : null,
+      group: kind == 'capability_list' && json['group'] is String
+          ? json['group'] as String
           : null,
       choices: (json['choices'] as List? ?? [])
           .map((value) => AssistantBookChoice.fromJson(value))
@@ -163,11 +184,21 @@ class AssistantBookChoice {
   final String title;
   final String subtitle;
   final bool enabled;
+
+  /// The option's catalogue category ('frequent' for the 常用 row); null
+  /// outside the catalogue.
+  final String? groupId;
+
+  /// A navigation option: 'more', 'prev', 'up', 'catalog' (看全部功能) or
+  /// '1999'; null for an option that opens or answers something.
+  final String? nav;
   const AssistantBookChoice(
     this.id,
     this.title, {
     this.subtitle = '',
     this.enabled = true,
+    this.groupId,
+    this.nav,
   });
 
   factory AssistantBookChoice.fromJson(Map<String, dynamic> json) {
@@ -179,6 +210,10 @@ class AssistantBookChoice {
       json['title'],
       subtitle: json['subtitle'] as String? ?? '',
       enabled: json['enabled'] != false,
+      groupId: json['group_id'] is String ? json['group_id'] as String : null,
+      nav: const {'more', 'prev', 'up', 'catalog', '1999'}.contains(json['nav'])
+          ? json['nav'] as String
+          : null,
     );
   }
 }

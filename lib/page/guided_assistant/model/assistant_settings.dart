@@ -3,6 +3,7 @@
 /// are shown through gt() in the conversation language (guide_i18n.dart).
 library;
 
+import 'package:town_pass/page/guided_assistant/model/guide_content.dart';
 import 'package:town_pass/page/guided_assistant/model/guide_i18n.dart';
 import 'package:town_pass/service/assistant_speech_language.dart';
 
@@ -118,6 +119,14 @@ abstract class SettingsTexts {
   static const change1 = '・助理說的話和操作提示。';
   static const change2 = '・按住說話時，用這個語言聽你說。';
   static const change3 = '・你用這個語言說話或打字時，服務網頁也會跟著翻譯；下次打開 App 會回到手機的語言。';
+  static const readHeader = '朗讀';
+  static const readAloud = '朗讀回覆';
+  static const readAloudDesc = '把助理的回答和選項唸出來。預設關閉；在公共場所請留意。';
+  static const speedHeader = '朗讀速度';
+
+  /// The names of AssistantSpeaker.rates, in order.
+  static const speeds = ['慢', '標準', '快'];
+  static const privacyHeader = '隱私';
   static const replay = '重看助理新手教學';
   static const replayNote = '不會改變設定，也不會清除對話。';
   static String modeChanged(AssistantMode m) =>
@@ -139,7 +148,9 @@ abstract class HomeAskTexts {
   static const aria = '按住提問，說完放開';
   static const listeningLabel = '正在聽…';
   static const listening = '正在聽…說完放開';
-  static const tooShort = '要按住不放才會開始聽喔';
+
+  /// The same line as the assistant's own microphone (2026-11-16).
+  static const tooShort = Replies.tooShort;
   static const title = '企鵝的回答';
   static const voiceTag = '用語音說的';
   static const thinking = '正在幫你找…';
