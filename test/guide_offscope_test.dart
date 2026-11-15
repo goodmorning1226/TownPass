@@ -745,8 +745,10 @@ void main() {
       expect(find.text('繼續引導'), findsNothing);
       expect(find.textContaining('結束引導'), findsNothing);
       expect(find.textContaining('要回去接著'), findsNothing);
-      // The default suggestions, not the guide's help chips.
-      for (final chip in starterChips) {
+      // The default suggestions (the first four), not the guide's help chips.
+      for (final chip in starterChips.take(
+        GuidedAssistantController.maxChips,
+      )) {
         expect(c.chips, contains(chip));
       }
       expect(c.chips, isNot(contains('下一步要做什麼？')));

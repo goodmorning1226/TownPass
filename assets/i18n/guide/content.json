@@ -136,6 +136,13 @@
    "id": "Tadi Anda juga bilang mau “{title}”. Lanjut sekarang?",
    "tl": "Kanina, hiniling mo rin ang “{title}”. Iyon na ba ang susunod nating gagawin?"
   },
+  "助理暫時無法回答，請再試一次。": {
+   "en": "The assistant cannot answer right now. Please try again.",
+   "ja": "アシスタントは今お答えできません。もう一度お試しください。",
+   "vi": "Trợ lý tạm thời chưa trả lời được. Hãy thử lại.",
+   "id": "Asisten belum bisa menjawab sekarang. Silakan coba lagi.",
+   "tl": "Hindi makasagot ang assistant ngayon. Pakisubukan ulit."
+  },
   "區公所申辦的案件": {
    "en": "District office applications",
    "ja": "区役所での申請",
@@ -276,13 +283,6 @@
    "id": "Selesai",
    "tl": "Tapos na"
   },
-  "已{todo}": {
-   "en": "Done: {todo}",
-   "ja": "完了：{todo}",
-   "vi": "Đã xong: {todo}",
-   "id": "Selesai: {todo}",
-   "tl": "Tapos na: {todo}"
-  },
   "已經幫你打開「{title}」。這個功能還沒有逐步引導，只幫你開頁。": {
    "en": "I opened “{title}” for you. There’s no step-by-step guide for this feature yet, so I only opened the page.",
    "ja": "「{title}」を開きました。この機能にはまだ手順のご案内がないので、ページを開くだけです。",
@@ -339,6 +339,13 @@
    "id": "Apakah buku yang saya pesan sudah datang?",
    "tl": "Dumating na ba ang librong ipinareserba ko?"
   },
+  "按得太快了，請按住不放，說完再放開。": {
+   "en": "That was too quick. Hold the button down while you speak, then let go.",
+   "ja": "押す時間が短すぎました。押したまま話し、話し終えたら離してください。",
+   "vi": "Bạn nhấn nhanh quá. Hãy nhấn giữ trong lúc nói, nói xong rồi thả ra.",
+   "id": "Terlalu cepat. Tekan dan tahan selama bicara, lalu lepaskan.",
+   "tl": "Masyadong mabilis. Pindutin nang matagal habang nagsasalita, saka bitawan."
+  },
   "服務頁面打不開，請檢查網路後再試一次。": {
    "en": "The service page won’t open. Check your network and try again.",
    "ja": "サービスページが開けません。ネットワークを確認して、もう一度お試しください。",
@@ -374,12 +381,12 @@
    "id": "Nomor pelanggan air adalah nomor untuk mengenali akun air rumah Anda, terdiri dari 10 digit, biasanya tercetak di tagihan air.",
    "tl": "Ang numero ng account sa tubig ang tumutukoy sa account sa tubig ng iyong bahay. May 10 digit ito at kadalasang nakalimbag sa bill mo sa tubig."
   },
-  "沒有錄到聲音，請按住麥克風再說話，說完放開。": {
-   "en": "Nothing was recorded. Hold the microphone while you speak, then release it.",
-   "ja": "録音されませんでした。マイクを押したまま話し、話し終えたら離してください。",
-   "vi": "Không ghi được âm thanh. Hãy nhấn giữ micrô khi nói, nói xong thì thả ra.",
-   "id": "Tidak ada suara yang terekam. Tekan tahan mikrofon sambil bicara, lalu lepaskan.",
-   "tl": "Walang na-record. Pindutin nang matagal ang mikropono habang nagsasalita, saka bitawan."
+  "準備開始：{task}": {
+   "en": "Ready to start: {task}",
+   "ja": "開始の準備：{task}",
+   "vi": "Sẵn sàng bắt đầu: {task}",
+   "id": "Siap dimulai: {task}",
+   "tl": "Handa nang simulan: {task}"
   },
   "災情通報的案件": {
    "en": "Disaster reports",
@@ -408,6 +415,20 @@
    "vi": "Dùng số điện thoại hoặc chứng thư số công dân để App biết đúng là bạn đang dùng.",
    "id": "Pakai nomor ponsel atau sertifikat digital warga agar App tahu bahwa ini benar-benar Anda.",
    "tl": "Gamitin ang iyong mobile number o Citizen Digital Certificate para malaman ng App na ikaw talaga ito."
+  },
+  "用語音之前先說明：只有按住麥克風時才會錄音，錄音只在這支手機上辨識，不會上傳。手機接著會問可不可以使用麥克風，請允許，之後按住麥克風就能說話。": {
+   "en": "Before you use your voice: it records only while you hold the microphone, and the recording is recognised on this phone and never uploaded. The phone will now ask whether the microphone may be used; please allow it, then hold the microphone to talk.",
+   "ja": "音声を使う前にお知らせします。マイクを押している間だけ録音し、録音はこの端末で認識され、アップロードされません。このあと端末がマイクの使用を確認しますので、許可してください。そのあとマイクを押しながら話せます。",
+   "vi": "Trước khi dùng giọng nói: chỉ ghi âm khi bạn nhấn giữ micrô, bản ghi được nhận dạng trên điện thoại này và không được tải lên. Điện thoại sẽ hỏi có cho dùng micrô không; hãy cho phép, sau đó nhấn giữ micrô để nói.",
+   "id": "Sebelum memakai suara: perekaman hanya terjadi selama Anda menekan tahan mikrofon, dan rekaman dikenali di ponsel ini serta tidak diunggah. Ponsel sekarang akan menanyakan izin memakai mikrofon; silakan izinkan, lalu tekan tahan mikrofon untuk berbicara.",
+   "tl": "Bago gumamit ng boses: nagre-record lang habang pinipindot mo nang matagal ang mikropono, at sa teleponong ito kinikilala ang recording at hindi ito ina-upload. Magtatanong na ngayon ang telepono kung puwedeng gamitin ang mikropono; pakipayagan, saka pindutin nang matagal ang mikropono para magsalita."
+  },
+  "看全部功能": {
+   "en": "See everything",
+   "ja": "すべての機能を見る",
+   "vi": "Xem tất cả chức năng",
+   "id": "Lihat semua fitur",
+   "tl": "Tingnan lahat ng serbisyo"
   },
   "確認是你本人（身分驗證）": {
    "en": "Confirm it’s you (identity verification)",

@@ -58,13 +58,13 @@ class ListingTests(unittest.TestCase):
                                     "resolution_id": result["resolution_id"], "page_step": 1})
         return first, titles, result
 
-    def test_microservices_first_and_start_pages_last(self):
+    def test_categories_page_by_page_and_wrap_around(self):
+        # The function catalogue (rules section 3, 2026-11-16): 12 categories, 8 per page.
         first, titles, wrapped = self.pages()
-        self.assertEqual(first["listing"], {"offset": 0, "size": 8, "total": len(titles)})
-        self.assertEqual(titles[:6], ["申辦服務", "有話要說", "臨櫃叫號", "警政服務", "災情通報", "圖書借閱"])
-        self.assertEqual(titles[-4:], ["首頁", "服務總覽", "App 起始頁面", "我的服務與置頂"])
-        self.assertLess(titles.index("水費"), titles.index("設定"))
-        self.assertLess(titles.index("基本資料"), titles.index("首頁"))
+        self.assertEqual(first["listing"], {"offset": 0, "size": 8, "total": 12})
+        categories = [t for t in titles[3:] if t not in ("更多", "上一頁")]  # after the three 常用 pages
+        self.assertEqual(categories[:3], ["繳費與帳單", "圖書館", "臨櫃叫號"])
+        self.assertEqual(categories[-1], "帳號、設定與 App")
         self.assertEqual(wrapped["listing"]["offset"], 0)
 
     def test_previous_page_wraps_and_is_also_spoken(self):
@@ -109,6 +109,20 @@ class OwnerRulesTests(unittest.TestCase):
         self.assertIn("遺失", faq.expand("身分證弄丟了"))
         for text in ("繳水費", "大型活動要申請嗎"):
             self.assertEqual(faq.expand(text), text, text)
+
+    def test_faq_aliases_are_data(self):
+        # 2026-11-16 (rules section 6): the aliases moved from faq.py to assets/assistant/faq_aliases.json.
+        import re
+        import faq
+        self.assertEqual(faq.COLLOQUIAL, faq.load_aliases(
+            faq.pathlib.Path(faq.__file__).resolve().parents[1] / "assets/assistant/faq_aliases.json"))
+        self.assertEqual(len(faq.COLLOQUIAL), 5)
+        for pattern, words in faq.COLLOQUIAL:
+            re.compile(pattern)
+            self.assertTrue(words.strip())
+        self.assertIn("敬老悠遊卡", faq.expand("老人卡怎麼辦"))
+        self.assertIn("收運時間", faq.expand("垃圾車幾點會來"))
+        self.assertEqual(faq.load_aliases(faq.pathlib.Path(faq.__file__).with_name("no_such_file.json")), ())
 
 
 if __name__ == "__main__":

@@ -6,6 +6,8 @@ import 'dart:typed_data';
 import 'package:town_pass/bean/assistant_result.dart';
 import 'package:town_pass/page/assistant/assistant_texts.dart';
 import 'package:town_pass/service/assistant_on_device.dart';
+import 'package:town_pass/service/assistant_readiness.dart';
+import 'package:town_pass/service/assistant_recent_pages.dart';
 
 /// Recognised speech. When [confirm] is true the user must pick one of
 /// [options] (the heard text first) before anything is sent. When
@@ -99,7 +101,12 @@ class AssistantService {
         // waits up to 75 s for it, server.MODEL_READY_WAIT_S).
       ).timeout(const Duration(seconds: 150));
     } on TimeoutException {
-      throw _error('turnTimeout', language);
+      // Right after launch the phone's models may still be loading: say so
+      // instead of the general timeout (rules section 5, 2026-11-16).
+      throw _error(
+        AssistantReadiness.loading.value ? 'modelsStillLoading' : 'turnTimeout',
+        language,
+      );
     } on SocketException {
       throw _error(_unreachable, language);
     } on HttpException {
@@ -145,6 +152,10 @@ class AssistantService {
         // A capability list's previous (-1) or next (1) page button, with the
         // list's resolution id and no text.
         'page_step': ?pageStep,
+        // Pages the assistant opened recently on this phone, for the function
+        // catalogue's 常用 row (ids only; older backends ignore it).
+        if (AssistantRecentPages.instance.items.isNotEmpty)
+          'recent_pages': AssistantRecentPages.instance.items.toList(),
       }),
     );
     // Python's local HTTP server requires a known byte length; Dart otherwise
@@ -159,7 +170,16 @@ class AssistantService {
         throw _error('replyTooLong', language);
       }
     }
-    final json = jsonDecode(body.toString()) as Map<String, dynamic>;
+    // A reply that is not the expected JSON is the assistant's problem, not
+    // the network's or the page's (rules section 5, 2026-11-16).
+    final Map<String, dynamic> json;
+    try {
+      final decoded = jsonDecode(body.toString());
+      if (decoded is! Map<String, dynamic>) throw const FormatException();
+      json = decoded;
+    } on FormatException {
+      throw _error('cannotProcess', language);
+    }
     if (response.statusCode != HttpStatus.ok) {
       throw json['error'] is String
           ? FormatException(json['error'] as String)
@@ -168,7 +188,15 @@ class AssistantService {
     if (json['request_id'] != requestId) {
       throw _error('replyMismatch', language);
     }
-    return AssistantResult.fromJson(json);
+    try {
+      return AssistantResult.fromJson(json);
+    } on FormatException {
+      // Another contract or catalogue version (developer wording only in
+      // debug builds, AssistantTexts.developerTexts).
+      throw _error('versionMismatch', language);
+    } on TypeError {
+      throw _error('cannotProcess', language);
+    }
   }
 
   /// Sends in-memory WAV audio to the backend's local speech recognition and

@@ -104,11 +104,11 @@
   },
   {
    "id": "classifier",
-   "name": "townpass-decision-e5-ce-v1-q8_0.gguf",
+   "name": "townpass-decision-e5-ce-v2-q8_0.gguf",
    "part": "decision",
    "size": 132441120,
-   "sha256": "ae1745a7a24c1217271f08e53f140df1ea9e3c50f098362045625290d6b6e22f",
-   "path": "decision/townpass-decision-e5-ce-v1-q8_0.gguf",
+   "sha256": "fd51639891dcdc6f906699a177a316f91c4381ffca00602e24428bd421fe1abd",
+   "path": "decision/townpass-decision-e5-ce-v2-q8_0.gguf",
    "server": "classifier",
    "decision_model": "classifier",
    "platforms": [

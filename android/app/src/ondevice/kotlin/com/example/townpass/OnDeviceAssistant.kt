@@ -52,7 +52,7 @@ object OnDeviceAssistant {
      *  fine-tuned from Microsoft multilingual-e5-small (MIT, 132 MB q8_0) scores the
      *  candidate pages; library and guide decisions follow rules. Downloaded by the
      *  App like the decision model (models.json "classifier"). */
-    const val CLASSIFIER_MODEL_FILE = "townpass-decision-e5-ce-v1-q8_0.gguf"
+    const val CLASSIFIER_MODEL_FILE = "townpass-decision-e5-ce-v2-q8_0.gguf"
     /** Optional separate Chinese model (e.g. Breeze-ASR-25 q8_0, branch
      *  feat/asr-breeze-q8). Without it the multilingual model serves Chinese too. */
     const val ASR_FILE = "ggml-whisper-chinese.bin"  // push_assistant_models.ps1 -Chinese

@@ -109,20 +109,41 @@ GREETING = {
           r"(?:\s+(?:po|ho|sa iyo|sa inyo|naman|ka|kayo))*[!.\s]*",
 }
 LISTING = {
-    "en": r"what can you do|what (?:services|features)|list (?:of )?(?:services|features)|all (?:services|features)|help me with what",
-    "ja": r"何ができ|どんなサービス|どんな機能|機能一覧|サービス一覧|できること",
+    # "See everything" etc.: the App's 看全部功能 chip in each language (2026-11-16).
+    "en": r"what can you do|what (?:services|features)|list (?:of )?(?:services|features)|all (?:services|features)|help me with what"
+          r"|^(?:see|show)(?: me)? (?:everything|all)[.!?\s]*$",
+    "ja": r"何ができ|どんなサービス|どんな機能|機能一覧|サービス一覧|できること|すべての機能|全部の機能",
     # Whole words at the end: unmarked "co gi" must not match "co giup".
     "vi": r"(?:bạn làm được gì|có những dịch vụ gì|danh sách dịch vụ|(?:có|những) chức năng gì"
           r"|(?:bạn|ứng dụng|app|trợ lý)(?: này)? (?:có thể )?(?:làm|giúp)(?: được)?(?: (?:cho )?(?:tôi|mình|em|anh|chị))?"
           r"(?: được)? (?:những )?(?:gì|việc gì)|(?:làm|giúp) được (?:những )?gì"
-          r"|có (?:những )?(?:dịch vụ|chức năng|tính năng) (?:gì|nào)|(?:ứng dụng|app) (?:này )?có (?:gì|những gì))(?!\w)",
-    "id": r"bisa apa saja|bisa apa aja|layanan apa saja|layanan apa aja|daftar layanan|fitur apa"
+          r"|có (?:những )?(?:dịch vụ|chức năng|tính năng) (?:gì|nào)|(?:ứng dụng|app) (?:này )?có (?:gì|những gì)"
+          r"|(?:xem )?tất cả (?:các )?(?:chức năng|dịch vụ|tính năng))(?!\w)",
+    "id": r"bisa apa saja|bisa apa aja|layanan apa saja|layanan apa aja|daftar layanan|fitur apa|semua (?:fitur|layanan)"
           r"|(?:kamu|aplikasi(?: ini)?|asisten(?: ini)?) bisa (?:bantu apa|ngapain|apa)",
     # Ends the sentence: "ano ang mga serbisyo para sa buwis" asks about one service.
     "tl": r"(?:ano(?:-ano)?(?:ng| ang)?\s+(?:mga\s+)?(?:kaya mong gawin|kaya mo|magagawa mo|maitutulong mo|"
           r"serbisyo|feature|function)|listahan ng (?:mga )?serbisyo|lahat ng (?:mga )?serbisyo)"
           r"(?:\s+(?:po|mo|ninyo|nyo|dito|ng app(?: na ito)?|sa app(?: na ito)?|ang (?:app|assistant)(?: na ito)?|"
           r"para sa akin|sa akin))*[\s?.!]*$",
+}
+# Thanks or goodbye among the greetings: one line, no catalogue (rules section 3, 2026-11-16).
+THANKS = {
+    "zh": r"謝謝|感謝|多謝|再見|掰掰|拜拜|thanks|thank you|bye",
+    "en": r"thanks?|thank you|bye|goodbye",
+    "ja": r"ありがとう|さようなら|またね",
+    "vi": r"cảm ơn|cám ơn|tạm biệt",
+    "id": r"terima ?kasih|makasih|trims|dadah|sampai jumpa",
+    "tl": r"salamat|paalam",
+}
+# Up one level in the function catalogue (rules section 3, 2026-11-16); not the cancel words.
+UP_LEVEL = {
+    "zh": r"(?:回|返回|回到)?上一層|回上層|回到分類|回分類",
+    "en": r"back|up a level|back to (?:the )?(?:categories|list|menu)",
+    "ja": r"前に戻る|上の階層|一つ上|カテゴリに戻る",
+    "vi": r"quay về danh mục|về danh mục|lên một cấp",
+    "id": r"kembali ke kategori|naik satu tingkat",
+    "tl": r"bumalik sa (?:mga )?kategorya",
 }
 YES = {
     "en": r"(?:yes|yeah|ok(?:ay)?|sure|that one|confirm)[.!]*",
@@ -154,12 +175,21 @@ _CHOICE_FILLER = {
 }
 # Negation markers: the clause after one is not a request.
 NEGATION = {
-    "en": r"\b(?:don't|do not|not|no|never|without)\b",
-    "ja": r"(?:じゃなくて|ではなく|ない|いらない|しない|なくて(?:も)?いい|結構です|やめ)",
+    # Also a past or future refusal of an intention (2026-11-16, like 「我沒有要借書」 in Chinese):
+    # "I didn't want / mean / ask...", "I wasn't going to...". Not every "didn't": "the bill
+    # didn't come" describes a state.
+    "en": r"\b(?:don't|do not|not|no|never|without)\b|\b(?:didn't|didnt|didn’t|wasn't|wasnt|wasn’t|won't|won’t|"
+          r"doesn't|doesnt|doesn’t)\s+(?:\w+\s+)?(?:want|wanna|mean|need|ask|plan|going|trying|intend)",
+    # Polite refusals of an intention too (2026-11-16): 借りたくありません, 借りるつもりはありません,
+    # 借りるわけではありません. A plain polite negative (つきません: the light is out) is a state.
+    "ja": r"(?:じゃなくて|ではなく|ない|いらない|しない|なくて(?:も)?いい|結構です|やめ|たくありません|"
+          r"つもり(?:は|では)?ありません|わけ(?:では|じゃ)ありません)",
     # A refusal is "không" before wanting or doing ("không muốn", "không cần", "không phải"),
     # also typed without marks. "không" / "chưa" describing a state is not one:
     # "tiền nước chưa trả" (unpaid water bill), "đèn đường không sáng" (street light out).
-    "vi": r"\b(?:đừng|khỏi cần|khoi can)\b|\b(?:thì|thi|là|la)\s+(?:không|khong|ko)\s*$|\b(?:không|khong|ko|hok|hông|chẳng|chang)\s+(?:(?:hề|he|có|co|còn|con)\s+)?"
+    # Also "đâu có muốn" and "không có ý định" (2026-11-16: did not mean to).
+    "vi": r"\b(?:đừng|khỏi cần|khoi can)\b|\b(?:đâu|dau)\s+(?:có|co)\s+(?:muốn|muon|cần|can|định|dinh|mượn|xem)\b|"
+          r"\b(?:không|khong|ko)\s+(?:(?:có|co)\s+)?(?:ý|y)\s+(?:định|dinh)\b|\b(?:thì|thi|là|la)\s+(?:không|khong|ko)\s*$|\b(?:không|khong|ko|hok|hông|chẳng|chang)\s+(?:(?:hề|he|có|co|còn|con)\s+)?"
           r"(?:muốn|muon|cần|can|phải|phai|định|dinh|thích|thich|mở|mo|dùng|dung|đóng|dong|mượn|trả|tra|xem|"
           r"làm|lam|đi|di|nộp|nop|đặt|dat|lấy|lay|báo|bao)\b",
     # Also chat spellings ("sy ga mau pinjem buku"). Describing a state is not a refusal
@@ -171,10 +201,11 @@ NEGATION = {
     # A refusal is "ayoko", "huwag", or "hindi" before wanting or doing ("hindi ko kailangan").
     # "hindi" describing a state is not one: "hindi gumagana ang ilaw" (the light is out),
     # "hindi pa bayad" (unpaid). "ayaw" alone is a state too ("ayaw gumana", will not work).
+    # Also "hindi ko balak" (2026-11-16: not planning to).
     "tl": r"\b(?:huwag|wag|ayoko(?:ng)?|ayaw (?:ko|kong|ko nang|ko na|namin))\b|\b(?:hindi|di)\s+"
           r"(?:(?:ko|ako|namin|kami|na|po|naman|pa|nang)\s+)*(?:gusto|gustong|kailangan|kailangang|kelangan|nais|"
           r"magbabayad|magbayad|babayaran|hihiram|humiram|manghihiram|bubuksan|buksan|gagamitin|gamitin|"
-          r"titingnan|tingnan|mag-uulat|mag-report|magpapa-?reserba)\b",
+          r"titingnan|tingnan|mag-uulat|mag-report|magpapa-?reserba|balak|balak kong|plano|planong)\b",
 }
 # Speech has no commas: "tiền nước không phải tiền học" (water, not tuition) splits
 # before "không phải", keeping the marker with the clause it negates.
@@ -337,7 +368,7 @@ def choice_number(text, language):
         folded, filler = vietnamese.unmark(folded), vietnamese.unmark(filler)
         words = {vietnamese.unmark(word): number for word, number in words.items()}
     alternatives = "|".join(sorted(map(re.escape, words), key=len, reverse=True))
-    match = re.fullmatch(filler + r"(?:(\d)" + (r"|(" + alternatives + ")" if alternatives else "") + r")" + filler,
+    match = re.fullmatch(filler + r"(?:(\d{1,2})" + (r"|(" + alternatives + ")" if alternatives else "") + r")" + filler,
                          folded)
     if not match:
         return None
@@ -534,6 +565,125 @@ MESSAGES = {
         "id": "Saya belum paham kebutuhan Anda. Saya bisa mencari layanan dan membuka halamannya; Anda juga bisa tanya \"bisa apa saja\".",
         "tl": "Hindi ko pa alam kung ano ang kailangan mo. Kaya kong maghanap ng serbisyo at buksan ang pahina nito; puwede mo ring itanong ang \"ano ang kaya mong gawin\".",
     },
+    # Fallback tiers and the function catalogue (rules section 3, 2026-11-16). Chinese
+    # included: these are used for every language. AI drafts pending native review.
+    "see_all": {
+        "zh": "看全部功能", "en": "See everything", "ja": "すべての機能を見る", "vi": "Xem tất cả chức năng",
+        "id": "Lihat semua fitur", "tl": "Tingnan lahat ng serbisyo",
+    },
+    "fallback_unsure": {
+        "zh": "我不太確定你要哪一個，是這些嗎？",
+        "en": "I'm not sure which one you mean. Is it one of these?",
+        "ja": "どれのことか、はっきりわかりませんでした。この中にありますか？",
+        "vi": "Tôi chưa chắc bạn muốn mục nào. Có phải là một trong các mục này không?",
+        "id": "Saya kurang yakin yang mana yang Anda maksud. Apakah salah satu dari ini?",
+        "tl": "Hindi ako sigurado kung alin ang ibig mo. Isa po ba sa mga ito?",
+    },
+    "fallback_unclear": {
+        "zh": "我沒有聽懂。你可以從這裡選，或換個說法再說一次。",
+        "en": "I didn't catch that. Pick from here, or say it another way.",
+        "ja": "うまく聞き取れませんでした。ここから選ぶか、言い方を変えてもう一度どうぞ。",
+        "vi": "Tôi chưa hiểu ý bạn. Bạn có thể chọn ở đây, hoặc nói lại theo cách khác.",
+        "id": "Saya belum paham. Pilih dari sini, atau katakan dengan cara lain.",
+        "tl": "Hindi ko po naintindihan. Pumili rito, o sabihin sa ibang paraan.",
+    },
+    "fallback_single": {
+        "zh": "我不確定你要辦哪一項，可以從這些功能找：",
+        "en": "I'm not sure which one you need. You can find it among these:",
+        "ja": "どの手続きかはっきりしませんでした。こちらから探せます：",
+        "vi": "Tôi chưa chắc bạn cần việc nào. Bạn có thể tìm trong các mục này:",
+        "id": "Saya belum yakin mana yang Anda perlukan. Anda bisa mencarinya di sini:",
+        "tl": "Hindi ako sigurado kung alin ang kailangan mo. Mahahanap mo ito rito:",
+    },
+    "out_of_scope": {
+        "zh": "這個我幫不上忙。我能做的是這些：",
+        "en": "I can't help with that. Here is what I can do:",
+        "ja": "それはお手伝いできません。できることはこちらです：",
+        "vi": "Việc này tôi không giúp được. Tôi có thể làm những việc sau:",
+        "id": "Saya tidak bisa membantu soal itu. Ini yang bisa saya lakukan:",
+        "tl": "Hindi ko po iyan matutulungan. Ito ang kaya kong gawin:",
+    },
+    "second_miss": {
+        "zh": "我還是沒找到。可以從下面選，或打 1999 市民熱線問專人。",
+        "en": "I still couldn't find it. Pick from below, or call the 1999 citizen hotline to ask a person.",
+        "ja": "まだ見つかりません。下から選ぶか、1999 市民ホットラインで担当者に聞いてください。",
+        "vi": "Tôi vẫn chưa tìm thấy. Bạn có thể chọn bên dưới, hoặc gọi đường dây nóng 1999 để hỏi nhân viên.",
+        "id": "Saya masih belum menemukannya. Pilih di bawah, atau telepon hotline warga 1999 untuk bertanya ke petugas.",
+        "tl": "Hindi ko pa rin po makita. Pumili sa ibaba, o tumawag sa 1999 citizen hotline para magtanong sa tao.",
+    },
+    "greeting_catalog": {
+        "zh": "你好！想做什麼直接說，或從下面選。",
+        "en": "Hi! Just tell me what you need, or pick from below.",
+        "ja": "こんにちは！やりたいことをそのまま話すか、下から選んでください。",
+        "vi": "Xin chào! Bạn cứ nói điều bạn cần, hoặc chọn bên dưới.",
+        "id": "Halo! Langsung sebutkan kebutuhan Anda, atau pilih di bawah.",
+        "tl": "Kumusta po! Sabihin lang ang kailangan mo, o pumili sa ibaba.",
+    },
+    "thanks": {
+        "zh": "不客氣，需要時再叫我。",
+        "en": "You're welcome. Call me whenever you need me.",
+        "ja": "どういたしまして。また必要なときに呼んでください。",
+        "vi": "Không có gì. Khi cần cứ gọi tôi nhé.",
+        "id": "Sama-sama. Panggil saya lagi kapan saja.",
+        "tl": "Walang anuman po. Tawagin lang ako kapag kailangan mo.",
+    },
+    "catalog_title": {
+        "zh": "你想做哪一類的事？也可以直接說或打出想做的事。",
+        "en": "What would you like to do? You can also just say or type it.",
+        "ja": "どの種類のことをしますか？やりたいことを直接話すか入力することもできます。",
+        "vi": "Bạn muốn làm loại việc nào? Bạn cũng có thể nói hoặc gõ thẳng điều bạn cần.",
+        "id": "Mau melakukan apa? Anda juga bisa langsung mengucapkan atau mengetik kebutuhan Anda.",
+        "tl": "Anong uri ng gawain ang gusto mo? Puwede mo ring sabihin o i-type ito nang direkta.",
+    },
+    "catalog_group": {
+        "zh": "「{group}」有這些：", "en": "Under {group}:", "ja": "「{group}」にはこれがあります：",
+        "vi": "Trong mục {group} có:", "id": "Di {group} ada:", "tl": "Nasa {group}:",
+    },
+    "frequent": {
+        "zh": "常用", "en": "Frequently used", "ja": "よく使う", "vi": "Hay dùng", "id": "Sering dipakai",
+        "tl": "Madalas gamitin",
+    },
+    "page_more": {
+        "zh": "更多", "en": "More", "ja": "次へ", "vi": "Xem thêm", "id": "Selanjutnya", "tl": "Susunod",
+    },
+    "page_prev": {
+        "zh": "上一頁", "en": "Previous page", "ja": "前のページ", "vi": "Trang trước", "id": "Halaman sebelumnya",
+        "tl": "Nakaraang pahina",
+    },
+    "level_up": {
+        "zh": "回上一層", "en": "Back", "ja": "前に戻る", "vi": "Quay về danh mục", "id": "Kembali ke kategori",
+        "tl": "Bumalik sa kategorya",
+    },
+    "call_1999": {
+        "zh": "打 1999 市民熱線", "en": "Call the 1999 hotline", "ja": "1999 市民ホットラインに電話",
+        "vi": "Gọi đường dây nóng 1999", "id": "Telepon hotline 1999", "tl": "Tumawag sa 1999 hotline",
+    },
+    "call_1999_note": {
+        "zh": "外縣市請撥 02-27208889", "en": "From outside Taipei: 02-27208889", "ja": "台北市外からは 02-27208889",
+        "vi": "Ngoài Đài Bắc gọi 02-27208889", "id": "Dari luar Taipei: 02-27208889",
+        "tl": "Mula sa labas ng Taipei: 02-27208889",
+    },
+    "call_1999_reply": {
+        "zh": "市民熱線 1999 有專人回答（外縣市請撥 02-27208889）。請自己撥打，助理不會幫你撥號。",
+        "en": "The 1999 citizen hotline has people who can answer (from outside Taipei: 02-27208889). "
+              "Please dial it yourself; the assistant does not make calls.",
+        "ja": "1999 市民ホットラインでは担当者が答えます（台北市外からは 02-27208889）。"
+              "ご自身でおかけください。アシスタントは電話をかけません。",
+        "vi": "Đường dây nóng 1999 có nhân viên trả lời (ngoài Đài Bắc gọi 02-27208889). "
+              "Bạn hãy tự gọi; trợ lý không gọi điện thay bạn.",
+        "id": "Hotline warga 1999 dijawab oleh petugas (dari luar Taipei: 02-27208889). "
+              "Silakan telepon sendiri; asisten tidak melakukan panggilan.",
+        "tl": "May sasagot na tao sa 1999 citizen hotline (mula sa labas ng Taipei: 02-27208889). "
+              "Ikaw na po ang tumawag; hindi tumatawag ang assistant.",
+    },
+    "no_sound": {
+        "zh": "沒有聽到聲音，請按住再說一次。",
+        "en": "I didn't hear anything. Hold the button and say it again.",
+        "ja": "声が聞こえませんでした。ボタンを押したまま、もう一度話してください。",
+        "vi": "Tôi không nghe thấy tiếng. Hãy nhấn giữ nút và nói lại.",
+        "id": "Tidak terdengar suara. Tekan dan tahan tombolnya, lalu bicara lagi.",
+        "tl": "Wala po akong narinig. Pindutin nang matagal ang button at magsalita ulit.",
+    },
     "demo_page": {
         "en": "demo page", "ja": "デモページ", "vi": "trang demo", "id": "halaman demo", "tl": "demo na pahina",
     },
@@ -548,7 +698,7 @@ PREV_PAGE = {
 }
 NEXT_PAGE = {
     "en": r"next(?: page)?|more", "ja": r"次(?:のページ)?|もっと", "vi": r"trang (?:tiếp|sau|kế)(?: theo)?|tiếp theo|xem thêm|thêm",
-    "id": r"halaman (?:berikutnya|selanjutnya)|lagi",
+    "id": r"halaman (?:berikutnya|selanjutnya)|selanjutnya|lagi",
     "tl": r"(?:(?:sa )?susunod na pahina|susunod|iba pa|marami pa)(?:\s+(?:po|na))*",
 }
 

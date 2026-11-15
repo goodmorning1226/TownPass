@@ -23,6 +23,10 @@ import 'package:town_pass/util/tp_colors.dart';
 import 'package:town_pass/util/tp_route.dart';
 import 'package:town_pass/util/tp_text.dart';
 
+/// Options shown on the home answer card; the rest are in the assistant
+/// (2026-11-16).
+const homeOptions = 4;
+
 const assistantFabTarget = 'assistant.fab';
 
 /// Root overlay of the guided (mock) assistant: corner button, penguin guide
@@ -218,14 +222,16 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
         ),
         // First use of a page language downloads its translation model
         // (tens of seconds): said on top of every page, as in the chat
-        // assistant's host. docs/AI_CURRENT_RULES.md section 4.
+        // assistant's host. docs/AI_CURRENT_RULES.md section 4. Below the
+        // page's (or the assistant's) title bar, so back and the title stay
+        // visible (section 5, 2026-11-16).
         Obx(() {
           final translation = PageTranslation.instance;
           if (!translation.preparing.value) return const SizedBox.shrink();
           return Positioned(
             left: 16,
             right: 16,
-            top: MediaQuery.of(context).padding.top + 8,
+            top: translationBannerTop(context),
             child: IgnorePointer(
               child: PageTranslationScope(
                 enabled: false,
@@ -501,7 +507,36 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
               ),
             ),
           );
-          if (c.homeNeedsAssistant) {
+          // The first options right on the card (2026-11-16), the rest in the
+          // assistant.
+          ChatMessage? offer;
+          for (final m in replies) {
+            if (m.options != null && c.optionsLive(m)) offer = m;
+          }
+          final all = offer?.options?.options ?? const <CandidateOption>[];
+          final shown = all.take(homeOptions).toList();
+          for (var i = 0; i < shown.length; i++) {
+            final o = shown[i];
+            final number = int.tryParse(o.choiceId ?? '') ?? i + 1;
+            body.add(
+              _SecondaryButton(
+                o.enabled
+                    ? '$number. ${gt(o.label)}'
+                    : gt('{n}. {label}（還不能用）', {
+                        'n': number,
+                        'label': gt(o.label),
+                      }),
+                () => c.choose(offer!, o),
+              ),
+            );
+          }
+          if (c.homeNeedsAssistant &&
+              (all.length > shown.length ||
+                  replies.any(
+                    (m) =>
+                        c.optionsLive(m) &&
+                        (m.teachGuideId != null || m.tutorialChoice),
+                  ))) {
             body.add(
               _SecondaryButton(gt(HomeAskTexts.openAssistant), c.openFromHome),
             );
@@ -768,6 +803,8 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
     switch (card.variant) {
       case CardVariant.step:
         tools.addAll([
+          // The icon with its words (docs/AI_CURRENT_RULES.md section 5,
+          // 2026-11-16: the icon alone was not understood).
           Semantics(
             button: true,
             label: gt('再唸一次'),
@@ -781,14 +818,35 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
                   side: const BorderSide(color: TPColors.secondary400),
                 ),
                 child: InkWell(
+                  key: const Key('guide-card-read-again'),
                   borderRadius: BorderRadius.circular(10),
                   onTap: _tapped(c.speakCard),
-                  child: const SizedBox(
-                    width: 48,
-                    height: 48,
-                    child: Icon(
-                      Icons.volume_up_outlined,
-                      color: TPColors.primary700,
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(
+                      minWidth: 48,
+                      minHeight: 48,
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            Icons.volume_up_outlined,
+                            color: TPColors.primary700,
+                            size: 20,
+                          ),
+                          const SizedBox(width: 4),
+                          // The button's label already says it.
+                          ExcludeSemantics(
+                            child: TPText(
+                              gt('再唸一次'),
+                              style: TPTextStyles.bodySemiBold,
+                              color: TPColors.primary700,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),

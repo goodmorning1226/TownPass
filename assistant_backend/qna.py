@@ -289,11 +289,27 @@ class CombinedIndex:
         if not self.qna.count:
             # Unchanged city behaviour while the App Q&A is not loaded.
             return self.city.search(text, k) if self.city is not None else ("none", [])
+        hits = self._merged(text, k)
+        if hits is None:
+            return "none", []
+        return faq.band(hits[0]["score"]), [hit for hit in hits if hit["score"] >= faq.MEDIUM_CONF]
+
+    def top(self, text, k=5):
+        """The k closest entries of both sources, whatever their score (faq.FaqIndex.top)."""
+        self.qna.refresh_if_due()
+        if not self.qna.count:
+            return self.city.top(text, k) if self.city is not None else []
+        return self._merged(text, k) or []
+
+    def _merged(self, text, k):
+        # The FAQ aliases (faq_aliases.json) apply here too, as in faq.FaqIndex.top: without
+        # them the colloquial wording reached the FAQ only while the App Q&A was not loaded.
+        text = faq.expand(text)
         try:
             vector = [float(x) for x in self.embed(text)]
         except (OSError, ValueError, KeyError) as exc:
             print(f"FAQ: embedding server unavailable ({type(exc).__name__})", flush=True)
-            return "none", []
+            return None
         # App items first, so they win ties; the city FAQ repeats some of them
         # (資訊局, other punctuation), and a repeated question is shown once.
         merged, seen = [], set()
@@ -303,8 +319,7 @@ class CombinedIndex:
             if key not in seen:
                 seen.add(key)
                 merged.append(hit)
-        hits = merged[:k]
-        return faq.band(hits[0]["score"]), [hit for hit in hits if hit["score"] >= faq.MEDIUM_CONF]
+        return merged[:k]
 
 
 def with_qna(city):

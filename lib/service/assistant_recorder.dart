@@ -26,15 +26,60 @@ class AssistantRecorder {
   BytesBuilder? _pcm;
   Completer<void>? _done;
 
+  /// Whether the microphone may be used already, without asking (so the
+  /// assistant can explain why before the system's permission prompt;
+  /// docs/AI_CURRENT_RULES.md section 5). True when it cannot be told.
+  Future<bool> micAllowed() async {
+    AudioRecorder? probe;
+    try {
+      probe = AudioRecorder();
+      return await probe.hasPermission(request: false);
+    } catch (_) {
+      return true;
+    } finally {
+      try {
+        await probe?.dispose();
+      } catch (_) {}
+    }
+  }
+
+  /// Shows the system's microphone permission prompt now, without recording
+  /// (right after the assistant has explained why; docs/AI_CURRENT_RULES.md
+  /// section 5). True when allowed.
+  Future<bool> requestMic() async {
+    AudioRecorder? probe;
+    try {
+      probe = AudioRecorder();
+      return await probe.hasPermission();
+    } catch (_) {
+      return false;
+    } finally {
+      try {
+        await probe?.dispose();
+      } catch (_) {}
+    }
+  }
+
+  /// True while [start] waits for the system's permission prompt, and after
+  /// a [start] that did not get the permission: releasing the button then is
+  /// not "too quick" (docs/AI_CURRENT_RULES.md section 5, 2026-11-16).
+  bool permissionPending = false;
+
   /// Starts capturing; false when the microphone permission is not granted.
   ///
   /// Each recording uses a fresh platform recorder: reusing one across
   /// sessions risked the next session delivering silence.
   Future<bool> start() async {
+    permissionPending = false;
     await cancel();
     await _recorder?.dispose();
     final recorder = _recorder = AudioRecorder();
-    if (!await recorder.hasPermission()) return false;
+    if (!await recorder.hasPermission(request: false)) {
+      // Not allowed yet: the system asks now (or refuses at once).
+      permissionPending = true;
+      if (!await recorder.hasPermission()) return false;
+      permissionPending = false;
+    }
     final pcm = BytesBuilder(copy: false);
     final done = Completer<void>();
     _pcm = pcm;

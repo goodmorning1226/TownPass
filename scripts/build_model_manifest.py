@@ -57,9 +57,9 @@ FILES = [
     # Option B' (docs/AI_DECISION_CLASSIFIER.md sections 10-12): the decision classifier
     # replaces the decision model (ASSISTANT_DECISION_MODEL=classifier); 132 MB, so
     # every tier gets it (models.Downloads.parts_for_phone).
-    ("classifier", "townpass-decision-e5-ce-v1-q8_0.gguf", "decision",
-     r"D:\TownPassAssistant\decision-classifier\models\townpass-decision-e5-ce-v1-q8_0.gguf",
-     "decision/townpass-decision-e5-ce-v1-q8_0.gguf", None,
+    ("classifier", "townpass-decision-e5-ce-v2-q8_0.gguf", "decision",
+     r"D:\TownPassAssistant\decision-classifier\models\townpass-decision-e5-ce-v2-q8_0.gguf",
+     "decision/townpass-decision-e5-ce-v2-q8_0.gguf", None,
      {"server": "classifier", "decision_model": "classifier", "platforms": ["android", "ios"],
       "license": "MIT (cross-encoder fine-tuned by this project from Microsoft multilingual-e5-small; GGUF q8_0)"}),
     # 10.5 GB+ Android phones: q4_0 as well (2026-11-13): as accurate as q8_0 and the

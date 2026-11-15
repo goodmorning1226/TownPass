@@ -27,9 +27,28 @@ LIBRARY_MASK = "〇"
 BOOK_EVIDENCE = re.compile(r"的書|書籍|本書|圖書|書名")
 
 
+# Borrowing between people is not a library request (rules section 3, 2026-11-16; 「我跟朋友借了錢
+# 還沒還」 opened 我的借閱紀錄 through 沒還): money borrowed, owed or paid back (借 / 欠 / 還 near 錢,
+# 款, 現金, 債 or an amount), or borrowing from / lending to a person (跟朋友借, 借給同事). Then the
+# sentence's 借 and 還 are not book evidence, unless it also names books or the library.
+# 錢天堂 is a book title (the demo catalogue), not money.
+_PEOPLE = (r"(?:我的?|我們的?)?(?:朋友|同學|同事|家人|親戚|鄰居|老闆|室友|男朋友|女朋友|男友|女友|老公|老婆|先生|太太|"
+           r"爸爸?|媽媽?|哥哥?|姐姐?|姊姊?|弟弟?|妹妹?|兒子|女兒|阿公|阿嬤|爺爺|奶奶|他們|他|她|別人|人家|人)")
+PERSONAL_LOAN = re.compile(
+    r"(?:借|欠|還)[^，,。！？!?；;]{0,6}?(?:錢(?!天堂)|款|現金|債|[0-9０-９一二三四五六七八九十百千萬兩幾]+\s*(?:塊|元|萬|千))"
+    r"|(?:錢(?!天堂)|款|現金|債)[^，,。！？!?；;]{0,4}?(?:借|欠)"
+    r"|(?:跟|向|找|和)" + _PEOPLE + r"[^，,。！？!?；;]{0,3}?借"
+    r"|借(?:了|過)?(?:錢)?給" + _PEOPLE)
+_NAMES_BOOKS = re.compile(r"書|冊|繪本|小說|漫畫|故事|雜誌|讀物|圖書|館|ISBN", re.I)
+
+
 def library_view(text):
-    """text with NOT_LIBRARY words masked (same length), for library and book evidence only."""
-    return NOT_LIBRARY.sub(lambda m: LIBRARY_MASK * len(m[0]), text or "")
+    """text with NOT_LIBRARY words masked (same length), for library and book evidence only;
+    in a sentence about borrowing between people (PERSONAL_LOAN) also its 借 and 還."""
+    masked = NOT_LIBRARY.sub(lambda m: LIBRARY_MASK * len(m[0]), text or "")
+    if PERSONAL_LOAN.search(masked) and not _NAMES_BOOKS.search(masked):
+        masked = re.sub(r"[借還]", LIBRARY_MASK, masked)
+    return masked
 
 
 # Spelling variants that mean the same thing in everyday Traditional Chinese.
@@ -61,6 +80,8 @@ class Registry:
         self.path = path  # semantic.examples() reads capability_examples.json next to it
         data = json.loads(path.read_text(encoding="utf-8"))
         self.version = data["version"]
+        # The function catalogue's categories (menu.py; rules section 3, 2026-11-16).
+        self.groups = data.get("groups") or []
         self.entries = data["capabilities"]
         self.by_id = {entry["id"]: entry for entry in self.entries}
         if len(self.by_id) != len(self.entries):

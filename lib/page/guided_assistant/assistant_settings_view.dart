@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:town_pass/page/assistant/assistant_texts.dart';
 import 'package:town_pass/page/assistant/widget/model_download_card.dart';
 import 'package:town_pass/page/guided_assistant/guided_assistant_controller.dart';
 import 'package:town_pass/page/guided_assistant/model/assistant_settings.dart';
@@ -8,12 +9,14 @@ import 'package:town_pass/page/guided_assistant/widget/guide_highlight.dart';
 import 'package:town_pass/util/tp_app_bar.dart';
 import 'package:town_pass/util/tp_colors.dart';
 import 'package:town_pass/service/assistant_model_download.dart';
+import 'package:town_pass/service/assistant_speaker.dart';
 import 'package:town_pass/service/assistant_speech_language.dart';
 import 'package:town_pass/service/page_translation.dart';
 import 'package:town_pass/util/tp_text.dart';
 
-/// AI 助理設定: assistant mode, assistant language and the tutorial replay.
-/// Each change is saved at once (a toast says what changed).
+/// AI 助理設定: assistant mode, assistant language, reading aloud, the privacy
+/// line, the tutorial replay and (on-device builds) the offline models. Each
+/// change is saved at once (a toast says what changed for mode and language).
 ///
 /// The language here is the speech-language menu's choice (the menu next to
 /// the microphone): one setting for the language the assistant listens in
@@ -65,6 +68,15 @@ class AssistantSettingsView extends StatelessWidget {
                     ),
                 ]),
                 _whatChanges(),
+                // Reading aloud: on / off and its speed (2026-11-16).
+                _header(gt(SettingsTexts.readHeader)),
+                _group(gt(SettingsTexts.readHeader), [
+                  _readAloudRow(c),
+                  _speedRow(c),
+                ]),
+                // Where recordings, typed text and the history stay
+                // (on-device builds, docs/AI_CURRENT_RULES.md section 5).
+                if (AssistantModelDownload.maybe != null) _privacy(),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
                   child: Column(
@@ -110,6 +122,97 @@ class AssistantSettingsView extends StatelessWidget {
       ),
     );
   }
+
+  // Its own Material: the group's white box would hide the ink.
+  Widget _readAloudRow(GuidedAssistantController c) => Material(
+    color: TPColors.white,
+    child: SwitchListTile(
+      key: const Key('assistant-read-aloud'),
+      value: c.readAloud.value,
+      activeTrackColor: TPColors.primary500,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      onChanged: c.setReadAloud,
+      title: TPText(
+        gt(SettingsTexts.readAloud),
+        style: TPTextStyles.h3Regular,
+        color: TPColors.grayscale950,
+      ),
+      subtitle: TPText(
+        gt(SettingsTexts.readAloudDesc),
+        style: TPTextStyles.bodyRegular,
+        color: TPColors.grayscale700,
+      ),
+    ),
+  );
+
+  /// 慢 / 標準 / 快 (AssistantSpeaker.rates), each at least 48 px high.
+  Widget _speedRow(GuidedAssistantController c) => Padding(
+    padding: const EdgeInsets.fromLTRB(16, 4, 16, 14),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        TPText(
+          gt(SettingsTexts.speedHeader),
+          style: TPTextStyles.bodyRegular,
+          color: TPColors.grayscale700,
+        ),
+        const SizedBox(height: 6),
+        Row(
+          children: [
+            for (final (i, rate) in AssistantSpeaker.rates.indexed) ...[
+              if (i > 0) const SizedBox(width: 8),
+              Expanded(
+                child: _SpeedButton(
+                  key: Key('assistant-read-speed-$i'),
+                  label: gt(SettingsTexts.speeds[i]),
+                  selected: c.speechRate.value == rate,
+                  onTap: () => c.setSpeechRate(rate),
+                ),
+              ),
+            ],
+          ],
+        ),
+      ],
+    ),
+  );
+
+  Widget _privacy() => Container(
+    key: const Key('assistant-settings-privacy'),
+    margin: const EdgeInsets.fromLTRB(16, 20, 16, 0),
+    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+    decoration: BoxDecoration(
+      color: TPColors.white,
+      borderRadius: BorderRadius.circular(10),
+    ),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Icon(Icons.lock_outline, size: 20, color: TPColors.grayscale700),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Semantics(
+                header: true,
+                child: TPText(
+                  gt(SettingsTexts.privacyHeader),
+                  style: TPTextStyles.h3SemiBold.copyWith(fontSize: 15),
+                  color: TPColors.grayscale950,
+                ),
+              ),
+              const SizedBox(height: 4),
+              TPText(
+                AssistantTexts.page('privacy'),
+                style: TPTextStyles.bodyRegular,
+                color: TPColors.grayscale800,
+              ),
+            ],
+          ),
+        ),
+      ],
+    ),
+  );
 
   Widget _summary(GuidedAssistantController c) => Container(
     margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
@@ -296,6 +399,42 @@ class _OptionRow extends StatelessWidget {
       ),
     );
   }
+}
+
+class _SpeedButton extends StatelessWidget {
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+  const _SpeedButton({
+    super.key,
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) => Semantics(
+    inMutuallyExclusiveGroup: true,
+    selected: selected,
+    child: OutlinedButton(
+      style: OutlinedButton.styleFrom(
+        minimumSize: const Size(48, 48),
+        backgroundColor: selected ? TPColors.primary50 : TPColors.white,
+        side: BorderSide(
+          color: selected ? TPColors.primary500 : TPColors.grayscale200,
+          width: selected ? 2 : 1,
+        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+      onPressed: onTap,
+      child: TPText(
+        label,
+        style: selected ? TPTextStyles.h3SemiBold : TPTextStyles.h3Regular,
+        color: selected ? TPColors.primary700 : TPColors.grayscale800,
+        textAlign: TextAlign.center,
+      ),
+    ),
+  );
 }
 
 class _Radio extends StatelessWidget {

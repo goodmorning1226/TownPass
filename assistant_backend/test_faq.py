@@ -102,25 +102,27 @@ class FaqLayerTests(unittest.TestCase):
         self.assertEqual(result["metrics"]["route"], "faq_medium")
         self.assertIn("你是不是想問", result["message"])
         self.assertNotIn("第一個答案", result["message"])
-        self.assertEqual([c["title"] for c in result["choices"]], ["第一題", "第二題"])
+        # 看全部功能 last (rules section 3, 2026-11-16).
+        self.assertEqual([c["title"] for c in result["choices"]], ["第一題", "第二題", "看全部功能"])
         chosen = self.turn(app, resolution_id=result["resolution_id"], choice_id="2")
         self.assertIn("第二個答案", chosen["message"])
         self.assertEqual(chosen["action"], "faq_answer")
 
-    def test_nothing_found_falls_back_to_no_related_content(self):
+    def test_nothing_found_falls_back_to_the_catalogue(self):
+        # Rules section 3 (2026-11-16): no FAQ and no clue -> the function catalogue.
         for hits in ([hit("1", BELOW)], []):
             app = self.app(hits)
             result = self.turn(app, "今天心情真好嗎")
-            self.assertEqual((result["kind"], result["action"], result["destination"]), ("reply", "no_related", None))
-            self.assertEqual(result["message"], workflow.NO_RELATED)
+            self.assertEqual((result["kind"], result["destination"]), ("capability_list", None))
+            self.assertEqual(result["metrics"]["route"], "fallback_catalog")
 
     def test_without_index_the_assistant_still_answers(self):
         app = Assistant(FakeCatalog(), lambda messages, tools: response("request_clarification"))
-        self.assertEqual(self.turn(app, "今天心情真好嗎")["message"], workflow.NO_RELATED)
+        self.assertEqual(self.turn(app, "今天心情真好嗎")["kind"], "capability_list")
 
     def test_short_text_skips_retrieval(self):
         app = self.app([hit("1", HIGH)])
-        self.assertEqual(self.turn(app, "嗯嗯")["message"], workflow.NO_RELATED)
+        self.assertEqual(self.turn(app, "嗯嗯")["metrics"]["route"], "fallback_catalog")
         self.assertEqual(self.faq.queries, [])
 
     def test_model_rejection_tries_faq_before_its_own_reply(self):
@@ -131,8 +133,13 @@ class FaqLayerTests(unittest.TestCase):
             self.assertTrue(any("open_library" in names for names in self.calls))
             self.assertEqual(result["action"], "faq_answer", decision)
             self.assertIn("看診請攜帶健保卡。", result["message"])
+        # No FAQ answer: "unsupported" for a sentence that only says 看 + something (no library
+        # word, no other service) is not a library answer, so the turn goes on as an unmatched
+        # one and ends in the catalogue (rules section 3, 2026-11-16); nothing opens.
         app = self.app([hit("1", BELOW - .1)], "unsupported")
-        self.assertEqual(self.turn(app, "看病要帶什麼證件")["kind"], "unsupported")
+        result = self.turn(app, "看病要帶什麼證件")
+        self.assertEqual(result["kind"], "capability_list")
+        self.assertIsNone(result["destination"])
 
     def test_related_questions_are_session_bound_choices(self):
         app = self.app([hit("1", HIGH, "第一題"), hit("2", MEDIUM, "第二題", "第二個答案"),

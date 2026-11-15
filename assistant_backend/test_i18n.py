@@ -71,6 +71,24 @@ class LanguageDetectionTests(unittest.TestCase):
         self.assertEqual(i18n.positive_text("gusto kong magbayad ng tubig, hindi ng tuition", "tl"),
                          "gusto kong magbayad ng tubig")
 
+    def test_refusing_an_intention_in_every_language(self):
+        # Rules section 3, 2026-11-16 (「我沒有要借書啦」 opened the library): the same gap in
+        # the other languages. A state stays a request.
+        refusals = {"en": ["I didn't want to borrow books", "I wasn't going to borrow a book",
+                           "I didn’t mean to open the library"],
+                    "ja": ["本を借りたくありません", "本を借りるつもりはありません", "本を借りるわけではありません"],
+                    "vi": ["Tôi đâu có muốn mượn sách", "Tôi không có ý định mượn sách"],
+                    "id": ["Saya tidak bermaksud pinjam buku"],
+                    "tl": ["Hindi ko balak manghiram ng libro"]}
+        for language, texts in refusals.items():
+            for text in texts:
+                self.assertEqual(i18n.positive_text(text, language), "", text)
+        states = {"en": "my water bill didn't come", "ja": "街灯がつきません", "vi": "Đèn đường không sáng",
+                  "tl": "hindi gumagana ang ilaw sa kalye"}
+        for language, text in states.items():
+            self.assertEqual(i18n.positive_text(text, language), text, text)
+        self.assertEqual(i18n.positive_text("I didn't want books, pay the water bill", "en"), "pay the water bill")
+
 
 class CatalogueNamesTests(unittest.TestCase):
     def test_every_enabled_service_has_a_name_in_every_language(self):
@@ -116,15 +134,16 @@ class ForeignTurnTests(unittest.TestCase):
 
     def test_rules_without_the_model(self):
         self.assertEqual(self.turn("hello")["metrics"]["model_calls"], 0)
-        self.assertIn("TownPass", self.turn("hello")["message"])
+        # A greeting: one line and the catalogue (rules section 3, 2026-11-16).
+        self.assertEqual(self.turn("hello")["message"], i18n.t("greeting_catalog", "en"))
         listing = self.turn("what can you do")
-        self.assertEqual(listing["kind"], "capability_list")
-        self.assertTrue(listing["message"].startswith("Services I can open"))
-        # Microservices first (owner, 2026-11-08); the App's start pages come last.
-        self.assertEqual(listing["choices"][0]["title"], "Applications")
+        self.assertEqual((listing["kind"], listing["message"]), ("capability_list", i18n.t("catalog_title", "en")))
+        # The 常用 row first, then the categories in English.
+        self.assertEqual(listing["choices"][0]["title"], Registry().title(Registry().by_id["fees.water"], "en"))
+        self.assertEqual(listing["choices"][3]["title"], "Pay bills")
         self.assertEqual(self.turn("cancel")["action"], "cancel")
         nothing = self.turn("tell me a joke")
-        self.assertEqual((nothing["kind"], nothing["destination"]), ("reply", None))
+        self.assertEqual((nothing["kind"], nothing["destination"]), ("capability_list", None))  # the catalogue
 
     def test_unavailable_and_negated_requests_never_navigate(self):
         unavailable = self.turn("I want a vaccine appointment")
@@ -161,7 +180,8 @@ class SimilarWordingTests(unittest.TestCase):
         for text in ("what can I do", "What can you help"):
             self.assertEqual(self.turn(text)["kind"], "capability_list", text)
         for text in ("what time is it", "what can I eat"):
-            self.assertNotEqual(self.turn(text)["kind"], "capability_list", text)
+            # Not a listing question; nothing found gives the catalogue (rules section 3, 2026-11-16).
+            self.assertNotIn(self.turn(text)["metrics"]["route"], ("listing", "listing_sound", "intent_listing"), text)
 
     def test_plural_and_near_keywords(self):
         self.assertEqual(self.turn("pay my water bills")["destination"], {"kind": "capability", "id": "fees.water"})
