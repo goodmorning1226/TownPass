@@ -3,7 +3,8 @@ the assistant's rules) against a running backend, to compare versions:
 A: TOWNPASS_INTENT_FALLBACK=0 (unmatched -> "nothing found"),
 B: TOWNPASS_INTENT_FALLBACK=1 (unmatched -> the model says what kind of message it is).
 
-Usage: python assistant_backend/eval_colloquial.py --base-url http://127.0.0.1:8768 [--output result.json]
+Usage: python assistant_backend/eval_colloquial.py --base-url http://127.0.0.1:8768 [--output result.json] [--quiet]
+--quiet prints the totals only, without the sentences (held-out sets, 2026-11-16).
 
 Scoring per item:
 - listing: correct when the reply is the capability list.
@@ -66,6 +67,7 @@ def main():
     parser.add_argument("--base-url", default="http://127.0.0.1:8765")
     parser.add_argument("--cases", default=str(pathlib.Path(__file__).with_name("eval_colloquial.json")))
     parser.add_argument("--output")
+    parser.add_argument("--quiet", action="store_true", help="totals only, no sentences (held-out sets)")
     args = parser.parse_args()
     base = args.base_url.rstrip("/")
     items = json.loads(pathlib.Path(args.cases).read_text(encoding="utf-8"))
@@ -91,10 +93,12 @@ def main():
                      "destination": reply.get("destination"), "route": (reply.get("metrics") or {}).get("route"),
                      "choices": [c.get("title") for c in reply.get("choices") or []],
                      "semantic": (reply.get("metrics") or {}).get("semantic"),
+                     "classifier": (reply.get("metrics") or {}).get("classifier"),
                      "model_calls": len((reply.get("metrics") or {}).get("model_timings") or []) or None,
                      "message": (reply.get("message") or reply.get("error") or "")[:120]})
-        print(f"{index}/{len(items)} {outcome:16} {item['language']} {item['intent']:12} {seconds:.1f}s {item['text']}",
-              flush=True)
+        if not args.quiet:
+            print(f"{index}/{len(items)} {outcome:16} {item['language']} {item['intent']:12} {seconds:.1f}s "
+                  f"{item['text']}", flush=True)
     summary = {}
     for key, group in (("all", rows), *(((f"lang:{l}"), [r for r in rows if r["language"] == l])
                                        for l in sorted({r["language"] for r in rows})),
@@ -106,10 +110,13 @@ def main():
     times = [r["seconds"] for r in rows if r["outcome"] != "error"]
     summary["seconds"] = {"p50": round(statistics.median(times), 2) if times else None,
                           "max": round(max(times), 2) if times else None}
-    print(json.dumps(summary, ensure_ascii=False, indent=1))
+    if args.quiet:
+        print(json.dumps({"all": summary["all"], "seconds": summary["seconds"]}, ensure_ascii=False, indent=1))
+    else:
+        print(json.dumps(summary, ensure_ascii=False, indent=1))
     if args.output:
-        pathlib.Path(args.output).write_text(json.dumps({"summary": summary, "rows": rows}, ensure_ascii=False,
-                                                        indent=1), encoding="utf-8")
+        kept = {"summary": summary} if args.quiet else {"summary": summary, "rows": rows}
+        pathlib.Path(args.output).write_text(json.dumps(kept, ensure_ascii=False, indent=1), encoding="utf-8")
     return 0 if summary["all"]["wrong_navigation"] == 0 else 1
 
 

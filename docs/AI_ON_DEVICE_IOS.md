@@ -59,7 +59,7 @@ Android 從 2026-11-10 起也認 `--dart-define=ASSISTANT_ON_DEVICE=true`（`and
 
 | 手機上的檔名 | 來源 | 大小 | 必要 |
 | --- | --- | --- | --- |
-| `townpass-decision-e5-ce-v1-q8_0.gguf` | 決策分類器（本專案由 Microsoft multilingual-e5-small 微調），MIT | 132 MB | 分類器模式（預設）；`push_assistant_models_ios.sh` 還沒有這個檔，由 App 下載 |
+| `townpass-decision-e5-ce-v2-q8_0.gguf` | 決策分類器 v2（本專案由 Microsoft multilingual-e5-small 微調；2026-11-16 起取代 v1），MIT | 132 MB | 分類器模式（預設）；`push_assistant_models_ios.sh` 還沒有這個檔，由 App 下載 |
 | `Ministral-3-3B-Instruct-2512-Q4_K_M.gguf` | Mistral AI，Apache-2.0 | 2.1 GB | `--decision-model ministral`（`push_assistant_models_ios.sh` 一律要它） |
 | `ggml-whisper-multilingual.bin` | Whisper small q8_0（ggerganov/whisper.cpp），MIT | 253 MB | 語音 |
 | `ggml-whisper-langid.bin` | Whisper tiny q8_0，MIT | 42 MB | 選用 |

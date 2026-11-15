@@ -17,9 +17,12 @@ nothing: the assistant runs as before. TOWNPASS_SEMANTIC=0 turns the layer off.
 Everyday example requests per page (capability_examples.json,
 docs/AI_COLLOQUIAL_MATCHING_EXPERIMENT.md) are indexed as well; they are part
 of the hashed texts, so editing them rebuilds the cache.
-TOWNPASS_SEMANTIC_EXAMPLES=0 leaves them out (rollback).
+TOWNPASS_SEMANTIC_EXAMPLES=0 leaves them out (rollback). Each capability's need
+description (capabilities.json "need", translated in capabilities_i18n.json) is indexed
+the same way as an example (NEED; TOWNPASS_SEMANTIC_NEED=0 leaves them out).
 """
 import array
+import collections
 import hashlib
 import json
 import math
@@ -42,12 +45,20 @@ ENABLED = os.environ.get("TOWNPASS_SEMANTIC", "1") == "1"
 # lift >= 0.04 keeps 18 of 29 paraphrases with the right service among the
 # candidates and 7 of 41 non-requests (which the model should then decline).
 # Specific to multilingual-e5-small and this catalogue; re-tune if either changes.
-THRESHOLD = float(os.environ.get("TOWNPASS_SEMANTIC_THRESHOLD", "0.04"))
+# 2026-11-16 (rules section 2, the need-style study's V1, owner 2026-11-15 point 5): 0.04 -> 0.03.
+# Need-style requests reached 54% -> 62% of the right pages with the classifier's semantic
+# threshold 0.10 -> 0.05, no new wrong page; a single candidate this weak is only listed
+# (workflow._semantic_fallback: below SEMANTIC_DIRECT the decision may only offer).
+THRESHOLD = float(os.environ.get("TOWNPASS_SEMANTIC_THRESHOLD", "0.03"))
 MARGIN = 0.02     # candidates must score within this of the best one
-LIMIT = 3
+# Pages within MARGIN of the best, at most LIMIT: 5 since 2026-11-16 (3 before; rules section 2,
+# step 3 of the need-style work): need-style dev 86 -> 89 of 125 reach the right page, no new
+# wrong page in any set; TOWNPASS_SEMANTIC_LIMIT=3 restores the old lists.
+LIMIT = int(os.environ.get("TOWNPASS_SEMANTIC_LIMIT", "5"))
 BATCH = 16        # passages per embedding request (the phone's server has -c 512)
 PROBE = faq.PASSAGE_PREFIX + "TownPass"
 RETRY_SECONDS = 10
+RECENT = 8        # requests whose scores are kept (CatalogIndex.recent)
 BUILD_TIMEOUT = 120  # one batch while building; a phone's 2 threads are slow
 
 
@@ -66,7 +77,17 @@ EXAMPLE_PREFIX = faq.QUERY_PREFIX
 # leave-one-out, a sentence never sees its own text). Tuned on
 # eval_colloquial_dev.json and semantic_tuning.json only.
 EXAMPLE_OFFSET = float(os.environ.get("TOWNPASS_SEMANTIC_EXAMPLE_OFFSET", "0.05"))
-# Languages whose own passages (names, keywords, examples) are scored only for requests
+# Need descriptions (2026-11-16, rules section 6, the need-style study's A2): each capability's
+# "need" (capabilities.json, Chinese) and its translations (capabilities_i18n.json) say in one
+# plain sentence what situation the page solves, so a request that describes the situation
+# ("東西被偷了") finds the page without its name. They are written as a citizen would say
+# them, so they are embedded like the examples below (query prefix, EXAMPLE_OFFSET): on the
+# need-style dev set e5 top-1/top-3 of the right page before step 6 79/104 of 125, with the
+# step-6 examples alone 98/118, + needs as "query:" texts 101/119; as "passage:" texts the
+# needs did worse than examples alone (94/113 vs 96/116 with the first draft of the examples).
+# TOWNPASS_SEMANTIC_NEED=0 leaves them out (rollback).
+NEED = os.environ.get("TOWNPASS_SEMANTIC_NEED", "1") == "1"
+# Languages whose own passages (names, keywords, needs, examples) are scored only for requests
 # in that language. Filipino (2026-11-11, docs/AI_FILIPINO.md) mixes in English words and
 # e5 reads it well, so its short form names drew English and Indonesian requests away
 # ("book me a cab to Taoyuan airport" opened the traffic-ticket appeal through "Apela sa
@@ -97,6 +118,8 @@ def passage_languages(registry, with_examples=None):
             if local and local.get("title"):
                 text = faq.PASSAGE_PREFIX + ", ".join([local["title"], *local.get("keywords", [])])
                 made.setdefault(text, set()).add(language)
+            if NEED and local and local.get("need"):
+                made.setdefault(EXAMPLE_PREFIX + local["need"], set()).add(language)
     if EXAMPLES if with_examples is None else with_examples:
         path = getattr(registry, "path", None)
         path = path.with_name("capability_examples.json") if path else None
@@ -108,6 +131,8 @@ def passage_languages(registry, with_examples=None):
     for entry in registry.entries:  # the Chinese texts are everyone's
         made.setdefault(faq.PASSAGE_PREFIX + entry["title"], set()).add("zh")
         made.setdefault(faq.PASSAGE_PREFIX + "，".join([entry["title"], *entry["keywords"]]), set()).add("zh")
+        if NEED and entry.get("need"):
+            made.setdefault(EXAMPLE_PREFIX + entry["need"], set()).add("zh")
     return {text: next(iter(languages)) for text, languages in made.items()
             if len(languages) == 1 and next(iter(languages)) in OWN_LANGUAGE_ONLY}
 
@@ -125,6 +150,10 @@ def passages(registry, with_examples=None):
                 texts.append(", ".join([local["title"], *local.get("keywords", [])]))
         for text in dict.fromkeys(texts):
             found.append((entry["id"], faq.PASSAGE_PREFIX + text))
+        if NEED:
+            needs = [entry.get("need")] + [(local or {}).get("need") for _, local in
+                                           sorted(registry.i18n.get(entry["id"], {}).items())]
+            found += [(entry["id"], EXAMPLE_PREFIX + text) for text in dict.fromkeys(n for n in needs if n)]
     if EXAMPLES if with_examples is None else with_examples:
         found += [(entry_id, EXAMPLE_PREFIX + text) for entry_id, text in dict.fromkeys(examples(registry))]
     return found
@@ -152,6 +181,11 @@ class CatalogIndex:
         self.rows = None          # one array("f") per passage once built
         self.lock = threading.Lock()
         self.last_attempt = None
+        # The last few requests' scores: one turn searches the same sentence several times
+        # (semantic fallback, clues, the classifier's expansion), and since step 6 (2026-11-16)
+        # the index has about 2,850 passages, so each pass costs an embedding call and a loop.
+        self.recent = collections.OrderedDict()
+        self.recent_lock = threading.Lock()
 
     def embed_many(self, texts, timeout=faq.EMBED_TIMEOUT):
         if self._embed_many is not None:
@@ -227,6 +261,10 @@ class CatalogIndex:
         Passages of an OWN_LANGUAGE_ONLY language count only when language is that one."""
         if not self.ready:
             return {}
+        key = (text[:faq.MAX_QUERY_CHARS], language)
+        with self.recent_lock:
+            if key in self.recent:
+                return dict(self.recent[key])
         try:
             vector = [float(x) for x in self.embed_many([faq.QUERY_PREFIX + text[:faq.MAX_QUERY_CHARS]])[0]]
         except (OSError, ValueError, KeyError, IndexError) as exc:
@@ -242,7 +280,11 @@ class CatalogIndex:
                 score -= EXAMPLE_OFFSET  # query-to-query cosines run higher (see EXAMPLE_OFFSET)
             if score > best.get(entry_id, -2.0):
                 best[entry_id] = score
-        return best
+        with self.recent_lock:
+            self.recent[key] = best
+            while len(self.recent) > RECENT:
+                self.recent.popitem(last=False)
+        return dict(best)
 
     def search(self, text, threshold=None, margin=MARGIN, limit=LIMIT, language=None):
         """[(lift, entry)] best first: lift at least threshold and within margin of the best.

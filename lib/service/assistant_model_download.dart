@@ -123,19 +123,29 @@ class AssistantModelDownload extends GetxService {
   /// A start, pause or delete request is on its way.
   final busy = false.obs;
 
-  /// The user's choice for Taiwanese on the offer (default on full phones).
+  /// The user's choice for Taiwanese on the offer. Off until chosen: it is a
+  /// feature in testing and another 0.8 GB (docs/AI_CURRENT_RULES.md section 7,
+  /// 2026-11-16; it was on by default on full phones).
   final taiwanese = false.obs;
-  bool _taiwaneseChosen = false;
 
   /// The last request failed (texts key), shown with a retry.
   final failure = RxnString();
+
+  /// Counts the times the core models became ready while the App was open
+  /// (from missing to ready): the assistant says the download is done.
+  final coreReady = 0.obs;
+
+  /// The clock for the time-left estimate (tests replace it).
+  final DateTime Function() now;
 
   Timer? _timer;
 
   AssistantModelDownload({
     AssistantService? service,
     this.poll = const Duration(seconds: 1),
-  }) : service = service ?? AssistantService();
+    DateTime Function()? now,
+  }) : service = service ?? AssistantService(),
+       now = now ?? DateTime.now;
 
   static AssistantModelDownload? get maybe =>
       Get.isRegistered<AssistantModelDownload>()
@@ -173,9 +183,14 @@ class AssistantModelDownload extends GetxService {
 
   void _apply(Map<String, dynamic> json) {
     final next = AssistantModelStatus.fromJson(json);
+    final before = status.value;
+    _sample(next);
     status.value = next;
-    if (!_taiwaneseChosen) {
-      taiwanese.value = next.tier == 'full' && next.part('taiwanese').allowed;
+    if (before != null &&
+        before.managed &&
+        !before.part('core').ready &&
+        next.part('core').ready) {
+      coreReady.value++;
     }
     if (next.downloading) {
       _timer ??= Timer.periodic(poll, (_) => refreshStatus());
@@ -208,9 +223,39 @@ class AssistantModelDownload extends GetxService {
   bool downloadable(String part) =>
       mirror.isNotEmpty || (_s?.part(part).downloadable ?? false);
 
-  void chooseTaiwanese(bool value) {
-    _taiwaneseChosen = true;
-    taiwanese.value = value;
+  void chooseTaiwanese(bool value) => taiwanese.value = value;
+
+  /// Recent (time, bytes done) while downloading, for [timeLeft].
+  final _samples = <(DateTime, int)>[];
+
+  /// How far back the speed is measured.
+  static const speedWindow = Duration(seconds: 20);
+
+  void _sample(AssistantModelStatus next) {
+    if (!next.downloading) {
+      _samples.clear();
+      return;
+    }
+    final at = now();
+    // A new plan (or a part started over): measure afresh.
+    if (_samples.isNotEmpty && next.done < _samples.last.$2) _samples.clear();
+    _samples.add((at, next.done));
+    _samples.removeWhere((sample) => at.difference(sample.$1) > speedWindow);
+  }
+
+  /// About how long the running download still takes, from the speed of the
+  /// last [speedWindow]; null while it is not known yet (under 3 s measured,
+  /// or nothing arrived) or when nothing downloads.
+  Duration? get timeLeft {
+    final s = _s;
+    if (s == null || !s.downloading || _samples.length < 2) return null;
+    final first = _samples.first;
+    final last = _samples.last;
+    final seconds = last.$1.difference(first.$1).inMilliseconds / 1000;
+    final bytes = last.$2 - first.$2;
+    if (seconds < 3 || bytes <= 0) return null;
+    final left = (s.total - s.done).clamp(0, s.total);
+    return Duration(seconds: (left / (bytes / seconds)).ceil());
   }
 
   /// What the offer downloads: the core, then the decision model, and
@@ -266,6 +311,9 @@ class AssistantModelDownload extends GetxService {
   Future<void> delete([
     List<String> parts = const ['core', 'decision', 'taiwanese'],
   ]) => _act(() => service.deleteModels(parts));
+
+  /// AI 助理設定: Taiwanese alone; the core and decision models stay.
+  Future<void> deleteTaiwanese() => delete(const ['taiwanese']);
 
   Future<void> _act(Future<Map<String, dynamic>> Function() request) async {
     if (busy.value) return;

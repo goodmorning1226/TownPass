@@ -184,6 +184,14 @@ class CombinedTests(unittest.TestCase):
         empty.next_try = float("inf")
         self.assertEqual(qna.CombinedIndex(city, empty).search("某個問題"), city.search("某個問題"))
 
+    def test_faq_aliases_apply_with_app_items_loaded(self):
+        seen = []
+        combined = qna.CombinedIndex(None, loaded(), embed=lambda text: seen.append(text) or [1.0, 0.0, 0.0])
+        with mock.patch.object(faq, "COLLOQUIAL", (("口語說法", "正式用詞"),)):
+            combined.search("我想問口語說法")
+            combined.top("我想問口語說法")
+        self.assertEqual(seen, ["我想問口語說法 正式用詞"] * 2)
+
     def test_unreachable_embedding_server_finds_nothing(self):
         def down(text):
             raise ConnectionRefusedError()
@@ -247,7 +255,8 @@ class WorkflowTests(unittest.TestCase):
         app = self.app([app_hit("a-1", faq.MEDIUM_CONF + .02), hit("9", faq.MEDIUM_CONF + .01)])
         result = self.turn(app)
         self.assertIn(qna.SCOPE_NOTE, result["message"])
-        self.assertEqual([c["subtitle"] for c in result["choices"]], ["台北通", "臺北市政府某局"])
+        # 看全部功能 last, without a source (rules section 3, 2026-11-16).
+        self.assertEqual([c["subtitle"] for c in result["choices"]], ["台北通", "臺北市政府某局", ""])
 
     def test_foreign_request_answers_in_chinese_marked_for_translation(self):
         app = self.app([app_hit("b-1", faq.HIGH_CONF + .02, "範例：有實體卡嗎？", "範例答案：沒有。")])

@@ -1418,7 +1418,7 @@ void main() {
       );
       await short.startListening();
       await short.stopListening();
-      expect(short.messages.single.text, contains('沒有錄到聲音'));
+      expect(short.messages.single.text, contains('按得太快了'));
     });
 
     test(
@@ -2234,7 +2234,7 @@ void main() {
     );
     await short.startListening();
     await short.stopListening();
-    expect(short.messages.single.text, contains('沒有錄到聲音'));
+    expect(short.messages.single.text, contains('按得太快了'));
 
     final discarded = AssistantViewController(
       service: service,

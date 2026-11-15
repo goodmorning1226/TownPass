@@ -46,7 +46,7 @@ param(
     [ValidateSet("ministral", "gemma", "classifier")][string]$DecisionModel = "classifier",
     [string]$GemmaModel = "D:\TownPassAssistant\model-study\dl-gemma4-e2b-q4_0\gemma-4-E2B-it-Q4_0.gguf",
     [switch]$RemoveGemma,
-    [string]$ClassifierModel = "D:\TownPassAssistant\decision-classifier\models\townpass-decision-e5-ce-v1-q8_0.gguf"
+    [string]$ClassifierModel = "D:\TownPassAssistant\decision-classifier\models\townpass-decision-e5-ce-v2-q8_0.gguf"
 )
 # Native tools write progress to stderr; Windows PowerShell 5.1 would treat that as
 # an error when output is redirected, so failures are detected by exit codes instead.
@@ -75,7 +75,7 @@ if ($DecisionModel -eq "gemma") {
 } elseif ($RemoveGemma) {
     & $adb -s $DeviceId shell rm -f "$target/gemma-4-E2B-it-Q4_0.gguf"
 }
-if ($DecisionModel -eq "classifier") { Push-Model $ClassifierModel "townpass-decision-e5-ce-v1-q8_0.gguf" }
+if ($DecisionModel -eq "classifier") { Push-Model $ClassifierModel "townpass-decision-e5-ce-v2-q8_0.gguf" }
 if ($Multilingual) { Push-Model $Multilingual "ggml-whisper-multilingual.bin" }
 if ($Chinese) {
     Push-Model $Chinese "ggml-whisper-chinese.bin"

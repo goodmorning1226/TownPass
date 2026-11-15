@@ -179,11 +179,19 @@ void main() {
     ) async {
       final c = await pumpHost(tester, reduced: true);
       expect(opacityOf(tester, find.text('開始')), 1);
+      // The start card says what is about to start, not 「已…」 (2026-11-16).
+      expect(find.textContaining('準備開始：'), findsOneWidget);
       await tester.tap(find.text('開始'));
       await tester.pump();
       expect(find.text('開始'), findsNothing, reason: 'no fading copy');
       expect(c.card?.variant, CardVariant.step);
       expect(opacityOf(tester, find.text('暫停')), 1);
+      // 再唸一次 has its words next to the speaker icon (2026-11-16).
+      expect(find.text('再唸一次'), findsOneWidget);
+      expect(
+        tester.getSize(find.byKey(const Key('guide-card-read-again'))).height,
+        greaterThanOrEqualTo(48),
+      );
       await still(tester);
       await frames(tester, const Duration(seconds: 2));
       // Only the 助理 button dodge and the ring's lookup: no breathing.

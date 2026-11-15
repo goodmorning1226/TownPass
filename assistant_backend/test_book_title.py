@@ -174,10 +174,11 @@ class ClassifierModeTests(unittest.TestCase):
                      "我們借助大家的力量", "板橋區公所現在叫到幾號", "大安區公所現在叫到幾號"):
             self.assertIsNone(self.turn(app, text)["destination"], text)
 
-    def test_without_the_faq_it_asks_as_before(self):
+    def test_without_the_faq_it_does_not_open(self):
+        # Unresolved: the fallback tiers since 2026-11-16 (rules section 3), not a page.
         reply = self.turn(self.app(faq=False), "借龜兔賽跑")
         self.assertIsNone(reply["destination"])
-        self.assertEqual(reply["action"], "request_clarification")
+        self.assertTrue(reply["metrics"]["route"].startswith("fallback"))
 
 
 class OtherModesTests(unittest.TestCase):

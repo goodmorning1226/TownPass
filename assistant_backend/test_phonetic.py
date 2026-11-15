@@ -131,15 +131,17 @@ class SoundFallbackTests(unittest.TestCase):
         self.assertIn("動悟園", evidence)
         self.assertIn("heard_as", evidence)
 
-    def test_model_clarification_falls_back_to_nothing_found(self):
-        import workflow
+    def test_model_clarification_falls_back_to_the_fallback_tiers(self):
+        # Rules section 3 (2026-11-16): nothing found -> a clue list or the catalogue, never a page.
         result = self.app("request_clarification").turn({"text": "我要去動悟園", "request_id": "r", "session_id": "s"})
-        self.assertEqual(result["message"], workflow.NO_RELATED)
+        self.assertIsNone(result["destination"])
+        self.assertTrue(result["metrics"]["route"].startswith("fallback"))
 
     def test_chance_sound_alikes_and_clear_requests_add_no_model_call(self):
         for text in ("鳳梨披薩好吃嗎", "早安你好嗎", "學齡前視力檢查要錢嗎"):
             app = self.app("confirm_candidates")
-            self.assertEqual(app.turn({"text": text, "request_id": "r", "session_id": "s"})["metrics"]["route"], "no_match", text)
+            route = app.turn({"text": text, "request_id": "r", "session_id": "s"})["metrics"]["route"]
+            self.assertTrue(route.startswith("fallback"), text)  # nothing found (rules section 3, 2026-11-16)
             self.assertEqual(self.calls, [], text)
         app = self.app("select_capability")
         app.turn({"text": "我要繳水費", "request_id": "r", "session_id": "s"})
@@ -212,15 +214,16 @@ class IntentFallbackTests(unittest.TestCase):
         result, _ = self.turn("what are you able to do for me", "list_capabilities", language="en")
         self.assertEqual(result["kind"], "capability_list")
 
-    def test_the_model_cannot_navigate_and_clarification_keeps_the_old_reply(self):
-        import workflow
+    def test_the_model_cannot_navigate_and_clarification_gives_the_catalogue(self):
+        # Rules section 3 (2026-11-16): small talk nothing matched is out of scope: the catalogue.
+        import i18n
         result, _ = self.turn("今天心情真好", "request_clarification")
         self.assertIsNone(result["destination"])
-        self.assertEqual(result["message"], workflow.NO_RELATED)
+        self.assertEqual((result["kind"], result["message"]), ("capability_list", i18n.t("out_of_scope", "zh")))
 
     def test_off_and_matched_requests_add_no_model_call(self):
         result, offered = self.turn("這個App能拿來幹嘛", "list_capabilities", enabled=False)
-        self.assertEqual((result["metrics"]["route"], offered), ("no_match", []))
+        self.assertEqual((result["metrics"]["route"], offered), ("fallback_catalog", []))
         _, offered = self.turn("我要繳水費", "list_capabilities")
         self.assertEqual(len(offered), 1)
         self.assertNotIn("list_capabilities", offered[0])

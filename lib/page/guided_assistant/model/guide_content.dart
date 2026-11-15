@@ -148,8 +148,10 @@ class Guide {
   /// Chat message when the page opens.
   String get openedText => texts().openedText;
 
-  /// Card before the steps start (with 開始): 已 + the first task line.
-  String get openedLabel => gt('已{todo}', {'todo': gt(todos.first.text)});
+  /// Card before the steps start (with 開始): what is about to start. It was
+  /// 「已開啟〇〇」 ("Done: …"), which read as if the whole task were done
+  /// (docs/AI_CURRENT_RULES.md section 5, 2026-11-16).
+  String get openedLabel => gt('準備開始：{task}', {'task': gt(title)});
   String get openedCard => texts().openedCard;
 
   final List<GuideStep> steps;
@@ -309,6 +311,12 @@ class CandidateOption {
   /// Task switching: `keep` or `switch:<guideId>`.
   final String? action;
 
+  /// The backend option's catalogue category ('frequent': the 常用 row).
+  final String? groupId;
+
+  /// A backend navigation option (more, prev, up, catalog, 1999).
+  final String? nav;
+
   const CandidateOption(
     this.label, {
     this.guideId,
@@ -316,6 +324,8 @@ class CandidateOption {
     this.say,
     this.available,
     this.action,
+    this.groupId,
+    this.nav,
   });
 
   bool get enabled =>
@@ -401,10 +411,19 @@ abstract class Replies {
 
   static const offline = '（目前連不到助理的模型，先用示範內容回答。）';
   static const listeningFailed = '語音辨識沒有成功，請再說一次，或按右邊的鍵盤打字。';
-  static const tooShort = '沒有錄到聲音，請按住麥克風再說話，說完放開。';
+
+  /// Every microphone's too-short press (rules section 5, 2026-11-16).
+  static const tooShort = '按得太快了，請按住不放，說完再放開。';
   static const noMic = '需要麥克風權限才能用語音。可以到手機設定開啟，或按右邊的鍵盤打字。';
   static const openingPage = '正在打開服務頁面…';
   static const pageFailed = '服務頁面打不開，請檢查網路後再試一次。';
+
+  /// The assistant itself failed (not the page; rules section 5, 2026-11-16).
+  static const assistantFailed = '助理暫時無法回答，請再試一次。';
+
+  /// The first press before the microphone is allowed (rules section 5).
+  static const micExplain =
+      '用語音之前先說明：只有按住麥克風時才會錄音，錄音只在這支手機上辨識，不會上傳。手機接著會問可不可以使用麥克風，請允許，之後按住麥克風就能說話。';
   // Texts with values, in the conversation language (guide_i18n.dart). The
   // task names passed in are the Chinese sources; they are translated here.
   static String heard(String text) =>
@@ -438,12 +457,20 @@ abstract class Replies {
 /// Example sentence on the first-run hint card.
 const onboardingExample = '我想繳停車費';
 
-/// Starter chips in the assistant when there is no task.
+/// The fixed first chip: the function catalogue (docs/AI_CURRENT_RULES.md
+/// section 3, 2026-11-16). The backend reads it in every language.
+const seeAllChip = '看全部功能';
+
+/// Starter chips in the assistant when there is no task; [seeAllChip] stays
+/// first, before the user's own recent requests. At most four show
+/// (GuidedAssistantController.maxChips, 2026-11-16), so the first ones are
+/// of different kinds: a service, a payment, an explanation.
 const starterChips = <String>[
+  seeAllChip,
   '我要借書',
-  '我預約的書到了沒',
-  '圖書館有什麼公告',
   '我要繳水費',
   '什麼是身分驗證',
+  '我預約的書到了沒',
+  '圖書館有什麼公告',
   '附近哪裡有老人共餐',
 ];

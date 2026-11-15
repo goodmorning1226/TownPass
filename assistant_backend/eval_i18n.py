@@ -12,7 +12,7 @@ import sys
 import time
 from collections import Counter
 
-from evaluate import FAQ_OR_UNSUPPORTED, LISTING, NONE, REPLY, call, cap, judge, outcome, want
+from evaluate import FAQ_OR_UNSUPPORTED, GREETING, LISTING, NONE, REPLY, call, cap, judge, outcome, want
 
 HOME = want("navigate", [{"kind": "home"}, {"kind": "capability", "id": "library"}])
 
@@ -28,16 +28,16 @@ CASES = {
     "en": [("I want to pay my water bill", cap("fees.water")), ("pay for parking", cap("fees.parking")),
            ("I want to borrow a book", HOME), ("show my borrowing records", cap("library.records")),
            ("report to the police online", cap("police.online")), ("I want a vaccine appointment", FAQ_OR_UNSUPPORTED),
-           ("hello", REPLY), ("what can you do", LISTING), ("I don't want to borrow books", NONE),
+           ("hello", GREETING), ("what can you do", LISTING), ("I don't want to borrow books", NONE),
            ("tell me a joke", NONE)],
     "ja": [("水道料金を払いたい", cap("fees.water")), ("駐車料金を払いたい", cap("fees.parking")),
            ("本を借りたい", HOME), ("貸出履歴を見たい", cap("library.records")),
            ("オンライン通報したい", cap("police.online")), ("ワクチンを予約したい", FAQ_OR_UNSUPPORTED),
-           ("こんにちは", REPLY), ("何ができますか", LISTING), ("面白い話をして", NONE)],
+           ("こんにちは", GREETING), ("何ができますか", LISTING), ("面白い話をして", NONE)],
     "vi": [("Tôi muốn đóng tiền nước", cap("fees.water")), ("Tôi muốn trả phí đỗ xe", cap("fees.parking")),
            ("Tôi muốn mượn sách", HOME), ("Xem lịch sử mượn sách", cap("library.records")),
            ("Tôi muốn trình báo trực tuyến", cap("police.online")), ("Tôi muốn đặt lịch tiêm vắc-xin", FAQ_OR_UNSUPPORTED),
-           ("Xin chào", REPLY), ("Bạn làm được gì", LISTING), ("Tôi không muốn mượn sách", NONE)],
+           ("Xin chào", GREETING), ("Bạn làm được gì", LISTING), ("Tôi không muốn mượn sách", NONE)],
     # Vietnamese as typed without marks, as heard with regional sounds, and as spoken
     # (docs/AI_VIETNAMESE.md); written for this set, a dev set like the lines above.
     "vi_variants": [
@@ -48,14 +48,14 @@ CASES = {
         ("Bạn có thể giúp tôi đóng tiền nước được không?", cap("fees.water")),
         ("tôi không cần mượn sách nữa", NONE), ("thôi khỏi", NONE), ("ban lam duoc gi", LISTING),
         ("app này giúp được gì vậy", LISTING), ("tôi muốn trình báo online", cap("police.online")),
-        ("tôi muốn đổi sang tiếng việt", cap("language")), ("chào bạn", REPLY),
+        ("tôi muốn đổi sang tiếng việt", cap("language")), ("chào bạn", GREETING),
         ("tôi muốn trả tiền thuế", cap("fees.tax")), ("phí rỗ xe", offer("fees.parking")),
         ("tôi muốn lấy số thứ tự", cap("reservation")), ("tra cứu tiến độ hồ sơ", cap("districtOffice.progress")),
         ("tôi muốn đóng tiền nước, không phải tiền học", cap("fees.water"))],
     "id": [("Saya mau bayar tagihan air", cap("fees.water")), ("Saya mau bayar parkir", cap("fees.parking")),
            ("Saya mau pinjam buku", HOME), ("Lihat riwayat peminjaman", cap("library.records")),
            ("Saya mau lapor polisi online", cap("police.online")), ("Saya mau janji vaksin", FAQ_OR_UNSUPPORTED),
-           ("Halo", REPLY), ("Bisa apa saja", LISTING), ("Saya tidak mau pinjam buku", NONE)],
+           ("Halo", GREETING), ("Bisa apa saja", LISTING), ("Saya tidak mau pinjam buku", NONE)],
     # Everyday and chat-style Indonesian (docs/AI_INDONESIAN.md); written for this set,
     # a dev set like the lines above.
     "id_variants": [
@@ -72,7 +72,7 @@ CASES = {
     "tl": [("Gusto kong magbayad ng tubig", cap("fees.water")), ("Gusto kong magbayad ng parking", cap("fees.parking")),
            ("Gusto kong humiram ng libro", HOME), ("Tingnan ang kasaysayan ng paghiram ko", cap("library.records")),
            ("Gusto kong mag-report sa pulis online", cap("police.online")), ("Gusto kong magpabakuna", FAQ_OR_UNSUPPORTED),
-           ("Kumusta po", REPLY), ("Ano ang kaya mong gawin?", LISTING), ("Ayokong humiram ng libro", NONE)],
+           ("Kumusta po", GREETING), ("Ano ang kaya mong gawin?", LISTING), ("Ayokong humiram ng libro", NONE)],
     "tl_variants": [
         ("gusto ko mag-pay ng water bill", cap("fees.water")), ("pano magbayad ng bill sa tubig", cap("fees.water")),
         ("magkuwento ka ng nakakatawa", NONE), ("hindi tubig, buwis ang babayaran ko", cap("fees.tax")),

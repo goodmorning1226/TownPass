@@ -27,6 +27,16 @@ String? modelDownloadError(AssistantModelDownload downloads) {
   };
 }
 
+/// 「大約還要 12 分鐘」 for [left]; under a minute 「快下載好了」.
+String modelTimeLeftText(Duration left) {
+  if (left < const Duration(minutes: 1)) return _t('modelsAlmostDone');
+  final minutes = (left.inSeconds / 60).ceil();
+  final time = minutes < 60
+      ? _t('timeMinutes', {'n': minutes})
+      : _t('timeHours', {'h': minutes ~/ 60, 'm': minutes % 60});
+  return _t('modelsTimeLeft', {'time': time});
+}
+
 /// How much more space the last download needs than the phone has.
 int _shortBy(AssistantModelDownload downloads, AssistantModelStatus s) {
   final free = s.freeBytes ?? 0;
@@ -77,21 +87,44 @@ class ModelDownloadCard extends StatelessWidget {
   });
 
   List<Widget> _body(AssistantModelStatus? s) {
-    if (s == null) return [_line(_t('modelsFailed'))];
+    // The phone's assistant did not answer yet: ask again, or later
+    // (docs/AI_CURRENT_RULES.md section 7, 2026-11-16).
+    if (s == null) {
+      return [
+        _line(_t('modelsFailed')),
+        const SizedBox(height: 20),
+        _filled(
+          _t('modelsRetry'),
+          downloads.busy.value ? null : () => downloads.refreshStatus(),
+          key: const Key('model-download-status-retry'),
+        ),
+        _later(),
+      ];
+    }
     if (downloads.unavailable) {
       return [_line(_t('modelsUnavailable')), _later()];
     }
     if (s.downloading) {
+      final left = downloads.timeLeft;
       return [
         _progress(s),
+        if (left != null && !s.retrying)
+          KeyedSubtree(
+            key: const Key('model-download-time-left'),
+            child: _line(modelTimeLeftText(left)),
+          ),
         // The network dropped: it tries again by itself for about a minute.
         if (s.retrying) _line(_t('modelsRetrying'), color: TPColors.orange700),
+        const SizedBox(height: 8),
+        // The assistant can be closed meanwhile; the App stays open.
+        _line(_t('modelsCanClose')),
         const SizedBox(height: 20),
         _outlined(
           _t('modelsPause'),
           downloads.busy.value ? null : downloads.pause,
           key: const Key('model-download-pause'),
         ),
+        _later(),
       ];
     }
     if (!downloads.downloadable('core')) {
@@ -124,13 +157,23 @@ class ModelDownloadCard extends StatelessWidget {
       ];
     }
     final tw = s.part('taiwanese');
+    final size = formatModelBytes(downloads.offerBytes);
     return [
-      _line(_t('modelsBody', {'size': formatModelBytes(downloads.offerBytes)})),
+      _line(_t('modelsBody', {'size': size})),
+      const SizedBox(height: 8),
+      KeyedSubtree(
+        key: const Key('model-download-mobile-data'),
+        child: _line(
+          _t('modelsMobileData', {'size': size}),
+          color: TPColors.orange700,
+        ),
+      ),
       // Lite: no decision model (a lite phone with the decision classifier is not).
       if (s.assistant == 'lite') ...[
         const SizedBox(height: 8),
         _line(_t('modelsLite')),
       ],
+      // Off unless chosen: a feature in testing (rules section 7, 2026-11-16).
       if (tw.allowed && !tw.ready)
         Padding(
           padding: const EdgeInsets.only(top: 12),
@@ -146,6 +189,11 @@ class ModelDownloadCard extends StatelessWidget {
               }),
               style: TPTextStyles.bodyRegular,
               color: TPColors.grayscale800,
+            ),
+            subtitle: TPText(
+              _t('modelsTaiwaneseNote'),
+              style: TPTextStyles.caption,
+              color: TPColors.grayscale700,
             ),
           ),
         ),
@@ -196,6 +244,7 @@ class ModelDownloadCard extends StatelessWidget {
     padding: const EdgeInsets.only(top: 8),
     child: TextButton(
       key: const Key('model-download-later'),
+      style: TextButton.styleFrom(minimumSize: const Size(48, 48)),
       onPressed: onLater,
       child: TPText(
         _t('modelsLater'),
@@ -333,17 +382,26 @@ class _ModelDownloadSettingsState extends State<ModelDownloadSettings> {
             color: TPColors.grayscale900,
           ),
           const SizedBox(height: 6),
-          TPText(
-            _t('modelsSettingsState', {
-              'have': formatModelBytes(have),
-              'missing': formatModelBytes(
-                (core.allowed ? core.missingBytes : 0) +
-                    (decision.allowed ? decision.missingBytes : 0),
+          // One line per part with its size: 「已下載 643 MB，還有 0 MB 未下載」
+          // was hard to read (rules section 7, 2026-11-16).
+          for (final (name, key) in const [
+            ('core', 'modelsCore'),
+            ('decision', 'modelsDecision'),
+            ('taiwanese', 'modelsTaiwanesePart'),
+          ])
+            if (s.part(name).allowed)
+              Padding(
+                key: Key('model-download-settings-$name'),
+                padding: const EdgeInsets.only(bottom: 2),
+                child: TPText(
+                  _t('modelsPartLine', {
+                    'part': _t(key),
+                    'state': _partState(s.part(name)),
+                  }),
+                  style: TPTextStyles.bodyRegular,
+                  color: TPColors.grayscale700,
+                ),
               ),
-            }),
-            style: TPTextStyles.bodyRegular,
-            color: TPColors.grayscale700,
-          ),
           if (s.downloading) ...[
             const SizedBox(height: 8),
             TPText(
@@ -428,18 +486,31 @@ class _ModelDownloadSettingsState extends State<ModelDownloadSettings> {
               key: const Key('model-download-taiwanese-add'),
             ),
           ],
-          if (have > 0) ...[
+          // Taiwanese alone (a feature in testing; 0.8 GB).
+          if (tw.ready && !s.downloading) ...[
             const SizedBox(height: 8),
-            TextButton(
-              key: const Key('model-download-delete'),
-              onPressed: downloads.busy.value
-                  ? null
-                  : () => _confirmDelete(context),
-              child: TPText(
-                _t('modelsDelete'),
-                style: TPTextStyles.bodyRegular,
-                color: TPColors.red600,
+            _deleteButton(
+              _t('modelsTaiwaneseDelete'),
+              () => _confirmDelete(
+                context,
+                _t('modelsTaiwaneseDeleteConfirm'),
+                _t('modelsTaiwaneseDelete'),
+                downloads.deleteTaiwanese,
               ),
+              key: const Key('model-download-delete-taiwanese'),
+            ),
+          ],
+          if (have > 0) ...[
+            const SizedBox(height: 4),
+            _deleteButton(
+              _t('modelsDelete'),
+              () => _confirmDelete(
+                context,
+                _t('modelsDeleteConfirm'),
+                _t('modelsDelete'),
+                downloads.delete,
+              ),
+              key: const Key('model-download-delete'),
             ),
           ],
         ],
@@ -447,11 +518,43 @@ class _ModelDownloadSettingsState extends State<ModelDownloadSettings> {
     );
   });
 
-  Future<void> _confirmDelete(BuildContext context) async {
+  /// 「已下載（512 MB）」, 「未下載（848 MB）」 or 「還要下載 20 MB（共 132 MB）」.
+  static String _partState(AssistantModelPart p) {
+    final size = formatModelBytes(p.bytes);
+    if (p.ready || p.missingBytes == 0) {
+      return _t('modelsPartReady', {'size': size});
+    }
+    if (p.missingBytes >= p.bytes) return _t('modelsPartNone', {'size': size});
+    return _t('modelsPartMissing', {
+      'missing': formatModelBytes(p.missingBytes),
+      'size': size,
+    });
+  }
+
+  Widget _deleteButton(String label, VoidCallback onTap, {Key? key}) => Align(
+    alignment: Alignment.centerLeft,
+    child: TextButton(
+      key: key,
+      style: TextButton.styleFrom(minimumSize: const Size(48, 48)),
+      onPressed: downloads.busy.value ? null : onTap,
+      child: TPText(
+        label,
+        style: TPTextStyles.bodyRegular,
+        color: TPColors.red600,
+      ),
+    ),
+  );
+
+  Future<void> _confirmDelete(
+    BuildContext context,
+    String question,
+    String yesLabel,
+    Future<void> Function() delete,
+  ) async {
     final yes = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        content: Text(_t('modelsDeleteConfirm')),
+        content: Text(question),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -459,11 +562,11 @@ class _ModelDownloadSettingsState extends State<ModelDownloadSettings> {
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: Text(_t('modelsDelete')),
+            child: Text(yesLabel),
           ),
         ],
       ),
     );
-    if (yes == true) await downloads.delete();
+    if (yes == true) await delete();
   }
 }
