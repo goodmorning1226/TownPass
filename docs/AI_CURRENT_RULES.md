@@ -20,6 +20,13 @@
     **正在發生的危險優先**：句子說的是現在正在發生（正在打、在打我、現在有人要殺我、快來、救命；right now、is hitting me、help me；助けて；đang đánh；sedang memukul；ngayon…，`emergency.HAPPENING`），
     就算也有被害人或申請類的字，**只回專線，不列頁面**。
   - **誤觸**：fire lane／fire exit／消防栓這類設施名稱不算失火；「沒反應」說的是按鈕、畫面、App 等東西時不算；日文「倒れ」說的是樹、看板、電線桿時不算（`emergency.NOT_EMERGENCY`）。
+  - **正在發生的身體暴力或威脅**（2026-11-17，擁有者同意補上；原因：這是**安全缺口**：暴力的緊急詞原本只有「被打」「家暴」這類說法，
+    「他正在打我」「he is hitting me right now」連專線都拿不到，會被當成一般請求）：6 種語言補上正在發生的暴力或威脅
+    （正在打我、一直打我、要打我、有人拿刀、要殺我、在打人；is hitting／beating me、has a knife、is going to kill me；殴られている、ナイフを持って；đang đánh tôi、cầm dao；
+    sedang memukul saya、bawa pisau；sinusuntok ako、may hawak na kutsilyo…，`emergency.VIOLENCE_NOW`），歸在暴力一類：回 110（家暴、性侵另有 113，和原本暴力那一句相同），
+    **一律只回專線、不列頁面**（也算第 1 節「正在發生的危險優先」）。
+    不算的說法：打電話、打字、打卡、打疫苗、打掃、打球、打我手機／電話；拿刀切菜這類沒有人拿刀對著人的句子；hit the button、beat the deadline、beating me at chess、hit me up
+    （新的觸發詞也跑碰撞測試）。
 - 不自動送出、付款、撥號、預約。開頁只是打開原服務頁面；「按住輸入」只填欄位，不按任何按鈕。
 - 取消、關閉面板後晚到的回覆不開頁；新的助理導航先清除舊服務頁。
 

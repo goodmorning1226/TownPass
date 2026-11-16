@@ -28,6 +28,37 @@ PATTERNS = {
                  r"pinagsamantalahan|sinusundan ako|binabantaan ako"),
 }
 
+# Physical violence or a threat happening now (rules section 1, 2026-11-17: a safety gap the owner agreed to
+# close; 「他正在打我」 and "he is hitting me right now" got no number at all). Part of "violence" (110, and
+# 113 for family or sexual violence, as its message says); the number only, never pages (HAPPENING below).
+# Someone hitting / kicking / choking / stabbing ME or a person, a knife held at someone, a threat to kill.
+# Not 打電話 / 打字 / 打卡 / 打疫苗 / 打掃 / 打球 / 打我手機 (打 + 我 must be the person), not 拿刀切菜,
+# not "hit the button", "beat the deadline", "beating me at chess", "hit me up" (NOT_EMERGENCY).
+VIOLENCE_NOW = {
+    "zh": r"正在(?:打|揍|踢|踹|掐|砍|追打|毆打)(?:我|人|他|她|小孩|孩子|媽媽|爸爸)?"
+          r"|(?:一直|又|還|現在|在|要|想|會)(?:打|揍|踢|踹|砍|掐)(?:我|我們|人)(?![的們手電家])"
+          r"|(?:他|她|有人|對方|老公|老婆|先生|太太|爸爸|媽媽|男友|女友|男朋友|女朋友|鄰居|陌生人)(?:打|揍|踢|踹|掐|砍)(?:我|我們)(?![的們手電家])"
+          r"|(?:他|她|有人|對方|歹徒|老公|男友|陌生人)(?:手上)?(?:拿|持|帶)著?(?:刀|刀子|菜刀|槍)|持刀|拿刀(?:威脅|指著|對著|追|砍|揮)"
+          r"|(?:要|想|會|揚言|說要)(?:殺|砍)(?:了)?(?:我|我們|人)|在打人|有人(?:在)?打人|打得很兇",
+    "en": r"\b(?:is|are|keeps?|started) (?:hitting|beating|punching|kicking|choking|strangling|attacking|stabbing|hurting) "
+          r"(?:me|us|my \w+|her|him|someone|a (?:man|woman|child|kid))\b"
+          r"|\b(?:he|she|they|someone|somebody|a (?:man|guy|woman)|my (?:husband|wife|boyfriend|girlfriend|ex|father|neighbou?r))"
+          r" (?:has|is holding|is waving|pulled|pointed) a (?:knife|gun)\b"
+          r"|\b(?:going|trying|wants?|about|threatening) to (?:kill|stab|shoot|hurt) (?:me|us)\b",
+    "ja": r"殴られて(?:いる|る|います)|蹴られて(?:いる|る|います)|首を絞められ|(?:ナイフ|刃物|包丁)を(?:向け|突きつけ)"
+          r"|(?:ナイフ|刃物|包丁)を持った(?:男|女|人)|殺すと(?:言|脅)|殺される",
+    "vi": r"\b(?:đang |cứ )?(?:đánh|đấm|đá|bóp cổ) (?:tôi|chúng tôi|em|mẹ tôi|con tôi)\b|\b(?:cầm dao|cầm súng|chĩa dao|chĩa súng)\b"
+          r"|muốn giết tôi|dọa giết|sẽ giết tôi",
+    "id": r"\b(?:sedang |terus )?(?:memukul|memukuli|menghajar|menendang|mencekik) (?:saya|aku|kami|ibu saya|anak saya)\b"
+          r"|\b(?:dia|orang itu|seseorang|suami saya|pacar saya) (?:bawa|membawa|pegang|memegang) (?:pisau|senjata tajam|pistol)\b"
+          r"|menodongkan (?:pisau|pistol)|mengacungkan pisau|mau membunuh (?:saya|aku)|mengancam (?:akan )?membunuh",
+    "tl": r"sinusuntok (?:niya )?ako|sinasapak (?:niya )?ako|hinahampas (?:niya )?ako|sinisipa (?:niya )?ako|sinasaktan (?:niya )?ako"
+          r"|may hawak na (?:kutsilyo|patalim|baril)|tinu(?:tu)?tukan (?:niya )?ako|papatayin (?:niya )?(?:ako|kami)"
+          r"|pinagbabantaan (?:niya )?ako",
+}
+PATTERNS["violence"] = (PATTERNS["violence"][0] + "|" + VIOLENCE_NOW["zh"],
+                        PATTERNS["violence"][1] + "|" + "|".join(VIOLENCE_NOW[lang] for lang in ("en", "ja", "vi", "id", "tl")))
+
 # Negated or second-hand mentions that are not an emergency now.
 NOT_NOW = r"(?:防火|消防演習|火災保險|預防|宣導|演練|電影|小說|新聞說|以前|曾經|fire drill|insurance)"
 
@@ -76,6 +107,7 @@ FIRE_FORMS = "disasterReport.form.D-4-"
 # person; a tree or a sign that 倒れ (fell) is not someone collapsing. Removed before matching that kind.
 NOT_EMERGENCY = {
     "fire": r"fire[ -]?(?:lanes?|exits?|escapes?|hydrants?|extinguishers?|doors?|alarm tests?)|消防(?:通道|栓|車道)|滅火器|防火巷",
+    "violence": r"\b(?:beat|beating|beats) (?:me|us) (?:at|in)\b|\bhit(?:ting)? (?:me|us) up\b|拿刀(?:切|削|剁|來切)",
     "medical": r"(?:按鈕|按鍵|螢幕|畫面|頁面|網頁|app|手機|電腦|系統|程式|機器|遙控器|感應|卡片|按了?|點了?)[^，。！？,.!?]{0,6}?沒反應"
                r"|(?:木|樹|看板|電柱|電線|塀|棚|自転車|バイク|標識)(?:が|も|は)?倒れ|倒れ(?:た|ている|そうな)(?:木|樹|看板|電柱|塀|標識)",
 }
@@ -151,7 +183,7 @@ def after_service(text, language="zh"):
     def has(table):
         # Chinese words are understood in every language's sentence (mixed input).
         return bool(re.search(table.get(language, table["en"]), text, re.I) or re.search(table["zh"], text))
-    if has(HAPPENING):
+    if has(HAPPENING) or has(VIOLENCE_NOW):
         return False
     return has(SERVICE_NEED) and (has(AFTER) or has(VICTIM))
 
