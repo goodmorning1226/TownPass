@@ -31,7 +31,10 @@ const _scan = '/fee-payment/scan';
 const _view = "(qa('.tab-view').find(inView) || null)";
 
 /// First field of [v] that is still empty: an input/select/textarea, or the
-/// labels of a radio/checkbox group with nothing ticked.
+/// labels of a radio/checkbox group with nothing ticked. A box the user is
+/// still typing in counts as empty (settled(), docs/AI_CURRENT_RULES.md
+/// section 5, 2026-11-16): the card stays on it until Enter, the keyboard
+/// goes down or the box loses the focus, not after the first letter.
 const _field = r'''((v) => {
   if (!v) return null;
   const seen = new Set();
@@ -45,7 +48,7 @@ const _field = r'''((v) => {
       continue;
     }
     if (!shown(e)) continue;
-    if (!(e.value || '').trim()) return e;
+    if (!settled(e)) return e;
   }
   return null;
 })''';
@@ -139,11 +142,15 @@ const feesPageSpec = WebPageSpec(
     'fieldName': '$_info.name',
     'fieldHint': '$_info.hint',
     'fieldChoices': '$_info.choices',
+    // The user is typing in the field the card is about (it has text).
+    'fieldTyping':
+        "(() => { const f = $_emptyField; return !!f && !Array.isArray(f) && editing(f) && !!(f.value || '').trim(); })()",
     'calendar': '$_calendar.length > 0',
     'calTitle':
         "txt(qa('.vc-popover-content-wrapper button.vc-title').find(shown))",
     'calNav': "qa('.vc-nav-container').some(shown)",
-    'searchTyped': "(() => { const i = q('input[placeholder=\"搜尋繳費關鍵字\"]'); return !!i && !!(i.value || '').trim(); })()",
+    // A name is typed out (not while still typing: the ring stays on the box).
+    'searchTyped': "settled(q('input[placeholder=\"搜尋繳費關鍵字\"]'))",
     'searchResults':
         "location.pathname.startsWith('$_search') ? qa('a[href^=\"/fee-payment/detail/\"]').filter(shown).length : 0",
     'noBill': _noBillJs,
@@ -277,6 +284,10 @@ String _dateCard(WebPageState s, String name) {
       : gt('先點月曆最上面的「{title}」，換到你出生的年和月，再點那一天。', {'title': pg(title)});
 }
 
+/// Added while the user is still typing in the box (the same words as the
+/// other guides' forms).
+const _typedHint = '寫好了就按鍵盤上的「完成」或「✓」，收起鍵盤。';
+
 /// The current field is picked, not typed (radio, select, date picker).
 bool _picking(WebPageState s) =>
     const {'choice', 'select', 'date'}.contains(s.now.text('fieldKind'));
@@ -285,6 +296,7 @@ final List<GuideComponent> feesComponents = [
   GuideComponent(
     id: 'pick_fee',
     title: '選要繳的費用',
+    briefs: const ['點要繳的費用'],
     description: '在繳費項目清單點要繳的費用，例如水費',
     keywords: const ['其他費用', '其他繳費', '別的費用', '繳費項目', '哪一種費用'],
     requires: const [],
@@ -341,6 +353,7 @@ final List<GuideComponent> feesComponents = [
   GuideComponent(
     id: 'enter_number',
     title: '輸入帳單號碼',
+    briefs: const ['打帳單上的號碼'],
     description: '把帳單上的號碼（例如水號）打進框框',
     keywords: const ['水號', '繳費編號', '單據號碼', '車號', '帳單號碼', '輸入號碼'],
     // pick_fee is added only where the user starts on the list (fees.other).
@@ -374,6 +387,13 @@ final List<GuideComponent> feesComponents = [
               'tab': pg(tab.isEmpty ? '輸入資料' : tab),
             });
           }
+          // Still typing: the card stays on this box and says how to finish.
+          if (s.now.flag('fieldTyping')) {
+            final card = gt(_fieldCard(s));
+            // A space after a Latin full stop (translations); none in Chinese.
+            final gap = RegExp(r'[.!?]$').hasMatch(card) ? ' ' : '';
+            return '$card$gap${gt(_typedHint)}';
+          }
           return _fieldCard(s);
         },
         detail: (s) {
@@ -403,6 +423,7 @@ final List<GuideComponent> feesComponents = [
   GuideComponent(
     id: 'query_bill',
     title: '按「查詢」找帳單',
+    briefs: const ['按查詢看要繳多少'],
     description: '號碼打好後按「查詢」，看要繳的帳單和金額',
     keywords: const ['查帳單', '查詢', '多少錢', '欠多少', '要繳多少'],
     requires: const ['enter_number'],
@@ -433,6 +454,7 @@ final List<GuideComponent> feesComponents = [
   GuideComponent(
     id: 'pick_bill',
     title: '勾選要繳的帳單',
+    briefs: const ['勾選要繳的帳單'],
     description: '在查到的帳單右邊打勾，選要繳哪幾張',
     keywords: const ['勾選', '哪一張', '全部繳清', '選帳單'],
     requires: const ['query_bill'],
@@ -476,6 +498,7 @@ final List<GuideComponent> feesComponents = [
   GuideComponent(
     id: 'to_payment',
     title: '按「前往繳費」',
+    briefs: const ['按前往繳費'],
     description: '看一下總金額，按「前往繳費」',
     keywords: const ['前往繳費', '總金額'],
     requires: const ['pick_bill'],
@@ -505,6 +528,7 @@ final List<GuideComponent> feesComponents = [
   GuideComponent(
     id: 'choose_method',
     title: '選付款方式',
+    briefs: const ['選一個付款方式'],
     description: '在「請選擇繳費方式」點一個常用的付款方式',
     keywords: const ['付款方式', '信用卡', '悠遊付', '行動支付', '怎麼付'],
     requires: const ['to_payment'],
@@ -536,6 +560,7 @@ final List<GuideComponent> feesComponents = [
   GuideComponent(
     id: 'confirm_pay',
     title: '確認後按「是」付款',
+    briefs: const ['確認金額後自己按是'],
     description: '看清楚費用和金額，再自己按「是」',
     keywords: const ['繳費', '繳錢', '付錢', '付款', '繳'],
     requires: const ['choose_method'],
@@ -584,6 +609,7 @@ final List<GuideComponent> feesComponents = [
   GuideComponent(
     id: 'filter_history',
     title: '篩選繳費紀錄',
+    briefs: const ['用上面的選單篩選'],
     description: '在繳費紀錄用上面的選單挑時間、費用或狀態',
     keywords: const ['繳費紀錄', '繳費記錄', '繳過', '繳了什麼', '紀錄', '記錄'],
     requires: const [],

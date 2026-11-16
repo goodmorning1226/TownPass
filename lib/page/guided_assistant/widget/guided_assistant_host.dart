@@ -11,6 +11,7 @@ import 'package:town_pass/page/guided_assistant/model/guide_content.dart';
 import 'package:town_pass/page/guided_assistant/model/guide_i18n.dart';
 import 'package:town_pass/page/guided_assistant/model/guides/guide_registry.dart';
 import 'package:town_pass/page/guided_assistant/web/web_page_state.dart';
+import 'package:town_pass/page/guided_assistant/widget/guide_card_layout.dart';
 import 'package:town_pass/page/guided_assistant/widget/guide_highlight.dart';
 import 'package:town_pass/page/guided_assistant/widget/ask_button.dart';
 import 'package:town_pass/page/guided_assistant/widget/guide_motion.dart';
@@ -794,12 +795,129 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
     GuidedAssistantController c,
     GuideCard card,
   ) {
-    final top = MediaQuery.of(context).padding.top + (c.cardTop ?? 62);
+    final media = MediaQuery.of(context);
+    final area = GuideCardLayout.areaOf(media);
+    final commit = card.variant == CardVariant.commit;
+    final stepKey = '${card.variant.name}:${c.stepIndex}';
+    // Kept off the ring by GuideCardLayout; the step's cardTop is only the
+    // preferred place (docs/AI_CURRENT_RULES.md section 5, 2026-11-16).
+    return Positioned.fill(
+      child: GuideCardPlacer(
+        target: c.highlightTarget,
+        // Usable beside the ring (e.g. 熱門關鍵字): kept clear when possible.
+        alsoUsable: c.highlightTarget == null
+            ? const []
+            : c.currentStep?.alsoUsable ?? const [],
+        // What comes next (e.g. 查詢 after the 水號): kept clear last.
+        nextTarget: c.nextTarget,
+        preferredTop: media.padding.top + (c.cardTop ?? 62),
+        areaTop: area.areaTop,
+        comfortTop: area.comfortTop,
+        areaBottom: area.areaBottom,
+        stepKey: stepKey,
+        measure: (opened) => Material(
+          type: MaterialType.transparency,
+          child: Container(
+            padding: _cardPadding,
+            decoration: _warm,
+            child: _cardContent(c, card, opened: opened, collapse: () {}),
+          ),
+        ),
+        full: (opened, collapse) => Semantics(
+          liveRegion: true,
+          label: gt('助理說'),
+          child: Material(
+            type: MaterialType.transparency,
+            child: _CardMotion(
+              step: c.stepIndex,
+              done: card.variant == CardVariant.done,
+              commit: commit,
+              // A new step (or 開始 / done) slides the content in; a nudge
+              // within the same step only changes the text.
+              contentKey: stepKey,
+              content: _cardContent(
+                c,
+                card,
+                opened: opened,
+                collapse: collapse,
+              ),
+            ),
+          ),
+        ),
+        compact: (open) => _compactCard(card, open),
+        wrap: (shown) => AskObstacle(child: shown),
+      ),
+    );
+  }
+
+  /// The card's inner padding (as in [_CardMotion]).
+  static const _cardPadding = EdgeInsets.fromLTRB(12, 8, 12, 10);
+
+  /// The one-line card when the full one does not fit beside the ring:
+  /// the penguin and the step's short point ([GuideCard.brief]); a tap
+  /// opens it. A screen reader still reads the whole card.
+  Widget _compactCard(GuideCard card, VoidCallback open) => Semantics(
+    button: true,
+    liveRegion: true,
+    label: [card.label, card.text].join('\n'),
+    hint: gt('點一下展開'),
+    excludeSemantics: true,
+    child: Material(
+      type: MaterialType.transparency,
+      child: InkWell(
+        key: const Key('guide-card-compact'),
+        borderRadius: BorderRadius.circular(14),
+        onTap: _tapped(open),
+        child: Container(
+          height: GuideCardLayout.compactHeight,
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          decoration: _warm,
+          child: Row(
+            children: [
+              const PenguinAvatar(size: 36),
+              const SizedBox(width: 8),
+              Expanded(
+                child: TPText(
+                  card.brief.isEmpty ? card.text : card.brief,
+                  style: TPTextStyles.bodySemiBold,
+                  color: TPColors.grayscale950,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              const Icon(Icons.expand_more_rounded, color: TPColors.primary700),
+            ],
+          ),
+        ),
+      ),
+    ),
+  );
+
+  /// The full card's words and buttons. [opened]: the user opened it from
+  /// the one-line card, so it offers [collapse] (收起).
+  Widget _cardContent(
+    GuidedAssistantController c,
+    GuideCard card, {
+    required bool opened,
+    required VoidCallback collapse,
+  }) {
     final commit = card.variant == CardVariant.commit;
     final followUp =
         card.variant == CardVariant.done &&
         c.task.value?.followUpGuideId != null;
-    final tools = <Widget>[];
+    final tools = <Widget>[
+      if (opened)
+        IconButton(
+          key: const Key('guide-card-collapse'),
+          tooltip: gt('收起'),
+          constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
+          onPressed: _tapped(collapse),
+          icon: const Icon(
+            Icons.expand_less_rounded,
+            color: TPColors.primary700,
+          ),
+        ),
+    ];
     switch (card.variant) {
       case CardVariant.step:
         tools.addAll([
@@ -863,7 +981,7 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
       case CardVariant.commit:
         break;
     }
-    final content = Column(
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Row(
@@ -928,31 +1046,6 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
           ),
         ],
       ],
-    );
-    return AnimatedPositioned(
-      duration: GuideMotion.of(context, GuideMotion.normal),
-      curve: GuideMotion.move,
-      left: 12,
-      right: 12,
-      top: top,
-      child: AskObstacle(
-        child: Semantics(
-          liveRegion: true,
-          label: gt('助理說'),
-          child: Material(
-            type: MaterialType.transparency,
-            child: _CardMotion(
-              step: c.stepIndex,
-              done: card.variant == CardVariant.done,
-              commit: commit,
-              // A new step (or 開始 / done) slides the content in; a nudge
-              // within the same step only changes the text.
-              contentKey: '${card.variant.name}:${c.stepIndex}',
-              content: content,
-            ),
-          ),
-        ),
-      ),
     );
   }
 

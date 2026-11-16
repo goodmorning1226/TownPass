@@ -182,6 +182,7 @@ final List<GuideComponent> couponWalletComponents = [
   GuideComponent(
     id: 'coupon_home',
     title: '回到優惠首頁',
+    briefs: const ['回到優惠首頁'],
     description: '從優惠券搜尋頁按左上角「‹」，回到優惠首頁',
     keywords: const ['優惠首頁', '回優惠', '優惠券首頁'],
     requires: const [],
@@ -210,6 +211,7 @@ final List<GuideComponent> couponWalletComponents = [
   GuideComponent(
     id: 'coupon_tab',
     title: '切到「優惠券」',
+    briefs: const ['點優惠券'],
     description: '在優惠首頁點上面的「優惠券」，看店家優惠',
     keywords: const ['優惠券分頁', '店家優惠', '店家折扣'],
     requires: const [],
@@ -236,6 +238,7 @@ final List<GuideComponent> couponWalletComponents = [
   GuideComponent(
     id: 'pick_coupon',
     title: '選一張優惠券',
+    briefs: const ['點想看的優惠券'],
     description: '在優惠券清單點一張，看優惠內容和截止日期',
     keywords: const ['找優惠', '看優惠', '有什麼優惠', '優惠內容', '優惠券列表', '折價券'],
     requires: const ['coupon_tab'],
@@ -302,6 +305,7 @@ final List<GuideComponent> couponWalletComponents = [
   GuideComponent(
     id: 'add_wallet',
     title: '按「加入票夾」存起來',
+    briefs: const ['按加入票夾'],
     description: '把優惠券存進票夾，之後要用再拿出來',
     keywords: const ['加入票夾', '存入票夾', '領優惠', '領取優惠', '存優惠券', '收藏優惠', '存到票夾'],
     requires: const ['pick_coupon'],
@@ -353,6 +357,7 @@ final List<GuideComponent> couponWalletComponents = [
   GuideComponent(
     id: 'wallet_coupons',
     title: '打開票夾的「優惠券」',
+    briefs: const ['打開票夾的優惠券'],
     description: '在票夾點上面的「優惠券」，看存起來的優惠',
     keywords: const ['票夾的優惠券', '我的優惠券', '領過的優惠', '存起來的優惠', '未兌換'],
     requires: const [],
@@ -389,6 +394,7 @@ final List<GuideComponent> couponWalletComponents = [
   GuideComponent(
     id: 'wallet_used',
     title: '看「已兌換」的優惠券',
+    briefs: const ['點已兌換'],
     description: '在票夾的優惠券點「已兌換」，看用過的優惠',
     keywords: const ['已兌換', '用過的優惠', '兌換紀錄', '兌換記錄', '用掉的優惠'],
     requires: const ['wallet_coupons'],
@@ -426,6 +432,7 @@ final List<GuideComponent> couponWalletComponents = [
   GuideComponent(
     id: 'wallet_pick',
     title: '打開要用的優惠券',
+    briefs: const ['點要用的優惠券'],
     description: '在票夾的「未兌換」點要用的那張優惠券',
     keywords: const ['票夾裡的優惠', '拿出優惠券', '打開優惠券'],
     requires: const ['wallet_coupons'],
@@ -476,6 +483,7 @@ final List<GuideComponent> couponWalletComponents = [
   GuideComponent(
     id: 'use_coupon',
     title: '確認後按「使用」兌換',
+    briefs: const ['結帳時自己按立即使用'],
     description: '在店家結帳時按「立即使用」，再自己按「使用」',
     keywords: const ['立即使用', '使用優惠', '兌換優惠', '用優惠券', '核銷', '用票夾裡', '要用票夾'],
     requires: const ['wallet_pick|pick_coupon'],
@@ -554,6 +562,7 @@ final List<GuideComponent> couponWalletComponents = [
   GuideComponent(
     id: 'wallet_ticket',
     title: '打開入場券的 QR code',
+    briefs: const ['打開入場券的 QR code'],
     description: '在票夾的「入場券」點一張票，出示 QR code 入場',
     keywords: const ['入場券', '門票', 'qrcode', '出示票券', '取票', '我的訂單', '我的票券'],
     requires: const [],

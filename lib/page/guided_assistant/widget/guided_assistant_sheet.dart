@@ -1343,7 +1343,9 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
           ],
         ),
       ),
-      // Live loudness while recording, so a quiet voice is noticed.
+      // Live loudness while recording, so a quiet voice is noticed. Spaced from
+      // the mic row above (it looked cramped right under it; owner, 2026-11-16).
+      const SizedBox(height: 12),
       SizedBox(
         width: 120,
         height: 6,
@@ -1354,7 +1356,7 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
               )
             : null,
       ),
-      const SizedBox(height: 4),
+      const SizedBox(height: 6),
       TPText(
         gt(
           !c.listening.value

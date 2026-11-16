@@ -381,6 +381,13 @@
    "id": "Ketuk “{page:立即使用}” di bawah kupon (jika dibuka dari dompet tiket, namanya “{page:兌換}”). Saat layar bertanya, ketuk “{page:使用}” sendiri hanya jika Anda yakin.",
    "tl": "I-tap ang “{page:立即使用}” sa ibaba ng coupon (“{page:兌換}” ang tawag dito kapag binuksan mula sa ticket wallet). Kapag nagtanong ang screen, ikaw mismo ang mag-tap ng “{page:使用}” kung sigurado ka lang."
   },
+  "按加入票夾": {
+   "en": "Tap Add to wallet",
+   "ja": "チケットホルダーに追加をタップ",
+   "vi": "Chạm Thêm vào ví vé",
+   "id": "Ketuk Tambah ke dompet",
+   "tl": "I-tap ang Add to wallet"
+  },
   "按鈕在最下面，可以往下滑一點。": {
    "en": "The button is at the bottom, so scroll down a little.",
    "ja": "ボタンはいちばん下にあるので、少しスクロールしてください。",
@@ -471,6 +478,13 @@
    "vi": "Dùng ngay",
    "id": "Pakai sekarang",
    "tl": "Gamitin ngayon"
+  },
+  "結帳時自己按立即使用": {
+   "en": "At checkout, tap Use now yourself",
+   "ja": "会計のとき自分で「今すぐ使う」をタップ",
+   "vi": "Khi thanh toán, tự chạm Dùng ngay",
+   "id": "Saat bayar, ketuk Gunakan sekarang sendiri",
+   "tl": "Sa checkout, ikaw mismo ang mag-tap ng Use now"
   },
   "要用的時候，按下面的「兌換」。按了就算用掉了喔。": {
    "en": "When you want to use it, tap “{page:兌換}” below. Once you tap it, the coupon counts as used.",
@@ -710,6 +724,13 @@
    "id": "Ketuk kupon yang ingin Anda pakai.",
    "tl": "I-tap ang coupon na gusto mong gamitin."
   },
+  "點優惠券": {
+   "en": "Tap Coupons",
+   "ja": "クーポンをタップ",
+   "vi": "Chạm Phiếu giảm giá",
+   "id": "Ketuk Kupon",
+   "tl": "I-tap ang Coupons"
+  },
   "點左邊的「我的訂單」，這裡是還能用的票。": {
    "en": "Tap “{page:我的訂單}” on the left; these are the tickets you can still use.",
    "ja": "左の「{page:我的訂單}」を押してください。ここにはまだ使えるチケットがあります。",
@@ -724,6 +745,20 @@
    "id": "Ketuk “{page:未兌換}” di sebelah kiri; di sini ada kupon yang belum dipakai.",
    "tl": "I-tap ang “{page:未兌換}” sa kaliwa; ito ang mga coupon na hindi mo pa nagagamit."
   },
+  "點已兌換": {
+   "en": "Tap Redeemed",
+   "ja": "引き換え済みをタップ",
+   "vi": "Chạm Đã đổi",
+   "id": "Ketuk Sudah ditukar",
+   "tl": "I-tap ang Redeemed"
+  },
+  "點想看的優惠券": {
+   "en": "Tap a coupon to see it",
+   "ja": "見たいクーポンをタップ",
+   "vi": "Chạm phiếu bạn muốn xem",
+   "id": "Ketuk kupon yang ingin dilihat",
+   "tl": "I-tap ang kupong gusto mong tingnan"
+  },
   "點畫面上方右邊的「優惠券」。": {
    "en": "Tap “{page:優惠券}” at the top right.",
    "ja": "画面の右上の「{page:優惠券}」を押してください。",
@@ -737,6 +772,13 @@
    "vi": "Bấm “‹” ở góc trên bên trái để quay lại trang chủ ưu đãi.",
    "id": "Ketuk “‹” di kiri atas untuk kembali ke halaman utama promo.",
    "tl": "I-tap ang “‹” sa kaliwang itaas para bumalik sa home page ng mga promo."
+  },
+  "點要用的優惠券": {
+   "en": "Tap the coupon you will use",
+   "ja": "使うクーポンをタップ",
+   "vi": "Chạm phiếu bạn sẽ dùng",
+   "id": "Ketuk kupon yang akan dipakai",
+   "tl": "I-tap ang kupong gagamitin mo"
   }
  }
 }
