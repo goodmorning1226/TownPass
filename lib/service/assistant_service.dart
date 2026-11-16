@@ -153,7 +153,7 @@ class AssistantService {
         // list's resolution id and no text.
         'page_step': ?pageStep,
         // Pages the assistant opened recently on this phone, for the function
-        // catalogue's 常用 row (ids only; older backends ignore it).
+        // catalogue's 常用 row (ids only; the backend's field whitelist must list it).
         if (AssistantRecentPages.instance.items.isNotEmpty)
           'recent_pages': AssistantRecentPages.instance.items.toList(),
       }),

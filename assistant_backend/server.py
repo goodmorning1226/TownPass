@@ -540,8 +540,13 @@ class Assistant:
             faq_text = None
         if payload.get("page_step") is not None and payload["page_step"] not in (1, -1):
             raise AssistantError("換頁欄位不正確。")
+        # Pages the App opened lately, for the catalogue's 常用 row (ids only; rules section 3,
+        # 2026-11-16). A malformed list is dropped, not an error: it only orders a shortcut row.
+        recent = payload.get("recent_pages")
+        recent = ([r for r in recent if isinstance(r, str) and 0 < len(r) <= 80][:16]
+                  if isinstance(recent, list) else [])
         payload = {**payload, "session_id": session, "text": text, "page_context": context, "language": language,
-                   "faq_text": faq_text}
+                   "faq_text": faq_text, "recent_pages": recent}
         started = time.monotonic()
         self.usage.calls, self.usage.timings = [], []
         self.usage.route, self.usage.candidates, self.usage.semantic = None, [], None
@@ -791,7 +796,7 @@ def make_handler(assistant, token=""):
                 payload = json.loads(self.rfile.read(length))
                 if not isinstance(payload, dict) or set(payload) - {"text", "session_id", "request_id", "resolution_id",
                                                                     "choice_id", "context", "language",
-                                                                    "faq_text", "page_step"}:
+                                                                    "faq_text", "page_step", "recent_pages"}:
                     raise AssistantError("請求欄位不正確。")
                 response = assistant.turn(payload)
                 self.reply(200, response)
