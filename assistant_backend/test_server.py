@@ -208,6 +208,14 @@ class TurnTests(unittest.TestCase):
                 with self.assertRaises(urllib.error.HTTPError) as caught:
                     urllib.request.urlopen(request, timeout=5)
                 self.assertEqual(caught.exception.code, status)
+            # The App sends recent_pages once a page was opened (2026-11-16: the iPhone got
+            # "請求欄位不正確" for every request then); a malformed list is ignored.
+            for recent in (["fees.water", "library.borrow"], "not a list", [1, None, "x" * 200]):
+                payload = {"text": "看全部功能", "request_id": "r", "session_id": "s", "recent_pages": recent}
+                request = urllib.request.Request(url, data=json.dumps(payload).encode(), headers={
+                    "Authorization": "Bearer test-token", "Content-Type": "application/json"})
+                with urllib.request.urlopen(request, timeout=5) as reply:
+                    self.assertEqual(reply.status, 200)
         finally:
             server.shutdown()
             server.server_close()
