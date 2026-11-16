@@ -51,8 +51,15 @@ final class OnDeviceAssistant {
   private static let classifierPort = 8778  // device_main.PORTS["classifier"]
   private static let taiwaneseName = "whisper-taiwanese"
   /// Breeze-ASR-26 (Whisper large) besides its file, and what must stay free after it
-  /// (startTaiwanese; measured 2026-11-13, see memoryAllows).
-  private static let taiwaneseOverhead: UInt64 = 1000 << 20
+  /// (startTaiwanese, memoryAllows). 2026-11-16: 750 MB, was 1,000. whisper.cpp printed on
+  /// the iPhone (q4_0, Metal): weights 888 + KV 343 + compute 335 = 1,567 MB (10^6 bytes),
+  /// i.e. 646 MiB besides the 848 MiB file, all allocated at load; the App's budget fell by
+  /// 1,327 MB after loading and one clip. The 1,000 also covered whisper.cpp re-creating its
+  /// self-attention KV cache at 4x (+240 MiB) on the first temperature fallback with
+  /// best_of 2; the server now runs with -bo 1 and the backend asks best_of 1, so that
+  /// never happens (docs/AI_TAIWANESE_ABLATION.md section 14). q8_0 under this rule needs
+  /// 1,579 + 750 + 256 MB: the 2,247 MB budget that aborted on 2026-11-13 is refused.
+  private static let taiwaneseOverhead: UInt64 = 750 << 20
   private static let taiwaneseMargin: UInt64 = 256 << 20
 
   private let lock = NSLock()
@@ -269,7 +276,12 @@ final class OnDeviceAssistant {
     try? fileManager.removeItem(at: previousLog)
     try? fileManager.moveItem(at: logURL, to: previousLog)
     let log = logURL.path
-    if freopen(log, "w", stdout) != nil { setvbuf(stdout, nil, _IOLBF, 0) }
+    // One empty file, then both streams in append mode (2026-11-16): stdout opened with "w"
+    // and stderr with "a" had two file offsets, so stdout wrote from the start of the file
+    // over what stderr had appended, and lines came out of order. With "a" every write
+    // (O_APPEND) goes to the current end of the file, whichever stream or thread makes it.
+    _ = fileManager.createFile(atPath: log, contents: nil)
+    if freopen(log, "a", stdout) != nil { setvbuf(stdout, nil, _IOLBF, 0) }
     if freopen(log, "a", stderr) != nil { setvbuf(stderr, nil, _IONBF, 0) }
 
     let multilingual = has(Self.multiAsrFile)
@@ -504,9 +516,8 @@ final class OnDeviceAssistant {
     defer { loadLock.unlock() }
     let began = Date()
     if !taiwaneseStarted {
-      // A large Whisper model needs about 1 GB besides its weights (kv cache 344 MB, four
-      // compute buffers ~200 MB, four scheduler contexts 4 x 79 MB; 2026-11-13: Breeze q8_0
-      // took 2,551 MB on the computer for a 1,579 MB file). The App's budget must keep
+      // A large Whisper model needs taiwaneseOverhead besides its weights (kv caches 343 MB,
+      // four Metal compute buffers 335 MB; see taiwaneseOverhead). The App's budget must keep
       // taiwaneseMargin on top: with 68 MB to spare the load ran out of memory, whisper.cpp
       // aborted and the whole App closed (iPhone 17 Pro Max, budget 2,247 MB, 2026-11-13).
       guard memoryAllows(size, for: "taiwanese speech", overhead: Self.taiwaneseOverhead,
@@ -517,8 +528,9 @@ final class OnDeviceAssistant {
           Server(
             name: Self.taiwaneseName, library: whisper, symbol: "townpass_whisper_server",
             port: Self.taiwaneseWhisperPort,
+            // -bo 1: one decoder per temperature, so the KV cache is never re-created at 4x.
             arguments: serverArguments(models, Self.taiwaneseAsrFile, Self.taiwaneseWhisperPort)
-              + ["-t", whisperThreads, "-l", "zh"],
+              + ["-t", whisperThreads, "-l", "zh", "-bo", "1"],
             file: Self.taiwaneseAsrFile))
       else { return "failed" }
       taiwaneseStarted = true

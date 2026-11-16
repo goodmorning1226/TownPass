@@ -75,9 +75,9 @@ const disasterReportPageSpec = WebPageSpec(
         "qa('a[href^=\"/disaster-report/form/\"]').filter(shown).some(opened)",
     'category': r"""(() => { const m = orig(q('#app') || document.body).match(/災情分類\s*\n+\s*([^\n]+)/); return m && !m[1].trim().startsWith('*') ? m[1].trim() : ''; })()""",
     'location': "(q('#location') || {}).value || ''",
-    // The address box still has the keyboard (the user is typing).
-    'locationFocus':
-        "!!q('#location') && document.activeElement === q('#location')",
+    // The user is still typing the address (editing(): until Enter, the
+    // keyboard goes down, 按住輸入 or the box loses the focus).
+    'locationFocus': "editing(q('#location'))",
     'hasChecks': '$_checks.length > 0',
     'checked':
         '''qa('div[class~="gap-1.5"] input').filter((i) => i.checked).length''',
@@ -85,11 +85,11 @@ const disasterReportPageSpec = WebPageSpec(
     // The form has a 道路 box (D-2-1 has only 傷亡/受困/失蹤).
     'hasRoad': "$_checks.some((l) => orig(l).trim() === '道路')",
     'hasNumbers': '$_numbers.length > 0',
-    // Number boxes filled in.
-    'numbers': "$_numbers.filter((i) => (i.value || '').trim() !== '').length",
+    // Number boxes filled in (not the one still being typed in).
+    'numbers': '$_numbers.filter(settled).length',
     // 補充描述 has text.
     'extraText': "!!(q('#additional_disc') || {}).value && q('#additional_disc').value.trim() !== ''",
-    'extraFocus': "!!q('#additional_disc') && document.activeElement === q('#additional_disc')",
+    'extraFocus': "editing(q('#additional_disc'))",
     'extraOff': "$_offFn(q('#additional_disc'))",
     // 送出 was pressed with no 災情描述: the red 「至少勾選一項」 (it stays
     // until the next 送出, also after something is described).
@@ -200,6 +200,7 @@ final List<GuideComponent> disasterReportComponents = [
   GuideComponent(
     id: 'pick_category',
     title: '選災情類別',
+    briefs: const ['點最符合的災情'],
     description: '在災情類別清單點一個大類打開，再點最符合的災情，例如路燈故障',
     keywords: const ['災情類別', '災情種類', '哪一類災情', '災情分類'],
     requires: const [],
@@ -223,6 +224,7 @@ final List<GuideComponent> disasterReportComponents = [
   GuideComponent(
     id: 'enter_location',
     title: '填災情發生地點',
+    briefs: const ['打地址或按定位'],
     description: '在「標注災情發生地點」打地址，或按定位圖示',
     keywords: const ['災情地點', '災情發生地點', '災情在哪裡', '災情地址'],
     requires: const ['pick_category'],
@@ -270,6 +272,7 @@ final List<GuideComponent> disasterReportComponents = [
   GuideComponent(
     id: 'describe_disaster',
     title: '勾選災情狀況',
+    briefs: const ['勾選看到的狀況'],
     description: '在「災情描述」勾選看到的狀況，例如有人受困、影響道路',
     keywords: const ['災情描述', '災情狀況', '傷亡', '受困', '影響交通'],
     requires: const ['enter_location'],
@@ -341,6 +344,7 @@ final List<GuideComponent> disasterReportComponents = [
   GuideComponent(
     id: 'give_consent',
     title: '勾選「提供個人資料給承辦人員」',
+    briefs: const ['往下滑，看完注意事項', '勾選提供個人資料'],
     description: '在最下面勾選提供個人資料給承辦人員，「送出」才會變成可以按',
     keywords: const ['提供個人資料給承辦人員', '承辦人員', '送出不能按', '送出灰色'],
     requires: const ['describe_disaster'],
@@ -389,6 +393,7 @@ final List<GuideComponent> disasterReportComponents = [
   GuideComponent(
     id: 'send_report',
     title: '確認後按「送出」',
+    briefs: const ['確認後自己按送出'],
     description: '看清楚地點和狀況，再自己按「送出」通報災情',
     keywords: const ['通報災情', '災情通報', '回報災情', '報災情', '災害通報'],
     requires: const ['give_consent'],

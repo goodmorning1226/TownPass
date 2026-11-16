@@ -132,6 +132,7 @@ final List<GuideComponent> libraryComponents = [
   GuideComponent(
     id: 'open_search',
     title: '打開關鍵字搜尋',
+    briefs: const ['點上面的關鍵字搜尋'],
     description: '在館藏查詢點「關鍵字搜尋」',
     keywords: const ['搜尋', '查書', '找書'],
     requires: const [],
@@ -157,6 +158,7 @@ final List<GuideComponent> libraryComponents = [
   GuideComponent(
     id: 'search_keyword',
     title: '輸入書名搜尋',
+    briefs: const ['打書名，按放大鏡搜尋'],
     description: '在搜尋框打書名或作者，再按放大鏡',
     keywords: const ['書名', '作者', '打字', '輸入'],
     requires: const ['open_search'],
@@ -187,6 +189,7 @@ final List<GuideComponent> libraryComponents = [
   GuideComponent(
     id: 'hot_keyword',
     title: '點熱門關鍵字',
+    briefs: const ['點一個熱門關鍵字'],
     description: '不知道要找什麼時，點一個熱門關鍵字',
     keywords: const ['熱門', '推薦', '不知道', '隨便', '有什麼書', '好看'],
     requires: const ['open_search'],
@@ -213,6 +216,7 @@ final List<GuideComponent> libraryComponents = [
   GuideComponent(
     id: 'pick_book',
     title: '選一本想借的書',
+    briefs: const ['點想借的書名'],
     description: '在搜尋結果點書名，看這本書的詳細內容',
     keywords: const ['詳細', '介紹', '館藏', '這本書'],
     // A book can also be picked from the 點閱排行 list.
@@ -242,6 +246,7 @@ final List<GuideComponent> libraryComponents = [
   GuideComponent(
     id: 'choose_branch',
     title: '選擇取書館',
+    briefs: const ['選要去拿書的圖書館'],
     description: '選要去哪一間圖書館拿書',
     keywords: const ['取書館', '哪一間', '哪間', '分館拿', '選取書館'],
     requires: const ['pick_book'],
@@ -329,6 +334,7 @@ final List<GuideComponent> libraryComponents = [
   GuideComponent(
     id: 'reserve',
     title: '確認後按「預約」',
+    briefs: const ['確認後自己按預約'],
     description: '看清楚書名和取書館，再自己按「預約」',
     keywords: const ['借', '預約'],
     requires: const ['choose_branch'],
@@ -397,6 +403,7 @@ final List<GuideComponent> libraryComponents = [
   GuideComponent(
     id: 'open_ranking',
     title: '看點閱排行',
+    briefs: const ['往下滑，點點閱排行'],
     description: '打開點閱排行的「更多」，看大家最常看的書',
     keywords: const ['排行', '排名', '最多人', '最熱門', '大家都看'],
     requires: const [],
@@ -441,6 +448,7 @@ final List<GuideComponent> libraryComponents = [
   GuideComponent(
     id: 'open_notices',
     title: '看圖書館公告',
+    briefs: const ['往下滑，看重要訊息'],
     description: '打開重要訊息的「更多」，看圖書館的公告',
     keywords: const ['公告', '訊息', '消息', '休館', '開館', '暫停服務'],
     requires: const [],
@@ -482,6 +490,7 @@ final List<GuideComponent> libraryComponents = [
   GuideComponent(
     id: 'open_records',
     title: '打開我的紀錄',
+    briefs: const ['點上面的我的紀錄'],
     description: '點上面的「我的紀錄」，看預約和借閱',
     keywords: const ['紀錄', '記錄', '借了', '借閱中', '還書', '到期'],
     requires: const [],
@@ -502,6 +511,7 @@ final List<GuideComponent> libraryComponents = [
   GuideComponent(
     id: 'check_pickup',
     title: '看可以取的書',
+    briefs: const ['點可取書'],
     description: '在我的紀錄點「可取書」，看哪本書可以去拿',
     keywords: const [
       '取書',
@@ -535,6 +545,7 @@ final List<GuideComponent> libraryComponents = [
   GuideComponent(
     id: 'open_map',
     title: '看分館地圖',
+    briefs: const ['點上面的分館地圖'],
     description: '點上面的「分館地圖」，找附近的圖書館',
     keywords: const ['分館', '地圖', '在哪', '附近', '最近', '地址'],
     requires: const [],

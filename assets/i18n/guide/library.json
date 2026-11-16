@@ -241,6 +241,20 @@
    "id": "Gulir sampai paling bawah untuk menemukan “{page:重要訊息}”.",
    "tl": "Mag-scroll pababa hanggang sa ibaba para makita ang “{page:重要訊息}”."
   },
+  "往下滑，看重要訊息": {
+   "en": "Scroll down to Important Messages",
+   "ja": "下へスクロールして重要なお知らせへ",
+   "vi": "Cuộn xuống phần Thông báo quan trọng",
+   "id": "Gulir ke bawah ke Pesan Penting",
+   "tl": "Mag-scroll pababa sa Important Messages"
+  },
+  "往下滑，點點閱排行": {
+   "en": "Scroll down to Most Viewed",
+   "ja": "下へスクロールして閲覧ランキングへ",
+   "vi": "Cuộn xuống phần Xem nhiều nhất",
+   "id": "Gulir ke bawah ke Paling Banyak Dilihat",
+   "tl": "Mag-scroll pababa sa Most Viewed"
+  },
   "我們先找書！點一下上面的「關鍵字搜尋」。": {
    "en": "Let’s find a book first! Tap “{page:關鍵字搜尋}” at the top.",
    "ja": "まず本を探しましょう！上の「{page:關鍵字搜尋}」をタップしてください。",
@@ -261,6 +275,13 @@
    "vi": "Gõ xong chưa? Chạm vào kính lúp bên phải để tìm.",
    "id": "Sudah selesai mengetik? Ketuk kaca pembesar di kanan untuk mencari.",
    "tl": "Tapos nang mag-type? I-tap ang magnifying glass sa kanan para maghanap."
+  },
+  "打書名，按放大鏡搜尋": {
+   "en": "Type a title, then tap the magnifier",
+   "ja": "書名を入力して虫めがねをタップ",
+   "vi": "Gõ tên sách rồi chạm kính lúp",
+   "id": "Ketik judul, lalu ketuk kaca pembesar",
+   "tl": "I-type ang pamagat, saka i-tap ang magnifier"
   },
   "打開我的紀錄": {
    "en": "Open my records",
@@ -401,6 +422,13 @@
    "vi": "Kiểm tra rồi chạm “{page:預約}”",
    "id": "Periksa, lalu ketuk “{page:預約}”",
    "tl": "Suriin, saka i-tap ang “{page:預約}”"
+  },
+  "確認後自己按預約": {
+   "en": "Check, then tap Reserve yourself",
+   "ja": "確認して自分で予約をタップ",
+   "vi": "Kiểm tra rồi tự chạm Đặt trước",
+   "id": "Periksa, lalu ketuk Reservasi sendiri",
+   "tl": "Suriin, saka ikaw mismo ang mag-tap ng Reserve"
   },
   "等通知，到館取書": {
    "en": "Wait for the notice, then pick up the book",
@@ -598,6 +626,13 @@
    "id": "Pilih perpustakaan pengambilan",
    "tl": "Pumili ng aklatang kukunan"
   },
+  "選要去拿書的圖書館": {
+   "en": "Choose where to pick up the book",
+   "ja": "受け取る図書館を選ぶ",
+   "vi": "Chọn thư viện để nhận sách",
+   "id": "Pilih perpustakaan tempat ambil buku",
+   "tl": "Piliin kung saang aklatan kukunin ang libro"
+  },
   "開啟圖書館服務": {
    "en": "Open the library service",
    "ja": "図書館サービスを開く",
@@ -696,12 +731,54 @@
    "id": "Ketuk kotaknya dan ketik judul yang Anda cari, misalnya “神奇柑仔店”.",
    "tl": "I-tap ang box at i-type ang pamagat na hinahanap mo, hal. “神奇柑仔店”."
   },
+  "點一個熱門關鍵字": {
+   "en": "Tap a popular keyword",
+   "ja": "人気キーワードを1つタップ",
+   "vi": "Chạm một từ khóa phổ biến",
+   "id": "Ketuk satu kata kunci populer",
+   "tl": "I-tap ang isang sikat na keyword"
+  },
+  "點上面的分館地圖": {
+   "en": "Tap Branch Map at the top",
+   "ja": "上の分館マップをタップ",
+   "vi": "Chạm Bản đồ chi nhánh ở trên",
+   "id": "Ketuk Peta Cabang di atas",
+   "tl": "I-tap ang Branch Map sa itaas"
+  },
+  "點上面的我的紀錄": {
+   "en": "Tap My Records at the top",
+   "ja": "上のマイ記録をタップ",
+   "vi": "Chạm Hồ sơ của tôi ở trên",
+   "id": "Ketuk Catatan Saya di atas",
+   "tl": "I-tap ang My Records sa itaas"
+  },
+  "點上面的關鍵字搜尋": {
+   "en": "Tap Keyword Search at the top",
+   "ja": "上のキーワード検索をタップ",
+   "vi": "Chạm Tìm theo từ khóa ở trên",
+   "id": "Ketuk Pencarian kata kunci di atas",
+   "tl": "I-tap ang Keyword Search sa itaas"
+  },
   "點公告的標題，可以看完整的內容。": {
    "en": "Tap a notice’s title to read all of it.",
    "ja": "お知らせのタイトルをタップすると、全文が読めます。",
    "vi": "Chạm vào tiêu đề thông báo để xem toàn bộ nội dung.",
    "id": "Ketuk judul pengumuman untuk membaca isi lengkapnya.",
    "tl": "I-tap ang pamagat ng isang abiso para mabasa ito nang buo."
+  },
+  "點可取書": {
+   "en": "Tap Ready for pickup",
+   "ja": "受け取り可をタップ",
+   "vi": "Chạm Có thể nhận sách",
+   "id": "Ketuk Siap diambil",
+   "tl": "I-tap ang Ready for pickup"
+  },
+  "點想借的書名": {
+   "en": "Tap the book you want",
+   "ja": "借りたい本の書名をタップ",
+   "vi": "Chạm vào sách bạn muốn mượn",
+   "id": "Ketuk buku yang ingin dipinjam",
+   "tl": "I-tap ang librong gusto mong hiramin"
   },
   "點每一行可以打開來看是哪幾本書。": {
    "en": "Tap each row to open it and see which books are in it.",

@@ -122,7 +122,9 @@ class WebFieldInput {
 
   /// Sets the value with the element's own (native) setter, then sends
   /// `input` and `change` so the page's framework (Vue's v-model) sees it,
-  /// as if typed. A textarea gets [FieldFill.text] after its text.
+  /// as if typed. A textarea gets [FieldFill.text] after its text. The
+  /// field then counts as finished for the guide's steps (no need to close
+  /// the keyboard first).
   static String insertScript(FieldFill fill) =>
       '''
 (() => {
@@ -137,6 +139,9 @@ class WebFieldInput {
   el.dispatchEvent(new Event('input', { bubbles: true }));
   el.dispatchEvent(new Event('change', { bubbles: true }));
   window.__tpFieldUndo = { el, before, after: el.value };
+  // Said words are a whole entry: the field counts as typed out, also while
+  // it keeps the focus (WebPageSpec.fieldWatch, settled()).
+  (window.__tpDone || (window.__tpDone = new WeakMap())).set(el, el.value || '');
   return JSON.stringify({ ok: true, value: el.value });
 })()
 ''';

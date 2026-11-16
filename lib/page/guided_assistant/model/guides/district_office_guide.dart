@@ -27,8 +27,9 @@ import 'package:town_pass/page/guided_assistant/web/web_page_state.dart';
 const _walk = r'''((sec, kind, any) => {
   const none = { el: null, kind: '', name: '', hint: '', opts: 0, choices: '', open: true, empty: false, typing: false };
   // A text box the user is still typing in counts as empty, so the card does
-  // not jump to the next field after the first letter.
-  const typed = (e) => !!(e.value || '').trim() && document.activeElement === e;
+  // not jump to the next field after the first letter (editing(): until
+  // Enter, the keyboard goes down, 按住輸入 or the box loses the focus).
+  const typed = (e) => !!(e.value || '').trim() && editing(e);
   if (!byText('form button.base-button', '下一步')) return none;
   const svc = byText('section > div.py-5.px-4 > button', '申辦服務資料');
   for (const g of qa('div.flex.flex-col')) {
@@ -210,12 +211,6 @@ const _readNote = '建議還是把說明看完喔。';
 
 // ---- Card position ---------------------------------------------------------
 
-/// The WebView starts this far below the safe-area top (cardTop's origin).
-const _webTop = 56.0;
-const _cardHeight = 200.0;
-const _maxCardTop = 560.0;
-const _viewport = 756.0;
-
 /// Where [id] is in the viewport: (top, bottom, 'in' / 'below' / 'above').
 (double, double, String)? _pos(WebPageState s, String? id) {
   if (id == null) return null;
@@ -227,18 +222,12 @@ const _viewport = 756.0;
   return (top, bottom, p[2]);
 }
 
-/// Card just below the target, or above it when there is no room.
-double _cardNear(WebPageState s, String? id, {double otherwise = 300}) {
-  final p = _pos(s, id);
-  if (p == null) return otherwise;
-  final top = p.$1.clamp(0.0, _viewport);
-  final bottom = p.$2.clamp(0.0, _viewport);
-  if (bottom - top < 8) return otherwise;
-  final below = bottom + _webTop + 14;
-  if (below <= _maxCardTop) return below;
-  final above = top + _webTop - _cardHeight - 14;
-  return above >= 4 ? above : 4;
-}
+/// The card's preferred top while the step points at [id]. The host keeps
+/// the card off that ring, beside it or as one line (GuideCardLayout,
+/// docs/AI_CURRENT_RULES.md section 5, 2026-11-16); the guessed card and
+/// screen heights that were here are gone.
+double _cardNear(WebPageState s, String? id, {double otherwise = 300}) =>
+    otherwise;
 
 /// The target is (partly) outside the viewport.
 bool _offScreen(WebPageState s, String? id) {
@@ -519,6 +508,7 @@ final List<GuideComponent> districtOfficeComponents = [
   GuideComponent(
     id: 'search_service',
     title: '用關鍵字找申辦項目',
+    briefs: const ['打關鍵字，按放大鏡'],
     description: '在上面的搜尋框打想辦的事，例如補助，再按放大鏡',
     keywords: const [
       '搜尋申辦',
@@ -571,6 +561,7 @@ final List<GuideComponent> districtOfficeComponents = [
   GuideComponent(
     id: 'open_service',
     title: '點要申辦的項目',
+    briefs: const ['點要申請的項目'],
     description: '在申辦清單打開申訴類或補助類，點要申請的項目',
     keywords: const ['申辦項目', '補助類', '申訴類', '要申請哪', '申請項目', '哪一項'],
     requires: const [],
@@ -594,6 +585,7 @@ final List<GuideComponent> districtOfficeComponents = [
   GuideComponent(
     id: 'fill_basic',
     title: '填寫基本資料',
+    briefs: const ['一格一格填基本資料'],
     description: '在表單的基本資料填電子信箱、縣市、鄉鎮區和通訊地址',
     keywords: const ['基本資料', '電子信箱', '通訊地址', '鄉鎮區', '縣市'],
     requires: const ['open_service'],
@@ -606,6 +598,7 @@ final List<GuideComponent> districtOfficeComponents = [
   GuideComponent(
     id: 'fill_details',
     title: '填寫申辦服務資料',
+    briefs: const ['一格一格填申辦資料'],
     description: '在申辦服務資料一格一格填好，有星號的都要填',
     keywords: const ['申辦服務資料', '申訴內容', '承辦機關', '駕駛人姓名', '寄發', '申請表單'],
     requires: const ['open_service'],
@@ -618,6 +611,7 @@ final List<GuideComponent> districtOfficeComponents = [
   GuideComponent(
     id: 'pick_items',
     title: '選申訴項目（可多選）',
+    briefs: const ['勾選符合的項目'],
     description: '點申訴項目的框框，在跳出的選單勾選，再按確認',
     keywords: const ['申訴項目', '可多選', '多選', '勾好幾個'],
     requires: const ['open_service'],
@@ -667,6 +661,7 @@ final List<GuideComponent> districtOfficeComponents = [
   GuideComponent(
     id: 'pick_date',
     title: '在日曆選日期',
+    briefs: const ['在日曆點那一天'],
     description: '點日期的框框，在跳出的日曆點那一天',
     keywords: const ['肇事日期', '選日期', '日曆', '哪一天', '月份', '日期要怎麼選', '怎麼選日期'],
     requires: const ['open_service'],
@@ -713,6 +708,7 @@ final List<GuideComponent> districtOfficeComponents = [
   GuideComponent(
     id: 'next_step',
     title: '按「下一步」檢查資料',
+    briefs: const ['按下一步'],
     description: '表單填好後滑到最下面按下一步，到確認頁',
     keywords: const ['下一步', '不能為空', '紅字', '填好了'],
     requires: const ['fill_basic', 'fill_details'],
@@ -751,6 +747,7 @@ final List<GuideComponent> districtOfficeComponents = [
   GuideComponent(
     id: 'consent',
     title: '選要不要提供個人資料',
+    briefs: const ['往下滑，看完說明', '選同意或不同意'],
     description: '在確認頁的個人資料是否提供給承辦員選同意或不同意',
     keywords: const ['提供給承辦員', '個人資料', '不同意', '同意'],
     requires: const ['next_step'],
@@ -812,6 +809,7 @@ final List<GuideComponent> districtOfficeComponents = [
   GuideComponent(
     id: 'submit',
     title: '確認後自己按「送出」',
+    briefs: const ['確認後自己按送出'],
     description: '在確認頁檢查填的資料，沒問題再自己按送出',
     keywords: const ['送出', '申辦', '申請', '區公所', '辦補助', '提出申請'],
     requires: const ['next_step'],
@@ -859,6 +857,7 @@ final List<GuideComponent> districtOfficeComponents = [
   GuideComponent(
     id: 'check_progress',
     title: '到「查詢」看案件進度',
+    briefs: const ['點上面的查詢'],
     description: '點上面的查詢，看申辦中的案件辦到哪裡',
     keywords: const ['申辦進度', '案件進度', '辦到哪', '申辦中', '待審核', '案件查詢', '處理到哪'],
     requires: const [],
@@ -893,6 +892,7 @@ final List<GuideComponent> districtOfficeComponents = [
   GuideComponent(
     id: 'view_closed',
     title: '看已結案的案件',
+    briefs: const ['點已結案'],
     description: '在查詢點已結案，看已經辦完的案件',
     keywords: const ['已結案', '辦完', '結案', '辦好了', '辦好的'],
     requires: const ['check_progress'],

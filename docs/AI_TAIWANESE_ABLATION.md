@@ -249,3 +249,52 @@ python -X utf8 scripts\taiwanese_ablation.py report     # results\report.json
 依序執行的批次：`D:\TownPassAssistant\taiwanese-ablation\scripts\run_all.sh`、`run_after.sh`、`run_mandarin.sh`。
 檔案：模型 `taiwanese-ablation\models\`（含 Breeze f16 3.1 GB，可刪）、權重 `source\`、音檔 `wav\`、參考與標籤 `data\`、結果 `results\`（每段 JSONL、`*.meta.json`、`*.cli-timing.json`、`decisions.json`、`report.json`）。
 復原：刪除本文件與 `scripts/taiwanese_ablation.py`（本分支只新增這兩個檔案）。
+
+## 14. 降低 Breeze q4_0 的記憶體需求（2026-11-16，`feat/need-style-assistant`）
+
+背景：iPhone 用了一陣子後 App 額度約 2.0 GB，載入前要「檔案＋1,000 MB＋256 MB」＝2,104 MB，台語 12 次都載不起來（[iOS](AI_ON_DEVICE_IOS.md)「台語：不改用華語、記憶體、紀錄檔」）。
+問題：同一個 q4_0，有沒有 whisper-server 設定能降低峰值記憶體、又不影響準確度。
+
+**怎麼量**：電腦版 whisper.cpp v1.9.5 `whisper-server`（CPU，MSYS2 UCRT64），`D:\TownPassAssistant\models\taiwanese\ggml-breeze-asr-26-q4_0.bin`（與 App 同一檔），
+請求走 `asr_server.WhisperCppRecognizer` 的台語路徑（`-l zh`、不送提示、`audio_ctx` ≥ 500、溫度重試 0.4）。資料是第 2 節的 held-out 100、dev 50、mandarin 40
+（沒有用其他資料）。記憶體：`psutil` 的 working set（RSS）與 private bytes（commit），載入後與全部跑完各讀一次（含峰值）。
+腳本：`D:\TownPassAssistant\taiwanese-ablation\scripts-20261116\tw_memory_bench.py`；結果：`D:\TownPassAssistant\taiwanese-ablation\results-memory-20261116\`。
+同時有其他程式在跑，秒數只當參考。
+
+| 設定 | 資料 | 華語 CER | 台語漢字 CER | 保留服務詞 | 聽不清／迴圈 | 載入後 RSS | 峰值 RSS | 峰值 commit |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 現在（`-t 6 -l zh`，best_of 預設 2） | held-out 100 | 0.498 | 0.564 | 32/50 | 4／2 | 1,219 MB | 1,513 MB | 2,066 MB |
+| **`-bo 1`** | held-out 100 | **0.498** | **0.564** | **32/50** | 4／2 | 1,221 MB | **1,274 MB** | **1,824 MB** |
+| 現在 | dev 50 | — | 0.649 | 13/25 | 1／1 | 1,219 MB | 1,515 MB | 2,066 MB |
+| `-bo 1` | dev 50 | — | 0.649 | 13/25 | 1／1 | 1,221 MB | 1,273 MB | 1,823 MB |
+| 現在 | mandarin 40 | 0.128 | — | — | 0／0 | 1,221 MB | 1,270 MB | 1,823 MB |
+
+- 第 4 節的 q4_0 數字（華語 CER 0.50、32/50、峰值 1,219／1,514）在這次完全重現。
+- `-bo 1` 的 held-out 100 段只有 2 段文字不同，都是溫度重試時的隨機取樣（其中 1 段兩邊都是重複迴圈）；dev 50 段相同。
+- **原因**：whisper.cpp 的 `whisper_full_with_state` 在溫度 > 0 時用 `best_of` 個解碼器，解碼器數變多就把 self-attention 的 KV 快取以 (n＋2) 倍重建（`factor = n_decoders > 1 ? n_decoders + 2 : 1`），
+  而且之後不縮回。預設 best_of 2 → 4 倍：84 MB → 336 MB（＋252 MB，10⁶ B）。mandarin 40 段沒有任何一段觸發溫度重試，所以峰值本來就只有 1,270 MB；
+  台語只要有一段重試，峰值就多約 240 MB 並一直留著。`-bo 1`（或請求帶 `best_of=1`）時溫度重試只用一個解碼器，KV 不重建。
+
+其他方向（10 段：held-out 裡最慢的第 2–5 段＋dev 前 6 段；6 種設定的文字全部相同；這 10 段沒有觸發 KV 重建）：
+
+| 設定 | 載入後 commit | 峰值 RSS | 峰值 commit | whisper.cpp 配置 | 結論 |
+| --- | --- | --- | --- | --- | --- |
+| 現在／`-bo 1`／只在請求帶 `best_of=1` | 1,806 MB | 1,266 MB | 1,817 MB | encode 55 MB | 同 |
+| `-nfa`（關 flash attention） | 1,956 MB | 1,291 MB | 1,974 MB | encode **212 MB** | 更多、更慢，不用（App 預設就是開） |
+| `-bo 1 -t 4` | 1,806 MB | 1,265 MB | 1,816 MB | 同 | 記憶體不變 |
+| `-bo 1 -mc 64`（文字上下文） | 1,806 MB | 1,266 MB | 1,817 MB | 同 | 記憶體不變 |
+
+- **beam size**：whisper-server 預設 `-bs -1`（greedy），`-bs 1` 相同，不用改。**processors**：App 都是 1；多於 1 會多開 state，只會更多。
+- **audio_ctx、n_text_ctx 不能從參數省**：KV cross 固定照模型的 1,500 格配置（252 MB），計算緩衝區在載入時照最壞情況（30 秒）配置；請求的 `audio_ctx` 只省計算時間。
+  KV self 照 `n_text_ctx`（448，補到 512）配置；`-mc` 只限制提示長度。要省這些得改 whisper.cpp 原生程式（第 9 節估約 110 MB），這次沒做。
+- 準確度只能用第 2 節的公開片段；沒有真人的台語請求錄音（tw01–tw52 還沒錄）。
+
+**iPhone 上的需要量**（iPhone 17 Pro Max 的 whisper.cpp 紀錄，Metal）：權重 888＋KV 343（self 84＋cross 252＋pad 8）＋計算緩衝區 335（conv 36、encode 67、cross 132、decode 100）＝1,567 MB（10⁶ B）＝1,494 MiB，
+比檔案（848 MiB）多 646 MiB；這些都在載入時配置。載入並辨識一段後 App 額度少了 1,327 MB。舊的 1,000 MB 等於 646＋KV 重建的 240＋餘裕。
+
+**採用**：
+- 台語 whisper-server 加 `-bo 1`（`OnDeviceAssistant.swift`、`OnDeviceAssistant.kt`），後端每個台語請求也送 `best_of=1`（`asr_server.TAIWANESE_BEST_OF`）——兩邊都設，舊的或新的一邊單獨更新也不會重建 KV。
+- iPhone 載入前的估計 `taiwaneseOverhead` 1,000 → **750 MB**（實際配置 646 MiB 再加約 100 MiB），保留 256 MB 不變：需要 848＋750＋256＝**1,854 MB**（原本 2,104 MB）。
+  前一次使用期間的額度 1,942–2,103 MB 在額度這一關都會通過；q8_0 照新算法要 2,585 MB，11/13 閃退時的 2,247 MB 仍會被拒絕。
+  位址空間檢查同樣保留檔案大小＋750＋256 MB，那 12 次也都是 `address space short`，**有沒有改善要 iPhone 實測**。
+- Android 的估計（檔案 × 1.3＋300 MB＝1,402 MB）不改：加了 `-bo 1` 後電腦峰值 1,274 MB 在它之下（原本 1,513 MB 反而超過）。

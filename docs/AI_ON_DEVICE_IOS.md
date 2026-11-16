@@ -168,6 +168,47 @@ Android 不受影響：`AssistantOnDevice.start` 在 Android 不啟用，`settle
 （紀錄顯示 iOS 收回 :8774／:8778 後約 1 秒內 `bound again`）；台語 q4_0 載入約 0.8 秒、沒有閃退，但記憶體很緊（需要約 1,847＋256 MB，額度約 2,204 MB）。
 這次的建置沒有 `increased-memory-limit` entitlement。
 
+## 台語：不改用華語、記憶體、紀錄檔（2026-11-16，branch `feat/need-style-assistant`，Swift 尚待 CI 編譯與 iPhone 實測）
+
+**紀錄**（擁有者，iPhone 17 Pro Max，`D:\TownPassAssistant\ios-resume\logs\taiwanese-20261116\`）：
+
+1. **前一次使用期間**（`.prev.log`，17:31–17:44）：台語模型 12 次都沒有載入，每次都是
+   `taiwanese speech: needs 1847 MB + 256 MB margin; app budget 1942–2103 MB … address space short`（回 `memory`）。
+   同一段期間閘門台語分數 0.80–0.90 的片段（`taiwanese=None:0.87` 等）都改用華語模型解碼，畫面上沒有任何提示。
+   App 額度剛啟動時約 2.2–2.4 GB，用一陣子、經過幾次背景降到約 2.0 GB。
+2. **新啟動**（`.log`，20:22）：額度 2,406 MB，台語 0.8 秒載入；whisper.cpp 印出的 Metal 配置是權重 888、KV 343（self 84＋cross 252＋pad 8）、
+   計算緩衝區 335（conv 36＋encode 67＋cross 132＋decode 100），合計 1,567 MB（10⁶ 位元組，＝1,494 MiB）。
+   載入並辨識一段之後額度從 2,406 降到 1,079 MB（用掉 1,327 MB）。鎖屏回來 `bound again`，仍然健康。
+3. **紀錄檔被覆蓋**：stdout 用 `freopen(log, "w")`、stderr 用 `freopen(log, "a")`，同一個檔有兩個各自的檔案位置，
+   stdout 從檔頭寫、蓋掉 stderr 已經寫的內容，順序也亂掉（`.log` 開頭就是被截斷的行）。
+
+**修正**
+
+| | 做法 | 位置 |
+| --- | --- | --- |
+| A | 閘門有把握是台語（分數 ≥ 0.5）而台語模型拿不到時，**不再用華語模型的結果**（分數只到 0.5–0.68、華語結果清楚又是 App 認得的例外；沒下載台語模型時照舊用華語聽）：還在載入就等（最多 25 秒）；記憶體不足、沒啟動成功、連不上時回 422 和原因，App 說「聽起來是台語，但台語模型現在無法使用（手機記憶體不足）。請改用華語說，或用打字。」（6 種語言）。規則與理由見 [現行規則](AI_CURRENT_RULES.md) 第 4 節、[台語規劃](AI_TAIWANESE_SPEECH_PLAN.md) 第 14 節 | `asr_server.py`、`server.py`、`i18n.py`、`device_main.BoundedStarter` |
+| B | 台語 whisper-server 加 `-bo 1`，後端每次送 `best_of=1`：whisper.cpp 在第一次溫度重試時會把 KV self 重建成 4 倍（84 → 336 MB）而且不釋放；改成一個解碼器後不會發生。載入前的估計從「檔案＋1,000 MB＋256 MB」改成「檔案＋750 MB＋256 MB」（848＋750＋256＝1,854 MB）。實測與理由見 [台語消融](AI_TAIWANESE_ABLATION.md) 第 14 節 | `OnDeviceAssistant.swift` `taiwaneseOverhead`、`OnDeviceAssistant.kt`、`asr_server.TAIWANESE_BEST_OF` |
+| C | 先建立空的紀錄檔，stdout 與 stderr 都用 `"a"` 開：每次寫入（`O_APPEND`）都寫到檔尾，不會互相覆蓋、依寫入順序排列。`.prev.log` 輪替不變 | `OnDeviceAssistant.swift` `launch` |
+
+C 為什麼這樣寫：只用這個檔案已經在用、已經在 CI 編譯過的 `freopen` 與 `FileManager.createFile`，不引入 `open`／`dup2` 的 Swift 型別轉換；
+POSIX 的 `O_APPEND` 保證每次 `write` 前先移到檔尾，Python 直接寫 fd 1／2 也一樣。電腦上用同樣的 C 程式重現：`"w"`＋`"a"` 時開頭一行被截成「rom a server)」，兩個都 `"a"` 時六行依序完整
+（`scratchpad\logtest\t.c`，不在 repo）。
+
+**用 B 的估計重看這次的紀錄**：前一次使用期間的額度 1,942–2,103 MB 都 ≥ 1,854 MB，12 次在額度上都會通過；但這 12 次同時也是 `address space short`，
+位址空間的保留量從 2,104 MB 降到 1,854 MB，**夠不夠要實機才知道**。11/13 閃退的 q8_0（額度 2,247 MB）在新估計下要 2,585 MB，仍然會被拒絕，不會再閃退。
+
+**擁有者實測步驟**（iPhone，CI 建置後側載；分類器模式）：
+
+1. 開 App 後先說一句台語：紀錄應有 `taiwanese speech: needs 1597 MB + 256 MB margin`、`loaded in`，whisper.cpp 的 `MTL0 total size`、`kv self size = 83.89 MB` 一行。
+2. 連說 5–10 句台語（含一兩句很短、含糊的，讓 whisper.cpp 走溫度重試），每句後看 `foreground:` 或下一次 `needs` 的 `app budget`：
+   **不應再看到額度在某一句後突然少約 250 MB**（那是 KV 重建；`-bo 1` 後不會發生）。
+3. 用一陣子、切背景幾次（額度降到約 2.0 GB）後，再把 App 滑掉重開前先說台語：看 `address space ok/short`。
+4. 故意讓台語載不起來（例如先開幾個大 App 把額度壓低再回來）說台語：應出現「聽起來是台語，但台語模型現在無法使用…」，
+   **不應出現奇怪的中文**；`diag` 行會有 `taiwanese=withheld:0.8x unavailable=memory`。同時說幾句華語請求（「我要繳水費」），應照常處理。
+   刪掉台語模型（`missing`）時照舊用華語聽、沒有說明。
+5. 鎖屏 1 分鐘再解鎖後立刻說台語：應正常辨識（`bound again` 後最多再問一次 App），不應出現 5 分鐘內都說無法使用。
+6. 把 `on_device_assistant.log` 拉回來：開頭不應有被截斷的行，`TownPassAssistant:` 行與 server 的輸出應依時間交錯。
+
 ## 與 Android 的差別
 
 - 還沒有的：Gemma 4 E2B 決策模型（只有 Ministral）、越南文 PhoWhisper（越南文由 Whisper small 解碼）。後端已支援，

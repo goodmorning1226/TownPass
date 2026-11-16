@@ -61,6 +61,42 @@ TAIWANESE_NAMES = ("nan", "taiwanese", "hokkien", "taigi")
 SPEECH_LANGUAGES = ("auto", *LANGUAGES, TAIWANESE)
 # Why Taiwanese was not used (reply field "notice"); the clip was heard as Chinese.
 TAIWANESE_UNAVAILABLE = ("missing", "memory", "failed", "loading")
+# The Taiwanese model could not be used for a clip the gate is sure is Taiwanese
+# (docs/AI_CURRENT_RULES.md section 4, owner 2026-11-16; iPhone: Breeze could not load
+# for memory 12 times, and clips at gate scores 0.80-0.90 came back from the Chinese
+# model as strange Chinese, with nothing said). Now:
+# - "loading": the clip waits for the model, at most TAIWANESE_LOAD_WAIT_S from its
+#   first ask (asking every TAIWANESE_POLL_S), and is decoded by it; a model that
+#   answered before and now refuses (iOS reclaimed its port, it is restarting) is asked
+#   for once more within the same wait;
+# - any reason in TAIWANESE_WITHHOLD ("unreachable": the server did not answer; also
+#   "loading" after the wait): no Chinese decode is returned. The reply has no text,
+#   notice "taiwanese_unavailable" and notice_reason, and the App says why and offers
+#   Mandarin or typing (server.py, i18n "taiwanese_unavailable_*").
+# "missing" (never downloaded; Taiwanese is optional and off by default) is not withheld:
+# the gate scores ~5 % of Mandarin clips as Taiwanese, and every such clip of a user
+# without the model would be refused (docs/AI_TAIWANESE_SPEECH_PLAN.md section 14).
+# Below TAIWANESE_GATE_SCORE (the same-speaker rule and the second check, 0.3-0.5) the
+# gate is not sure: TAIWANESE_MARGINAL_WITHHOLD decides ("not_clear": withheld only
+# when the Chinese decode is not clear; None: never; "always").
+TAIWANESE_LOAD_WAIT_S = 25.0
+TAIWANESE_POLL_S = 0.5
+TAIWANESE_WITHHOLD = ("memory", "failed", "loading", "unreachable")
+TAIWANESE_MARGINAL_WITHHOLD = "not_clear"
+# Owner, 2026-11-16: the gate only just sure (TAIWANESE_GATE_SCORE up to this score) and the
+# Chinese decode clear and known to the App (known_text): the Chinese decode is kept. The
+# gate scores ~5 % of Mandarin as Taiwanese; on the iPhone, clips at 0.56-0.65 with clear,
+# Mandarin-like text would otherwise be refused. Set on the tuning clips (lang-fix "ours", model
+# out of memory, docs/AI_TAIWANESE_SPEECH_PLAN.md section 14): of the clips withheld at 0.5 or more
+# whose Chinese decode was clear and known, Mandarin scored 0.501-0.547 (and 0.84, 0.91), Taiwanese
+# 0.597 and 0.700-0.955; any value in (0.597, 0.700] keeps 4 Mandarin clips and lets 1 Taiwanese
+# through; 0.68 also covers the iPhone's 0.56-0.65 clips. None: off (no exception).
+TAIWANESE_KEEP_KNOWN_BELOW = 0.68
+# Each Taiwanese decode asks for one decoder only (whisper.cpp best_of): with the server's
+# default of 2, the first temperature fallback re-creates the self-attention KV cache at
+# 4x (84 -> 336 MB for Breeze) and keeps it; one sample per temperature keeps it at 84 MB
+# (docs/AI_TAIWANESE_ABLATION.md section 14).
+TAIWANESE_BEST_OF = 1
 # Encoder frames at least for the Taiwanese model (10 s). With the usual 256 (5 s)
 # Breeze-ASR-26 repeated short clips ("大西洋 大西洋 大西洋…"), whisper.cpp then
 # retried warmer and wrote noise for up to 2 minutes; 500 stopped it on the same
@@ -509,6 +545,7 @@ class WhisperCppRecognizer:
         self.known_text = known_text
         self._models = None  # (taiwanese_gate model, plausibility model), read on first use
         self.taiwanese_until = 0.0  # same-speaker rule: lower threshold until then
+        self.unavailable = self.marginal = None  # this clip's Taiwanese model state (transcribe)
         self.vietnamese = vietnamese
         self.vietnamese_reply = None  # the last decode made by the Vietnamese model
         self.gate_url = gate_url.rstrip("/") if gate_url and self.multi_url else None
@@ -614,25 +651,32 @@ class WhisperCppRecognizer:
         no_speech = max((s.get("no_speech_prob", 0.0) for s in segments), default=1.0)
         return text, round(logprob, 3), round(no_speech, 3)
 
-    def _post(self, url, fields, wav):
+    def _post(self, url, fields, wav, hold=True):
         """One whisper-server request. whisper-server listens only once its model has
         loaded: right after the App starts (or a model was just downloaded) the
         connection is refused, and the clip waits for it, up to READY_WAIT_S,
-        instead of failing (2026-11-11: the first spoken question after launch)."""
+        instead of failing (2026-11-11: the first spoken question after launch).
+        hold=False (the Taiwanese model, 2026-11-16): a server that failed recently is
+        still tried, and a refused connection or timeout does not make the next clips
+        skip it for liveness.HOLD_S (a port iOS reclaimed is bound again in ~1 s); the
+        App is still asked to restart it."""
         import urllib.error
         import urllib.request
         import liveness
         # Only a model that never answered is "still loading": once it has, a refused
         # connection (iOS reclaimed its socket while the App was away) or a timeout gets
         # a short wait, and a model that just failed is skipped (liveness.py, 2026-11-13).
-        if liveness.down(url):
+        if hold and liveness.down(url):
             raise urllib.error.URLError(ConnectionRefusedError("speech model not answering"))
         # A decode may legitimately take many seconds, so a hung whisper-server cost the
         # whole request timeout (the App gave up at 40 s): ask /health first (2 s).
         if liveness.hung(url):
             raise urllib.error.URLError(TimeoutError("speech model not answering"))
         body, content_type = self.multipart(fields, wav)
-        deadline = time.monotonic() + liveness.wait_s(url, READY_WAIT_S)
+        # hold=False: the caller's hook already saw the server listen (the model is
+        # loaded), so a refused connection gets only the short wait, never READY_WAIT_S.
+        startup = READY_WAIT_S if hold else liveness.AFTER_READY_WAIT_S
+        deadline = time.monotonic() + liveness.wait_s(url, startup)
         while True:
             self._wait_until_active()
             request = urllib.request.Request(url + "/inference", data=body, headers={"Content-Type": content_type})
@@ -646,7 +690,7 @@ class WhisperCppRecognizer:
                            and isinstance(exc.reason, ConnectionRefusedError))
                 if not refused or time.monotonic() + READY_PAUSE_S > deadline:
                     if refused or liveness.is_timeout(exc):
-                        liveness.failed(url, "timeout" if liveness.is_timeout(exc) else "refused")
+                        liveness.failed(url, "timeout" if liveness.is_timeout(exc) else "refused", hold=hold)
                     elif isinstance(exc, urllib.error.HTTPError) and exc.code >= 500 and exc.code != 503:
                         # whisper-server could not process the clip: after a failed GPU
                         # command buffer it fails every clip until it restarts.
@@ -687,6 +731,43 @@ class WhisperCppRecognizer:
         if detect_only:
             fields["detect_language"] = "true"  # whisper-server: language only, no text
         return self._post(url, fields, wav)
+
+    def _taiwanese_decode(self, wav, seconds, fallback=True, wait=False):
+        """One decode by the Taiwanese model (Chinese characters, no prompt, no detection):
+        (reply, url, None), or (None, None, reason) with a TAIWANESE_UNAVAILABLE reason or
+        "unreachable". wait: a model still loading is waited for (TAIWANESE_LOAD_WAIT_S),
+        and one that refuses is asked for again once within that time (it may be
+        restarting). A reason found once holds for the rest of the clip (self.unavailable)."""
+        import urllib.error
+        if self.unavailable:
+            return None, None, self.unavailable
+        deadline = time.monotonic() + TAIWANESE_LOAD_WAIT_S
+        asked_again = False
+        while True:
+            url, reason = self.taiwanese_url()
+            if url is None:
+                if wait and reason == "loading" and time.monotonic() + TAIWANESE_POLL_S < deadline:
+                    time.sleep(TAIWANESE_POLL_S)
+                    continue
+                self.unavailable = reason
+                return None, None, reason
+            self.passes = getattr(self, "passes", 0) + 1
+            fields = self._fields(seconds, "zh", fallback, False, TAIWANESE_MIN_AUDIO_CTX)
+            if TAIWANESE_BEST_OF is not None:
+                fields["best_of"] = str(TAIWANESE_BEST_OF)
+            try:
+                return self._post(url, fields, wav, hold=False), url, None
+            except ValueError:
+                self.unavailable = "failed"  # not JSON: the server is broken
+            except urllib.error.HTTPError:
+                self.unavailable = "failed"  # it answered with an error (restart asked by _post)
+            except OSError:
+                if wait and not asked_again and time.monotonic() + TAIWANESE_POLL_S < deadline:
+                    asked_again = True  # restarting, or its port is being bound again: ask the App
+                    time.sleep(TAIWANESE_POLL_S)
+                    continue
+                self.unavailable = "unreachable"
+            return None, None, self.unavailable
 
     def _decode(self, wav, seconds, language, fallback=True):
         """One decode in language: Chinese on the Chinese model, Vietnamese on the
@@ -804,8 +885,11 @@ class WhisperCppRecognizer:
         detectable = bool(self.multi_url) and (language == "auto" or language in LANGUAGES)
         with self.lock:
             taiwanese = None
-            if language == TAIWANESE:
-                taiwanese, notice = self.taiwanese_url()
+            self.unavailable = None  # why the Taiwanese model could not be used (_taiwanese_decode)
+            self.marginal = None  # the same below TAIWANESE_GATE_SCORE (TAIWANESE_MARGINAL_WITHHOLD)
+            withheld = None  # the gate sure of Taiwanese, its model unavailable: no text (TAIWANESE_WITHHOLD)
+            chosen = language == TAIWANESE
+            if chosen:
                 language = "zh"  # without the Taiwanese model: a plain Chinese decode below
             gate = self._gate(wav, seconds) if detectable else None
             heard = language_scores(gate) if gate is not None else {}
@@ -818,7 +902,7 @@ class WhisperCppRecognizer:
                 sure = None  # tiny mistakes Vietnamese for Chinese: let Whisper small detect
             # Leaning to another of our languages, not sure of it (FOREIGN_LEAD).
             lead = top if sure is None and top in FOREIGN and heard[top] >= FOREIGN_LEAD else None
-            route = "chosen" if taiwanese else None
+            route = None
             score = None
             # The gate picked another of our languages (sure of it): that language is
             # decoded and nothing Taiwanese runs (a Vietnamese clip once scored 0.71).
@@ -840,22 +924,23 @@ class WhisperCppRecognizer:
                 # trusted for this menu, so its Taiwanese verdict waits for Whisper
                 # small's detection below (Vietnamese speech then goes to its own model).
                 # The same when the gate leans to another of our languages (FOREIGN_LEAD).
-                if taiwanese_by_gate and menu not in MENU_OVER_CHINESE and not lead:
-                    taiwanese = self.taiwanese_url()[0]
-                    if taiwanese:
-                        route = "gate" if score >= TAIWANESE_GATE_SCORE else "sticky"
             reply = None
-            if taiwanese:
+            if chosen:
                 # Chinese characters from Taiwanese speech, no prompt, no further
-                # language detection.
-                try:
-                    reply, used = self._infer(taiwanese, wav, seconds, "zh", prompt=False,
-                                              minimum_ctx=TAIWANESE_MIN_AUDIO_CTX), "zh"
-                except (OSError, ValueError):
-                    if route == "chosen":
-                        raise
-                    taiwanese, route = None, None  # heard automatically: the usual path instead
-            if reply is None and lead and language not in MENU_OVER_CHINESE and (taiwanese_by_gate or language == "zh"):
+                # language detection. Without the model: a Chinese decode, and the notice.
+                reply, taiwanese, notice = self._taiwanese_decode(wav, seconds, wait=True)
+                if reply is not None:
+                    route, used = "chosen", "zh"
+                elif notice == "unreachable":
+                    notice = "failed"
+            elif taiwanese_by_gate and menu not in MENU_OVER_CHINESE and not lead:
+                why = "gate" if score >= TAIWANESE_GATE_SCORE else "sticky"
+                reply, taiwanese, reason = self._taiwanese_decode(wav, seconds, wait=why == "gate")
+                if reply is not None:
+                    route, used = why, "zh"
+                else:
+                    withheld = self._withhold(score, reason)
+            if reply is None and not withheld and lead and language not in MENU_OVER_CHINESE and (taiwanese_by_gate or language == "zh"):
                 # The gate leans to another of our languages (FOREIGN_LEAD): Whisper small
                 # detects first (detection only: cannot loop). When small picks one of FOREIGN
                 # at CLEAR_LANGUAGE or more (NEAREST folded in, the most likely of all its
@@ -869,15 +954,14 @@ class WhisperCppRecognizer:
                 if leader in FOREIGN and chance >= CLEAR_LANGUAGE:
                     reply, used, confidence = self._decide(wav, seconds, language, language_scores(probe), self.decodes)
                 elif taiwanese_by_gate:
-                    taiwanese = self.taiwanese_url()[0]
-                    if taiwanese:
-                        route = "gate" if score >= TAIWANESE_GATE_SCORE else "sticky"
-                        try:
-                            reply, used = self._infer(taiwanese, wav, seconds, "zh", prompt=False,
-                                                      minimum_ctx=TAIWANESE_MIN_AUDIO_CTX, fallback=False), "zh"
-                        except (OSError, ValueError):
-                            taiwanese, route = None, None
-            if reply is not None:
+                    why = "gate" if score >= TAIWANESE_GATE_SCORE else "sticky"
+                    reply, taiwanese, reason = self._taiwanese_decode(wav, seconds, fallback=False,
+                                                                      wait=why == "gate")
+                    if reply is not None:
+                        route, used = why, "zh"
+                    else:
+                        withheld = self._withhold(score, reason)
+            if reply is not None or withheld:
                 pass
             elif sure:
                 # The gate is sure: one decode, in the language spoken, whatever the menu.
@@ -911,15 +995,14 @@ class WhisperCppRecognizer:
                     # Not another of our languages (Chinese, or one outside ours such as
                     # Korean; 2026-11-13: the most likely overall, not the most likely of
                     # ours): the gate's Taiwanese verdict applies.
-                    taiwanese = self.taiwanese_url()[0]
-                    if taiwanese:
-                        route = "gate" if score >= TAIWANESE_GATE_SCORE else "sticky"
-                        try:
-                            reply, used = self._infer(taiwanese, wav, seconds, "zh", prompt=False,
-                                                      minimum_ctx=TAIWANESE_MIN_AUDIO_CTX, fallback=False), "zh"
-                        except (OSError, ValueError):
-                            taiwanese, route = None, None
-                if reply is None:
+                    why = "gate" if score >= TAIWANESE_GATE_SCORE else "sticky"
+                    reply, taiwanese, reason = self._taiwanese_decode(wav, seconds, fallback=False,
+                                                                      wait=why == "gate")
+                    if reply is not None:
+                        route, used = why, "zh"
+                    else:
+                        withheld = self._withhold(score, reason)
+                if reply is None and not withheld:
                     reply, used, confidence = self._decide(wav, seconds, language, probed, self.decodes)
             else:
                 # Detect with the multilingual model; its decode in the detected
@@ -936,13 +1019,27 @@ class WhisperCppRecognizer:
                     # script).
                     decodes[detected] = auto
                 reply, used, confidence = self._decide(wav, seconds, language, language_scores(auto), decodes)
-            if detectable and not taiwanese:
-                reply, used, confidence = self._rivals(wav, seconds, reply, used, confidence)
-            if other_language and used != "zh":
-                self.taiwanese_until = 0.0  # another of our languages, the gate sure of it: someone else
-            if automatic:
-                reply, taiwanese, route, confidence = self._taiwanese_after(
-                    wav, seconds, score, reply, used, taiwanese, route, confidence)
+            if withheld:
+                reply, used, route = {"text": ""}, "zh", "withheld"
+            else:
+                if detectable and not taiwanese:
+                    reply, used, confidence = self._rivals(wav, seconds, reply, used, confidence)
+                if other_language and used != "zh":
+                    self.taiwanese_until = 0.0  # another of our languages, the gate sure of it: someone else
+                if automatic:
+                    reply, taiwanese, route, confidence = self._taiwanese_after(
+                        wav, seconds, score, reply, used, taiwanese, route, confidence)
+                if self.marginal and not taiwanese and used == "zh":
+                    # The model unavailable and the gate not (quite) sure: below the gate threshold
+                    # only a clear Chinese decode is kept (TAIWANESE_MARGINAL_WITHHOLD "not_clear");
+                    # just above it, only a clear one the App knows (TAIWANESE_KEEP_KNOWN_BELOW).
+                    reason, needs_known = self.marginal
+                    text, logprob, no_speech = self.summarize(reply)
+                    clear = judge(traditional(text), logprob, no_speech) == "clear"
+                    keep = clear and (self._known(reply) if needs_known else TAIWANESE_MARGINAL_WITHHOLD != "always")
+                    if not keep:
+                        withheld = reason
+                        reply, route = {"text": ""}, "withheld"
         text, logprob, no_speech = self.summarize(reply)
         if used == "zh":
             text = traditional(text)  # Whisper small and others often write Simplified
@@ -952,7 +1049,10 @@ class WhisperCppRecognizer:
                   "language_confidence": confidence,
                   **({"speech_model": "taiwanese"} if taiwanese else {}),
                   **({"speech_model": "vietnamese"} if reply is self.vietnamese_reply else {}),
-                  **({"notice": notice} if notice else {})}
+                  **({"notice": notice} if notice else {}),
+                  # No text on purpose: the App says the Taiwanese model cannot be used now.
+                  **({"reason": "taiwanese_unavailable", "notice": "taiwanese_unavailable",
+                      "notice_reason": withheld} if withheld else {})}
         if route or score is not None or (automatic_taiwanese and auto_taiwanese(requested) and self.taiwanese is not None):
             # Timing log only: how Taiwanese was decided, and how Mandarin-like the text reads.
             import plausibility
@@ -1021,6 +1121,22 @@ class WhisperCppRecognizer:
             return False
         return UNKNOWN_TO_TAIWANESE == "any" or status < STATUS_RANK["clear"]
 
+    def _withhold(self, score, reason):
+        """The Taiwanese model could not be used (reason) for a clip whose gate score sent it
+        there: the reason when no Chinese decode may be returned (TAIWANESE_WITHHOLD; the
+        gate sure, at TAIWANESE_GATE_SCORE or more), else None. Below the threshold (the
+        same-speaker rule) the reason is kept in self.marginal for TAIWANESE_MARGINAL_WITHHOLD."""
+        if reason not in TAIWANESE_WITHHOLD:
+            return None  # "missing" (never downloaded): the usual path, as before
+        if score is not None and score >= TAIWANESE_GATE_SCORE:
+            if TAIWANESE_KEEP_KNOWN_BELOW is not None and score < TAIWANESE_KEEP_KNOWN_BELOW:
+                self.marginal = (reason, True)  # only just sure: a clear decode the App knows is kept
+                return None
+            return reason
+        if TAIWANESE_MARGINAL_WITHHOLD:
+            self.marginal = (reason, False)
+        return None
+
     def _taiwanese_after(self, wav, seconds, score, reply, used, taiwanese, route, confidence):
         """After the usual decode (auto_taiwanese): the second check
         (TAIWANESE_RECHECK_SCORE, gate score band and a decode that is not clear), the
@@ -1036,16 +1152,13 @@ class WhisperCppRecognizer:
             elif self._unknown(reply):
                 why = "unknown"
         if why:
-            url = self.taiwanese_url()[0]
-            if url:
-                # A second opinion: no temperature retries (like every pass after the first).
-                try:
-                    other = self._infer(url, wav, seconds, "zh", prompt=False,
-                                        minimum_ctx=TAIWANESE_MIN_AUDIO_CTX, fallback=False)
-                except (OSError, ValueError):
-                    other = None
-                if other is not None and self._key(other) > self._key(reply):
-                    reply, taiwanese, route, confidence = other, url, why, None
+            # A second opinion: no temperature retries (like every pass after the first).
+            other, url, reason = self._taiwanese_decode(wav, seconds, fallback=False)
+            if other is not None and self._key(other) > self._key(reply):
+                reply, taiwanese, route, confidence = other, url, why, None
+            elif (other is None and why == "recheck" and TAIWANESE_MARGINAL_WITHHOLD and reason in TAIWANESE_WITHHOLD
+                    and not self.marginal):
+                self.marginal = (reason, False)  # the gate score said Taiwanese (below the threshold)
         if taiwanese:
             self.taiwanese_until = time.monotonic() + TAIWANESE_STICKY_SECONDS
         else:
@@ -1131,7 +1244,8 @@ def make_handler(recognizer, model_name):
                       f"gate_ms={decoded.get('gate_ms')} candidates={','.join(decoded.get('candidates') or [])} "
                       f"taiwanese={decoded.get('taiwanese_route')}:{decoded.get('taiwanese_score')} "
                       f"plausibility={decoded.get('plausibility')} "
-                      f"{elapsed}ms", flush=True)
+                      + (f"unavailable={decoded['notice_reason']} " if decoded.get("notice_reason") else "")
+                      + f"{elapsed}ms", flush=True)
             self.reply(200, {**decoded, "audio_seconds": round(seconds, 2), "elapsed_ms": elapsed})
     return Handler
 

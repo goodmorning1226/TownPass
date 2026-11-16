@@ -14,6 +14,41 @@
         "vi": "Thanh toán hóa đơn",
         "id": "Bayar tagihan",
         "tl": "Pagbabayad ng bill"
+      },
+      "synonyms": {
+        "zh": [
+          "繳費",
+          "繳款",
+          "付費",
+          "帳單",
+          "費用",
+          "稅費"
+        ],
+        "en": [
+          "bills",
+          "payments",
+          "fees"
+        ],
+        "ja": [
+          "支払い",
+          "料金",
+          "請求書"
+        ],
+        "vi": [
+          "hóa đơn",
+          "thanh toán",
+          "phí"
+        ],
+        "id": [
+          "tagihan",
+          "pembayaran",
+          "biaya"
+        ],
+        "tl": [
+          "bayarin",
+          "bills",
+          "babayaran"
+        ]
       }
     },
     {
@@ -28,6 +63,30 @@
         "vi": "Thư viện",
         "id": "Perpustakaan",
         "tl": "Aklatan"
+      },
+      "synonyms": {
+        "zh": [
+          "圖書",
+          "藏書",
+          "借書服務"
+        ],
+        "en": [
+          "books",
+          "library services"
+        ],
+        "ja": [
+          "本",
+          "図書"
+        ],
+        "vi": [
+          "sách"
+        ],
+        "id": [
+          "buku"
+        ],
+        "tl": [
+          "libro"
+        ]
       }
     },
     {
@@ -42,6 +101,35 @@
         "vi": "Số thứ tự tại quầy",
         "id": "Nomor antrean loket",
         "tl": "Numero sa pila"
+      },
+      "synonyms": {
+        "zh": [
+          "叫號",
+          "抽號",
+          "號碼牌",
+          "排隊"
+        ],
+        "en": [
+          "queues",
+          "queue numbers",
+          "number tickets"
+        ],
+        "ja": [
+          "番号札",
+          "順番待ち"
+        ],
+        "vi": [
+          "số thứ tự",
+          "xếp hàng"
+        ],
+        "id": [
+          "antrean",
+          "nomor antrean"
+        ],
+        "tl": [
+          "pila",
+          "numero sa pila"
+        ]
       }
     },
     {
@@ -56,6 +144,49 @@
         "vi": "Thủ tục và trợ cấp",
         "id": "Pengajuan & bantuan",
         "tl": "Aplikasyon at tulong"
+      },
+      "synonyms": {
+        "zh": [
+          "申辦",
+          "申請",
+          "補助",
+          "津貼",
+          "補貼",
+          "救助",
+          "福利"
+        ],
+        "en": [
+          "benefits",
+          "subsidies",
+          "allowances",
+          "applications",
+          "financial aid"
+        ],
+        "ja": [
+          "補助",
+          "助成",
+          "給付",
+          "手当",
+          "申請"
+        ],
+        "vi": [
+          "trợ cấp",
+          "hỗ trợ",
+          "thủ tục"
+        ],
+        "id": [
+          "bantuan",
+          "subsidi",
+          "tunjangan",
+          "pengajuan"
+        ],
+        "tl": [
+          "tulong",
+          "ayuda",
+          "subsidyo",
+          "benepisyo",
+          "aplikasyon"
+        ]
       }
     },
     {
@@ -70,6 +201,36 @@
         "vi": "Phản ánh với thành phố",
         "id": "Lapor ke pemerintah kota",
         "tl": "Mag-ulat sa lungsod"
+      },
+      "synonyms": {
+        "zh": [
+          "陳情",
+          "反映",
+          "檢舉",
+          "投訴"
+        ],
+        "en": [
+          "complaints",
+          "petitions"
+        ],
+        "ja": [
+          "陳情",
+          "苦情",
+          "要望"
+        ],
+        "vi": [
+          "khiếu nại",
+          "phản ánh",
+          "kiến nghị"
+        ],
+        "id": [
+          "pengaduan",
+          "keluhan"
+        ],
+        "tl": [
+          "reklamo",
+          "sumbong"
+        ]
       }
     },
     {
@@ -84,6 +245,31 @@
         "vi": "Báo cáo thiên tai",
         "id": "Lapor bencana",
         "tl": "Mag-ulat ng sakuna"
+      },
+      "synonyms": {
+        "zh": [
+          "災情",
+          "災害"
+        ],
+        "en": [
+          "hazards",
+          "disasters"
+        ],
+        "ja": [
+          "災害",
+          "被害"
+        ],
+        "vi": [
+          "thiên tai",
+          "sự cố"
+        ],
+        "id": [
+          "bencana"
+        ],
+        "tl": [
+          "sakuna",
+          "kalamidad"
+        ]
       }
     },
     {
@@ -98,6 +284,33 @@
         "vi": "Báo cảnh sát",
         "id": "Lapor polisi",
         "tl": "Pulis"
+      },
+      "synonyms": {
+        "zh": [
+          "報案",
+          "警察",
+          "警政"
+        ],
+        "en": [
+          "police reports",
+          "police services"
+        ],
+        "ja": [
+          "警察",
+          "届け出"
+        ],
+        "vi": [
+          "cảnh sát",
+          "trình báo"
+        ],
+        "id": [
+          "polisi",
+          "laporan polisi"
+        ],
+        "tl": [
+          "pulis",
+          "ulat sa pulis"
+        ]
       }
     },
     {
@@ -112,6 +325,33 @@
         "vi": "Theo dõi hồ sơ",
         "id": "Cek status kasus",
         "tl": "Subaybayan ang kaso"
+      },
+      "synonyms": {
+        "zh": [
+          "案件",
+          "進度",
+          "案件進度"
+        ],
+        "en": [
+          "cases",
+          "case status"
+        ],
+        "ja": [
+          "進捗",
+          "案件"
+        ],
+        "vi": [
+          "hồ sơ",
+          "tiến độ"
+        ],
+        "id": [
+          "kasus",
+          "status kasus"
+        ],
+        "tl": [
+          "kaso",
+          "status ng kaso"
+        ]
       }
     },
     {
@@ -126,6 +366,46 @@
         "vi": "Ưu đãi và vé",
         "id": "Promo & tiket",
         "tl": "Mga diskwento at tiket"
+      },
+      "synonyms": {
+        "zh": [
+          "優惠",
+          "折扣",
+          "票券",
+          "優惠券",
+          "好康"
+        ],
+        "en": [
+          "deals",
+          "discounts",
+          "coupons",
+          "tickets",
+          "offers"
+        ],
+        "ja": [
+          "特典",
+          "割引",
+          "クーポン",
+          "チケット"
+        ],
+        "vi": [
+          "ưu đãi",
+          "giảm giá",
+          "phiếu giảm giá",
+          "vé"
+        ],
+        "id": [
+          "promo",
+          "diskon",
+          "kupon",
+          "tiket"
+        ],
+        "tl": [
+          "diskwento",
+          "kupon",
+          "promo",
+          "tiket"
+        ]
       }
     },
     {
@@ -140,6 +420,43 @@
         "vi": "Tin nhắn, sự kiện và đăng ký",
         "id": "Pesan, acara & langganan",
         "tl": "Mensahe, event at subscription"
+      },
+      "synonyms": {
+        "zh": [
+          "訊息",
+          "活動",
+          "訂閱",
+          "通知",
+          "消息"
+        ],
+        "en": [
+          "messages",
+          "events",
+          "notifications",
+          "activities"
+        ],
+        "ja": [
+          "お知らせ",
+          "イベント",
+          "通知"
+        ],
+        "vi": [
+          "tin nhắn",
+          "sự kiện",
+          "thông báo"
+        ],
+        "id": [
+          "pesan",
+          "acara",
+          "berita",
+          "notifikasi"
+        ],
+        "tl": [
+          "mensahe",
+          "event",
+          "balita",
+          "abiso"
+        ]
       }
     },
     {
@@ -154,6 +471,33 @@
         "vi": "Câu hỏi thường gặp",
         "id": "Tanya jawab (FAQ)",
         "tl": "Mga madalas itanong"
+      },
+      "synonyms": {
+        "zh": [
+          "常見問題",
+          "問答",
+          "問題集"
+        ],
+        "en": [
+          "faqs",
+          "common questions"
+        ],
+        "ja": [
+          "よくある質問",
+          "質問"
+        ],
+        "vi": [
+          "câu hỏi",
+          "hỏi đáp"
+        ],
+        "id": [
+          "pertanyaan",
+          "tanya jawab"
+        ],
+        "tl": [
+          "mga tanong",
+          "tanong"
+        ]
       }
     },
     {
@@ -168,6 +512,39 @@
         "vi": "Tài khoản và cài đặt",
         "id": "Akun & pengaturan",
         "tl": "Account at mga setting"
+      },
+      "synonyms": {
+        "zh": [
+          "帳號",
+          "設定",
+          "個人資料",
+          "會員"
+        ],
+        "en": [
+          "account",
+          "settings",
+          "profile"
+        ],
+        "ja": [
+          "アカウント",
+          "設定",
+          "プロフィール"
+        ],
+        "vi": [
+          "tài khoản",
+          "cài đặt",
+          "hồ sơ cá nhân"
+        ],
+        "id": [
+          "akun",
+          "pengaturan",
+          "profil"
+        ],
+        "tl": [
+          "account",
+          "setting",
+          "profile"
+        ]
       }
     },
     {

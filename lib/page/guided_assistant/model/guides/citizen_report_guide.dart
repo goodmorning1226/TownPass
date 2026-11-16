@@ -141,8 +141,10 @@ final citizenReportPageSpec = WebPageSpec(
     'location': "(($_jsLocation || {}).value || '').trim()",
     'title': "(($_jsTitle || {}).value || '').trim()",
     'description': "(($_jsDesc || {}).value || '').trim()",
-    // Id of the box that has the keyboard (location / title / description).
-    'focus': "(document.activeElement && document.activeElement.id) || ''",
+    // Id of the box the user is still typing in (location / title /
+    // description); '' once it is typed out (editing(): Enter, the keyboard
+    // goes down, 按住輸入 or the box loses the focus).
+    'focus': "(() => { const a = document.activeElement; return a && editing(a) ? a.id || '' : ''; })()",
     'titleWarn': "!!q('#title.base-input--warn')",
     'descWarn': "!!q('#description.base-textarea--warn')",
     'photos': "qa('input[type=file]').reduce((n, i) => n + ((i.files && i.files.length) || 0), 0)",
@@ -153,10 +155,11 @@ final citizenReportPageSpec = WebPageSpec(
     'caseKeyword': "(($_jsCaseInput || {}).value || '').trim()",
     'caseCount': '$_jsCases.length',
     'noCases': "inView($_jsCaseInput) && $_jsBodyText.includes('無紀錄')",
-    // A keyword is typed and the list shows only matching cases (or none):
-    // the search was done.
+    // A keyword is typed out and the list shows only matching cases (or
+    // none): the search was done. While still typing it does not count
+    // (「A」 alone matches every A10- case).
     'casesFiltered':
-        "(() => { const k = (($_jsCaseInput || {}).value || '').trim(); if (!k) return false; const l = $_jsCases; return l.length ? l.every((a) => txt(a).includes(k)) : $_jsBodyText.includes('無紀錄'); })()",
+        "(() => { const i = $_jsCaseInput; const k = ((i || {}).value || '').trim(); if (!k || !settled(i)) return false; const l = $_jsCases; return l.length ? l.every((a) => txt(a).includes(k)) : $_jsBodyText.includes('無紀錄'); })()",
     'detailTab': "txt(q('div.pt-12 > section.tabs > button.tab-label.tab-label--active'))",
     'caseStatus': _after('詳細內容'),
     'caseSubject': _after('案件主旨'),
@@ -186,16 +189,10 @@ bool _no(WebPageState s) => false;
 
 // --- Card place and scrolling -------------------------------------------
 
-/// WebView top in card coordinates (WebView ~118pt from the screen top,
-/// card measured from below the ~62pt status bar).
-const _webTop = 56;
-const _cardH = 200;
-const _gap = 12;
-const _cardMax = 770;
-
-int _vh(WebPageState s) {
+/// The page's visible height (innerHeight), or null before it is read.
+int? _vh(WebPageState s) {
   final v = s.now.number('vh');
-  return v > 0 ? v : 756;
+  return v > 0 ? v : null;
 }
 
 int _top(WebPageState s, String k) => s.now.number('${k}Top');
@@ -203,32 +200,24 @@ int _bot(WebPageState s, String k) => s.now.number('${k}Bot');
 
 /// [k] is rendered but (partly) outside the viewport vertically.
 bool _off(WebPageState s, String k) {
-  final t = _top(s, k);
-  if (t <= -9999) return false;
-  return t < 0 || _bot(s, k) > _vh(s);
+  final t = _top(s, k), vh = _vh(s);
+  if (t <= -9999 || vh == null) return false;
+  return t < 0 || _bot(s, k) > vh;
 }
 
 /// [k] is below the visible part of the page (scroll down to see it).
 bool _below(WebPageState s, String k) {
-  final b = _bot(s, k);
-  return _top(s, k) > -9999 && b > _vh(s);
+  final vh = _vh(s);
+  return vh != null && _top(s, k) > -9999 && _bot(s, k) > vh;
 }
 
-/// Card place next to [k] without covering it: above it when there is
-/// room (the keyboard comes up from below), else below, else at the top.
-double? _near(WebPageState s, String k, {bool preferBelow = false}) {
-  final rawTop = _top(s, k), rawBot = _bot(s, k);
-  if (rawTop <= -9999 || rawBot <= 0 || rawTop >= _vh(s)) return null;
-  final t = rawTop < 0 ? 0 : rawTop;
-  final b = rawBot > _vh(s) ? _vh(s) : rawBot;
-  final above = t + _webTop - _gap - _cardH;
-  final below = b + _webTop + _gap;
-  final fitsBelow = below + _cardH <= _cardMax;
-  if (preferBelow && fitsBelow) return below.toDouble();
-  if (above >= 0) return above.toDouble();
-  if (fitsBelow) return below.toDouble();
-  return 0;
-}
+/// The card's preferred top on a step about [k]: at the top (null; the
+/// keyboard comes up from below), or lower for a list ([preferBelow]).
+/// The host keeps the card off the ring, beside it or as one line
+/// (GuideCardLayout, docs/AI_CURRENT_RULES.md section 5, 2026-11-16); the
+/// guessed card and screen heights that were here are gone.
+double? _near(WebPageState s, String k, {bool preferBelow = false}) =>
+    preferBelow ? 300 : null;
 
 // --- Shared texts --------------------------------------------------------
 
@@ -355,6 +344,7 @@ final List<GuideComponent> citizenReportComponents = [
   GuideComponent(
     id: 'pick_category',
     title: '選要反映的類別',
+    briefs: const ['點最接近的類別'],
     description: '在「通報」點一個最接近的類別，或按「更多項目」看全部',
     keywords: const ['案件類別', '通報項目', '更多項目', '選類別', '哪一類', '自動選擇案件類別'],
     requires: const [],
@@ -384,6 +374,7 @@ final List<GuideComponent> citizenReportComponents = [
   GuideComponent(
     id: 'search_item',
     title: '用搜尋找類別',
+    briefs: const ['點上面的搜尋框', '打字搜尋，點類別'],
     description: '在「您遇到哪些問題?」搜尋框打字，找到要反映的類別',
     keywords: const ['搜尋類別', '找類別', '遇到哪些問題', '不知道選哪個', '打字找'],
     requires: const [],
@@ -435,6 +426,7 @@ final List<GuideComponent> citizenReportComponents = [
   GuideComponent(
     id: 'fill_location',
     title: '寫發生地點',
+    briefs: const ['打發生地點（可不寫）'],
     description: '在「發生地點」打事情發生的完整地址（可以不寫）',
     keywords: const ['發生地點', '完整地址', '在哪裡發生', '寫地址'],
     requires: const ['pick_category|search_item'],
@@ -456,6 +448,7 @@ final List<GuideComponent> citizenReportComponents = [
   GuideComponent(
     id: 'fill_form',
     title: '寫主旨和描述',
+    briefs: const ['用一句話寫主旨', '寫清楚發生什麼事'],
     description: '在「案件主旨」寫一句話，在「描述」寫清楚人、事、時、地、物',
     keywords: const ['案件主旨', '主旨', '描述', '怎麼寫', '要寫什麼', '人事時地物'],
     requires: const ['pick_category|search_item'],
@@ -489,6 +482,7 @@ final List<GuideComponent> citizenReportComponents = [
   GuideComponent(
     id: 'add_photo',
     title: '加上照片',
+    briefs: const ['想加照片就點方框'],
     description: '在「新增附件」點方框，選照片、錄影或錄音（可以不加）',
     keywords: const ['附件', '照片', '拍照', '上傳', '錄影', '錄音'],
     requires: const ['pick_category|search_item'],
@@ -514,6 +508,7 @@ final List<GuideComponent> citizenReportComponents = [
   GuideComponent(
     id: 'submit_report',
     title: '確認後按「送出」',
+    briefs: const ['確認後自己按送出'],
     description: '看清楚內容和「個人資料是否提供給承辦」，再自己按「送出」',
     keywords: const ['陳情', '我要反映', '有話要說', '申訴', '檢舉', '投訴', '送出陳情'],
     requires: const ['fill_form'],
@@ -578,6 +573,7 @@ final List<GuideComponent> citizenReportComponents = [
   GuideComponent(
     id: 'open_cases',
     title: '打開「查詢」',
+    briefs: const ['點上面的查詢'],
     description: '點上面的「查詢」，看自己陳情過的案件',
     keywords: const ['查詢案件', '我的陳情', '陳情紀錄', '陳情記錄', '反映過的'],
     requires: const [],
@@ -602,6 +598,7 @@ final List<GuideComponent> citizenReportComponents = [
   GuideComponent(
     id: 'disaster_cases',
     title: '切到「災情通報」',
+    briefs: const ['點災情通報'],
     description: '在「查詢」點「災情通報」，看通報過的災情案件',
     keywords: const ['災情案件', '災情通報的案件', '災情的進度', '通報過的災情'],
     requires: const ['open_cases'],
@@ -624,6 +621,7 @@ final List<GuideComponent> citizenReportComponents = [
   GuideComponent(
     id: 'search_case',
     title: '用案號找案件',
+    briefs: const ['打案號，按放大鏡'],
     description: '在「搜尋案號關鍵字」打案號，按放大鏡',
     keywords: const ['案號', '案件編號', '搜尋案號', '編號找'],
     requires: const ['open_cases'],
@@ -659,6 +657,7 @@ final List<GuideComponent> citizenReportComponents = [
   GuideComponent(
     id: 'open_case',
     title: '看案件處理進度',
+    briefs: const ['點想看的案件'],
     description: '在「查詢」點一件案件，看處理中還是處理完成',
     keywords: const ['陳情進度', '處理進度', '辦到哪', '處理到哪', '回覆了沒', '辦好了沒', '案件進度'],
     requires: const ['open_cases'],
@@ -726,6 +725,7 @@ final List<GuideComponent> citizenReportComponents = [
   GuideComponent(
     id: 'case_detail',
     title: '看「詳細內容」',
+    briefs: const ['點詳細內容'],
     description: '在案件頁點「詳細內容」，看當初寫的主旨和案件資訊',
     keywords: const ['詳細內容', '案件資訊', '辦理機關', '當初寫的', '受理時間'],
     requires: const ['open_case'],
@@ -754,6 +754,7 @@ final List<GuideComponent> citizenReportComponents = [
   GuideComponent(
     id: 'call_1999',
     title: '找「撥打1999專線」',
+    briefs: const ['找撥打1999專線'],
     description: '在「通報」最下面找到「撥打1999專線」，用講的反映',
     keywords: const ['1999', '撥打1999', '市民熱線', '語音通報', '打電話反映', '用講的'],
     requires: const [],

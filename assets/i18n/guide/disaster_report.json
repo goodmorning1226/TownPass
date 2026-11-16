@@ -129,12 +129,26 @@
    "id": "Centang “{page:提供個人資料給承辦人員}”",
    "tl": "I-tsek ang “{page:提供個人資料給承辦人員}”"
   },
+  "勾選提供個人資料": {
+   "en": "Tick to share your details",
+   "ja": "個人情報の提供にチェック",
+   "vi": "Đánh dấu cung cấp thông tin cá nhân",
+   "id": "Centang untuk memberikan data pribadi",
+   "tl": "I-check para ibigay ang personal na detalye"
+  },
   "勾選災情狀況": {
    "en": "Tick what you see",
    "ja": "災害の状況にチェックする",
    "vi": "Đánh dấu tình trạng thiên tai",
    "id": "Centang keadaan bencana",
    "tl": "I-tsek ang nakikita mo"
+  },
+  "勾選看到的狀況": {
+   "en": "Tick what you saw",
+   "ja": "見た状況にチェック",
+   "vi": "Đánh dấu tình trạng bạn thấy",
+   "id": "Centang kondisi yang terlihat",
+   "tl": "I-check ang mga nakita mo"
   },
   "危險物品火災": {
    "en": "Hazardous material fire",
@@ -310,6 +324,20 @@
    "vi": "Cuộn xuống dưới cùng, chạm vào ô nhỏ phía trước “{page:提供個人資料給承辦人員}”. Nếu chưa đánh dấu thì “{page:送出}” có màu xám, không bấm được.",
    "id": "Gulir ke paling bawah dan ketuk kotak kecil di depan “{page:提供個人資料給承辦人員}”. Kalau belum dicentang, “{page:送出}” berwarna abu-abu dan tidak bisa ditekan.",
    "tl": "Mag-scroll hanggang sa pinakaibaba at i-tap ang maliit na kahon sa unahan ng “{page:提供個人資料給承辦人員}”. Kung walang tsek, mananatiling kulay abo ang “{page:送出}” at hindi ito mata-tap."
+  },
+  "往下滑，看完注意事項": {
+   "en": "Scroll down and read the notes",
+   "ja": "下へスクロールして注意事項を読む",
+   "vi": "Cuộn xuống đọc phần lưu ý",
+   "id": "Gulir ke bawah dan baca catatan",
+   "tl": "Mag-scroll pababa at basahin ang paalala"
+  },
+  "打地址或按定位": {
+   "en": "Type the address or tap locate",
+   "ja": "住所を入力するか位置ボタンをタップ",
+   "vi": "Gõ địa chỉ hoặc chạm định vị",
+   "id": "Ketik alamat atau ketuk lokasi",
+   "tl": "I-type ang address o i-tap ang locate"
   },
   "按「確認」會回到災情類別清單。這是示範網站，沒有真的通報喔。": {
    "en": "Tapping “{page:確認}” takes you back to the disaster category list. This is a demo site, so nothing was really reported.",
@@ -513,6 +541,13 @@
    "vi": "Chạm vào ô “{page:補充描述}”, viết tình trạng bạn thấy, viết xong bấm “Xong” trên bàn phím để ẩn bàn phím.",
    "id": "Ketuk kotak “{page:補充描述}” dan tulis keadaan yang Anda lihat. Setelah selesai, tekan “Selesai” di keyboard untuk menutupnya.",
    "tl": "I-tap ang kahon na “{page:補充描述}” at isulat ang nakikita mo. Kapag tapos na, i-tap ang “Tapos na” sa keyboard para itago ito."
+  },
+  "點最符合的災情": {
+   "en": "Tap the closest kind of disaster",
+   "ja": "一番近い災害の種類をタップ",
+   "vi": "Chạm loại thiên tai phù hợp nhất",
+   "id": "Ketuk jenis bencana yang paling sesuai",
+   "tl": "I-tap ang pinakaangkop na uri ng sakuna"
   },
   "點最符合的那一項，例如「路燈故障」或「電力停電」。沒有一樣的，就選最接近的。": {
    "en": "Tap the item that fits best, e.g. “{page:路燈故障}” or “{page:電力停電}”. If none is exactly right, pick the closest.",

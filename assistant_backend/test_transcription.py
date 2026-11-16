@@ -258,6 +258,32 @@ class TranscriptionTests(unittest.TestCase):
         status, body = self.post(wav_bytes(1.0), language="zh")
         self.assertNotIn("speech_notice", body)  # only known reasons are shown
 
+    def test_taiwanese_without_its_model_is_explained_and_never_guessed(self):
+        # The gate was sure of Taiwanese and the model could not be used (rules section 4,
+        # 2026-11-16): no text from the recogniser, a 422 that names the reason, in the menu's language.
+        import i18n
+        for reason in ("memory", "loading", "failed", "unreachable", "missing"):
+            self.asr_reply = (200, {"text": "", "status": "unclear", "language": "zh", "reason": "taiwanese_unavailable",
+                                    "notice": "taiwanese_unavailable", "notice_reason": reason})
+            for language in ("zh", "en", "auto", "nan"):
+                status, body = self.post(wav_bytes(1.0), language=language)
+                shown = language if language in i18n.LANGUAGES else "zh"
+                self.assertEqual((status, body["code"], body["reason"]), (422, "taiwanese_unavailable", reason))
+                self.assertEqual(body["error"], i18n.t(f"taiwanese_unavailable_{reason}", shown))
+        status, body = self.post(wav_bytes(1.0), language="zh")
+        self.assertIn("華語", body["error"])
+        self.assertIn("打字", body["error"])
+        self.asr_reply = (200, {"text": "", "status": "unclear", "notice": "taiwanese_unavailable",
+                                "notice_reason": "strange"})
+        status, body = self.post(wav_bytes(1.0), language="zh")
+        self.assertEqual(body["error"], i18n.t("taiwanese_unavailable_failed", "zh"))  # unknown reasons
+
+    def test_taiwanese_unavailable_texts_exist_in_every_language(self):
+        import i18n
+        for reason in ("memory", "loading", "failed", "unreachable", "missing"):
+            texts = i18n.MESSAGES[f"taiwanese_unavailable_{reason}"]
+            self.assertEqual(set(texts), set(i18n.LANGUAGES), reason)
+
     def test_taiwanese_from_the_phone_recogniser_is_chinese(self):
         from server import device_transcript
         result = device_transcript(json.dumps({"texts": ["我要借書"], "confidences": [0.9],

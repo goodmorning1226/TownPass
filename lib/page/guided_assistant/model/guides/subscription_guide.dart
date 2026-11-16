@@ -181,6 +181,7 @@ final List<GuideComponent> subscriptionComponents = [
   GuideComponent(
     id: 'pick_topic',
     title: '打開想訂閱的項目',
+    briefs: const ['點想看的項目'],
     description: '在訂閱頁點一個項目的名稱，看它會通知什麼',
     keywords: const ['可以訂閱什麼', '有哪些訂閱', '訂閱什麼', '訂閱哪些', '有哪些可以訂閱', '訂閱了哪些'],
     requires: const [],
@@ -225,6 +226,7 @@ final List<GuideComponent> subscriptionComponents = [
   GuideComponent(
     id: 'subscribe',
     title: '按「訂閱」',
+    briefs: const ['打開項目，按訂閱'],
     description: '看完說明，自己按「訂閱」收到這個項目的消息',
     keywords: const [
       '我要訂閱',
@@ -297,6 +299,7 @@ final List<GuideComponent> subscriptionComponents = [
   GuideComponent(
     id: 'unsubscribe',
     title: '按「取消訂閱」',
+    briefs: const ['打開項目，按取消訂閱', '打開項目，按取消訂閱'],
     description: '打開已經訂閱的項目，自己按「取消訂閱」',
     keywords: const ['取消訂閱', '退訂', '不想收', '不要再通知', '關掉通知', '太多通知', '通知太多'],
     requires: const [],
@@ -374,6 +377,7 @@ final List<GuideComponent> subscriptionComponents = [
   GuideComponent(
     id: 'read_messages',
     title: '打開一則訂閱的消息',
+    briefs: const ['點一則消息'],
     description: '在訂閱的訊息列表點一則，看完整內容',
     keywords: const ['訂閱的訊息', '訂閱的消息', '訂閱訊息', '訂閱內容', '收到的消息', '未讀'],
     requires: const [],
@@ -417,6 +421,7 @@ final List<GuideComponent> subscriptionComponents = [
   GuideComponent(
     id: 'open_settings',
     title: '按「設定」改訂閱項目',
+    briefs: const ['按右上角的設定'],
     description: '在訂閱的訊息頁按右上角「設定」，去改要訂閱的項目',
     keywords: const ['訂閱設定', '改訂閱', '設定訂閱', '換訂閱'],
     requires: const [],

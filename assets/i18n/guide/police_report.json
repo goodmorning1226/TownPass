@@ -143,12 +143,33 @@
    "id": "Sudah di langkah 2! Selanjutnya, isi data kasusnya.",
    "tl": "Nasa hakbang 2 ka na! Susunod, punan ang mga detalye ng kaso."
   },
+  "勾選同意": {
+   "en": "Tick to agree",
+   "ja": "同意にチェック",
+   "vi": "Đánh dấu đồng ý",
+   "id": "Centang setuju",
+   "tl": "I-check ang pagsang-ayon"
+  },
   "勾選同意個資聲明": {
    "en": "Tick to agree to the personal data statement",
    "ja": "個人情報の声明に同意する",
    "vi": "Đánh dấu đồng ý tuyên bố dữ liệu cá nhân",
    "id": "Centang setuju pernyataan data pribadi",
    "tl": "Lagyan ng tsek para pumayag sa pahayag sa personal na datos"
+  },
+  "勾選同意聲明": {
+   "en": "Tick to agree to the statement",
+   "ja": "声明への同意にチェック",
+   "vi": "Đánh dấu đồng ý với tuyên bố",
+   "id": "Centang setuju dengan pernyataan",
+   "tl": "I-check ang pagsang-ayon sa pahayag"
+  },
+  "勾選同意須知": {
+   "en": "Tick to agree to the notice",
+   "ja": "注意書きへの同意にチェック",
+   "vi": "Đánh dấu đồng ý với hướng dẫn",
+   "id": "Centang setuju dengan pemberitahuan",
+   "tl": "I-check ang pagsang-ayon sa paunawa"
   },
   "勾選同意，按「下一步」": {
    "en": "Tick to agree, then tap “{page:下一步}”",
@@ -241,6 +262,20 @@
    "id": "“{page:報案人類別}” adalah “{role}”",
    "tl": "Nakatakda ang “{page:報案人類別}” sa “{role}”"
   },
+  "填好案件資料": {
+   "en": "Fill in the case details",
+   "ja": "事件の内容を入力",
+   "vi": "Điền thông tin vụ việc",
+   "id": "Isi data kasus",
+   "tl": "Punan ang detalye ng kaso"
+  },
+  "填好聯絡資料": {
+   "en": "Fill in your contact details",
+   "ja": "連絡先を入力",
+   "vi": "Điền thông tin liên lạc",
+   "id": "Isi data kontak",
+   "tl": "Punan ang contact details"
+  },
   "填案件資料": {
    "en": "Fill in the case details",
    "ja": "事件の内容を入力",
@@ -332,6 +367,20 @@
    "id": "Gulir ke bawah, centang “{page:本人已詳閱並同意以上內容}”, lalu tekan “{page:下一步}”.",
    "tl": "Mag-scroll pababa, lagyan ng tsek ang “{page:本人已詳閱並同意以上內容}”, saka i-tap ang “{page:下一步}”."
   },
+  "往下滑，看完聲明": {
+   "en": "Scroll down and read the statement",
+   "ja": "下へスクロールして声明を読む",
+   "vi": "Cuộn xuống đọc tuyên bố",
+   "id": "Gulir ke bawah dan baca pernyataan",
+   "tl": "Mag-scroll pababa at basahin ang pahayag"
+  },
+  "往下滑，看完須知": {
+   "en": "Scroll down and read the notice",
+   "ja": "下へスクロールして注意書きを読む",
+   "vi": "Cuộn xuống đọc hướng dẫn",
+   "id": "Gulir ke bawah dan baca pemberitahuan",
+   "tl": "Mag-scroll pababa at basahin ang paunawa"
+  },
   "打好了就按鍵盤上的「完成」或「✓」。": {
    "en": " When you're done typing, tap “Done” or “✓” on the keyboard.",
    "ja": "入力が終わったら、キーボードの「完了」か「✓」を押してください。",
@@ -352,6 +401,13 @@
    "vi": "Bấm “{page:確認}” sẽ quay lại trang lưu ý. Đây là trang web mẫu, chưa trình báo thật đâu. Khi trình báo thật, với các vụ như trộm cắp, lừa đảo, cảnh sát sẽ mời bạn đến đồn để lấy lời khai.",
    "id": "Menekan “{page:確認}” akan kembali ke halaman ketentuan. Ini situs demo, jadi tidak benar-benar melapor. Setelah melapor sungguhan, untuk kasus seperti pencurian atau penipuan, polisi akan meminta Anda datang ke kantor polisi untuk memberi keterangan.",
    "tl": "Kapag in-tap mo ang “{page:確認}”, babalik ka sa page ng abiso. Demo site ito, kaya walang totoong ulat na nagawa. Pagkatapos ng totoong ulat, para sa mga kaso tulad ng pagnanakaw o panloloko, hihilingin din ng pulis na pumunta ka sa istasyon ng pulis para magbigay ng salaysay."
+  },
+  "按同意開始填寫": {
+   "en": "Tap Agree to start",
+   "ja": "同意をタップして入力開始",
+   "vi": "Chạm Đồng ý để bắt đầu",
+   "id": "Ketuk Setuju untuk mulai",
+   "tl": "I-tap ang Agree para magsimula"
   },
   "按左上角的「‹」可以回到報案紀錄。網路報案大約 5 天內回覆（假日順延）。": {
    "en": "Tap “‹” at the top left to go back to your police reports. Online reports are answered within about 5 days (later if there are holidays).",
@@ -457,6 +513,13 @@
    "vi": "Xem lại thông tin đã điền có đúng không, nếu không có vấn đề gì thì tự bấm “{page:送出}” ở cuối. Nếu không muốn trình báo nữa, chỉ cần bấm “‹” ở góc trên bên trái để thoát.",
    "id": "Periksa apakah data yang diisi sudah benar. Kalau sudah, tekan sendiri “{page:送出}” di paling bawah. Kalau tidak jadi melapor, cukup tekan “‹” di kiri atas untuk keluar.",
    "tl": "Suriin kung tama ang napunan mo. Kung tama, ikaw mismo ang mag-tap ng “{page:送出}” sa ibaba. Kung ayaw mo nang mag-report, i-tap lang ang “‹” sa kaliwang itaas para umalis."
+  },
+  "看回覆和詳細內容": {
+   "en": "See the reply and the details",
+   "ja": "回答と詳細を見る",
+   "vi": "Xem phản hồi và chi tiết",
+   "id": "Lihat balasan dan detail",
+   "tl": "Tingnan ang sagot at detalye"
   },
   "看報案紀錄": {
    "en": "View my police reports",
@@ -681,6 +744,13 @@
    "vi": "Bấm vào ô “{page:電子信箱}” và nhập e-mail của bạn, cảnh sát sẽ dùng nó để phản hồi bạn.",
    "id": "Tekan kotak “{page:電子信箱}” dan ketik e-mail Anda. Polisi akan membalas lewat e-mail itu.",
    "tl": "I-tap ang box na “{page:電子信箱}” at i-type ang iyong e-mail. Gagamitin ito ng pulis para sagutin ka."
+  },
+  "點一筆報案紀錄": {
+   "en": "Tap a report in the list",
+   "ja": "通報記録を1件タップ",
+   "vi": "Chạm một báo cáo trong danh sách",
+   "id": "Ketuk satu laporan di daftar",
+   "tl": "I-tap ang isang report sa listahan"
   },
   "點畫面上方的「詳細內容」。按左上角的「‹」可以回到紀錄清單。": {
    "en": "Tap “{page:詳細內容}” at the top of the screen. Tap “‹” at the top left to go back to the list.",

@@ -28,9 +28,12 @@ class WebPageSpec {
   /// dialogButton(title, label), textBetween(scope, head, stop) (the shown
   /// text pieces from [head] up to the [stop] text or a control, e.g. a
   /// consent statement), scrollBox(el) (nearest scrolling ancestor),
-  /// readArea(el or list) (each part, or the box it scrolls in, for a ring)
-  /// and readToEnd(el or list) (the user has scrolled to its end, or it
-  /// fits on screen; see `_helpers`).
+  /// readArea(el or list) (each part, or the box it scrolls in, for a ring),
+  /// readToEnd(el or list) (the user has scrolled to its end, or it
+  /// fits on screen; see `_helpers`), and for typed fields settled(el)
+  /// (filled in and not being typed in: use it, not `.value`, wherever a
+  /// value finishes a step) and editing(el) (the user is still typing in
+  /// it; see [fieldWatch]).
   final Map<String, String> flags;
 
   /// Flags that, once true, stay true for the guide run (see
@@ -43,7 +46,13 @@ class WebPageSpec {
     this.latchFlags = const {},
   });
 
-  String get script {
+  /// The probe script without the keyboard state (tools, tests).
+  String get script => scriptWith();
+
+  /// The probe script. [keyboard] is whether the soft keyboard is up now
+  /// (null: unknown); when it goes down while a text field is focused, that
+  /// field counts as typed out (see [fieldWatch]).
+  String scriptWith({bool? keyboard}) {
     String entry(MapEntry<String, String> e) =>
         '${jsonEncode(e.key)}: () => (${originalPlaceholders(e.value)})';
     final t = targets.entries.map(entry).join(',\n');
@@ -51,6 +60,7 @@ class WebPageSpec {
     return '''
 (() => {
   const $_helpers
+  ${fieldWatch(keyboard)}
   const T = {$t};
   const F = {$f};
   const rects = {}, flags = {};
@@ -98,6 +108,36 @@ class WebPageSpec {
   static const _watchFocus =
       r'''try { if (!window.__tpFocusWatch) { window.__tpFocusWatch = true; document.addEventListener('focusout', (e) => { window.__tpLastField = { el: e.target, at: Date.now() }; }, true); } } catch (_) {}''';
 
+  /// When a typed field is finished (docs/AI_CURRENT_RULES.md section 5,
+  /// 2026-11-16): a text box or textarea that has the focus is still being
+  /// typed in, so a step must not move on after the first letter. It is
+  /// finished ([commitField] keeps its value then) on Enter / Go / Done
+  /// (keydown Enter in an input; a textarea's Enter is a new line), a form
+  /// submit, a tap on something else on the page (iOS may keep the focus on
+  /// the box when a button is tapped), the keyboard going down (the App's
+  /// [keyboard] state, and the visual viewport growing back: Android keeps
+  /// the focus when the keyboard is closed with Back) or 按住輸入 filling it
+  /// (web_field_input.dart). Losing the focus finishes it as well
+  /// ([editing] is false then). Typing again changes the value, so the box
+  /// counts as being typed in again. Waiting never finishes a field.
+  /// The listeners only read; nothing on the page changes.
+  @visibleForTesting
+  static String fieldWatch(bool? keyboard) =>
+      '''
+  try {
+    if (!window.__tpFieldWatch) {
+      window.__tpFieldWatch = true;
+      const enter = (e) => (e.key === 'Enter' || e.keyCode === 13) && !e.isComposing;
+      document.addEventListener('keydown', (e) => { if (enter(e) && e.target && e.target.tagName === 'INPUT') commitField(e.target); }, true);
+      document.addEventListener('submit', (e) => { try { for (const i of e.target.querySelectorAll('input')) commitField(i); } catch (_) {} }, true);
+      document.addEventListener('click', (e) => { const a = document.activeElement; if (typedField(a) && e.target !== a && !(a.contains && a.contains(e.target))) commitField(a); }, true);
+      const vv = window.visualViewport;
+      if (vv && vv.addEventListener) { let h = vv.height; vv.addEventListener('resize', () => { if (vv.height > h + 100) commitField(document.activeElement); h = vv.height; }); }
+    }
+    const kb = ${keyboard == null ? 'null' : '$keyboard'};
+    if (kb !== null) { if (window.__tpKeyboard === true && kb === false) commitField(document.activeElement); window.__tpKeyboard = kb; }
+  } catch (_) {}''';
+
   static const _helpers = r'''
     q = (s) => document.querySelector(s),
     qa = (s) => [...document.querySelectorAll(s)],
@@ -130,6 +170,15 @@ class WebPageSpec {
     bottomBar = () => { let h = 0; for (const e of qa('.fixed, .floating-box, .sticky')) { if (!shown(e) || e.closest('[id^="headlessui-dialog"]')) continue; const r = e.getBoundingClientRect(); if (r.bottom >= innerHeight - 2 && r.top > innerHeight / 2) h = Math.max(h, innerHeight - r.top); } return Math.round(h); },
     leaf = (e) => ![...e.children].some(shown),
     textField = (e) => !!e && !e.disabled && !e.readOnly && (e.tagName === 'TEXTAREA' || (e.tagName === 'INPUT' && !/^(radio|checkbox|file|hidden|button|submit|reset|image|range|color)$/i.test(e.type || 'text'))),
+    // A box typed into with the keyboard (no date / time pickers), whether
+    // the user is still typing in it, and a value field that is filled in
+    // and not being typed in (see WebPageSpec.fieldWatch). settled() is for
+    // inputs, selects and textareas, not for radio / checkbox.
+    typedField = (e) => textField(e) && !/^(date|datetime-local|month|week|time)$/i.test(e.type || ''),
+    doneValues = () => window.__tpDone || (window.__tpDone = new WeakMap()),
+    commitField = (e) => { if (typedField(e)) doneValues().set(e, e.value || ''); },
+    editing = (e) => typedField(e) && document.activeElement === e && doneValues().get(e) !== (e.value || ''),
+    settled = (e) => !!e && !!String(e.value || '').trim() && !editing(e),
     hasField = (x) => (Array.isArray(x) ? x : [x]).some((e) => !!e && e.nodeType === 1 && ((textField(e) && shown(e)) || [...e.querySelectorAll('input, textarea')].some((i) => textField(i) && shown(i)))),
     textBetween = (scope, head, stop) => {
       const all = qa(scope + ' *').filter((e) => shown(e) && leaf(e));
@@ -180,15 +229,29 @@ class WebGuideProbe {
   final AssistantPageTracker tracker;
   final Duration interval;
 
+  /// Whether the soft keyboard is up now (the page's field is typed out
+  /// when it goes down, see [WebPageSpec.fieldWatch]).
+  final bool Function() keyboardOpen;
+
   WebGuideProbe(
     this.state, {
     AssistantPageTracker? tracker,
     this.interval = const Duration(milliseconds: 80),
-  }) : tracker = tracker ?? AssistantPageTracker.instance;
+    bool Function()? keyboardOpen,
+  }) : tracker = tracker ?? AssistantPageTracker.instance,
+       keyboardOpen = keyboardOpen ?? keyboardUp;
+
+  /// Any App view has a bottom inset: the keyboard, also when a WebView
+  /// field opened it (Flutter gets the window insets either way).
+  @visibleForTesting
+  static bool keyboardUp() => WidgetsBinding.instance.platformDispatcher.views
+      .any((v) => v.viewInsets.bottom > 0);
 
   Timer? _timer;
   WebPageSpec? _spec;
-  String? _script;
+
+  /// The spec's script with the keyboard up / down.
+  ({String up, String down})? _scripts;
   bool _busy = false;
 
   bool get running => _timer != null;
@@ -196,7 +259,10 @@ class WebGuideProbe {
   void start(WebPageSpec spec) {
     if (identical(spec, _spec) && running) return;
     _spec = spec;
-    _script = spec.script;
+    _scripts = (
+      up: spec.scriptWith(keyboard: true),
+      down: spec.scriptWith(keyboard: false),
+    );
     _timer?.cancel();
     _timer = Timer.periodic(interval, (_) => _tick());
     _tick();
@@ -226,7 +292,10 @@ class WebGuideProbe {
         _clear();
         return;
       }
-      final raw = await controller.evaluateJavascript(source: _script!);
+      final scripts = _scripts!;
+      final raw = await controller.evaluateJavascript(
+        source: keyboardOpen() ? scripts.up : scripts.down,
+      );
       if (_spec == null || raw is! String) return;
       final data = jsonDecode(raw) as Map<String, dynamic>;
       if (!box.attached) return;

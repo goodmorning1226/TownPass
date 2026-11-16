@@ -796,9 +796,13 @@ class TaiwaneseSpeechTests(unittest.TestCase):
         self.assertIsNone(result["language_confidence"])
 
     def test_missing_model_falls_back_to_chinese_with_a_notice(self):
+        from device_main import taiwanese_provider
+        port = int(self.nan_url.rstrip("/").rsplit(":", 1)[1])
         for state in ("missing", "memory", "failed"):
             self.calls.clear()
             self.state = state
+            # A new provider each time: "memory" and "failed" pause the next asks (BoundedStarter).
+            self.recognizer.taiwanese = taiwanese_provider(port, lambda: self.state)
             result = self.recognizer.transcribe(loud_frames(), "nan")
             self.assertEqual((self.models(), result["language"], result["notice"]), (["zh"], "zh", state))
             self.assertIn(field("prompt", self.recognizer.prompt), self.calls[0][3])  # the normal Chinese request
@@ -895,11 +899,12 @@ class AutoTaiwaneseTests(unittest.TestCase):
     def small_says(self, detected, probabilities):
         self.detected["multi"], self.probabilities["multi"] = detected, probabilities
 
-    def provider(self, port=None):
+    def provider(self, port=None, delay=0.0):
         from device_main import taiwanese_provider
 
         def starter():
             self.starts.append(self.state)
+            time.sleep(delay)
             return self.state
         return taiwanese_provider(port or int(self.nan_url.rstrip("/").rsplit(":", 1)[1]), starter)
 
@@ -1104,16 +1109,116 @@ class AutoTaiwaneseTests(unittest.TestCase):
             self.recognizer.taiwanese_until = 0.0
             self.assertIsNone(self.heard()["taiwanese_route"])
 
-    def test_missing_or_broken_taiwanese_model_takes_the_usual_path_silently(self):
+    def test_a_missing_taiwanese_model_takes_the_usual_path_silently(self):
+        # Never downloaded (optional, off by default): the gate scores ~5 % of Mandarin as
+        # Taiwanese, so these clips are not refused (rules section 4, 2026-11-16).
         self.state = "missing"
         result = self.heard()
-        self.assertEqual((self.decodes(), result["language"]), (["multi"], "zh"))
+        self.assertEqual((self.decodes(), result["language"], result["text"]), (["multi"], "zh", "我要借這個月新到的書"))
         self.assertNotIn("notice", result)
-        self.state = "ready"
-        self.recognizer.taiwanese = self.provider(port=9)  # nothing listens
+
+    def test_a_gate_sure_of_taiwanese_never_gets_a_chinese_guess_without_its_model(self):
+        # iPhone 2026-11-16: memory 12 times, gate scores 0.80-0.90 decoded as strange Chinese.
+        for state in ("memory", "failed"):
+            self.recognizer.taiwanese = self.provider()
+            self.state = state
+            result = self.heard()
+            self.assertEqual(self.decodes(), [], state)  # no Chinese decode at all
+            self.assertEqual((result["text"], result["status"], result["notice"], result["notice_reason"]),
+                             ("", "unclear", "taiwanese_unavailable", state))
+            self.assertEqual((result["language"], result["taiwanese_route"], result["taiwanese_score"]),
+                             ("zh", "withheld", 0.9))
+            self.assertNotIn("speech_model", result)
+
+    def test_a_loading_taiwanese_model_is_waited_for_and_then_used(self):
+        import device_main
+        with patch.object(device_main.BoundedStarter, "WAIT_S", 0.2),                 patch("asr_server.TAIWANESE_LOAD_WAIT_S", 5.0), patch("asr_server.TAIWANESE_POLL_S", 0.05):
+            self.recognizer.taiwanese = self.provider(delay=0.8)
+            started = time.monotonic()
+            result = self.heard()
+        self.assertGreaterEqual(time.monotonic() - started, 0.7)
+        self.assertEqual((self.decodes(), result["text"], result["speech_model"]), (["nan"], "我要繳水費", "taiwanese"))
+        self.assertEqual(result["taiwanese_route"], "gate")
+        self.assertIn(field("best_of", "1"), self.calls[-1][3])  # one decoder (TAIWANESE_BEST_OF)
+
+    def test_a_model_still_loading_after_the_wait_is_explained(self):
+        import device_main
+        with patch.object(device_main.BoundedStarter, "WAIT_S", 0.1),                 patch("asr_server.TAIWANESE_LOAD_WAIT_S", 0.5), patch("asr_server.TAIWANESE_POLL_S", 0.05):
+            self.recognizer.taiwanese = self.provider(delay=3.0)
+            started = time.monotonic()
+            result = self.heard()
+            self.assertLess(time.monotonic() - started, 2.0)
+        self.assertEqual((self.decodes(), result["text"], result["notice_reason"]), ([], "", "loading"))
+
+    def test_a_taiwanese_server_that_stops_answering_is_not_held_off(self):
+        # iOS reclaimed its port or it is restarting: the clip asks the App once more, says so,
+        # and the next clip tries the server again (no liveness hold, no BoundedStarter pause).
+        import liveness
+        liveness.reset()
+        self.addCleanup(liveness.reset)
+        self.recognizer.taiwanese = self.provider(port=9)  # the App says ready, nothing listens
+        with patch("liveness.AFTER_READY_WAIT_S", 0.1), patch("asr_server.TAIWANESE_POLL_S", 0.05):
+            started = time.monotonic()
+            result = self.heard()
+            # Seconds, not READY_WAIT_S (60 s); a refused connect alone takes ~2 s on Windows.
+            self.assertLess(time.monotonic() - started, 10.0)
+            self.assertEqual((self.decodes(), result["text"], result["notice_reason"]), ([], "", "unreachable"))
+            self.assertEqual(self.starts, ["ready", "ready"])  # asked again within the clip
+            self.assertFalse(liveness.down("http://127.0.0.1:9"))
+            self.starts.clear()
+            self.heard()
+            self.assertEqual(self.starts, ["ready", "ready"])  # the next clip tries again
+            self.recognizer.taiwanese = self.provider()  # bound again
+            result = self.heard()
+        self.assertEqual((self.decodes(), result["speech_model"]), (["nan"], "taiwanese"))
+
+    def test_the_gate_hearing_mandarin_is_not_affected(self):
+        self.state = "memory"
+        self.score = 0.2  # under every threshold
         result = self.heard()
         self.assertEqual((self.decodes(), result["text"]), (["multi"], "我要借這個月新到的書"))
-        self.assertNotIn("speech_model", result)
+        self.assertNotIn("notice", result)
+        self.assertEqual(self.starts, [])  # the Taiwanese model is not even asked for
+
+    def test_only_just_sure_clear_text_the_app_knows_is_kept_without_the_model(self):
+        # Owner, 2026-11-16: gate scores just over 0.5 (iPhone: 0.56-0.65) with a clear decode the
+        # App knows keep the Chinese decode (TAIWANESE_KEEP_KNOWN_BELOW); anything else is withheld.
+        self.state = "memory"
+        self.recognizer.known_text = lambda text: text == "我要借這個月新到的書"
+        with patch("asr_server.TAIWANESE_KEEP_KNOWN_BELOW", 0.7):
+            self.score = 0.6
+            result = self.heard()
+            self.assertEqual((self.decodes(), result["text"]), (["multi"], "我要借這個月新到的書"))
+            self.assertNotIn("notice", result)
+            self.recognizer.known_text = lambda text: False  # clear, but not known to the App
+            self.assertEqual(self.heard()["notice_reason"], "memory")
+            self.recognizer.known_text = lambda text: True
+            self.speech["zh"] = ("我要借這個月新到的書", -0.9)  # known, but not clear
+            self.assertEqual(self.heard()["notice_reason"], "memory")
+            self.speech["zh"] = ("我要借這個月新到的書", -0.1)
+            self.score = 0.8  # sure: no exception
+            result = self.heard()
+            self.assertEqual((self.decodes(), result["notice_reason"]), ([], "memory"))
+        with patch("asr_server.TAIWANESE_KEEP_KNOWN_BELOW", None):
+            self.score = 0.6
+            self.assertEqual(self.heard()["notice_reason"], "memory")
+
+    def test_below_the_threshold_only_clear_chinese_is_kept_without_the_model(self):
+        # The same-speaker rule (0.3-0.5): the gate is not sure (TAIWANESE_MARGINAL_WITHHOLD).
+        self.state = "memory"
+        self.score = 0.4
+        self.recognizer.taiwanese_until = time.monotonic() + 60  # just after a Taiwanese clip
+        result = self.heard()
+        self.assertEqual((self.decodes(), result["text"]), (["multi"], "我要借這個月新到的書"))  # clear Mandarin
+        self.assertNotIn("notice", result)
+        self.speech["zh"] = ("溫刀揮袖促", -0.82)  # not clear
+        self.recognizer.taiwanese_until = time.monotonic() + 60
+        result = self.heard()
+        self.assertEqual((result["text"], result["notice"], result["notice_reason"]),
+                         ("", "taiwanese_unavailable", "memory"))
+        with patch("asr_server.TAIWANESE_MARGINAL_WITHHOLD", None):
+            self.recognizer.taiwanese_until = time.monotonic() + 60
+            self.assertEqual(self.heard()["text"], "溫刀揮袖促")
 
     def test_off_without_a_gate_or_with_no_menus(self):
         with patch("asr_server.AUTO_TAIWANESE_MENUS", ()):

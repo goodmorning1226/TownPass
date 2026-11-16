@@ -311,5 +311,57 @@ class ChoiceNumberTests(unittest.TestCase):
         self.assertIsNone(workflow.UP_LEVEL_ZH.fullmatch("返回"))  # a cancel word
 
 
+class ListingScopeTests(unittest.TestCase):
+    """「有什麼 X／有哪些 X」: X decides (rules section 2, 2026-11-17)."""
+
+    def setUp(self):
+        self.menu = menu.Menu(REGISTRY)
+
+    def test_every_category_has_synonyms_in_every_language_and_none_is_shared(self):
+        for group in REGISTRY.groups:
+            if group["id"] == menu.OTHER:
+                continue
+            for language in LANGUAGES:
+                self.assertTrue((group.get("synonyms") or {}).get(language), (group["id"], language))
+        for language in LANGUAGES:
+            owners = {}
+            for group in self.menu.visible():
+                name = group["names"][language]
+                for word in [name, *menu._SPLIT.split(name), *group["synonyms"][language]]:
+                    key = self.menu._key(word, language)
+                    if key:
+                        owners.setdefault(key, set()).add(group["id"])
+            self.assertEqual({k: v for k, v in owners.items() if len(v) > 1}, {}, language)
+
+    def test_x_decides(self):
+        for text, language, scope in (
+                ("我想看有甚麼補助", "zh", ("group", "apply")), ("最近手頭有點緊，想看看有什麼補助", "zh", ("group", "apply")),
+                ("有什麼補助可以申請", "zh", ("group", "apply")), ("有哪些功能", "zh", ("catalogue",)),
+                ("有什麼服務", "zh", ("catalogue",)), ("你有甚麼樣子的功能", "zh", ("catalogue",)),
+                ("你都會些什麼", "zh", None), ("有什麼好玩的", "zh", None), ("圖書子功能有哪些", "zh", ("pages",)),
+                ("有什麼問題", "zh", ("pages",)), ("有什麼津貼", "zh", ("group", "apply")),
+                ("ada bantuan apa saja", "id", ("group", "apply")), ("ada layanan apa saja", "id", ("catalogue",)),
+                ("what benefits do you have", "en", ("group", "apply")), ("what services do you have", "en", ("catalogue",)),
+                ("có những dịch vụ gì", "vi", ("catalogue",)), ("ano ang mga serbisyo mo", "tl", ("catalogue",)),
+                ("どんな補助がありますか", "ja", ("group", "apply")), ("どんなサービスがありますか", "ja", ("catalogue",))):
+            self.assertEqual(self.menu.listing_scope(text, language), scope, text)
+
+    def test_the_turns(self):
+        assistant = app()
+        result = turn(assistant, "我想看有甚麼補助")
+        self.assertEqual((result["kind"], result["level"], result["group"]), ("capability_list", 2, "apply"))
+        self.assertEqual(result["metrics"]["route"], "listing_sound_group")
+        for text in ("你有甚麼樣子的功能", "你都會些什麼", "有哪些功能"):
+            result = turn(assistant, text, session="s" + str(len(text)))
+            self.assertEqual((result["kind"], result["level"]), ("capability_list", 1), text)
+        result = turn(assistant, "ada bantuan apa saja", language="id")
+        self.assertEqual((result["level"], result["group"]), (2, "apply"))
+        result = turn(assistant, "what services do you have", language="en")
+        self.assertEqual(result["level"], 1)
+        # A page's own word is not a listing question: the usual flow (here: nothing found, the fallback).
+        result = turn(assistant, "有什麼問題", session="q1")
+        self.assertNotIn(result["metrics"]["route"], ("listing", "listing_sound"))
+
+
 if __name__ == "__main__":
     unittest.main()

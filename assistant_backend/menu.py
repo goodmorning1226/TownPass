@@ -24,6 +24,31 @@ FREQUENT_SIZE = 3
 LAST = ("app.home", "app.services", "start_page", "pinned")
 _SPLIT = re.compile(r"\s*(?:與|和|及|、|,|，|&|＆|・|/|／|\band\b|\bdan\b|\bat\b|\bvà\b)\s*", re.I)
 
+# "有什麼 X／有哪些 X" decides the listing's scope by X (rules section 2, 2026-11-17): the sentence shapes
+# that ask "what X is there", per language; group x is X. Lower case for the spaced languages.
+LISTING_SHAPES = {
+    "zh": (r"有(?:什麼|甚麼|哪些|啥)(?:樣子的|樣的|種類的|種|類|的)?(?P<x>[一-鿿A-Za-z]{1,12}?)"
+           r"(?:可以(?:用|辦|申請|看|領)?|能(?:用|辦|申請)|呢|嗎|啊|啦|喔|吧|呀|嘛)*[？?。！!～~\s]*$",
+           r"^(?:請問|我想知道|想知道)?(?P<x>[一-鿿A-Za-z]{2,12}?)(?:有哪些|有什麼|有甚麼)(?:呢|嗎|啊)?[？?。！!\s]*$"),
+    "en": (r"\bwhat (?:kinds? of |sorts? of |types? of )?(?P<x>[a-z][a-z &'-]*?) "
+           r"(?:do you have|are there|are available|do you offer|can i (?:get|apply for|use))\b",
+           r"\b(?:show me|list)(?: all| the| available)* (?P<x>[a-z][a-z &'-]*?)[.!?\s]*$"),
+    "ja": (r"どんな(?P<x>[^、。？?]+?)が(?:あります|ある|できます)", r"^(?P<x>[^、。？?]+?)(?:は|って)(?:何が)?(?:あります|ある)か"),
+    "vi": (r"\bcó (?:những )?(?P<x>[^?.!]+?) (?:gì|nào)\b", r"^(?P<x>[^?.!]+?) có (?:những )?gì\b"),
+    "id": (r"^(?:ada |apa )?(?P<x>[a-z][a-z &'-]*?) apa (?:saja|aja)\b",),
+    "tl": (r"\bano(?:-ano)?(?:ng| ang)? (?:mga )?(?P<x>[a-z][a-z &'-]*?)(?: ang)?"
+           r"(?: (?:meron|mayroon|ninyo|niyo|mo|dito|po))*[?.!\s]*$",),
+}
+# X for which the whole catalogue is the answer (有什麼功能, what services do you have).
+LISTING_NOUNS = {
+    "zh": ("功能", "服務", "功用", "用途"),
+    "en": ("features", "feature", "services", "service", "functions", "function", "things", "options"),
+    "ja": ("機能", "サービス", "こと"),
+    "vi": ("dịch vụ", "chức năng", "tính năng"),
+    "id": ("layanan", "fitur"),
+    "tl": ("serbisyo", "feature", "function", "magagawa"),
+}
+
 
 class Menu:
     def __init__(self, registry):
@@ -104,3 +129,71 @@ class Menu:
                 if any(said == matching.normalized(part) for part in parts if matching.normalized(part)):
                     return group["id"]
         return None
+
+    def listing_scope(self, text, language="zh"):
+        """What a "what can you do" rule that fired on text gives (rules section 2, 2026-11-17):
+        ("catalogue",) for 有什麼功能 / 服務; ("group", id) when X names a category, a part of its
+        name or one of its synonyms (補助 -> 申辦與補助); ("pages",) when X is a page's own word
+        (the usual flow decides); None when the sentence is not "有什麼 X" or X is none of these
+        (as before: the catalogue)."""
+        said = self._listing_object(text, language)
+        key = self._key(said, language) if said is not None else ""
+        if not key:
+            return None
+        nouns = [self._key(noun, language) for noun in LISTING_NOUNS.get(language, ())]
+        if key in nouns:
+            return ("catalogue",)
+        if self._page_word(key, language, exact=True):
+            return ("pages",)
+        group = self._group_word(key, language)
+        if group:
+            return ("group", group)
+        if self._page_word(key, language, exact=False):
+            return ("pages",)
+        if any(noun and noun in key for noun in nouns):
+            return ("catalogue",)  # 你有甚麼樣子的功能, 市府的服務
+        return None
+
+    @staticmethod
+    def _key(value, language):
+        value = (value or "").strip()
+        if language in ("zh", "ja"):
+            return matching.normalized(value)
+        return re.sub(r"\s+", " ", i18n.fold(value)).strip()
+
+    def _listing_object(self, text, language):
+        """X of "有什麼 X" / "X 有哪些" (and the other languages' shapes), or None."""
+        folded = text if language in ("zh", "ja") else i18n.fold(text)
+        for shape in LISTING_SHAPES.get(language, ()):
+            found = re.search(shape, folded, re.I)
+            if found:
+                said = re.sub(r"^(?:些|個|樣|種|的)+", "", found["x"]).strip()
+                if language not in ("zh", "ja"):
+                    said = re.sub(r"^(?:the|any|mga|các|những)\s+", "", said)
+                return said
+        return None
+
+    def _group_word(self, key, language):
+        """The visible category whose name, a part of its name, or a synonym is X."""
+        for group in self.visible():
+            name = group["names"].get(language) or ""
+            words = [name, *_SPLIT.split(name), *((group.get("synonyms") or {}).get(language) or [])]
+            if any(key == self._key(word, language) for word in words if word and word.strip()):
+                return group["id"]
+        return None
+
+    def _page_word(self, key, language, exact):
+        """Whether X is a page's title or keyword (exact), or a part of one or contains one (not exact)."""
+        if len(key) < 2:
+            return False
+        for entry in self.registry.entries:
+            if language == "zh":
+                terms = [entry["title"], *entry["keywords"]]
+            else:
+                local = (self.registry.i18n.get(entry["id"]) or {}).get(language) or {}
+                terms = [local.get("title") or "", *(local.get("keywords") or [])]
+            for term in terms:
+                word = self._key(term, language)
+                if word and (word == key or (not exact and (key in word or (len(word) >= 2 and word in key)))):
+                    return True
+        return False

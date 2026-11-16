@@ -192,6 +192,20 @@
    "id": "Buka pengaturan langganan",
    "tl": "Buksan ang mga setting ng subscription"
   },
+  "打開項目，按取消訂閱": {
+   "en": "Open the item, tap Unsubscribe",
+   "ja": "項目を開いて購読解除をタップ",
+   "vi": "Mở mục rồi chạm Hủy đăng ký",
+   "id": "Buka item, ketuk Berhenti langganan",
+   "tl": "Buksan ang item, i-tap ang Unsubscribe"
+  },
+  "打開項目，按訂閱": {
+   "en": "Open the item, tap Subscribe",
+   "ja": "項目を開いて購読をタップ",
+   "vi": "Mở mục rồi chạm Đăng ký",
+   "id": "Buka item, ketuk Langganan",
+   "tl": "Buksan ang item, i-tap ang Subscribe"
+  },
   "按「取消訂閱」": {
    "en": "Tap “{page:取消訂閱}”",
    "ja": "「{page:取消訂閱}」を押す",
@@ -212,6 +226,13 @@
    "vi": "Bấm “{page:設定}” để đổi các mục đăng ký",
    "id": "Ketuk “{page:設定}” untuk mengubah topik langganan",
    "tl": "I-tap ang “{page:設定}” para baguhin ang mga paksa mo"
+  },
+  "按右上角的設定": {
+   "en": "Tap Settings at the top right",
+   "ja": "右上の設定をタップ",
+   "vi": "Chạm Cài đặt ở góc trên bên phải",
+   "id": "Ketuk Pengaturan di kanan atas",
+   "tl": "I-tap ang Settings sa kanang itaas"
   },
   "按訊息頁右上角的「設定」。": {
    "en": "Tap “{page:設定}” at the top right of the message page.",
@@ -437,6 +458,13 @@
    "id": "Ketuk satu",
    "tl": "I-tap ang isa"
   },
+  "點一則消息": {
+   "en": "Tap a message",
+   "ja": "メッセージを1件タップ",
+   "vi": "Chạm một tin nhắn",
+   "id": "Ketuk satu pesan",
+   "tl": "I-tap ang isang mensahe"
+  },
   "點你想取消的項目名稱，把它打開。": {
    "en": "Tap the name of the topic you want to cancel to open it.",
    "ja": "やめたい項目の名前を押して開いてください。",
@@ -457,6 +485,13 @@
    "vi": "Bấm vào tên mục đã đăng ký, mở ra sẽ thấy “{page:取消訂閱}”.",
    "id": "Ketuk nama topik yang sudah dilanggani; setelah terbuka, Anda akan melihat “{page:取消訂閱}”.",
    "tl": "I-tap ang pangalan ng paksang naka-subscribe ka; pagbukas nito, makikita mo ang “{page:取消訂閱}”."
+  },
+  "點想看的項目": {
+   "en": "Tap an item to see it",
+   "ja": "見たい項目をタップ",
+   "vi": "Chạm mục bạn muốn xem",
+   "id": "Ketuk item yang ingin dilihat",
+   "tl": "I-tap ang item na gusto mong tingnan"
   }
  }
 }

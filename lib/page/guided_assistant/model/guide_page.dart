@@ -19,6 +19,13 @@ class GuideComponent {
 
   final List<GuideStep> steps;
 
+  /// One short point per step, in step order (Chinese source, e.g.
+  /// 「打書名，按放大鏡搜尋」): the one-line card beside a big ring
+  /// (docs/AI_CURRENT_RULES.md section 5, 2026-11-16). A test checks every
+  /// step has one in all six languages; a missing one falls back to the
+  /// card's first sentence.
+  final List<String> briefs;
+
   /// The user does this alone (shown instead of 進行中).
   final String? self;
 
@@ -53,6 +60,7 @@ class GuideComponent {
     required this.taskTitle,
     required this.doneText,
     required this.doneDetail,
+    this.briefs = const [],
     this.self,
     this.after,
     this.doneLabelOf,
@@ -366,7 +374,8 @@ class GuidePage {
     for (var i = 0; i < n; i++) {
       final part = parts[i];
       todos.add(TodoItem(part.title, self: part.self));
-      for (final step in part.steps) {
+      for (var j = 0; j < part.steps.length; j++) {
+        final step = part.steps[j];
         final verb = step.label;
         steps.add(
           step.numbered(
@@ -376,6 +385,7 @@ class GuidePage {
               'n': n,
               'verb': gt(verb(s)),
             }),
+            brief: j < part.briefs.length ? part.briefs[j] : null,
           ),
         );
       }
