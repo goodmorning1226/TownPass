@@ -196,6 +196,34 @@ class EmergencyServiceTests(unittest.TestCase):
                                ("tulungan mo ako, biktima ako, may ayuda ba", "tl")):
             self.assertFalse(emergency.after_service(text, language), text)
 
+    def test_violence_happening_now_gets_the_number_only(self):
+        # A safety gap the owner agreed to close (rules section 1, 2026-11-17): these got no number before.
+        for text, language in (("他正在打我", "zh"), ("他一直打我", "zh"), ("他要打我", "zh"), ("有人拿刀在門口", "zh"),
+                               ("外面有人在打人", "zh"), ("老公又打我了，我是家暴被害人，要申請補助", "zh"),
+                               ("he is hitting me right now", "en"), ("my husband is beating me", "en"),
+                               ("a man has a knife", "en"), ("he is going to kill me", "en"),
+                               ("殴られています、助けて", "ja"), ("ナイフを持った男がいる", "ja"),
+                               ("anh ta đang đánh tôi", "vi"), ("có người cầm dao", "vi"),
+                               ("dia sedang memukul saya", "id"), ("orang itu membawa pisau", "id"),
+                               ("sinusuntok niya ako", "tl"), ("may hawak na kutsilyo siya", "tl"), ("papatayin niya ako", "tl")):
+            self.assertEqual(emergency.detect(text, language), "violence", text)
+            result = self.turn(text, language)
+            self.assertEqual(result["action"], "emergency", text)
+            self.assertEqual(result["metrics"]["route"], "emergency", text)
+            self.assertIn("110", result["message"], text)
+            self.assertNotIn("\n", result["message"], text)
+            self.assertEqual(result["choices"], [], text)  # the number only, no pages
+
+    def test_everyday_words_with_hit_or_knife_are_not_emergencies(self):
+        for text, language in (("幫我打電話給1999", "zh"), ("我要打字", "zh"), ("上班要打卡", "zh"), ("我想打疫苗", "zh"),
+                               ("打掃公園", "zh"), ("週末去打球", "zh"), ("他一直打我手機", "zh"), ("打我電話就好", "zh"),
+                               ("媽媽拿刀切菜", "zh"), ("hit the button", "en"), ("how to beat the deadline", "en"),
+                               ("he is beating me at chess", "en"), ("hit me up later", "en"),
+                               ("can I bring a knife on the MRT", "en"), ("ナイフを持って行ってもいいですか", "ja"),
+                               ("có dao không", "vi"), ("tôi đánh răng", "vi"), ("bolehkah bawa pisau ke pesawat", "id"),
+                               ("memukul bola", "id"), ("may kutsilyo ba kayo", "tl")):
+            self.assertIsNone(emergency.detect(text, language), text)
+
     def test_nothing_found_keeps_the_number_alone(self):
         # The usual flow finds no page (no keyword, no index in this test): the number only.
         result = self.turn("家暴之後要聲請保護令，律師費好貴")
