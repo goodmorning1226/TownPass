@@ -122,6 +122,7 @@ class Downloads:
         self.retrying = False    # waiting to try again after a network failure
         self.plan = []           # entries of the current or last download
         self.dir.mkdir(parents=True, exist_ok=True)
+        self.remove_superseded()  # at start (device_main makes one Downloads per launch)
 
     # ------------------------------------------------------------- which files
 
@@ -144,6 +145,39 @@ class Downloads:
 
     def path(self, entry):
         return self.dir / entry["name"]
+
+    def superseded(self):
+        """The manifest's "superseded" names (files an older App downloaded that nothing
+        uses any more, e.g. the decision classifier v1 after v2; docs/AI_MODEL_DOWNLOAD.md,
+        2026-11-16) that may be deleted: a plain name in the models folder, and not the
+        name of any file the manifest still lists (going back to v1 keeps it)."""
+        current = {e["name"] for e in self.manifest["files"]}
+        names = []
+        for name in self.manifest.get("superseded") or []:
+            if not isinstance(name, str) or not name or name in current:
+                continue
+            path = pathlib.PurePosixPath(name)
+            if path.is_absolute() or ".." in path.parts or "\\" in name or ":" in name:
+                continue
+            names.append(name)
+        return names
+
+    def remove_superseded(self):
+        """Delete exactly the superseded files (and their .part) from the models folder; other
+        files there, such as ones a developer pushed with adb, are never touched. Returns
+        the names deleted."""
+        removed = []
+        for name in self.superseded():
+            for path in (self.dir / name, self.dir / (name + ".part")):
+                try:
+                    if path.is_file():
+                        path.unlink()
+                        removed.append(path.name)
+                except OSError:
+                    pass
+        if removed:
+            print(f"models: removed superseded {', '.join(removed)}", flush=True)
+        return removed
 
     def present(self, entry):
         """In place with the manifest's size (a pushed file counts; a .part does not)."""
@@ -274,6 +308,7 @@ class Downloads:
                         path.unlink()
                     except OSError:
                         pass
+        self.remove_superseded()  # 刪除模型 also takes what an older App left
         with self.lock:
             self.state, self.error, self.current, self.plan = "idle", None, None, []
 
@@ -302,6 +337,7 @@ class Downloads:
                         print(f"models: starting the server for {entry['id']} failed ({type(exc).__name__})",
                               flush=True)
             state, error = "done", None
+            self.remove_superseded()  # the replacement is in place
         except _Paused:
             state, error = "paused", None
         except DownloadError as exc:

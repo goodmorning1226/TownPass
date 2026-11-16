@@ -789,10 +789,13 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
           ),
         );
       }
-      if (m.followUpOf == null && !catalog) {
+      // Said or typed, its number is answered as a tap (the backend's
+      // choice_out_of_range, GuidedAssistantController; 2026-11-16).
+      final none = m.noneNumber;
+      if (none != null) {
         parts.add(
           _OptionButton(
-            label: gt('{n}. 都不是，我再說一次', {'n': n}),
+            label: gt('{n}. 都不是，我再說一次', {'n': none}),
             enabled: live,
             onTap: live ? () => c.choose(m, null) : null,
           ),
@@ -1379,6 +1382,9 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
           child: TextField(
             controller: _input,
             autofocus: true,
+            // The backend takes at most 500 characters (server.turn: 422
+            // beyond), as in the chat panel (2026-11-16, contract audit).
+            maxLength: GuidedAssistantController.maxInput,
             textInputAction: TextInputAction.send,
             onSubmitted: (_) => _send(),
             style: TPTextStyles.h3Regular.copyWith(
@@ -1389,6 +1395,7 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
               hintStyle: TPTextStyles.h3Regular.copyWith(
                 color: TPColors.grayscale400,
               ),
+              counterText: '',
               filled: true,
               fillColor: TPColors.grayscale50,
               contentPadding: const EdgeInsets.symmetric(

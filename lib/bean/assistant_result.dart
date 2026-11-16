@@ -37,6 +37,12 @@ class AssistantResult {
   final int? level;
   final String? group;
 
+  /// With action 'choice_out_of_range': the number said or typed past the
+  /// list's last option (「第 4 個」 for three options). The reply offers the
+  /// same list again; the guided App's own 「N. 都不是」 is that number
+  /// (docs/AI_CURRENT_RULES.md section 5, 2026-11-16).
+  final int? choiceNumber;
+
   const AssistantResult({
     required this.sessionId,
     required this.message,
@@ -51,6 +57,7 @@ class AssistantResult {
     this.listing,
     this.level,
     this.group,
+    this.choiceNumber,
   });
 
   /// The same reply with [message] and choice titles replaced (translation).
@@ -68,6 +75,7 @@ class AssistantResult {
         listing: listing,
         level: level,
         group: group,
+        choiceNumber: choiceNumber,
         choices: [
           for (var i = 0; i < choices.length; i++)
             AssistantBookChoice(
@@ -131,6 +139,9 @@ class AssistantResult {
           : null,
       group: kind == 'capability_list' && json['group'] is String
           ? json['group'] as String
+          : null,
+      choiceNumber: json['choice_number'] is int
+          ? json['choice_number'] as int
           : null,
       choices: (json['choices'] as List? ?? [])
           .map((value) => AssistantBookChoice.fromJson(value))

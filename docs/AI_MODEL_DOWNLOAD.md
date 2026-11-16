@@ -68,6 +68,13 @@
 - 一份 Python（只用標準函式庫），Android（Chaquopy）和 iPhone（內嵌 CPython）共用，電腦上就能測。
 - 檔案先寫到 `<名稱>.part`，用 HTTP `Range` 續傳；大小與 SHA-256 都對才改名放到位置；不符就刪掉，回報 `checksum`。
 - 已經在手機上、大小相符的檔案（adb／devicectl 推的）不重下。
+- **已被取代的舊檔**（2026-11-16，App 與後端契約檢查；原因：換成分類器 v2 後，舊的 `townpass-decision-e5-ce-v1-q8_0.gguf`（132 MB）一直留在手機上，
+  「刪除模型」只刪清單上的檔，也刪不到）：`models.json` 的 `superseded` 列出舊版 App 下載過、現在沒有檔案用到的檔名，
+  由 `scripts/build_model_manifest.py` 的 `SUPERSEDED` 產生（目前只有 v1 分類器）。`models.Downloads` 在**啟動時**（每次開 App 建一個）、**下載完成時**、
+  **刪除模型時**（`/v1/models/delete`，任何批次）刪掉這些檔與它們的 `.part`。
+  - **只刪清單上列名的檔**：同一個 models 資料夾裡開發者用 adb／devicectl 推的其他檔不會動。名稱必須是資料夾裡的單純檔名（不是絕對路徑、沒有 `..`、`\`、`:`），否則略過。
+  - 某個名稱又出現在 `files` 裡（例如改回 v1）就**不刪**；改回 v1 時要把 v2 的檔名加進 `SUPERSEDED`，手機上才不會留著 v2。
+  - 舊版 App 不認得 `superseded`（多的欄位不影響 `version: 1` 的讀法）。
 - 下載前檢查剩餘空間（缺的大小＋300 MB）；一次一個檔案；網路錯誤重試 4 次（間隔 1、2、4、8 秒）；401／403／404 回報 `source`。
 - 來源：App 的 `ASSISTANT_MODEL_BASE_URL`（一個鏡像提供全部檔案：市府伺服器，或本機測試伺服器；只接受 https 或手機自己的 127.0.0.1）→ 檔案自己的 `url` → 清單的 `team_url` + `path`。
   鏡像換不了內容：每個檔案都對照 App 內建清單的 SHA-256。
@@ -90,6 +97,7 @@
 ## 6. 測試
 
 - Python：`assistant_backend/test_models.py`（本機 HTTP 伺服器：續傳、暫停、雜湊值不符、404、空間不足、沒有來源、分級、刪除；沒有決策模型的行為；HTTP 端點；Activator）。
+  已被取代的舊檔：`assistant_backend/test_contract_audit.py` 的 `SupersededModelTests`（啟動、經 HTTP 下載完成與刪除、adb 推的檔與資料夾外的檔不動、改回 v1 時不刪、出貨的清單）。
 - Flutter：`test/assistant_model_download_test.dart`（狀態解析、分級預設、輪詢、下載卡片各狀態、引導介面缺模型時顯示下載、按住提問改開下載）。
 - 電腦上實際下載核心 541 MB（本機鏡像）：中途暫停在 314 MB、續傳完成，全部 SHA-256 通過。
 - 2026-11-11：自己轉檔的 7 個檔案上傳到 Hugging Face [`allensung1226/townpass-assistant-models`](https://huggingface.co/allensung1226/townpass-assistant-models)（附授權全文與來源說明），`team_url` 指向它；

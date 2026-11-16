@@ -547,9 +547,20 @@ MESSAGES = {
         "tl": "Aling serbisyo ang ibig mong sabihin? Pumili muna ng isa.",
     },
     "choose_one": {
+        "zh": "請選擇一個具體選項，或說第幾個。",
         "en": "Please choose one option, or say its number.", "ja": "選択肢を選ぶか、番号を言ってください。",
         "vi": "Hãy chọn một mục, hoặc nói số thứ tự.", "id": "Pilih salah satu, atau sebutkan nomornya.",
         "tl": "Pumili ng isang opsiyon, o sabihin ang numero nito.",
+    },
+    # A number said or typed past the list's last option (2026-11-16, contract audit): the
+    # list again, not an error (the other languages are AI drafts, to be reviewed).
+    "beyond_list": {
+        "zh": "清單裡沒有第 {number} 個，請從第 1 到第 {count} 個選一個，或換個說法。",
+        "en": "There is no option {number}. Please choose from 1 to {count}, or say it another way.",
+        "ja": "{number}番はありません。1〜{count}番から選ぶか、言い方を変えてください。",
+        "vi": "Không có mục số {number}. Hãy chọn từ 1 đến {count}, hoặc nói cách khác.",
+        "id": "Tidak ada pilihan nomor {number}. Pilih dari 1 sampai {count}, atau sampaikan dengan cara lain.",
+        "tl": "Walang opsiyon bilang {number}. Pumili mula 1 hanggang {count}, o sabihin sa ibang paraan.",
     },
     "clarify": {
         "en": "Which service or task do you mean? You can also ask \"what can you do\".",
