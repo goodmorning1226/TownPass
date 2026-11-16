@@ -764,10 +764,43 @@ class Workflow:
             self.pending = {k: v for k, v in self.pending.items() if now - v["created"] < PENDING_S}
             if len(self.pending) >= 128:
                 self.pending.pop(next(iter(self.pending)))
+            shown = self.reply(payload, message, kind=kind, resolution_id=resolution, choices=public, **extra)
+            # shown: the reply itself, so the list can be offered again exactly as it was
+            # (_offer_again; it also sees content_language set on it afterwards).
             self.pending[payload["session_id"]] = {"id": resolution, "created": now, "items": items,
                 "registry_version": self.registry.version, "page": page,
-                "language": payload.get("language", "zh")}
-        return self.reply(payload, message, kind=kind, resolution_id=resolution, choices=public, **extra)
+                "language": payload.get("language", "zh"), "shown": shown}
+        return shown
+
+    # The fields of a list reply that _offer_again keeps (all but the message).
+    LIST_FIELDS = ("kind", "action", "choices", "content_language", "listing", "level", "group")
+
+    def _offer_again(self, payload, pending, message_key, overrides=None, **values):
+        """The pending list once more, with its own kind, options (nav, group_id, type,
+        subtitle), catalogue level, group and listing and the same resolution id; only
+        the message changes (2026-11-16, contract audit: 好 after a catalogue offered
+        plain options without nav or level, so the App showed a candidate list with 都不是).
+        Used for 好／是 while several options wait, and for a number past the last option.
+        Chinese content (content_language zh) keeps a Chinese message for the App to translate."""
+        shown = pending.get("shown") or {}
+        language = pending.get("language", payload.get("language", "zh"))
+        kept = {key: shown[key] for key in self.LIST_FIELDS if shown.get(key) is not None}
+        kept.setdefault("kind", "confirm_candidates")
+        kept.setdefault("choices", [{"id": str(i), "title": item["title"], "enabled": item.get("enabled", True)}
+                                    for i, item in enumerate(pending["items"], 1)])
+        kept.update(overrides or {})
+        message = i18n.t(message_key, "zh" if kept.get("content_language") == "zh" else language, **values)
+        return self.reply({**payload, "language": language}, message, resolution_id=pending["id"], **kept)
+
+    def _beyond_list(self, payload, pending, number):
+        """「第 4 個」 for a list of three (said or typed): the list again with action
+        choice_out_of_range and choice_number, not the 422 error of a tapped option that is
+        not there (2026-11-16, contract audit: the guided App numbers its own 「都不是」 after
+        the backend's options, so saying that number answered 「選項不在本輪候選中」)."""
+        self._trace("beyond_list")
+        return self._offer_again(payload, pending, "beyond_list",
+                                 {"action": "choice_out_of_range", "choice_number": number},
+                                 number=number, count=len(pending["items"]))
 
     def _cap_items(self, entries, language="zh", group=False):
         """Options that open these pages; group: each carries its catalogue category."""
@@ -953,14 +986,14 @@ class Workflow:
                 if group:
                     return self._catalog_step(payload, pending, group=group)
             number = i18n.choice_number(text, language)
+            if number and number > len(pending["items"]):
+                return self._beyond_list(payload, pending, number)
             if number:
                 return self._select(payload, pending, str(number))
             if i18n.matches(i18n.YES, text, language):
                 if len(pending["items"]) == 1:
                     return self._select(payload, pending, "1")
-                return self.reply(payload, i18n.t("choose_one", language), kind="confirm_candidates", resolution_id=resolution,
-                                  choices=[{"id": str(i), "title": item["title"], "enabled": item.get("enabled", True)}
-                                           for i, item in enumerate(pending["items"], 1)])
+                return self._offer_again(payload, pending, "choose_one")
         with self.lock:
             self.pending.pop(session, None)
         if i18n.matches(i18n.GREETING, text, language):
@@ -1168,18 +1201,21 @@ class Workflow:
                     return self._catalog_step(payload, pending, group=group)
             match = re.fullmatch(r"第?(十[一二]?|[一二兩三四五六七八九]|1[0-2]|[1-9])(?:個|本|筆|項)?", text)
             index = str(_ORDINAL_WORDS.get(match[1]) or int(match[1])) if match else None
-            if index is not None and int(index) > max(8, len(pending["items"])):
-                index = None  # 第十個 for two books is a sentence, as before (only 1-8 were numbers)
+            if index is not None and int(index) > max(8, len(pending["items"]) + 1):
+                # 第十個 for two books is a sentence, as before (only 1-8 were numbers); one past
+                # the last option is still a number (the guided App's 「N. 都不是」, 2026-11-16).
+                index = None
             if index is None and len(text) <= 3:
                 spoken = sound_ordinal(text)
                 index = str(spoken) if spoken else None
+            if index is not None and int(index) > len(pending["items"]):
+                return self._beyond_list(payload, pending, int(index))
             if index is not None:
                 return self._select(payload, pending, index)
             if text in ("好", "是", "就是它", "確認"):
                 if len(pending["items"]) == 1:
                     return self._select(payload, pending, "1")
-                return self.reply(payload, "請選擇一個具體選項，或說第幾個。", kind="confirm_candidates", resolution_id=resolution,
-                                  choices=[{"id": str(i), "title": item["title"], "enabled": item.get("enabled", True)} for i, item in enumerate(pending["items"], 1)])
+                return self._offer_again(payload, pending, "choose_one")
         # A new subject or a client that discarded its panel cannot reuse an old resolution.
         with self.lock:
             self.pending.pop(session, None)

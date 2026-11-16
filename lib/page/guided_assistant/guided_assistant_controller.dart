@@ -81,6 +81,22 @@ class ChatMessage {
   /// The text on screen: the assistant's pre-written Chinese texts follow
   /// the conversation language (gt); the user's words stay as they were.
   String get shown => user ? text : gt(text);
+
+  /// The number of the 「N. 都不是，我再說一次」 button under [options]: one
+  /// after the last option's number (the backend's ids, as on screen); null
+  /// when there is no such button (no options, the function catalogue, or a
+  /// reply to 都不是 or another follow-up).
+  int? get noneNumber {
+    final group = options;
+    if (group == null || catalogLevel != null || followUpOf != null) {
+      return null;
+    }
+    var n = 1;
+    for (final o in group.options) {
+      n = (int.tryParse(o.choiceId ?? '') ?? n) + 1;
+    }
+    return n;
+  }
 }
 
 /// [ended]: the page is open without steps although the user did not end
@@ -435,6 +451,10 @@ class GuidedAssistantController extends GetxController {
   /// The list's option titles by choice id (a tapped option's page title).
   Map<String, String> _resolutionChoices = const {};
 
+  /// The language the list was offered in (the reply's language): a typed
+  /// follow-up carries it (docs/AI_CURRENT_RULES.md section 5, 2026-11-16).
+  String? _resolutionLanguage;
+
   /// This turn's speech notice ([_sayNotice]), said after the list.
   int? _noticeId;
 
@@ -468,6 +488,25 @@ class GuidedAssistantController extends GetxController {
     _resolutionAt = null;
     _resolutionTitles = const [];
     _resolutionChoices = const {};
+    _resolutionLanguage = null;
+  }
+
+  /// The list's [language] for a typed follow-up to it, unless the words are
+  /// written in a script that language does not use: 我要繳水費 under an
+  /// English list, or "Library" under a Japanese one, is left to the backend
+  /// to tell from its letters, as before (rules section 5, 2026-11-16; the
+  /// contract audit: 「2」 under a Japanese list was answered in Chinese,
+  /// 図書館 read as Chinese, "trang sau", "batal" and "kanselahin" as English).
+  static String? listLanguageFor(String text, String? language) {
+    if (language == null) return null;
+    final kana = RegExp(r'[぀-ヿ]').hasMatch(text);
+    final han = RegExp(r'[一-鿿]').hasMatch(text);
+    final latin = RegExp(r'[A-Za-zÀ-ɏḀ-ỿ]').hasMatch(text);
+    final cjk = language == 'zh' || language == 'ja';
+    if (kana && language != 'ja') return null;
+    if (han && !cjk) return null;
+    if (latin && cjk) return null;
+    return language;
   }
 
   bool _offlineNoted = false;
@@ -614,6 +653,10 @@ class GuidedAssistantController extends GetxController {
   /// Six or seven chips took half the screen (2026-11-16).
   static const maxChips = 4;
 
+  /// The longest request the backend takes (server.turn), the text box's
+  /// limit as in the chat panel (2026-11-16, contract audit).
+  static const maxInput = 500;
+
   List<String> _localChips(List<String> sources) => [
     for (final source in sources) _chip(source),
   ];
@@ -665,6 +708,11 @@ class GuidedAssistantController extends GetxController {
     }
     // Before the user's bubble: can this turn answer the backend's list?
     final followUp = choiceId == null ? _liveResolution() : null;
+    if (followUp != null && !voice && _turnLanguage == null) {
+      // Typed words answering the list are in the list's language (「2」,
+      // 図書館, trang sau, batal; rules section 5, 2026-11-16).
+      _turnLanguage = listLanguageFor(text, _resolutionLanguage);
+    }
     _noticeId = null;
     messages.add(
       ChatMessage(
@@ -740,11 +788,13 @@ class GuidedAssistantController extends GetxController {
     // then resolves 第 2 個, a category, 下一頁 or 取消 against it.
     final offered = followUp == null ? const <String>[] : _resolutionTitles;
     final listed = _resolutionChoices;
+    final followedList = followUp == null ? null : _resolutionMessage;
+    final requestId = '${DateTime.now().microsecondsSinceEpoch}-$generation';
     AssistantResult result;
     try {
       result = await service!.decide(
         text: text,
-        requestId: '${DateTime.now().microsecondsSinceEpoch}-$generation',
+        requestId: requestId,
         sessionId: _session,
         resolutionId: choiceId == null && pageStep == null
             ? followUp
@@ -754,6 +804,21 @@ class GuidedAssistantController extends GetxController {
         language: _turnLanguage,
         pageStep: pageStep,
       );
+      // A foreign request the FAQ may answer: translated on the phone and
+      // asked again; Chinese FAQ content translated back (rules section 3,
+      // shared with the chat panel; 2026-11-16, contract audit).
+      if (generation == _generation &&
+          !isClosed &&
+          (result.action == 'translate_for_faq' ||
+              result.contentLanguage == 'zh')) {
+        result = await service!.withChineseFaq(
+          result,
+          text: choiceId == null && pageStep == null ? text : '',
+          requestId: requestId,
+          context: requestContext(),
+          stillWanted: () => generation == _generation && !isClosed,
+        );
+      }
     } catch (error) {
       if (generation != _generation || isClosed) return;
       loading.value = false;
@@ -778,6 +843,19 @@ class GuidedAssistantController extends GetxController {
     if (generation != _generation || isClosed) return;
     loading.value = false;
     _session = result.sessionId;
+    // 「第 N 個」 past the backend's options (action choice_out_of_range) is
+    // this App's own 「N. 都不是」 when N is its number (rules section 5,
+    // 2026-11-16; it was a 422 「選項不在本輪候選中」).
+    final none = followedList == null
+        ? null
+        : messages.firstWhereOrNull((m) => m.id == followedList)?.noneNumber;
+    if (result.action == 'choice_out_of_range' &&
+        none != null &&
+        result.choiceNumber == none) {
+      _dropResolution();
+      _sayNoneOfThem();
+      return;
+    }
     _dropResolution();
     _resolutionId = result.resolutionId;
     // Typed words in another language switch the texts and pages, as speech
@@ -864,6 +942,7 @@ class GuidedAssistantController extends GetxController {
         _resolutionAt = clock();
         _resolutionTitles = [for (final c in result.choices) c.title];
         _resolutionChoices = {for (final c in result.choices) c.id: c.title};
+        _resolutionLanguage = result.language;
       }
       return;
     }
@@ -1135,21 +1214,25 @@ class GuidedAssistantController extends GetxController {
   /// guide in progress when it was asked.
   static const _switchOf = 'switch:';
 
+  /// The reply to 都不是 (tapped, or its number said or typed): 看全部功能
+  /// under it (2026-11-16); its followUpOf keeps a second 都不是 button away.
+  void _sayNoneOfThem() {
+    _say(
+      _bot(
+        Replies.noneOfThem,
+        options: CandidateGroup(Replies.noneOfThem, [
+          CandidateOption(seeAllChip, say: _chip(seeAllChip)),
+        ]),
+        followUpOf: 'none',
+      ),
+    );
+  }
+
   void choose(ChatMessage message, CandidateOption? option) {
     if (!optionsLive(message) || loading.value) return;
     if (option == null) {
       messages.add(ChatMessage(id: _nextId++, user: true, text: gt('都不是')));
-      // 看全部功能 under it (2026-11-16); its followUpOf keeps a second
-      // 都不是 button away.
-      _say(
-        _bot(
-          Replies.noneOfThem,
-          options: CandidateGroup(Replies.noneOfThem, [
-            CandidateOption(seeAllChip, say: _chip(seeAllChip)),
-          ]),
-          followUpOf: 'none',
-        ),
-      );
+      _sayNoneOfThem();
       return;
     }
     if (!option.enabled) {

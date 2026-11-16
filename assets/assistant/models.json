@@ -163,5 +163,8 @@
    ],
    "license": "Apache-2.0 (MediaTek Research Breeze-ASR-26; ggml q4_0 by this project)"
   }
+ ],
+ "superseded": [
+  "townpass-decision-e5-ce-v1-q8_0.gguf"
  ]
 }
