@@ -23,6 +23,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 import classifier  # noqa: E402  (TOWNPASS_DECISION_BACKEND: the decision classifier, opt-in)
 import liveness  # noqa: E402  (which local model servers answer; no long waits for a dead one)
+import rule_switches  # noqa: E402  (evaluation only: early rules switched off / traced)
 import decision  # noqa: E402  (TOWNPASS_DECISION_MODEL: Ministral by default, or Gemma)
 
 # Ollama tag and the reported model name; llama-server (the phone) serves the file
@@ -551,6 +552,7 @@ class Assistant:
         self.usage.calls, self.usage.timings = [], []
         self.usage.route, self.usage.candidates, self.usage.semantic = None, [], None
         self.usage.classifier = []  # TOWNPASS_DECISION_BACKEND=classifier decisions (classifier.py)
+        rule_switches.start()
         result = self.workflow.handle(payload)
         tokens = [count for count in self.usage.calls if count is not None]
         result["metrics"] = {"elapsed_ms": round((time.monotonic() - started) * 1000),
@@ -558,7 +560,9 @@ class Assistant:
             "model": MODEL if self.usage.calls else None, "page_capability": self._page_id(context),
             "route": self.usage.route, "candidates": self.usage.candidates, "semantic": self.usage.semantic,
             "model_timings": [timing for timing in self.usage.timings if timing],
-            **({"classifier": self.usage.classifier} if self.usage.classifier else {})}
+            **({"classifier": self.usage.classifier} if self.usage.classifier else {}),
+            # TOWNPASS_RULE_TRACE=1 only (evaluation): the early rules that fired (rule_switches.py).
+            **({"rules": rule_switches.fired()} if rule_switches.fired() else {})}
         if TIMING_LOG:
             # Numbers only (never the request text), for measuring a phone's speed.
             calls = " ".join(f"[prompt {t['prompt_tokens']} tok cached {t['cached_tokens']} {t['prompt_ms']} ms"
@@ -925,6 +929,17 @@ def make_handler(assistant, token=""):
                       f"chars={len(text) if isinstance(text, str) else None} "
                       f"alternatives={len(result.get('alternatives') or [])} "
                       f"confidence={result.get('confidence')}", flush=True)
+            if isinstance(result, dict) and result.get("notice") == "taiwanese_unavailable":
+                # The gate was sure the clip is Taiwanese and its model cannot be used now:
+                # no Chinese guess, the reason and what to do instead (rules section 4, 2026-11-16).
+                import i18n
+                from asr_server import language_code
+                asked = language_code(self.headers.get("X-Language"))
+                reason = result.get("notice_reason")
+                key = f"taiwanese_unavailable_{reason}"
+                return self.reply(422, {"error": i18n.t(key if key in i18n.MESSAGES else "taiwanese_unavailable_failed",
+                                                        asked if asked in i18n.LANGUAGES else "zh"),
+                                        "code": "taiwanese_unavailable", "reason": reason})
             if not isinstance(text, str) or not text.strip():
                 # Nothing heard (rules section 3, 2026-11-16): one line, no list.
                 import i18n

@@ -66,8 +66,48 @@ MESSAGES = {
     },
 }
 
-# The App page offered (not opened) after the number.
+# The App page offered (not opened) after the number: the building-fire form, unless the sentence
+# names another fire form (workflow._emergency_offer, rules section 1, 2026-11-17).
 OFFER = {"fire": "disasterReport.form.D-4-1"}
+FIRE_FORMS = "disasterReport.form.D-4-"
+
+# Words that contain an emergency word but are not one (rules section 1, 2026-11-17; the rule-collision
+# test found them): a fire lane or hydrant is not a fire; a button or a screen that 沒反應 is not a
+# person; a tree or a sign that 倒れ (fell) is not someone collapsing. Removed before matching that kind.
+NOT_EMERGENCY = {
+    "fire": r"fire[ -]?(?:lanes?|exits?|escapes?|hydrants?|extinguishers?|doors?|alarm tests?)|消防(?:通道|栓|車道)|滅火器|防火巷",
+    "medical": r"(?:按鈕|按鍵|螢幕|畫面|頁面|網頁|app|手機|電腦|系統|程式|機器|遙控器|感應|卡片|按了?|點了?)[^，。！？,.!?]{0,6}?沒反應"
+               r"|(?:木|樹|看板|電柱|電線|塀|棚|自転車|バイク|標識)(?:が|も|は)?倒れ|倒れ(?:た|ている|そうな)(?:木|樹|看板|電柱|塀|標識)",
+}
+
+# 緊急詞＋申請類的字＋說的是過去的事 (rules section 1, 2026-11-17): 「家暴之後要聲請保護令，律師費好貴」,
+# 「中風了想申請長照補助」. The number stays first and the pages the usual flow finds are listed after it.
+# Something happening now (火在燒, 叫不醒, 他在打我) has neither, and gets the number only.
+SERVICE_NEED = {
+    "zh": r"補助|申請|聲請|津貼|補貼|扶助|救助|保護令|律師費|訴訟費|醫療費|生活費|可以領|領什麼|長照",
+    "en": r"subsid|benefit|allowance|grant|\bapply\b|application|financial (?:help|aid|assistance)|compensation|legal fees",
+    "ja": r"補助|助成|給付|手当|申請|支援制度",
+    "vi": r"trợ cấp|hỗ trợ tài chính|xin hỗ trợ|đăng ký|nộp đơn|bồi thường",
+    "id": r"bantuan|subsidi|tunjangan|mengajukan|\bajukan\b|santunan|kompensasi",
+    "tl": r"tulong pinansyal|ayuda|subsidyo|mag-?apply|benepisyo|financial assistance",
+}
+AFTER = {
+    "zh": r"之前|以前|曾經|過去|後來|之後|以後|事後|被害人|受害者|受害人|被害者|遭受|遭到|過的|了[，,、\s]*(?:想|要|可以|能|該|需要)",
+    "en": r"victim|survivor|\bafter\b|previously|used to|\bwas\b|\bwere\b|had been|in the past|last (?:year|month|week)",
+    "ja": r"被害者|被害に|後で|あとで|以前|前に|でした|されて",
+    "vi": r"nạn nhân|sau khi|trước đây|đã bị|từng bị",
+    "id": r"korban|setelah|sesudah|\bdulu\b|pernah|sebelumnya",
+    "tl": r"biktima|pagkatapos|\bdati\b|noon|nakaraan",
+}
+# Said after the number when the pages are listed too. AI drafts for the other languages.
+SERVICE_NOTE = {
+    "zh": "如果要申請相關的協助，也可以從下面選：",
+    "en": "If you want to apply for related help, you can also choose below:",
+    "ja": "関連する支援を申請したい場合は、下から選ぶこともできます。",
+    "vi": "Nếu bạn muốn xin hỗ trợ liên quan, bạn cũng có thể chọn bên dưới:",
+    "id": "Jika Anda ingin mengajukan bantuan terkait, Anda juga bisa memilih di bawah:",
+    "tl": "Kung gusto mong mag-apply ng kaugnay na tulong, puwede ka ring pumili sa ibaba:",
+}
 
 
 def detect(text, language="zh"):
@@ -75,9 +115,23 @@ def detect(text, language="zh"):
     if not text or re.search(NOT_NOW, text, re.I):
         return None
     for kind, (chinese, other) in PATTERNS.items():
-        if re.search(chinese, text) or (language != "zh" and re.search(other, text, re.I)):
+        said = re.sub(NOT_EMERGENCY[kind], "□", text, flags=re.I) if kind in NOT_EMERGENCY else text
+        if re.search(chinese, said) or (language != "zh" and re.search(other, said, re.I)):
             return kind
     return None
+
+
+def after_service(text, language="zh"):
+    """Whether an emergency sentence also asks for help after the event (an application word and a
+    past or after-the-event word): the number first, then the pages are listed too."""
+    need, after = SERVICE_NEED.get(language, SERVICE_NEED["en"]), AFTER.get(language, AFTER["en"])
+    # Chinese words are understood in every language's sentence (mixed input).
+    return bool((re.search(need, text, re.I) or re.search(SERVICE_NEED["zh"], text))
+                and (re.search(after, text, re.I) or re.search(AFTER["zh"], text)))
+
+
+def service_note(language):
+    return SERVICE_NOTE.get(language) or SERVICE_NOTE["en"]
 
 
 def message(kind, language):

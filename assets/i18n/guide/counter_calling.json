@@ -283,6 +283,13 @@
    "id": "Untuk menambahkannya lagi, buka tempat itu dan tekan “{page:加入常用}”.",
    "tl": "Para idagdag ulit ito, buksan ang lugar na iyon at i-tap ang “{page:加入常用}”."
   },
+  "想存起來就按加入常用": {
+   "en": "Tap Add to favorites to save it",
+   "ja": "保存するなら「よく使うに追加」をタップ",
+   "vi": "Chạm Thêm vào thường dùng để lưu",
+   "id": "Ketuk Tambah ke favorit untuk menyimpan",
+   "tl": "I-tap ang Add to favorites para i-save"
+  },
   "打開常用地點": {
    "en": "Open a saved place",
    "ja": "よく使う場所を開く",
@@ -366,6 +373,13 @@
    "vi": "Xem số đang gọi",
    "id": "Lihat nomor antrean",
    "tl": "Tingnan ang mga numero sa pila"
+  },
+  "看各櫃檯叫到幾號": {
+   "en": "See the number each counter is on",
+   "ja": "各窓口の呼び出し番号を見る",
+   "vi": "Xem mỗi quầy đang gọi số mấy",
+   "id": "Lihat nomor yang dipanggil tiap loket",
+   "tl": "Tingnan kung anong numero na sa bawat counter"
   },
   "看現在叫到幾號": {
    "en": "See which number is being called",
@@ -493,6 +507,13 @@
    "id": "Pilih tempat yang dituju",
    "tl": "Piliin ang lugar na pupuntahan"
   },
+  "選要去的那一間": {
+   "en": "Choose the place you are going to",
+   "ja": "行く場所を選ぶ",
+   "vi": "Chọn nơi bạn sẽ đến",
+   "id": "Pilih lokasi yang akan dituju",
+   "tl": "Piliin ang lugar na pupuntahan mo"
+  },
   "還有 {n} 個常用地點。": {
    "en": "You still have {n} saved places. ",
    "ja": "よく使う場所はあと{n}件あります。",
@@ -542,6 +563,13 @@
    "id": "Tekan tempat favorit “{name}” di paling atas.",
    "tl": "I-tap ang naka-save mong lugar na “{name}” sa itaas."
   },
+  "點常用地點旁的變更": {
+   "en": "Tap Change next to saved places",
+   "ja": "よく使う場所の横の変更をタップ",
+   "vi": "Chạm Thay đổi cạnh địa điểm thường dùng",
+   "id": "Ketuk Ubah di samping tempat favorit",
+   "tl": "I-tap ang Change sa tabi ng saved places"
+  },
   "點最上面的「選擇地點」框框，例如「{first}」，選你要去的那一間。": {
    "en": "Tap the “{page:選擇地點}” box at the top, for example “{first}”, and choose the one you're going to.",
    "ja": "一番上の「{page:選擇地點}」の枠（例：「{first}」）を押して、行く場所を選んでください。",
@@ -555,6 +583,13 @@
    "vi": "Bấm vào ô “{page:選擇地點}” trên cùng, chọn nơi bạn sẽ đến.",
    "id": "Tekan kotak “{page:選擇地點}” paling atas, lalu pilih tempat yang akan Anda tuju.",
    "tl": "I-tap ang kahon na “{page:選擇地點}” sa itaas at piliin ang pupuntahan mo."
+  },
+  "點要去的單位": {
+   "en": "Tap the office you are going to",
+   "ja": "行く機関をタップ",
+   "vi": "Chạm cơ quan bạn sẽ đến",
+   "id": "Ketuk kantor yang akan dituju",
+   "tl": "I-tap ang opisinang pupuntahan mo"
   },
   "；": {
    "en": "; ",

@@ -403,6 +403,22 @@ class BoundedStarterTest(unittest.TestCase):
         self.assertEqual(bounded(), "failed")
         self.assertEqual(len(calls), 2)
 
+    def test_memory_is_asked_again_after_a_minute(self):
+        # Only a lack of memory pauses the asks briefly (owner, 2026-11-16); free memory changes.
+        now = [0.0]
+        bounded, calls = self.starter("memory", clock=lambda: now[0])
+        self.assertEqual((bounded(), bounded()), ("memory", "memory"))
+        self.assertEqual(len(calls), 1)
+        now[0] = device_main.BoundedStarter.MEMORY_S + 1
+        self.assertEqual(bounded(), "memory")
+        self.assertEqual(len(calls), 2)
+
+    def test_missing_and_ready_never_pause(self):
+        for state in ("missing", "ready"):
+            bounded, calls = self.starter(state, clock=lambda: 0.0)
+            self.assertEqual((bounded(), bounded(), bounded()), (state, state, state))
+            self.assertEqual(len(calls), 3, state)
+
     def test_a_starter_that_raises_counts_as_failed(self):
         def broken():
             raise RuntimeError("no bridge")

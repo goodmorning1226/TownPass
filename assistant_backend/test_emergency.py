@@ -125,5 +125,67 @@ class OwnerRulesTests(unittest.TestCase):
         self.assertEqual(faq.load_aliases(faq.pathlib.Path(faq.__file__).with_name("no_such_file.json")), ())
 
 
+class EmergencyServiceTests(unittest.TestCase):
+    """The number always first (rules section 1, 2026-11-17): a fire gets the form it names; an emergency
+    word with an application word about something past also lists the pages; three misfires are gone."""
+
+    def setUp(self):
+        self.app = Assistant(FakeCatalog(), lambda messages, tools: response("request_clarification"))
+
+    def turn(self, text, language="zh", session="s"):
+        return self.app.turn({"text": text, "request_id": "r1", "session_id": session, "language": language})
+
+    def listed(self, session="s"):
+        return [item.get("entry_id") for item in (self.app.workflow.pending.get(session) or {}).get("items", [])]
+
+    def test_a_fire_gets_the_form_it_names(self):
+        for text, form in (("工廠火災要通報", "disasterReport.form.D-4-3"), ("化學品起火了", "disasterReport.form.D-4-2"),
+                           ("我老家失火了", "disasterReport.form.D-4-1")):
+            result = self.turn(text)
+            self.assertEqual(result["action"], "emergency", text)
+            self.assertTrue(result["message"].startswith("如果有火災"), text)
+            self.assertEqual(self.listed(), [form], text)
+            self.assertNotEqual(result["kind"], "navigate", text)
+        result = self.turn("There is a factory fire", "en")
+        self.assertIn("119", result["message"])
+        self.assertEqual(self.listed(), ["disasterReport.form.D-4-3"])
+
+    def test_after_the_event_lists_the_pages_after_the_number(self):
+        for text, language, page, number in (("我要申請家暴被害人補助", "zh", "districtOffice.form.c-3", "113"),
+                                             ("中風了想申請長照補助", "zh", "districtOffice", "119"),
+                                             ("Domestic violence victim subsidy", "en", "districtOffice.form.c-3", "113")):
+            result = self.turn(text, language)
+            self.assertEqual(result["action"], "emergency", text)
+            self.assertEqual(result["metrics"]["route"], "emergency_service", text)
+            self.assertIn(number, result["message"].split("\n")[0], text)
+            self.assertEqual(result["message"].split("\n")[1], emergency.service_note(language), text)
+            self.assertIn(page, self.listed(), text)
+            self.assertNotEqual(result["kind"], "navigate", text)
+
+    def test_happening_now_gets_the_number_only(self):
+        for text in ("我被家暴", "我爸倒在地上叫不醒", "家裡失火了快來"):
+            result = self.turn(text)
+            self.assertEqual(result["metrics"]["route"], "emergency", text)
+            self.assertNotIn("\n", result["message"], text)
+        self.assertFalse(emergency.after_service("他現在在打我，好痛"))
+        self.assertTrue(emergency.after_service("家暴之後要聲請保護令，律師費好貴"))
+        self.assertTrue(emergency.after_service("Nạn nhân bạo lực gia đình có trợ cấp không", "vi"))
+
+    def test_nothing_found_keeps_the_number_alone(self):
+        # The usual flow finds no page (no keyword, no index in this test): the number only.
+        result = self.turn("家暴之後要聲請保護令，律師費好貴")
+        self.assertEqual(result["metrics"]["route"], "emergency")
+        self.assertIn("113", result["message"])
+
+    def test_the_three_misfires_are_not_emergencies(self):
+        self.assertIsNone(emergency.detect("Scooters block the fire lane in my alley", "en"))
+        self.assertIsNone(emergency.detect("台風で倒れた木が道路をふさいでいる", "ja"))
+        self.assertIsNone(emergency.detect("有個按鈕按了沒反應，要回報"))
+        self.assertIsNone(emergency.detect("App 的畫面一直沒反應"))
+        self.assertEqual(emergency.detect("我叫他都沒反應"), "medical")
+        self.assertEqual(emergency.detect("The building is on fire, the fire exit is blocked", "en"), "fire")
+        self.assertEqual(emergency.detect("父が倒れて意識がない", "ja"), "medical")
+
+
 if __name__ == "__main__":
     unittest.main()

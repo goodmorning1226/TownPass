@@ -604,6 +604,8 @@ object OnDeviceAssistant {
         val model = File(models, fileName)
         if (!model.isFile) return "missing" to current
         // Breeze-ASR-26 q8_0 peaked at 1.28x its file size on the phone (2.0 GB for 1.58 GB).
+        // Kept as is (2026-11-16): with -bo 1 below, q4_0 peaked at 1,274 MB on the computer
+        // (1,513 MB without it), under this rule's 1,402 MB (docs/AI_TAIWANESE_ABLATION.md section 14).
         val memory = ActivityManager.MemoryInfo()
         (app.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager).getMemoryInfo(memory)
         val needed = model.length() * 13 / 10 + 300L * 1024 * 1024
@@ -613,8 +615,12 @@ object OnDeviceAssistant {
         }
         current?.destroy()
         val started = System.currentTimeMillis()
+        // Taiwanese: -bo 1, one decoder per temperature, so whisper.cpp never re-creates its
+        // KV cache at 4x on a temperature fallback (+240 MB for Breeze).
+        val extra = listOf("-t", whisperThreads, "-l", language) +
+            if (label == "taiwanese") listOf("-bo", "1") else emptyList<String>()
         val process = launch(app, "libwhisper_server.so", model, port,
-            listOf("-t", whisperThreads, "-l", language), stopLeftovers = false, name = label) ?: return "failed" to null
+            extra, stopLeftovers = false, name = label) ?: return "failed" to null
         // whisper-server listens only after the model has loaded.
         while (System.currentTimeMillis() - started < 60_000) {
             if (!process.isAlive) return "failed" to null

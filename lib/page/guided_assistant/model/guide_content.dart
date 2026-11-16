@@ -57,6 +57,12 @@ class GuideStep {
   /// lets the microphone read it from the field.
   final FieldKind? Function(WebPageState s)? field;
 
+  /// The step's short point (Chinese source), shown when the card shrinks to
+  /// one line beside a big ring (docs/AI_CURRENT_RULES.md section 5,
+  /// 2026-11-16); from [GuideComponent.briefs]. Null: the card's first
+  /// sentence.
+  final String? brief;
+
   const GuideStep({
     required this.target,
     required this.label,
@@ -71,29 +77,35 @@ class GuideStep {
     this.alsoUsable = const [],
     this.commit = false,
     this.field,
+    this.brief,
   });
 
   String? targetFor(WebPageState s) => target(s);
 
   FieldKind? fieldFor(WebPageState s) => field?.call(s);
 
-  /// Copy with this step's task-list line and label prefix filled in.
-  GuideStep numbered(int todoIndex, String Function(WebPageState s) newLabel) =>
-      GuideStep(
-        target: target,
-        label: newLabel,
-        card: card,
-        detail: detail,
-        isDone: isDone,
-        todo: todoIndex,
-        locks: locks,
-        arrow: arrow,
-        scrollHint: scrollHint,
-        cardTop: cardTop,
-        alsoUsable: alsoUsable,
-        commit: commit,
-        field: field,
-      );
+  /// Copy with this step's task-list line, label prefix and short point
+  /// filled in.
+  GuideStep numbered(
+    int todoIndex,
+    String Function(WebPageState s) newLabel, {
+    String? brief,
+  }) => GuideStep(
+    target: target,
+    label: newLabel,
+    card: card,
+    detail: detail,
+    isDone: isDone,
+    todo: todoIndex,
+    locks: locks,
+    arrow: arrow,
+    scrollHint: scrollHint,
+    cardTop: cardTop,
+    alsoUsable: alsoUsable,
+    commit: commit,
+    field: field,
+    brief: brief ?? this.brief,
+  );
 }
 
 /// A line in the task list. [self] marks things the user does alone (shown

@@ -241,6 +241,13 @@
    "id": "Selesai! Ketuk “{page:查詢}” di bawah untuk melihat berapa yang harus dibayar untuk {fee}.",
    "tl": "Tapos na! I-tap ang “{page:查詢}” sa ibaba para makita kung magkano ang babayaran mo para sa {fee}."
   },
+  "打帳單上的號碼": {
+   "en": "Type the number on your bill",
+   "ja": "請求書の番号を入力",
+   "vi": "Gõ số trên hóa đơn",
+   "id": "Ketik nomor di tagihan",
+   "tl": "I-type ang numero sa bill"
+  },
   "打費用名稱，例如「水費」，按放大鏡，再點下面的結果。": {
    "en": "Type the fee’s name, e.g. “{page:水費}”, tap the magnifying glass, then tap the result below.",
    "ja": "料金の名前（例：「{page:水費}」）を入力し、虫めがねを押してから、下の結果をタップしてください。",
@@ -276,12 +283,26 @@
    "id": "Ketuk “{page:查詢}” di bawah untuk melihat berapa yang harus dibayar.",
    "tl": "I-tap ang “{page:查詢}” sa ibaba para makita kung magkano ang babayaran."
   },
+  "按前往繳費": {
+   "en": "Tap Go to payment",
+   "ja": "支払いへ進むをタップ",
+   "vi": "Chạm Đi đến thanh toán",
+   "id": "Ketuk Lanjut ke pembayaran",
+   "tl": "I-tap ang Go to payment"
+  },
   "按左右的箭頭換年份，點中間的年份可以看更多年。選好年，點你出生的月份，再點那一天。": {
    "en": "Use the left and right arrows to change the year; tap the year in the middle to see more years. Once the year is right, tap the month you were born, then tap the day.",
    "ja": "左右の矢印で年を切り替えます。真ん中の年をタップするともっと多くの年が見られます。年を選んだら生まれた月をタップし、その日をタップしてください。",
    "vi": "Dùng mũi tên trái phải để đổi năm; chạm vào năm ở giữa để xem nhiều năm hơn. Chọn xong năm, chạm vào tháng bạn sinh, rồi chạm vào ngày đó.",
    "id": "Pakai panah kiri dan kanan untuk mengganti tahun; ketuk tahun di tengah untuk melihat lebih banyak tahun. Setelah tahunnya benar, ketuk bulan lahir Anda, lalu ketuk tanggalnya.",
    "tl": "Gamitin ang kaliwa at kanang arrow para palitan ang taon; i-tap ang taon sa gitna para makakita ng mas maraming taon. Kapag tama na ang taon, i-tap ang buwan ng iyong kapanganakan, saka i-tap ang araw."
+  },
+  "按查詢看要繳多少": {
+   "en": "Tap Search to see the amount",
+   "ja": "照会をタップして金額を確認",
+   "vi": "Chạm Tra cứu để xem số tiền",
+   "id": "Ketuk Cari untuk melihat jumlahnya",
+   "tl": "I-tap ang Search para makita ang halaga"
   },
   "按畫面最下面的「前往繳費」。": {
    "en": "Tap “{page:前往繳費}” at the very bottom of the screen.",
@@ -346,6 +367,13 @@
    "id": "Isi kotak di layar dengan nomor di tagihan, lalu ketuk “{page:查詢}”.",
    "tl": "Punan ang mga kahon sa screen ng mga numero sa iyong bill, saka i-tap ang “{page:查詢}”."
   },
+  "用上面的選單篩選": {
+   "en": "Filter with the menus at the top",
+   "ja": "上のメニューで絞り込む",
+   "vi": "Lọc bằng menu phía trên",
+   "id": "Saring dengan menu di atas",
+   "tl": "I-filter gamit ang mga menu sa itaas"
+  },
   "畫面寫「目前查無待繳帳單」，可能已經繳過或還沒出帳。可以按左上角「‹」檢查號碼，或按「回到城市通」。": {
    "en": "The screen says “no bills to pay right now”. It may already be paid, or the bill isn’t out yet. You can tap “‹” at the top left to check the number, or tap “{page:回到城市通}”.",
    "ja": "画面に「現在、未払いの請求はありません」と表示されています。すでに支払い済みか、まだ請求が出ていない可能性があります。左上の「‹」で番号を確認するか、「{page:回到城市通}」を押してください。",
@@ -394,6 +422,13 @@
    "vi": "Kiểm tra rồi chạm “{page:是}” để trả tiền",
    "id": "Periksa, lalu ketuk “{page:是}” untuk membayar",
    "tl": "Suriin, saka i-tap ang “{page:是}” para magbayad"
+  },
+  "確認金額後自己按是": {
+   "en": "Check the amount, then tap Yes yourself",
+   "ja": "金額を確認して自分で「はい」をタップ",
+   "vi": "Kiểm tra số tiền rồi tự chạm Có",
+   "id": "Periksa jumlahnya, lalu ketuk Ya sendiri",
+   "tl": "Suriin ang halaga, saka ikaw mismo ang mag-tap ng Yes"
   },
   "篩選好了！下面就是符合的繳費紀錄。": {
    "en": "Filtered! The matching payment records are below.",
@@ -535,6 +570,13 @@
    "id": "Ini untuk memindai dengan kamera. Ketuk “{tab}” di atas untuk mengetik saja.",
    "tl": "Nag-i-scan gamit ang camera ang tab na ito. I-tap ang “{tab}” sa itaas para mag-type na lang."
   },
+  "選一個付款方式": {
+   "en": "Choose a payment method",
+   "ja": "支払い方法を選ぶ",
+   "vi": "Chọn cách thanh toán",
+   "id": "Pilih cara pembayaran",
+   "tl": "Pumili ng paraan ng pagbabayad"
+  },
   "選一個你平常用的付款方式，例如「悠遊付」。": {
    "en": "Pick the payment method you usually use, e.g. “{page:悠遊付}”.",
    "ja": "いつも使うお支払い方法を1つ選んでください。例：「{page:悠遊付}」。",
@@ -660,6 +702,13 @@
    "vi": "Chạm vào khoản bạn muốn đóng, ví dụ “{page:水費}” hoặc “{page:停車費}”.",
    "id": "Ketuk yang ingin Anda bayar, misalnya “{page:水費}” atau “{page:停車費}”.",
    "tl": "I-tap ang gusto mong bayaran, hal. “{page:水費}” o “{page:停車費}”."
+  },
+  "點要繳的費用": {
+   "en": "Tap the fee you want to pay",
+   "ja": "支払う料金をタップ",
+   "vi": "Chạm khoản phí cần trả",
+   "id": "Ketuk biaya yang akan dibayar",
+   "tl": "I-tap ang bayaring babayaran mo"
   }
  }
 }

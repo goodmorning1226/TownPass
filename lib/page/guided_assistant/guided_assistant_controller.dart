@@ -175,7 +175,18 @@ class GuideCard {
   final CardVariant variant;
   final String label;
   final String text;
-  const GuideCard(this.variant, this.label, this.text);
+
+  /// The one-line card's words: the step's short point, else [text]'s first
+  /// sentence (docs/AI_CURRENT_RULES.md section 5, 2026-11-16).
+  final String brief;
+
+  const GuideCard(this.variant, this.label, this.text, {this.brief = ''});
+
+  /// [text] up to its first full stop (Chinese or Latin), or all of it.
+  static String firstSentence(String text) {
+    final m = RegExp(r'^.+?(?:[。！？]|[.!?](?=\s|$))').firstMatch(text);
+    return (m?[0] ?? text).trim();
+  }
 }
 
 enum TodoState { done, current, todo }
@@ -1462,6 +1473,22 @@ class GuidedAssistantController extends GetxController {
   String? get highlightTarget =>
       (locked || pointingOnly) ? currentStep?.targetFor(web) : doneTarget;
 
+  /// What the user taps after this step: the next step's target read from
+  /// the page as it is now (e.g. 查詢 while the 水號 is typed), or the done
+  /// card's ring after the last step. The penguin card keeps it clear when
+  /// there is room (docs/AI_CURRENT_RULES.md section 5, 2026-11-16). Null
+  /// when no step runs; a target not on screen is ignored by the card.
+  String? get nextTarget {
+    if (!_stepRunning || allStepsDone) return null;
+    final t = task.value!;
+    final i = t.currentStep(web) + 1;
+    final steps = t.guide.steps;
+    final next = i < steps.length
+        ? steps[i].targetFor(web)
+        : t.guide.doneTargetOf?.call(web);
+    return next == highlightTarget ? null : next;
+  }
+
   /// Ring (nothing blocked) on the result or the button the done card
   /// talks about.
   String? get doneTarget => _stepRunning && allStepsDone
@@ -1527,7 +1554,14 @@ class GuidedAssistantController extends GetxController {
   /// Chinese sources or already translated templates).
   GuideCard? get card {
     final c = _card;
-    return c == null ? null : GuideCard(c.variant, gt(c.label), gt(c.text));
+    if (c == null) return null;
+    final text = gt(c.text);
+    return GuideCard(
+      c.variant,
+      gt(c.label),
+      text,
+      brief: c.brief.isEmpty ? GuideCard.firstSentence(text) : gt(c.brief),
+    );
   }
 
   GuideCard? get _card {
@@ -1563,13 +1597,19 @@ class GuidedAssistantController extends GetxController {
     if (nudge.value.isNotEmpty) {
       return GuideCard(CardVariant.step, label, nudge.value);
     }
+    final brief = step.brief ?? '';
     if (step.commit && !t.commitAccepted) {
-      return GuideCard(CardVariant.commit, label, step.card(web));
+      return GuideCard(CardVariant.commit, label, step.card(web), brief: brief);
     }
     if (step.commit) {
-      return GuideCard(CardVariant.step, label, '請按亮起來的「預約」，按了就會送出。');
+      return GuideCard(
+        CardVariant.step,
+        label,
+        '請按亮起來的「預約」，按了就會送出。',
+        brief: brief,
+      );
     }
-    return GuideCard(CardVariant.step, label, step.card(web));
+    return GuideCard(CardVariant.step, label, step.card(web), brief: brief);
   }
 
   /// The page is read only while the guide can show on it: a task that is

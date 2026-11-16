@@ -695,6 +695,67 @@ MESSAGES = {
         "id": "Tidak terdengar suara. Tekan dan tahan tombolnya, lalu bicara lagi.",
         "tl": "Wala po akong narinig. Pindutin nang matagal ang button at magsalita ulit.",
     },
+    # Speech the language gate is sure is Taiwanese while the Taiwanese model cannot be
+    # used (asr_server.TAIWANESE_WITHHOLD; rules section 4, 2026-11-16): never a Chinese guess.
+    "taiwanese_unavailable_memory": {
+        "zh": "聽起來是台語，但台語模型現在無法使用（手機記憶體不足）。請改用華語說，或用打字。",
+        "en": "That sounded like Taiwanese, but the Taiwanese model can't be used right now (not enough "
+              "memory on the phone). Please say it in Mandarin or type it.",
+        "ja": "台湾語のようですが、いまは台湾語モデルを使えません（スマートフォンのメモリ不足）。"
+              "中国語で話すか、文字で入力してください。",
+        "vi": "Có vẻ bạn nói tiếng Đài, nhưng hiện không dùng được mô hình tiếng Đài (điện thoại thiếu bộ nhớ). "
+              "Hãy nói bằng tiếng Hoa hoặc gõ chữ.",
+        "id": "Sepertinya itu bahasa Taiwan, tetapi model bahasa Taiwan belum bisa dipakai sekarang "
+              "(memori ponsel tidak cukup). Silakan bicara dalam bahasa Mandarin atau ketik.",
+        "tl": "Parang Taiwanese po iyon, pero hindi magamit ngayon ang Taiwanese model (kulang ang memory "
+              "ng telepono). Magsalita po sa Mandarin o mag-type.",
+    },
+    "taiwanese_unavailable_missing": {
+        "zh": "聽起來是台語，但還沒有下載台語模型。請改用華語說或用打字；也可以在 AI 助理設定下載台語辨識。",
+        "en": "That sounded like Taiwanese, but the Taiwanese model isn't downloaded yet. Please say it in "
+              "Mandarin or type it; you can download Taiwanese speech in the AI assistant settings.",
+        "ja": "台湾語のようですが、台湾語モデルがまだダウンロードされていません。中国語で話すか、文字で入力してください。"
+              "AI アシスタントの設定からダウンロードできます。",
+        "vi": "Có vẻ bạn nói tiếng Đài, nhưng chưa tải mô hình tiếng Đài. Hãy nói bằng tiếng Hoa hoặc gõ chữ; "
+              "có thể tải trong phần cài đặt trợ lý AI.",
+        "id": "Sepertinya itu bahasa Taiwan, tetapi model bahasa Taiwan belum diunduh. Silakan bicara dalam "
+              "bahasa Mandarin atau ketik; model bisa diunduh di pengaturan asisten AI.",
+        "tl": "Parang Taiwanese po iyon, pero hindi pa na-download ang Taiwanese model. Magsalita po sa "
+              "Mandarin o mag-type; puwede itong i-download sa settings ng AI assistant.",
+    },
+    "taiwanese_unavailable_loading": {
+        "zh": "台語模型還在載入。請等一下再說一次，或改用華語、打字。",
+        "en": "The Taiwanese model is still loading. Please say it again in a moment, or use Mandarin or typing.",
+        "ja": "台湾語モデルを読み込み中です。少し待ってからもう一度話すか、中国語か文字入力を使ってください。",
+        "vi": "Mô hình tiếng Đài vẫn đang tải. Hãy đợi một chút rồi nói lại, hoặc nói tiếng Hoa hay gõ chữ.",
+        "id": "Model bahasa Taiwan masih dimuat. Silakan ulangi sebentar lagi, atau pakai bahasa Mandarin atau ketik.",
+        "tl": "Naglo-load pa ang Taiwanese model. Magsalita po ulit maya-maya, o gumamit ng Mandarin o mag-type.",
+    },
+    "taiwanese_unavailable_failed": {
+        "zh": "聽起來是台語，但台語模型現在無法使用（沒有啟動成功）。請稍後再試，或改用華語、打字。",
+        "en": "That sounded like Taiwanese, but the Taiwanese model can't be used right now (it didn't start). "
+              "Please try again later, or use Mandarin or typing.",
+        "ja": "台湾語のようですが、いまは台湾語モデルを使えません（起動できませんでした）。"
+              "あとでもう一度試すか、中国語か文字入力を使ってください。",
+        "vi": "Có vẻ bạn nói tiếng Đài, nhưng hiện không dùng được mô hình tiếng Đài (chưa khởi động được). "
+              "Hãy thử lại sau, hoặc nói tiếng Hoa hay gõ chữ.",
+        "id": "Sepertinya itu bahasa Taiwan, tetapi model bahasa Taiwan tidak bisa dipakai sekarang (gagal dimulai). "
+              "Silakan coba lagi nanti, atau pakai bahasa Mandarin atau ketik.",
+        "tl": "Parang Taiwanese po iyon, pero hindi magamit ngayon ang Taiwanese model (hindi ito nagsimula). "
+              "Subukan po ulit mamaya, o gumamit ng Mandarin o mag-type.",
+    },
+    "taiwanese_unavailable_unreachable": {
+        "zh": "聽起來是台語，但台語模型暫時沒有回應。請再說一次，或改用華語、打字。",
+        "en": "That sounded like Taiwanese, but the Taiwanese model isn't answering for the moment. "
+              "Please say it again, or use Mandarin or typing.",
+        "ja": "台湾語のようですが、台湾語モデルが一時的に応答しません。もう一度話すか、中国語か文字入力を使ってください。",
+        "vi": "Có vẻ bạn nói tiếng Đài, nhưng mô hình tiếng Đài tạm thời không phản hồi. "
+              "Hãy nói lại, hoặc nói tiếng Hoa hay gõ chữ.",
+        "id": "Sepertinya itu bahasa Taiwan, tetapi model bahasa Taiwan sementara tidak merespons. "
+              "Silakan ulangi, atau pakai bahasa Mandarin atau ketik.",
+        "tl": "Parang Taiwanese po iyon, pero pansamantalang hindi sumasagot ang Taiwanese model. "
+              "Magsalita po ulit, o gumamit ng Mandarin o mag-type.",
+    },
     "demo_page": {
         "en": "demo page", "ja": "デモページ", "vi": "trang demo", "id": "halaman demo", "tl": "demo na pahina",
     },

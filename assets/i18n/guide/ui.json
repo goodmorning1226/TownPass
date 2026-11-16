@@ -1221,6 +1221,13 @@
    "id": "Default",
    "tl": "Default"
   },
+  "點一下展開": {
+   "en": "Tap to open",
+   "ja": "タップして開く",
+   "vi": "Chạm để mở",
+   "id": "Ketuk untuk membuka",
+   "tl": "I-tap para buksan"
+  },
   "點企鵝\n開始問助理": {
    "en": "Tap the penguin\nto ask the Assistant",
    "ja": "ペンギンをタップして\nアシスタントに質問",

@@ -26,6 +26,7 @@ import i18n
 import menu
 import qna
 import registry as matching
+import rule_switches
 import semantic
 from decision import decide
 from faq import SCOPE_NOTE
@@ -49,6 +50,8 @@ LIBRARY_CUE = re.compile(r"借|找|搜尋|看|閱|書|館|寫的|ISBN", re.I)
 # sentence says more: a connected page that means the same is offered first.
 T2_GENERIC = os.environ.get("TOWNPASS_T2_GENERIC", "1") == "1"
 LIBRARY_NOUN = re.compile(r"借|書|(?<!手)冊|館|閱|寫的|作者|ISBN", re.I)  # 冊: Taiwanese for book; not 手冊
+# TOWNPASS_DISABLE_RULES=library_cue (evaluation only, rule_switches.py): the library words without the verb 借.
+LIBRARY_WORD = re.compile(r"書|(?<!手)冊|館|閱|寫的|作者|ISBN", re.I)
 GENERIC_REST = 3  # characters besides the common word that make the sentence say more
 GENERIC_REST_FOREIGN = 8  # letters, for the other languages
 
@@ -127,6 +130,10 @@ _ORDINAL_SYLLABLES = {"yi": 1, "er": 2, "san": 3, "si": 4, "wu": 5, "liu": 6, "q
 # "你都會些什麼" 0.74), compared by Mandarin syllables with a few standard
 # phrasings; small talk and other requests score at most ~0.55 ("有什麼好吃的"
 # 0.70). Only for text no service matched; a false hit only shows the list.
+# "What can you do" said in words (rules section 3): the catalogue, before any retrieval.
+LISTING_ZH = re.compile(r"有哪些功能|有什麼功能|功能(?:列表|有哪些)|(?:所有|全部)功能|查看全部功能|"
+                        r"(?:能|可以|會)做(?:什麼|哪些)|(?:能|可以|會)幫(?:我)?(?:什麼|哪些)|"
+                        r"有(?:什麼|哪些)服務|介紹.{0,4}功能|(?:能|可以)?辦(?:什麼|哪些)事?")
 LISTING_PHRASES_ZH = ("你有什麼功能", "你會做什麼", "你可以做什麼", "有哪些功能", "你能幫我做什麼", "有什麼服務")
 LISTING_SOUND = 0.72
 
@@ -298,6 +305,9 @@ class Workflow:
         """
         from server import tools_for
         context = self.retrieve(text, books)
+        if not rule_switches.on("library_cue"):  # evaluation only (see _handle)
+            context = {**context, "library_candidate": context["library"]}
+        rule_switches.hit("library_cue", context["library_candidate"] and not context["library"])
         tools = tools_for(context)
         # Do not expose a keyword miss as `library=false`: the model must decide
         # intent, not mistake a lexical retrieval flag for semantic ground truth.
@@ -306,8 +316,9 @@ class Workflow:
         # cleaned text when it equals the request, an action object equal to the query,
         # and empty lists. unique_exact_id stays, even when null: dropping it made the
         # model open the library for "借ABC123".
-        if (context["library"] and not context["query"] and not context["books"] and not context["other"]
-                and len(text) <= 14 and PLAIN_BORROW.search(matching.library_view(text))):
+        if (rule_switches.on("plain_borrow") and context["library"] and not context["query"] and not context["books"]
+                and not context["other"] and len(text) <= 14
+                and rule_switches.hit("plain_borrow", PLAIN_BORROW.search(matching.library_view(text)))):
             self._trace("library_plain", ["library"])
             return self.reply(payload, "請在圖書借閱頁搜尋想看的書。這裡使用示範資料。", kind="navigate",
                               action="open_library", destination={"kind": "home"})
@@ -386,9 +397,9 @@ class Workflow:
                 return "open_library"
             # Only a work's title ("借龜兔賽跑", rules 2026-11-13): an object shaped like a name
             # that the city's vocabulary (FAQ, catalogue, places) does not know.
-            judged = book_title.judge(context.get("action_object") or "",
-                                      book_title.verb(matching.library_view(context.get("text") or text)),
-                                      self.city_words(), context.get("text") or text)
+            judged = rule_switches.on("library_title") and rule_switches.hit("library_title", book_title.judge(
+                context.get("action_object") or "", book_title.verb(matching.library_view(context.get("text") or text)),
+                self.city_words(), context.get("text") or text))
             if judged:
                 self._trace("library_title", ["library"])
                 return "open_library" if judged == "open" else "offer_library"
@@ -578,7 +589,7 @@ class Workflow:
         A two-character word only counts by near-sound when the sentence is just
         a request for it (我要解釋 -> 我要借書, but not 早安 -> 報案).
         """
-        if self.recognizes(text):
+        if self.recognizes(text) or not rule_switches.on("speech_rewrite"):
             return None, []
         try:
             books = self.owner.catalog.books()
@@ -880,6 +891,19 @@ class Workflow:
                                  "offset": offset, "total": total, "recent": recent, "hotline": hotline},
                            listing={"offset": offset, "size": LIST_SIZE, "total": total}, level=level, group=group)
 
+    def _scoped_listing(self, payload, text, route, listing):
+        """A "what can you do" rule fired (rules section 2, 2026-11-17, 「有什麼 X」): X decides.
+        功能 / 服務 (or not that shape): listing(), as before; a category's name or synonym: that
+        category's second level; a page's own word: None, the usual flow goes on."""
+        scope = self.menu.listing_scope(text, payload.get("language", "zh"))
+        if scope and scope[0] == "pages":
+            return None
+        if scope and scope[0] == "group":
+            self._trace(route + "_group", [scope[1]])
+            return self._catalog(payload, 2, scope[1])
+        self._trace(route)
+        return listing()
+
     def _emergency(self, payload, kind):
         """The emergency number first, before retrieval, FAQ or the model (T1). A
         related page is only offered; nothing opens by itself."""
@@ -888,10 +912,60 @@ class Workflow:
         with self.lock:
             self.pending.pop(payload["session_id"], None)
         text = emergency.message(kind, language)
-        entry = self.registry.by_id.get(emergency.OFFER.get(kind, ""))
+        entry = self._emergency_offer(kind, payload.get("text", ""), language)
         if entry and entry["enabled"]:
             return self._offer(payload, self._cap_items([entry], language), text, action="emergency")
         return self.reply(payload, text, action="emergency")
+
+    def _emergency_offer(self, kind, text, language="zh"):
+        """The page offered under the number (rules section 1, 2026-11-17): for a fire, the fire form the
+        sentence names (its keywords, else the semantic index when it is ready), else the building fire."""
+        default = self.registry.by_id.get(emergency.OFFER.get(kind, ""))
+        if kind != "fire":
+            return default
+        from server import positive_text
+        positive = positive_text(text) if language == "zh" else i18n.positive_text(text, language)
+        found = self.registry.search(positive) if language == "zh" else self.registry.search_language(positive, language)
+        forms = [m["entry"] for m in found if m["entry"]["id"].startswith(emergency.FIRE_FORMS) and m["entry"]["enabled"]]
+        if forms:
+            return forms[0]
+        index = getattr(self.owner, "semantic", None)
+        if index is not None and getattr(index, "ready", False) and len(re.findall(r"\w", positive)) >= SEMANTIC_MIN_CHARS:
+            try:
+                ranked = index.search(positive, language=language)
+            except Exception:  # noqa: BLE001 - the number does not wait for retrieval
+                ranked = []
+            forms = [entry for _, entry in ranked if entry["id"].startswith(emergency.FIRE_FORMS) and entry["enabled"]]
+            if forms:
+                return forms[0]
+        return default
+
+    def _emergency_service(self, payload, kind):
+        """An emergency word with an application word about something past (rules section 1, 2026-11-17:
+        「家暴之後要聲請保護令，律師費好貴」): the number first, then the pages (and FAQ questions) the usual
+        flow finds, listed, never opened. Without any, the number alone (with its usual form)."""
+        language = payload.get("language", "zh")
+        usual = self._handle({**payload, "_after_emergency": True})
+        items = []
+        destination = usual.get("destination") or {}
+        if usual.get("kind") == "navigate" and destination.get("kind") == "capability" and destination.get("id") in self.registry.by_id:
+            items = self._cap_items([self.registry.by_id[destination["id"]]], language)
+        elif usual.get("kind") == "navigate" and destination.get("kind") in ("home", "search", "detail"):
+            items = self._cap_items([self.registry.by_id["library"]], language)
+        elif usual.get("kind") in ("confirm_candidates", "reply", "unsupported") and usual.get("resolution_id"):
+            with self.lock:
+                listed = self.pending.get(payload["session_id"]) or {}
+            if listed.get("id") == usual["resolution_id"]:
+                items = [dict(c) for c in listed.get("items") or [] if c.get("entry_id") or c.get("faq_id")]
+        offered = self._emergency_offer(kind, payload.get("text", ""), language)
+        if offered and offered["enabled"] and not any(c.get("entry_id") == offered["id"] for c in items):
+            items = self._cap_items([offered], language) + items
+        if not any(c.get("entry_id") and c.get("entry_id") != (offered or {}).get("id") or c.get("faq_id") for c in items):
+            return self._emergency(payload, kind)
+        self._trace("emergency_service", [kind] + [c.get("entry_id") or "faq:" + str(c.get("faq_id")) for c in items])
+        message = emergency.message(kind, language) + "\n" + emergency.service_note(language)
+        has_page = any(c.get("entry_id") for c in items)
+        return self._offer(payload, items, message, kind="confirm_candidates" if has_page else "reply", action="emergency")
 
     def _offer_services(self, payload, entries, message, language=None, keep_choice=False):
         """Services to confirm; a single connected one opens directly instead
@@ -996,14 +1070,17 @@ class Workflow:
                 return self._offer_again(payload, pending, "choose_one")
         with self.lock:
             self.pending.pop(session, None)
-        if i18n.matches(i18n.GREETING, text, language):
+        if rule_switches.on("greeting") and rule_switches.hit("greeting", i18n.matches(i18n.GREETING, text, language)):
             return self._greeting(payload, text)
         if not re.search(r"\w", text):
             self._trace("empty")
             return self._catalog(payload, message=i18n.t("fallback_unclear", language))
-        if i18n.searches(i18n.LISTING, text, language) or i18n.similar(i18n.LISTING_PHRASES, text, language):
-            self._trace("listing")
-            return self._list(payload)
+        if ((rule_switches.on("listing") and rule_switches.hit("listing", i18n.searches(i18n.LISTING, text, language)))
+                or (rule_switches.on("listing_similar")
+                    and rule_switches.hit("listing_similar", i18n.similar(i18n.LISTING_PHRASES, text, language)))):
+            decided = self._scoped_listing(payload, text, "listing", lambda: self._list(payload))
+            if decided:
+                return decided
         matches = self.registry.search_language(i18n.positive_text(text, language), language)
         if not matches:
             decided = self._semantic_then_intent(payload, text, i18n.positive_text(text, language))
@@ -1032,11 +1109,13 @@ class Workflow:
                 return self._fallback(payload, text)
             self._trace("unavailable_direct", [entries[0]["id"]])
             return self._navigate(payload, entries[0])
+        rule_switches.hit("foreign_fuzzy", all(m["fuzzy"] for m in matches))
         if language == "tl" and all(m["fuzzy"] for m in matches):
             # Filipino worded or heard close to a keyword ("bill sa tubi"): offered only.
             self._trace("filipino_similar", [e["id"] for e in entries])
             return self._offer(payload, self._cap_items(entries, language), i18n.t("confirm_capability", language))
-        if language == "tl" and len(matches) == 1 and not matches[0]["fuzzy"] and entries[0]["enabled"]:
+        if (language == "tl" and len(matches) == 1 and not matches[0]["fuzzy"] and entries[0]["enabled"]
+                and rule_switches.on("foreign_direct")):
             # As for Vietnamese below: Ministral answered "clarify" for most Filipino requests
             # whose one page retrieval had named (2026-11-11 speech test, docs/AI_FILIPINO.md).
             # Opened when sure (a keyword of two words, or one word with at most one other
@@ -1046,6 +1125,7 @@ class Workflow:
             if (entries[0]["id"] not in LIST_LAST
                     and i18n.filipino_sure(i18n.positive_text(text, language), matches[0]["evidence"])):
                 self._trace("filipino_keyword", [entries[0]["id"]])
+                rule_switches.hit("foreign_direct")
                 return self._navigate(payload, entries[0])
         if language == "vi" and all(m["fuzzy"] for m in matches):
             # Vietnamese heard with regional sounds or a one-syllable word without marks
@@ -1053,25 +1133,28 @@ class Workflow:
             # model could open it, or ask again although the page is named.
             self._trace("vietnamese_sound", [e["id"] for e in entries])
             return self._offer(payload, self._cap_items(entries, language), i18n.t("confirm_capability", language))
-        if language == "vi" and len(matches) == 1 and not matches[0]["fuzzy"]:
+        if language == "vi" and len(matches) == 1 and not matches[0]["fuzzy"] and rule_switches.on("foreign_direct"):
             # One connected page named by its Vietnamese word (exact, or exact once
             # marks are ignored): open it, as a single sure keyword match does
             # (docs/AI_CURRENT_RULES.md section 2). Asked, Ministral answered "clarify"
             # for "xem lịch sử mượn sách" and for most tone slips (2026-11-08 TTS test:
             # 11 of 42 requests were lost that way); with two or more pages it decides.
             self._trace("vietnamese_keyword", [entries[0]["id"]])
+            rule_switches.hit("foreign_direct")
             return self._navigate(payload, entries[0])
         if language == "id" and all(m["fuzzy"] for m in matches):
             # Indonesian worded or spelled almost like a keyword ("gmn caranya bayar parkr"):
             # only offered, without a model call, like Vietnamese sound-alikes (2026-11-11).
             self._trace("indonesian_similar", [e["id"] for e in entries])
             return self._offer(payload, self._cap_items(entries, language), i18n.t("confirm_capability", language))
-        if language == "id" and len(matches) == 1 and not matches[0]["fuzzy"] and self._indonesian_sure(text, matches[0]):
+        if (language == "id" and len(matches) == 1 and not matches[0]["fuzzy"] and rule_switches.on("foreign_direct")
+                and self._indonesian_sure(text, matches[0])):
             # One connected page named by a keyword of two or more words, or by a word in
             # a sentence that asks for something ("mau", "tolong", "lihat"…): open it, as a
             # sure single keyword match does (docs/AI_CURRENT_RULES.md section 2). Asked,
             # Ministral answered "clarify" for 32 of 145 such dev sentences ("Mau bayar air").
             self._trace("indonesian_keyword", [entries[0]["id"]])
+            rule_switches.hit("foreign_direct")
             return self._navigate(payload, entries[0])
         ambiguous = len(entries) > 1 or (language in ("vi", "id") and any(m["fuzzy"] for m in matches))
         self._trace("capability_model", [e["id"] for e in entries])
@@ -1170,14 +1253,18 @@ class Workflow:
             # A tapped option continues in the language the options were offered in.
             payload = {**payload, "language": pending.get("language", payload.get("language", "zh"))}
             return self._select(payload, pending, payload["choice_id"])
-        crisis = emergency.detect(text, payload.get("language", "zh"))
-        if crisis:
+        crisis = (emergency.detect(text, payload.get("language", "zh"))
+                  if rule_switches.on("emergency") and not payload.get("_after_emergency") else None)
+        if rule_switches.hit("emergency", crisis):
+            if emergency.after_service(text, payload.get("language", "zh")):
+                return self._emergency_service(payload, crisis)
             return self._emergency(payload, crisis)
         if payload.get("language", "zh") != "zh":
             return self._handle_language(payload, text, pending, resolution)
         bare = re.sub(r"^請", "", text)
         if CANCEL_ZH.fullmatch(text) or (
-                len(bare) <= 3 and sounds_like(bare, CANCEL_WORDS, CANCEL_SOUND)):
+                len(bare) <= 3 and rule_switches.on("cancel_sound")
+                and rule_switches.hit("cancel_sound", sounds_like(bare, CANCEL_WORDS, CANCEL_SOUND))):
             with self.lock:
                 self.pending.pop(session, None)
             self._trace("cancel")
@@ -1186,10 +1273,12 @@ class Workflow:
         if pending and resolution == pending["id"]:
             self._trace("pending")
             if pending.get("page") and (text in PREV_PAGE_WORDS or (
-                    len(text) <= 4 and sounds_like(text, PREV_PAGE_WORDS, COMMAND_SOUND))):
+                    len(text) <= 4 and rule_switches.on("page_sound")
+                    and rule_switches.hit("page_sound", sounds_like(text, PREV_PAGE_WORDS, COMMAND_SOUND)))):
                 return self._turn_page(payload, pending, -1)
             if pending.get("page") and (text in NEXT_PAGE_WORDS or (
-                    len(text) <= 4 and sounds_like(text, NEXT_PAGE_WORDS, COMMAND_SOUND))):
+                    len(text) <= 4 and rule_switches.on("page_sound")
+                    and rule_switches.hit("page_sound", sounds_like(text, NEXT_PAGE_WORDS, COMMAND_SOUND)))):
                 return self._turn_page(payload, pending, 1)
             state = pending.get("page") or {}
             if state.get("catalog"):
@@ -1205,8 +1294,8 @@ class Workflow:
                 # 第十個 for two books is a sentence, as before (only 1-8 were numbers); one past
                 # the last option is still a number (the guided App's 「N. 都不是」, 2026-11-16).
                 index = None
-            if index is None and len(text) <= 3:
-                spoken = sound_ordinal(text)
+            if index is None and len(text) <= 3 and rule_switches.on("ordinal_sound"):
+                spoken = rule_switches.hit("ordinal_sound", sound_ordinal(text))
                 index = str(spoken) if spoken else None
             if index is not None and int(index) > len(pending["items"]):
                 return self._beyond_list(payload, pending, int(index))
@@ -1219,35 +1308,39 @@ class Workflow:
         # A new subject or a client that discarded its panel cannot reuse an old resolution.
         with self.lock:
             self.pending.pop(session, None)
-        if GREETING_ZH.fullmatch(text) or THANKS_ZH.fullmatch(text):
+        if rule_switches.on("greeting") and rule_switches.hit("greeting", GREETING_ZH.fullmatch(text)
+                                                               or THANKS_ZH.fullmatch(text)):
             return self._greeting(payload, text)
         if not re.search(r"[\w\u4e00-\u9fff]", text):
             self._trace("empty")
             return self._catalog(payload, message=i18n.t("fallback_unclear", "zh"))
-        listing = re.search(r"有哪些功能|有什麼功能|功能(?:列表|有哪些)|(?:所有|全部)功能|查看全部功能|"
-                            r"(?:能|可以|會)做(?:什麼|哪些)|(?:能|可以|會)幫(?:我)?(?:什麼|哪些)|"
-                            r"有(?:什麼|哪些)服務|介紹.{0,4}功能|(?:能|可以)?辦(?:什麼|哪些)事?", text)
+        listing = rule_switches.on("listing") and rule_switches.hit("listing", LISTING_ZH.search(text))
         if listing:
             root = "library" if any(word in text for word in ("圖書", "借書")) else None
-            self._trace("listing")
             # 看全部功能 / 全部功能 is the catalogue of what opens; "App" or 未串接 also shows the
             # pages that are not connected (rules section 3, 2026-11-16).
-            return self._list(payload, all_entries=bool(re.search(r"app|未串接", text, re.I)) or bool(root),
-                              root=root)
-        if re.search(r"怎麼|如何|教我", text) and any(word in text for word in ("借書", "借閱", "圖書")):
+            decided = self._scoped_listing(payload, text, "listing", lambda: self._list(
+                payload, all_entries=bool(re.search(r"app|未串接", text, re.I)) or bool(root), root=root))
+            if decided:
+                return decided
+        if (rule_switches.on("library_howto") and re.search(r"怎麼|如何|教我", text)
+                and any(word in text for word in ("借書", "借閱", "圖書"))):
             self._trace("howto", ["library"])
+            rule_switches.hit("library_howto")
             return self._offer(payload, self._cap_items([self.registry.by_id["library"]]),
                 "先在圖書借閱搜尋書籍，再查看館藏、冊次與取書館；預約由你在原頁面確認。這裡使用示範資料。", kind="reply")
 
         from server import positive_text
-        office = named_office(positive_text(text))
+        office = named_office(positive_text(text)) if rule_switches.on("named_office") else None
         if office:
             # "大安區公所現在叫到幾號": never another district's page (rules 2026-11-13).
             payload = {**payload, "named_office": office}
-            handled = self._named_office(payload, text, office)
+            handled = rule_switches.hit("named_office", self._named_office(payload, text, office))
             if handled:
                 return handled
         matches = self.registry.search(positive_text(text))
+        rule_switches.hit("keyword_fuzzy", any(m["fuzzy"] for m in matches))
+        rule_switches.hit("pay_words", any(m.get("pay_words") for m in matches))
         # Book-specific ambiguity is resolved before any navigation.
         if not any(m["entry"]["id"] not in ("library",) for m in matches):
             # Unmatched requests also consult the (cached) book catalogue, so a
@@ -1255,7 +1348,9 @@ class Workflow:
             books = self._books_if_any() if (matches or LIBRARY_CUE.search(text) or len(text) >= 3) else []
             if books:
                 context = self.retrieve(text, books)
-                if not context["other"] and context["library_candidate"]:
+                # TOWNPASS_DISABLE_RULES=library_cue (evaluation only): a verb and an object alone
+                # (no library word) do not make a library request.
+                if not context["other"] and context["library_candidate" if rule_switches.on("library_cue") else "library"]:
                     candidates = context["books"]
                     fuzzy = False
                     sound = []
@@ -1273,7 +1368,7 @@ class Workflow:
                     elif sound and sound[0][0] >= SOUND_AUTO and (
                             len(sound) < 2 or sound[0][0] - sound[1][0] >= SOUND_MARGIN) and only_plausible(sound[0][1]):
                         corrected = ("book_sound_autocorrect", sound[0][1])
-                    if corrected:
+                    if rule_switches.hit("book_sound", corrected and rule_switches.on("book_sound")):
                         # One plausible book that differs by one character or only in
                         # characters that sound alike: open it and say what was assumed,
                         # instead of asking (user decisions 2026-11-06).
@@ -1341,7 +1436,8 @@ class Workflow:
             return self._faq(payload, text) or self._fallback(payload, text, entries)
         # 證書, 秘書, 書法, 借題發揮... do not send a sentence to the library (rules 2026-11-13);
         # neither does a refused clause (「我沒有要借書啦」, rules 2026-11-16).
-        if (LIBRARY_NOUN if T2_GENERIC else LIBRARY_CUE).search(matching.library_view(positive_text(text))):
+        if ((LIBRARY_NOUN if T2_GENERIC else LIBRARY_CUE) if rule_switches.on("library_cue") else LIBRARY_WORD).search(
+                matching.library_view(positive_text(text))):
             return self._library(payload, text, self.owner.catalog.books())
         return self._unmatched(payload, text)
 
@@ -1350,12 +1446,14 @@ class Workflow:
         sound-alike services, a "what can you do" question, semantic retrieval, the
         intent fallback, the FAQ, then the fallback tiers (clue: keyword pages found)."""
         from server import positive_text
-        sounded = self._sound_fallback(payload, text)
+        sounded = rule_switches.hit("sound_fallback", self._sound_fallback(payload, text)
+                                    if rule_switches.on("sound_fallback") else None)
         if sounded:
             return sounded
-        if listing_by_sound(text):
-            self._trace("listing_sound")
-            return self._list(payload)
+        if rule_switches.on("listing_sound") and rule_switches.hit("listing_sound", listing_by_sound(text)):
+            decided = self._scoped_listing(payload, text, "listing_sound", lambda: self._list(payload))
+            if decided:
+                return decided
         # After listing_by_sound: a "what can you do" question worded differently
         # must show the list (no model call), not services that happen to be close.
         decided = self._semantic_then_intent(payload, text, positive_text(text))
@@ -1377,7 +1475,7 @@ class Workflow:
                     chat = self.classifier.intent_scores(text)[1]  # the same call, cached
             except classifier.ClassifierUnavailable:
                 intent = "request_clarification"
-            if intent == "list_capabilities":
+            if intent == "list_capabilities" and rule_switches.hit("intent_first", rule_switches.on("intent_first")):
                 self._trace("intent_listing")
                 return self._list(payload)
         return (self._semantic_fallback(payload, text, positive, chat)

@@ -6,6 +6,8 @@ import pathlib
 import re
 import unicodedata
 
+import rule_switches
+
 
 # A sentence about paying: any of these plus a bill's subject (its pay_words).
 PAY_CUE = re.compile(r"繳|付|交|帳|錢|費")
@@ -131,11 +133,13 @@ class Registry:
             if hits:
                 matches.append({"entry": entry, "score": max(len(term) for term in hits), "fuzzy": False,
                                 "evidence": hits, "span": None})
-        if matches and language == "vi":
+        # TOWNPASS_DISABLE_RULES=foreign_fuzzy (evaluation only, rule_switches.py): exact words only.
+        fuzzy = rule_switches.on("foreign_fuzzy")
+        if matches and language == "vi" and fuzzy:
             matches += self._vietnamese_longer(text, matches)
-        if not matches and language == "vi":
+        if not matches and language == "vi" and fuzzy:
             matches = self._vietnamese_sound(text)
-        if not matches:
+        if not matches and fuzzy:
             matches = self._similar_language(readings[-1], language)
         if not matches:
             return []
@@ -291,11 +295,12 @@ class Registry:
             own = [entry["title"], *entry["keywords"]]
             direct = [term for term in own if normalized(term) and normalized(term) in n]
             score = max((len(normalized(term)) * 3 for term in direct), default=0)
-            if not direct and entry.get("pay_words") and PAY_CUE.search(n):
+            paid = False
+            if not direct and entry.get("pay_words") and PAY_CUE.search(n) and rule_switches.on("pay_words"):
                 # "車子停路邊的錢要繳", "幫我繳醫院的帳": the bill named by its subject.
                 subject = [word for word in entry["pay_words"] if normalized(word) in n]
                 if subject:
-                    direct = subject
+                    direct, paid = subject, True
                     score = max(len(normalized(word)) * 3 for word in subject) + 3
             longest = max(direct, key=lambda term: len(normalized(term)), default=None)
             inner = [term for term in entry["features"] if normalized(term) in n]
@@ -305,7 +310,8 @@ class Registry:
                               if normalized(term) in n), default=0)
             if score:
                 matches.append({"entry": entry, "score": score, "fuzzy": False, "evidence": direct + inner,
-                                "span": _span(normalized(longest), n) if longest else None})
+                                "span": _span(normalized(longest), n) if longest else None,
+                                **({"pay_words": True} if paid else {})})  # named by its subject (rule audit)
         n = plain
         if matches:
             best = max(item["score"] for item in matches)
@@ -334,7 +340,7 @@ class Registry:
             return sorted(kept, key=lambda item: -item["score"])[:5]
         # A conservative spelling fallback; fuzzy matches always require consent.
         residual = re.sub(r"^(?:請|我想|我要|幫我|開啟|打開|查看|查詢|找|去)+", "", text).strip()
-        if len(normalized(residual)) < 3:
+        if len(normalized(residual)) < 3 or not rule_switches.on("keyword_fuzzy"):
             return []
         for entry in self.entries:
             score = max(difflib.SequenceMatcher(None, normalized(residual), normalized(term)).ratio()

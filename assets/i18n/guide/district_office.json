@@ -136,6 +136,20 @@
    "id": "” atau “",
    "tl": "” o “"
   },
+  "一格一格填基本資料": {
+   "en": "Fill in the basic details",
+   "ja": "基本情報を順に入力",
+   "vi": "Điền lần lượt thông tin cơ bản",
+   "id": "Isi data dasar satu per satu",
+   "tl": "Punan isa-isa ang basic details"
+  },
+  "一格一格填申辦資料": {
+   "en": "Fill in the application details",
+   "ja": "申請内容を順に入力",
+   "vi": "Điền lần lượt thông tin đăng ký",
+   "id": "Isi data pengajuan satu per satu",
+   "tl": "Punan isa-isa ang application details"
+  },
   "上面左右的箭頭": {
    "en": "the left and right arrows at the top",
    "ja": "上の左右の矢印",
@@ -220,6 +234,13 @@
    "id": "Centang item yang sesuai dengan keadaan Anda{example}. Boleh lebih dari satu. Setelah itu, ketuk “{page:確認}” paling bawah.",
    "tl": "Lagyan ng tsek ang mga item na akma sa sitwasyon mo{example}. Puwede kang pumili ng higit sa isa. Kapag tapos na, i-tap ang “{page:確認}” sa ibaba."
   },
+  "勾選符合的項目": {
+   "en": "Tick the items that apply",
+   "ja": "当てはまる項目にチェック",
+   "vi": "Đánh dấu các mục phù hợp",
+   "id": "Centang item yang sesuai",
+   "tl": "I-check ang mga angkop na item"
+  },
   "可以向市府申請補助或提出申訴：在「申辦」選一個項目，把表單填好按「下一步」，檢查後再「送出」。在「查詢」可以看案件辦到哪裡。": {
    "en": "You can apply to the city government for a subsidy or file a complaint: pick an item in “{page:申辦}”, fill in the form and tap “{page:下一步}”, check it, then tap “{page:送出}”. In “{page:查詢}” you can see how far your case has gone.",
    "ja": "市役所に補助の申請や陳情ができます：「{page:申辦}」で項目を選び、フォームに入力して「{page:下一步}」を押し、確認してから「{page:送出}」します。「{page:查詢}」で案件の進み具合を見られます。",
@@ -261,6 +282,13 @@
    "vi": "Chọn ngày trên lịch",
    "id": "Pilih tanggal di kalender",
    "tl": "Pumili ng petsa sa kalendaryo"
+  },
+  "在日曆點那一天": {
+   "en": "Tap the day on the calendar",
+   "ja": "カレンダーで日付をタップ",
+   "vi": "Chạm vào ngày trên lịch",
+   "id": "Ketuk tanggalnya di kalender",
+   "tl": "I-tap ang araw sa kalendaryo"
   },
   "在申辦首頁點上面的「查詢」，就能看到申辦中和已結案的案件。": {
    "en": "On the Applications home page, tap “{page:查詢}” at the top to see cases in progress and finished cases.",
@@ -381,6 +409,13 @@
    "id": "Gulir ke bawah, lalu isi “{page:申辦服務資料}”.",
    "tl": "Mag-scroll pababa at punan ang “{page:申辦服務資料}” sunod."
   },
+  "往下滑，看完說明": {
+   "en": "Scroll down and read the note",
+   "ja": "下へスクロールして説明を読む",
+   "vi": "Cuộn xuống đọc phần giải thích",
+   "id": "Gulir ke bawah dan baca penjelasan",
+   "tl": "Mag-scroll pababa at basahin ang paliwanag"
+  },
   "從最上面的「基本資料」開始填，填完往下滑。": {
    "en": "Start with “{page:基本資料}” at the top, then scroll down when done.",
    "ja": "一番上の「{page:基本資料}」から入力して、終わったら下にスクロールします。",
@@ -430,6 +465,13 @@
    "id": "Sudah diketik? Ketuk kaca pembesar di kanan untuk mencari.",
    "tl": "Tapos nang mag-type? I-tap ang magnifying glass sa kanan para maghanap."
   },
+  "打關鍵字，按放大鏡": {
+   "en": "Type a keyword, tap the magnifier",
+   "ja": "キーワードを入力し虫めがねをタップ",
+   "vi": "Gõ từ khóa rồi chạm kính lúp",
+   "id": "Ketik kata kunci, ketuk kaca pembesar",
+   "tl": "I-type ang keyword, i-tap ang magnifier"
+  },
   "找到了！下面就是符合的項目。": {
    "en": "Found it! The matching items are below.",
    "ja": "見つかりました！下が合う項目です。",
@@ -450,6 +492,13 @@
    "vi": "Bấm “{page:下一步}” để kiểm tra",
    "id": "Ketuk “{page:下一步}” untuk memeriksa",
    "tl": "I-tap ang “{page:下一步}” para suriin"
+  },
+  "按下一步": {
+   "en": "Tap Next",
+   "ja": "次へをタップ",
+   "vi": "Chạm Tiếp theo",
+   "id": "Ketuk Berikutnya",
+   "tl": "I-tap ang Next"
   },
   "按表單最下面右邊的「下一步」。": {
    "en": "Tap “{page:下一步}” at the bottom right of the form.",
@@ -871,6 +920,13 @@
    "id": "Ketuk item yang ingin diajukan, formulir permohonan akan terbuka.",
    "tl": "I-tap ang item na gusto mong aplayan, at magbubukas ang form ng aplikasyon."
   },
+  "點已結案": {
+   "en": "Tap Closed",
+   "ja": "終了済みをタップ",
+   "vi": "Chạm Đã kết thúc",
+   "id": "Ketuk Selesai",
+   "tl": "I-tap ang Closed"
+  },
   "點日期的框框會跳出日曆。點那一天就好；要換月份，按月份兩邊的箭頭。": {
    "en": "Tap the date box and a calendar pops up. Just tap the day; to change the month, tap the arrows on both sides of the month.",
    "ja": "日付の枠をタップするとカレンダーが出ます。その日をタップするだけです。月を変えるには、月の両側の矢印を押します。",
@@ -884,6 +940,13 @@
    "vi": "Bấm vào ô, menu sẽ hiện ra. Đánh dấu các mục phù hợp (có thể chọn nhiều), rồi bấm “{page:確認}” ở dưới cùng.",
    "id": "Ketuk kotaknya, menu akan muncul. Centang item yang sesuai (boleh lebih dari satu), lalu ketuk “{page:確認}” paling bawah.",
    "tl": "I-tap ang kahon at lalabas ang menu. I-tick ang mga angkop na item (puwede ang higit sa isa), saka i-tap ang “{page:確認}” sa ibaba."
+  },
+  "點要申請的項目": {
+   "en": "Tap what you want to apply for",
+   "ja": "申請したい項目をタップ",
+   "vi": "Chạm mục bạn muốn đăng ký",
+   "id": "Ketuk layanan yang ingin diajukan",
+   "tl": "I-tap ang gusto mong i-apply"
   },
   "點要申辦的項目": {
    "en": "Tap the item to apply for",

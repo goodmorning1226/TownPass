@@ -262,6 +262,13 @@
    "id": "Kalau sudah, tekan “Selesai” atau “✓” di keyboard untuk menutupnya.",
    "tl": "Kapag tapos ka na, i-tap ang “Done” o “✓” sa keyboard para isara ito."
   },
+  "寫清楚發生什麼事": {
+   "en": "Describe what happened",
+   "ja": "何が起きたかを書く",
+   "vi": "Mô tả chuyện gì đã xảy ra",
+   "id": "Jelaskan apa yang terjadi",
+   "tl": "Ilarawan ang nangyari"
+  },
   "寫發生地點": {
    "en": "Write where it happened",
    "ja": "場所を書く",
@@ -310,6 +317,13 @@
    "vi": "Xem mục “{page:個人資料是否提供給承辦}” ở dưới, rồi bấm “{page:送出}”.",
    "id": "Lihat bagian “{page:個人資料是否提供給承辦}” di bawah, lalu tekan “{page:送出}”.",
    "tl": "Tingnan pa sa ibaba ang “{page:個人資料是否提供給承辦}”, saka i-tap ang “{page:送出}”."
+  },
+  "想加照片就點方框": {
+   "en": "Tap the box to add photos",
+   "ja": "写真を付けるなら枠をタップ",
+   "vi": "Chạm ô để thêm ảnh",
+   "id": "Ketuk kotak untuk menambah foto",
+   "tl": "I-tap ang kahon para magdagdag ng litrato"
   },
   "想看當初寫的內容和案件資訊，點上面的「詳細內容」。": {
    "en": "To see what you wrote and the case info, tap “{page:詳細內容}” at the top.",
@@ -374,6 +388,27 @@
    "id": "Ketik",
    "tl": "Mag-type"
   },
+  "打字搜尋，點類別": {
+   "en": "Search, then tap a category",
+   "ja": "入力して検索し、分類をタップ",
+   "vi": "Gõ để tìm rồi chạm danh mục",
+   "id": "Cari, lalu ketuk kategori",
+   "tl": "Maghanap, saka i-tap ang kategorya"
+  },
+  "打案號，按放大鏡": {
+   "en": "Type the case number, tap the magnifier",
+   "ja": "案件番号を入力し虫めがねをタップ",
+   "vi": "Gõ số hồ sơ rồi chạm kính lúp",
+   "id": "Ketik nomor kasus, ketuk kaca pembesar",
+   "tl": "I-type ang case number, i-tap ang magnifier"
+  },
+  "打發生地點（可不寫）": {
+   "en": "Type where it happened (optional)",
+   "ja": "発生場所を入力（任意）",
+   "vi": "Gõ nơi xảy ra (không bắt buộc)",
+   "id": "Ketik lokasi kejadian (opsional)",
+   "tl": "I-type kung saan nangyari (opsyonal)"
+  },
   "打開「查詢」": {
    "en": "Open “{page:查詢}”",
    "ja": "「{page:查詢}」を開く",
@@ -401,6 +436,13 @@
    "vi": "Tìm xong rồi! Bên dưới là các vụ việc phù hợp.",
    "id": "Sudah! Kasus yang cocok ada di bawah.",
    "tl": "Tapos na! Nasa ibaba ang mga tugmang kaso."
+  },
+  "找撥打1999專線": {
+   "en": "Find Call the 1999 hotline",
+   "ja": "1999ホットラインへの発信を探す",
+   "vi": "Tìm mục Gọi đường dây 1999",
+   "id": "Cari Telepon layanan 1999",
+   "tl": "Hanapin ang Call the 1999 hotline"
   },
   "接著在「案件主旨」和「描述」寫清楚要反映的事（有「*」的兩格一定要寫），再自己按「送出」。": {
    "en": "Next, write clearly what you want to report in “{page:案件主旨}” and “{page:描述}” (the two boxes with “*” must be filled in), then tap “{page:送出}” yourself.",
@@ -485,6 +527,13 @@
    "vi": "Đã thêm ảnh!",
    "id": "Foto sudah ditambahkan!",
    "tl": "Naidagdag na ang mga larawan!"
+  },
+  "用一句話寫主旨": {
+   "en": "Write the subject in one line",
+   "ja": "件名を一文で書く",
+   "vi": "Viết chủ đề trong một câu",
+   "id": "Tulis subjek dalam satu kalimat",
+   "tl": "Isulat ang paksa sa isang pangungusap"
   },
   "用搜尋找類別": {
    "en": "Search for a category",
@@ -576,6 +625,13 @@
    "vi": "Kiểm tra rồi bấm “{page:送出}”",
    "id": "Periksa, lalu tekan “{page:送出}”",
    "tl": "Suriin, saka i-tap ang “{page:送出}”"
+  },
+  "確認後自己按送出": {
+   "en": "Check, then tap Send yourself",
+   "ja": "確認して自分で送信をタップ",
+   "vi": "Kiểm tra rồi tự chạm Gửi",
+   "id": "Periksa, lalu ketuk Kirim sendiri",
+   "tl": "Suriin, saka ikaw mismo ang mag-tap ng Send"
   },
   "紅字寫「描述不能為空」，這格也要寫。點一下大框框，寫清楚什麼時候、在哪裡、發生了什麼事。": {
    "en": "The red text says “{page:描述不能為空}”: this box must be filled in too. Tap the big box and write clearly when, where and what happened.",
@@ -864,12 +920,47 @@
    "id": "Ketuk satu kasus untuk melihat penanganan dan balasannya.",
    "tl": "I-tap ang isang kaso para makita kung paano ito inaasikaso at ang sagot."
   },
+  "點上面的搜尋框": {
+   "en": "Tap the search box at the top",
+   "ja": "上の検索欄をタップ",
+   "vi": "Chạm ô tìm kiếm ở trên",
+   "id": "Ketuk kotak pencarian di atas",
+   "tl": "I-tap ang search box sa itaas"
+  },
+  "點上面的查詢": {
+   "en": "Tap the Inquiry tab at the top",
+   "ja": "上の照会タブをタップ",
+   "vi": "Chạm thẻ Tra cứu ở trên",
+   "id": "Ketuk tab Kueri di atas",
+   "tl": "I-tap ang Inquiry tab sa itaas"
+  },
+  "點想看的案件": {
+   "en": "Tap the case you want to see",
+   "ja": "見たい案件をタップ",
+   "vi": "Chạm hồ sơ bạn muốn xem",
+   "id": "Ketuk kasus yang ingin dilihat",
+   "tl": "I-tap ang kasong gusto mong tingnan"
+  },
   "點最接近你問題的那一項。看不懂要選哪個，可以打開最下面的「自動選擇案件類別」。": {
    "en": "Tap the item closest to your problem. If you’re not sure which to pick, open “{page:自動選擇案件類別}” at the very bottom.",
    "ja": "困っていることに一番近い項目をタップしてください。どれを選べばいいかわからないときは、一番下の「{page:自動選擇案件類別}」を開いてください。",
    "vi": "Chạm vào mục gần với vấn đề của bạn nhất. Không biết chọn cái nào thì mở “{page:自動選擇案件類別}” ở dưới cùng.",
    "id": "Ketuk item yang paling mirip dengan masalah Anda. Kalau bingung memilih, buka “{page:自動選擇案件類別}” di paling bawah.",
    "tl": "I-tap ang item na pinakamalapit sa iyong problema. Kung hindi ka sigurado kung alin ang pipiliin, buksan ang “{page:自動選擇案件類別}” sa pinakaibaba."
+  },
+  "點最接近的類別": {
+   "en": "Tap the closest category",
+   "ja": "一番近い分類をタップ",
+   "vi": "Chạm danh mục gần nhất",
+   "id": "Ketuk kategori yang paling dekat",
+   "tl": "I-tap ang pinakamalapit na kategorya"
+  },
+  "點災情通報": {
+   "en": "Tap Disaster reports",
+   "ja": "災害通報をタップ",
+   "vi": "Chạm Báo cáo thiên tai",
+   "id": "Ketuk Laporan bencana",
+   "tl": "I-tap ang Disaster reports"
   },
   "點畫面上方寫著「您遇到哪些問題?」的搜尋框。": {
    "en": "Tap the search box at the top that says “{page:您遇到哪些問題?}”.",
@@ -891,6 +982,13 @@
    "vi": "Chạm vào “{page:查詢}” ở trên cùng màn hình.",
    "id": "Ketuk “{page:查詢}” di paling atas layar.",
    "tl": "I-tap ang “{page:查詢}” sa pinakaitaas ng screen."
+  },
+  "點詳細內容": {
+   "en": "Tap Details",
+   "ja": "詳細をタップ",
+   "vi": "Chạm Chi tiết",
+   "id": "Ketuk Detail",
+   "tl": "I-tap ang Details"
   },
   "，": {
    "en": ", ",

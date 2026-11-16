@@ -33,9 +33,9 @@ const _record = '/police-report/record/';
 /// The 戶籍地址 (second address) is pointed at with its 同通訊地址 box.
 const _next = r'''(() => {
   // A box the user is still typing in counts as not filled yet, so the
-  // card does not move on after the first letter.
-  const has = (e) => !!e && !!(e.value || '').trim() &&
-    (e.tagName === 'SELECT' || document.activeElement !== e);
+  // card does not move on after the first letter (settled(): until Enter,
+  // the keyboard goes down, 按住輸入 or the box loses the focus).
+  const has = settled;
   if (q('#mobile_number')) {
     const counties = qa('select#county'), cities = qa('select#city');
     const addrs = qa('input[placeholder="請輸入詳細地址"]');
@@ -118,7 +118,7 @@ const policeReportPageSpec = WebPageSpec(
     'fieldKey': "(() => { const n = $_next; return n ? n[0] : ''; })()",
     // The user is typing in the field the card is about.
     'typing':
-        "(() => { const n = $_next; const e = n && n[1]; return !!e && !Array.isArray(e) && e === document.activeElement && e.tagName !== 'SELECT' && !!(e.value || '').trim(); })()",
+        "(() => { const n = $_next; const e = n && n[1]; return !!e && !Array.isArray(e) && editing(e) && !!(e.value || '').trim(); })()",
     'fieldTop':
         "(() => { const n = $_next; let e = n && n[1]; if (Array.isArray(e)) e = e[0]; return e ? Math.round(e.getBoundingClientRect().top) : 0; })()",
     'fieldOff':
@@ -238,6 +238,7 @@ final List<GuideComponent> policeReportComponents = [
   GuideComponent(
     id: 'read_notice',
     title: '看須知，按「同意」',
+    briefs: const ['往下滑，看完須知', '勾選同意須知', '按同意開始填寫'],
     description: '看網路報案使用須知，勾選本人已詳閱須知並同意繼續，再按「同意」',
     keywords: const ['報案須知', '網路報案須知', '報案注意事項'],
     requires: const [],
@@ -291,6 +292,7 @@ final List<GuideComponent> policeReportComponents = [
   GuideComponent(
     id: 'fill_contact',
     title: '填聯絡資料',
+    briefs: const ['填好聯絡資料'],
     description: '在第 1 步填手機號碼、電子信箱、通訊地址和戶籍地址',
     keywords: const ['報案人資料', '報案聯絡資料', '戶籍地址', '同通訊地址'],
     requires: const ['read_notice'],
@@ -329,6 +331,7 @@ final List<GuideComponent> policeReportComponents = [
   GuideComponent(
     id: 'next_step',
     title: '勾選同意，按「下一步」',
+    briefs: const ['勾選同意', '按下一步'],
     description: '在第 1 步最下面勾選本人已詳閱並同意以上內容，再按「下一步」',
     keywords: const ['報案下一步', '報案第二步'],
     requires: const ['fill_contact'],
@@ -374,6 +377,7 @@ final List<GuideComponent> policeReportComponents = [
   GuideComponent(
     id: 'fill_case',
     title: '填案件資料',
+    briefs: const ['填好案件資料'],
     description: '在第 2 步選報案人類別，填發生地點、用月曆選發生日期、寫案情摘要',
     keywords: const ['案情', '案情摘要', '報案人類別', '發生日期', '被害人'],
     requires: const ['next_step'],
@@ -403,6 +407,7 @@ final List<GuideComponent> policeReportComponents = [
   GuideComponent(
     id: 'agree_case',
     title: '勾選同意個資聲明',
+    briefs: const ['往下滑，看完聲明', '勾選同意聲明'],
     description: '在第 2 步最下面勾選本人已詳閱並同意以上內容，「送出」才會變成可以按',
     keywords: const ['個資聲明', '個人資料收集聲明', '報案送出不能按'],
     requires: const ['fill_case'],
@@ -452,6 +457,7 @@ final List<GuideComponent> policeReportComponents = [
   GuideComponent(
     id: 'submit_report',
     title: '確認後按「送出」',
+    briefs: const ['確認後自己按送出'],
     description: '看清楚報案資料，再自己按「送出」',
     keywords: const ['報案', '網路報案', '線上報案', '報警', '被偷', '被騙', '詐騙', '遭竊'],
     requires: const ['agree_case'],
@@ -499,6 +505,7 @@ final List<GuideComponent> policeReportComponents = [
   GuideComponent(
     id: 'open_record',
     title: '在報案紀錄點一筆案件',
+    briefs: const ['點一筆報案紀錄'],
     description: '看報案紀錄清單，每筆寫著處理中或已結案，點一筆看詳細',
     keywords: const ['報案紀錄', '報案記錄', '報過的案'],
     requires: const [],
@@ -538,6 +545,7 @@ final List<GuideComponent> policeReportComponents = [
   GuideComponent(
     id: 'record_detail',
     title: '看案件的回覆和詳細內容',
+    briefs: const ['看回覆和詳細內容'],
     description: '在案件頁看處理狀態和回覆，點「詳細內容」看報案內容',
     keywords: const [
       '報案進度',

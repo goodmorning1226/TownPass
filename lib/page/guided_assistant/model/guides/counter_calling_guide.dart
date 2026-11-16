@@ -240,6 +240,7 @@ final List<GuideComponent> counterCallingComponents = [
   GuideComponent(
     id: 'pick_unit',
     title: '選要去的單位',
+    briefs: const ['點要去的單位'],
     description: '在櫃檯等待人數查詢點要去的單位，例如戶政事務所',
     keywords: const ['地政事務所', '戶政事務所', '稅捐處', '就業服務站', '哪個單位', '選單位'],
     requires: const [],
@@ -263,6 +264,7 @@ final List<GuideComponent> counterCallingComponents = [
   GuideComponent(
     id: 'open_favorite',
     title: '打開常用地點',
+    briefs: const ['打開常用地點'],
     description: '在最上面的「常用地點」點之前存起來的地點',
     keywords: const ['常用地點', '打開常用', '常去的地方', '上次的地點', '存起來的地點', '常用的地點'],
     requires: const [],
@@ -307,6 +309,7 @@ final List<GuideComponent> counterCallingComponents = [
   GuideComponent(
     id: 'pick_location',
     title: '選要去的地點',
+    briefs: const ['選要去的那一間'],
     description: '點「選擇地點」的框框，選要去的那一間',
     keywords: const ['選擇地點', '換地點', '哪個地點', '哪一區', '分處', '換一間'],
     requires: const ['pick_unit|open_favorite'],
@@ -360,6 +363,7 @@ final List<GuideComponent> counterCallingComponents = [
   GuideComponent(
     id: 'read_counters',
     title: '看現在叫到幾號',
+    briefs: const ['看各櫃檯叫到幾號'],
     description: '看每個櫃檯現在叫到幾號、還有幾個人在等',
     keywords: const [
       '叫到幾號',
@@ -399,6 +403,7 @@ final List<GuideComponent> counterCallingComponents = [
   GuideComponent(
     id: 'add_favorite',
     title: '按「加入常用」',
+    briefs: const ['想存起來就按加入常用'],
     description: '把這個地點存成常用地點，下次從首頁直接打開',
     keywords: const ['加入常用', '加入常用地點', '存成常用', '收藏地點', '加到常用'],
     requires: const ['pick_location|open_favorite'],
@@ -434,6 +439,7 @@ final List<GuideComponent> counterCallingComponents = [
   GuideComponent(
     id: 'remove_favorite',
     title: '移除常用地點',
+    briefs: const ['點常用地點旁的變更'],
     description: '在首頁按「變更」，勾選不要的地點，再按「移除地點」',
     keywords: const ['移除常用', '移除常用地點', '刪除常用', '移除地點', '變更常用', '不要這個地點', '刪掉'],
     requires: const [],
