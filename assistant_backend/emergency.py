@@ -85,8 +85,9 @@ NOT_EMERGENCY = {
 # Something happening now (火在燒, 叫不醒, 他在打我) has neither, and gets the number only.
 SERVICE_NEED = {
     "zh": r"補助|申請|聲請|津貼|補貼|扶助|救助|保護令|律師費|訴訟費|醫療費|生活費|可以領|領什麼|長照",
-    "en": r"subsid|benefit|allowance|grant|\bapply\b|application|financial (?:help|aid|assistance)|compensation|legal fees",
-    "ja": r"補助|助成|給付|手当|申請|支援制度",
+    "en": r"subsid|benefit|allowance|grant|\bapply\b|application|financial (?:help|aid|assistance)|compensation|legal fees"
+          r"|victim support|support (?:for|services|programs?)",
+    "ja": r"補助|助成|給付|手当|申請|支援|援助",
     "vi": r"trợ cấp|hỗ trợ tài chính|xin hỗ trợ|đăng ký|nộp đơn|bồi thường",
     "id": r"bantuan|subsidi|tunjangan|mengajukan|\bajukan\b|santunan|kompensasi",
     "tl": r"tulong pinansyal|ayuda|subsidyo|mag-?apply|benepisyo|financial assistance",
@@ -98,6 +99,28 @@ AFTER = {
     "vi": r"nạn nhân|sau khi|trước đây|đã bị|từng bị",
     "id": r"korban|setelah|sesudah|\bdulu\b|pernah|sebelumnya",
     "tl": r"biktima|pagkatapos|\bdati\b|noon|nakaraan",
+}
+# A victim word with an application word is enough, without a past word (rules section 1, owner 2026-11-17:
+# 「性侵被害補助」, "sexual assault victim support" are the help after the event).
+VICTIM = {
+    "zh": r"被害|受害",
+    "en": r"victim|survivor",
+    "ja": r"被害者|被害",
+    "vi": r"nạn nhân|người bị hại",
+    "id": r"korban",
+    "tl": r"biktima",
+}
+# Danger happening now wins (owner 2026-11-17): the number only, no pages, even with a victim or
+# application word (「他正在打我」, 「現在有人要殺我」, 「我是被害人，他又在打我」). AI drafts for the other languages.
+HAPPENING = {
+    "zh": r"正在|在打我|又在打|一直打我|要殺我|想殺我|追殺|快來|救命|救我|現在有人|現在(?:他|她|他們)?(?:正?在|又在)(?:打|揍|追|殺|罵|威脅|跟)"
+          r"|就在(?:門口|外面|樓下|家裡)|闖進|拿刀",
+    "en": r"right now|\bis (?:hitting|beating|attacking|chasing|following|threatening|hurting) (?:me|us)\b|help me"
+          r"|(?:going|trying|wants?) to kill me|at my door|outside my (?:door|house)|has a knife",
+    "ja": r"助けて|殺される|今(?:、)?(?:殴られ|襲われ|追われ|叩かれ)|殴られている|襲われている",
+    "vi": r"\bđang (?:đánh|đuổi|đe dọa|đánh đập)|cứu tôi|cứu với|muốn giết tôi|ngay bây giờ",
+    "id": r"\bsedang (?:memukul|mengejar|mengancam|dipukul)|tolong saya|mau membunuh|sekarang juga",
+    "tl": r"binubugbog ako ngayon|sinasaktan ako ngayon|tulungan mo ako|tulong po|papatayin ako|ngayon mismo",
 }
 # Said after the number when the pages are listed too. AI drafts for the other languages.
 SERVICE_NOTE = {
@@ -122,12 +145,15 @@ def detect(text, language="zh"):
 
 
 def after_service(text, language="zh"):
-    """Whether an emergency sentence also asks for help after the event (an application word and a
-    past or after-the-event word): the number first, then the pages are listed too."""
-    need, after = SERVICE_NEED.get(language, SERVICE_NEED["en"]), AFTER.get(language, AFTER["en"])
-    # Chinese words are understood in every language's sentence (mixed input).
-    return bool((re.search(need, text, re.I) or re.search(SERVICE_NEED["zh"], text))
-                and (re.search(after, text, re.I) or re.search(AFTER["zh"], text)))
+    """Whether an emergency sentence also asks for help after the event: an application word with a past or
+    after-the-event word, or with a victim word (owner 2026-11-17); never when the danger is happening now.
+    Then the number comes first and the pages are listed too."""
+    def has(table):
+        # Chinese words are understood in every language's sentence (mixed input).
+        return bool(re.search(table.get(language, table["en"]), text, re.I) or re.search(table["zh"], text))
+    if has(HAPPENING):
+        return False
+    return has(SERVICE_NEED) and (has(AFTER) or has(VICTIM))
 
 
 def service_note(language):
