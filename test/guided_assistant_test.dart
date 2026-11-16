@@ -68,6 +68,8 @@ class FakeService extends AssistantService {
   final calls = <(String, String?)>[];
   final pageSteps = <int?>[];
   final resolutionIds = <String?>[];
+  final languages = <String?>[];
+  final faqTexts = <String?>[];
   bool fail;
   FakeService(this.replies, {this.fail = false});
 
@@ -86,6 +88,8 @@ class FakeService extends AssistantService {
     calls.add((text, choiceId));
     pageSteps.add(pageStep);
     resolutionIds.add(resolutionId);
+    languages.add(language);
+    faqTexts.add(faqText);
     if (fail) throw const FormatException('連不到電腦上的助理。');
     return replies.removeAt(0)(text, choiceId);
   }

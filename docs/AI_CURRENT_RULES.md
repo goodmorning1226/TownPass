@@ -155,6 +155,7 @@ evaluate dev 在這條路上有 17 次只回「你想先使用哪個服務？」
 - 沒有語意候選時，FAQ 那一層（本節開頭的順序）也用同樣的方法排 FAQ 前 5 名；**說了未串接的功能**（第 2 節）時照舊用 e5 的高／中把握，
   原因：開發集上分類器多給的 FAQ 取代了「尚未串接」的說明（「我要登出」）。分類器沒回應時：頁面照第 6 節列出，FAQ 照 e5 的高／中把握。
 - 外語：FAQ 是中文，外語的語意候選只排頁面；App 翻譯後送來的 `faq_text` 照上面排 FAQ。
+  **引導介面與聊天面板都會翻譯再問**（2026-11-16 起；原本只有聊天面板，見第 5 節「App 與後端契約檢查的修正」第 2 點）。
 - **閒聊偽候選**（「chitchat」：閒聊、打招呼、道謝、說自己的事）有訓練，但**預設關閉**（`chitchat` 1.01）：
   原因：need 開發集上它也給抱怨型的服務請求 0.99（「我的腳踏車不見了」「手機一直叮叮叮很煩」），打開會把要找的頁面藏起來；
   打開時（`TOWNPASS_CLASSIFIER_T_CHITCHAT`）閒聊分數過門檻而且高過每個候選，就不列候選、直接給目錄（打招呼、道謝照原本的回覆）。
@@ -322,6 +323,31 @@ App 上看起來重複，也很難找到想要的；研究第 D 節）：
   5 分鐘後點按鈕、說「第 2 個」仍可能生效，和 App 不一致）：超過 300 秒的清單一進來就刪掉；之後帶它的 `resolution_id` 說或打的話當成新的請求，
   點選項或 ◀ ▶ 回「候選已過期，請重新描述需求。」（`workflow._handle`；測試 `test_classifier_v2.PendingExpiryTests`）。聊天面板原本就帶。
   （`GuidedAssistantController._liveResolution`；測試 `test/guided_resolution_test.dart`）
+- **App 與後端契約檢查的修正**（2026-11-16，擁有者決定裝手機測試之前先修；原因：`D:\TownPassAssistant\need-impl\contract-audit\AUDIT.md`
+  用真的 HTTP、真的 e5 與分類器 v2 照 App 的方式送請求，查到下面幾個 App 少送或不處理後端依賴的東西，單元測試直接呼叫後端看不出來）：
+  1. **打字的追問帶清單的語言**（原因：引導介面打字不送 `language`，後端只能看字形猜：外語清單後打「2」回中文、日文「図書館」被當成中文、
+     越南文「trang sau」、印尼文「batal」、菲律賓文「kanselahin」被當成英文，回 `translate_for_faq`，清單也被清掉；同一句帶 language 都正確）：
+     上面「還是最新的一則回覆」的清單在等使用者選時，打的字帶**這份清單的語言**（後端回覆的 `language`）。
+     例外：打的字是清單語言不用的文字（英文清單下打中文字或假名、中日文清單下打拉丁字母）時不帶，照舊由後端看字形判斷（「我要繳水費」在英文清單後仍是中文的新請求）；
+     沒有清單時、說話（帶辨識出的語言）、點建議句（帶介面語言）都不變。後端不用改：同一句帶 language 原本就正確。
+     （`GuidedAssistantController.listLanguageFor`；測試 `test/guided_resolution_test.dart`「list's language」、`test_contract_audit.ContractTests`）
+  2. **引導介面也處理 `translate_for_faq`**（原因：只有聊天面板處理，引導介面（預設）外語沒找到時只有一句「I'm not sure…」，沒有三層的目錄，也拿不到 FAQ，違反第 3 節）：
+     和聊天面板同一段程式（`AssistantService.withChineseFaq`）：在手機上把句子翻成中文、帶 `faq_text` 在同一個 session 再問一次，拿到 FAQ 或第 3 節的三層回覆；
+     回覆是中文內容（`content_language: zh`，FAQ 答案、點了外語清單裡的 FAQ 題目）時翻回回覆的語言。翻不了時留第一次的回覆。
+     使用者在翻譯時已經問了別的（或取消）就不送第二次（第二次送出會取消正在進行的請求）。（`GuidedAssistantController._askModel`；測試 `test/guided_resolution_test.dart`「translate_for_faq」）
+  3. **「N. 都不是，我再說一次」的號碼說或打也有效**（原因：這個號碼排在後端的選項後面，說或打它時後端回 422「選項不在本輪候選中」）：
+     說或打的號碼（中文、數字、各語言的「第幾個」，後端原本的判斷）**超過清單最後一個選項**時，後端不再回錯誤，而是把**同一份清單再給一次**
+     （同一個 `resolution_id`、欄位全部不變，`action: choice_out_of_range`、`choice_number: N`，訊息「清單裡沒有第 N 個，請從第 1 到第 K 個選一個，或換個說法。」，6 種語言，外語是 AI 草稿）；
+     引導介面收到時，N 剛好是畫面上「都不是」的號碼，就照點了「都不是」處理，否則照常顯示這份清單。中文的「第幾個」原本只認到 8（或清單長度），現在認到清單長度＋1，
+     所以 8 個選項時「第九個」也是號碼。點按鈕送出的不存在選項（`choice_id`）照舊回 422。聊天面板沒有「都不是」，照常顯示。
+     （`workflow._beyond_list`、`ChatMessage.noneNumber`；測試 `test_contract_audit.ContractTests`、`test/guided_resolution_test.dart`「都不是」）
+  4. **回「好／是」時重列的清單和原本一樣**（原因：重列時只留 id、title、enabled，丟掉 nav、group_id、type、subtitle、level，目錄變成一般候選、還多出「都不是」）：
+     清單有兩個以上選項時回「好／是／yes…」，後端把原本那則回覆的 kind、選項（全部欄位）、level、group、listing、action、content_language 照原樣再給一次，同一個 `resolution_id`，
+     只換訊息「請選擇一個具體選項，或說第幾個。」（中文內容的清單用中文訊息，讓 App 一起翻譯）；語言用清單的語言。只有一個選項時照舊直接選它。（`workflow._offer_again`；測試 `test_contract_audit.ContractTests`）
+  5. 舊的模型檔：第 7 節「已被取代的舊檔」。
+  6. **引導介面的輸入框最多 500 字**，和聊天面板一樣（原因：後端超過 500 字回 422，超過 8192 bytes 回 413；`GuidedAssistantController.maxInput`）。
+     Flutter 的字數算的是字元群（emoji 組合算一個），後端算 code point，極少數 emoji 組合仍可能超過，沒有另外處理。
+  不修、記成待辦：後端錯誤訊息只有中文、「中風」的緊急規則、300 秒 App 用牆上時間而後端用 monotonic、聊天面板的常用列、Android 建置 `TOWNPASS_DECISION_MODEL` 環境變數優先於 dart-define。
 - **從清單打開的頁面，最近請求記那一頁**（2026-11-16，擁有者決定，**取代**原本「說『第 2 個』和點按鈕一樣，記住帶出清單的那一句」；
   原因：Android 模擬器端對端測試「我想處理一下家裡的事 → 看全部功能 → 圖書館 → 打『第二個』」打開了圖書點閱排行榜，記住的卻是最早那一句，
   下次點這個建議句又列一次候選，到不了排行榜）：引導介面裡，頁面是**從清單打開**的（點候選或目錄的按鈕、說或打「第 2 個」；判斷方式：回覆說出了清單裡的頁面名稱、而這句話本身沒說），
@@ -470,6 +496,11 @@ App 上看起來重複，也很難找到想要的；研究第 D 節）：
   超過才停下，下載卡片與 AI 助理設定（含台語）都顯示原因和「再試一次」。顯示的大小扣掉已經下載的部分（`.part`）；設定頁下載中也有「暫停」。（`models.Downloads`、`model_download_card.dart`）
 - **分批**：核心（語言判斷、語音、檢索、FAQ 索引、越南文，約 0.5 GB）下載好助理就能用；決策模型（或分類器模式的分類器）接著下載；台語是選項。
   開發者用 adb／devicectl 推進去的檔案照樣有效（大小相符就不重下）。
+- **已被取代的舊檔**（2026-11-16，App 與後端契約檢查；原因：換成分類器 v2 後，舊的 v1 檔（132 MB）一直留在手機上，「刪除模型」也刪不到，因為只刪清單上的檔）：
+  `assets/assistant/models.json` 的 `superseded` 列出舊版 App 下載過、現在沒有任何檔案用到的檔名（目前只有 `townpass-decision-e5-ce-v1-q8_0.gguf`；
+  改這份清單要改 `scripts/build_model_manifest.py` 的 `SUPERSEDED` 再重產 models.json）。手機在**助理啟動時、下載完成時、「刪除模型」時**刪掉這些檔與它們的 `.part`。
+  **只刪清單上列名的檔**：同一個資料夾裡開發者用 adb／devicectl 推的其他檔不會動；名稱必須是資料夾裡的單純檔名（不能是絕對路徑、`..`）；
+  某個名稱又出現在 `files` 裡（例如改回 v1）就不刪。（`models.Downloads.superseded`、`remove_superseded`；`docs/AI_MODEL_DOWNLOAD.md`；測試 `test_contract_audit.SupersededModelTests`）
 - **沒有決策模型時**（還在下載，或精簡版）：緊急、指令、關鍵字很有把握直接開頁、FAQ 的規則都不變；
   原本要問模型的地方一律**列出候選讓使用者選，只有一個也列出來**，不直接開頁；書：唯一確定的書照常開，有搜尋詞就開搜尋結果，其餘請使用者補充；
   分不出意圖時先查 FAQ，再請使用者補充；教學用該頁的預設步驟。（`decision.rule_decision`、`workflow.no_model`）

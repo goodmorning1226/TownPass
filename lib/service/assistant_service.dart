@@ -8,6 +8,7 @@ import 'package:town_pass/page/assistant/assistant_texts.dart';
 import 'package:town_pass/service/assistant_on_device.dart';
 import 'package:town_pass/service/assistant_readiness.dart';
 import 'package:town_pass/service/assistant_recent_pages.dart';
+import 'package:town_pass/service/page_translation.dart';
 
 /// Recognised speech. When [confirm] is true the user must pick one of
 /// [options] (the heard text first) before anything is sent. When
@@ -115,6 +116,69 @@ class AssistantService {
       client.close(force: true);
       if (identical(_active, client)) _active = null;
     }
+  }
+
+  /// The Taipei FAQ is Chinese (docs/AI_CURRENT_RULES.md section 3). For a
+  /// foreign request the backend asks for a Chinese translation (action
+  /// translate_for_faq): [text] is translated on the phone and asked once more
+  /// with faq_text in the same session, which gives the FAQ or the
+  /// three-layer "not found" reply. Chinese FAQ content in the reply
+  /// (content_language zh) is translated back into the reply language. When a
+  /// translation is not possible the backend's own reply stays. Both
+  /// assistants use this (2026-11-16, contract audit: the guided one did
+  /// neither). [stillWanted] is asked before the second request: a newer
+  /// turn must not be cancelled by it ([decide] cancels the active request).
+  Future<AssistantResult> withChineseFaq(
+    AssistantResult result, {
+    required String text,
+    required String requestId,
+    Map<String, dynamic>? context,
+    bool Function()? stillWanted,
+  }) async {
+    final translation = PageTranslation.instance;
+    if (result.action == 'translate_for_faq' &&
+        result.language != 'zh' &&
+        text.trim().isNotEmpty) {
+      final chinese = await translation.translateBetween(
+        text,
+        from: result.language,
+        to: 'zh',
+      );
+      if (chinese != null &&
+          chinese.trim().isNotEmpty &&
+          (stillWanted?.call() ?? true)) {
+        try {
+          result = await decide(
+            text: text,
+            requestId: '$requestId-faq',
+            sessionId: result.sessionId,
+            context: context,
+            language: result.language,
+            faqText: chinese,
+          );
+        } catch (_) {
+          // Keep the first "nothing found" reply.
+        }
+      }
+    }
+    if (result.contentLanguage == 'zh' && result.language != 'zh') {
+      final message = await translation.translateBetween(
+        result.message,
+        from: 'zh',
+        to: result.language,
+      );
+      final titles = <String>[
+        for (final choice in result.choices)
+          await translation.translateBetween(
+                choice.title,
+                from: 'zh',
+                to: result.language,
+              ) ??
+              choice.title,
+      ];
+      result = result.withTexts(message ?? result.message, titles);
+    }
+    return result;
   }
 
   Future<AssistantResult> _request(

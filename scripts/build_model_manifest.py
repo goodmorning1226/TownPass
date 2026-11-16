@@ -86,6 +86,15 @@ FILES = [
       "license": "Apache-2.0 (MediaTek Research Breeze-ASR-26; ggml q4_0 by this project)"}),
 ]
 
+# Files an older App downloaded that no file above uses any more (docs/AI_MODEL_DOWNLOAD.md
+# section "已被取代的舊檔", 2026-11-16): the phone deletes exactly these names from its models
+# folder at start, after a download and with 刪除模型 (models.Downloads.remove_superseded).
+# Only names listed here are deleted, never other files a developer pushed with adb; a name
+# that is in FILES again (going back to v1) is kept.
+SUPERSEDED = [
+    "townpass-decision-e5-ce-v1-q8_0.gguf",  # decision classifier v1, replaced by v2 on 2026-11-16 (132 MB)
+]
+
 
 def sha256(path):
     digest = hashlib.sha256()
@@ -110,7 +119,7 @@ def main():
         entry.update(extra)
         files.append(entry)
         print(f"{file_id}: {entry['size'] >> 20} MB {entry['sha256'][:12]}", flush=True)
-    manifest = {"version": 1, "team_url": args.team_url, "files": files}
+    manifest = {"version": 1, "team_url": args.team_url, "files": files, "superseded": SUPERSEDED}
     pathlib.Path(args.output).write_text(json.dumps(manifest, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
     print(f"wrote {args.output}")
 

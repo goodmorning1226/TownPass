@@ -2,6 +2,7 @@
 // carry the list's resolution_id (docs/AI_CURRENT_RULES.md section 5,
 // 2026-11-16): 第 2 個, a category's name, 下一頁, 回上一層 and 取消 work by
 // voice and typing, not only by tapping.
+import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -17,6 +18,7 @@ import 'package:town_pass/page/guided_assistant/widget/guided_assistant_sheet.da
 import 'package:town_pass/service/assistant_recent_inputs.dart';
 import 'package:town_pass/service/assistant_recent_pages.dart';
 import 'package:town_pass/service/assistant_service.dart';
+import 'package:town_pass/service/page_translation.dart';
 
 import 'assistant_catalog_test.dart' show categories, libraryPages;
 import 'guided_assistant_test.dart'
@@ -512,5 +514,321 @@ void main() {
     expect(service.resolutionIds.last, 'r1');
     expect(c.messages.last.catalogLevel, 2);
     expect(c.messages.where((m) => m.user).last.voice, isTrue);
+  });
+
+  // The contract audit (2026-11-16, docs/AI_CURRENT_RULES.md section 5
+  // 「App 與後端契約檢查的修正」): what the guided App sends and handles.
+  group('contract audit', () {
+    tearDown(() {
+      PageTranslation.instance.pairTranslator = null;
+      PageTranslation.instance.reset();
+    });
+
+    AssistantResult catalogueIn(String language, {String id = 'r1'}) =>
+        AssistantResult(
+          sessionId: 's',
+          message: 'catalogue',
+          kind: 'capability_list',
+          resolutionId: id,
+          level: 1,
+          language: language,
+          listing: const AssistantListing(offset: 0, size: 8, total: 12),
+          choices: const [
+            AssistantBookChoice('1', 'A', groupId: 'bills'),
+            AssistantBookChoice('2', 'B', groupId: 'library'),
+            AssistantBookChoice('3', 'more', nav: 'more'),
+          ],
+        );
+
+    AssistantResult reply(String language) =>
+        AssistantResult(sessionId: 's', message: 'ok', language: language);
+
+    test(
+      "a typed follow-up carries the list's language (foreign lists)",
+      () async {
+        // UI language, the request that listed, the typed follow-up.
+        const cases = [
+          ('ja', 'すべての機能を見る', '図書館'),
+          ('ja', 'すべての機能を見る', '2'),
+          ('vi', 'Xem tất cả chức năng', 'trang sau'),
+          ('id', 'Lihat semua fitur', 'batal'),
+          ('tl', 'Tingnan lahat ng serbisyo', 'kanselahin'),
+          ('en', 'See everything', '1'),
+        ];
+        for (final (language, request, word) in cases) {
+          final service = FakeService([
+            (_, _) => catalogueIn(language),
+            (_, _) => reply(language),
+          ]);
+          final c = makeController(service: service, executor: executor);
+          c.submit(request);
+          await settle();
+          c.submit(word);
+          await settle();
+          expect(service.calls.last, (word, null));
+          expect(service.resolutionIds.last, 'r1', reason: word);
+          // Before: null, so the backend guessed from the letters.
+          expect(service.languages.last, language, reason: word);
+          Get.reset();
+        }
+      },
+    );
+
+    test('another script, or no list, is still left to the backend', () async {
+      final service = FakeService([
+        (_, _) => catalogueIn('en'),
+        (_, _) => reply('zh'),
+        (_, _) => catalogueIn('ja', id: 'r2'),
+        (_, _) => reply('en'),
+        (_, _) => reply('vi'),
+      ]);
+      final c = makeController(service: service, executor: executor);
+      c.submit('See everything');
+      await settle();
+      c.submit('我要繳水費'); // Chinese under an English list: a new request
+      await settle();
+      expect(service.resolutionIds.last, 'r1');
+      expect(service.languages.last, isNull);
+      c.submit('すべての機能を見る');
+      await settle();
+      c.submit('Library'); // Latin letters under a Japanese list
+      await settle();
+      expect(service.languages.last, isNull);
+      c.submit('trang sau'); // no list waits now
+      await settle();
+      expect(service.resolutionIds.last, isNull);
+      expect(service.languages.last, isNull);
+      expect(GuidedAssistantController.listLanguageFor('図書館', 'ja'), 'ja');
+      expect(GuidedAssistantController.listLanguageFor('としょかん', 'zh'), isNull);
+      expect(GuidedAssistantController.listLanguageFor('số 2', 'vi'), 'vi');
+      expect(GuidedAssistantController.listLanguageFor('3', 'tl'), 'tl');
+    });
+
+    test(
+      'translate_for_faq: translated, asked again, FAQ translated back',
+      () async {
+        PageTranslation.instance.pairTranslator = (text, from, to) async =>
+            '[$from>$to] $text';
+        final service = FakeService([
+          (_, _) => const AssistantResult(
+            sessionId: 's',
+            message: "I'm not sure what you need.",
+            language: 'en',
+            action: 'translate_for_faq',
+          ),
+          (_, _) => const AssistantResult(
+            sessionId: 's',
+            message: '你是不是想問以下的問題？',
+            language: 'en',
+            action: 'faq_answer',
+            kind: 'confirm_candidates',
+            contentLanguage: 'zh',
+            resolutionId: 'r9',
+            choices: [AssistantBookChoice('1', '學齡前視力檢查要錢嗎')],
+          ),
+        ]);
+        final c = makeController(service: service, executor: executor);
+        c.submit('is the eye check for kids free');
+        await pumpEventQueue();
+        // Before: one request only, and "I'm not sure" with nothing to choose.
+        expect(service.faqTexts, [
+          null,
+          '[en>zh] is the eye check for kids free',
+        ]);
+        expect(service.languages.last, 'en');
+        final last = c.messages.last;
+        expect(last.text, '[zh>en] 你是不是想問以下的問題？');
+        expect(last.options!.options.first.label, '[zh>en] 學齡前視力檢查要錢嗎');
+      },
+    );
+
+    test(
+      'translate_for_faq without an FAQ gives the three-layer reply',
+      () async {
+        PageTranslation.instance.pairTranslator = (text, from, to) async =>
+            'zh: $text';
+        final service = FakeService([
+          (_, _) => const AssistantResult(
+            sessionId: 's',
+            message: 'Không tìm thấy.',
+            language: 'vi',
+            action: 'translate_for_faq',
+          ),
+          (_, _) => catalogueIn('vi', id: 'r7'),
+          (_, _) => reply('vi'),
+        ]);
+        final c = makeController(service: service, executor: executor);
+        c.submit('tôi muốn hỏi về chuyện nhà');
+        await pumpEventQueue();
+        expect(service.faqTexts.last, 'zh: tôi muốn hỏi về chuyện nhà');
+        expect(c.messages.last.catalogLevel, 1);
+        // The catalogue that came back is live: 「2」 answers it, in Vietnamese.
+        c.submit('2');
+        await pumpEventQueue();
+        expect(service.resolutionIds.last, 'r7');
+        expect(service.languages.last, 'vi');
+      },
+    );
+
+    test('no second request once the user moved on', () async {
+      final gate = Completer<String>();
+      PageTranslation.instance.pairTranslator = (text, from, to) => gate.future;
+      final service = FakeService([
+        (_, _) => const AssistantResult(
+          sessionId: 's',
+          message: 'Not found.',
+          language: 'en',
+          action: 'translate_for_faq',
+        ),
+      ]);
+      final c = makeController(service: service, executor: executor);
+      c.submit('is parking free on sundays');
+      await settle();
+      c.cancelLoading();
+      gate.complete('翻好了');
+      await pumpEventQueue();
+      expect(service.calls.length, 1);
+    });
+
+    test(
+      'a tapped FAQ question in a foreign list is translated back',
+      () async {
+        PageTranslation.instance.pairTranslator = (text, from, to) async =>
+            '[$from>$to] $text';
+        final service = FakeService([
+          (_, _) => const AssistantResult(
+            sessionId: 's',
+            message: 'Do you mean these?',
+            language: 'id',
+            kind: 'confirm_candidates',
+            resolutionId: 'r1',
+            choices: [AssistantBookChoice('1', 'FAQ')],
+          ),
+          (_, _) => const AssistantResult(
+            sessionId: 's',
+            message: '可以線上申請。',
+            language: 'id',
+            action: 'faq_answer',
+            contentLanguage: 'zh',
+          ),
+        ]);
+        final c = makeController(service: service, executor: executor);
+        c.submit('bagaimana cara daftar');
+        await settle();
+        c.choose(c.messages.last, c.messages.last.options!.options.first);
+        await pumpEventQueue();
+        expect(service.calls.last, ('', '1'));
+        expect(
+          service.faqTexts.last,
+          isNull,
+          reason: 'a tap is not translated',
+        );
+        expect(c.messages.last.text, '[zh>id] 可以線上申請。');
+      },
+    );
+
+    AssistantResult beyond(int number, {String language = 'zh'}) =>
+        AssistantResult(
+          sessionId: 's',
+          message: '清單裡沒有第 $number 個',
+          kind: 'confirm_candidates',
+          resolutionId: 'r1',
+          language: language,
+          action: 'choice_out_of_range',
+          choiceNumber: number,
+          choices: const [
+            AssistantBookChoice('1', '申辦案件進度'),
+            AssistantBookChoice('2', '陳情案件進度'),
+          ],
+        );
+
+    test('the number of 「都不是」 said or typed answers as the button', () async {
+      final service = FakeService([
+        (_, _) => candidates(),
+        (_, _) => beyond(3),
+        (_, _) => candidates(id: 'r2'),
+        (_, _) => beyond(5),
+      ]);
+      final c = makeController(service: service, executor: executor);
+      c.submit('我想知道案子辦到哪');
+      await settle();
+      expect(c.messages.last.noneNumber, 3);
+      c.submit('第3個');
+      await settle();
+      expect(service.resolutionIds.last, 'r1');
+      // Before: the list again (and, from the real backend, a 422 error).
+      expect(c.messages.last.text, Replies.noneOfThem);
+      expect(c.messages.last.options!.options.single.label, seeAllChip);
+      expect(c.messages.where((m) => m.user).last.text, '第3個');
+      // Another number past the list: the list again, still answerable.
+      c.submit('我想知道案子辦到哪');
+      await settle();
+      c.submit('第5個');
+      await settle();
+      expect(c.messages.last.options!.options.length, 2);
+      expect(c.messages.last.noneNumber, 3);
+      expect(c.optionsLive(c.messages.last), isTrue);
+    });
+
+    test('in another language, by voice too', () async {
+      final service = HearingService(
+        [
+          (_, _) => const AssistantResult(
+            sessionId: 's',
+            message: 'Do you mean these?',
+            kind: 'confirm_candidates',
+            resolutionId: 'r1',
+            language: 'en',
+            choices: [
+              AssistantBookChoice('1', 'Water bill'),
+              AssistantBookChoice('2', 'Parking fee'),
+              AssistantBookChoice('3', 'See everything', nav: 'catalog'),
+            ],
+          ),
+          (_, _) => beyond(4, language: 'en'),
+        ],
+        [const AssistantTranscript('Number four.', language: 'en')],
+      );
+      final web = Get.put<WebPageState>(WebPageState());
+      final c = Get.put(
+        GuidedAssistantController(
+          thinkDelay: Duration.zero,
+          speaker: SilentSpeaker(),
+          service: service,
+          recorder: LoudRecorder(),
+          executor: executor,
+          probeOverride: FakeProbe(web),
+        ),
+      );
+      await settle();
+      c.submit('I need to pay something');
+      await settle();
+      expect(c.messages.last.noneNumber, 4);
+      await c.micDown();
+      await c.micUp();
+      await settle();
+      expect(service.calls.last, ('Number four.', null));
+      expect(service.languages.last, 'en');
+      expect(c.messages.last.text, Replies.noneOfThem);
+    });
+
+    testWidgets('the text box takes at most 500 characters', (tester) async {
+      tester.view.physicalSize = const Size(402, 2400);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      final c = makeController(service: FakeService([]), executor: executor);
+      await tester.pumpWidget(
+        MaterialApp(home: GuidedAssistantSheet(controller: c)),
+      );
+      c.typing.value = true;
+      await tester.pump();
+      await tester.enterText(find.byType(TextField), '水' * 600);
+      await tester.pump();
+      final field = tester.widget<TextField>(find.byType(TextField));
+      expect(field.maxLength, 500);
+      expect(field.controller!.text.length, 500);
+      expect(find.text('500/500'), findsNothing, reason: 'no counter shown');
+      await tester.pump(const Duration(seconds: 4));
+    });
   });
 }
