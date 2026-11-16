@@ -33,7 +33,8 @@ MODEL = "intfloat/multilingual-e5-small"
 QUERY_PREFIX = "query: "
 PASSAGE_PREFIX = "passage: "
 DEFAULT_EMBED_URL = "http://127.0.0.1:8774"
-EMBED_TIMEOUT = 5
+# TOWNPASS_EMBED_TIMEOUT: a longer wait, only for evaluation on a loaded computer (2026-11-16 rule audit).
+EMBED_TIMEOUT = float(os.environ.get("TOWNPASS_EMBED_TIMEOUT", "5"))
 # Tuned for the assistant on 2026-11-07 (docs/AI_FAQ_RAG.md section 6) with
 # rag_handoff/tuning/sweep.py: scores from MEDIUM_CONF ask "did you mean" with
 # the closest questions and answer only after the user picks one; HIGH_CONF

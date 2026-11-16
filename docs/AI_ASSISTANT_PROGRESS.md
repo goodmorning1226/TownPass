@@ -52,6 +52,27 @@
 | Android | debug APK 建置成功；fluttertoast 的 KGP 未來相容性警告仍存在 |
 | Git | commit 前執行 diff 檢查；本機 commit 不代表已 push。沒有驗證 iOS／release／正式 API |
 
+## 台語：不改用華語、記憶體、紀錄檔（2026-11-16～17，`feat/need-style-assistant`，未 commit）
+
+規則：[現行規則](AI_CURRENT_RULES.md) 第 4、5、7 節；細節與評估：[台語規劃](AI_TAIWANESE_SPEECH_PLAN.md) 第 14 節、[台語消融](AI_TAIWANESE_ABLATION.md) 第 14 節、[iOS](AI_ON_DEVICE_IOS.md) 同名一節。
+
+**做了什麼**
+- A（不偷偷改用華語）：閘門台語分數 ≥ 0.5、模型載入中就等（最多 25 秒）；記憶體不足、沒啟動成功、連不上時不輸出華語結果，App 說明原因（6 語，422 `code: taiwanese_unavailable`）。
+  擁有者 2026-11-16 的兩個決定：沒下載（`missing`）不擋；分數 0.5–0.68、華語結果清楚又是 App 認得的照常保留（`TAIWANESE_KEEP_KNOWN_BELOW`，門檻用調整用錄音定）。
+  分數 0.3–0.5 時華語結果清楚就保留。台語連不上不再觸發 30 秒略過，只有記憶體不足 60 秒內不再問 App。
+  （`asr_server.py`、`server.py`、`i18n.py`、`device_main.BoundedStarter`）
+- B（記憶體）：台語 whisper-server `-bo 1`、後端送 `best_of=1`；iPhone 估計 1,000 → 750 MB（需要 2,104 → 1,854 MB）。（`OnDeviceAssistant.swift`、`OnDeviceAssistant.kt`、`asr_server.TAIWANESE_BEST_OF`）
+- C（紀錄檔）：先建空檔，stdout／stderr 都用 `"a"` 開。（`OnDeviceAssistant.swift`）
+- 測試：`test_device.py`（自動台語新增 7 個、改 2 個）、`test_liveness.py`（2 個）、`test_transcription.py`（2 個）、`test/taiwanese_unavailable_test.dart`（2 個）。
+
+**數字**
+- B（held-out 100）：`-bo 1` 華語 CER 0.498、服務詞 32/50 與現在相同；峰值 RSS 1,513 → 1,274 MB、commit 2,066 → 1,824 MB。`-nfa` 更多、`-t 4`／`-mc 64` 不變。
+- A（調整用錄音，模型記憶體不足）：台語 205/276 拿到說明（以前 241 段輸出成華語）；華語被擋 43/396（請求句 2/70）；外語聽對 366/469（模型可用時 358）。模型可用時舊版與新版逐段相同。
+
+**沒做／待辦**
+- 「台語之後的英文被聽成中文」：擁有者 2026-11-17 決定先不修，記在台語規劃第 14.1 節（再遇到時要拉的紀錄與欄位）。
+- Swift 只能在 CI 編譯；Kotlin 地端 flavor 沒有編譯；iPhone 實測步驟在 iOS 文件。
+
 ## 功能相關檔案樹
 
 下列只列地端助理直接使用或變更的檔案；不是整個 TownPass repository 架構。

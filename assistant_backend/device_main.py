@@ -178,27 +178,35 @@ class BoundedStarter:
     - the App's starter (which answers at once when the server already runs) runs on
       its own thread; a clip waits for it at most
       wait_s, counted from when the start began (later clips do not wait again), and
-      then gets "loading" (the clip is heard as Chinese; the next ones use the model
-      once it is up);
-    - "failed" (the slow failure): no new start for retry_s; "missing" and "memory"
-      are quick answers from the App and are asked again on the next clip.
+      then gets "loading" (asr_server asks again while a clip the gate is sure of waits,
+      up to TAIWANESE_LOAD_WAIT_S; the next clips use the model once it is up);
+    - "failed" (the slow failure: the load did not finish, the server died): no new
+      start for retry_s; "memory" (2026-11-16, owner: only a lack of memory needs a
+      pause): not asked again for memory_s, as free memory changes from minute to
+      minute (iPhone: the App's budget moved between 1,942 and 2,327 MB); "missing" is a
+      quick answer and is asked again on the next clip. A server that stops answering for a
+      moment (iOS reclaimed its port, it is restarting) is not a failed start: the App
+      answers "ready" or waits for its port, and asr_server asks again (no pause).
     """
 
     WAIT_S = 20.0
     RETRY_S = 300.0
+    MEMORY_S = 60.0
 
-    def __init__(self, starter, port, wait_s=None, retry_s=None, clock=None):
+    def __init__(self, starter, port, wait_s=None, retry_s=None, clock=None, memory_s=None):
         import time
         self.starter = starter
         self.port = port
         self.wait_s = self.WAIT_S if wait_s is None else wait_s
         self.retry_s = self.RETRY_S if retry_s is None else retry_s
+        self.memory_s = self.MEMORY_S if memory_s is None else memory_s
         self.clock = clock or time.monotonic
         self.lock = threading.Lock()
         self.thread = None
         self.began = 0.0
         self.result = None
         self.failed_at = None
+        self.short_at = None  # the last "memory" answer
 
     def _run(self):
         try:
@@ -209,6 +217,8 @@ class BoundedStarter:
             self.result = state
             if state == "failed":
                 self.failed_at = self.clock()
+            elif state == "memory":
+                self.short_at = self.clock()
 
     def __call__(self):
         with self.lock:
@@ -219,6 +229,8 @@ class BoundedStarter:
                         return done
                 if self.failed_at is not None and self.clock() - self.failed_at < self.retry_s:
                     return "failed"
+                if self.short_at is not None and self.clock() - self.short_at < self.memory_s:
+                    return "memory"
                 self.result = None
                 self.began = self.clock()
                 self.thread = threading.Thread(target=self._run, name=f"speech-start-{self.port}", daemon=True)

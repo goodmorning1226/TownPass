@@ -95,7 +95,10 @@ def main():
                      "semantic": (reply.get("metrics") or {}).get("semantic"),
                      "classifier": (reply.get("metrics") or {}).get("classifier"),
                      "model_calls": len((reply.get("metrics") or {}).get("model_timings") or []) or None,
-                     "message": (reply.get("message") or reply.get("error") or "")[:120]})
+                     "message": (reply.get("message") or reply.get("error") or "")[:120],
+                     # TOWNPASS_RULE_TRACE=1 on the backend only (rule_switches.py): the early rules that fired.
+                     **({"rules": (reply.get("metrics") or {})["rules"]} if (reply.get("metrics") or {}).get("rules")
+                        else {})})
         if not args.quiet:
             print(f"{index}/{len(items)} {outcome:16} {item['language']} {item['intent']:12} {seconds:.1f}s "
                   f"{item['text']}", flush=True)

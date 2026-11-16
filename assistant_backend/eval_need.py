@@ -291,7 +291,9 @@ def main():
                      "choices": [c.get("title") for c in reply.get("choices") or []],
                      "listing": reply.get("listing"), "message": (reply.get("message") or "")[:160],
                      "semantic": metrics.get("semantic"), "classifier": metrics.get("classifier"),
-                     "seconds": round(seconds, 2)})
+                     "seconds": round(seconds, 2),
+                     # TOWNPASS_RULE_TRACE=1 on the backend only (rule_switches.py): the early rules that fired.
+                     **({"rules": metrics["rules"]} if metrics.get("rules") else {})})
         if not quiet:
             print(f"{index}/{len(items)} {result:18} {item['intent']:11} {str(metrics.get('route')):22} "
                   f"{seconds:5.1f}s {item['text'][:40]}", flush=True)
