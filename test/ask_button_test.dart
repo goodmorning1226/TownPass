@@ -247,6 +247,26 @@ void main() {
       expect(lifted.compact, isFalse);
     });
 
+    test('the step\'s other usable parts: kept clear when there is room', () {
+      const hot = Rect.fromLTWH(0, 680, 400, 80);
+      AskPlacement? prefer(List<Rect> keep) => AskLayout.placePreferring(
+        screen: screen,
+        right: 80,
+        bottom: 40,
+        width: 150,
+        topClear: 80,
+        avoid: const [],
+        prefer: keep,
+      );
+      final up = prefer(const [hot])!;
+      expect(rect(up).overlaps(hot.inflate(AskLayout.gap)), isFalse);
+      // Nowhere clear of them: its usual place (not hidden).
+      expect(
+        prefer(const [Rect.fromLTWH(0, 0, 400, 800)]),
+        const AskPlacement(right: 80, bottom: 40),
+      );
+    });
+
     test('above the keyboard; hidden when there is no room', () {
       final typing = place(const [], bottom: 340)!;
       expect(rect(typing).bottom, 460);
@@ -361,6 +381,63 @@ void main() {
       await tester.pump(const Duration(seconds: 1));
       expect(tester.getRect(_box).bottom, lessThanOrEqualTo(874 - 300));
       expect(_button, findsOneWidget, reason: 'stays while typing');
+      await finish(tester);
+    });
+
+    /// The library search step: the ring is the search row, the 熱門關鍵字
+    /// ([hot]) are its other usable part.
+    Future<void> searchStep(
+      WidgetTester tester,
+      GuidedAssistantController c,
+      Rect hot,
+    ) async {
+      GuideTargets.setWebRects({
+        'library.search_row': const Rect.fromLTWH(20, 100, 360, 48),
+        'library.hot_keywords': hot,
+      });
+      c.startGuide('library');
+      c.routeChanged(TPRoute.webView);
+      c.web.snapshot.value = const WebSnapshot(
+        path: '/library-service/keyword-search',
+        flags: {'__fieldTargets': 'library.search_row', '__focusField': true},
+      );
+      c.beginSteps();
+      await tester.pump(const Duration(seconds: 1));
+      await tester.pump(const Duration(seconds: 1));
+      expect(c.highlightTarget, 'library.search_row');
+    }
+
+    testWidgets('keeps off the step\'s other usable parts when there is room', (
+      tester,
+    ) async {
+      final c = await pump(tester);
+      final usual = tester.getRect(_box);
+      // 熱門關鍵字 right where the button usually is.
+      final hot = Rect.fromLTWH(0, usual.top - 20, 402, usual.height + 40);
+      await searchStep(tester, c, hot);
+      final moved = tester.getRect(_box);
+      expect(moved.overlaps(hot), isFalse);
+      expect(moved.overlaps(const Rect.fromLTWH(20, 100, 360, 48)), isFalse);
+      for (final card in AskObstacle.rects) {
+        expect(moved.overlaps(card), isFalse);
+      }
+      await finish(tester);
+    });
+
+    testWidgets('no room beside them: back to its place, still off the ring', (
+      tester,
+    ) async {
+      final c = await pump(tester);
+      // 熱門關鍵字 fill everything under the search row.
+      const hot = Rect.fromLTWH(0, 160, 402, 714);
+      await searchStep(tester, c, hot);
+      expect(_button, findsOneWidget, reason: 'not hidden for them');
+      final at = tester.getRect(_box);
+      expect(at.overlaps(hot), isTrue);
+      expect(at.overlaps(const Rect.fromLTWH(20, 100, 360, 48)), isFalse);
+      for (final card in AskObstacle.rects) {
+        expect(at.overlaps(card), isFalse);
+      }
       await finish(tester);
     });
 

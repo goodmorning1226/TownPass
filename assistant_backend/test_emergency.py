@@ -171,6 +171,31 @@ class EmergencyServiceTests(unittest.TestCase):
         self.assertTrue(emergency.after_service("家暴之後要聲請保護令，律師費好貴"))
         self.assertTrue(emergency.after_service("Nạn nhân bạo lực gia đình có trợ cấp không", "vi"))
 
+    def test_a_victim_word_with_an_application_word_is_enough(self):
+        # Owner 2026-11-17: no past word needed when the sentence says victim (被害, 受害, victim...).
+        for text, language, page in (("我想申請性侵被害補助", "zh", "districtOffice.form.c-2"),
+                                     ("性侵被害補助", "zh", "districtOffice.form.c-2"),
+                                     ("sexual assault victim support", "en", "districtOffice.form.c-2")):
+            result = self.turn(text, language)
+            self.assertEqual(result["metrics"]["route"], "emergency_service", text)
+            self.assertIn("113", result["message"].split("\n")[0], text)
+            self.assertIn(page, self.listed(), text)
+        for text, language in (("Korban kekerasan dalam rumah tangga, ada bantuan?", "id"),
+                               ("biktima ng karahasan, may ayuda ba", "tl"), ("被害者の支援を受けたい", "ja")):
+            self.assertTrue(emergency.after_service(text, language), text)
+        self.assertFalse(emergency.after_service("家暴補助"))  # no victim and no past word: the number only
+
+    def test_danger_happening_now_gets_the_number_only_even_with_a_victim_word(self):
+        for text in ("現在有人要殺我", "我是家暴被害人，他現在又在打我，我要申請保護令", "救命，我被打了，要申請補助"):
+            result = self.turn(text)
+            self.assertEqual(result["action"], "emergency", text)
+            self.assertEqual(result["metrics"]["route"], "emergency", text)
+            self.assertNotIn("\n", result["message"], text)
+            self.assertFalse(emergency.after_service(text), text)
+        for text, language in (("I'm a victim and he is hitting me right now, I need financial help", "en"),
+                               ("tulungan mo ako, biktima ako, may ayuda ba", "tl")):
+            self.assertFalse(emergency.after_service(text, language), text)
+
     def test_nothing_found_keeps_the_number_alone(self):
         # The usual flow finds no page (no keyword, no index in this test): the number only.
         result = self.turn("家暴之後要聲請保護令，律師費好貴")
