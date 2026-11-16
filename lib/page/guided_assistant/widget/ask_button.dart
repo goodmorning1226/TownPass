@@ -94,6 +94,35 @@ abstract final class AskLayout {
     return Rect.fromLTWH(left, screen.height - p.bottom - height, w, height);
   }
 
+  /// [place] keeping off [avoid] (the ring, the card, the penguin; always)
+  /// and also off [prefer] (the step's other usable parts, e.g. the
+  /// 熱門關鍵字) when there is such a place; else as [place] without
+  /// [prefer] (docs/AI_CURRENT_RULES.md section 5, 2026-11-16). The
+  /// keyboard is kept clear by [bottom] either way.
+  static AskPlacement? placePreferring({
+    required Size screen,
+    required double right,
+    required double bottom,
+    required double width,
+    required double topClear,
+    required Iterable<Rect> avoid,
+    Iterable<Rect> prefer = const [],
+  }) {
+    AskPlacement? at(Iterable<Rect> keep) => place(
+      screen: screen,
+      right: right,
+      bottom: bottom,
+      width: width,
+      topClear: topClear,
+      avoid: keep,
+    );
+    if (prefer.isNotEmpty) {
+      final clear = at([...avoid, ...prefer]);
+      if (clear != null) return clear;
+    }
+    return at(avoid);
+  }
+
   /// Its usual place ([right], [bottom]: above the keyboard and the page's
   /// bottom bar), else the left edge, else only the mic (at the right, then
   /// the left), else lifted above what is in the way. Null: nowhere free
@@ -164,6 +193,10 @@ class AskButton extends StatefulWidget {
   /// [GuideTargets] ids to keep off (the step's ring, the penguin button).
   final List<String> avoidTargets;
 
+  /// [GuideTargets] ids kept clear when there is room (the step's other
+  /// usable parts, e.g. the 熱門關鍵字); see [AskLayout.placePreferring].
+  final List<String> preferClear;
+
   const AskButton({
     super.key,
     required this.controller,
@@ -172,6 +205,7 @@ class AskButton extends StatefulWidget {
     required this.topClear,
     required this.onHome,
     this.avoidTargets = const [],
+    this.preferClear = const [],
   });
 
   /// How often the place is checked (the ring follows the page's scrolling
@@ -253,13 +287,14 @@ class _AskButtonState extends State<AskButton> {
     if (own != null && _at?.compact == false && own.width > 0) {
       _width = own.width;
     }
-    return AskLayout.place(
+    return AskLayout.placePreferring(
       screen: MediaQuery.sizeOf(context),
       right: widget.right,
       bottom: widget.bottom,
       width: _width,
       topClear: widget.topClear,
       avoid: _avoid,
+      prefer: [for (final id in widget.preferClear) ?GuideTargets.rectOf(id)],
     );
   }
 

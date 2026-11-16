@@ -360,7 +360,8 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
   /// by the enlarged penguin's extra width (its breathing does not move it);
   /// at the right edge while the penguin steps aside for the keyboard. It
   /// keeps off the step's ring, the penguin, the card and the 「你離開了」
-  /// bar (see [AskButton]).
+  /// bar (see [AskButton]), and off the step's other usable parts (e.g. the
+  /// 熱門關鍵字) when there is room (docs/AI_CURRENT_RULES.md section 5).
   Widget _askButton(
     BuildContext context,
     GuidedAssistantController c, {
@@ -378,6 +379,9 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
         topClear: MediaQuery.of(context).padding.top + 56,
         onHome: onHome,
         avoidTargets: [?c.highlightTarget, assistantFabTarget],
+        preferClear: c.highlightTarget == null
+            ? const []
+            : c.currentStep?.alsoUsable ?? const [],
       ),
     );
   }

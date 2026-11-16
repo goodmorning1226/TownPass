@@ -36,17 +36,24 @@ LISTING_SHAPES = {
     "ja": (r"どんな(?P<x>[^、。？?]+?)が(?:あります|ある|できます)", r"^(?P<x>[^、。？?]+?)(?:は|って)(?:何が)?(?:あります|ある)か"),
     "vi": (r"\bcó (?:những )?(?P<x>[^?.!]+?) (?:gì|nào)\b", r"^(?P<x>[^?.!]+?) có (?:những )?gì\b"),
     "id": (r"^(?:ada |apa )?(?P<x>[a-z][a-z &'-]*?) apa (?:saja|aja)\b",),
-    "tl": (r"\bano(?:-ano)?(?:ng| ang)? (?:mga )?(?P<x>[a-z][a-z &'-]*?)(?: ang)?"
-           r"(?: (?:meron|mayroon|ninyo|niyo|mo|dito|po))*[?.!\s]*$",),
+    # Filipino (2026-11-17): also "anong X ang meron", "ano ang mga X na meron / inaalok", and the endings of
+    # i18n.LISTING["tl"] (po, mo, ninyo, dito, sa app na ito, ng app, para sa akin).
+    "tl": (r"\banong (?:mga )?(?P<x>[a-z][a-z &'-]*?) (?:ang )?(?:meron|mayroon|inaalok|maibibigay)\b",
+           r"\bano(?:-ano)?(?:ng| ang)? (?:mga )?(?P<x>[a-z][a-z &'-]*?)(?: na (?:meron|mayroon|inaalok|kaya)[a-z ]*)?(?: ang)?"
+           r"(?: (?:meron|mayroon|ninyo|niyo|nyo|mo|dito|po|ho|ng app(?: na ito)?|sa app(?: na ito)?|para sa akin|sa akin))*"
+           r"[?.!\s]*$"),
 }
 # X for which the whole catalogue is the answer (有什麼功能, what services do you have).
 LISTING_NOUNS = {
     "zh": ("功能", "服務", "功用", "用途"),
-    "en": ("features", "feature", "services", "service", "functions", "function", "things", "options"),
-    "ja": ("機能", "サービス", "こと"),
-    "vi": ("dịch vụ", "chức năng", "tính năng"),
-    "id": ("layanan", "fitur"),
-    "tl": ("serbisyo", "feature", "function", "magagawa"),
+    "en": ("features", "feature", "services", "service", "functions", "function", "things", "options",
+           "things you can do", "help"),
+    "ja": ("機能", "サービス", "こと", "できること"),
+    "vi": ("dịch vụ", "chức năng", "tính năng", "việc", "tiện ích"),
+    "id": ("layanan", "fitur", "fungsi", "menu"),
+    # AI drafts (2026-11-17), from eval_i18n's Filipino dev sentences and i18n.LISTING / LISTING_PHRASES.
+    "tl": ("serbisyo", "mga serbisyo", "feature", "features", "function", "functions", "services", "magagawa",
+           "magagawa mo", "kaya mong gawin", "kaya mo", "maitutulong", "maitutulong mo", "tampok", "gamit"),
 }
 
 
@@ -148,10 +155,11 @@ class Menu:
         group = self._group_word(key, language)
         if group:
             return ("group", group)
+        spaced = language not in ("zh", "ja")
+        if any(noun and (f" {noun} " in f" {key} " if spaced else noun in key) for noun in nouns):
+            return ("catalogue",)  # 你有甚麼樣子的功能, 市府的服務, serbisyo sa app na ito
         if self._page_word(key, language, exact=False):
             return ("pages",)
-        if any(noun and noun in key for noun in nouns):
-            return ("catalogue",)  # 你有甚麼樣子的功能, 市府的服務
         return None
 
     @staticmethod

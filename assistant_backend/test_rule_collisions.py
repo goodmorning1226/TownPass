@@ -386,6 +386,9 @@ class Scanner:
             return None
         if scope and scope[0] == "group":
             return (rule, score, [entry["id"] for entry in self.menu.items(scope[1])])
+        if rule == "listing" and language == "zh" and any(word in probe for word in ("圖書", "借書")):
+            # The listing regex lists the library's own pages then (Workflow._handle, root="library").
+            return (rule, score, [e["id"] for e in self.registry.entries if e["id"].split(".")[0] == "library"])
         return (rule, score, "catalogue")
 
     def emergency(self, probe, kind, language):

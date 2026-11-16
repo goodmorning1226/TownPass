@@ -338,11 +338,15 @@ class ListingScopeTests(unittest.TestCase):
                 ("我想看有甚麼補助", "zh", ("group", "apply")), ("最近手頭有點緊，想看看有什麼補助", "zh", ("group", "apply")),
                 ("有什麼補助可以申請", "zh", ("group", "apply")), ("有哪些功能", "zh", ("catalogue",)),
                 ("有什麼服務", "zh", ("catalogue",)), ("你有甚麼樣子的功能", "zh", ("catalogue",)),
-                ("你都會些什麼", "zh", None), ("有什麼好玩的", "zh", None), ("圖書子功能有哪些", "zh", ("pages",)),
+                ("你都會些什麼", "zh", None), ("有什麼好玩的", "zh", None), ("圖書子功能有哪些", "zh", ("catalogue",)),  # X has 功能 (2026-11-17)
                 ("有什麼問題", "zh", ("pages",)), ("有什麼津貼", "zh", ("group", "apply")),
                 ("ada bantuan apa saja", "id", ("group", "apply")), ("ada layanan apa saja", "id", ("catalogue",)),
                 ("what benefits do you have", "en", ("group", "apply")), ("what services do you have", "en", ("catalogue",)),
                 ("có những dịch vụ gì", "vi", ("catalogue",)), ("ano ang mga serbisyo mo", "tl", ("catalogue",)),
+                ("Ano ang kaya mong gawin?", "tl", ("catalogue",)), ("anong serbisyo ang meron kayo", "tl", ("catalogue",)),
+                ("ano ang mga serbisyo sa app na ito", "tl", ("catalogue",)), ("ano ang magagawa mo para sa akin", "tl", ("catalogue",)),
+                ("ano ang mga tampok ng app na ito", "tl", ("catalogue",)), ("anong tulong ang meron", "tl", ("group", "apply")),
+                ("có những việc gì", "vi", ("catalogue",)), ("ada fungsi apa saja", "id", ("catalogue",)),
                 ("どんな補助がありますか", "ja", ("group", "apply")), ("どんなサービスがありますか", "ja", ("catalogue",))):
             self.assertEqual(self.menu.listing_scope(text, language), scope, text)
 
