@@ -375,6 +375,7 @@ class _AskButtonState extends State<AskButton> {
     c.fieldMic.value;
     c.homeAsk.value;
     c.listening.value;
+    final ready = c.micReady.value;
     final listening = _listening;
     final working = _working;
     return Semantics(
@@ -387,14 +388,17 @@ class _AskButtonState extends State<AskButton> {
         onUp: _up,
         listening: () => _listening,
         onDiscardChanged: (v) => setState(() => _discard = v),
+        onShown: c.micShown,
+        onHidden: c.micHidden,
         child: _AskFace(
           listening: listening,
+          ready: ready,
           working: working,
           discard: _discard && listening,
           compact: compact,
           label: gt(
             listening
-                ? HomeAskTexts.listeningLabel
+                ? (ready ? HomeAskTexts.listeningLabel : HomeAskTexts.preparing)
                 : dictating
                 ? FieldMicTexts.label
                 : HomeAskTexts.label,
@@ -420,7 +424,14 @@ class _AskButtonState extends State<AskButton> {
           color: color,
         );
     if (listening) {
-      lines.add(MicLevelMeter(level: c.level.value, width: 100));
+      lines.add(
+        MicLevelMeter(
+          key: const Key('ask-level'),
+          level: c.level.value,
+          width: 100,
+          enabled: c.micReady.value,
+        ),
+      );
       lines.add(const SizedBox(height: 6));
       lines.add(
         line(
@@ -520,6 +531,9 @@ class _AskButtonState extends State<AskButton> {
 /// in place of the mic while listening, a soft ring once when sent.
 class _AskFace extends StatefulWidget {
   final bool listening;
+
+  /// The microphone's first audio arrived (until then: getting ready).
+  final bool ready;
   final bool working;
   final bool discard;
   final bool compact;
@@ -527,6 +541,7 @@ class _AskFace extends StatefulWidget {
 
   const _AskFace({
     required this.listening,
+    required this.ready,
     required this.working,
     required this.discard,
     required this.compact,
@@ -588,6 +603,14 @@ class _AskFaceState extends State<_AskFace>
       icon = const Icon(
         Icons.close_rounded,
         key: ValueKey('cancel'),
+        color: TPColors.white,
+        size: 22,
+      );
+    } else if (listening && !widget.ready) {
+      // Pressed, not listening yet: a still microphone, no moving bars.
+      icon = const Icon(
+        Icons.mic_none_rounded,
+        key: ValueKey('preparing'),
         color: TPColors.white,
         size: 22,
       );
