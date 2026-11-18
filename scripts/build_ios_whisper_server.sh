@@ -4,7 +4,9 @@
 # whose main() is exported as townpass_whisper_server, with
 # ios/native/whisper-server-ios.patch (no shell on iOS; bind the port again
 # after iOS reclaims a suspended App's listening socket, keeping the model loaded;
-# townpass_whisper_server_stop(port) stops one server, which frees its model).
+# townpass_whisper_server_stop(port) stops one server, which frees its model;
+# 2026-11-18: src/whisper.cpp no longer frees the state when the KV cache cannot be
+# re-created, and townpass_whisper_server_pause / _busy / _fixes for the App).
 #
 #   scripts/build_ios_whisper_server.sh [whisper.cpp-dir] [out-dir]
 #
@@ -19,7 +21,7 @@ BUILD="$SRC/build-ios"
 if ! git -C "$SRC" apply --check --reverse "$ROOT/ios/native/whisper-server-ios.patch" 2>/dev/null; then
   # An older version of the patch may be applied (this checkout only builds the
   # framework): put the files back first, then apply the current patch.
-  git -C "$SRC" checkout -- examples/server/server.cpp examples/common-whisper.cpp
+  git -C "$SRC" checkout -- examples/server/server.cpp examples/common-whisper.cpp src/whisper.cpp
   git -C "$SRC" apply "$ROOT/ios/native/whisper-server-ios.patch"
 fi
 # CMAKE_MACOSX_BUNDLE=OFF: for iOS, CMake makes every executable an App bundle, and
@@ -41,7 +43,9 @@ cd "$BUILD"
 xcrun --sdk iphoneos clang++ -target arm64-apple-ios16.4 -isysroot "$SDK" -std=c++17 -O2 -dynamiclib \
   -install_name @rpath/WhisperServer.framework/WhisperServer \
   -Wl,-alias,_main,_townpass_whisper_server -Wl,-exported_symbol,_townpass_whisper_server \
-  -Wl,-exported_symbol,_townpass_whisper_server_stop -Wl,-dead_strip \
+  -Wl,-exported_symbol,_townpass_whisper_server_stop -Wl,-exported_symbol,_townpass_whisper_server_pause \
+  -Wl,-exported_symbol,_townpass_whisper_server_busy -Wl,-exported_symbol,_townpass_whisper_server_fixes \
+  -Wl,-dead_strip \
   "$ROOT/ios/native/whisper_entry.cpp" examples/server/CMakeFiles/whisper-server.dir/server.cpp.o \
   examples/libcommon.a src/libwhisper.a ggml/src/libggml.a ggml/src/ggml-metal/libggml-metal.a \
   ggml/src/ggml-blas/libggml-blas.a ggml/src/libggml-cpu.a ggml/src/libggml-base.a \
@@ -62,5 +66,7 @@ cat > "$FRAMEWORK/Info.plist" <<'PLIST'
 </dict></plist>
 PLIST
 nm -gU "$FRAMEWORK/WhisperServer" | grep -q " _townpass_whisper_server$"
-nm -gU "$FRAMEWORK/WhisperServer" | grep -q " _townpass_whisper_server_stop$"
+for symbol in stop pause busy fixes; do
+  nm -gU "$FRAMEWORK/WhisperServer" | grep -q " _townpass_whisper_server_${symbol}$"
+done
 echo "built $FRAMEWORK; run scripts/setup_ios_on_device.sh next"

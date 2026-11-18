@@ -379,6 +379,25 @@ App 上看起來重複，也很難找到想要的；研究第 D 節）：
 - 引導介面是預設（`ASSISTANT_GUIDED=true`），聊天面板用 `-Chat`。
 - 「按住提問」在每個畫面都有（面板關著時），會避開光圈目標、教學卡片、提示列和鍵盤；教學要填欄位時變成「按住輸入」，講的話轉成欄位格式填入，可以「復原」。
 - 兩個介面的麥克風：按住說話、放開送出、往上滑取消，有音量條。
+- **麥克風真的開始收音才提示說話**（2026-11-18，擁有者同意的規劃；原因：按下麥克風後大約第一秒收不到聲音，按了就講話會漏掉開頭的字。
+  按下時畫面立刻變成聆聽中，但每次按下才建新的錄音器、確認權限、開串流（iOS 還要切 audio session、啟動 AVAudioEngine），也沒有等朗讀停下來；
+  Android 模擬器量到按下後約 1.0 秒串流才開好、約 1.6 秒才收到第一段聲音，`D:\TownPassAssistant\need-impl\mic-latency\`）。
+  助理麥克風、首頁的「按住提問」、「按住輸入」都一樣：
+  - **預先準備**：畫面上有麥克風按鈕時，先建好「下一次要用的」錄音器並確認權限（不跳出詢問），按下時只剩開串流。
+    仍然**每次錄音用新的錄音器**（重複使用同一個，下一次可能錄到靜音）：用完就丟，立刻預先建下一個。
+    iOS 在預先準備時把 audio session 的類別設成錄音用的（和開串流時相同：play and record、喇叭、藍牙；每次啟動 App 設一次），**不啟用** session（啟用會讓其他 App 的音樂停下來）。
+    畫面上沒有麥克風按鈕、App 進背景時，放掉預先準備的錄音器；回到前景再準備。
+  - **預先準備只建物件、不開麥克風**（隱私原則）：沒按住時絕不錄音。預先準備不開串流、不啟用 iOS 的 audio session，只有按住時才開麥克風；
+    放開、往上滑取消、面板在按住時被關掉，錄音都當下停止；按下後還沒開始錄音就放開，晚開始的錄音馬上停掉。
+  - **真的收到聲音才提示說話**：按下後、第一段錄音資料到達前，畫面顯示「準備中…」（6 種語言；外語是 AI 草稿），音量條顯示為未啟用、沒有聆聽的動畫；
+    第一段資料到達後才切到聆聽中的提示（助理麥克風「放開送出，往上滑可取消」與聆聽光圈；「按住提問」「按住輸入」按鈕「正在聽…」與跳動的音量、首頁卡片「正在聽…說完放開」），並輕震一下。
+  - **「太快」以開始收音的時間為準**：首頁「按住提問」原本從按下算 0.4 秒，改成從第一段資料到達算起；資料還沒到就放開，算按太快。
+    助理麥克風與「按住輸入」本來就用錄到的長度（0.5 秒）判斷，不變。權限詢問時放開不算太快（上面 2026-11-16 的規則）不變。
+  - **先停朗讀再開麥克風**：按下時先等朗讀停下來（最多 0.3 秒）才開始錄音（這段時間顯示「準備中…」），避免錄到助理自己的聲音，
+    也避免 iOS 的 audio session 切換互相干擾。等待中放開就不開始錄音。
+  - 開發版（debug、profile）每次錄音記一行 `TownPassMic:`，只有毫秒數：按下到開串流回來（`start`）、第一段資料（`first_chunk`）、第一段有聲音（RMS 超過 0.03，`first_voice`）的資料，
+    以及有沒有用到預先準備的錄音器（`prepared`）；不記聲音內容，release 版不記。Android 在 logcat 的 `flutter` 標籤，iOS 用 print（console；手機版的紀錄也收進 `on_device_assistant.log`）。
+  聊天面板（`-Chat`）沒有改。（`AssistantRecorder.prepare`、`MicTiming`、`GuidedAssistantController.micReady`、`micDown`、`homeMicDown`；測試 `test/mic_ready_test.dart`）
 - 功能選單：微服務排最前，起始頁類（首頁、服務總覽、起始頁面、置頂）排最後；有 ◀ ▶ 換頁，也可以說「上一頁／下一頁」。
 - **說或打也能回答剛列出的選項**（2026-11-16；原因：引導介面打字、說話、「按住提問」都沒有帶 `resolution_id`，
   候選清單下面寫「也可以直接說「第 1 個」」，卻只有點按鈕有效；「第二個」、分類名稱、下一頁／上一頁／更多、回上一層、取消對清單都不起作用）：
@@ -525,6 +544,23 @@ App 上看起來重複，也很難找到想要的；研究第 D 節）：
   **2026-11-16 改**（原因見第 4 節「台語模型拿不到時不偷偷改用華語」）：閘門有把握是台語的一句會再多等，從第一次問起最多 25 秒，沒好就說明、不再用中文聽；
   **只有記憶體不足需要冷卻**：App 回 `memory` 後 60 秒內不再問（`BoundedStarter.MEMORY_S`；額度一分鐘內就會變，iPhone 紀錄在 1,942–2,327 MB 之間），
   `missing` 每句都問。台語模型回應過以後連不上（iOS 收回 port、重啟中）不算失敗：不觸發 liveness 的 30 秒略過、只短等 3 秒，同一句再問 App 一次（`asr_server._post(hold=False)`）。
+- **切到別的 App 再回來時，語音模型先重試、重啟要安全、絕不閃退**（2026-11-18，擁有者同意的規劃；原因：iPhone 17 Pro Max 切到別的 App 再切回來講話時閃退，
+  crash log 是 whisper-multilingual 在 `whisper_free` → `ggml_backend_buffer_free` 用到壞指標，同時後端剛請 App 重啟它。
+  whisper.cpp v1.9.5 在溫度重試要把 KV 快取放大、但配置失敗時（記憶體被大 App 擠掉）會**釋放整個 state 卻留著指標**，之後停止 server 時第二次釋放就閃退。
+  詳細分析見 `docs/AI_ON_DEVICE_IOS.md`「切到別的 App 回來講話閃退」一節）：
+  - **App 狀態**：只有 `didBecomeActive`（scene `didActivate`）才算 active；`willResignActive`（scene `willDeactivate`）起就算 inactive，進背景也是。
+    以前 `willEnterForeground` 就算 active，那時 iOS 還不允許 GPU 工作。inactive 時後端不送新的語音辨識（照舊每次問 `appActiveFlag`），
+    正在辨識的一段在下一步停下、回 503（`townpass_whisper_server_pause`），不用 `beginBackgroundTask` 撐著跑完：背景中 iOS 拒絕 GPU 工作，撐著只會讓 Metal 出錯、模型壞到重啟為止。
+  - **先重試**：語音模型連不上（短等之後）或回 5xx（含上面的 503），等 1 秒、確認 App 是 active，**同一段再送一次**；第二次還失敗才請 App 重啟（`asr_server.RETRY_PAUSE_S`）。
+    逾時不重試（已經等滿一次逾時）。台語模型連不上時不再多等這一次：上面已經有「同一句再問 App 一次」，疊在一起會多等好幾秒；台語回 5xx 一樣重試。
+    App 不是 active 時不請 App 重啟（`device_main.Restarter(active=…)`）。
+  - **重啟的條件**（iPhone）：App 是 active、這個 server 沒有正在處理的一段（`townpass_whisper_server_busy`）、一次一個（`loadLock`），
+    而且 WhisperServer 帶有這次的釋放修正（`townpass_whisper_server_fixes`）。不符合（舊框架、或這個框架版本曾在重啟中結束）就**不在 App 裡釋放模型**，
+    標記「需要重新開 App」：之後每段語音回「語音辨識需要重新開啟 App 才能再用。請把 App 關掉再打開；現在可以先用打字。」（6 種語言，`speech_needs_relaunch`；台語模型是 `taiwanese_unavailable_relaunch`），
+    App 回到前景時不再等它。Android 的模型是獨立行程，停掉、重開不會讓 App 閃退，不改。
+  - **證據**：紀錄保留最近 5 次（`on_device_assistant.log`、`.prev.log`、`.prev2.log`～`.prev4.log`）；進出前景、背景，重啟、重試都寫一行；
+    下次啟動寫一行上一次怎麼結束（正常、在背景被收掉、在前景結束（多半是閃退）、重啟中結束）。
+  （`OnDeviceAssistant.swift`、`ios/native/whisper-server-ios.patch`、`asr_server._post`、`device_main.Restarter`、`liveness.needs_relaunch`、`server.py`；測試 `test_liveness.RetryBeforeRestartTest`、`RestarterTest`、`test_transcription`）
 - **手機上的助理出錯時說原因**，不再改用預寫的示範內容代答（那會被誤認為 FAQ）；示範內容只留給連電腦後端、而電腦沒開的展示。
 - **離線（飛航模式）**：模型、FAQ、語意檢索都在手機上，照常運作；圖書館藏清單在網路上，離線時用上次下載並存在手機上的副本，
   一份都沒有時只有找書不能用，其他請求不受影響。服務頁本身是網頁，離線時打不開。（`server.Catalog`）

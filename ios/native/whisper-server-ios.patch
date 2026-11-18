@@ -5,7 +5,7 @@ index b12481c..5a750de 100644
 @@ -1,3 +1,4 @@
 +extern "C" int townpass_system_unavailable(const char *); // iOS: no shell (TownPass on-device patch)
  #define _USE_MATH_DEFINES // for M_PI
- 
+
  #include "common-whisper.h"
 @@ -234,7 +235,7 @@ bool speak_with_file(const std::string & command, const std::string & text, cons
      } else {
@@ -17,7 +17,7 @@ index b12481c..5a750de 100644
              fprintf(stderr, "%s: failed to speak\n", __func__);
              return false;
 diff --git a/examples/server/server.cpp b/examples/server/server.cpp
-index b745f4d..edea0d1 100644
+index b745f4d..0953574 100644
 --- a/examples/server/server.cpp
 +++ b/examples/server/server.cpp
 @@ -1,4 +1,7 @@
@@ -26,11 +26,11 @@ index b745f4d..edea0d1 100644
 +#include <map>   // TownPass on-device patch
 +#include <mutex> // TownPass on-device patch
  #include "common-whisper.h"
- 
+
  #include "whisper.h"
-@@ -41,6 +44,28 @@ const std::string vjson_format  = "verbose_json";
+@@ -41,6 +44,60 @@ const std::string vjson_format  = "verbose_json";
  const std::string vtt_format    = "vtt";
- 
+
  std::function<void(int)> shutdown_handler;
 +// TownPass iOS: several whisper-servers run in one App process (no child
 +// processes on iOS), so one of them is stopped by its port, not by a signal.
@@ -40,6 +40,7 @@ index b745f4d..edea0d1 100644
 +struct townpass_server_entry {
 +    httplib::Server * server;
 +    std::atomic<bool> * stopping;
++    std::atomic<int> * busy;
 +};
 +static std::mutex townpass_servers_mutex;
 +static std::map<int, townpass_server_entry> townpass_servers;
@@ -54,43 +55,123 @@ index b745f4d..edea0d1 100644
 +    return 1;
 +}
 +
++// TownPass iOS (2026-11-18): set while the App is not active. iOS refuses GPU work from
++// an App in the background, and one failed Metal command buffer leaves ggml's Metal
++// backend failing every clip until the server is restarted; a clip in progress
++// therefore stops at its next step (abort_callback) and answers 503, and the backend
++// asks again once the App is active. One flag for every server in the App.
++static std::atomic<bool> townpass_paused{false};
++extern "C" __attribute__((visibility("default"))) void townpass_whisper_server_pause(int paused) {
++    townpass_paused.store(paused != 0);
++}
++// Clips the server on that port is handling now (waiting for the model included);
++// -1 when no server runs there. The App restarts only an idle server.
++extern "C" __attribute__((visibility("default"))) int townpass_whisper_server_busy(int port) {
++    std::lock_guard<std::mutex> lock(townpass_servers_mutex);
++    auto it = townpass_servers.find(port);
++    if (it == townpass_servers.end()) {
++        return -1;
++    }
++    return it->second.busy->load();
++}
++// Which fixes this build carries: 1 = the KV cache re-creation no longer frees the
++// state (src/whisper.cpp), so stopping a server (whisper_free) is safe after a failed
++// clip. The App frees a model inside the App only with 1 or more.
++extern "C" __attribute__((visibility("default"))) int townpass_whisper_server_fixes(void) {
++    return 1;
++}
++struct townpass_busy_scope {
++    std::atomic<int> & count;
++    explicit townpass_busy_scope(std::atomic<int> & value) : count(value) { count.fetch_add(1); }
++    ~townpass_busy_scope() { count.fetch_sub(1); }
++};
++
  std::atomic_flag is_terminating = ATOMIC_FLAG_INIT;
- 
+
  inline void signal_handler(int signal) {
-@@ -283,7 +308,7 @@ struct whisper_print_user_data {
+@@ -283,7 +340,7 @@ struct whisper_print_user_data {
  };
- 
+
  void check_ffmpeg_availibility() {
 -    int result = system("ffmpeg -version");
 +    int result = townpass_system_unavailable("ffmpeg -version");
- 
+
      if (result == 0) {
          std::cout << "ffmpeg is available." << std::endl;
-@@ -321,7 +346,7 @@ bool convert_to_wav(const std::string & temp_filename, std::string & error_resp,
+@@ -321,7 +378,7 @@ bool convert_to_wav(const std::string & temp_filename, std::string & error_resp,
      cmd_stream << "ffmpeg -i \"" << temp_filename << "\" -y -ar 16000 -ac " << (stereo ? 2 : 1) << " -c:a pcm_s16le \"" << converted_filename_temp << "\" 2>&1";
      std::string cmd = cmd_stream.str();
- 
+
 -    int status = std::system(cmd.c_str());
 +    int status = townpass_system_unavailable(cmd.c_str());
      if (status != 0) {
          error_resp = "{\"error\":\"FFmpeg conversion failed.\"}";
          return false;
-@@ -1266,6 +1291,12 @@ int main(int argc, char ** argv) {
+@@ -645,6 +702,7 @@ int main(int argc, char ** argv) {
+     server_params sparams;
+
+     std::mutex whisper_mutex;
++    std::atomic<int> townpass_busy{0}; // TownPass on-device patch: clips in progress
+
+     if (whisper_params_parse(argc, argv, params, sparams) == false) {
+         whisper_print_usage(argc, argv, params, sparams);
+@@ -824,8 +882,15 @@ int main(int argc, char ** argv) {
+     });
+
+     svr->Post(sparams.request_path + sparams.inference_path, [&](const Request &req, Response &res){
++        townpass_busy_scope townpass_busy_now(townpass_busy); // TownPass on-device patch
+         // acquire whisper model mutex lock
+         std::lock_guard<std::mutex> lock(whisper_mutex);
++        if (townpass_paused.load()) {
++            // TownPass iOS: no GPU work while the App is not active; asked again later.
++            res.status = 503;
++            res.set_content("{\"error\":\"the App is not active\"}", "application/json");
++            return;
++        }
+
+         // first check user requested fields of the request
+         if (!req.has_file("file"))
+@@ -992,7 +1057,8 @@ int main(int argc, char ** argv) {
+             wparams.abort_callback = [](void *user_data) {
+                 // user_data is a pointer to our Request
+                 auto req_ptr = static_cast<const httplib::Request*>(user_data);
+-                return req_ptr->is_connection_closed();
++                // TownPass iOS: also stop once the App is no longer active (townpass_paused).
++                return townpass_paused.load() || req_ptr->is_connection_closed();
+             };
+             wparams.abort_callback_user_data = (void*)&req;
+
+@@ -1005,6 +1071,14 @@ int main(int argc, char ** argv) {
+                     res.set_content("{\"error\":\"client disconnected\"}", "application/json");
+                     return;
+                 }
++                if (townpass_paused.load()) {
++                    // TownPass iOS: stopped because the App left the foreground; not a
++                    // server error (no restart), the backend asks again once it is active.
++                    fprintf(stderr, "whisper-server: clip stopped, the App is not active\n");
++                    res.status = 503;
++                    res.set_content("{\"error\":\"the App is not active\"}", "application/json");
++                    return;
++                }
+                 fprintf(stderr, "%s: failed to process audio\n", argv[0]);
+                 res.status = 500; // Internal Server Error
+                 const std::string error_resp = "{\"error\":\"failed to process audio\"}";
+@@ -1266,6 +1340,12 @@ int main(int argc, char ** argv) {
      // to make it ctrl+clickable:
      printf("\nwhisper server listening at http://%s:%d\n\n", sparams.hostname.c_str(), sparams.port);
- 
+
 +    std::atomic<bool> townpass_stopping{false};
 +    {
 +        std::lock_guard<std::mutex> lock(townpass_servers_mutex);
-+        townpass_servers[sparams.port] = {svr.get(), &townpass_stopping};
++        townpass_servers[sparams.port] = {svr.get(), &townpass_stopping, &townpass_busy};
 +    }
 +
      shutdown_handler = [&](int signal) {
          printf("\nCaught signal %d, shutting down gracefully...\n", signal);
          if (svr) {
-@@ -1294,8 +1325,29 @@ int main(int argc, char ** argv) {
+@@ -1294,8 +1374,29 @@ int main(int argc, char ** argv) {
      };
- 
+
      std::thread t([&] {
 -        if (!svr->listen_after_bind()) {
 +        // TownPass iOS: a suspended App loses its listening sockets (the system
@@ -118,15 +199,54 @@ index b745f4d..edea0d1 100644
 +            fprintf(stderr, "whisper-server: listener on %s:%d bound again\n", sparams.hostname.c_str(), sparams.port);
          }
      });
- 
-@@ -1303,6 +1355,10 @@ int main(int argc, char ** argv) {
- 
+
+@@ -1303,6 +1404,10 @@ int main(int argc, char ** argv) {
+
      t.join();
- 
+
 +    {
 +        std::lock_guard<std::mutex> lock(townpass_servers_mutex);
 +        townpass_servers.erase(sparams.port);
 +    }
- 
+
      clean_up();
- 
+
+diff --git a/src/whisper.cpp b/src/whisper.cpp
+index 1675f33..6e11ac4 100644
+--- a/src/whisper.cpp
++++ b/src/whisper.cpp
+@@ -7317,20 +7317,30 @@ int whisper_full_with_state(
+                 if (state->kv_self_n_dec < n_decoders_cur) {
+                     WHISPER_LOG_DEBUG("%s: recreating KV cache: n_decoders_cur = %d\n", __func__, n_decoders_cur);
+
+-                    whisper_kv_cache_free(state->kv_self);
+-
+                     // overallocate to workaround KV cache fragmentation issues
+                     const int factor = n_decoders_cur > 1 ? n_decoders_cur + 2 : 1;
+
+-                    if (!whisper_kv_cache_init(state->kv_self, state->backends[0], ctx->itype,
++                    // TownPass on-device patch: allocate the new cache before freeing the old one.
++                    // Upstream freed the old cache first and, when the new one could not be
++                    // allocated (GPU memory short, e.g. back from a large App), freed the whole
++                    // state and returned -7 while ctx->state still pointed at it: the server's
++                    // next whisper_free() freed it a second time and the App crashed in
++                    // ggml_backend_buffer_free (iPhone, 2026-11-18). Now only this call fails;
++                    // the state and its old cache stay usable, and the next call tries again.
++                    whisper_kv_cache kv_new;
++                    if (!whisper_kv_cache_init(kv_new, state->backends[0], ctx->itype,
+                                 ctx->model.hparams.n_text_state,
+                                 ctx->model.hparams.n_text_layer,
+                                 GGML_PAD(ctx->model.hparams.n_text_ctx, 256)*factor)) {
+                         WHISPER_LOG_ERROR("%s: whisper_kv_cache_init() failed for self-attention cache\n", __func__);
+-                        whisper_free_state(state);
++                        whisper_kv_cache_free(kv_new);
+                         return -7;
+                     }
+
++                    whisper_kv_cache_free(state->kv_self);
++                    // moved, not copied: k and v live in ctx_buf's heap block, which moves with it
++                    state->kv_self = std::move(kv_new);
++
+                     state->kv_self_n_dec = n_decoders_cur;
+                 }
+

@@ -14,6 +14,20 @@ from test_server import FakeCatalog
 from test_transcription import wav_bytes
 
 
+def fresh_speech_state(test):
+    """Each test starts without liveness memory and with a short retry pause. The fake servers
+    get ephemeral ports that the OS hands out again, so a port that an earlier test's server
+    answered or failed on (liveness keeps both, process-wide) must not change how a new
+    server on it is treated: in the full suite a later test was refused at once ("speech
+    model not answering"). asr_server.RETRY_PAUSE_S (1 s on the phone) only slows tests."""
+    import liveness
+    liveness.reset()
+    test.addCleanup(liveness.reset)
+    pause = patch("asr_server.RETRY_PAUSE_S", 0.05)
+    pause.start()
+    test.addCleanup(pause.stop)
+
+
 def serve(handler):
     httpd = ThreadingHTTPServer(("127.0.0.1", 0), handler)
     threading.Thread(target=httpd.serve_forever, daemon=True).start()
@@ -42,6 +56,7 @@ class FakeLlamaServer(BaseHTTPRequestHandler):
 
 class LlamaServerModelTests(unittest.TestCase):
     def setUp(self):
+        fresh_speech_state(self)
         FakeLlamaServer.requests = []
         self.httpd, url = serve(FakeLlamaServer)
         self.addCleanup(self.httpd.shutdown)
@@ -135,6 +150,7 @@ def loud_frames(seconds=1.0):
 
 class WhisperCppRecognizerTests(unittest.TestCase):
     def setUp(self):
+        fresh_speech_state(self)
         FakeWhisperServer.seen = []
         self.httpd, url = serve(FakeWhisperServer)
         self.addCleanup(self.httpd.shutdown)
@@ -271,6 +287,7 @@ class MultilingualSpeechTests(unittest.TestCase):
     was not spoken is a translation with a lower score."""
 
     def setUp(self):
+        fresh_speech_state(self)  # also for the Taiwanese and Vietnamese tests (they call this setUp)
         self.calls = []
         self.detected = {"gate": "chinese", "multi": "chinese"}  # what each fake detects
         self.probabilities = {}  # language_probabilities each fake reports
@@ -605,7 +622,10 @@ class MultilingualSpeechTests(unittest.TestCase):
     def test_gate_failure_falls_back_to_the_previous_behaviour(self):
         recognizer = self.with_gate({"zh": 0.95})
         recognizer.gate_url = "http://127.0.0.1:9"  # nothing listens
-        result = recognizer.transcribe(loud_frames(), "zh")
+        # A gate that never answered is waited for as if still loading (READY_WAIT_S, 60 s on
+        # the phone); a short wait tests the same fallback.
+        with patch("asr_server.READY_WAIT_S", 2):
+            result = recognizer.transcribe(loud_frames(), "zh")
         self.assertEqual((result["language"], [r[0] for r in self.requests()]), ("zh", ["multi"]))
         self.assertNotIn("gate_language", result)
 
@@ -1418,7 +1438,8 @@ class VietnameseSpeechTests(unittest.TestCase):
         self.detected["multi"] = "vietnamese"
         from device_main import vietnamese_provider
         self.recognizer.vietnamese = vietnamese_provider(1, lambda: "ready")  # nothing listens on port 1
-        result = self.recognizer.transcribe(loud_frames(), "vi")
+        with patch("asr_server.READY_WAIT_S", 2):  # never answered: the loading wait, shortened
+            result = self.recognizer.transcribe(loud_frames(), "vi")
         self.assertEqual((result["language"], result["text"]), ("vi", "tôi muốn mượn sách"))
         self.assertNotIn("speech_model", result)
 
