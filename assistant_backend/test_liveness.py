@@ -2,7 +2,7 @@
 (docs/AI_CURRENT_RULES.md section 5, 2026-11-13: after unlocking an iPhone, turns
 "looked for the answer" for minutes and speech stopped working).
 
-Real loopback HTTP servers on ports 9001-9029 stand in for llama-server / whisper-server:
+Real loopback HTTP servers on ports 9001-9035 stand in for llama-server / whisper-server:
 answering, then closed (connection refused, as after iOS reclaims the socket), or
 accepting without ever answering (a server that hangs).
 """
@@ -33,7 +33,12 @@ class Fake(http.server.BaseHTTPRequestHandler):
 
     def do_POST(self):
         self.rfile.read(int(self.headers.get("Content-Length") or 0))
+        self.server.posts = getattr(self.server, "posts", 0) + 1
         time.sleep(getattr(self.server, "delay", 0.0))  # a busy server that still answers
+        failures = getattr(self.server, "failures", 0)
+        if failures:  # fails this many requests (status), then answers
+            self.server.failures = failures - 1
+            return self.reply({"error": "failed"}, getattr(self.server, "failure_status", 500))
         if self.server.status != 200:
             return self.reply({"error": "failed"}, self.server.status)
         if self.path == "/v1/rerank":
@@ -290,6 +295,9 @@ class SpeechAfterResumeTest(unittest.TestCase):
     def setUp(self):
         liveness.reset()
         self.addCleanup(liveness.reset)
+        old = asr_server.RETRY_PAUSE_S  # 1 s on the phone; the second try itself is tested below
+        asr_server.RETRY_PAUSE_S = 0.05
+        self.addCleanup(setattr, asr_server, "RETRY_PAUSE_S", old)
 
     def recognizer(self, url):
         recognizer = asr_server.WhisperCppRecognizer(url, timeout=1)
@@ -356,6 +364,99 @@ class SpeechAfterResumeTest(unittest.TestCase):
         self.addCleanup(setattr, asr_server, "ACTIVE_WAIT_S", old)
         with self.assertRaises(OSError):
             recognizer._post(server.url, {"language": "zh"}, b"RIFF")
+
+
+class RetryBeforeRestartTest(unittest.TestCase):
+    """Rules section 5, 2026-11-18: the first clip after coming back from another App
+    failed, the backend asked the App to restart the speech model at once, and freeing
+    it inside the App crashed the iPhone App. A failing speech model is now asked once
+    more after asr_server.RETRY_PAUSE_S, with the App active, before any restart."""
+
+    def setUp(self):
+        liveness.reset()
+        self.addCleanup(liveness.reset)
+        old = asr_server.RETRY_PAUSE_S
+        asr_server.RETRY_PAUSE_S = 0.4
+        self.addCleanup(setattr, asr_server, "RETRY_PAUSE_S", old)
+        self.heard = []
+        liveness.watch(lambda url, reason: self.heard.append(reason))
+
+    def server(self, port, failures, status=500):
+        server = Server(port)
+        server.http.failures = failures
+        server.http.failure_status = status
+        self.addCleanup(server.close)
+        liveness.answered(server.url)  # it answered before the App went away
+        return server
+
+    def post(self, server, recognizer=None):
+        recognizer = recognizer or asr_server.WhisperCppRecognizer(server.url, timeout=2)
+        return recognizer._post(server.url, {"language": "zh"}, b"RIFF")
+
+    def test_the_first_failure_after_coming_back_is_asked_again_not_restarted(self):
+        server = self.server(9030, failures=1)
+        started = time.monotonic()
+        self.assertEqual(self.post(server)["text"], "我要繳水費")  # the second try answers
+        self.assertGreaterEqual(time.monotonic() - started, asr_server.RETRY_PAUSE_S)
+        self.assertEqual(server.http.posts, 2)
+        self.assertEqual(self.heard, [])  # no restart asked
+        self.assertFalse(liveness.down(server.url))
+
+    def test_a_clip_stopped_because_the_app_left_is_asked_again(self):
+        # whisper-server-ios.patch answers 503 when townpass_whisper_server_pause stopped it.
+        server = self.server(9031, failures=1, status=503)
+        self.assertEqual(self.post(server)["text"], "我要繳水費")
+        self.assertEqual((server.http.posts, self.heard), (2, []))
+
+    def test_still_failing_after_the_second_try_asks_for_one_restart(self):
+        server = self.server(9032, failures=5)
+        with self.assertRaises(urllib.error.HTTPError):
+            self.post(server)
+        self.assertEqual(server.http.posts, 2)  # one try more, not a loop
+        self.assertEqual(self.heard, ["error"])
+
+    def test_the_second_try_waits_for_the_app_to_be_active(self):
+        server = self.server(9033, failures=1)
+        recognizer = asr_server.WhisperCppRecognizer(server.url, timeout=2)
+        back = threading.Event()
+        asked = [0]
+
+        def active():
+            asked[0] += 1
+            return asked[0] == 1 or back.is_set()  # active for the first try only, then away
+        recognizer.active = active
+        threading.Timer(1.0, back.set).start()
+        started = time.monotonic()
+        self.assertEqual(self.post(server, recognizer)["text"], "我要繳水費")
+        self.assertGreaterEqual(time.monotonic() - started, 0.9)
+        self.assertEqual(self.heard, [])
+
+    def test_no_restart_while_the_app_stays_inactive(self):
+        server = self.server(9034, failures=1)
+        recognizer = asr_server.WhisperCppRecognizer(server.url, timeout=2)
+        asked = [0]
+
+        def active():
+            asked[0] += 1
+            return asked[0] == 1
+        recognizer.active = active
+        old = asr_server.ACTIVE_WAIT_S
+        asr_server.ACTIVE_WAIT_S = 0.3
+        self.addCleanup(setattr, asr_server, "ACTIVE_WAIT_S", old)
+        with self.assertRaises(OSError):
+            self.post(server, recognizer)
+        self.assertEqual((server.http.posts, self.heard), (1, []))
+
+    def test_refused_twice_is_reported_once(self):
+        server = Server(9035)
+        recognizer = asr_server.WhisperCppRecognizer(server.url, timeout=2)
+        self.post(server, recognizer)
+        server.close()
+        with self.assertRaises(urllib.error.URLError):
+            self.post(server, recognizer)
+        # Once ("refused"; "timeout" where a refused connect itself takes seconds, e.g.
+        # Windows, so the /health probe before the clip already counts it as hung).
+        self.assertEqual(len(self.heard), 1, self.heard)
 
 
 class BoundedStarterTest(unittest.TestCase):
@@ -467,6 +568,39 @@ class RestarterTest(unittest.TestCase):
         restarter("http://127.0.0.1:8773", "error")
         time.sleep(0.2)
         self.assertEqual(asked, ["multilingual:error"])
+
+    def test_the_app_is_not_asked_while_it_is_not_active(self):
+        # 2026-11-18: iOS refuses GPU work then; a model loaded then would fail again.
+        asked = []
+        active = [False]
+        restarter = device_main.Restarter(lambda name: asked.append(name) or "restarted",
+                                          active=lambda: active[0])
+        restarter("http://127.0.0.1:8773", "error")
+        time.sleep(0.2)
+        self.assertEqual(asked, [])
+        active[0] = True  # and the skipped one does not hold back the next report
+        restarter("http://127.0.0.1:8773", "error")
+        time.sleep(0.2)
+        self.assertEqual(asked, ["multilingual:error"])
+
+    def test_relaunch_keeps_speech_off_the_model_until_the_app_is_opened_again(self):
+        # The iPhone will not free the model inside the App (OnDeviceAssistant.swift restart).
+        done = threading.Event()
+
+        def restart(name):
+            done.set()
+            return "relaunch"
+        server = Server(9029)
+        self.addCleanup(server.close)
+        restarter = device_main.Restarter(restart, ports={"multilingual": 9029})
+        restarter(server.url, "error")
+        self.assertTrue(done.wait(2))
+        time.sleep(0.2)
+        self.assertTrue(liveness.relaunch_needed(server.url))
+        recognizer = asr_server.WhisperCppRecognizer(server.url, timeout=2)
+        with self.assertRaises(asr_server.RelaunchNeeded):
+            recognizer._post(server.url, {"language": "zh"}, b"RIFF")
+        self.assertEqual(getattr(server.http, "posts", 0), 0)  # nothing sent to it
 
     def test_unknown_servers_are_ignored(self):
         asked = []

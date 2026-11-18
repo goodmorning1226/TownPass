@@ -19,6 +19,11 @@ class HoldToTalk extends StatefulWidget {
   /// The microphone is recording now (sliding only counts then).
   final bool Function() listening;
   final ValueChanged<bool>? onDiscardChanged;
+
+  /// The button appeared / went away: the next recorder is made ahead while
+  /// a microphone is on screen (docs/AI_CURRENT_RULES.md section 5).
+  final VoidCallback? onShown;
+  final VoidCallback? onHidden;
   final Widget child;
 
   static const cancelDistance = 80.0;
@@ -29,6 +34,8 @@ class HoldToTalk extends StatefulWidget {
     required this.onUp,
     required this.listening,
     this.onDiscardChanged,
+    this.onShown,
+    this.onHidden,
     required this.child,
   });
 
@@ -39,6 +46,18 @@ class HoldToTalk extends StatefulWidget {
 class _HoldToTalkState extends State<HoldToTalk> {
   Offset? _origin;
   bool _discard = false;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.onShown?.call();
+  }
+
+  @override
+  void dispose() {
+    widget.onHidden?.call();
+    super.dispose();
+  }
 
   void _setDiscard(bool value) {
     if (value == _discard) return;
@@ -77,22 +96,32 @@ class _HoldToTalkState extends State<HoldToTalk> {
   );
 }
 
-/// Live loudness while recording, so a quiet voice is noticed.
+/// Live loudness while recording, so a quiet voice is noticed. Not [enabled]
+/// (greyed out, empty) until the microphone's first audio arrives.
 class MicLevelMeter extends StatelessWidget {
   final double level;
   final double width;
-  const MicLevelMeter({super.key, required this.level, this.width = 120});
+  final bool enabled;
+  const MicLevelMeter({
+    super.key,
+    required this.level,
+    this.width = 120,
+    this.enabled = true,
+  });
 
   @override
   Widget build(BuildContext context) => SizedBox(
     width: width,
     height: 6,
-    child: ClipRRect(
-      borderRadius: BorderRadius.circular(3),
-      child: LinearProgressIndicator(
-        value: level,
-        color: TPColors.primary500,
-        backgroundColor: TPColors.grayscale100,
+    child: Opacity(
+      opacity: enabled ? 1 : 0.4,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(3),
+        child: LinearProgressIndicator(
+          value: enabled ? level : 0,
+          color: TPColors.primary500,
+          backgroundColor: TPColors.grayscale100,
+        ),
       ),
     ),
   );

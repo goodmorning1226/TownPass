@@ -1260,8 +1260,10 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
           // The listening ring may spread a little past the row.
           clipBehavior: Clip.none,
           children: [
-            // A soft ring spreads from the mic only while it listens.
-            if (c.listening.value) const IgnorePointer(child: MicPulse()),
+            // A soft ring spreads from the mic only while it listens: from
+            // the first audio on, not while it is getting ready.
+            if (c.listening.value && c.micReady.value)
+              const IgnorePointer(child: MicPulse()),
             Semantics(
               button: true,
               label: gt('按住說話，說完放開'),
@@ -1271,6 +1273,8 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
                 onUp: (send) => c.micUp(send: send),
                 listening: () => c.listening.value,
                 onDiscardChanged: (v) => setState(() => _micDiscard = v),
+                onShown: c.micShown,
+                onHidden: c.micHidden,
                 child: AnimatedContainer(
                   duration: GuideMotion.of(context, GuideMotion.quick),
                   curve: GuideMotion.enter,
@@ -1353,6 +1357,7 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
             ? MicLevelMeter(
                 key: const Key('guided-level'),
                 level: c.level.value,
+                enabled: c.micReady.value,
               )
             : null,
       ),
@@ -1363,6 +1368,8 @@ class _GuidedAssistantSheetState extends State<GuidedAssistantSheet> {
               ? '按住說話，或點上面的選項'
               : _micDiscard
               ? '放開取消'
+              : !c.micReady.value
+              ? HomeAskTexts.preparing
               : '放開送出，往上滑可取消',
         ),
         style: TPTextStyles.bodyRegular,

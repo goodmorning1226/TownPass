@@ -248,7 +248,7 @@ class TranscriptionTests(unittest.TestCase):
         self.assertEqual((status, body["language"], self.asr_languages), (200, "zh", ["nan"]))
         self.assertNotIn("speech_notice", body)
         self.assertEqual(body["metrics"]["speech_model"], "taiwanese")
-        for reason in ("missing", "memory", "failed"):
+        for reason in ("missing", "memory", "failed", "relaunch"):
             self.asr_reply = (200, {"text": "我要繳水費", "language": "zh", "status": "clear", "notice": reason})
             status, body = self.post(wav_bytes(1.0), language="nan")
             self.assertEqual((status, body["language"]), (200, "zh"))
@@ -258,11 +258,29 @@ class TranscriptionTests(unittest.TestCase):
         status, body = self.post(wav_bytes(1.0), language="zh")
         self.assertNotIn("speech_notice", body)  # only known reasons are shown
 
+    def test_a_speech_model_the_phone_will_not_restart_asks_to_open_the_app_again(self):
+        # Rules section 5, 2026-11-18: the iPhone does not free a failed speech model inside
+        # the App any more; the clip says so in the menu's language instead of "try again".
+        import i18n
+        self.asr_reply = (503, {"error": "語音辨識需要重新開啟 App。", "code": "speech_relaunch"})
+        for language in ("zh", "en", "ja", "vi", "id", "tl", "auto", "nan"):
+            status, body = self.post(wav_bytes(1.0), language=language)
+            shown = language if language in i18n.LANGUAGES else "zh"
+            self.assertEqual((status, body["code"]), (503, "speech_relaunch"))
+            self.assertEqual(body["error"], i18n.t("speech_needs_relaunch", shown))
+        self.assertIn("重新開啟 App", i18n.t("speech_needs_relaunch", "zh"))
+        # Any other 503 keeps the usual message.
+        self.asr_reply = (503, {"error": "busy"})
+        status, body = self.post(wav_bytes(1.0), language="zh")
+        self.assertEqual(status, 503)
+        self.assertNotIn("code", body)
+        self.assertIn("鍵盤", body["error"])
+
     def test_taiwanese_without_its_model_is_explained_and_never_guessed(self):
         # The gate was sure of Taiwanese and the model could not be used (rules section 4,
         # 2026-11-16): no text from the recogniser, a 422 that names the reason, in the menu's language.
         import i18n
-        for reason in ("memory", "loading", "failed", "unreachable", "missing"):
+        for reason in ("memory", "loading", "failed", "unreachable", "missing", "relaunch"):
             self.asr_reply = (200, {"text": "", "status": "unclear", "language": "zh", "reason": "taiwanese_unavailable",
                                     "notice": "taiwanese_unavailable", "notice_reason": reason})
             for language in ("zh", "en", "auto", "nan"):
@@ -280,9 +298,10 @@ class TranscriptionTests(unittest.TestCase):
 
     def test_taiwanese_unavailable_texts_exist_in_every_language(self):
         import i18n
-        for reason in ("memory", "loading", "failed", "unreachable", "missing"):
+        for reason in ("memory", "loading", "failed", "unreachable", "missing", "relaunch"):
             texts = i18n.MESSAGES[f"taiwanese_unavailable_{reason}"]
             self.assertEqual(set(texts), set(i18n.LANGUAGES), reason)
+        self.assertEqual(set(i18n.MESSAGES["speech_needs_relaunch"]), set(i18n.LANGUAGES))
 
     def test_taiwanese_from_the_phone_recogniser_is_chinese(self):
         from server import device_transcript

@@ -393,16 +393,25 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
     final note = TPTextStyles.h3Regular.copyWith(fontSize: 17, height: 24 / 17);
     switch (state) {
       case HomeAsk.listening:
+        // 準備中… until the microphone's first audio arrives.
+        final ready = c.micReady.value;
         body.add(
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 4),
             child: Row(
               children: [
-                const LevelBars(color: TPColors.primary700),
+                if (ready)
+                  const LevelBars(color: TPColors.primary700)
+                else
+                  const Icon(
+                    Icons.mic_none_rounded,
+                    color: TPColors.grayscale400,
+                    size: 22,
+                  ),
                 const SizedBox(width: 10),
                 Expanded(
                   child: TPText(
-                    gt(HomeAskTexts.listening),
+                    gt(ready ? HomeAskTexts.listening : HomeAskTexts.preparing),
                     style: note,
                     color: TPColors.grayscale800,
                   ),

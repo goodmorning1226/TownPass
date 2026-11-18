@@ -298,13 +298,20 @@ class Restarter:
     (OnDeviceAssistant.swift restartServer: health-checks the server and runs it
     again when it does not answer; Android: OnDeviceAssistant.kt restartServer, the same
     contract, through java_server_restarter) and returns "ready", "restarted" or "failed"
-    ("busy" / "missing": not restarted now).
+    ("busy" / "missing" / "inactive": not restarted now; "relaunch" (iOS, 2026-11-18): it
+    will not be restarted inside the App, liveness.needs_relaunch, and speech says the App
+    must be opened again).
     One request per server at a time, on its own thread: the request that noticed
     goes on at once with its usual "no answer" path.
+    active() (iOS, native_flag; None: always): the App is never asked while it is not
+    active (2026-11-18: iOS refuses GPU work then, and a model loaded then fails again).
+    Speech asks a failing model once more before it is reported here
+    (asr_server.RETRY_PAUSE_S).
     """
 
-    def __init__(self, restart, ports=None):
+    def __init__(self, restart, ports=None, active=None):
         self.restart = restart
+        self.active = active
         self.names = {f"http://127.0.0.1:{port}": name for name, port in (ports or PORTS).items()}
         self.lock = threading.Lock()
         self.busy = set()
@@ -317,6 +324,9 @@ class Restarter:
         import time
         name = self.names.get(server)
         if name is None:
+            return
+        if self.active is not None and not self._active():
+            print(f"models: {name} not answering ({reason}); App not active, not restarted", flush=True)
             return
         with self.lock:
             if name in self.busy:
@@ -338,9 +348,17 @@ class Restarter:
             with self.lock:
                 self.busy.discard(name)
         print(f"models: {name} not answering ({reason}); restart {state}", flush=True)
+        import liveness
         if state in ("ready", "restarted"):
-            import liveness
             liveness.answered(self.names_by_name(name))
+        elif state == "relaunch":
+            liveness.needs_relaunch(self.names_by_name(name))
+
+    def _active(self):
+        try:
+            return bool(self.active())
+        except Exception:  # the App's flag must never break a request
+            return True
 
     def names_by_name(self, name):
         return next(server for server, value in self.names.items() if value == name)
@@ -607,7 +625,7 @@ def start(model_port=8771, whisper_port=8772, assistant_port=8765, asr_port=8770
         recognizer.active = app_active
         if server_restarter is not None:
             import liveness
-            liveness.watch(Restarter(server_restarter))
+            liveness.watch(Restarter(server_restarter, active=app_active))
         activator = None
         if models_dir:
             import models

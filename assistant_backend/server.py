@@ -672,7 +672,18 @@ TAIWANESE_NOTICES = {
     "failed": "台語語音模型沒有啟動成功，這次先用中文聽。",
     # Still loading after device_main.BoundedStarter.WAIT_S: the next clips use it once it is up.
     "loading": "台語語音模型還在載入，這次先用中文聽，等一下再說一次。",
+    # 2026-11-18: the phone will not restart it inside the App (asr_server.RelaunchNeeded).
+    "relaunch": "台語語音模型需要重新開啟 App 才能再用，這次先用中文聽。",
 }
+
+
+def speech_code(error):
+    """The "code" of a speech-service error reply (asr_server), or None."""
+    try:
+        body = json.loads(error.read(10_000) or b"{}")
+    except (OSError, ValueError):
+        return None
+    return body.get("code") if isinstance(body, dict) else None
 
 
 # An alternative may replace the heard text only if the recogniser scored it
@@ -906,6 +917,13 @@ def make_handler(assistant, token=""):
                 with urllib.request.urlopen(request, timeout=ASR_TIMEOUT * (1 if language == "zh" else 1.6)) as response:
                     result = json.loads(response.read(100_000))
             except urllib.error.HTTPError as exc:
+                if exc.code == 503 and speech_code(exc) == "speech_relaunch":
+                    # The phone will not restart its speech model inside the App (iPhone,
+                    # 2026-11-18: freeing it there crashed the App): say how to get it back.
+                    import i18n
+                    return self.reply(503, {"error": i18n.t("speech_needs_relaunch",
+                                                            language if language in i18n.LANGUAGES else "zh"),
+                                            "code": "speech_relaunch"})
                 return self.reply(422 if exc.code in (400, 413) else 503,
                                   {"error": "語音辨識沒有成功，請再說一次，或改用鍵盤。"})
             except (OSError, ValueError):

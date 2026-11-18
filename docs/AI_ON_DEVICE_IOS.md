@@ -69,6 +69,7 @@ Android 從 2026-11-10 起也認 `--dart-define=ASSISTANT_ON_DEVICE=true`（`and
 紀錄：`Library/Caches/on_device_assistant.log`（Python 與各 server 的輸出，只有數字與檔名），可用
 `xcrun devicectl device copy from --domain-type appDataContainer --domain-identifier com.example.townpass --source Library/Caches/on_device_assistant.log --destination <檔案>` 取回。
 上一次啟動的紀錄留在 `Library/Caches/on_device_assistant.prev.log`（2026-11-10 起；出事後重開 App 也查得到），同樣的指令把 `--source` 換掉即可。
+2026-11-18 起保留最近 5 次：`.log`（這次）、`.prev.log`、`.prev2.log`、`.prev3.log`、`.prev4.log`；`on_device_assistant.state` 是這次啟動的狀態紀錄（見「切到別的 App 回來講話閃退」）。
 
 ## 實測（iPhone 17，A19，2026-11-08）
 
@@ -208,6 +209,76 @@ POSIX 的 `O_APPEND` 保證每次 `write` 前先移到檔尾，Python 直接寫 
    刪掉台語模型（`missing`）時照舊用華語聽、沒有說明。
 5. 鎖屏 1 分鐘再解鎖後立刻說台語：應正常辨識（`bound again` 後最多再問一次 App），不應出現 5 分鐘內都說無法使用。
 6. 把 `on_device_assistant.log` 拉回來：開頭不應有被截斷的行，`TownPassAssistant:` 行與 server 的輸出應依時間交錯。
+
+## 切到別的 App 回來講話閃退（2026-11-18，branch `fix/mic-and-resume-crash`，Swift 與 native 尚待 CI 編譯與 iPhone 實測）
+
+**現象**（擁有者，iPhone 17 Pro Max，iOS 27.0.1，App 0.0.12）：切到別的 App 再切回來，一講話 App 就閃退。
+crash log：`D:\TownPassAssistant\ios-resume\logs\crash-20261118\Runner-2026-11-18-010906.ips`（分析 `ANALYSIS.md`）。閃退那一次的 App 紀錄已被覆蓋（當時只保留 2 次）。
+
+**crash log 看到的**
+
+- EXC_BAD_ACCESS／SIGBUS（`EXC_ARM_DA_ALIGN`，0xaf249beaff9ac65b）：程式跳到一個不在任何記憶體區段的位址。
+- 閃退的執行緒 whisper-multilingual：`townpass_whisper_server`（main 結束前的 clean_up）→ `whisper_free` → `whisper_free_state` → `ggml_backend_buffer_free` → 壞位址。
+  `ggml_backend_buffer_free` 是呼叫 `buffer->iface.free_buffer`：buffer 結構本身已經是被釋放過的記憶體。
+- 同時執行緒 84：Python → `OnDeviceAssistant.restartServer` → `restart(_:failing:)` 正在等 server 回應：後端判定 whisper-multilingual 出錯，請 App 重啟，
+  `townpass_whisper_server_stop` 讓 main 結束並釋放模型。執行緒 1 是 Metal residency set 的背景執行緒，在 `usleep`，沒有拿鎖。
+
+**原因（讀 whisper.cpp v1.9.5 原始碼，`D:\TownPassAssistant\native-src\whisper.cpp`）**
+
+1. **重複釋放**（最符合 crash log 的解釋）：`whisper_full_with_state` 在溫度重試、解碼器變多時重建 KV self 快取（`src/whisper.cpp` 約 7317 行）：
+   先釋放舊的，再配置新的（Whisper small、best_of 2 時放大 4 倍，約 75 MB 的 Metal 緩衝區）；**配置失敗時呼叫 `whisper_free_state(state)` 並回 -7，但 `ctx->state` 還指著它**。
+   server 回 500 → 後端請 App 重啟 → `whisper_free(ctx)` 對同一個 state 再釋放一次，讀到的 buffer 指標是垃圾 → 跳到壞位址。
+   切到相機、Instagram 這類大 App 回來時記憶體最緊，正好是配置失敗的時候；這一步在每個 server 第一次溫度重試才會發生，所以不是每次都閃退。
+   閃退前那次的紀錄被覆蓋，沒有 `whisper_kv_cache_init() failed` 那一行可以直接證實。
+2. 停止時**沒有** HTTP worker 還在用 ctx：cpp-httplib 0.20 的 `listen_internal` 結束前 `task_queue->shutdown()` 會 join 所有 worker，`t.join()` 之後才 `whisper_free`。
+   residency set 的背景執行緒拿鎖後才碰清單，`ggml_metal_buffer_free` 也拿同一把鎖，不是競態。
+3. 回到前景的時機：App 在 `willEnterForeground` 就當成 active，但 iOS 到 `didBecomeActive` 才允許 GPU 工作；也沒有處理 `willResignActive`，
+   切走時正在跑的辨識會在背景送 GPU 工作而失敗。ggml 的 Metal backend 失敗一次就一直回錯（`ggml-metal-context.m` 的 `has_error`：「recreate the backend to recover」），
+   只能重啟 server，於是走到上面那條重啟的路。
+
+**改法**（規則：[現行規則](AI_CURRENT_RULES.md) 第 5 節「切到別的 App 再回來時…」）
+
+| | 做法 | 位置 |
+| --- | --- | --- |
+| A | 修掉重複釋放：先配置新的 KV 快取，成功才釋放舊的（`std::move` 換上）；失敗時只有這一段回 -7，state 和舊快取保持可用，下一段再試。高峰多佔舊快取那一份（Whisper small 約 19 MB；台語 `-bo 1` 從不重建） | `ios/native/whisper-server-ios.patch`（`src/whisper.cpp`） |
+| B | 只有 `didBecomeActive`／scene `didActivate` 才 active；`willResignActive`／scene `willDeactivate` 起就 inactive，進背景也是；`willEnterForeground` 只記紀錄 | `OnDeviceAssistant.swift` `register`、`lifecycle` |
+| C | inactive 時正在辨識的一段在下一個解碼步停下（whisper-server 的 `abort_callback` 多看一個全域旗標 `townpass_whisper_server_pause`），回 503；後端等 App active 再送一次 | patch `server.cpp`、`setActive`、`asr_server._post` |
+| D | 第一次失敗（短等後仍連不上、5xx、上面的 503）等 1 秒、確認 active 再試一次；第二次還失敗才請 App 重啟；App 不是 active 時不請。台語模型連不上時沿用它原本的「再問 App 一次」，不疊加 | `asr_server.RETRY_PAUSE_S`、`device_main.Restarter(active=…)` |
+| E | App 重啟 whisper-server 前確認：App active、沒有正在處理的一段（`townpass_whisper_server_busy`）、一次一個（`loadLock`）、框架帶有 A 的修正（`townpass_whisper_server_fixes() >= 1`）。不符合就**不在 App 裡釋放模型**，回 `relaunch`：後端之後每段都說「語音辨識需要重新開啟 App 才能再用…」（6 語），`status` 不再等它 | `restart`、`whisperRestartRefused`、`needsRelaunch`、`liveness.needs_relaunch`、`server.py`、`i18n` |
+| F | 狀態紀錄 `Library/Caches/on_device_assistant.state`（phase、有沒有正常結束、正在重啟哪個 server、WhisperServer 版本）：下次啟動寫一行 `previous launch: …`。上一次如果在重啟中結束（多半是釋放時閃退），把那個 WhisperServer 版本記到 `on_device_assistant.restart-unsafe`，這個版本之後一律改走 E 的「需要重新開 App」 | `recordLaunch`、`previousLaunch`、`recordRestart` |
+| G | 紀錄保留 5 次；`lifecycle: willResignActive -> inactive` 等、`speech: … asking again in 1 s`、`answered the second try`、`failed the second try too`、`models: … restart …`、`… stopping it to run it again`、`… answers again after` 各一行 | 同上 |
+
+**為什麼這樣選**
+
+- A 能在 patch 裡修，而且有直接的程式證據（-7 那條路釋放了 state 卻沒清掉指標），所以重啟（停止＋釋放＋重載）保留：Metal 壞掉後只有重啟能恢復，
+  如果一律改成「請重開 App」，每次切 App 回來碰到 GPU 錯誤都要使用者自己重開 App。
+- 但閃退前的紀錄不見了，A 不是 100% 證實，所以 E 和 F 是退路：沒有 A 的舊框架不在 App 裡釋放；這個版本萬一還是在重啟中結束，下次起就不再在 App 裡釋放。最壞情況是再閃退一次，之後只會看到「需要重新開 App」。
+- 不用 `beginBackgroundTask` 撐著把那一段跑完：iOS 在背景拒絕 GPU 工作，跟有沒有背景工作無關；撐著跑只會讓接下來的解碼步在背景送 GPU 而出錯（Metal backend 壞到重啟）。
+  改成在下一個解碼步停下（一步約數十毫秒；encoder 那一段中間沒有檢查點），回 503，App 回來後重送。
+- 重試只做一次，逾時不重試（已經等滿一次逾時，再等一次太久）。
+
+**Android**：`OnDeviceAssistant.kt` 的模型伺服器是獨立行程，`restartServer` 已經只在前景、一次一個（`serverLock`），停止是 `destroy()` 那個行程；
+就算 whisper-server 在釋放時當掉，也只是那個子行程，App 不會閃退；Android 的伺服器也不用 GPU（Metal 的 `has_error` 不適用）。Kotlin 不改。
+Python 的「先重試一次」兩個平台共用（Android 沒有 `app_active`，一律當 active）。
+
+**沒有驗證過的地方**：Swift 與 patch 在 Windows 上寫。patch 的兩個 C++ 檔用 g++ 13 做過語法檢查（`-fsyntax-only`，不含 Metal 與 iOS SDK），Swift 沒有編譯；
+沒有在電腦上重現 KV 配置失敗；encoder 進行中切走時仍可能在背景送出一次 GPU 工作（那時靠 D、E 恢復）。台語模型的第一次載入（`startTaiwanese`）沒有檢查 App 是否 active。
+
+**擁有者實測步驟**（iPhone，CI 建置後側載，release；**每項做完都不殺 App，直接再講一句**，看有沒有回應、有沒有閃退）：
+
+1. 開 App、等模型載完。按住說話、**話講到一半**切到別的 App（例如設定），3 秒後切回來，立刻再講一句華語。
+2. 說一句話，**辨識中**切到別的 App，再切回來，立刻講一句**台語**。
+3. 開相機錄影 10–20 秒（或開 Instagram 滑一陣子、看幾支影片），再切回來，立刻講一句話；再講一句很短、含糊的（讓 Whisper 走溫度重試）。
+4. 從控制中心往下拉一下再收回（只會 inactive，不進背景），立刻講一句。
+5. 鎖定手機 1 分鐘再解鎖，講一句。
+
+每項記下：回應時間、有沒有出現「助理重新連線中…」或「語音辨識需要重新開啟 App…」、有沒有閃退。
+結束後**先不要重開 App**，把 `on_device_assistant.log` 拉回來（已經重開就拉 `.prev.log`、`.prev2.log`…），找這些行：
+`lifecycle:`（應看到 `willResignActive -> inactive`、`didEnterBackground -> background`、`willEnterForeground -> inactive`、`didBecomeActive -> active` 的順序）、
+`whisper-server: clip stopped, the App is not active`、`speech: … asking again in 1 s`、`answered the second try`、`whisper_kv_cache_init() failed`、
+`… stopping it to run it again`、`answers again after`、`not restarted inside the App`、`previous launch:`。
+如果還是閃退：重開 App 後的 `previous launch:` 應寫 `ended while whisper-multilingual was restarting` 或 `ended in the foreground`，同時把 `Runner-*.ips` 一起拉回來；
+之後同一個建置再出錯應該只看到「語音辨識需要重新開啟 App」，不再閃退。
 
 ## 與 Android 的差別
 
