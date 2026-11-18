@@ -67,7 +67,8 @@ $strip = Join-Path $strip.FullName "bin\llvm-strip.exe"
 foreach ($abi in $Abi) {
     $out = Join-Path $Root "android\app\assistant-native\jniLibs\$abi"
     New-Item -ItemType Directory -Force $out | Out-Null
-    $llamaFlags = @("-DLLAMA_OPENSSL=OFF", "-DLLAMA_BUILD_TESTS=OFF", "-DLLAMA_CURL=OFF")
+    # No embedded Web UI (the server runs with --no-webui; its download failed on 2026-11-18).
+    $llamaFlags = @("-DLLAMA_OPENSSL=OFF", "-DLLAMA_BUILD_TESTS=OFF", "-DLLAMA_CURL=OFF", "-DLLAMA_USE_PREBUILT_UI=OFF")
     # Arm KleidiAI micro-kernels (fetched by llama.cpp's CMake from ARM-software/kleidiai).
     if ($abi -eq "arm64-v8a") { $llamaFlags += "-DGGML_CPU_KLEIDIAI=ON" }
     $server = Build $llama $abi "llama-server" $llamaFlags
