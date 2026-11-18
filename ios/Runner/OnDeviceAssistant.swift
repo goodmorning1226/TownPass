@@ -97,11 +97,38 @@ final class OnDeviceAssistant {
   /// Signalled when every start-up server has loaded (or given up): the
   /// Taiwanese model never loads while another model is still loading.
   private let startupDone = DispatchSemaphore(value: 0)
-  /// Whether the App is in the foreground. iOS refuses GPU work from the background, and
-  /// a failed Metal command buffer leaves ggml's Metal backend broken until that server
-  /// restarts; the backend asks before each speech pass (appActiveFlag, device_main.native_flag).
+  /// Whether the App is active: only from didBecomeActive until willResignActive
+  /// (2026-11-18; it used to turn true at willEnterForeground, before iOS allows GPU work,
+  /// and stayed true while the App was resigning). iOS refuses GPU work from the
+  /// background, and a failed Metal command buffer leaves ggml's Metal backend broken until
+  /// that server restarts; the backend asks before each speech pass (appActiveFlag,
+  /// device_main.native_flag), and the whisper-servers stop a clip in progress at its next
+  /// step while it is false (whisperPause).
   private let activeLock = NSLock()
   private var activeNow = true
+  /// townpass_whisper_server_pause(paused) (whisper-server-ios.patch, 2026-11-18): one flag
+  /// for every whisper-server in the App, set with activeNow (under activeLock). Found by
+  /// runServer once WhisperServer is open; older frameworks do not have it.
+  private typealias WhisperPause = @convention(c) (Int32) -> Void
+  private var whisperPause: WhisperPause?
+  /// townpass_whisper_server_busy(port): clips in progress, -1 when no server runs there.
+  private typealias WhisperBusy = @convention(c) (Int32) -> Int32
+  /// townpass_whisper_server_fixes(): 1 when the 2026-11-18 free fix is built in.
+  private typealias WhisperFixes = @convention(c) () -> Int32
+  /// Servers that failed and are not restarted inside the App (restart): speech then asks
+  /// for the App to be opened again instead of freeing a model in the App (under serversLock).
+  private var relaunch: Set<String> = []
+  /// The lifecycle record, Library/Caches/on_device_assistant.state (2026-11-18): rewritten at
+  /// each change so that the next launch can tell how this one ended. Set by launch().
+  private let stateLock = NSLock()
+  private var stateURL: URL?
+  private var phase = "active"
+  private var restartingName = ""
+  /// WhisperServer's size and date: which native build a crash during a restart belongs to.
+  private var whisperBuild = ""
+  /// A launch of this WhisperServer build ended while a whisper-server was being restarted
+  /// (probably a crash while it freed its model): no more in-App restarts with this build.
+  private var restartUnsafe = false
   /// townpass_whisper_server_stop(port) (ios/native/whisper-server-ios.patch, frameworks
   /// built from 2026-11-13): stops one whisper-server, whose main() then frees its model
   /// and returns; runServer's loop runs it again. Older frameworks do not have it.
@@ -134,25 +161,45 @@ final class OnDeviceAssistant {
         result(FlutterMethodNotImplemented)
       }
     }
-    // Back in the foreground (phone unlocked, back from another App): run again any
-    // server that stopped while the App was away. Both notifications, since the App
-    // uses the UIScene lifecycle; recover() runs once at a time and does nothing
-    // when every server is running.
-    for name in [UIApplication.didBecomeActiveNotification, UIScene.didActivateNotification] {
+    // The App's state, from both the UIApplication and the UIScene notifications (the App
+    // uses the UIScene lifecycle). Active only at didBecomeActive / didActivate (2026-11-18:
+    // willEnterForeground comes before iOS allows GPU work again); inactive already at
+    // willResignActive / willDeactivate, so no new GPU work starts while the App leaves.
+    // Back active (phone unlocked, back from another App): recover() runs again any server
+    // that stopped while the App was away; it runs once at a time and does nothing when
+    // every server is running.
+    let events: [(Notification.Name, String, String)] = [
+      (UIApplication.didBecomeActiveNotification, "didBecomeActive", "active"),
+      (UIScene.didActivateNotification, "scene didActivate", "active"),
+      (UIApplication.willResignActiveNotification, "willResignActive", "inactive"),
+      (UIScene.willDeactivateNotification, "scene willDeactivate", "inactive"),
+      (UIApplication.didEnterBackgroundNotification, "didEnterBackground", "background"),
+      (UIScene.didEnterBackgroundNotification, "scene didEnterBackground", "background"),
+      (UIApplication.willEnterForegroundNotification, "willEnterForeground", "inactive"),
+      (UIScene.willEnterForegroundNotification, "scene willEnterForeground", "inactive"),
+    ]
+    for (name, label, next) in events {
       NotificationCenter.default.addObserver(forName: name, object: nil, queue: nil) { [weak self] _ in
-        self?.setActive(true)
-        DispatchQueue.global(qos: .userInitiated).async { self?.recover() }
+        self?.lifecycle(label, to: next)
       }
     }
-    for name in [UIApplication.willEnterForegroundNotification, UIScene.willEnterForegroundNotification] {
-      NotificationCenter.default.addObserver(forName: name, object: nil, queue: nil) { [weak self] _ in
-        self?.setActive(true)
-      }
+    NotificationCenter.default.addObserver(
+      forName: UIApplication.willTerminateNotification, object: nil, queue: nil
+    ) { [weak self] _ in
+      self?.recordEnd()
     }
-    for name in [UIApplication.didEnterBackgroundNotification, UIScene.didEnterBackgroundNotification] {
-      NotificationCenter.default.addObserver(forName: name, object: nil, queue: nil) { [weak self] _ in
-        self?.setActive(false)
-      }
+  }
+
+  /// One App state change: active or not (activeNow and the whisper-servers' pause flag),
+  /// one log line and the lifecycle record once launch() has run.
+  private func lifecycle(_ label: String, to next: String) {
+    let active = next == "active"
+    setActive(active)
+    if recordPhase(next) {
+      note("lifecycle: \(label) -> \(next)")
+    }
+    if active {
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in self?.recover() }
     }
   }
 
@@ -167,7 +214,73 @@ final class OnDeviceAssistant {
   private func setActive(_ value: Bool) {
     activeLock.lock()
     activeNow = value
+    // A clip in progress stops at its next step while the App is not active (503); the
+    // backend asks again once it is active.
+    whisperPause?(value ? 0 : 1)
     activeLock.unlock()
+  }
+
+  /// Rewrites the lifecycle record (stateLock held). Numbers and server names only.
+  private func writeState(ended: Bool = false) {
+    guard let url = stateURL else { return }
+    let text = "phase=\(phase)\nended=\(ended ? 1 : 0)\nrestarting=\(restartingName)\n"
+      + "whisper=\(whisperBuild)\ntime=\(Int(Date().timeIntervalSince1970))\n"
+    try? text.write(to: url, atomically: true, encoding: .utf8)
+  }
+
+  /// false before launch() (nothing is recorded then).
+  private func recordPhase(_ value: String) -> Bool {
+    stateLock.lock()
+    defer { stateLock.unlock() }
+    guard stateURL != nil else { return false }
+    phase = value
+    writeState()
+    return true
+  }
+
+  /// The whisper-server being restarted (freeing and loading its model), or nil when done.
+  private func recordRestart(_ name: String?) {
+    stateLock.lock()
+    restartingName = name ?? ""
+    writeState()
+    stateLock.unlock()
+  }
+
+  private func recordEnd() {
+    stateLock.lock()
+    writeState(ended: true)
+    stateLock.unlock()
+  }
+
+  /// How the previous launch ended, from the record it kept (launch()), the whisper-server
+  /// it was restarting then ("" for none) and its WhisperServer build.
+  private func previousLaunch(_ url: URL) -> (summary: String, restarting: String, build: String) {
+    guard let text = try? String(contentsOf: url, encoding: .utf8) else {
+      return ("no record (first launch that keeps one, or it was cleared)", "", "")
+    }
+    var fields: [String: String] = [:]
+    for line in text.split(separator: "\n") {
+      let parts = line.split(separator: "=", maxSplits: 1, omittingEmptySubsequences: false)
+      if parts.count == 2 { fields[String(parts[0])] = String(parts[1]) }
+    }
+    let lastPhase = fields["phase"] ?? "unknown"
+    let restarting = fields["restarting"] ?? ""
+    var ago = ""
+    if let time = Double(fields["time"] ?? "") {
+      ago = String(format: "; last record %.0f s before this launch", Date().timeIntervalSince1970 - time)
+    }
+    let summary: String
+    if fields["ended"] == "1" {
+      summary = "ended normally (the App was closed)"
+    } else if !restarting.isEmpty {
+      summary = "ended while \(restarting) was restarting (\(lastPhase)): probably a crash in the restart"
+    } else if lastPhase == "background" {
+      summary = "ended in the background (iOS closed the suspended App, or it was swiped away)"
+    } else {
+      summary = "ended in the foreground (\(lastPhase)) without closing: probably a crash or a stop by iOS "
+        + "(look for Runner-*.ips or JetsamEvent-*.ips)"
+    }
+    return (summary + ago, restarting, fields["whisper"] ?? "")
   }
 
   /// Which servers answer now ("status" from Dart, which waits for ready after the
@@ -181,6 +294,7 @@ final class OnDeviceAssistant {
     lock.unlock()
     serversLock.lock()
     let list = servers
+    let waitingForRelaunch = relaunch
     serversLock.unlock()
     let python = listening(Self.assistantPort) && listening(Self.asrPort)
     var answering: [String: Bool] = [:]
@@ -189,9 +303,14 @@ final class OnDeviceAssistant {
       // connect: a server must also answer.
       answering[server.name] = healthy(server.port)
     }
+    // A server marked for an App relaunch (restart) is not waited for: it stays down
+    // until the App is opened again, and the backend says so for each clip.
     let ready = !started || list.isEmpty
-      || (python && list.allSatisfy { $0.name == Self.taiwaneseName || answering[$0.name] == true })
-    return ["started": started, "python": python, "servers": answering, "ready": ready]
+      || (python && list.allSatisfy {
+        $0.name == Self.taiwaneseName || waitingForRelaunch.contains($0.name) || answering[$0.name] == true
+      })
+    return ["started": started, "python": python, "servers": answering, "ready": ready,
+            "relaunch": waitingForRelaunch.sorted()]
   }
 
   /// After the App comes back to the foreground: a server whose thread gave up (it
@@ -208,6 +327,7 @@ final class OnDeviceAssistant {
     let again = servers.filter { stopped.contains($0.name) }
     stopped.subtract(again.map(\.name))
     let list = servers
+    let waitingForRelaunch = relaunch
     serversLock.unlock()
     guard !list.isEmpty else { return }
     for server in again {
@@ -218,13 +338,15 @@ final class OnDeviceAssistant {
     if startupDone.wait(timeout: .now()) == .success {
       startupDone.signal()
       for server in list where !again.contains(where: { $0.name == server.name }) {
+        if waitingForRelaunch.contains(server.name) { continue }
         if !healthy(server.port) { note("\(server.name): \(restart(server)) after the App came back") }
       }
     }
     let now = status()
     let answering = (now["servers"] as? [String: Bool] ?? [:])
       .sorted { $0.key < $1.key }.map { "\($0.key)=\($0.value)" }.joined(separator: " ")
-    note("foreground: python=\(now["python"] ?? false) \(answering); \(memoryNote())")
+    let marked = waitingForRelaunch.isEmpty ? "" : " relaunch=" + waitingForRelaunch.sorted().joined(separator: ",")
+    note("foreground: python=\(now["python"] ?? false) \(answering)\(marked); \(memoryNote())")
   }
 
   /// Starts everything once; returns what was started (or why not), numbers and
@@ -268,13 +390,18 @@ final class OnDeviceAssistant {
 
     // Everything the servers and Python print goes to one log the Mac can copy
     // back (Library/Caches/on_device_assistant.log, this launch); release iOS shows no stdout.
-    // The previous launch's log is kept as on_device_assistant.prev.log: after a
-    // failure the App is usually started again, which used to overwrite the only
-    // record of what went wrong.
+    // The previous launches' logs are kept: after a failure the App is usually started
+    // again, which used to overwrite the only record of what went wrong. Five launches
+    // (2026-11-18; two were not enough: the log of the launch that crashed on 2026-11-18
+    // had been overwritten): .log (this one), .prev.log, .prev2.log, .prev3.log, .prev4.log.
     let logURL = caches.appendingPathComponent("on_device_assistant.log")
-    let previousLog = caches.appendingPathComponent("on_device_assistant.prev.log")
-    try? fileManager.removeItem(at: previousLog)
-    try? fileManager.moveItem(at: logURL, to: previousLog)
+    let logs = [logURL] + (1...4).map {
+      caches.appendingPathComponent($0 == 1 ? "on_device_assistant.prev.log" : "on_device_assistant.prev\($0).log")
+    }
+    try? fileManager.removeItem(at: logs[4])
+    for index in stride(from: 3, through: 0, by: -1) {
+      try? fileManager.moveItem(at: logs[index], to: logs[index + 1])
+    }
     let log = logURL.path
     // One empty file, then both streams in append mode (2026-11-16): stdout opened with "w"
     // and stderr with "a" had two file offsets, so stdout wrote from the start of the file
@@ -283,6 +410,7 @@ final class OnDeviceAssistant {
     _ = fileManager.createFile(atPath: log, contents: nil)
     if freopen(log, "a", stdout) != nil { setvbuf(stdout, nil, _IOLBF, 0) }
     if freopen(log, "a", stderr) != nil { setvbuf(stderr, nil, _IONBF, 0) }
+    recordLaunch(caches: caches, whisper: "\(frameworks)/WhisperServer.framework/WhisperServer")
 
     let multilingual = has(Self.multiAsrFile)
     let gate = multilingual && has(Self.gateAsrFile)
@@ -421,6 +549,41 @@ final class OnDeviceAssistant {
     starter.start()
     return "started python :8765; loading " + plan.map { "\($0.name) :\($0.port)" }
       .joined(separator: ", ") + (multilingual ? "" : "; no whisper model")
+  }
+
+  /// Logs how the previous launch ended (its lifecycle record) and starts this launch's
+  /// record. A launch that ended while a whisper-server was restarting (it frees its model
+  /// in the App) marks this WhisperServer build unsafe to restart: from then on a failed
+  /// whisper-server asks for the App to be opened again instead (restart).
+  private func recordLaunch(caches: URL, whisper: String) {
+    let fileManager = FileManager.default
+    let stateFile = caches.appendingPathComponent("on_device_assistant.state")
+    let unsafeFile = caches.appendingPathComponent("on_device_assistant.restart-unsafe")
+    let attributes = try? fileManager.attributesOfItem(atPath: whisper)
+    let size = (attributes?[.size] as? NSNumber)?.uint64Value ?? 0
+    let modified = (attributes?[.modificationDate] as? Date)?.timeIntervalSince1970 ?? 0
+    let build = "\(size)-\(Int(modified))"
+    let previous = previousLaunch(stateFile)
+    note("previous launch: \(previous.summary)")
+    // The build that crashed, not this one: an update since then starts clean.
+    if !previous.restarting.isEmpty && !previous.build.isEmpty {
+      try? previous.build.write(to: unsafeFile, atomically: true, encoding: .utf8)
+    }
+    let unsafeBuild = (try? String(contentsOf: unsafeFile, encoding: .utf8)) ?? ""
+    let unsafe = !unsafeBuild.isEmpty && unsafeBuild == build
+    let current = isActive() ? "active" : "inactive"
+    stateLock.lock()
+    whisperBuild = build
+    restartUnsafe = unsafe
+    stateURL = stateFile
+    phase = current
+    restartingName = ""
+    writeState()
+    stateLock.unlock()
+    if unsafe {
+      note("speech models are not restarted inside the App with this WhisperServer build "
+        + "(a launch ended while one was restarting); a failed one asks for the App to be opened again")
+    }
   }
 
   private func availableMB() -> Int { Int(os_proc_available_memory() >> 20) }
@@ -635,9 +798,17 @@ final class OnDeviceAssistant {
   /// The backend's call when a server stopped answering (device_main.Restarter through
   /// serverRestarter): name is an ensureServer name or "taiwanese", with ":error" when the
   /// server answers /health but fails requests (restarted anyway). Returns "ready" (it
-  /// answers), "restarted", "busy" (a model is loading; asked again later) or "failed".
+  /// answers), "restarted", "busy" (a model is loading, or the server has a clip in progress;
+  /// asked again later), "inactive" (the App is not active: nothing is restarted then),
+  /// "relaunch" (not restarted inside the App; speech asks for the App to be opened again)
+  /// or "failed".
   func restartServer(_ request: String) -> String {
-    guard isActive() else { return "failed" }  // runServer would only wait for the foreground
+    // runServer would only wait for the foreground, and a model loaded while iOS refuses
+    // GPU work would fail again (2026-11-18).
+    guard isActive() else {
+      note("restart of \(request) asked while the App is not active; not now")
+      return "inactive"
+    }
     let parts = request.split(separator: ":", maxSplits: 1).map(String.init)
     let name = parts.first ?? ""
     let failing = parts.count > 1 && parts[1] == "error"
@@ -657,12 +828,26 @@ final class OnDeviceAssistant {
   /// process-wide): it is reported, and the backend keeps not waiting for it (liveness.py)
   /// until the App is started again. Running a second copy on the same port was left out:
   /// the old copy's memory would stay allocated.
+  /// 2026-11-18 (the App crashed in whisper_free while restarting whisper-multilingual after
+  /// it came back from another App): a whisper-server is stopped only while the App is active,
+  /// one at a time (loadLock), when it has no clip in progress (townpass_whisper_server_busy),
+  /// and only with a WhisperServer that carries the free fix (townpass_whisper_server_fixes);
+  /// otherwise, or when a launch of this build already ended during such a restart, it is
+  /// marked for an App relaunch (needsRelaunch) and its model is never freed inside the App.
   private func restart(_ server: Server, failing: Bool = false) -> String {
     let began = Date()
     while !failing && Date().timeIntervalSince(began) < 3 {
       if healthy(server.port) { return "ready" }
       Thread.sleep(forTimeInterval: 0.25)
     }
+    guard isActive() else {
+      note("\(server.name) does not answer; not restarted while the App is not active")
+      return "inactive"
+    }
+    serversLock.lock()
+    let marked = relaunch.contains(server.name)
+    serversLock.unlock()
+    if marked { return "relaunch" }
     // One model load at a time; a load in progress is not interrupted.
     guard loadLock.try() else { return "busy" }
     defer { loadLock.unlock() }
@@ -670,14 +855,30 @@ final class OnDeviceAssistant {
     let gaveUp = stopped.remove(server.name) != nil
     serversLock.unlock()
     if gaveUp {
+      note("\(server.name) had stopped; running it again")
       guard runServer(server) else { return "failed" }
-    } else if !server.llama, let stop = whisperStop() {
-      note("\(server.name) does not answer; stopping it to run it again")
-      guard stop(Int32(server.port)) == 1 else { return "failed" }
+    } else if !server.llama {
+      if let why = whisperRestartRefused() { return needsRelaunch(server, why) }
+      guard let stop = whisperStop() else { return needsRelaunch(server, "no townpass_whisper_server_stop") }
+      let busy = whisperBusy(server.port)
+      if busy > 0 {
+        note("\(server.name) does not answer but has \(busy) clip(s) in progress; not restarted now")
+        return "busy"
+      }
+      note("\(server.name) \(failing ? "fails its clips" : "does not answer"); stopping it to run it again; "
+        + memoryNote())
+      // Kept until it answers again: a launch that ends meanwhile (a crash while the model
+      // is freed or loaded) turns in-App restarts off for this build (recordLaunch).
+      recordRestart(server.name)
+      guard stop(Int32(server.port)) == 1 else {
+        recordRestart(nil)
+        return "failed"
+      }
     } else {
       note("\(server.name) does not answer and cannot be restarted inside the App; \(memoryNote())")
       return "failed"
     }
+    defer { recordRestart(nil) }
     let restarted = Date()
     while Date().timeIntervalSince(restarted) < 60 {
       if healthy(server.port) {
@@ -687,14 +888,51 @@ final class OnDeviceAssistant {
       }
       Thread.sleep(forTimeInterval: 0.25)
     }
+    note("\(server.name) did not answer within 60 s of its restart")
     return "failed"
   }
 
+  /// Why a whisper-server must not be stopped inside the App (nil: it may be). Stopping frees
+  /// its model (whisper_free); before the 2026-11-18 patch a clip whose KV cache could not be
+  /// re-created had already freed the state, so that free crashed the App.
+  private func whisperRestartRefused() -> String? {
+    stateLock.lock()
+    let unsafe = restartUnsafe
+    stateLock.unlock()
+    if unsafe { return "a launch of this WhisperServer build ended while one was restarting" }
+    guard let address = whisperFunction("townpass_whisper_server_fixes") else {
+      return "this WhisperServer is older than the 2026-11-18 free fix"
+    }
+    let fixes = unsafeBitCast(address, to: WhisperFixes.self)()
+    return fixes >= 1 ? nil : "this WhisperServer is older than the 2026-11-18 free fix"
+  }
+
+  /// Marks a server that is not restarted inside the App: the backend then answers its clips
+  /// with "open the App again" (device_main.Restarter, asr_server.RelaunchNeeded), and
+  /// recover() and status() leave it alone until the App is started again.
+  private func needsRelaunch(_ server: Server, _ why: String) -> String {
+    serversLock.lock()
+    relaunch.insert(server.name)
+    serversLock.unlock()
+    note("\(server.name) fails and is not restarted inside the App (\(why)); speech needs the App opened again")
+    return "relaunch"
+  }
+
+  /// Clips the whisper-server on port is handling now; 0 when the framework cannot tell.
+  private func whisperBusy(_ port: Int) -> Int {
+    guard let address = whisperFunction("townpass_whisper_server_busy") else { return 0 }
+    return Int(unsafeBitCast(address, to: WhisperBusy.self)(Int32(port)))
+  }
+
   private func whisperStop() -> WhisperStop? {
-    guard let library = whisperLibrary, let handle = dlopen(library, RTLD_NOW | RTLD_LOCAL),
-      let address = dlsym(handle, "townpass_whisper_server_stop")
-    else { return nil }
+    guard let address = whisperFunction("townpass_whisper_server_stop") else { return nil }
     return unsafeBitCast(address, to: WhisperStop.self)
+  }
+
+  /// A symbol of WhisperServer.framework (already open once a whisper-server runs), or nil.
+  private func whisperFunction(_ symbol: String) -> UnsafeMutableRawPointer? {
+    guard let library = whisperLibrary, let handle = dlopen(library, RTLD_NOW | RTLD_LOCAL) else { return nil }
+    return dlsym(handle, symbol)
   }
 
   /// To the system log and to on_device_assistant.log (stderr, once redirected).
@@ -719,6 +957,15 @@ final class OnDeviceAssistant {
     serversLock.lock()
     if !servers.contains(where: { $0.name == name }) { servers.append(server) }
     serversLock.unlock()
+    // The whisper-servers' pause flag follows the App from now on (setActive); set it to
+    // the App's state now, in case the App left the foreground before WhisperServer opened.
+    if !server.llama, let pauseAddress = dlsym(handle, "townpass_whisper_server_pause") {
+      let pause = unsafeBitCast(pauseAddress, to: WhisperPause.self)
+      activeLock.lock()
+      whisperPause = pause
+      pause(activeNow ? 0 : 1)
+      activeLock.unlock()
+    }
     let main = unsafeBitCast(address, to: ServerMain.self)
     let argv = ([name] + server.arguments).map { strdup($0) }
     // When iOS reclaims a suspended App's listening socket, llama-server and

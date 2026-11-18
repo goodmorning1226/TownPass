@@ -380,6 +380,11 @@ void main() {
       c.listening.value = true;
       await tester.pump();
       await tester.pump(const Duration(seconds: 2));
+      // No ring while the microphone gets ready (rules section 5, 2026-11-18).
+      expect(tickers(tester), 0, reason: 'getting ready');
+      c.micReady.value = true;
+      await tester.pump();
+      await tester.pump(const Duration(seconds: 2));
       expect(tickers(tester), greaterThan(0), reason: 'mic ring going');
       c.listening.value = false;
       await tester.pumpAndSettle();
@@ -395,6 +400,7 @@ void main() {
       await tester.pumpAndSettle();
       c.loading.value = false;
       c.listening.value = true;
+      c.micReady.value = true;
       await tester.pump();
       expect(tickers(tester), 0);
       await tester.pumpAndSettle();

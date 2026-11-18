@@ -756,6 +756,34 @@ MESSAGES = {
         "tl": "Parang Taiwanese po iyon, pero pansamantalang hindi sumasagot ang Taiwanese model. "
               "Magsalita po ulit, o gumamit ng Mandarin o mag-type.",
     },
+    # 2026-11-18 (rules section 5): the phone will not restart its speech model inside the
+    # App (iPhone: freeing it there crashed the App); closing and opening the App loads it again.
+    "taiwanese_unavailable_relaunch": {
+        "zh": "聽起來是台語，但台語模型需要重新開啟 App 才能再用。請把 App 關掉再打開，或先改用華語、打字。",
+        "en": "That sounded like Taiwanese, but the Taiwanese model needs the App to be opened again. "
+              "Please close and reopen the App, or use Mandarin or typing for now.",
+        "ja": "台湾語のようですが、台湾語モデルを使うにはアプリを開き直す必要があります。"
+              "アプリを閉じてもう一度開くか、いまは中国語か文字入力を使ってください。",
+        "vi": "Có vẻ bạn nói tiếng Đài, nhưng cần mở lại ứng dụng thì mới dùng được mô hình tiếng Đài. "
+              "Hãy đóng rồi mở lại ứng dụng, hoặc tạm thời nói tiếng Hoa hay gõ chữ.",
+        "id": "Sepertinya itu bahasa Taiwan, tetapi model bahasa Taiwan baru bisa dipakai lagi setelah aplikasi "
+              "dibuka ulang. Silakan tutup lalu buka lagi aplikasinya, atau pakai bahasa Mandarin atau ketik dulu.",
+        "tl": "Parang Taiwanese po iyon, pero kailangang buksan ulit ang App para magamit ang Taiwanese model. "
+              "Isara po at buksan ulit ang App, o gumamit muna ng Mandarin o mag-type.",
+    },
+    "speech_needs_relaunch": {
+        "zh": "語音辨識需要重新開啟 App 才能再用。請把 App 關掉再打開；現在可以先用打字。",
+        "en": "Speech recognition needs the App to be opened again. Please close and reopen the App; "
+              "you can type for now.",
+        "ja": "音声認識を使うにはアプリを開き直す必要があります。アプリを閉じてもう一度開いてください。"
+              "いまは文字入力が使えます。",
+        "vi": "Cần mở lại ứng dụng thì mới dùng được nhận dạng giọng nói. Hãy đóng rồi mở lại ứng dụng; "
+              "bây giờ bạn có thể gõ chữ.",
+        "id": "Pengenalan suara baru bisa dipakai lagi setelah aplikasi dibuka ulang. Silakan tutup lalu buka "
+              "lagi aplikasinya; sekarang Anda bisa mengetik dulu.",
+        "tl": "Kailangang buksan ulit ang App para magamit ang pagkilala ng boses. Isara po at buksan ulit "
+              "ang App; puwede munang mag-type.",
+    },
     "demo_page": {
         "en": "demo page", "ja": "デモページ", "vi": "trang demo", "id": "halaman demo", "tl": "demo na pahina",
     },

@@ -33,6 +33,20 @@ READY_PAUSE_S = 1.0
 # iOS: a clip whose App went to the background waits this long for it to come back
 # before its next speech-model pass (no GPU work in the background; WhisperCppRecognizer._post).
 ACTIVE_WAIT_S = 20
+# A speech model that refused (after its wait) or answered with a server error is asked
+# once more after this pause, the App active again, before the App is asked to restart it
+# (docs/AI_CURRENT_RULES.md section 5, 2026-11-18: the first clip after coming back from
+# another App failed, the restart that followed freed the model inside the App and the
+# iPhone App crashed). A timeout is not asked again (it already cost the request timeout).
+# TOWNPASS_SPEECH_RETRY_PAUSE_S overrides it (tests use a short pause; the App never sets it).
+RETRY_PAUSE_S = float(os.environ.get("TOWNPASS_SPEECH_RETRY_PAUSE_S") or 1.0)
+
+
+class RelaunchNeeded(OSError):
+    """The App will not restart this speech model inside the App (liveness.needs_relaunch):
+    its clips get "open the App again" (i18n speech_needs_relaunch) until it is opened again."""
+
+
 # Hold-to-talk bounds the clip, so a VAD pass mostly adds latency (~1 s on CPU).
 # Near-silent audio is rejected instead, which stops Whisper inventing text.
 MIN_RMS = 0.003
@@ -81,7 +95,8 @@ TAIWANESE_UNAVAILABLE = ("missing", "memory", "failed", "loading")
 # when the Chinese decode is not clear; None: never; "always").
 TAIWANESE_LOAD_WAIT_S = 25.0
 TAIWANESE_POLL_S = 0.5
-TAIWANESE_WITHHOLD = ("memory", "failed", "loading", "unreachable")
+# "relaunch" (2026-11-18): the App will not restart the Taiwanese model inside the App.
+TAIWANESE_WITHHOLD = ("memory", "failed", "loading", "unreachable", "relaunch")
 TAIWANESE_MARGINAL_WITHHOLD = "not_clear"
 # Owner, 2026-11-16: the gate only just sure (TAIWANESE_GATE_SCORE up to this score) and the
 # Chinese decode clear and known to the App (known_text): the Chinese decode is kept. The
@@ -659,10 +674,17 @@ class WhisperCppRecognizer:
         hold=False (the Taiwanese model, 2026-11-16): a server that failed recently is
         still tried, and a refused connection or timeout does not make the next clips
         skip it for liveness.HOLD_S (a port iOS reclaimed is bound again in ~1 s); the
-        App is still asked to restart it."""
+        App is still asked to restart it.
+        A refusal (after the wait) or a server error (5xx, also whisper-server's 503 for a
+        clip stopped because the App left the foreground) is asked once more after
+        RETRY_PAUSE_S, once the App is active (2026-11-18); only a second failure reports it
+        (liveness.failed: the App is asked to restart it). With hold=False only server
+        errors: a refusal there is asked again by _taiwanese_decode."""
         import urllib.error
         import urllib.request
         import liveness
+        if liveness.relaunch_needed(url):
+            raise RelaunchNeeded("speech model needs the App opened again")
         # Only a model that never answered is "still loading": once it has, a refused
         # connection (iOS reclaimed its socket while the App was away) or a timeout gets
         # a short wait, and a model that just failed is skipped (liveness.py, 2026-11-13).
@@ -677,18 +699,33 @@ class WhisperCppRecognizer:
         # loaded), so a refused connection gets only the short wait, never READY_WAIT_S.
         startup = READY_WAIT_S if hold else liveness.AFTER_READY_WAIT_S
         deadline = time.monotonic() + liveness.wait_s(url, startup)
+        retried = False
         while True:
-            self._wait_until_active()
+            self._wait_until_active()  # also before the second try: the App must be active
             request = urllib.request.Request(url + "/inference", data=body, headers={"Content-Type": content_type})
             try:
                 with urllib.request.urlopen(request, timeout=self.timeout) as response:
                     reply = json.loads(response.read(2_000_000))
                 liveness.answered(url)
+                if retried:
+                    print(f"speech: {liveness.key(url)} answered the second try", flush=True)
                 return reply
             except (urllib.error.URLError, TimeoutError) as exc:
                 refused = (isinstance(exc, urllib.error.URLError) and not isinstance(exc, urllib.error.HTTPError)
                            and isinstance(exc.reason, ConnectionRefusedError))
                 if not refused or time.monotonic() + READY_PAUSE_S > deadline:
+                    server_error = isinstance(exc, urllib.error.HTTPError) and exc.code >= 500
+                    # hold=False (Taiwanese): a refusal is already asked again by the caller,
+                    # with the App asked for the server first (_taiwanese_decode).
+                    if not retried and (server_error or (refused and hold)):
+                        # Not a restart yet: once more in a second (RETRY_PAUSE_S), the App active.
+                        retried = True
+                        print(f"speech: {liveness.key(url)} {'refused' if refused else exc.code}; "
+                              f"asking again in {RETRY_PAUSE_S:g} s", flush=True)
+                        time.sleep(RETRY_PAUSE_S)
+                        continue
+                    if retried:
+                        print(f"speech: {liveness.key(url)} failed the second try too", flush=True)
                     if refused or liveness.is_timeout(exc):
                         liveness.failed(url, "timeout" if liveness.is_timeout(exc) else "refused", hold=hold)
                     elif isinstance(exc, urllib.error.HTTPError) and exc.code >= 500 and exc.code != 503:
@@ -761,6 +798,8 @@ class WhisperCppRecognizer:
                 self.unavailable = "failed"  # not JSON: the server is broken
             except urllib.error.HTTPError:
                 self.unavailable = "failed"  # it answered with an error (restart asked by _post)
+            except RelaunchNeeded:
+                self.unavailable = "relaunch"  # the App will not restart it: open the App again
             except OSError:
                 if wait and not asked_again and time.monotonic() + TAIWANESE_POLL_S < deadline:
                     asked_again = True  # restarting, or its port is being bound again: ask the App
@@ -1231,6 +1270,9 @@ def make_handler(recognizer, model_name):
             language = language_code(self.headers.get("X-Language"))
             try:
                 decoded = recognizer.transcribe(frames, language)
+            except RelaunchNeeded:
+                # server.py says "open the App again" in the App's language (speech_needs_relaunch).
+                return self.reply(503, {"error": "語音辨識需要重新開啟 App。", "code": "speech_relaunch"})
             except Exception:
                 return self.reply(500, {"error": "語音辨識失敗。"})
             elapsed = round((time.monotonic() - started) * 1000)

@@ -149,6 +149,11 @@ abstract class HomeAskTexts {
   static const listeningLabel = '正在聽…';
   static const listening = '正在聽…說完放開';
 
+  /// Pressed, but the microphone's first audio has not arrived yet: not time
+  /// to talk (every guided microphone; docs/AI_CURRENT_RULES.md section 5,
+  /// 2026-11-18).
+  static const preparing = '準備中…';
+
   /// The same line as the assistant's own microphone (2026-11-16).
   static const tooShort = Replies.tooShort;
   static const title = '企鵝的回答';

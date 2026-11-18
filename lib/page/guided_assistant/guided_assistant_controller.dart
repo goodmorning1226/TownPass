@@ -1,6 +1,6 @@
 import 'dart:async';
-import 'dart:typed_data';
 
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:get/get.dart';
@@ -351,9 +351,109 @@ class GuidedAssistantController extends GetxController {
   static final _hasWords = RegExp(r'[^\d\s\p{P}\p{S}]{2,}', unicode: true);
 
   void _onLevel(double rms) {
-    if (listening.value || homeAsk.value == HomeAsk.listening) {
-      level.value = (rms / 0.15).clamp(0.0, 1.0);
+    if (!listening.value && homeAsk.value != HomeAsk.listening) return;
+    // The first audio of a press: the microphone really listens now.
+    if (!micReady.value) _micListening();
+    level.value = (rms / 0.15).clamp(0.0, 1.0);
+  }
+
+  // ---------------------------------------------------------- mic readiness
+  //
+  // docs/AI_CURRENT_RULES.md section 5 (2026-11-18): a press used to show
+  // "listening" at once while the recorder was still being made and started
+  // (about a second on some phones), so the first words were lost. The next
+  // recorder is now made ahead (never started), the read-aloud voice is
+  // stopped first, and the screen says 準備中… until the first audio arrives.
+
+  /// The microphone of the current press really listens: its first audio
+  /// arrived. Until then the screen says [HomeAskTexts.preparing].
+  final micReady = false.obs;
+
+  /// When the current press's first audio arrived ("too quick" counts from
+  /// here, not from the press).
+  DateTime? _heardAt;
+
+  /// Counts presses and releases: a start that finishes after its press
+  /// ended is stopped at once.
+  int _press = 0;
+
+  /// Microphone buttons on screen ([micShown]).
+  int _micsShown = 0;
+  AppLifecycleListener? _lifecycle;
+
+  /// Longest wait for the read-aloud voice to stop before recording.
+  static const speakerStopLimit = Duration(milliseconds: 300);
+
+  /// 按住提問 shorter than this, counted from the first audio, is too quick.
+  static const homeTooQuick = Duration(milliseconds: 400);
+
+  /// A microphone button appeared: the next recorder is made now (created,
+  /// permission checked, never started).
+  void micShown() {
+    if (++_micsShown == 1) _prepareMic();
+  }
+
+  /// A microphone button went away; with none left the prepared recorder
+  /// is released.
+  void micHidden() {
+    if (_micsShown == 0) return;
+    if (--_micsShown == 0) recorder?.release();
+  }
+
+  void _prepareMic() {
+    final rec = recorder;
+    if (rec == null || service == null || isClosed) return;
+    rec.prepare().catchError((_) {});
+  }
+
+  void _onAppState(AppLifecycleState state) {
+    switch (state) {
+      case AppLifecycleState.hidden:
+      case AppLifecycleState.paused:
+      case AppLifecycleState.detached:
+        recorder?.release();
+      case AppLifecycleState.resumed:
+        if (_micsShown > 0) _prepareMic();
+      case AppLifecycleState.inactive:
+        break;
     }
+  }
+
+  /// A press begins: not listening until its first audio.
+  int _beginPress(AssistantRecorder rec) {
+    micReady.value = false;
+    _heardAt = null;
+    level.value = 0;
+    rec.timing.press();
+    return ++_press;
+  }
+
+  void _micListening() {
+    micReady.value = true;
+    _heardAt = clock();
+    // A light tap: talk now (as GuideMotion.confirm).
+    try {
+      HapticFeedback.lightImpact().catchError((_) {});
+    } catch (_) {}
+  }
+
+  /// A press is held now (any guided microphone).
+  bool get _held => listening.value || homeAsk.value == HomeAsk.listening;
+
+  /// Stops a start whose press has ended, unless a newer press is held: its
+  /// own start already threw the old recorder away, and cancelling now would
+  /// stop the new recording.
+  Future<void> _cancelStale(AssistantRecorder rec) async {
+    if (!_held) await rec.cancel();
+  }
+
+  /// Stops the read-aloud voice before recording (never record the
+  /// assistant's own voice; on iOS the two would also switch the audio
+  /// session against each other), waiting at most [speakerStopLimit].
+  Future<void> _quietSpeaker() async {
+    try {
+      await speaker.stop().timeout(speakerStopLimit);
+    } catch (_) {}
   }
 
   WebPageState get web => Get.find<WebPageState>();
@@ -546,6 +646,11 @@ class GuidedAssistantController extends GetxController {
     }
     _loadSettings();
     unawaited(_checkMic());
+    if (recorder != null) {
+      try {
+        _lifecycle = AppLifecycleListener(onStateChange: _onAppState);
+      } catch (_) {}
+    }
     if (runOnboarding) _loadOnboarding();
   }
 
@@ -567,6 +672,7 @@ class GuidedAssistantController extends GetxController {
     probe.stop();
     speaker.stop();
     service?.cancel();
+    _lifecycle?.dispose();
     recorder?.dispose();
     super.onClose();
   }
@@ -2061,6 +2167,12 @@ class GuidedAssistantController extends GetxController {
     }
     sheetOpen.value = false;
     typing.value = false;
+    if (listening.value && !_fieldMode) {
+      // Closed while held: the recording ends here, never later.
+      _press++;
+      level.value = 0;
+      recorder?.cancel();
+    }
     listening.value = false;
     _removeBackEntry();
   }
@@ -2105,14 +2217,17 @@ class GuidedAssistantController extends GetxController {
       _askMicNow(rec);
       return;
     }
-    speaker.stop(); // never record the assistant's own voice
+    final press = _beginPress(rec);
+    // 準備中… until the first audio arrives ([micReady]).
     listening.value = true;
     final fieldPress = _fieldMode;
+    await _quietSpeaker();
+    if (press != _press || !listening.value) return; // released meanwhile
     final started = await rec.start();
-    if (started && !listening.value) {
+    if (started && (press != _press || !listening.value)) {
       // Released (or slid up) before the microphone had started, e.g. while
       // the system asked for the permission: nothing to record.
-      await rec.cancel();
+      await _cancelStale(rec);
       return;
     }
     if (!started && !isClosed) {
@@ -2181,6 +2296,7 @@ class GuidedAssistantController extends GetxController {
   /// transcribed or sent.
   Future<void> micUp({bool send = true}) async {
     if (!listening.value) return;
+    _press++;
     listening.value = false;
     // The 按住輸入 press: its words go into the page field.
     final field = _fieldMode;
@@ -2464,7 +2580,7 @@ class GuidedAssistantController extends GetxController {
     if (loading.value || homeAsk.value == HomeAsk.listening) return;
     if (_downloadFirst()) return;
     _homeCard = card;
-    _homeHeldAt = DateTime.now();
+    _homeHeldAt = clock();
     homeAsk.value = HomeAsk.listening;
     final rec = recorder;
     if (rec == null || service == null) return;
@@ -2473,8 +2589,8 @@ class GuidedAssistantController extends GetxController {
       _askMicNow(rec);
       return;
     }
-    speaker.stop(); // never record the assistant's own voice
-    final start = _homeStart = rec.start();
+    final press = _beginPress(rec);
+    final start = _homeStart = _startHome(rec, press);
     final started = await start;
     if (!started && !isClosed && homeAsk.value == HomeAsk.listening) {
       _homeStart = null;
@@ -2482,19 +2598,36 @@ class GuidedAssistantController extends GetxController {
     }
   }
 
+  /// Stops the read-aloud voice, then starts recording unless the press
+  /// ended meanwhile (true then: not a permission problem). A start that
+  /// finishes after the press ended is stopped at once.
+  Future<bool> _startHome(AssistantRecorder rec, int press) async {
+    await _quietSpeaker();
+    if (press != _press || isClosed) return true;
+    final started = await rec.start();
+    if (started && press != _press) await _cancelStale(rec);
+    return started;
+  }
+
   /// Released: [send] false (slid up to cancel, or the pointer was
   /// cancelled) discards the recording; nothing is heard or sent.
   Future<void> homeMicUp({bool send = true}) async {
     if (homeAsk.value != HomeAsk.listening) return;
-    final held = DateTime.now().difference(_homeHeldAt ?? DateTime.now());
+    _press++;
     final rec = recorder;
     final svc = service;
+    // "Too quick" counts from the first audio (docs/AI_CURRENT_RULES.md
+    // section 5, 2026-11-18); without a microphone, from the press.
+    final since = rec == null || svc == null ? _homeHeldAt : _heardAt;
+    final held = since == null ? Duration.zero : clock().difference(since);
     final starting = _homeStart;
     _homeStart = null;
     if (!send) {
       homeAsk.value = HomeAsk.idle;
       level.value = 0;
-      if (starting != null && await starting) await rec?.cancel();
+      if (rec != null && starting != null && await starting) {
+        await _cancelStale(rec);
+      }
       return;
     }
     if (rec != null && rec.permissionPending) {
@@ -2505,20 +2638,22 @@ class GuidedAssistantController extends GetxController {
       level.value = 0;
       final allowed = starting != null && await starting;
       if (allowed) {
-        await rec.cancel(); // allowed meanwhile: the next press talks
+        await _cancelStale(rec); // allowed meanwhile: the next press talks
       } else if (!isClosed && homeAsk.value == HomeAsk.idle) {
         _showHomeNotice(HomeAskTexts.noMic);
       }
       return;
     }
-    if (held < const Duration(milliseconds: 400)) {
+    if (held < homeTooQuick) {
       if (_homeCard) {
         homeAsk.value = HomeAsk.tooShort;
       } else {
         homeAsk.value = HomeAsk.idle;
         _showToast(HomeAskTexts.tooShort);
       }
-      if (starting != null && await starting) await rec?.cancel();
+      if (rec != null && starting != null && await starting) {
+        await _cancelStale(rec);
+      }
       return;
     }
     if (rec == null || svc == null) {
@@ -2603,10 +2738,11 @@ class GuidedAssistantController extends GetxController {
   void dismissHomeAsk() {
     if (homeAsk.value == HomeAsk.idle) return;
     if (homeAsk.value == HomeAsk.listening) {
+      _press++;
       final starting = _homeStart;
       _homeStart = null;
       starting?.then((ok) {
-        if (ok) recorder?.cancel();
+        if (ok && !_held) recorder?.cancel();
       });
     }
     homeAsk.value = HomeAsk.idle;

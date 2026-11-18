@@ -20,6 +20,9 @@ or it exited) and a timeout means it hangs: waiting 75 s per call then made a tu
   usual "no answer" path (list the candidates, "please say it again", no FAQ).
 - answered(url) / failed(url): what callers report. failed() also tells the
   watchers (device_main.Restarter asks the App to start the server again).
+- needs_relaunch(url) / relaunch_needed(url) (2026-11-18): the App will not restart
+  this server inside the App (iPhone: freeing a whisper model there crashed the App);
+  speech then says the App must be opened again (asr_server.RelaunchNeeded).
 
 Standard library only; one instance per process (the functions below).
 """
@@ -41,6 +44,7 @@ PROBE_S = 2.0
 _lock = threading.Lock()
 _answered: set[str] = set()
 _down_until: dict[str, float] = {}
+_relaunch: set[str] = set()
 _watchers: list = []
 clock = time.monotonic
 
@@ -98,6 +102,17 @@ def failed(url, reason="failed", hold=True):
             pass
 
 
+def needs_relaunch(url):
+    """The App answered "relaunch" for url: it stays down until the App is opened again."""
+    with _lock:
+        _relaunch.add(key(url))
+
+
+def relaunch_needed(url):
+    with _lock:
+        return key(url) in _relaunch
+
+
 def watch(callback):
     """callback(server_key, reason) after a server stops answering."""
     with _lock:
@@ -144,4 +159,5 @@ def reset():
     with _lock:
         _answered.clear()
         _down_until.clear()
+        _relaunch.clear()
         _watchers.clear()

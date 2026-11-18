@@ -165,6 +165,11 @@ class ServerTests(unittest.TestCase):
         cls.http.server_close()
 
     def setUp(self):
+        # liveness is process-wide: what these calls leave (the fake's ephemeral port and :9
+        # marked down) must not reach later tests whose fake servers get the same port.
+        import liveness
+        liveness.reset()
+        self.addCleanup(liveness.reset)
         FakeReranker.loading = 0
         FakeReranker.requests = []
 
