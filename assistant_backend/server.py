@@ -732,6 +732,47 @@ def _alternative_resolution(text, alternatives, status, recognizes, top_logprob,
     return {"text": text, "confirm": bool(options), "options": options, "corrected_from": None}
 
 
+# /v1/assistant/match (按住選擇 and addresses, 2026-11-24): the request fields, and limits
+# (a page's options: up to 60, each up to 120 characters).
+MATCH_FIELDS = {"kind", "text", "options", "language", "county", "district"}
+MATCH_MAX_BYTES = 16384
+MATCH_MAX_OPTIONS = 60
+
+
+def match_reply(payload):
+    """Checks a /v1/assistant/match request and answers it (matching.py, address.py)."""
+    import address
+    import matching
+    if not isinstance(payload, dict) or set(payload) - MATCH_FIELDS:
+        raise AssistantError("請求欄位不正確。")
+    kind, text = payload.get("kind"), payload.get("text")
+    language = payload.get("language") or "zh"
+    if kind not in ("choice", "address") or not isinstance(text, str) or not isinstance(language, str):
+        raise AssistantError("請求欄位不正確。")
+    text = text.strip()[:200]
+    language = language if language in ("zh", "en", "ja", "vi", "id", "tl") else "zh"
+    if kind == "address":
+        hints = {}
+        for key in ("county", "district"):
+            value = payload.get(key)
+            if value is not None and not isinstance(value, str):
+                raise AssistantError("請求欄位不正確。")
+            hints[key] = (value or "").strip()[:20] or None
+        return address.match_address(text, **hints)
+    options = payload.get("options")
+    if not isinstance(options, list) or not 0 < len(options) <= MATCH_MAX_OPTIONS:
+        raise AssistantError("請求欄位不正確。")
+    clean = []
+    for option in options:
+        if isinstance(option, str):
+            option = {"text": option}
+        if not isinstance(option, dict) or set(option) - {"text", "shown"} or not isinstance(option.get("text"), str) \
+                or not isinstance(option.get("shown", ""), str):
+            raise AssistantError("請求欄位不正確。")
+        clean.append({"text": option["text"][:120], "shown": option.get("shown", "")[:120]})
+    return matching.match_choice(text, clean, language)
+
+
 def make_handler(assistant, token=""):
     class Handler(BaseHTTPRequestHandler):
         def log_message(self, *args):
@@ -795,6 +836,8 @@ def make_handler(assistant, token=""):
                 return self.transcription()
             if self.path in MODEL_ACTIONS:
                 return self.models(MODEL_ACTIONS[self.path])
+            if self.path == "/v1/assistant/match":
+                return self.match()
             if self.path != "/v1/assistant/turns":
                 return self.reply(404, {"error": "找不到此功能。"})
             if self.headers.get("Origin"):
@@ -821,6 +864,33 @@ def make_handler(assistant, token=""):
                 self.reply(422, {"error": str(exc)})
             except Exception:
                 self.reply(500, {"error": "助理暫時無法處理，請使用原服務入口。"})
+
+        def match(self):
+            """按住選擇 / an address said at once (docs/AI_CURRENT_RULES.md section 5, 2026-11-24):
+            the said words against the options on the screen (kind "choice", matching.py) or
+            the address layers (kind "address", address.py). Only matches; it never changes
+            the conversation, the session or the page. Fields: MATCH_FIELDS."""
+            if self.headers.get("Origin"):
+                self.drain(MATCH_MAX_BYTES)
+                return self.reply(403, {"error": "此測試服務僅接受 App 或本機 API 呼叫。"})
+            if self.headers.get("Content-Type", "").split(";")[0] != "application/json":
+                self.drain(MATCH_MAX_BYTES)
+                return self.reply(415, {"error": "請使用 application/json。"})
+            try:
+                self.connection.settimeout(10)
+                if self.headers.get("Transfer-Encoding") or self.headers.get("Content-Length") is None:
+                    return self.reply(411, {"error": "App 傳送格式不符，請更新 App 後重試。"})
+                length = int(self.headers.get("Content-Length", "0"))
+                if not 0 < length <= MATCH_MAX_BYTES:
+                    return self.reply(413, {"error": "請求內容過長或空白。"})
+                payload = json.loads(self.rfile.read(length))
+                self.reply(200, match_reply(payload))
+            except (ValueError, UnicodeError):
+                self.reply(400, {"error": "請使用正確的 JSON 格式。"})
+            except AssistantError as exc:
+                self.reply(422, {"error": str(exc)})
+            except Exception:
+                self.reply(500, {"error": "助理暫時無法處理，請直接點選。"})
 
         def models(self, action):
             """Start, pause or delete model downloads (docs/AI_MODEL_DOWNLOAD.md).

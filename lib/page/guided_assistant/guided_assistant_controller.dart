@@ -12,6 +12,8 @@ import 'package:town_pass/page/guided_assistant/model/guide_i18n.dart';
 import 'package:town_pass/page/guided_assistant/model/mock_assistant_engine.dart';
 import 'package:town_pass/page/guided_assistant/model/guides/guide_registry.dart';
 import 'package:town_pass/page/guided_assistant/model/input_formatter.dart';
+import 'package:town_pass/page/guided_assistant/model/skip_words.dart';
+import 'package:town_pass/page/guided_assistant/web/web_choice_input.dart';
 import 'package:town_pass/page/guided_assistant/web/web_field_input.dart';
 import 'package:town_pass/page/guided_assistant/web/web_guide_probe.dart';
 import 'package:town_pass/page/guided_assistant/web/web_page_state.dart';
@@ -213,17 +215,25 @@ enum HomeAsk { idle, listening, tooShort, working, notice, asked }
 enum FieldMicPhase { idle, listening, working }
 
 /// A line by the 按住輸入 button: a Chinese [source] for gt() with its
-/// [values]; [undo] offers 「復原」.
+/// [values]; [undo] offers 「復原」; [choices] are close options of 按住選擇
+/// for the user to tap (option index, the option's text as the page shows
+/// it).
 class FieldMicNotice {
   final String source;
   final Map<String, Object?> values;
   final bool undo;
+  final List<({int index, String text})> choices;
   const FieldMicNotice(
     this.source, {
     this.values = const {},
     this.undo = false,
+    this.choices = const [],
   });
 }
+
+/// What 復原 puts back: a dictated field, a choice (or address) made by
+/// 按住選擇, or a list item it opened (back to the page before).
+enum _UndoKind { field, choice, back }
 
 class GuidedAssistantController extends GetxController {
   final MockAssistantEngine engine;
@@ -265,6 +275,7 @@ class GuidedAssistantController extends GetxController {
     AssistantSpeaker? speaker,
     this.probeOverride,
     this.fieldInputOverride,
+    this.choiceInputOverride,
     DateTime Function()? clock,
   }) : clock = clock ?? DateTime.now,
        speaker = speaker ?? AssistantSpeaker(),
@@ -812,6 +823,8 @@ class GuidedAssistantController extends GetxController {
           : null;
     }
     _voiceTurn = voice;
+    // 跳過 on a field that need not be filled (rules section 5, 2026-11-24).
+    if (choiceId == null && !loading.value && _skipRequest(raw.trim())) return;
     final earlier = _lastRequest;
     if (choiceId == null && raw.trim().isNotEmpty) _lastRequest = raw.trim();
     final text = raw.trim();
@@ -1769,6 +1782,13 @@ class GuidedAssistantController extends GetxController {
       _nudgeTimer?.cancel();
       nudge.value = '';
     }
+    // The field the user can skip, kept while the assistant panel is open
+    // (the page is not read then): 跳過 said there skips it.
+    if (t == null) {
+      _shownSkip = null;
+    } else if (_stepRunning) {
+      _shownSkip = skipKey;
+    }
     final c = card;
     if (c == null) return;
     final key = '${task.value?.guide.id}:${c.variant}:${c.label}:${c.text}';
@@ -1945,6 +1965,79 @@ class GuidedAssistantController extends GetxController {
     final t = task.value;
     if (t == null) return;
     task.value = t.copyWith(status: TaskStatus.paused);
+  }
+
+  // -------------------------------------------------------- skipping a field
+
+  /// The step on screen is about a field that need not be filled: its key,
+  /// and the card offers 跳過這格. Null on a required field, the opened or
+  /// done card, or with no step running (docs/AI_CURRENT_RULES.md section 5,
+  /// 2026-11-24).
+  String? get skipKey {
+    if (!_stepRunning || allStepsDone) return null;
+    final step = currentStep;
+    if (step == null || step.commit) return null;
+    return step.skipFor(web);
+  }
+
+  /// [skipKey] as last shown on the page, kept while the assistant panel is
+  /// open (the page is not read then).
+  String? _shownSkip;
+
+  /// Said after a skip (chat).
+  static const skipDone = '好，這格先跳過，我們接著做下一步。';
+
+  /// 按住輸入 heard 跳過 on a field that must be filled.
+  static const skipRequired = '這格要填，不能跳過。';
+
+  /// 跳過這格: the field stays empty and does not come back in this guide
+  /// run ([WebPageState.skipped]); the guide goes on to the next step. A
+  /// field the user fills later still counts.
+  void skipField() => _skip(skipKey);
+
+  bool _skip(String? key) {
+    if (key == null) return false;
+    web.skip(key);
+    _shownSkip = null;
+    _nudgeTimer?.cancel();
+    nudge.value = '';
+    return true;
+  }
+
+  /// Typed or said 跳過／不用填 ([SkipWords]) while the running guide's step
+  /// is about a field that need not be filled: skipped, and back to the
+  /// page. False otherwise (a required field: a normal request).
+  bool _skipRequest(String text) {
+    final t = task.value;
+    if (t == null || t.status != TaskStatus.on || !SkipWords.matches(text)) {
+      return false;
+    }
+    final key = skipKey ?? _shownSkip;
+    if (key == null) return false;
+    messages.add(
+      ChatMessage(id: _nextId++, user: true, text: text, voice: _voiceTurn),
+    );
+    _skip(key);
+    _say(_bot(skipDone));
+    if (sheetOpen.value) closeSheet();
+    return true;
+  }
+
+  /// 按住輸入 heard 跳過／不用填: skips a field that need not be filled, and
+  /// on a required one says so instead of typing the words in. False when
+  /// the words are not a skip request.
+  bool _skipBySpeech(String said) {
+    final key = skipKey;
+    if (key == null) {
+      // Required: only the bare words (not e.g. a 案情摘要 that says 不填).
+      if (!SkipWords.matches(said, strict: true)) return false;
+      _showFieldNotice(skipRequired);
+      return true;
+    }
+    if (!SkipWords.matches(said)) return false;
+    _skip(key);
+    fieldMic.value = FieldMicPhase.idle;
+    return true;
   }
 
   void resume() {
@@ -2403,6 +2496,26 @@ class GuidedAssistantController extends GetxController {
   /// Tests replace the page field access.
   final WebFieldInput? fieldInputOverride;
 
+  /// Reads and chooses the step's options for 按住選擇 (docs/AI_CURRENT_RULES.md
+  /// section 5, 2026-11-24).
+  late final WebChoiceInput choiceInput =
+      choiceInputOverride ?? WebChoiceInput(_runOnPage);
+
+  /// Tests replace the page choice access.
+  final WebChoiceInput? choiceInputOverride;
+
+  /// The choice the words go to (a select, radio or checkbox group, list of
+  /// links, or an address's selects), read when the button is pressed; null
+  /// when the step has none (then [fieldTarget]).
+  final choiceTarget = Rxn<ChoiceInfo>();
+
+  _UndoKind _undo = _UndoKind.field;
+
+  /// How often (and how many times) an address's district select is checked
+  /// for its options after the county was picked (the page fills it then).
+  static Duration addressPoll = const Duration(milliseconds: 150);
+  static const addressPolls = 16;
+
   final fieldMic = FieldMicPhase.idle.obs;
 
   /// The field the words will go into, read when the microphone is pressed;
@@ -2432,7 +2545,23 @@ class GuidedAssistantController extends GetxController {
     if (page.flag('__focusField')) return true;
     final target = currentStep?.targetFor(web);
     return target != null &&
-        page.text('__fieldTargets').split(',').contains(target);
+        (page.text('__fieldTargets').split(',').contains(target) ||
+            page.text('__choiceTargets').split(',').contains(target));
+  }
+
+  /// The step is a choice (a select, radio or checkbox group, a list of
+  /// links): the button reads 按住選擇 and the words pick an option
+  /// (docs/AI_CURRENT_RULES.md section 5, 2026-11-24). A text field still
+  /// being typed in wins; one only left focused (Android keeps the focus
+  /// when the keyboard goes down) does not.
+  bool get choosing {
+    if (!dictating) return false;
+    final page = web.now;
+    if (page.flag('__editingField')) return false;
+    final target = currentStep?.targetFor(web);
+    return target != null &&
+        page.text('__choiceTargets').split(',').contains(target) &&
+        !page.text('__fieldTargets').split(',').contains(target);
   }
 
   /// 按住輸入 is pressed: listens, and meanwhile finds the field the words
@@ -2443,6 +2572,7 @@ class GuidedAssistantController extends GetxController {
     _fieldTimer?.cancel();
     fieldNotice.value = null;
     fieldTarget.value = null;
+    choiceTarget.value = null;
     fieldTargetRead.value = false;
     final read = _fieldRead = _readField();
     read.then((info) {
@@ -2466,9 +2596,18 @@ class GuidedAssistantController extends GetxController {
     await micUp(send: send);
   }
 
+  /// The choice of the step first (it also finds an address's 地址 box),
+  /// else the text field.
   Future<FieldInfo?> _readField() async {
     final id = currentStep?.targetFor(web);
     final expression = id == null ? null : task.value?.guide.spec.targets[id];
+    try {
+      final choice = await choiceInput.read(stepTarget: expression);
+      if (choice != null) {
+        if (!isClosed) choiceTarget.value = choice;
+        return null;
+      }
+    } catch (_) {}
     try {
       return await fieldInput.read(stepTarget: expression);
     } catch (_) {
@@ -2484,6 +2623,13 @@ class GuidedAssistantController extends GetxController {
     final info = await (_fieldRead ?? Future<FieldInfo?>.value());
     _fieldRead = null;
     if (isClosed) return;
+    // 跳過／不用填 on the step's field (rules section 5, 2026-11-24).
+    if (_skipBySpeech(heard.correctedFrom ?? heard.text)) return;
+    final choice = choiceTarget.value;
+    if (choice != null) {
+      await _chooseBySpeech(heard, choice);
+      return;
+    }
     if (info == null) {
       fieldMic.value = FieldMicPhase.idle;
       final reading = _bestReading(heard);
@@ -2498,7 +2644,7 @@ class GuidedAssistantController extends GetxController {
     // The words as heard: the backend's correction leans towards service
     // names, which a field never wants.
     final said = heard.correctedFrom ?? heard.text;
-    final fill = InputFormatter.fill(
+    var fill = InputFormatter.fill(
       said,
       info,
       hint: currentStep?.fieldFor(web),
@@ -2507,6 +2653,20 @@ class GuidedAssistantController extends GetxController {
       _showFieldNotice(FieldMicTexts.nothing);
       return;
     }
+    if (fill.kind == FieldKind.address && !fill.append) {
+      final standard = await _standardAddress(said, heard.language);
+      if (isClosed) return;
+      if (standard != null) {
+        final max = info.maxLength;
+        fill = FieldFill(
+          max != null && standard.length > max
+              ? standard.substring(0, max)
+              : standard,
+          kind: FieldKind.address,
+        );
+      }
+    }
+    _undo = _UndoKind.field;
     String? value;
     try {
       value = await fieldInput.insert(fill);
@@ -2523,13 +2683,19 @@ class GuidedAssistantController extends GetxController {
     );
   }
 
-  /// 復原: the field's value from before the last fill.
+  /// 復原: the field's value from before the last fill, or what the last
+  /// 按住選擇 chose (the address's selects and box too), or back from the
+  /// list item it opened.
   Future<void> undoFieldFill() async {
     if (fieldNotice.value?.undo != true) return;
     fieldNotice.value = null;
     var ok = false;
     try {
-      ok = await fieldInput.undo();
+      ok = switch (_undo) {
+        _UndoKind.field => await fieldInput.undo(),
+        _UndoKind.choice => await choiceInput.undo(),
+        _UndoKind.back => await choiceInput.back(),
+      };
     } catch (_) {}
     if (isClosed) return;
     _showFieldNotice(ok ? FieldMicTexts.undone : FieldMicTexts.undoFailed);
@@ -2539,11 +2705,232 @@ class GuidedAssistantController extends GetxController {
     String source, {
     Map<String, Object?> values = const {},
     bool undo = false,
+    List<({int index, String text})> choices = const [],
   }) {
     fieldMic.value = FieldMicPhase.idle;
-    fieldNotice.value = FieldMicNotice(source, values: values, undo: undo);
+    fieldNotice.value = FieldMicNotice(
+      source,
+      values: values,
+      undo: undo,
+      choices: choices,
+    );
     _fieldTimer?.cancel();
-    _fieldTimer = Timer(fieldNoticeTime, () => fieldNotice.value = null);
+    // Close options to tap stay a little longer.
+    _fieldTimer = Timer(
+      choices.isEmpty ? fieldNoticeTime : fieldNoticeTime * 3,
+      () => fieldNotice.value = null,
+    );
+  }
+
+  // ------------------------------------------------------------- 按住選擇
+
+  /// The words against the step's options (backend /v1/assistant/match,
+  /// assistant_backend/matching.py): one clear option is chosen like a tap,
+  /// two or three close ones are listed to tap, none: say it again or tap.
+  /// The words stay out of the chat and the decision model, as with 按住輸入.
+  Future<void> _chooseBySpeech(
+    AssistantTranscript heard,
+    ChoiceInfo choice,
+  ) async {
+    final said = heard.correctedFrom ?? heard.text;
+    if (choice.kind == ChoiceKind.address) {
+      await _fillAddressGroup(said, heard.language, choice);
+      return;
+    }
+    Map<String, dynamic>? reply;
+    try {
+      reply = await service?.match(
+        kind: 'choice',
+        text: said,
+        options: [for (final o in choice.options) o.toJson()],
+        language: heard.language,
+      );
+    } catch (_) {}
+    if (isClosed) return;
+    if (reply == null) {
+      _showFieldNotice(ChoiceMicTexts.failed);
+      return;
+    }
+    int? indexOf(Object? entry) {
+      if (entry is! Map) return null;
+      final i = entry['index'];
+      return i is int && i >= 0 && i < choice.options.length ? i : null;
+    }
+
+    switch (reply['decision']) {
+      case 'pick':
+        final index = indexOf(reply['best']);
+        if (index != null) {
+          await chooseOption(index);
+          return;
+        }
+      case 'ask':
+        final candidates = [
+          if (reply['candidates'] is List)
+            for (final c in reply['candidates'] as List)
+              if (indexOf(c) case final int i)
+                (index: i, text: choice.options[i].label),
+        ];
+        if (candidates.isNotEmpty) {
+          _showFieldNotice(ChoiceMicTexts.which, choices: candidates);
+          return;
+        }
+    }
+    _showFieldNotice(ChoiceMicTexts.none);
+  }
+
+  /// Chooses option [index] of the choice read at the press (said clearly,
+  /// or tapped among the close ones), with the page's own events.
+  Future<void> chooseOption(int index) async {
+    final choice = choiceTarget.value;
+    if (choice == null || index < 0 || index >= choice.options.length) return;
+    fieldNotice.value = null;
+    ChoiceResult result;
+    try {
+      result = await choiceInput.choose(index);
+    } catch (_) {
+      result = const ChoiceResult();
+    }
+    if (isClosed) return;
+    final text = choice.options[index].label;
+    if (!result.ok) {
+      _showFieldNotice(ChoiceMicTexts.failed);
+    } else if (result.already) {
+      _showFieldNotice(ChoiceMicTexts.already, values: {'text': text});
+    } else if (result.navigated) {
+      _undo = _UndoKind.back;
+      _showFieldNotice(
+        ChoiceMicTexts.opened,
+        values: {'text': text},
+        undo: true,
+      );
+    } else {
+      _undo = _UndoKind.choice;
+      _showFieldNotice(
+        result.undoable ? ChoiceMicTexts.chosen : ChoiceMicTexts.chosenNoUndo,
+        values: {'text': text},
+        undo: result.undoable,
+      );
+    }
+  }
+
+  /// A whole address said for the 縣市 / 區 selects and the 地址 box: the
+  /// county is picked, then (once the page has filled the district list) the
+  /// district, then the rest goes into the box. It stops at a layer it is
+  /// not sure of or cannot pick, and says to pick that one by hand; 復原
+  /// puts back what it did.
+  Future<void> _fillAddressGroup(
+    String said,
+    String? language,
+    ChoiceInfo info,
+  ) async {
+    Map<String, dynamic>? reply;
+    try {
+      reply = await service?.match(
+        kind: 'address',
+        text: said,
+        language: language,
+        county: info.county,
+        district: info.district,
+      );
+    } catch (_) {}
+    if (isClosed) return;
+    if (reply == null) {
+      _showFieldNotice(ChoiceMicTexts.failed);
+      return;
+    }
+    _undo = _UndoKind.choice;
+    final layers = reply;
+    String? name(String layer) {
+      final v = layers[layer];
+      return v is Map && v['name'] is String ? v['name'] as String : null;
+    }
+
+    final county = name('county');
+    final countyLayer = layers['county'];
+    final countyHow = countyLayer is Map ? countyLayer['how'] : null;
+    var changed = false;
+    if (county == null) {
+      _showFieldNotice(ChoiceMicTexts.noCounty);
+      return;
+    }
+    if (countyHow != 'page') {
+      final r = await choiceInput.pickAddress('county', county);
+      if (isClosed) return;
+      if (!r.ok) {
+        _showFieldNotice(
+          ChoiceMicTexts.countyMissing,
+          values: {'name': county},
+        );
+        return;
+      }
+      changed = !r.already;
+    }
+    final district = name('district');
+    if (district != null) {
+      var r = const ChoiceResult();
+      for (var i = 0; i < addressPolls; i++) {
+        r = await choiceInput.pickAddress('district', district);
+        if (isClosed) return;
+        if (r.ok || r.loaded) break;
+        await Future<void>.delayed(addressPoll);
+        if (isClosed) return;
+      }
+      if (!r.ok) {
+        _showFieldNotice(
+          r.loaded
+              ? ChoiceMicTexts.districtMissing
+              : ChoiceMicTexts.districtLoading,
+          values: {'name': district},
+          undo: changed,
+        );
+        return;
+      }
+      changed = changed || !r.already;
+    } else if (changed || info.district.isEmpty) {
+      _showFieldNotice(
+        ChoiceMicTexts.noDistrict,
+        values: {'county': county},
+        undo: changed,
+      );
+      return;
+    }
+    final detail = layers['detail'];
+    if (info.hasDetail && detail is String && detail.trim().isNotEmpty) {
+      final r = await choiceInput.fillAddressDetail(detail.trim());
+      if (isClosed) return;
+      if (!r.ok) {
+        _showFieldNotice(ChoiceMicTexts.failed, undo: changed);
+        return;
+      }
+      changed = true;
+    }
+    final standard = layers['standard'];
+    _showFieldNotice(
+      FieldMicTexts.filled,
+      values: {
+        'text': standard is String && standard.isNotEmpty ? standard : said,
+      },
+      undo: changed,
+    );
+  }
+
+  /// An address said into one box, written the standard way
+  /// (臺北市信義區市府路1號) when the backend recognised a county, district
+  /// or road; null: keep the words as formatted.
+  Future<String?> _standardAddress(String said, String? language) async {
+    if (language != null && language != 'zh') return null;
+    try {
+      final reply = await service?.match(kind: 'address', text: said);
+      if (reply == null) return null;
+      final known = ['county', 'district', 'road'].any((k) => reply[k] is Map);
+      final standard = reply['standard'];
+      return known && standard is String && standard.isNotEmpty
+          ? standard
+          : null;
+    } catch (_) {
+      return null;
+    }
   }
 
   /// Runs a field script in the visible TownPass service page only.

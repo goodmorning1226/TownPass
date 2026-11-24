@@ -28,6 +28,11 @@ enum FieldKind {
 
   /// Plate, case or account numbers: capitals, digits and dashes.
   code,
+
+  /// An address or a place in one box (發生地點): the words as said here; the
+  /// controller has the backend write it the standard way (臺北市信義區市府路1號,
+  /// assistant_backend/address.py) and keeps the words when that fails.
+  address,
 }
 
 /// How a date field writes its value.
@@ -168,6 +173,7 @@ abstract final class InputFormatter {
     if (_mailWords.hasMatch(words)) return FieldKind.email;
     if (_dateWords.hasMatch(words)) return FieldKind.date;
     if (_timeWords.hasMatch(words)) return FieldKind.time;
+    if (_addressWords.hasMatch(words)) return FieldKind.address;
     if (_codeWords.hasMatch(words)) return FieldKind.code;
     if (field.inputMode == 'numeric' || field.inputMode == 'decimal') {
       return FieldKind.number;
@@ -188,6 +194,7 @@ abstract final class InputFormatter {
   static final _mailWords = RegExp(r'信箱|郵件|e-?mail|(^|[^a-z])mail');
   static final _dateWords = RegExp(r'日期|生日|出生|date|birth');
   static final _timeWords = RegExp(r'時間|幾點|(^|[^a-z])time');
+  static final _addressWords = RegExp(r'地址|地點|住址|address|location');
   static final _codeWords = RegExp(
     r'車牌|牌照|案號|編號|單號|序號|水號|電號|帳號|證號|plate|license|code|serial|case',
   );
@@ -253,7 +260,7 @@ abstract final class InputFormatter {
     int? maxLength,
   }) {
     final out = switch (kind) {
-      FieldKind.text => text(transcript),
+      FieldKind.text || FieldKind.address => text(transcript),
       FieldKind.multiline => text(transcript, multiline: true),
       FieldKind.phone => phone(transcript),
       FieldKind.email => email(transcript),

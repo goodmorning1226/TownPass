@@ -45,6 +45,13 @@
    "id": "Di “{page:描述}”, tulis siapa, apa, kapan, di mana, dan bendanya, misalnya “11月7日晚上，〇〇路口的路燈不亮，很暗很危險” (malam 7 November, lampu jalan di persimpangan 〇〇 mati, gelap dan berbahaya).",
    "tl": "Sa “{page:描述}”, isulat kung sino, ano, kailan, saan at anong bagay, hal. “11月7日晚上，〇〇路口的路燈不亮，很暗很危險” (noong gabi ng Nob. 7, patay ang ilaw sa kalye sa kanto ng 〇〇; madilim at delikado)."
   },
+  "「新增附件」這格可以不加。想附上照片，點「最多上傳 10個檔案」的方框，選手機裡的照片；不加就按「跳過這格」。": {
+   "en": "“{page:新增附件}” is optional. To add photos, tap the “{page:最多上傳 10個檔案}” box and pick photos from your phone. If not, tap “Skip this field”.",
+   "ja": "「{page:新增附件}」は付けなくても大丈夫です。写真を付けるなら、「{page:最多上傳 10個檔案}」の枠をタップしてスマホの写真を選んでください。付けないなら「この欄をスキップ」を押します。",
+   "vi": "“{page:新增附件}” không thêm cũng được. Muốn đính kèm ảnh, chạm vào ô “{page:最多上傳 10個檔案}” và chọn ảnh trong điện thoại; không thêm thì bấm “Bỏ qua ô này”.",
+   "id": "“{page:新增附件}” boleh tidak diisi. Untuk melampirkan foto, ketuk kotak “{page:最多上傳 10個檔案}” dan pilih foto di ponsel Anda. Kalau tidak, tekan “Lewati kolom ini”.",
+   "tl": "Hindi kailangan ang “{page:新增附件}”. Para magdagdag ng larawan, i-tap ang kahon na “{page:最多上傳 10個檔案}” at pumili ng larawan sa iyong phone. Kung hindi, i-tap ang “Laktawan ito”."
+  },
   "「案件主旨」是一句話的標題，例如「巷口路燈不亮」。有「*」的格子一定要寫。": {
    "en": "“{page:案件主旨}” is a one-line title, e.g. “巷口路燈不亮” (the street light at the lane entrance is out). Boxes marked “*” must be filled in.",
    "ja": "「{page:案件主旨}」は一文のタイトルです。例：「巷口路燈不亮」（路地の入口の街灯がつかない）。「*」がある欄は必ず書いてください。",
@@ -52,12 +59,19 @@
    "id": "“{page:案件主旨}” adalah judul satu kalimat, misalnya “巷口路燈不亮” (lampu jalan di mulut gang mati). Kotak bertanda “*” wajib diisi.",
    "tl": "Ang “{page:案件主旨}” ay isang linyang pamagat, hal. “巷口路燈不亮” (patay ang ilaw sa kalye sa bukana ng eskinita). Dapat punan ang mga kahong may “*”."
   },
-  "「發生地點」寫事情在哪裡發生，例如路名和門牌。不寫也可以送出。": {
-   "en": "“{page:發生地點}” is where it happened, such as the street name and house number. You can send it without this too.",
-   "ja": "「{page:發生地點}」には、起きた場所（通りの名前と番地など）を書きます。書かなくても送信できます。",
-   "vi": "“{page:發生地點}” là nơi xảy ra, ví dụ tên đường và số nhà. Không điền cũng gửi được.",
-   "id": "“{page:發生地點}” adalah tempat kejadiannya, misalnya nama jalan dan nomor rumah. Tanpa ini juga bisa dikirim.",
-   "tl": "Ang “{page:發生地點}” ay kung saan ito nangyari, gaya ng pangalan ng kalye at numero ng bahay. Puwede mo rin itong ipadala kahit wala ito."
+  "「發生地點」寫事情在哪裡發生，例如路名和門牌。不寫也可以送出：按卡片上的「跳過這格」，或說「跳過」。": {
+   "en": "“{page:發生地點}” is where it happened, such as the street name and house number. You can send without it: tap “Skip this field” on the card, or say “skip”.",
+   "ja": "「{page:發生地點}」には、起きた場所（通りの名前と番地など）を書きます。書かなくても送信できます。カードの「この欄をスキップ」を押すか、「スキップ」と言ってください。",
+   "vi": "“{page:發生地點}” là nơi xảy ra, ví dụ tên đường và số nhà. Không điền cũng gửi được: bấm “Bỏ qua ô này” trên thẻ, hoặc nói “bỏ qua”.",
+   "id": "“{page:發生地點}” adalah tempat kejadiannya, misalnya nama jalan dan nomor rumah. Tanpa ini juga bisa dikirim: tekan “Lewati kolom ini” di kartu, atau ucapkan “lewati”.",
+   "tl": "Ang “{page:發生地點}” ay kung saan ito nangyari, gaya ng pangalan ng kalye at numero ng bahay. Puwede mo itong ipadala kahit wala ito: i-tap ang “Laktawan ito” sa card, o sabihin ang “laktawan”."
+  },
+  "「發生地點」這格可以不填。想寫的話，點框框打事情發生的完整地址，例如「〇〇路〇號」；不寫就按「跳過這格」。": {
+   "en": "“{page:發生地點}” is optional. To fill it in, tap the box and type the full address where it happened, e.g. “〇〇路〇號” (No. 〇, 〇〇 Road). If not, tap “Skip this field”.",
+   "ja": "「{page:發生地點}」は書かなくても大丈夫です。書くなら、枠をタップして起きた場所の住所を全部入力してください。例：「〇〇路〇號」。書かないなら「この欄をスキップ」を押します。",
+   "vi": "Ô “{page:發生地點}” không điền cũng được. Muốn điền thì chạm vào ô, gõ địa chỉ đầy đủ nơi xảy ra, ví dụ “〇〇路〇號” (số 〇, đường 〇〇); không điền thì bấm “Bỏ qua ô này”.",
+   "id": "Kotak “{page:發生地點}” boleh dikosongkan. Kalau mau mengisi, ketuk kotaknya dan ketik alamat lengkap tempat kejadian, misalnya “〇〇路〇號” (Jalan 〇〇 No. 〇). Kalau tidak, tekan “Lewati kolom ini”.",
+   "tl": "Puwedeng iwanang blangko ang “{page:發生地點}”. Kung pupunan, i-tap ang kahon at i-type ang buong address kung saan ito nangyari, hal. “〇〇路〇號” (No. 〇, 〇〇 Road). Kung hindi, i-tap ang “Laktawan ito”."
   },
   "「送出」現在還不能按。往上看看有沒有紅字，把漏掉的格子補好。": {
    "en": "“{page:送出}” can’t be tapped yet. Look above for red text and fill in the boxes you missed.",
@@ -345,13 +359,6 @@
    "vi": "Muốn xem các vụ phản ánh, chạm vào “{page:有話要說}” bên trái.",
    "id": "Untuk melihat kasus keluhan, ketuk “{page:有話要說}” di sebelah kiri.",
    "tl": "Para makita ang iyong mga reklamo, i-tap ang “{page:有話要說}” sa kaliwa."
-  },
-  "想附上照片，點一下「最多上傳 10個檔案」的方框，選手機裡的照片。不加也可以。": {
-   "en": "To add photos, tap the “{page:最多上傳 10個檔案}” box and pick photos from your phone. You can skip this.",
-   "ja": "写真を付けたいときは、「{page:最多上傳 10個檔案}」の枠をタップして、スマホの写真を選んでください。付けなくても大丈夫です。",
-   "vi": "Muốn đính kèm ảnh, chạm vào ô “{page:最多上傳 10個檔案}” và chọn ảnh trong điện thoại. Không thêm cũng được.",
-   "id": "Untuk melampirkan foto, ketuk kotak “{page:最多上傳 10個檔案}” dan pilih foto di ponsel Anda. Tidak ditambah juga boleh.",
-   "tl": "Para magdagdag ng larawan, i-tap ang kahon na “{page:最多上傳 10個檔案}” at pumili ng mga larawan sa iyong phone. Puwede mo itong laktawan."
   },
   "我要陳情": {
    "en": "I want to file a complaint",
@@ -829,12 +836,12 @@
    "id": "Kategori sudah dipilih! Selanjutnya, tulis apa yang ingin Anda sampaikan.",
    "tl": "Napili na ang kategorya! Susunod, isulat ang gusto mong iulat."
   },
-  "點「新增附件」下面的方框，可以選照片、錄影或錄音，最多 10 個檔案。不加也可以送出。": {
-   "en": "Tap the box under “{page:新增附件}” to pick photos, videos or audio recordings, up to 10 files. You can send without them too.",
-   "ja": "「{page:新增附件}」の下の枠をタップすると、写真・動画・録音を選べます。最大 10 個までです。付けなくても送信できます。",
-   "vi": "Chạm vào ô dưới “{page:新增附件}” để chọn ảnh, video hoặc ghi âm, tối đa 10 tệp. Không thêm cũng gửi được.",
-   "id": "Ketuk kotak di bawah “{page:新增附件}” untuk memilih foto, video, atau rekaman suara, hingga 10 file. Tanpa lampiran juga bisa dikirim.",
-   "tl": "I-tap ang kahon sa ilalim ng “{page:新增附件}” para pumili ng larawan, video o audio recording, hanggang 10 file. Puwede mo rin itong ipadala nang wala ang mga ito."
+  "點「新增附件」下面的方框，可以選照片、錄影或錄音，最多 10 個檔案。不加也可以送出：按卡片上的「跳過這格」，或說「跳過」。": {
+   "en": "Tap the box under “{page:新增附件}” to pick photos, videos or audio recordings, up to 10 files. You can send without them: tap “Skip this field” on the card, or say “skip”.",
+   "ja": "「{page:新增附件}」の下の枠をタップすると、写真・動画・録音を選べます。最大 10 個までです。付けなくても送信できます。カードの「この欄をスキップ」を押すか、「スキップ」と言ってください。",
+   "vi": "Chạm vào ô dưới “{page:新增附件}” để chọn ảnh, video hoặc ghi âm, tối đa 10 tệp. Không thêm cũng gửi được: bấm “Bỏ qua ô này” trên thẻ, hoặc nói “bỏ qua”.",
+   "id": "Ketuk kotak di bawah “{page:新增附件}” untuk memilih foto, video, atau rekaman suara, hingga 10 file. Tanpa lampiran juga bisa dikirim: tekan “Lewati kolom ini” di kartu, atau ucapkan “lewati”.",
+   "tl": "I-tap ang kahon sa ilalim ng “{page:新增附件}” para pumili ng larawan, video o audio recording, hanggang 10 file. Puwede mo itong ipadala nang wala ang mga ito: i-tap ang “Laktawan ito” sa card, o sabihin ang “laktawan”."
   },
   "點一下": {
    "en": "Tap",
@@ -850,6 +857,13 @@
    "id": "Ketuk kotak “{page:搜尋案號關鍵字}”, ketik nomor kasus (yang diawali “A10-”), lalu tekan kaca pembesar di kanan.",
    "tl": "I-tap ang kahon na “{page:搜尋案號關鍵字}”, i-type ang numero ng kaso (iyong nagsisimula sa “A10-”), saka i-tap ang magnifying glass sa kanan."
   },
+  "點一下「最多上傳 10個檔案」的方框，選手機裡的照片。": {
+   "en": "Tap the “{page:最多上傳 10個檔案}” box and pick photos from your phone.",
+   "ja": "「{page:最多上傳 10個檔案}」の枠をタップして、スマホの写真を選んでください。",
+   "vi": "Chạm vào ô “{page:最多上傳 10個檔案}” và chọn ảnh trong điện thoại.",
+   "id": "Ketuk kotak “{page:最多上傳 10個檔案}” dan pilih foto di ponsel Anda.",
+   "tl": "I-tap ang kahon na “{page:最多上傳 10個檔案}” at pumili ng mga larawan sa iyong phone."
+  },
   "點一下「案件主旨」的框框，用一句話寫你要反映什麼，例如「巷口路燈不亮」。": {
    "en": "Tap the “{page:案件主旨}” box and write in one sentence what you want to report, e.g. “巷口路燈不亮” (the street light at the lane entrance is out).",
    "ja": "「{page:案件主旨}」の枠をタップして、伝えたいことを一文で書いてください。例：「巷口路燈不亮」（路地の入口の街灯がつかない）。",
@@ -864,12 +878,12 @@
    "id": "Ketuk “{page:災情通報}” untuk melihat bencana yang pernah Anda laporkan.",
    "tl": "I-tap ang “{page:災情通報}” para makita ang mga sakunang iniulat mo."
   },
-  "點一下「發生地點」的框框，打事情發生的完整地址，例如「〇〇路〇號」。這格不寫也可以。": {
-   "en": "Tap the “{page:發生地點}” box and type the full address where it happened, e.g. “〇〇路〇號” (No. 〇, 〇〇 Road). You can leave this box empty.",
-   "ja": "「{page:發生地點}」の枠をタップして、起きた場所の住所を全部入力してください。例：「〇〇路〇號」。この欄は書かなくても大丈夫です。",
-   "vi": "Chạm vào ô “{page:發生地點}”, gõ địa chỉ đầy đủ nơi xảy ra, ví dụ “〇〇路〇號” (số 〇, đường 〇〇). Ô này không điền cũng được.",
-   "id": "Ketuk kotak “{page:發生地點}” dan ketik alamat lengkap tempat kejadian, misalnya “〇〇路〇號” (Jalan 〇〇 No. 〇). Kotak ini boleh dikosongkan.",
-   "tl": "I-tap ang kahon na “{page:發生地點}” at i-type ang buong address kung saan ito nangyari, hal. “〇〇路〇號” (No. 〇, 〇〇 Road). Puwede mong iwanang blangko ang kahong ito."
+  "點一下「發生地點」的框框，打事情發生的完整地址，例如「〇〇路〇號」。": {
+   "en": "Tap the “{page:發生地點}” box and type the full address where it happened, e.g. “〇〇路〇號” (No. 〇, 〇〇 Road).",
+   "ja": "「{page:發生地點}」の枠をタップして、起きた場所の住所を全部入力してください。例：「〇〇路〇號」。",
+   "vi": "Chạm vào ô “{page:發生地點}”, gõ địa chỉ đầy đủ nơi xảy ra, ví dụ “〇〇路〇號” (số 〇, đường 〇〇).",
+   "id": "Ketuk kotak “{page:發生地點}” dan ketik alamat lengkap tempat kejadian, misalnya “〇〇路〇號” (Jalan 〇〇 No. 〇).",
+   "tl": "I-tap ang kahon na “{page:發生地點}” at i-type ang buong address kung saan ito nangyari, hal. “〇〇路〇號” (No. 〇, 〇〇 Road)."
   },
   "點一下上面的「查詢」。": {
    "en": "Tap “{page:查詢}” at the top.",

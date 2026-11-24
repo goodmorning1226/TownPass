@@ -8,6 +8,7 @@ import 'package:town_pass/page/guided_assistant/guide_target.dart';
 import 'package:town_pass/page/guided_assistant/guided_assistant_controller.dart';
 import 'package:town_pass/page/guided_assistant/model/assistant_settings.dart';
 import 'package:town_pass/page/guided_assistant/model/guide_i18n.dart';
+import 'package:town_pass/page/guided_assistant/web/web_choice_input.dart';
 import 'package:town_pass/page/guided_assistant/widget/guide_motion.dart';
 import 'package:town_pass/page/guided_assistant/widget/hold_to_talk.dart';
 import 'package:town_pass/util/tp_colors.dart';
@@ -359,8 +360,15 @@ class _AskButtonState extends State<AskButton> {
           right: shown.right,
           bottom: shown.bottom + AskLayout.height + 8,
           child: ConstrainedBox(
+            // Within the screen from the side it is anchored to (a long
+            // line, e.g. 按住選擇 on an address, went off the other edge).
             constraints: BoxConstraints(
-              maxWidth: math.max(160, MediaQuery.sizeOf(context).width - 32),
+              maxWidth: math.max(
+                160,
+                MediaQuery.sizeOf(context).width -
+                    (shown.right ?? shown.left ?? 16) -
+                    16,
+              ),
             ),
             child: Obx(() => _caption(shown.left == null)),
           ),
@@ -372,6 +380,7 @@ class _AskButtonState extends State<AskButton> {
   Widget _button(bool compact) {
     // Read here so the label follows the step and the focused field.
     final dictating = c.dictating;
+    final choosing = dictating && c.choosing;
     c.fieldMic.value;
     c.homeAsk.value;
     c.listening.value;
@@ -380,7 +389,13 @@ class _AskButtonState extends State<AskButton> {
     final working = _working;
     return Semantics(
       button: true,
-      label: gt(dictating ? FieldMicTexts.aria : HomeAskTexts.aria),
+      label: gt(
+        choosing
+            ? ChoiceMicTexts.aria
+            : dictating
+            ? FieldMicTexts.aria
+            : HomeAskTexts.aria,
+      ),
       excludeSemantics: true,
       child: HoldToTalk(
         key: const Key('ask-button'),
@@ -399,6 +414,8 @@ class _AskButtonState extends State<AskButton> {
           label: gt(
             listening
                 ? (ready ? HomeAskTexts.listeningLabel : HomeAskTexts.preparing)
+                : choosing
+                ? ChoiceMicTexts.label
                 : dictating
                 ? FieldMicTexts.label
                 : HomeAskTexts.label,
@@ -441,9 +458,16 @@ class _AskButtonState extends State<AskButton> {
       );
       if (_dictate) {
         final target = c.fieldTarget.value;
+        final choice = c.choiceTarget.value;
         final String where;
         if (!c.fieldTargetRead.value) {
           where = gt(FieldMicTexts.finding);
+        } else if (choice != null) {
+          where = choice.kind == ChoiceKind.address
+              ? gt(ChoiceMicTexts.addressHere)
+              : choice.title.isEmpty
+              ? gt(ChoiceMicTexts.chooseHere)
+              : gt(ChoiceMicTexts.chooseIn, {'field': pg(choice.title)});
         } else if (target == null) {
           where = gt(FieldMicTexts.toAssistant);
         } else if (target.title.isEmpty) {
@@ -490,6 +514,33 @@ class _AskButtonState extends State<AskButton> {
               ? CrossAxisAlignment.end
               : CrossAxisAlignment.start,
           children: [
+            if (notice != null &&
+                notice.choices.isNotEmpty &&
+                !listening &&
+                !working)
+              for (final option in notice.choices) ...[
+                SizedBox(
+                  height: 48,
+                  child: OutlinedButton(
+                    key: Key('ask-choice-${option.index}'),
+                    style: OutlinedButton.styleFrom(
+                      backgroundColor: TPColors.white,
+                      side: const BorderSide(color: TPColors.primary500),
+                      shape: const StadiumBorder(),
+                    ),
+                    onPressed: () {
+                      GuideMotion.tap();
+                      c.chooseOption(option.index);
+                    },
+                    child: TPText(
+                      option.text,
+                      style: TPTextStyles.h3SemiBold.copyWith(fontSize: 15),
+                      color: TPColors.primary700,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 6),
+              ],
             if (notice?.undo == true && !listening && !working) ...[
               SizedBox(
                 height: 48,

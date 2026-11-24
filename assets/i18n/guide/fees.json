@@ -479,6 +479,13 @@
    "id": "Pembayaran",
    "tl": "Pagbabayad"
   },
+  "繳費編號可以不填": {
+   "en": "Payment number is optional",
+   "ja": "納付番号は入力しなくてよい",
+   "vi": "Mã số thanh toán không bắt buộc",
+   "id": "Nomor pembayaran boleh kosong",
+   "tl": "Hindi kailangan ang payment number"
+  },
   "號碼": {
    "en": "The number",
    "ja": "番号",
@@ -548,6 +555,13 @@
    "vi": "Đây là lịch sử thanh toán của bạn, hiện đang trống. Muốn xem xa hơn, chạm “{page:近1年}” bên trái và đổi thành “{page:近3年}”.",
    "id": "Ini riwayat pembayaran Anda, saat ini masih kosong. Untuk melihat yang lebih lama, ketuk “{page:近1年}” di kiri dan ubah menjadi “{page:近3年}”.",
    "tl": "Ito ang iyong kasaysayan ng pagbabayad. Wala pa itong laman. Para makita ang mas lumang tala, i-tap ang “{page:近1年}” sa kaliwa at palitan ito ng “{page:近3年}”."
+  },
+  "這格可以不填，不填也能查詢；不填就按「跳過這格」。": {
+   "en": "This field is optional: you can search without it. If you leave it empty, tap “Skip this field”. ",
+   "ja": "この欄は入力しなくても照会できます。入力しないなら「この欄をスキップ」を押します。",
+   "vi": "Ô này không điền cũng tra cứu được; không điền thì bấm “Bỏ qua ô này”. ",
+   "id": "Kolom ini boleh dikosongkan, pencarian tetap bisa. Kalau tidak diisi, tekan “Lewati kolom ini”. ",
+   "tl": "Puwedeng iwanang blangko ang field na ito; makakapaghanap ka pa rin. Kung hindi pupunan, i-tap ang “Laktawan ito”. "
   },
   "這次沒有查到要繳的帳單。按左上角的「‹」回上一頁，檢查號碼再查一次。": {
    "en": "No bills to pay were found this time. Tap “‹” at the top left to go back, check the number and try again.",

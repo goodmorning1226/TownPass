@@ -23,15 +23,20 @@ import 'package:town_pass/page/guided_assistant/web/web_page_state.dart';
 /// The visible field walker of a step-1 form: the first field group (a
 /// `div.flex.flex-col` with a `.field-label`) in section [sec] ('basic' =
 /// 基本資料, 'service' = 申辦服務資料, null = both) of [kind] (null = any)
-/// that is still empty ([any] = also filled ones).
+/// that is still empty ([any] = also filled ones). Every field is walked in
+/// screen order; one without 「*」 on its label is `optional` (it has a step
+/// too, with 跳過這格) and is passed once skipped (`district:<name>`) or
+/// once a field after it is filled or focused (docs/AI_CURRENT_RULES.md
+/// section 5, 2026-11-24; the forms have none now).
 const _walk = r'''((sec, kind, any) => {
-  const none = { el: null, kind: '', name: '', hint: '', opts: 0, choices: '', open: true, empty: false, typing: false };
+  const none = { el: null, kind: '', name: '', hint: '', opts: 0, choices: '', open: true, empty: false, typing: false, optional: false };
   // A text box the user is still typing in counts as empty, so the card does
   // not jump to the next field after the first letter (editing(): until
   // Enter, the keyboard goes down, 按住輸入 or the box loses the focus).
   const typed = (e) => !!(e.value || '').trim() && editing(e);
   if (!byText('form button.base-button', '下一步')) return none;
   const svc = byText('section > div.py-5.px-4 > button', '申辦服務資料');
+  const all = [];
   for (const g of qa('div.flex.flex-col')) {
     let head = null;
     for (const c of g.children) {
@@ -55,10 +60,17 @@ const _walk = r'''((sec, kind, any) => {
     else if (area) f = { kind: 'text', el: area, empty: !(area.value || '').trim() || typed(area), typing: typed(area), hint: ph(area) || '' };
     else if (inp) f = { kind: inp.readOnly ? 'date' : 'text', el: inp, empty: !(inp.value || '').trim() || (!inp.readOnly && typed(inp)), typing: !inp.readOnly && typed(inp), hint: ph(inp) || '' };
     else continue;
+    const first = Array.isArray(f.el) ? f.el[0] : f.el;
+    all.push(Object.assign({}, none, f, { g, name: txt(head).replace(/\s*\*\s*$/, ''), open: opened(first), optional: !/[*＊]/.test(txt(head)) }));
+  }
+  const touched = (x) => !x.empty || x.g.contains(document.activeElement);
+  for (let i = 0; i < all.length; i++) {
+    const f = all[i];
     if (kind && f.kind !== kind) continue;
     if (!any && !f.empty) continue;
-    const first = Array.isArray(f.el) ? f.el[0] : f.el;
-    return Object.assign({}, none, f, { name: txt(head).replace(/\s*\*\s*$/, ''), open: opened(first) });
+    if (!any && f.optional && (skippedField('district:' + f.name) || all.slice(i + 1).some(touched))) continue;
+    delete f.g;
+    return f;
   }
   return none;
 })''';
@@ -157,6 +169,7 @@ final districtOfficePageSpec = WebPageSpec(
       '${e.key}Opts': '${e.value}.opts',
       '${e.key}Open': '${e.value}.open',
       '${e.key}Typing': '${e.value}.typing',
+      '${e.key}Optional': '${e.value}.optional',
     },
     'multiEmpty': '!!$_multi.el',
     'multiName': "$_walk(null, 'multi', true).name",
@@ -335,7 +348,24 @@ String _formCard(WebPageState s, String sec) {
     return gt('「{section}」收起來了，點一下把它打開。', {'section': pg(_sectionName[sec]!)});
   }
   if (s.now.flag('${sec}Typing')) return '寫好了就按鍵盤上的「完成」或「✓」，收起鍵盤。';
-  return _scrollWord(s, 'district.${sec}_field') + _fieldCard(s, sec);
+  final optional = _skipKey(s, sec) == null
+      ? ''
+      : gt('「{name}」這格可以不填；不填就按「跳過這格」。', {
+          'name': pg(s.now.text('${sec}Name')),
+        });
+  return _scrollWord(s, 'district.${sec}_field') +
+      optional +
+      _fieldCard(s, sec);
+}
+
+/// The field of section [sec] the card is about need not be filled (no
+/// 「*」 on its label): its skip key (docs/AI_CURRENT_RULES.md section 5,
+/// 2026-11-24). Null on a required field, a popup or a closed section.
+String? _skipKey(WebPageState s, String sec) {
+  if (!_step1(s) || _popupTarget(s) != null) return null;
+  if (!s.now.flag('${sec}Open') || !s.now.flag('${sec}Optional')) return null;
+  final name = s.now.text('${sec}Name');
+  return name.isEmpty ? null : 'district:$name';
 }
 
 String _formLabel(WebPageState s, String sec) {
@@ -387,10 +417,14 @@ GuideStep _fillStep(String sec) => GuideStep(
     );
   },
   isDone: (s) => _sectionDone(s, sec),
-  locks: (s) => _home(s) || _lockIfVisible(s, _formTarget(s, sec)),
+  // A field that need not be filled: the ring only, not dimmed.
+  locks: (s) =>
+      _home(s) ||
+      (_lockIfVisible(s, _formTarget(s, sec)) && _skipKey(s, sec) == null),
   arrow: (s) => _home(s) ? _queryTab(s) : _popupTarget(s) == 'district.item_ok',
   scrollHint: (s) => !_home(s) && _offScreen(s, _formTarget(s, sec)),
   cardTop: (s) => _cardNear(s, _home(s) ? _listTarget(s) : _formTarget(s, sec)),
+  skipKey: (s) => _home(s) ? null : _skipKey(s, sec),
 );
 
 // ---- Home ------------------------------------------------------------------

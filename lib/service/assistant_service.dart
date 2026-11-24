@@ -420,6 +420,29 @@ class AssistantService {
   Future<Map<String, dynamic>> deleteModels(List<String> parts) =>
       _models('POST', '/v1/models/delete', {'parts': parts});
 
+  // ------------------------------------------- 按住選擇 and addresses (match)
+
+  /// POST /v1/assistant/match (docs/AI_CURRENT_RULES.md section 5,
+  /// 2026-11-24): what the user said against the options on the screen
+  /// ([kind] 'choice', [options] as `{text, shown}`) or an address said at
+  /// once ([kind] 'address', with the page's [county] / [district]). Its own
+  /// connection, like the model requests: it never cancels a turn.
+  Future<Map<String, dynamic>> match({
+    required String kind,
+    required String text,
+    List<Map<String, String>> options = const [],
+    String? language,
+    String? county,
+    String? district,
+  }) => _models('POST', '/v1/assistant/match', {
+    'kind': kind,
+    'text': text,
+    if (kind == 'choice') 'options': options,
+    'language': ?language,
+    if (county != null && county.isNotEmpty) 'county': county,
+    if (district != null && district.isNotEmpty) 'district': district,
+  });
+
   /// Its own connection: a model request never cancels a turn ([cancel]).
   Future<Map<String, dynamic>> _models(
     String method,
