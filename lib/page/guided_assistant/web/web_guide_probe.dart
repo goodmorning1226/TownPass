@@ -17,7 +17,8 @@ class WebPageSpec {
   /// Every spec also gets `__bottomBar` (height of the page's fixed bottom
   /// bar, for the 助理 button) and `__dialog` (a headlessui dialog is open),
   /// plus `__fieldTargets` (the shown targets holding a text field, comma
-  /// separated) and `__focusField` (a text field is focused) for 按住輸入.
+  /// separated) and `__focusField` (a text field is focused) for 按住輸入,
+  /// and `__choiceTargets` (the shown targets holding a choice) for 按住選擇.
   /// Helpers usable in expressions: q, qa, shown, byText, txt, orig (the
   /// element's innerText in the page's original Chinese, also on a page the
   /// App translated; use it instead of `.innerText`), origContent (the same
@@ -33,7 +34,12 @@ class WebPageSpec {
   /// fits on screen; see `_helpers`), and for typed fields settled(el)
   /// (filled in and not being typed in: use it, not `.value`, wherever a
   /// value finishes a step) and editing(el) (the user is still typing in
-  /// it; see [fieldWatch]).
+  /// it; see [fieldWatch]). For forms (docs/AI_CURRENT_RULES.md section 5,
+  /// 2026-11-24): fieldLabel(el), mustFill(el) (true: 「*」 on its label,
+  /// `required` or `aria-required`; false: a label without them; null: no
+  /// label, the guide's own list decides), skippedField(key), fieldHas(x),
+  /// fieldTouched(x) and nextField(list) (the first field still to do, in
+  /// screen order, also the ones that need not be filled).
   final Map<String, String> flags;
 
   /// Flags that, once true, stay true for the guide run (see
@@ -51,8 +57,10 @@ class WebPageSpec {
 
   /// The probe script. [keyboard] is whether the soft keyboard is up now
   /// (null: unknown); when it goes down while a text field is focused, that
-  /// field counts as typed out (see [fieldWatch]).
-  String scriptWith({bool? keyboard}) {
+  /// field counts as typed out (see [fieldWatch]). [skipped] are the fields
+  /// the user skipped in this guide run ([WebPageState.skipped]), for
+  /// `nextField()`; they are kept in a window variable only.
+  String scriptWith({bool? keyboard, Set<String> skipped = const {}}) {
     String entry(MapEntry<String, String> e) =>
         '${jsonEncode(e.key)}: () => (${originalPlaceholders(e.value)})';
     final t = targets.entries.map(entry).join(',\n');
@@ -61,13 +69,16 @@ class WebPageSpec {
 (() => {
   const $_helpers
   ${fieldWatch(keyboard)}
+  try { window.__tpSkip = ${jsonEncode(skipped.toList()..sort())}; } catch (_) {}
   const T = {$t};
   const F = {$f};
   const rects = {}, flags = {};
-  const fieldTargets = [];
-  for (const k in T) { try { const el = T[k](); rects[k] = rectOf(el); if (rects[k] && hasField(el)) fieldTargets.push(k); } catch (_) { rects[k] = null; } }
+  const fieldTargets = [], choiceTargets = [];
+  for (const k in T) { try { const el = T[k](); rects[k] = rectOf(el); if (rects[k] && hasField(el)) fieldTargets.push(k); if (rects[k] && hasChoice(el)) choiceTargets.push(k); } catch (_) { rects[k] = null; } }
   flags.__fieldTargets = fieldTargets.join(',');
+  flags.__choiceTargets = choiceTargets.join(',');
   try { flags.__focusField = textField(document.activeElement); } catch (_) { flags.__focusField = false; }
+  try { flags.__editingField = editing(document.activeElement); } catch (_) { flags.__editingField = false; }
   for (const k in F) { try { flags[k] = F[k](); } catch (_) { flags[k] = null; } }
   try { flags.__bottomBar = bottomBar(); } catch (_) { flags.__bottomBar = 0; }
   try { flags.__dialog = qa('[id^="headlessui-dialog-panel"]').some(shown); } catch (_) { flags.__dialog = false; }
@@ -180,6 +191,62 @@ class WebPageSpec {
     editing = (e) => typedField(e) && document.activeElement === e && doneValues().get(e) !== (e.value || ''),
     settled = (e) => !!e && !!String(e.value || '').trim() && !editing(e),
     hasField = (x) => (Array.isArray(x) ? x : [x]).some((e) => !!e && e.nodeType === 1 && ((textField(e) && shown(e)) || [...e.querySelectorAll('input, textarea')].some((i) => textField(i) && shown(i)))),
+    // 按住選擇 (docs/AI_CURRENT_RULES.md section 5, 2026-11-24): a select, radio or
+    // checkbox group, or a list of 2+ links / category buttons (web_choice_input.dart
+    // reads the options when the button is pressed). A single consent box (同意 /
+    // 已詳閱 / 聲明) is not one: the user ticks it.
+    hasChoice = (x) => { const l = (Array.isArray(x) ? x : [x]).filter((e) => !!e && e.nodeType === 1); if (!l.length) return false; const own = (e, s) => (e.matches(s) ? [e] : []).concat([...e.querySelectorAll(s)]); const sel = l.some((e) => own(e, 'select').length > 0); const boxes = [...new Set(l.flatMap((e) => own(e, 'input[type=radio], input[type=checkbox]')))]; if (sel) return true; if (boxes.length === 1 && boxes[0].type === 'checkbox' && /同意|已詳閱|聲明|條款/.test(l.map(orig).join(' '))) return false; if (boxes.length) return true; return l.length >= 2 && l.every((e) => (e.tagName === 'A' && !!e.getAttribute('href')) || (e.tagName === 'BUTTON' && !!e.parentElement && e.parentElement.tagName === 'LI')); },
+    // Form fields that need not be filled (docs/AI_CURRENT_RULES.md section
+    // 5, 2026-11-24). fieldLabel: the field's <label for>, else the nearest
+    // label-like text before it in its group (a label, a .field-label, a
+    // bold <p>) with no other field in between (that one would be the other
+    // field's label). mustFill: true with 「*」 on that label, `required` or
+    // `aria-required`; false for a label without them; null with no label
+    // (the guide's own list decides then).
+    fieldLabel = (e) => {
+      try {
+        if (!e || e.nodeType !== 1) return null;
+        if (e.id) { const l = qa('label').find((x) => x.getAttribute('for') === e.id); if (l && !l.contains(e) && txt(l)) return l; }
+        const before = (a, b) => !!(a.compareDocumentPosition(b) & 4);
+        for (let a = e.parentElement, n = 0; a && n < 4 && a.tagName !== 'FORM'; a = a.parentElement, n++) {
+          const heads = [...a.querySelectorAll('.field-label, label, p')].filter((h) => (h.tagName !== 'P' || /font-semibold|field-label/.test(h.className || '')) && !h.contains(e) && !h.querySelector('input, select, textarea') && before(h, e) && txt(h));
+          if (!heads.length) continue;
+          const h = heads[heads.length - 1];
+          return [...a.querySelectorAll('input, select, textarea')].some((c) => c !== e && before(h, c) && before(c, e)) ? null : h;
+        }
+      } catch (_) {}
+      return null;
+    },
+    mustFill = (e) => {
+      if (!e || e.nodeType !== 1) return null;
+      if (e.required === true || (e.getAttribute && e.getAttribute('aria-required') === 'true')) return true;
+      const l = fieldLabel(e);
+      return l ? /[*＊]/.test(txt(l)) : null;
+    },
+    skippedField = (k) => { const s = window.__tpSkip; return Array.isArray(s) && s.includes(k); },
+    // Has a value: typed text, a picked option, a ticked box, a chosen file.
+    fieldHas = (x) => (Array.isArray(x) ? x : [x]).some((e) => !!e && e.nodeType === 1 && (e.type === 'file' ? !!(e.files && e.files.length) : (e.type === 'checkbox' || e.type === 'radio') ? !!e.checked : !!String(e.value || '').trim())),
+    fieldTouched = (x) => fieldHas(x) || (Array.isArray(x) ? x : [x]).some((e) => !!e && e.nodeType === 1 && document.activeElement !== document.body && (document.activeElement === e || (!!e.contains && e.contains(document.activeElement)))),
+    // The first field still to do, walking [key, field, { req, done, ring }]
+    // in screen order: [key, ring (else the field), required], or null.
+    // done: given, else every element is settled(). required: mustFill(),
+    // else the guide's `req` (unknown counts as required). A field that need
+    // not be filled is passed once skipped (skippedField), or once a field
+    // after it is touched (the user went on without it).
+    nextField = (list) => {
+      const items = list.filter((it) => !!it[1] && (!Array.isArray(it[1]) || it[1].length));
+      for (let i = 0; i < items.length; i++) {
+        const k = items[i][0], el = items[i][1], o = items[i][2] || {};
+        const all = Array.isArray(el) ? el : [el];
+        const done = o.done !== undefined ? !!o.done : all.every((e) => settled(e));
+        if (done) continue;
+        const m = mustFill(all[0]);
+        const req = m === null ? o.req !== false : m;
+        if (!req && (skippedField(k) || items.slice(i + 1).some((it) => fieldTouched(it[1])))) continue;
+        return [k, o.ring || el, req];
+      }
+      return null;
+    },
     textBetween = (scope, head, stop) => {
       const all = qa(scope + ' *').filter((e) => shown(e) && leaf(e));
       const i = all.findIndex((e) => txt(e).startsWith(head));
@@ -250,19 +317,33 @@ class WebGuideProbe {
   Timer? _timer;
   WebPageSpec? _spec;
 
-  /// The spec's script with the keyboard up / down.
+  /// The spec's script with the keyboard up / down, for the skipped fields
+  /// [_scriptsSkipped] ([WebPageState.skipped]).
   ({String up, String down})? _scripts;
+  String _scriptsSkipped = '';
   bool _busy = false;
 
   bool get running => _timer != null;
 
+  /// [_scripts] for the fields skipped now (built again when they change).
+  ({String up, String down}) _scriptsNow(WebPageSpec spec) {
+    final skipped = state.skipped.value;
+    final key = (skipped.toList()..sort()).join('\n');
+    if (_scripts == null || key != _scriptsSkipped) {
+      _scriptsSkipped = key;
+      _scripts = (
+        up: spec.scriptWith(keyboard: true, skipped: skipped),
+        down: spec.scriptWith(keyboard: false, skipped: skipped),
+      );
+    }
+    return _scripts!;
+  }
+
   void start(WebPageSpec spec) {
     if (identical(spec, _spec) && running) return;
     _spec = spec;
-    _scripts = (
-      up: spec.scriptWith(keyboard: true),
-      down: spec.scriptWith(keyboard: false),
-    );
+    _scripts = null;
+    _scriptsNow(spec);
     _timer?.cancel();
     _timer = Timer.periodic(interval, (_) => _tick());
     _tick();
@@ -292,7 +373,7 @@ class WebGuideProbe {
         _clear();
         return;
       }
-      final scripts = _scripts!;
+      final scripts = _scriptsNow(_spec!);
       final raw = await controller.evaluateJavascript(
         source: keyboardOpen() ? scripts.up : scripts.down,
       );

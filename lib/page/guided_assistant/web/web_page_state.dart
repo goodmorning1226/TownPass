@@ -48,8 +48,23 @@ class WebPageState extends GetxService {
     if (next.length != latches.value.length) latches.value = next;
   }
 
-  void resetLatches() => latches.value = const {};
+  /// Fields the user skipped ([GuideStep.skipKey]) in this guide run: they
+  /// do not come back (docs/AI_CURRENT_RULES.md section 5, 2026-11-24).
+  /// The probe tells the page's field walker ([WebPageSpec.scriptWith]).
+  final skipped = Rx<Set<String>>(const {});
+
+  bool isSkipped(String key) => skipped.value.contains(key);
+
+  void skip(String key) {
+    if (!skipped.value.contains(key)) skipped.value = {...skipped.value, key};
+  }
+
+  /// A new guide run: no latches, nothing skipped.
+  void resetLatches() {
+    latches.value = const {};
+    skipped.value = const {};
+  }
 
   /// Every value the guide looks at, for the controller's watcher.
-  List<Rx<Object?>> get watched => [snapshot, latches];
+  List<Rx<Object?>> get watched => [snapshot, latches, skipped];
 }

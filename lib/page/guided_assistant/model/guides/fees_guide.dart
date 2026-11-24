@@ -30,12 +30,28 @@ const _scan = '/fee-payment/scan';
 /// sideways; only one is in the viewport).
 const _view = "(qa('.tab-view').find(inView) || null)";
 
+/// JS function: [e] is the 繳費編號 box on a fee type whose 查詢 works
+/// without it (the guide's own list, docs/AI_CURRENT_RULES.md section 5,
+/// 2026-11-24: the fee pages put 「*」 on no field at all, so the page cannot
+/// tell). On the demo site 查詢 still reaches result/ without 繳費編號 for
+/// fee-1 (公司登記費), fee-3 (地政登記規費), fee-8 (國/社宅租金維管費),
+/// fee-9 (聯合醫院醫療費) and fee-12 (快閃購繳款)
+/// (D:\TownPassAssistant\small-fixes-20261124\optional\inventory\
+/// fees_leave_one_out.txt); the real site may differ. Every other fee field,
+/// and 繳費編號 of every other fee type, is required.
+const _optionalPay =
+    r'''((e) => !!e && !Array.isArray(e) && e.id === 'payment_number' && /^\/fee-payment\/detail\/(fee-1|fee-3|fee-8|fee-9|fee-12)\/?$/.test(location.pathname))''';
+
 /// First field of [v] that is still empty: an input/select/textarea, or the
-/// labels of a radio/checkbox group with nothing ticked. A box the user is
+/// labels of a radio/checkbox group with nothing ticked. Required by the
+/// list above, except [_optionalPay]'s box, which is passed once skipped
+/// (skippedField('payment_number'); it is the last field of those forms).
+/// A box the user is
 /// still typing in counts as empty (settled(), docs/AI_CURRENT_RULES.md
 /// section 5, 2026-11-16): the card stays on it until Enter, the keyboard
 /// goes down or the box loses the focus, not after the first letter.
-const _field = r'''((v) => {
+const _field =
+    '''((v) => {
   if (!v) return null;
   const seen = new Set();
   for (const e of v.querySelectorAll('input, select, textarea')) {
@@ -48,7 +64,9 @@ const _field = r'''((v) => {
       continue;
     }
     if (!shown(e)) continue;
-    if (!settled(e)) return e;
+    if (settled(e)) continue;
+    if ($_optionalPay(e) && skippedField('payment_number')) continue;
+    return e;
   }
   return null;
 })''';
@@ -142,6 +160,8 @@ const feesPageSpec = WebPageSpec(
     'fieldName': '$_info.name',
     'fieldHint': '$_info.hint',
     'fieldChoices': '$_info.choices',
+    // The field the card is about need not be filled (see _optionalPay).
+    'fieldOptional': '$_optionalPay($_emptyField)',
     // The user is typing in the field the card is about (it has text).
     'fieldTyping':
         "(() => { const f = $_emptyField; return !!f && !Array.isArray(f) && editing(f) && !!(f.value || '').trim(); })()",
@@ -292,6 +312,83 @@ const _typedHint = '寫好了就按鍵盤上的「完成」或「✓」，收起
 bool _picking(WebPageState s) =>
     const {'choice', 'select', 'date'}.contains(s.now.text('fieldKind'));
 
+/// The 繳費編號 the card is about can be skipped now (see _optionalPay).
+String? _skipPay(WebPageState s) =>
+    _onDetail(s) && !_alert(s) && !_scanTab(s) && s.now.flag('fieldOptional')
+    ? 'payment_number'
+    : null;
+
+/// A step of 輸入帳單號碼: the required fields, or ([optional]) the
+/// 繳費編號 that need not be filled, with 跳過這格 (docs/AI_CURRENT_RULES.md
+/// section 5, 2026-11-24).
+GuideStep _enterStep({bool optional = false}) => GuideStep(
+  target: (s) {
+    if (_alert(s)) return 'fees.alert_ok';
+    if (_scanTab(s)) return 'fees.tab_input';
+    // 出生日期: the calendar that opened from the box.
+    if (s.now.text('fieldKind') == 'date' && s.now.flag('calendar')) {
+      return 'fees.calendar';
+    }
+    return 'fees.field';
+  },
+  alsoUsable: const ['fees.calendar'],
+  arrow: _scanTab,
+  label: (s) {
+    if (_alert(s) || _scanTab(s)) return '點一下';
+    return _picking(s) ? '選擇' : '打字';
+  },
+  card: (s) {
+    if (_alert(s)) return _alertCard(s);
+    if (_scanTab(s)) {
+      final tab = s.now.text('firstTab');
+      return gt('這裡是用相機掃描的。點上面的「{tab}」，改用打字的。', {
+        'tab': pg(tab.isEmpty ? '輸入資料' : tab),
+      });
+    }
+    // Still typing: the card stays on this box and says how to finish.
+    if (s.now.flag('fieldTyping')) {
+      final card = gt(_fieldCard(s));
+      // A space after a Latin full stop (translations); none in Chinese.
+      final gap = RegExp(r'[.!?]$').hasMatch(card) ? ' ' : '';
+      return '$card$gap${gt(_typedHint)}';
+    }
+    if (optional && _skipPay(s) != null) {
+      return '${gt(_payOptional)}${gt(_fieldCard(s))}';
+    }
+    return _fieldCard(s);
+  },
+  detail: (s) {
+    final hint = s.now.text('fieldHint');
+    final name = s.now.text('fieldName');
+    final where = name.isEmpty ? gt('號碼') : gt('「{name}」', {'name': pg(name)});
+    if (s.now.text('fieldKind') == 'date') {
+      return gt('{where}要在月曆上選：點框框，點月曆最上面的月份和年份換到你出生的年和月，再點那一天。', {
+        'where': where,
+      });
+    }
+    return hint.isEmpty || hint.startsWith('範例')
+        ? gt('{where}印在帳單上。點一下亮起來的框框，照帳單打進去。', {'where': where})
+        : gt('{where}印在帳單上（{hint}）。點一下亮起來的框框，照帳單打進去。', {
+            'where': where,
+            'hint': pg(hint),
+          });
+  },
+  // The required fields are done once only the optional 繳費編號 is
+  // left; that step is done once it is filled or skipped ('filled').
+  isDone: (s) =>
+      _stage(s) > 1 ||
+      _paid(s) ||
+      (_onDetail(s) &&
+          (s.now.flag('filled') || (!optional && s.now.flag('fieldOptional')))),
+  cardTop: _alertTop,
+  // A field that need not be filled: the ring only, not dimmed.
+  locks: (s) => !optional || _skipPay(s) == null,
+  skipKey: optional ? _skipPay : null,
+);
+
+/// Said first on the 繳費編號 that need not be filled.
+const _payOptional = '這格可以不填，不填也能查詢；不填就按「跳過這格」。';
+
 final List<GuideComponent> feesComponents = [
   GuideComponent(
     id: 'pick_fee',
@@ -353,7 +450,9 @@ final List<GuideComponent> feesComponents = [
   GuideComponent(
     id: 'enter_number',
     title: '輸入帳單號碼',
-    briefs: const ['打帳單上的號碼'],
+    // The 繳費編號 that need not be filled has a step of its own (see
+    // _optionalPay); on the other fee types it is always done with the first.
+    briefs: const ['打帳單上的號碼', '繳費編號可以不填'],
     description: '把帳單上的號碼（例如水號）打進框框',
     keywords: const ['水號', '繳費編號', '單據號碼', '車號', '帳單號碼', '輸入號碼'],
     // pick_fee is added only where the user starts on the list (fees.other).
@@ -362,63 +461,7 @@ final List<GuideComponent> feesComponents = [
     doneText: '號碼打好了！按「查詢」就能看到要繳的帳單。',
     doneDetail: '按下面的「查詢」，看看要繳多少錢。',
     doneTarget: (s) => _onDetail(s) ? 'fees.query' : null,
-    steps: [
-      GuideStep(
-        target: (s) {
-          if (_alert(s)) return 'fees.alert_ok';
-          if (_scanTab(s)) return 'fees.tab_input';
-          // 出生日期: the calendar that opened from the box.
-          if (s.now.text('fieldKind') == 'date' && s.now.flag('calendar')) {
-            return 'fees.calendar';
-          }
-          return 'fees.field';
-        },
-        alsoUsable: const ['fees.calendar'],
-        arrow: _scanTab,
-        label: (s) {
-          if (_alert(s) || _scanTab(s)) return '點一下';
-          return _picking(s) ? '選擇' : '打字';
-        },
-        card: (s) {
-          if (_alert(s)) return _alertCard(s);
-          if (_scanTab(s)) {
-            final tab = s.now.text('firstTab');
-            return gt('這裡是用相機掃描的。點上面的「{tab}」，改用打字的。', {
-              'tab': pg(tab.isEmpty ? '輸入資料' : tab),
-            });
-          }
-          // Still typing: the card stays on this box and says how to finish.
-          if (s.now.flag('fieldTyping')) {
-            final card = gt(_fieldCard(s));
-            // A space after a Latin full stop (translations); none in Chinese.
-            final gap = RegExp(r'[.!?]$').hasMatch(card) ? ' ' : '';
-            return '$card$gap${gt(_typedHint)}';
-          }
-          return _fieldCard(s);
-        },
-        detail: (s) {
-          final hint = s.now.text('fieldHint');
-          final name = s.now.text('fieldName');
-          final where = name.isEmpty
-              ? gt('號碼')
-              : gt('「{name}」', {'name': pg(name)});
-          if (s.now.text('fieldKind') == 'date') {
-            return gt('{where}要在月曆上選：點框框，點月曆最上面的月份和年份換到你出生的年和月，再點那一天。', {
-              'where': where,
-            });
-          }
-          return hint.isEmpty || hint.startsWith('範例')
-              ? gt('{where}印在帳單上。點一下亮起來的框框，照帳單打進去。', {'where': where})
-              : gt('{where}印在帳單上（{hint}）。點一下亮起來的框框，照帳單打進去。', {
-                  'where': where,
-                  'hint': pg(hint),
-                });
-        },
-        isDone: (s) =>
-            _stage(s) > 1 || _paid(s) || (_onDetail(s) && s.now.flag('filled')),
-        cardTop: _alertTop,
-      ),
-    ],
+    steps: [_enterStep(), _enterStep(optional: true)],
   ),
   GuideComponent(
     id: 'query_bill',

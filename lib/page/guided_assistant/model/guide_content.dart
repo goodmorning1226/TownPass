@@ -63,6 +63,13 @@ class GuideStep {
   /// sentence.
   final String? brief;
 
+  /// While this step points at a field that need not be filled: the key the
+  /// user can skip it with ([WebPageState.skip]; the card's 「跳過這格」, or
+  /// saying 跳過). Null, or returning null: a required field, no skipping
+  /// (docs/AI_CURRENT_RULES.md section 5, 2026-11-24). The step's [isDone]
+  /// counts a skipped key as done.
+  final String? Function(WebPageState s)? skipKey;
+
   const GuideStep({
     required this.target,
     required this.label,
@@ -78,9 +85,13 @@ class GuideStep {
     this.commit = false,
     this.field,
     this.brief,
+    this.skipKey,
   });
 
   String? targetFor(WebPageState s) => target(s);
+
+  /// [skipKey] now: non-null only on a field that need not be filled.
+  String? skipFor(WebPageState s) => skipKey?.call(s);
 
   FieldKind? fieldFor(WebPageState s) => field?.call(s);
 
@@ -105,6 +116,7 @@ class GuideStep {
     commit: commit,
     field: field,
     brief: brief ?? this.brief,
+    skipKey: skipKey,
   );
 }
 

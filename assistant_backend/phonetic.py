@@ -124,7 +124,11 @@ def near_syllable(a, b):
         return True
     if a not in table or b not in table:
         return False
-    x, y = fold(table[a]), fold(table[b])
+    return near_syllables(fold(table[a]), fold(table[b]))
+
+
+def near_syllables(x, y):
+    """near_syllable for two folded syllables (from syllables())."""
     if x == y:
         return True
     (xi, xf), (yi, yf) = _split(x), _split(y)

@@ -388,8 +388,11 @@ return [a.fieldKey, a.typing, b.fieldKey, b.typing];
       final typing = _state(detail, page(filled: false, typing: true));
       final done = _state(detail, page(filled: true));
       final i = guide.currentStep(typing);
-      expect(guide.currentStep(done), i + 1);
-      expect(guide.steps[i + 1].targetFor(done), 'fees.query');
+      // Past the 繳費編號 step too (水費 has none that may be skipped:
+      // docs/AI_CURRENT_RULES.md section 5, 2026-11-24).
+      final next = guide.currentStep(done);
+      expect(next, greaterThan(i));
+      expect(guide.steps[next].targetFor(done), 'fees.query');
     });
 
     test('the probe flags the guides use read settled / editing', () {

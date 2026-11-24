@@ -101,6 +101,13 @@
    "id": "kotak isian “{name}”",
    "tl": "ang kahon para sa “{name}”"
   },
+  "「{name}」這格可以不填；不填就按「跳過這格」。": {
+   "en": "“{name}” is optional. If you leave it empty, tap “Skip this field”.",
+   "ja": "「{name}」は入力しなくても大丈夫です。入力しないなら「この欄をスキップ」を押します。",
+   "vi": "Ô “{name}” không điền cũng được; không điền thì bấm “Bỏ qua ô này”.",
+   "id": "“{name}” boleh dikosongkan. Kalau tidak diisi, tekan “Lewati kolom ini”.",
+   "tl": "Puwedeng iwanang blangko ang “{name}”. Kung hindi pupunan, i-tap ang “Laktawan ito”."
+  },
   "「{section}」收起來了，點一下把它打開。": {
    "en": "“{section}” is folded up. Tap it to open it.",
    "ja": "「{section}」が閉じています。タップして開いてください。",

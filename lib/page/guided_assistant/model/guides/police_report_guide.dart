@@ -28,35 +28,35 @@ const _form = '/police-report/form';
 const _records = '/police-report/record';
 const _record = '/police-report/record/';
 
-/// The next required field that is still empty, as [key, element] (null
-/// when all are filled). Step 1: contact data; step 2: the case.
-/// The 戶籍地址 (second address) is pointed at with its 同通訊地址 box.
+/// The next field still to do, in screen order, as [key, element, required]
+/// (null when all are done). Step 1: contact data; step 2: the case.
+/// Fields that need not be filled have a step too (住家電話, 上傳附件; docs/
+/// AI_CURRENT_RULES.md section 5, 2026-11-24): nextField() asks the page
+/// (「*」 on the label), else the `req` here. The 戶籍地址 (second address)
+/// is pointed at with its 同通訊地址 box.
 const _next = r'''(() => {
   // A box the user is still typing in counts as not filled yet, so the
   // card does not move on after the first letter (settled(): until Enter,
   // the keyboard goes down, 按住輸入 or the box loses the focus).
-  const has = settled;
   if (q('#mobile_number')) {
     const counties = qa('select#county'), cities = qa('select#city');
     const addrs = qa('input[placeholder="請輸入詳細地址"]');
     const same = byText('label', '同通訊地址');
-    const list = [['mobile', q('#mobile_number')], ['mail', q('#mail')],
+    return nextField([['mobile', q('#mobile_number')],
+      ['contact', q('#contact_number'), { req: false }], ['mail', q('#mail')],
       ['county', counties[0]], ['city', cities[0]], ['addr', addrs[0]],
-      ['county2', counties[1]], ['city2', cities[1]], ['addr2', addrs[1]]];
-    for (const [k, e] of list) {
-      if (!e || has(e)) continue;
-      return k === 'county2' && same ? [k, [same, e]] : [k, e];
-    }
-    return null;
+      ['county2', counties[1], same ? { ring: [same, counties[1]] } : {}],
+      ['city2', cities[1]], ['addr2', addrs[1]]]);
   }
   if (q('#your_role')) {
     const cal = qa('.vc-pane-header-wrapper').find(shown);
-    if (cal) return ['calendar', cal.closest('.vc-popover-content') || cal.closest('.vc-container') || cal.parentElement];
+    if (cal) return ['calendar', cal.closest('.vc-popover-content') || cal.closest('.vc-container') || cal.parentElement, true];
     const date = qa('input.base-input[readonly]').find(shown) || null;
-    const list = [['role', q('#your_role')], ['location', q('#location')],
-      ['date', date], ['summary', q('#case_summary')]];
-    for (const [k, e] of list) if (e && !has(e)) return [k, e];
-    return null;
+    const files = qa('input[type=file]');
+    const box = qa('label.upload-box').filter(shown)[0] || null;
+    return nextField([['role', q('#your_role')], ['location', q('#location')],
+      ['date', date], ['summary', q('#case_summary')],
+      ['photo', files[0] || null, { req: false, ring: box, done: !box || fieldHas(files) }]]);
   }
   return null;
 })()''';
@@ -116,6 +116,11 @@ const policeReportPageSpec = WebPageSpec(
         "(() => { const a = $_statement; return !!a && a.some((e) => !!scrollBox(e)); })()",
     'formStep': "q('#your_role') ? 2 : (q('#mobile_number') ? 1 : 0)",
     'fieldKey': "(() => { const n = $_next; return n ? n[0] : ''; })()",
+    // The field the card is about need not be filled (it can be skipped).
+    'fieldOptional':
+        "(() => { const n = $_next; return !!n && n[2] === false; })()",
+    // A file is chosen in 上傳附件.
+    'photos': "qa('input[type=file]').reduce((n, i) => n + ((i.files && i.files.length) || 0), 0)",
     // The user is typing in the field the card is about.
     'typing':
         "(() => { const n = $_next; const e = n && n[1]; return !!e && !Array.isArray(e) && editing(e) && !!(e.value || '').trim(); })()",
@@ -188,6 +193,9 @@ String _contactCard(WebPageState s) {
   final scroll = _scroll(s.now.text('fieldOff'));
   final text = gt(switch (s.now.text('fieldKey')) {
     'mobile' => '姓名和身分證字號已經帶好了。點「手機號碼」的框框，打你的手機號碼，例如 0912345678。',
+    'contact' when s.now.flag('fieldOptional') =>
+      '「住家電話」這格可以不填。家裡有市話的話，點框框打號碼，例如 0227208889；沒有或不想填，就按「跳過這格」。',
+    'contact' => '點「住家電話」的框框，打你家裡的電話號碼。',
     'mail' => '點「電子信箱」的框框，打你的 E-mail，警察會用它回覆你。',
     'county' => '「通訊地址」先點「請選擇縣市」，選你住的縣市。',
     'city' => '再點旁邊的「請選擇區域」，選你住的區。',
@@ -222,6 +230,10 @@ String _caseCard(WebPageState s) {
           : gt('「發生時間」已經先填「{time}」，不對可以點時、分改。', {'time': time});
       return gt('{at}接著在「案情摘要」寫下發生什麼事：什麼人、什麼事、什麼時候、在哪裡、什麼東西。', {'at': at});
     }(),
+    'photo' when s.now.flag('fieldOptional') => gt(
+      '「上傳附件」這格可以不附。想附上照片或檔案，點「上傳附件」選手機裡的檔案；不附就按「跳過這格」。',
+    ),
+    'photo' => gt('點「上傳附件」，選要附上的照片或檔案。'),
     _ => gt('照畫面把案件資料填好。'),
   };
   if (s.now.flag('typing')) return '$text${gt(_typed)}';
@@ -233,6 +245,99 @@ double _fieldCardTop(WebPageState s) {
   if (s.now.text('fieldKey') == 'calendar') return 60;
   return s.now.number('fieldTop') < 260 ? 380 : 60;
 }
+
+/// The field keys of form step 1 and 2 in screen order (see [_next]).
+const _contactKeys = [
+  'mobile',
+  'contact',
+  'mail',
+  'county',
+  'city',
+  'addr',
+  'county2',
+  'city2',
+  'addr2',
+];
+const _caseKeys = ['role', 'location', 'date', 'summary', 'photo'];
+
+/// The field the card is about comes after [last] in [keys], or every field
+/// is done. The open calendar belongs to 發生日期.
+bool _pastField(WebPageState s, List<String> keys, String last) {
+  var key = s.now.text('fieldKey');
+  if (key == 'calendar') key = 'date';
+  return key.isEmpty || keys.indexOf(key) > keys.indexOf(last);
+}
+
+/// [key] can be skipped now: the card is about it on form step [stage] and
+/// the page does not mark it as required.
+String? _skippable(WebPageState s, int stage, String key) =>
+    _stage(s) == stage &&
+        s.now.text('fieldKey') == key &&
+        s.now.flag('fieldOptional')
+    ? key
+    : null;
+
+/// One step of 填聯絡資料: the fields up to [last] (docs/AI_CURRENT_RULES.md
+/// section 5, 2026-11-24: 住家電話 has its own step).
+GuideStep _contactStep(
+  String last, {
+  required String detail,
+  String? Function(WebPageState s)? skipKey,
+}) => GuideStep(
+  target: (s) =>
+      _stage(s) == 2 && _onScreen(s, 'fieldOff') ? 'police.field' : null,
+  alsoUsable: const ['police.same_addr'],
+  // A field that need not be filled: the ring only, not dimmed, so the user
+  // may go on to the next box instead.
+  locks: (s) => _onScreen(s, 'fieldOff') && skipKey?.call(s) == null,
+  arrow: _no,
+  scrollHint: (s) => !_onScreen(s, 'fieldOff'),
+  label: (_) => '填資料',
+  card: _contactCard,
+  detail: (_) => detail,
+  isDone: (s) =>
+      _reported(s) ||
+      _stage(s) == 3 ||
+      (_stage(s) == 2 &&
+          s.now.number('formStep') == 1 &&
+          _pastField(s, _contactKeys, last)),
+  cardTop: _fieldCardTop,
+  // For 按住輸入 (the boxes are plain text inputs).
+  field: (s) => switch (s.now.text('fieldKey')) {
+    'mobile' || 'contact' => FieldKind.phone,
+    'mail' => FieldKind.email,
+    _ => null,
+  },
+  skipKey: skipKey,
+);
+
+/// One step of 填案件資料: the fields up to [last]. A step about 上傳附件
+/// ([photo]) is passed as well once the user ticked the agree box below it.
+GuideStep _caseStep(
+  String last, {
+  required String label,
+  required String detail,
+  bool photo = false,
+}) => GuideStep(
+  target: (s) =>
+      _stage(s) == 3 && _onScreen(s, 'fieldOff') ? 'police.field' : null,
+  // The card says the prefilled 發生時間 can be changed.
+  alsoUsable: photo ? const [] : const ['police.locate', 'police.time'],
+  locks: (s) =>
+      _onScreen(s, 'fieldOff') && !(photo && _skippable(s, 3, 'photo') != null),
+  arrow: _no,
+  scrollHint: (s) => !_onScreen(s, 'fieldOff'),
+  label: (_) => label,
+  card: _caseCard,
+  detail: (_) => detail,
+  isDone: (s) =>
+      _reported(s) ||
+      (_stage(s) == 3 &&
+          (_pastField(s, _caseKeys, last) ||
+              (photo && s.now.flag('sendEnabled')))),
+  cardTop: _fieldCardTop,
+  skipKey: photo ? (s) => _skippable(s, 3, 'photo') : null,
+);
 
 final List<GuideComponent> policeReportComponents = [
   GuideComponent(
@@ -292,7 +397,7 @@ final List<GuideComponent> policeReportComponents = [
   GuideComponent(
     id: 'fill_contact',
     title: '填聯絡資料',
-    briefs: const ['填好聯絡資料'],
+    briefs: const ['打手機號碼', '住家電話可以不填', '填好信箱和地址'],
     description: '在第 1 步填手機號碼、電子信箱、通訊地址和戶籍地址',
     keywords: const ['報案人資料', '報案聯絡資料', '戶籍地址', '同通訊地址'],
     requires: const ['read_notice'],
@@ -301,30 +406,19 @@ final List<GuideComponent> policeReportComponents = [
     doneDetail: '往下滑，勾「本人已詳閱並同意以上內容」，再按「下一步」。',
     doneTarget: (s) => _stage(s) == 2 ? 'police.agree' : null,
     steps: [
-      GuideStep(
-        target: (s) =>
-            _stage(s) == 2 && _onScreen(s, 'fieldOff') ? 'police.field' : null,
-        alsoUsable: const ['police.same_addr'],
-        locks: (s) => _onScreen(s, 'fieldOff'),
-        arrow: _no,
-        scrollHint: (s) => !_onScreen(s, 'fieldOff'),
-        label: (_) => '填資料',
-        card: _contactCard,
-        detail: (_) =>
-            '有「*」的都要填：手機號碼、電子信箱、通訊地址、戶籍地址。住家電話可以不填。戶籍地址一樣的話勾「同通訊地址」。',
-        isDone: (s) =>
-            _reported(s) ||
-            _stage(s) == 3 ||
-            (_stage(s) == 2 &&
-                s.now.number('formStep') == 1 &&
-                s.now.text('fieldKey').isEmpty),
-        cardTop: _fieldCardTop,
-        // For 按住輸入 (the boxes are plain text inputs).
-        field: (s) => switch (s.now.text('fieldKey')) {
-          'mobile' => FieldKind.phone,
-          'mail' => FieldKind.email,
-          _ => null,
-        },
+      _contactStep(
+        'mobile',
+        detail: '有「*」的都要填：手機號碼、電子信箱、通訊地址、戶籍地址。住家電話可以不填。戶籍地址一樣的話勾「同通訊地址」。',
+      ),
+      // 住家電話 need not be filled: its own step, with 跳過這格.
+      _contactStep(
+        'contact',
+        detail: '「住家電話」不是一定要填：有市話就打號碼，沒有就按卡片上的「跳過這格」，或說「跳過」。',
+        skipKey: (s) => _skippable(s, 2, 'contact'),
+      ),
+      _contactStep(
+        'addr2',
+        detail: '有「*」的都要填：手機號碼、電子信箱、通訊地址、戶籍地址。住家電話可以不填。戶籍地址一樣的話勾「同通訊地址」。',
       ),
     ],
   ),
@@ -377,7 +471,7 @@ final List<GuideComponent> policeReportComponents = [
   GuideComponent(
     id: 'fill_case',
     title: '填案件資料',
-    briefs: const ['填好案件資料'],
+    briefs: const ['填好案件資料', '附件可以不附'],
     description: '在第 2 步選報案人類別，填發生地點、用月曆選發生日期、寫案情摘要',
     keywords: const ['案情', '案情摘要', '報案人類別', '發生日期', '被害人'],
     requires: const ['next_step'],
@@ -386,21 +480,18 @@ final List<GuideComponent> policeReportComponents = [
     doneDetail: '要附照片可以按「上傳附件」，不附也可以。往下滑勾同意，再按「送出」。',
     doneTarget: (s) => _stage(s) == 3 ? 'police.agree' : null,
     steps: [
-      GuideStep(
-        target: (s) =>
-            _stage(s) == 3 && _onScreen(s, 'fieldOff') ? 'police.field' : null,
-        // The card says the prefilled 發生時間 can be changed.
-        alsoUsable: const ['police.locate', 'police.time'],
-        locks: (s) => _onScreen(s, 'fieldOff'),
-        arrow: _no,
-        scrollHint: (s) => !_onScreen(s, 'fieldOff'),
-        label: (_) => '填資料',
-        card: _caseCard,
-        detail: (_) =>
+      _caseStep(
+        'summary',
+        label: '填資料',
+        detail:
             '「報案人類別」點一下選一個；「發生日期」點框框會跳出月曆，點那一天；「發生時間」已先填現在的時間；「案情摘要」寫發生了什麼事。',
-        isDone: (s) =>
-            _reported(s) || (_stage(s) == 3 && s.now.text('fieldKey').isEmpty),
-        cardTop: _fieldCardTop,
+      ),
+      // 上傳附件 need not be filled: its own step, with 跳過這格.
+      _caseStep(
+        'photo',
+        label: '選照片',
+        detail: '「上傳附件」不是一定要附：想附照片就點它選檔案，不附就按卡片上的「跳過這格」，或說「跳過」。',
+        photo: true,
       ),
     ],
   ),

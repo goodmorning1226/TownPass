@@ -35,6 +35,10 @@ class ReplayResult {
   /// Every card / detail text the guide showed during the run.
   final List<String> shownTexts = [];
 
+  /// Fields the user skipped with 跳過這格 (the recording went on without
+  /// them; see replayFixture).
+  final List<String> skipped = [];
+
   bool done = false;
 
   ReplayResult(this.name, this.guide);
@@ -148,14 +152,46 @@ ReplayResult replayFixture(String name) {
     );
   }
 
+  /// The action's taps hit what step [i] points at (or also lets use).
+  bool hits(int i, Map<String, dynamic> a) {
+    final hit = {
+      for (final t in ((a['hit'] as Map?)?['targets'] as List? ?? const []))
+        t as String,
+    };
+    final step = guide.steps[i];
+    return hit.any({?step.targetFor(s), ...step.alsoUsable}.contains);
+  }
+
+  /// A step about a field that need not be filled (docs/AI_CURRENT_RULES.md
+  /// section 5, 2026-11-24): the recorded user went on without it, so they
+  /// press 跳過這格 there, as the card offers. Not when the action fills
+  /// that field.
+  void skipPassed(int n, Map<String, dynamic> a) {
+    for (var i = guide.currentStep(s); i < guide.steps.length;) {
+      final key = guide.steps[i].skipFor(s);
+      if (key == null || s.isSkipped(key)) return;
+      final onIt = _elementActions.contains(a['do'])
+          ? hits(i, a)
+          : a['step'] == null || a['step'] == componentAt(i);
+      if (onIt) return;
+      s.skip(key);
+      r.skipped.add(key);
+      // The card after the skip is what the user then sees.
+      look('[$n] after 跳過這格 ($key)');
+      i = guide.currentStep(s);
+    }
+  }
+
   for (var n = 0; n < steps.length; n++) {
     final e = steps[n];
     final a = e['action'] as Map<String, dynamic>?;
     if (a != null && e['before'] != null) {
       feed(e['before'] as Map<String, dynamic>);
+      skipPassed(n, a);
       final i = guide.currentStep(s);
       final now = componentAt(i);
-      final what = '${a['do']} ${a['text'] ?? a['selector'] ?? a['label'] ?? a['placeholder'] ?? a['to'] ?? ''}';
+      final what =
+          '${a['do']} ${a['text'] ?? a['selector'] ?? a['label'] ?? a['placeholder'] ?? a['to'] ?? ''}';
       final card = i < guide.steps.length ? guide.steps[i].card(s) : '';
       final forStep = a['step'] as String?;
       if (forStep != null && forStep != now) {
@@ -200,10 +236,25 @@ ReplayResult replayFixture(String name) {
     }
   }
 
+  // Steps about fields that need not be filled left at the end: the user
+  // following the cards presses 跳過這格 on them too.
+  for (var i = guide.currentStep(s); i < guide.steps.length;) {
+    final key = guide.steps[i].skipFor(s);
+    if (key == null || s.isSkipped(key)) break;
+    s.skip(key);
+    r.skipped.add(key);
+    look('[end] after 跳過這格 ($key)');
+    i = guide.currentStep(s);
+  }
+
   final last = steps.last;
   final facts = (last['facts'] as Map?) ?? const {};
-  r.finalErrors = [for (final x in (facts['errors'] as List? ?? const [])) '$x'];
-  r.finalDialogs = [for (final x in (facts['dialogs'] as List? ?? const [])) '$x'];
+  r.finalErrors = [
+    for (final x in (facts['errors'] as List? ?? const [])) '$x',
+  ];
+  r.finalDialogs = [
+    for (final x in (facts['dialogs'] as List? ?? const [])) '$x',
+  ];
   r.done = guide.currentStep(s) >= guide.steps.length;
   final expectDone = ((fx['expect'] as Map?) ?? const {})['done'] != false;
   if (expectDone && !r.done) {
@@ -220,7 +271,9 @@ ReplayResult replayFixture(String name) {
   for (final f in r.requiredFields) {
     if (f.isEmpty) continue;
     if (!r.shownTexts.any((t) => t.contains(f))) {
-      r.problems.add('required field 「$f」 is never mentioned by a card shown during the run');
+      r.problems.add(
+        'required field 「$f」 is never mentioned by a card shown during the run',
+      );
     }
   }
   return r;

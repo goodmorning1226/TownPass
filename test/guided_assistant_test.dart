@@ -538,6 +538,8 @@ void main() {
       expect(g.currentStep(s), 0);
       expect(g.steps[0].targetFor(s), 'fees.field');
       expect(g.steps[0].card(s), contains('「水號」'));
+      // enter_number's second step is the 繳費編號 that may be skipped
+      // (fee-1/3/8/9/12 only; done here with the first).
 
       at(detail, {
         'onInputTab': true,
@@ -545,9 +547,9 @@ void main() {
         'filled': true,
         'feeName': '水費',
       });
-      expect(g.currentStep(s), 1);
-      expect(g.steps[1].targetFor(s), 'fees.query');
-      expect(g.steps[1].card(s), contains('「水費」'));
+      expect(g.currentStep(s), 2);
+      expect(g.steps[2].targetFor(s), 'fees.query');
+      expect(g.steps[2].card(s), contains('「水費」'));
       at(detail, {
         'onInputTab': true,
         'hasFields': true,
@@ -555,31 +557,31 @@ void main() {
         'alert': true,
         'alertText': '請確認資料是否含空白或符號',
       });
-      expect(g.steps[1].targetFor(s), 'fees.alert_ok');
-      expect(g.steps[1].card(s), contains('請確認資料是否含空白或符號'));
+      expect(g.steps[2].targetFor(s), 'fees.alert_ok');
+      expect(g.steps[2].card(s), contains('請確認資料是否含空白或符號'));
 
       const result = '/fee-payment/result/fee-6';
       at(result, {'bills': 1, 'selected': 0});
-      expect(g.currentStep(s), 2);
-      expect(g.steps[2].targetFor(s), 'fees.bills');
-      expect(g.steps[2].locks(s), isTrue);
-      at(result, {'bills': 1, 'selected': 1, 'total': 'NT\$ 120'});
       expect(g.currentStep(s), 3);
-      expect(g.steps[3].card(s), contains('NT\$ 120'));
+      expect(g.steps[3].targetFor(s), 'fees.bills');
+      expect(g.steps[3].locks(s), isTrue);
+      at(result, {'bills': 1, 'selected': 1, 'total': 'NT\$ 120'});
+      expect(g.currentStep(s), 4);
+      expect(g.steps[4].card(s), contains('NT\$ 120'));
 
       const payment = '/fee-payment/payment/fee-6/B999999999';
       at(payment, {'feeName': '水費', 'amount': '\$120'});
-      expect(g.currentStep(s), 4);
-      expect(g.steps[4].targetFor(s), 'fees.methods');
-      at(payment, {'feeName': '水費', 'amount': '\$120', 'payConfirm': true});
       expect(g.currentStep(s), 5);
-      expect(g.steps[5].targetFor(s), 'fees.pay_yes');
-      expect(g.steps[5].card(s), contains('自己按「是」'));
-      expect(g.steps[5].card(s), contains('不會真的扣款'));
+      expect(g.steps[5].targetFor(s), 'fees.methods');
+      at(payment, {'feeName': '水費', 'amount': '\$120', 'payConfirm': true});
+      expect(g.currentStep(s), 6);
+      expect(g.steps[6].targetFor(s), 'fees.pay_yes');
+      expect(g.steps[6].card(s), contains('自己按「是」'));
+      expect(g.steps[6].card(s), contains('不會真的扣款'));
       expect(g.todos[6].self, '你自己確認');
       // 否 closes the dialog: back to choosing a method.
       at(payment, {'feeName': '水費'});
-      expect(g.currentStep(s), 4);
+      expect(g.currentStep(s), 5);
 
       s.latch(['paid']);
       at('/fee-payment/fee-payment-finished/fee-6', {
@@ -623,9 +625,9 @@ void main() {
     test('no bills found sends the user back', () {
       final g = page.build(page.plan(['pick_bill']));
       at('/fee-payment/result/fee-6', {'bills': 0});
-      expect(g.currentStep(s), 2);
-      expect(g.steps[2].targetFor(s), isNull);
-      expect(g.steps[2].card(s), contains('沒有查到'));
+      expect(g.currentStep(s), 3);
+      expect(g.steps[3].targetFor(s), isNull);
+      expect(g.steps[3].card(s), contains('沒有查到'));
     });
 
     test('the fee list comes first only for 其他繳費', () {

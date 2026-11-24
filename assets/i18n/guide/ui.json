@@ -1255,6 +1255,146 @@
    "vi": "(Bản mẫu) Nhận dạng giọng nói chưa được kết nối, hãy chạm chú chim cánh cụt ở góc dưới bên phải và gõ câu hỏi.",
    "id": "(Versi demo) Pengenalan suara belum terhubung. Ketuk penguin di kanan bawah dan ketik pertanyaan Anda.",
    "tl": "(Demo version) Hindi pa nakakonekta ang speech recognition. I-tap ang penguin sa kanang ibaba at i-type ang tanong mo."
+  },
+  "「{text}」已經選好了": {
+   "en": "\"{text}\" is already chosen",
+   "ja": "「{text}」はもう選ばれています",
+   "vi": "\"{text}\" đã được chọn rồi",
+   "id": "\"{text}\" sudah dipilih",
+   "tl": "Napili na ang \"{text}\""
+  },
+  "區的選單還沒出來，請自己選區": {
+   "en": "The district list hasn't appeared yet. Please pick the district yourself.",
+   "ja": "区の一覧がまだ出ていません。区をご自分で選んでください",
+   "vi": "Danh sách quận chưa hiện ra. Hãy tự chọn quận.",
+   "id": "Daftar distrik belum muncul. Pilih distrik sendiri.",
+   "tl": "Hindi pa lumalabas ang listahan ng distrito. Piliin mo ang distrito."
+  },
+  "好，這格先跳過，我們接著做下一步。": {
+   "en": "OK, this field is skipped. Let's go on to the next step.",
+   "ja": "わかりました。この欄は飛ばして、次のステップに進みましょう。",
+   "vi": "Được, bỏ qua ô này, chúng ta làm bước tiếp theo nhé.",
+   "id": "Oke, kolom ini dilewati. Kita lanjut ke langkah berikutnya.",
+   "tl": "Sige, nilaktawan na ang field na ito. Tuloy tayo sa susunod na hakbang."
+  },
+  "已打開「{text}」": {
+   "en": "Opened \"{text}\"",
+   "ja": "「{text}」を開きました",
+   "vi": "Đã mở \"{text}\"",
+   "id": "Sudah membuka \"{text}\"",
+   "tl": "Nabuksan ang \"{text}\""
+  },
+  "已選「{county}」，沒有聽出是哪一區，請自己選區": {
+   "en": "Chose \"{county}\". Didn't catch the district; please pick it yourself.",
+   "ja": "「{county}」を選びました。区が聞き取れなかったので、ご自分で選んでください",
+   "vi": "Đã chọn \"{county}\". Không nghe rõ quận, hãy tự chọn.",
+   "id": "Sudah memilih \"{county}\". Distrik tidak terdengar, pilih sendiri.",
+   "tl": "Napili ang \"{county}\". Hindi narinig ang distrito; piliin mo ito."
+  },
+  "已選「{text}」": {
+   "en": "Chose \"{text}\"",
+   "ja": "「{text}」を選びました",
+   "vi": "Đã chọn \"{text}\"",
+   "id": "Sudah memilih \"{text}\"",
+   "tl": "Napili ang \"{text}\""
+  },
+  "已選「{text}」。要改的話，直接點別的選項": {
+   "en": "Chose \"{text}\". To change it, tap another option.",
+   "ja": "「{text}」を選びました。変えるときは、別の項目をタップしてください",
+   "vi": "Đã chọn \"{text}\". Muốn đổi, hãy chạm vào mục khác.",
+   "id": "Sudah memilih \"{text}\". Untuk mengganti, ketuk opsi lain.",
+   "tl": "Napili ang \"{text}\". Para palitan, i-tap ang ibang opsyon."
+  },
+  "按住選擇": {
+   "en": "Hold to choose",
+   "ja": "長押しで選択",
+   "vi": "Giữ để chọn",
+   "id": "Tahan untuk memilih",
+   "tl": "Pindutin para pumili"
+  },
+  "按住選擇，說出要選的項目，說完放開": {
+   "en": "Hold to choose: say the option you want, then let go",
+   "ja": "長押しで選択：選びたい項目を言って、話し終えたら離してください",
+   "vi": "Giữ để chọn: nói mục bạn muốn chọn, nói xong thì thả ra",
+   "id": "Tahan untuk memilih: sebutkan pilihan Anda, lalu lepaskan",
+   "tl": "Pindutin para pumili: sabihin ang gusto mong piliin, saka bitawan"
+  },
+  "是哪一個？點一下：": {
+   "en": "Which one? Tap it:",
+   "ja": "どれですか？タップしてください：",
+   "vi": "Mục nào? Hãy chạm vào:",
+   "id": "Yang mana? Ketuk salah satu:",
+   "tl": "Alin dito? I-tap ito:"
+  },
+  "沒有對到畫面上的選項，請再說一次，或直接點選": {
+   "en": "That doesn't match an option on the screen. Please say it again, or tap it.",
+   "ja": "画面の項目と一致しませんでした。もう一度言うか、直接タップしてください",
+   "vi": "Không khớp với mục nào trên màn hình. Hãy nói lại, hoặc chạm để chọn.",
+   "id": "Tidak cocok dengan opsi di layar. Ucapkan lagi, atau ketuk langsung.",
+   "tl": "Walang tumugmang opsyon sa screen. Pakisabi ulit, o i-tap ito."
+  },
+  "沒有聽出是哪個縣市，請再說一次，或自己選縣市": {
+   "en": "Didn't catch the city or county. Please say it again, or pick it yourself.",
+   "ja": "県市が聞き取れませんでした。もう一度言うか、県市をご自分で選んでください",
+   "vi": "Không nghe rõ thành phố/huyện. Hãy nói lại, hoặc tự chọn.",
+   "id": "Kota/kabupaten tidak terdengar. Ucapkan lagi, atau pilih sendiri.",
+   "tl": "Hindi narinig ang lungsod o county. Pakisabi ulit, o piliin mo ito."
+  },
+  "說完整的地址，會依序選縣市、區，再填地址": {
+   "en": "Say the whole address: the city/county and district are picked, then the address is filled in",
+   "ja": "住所を最後まで言ってください。県市・区を順に選び、住所を入力します",
+   "vi": "Hãy nói cả địa chỉ: sẽ chọn thành phố/huyện, quận, rồi điền địa chỉ",
+   "id": "Sebutkan alamat lengkap: kota/kabupaten dan distrik dipilih, lalu alamat diisi",
+   "tl": "Sabihin ang buong address: pipiliin ang lungsod/county at distrito, saka pupunan ang address"
+  },
+  "說完會從畫面上的選項選一個": {
+   "en": "What you say picks one of the options on the screen",
+   "ja": "話した内容で画面の項目から1つ選びます",
+   "vi": "Lời bạn nói sẽ chọn một mục trên màn hình",
+   "id": "Ucapan Anda akan memilih salah satu opsi di layar",
+   "tl": "Ang sasabihin mo ay pipili ng isa sa mga opsyon sa screen"
+  },
+  "說完會選「{field}」的選項": {
+   "en": "What you say picks an option of \"{field}\"",
+   "ja": "話した内容で「{field}」の項目を選びます",
+   "vi": "Lời bạn nói sẽ chọn một mục của \"{field}\"",
+   "id": "Ucapan Anda akan memilih opsi \"{field}\"",
+   "tl": "Ang sasabihin mo ay pipili ng opsyon sa \"{field}\""
+  },
+  "跳過這格": {
+   "en": "Skip this field",
+   "ja": "この欄をスキップ",
+   "vi": "Bỏ qua ô này",
+   "id": "Lewati kolom ini",
+   "tl": "Laktawan ito"
+  },
+  "這格要填，不能跳過。": {
+   "en": "This field must be filled in. It can't be skipped.",
+   "ja": "この欄は入力が必要なので、飛ばせません。",
+   "vi": "Ô này bắt buộc phải điền, không bỏ qua được.",
+   "id": "Kolom ini wajib diisi, tidak bisa dilewati.",
+   "tl": "Kailangang punan ang field na ito. Hindi ito puwedeng laktawan."
+  },
+  "選不到，請直接點選": {
+   "en": "Couldn't choose it. Please tap it.",
+   "ja": "選べませんでした。直接タップしてください",
+   "vi": "Không chọn được. Hãy chạm để chọn.",
+   "id": "Tidak bisa dipilih. Ketuk langsung.",
+   "tl": "Hindi ito mapili. Paki-tap ito."
+  },
+  "選單裡沒有「{name}」，請自己選區": {
+   "en": "\"{name}\" is not in the list. Please pick the district yourself.",
+   "ja": "一覧に「{name}」がありません。区をご自分で選んでください",
+   "vi": "Danh sách không có \"{name}\". Hãy tự chọn quận.",
+   "id": "\"{name}\" tidak ada di daftar. Pilih distrik sendiri.",
+   "tl": "Wala sa listahan ang \"{name}\". Piliin mo ang distrito."
+  },
+  "選單裡沒有「{name}」，請自己選縣市": {
+   "en": "\"{name}\" is not in the list. Please pick the city or county yourself.",
+   "ja": "一覧に「{name}」がありません。県市をご自分で選んでください",
+   "vi": "Danh sách không có \"{name}\". Hãy tự chọn thành phố/huyện.",
+   "id": "\"{name}\" tidak ada di daftar. Pilih kota/kabupaten sendiri.",
+   "tl": "Wala sa listahan ang \"{name}\". Piliin mo ang lungsod o county."
   }
  }
 }
