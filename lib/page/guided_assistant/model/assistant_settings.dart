@@ -182,3 +182,27 @@ abstract class FieldMicTexts {
   static const nothing = '沒有聽出可以填的內容，請再說一次';
   static const failed = '填不進去，請點格子自己打字';
 }
+
+/// Texts of 按住選擇: the same button on a guide step that picks one of the
+/// options on the page (a drop-down, radio buttons, checkboxes, a list), and
+/// an address said at once for the 縣市 / 區 selects (docs/AI_CURRENT_RULES.md
+/// section 5, 2026-11-24). The 復原 and 已填入 texts are [FieldMicTexts]'.
+abstract class ChoiceMicTexts {
+  static const label = '按住選擇';
+  static const aria = '按住選擇，說出要選的項目，說完放開';
+  static const chooseIn = '說完會選「{field}」的選項';
+  static const chooseHere = '說完會從畫面上的選項選一個';
+  static const addressHere = '說完整的地址，會依序選縣市、區，再填地址';
+  static const chosen = '已選「{text}」';
+  static const chosenNoUndo = '已選「{text}」。要改的話，直接點別的選項';
+  static const opened = '已打開「{text}」';
+  static const already = '「{text}」已經選好了';
+  static const which = '是哪一個？點一下：';
+  static const none = '沒有對到畫面上的選項，請再說一次，或直接點選';
+  static const failed = '選不到，請直接點選';
+  static const noCounty = '沒有聽出是哪個縣市，請再說一次，或自己選縣市';
+  static const countyMissing = '選單裡沒有「{name}」，請自己選縣市';
+  static const districtLoading = '區的選單還沒出來，請自己選區';
+  static const districtMissing = '選單裡沒有「{name}」，請自己選區';
+  static const noDistrict = '已選「{county}」，沒有聽出是哪一區，請自己選區';
+}

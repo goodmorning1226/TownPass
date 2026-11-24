@@ -62,6 +62,9 @@ const disasterReportPageSpec = WebPageSpec(
     'disaster.checks': _checks,
     'disaster.numbers': _numbers,
     'disaster.extra': "q('#additional_disc')",
+    // 地點描述 and the first upload box (both need not be filled).
+    'disaster.place': "q('#desc')",
+    'disaster.photo': "qa('label.upload-box').filter(shown)[0] || null",
     'disaster.note': 'readArea($_note)',
     'disaster.consent': _consent,
     'disaster.send': _send,
@@ -91,6 +94,20 @@ const disasterReportPageSpec = WebPageSpec(
     'extraText': "!!(q('#additional_disc') || {}).value && q('#additional_disc').value.trim() !== ''",
     'extraFocus': "editing(q('#additional_disc'))",
     'extraOff': "$_offFn(q('#additional_disc'))",
+    // Fields that need not be filled (docs/AI_CURRENT_RULES.md section 5,
+    // 2026-11-24): 地點描述, 補充描述 (beside the boxes), 附件. *Required is
+    // true only when the page marks the field (「*」, required).
+    'place': "(q('#desc') || {}).value || ''",
+    'placeFocus': "editing(q('#desc'))",
+    'placeOff': "$_offFn(q('#desc'))",
+    'placeRequired': "mustFill(q('#desc'))",
+    'extraRequired': "mustFill(q('#additional_disc'))",
+    'photoRequired': "mustFill(qa('input[type=file]')[0] || null)",
+    'photoOff': "$_offFn(qa('label.upload-box').filter(shown)[0] || null)",
+    'photos': "qa('input[type=file]').reduce((n, i) => n + ((i.files && i.files.length) || 0), 0)",
+    // The user went on below 地點描述 (災情描述, 補充描述, 附件).
+    'pastPlace':
+        '''fieldTouched([...qa('div[class~="gap-1.5"] input'), ...$_numbers, q('#additional_disc'), ...qa('input[type=file]')].filter((e) => !!e))''',
     // 送出 was pressed with no 災情描述: the red 「至少勾選一項」 (it stays
     // until the next 送出, also after something is described).
     'needDescribe':
@@ -176,6 +193,99 @@ String _scroll(String off) => switch (off) {
   _ => '',
 };
 
+/// A field that need not be filled unless the page marks it ([flag], e.g.
+/// `placeRequired`; docs/AI_CURRENT_RULES.md section 5, 2026-11-24).
+bool _optional(WebPageState s, String flag) => s.now.flags[flag] != true;
+
+/// 補充描述 is a step of its own only beside the 災情描述 boxes: a form
+/// without them has 補充描述 as its required 災情描述 (describe_disaster).
+bool _extraOptional(WebPageState s) =>
+    s.now.flag('hasChecks') && _optional(s, 'extraRequired');
+
+/// A step on a field that need not be filled: ring [target] (null while it
+/// is off screen, [off] says where), done once [filled], skipped as [skip],
+/// or [passed]. [typing] adds how to finish a box being typed in.
+GuideStep _optionalStep({
+  required String target,
+  required String off,
+  required String skip,
+  required String label,
+  required bool Function(WebPageState s) optional,
+  required bool Function(WebPageState s) filled,
+  required bool Function(WebPageState s) passed,
+  required String Function(WebPageState s) card,
+  required String detail,
+  bool Function(WebPageState s)? typing,
+}) => GuideStep(
+  target: (s) => _onForm(s) && s.now.text(off).isEmpty ? target : null,
+  // The ring only, the screen is not dimmed: the user may go on to the next
+  // field instead (docs/AI_CURRENT_RULES.md section 5, 2026-11-24).
+  locks: (s) => !optional(s) && s.now.text(off).isEmpty,
+  arrow: _no,
+  scrollHint: (s) => _onForm(s) && s.now.text(off).isNotEmpty,
+  label: (_) => label,
+  card: (s) {
+    if (typing?.call(s) ?? false) {
+      return '寫好了就按鍵盤上的「完成」或「✓」，收起鍵盤。';
+    }
+    return '${_scroll(s.now.text(off))}${gt(card(s))}';
+  },
+  detail: (_) => detail,
+  isDone: (s) =>
+      _reported(s) ||
+      (_onForm(s) &&
+          (filled(s) || (optional(s) && (s.isSkipped(skip) || passed(s))))),
+  cardTop: (_) => 70,
+  skipKey: (s) => _onForm(s) && optional(s) ? skip : null,
+);
+
+/// 地點描述, under the address (enter_location's second step).
+final _placeStep = _optionalStep(
+  target: 'disaster.place',
+  off: 'placeOff',
+  skip: 'place',
+  label: '打字',
+  optional: (s) => _optional(s, 'placeRequired'),
+  filled: (s) => s.now.text('place').isNotEmpty && !s.now.flag('placeFocus'),
+  passed: (s) => s.now.flag('pastPlace'),
+  typing: (s) => s.now.text('place').isNotEmpty && s.now.flag('placeFocus'),
+  card: (s) => _optional(s, 'placeRequired')
+      ? '「地點描述」這格可以不填。想補充位置，點框框寫，例如「公園門口旁邊」；不寫就按「跳過這格」。'
+      : '點「地點描述」的框框，補充位置，例如「公園門口旁邊」。',
+  detail: '「地點描述」是補充說明位置，例如「公園門口旁邊」。不寫也可以：按卡片上的「跳過這格」，或說「跳過」。',
+);
+
+/// 補充描述 beside the boxes (describe_disaster's second step).
+final _extraStep = _optionalStep(
+  target: 'disaster.extra',
+  off: 'extraOff',
+  skip: 'extra',
+  label: '打字',
+  optional: _extraOptional,
+  filled: (s) => s.now.flag('extraText') && !s.now.flag('extraFocus'),
+  passed: (s) => s.now.number('photos') > 0 || s.now.flag('sendEnabled'),
+  typing: (s) => s.now.flag('extraText') && s.now.flag('extraFocus'),
+  card: (s) => _extraOptional(s)
+      ? '「補充描述」這格可以不寫。想多說明，點框框寫看到的細節，例如「整排路燈都不亮」；不寫就按「跳過這格」。'
+      : '點「補充描述」的框框，寫看到的狀況。',
+  detail: '「補充描述」可以多寫看到的細節。不寫也可以：按卡片上的「跳過這格」，或說「跳過」。',
+);
+
+/// 附件 (describe_disaster's last step).
+final _photoStep = _optionalStep(
+  target: 'disaster.photo',
+  off: 'photoOff',
+  skip: 'photo',
+  label: '選照片',
+  optional: (s) => _optional(s, 'photoRequired'),
+  filled: (s) => s.now.number('photos') > 0,
+  passed: (s) => s.now.flag('sendEnabled'),
+  card: (s) => _optional(s, 'photoRequired')
+      ? '「附件」這格可以不加。想附上照片，點「最多上傳 3個檔案」的方框，選手機裡的照片；不加就按「跳過這格」。'
+      : '點「最多上傳 3個檔案」的方框，選手機裡的照片。',
+  detail: '點「最多上傳 3個檔案」的方框，可以附上照片。不加也可以：按卡片上的「跳過這格」，或說「跳過」。',
+);
+
 /// 選災情類別 on the category list. Also the first form step's fallback when
 /// a guide opened straight on a form (no pick_category step) and the list is
 /// showing: briefly before the site switches to the form, or after the user
@@ -224,7 +334,9 @@ final List<GuideComponent> disasterReportComponents = [
   GuideComponent(
     id: 'enter_location',
     title: '填災情發生地點',
-    briefs: const ['打地址或按定位'],
+    // 地點描述 need not be filled: a step of its own (docs/AI_CURRENT_RULES.md
+    // section 5, 2026-11-24).
+    briefs: const ['打地址或按定位', '地點描述可以不寫'],
     description: '在「標注災情發生地點」打地址，或按定位圖示',
     keywords: const ['災情地點', '災情發生地點', '災情在哪裡', '災情地址'],
     requires: const ['pick_category'],
@@ -267,12 +379,15 @@ final List<GuideComponent> disasterReportComponents = [
                 !s.now.flag('locationFocus')),
         cardTop: (s) => _onHome(s) ? 450 : 250,
       ),
+      _placeStep,
     ],
   ),
   GuideComponent(
     id: 'describe_disaster',
     title: '勾選災情狀況',
-    briefs: const ['勾選看到的狀況'],
+    // 補充描述 (beside the boxes) and 附件 need not be filled: steps of their
+    // own (docs/AI_CURRENT_RULES.md section 5, 2026-11-24).
+    briefs: const ['勾選看到的狀況', '補充描述可以不寫', '附件可以不加'],
     description: '在「災情描述」勾選看到的狀況，例如有人受困、影響道路',
     keywords: const ['災情描述', '災情狀況', '傷亡', '受困', '影響交通'],
     requires: const ['enter_location'],
@@ -339,6 +454,8 @@ final List<GuideComponent> disasterReportComponents = [
         isDone: (s) => _reported(s) || (_onForm(s) && _described(s)),
         cardTop: (_) => 70,
       ),
+      _extraStep,
+      _photoStep,
     ],
   ),
   GuideComponent(

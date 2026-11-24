@@ -52,6 +52,34 @@
    "id": ", ",
    "tl": ", "
   },
+  "「上傳附件」不是一定要附：想附照片就點它選檔案，不附就按卡片上的「跳過這格」，或說「跳過」。": {
+   "en": "“{page:上傳附件}” is optional: to add a photo, tap it and pick a file; if not, tap “Skip this field” on the card, or say “skip”.",
+   "ja": "「{page:上傳附件}」は付けなくても大丈夫です。写真を付けるならタップしてファイルを選び、付けないならカードの「この欄をスキップ」を押すか、「スキップ」と言ってください。",
+   "vi": "“{page:上傳附件}” không bắt buộc: muốn đính kèm ảnh thì bấm vào đó chọn tệp, không thì bấm “Bỏ qua ô này” trên thẻ, hoặc nói “bỏ qua”.",
+   "id": "“{page:上傳附件}” tidak wajib: kalau mau melampirkan foto, tekan lalu pilih file; kalau tidak, tekan “Lewati kolom ini” di kartu, atau ucapkan “lewati”.",
+   "tl": "Hindi kailangan ang “{page:上傳附件}”: para magdagdag ng litrato, i-tap ito at pumili ng file; kung hindi, i-tap ang “Laktawan ito” sa card, o sabihin ang “laktawan”."
+  },
+  "「上傳附件」這格可以不附。想附上照片或檔案，點「上傳附件」選手機裡的檔案；不附就按「跳過這格」。": {
+   "en": "“{page:上傳附件}” is optional. To attach a photo or file, tap “{page:上傳附件}” and pick a file on your phone. If not, tap “Skip this field”.",
+   "ja": "「{page:上傳附件}」は付けなくても大丈夫です。写真やファイルを付けるなら、「{page:上傳附件}」を押してスマホのファイルを選んでください。付けないなら「この欄をスキップ」を押します。",
+   "vi": "“{page:上傳附件}” không đính kèm cũng được. Muốn đính kèm ảnh hoặc tệp, bấm “{page:上傳附件}” và chọn tệp trong điện thoại; không thì bấm “Bỏ qua ô này”.",
+   "id": "“{page:上傳附件}” boleh tidak diisi. Untuk melampirkan foto atau file, tekan “{page:上傳附件}” dan pilih file di ponsel Anda. Kalau tidak, tekan “Lewati kolom ini”.",
+   "tl": "Hindi kailangan ang “{page:上傳附件}”. Para mag-attach ng litrato o file, i-tap ang “{page:上傳附件}” at pumili ng file sa iyong phone. Kung hindi, i-tap ang “Laktawan ito”."
+  },
+  "「住家電話」不是一定要填：有市話就打號碼，沒有就按卡片上的「跳過這格」，或說「跳過」。": {
+   "en": "“{page:住家電話}” is optional: if you have a landline, type its number; if not, tap “Skip this field” on the card, or say “skip”.",
+   "ja": "「{page:住家電話}」は入力しなくても大丈夫です。固定電話があれば番号を入力し、なければカードの「この欄をスキップ」を押すか、「スキップ」と言ってください。",
+   "vi": "“{page:住家電話}” không bắt buộc: có điện thoại bàn thì nhập số, không có thì bấm “Bỏ qua ô này” trên thẻ, hoặc nói “bỏ qua”.",
+   "id": "“{page:住家電話}” tidak wajib: kalau punya telepon rumah, ketik nomornya; kalau tidak, tekan “Lewati kolom ini” di kartu, atau ucapkan “lewati”.",
+   "tl": "Hindi kailangan ang “{page:住家電話}”: kung may landline ka, i-type ang numero; kung wala, i-tap ang “Laktawan ito” sa card, o sabihin ang “laktawan”."
+  },
+  "「住家電話」這格可以不填。家裡有市話的話，點框框打號碼，例如 0227208889；沒有或不想填，就按「跳過這格」。": {
+   "en": "“{page:住家電話}” is optional. If you have a landline at home, tap the box and type the number, e.g. 0227208889. If you don't have one or don't want to fill it in, tap “Skip this field”.",
+   "ja": "「{page:住家電話}」は入力しなくても大丈夫です。家に固定電話があれば、枠をタップして番号を入力してください（例：0227208889）。ない場合や入力したくない場合は「この欄をスキップ」を押します。",
+   "vi": "Ô “{page:住家電話}” không điền cũng được. Nếu nhà có điện thoại bàn, bấm vào ô và nhập số, ví dụ 0227208889; không có hoặc không muốn điền thì bấm “Bỏ qua ô này”.",
+   "id": "Kotak “{page:住家電話}” boleh dikosongkan. Kalau punya telepon rumah, tekan kotaknya dan ketik nomornya, misalnya 0227208889. Kalau tidak punya atau tidak mau mengisi, tekan “Lewati kolom ini”.",
+   "tl": "Puwedeng iwanang blangko ang “{page:住家電話}”. Kung may landline sa bahay, i-tap ang kahon at i-type ang numero, hal. 0227208889. Kung wala o ayaw mong punan, i-tap ang “Laktawan ito”."
+  },
   "「報案人類別」點一下選一個；「發生日期」點框框會跳出月曆，點那一天；「發生時間」已先填現在的時間；「案情摘要」寫發生了什麼事。": {
    "en": "“{page:報案人類別}”: tap and pick one. “{page:發生日期}”: tap the box to open the calendar, then tap the day. “{page:發生時間}” is already set to the current time. “{page:案情摘要}”: write what happened.",
    "ja": "「{page:報案人類別}」は押して1つ選びます。「{page:發生日期}」は枠を押すとカレンダーが出るので、その日を押します。「{page:發生時間}」には今の時刻が入っています。「{page:案情摘要}」には何があったかを書きます。",
@@ -121,6 +149,13 @@
    "vi": "Vụ việc không khẩn cấp có thể trình báo qua mạng: đọc phần lưu ý, điền thông tin liên lạc và nội dung vụ việc, rồi gửi đi. Bạn cũng có thể xem hồ sơ trình báo và tiến độ xử lý. Trường hợp khẩn cấp, hãy gọi ngay 110.",
    "id": "Kasus yang tidak darurat bisa dilaporkan online: baca ketentuannya, isi data kontak dan kejadiannya, lalu kirim. Anda juga bisa melihat riwayat laporan dan perkembangannya. Dalam keadaan darurat, segera telepon 110.",
    "tl": "Puwedeng i-report online ang mga kasong hindi emergency: basahin ang abiso, punan ang iyong contact details at ang nangyari, saka ipadala. Makikita mo rin ang mga dati mong ulat at ang progreso ng mga ito. Kapag emergency, tumawag agad sa 110."
+  },
+  "住家電話可以不填": {
+   "en": "Home phone is optional",
+   "ja": "自宅の電話は入力しなくてよい",
+   "vi": "Điện thoại nhà không bắt buộc",
+   "id": "Telepon rumah boleh kosong",
+   "tl": "Hindi kailangan ang telepono sa bahay"
   },
   "再點旁邊的「請選擇區域」，選你住的區。": {
    "en": "Then tap “{page:請選擇區域}” next to it and pick your district.",
@@ -262,19 +297,19 @@
    "id": "“{page:報案人類別}” adalah “{role}”",
    "tl": "Nakatakda ang “{page:報案人類別}” sa “{role}”"
   },
+  "填好信箱和地址": {
+   "en": "Fill in your e-mail and addresses",
+   "ja": "メールと住所を入力",
+   "vi": "Điền e-mail và địa chỉ",
+   "id": "Isi e-mail dan alamat",
+   "tl": "Punan ang e-mail at mga address"
+  },
   "填好案件資料": {
    "en": "Fill in the case details",
    "ja": "事件の内容を入力",
    "vi": "Điền thông tin vụ việc",
    "id": "Isi data kasus",
    "tl": "Punan ang detalye ng kaso"
-  },
-  "填好聯絡資料": {
-   "en": "Fill in your contact details",
-   "ja": "連絡先を入力",
-   "vi": "Điền thông tin liên lạc",
-   "id": "Isi data kontak",
-   "tl": "Punan ang contact details"
   },
   "填案件資料": {
    "en": "Fill in the case details",
@@ -387,6 +422,13 @@
    "vi": " Gõ xong thì bấm “Xong” hoặc “✓” trên bàn phím.",
    "id": " Kalau sudah selesai mengetik, tekan “Selesai” atau “✓” di keyboard.",
    "tl": " Kapag tapos ka nang mag-type, i-tap ang “Done” o “✓” sa keyboard."
+  },
+  "打手機號碼": {
+   "en": "Type your mobile number",
+   "ja": "携帯番号を入力",
+   "vi": "Nhập số di động",
+   "id": "Ketik nomor ponsel",
+   "tl": "I-type ang mobile number"
   },
   "打開這筆案件了！": {
    "en": "This case is open!",
@@ -710,6 +752,13 @@
    "id": "Buka Lapor polisi online",
    "tl": "Buksan ang “Mag-report sa pulis online”"
   },
+  "附件可以不附": {
+   "en": "Attachments are optional",
+   "ja": "添付は付けなくてよい",
+   "vi": "Tệp đính kèm không bắt buộc",
+   "id": "Lampiran boleh tidak ada",
+   "tl": "Hindi kailangan ang attachment"
+  },
   "須知看完了！勾下面的「本人已詳閱須知並同意繼續」。": {
    "en": "You've read the notice! Tick “{page:本人已詳閱須知並同意繼續}” below.",
    "ja": "注意事項を読み終わりました！下の「{page:本人已詳閱須知並同意繼續}」にチェックしてください。",
@@ -723,6 +772,20 @@
    "vi": "Điểm chính: trường hợp khẩn cấp hãy gọi 110; trình báo qua mạng được phản hồi trong khoảng 5 ngày; với các vụ như trộm cắp, lừa đảo, sau đó bạn còn phải đến đồn cảnh sát để lấy lời khai. Kéo xuống cuối là đọc xong.",
    "id": "Poin penting: dalam keadaan darurat, telepon 110; laporan online dibalas dalam sekitar 5 hari; untuk kasus seperti pencurian atau penipuan, nanti Anda juga perlu ke kantor polisi untuk memberi keterangan. Gulir sampai paling bawah, selesai dibaca.",
    "tl": "Mahahalagang punto: kapag emergency, tumawag sa 110; sinasagot ang mga online na ulat sa loob ng mga 5 araw; para sa mga kaso tulad ng pagnanakaw o panloloko, kailangan mo ring pumunta sa istasyon ng pulis pagkatapos para magbigay ng salaysay. Mag-scroll hanggang sa pinakaibaba at tapos ka nang magbasa."
+  },
+  "點「上傳附件」，選要附上的照片或檔案。": {
+   "en": "Tap “{page:上傳附件}” and pick the photo or file to attach.",
+   "ja": "「{page:上傳附件}」を押して、付ける写真やファイルを選んでください。",
+   "vi": "Bấm “{page:上傳附件}” và chọn ảnh hoặc tệp muốn đính kèm.",
+   "id": "Tekan “{page:上傳附件}” dan pilih foto atau file yang mau dilampirkan.",
+   "tl": "I-tap ang “{page:上傳附件}” at piliin ang litrato o file na ia-attach."
+  },
+  "點「住家電話」的框框，打你家裡的電話號碼。": {
+   "en": "Tap the “{page:住家電話}” box and type your home phone number.",
+   "ja": "「{page:住家電話}」の枠を押して、自宅の電話番号を入力してください。",
+   "vi": "Bấm vào ô “{page:住家電話}” và nhập số điện thoại nhà bạn.",
+   "id": "Tekan kotak “{page:住家電話}” dan ketik nomor telepon rumah Anda.",
+   "tl": "I-tap ang kahon na “{page:住家電話}” at i-type ang numero ng telepono sa inyong bahay."
   },
   "點「報案人類別」選一個：自己遇到的選「當事人」，東西被偷、被騙選「被害人」，看到別人違法選「檢舉人」。": {
    "en": "Tap “{page:報案人類別}” and pick one: if it happened to you, pick “{page:當事人}”; if something was stolen or you were cheated, pick “{page:被害人}”; if you saw someone else break the law, pick “{page:檢舉人}”.",

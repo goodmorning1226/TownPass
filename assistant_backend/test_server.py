@@ -221,6 +221,63 @@ class TurnTests(unittest.TestCase):
             server.server_close()
             thread.join()
 
+    def test_http_match(self):
+        """/v1/assistant/match (按住選擇 and addresses, 2026-11-24) over real HTTP: the
+        token, the field whitelist, bad options, a choice and an address."""
+        assistant = Assistant(FakeCatalog(), lambda *_: response("open_library"))
+        server = ThreadingHTTPServer(("127.0.0.1", 0), make_handler(assistant, "test-token"))
+        thread = threading.Thread(target=server.serve_forever, daemon=True)
+        thread.start()
+        url = f"http://127.0.0.1:{server.server_port}/v1/assistant/match"
+
+        def post(payload, token="test-token", headers=None):
+            data = payload if isinstance(payload, bytes) else json.dumps(payload).encode()
+            request = urllib.request.Request(url, data=data, headers={
+                "Authorization": f"Bearer {token}", "Content-Type": "application/json", **(headers or {})})
+            try:
+                with urllib.request.urlopen(request, timeout=5) as reply:
+                    return reply.status, json.loads(reply.read())
+            except urllib.error.HTTPError as error:
+                return error.code, json.loads(error.read() or b"{}")
+
+        vehicle = [{"text": "汽車", "shown": "Car"}, {"text": "機車", "shown": "Scooter"}]
+        try:
+            self.assertEqual(post({"kind": "choice", "text": "機車", "options": vehicle}, token="wrong")[0], 401)
+            for bad in ({"kind": "choice", "text": "機車", "options": vehicle, "url": "evil"},
+                        {"kind": "other", "text": "機車", "options": vehicle},
+                        {"kind": "choice", "text": "機車", "options": []},
+                        {"kind": "choice", "text": "機車", "options": [{"text": 1}]},
+                        {"kind": "choice", "text": "機車", "options": [{"text": "x"}] * 61},
+                        {"kind": "address", "text": "台北市", "county": 3}):
+                self.assertEqual(post(bad)[0], 422, bad)
+            self.assertEqual(post(b"{not json")[0], 400)
+            self.assertEqual(post({"kind": "choice", "text": "x", "options": vehicle},
+                                  headers={"Origin": "https://evil.example"})[0], 403)
+            status, body = post({"kind": "choice", "text": "我選機車", "options": vehicle, "language": "zh"})
+            self.assertEqual((status, body["decision"], body["best"]["index"]), (200, "pick", 1))
+            status, body = post({"kind": "choice", "text": "the first one", "options": vehicle, "language": "en"})
+            self.assertEqual((body["decision"], body["best"]["index"]), ("pick", 0))
+            # Plain strings are options too.
+            status, body = post({"kind": "choice", "text": "地政事務所",
+                                 "options": ["古亭地政事務所", "建成地政事務所"]})
+            self.assertEqual((status, body["decision"], len(body["candidates"])), (200, "ask", 2))
+            status, body = post({"kind": "address", "text": "台北市新義區市府路一號", "language": "zh"})
+            self.assertEqual((status, body["standard"], body["detail"]), (200, "臺北市信義區市府路1號", "市府路1號"))
+            self.assertEqual((body["county"]["name"], body["district"]["name"]), ("臺北市", "信義區"))
+            status, body = post({"kind": "address", "text": "新義區市府路一號", "county": "臺北市"})
+            self.assertEqual((status, body["district"]["name"]), (200, "信義區"))
+            # The turns endpoint is unchanged by the new one.
+            turns = url.replace("/match", "/turns")
+            request = urllib.request.Request(turns, data=json.dumps({"kind": "choice", "text": "x"}).encode(), headers={
+                "Authorization": "Bearer test-token", "Content-Type": "application/json"})
+            with self.assertRaises(urllib.error.HTTPError) as caught:
+                urllib.request.urlopen(request, timeout=5)
+            self.assertEqual(caught.exception.code, 422)
+        finally:
+            server.shutdown()
+            server.server_close()
+            thread.join()
+
 
 if __name__ == "__main__":
     unittest.main()

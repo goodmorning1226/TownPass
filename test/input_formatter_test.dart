@@ -55,7 +55,15 @@ void main() {
       expect(k(const FieldInfo(placeholder: '搜尋案號關鍵字')), FieldKind.code);
       expect(k(const FieldInfo(label: '繳費金額')), FieldKind.number);
       expect(k(const FieldInfo(label: '路燈傾倒(失明盞)')), FieldKind.number);
-      expect(k(const FieldInfo(placeholder: '請輸入詳細地址')), FieldKind.text);
+      // An address box is written the standard way by the backend (rules
+      // section 5, 2026-11-24); the words themselves stay text.
+      expect(k(const FieldInfo(placeholder: '請輸入詳細地址')), FieldKind.address);
+      expect(k(const FieldInfo(label: '發生地點')), FieldKind.address);
+      expect(k(const FieldInfo(label: '電子郵件地址')), FieldKind.email);
+      expect(
+        InputFormatter.format('  台北市 信義區 市府路1號  ', FieldKind.address),
+        '台北市信義區市府路1號',
+      );
       expect(k(const FieldInfo(id: 'hotel')), FieldKind.text);
     });
 

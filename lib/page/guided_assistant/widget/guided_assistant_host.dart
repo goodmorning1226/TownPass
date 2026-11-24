@@ -986,6 +986,16 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
           ),
           const SizedBox(width: 8),
           _WarmButton(gt('暫停'), c.pause),
+          // A field that need not be filled (docs/AI_CURRENT_RULES.md
+          // section 5, 2026-11-24); never on a required one.
+          if (c.skipKey != null) ...[
+            const SizedBox(width: 8),
+            _WarmButton(
+              gt('跳過這格'),
+              c.skipField,
+              key: const Key('guide-card-skip'),
+            ),
+          ],
         ]);
       case CardVariant.opened:
         break; // 我自己來 / 開始 under the text
@@ -994,6 +1004,14 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
       case CardVariant.commit:
         break;
     }
+    final label = TPText(
+      card.label,
+      style: TPTextStyles.bodySemiBold,
+      color: commit ? TPColors.orange700 : TPColors.secondary800,
+    );
+    // With 跳過這格 there are three buttons: they go on the label's line
+    // when they fit, else on the next line (long languages, large text).
+    final skipping = card.variant == CardVariant.step && c.skipKey != null;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -1003,14 +1021,26 @@ class _GuidedAssistantHostState extends State<GuidedAssistantHost> {
             // ([_CardMotion]), so it stays put while the text changes.
             const SizedBox(width: _cardAvatar, height: _cardAvatar),
             const SizedBox(width: 10),
-            Expanded(
-              child: TPText(
-                card.label,
-                style: TPTextStyles.bodySemiBold,
-                color: commit ? TPColors.orange700 : TPColors.secondary800,
-              ),
-            ),
-            ...tools,
+            if (skipping)
+              Expanded(
+                child: Wrap(
+                  alignment: WrapAlignment.spaceBetween,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  runSpacing: 6,
+                  children: [
+                    label,
+                    Wrap(
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      runSpacing: 6,
+                      children: tools,
+                    ),
+                  ],
+                ),
+              )
+            else ...[
+              Expanded(child: label),
+              ...tools,
+            ],
           ],
         ),
         const SizedBox(height: 6),
@@ -1834,7 +1864,7 @@ class _SecondaryButton extends StatelessWidget {
 class _WarmButton extends StatelessWidget {
   final String label;
   final VoidCallback onTap;
-  const _WarmButton(this.label, this.onTap);
+  const _WarmButton(this.label, this.onTap, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -1850,11 +1880,17 @@ class _WarmButton extends StatelessWidget {
           onTap: _tapped(onTap),
           child: Container(
             constraints: const BoxConstraints(minWidth: 56, minHeight: 48),
-            alignment: Alignment.center,
-            child: TPText(
-              label,
-              style: TPTextStyles.bodySemiBold.copyWith(fontSize: 15),
-              color: TPColors.primary700,
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            // As wide as its words also where it may take the whole line
+            // (the wrapped button row of a 跳過這格 step).
+            child: Center(
+              widthFactor: 1,
+              heightFactor: 1,
+              child: TPText(
+                label,
+                style: TPTextStyles.bodySemiBold.copyWith(fontSize: 15),
+                color: TPColors.primary700,
+              ),
             ),
           ),
         ),

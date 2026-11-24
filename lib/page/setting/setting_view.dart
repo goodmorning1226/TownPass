@@ -53,6 +53,14 @@ class SettingView extends GetView<SettingViewController> {
                 title: '停用帳號',
                 onTap: () => Get.toNamed(TPRoute.suspendAccount),
               ),
+              TPSettingListTile.header(title: '關於'),
+              TPSettingListTile.navigate(
+                title: '授權與資料來源',
+                onTap: () => showLicensePage(
+                  context: context,
+                  applicationName: 'Town Pass',
+                ),
+              ),
             ],
           ),
           bottomNavigationBar: TPBottomSheet(

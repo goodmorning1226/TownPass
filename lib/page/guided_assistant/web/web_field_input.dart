@@ -138,6 +138,10 @@ class WebFieldInput {
   Object.getOwnPropertyDescriptor(proto, 'value').set.call(el, next);
   el.dispatchEvent(new Event('input', { bubbles: true }));
   el.dispatchEvent(new Event('change', { bubbles: true }));
+  // The service forms check a box on input against the value before it, so a
+  // whole value set at once stayed marked 「不能為空」 (2026-11-24, police
+  // 詳細地址); one more input event a moment later lets them see it.
+  if (typeof setTimeout === 'function') setTimeout(() => { if (el.isConnected && el.value === next) el.dispatchEvent(new Event('input', { bubbles: true })); }, 60);
   window.__tpFieldUndo = { el, before, after: el.value };
   // Said words are a whole entry: the field counts as typed out, also while
   // it keeps the focus (WebPageSpec.fieldWatch, settled()).

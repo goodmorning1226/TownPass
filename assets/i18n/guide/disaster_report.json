@@ -66,6 +66,34 @@
    "id": "Ketuk kotak kecil di bawah “{page:人員傷亡}” dan “{page:影響交通}” untuk mencentang. Di bawahnya Anda juga bisa menulis “{page:補充描述}” atau melampirkan foto.",
    "tl": "I-tap ang maliliit na kahon sa ilalim ng “{page:人員傷亡}” at “{page:影響交通}” para lagyan ng tsek. Sa ibaba nito, puwede ka ring magsulat sa “{page:補充描述}” o magdagdag ng mga larawan."
   },
+  "「地點描述」是補充說明位置，例如「公園門口旁邊」。不寫也可以：按卡片上的「跳過這格」，或說「跳過」。": {
+   "en": "“{page:地點描述}” adds detail about the place, e.g. “公園門口旁邊” (next to the park entrance). You can leave it empty: tap “Skip this field” on the card, or say “skip”.",
+   "ja": "「{page:地點描述}」は場所の補足です。例：「公園門口旁邊」（公園の入口の横）。書かなくても大丈夫です。カードの「この欄をスキップ」を押すか、「スキップ」と言ってください。",
+   "vi": "“{page:地點描述}” là phần nói thêm về vị trí, ví dụ “公園門口旁邊” (cạnh cổng công viên). Không viết cũng được: bấm “Bỏ qua ô này” trên thẻ, hoặc nói “bỏ qua”.",
+   "id": "“{page:地點描述}” untuk menambah keterangan lokasi, misalnya “公園門口旁邊” (di samping pintu taman). Boleh dikosongkan: tekan “Lewati kolom ini” di kartu, atau ucapkan “lewati”.",
+   "tl": "Ang “{page:地點描述}” ay dagdag na detalye ng lugar, hal. “公園門口旁邊” (katabi ng pasukan ng parke). Puwede itong iwanang blangko: i-tap ang “Laktawan ito” sa card, o sabihin ang “laktawan”."
+  },
+  "「地點描述」這格可以不填。想補充位置，點框框寫，例如「公園門口旁邊」；不寫就按「跳過這格」。": {
+   "en": "“{page:地點描述}” is optional. To add detail about the place, tap the box and write it, e.g. “公園門口旁邊” (next to the park entrance). If not, tap “Skip this field”.",
+   "ja": "「{page:地點描述}」は書かなくても大丈夫です。場所を補足するなら、枠をタップして書いてください。例：「公園門口旁邊」（公園の入口の横）。書かないなら「この欄をスキップ」を押します。",
+   "vi": "Ô “{page:地點描述}” không điền cũng được. Muốn nói thêm về vị trí, chạm vào ô và viết, ví dụ “公園門口旁邊” (cạnh cổng công viên); không viết thì bấm “Bỏ qua ô này”.",
+   "id": "Kotak “{page:地點描述}” boleh dikosongkan. Untuk menambah keterangan lokasi, ketuk kotaknya dan tulis, misalnya “公園門口旁邊” (di samping pintu taman). Kalau tidak, tekan “Lewati kolom ini”.",
+   "tl": "Puwedeng iwanang blangko ang “{page:地點描述}”. Para magdagdag ng detalye ng lugar, i-tap ang kahon at isulat, hal. “公園門口旁邊” (katabi ng pasukan ng parke). Kung hindi, i-tap ang “Laktawan ito”."
+  },
+  "「補充描述」可以多寫看到的細節。不寫也可以：按卡片上的「跳過這格」，或說「跳過」。": {
+   "en": "In “{page:補充描述}” you can write more about what you saw. You can leave it empty: tap “Skip this field” on the card, or say “skip”.",
+   "ja": "「{page:補充描述}」には、見たことをもっと詳しく書けます。書かなくても大丈夫です。カードの「この欄をスキップ」を押すか、「スキップ」と言ってください。",
+   "vi": "Ở “{page:補充描述}” có thể viết thêm chi tiết đã thấy. Không viết cũng được: bấm “Bỏ qua ô này” trên thẻ, hoặc nói “bỏ qua”.",
+   "id": "Di “{page:補充描述}” Anda bisa menulis lebih rinci apa yang Anda lihat. Boleh dikosongkan: tekan “Lewati kolom ini” di kartu, atau ucapkan “lewati”.",
+   "tl": "Sa “{page:補充描述}”, puwede mong isulat ang iba pang detalyeng nakita mo. Puwede itong iwanang blangko: i-tap ang “Laktawan ito” sa card, o sabihin ang “laktawan”."
+  },
+  "「補充描述」這格可以不寫。想多說明，點框框寫看到的細節，例如「整排路燈都不亮」；不寫就按「跳過這格」。": {
+   "en": "“{page:補充描述}” is optional. To say more, tap the box and write what you saw, e.g. “整排路燈都不亮” (the whole row of street lights is out). If not, tap “Skip this field”.",
+   "ja": "「{page:補充描述}」は書かなくても大丈夫です。詳しく伝えたいなら、枠をタップして見たことを書いてください。例：「整排路燈都不亮」（街灯が一列全部消えている）。書かないなら「この欄をスキップ」を押します。",
+   "vi": "Ô “{page:補充描述}” không viết cũng được. Muốn nói rõ hơn, chạm vào ô và viết chi tiết đã thấy, ví dụ “整排路燈都不亮” (cả dãy đèn đường đều tắt); không viết thì bấm “Bỏ qua ô này”.",
+   "id": "Kotak “{page:補充描述}” boleh dikosongkan. Untuk menjelaskan lebih banyak, ketuk kotaknya dan tulis apa yang Anda lihat, misalnya “整排路燈都不亮” (seluruh deretan lampu jalan mati). Kalau tidak, tekan “Lewati kolom ini”.",
+   "tl": "Puwedeng iwanang blangko ang “{page:補充描述}”. Para magpaliwanag pa, i-tap ang kahon at isulat ang nakita mo, hal. “整排路燈都不亮” (patay ang buong hilera ng ilaw sa kalye). Kung hindi, i-tap ang “Laktawan ito”."
+  },
   "「送出」沒有成功，因為還沒填「災情描述」。": {
    "en": "“{page:送出}” didn’t go through because “{page:災情描述}” is still empty. ",
    "ja": "「{page:災情描述}」がまだ空なので、「{page:送出}」できませんでした。",
@@ -79,6 +107,13 @@
    "vi": "“{page:送出}” vẫn còn màu xám. Hãy đánh dấu “{page:提供個人資料給承辦人員}” trước, nút đó mới bấm được.",
    "id": "“{page:送出}” masih abu-abu. Centang dulu “{page:提供個人資料給承辦人員}”, baru tombolnya bisa ditekan.",
    "tl": "Kulay abo pa rin ang “{page:送出}”. Lagyan muna ng tsek ang “{page:提供個人資料給承辦人員}”, at saka ito mata-tap."
+  },
+  "「附件」這格可以不加。想附上照片，點「最多上傳 3個檔案」的方框，選手機裡的照片；不加就按「跳過這格」。": {
+   "en": "“{page:附件}” is optional. To add photos, tap the “{page:最多上傳 3個檔案}” box and pick photos from your phone. If not, tap “Skip this field”.",
+   "ja": "「{page:附件}」は付けなくても大丈夫です。写真を付けるなら、「{page:最多上傳 3個檔案}」の枠をタップしてスマホの写真を選んでください。付けないなら「この欄をスキップ」を押します。",
+   "vi": "“{page:附件}” không thêm cũng được. Muốn đính kèm ảnh, chạm vào ô “{page:最多上傳 3個檔案}” và chọn ảnh trong điện thoại; không thêm thì bấm “Bỏ qua ô này”.",
+   "id": "“{page:附件}” boleh tidak diisi. Untuk melampirkan foto, ketuk kotak “{page:最多上傳 3個檔案}” dan pilih foto di ponsel Anda. Kalau tidak, tekan “Lewati kolom ini”.",
+   "tl": "Hindi kailangan ang “{page:附件}”. Para magdagdag ng larawan, i-tap ang kahon na “{page:最多上傳 3個檔案}” at pumili ng larawan sa iyong phone. Kung hindi, i-tap ang “Laktawan ito”."
   },
   "下面的「地點描述」可以補充說明，例如「公園門口旁邊」，不寫也可以。": {
    "en": "In “{page:地點描述}” below you can add more detail, e.g. “公園門口旁邊” (next to the park entrance). You can leave it empty.",
@@ -219,6 +254,13 @@
    "vi": "Đã điền xong địa điểm!",
    "id": "Lokasi sudah diisi!",
    "tl": "Napunan na ang lugar!"
+  },
+  "地點描述可以不寫": {
+   "en": "Place details are optional",
+   "ja": "場所の補足は書かなくてよい",
+   "vi": "Mô tả địa điểm không bắt buộc",
+   "id": "Keterangan lokasi boleh kosong",
+   "tl": "Hindi kailangan ang detalye ng lugar"
   },
   "地點是「{where}」，": {
    "en": "Place: “{where}”. ",
@@ -451,6 +493,13 @@
    "id": "Kalau melihat lampu jalan rusak, listrik padam, kerusakan jembatan, atau tanah longsor, Anda bisa melaporkannya di sini: pilih kategori bencana, isi lokasi dan keadaannya, lalu kirim. Kalau ada yang terluka atau ada bahaya langsung, segera telepon 119.",
    "tl": "Kung may makita kang sirang ilaw sa kalye, brownout, o pinsala sa tulay o pagguho ng lupa, puwede mo itong iulat dito: pumili ng kategorya ng sakuna, ilagay ang lugar at sitwasyon, at ipadala ito. Kung may nasaktan o may agarang panganib, tumawag agad sa 119."
   },
+  "補充描述可以不寫": {
+   "en": "Extra details are optional",
+   "ja": "補足説明は書かなくてよい",
+   "vi": "Mô tả thêm không bắt buộc",
+   "id": "Keterangan tambahan boleh kosong",
+   "tl": "Hindi kailangan ang dagdag na detalye"
+  },
   "變電所、電廠受災": {
    "en": "Substation or power plant damage",
    "ja": "変電所・発電所の被害",
@@ -521,6 +570,13 @@
    "id": "Buka Laporan bencana",
    "tl": "Buksan ang Ulat sa sakuna"
   },
+  "附件可以不加": {
+   "en": "Photos are optional",
+   "ja": "添付は付けなくてよい",
+   "vi": "Tệp đính kèm không bắt buộc",
+   "id": "Lampiran boleh tidak ada",
+   "tl": "Hindi kailangan ang attachment"
+  },
   "電力停電": {
    "en": "Power outage",
    "ja": "停電",
@@ -534,6 +590,34 @@
    "vi": "Dây điện hoặc cột điện hư hỏng",
    "id": "Kabel atau tiang listrik rusak",
    "tl": "Sirang linya o poste ng kuryente"
+  },
+  "點「地點描述」的框框，補充位置，例如「公園門口旁邊」。": {
+   "en": "Tap the “{page:地點描述}” box and add detail about the place, e.g. “公園門口旁邊” (next to the park entrance).",
+   "ja": "「{page:地點描述}」の枠をタップして、場所を補足してください。例：「公園門口旁邊」（公園の入口の横）。",
+   "vi": "Chạm vào ô “{page:地點描述}” và nói thêm về vị trí, ví dụ “公園門口旁邊” (cạnh cổng công viên).",
+   "id": "Ketuk kotak “{page:地點描述}” dan tambahkan keterangan lokasi, misalnya “公園門口旁邊” (di samping pintu taman).",
+   "tl": "I-tap ang kahon na “{page:地點描述}” at magdagdag ng detalye ng lugar, hal. “公園門口旁邊” (katabi ng pasukan ng parke)."
+  },
+  "點「最多上傳 3個檔案」的方框，可以附上照片。不加也可以：按卡片上的「跳過這格」，或說「跳過」。": {
+   "en": "Tap the “{page:最多上傳 3個檔案}” box to add photos. You can do without them: tap “Skip this field” on the card, or say “skip”.",
+   "ja": "「{page:最多上傳 3個檔案}」の枠をタップすると、写真を付けられます。付けなくても大丈夫です。カードの「この欄をスキップ」を押すか、「スキップ」と言ってください。",
+   "vi": "Chạm vào ô “{page:最多上傳 3個檔案}” để đính kèm ảnh. Không thêm cũng được: bấm “Bỏ qua ô này” trên thẻ, hoặc nói “bỏ qua”.",
+   "id": "Ketuk kotak “{page:最多上傳 3個檔案}” untuk melampirkan foto. Tanpa foto juga boleh: tekan “Lewati kolom ini” di kartu, atau ucapkan “lewati”.",
+   "tl": "I-tap ang kahon na “{page:最多上傳 3個檔案}” para magdagdag ng larawan. Puwede rin nang wala: i-tap ang “Laktawan ito” sa card, o sabihin ang “laktawan”."
+  },
+  "點「最多上傳 3個檔案」的方框，選手機裡的照片。": {
+   "en": "Tap the “{page:最多上傳 3個檔案}” box and pick photos from your phone.",
+   "ja": "「{page:最多上傳 3個檔案}」の枠をタップして、スマホの写真を選んでください。",
+   "vi": "Chạm vào ô “{page:最多上傳 3個檔案}” và chọn ảnh trong điện thoại.",
+   "id": "Ketuk kotak “{page:最多上傳 3個檔案}” dan pilih foto di ponsel Anda.",
+   "tl": "I-tap ang kahon na “{page:最多上傳 3個檔案}” at pumili ng mga larawan sa iyong phone."
+  },
+  "點「補充描述」的框框，寫看到的狀況。": {
+   "en": "Tap the “{page:補充描述}” box and write what you saw.",
+   "ja": "「{page:補充描述}」の枠をタップして、見た状況を書いてください。",
+   "vi": "Chạm vào ô “{page:補充描述}” và viết tình trạng đã thấy.",
+   "id": "Ketuk kotak “{page:補充描述}” dan tulis keadaan yang Anda lihat.",
+   "tl": "I-tap ang kahon na “{page:補充描述}” at isulat ang nakita mong kalagayan."
   },
   "點一下「補充描述」的框框，寫你看到的狀況，寫完按鍵盤上的「完成」收起鍵盤。": {
    "en": "Tap the “{page:補充描述}” box and write what you see. When done, tap “Done” on the keyboard to put it away.",

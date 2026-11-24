@@ -14,6 +14,7 @@ import 'package:town_pass/service/package_service.dart';
 import 'package:town_pass/service/shared_preferences_service.dart';
 import 'package:town_pass/service/subscription_service.dart';
 import 'package:town_pass/util/tp_colors.dart';
+import 'package:town_pass/util/tp_data_licenses.dart';
 import 'package:town_pass/util/tp_route.dart';
 import 'package:town_pass/page/assistant/assistant_view_controller.dart';
 import 'package:town_pass/page/assistant/widget/assistant_host.dart';
@@ -58,6 +59,7 @@ void main() async {
   // );
 
   await initServices();
+  if (assistantEnabled) TPDataLicenses.register();
 
   SystemChrome.setSystemUIOverlayStyle(_transparentStatusBar);
 

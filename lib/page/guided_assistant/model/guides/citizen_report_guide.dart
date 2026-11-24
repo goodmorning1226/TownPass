@@ -145,6 +145,11 @@ final citizenReportPageSpec = WebPageSpec(
     // description); '' once it is typed out (editing(): Enter, the keyboard
     // goes down, 按住輸入 or the box loses the focus).
     'focus': "(() => { const a = document.activeElement; return a && editing(a) ? a.id || '' : ''; })()",
+    // 發生地點 / 附件 must be filled: true only when the page marks them
+    // (「*」, required); they need not be (docs/AI_CURRENT_RULES.md section
+    // 5, 2026-11-24).
+    'locRequired': 'mustFill($_jsLocation)',
+    'photoRequired': "mustFill(qa('input[type=file]')[0] || null)",
     'titleWarn': "!!q('#title.base-input--warn')",
     'descWarn': "!!q('#description.base-textarea--warn')",
     'photos': "qa('input[type=file]').reduce((n, i) => n + ((i.files && i.files.length) || 0), 0)",
@@ -313,6 +318,11 @@ String _sendKey(WebPageState s) => _disagree(s) ? 'consent' : 'send';
 /// A form field step: ring the field, tell what to write. The step is done
 /// once the box has text and the keyboard is put away ([id] is the box's
 /// element id), so the card does not move on after the first letter.
+///
+/// [skip]: the field need not be filled unless the page marks it (flag
+/// `<key>Required`; docs/AI_CURRENT_RULES.md section 5, 2026-11-24). It is
+/// then also done once skipped, or once [passed] (the user went on to a
+/// later field).
 GuideStep _fieldStep({
   required String key,
   required String id,
@@ -320,19 +330,79 @@ GuideStep _fieldStep({
   required String Function(WebPageState s) card,
   required String detail,
   required bool Function(WebPageState s) filled,
-}) => GuideStep(
-  target: (s) => _onForm(s) ? target : null,
+  String? skip,
+  bool Function(WebPageState s)? passed,
+}) {
+  bool optional(WebPageState s) =>
+      skip != null && s.now.flags['${key}Required'] != true;
+  return GuideStep(
+    target: (s) => _onForm(s) ? target : null,
+    arrow: _no,
+    // A field that need not be filled: the ring only, not dimmed, so the
+    // user may go on to the next one instead.
+    locks: (s) => !_off(s, key) && !optional(s),
+    scrollHint: (s) => _off(s, key),
+    label: (_) => '打字',
+    card: (s) => filled(s) && s.now.text('focus') == id
+        ? '寫好了就按鍵盤上的「完成」或「✓」，收起鍵盤。'
+        : card(s),
+    detail: (_) => detail,
+    isDone: (s) =>
+        _accepted(s) ||
+        (_onForm(s) &&
+            ((filled(s) && s.now.text('focus') != id) ||
+                (optional(s) &&
+                    (s.isSkipped(skip!) || (passed?.call(s) ?? false))))),
+    cardTop: (s) => _near(s, key),
+    skipKey: skip == null
+        ? null
+        : (s) => _onForm(s) && optional(s) ? skip : null,
+  );
+}
+
+/// 發生地點, the form's first field. It need not be filled: a step of its
+/// own with 跳過這格 (docs/AI_CURRENT_RULES.md section 5, 2026-11-24), in
+/// fill_location and at the start of fill_form.
+GuideStep _locationStep() => _fieldStep(
+  key: 'loc',
+  id: 'location',
+  target: 'report.location',
+  card: (s) => s.now.flags['locRequired'] == true
+      ? '點一下「發生地點」的框框，打事情發生的完整地址，例如「〇〇路〇號」。'
+      : '「發生地點」這格可以不填。想寫的話，點框框打事情發生的完整地址，例如「〇〇路〇號」；不寫就按「跳過這格」。',
+  detail: '「發生地點」寫事情在哪裡發生，例如路名和門牌。不寫也可以送出：按卡片上的「跳過這格」，或說「跳過」。',
+  filled: (s) => s.now.text('location').isNotEmpty,
+  skip: 'location',
+  // Went on to 案件主旨 or 描述 without it.
+  passed: (s) =>
+      s.now.text('title').isNotEmpty ||
+      s.now.text('description').isNotEmpty ||
+      const {'title', 'description'}.contains(s.now.text('focus')),
+);
+
+/// 附件 need not be filled unless the page marks it.
+bool _photoOptional(WebPageState s) => s.now.flags['photoRequired'] != true;
+
+/// 新增附件, after 描述: a step of its own with 跳過這格, in add_photo and
+/// at the end of fill_form.
+GuideStep _photoStep() => GuideStep(
+  target: (s) => _onForm(s) ? 'report.photo' : null,
   arrow: _no,
-  locks: (s) => !_off(s, key),
-  scrollHint: (s) => _off(s, key),
-  label: (_) => '打字',
-  card: (s) => filled(s) && s.now.text('focus') == id
-      ? '寫好了就按鍵盤上的「完成」或「✓」，收起鍵盤。'
-      : card(s),
-  detail: (_) => detail,
+  locks: (s) => !_off(s, 'photo') && !_photoOptional(s),
+  scrollHint: (s) => _off(s, 'photo'),
+  label: (_) => '選照片',
+  card: (s) => _photoOptional(s)
+      ? '「新增附件」這格可以不加。想附上照片，點「最多上傳 10個檔案」的方框，選手機裡的照片；不加就按「跳過這格」。'
+      : '點一下「最多上傳 10個檔案」的方框，選手機裡的照片。',
+  detail: (_) =>
+      '點「新增附件」下面的方框，可以選照片、錄影或錄音，最多 10 個檔案。不加也可以送出：按卡片上的「跳過這格」，或說「跳過」。',
   isDone: (s) =>
-      _accepted(s) || (_onForm(s) && filled(s) && s.now.text('focus') != id),
-  cardTop: (s) => _near(s, key),
+      _accepted(s) ||
+      (_onForm(s) &&
+          (s.now.number('photos') > 0 ||
+              (_photoOptional(s) && s.isSkipped('photo')))),
+  cardTop: (s) => _near(s, 'photo'),
+  skipKey: (s) => _onForm(s) && _photoOptional(s) ? 'photo' : null,
 );
 
 /// Done-card rings: the 案件主旨 box, the case list.
@@ -434,21 +504,15 @@ final List<GuideComponent> citizenReportComponents = [
     doneText: '地點寫好了！',
     doneDetail: '接著在「案件主旨」和「描述」寫清楚要反映的事（有「*」的兩格一定要寫），再自己按「送出」。',
     doneTarget: _titleDone,
-    steps: [
-      _fieldStep(
-        key: 'loc',
-        id: 'location',
-        target: 'report.location',
-        card: (_) => '點一下「發生地點」的框框，打事情發生的完整地址，例如「〇〇路〇號」。這格不寫也可以。',
-        detail: '「發生地點」寫事情在哪裡發生，例如路名和門牌。不寫也可以送出。',
-        filled: (s) => s.now.text('location').isNotEmpty,
-      ),
-    ],
+    steps: [_locationStep()],
   ),
   GuideComponent(
     id: 'fill_form',
     title: '寫主旨和描述',
-    briefs: const ['用一句話寫主旨', '寫清楚發生什麼事'],
+    // In screen order, with the fields that need not be filled (發生地點,
+    // 附件) as steps of their own (docs/AI_CURRENT_RULES.md section 5,
+    // 2026-11-24).
+    briefs: const ['打發生地點（可不寫）', '用一句話寫主旨', '寫清楚發生什麼事', '想加照片就點方框'],
     description: '在「案件主旨」寫一句話，在「描述」寫清楚人、事、時、地、物',
     keywords: const ['案件主旨', '主旨', '描述', '怎麼寫', '要寫什麼', '人事時地物'],
     requires: const ['pick_category|search_item'],
@@ -457,6 +521,7 @@ final List<GuideComponent> citizenReportComponents = [
     doneDetail: '往下看「個人資料是否提供給承辦」，再按「送出」。',
     doneTarget: (s) => _onForm(s) ? 'report.consent' : null,
     steps: [
+      _locationStep(),
       _fieldStep(
         key: 'title',
         id: 'title',
@@ -477,6 +542,7 @@ final List<GuideComponent> citizenReportComponents = [
         detail: '「描述」要寫人、事、時、地、物，例如「11月7日晚上，〇〇路口的路燈不亮，很暗很危險」。',
         filled: (s) => s.now.text('description').isNotEmpty,
       ),
+      _photoStep(),
     ],
   ),
   GuideComponent(
@@ -490,20 +556,7 @@ final List<GuideComponent> citizenReportComponents = [
     doneText: '照片加好了！',
     doneDetail: '最多可以加 10 個檔案。接著在「案件主旨」和「描述」寫清楚要反映的事（有「*」的兩格一定要寫），再自己按「送出」。',
     doneTarget: (s) => _onForm(s) ? 'report.send' : null,
-    steps: [
-      GuideStep(
-        target: (s) => _onForm(s) ? 'report.photo' : null,
-        arrow: _no,
-        locks: (s) => !_off(s, 'photo'),
-        scrollHint: (s) => _off(s, 'photo'),
-        label: (_) => '選照片',
-        card: (_) => '想附上照片，點一下「最多上傳 10個檔案」的方框，選手機裡的照片。不加也可以。',
-        detail: (_) => '點「新增附件」下面的方框，可以選照片、錄影或錄音，最多 10 個檔案。不加也可以送出。',
-        isDone: (s) =>
-            _accepted(s) || (_onForm(s) && s.now.number('photos') > 0),
-        cardTop: (s) => _near(s, 'photo'),
-      ),
-    ],
+    steps: [_photoStep()],
   ),
   GuideComponent(
     id: 'submit_report',
