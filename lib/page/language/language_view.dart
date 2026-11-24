@@ -1,5 +1,5 @@
 import 'package:town_pass/page/language/language_view_controller.dart';
-import 'package:town_pass/service/page_translation.dart';
+import 'package:townpass_portal_assistant/townpass_portal_assistant.dart';
 import 'package:town_pass/util/tp_setting_list.dart';
 import 'package:town_pass/util/tp_app_bar.dart';
 import 'package:town_pass/util/tp_colors.dart';

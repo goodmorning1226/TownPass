@@ -53,6 +53,7 @@ class SettingView extends GetView<SettingViewController> {
                 title: '停用帳號',
                 onTap: () => Get.toNamed(TPRoute.suspendAccount),
               ),
+              // Portal assistant: the data and model sources (AssistantDataLicenses) with the packages' licences.
               TPSettingListTile.header(title: '關於'),
               TPSettingListTile.navigate(
                 title: '授權與資料來源',

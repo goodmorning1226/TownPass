@@ -1,444 +1,396 @@
+<!-- Generated from portal_assistant/README.md by portal_assistant/scripts/sync_root_readme.py.
+     Edit that file, then run the script. -->
 <p align="center">
-  <img src="docs/images/cover.png" alt="台北一點就通！微服務入口整合助理：首頁按住提問、圖書借閱引導教學、越南文頁面翻譯、台語語音與緊急回應" width="100%">
+  <img src="portal_assistant/docs/images/cover.png" alt="台北一點就通！微服務入口整合助理：首頁按住提問、圖書借閱引導教學、越南文頁面翻譯、台語語音與緊急回應" width="100%">
 </p>
 
-<h1 align="center">台北一點就通！微服務入口整合助理</h1>
+# 台北一點就通！微服務入口整合助理 / TownPass On-Device Service Assistant
 
-<p align="center">
-  <b>TownPass 地端 AI 助理：全部在手機上跑，說一句話，就幫你打開對的台北通服務。</b><br>
-  中文 · 台語 · 英文 · 日文 · 越南文 · 印尼文 · 菲律賓文 ｜ 沒有雲端模型，錄音不離開手機。
-</p>
+【2026臺北秋季程式設計節-城市通微服務大黑客松】第一名得獎團隊：尖銳吉吉如綠豆冰
 
-<p align="center">
-  <code>Flutter 3.47.6</code> ·
-  <code>Android ＋ iPhone 實機</code> ·
-  <code>llama.cpp + whisper.cpp</code> ·
-  <code>Chaquopy Python</code> ·
-  <code>GPL-3.0</code>
-</p>
+> 助理放在 `portal_assistant/` 資料夾，是一個**可以整包接進台北通（TownPass）App 的獨立專案**：
+> 助理的 Flutter 套件、手機上執行的 Python 後端、原生模型伺服器與文件都在這裡；台北通只要照
+> **[串接文件 INTEGRATION.md](portal_assistant/INTEGRATION.md)** 改幾個檔（每處只有幾行，程式碼在 [integration/](portal_assistant/integration/)）。
+> 本 repository 的根目錄就是一份已經接好的台北通 App（官方 [taipei-doit/TownPass](https://github.com/taipei-doit/TownPass) 的 fork），可以直接建置執行。
 
-> 本專案是台北市政府開源的 [TownPass（台北通）](https://github.com/taipei-doit/TownPass) App 的 fork，
-> 在官方 App 架構上加了一個離線的 AI 助理。官方專案說明見 [docs/UPSTREAM_README.md](docs/UPSTREAM_README.md)，
-> 改程式之前請先讀 [AGENTS.md](AGENTS.md)。
-
-**English summary.** This fork of Taipei City Government's open-source TownPass app adds a municipal-service
-assistant that runs entirely on the phone: no cloud model, and recordings never leave the device. You speak
-(Mandarin, Taiwanese Hokkien, English, Japanese, Vietnamese, Indonesian or Filipino) or type; a 0.2-second language
-gate (Whisper tiny) picks the recogniser (Whisper small, Breeze-ASR-26 for Taiwanese, PhoWhisper for Vietnamese);
-a rule-first pipeline (emergency words, commands, keyword search, phonetic and e5 semantic matching scored by a
-132 MB decision classifier (v2) fine-tuned from Microsoft multilingual-e5-small, rules for library requests and guides,
-then 8,121 Taipei City FAQ entries ranked together with the pages) opens the right TownPass service page, lists options or answers;
-when nothing fits it lists 2-4 likely pages or shows a 12-category function catalogue instead of saying "not found". By default no
-decision LLM is loaded; Ministral 3B (and Gemma 4 E2B on Android) remain build options. A guided mode (penguin, task
-cards, highlight halos, hold-to-speak form filling) walks you through the real service page, which is translated on
-the fly. Model files are downloaded in the App after the user agrees. On the computer evaluation sets the default
-classifier scores 95/102 (held-out; Ministral 97) and 96/96 (five foreign languages) with zero wrong pages, and on four
-colloquial sets it opens a wrong page 3 times against 16 for Ministral.
-Built with Flutter 3.47.6, an embedded Python backend (Chaquopy on Android, CPython on iPhone), llama.cpp and whisper.cpp,
-running on both Android and iPhone from one code base (iPhone verified on an iPhone 17 Pro Max on 2026-11-13); GPL-3.0.
-Developer guide: [ASSISTANT_README.md](ASSISTANT_README.md).
+**English summary.** An AI assistant for the TownPass (台北通) app that runs entirely on the phone: no cloud model, and
+recordings never leave the device. Speak Mandarin, Taiwanese Hokkien, English, Japanese, Vietnamese, Indonesian or
+Filipino (or type), and it opens the right TownPass service page; on forms it teaches step by step on the real service
+page (task cards, highlight halos, fill fields and pick options by voice, skip optional fields), and the whole app and
+the service pages follow the user's language. It is packaged as a standalone folder that plugs into TownPass through a
+small host interface and 23 short hooks documented in [INTEGRATION.md](portal_assistant/INTEGRATION.md).
 
 ## 目錄
 
-- [為什麼做這件事](#為什麼做這件事)
-- [功能亮點](#功能亮點)
-- [架構](#架構)
-- [技術與模型](#技術與模型)
-- [數字](#數字)
-- [怎麼跑](#怎麼跑)
-- [專案結構](#專案結構)
-- [文件索引](#文件索引)
-- [授權](#授權)
-- [致謝](#致謝)
+- [一、一般參賽者必填項目](#一一般參賽者必填項目readme)
+  - [1. 專案簡介](#1-專案簡介--project-overview)
+  - [2. 系統架構](#2-系統架構--system-architecture)
+  - [3. 安裝與執行方式](#3-安裝與執行方式--installation--run)
+  - [4. 功能說明](#4-功能說明--features)
+- [二、AI 使用聲明](#二若使用-ai需額外補充的項目ai-usage-declaration)
+- [三、串接到台北通](#三串接到台北通)
+- [四、專案結構與文件](#四專案結構與文件)
+- [授權與致謝](#授權與致謝)
 
-## 為什麼做這件事
+---
 
-台北通有上百項服務，但很多人不是找不到服務，是找不到**選單**：
+# 一、一般參賽者必填項目（README）
+
+## 1. 專案簡介 / Project Overview
+
+### 專案目的與想解決的問題
+
+台北通有上百項服務，但很多人不是找不到服務，而是找不到**選單**：
 
 - **長輩**：看不清小字、不知道「繳費」在哪一層、不習慣打字，但很會講。
-- **移工、新住民、旅客**：介面是中文，服務名稱更是中文；就算會一點中文，也不知道「規費」「巨大垃圾」是什麼。
-- **第一次用的人**：知道要借書，卻不知道借書要先搜尋、選分館、再預約。
+- **移工、新住民、旅客**：介面和服務名稱都是中文；就算會一點中文，也不知道「規費」「巨大垃圾」是什麼。
+- **第一次用的人**：知道要借書，卻不知道要先搜尋、選分館、再預約；表單上哪幾格一定要填也不清楚。
 
-所以我們把助理做成「用講的」：按住說一句話，助理直接打開對的頁面，必要時一步步教你在**真正的服務頁面**上操作，
-頁面文字也翻成你講的語言。而且全部在手機上跑：
+我們的目標是讓使用者**用講的**就能用到台北通的微服務：說一句話，助理打開對的服務頁面；
+需要填表時，在**真正的服務頁面**上一步步教，欄位與選項都能用說的填，頁面也翻成使用者講的語言。同時堅持三個原則：
 
-- **離線**：決策分類器、語音辨識、向量檢索、頁面翻譯都在裝置上；網路只用來抓資料（圖書館藏、台北通常見問答）、第一次下載 ML Kit 翻譯檔，以及使用者同意後下載模型。
+- **離線**：語音辨識、決策、檢索、頁面翻譯都在手機上執行，沒有雲端模型。
 - **隱私**：錄音不存檔、不上傳；填欄位時講的內容不進對話紀錄、不送決策模型。
-- **不越權**：不自動送出、付款、撥號、預約；開頁只是打開原本的頁面，模型輸出一律經驗證才會變成動作。
+- **不越權**：助理不替使用者送出、付款、撥號、預約或勾同意聲明；最後一步一律由使用者自己按。
 
-## 功能亮點
+### 核心功能摘要
 
-### 1. 說話就開服務
+按住說一句話（中文、台語、英、日、越、印尼、菲律賓文），助理在手機上聽懂並直接打開對的台北通服務頁面；
+需要操作時用企鵝任務卡和光圈在真實頁面上一步步教，欄位用「按住輸入」、選項與地址用「按住選擇」說的就能填，
+整個 App 畫面與服務網頁跟著語言翻譯。
 
-<table>
-  <tr>
-    <td width="33%"><img src="docs/images/home-hold-to-ask.png" alt="台北通首頁：按住「按住提問」正在聽，顯示音量條與「放開送出，往上滑可取消」" width="100%"></td>
-    <td width="33%"><img src="docs/images/assistant-chat.png" alt="助理聊天面板：企鵝打招呼、用語音說「你好」、下方有建議句、語言選單與麥克風" width="100%"></td>
-    <td valign="top">
-      <ul>
-        <li>每個畫面都有「<b>按住提問</b>」：按住說、放開送出、往上滑取消，有音量條。</li>
-        <li>「我要繳水費」「我家前面路燈壞了」「我欲借冊」→ 直接打開對應的服務頁面；<b>只有一個明確的選項就直接開，有多個才讓你選</b>。</li>
-        <li>「有哪些功能」→ 列出可用服務，◀ ▶ 換頁，說「第二個」就選。</li>
-        <li>聽不清楚時直接用最可能的讀法，不再反問「是這句嗎？」；但只有每個被換掉的字讀音都相近才改寫，地名、成語、「證書／申請書」這類固定詞不會被改成服務詞。</li>
-        <li>說了沒有頁面的區公所（例如「大安區公所」）不會開到別區的頁面；「借書」只認真正的書，「借花獻佛」「秘書」不算。</li>
-        <li>也可以打字；建議句會換成你最近真的用過的請求。</li>
-      </ul>
-    </td>
-  </tr>
-</table>
+### Demo Screenshot
 
-### 2. 引導教學：企鵝、任務卡、光圈
-
-<table>
-  <tr>
-    <td width="25%"><img src="docs/images/guide-1-tap-search.png" alt="圖書借閱頁，步驟 1/5：光圈標出「關鍵字搜尋」，任務卡說「點一下上面的關鍵字搜尋」" width="100%"></td>
-    <td width="25%"><img src="docs/images/guide-2-type-title.png" alt="步驟 2/5 打字：搜尋框被光圈標出，下方的按鈕變成「按住輸入」" width="100%"></td>
-    <td width="25%"><img src="docs/images/guide-4-library-list.png" alt="步驟 4/5 選擇：取書館清單被光圈標出，離我最近的分館排在前面" width="100%"></td>
-    <td width="25%"><img src="docs/images/guide-5-confirm.png" alt="步驟 5/5 確認：任務卡複述預約內容，「預約」按鈕被光圈標出，由使用者自己按" width="100%"></td>
-  </tr>
-</table>
-
-- 預設介面就是引導模式：企鵝的**任務卡**寫這一步要做什麼、**光圈**標出要按的地方、可以朗讀或暫停，在**真實的官方服務頁面**上教學（頁面不修改、不打包，用網頁自己的換頁機制在頁內切換）。
-- 教學要填欄位時，「按住提問」變成「**按住輸入**」：用講的說電話號碼，就轉成數字填進欄位，依欄位型別轉格式（電話、Email、金額、日期、時間、身分證、車牌、文字），可以「復原」，**不會按送出**。
-- 最後一步永遠是使用者自己按；完成後企鵝會說明「這是示範網站，沒有真的送出」。
-- 教學流程以 `tool/guide_audit/` 在示範網站錄製 177 條重播驗證；教學文字 1,134 句，6 種語言（中、英、日、越、印、菲）。
+| 按住提問 | 引導教學（圖書借閱） | 非必填欄位：跳過這格 | 台語緊急回應 | 越南文整頁翻譯 |
+| --- | --- | --- | --- | --- |
+| <img src="portal_assistant/docs/images/home-hold-to-ask.png" alt="首頁按住提問，顯示音量條" width="160"> | <img src="portal_assistant/docs/images/guide-4-library-list.png" alt="引導教學：光圈標出取書館清單" width="160"> | <img src="portal_assistant/docs/images/guide-skip-optional-field.png" alt="警政報案的住家電話是非必填，任務卡出現跳過這格" width="160"> | <img src="portal_assistant/docs/images/taiwanese-emergency.png" alt="用台語說我家失火了，助理請撥 119 並列出災情表單" width="160"> | <img src="portal_assistant/docs/images/vietnamese-page-translation.png" alt="服務頁整頁翻成越南文" width="160"> |
 
 <details>
-<summary>完整的圖書借閱 5 步驟（7 張截圖）</summary>
+<summary>圖書借閱完整 5 步驟（7 張截圖）</summary>
 <table>
   <tr>
-    <td width="25%"><img src="docs/images/guide-1-tap-search.png" alt="步驟 1/5 點一下關鍵字搜尋" width="100%"><br><sub>1. 點一下搜尋</sub></td>
-    <td width="25%"><img src="docs/images/guide-2-type-title.png" alt="步驟 2/5 打書名" width="100%"><br><sub>2. 打書名（或按住輸入）</sub></td>
-    <td width="25%"><img src="docs/images/guide-3-pick-book.png" alt="步驟 3/5 從搜尋結果選一本" width="100%"><br><sub>3. 選一本</sub></td>
-    <td width="25%"><img src="docs/images/guide-4-pick-library.png" alt="步驟 4/5 箭頭與光圈指向取書館下拉選單" width="100%"><br><sub>4a. 找到取書館欄位</sub></td>
+    <td width="25%"><img src="portal_assistant/docs/images/guide-1-tap-search.png" alt="步驟 1/5 點一下關鍵字搜尋" width="100%"><br><sub>1. 點一下搜尋</sub></td>
+    <td width="25%"><img src="portal_assistant/docs/images/guide-2-type-title.png" alt="步驟 2/5 打書名" width="100%"><br><sub>2. 打書名（或按住輸入）</sub></td>
+    <td width="25%"><img src="portal_assistant/docs/images/guide-3-pick-book.png" alt="步驟 3/5 從搜尋結果選一本" width="100%"><br><sub>3. 選一本</sub></td>
+    <td width="25%"><img src="portal_assistant/docs/images/guide-4-pick-library.png" alt="步驟 4/5 箭頭與光圈指向取書館下拉選單" width="100%"><br><sub>4a. 找到取書館欄位</sub></td>
   </tr>
   <tr>
-    <td><img src="docs/images/guide-4-library-list.png" alt="步驟 4/5 取書館清單" width="100%"><br><sub>4b. 選分館</sub></td>
-    <td><img src="docs/images/guide-5-confirm.png" alt="步驟 5/5 確認預約" width="100%"><br><sub>5. 自己按「預約」</sub></td>
-    <td><img src="docs/images/guide-done.png" alt="完成：預約成功對話框，企鵝說這是示範網站沒有真的送出" width="100%"><br><sub>完成</sub></td>
+    <td><img src="portal_assistant/docs/images/guide-4-library-list.png" alt="步驟 4/5 取書館清單" width="100%"><br><sub>4b. 選分館</sub></td>
+    <td><img src="portal_assistant/docs/images/guide-5-confirm.png" alt="步驟 5/5 確認預約" width="100%"><br><sub>5. 自己按「預約」</sub></td>
+    <td><img src="portal_assistant/docs/images/guide-done.png" alt="完成：預約成功對話框，企鵝說這是示範網站沒有真的送出" width="100%"><br><sub>完成</sub></td>
     <td></td>
   </tr>
 </table>
 </details>
 
-### 3. 台語自動辨識
+## 2. 系統架構 / System Architecture
 
-<table>
-  <tr>
-    <td width="33%"><img src="docs/images/taiwanese-emergency.png" alt="助理面板語言顯示台語，用語音說「我家失火了」，助理回覆請撥打 119 並列出災情表單選項" width="100%"></td>
-    <td valign="top">
-      <ul>
-        <li>台語<b>不用切選單</b>：語言判斷模型（Whisper tiny）回傳 99 種語言的機率，台語的分布和華語不一樣，我們在上面加了一個 104 個係數的小分類器；分數夠高就交給台語模型。</li>
-        <li>閘門漏掉的，用文字再補：中文結果<b>不像華語</b>（台灣華語字元 bigram 模型）或 <b>App 認不出那句話</b>，就交給台語模型再聽一次，留比較好的那份。</li>
-        <li>台語模型是聯發科技研究中心＋陽明交大的 <b>Breeze-ASR-26</b>（Apache-2.0），每支手機都用 q4_0（848 MB，iPhone 的 Metal 上約 1.43 GB），第一次用到才載入；輸出中文字，之後走原本的中文流程。</li>
-        <li>iPhone 載入前先對照 iOS 給單一 App 的記憶體額度（檔案＋1,000 MB，再留 256 MB），不夠就不載入、台語片段當中文聽，不會閃退；iPhone 17 Pro Max 實機載入約 0.8 秒。</li>
-        <li>手動「台語（測試）」選項保留；說過一次台語後 5 分鐘內門檻降到 0.3。</li>
-        <li>限制：目前只有辨識，朗讀用中文。</li>
-      </ul>
-    </td>
-  </tr>
-</table>
+### 架構圖
 
-### 4. 多語＋頁面即時翻譯
-
-<table>
-  <tr>
-    <td width="33%"><img src="docs/images/vietnamese-chat.png" alt="越南文助理面板：用語音問有哪些功能，助理用越南文列出可開的服務，建議句也是越南文" width="100%"></td>
-    <td width="33%"><img src="docs/images/vietnamese-page-translation.png" alt="台北通服務頁整頁翻成越南文，右下角是越南文的「按住提問」與企鵝" width="100%"></td>
-    <td valign="top">
-      <ul>
-        <li>講什麼語言，<b>助理文字、建議句、教學卡片、按鈕、設定頁、App 畫面與服務網頁一起換</b>；語音判斷把握 ≥ 0.8 才改選單並記住。</li>
-        <li>頁面翻譯：預翻好的字串直接用（<code>assets/i18n/app_strings.json</code>），其餘用 Google ML Kit 離線翻譯，一次 20 句；翻譯時保留原文，教學光圈用原文找按鈕。</li>
-        <li><b>不強制用使用者沒講的語言解碼</b>（強制會讓 Whisper 把日文「翻」成中文）；不確定時把最可能的兩、三種語言各聽一次，留字體符合、清楚、分數高的那份。</li>
-        <li>越南文專用 <b>PhoWhisper</b>（VinAI，BSD-3）；比對不打聲調、聲調聽錯、南北口音（d/gi/r/v、ch/tr、s/x、字尾 n/ng）都能對到。</li>
-        <li><b>印尼文</b>（2026-11-11 優化）：聊天縮寫與口語寫法（sy、yg、gmn、pinjem…）先換成標準寫法再比對，句尾「…nggak?」是問句不是拒絕。</li>
-        <li><b>菲律賓文</b>（2026-11-11 取代泰文，代碼 <code>tl</code>）：夾英文（Taglish）照樣比對，e／i、o／u 與西班牙拼法不分；翻譯是 AI 草稿，待母語者審閱。</li>
-        <li>外語標題與關鍵字 5 種語言（英、日、越、印、菲）、口語例句 602 句（含中文）；外語 FAQ 先翻成中文再查，答案再翻回來。</li>
-      </ul>
-    </td>
-  </tr>
-</table>
-
-### 5. 市府 FAQ
-
-<table>
-  <tr>
-    <td width="33%"><img src="docs/images/faq-bulk-waste.png" alt="打字問「大型垃圾要丟哪」，助理列出三題臺北市政府環保局的 FAQ 讓使用者選" width="100%"></td>
-    <td valign="top">
-      <ul>
-        <li>「大包垃圾要怎麼丟」「身分證掉了怎麼辦」→ 從<b>市府 FAQ 8,121 筆</b>（e5 向量，手機上 22 MB 索引）和台北通常見問答找答案。資料來源：臺北市資料大平台〈<a href="https://data.taipei/dataset/detail?id=203f1657-bb4a-45a7-b25f-279b63136645">臺北市市政網站整合平台之常見問答</a>〉。</li>
-        <li>查詢前先把口語詞補成 FAQ 用詞：大包垃圾／舊家具 → 巨大垃圾 大型廢棄物；身分證掉了 → 遺失 補發；敬老卡 → 敬老悠遊卡。</li>
-        <li>cosine ≥ 0.915 直接回答；≥ 0.88 列出最接近的問題讓使用者選；以下不回，不亂答。答案超過 600 字截斷並提示洽 1999。</li>
-      </ul>
-    </td>
-  </tr>
-</table>
-
-### 6. 緊急回應
-
-- 失火、冒煙、受困、倒地、沒呼吸、自殺、家暴、性侵、跟蹤等詞表（6 種語言：中、英、日、越、印、菲），**在所有檢索、FAQ、模型之前**直接回 119／1925／1995／113／110（上面第 3 點的截圖就是「我家失火了」）。
-- 失火只**列出**災情表單讓使用者選，不自己打開；「防火宣導、火災保險、演習、以前…」排除。
-- 不經模型，所以不會慢、不會被模型想歪。
-
-## 架構
-
-手機（Android 或 iPhone，依記憶體分級下載模型）上有一個 Flutter App、一個 Python 後端和六個模型伺服器（iPhone 沒有 PhoWhisper，是五個），全部綁在 `127.0.0.1`。
-App 只直接連後端 `:8765`。Android 與 iPhone 是同一份 App、後端與規則，只有啟動模型伺服器的原生程式不同（Kotlin／Swift）。
-**預設的決策是決策分類器**（2026-11-13 起）：頁面由分類器打分、圖書請求（含只說書名的）用規則、教學用關鍵字規則，**不載入決策 LLM**；
-Ministral 3B（`-DecisionModel ministral`）與 Gemma 4 E2B（只有 Android，`-DecisionModel gemma`）仍是建置選項，選了 LLM 就不啟動分類器。
+手機（Android 或 iPhone）上有台北通 App（內含助理套件）、一個 Python 後端與數個本機模型伺服器，全部只綁在 `127.0.0.1`；
+App 只連後端 `:8765`。網路只用來讀取服務網頁與資料、第一次下載翻譯檔，以及使用者同意後下載模型。
 
 ```mermaid
 flowchart LR
     subgraph phone["手機（Android／iPhone）：全部在裝置上執行"]
         direction TB
-        app["Flutter App（GetX）<br/>引導助理／聊天面板、按住提問<br/>WebView 服務頁＋ML Kit 頁面翻譯"]
-        backend["Python 後端（Android：Chaquopy；iPhone：內嵌 CPython）:8765<br/>緊急 → 指令 → 關鍵字 → 決策（分類器打分／圖書規則）→ 讀音 → 語意 → 意圖 → FAQ"]
-        subgraph speech["語音：whisper-server"]
-            direction TB
-            tiny[":8775 Whisper tiny<br/>語言判斷，約 0.2 秒"]
-            small[":8773 Whisper small<br/>中、英、日、越、印、菲"]
-            breeze[":8776 Breeze-ASR-26 q4_0<br/>台語，第一次用到才啟動"]
-            pho[":8777 PhoWhisper-base<br/>越南文，只有 Android，第一次用到才啟動"]
+        subgraph host["台北通 App（Flutter）"]
+            tp["官方頁面、TPWebView、路由<br/>23 個串接點＋主機介面 PortalAssistantHost"]
+            pkg["助理套件 townpass_portal_assistant<br/>引導教學、按住提問／輸入／選擇<br/>頁面翻譯（預翻＋ML Kit）"]
         end
-        subgraph llm["文字：llama-server"]
+        backend["Python 後端 :8765<br/>（Android：Chaquopy；iPhone：內嵌 CPython）<br/>緊急 → 指令 → 關鍵字 → 決策分類器 → 讀音 → 語意 → FAQ<br/>選項與地址比對"]
+        subgraph speech["語音：whisper.cpp whisper-server"]
             direction TB
-            cls[":8778 決策分類器（預設）<br/>e5 微調的 cross-encoder，--reranking"]
-            e5[":8774 multilingual-e5-small<br/>語意檢索、FAQ 向量"]
-            decide[":8771 Ministral 3B 或 Gemma 4 E2B<br/>選項：決策 LLM（GBNF 文法限制），預設不載入"]
+            tiny["Whisper tiny<br/>語言判斷約 0.2 秒"]
+            small["Whisper small<br/>中、英、日、越、印、菲"]
+            breeze["Breeze-ASR-26<br/>台語，第一次用到才載入"]
+        end
+        subgraph text["文字：llama.cpp llama-server"]
+            direction TB
+            cls["決策分類器<br/>multilingual-e5-small 微調"]
+            e5["multilingual-e5-small<br/>語意檢索、FAQ 向量"]
         end
     end
-    net[("網路只抓資料與模型：<br/>圖書館藏、台北通問答、ML Kit 翻譯檔、<br/>使用者同意後下載模型（Hugging Face）")]
+    web[("台北通服務網頁<br/>（TownPass-Services 示範站）")]
+    data[("政府開放資料<br/>市府 FAQ、內政部路名與鄉鎮市區")]
+    hf[("Hugging Face<br/>使用者同意後下載模型")]
 
-    app -->|"錄音／文字"| backend
-    backend -->|"開頁、選項或回答"| app
-    backend --> tiny
-    tiny -->|"選單語言 ≥ 0.6 或別的語言 ≥ 0.8"| small
-    tiny -->|"台語分類器 ≥ 0.5，或中文不像華語／App 不認得"| breeze
-    tiny -->|"越南文"| pho
-    backend --> cls
-    backend --> e5
-    backend -.->|"-DecisionModel ministral／gemma"| decide
-    net -.-> app
+    tp <--> pkg
+    pkg -->|錄音／文字| backend
+    backend -->|開頁、選項、回答| pkg
+    backend --> speech
+    backend --> text
+    tp -->|WebView| web
+    data -.->|事先整理成 App 內資料| backend
+    hf -.->|下載並檢查 SHA-256| phone
 ```
 
-**一句話的旅程**
+一句話的旅程：按住說話 → 語言判斷（0.2 秒）→ 用該語言的模型聽成文字 → 後端規則優先、分類器只替候選頁打分 →
+開頁、列出 2–4 個選項或回答。只有一個明確選項、而且分數夠高才直接開；其他情況列出來讓使用者選，不亂開。
+更細的流程見 [docs/AI_TECHNICAL_OVERVIEW.md](portal_assistant/docs/AI_TECHNICAL_OVERVIEW.md)，行為規則的唯一準則是 [docs/AI_CURRENT_RULES.md](portal_assistant/docs/AI_CURRENT_RULES.md)。
 
-```mermaid
-flowchart LR
-    a["按住說話<br/>錄音不存檔"] --> b["語言判斷<br/>tiny，0.2 秒"] --> c["用該語言聽成文字<br/>small／Breeze／PhoWhisper"] --> d["規則優先，分類器只替候選打分<br/>緊急 → 指令 → 關鍵字 → 分類器／圖書規則 → 讀音 → 語意 → 意圖 → FAQ"] --> e["開頁／列選項／回答<br/>介面與頁面跟著語言換"]
+### 使用到的主要技術堆疊（Tech Stack）
+
+| 類別 | 使用技術／版本 | 備註 |
+| --- | --- | --- |
+| 前端框架 | Flutter 3.47.6／Dart 3.13.5（`.fvmrc` 鎖定，用 FVM）、GetX | 助理是 Flutter 套件 `townpass_portal_assistant`（[app/](portal_assistant/app/)），沿用台北通的路由、WebView 與 bridge；服務頁是官方網頁，在 WebView 內開啟、不修改 |
+| 後端框架 | Python 3.13（Android：Chaquopy 17.2；iPhone：BeeWare CPython 內嵌），只用標準函式庫（`http.server`） | 在手機上執行（[backend/](portal_assistant/backend/)），負責語音流程、規則、檢索、決策、選項與地址比對；電腦開發時可用 Python 3.11+ |
+| 模型執行 | llama.cpp b12182（`llama-server`）、whisper.cpp v1.9.5（`whisper-server`） | Android 由 Kotlin、iPhone 由 Swift 啟動（[native/](portal_assistant/native/)）；iPhone 用 Metal GPU |
+| 資料庫 | 無伺服器資料庫 | 設定與最近的請求存在手機本機（SharedPreferences）；功能目錄、例句、地址資料是 App 內的 JSON；FAQ 是手機上的向量索引檔 |
+| 外部 API／資料 | 台北通服務網頁（TownPass-Services 示範站）、臺北市資料大平台常見問答、內政部全國路名資料、內政部國土測繪中心鄉鎮市區清單、Hugging Face（模型下載）、Google ML Kit（離線翻譯檔） | 政府資料都是事先下載整理後放進 App，執行時不呼叫政府 API；詳見第 4 節 |
+
+## 3. 安裝與執行方式 / Installation & Run
+
+### 本地端執行方式
+
+執行本專案前，請確認您的環境已安裝以下必要組件：
+
+- **Flutter**：用 [FVM](https://fvm.app/) 安裝 `.fvmrc` 指定的 3.47.6（Dart 3.13.5），不要用電腦全域的 Flutter。
+- **Python**：3.11 或以上（電腦上跑後端與測試；手機上的 Python 由建置流程打包）。
+- **Android**：Android SDK（Platform 36、NDK 29）、JDK 17、adb；實機建議 7 GB 以上記憶體（以下只下載核心模型）。
+- **iPhone**（選用）：Mac＋Xcode；沒有 Mac 時可用 GitHub Actions 建置未簽章版本再側載。
+- **Node.js**（選用）：v18 或以上，只有教學流程錄製工具 [tools/guide_audit/](portal_assistant/tools/guide_audit/) 需要。
+
+步驟說明（Android，Windows PowerShell，在 repository 根目錄執行）：
+
+1. 複製專案庫：`git clone https://github.com/taipei-doit/townpass2026-microservice-portal-assistant.git`
+2. 進入專案目錄：`cd townpass2026-microservice-portal-assistant`
+3. 安裝依賴套件：
+   ```powershell
+   fvm install
+   fvm flutter pub get --enforce-lockfile
+   fvm dart run build_runner build --delete-conflicting-outputs          # 產生檔不在 Git，每次 clone 後都要
+   .\portal_assistant\native\android\build_assistant_native.ps1          # 建置 llama-server、whisper-server（不在 Git）
+   ```
+4. 設定環境變數（見下一節）。
+5. 啟動服務（手機接上電腦，`fvm flutter devices` 查裝置 ID）：
+   ```powershell
+   .\portal_assistant\scripts\run_assistant_on_device.ps1 -DeviceId <裝置 ID>
+   # 或用設定檔：fvm flutter run -d <裝置 ID> --dart-define-from-file=.env
+   ```
+   第一次打開助理時，App 會詢問是否下載離線模型（核心＋決策分類器約 0.7 GB；記憶體 7 GB 以上的手機可加台語模型，合計約 1.6 GB），
+   使用者同意後才下載，可暫停、續傳並檢查 SHA-256。
+
+- iPhone（Mac）：`portal_assistant/native/ios/setup_ios_on_device.sh` 後執行 `portal_assistant/scripts/run_assistant_on_device.sh`，細節見 [docs/AI_ON_DEVICE_IOS.md](portal_assistant/docs/AI_ON_DEVICE_IOS.md)。
+- 只想在電腦上開發（模擬器＋電腦上的 Python 後端）：見 [docs/TEAM_LOCAL_SETUP.md](portal_assistant/docs/TEAM_LOCAL_SETUP.md)。
+- 測試：`fvm flutter test`（台北通）、`cd portal_assistant/app && fvm flutter test`（助理套件）、`python -X utf8 -m unittest discover -s portal_assistant/backend -p "test_*.py"`（後端）。
+
+### 需要設定的環境參數（.env example）
+
+App 的設定是建置時的 `--dart-define`。請在 repository 根目錄建立 `.env`（複製 [`.env.example`](.env.example)），
+再用 `--dart-define-from-file=.env` 帶入；`run_assistant_on_device.ps1` 已內建同樣的預設值。`.env` 已列在 `.gitignore`。
+
+```dotenv
+# 開啟助理（false 則完全是原本的台北通）
+ASSISTANT_ENABLED=true
+# 助理在手機上執行（Python 後端與模型都在裝置上；Android 需先跑 build_assistant_native.ps1）
+ASSISTANT_ON_DEVICE=true
+# 引導介面（企鵝任務卡、光圈）；false 為聊天面板
+ASSISTANT_GUIDED=true
+# 決策：classifier（預設，決策分類器）、ministral 或 gemma（只有 Android）
+ASSISTANT_DECISION_MODEL=classifier
+# 語音辨識：whisper（預設）或 system（手機內建辨識）
+ASSISTANT_SPEECH=whisper
+# 選用：模型下載的鏡像位址（預設是 models.json 裡的 Hugging Face 位址）
+# ASSISTANT_MODEL_BASE_URL=
+# 選用：不在手機上執行時，電腦後端的位址（例如 Android 模擬器用 http://10.0.2.2:8765）
+# ASSISTANT_BASE_URL=
 ```
 
-1. **錄音 → 語言判斷 → 辨識**：tiny 先判斷語言（0.2 秒），再用該語言的模型聽成文字。台語不用切選單：閘門分類器、或「中文不像華語／App 認不出」時交給 Breeze 再聽一次。
-2. **文字 → 決定**：後端依序找：緊急詞 → 取消／換頁／第幾個 → 指名但沒有頁面的區公所／戶政 → 功能關鍵字 → 決策 → 讀音相似（Unihan 台灣讀音，折疊 zh/z、l/n、ing/in 等）→ 語意相似（e5 ＋ 602 句口語例句）→ 意圖 → FAQ。都沒有時**不開頁**：有線索就列 2–4 個可能的頁面＋「看全部功能」，沒有線索（模糊、打招呼、閒聊）就給 12 類的功能目錄（第一列是常用），謝謝只回一句（2026-11-16）。
-   問「有什麼 X」時由 X 決定範圍：功能／服務給整個目錄，分類（例如「有什麼補助」）給那一類，其他照一般流程；緊急詞永遠先回專線，句子同時在講申請補助時另外列出相關頁面。台語模型無法使用時不再改用華語硬聽，而是說明原因；模糊規則會不會誤觸發，由 `test_rule_collisions.py` 用目錄的詞自動檢查（2026-11-17）。
-   預設的「決策」與「意圖」由**決策分類器**替每個候選頁打分：只有一個已串接頁面、分數夠高、沒有別的服務接近時才直接開（沒有關鍵字、只靠語意的清楚需求也一樣），其餘列出讓使用者選，常見問答和服務頁混在同一個清單；圖書（確定的書、館藏、只說作品名的「借小王子」）用規則，教學用教學自己的關鍵字規則；分類器沒回應時一律列出候選，不猜。
-   選 Ministral／Gemma 時改由決策 LLM 在 A／B／C 候選中選一個（GBNF 文法硬性限制，只能輸出 `{"choice":"X"}`，6 個 token）。
-3. **決定 → 畫面**：App 打開頁面、列出選項或回答；決策 LLM 選項之外的任何輸出都被 `validate_call` 擋下，候選 ID 與選項綁定、5 分鐘過期。
+本專案沒有 API 金鑰或密碼需要設定；請勿把任何憑證寫進 `.env` 或提交到 Git。全部開關見 [INTEGRATION.md](portal_assistant/INTEGRATION.md) 第 4.3 節。
 
-更細的流程與每層門檻在 [docs/AI_TECHNICAL_OVERVIEW.md](docs/AI_TECHNICAL_OVERVIEW.md)，行為規則的唯一準則是 [docs/AI_CURRENT_RULES.md](docs/AI_CURRENT_RULES.md)。
+### Docker 執行方式
 
-## 技術與模型
+不適用：本專案是手機 App，後端與模型都在手機上執行，沒有伺服器需要部署。
 
-| 用途 | 模型 | 量化／大小 | 開發者、授權 | 手機速度 |
-| --- | --- | --- | --- | --- |
-| 決策（預設） | 決策分類器 v2（cross-encoder，由 multilingual-e5-small 微調；2026-11-16 起，用需求型說法與常見問答訓練） | q8_0，132 MB | 本專案訓練（基底 Microsoft），MIT；llama-server `--reranking`，port 8778 | 每輪決策約 0.1–0.2 秒（電腦評估換算的**估計**，手機還沒量） |
-| 決策（選項，`-DecisionModel ministral`） | Ministral-3-3B-Instruct-2512 | Q4_K_M，約 2.1 GB | Mistral AI（法國），Apache-2.0 | 讀提示約 50 tok/s、生成約 5 tok/s，每次決策約 4.7 秒（Android 實測） |
-| 決策（選項，只有 Android，`-DecisionModel gemma`） | Gemma 4 E2B | Q4_0，2.84 GB | Google，Gemma 授權 | 約 114／7.8 tok/s，每次約 2.3 秒（Android 實測）；口語集開錯頁略多 |
-| 語音辨識 | Whisper small | q8_0，264 MB | OpenAI，MIT | 3 秒句約 0.8–1.2 秒 |
-| 語言判斷 | Whisper tiny | q8_0，44 MB | OpenAI，MIT | 約 0.19 秒 |
-| 台語辨識 | Breeze-ASR-26 | q4_0，848 MB（iPhone Metal 上約 1.43 GB） | 聯發科技研究中心＋陽明交大，Apache-2.0 | 雲端 ARM 測速推估每段 3.6–4.2 秒；iPhone 17 Pro Max 實機載入約 0.8 秒 |
-| 越南文辨識（只有 Android） | PhoWhisper-base | q8_0，82 MB | VinAI（越南），BSD-3 | 手機上還沒量；電腦上每段約 1.4 秒 |
-| 向量檢索 | multilingual-e5-small | q8_0，132 MB，384 維 | Microsoft，MIT | 一次查詢數十毫秒 |
-| 頁面翻譯 | ML Kit on-device translation | 每語言約 30 MB | Google | 預翻字串直接用，剩下才即時翻 |
+## 4. 功能說明 / Features
 
-執行方式與工具：
+| 功能編號 | 功能名稱 | 簡述 | 資料來源描述（若為政府資料） |
+| --- | --- | --- | --- |
+| 4.1 | 說話就開服務 | 按住說一句話或打字，助理直接打開對的服務頁；只有一個明確選項才直接開，否則列出 2–4 個候選或 12 類功能目錄 | 無，為專案整理的功能目錄（109 項）與口語例句（602 句） |
+| 4.2 | 引導教學 | 企鵝任務卡＋光圈，在真實的服務頁上一步步教（9 種服務）；打字的欄位打完才進下一步；非必填欄位也教，可「跳過這格」 | 無，為專案撰寫的教學內容（6 種語言） |
+| 4.3 | 按住輸入、按住選擇 | 欄位用說的填（依欄位轉成電話、日期、身分證等格式）；下拉、單選、勾選、清單用說的選；都可以復原，不會替使用者送出 | 無 |
+| 4.4 | 語音地址分層比對 | 說一次完整地址，依序比對縣市 → 區 → 路名，校正語音辨識的錯字後填入；縣市／區／地址三格的下拉一次填好 | 內政部戶政司〈全國路名資料〉（[data.gov.tw 35321](https://data.gov.tw/dataset/35321)），CSV，115 年版；內政部國土測繪中心〈鄉鎮市區清單〉（[data.gov.tw 102011](https://data.gov.tw/dataset/102011)），API；均為政府資料開放授權條款第 1 版，事先整理進 App |
+| 4.5 | 台語自動辨識 | 不用切選單：語言判斷後自動交給台語模型（Breeze-ASR-26），辨識成中文字再走原本流程 | 無政府資料 |
+| 4.6 | 多語介面與頁面即時翻譯 | 7 種語言；講什麼語言，助理、教學卡片、App 畫面與服務網頁一起換（預翻字串＋ML Kit 離線翻譯） | 無政府資料 |
+| 4.7 | 市府 FAQ | 從市府常見問答 8,121 筆找答案；分數不夠就不回答，不亂答 | 臺北市資料大平台〈[臺北市市政網站整合平台之常見問答](https://data.taipei/dataset/detail?id=203f1657-bb4a-45a7-b25f-279b63136645)〉，政府資料開放授權條款第 1 版；事先轉成手機上的向量索引 |
+| 4.8 | 緊急回應 | 失火、受困、自殺、家暴等緊急詞（6 種語言）在所有流程之前直接回 119／110／113／1925／1995 等專線，不經模型 | 無，為專案整理的詞表 |
+| 4.9 | 離線模型下載 | 模型不包在 App 裡；使用者同意後下載，依手機記憶體分級，可暫停、續傳、檢查 SHA-256 | 無政府資料（模型來源與授權見 [app/assets/assistant/models.json](portal_assistant/app/assets/assistant/models.json)） |
+| 4.10 | 獨立專案＋串接文件 | 助理整包放在 `portal_assistant/`，透過主機介面與 23 個串接點接進台北通；已在乾淨的官方台北通上照文件實測 | 無 |
 
-- **App**：Flutter 3.47.6／Dart 3.13.5（`.fvmrc` 鎖定）、GetX，沿用官方 `TPRoute`／`TPWebView`／WebView bridge（`{name, data}` 契約只新增欄位）。
-- **後端**：Python（Android 用 Chaquopy、iPhone 用 BeeWare CPython 3.13 內嵌），`assistant_backend/`；電腦開發時同一份程式配 Ollama。
-- **模型執行**：llama.cpp b12182 `llama-server`（決策分類器、e5、選用的決策 LLM）、whisper.cpp v1.9.5 `whisper-server`（四個語音伺服器）。
-  Android 由 Kotlin 負責啟動、CPU 綁定（提示用 5 核、生成用 3 核）、第一次用到才載入台語／越南文模型並先檢查可用記憶體；
-  iPhone 由 Swift 在 App 內以執行緒啟動（iOS 不能開子行程）、用 Metal GPU 計算，鎖定手機後自動重新 bind 埠號（[AI_ON_DEVICE_IOS.md](docs/AI_ON_DEVICE_IOS.md)）。
-- **切到背景再回來**（兩個平台，2026-11-13）：回到前景時用真正的 HTTP 請求（`/health`）檢查每個模型，沒回應的重新啟動（Android 的重新啟動是 2026-11-13 加的）；
-  模型回應過以後才連不上或停住時只等幾秒（`liveness`），這一句先列出候選或請使用者再說一次，不再一直等。iPhone 17 Pro Max 實機上，iOS 收回的埠約 1 秒內重新 bind。
-- **模型下載**：模型不包在 App 裡；第一次打開助理時問「下載離線助理（約 X GB）」，使用者同意才下載，可暫停、續傳、檢查 SHA-256。
-  Whisper、Ministral、Gemma 從原作者的 Hugging Face 下載；我們自己轉檔或訓練的檔案（決策分類器、e5、FAQ 索引、Breeze、PhoWhisper）放團隊的 Hugging Face [`allensung1226/townpass-assistant-models`](https://huggingface.co/allensung1226/townpass-assistant-models)。
-  依手機總記憶體分級：7 GB 以上全部（台語 q4_0 可選）；7 GB 以下只有核心；**決策分類器每個等級都下載**，所以預設的決策模型只要 0.13 GB（Ministral 2.15 GB）。開發者用 adb／devicectl 推的檔案照樣有效（[AI_MODEL_DOWNLOAD.md](docs/AI_MODEL_DOWNLOAD.md)）。
-- **檢索資料**：`capabilities.json` 109 項功能（86 項可開）、5 種外語的標題與關鍵字、602 句口語例句、Unihan 台灣讀音表（2 萬多字）、市府 FAQ 8,121 筆的 e5 索引、內政部的全國 368 個鄉鎮市區名稱（區公所不開到別區）。
-- **原則**：**不用中國開發的模型與工具**（CosyVoice、sherpa-onnx、GPT-SoVITS、FunASR 等一律不用）；**官方 TownPass-Services 網頁不修改、不複製、不打包**，App 透過網頁自己的換頁機制（History API）在頁面內切換；模型檔不放進 repo 也不放進 APK，由 App 在使用者同意後下載，或由開發者自己推到手機。
-- 評估過但不採用：Breeze-ASR-25（中文，5.4 秒太慢）、Breeze-ASR-26 q8_0／q4_K（換成 q4_0：和 q8_0 一樣準、檔案約一半，ARM 上三種裡最快）、Whisper medium／large-turbo（太慢）、bge 向量模型（換成 e5）、ViWhisper（訓練資料授權不明）、alexachang 台語模型（訓練資料不明，只當對照）。
+App 內「設定 → 關於 → 授權與資料來源」列出上述資料與每個模型的出處和授權。
 
-速度上做過的事（詳見技術總覽第 6 節）：預設的決策分類器不生成文字，每輪決策估計約 0.1–0.2 秒（同樣方法估計 Ministral 約 3–5 秒）；決策 LLM 模式下，字母選項＋精確文法讓每次決策只生成 6 個 token（省約 1 秒）、系統提示 KV 快取、3 個快取槽；tiny 語言判斷讓中文每句約 2.0 → 1.5 秒；`audio_ctx` 依句長縮短讓 3 秒句編碼從約 2 秒降到 0.4 秒；清楚的語意命中與單一候選不問模型（省約 4 秒）。
+### 各功能詳細說明
 
-## 數字
+#### 4.1 說話就開服務
 
-以下全部來自 `docs/` 的紀錄；保留集（held-out）只用來報告，不拿來調規則，**開錯頁必須維持不增加**。
-每個標題都寫了是**電腦評估**還是**手機實測**；電腦評估的秒數是換算出來的估計，不是手機量到的。
+- 每個畫面都有「**按住提問**」：按住說、放開送出、往上滑取消，有音量條。也可以打字；建議句會換成使用者最近真的用過的請求。
+- 「我要繳水費」「我家前面路燈壞了」「我欲借冊」→ 直接打開對應的服務頁面。只說情況、不說服務名稱的需求型說法也能對到頁面。
+- 後端依序：緊急詞 → 取消／換頁／第幾個 → 功能關鍵字 → 決策分類器 → 讀音相似（Unihan 台灣讀音）→ 語意相似（e5＋口語例句）→ FAQ。
+  都對不到時不開頁：有線索就列 2–4 個可能的頁面，沒有線索就給 12 類的功能目錄。
+- 說了沒有頁面的區公所（例如「大安區公所」）不會開到別區的頁面；「借書」只認真正的書。
 
-### 決策：預設分類器對 Ministral（電腦評估，2026-11-13）
+#### 4.2 引導教學
 
-分類器用手機同一份 q8_0 檔案（llama-server `--reranking`）、App 的分類器模式設定；Ministral 用 Ollama `ministral-3:3b`。數字來自 [AI_DECISION_CLASSIFIER.md](docs/AI_DECISION_CLASSIFIER.md) 第 10、12、13 節。
+<table>
+  <tr>
+    <td width="25%"><img src="portal_assistant/docs/images/guide-1-tap-search.png" alt="圖書借閱步驟 1/5：光圈標出關鍵字搜尋" width="100%"></td>
+    <td width="25%"><img src="portal_assistant/docs/images/guide-water-bill-card.png" alt="水費教學：任務卡與光圈，下方是按住輸入" width="100%"></td>
+    <td width="25%"><img src="portal_assistant/docs/images/guide-skip-optional-field.png" alt="警政報案住家電話：跳過這格" width="100%"></td>
+    <td width="25%"><img src="portal_assistant/docs/images/guide-done.png" alt="完成：企鵝說這是示範網站，沒有真的送出" width="100%"></td>
+  </tr>
+</table>
 
-| 評估集 | 決策分類器（預設） | Ministral 3B |
+- 9 種服務有教學：圖書借閱、繳費（15 種費用）、警政報案、區公所申辦、災情通報、陳情、臨櫃叫號、優惠券、訂閱。
+- 任務卡寫這一步要做什麼（一行精簡重點，可展開）、光圈標出要按的地方，可朗讀、暫停；卡片會避開光圈目標與「下一步」按鈕。
+- 打字的欄位**打完才算完成**（按 Enter、收起鍵盤或離開那一格才進下一步）。
+- **非必填欄位也教**：沒有「*」的欄位，任務卡出現「跳過這格」，說或打「跳過」也可以；跳過的欄位這次教學不再回來。
+- 頁面不修改、不打包，只在上面畫；最後一步永遠是使用者自己按，完成後說明「這是示範網站，沒有真的送出」。
+- 教學流程在示範網站錄製操作後重播驗證（[tools/guide_audit/](portal_assistant/tools/guide_audit/)）。
+
+#### 4.3 按住輸入、按住選擇
+
+- 教學要填欄位時，「按住提問」變成「**按住輸入**」：講的話轉成欄位格式填入（電話、Email、金額、日期、時間、身分證、車牌、地址、文字），可以「復原」。
+- 教學在下拉、單選、勾選或清單的步驟時變成「**按住選擇**」：拿畫面上的選項（翻譯後的也算）比對講的話（正規化、包含、「第二個」這類序號、讀音相似）。
+  有把握就直接選並顯示「已選『X』，可復原」；兩三個接近時列出讓使用者點；都不像就請他再說一次。單一的同意聲明勾選框一律留給使用者自己勾。
+- 填欄位時講的內容不進對話紀錄、不送決策模型。
+
+#### 4.4 語音地址分層比對
+
+- 「台北市新義區市府路一號」→「臺北市信義區市府路1號」：縣市（22）→ 該縣市的區（368 個鄉鎮市區）→ 該區的路名（35,740 條）→ 段、巷、弄、號。
+  每一層只在上一層的範圍內找，所以語音辨識的錯字在小範圍內對得回來；沒有把握的那一層照原文，不亂改。
+- 警政報案、區公所申辦的「縣市／區／詳細地址」三格下拉：說一次地址，依序選好縣市、等區的選單載入後選區、再填詳細地址；可一次復原。
+- 災情通報、陳情的地點欄位：整句校正成標準寫法後填入。
+
+#### 4.5 台語自動辨識
+
+- 不用切選單：語言判斷模型（Whisper tiny）的輸出上加了一個小分類器，分數夠高就交給台語模型 **Breeze-ASR-26**（聯發科技研究中心＋陽明交大，Apache-2.0）。
+- 中文結果不像華語、或 App 認不出那句話時，也會交給台語模型再聽一次，留比較好的那份。
+- 台語模型無法使用時不會用華語硬聽，而是說明原因。目前只有辨識，朗讀用中文。
+
+#### 4.6 多語介面與頁面即時翻譯
+
+- 中文、台語、英、日、越、印尼、菲律賓文；講什麼語言，助理文字、建議句、教學卡片、按鈕、設定頁、App 畫面與服務網頁一起換。
+- 預翻好的字串直接用，其餘用 Google ML Kit 離線翻譯；翻譯時保留原文，教學用原文找按鈕。
+- 越南文的聲調與南北口音、印尼文的聊天縮寫、菲律賓文夾英文都有專門處理。外語文字目前是 AI 翻譯草稿，待母語者審閱。
+
+#### 4.7 市府 FAQ
+
+- 「大包垃圾要怎麼丟」「身分證掉了怎麼辦」→ 從市府常見問答 8,121 筆（e5 向量，手機上約 19 MB 索引）找答案；查詢前先把口語詞補成 FAQ 用詞。
+- 分數夠高直接回答，接近時列出最接近的問題讓使用者選，以下不回答；答案過長截斷並提示洽 1999。
+
+#### 4.8 緊急回應
+
+- 失火、冒煙、受困、倒地、沒呼吸、自殺、家暴、性侵、跟蹤等詞表（6 種語言），在所有檢索、FAQ、模型之前直接回 119／1925／1995／113／110；
+  正在發生的暴力只回專線，失火會另外列出災情表單讓使用者選。不經模型，所以不會慢、不會被模型想歪。
+
+#### 4.9 離線模型下載
+
+- 第一次打開助理時問「下載離線助理（約 X GB）」，使用者同意才下載；依手機總記憶體分級，可暫停、續傳、檢查 SHA-256。
+- 我們自己轉檔或訓練的檔案放在團隊的 Hugging Face [`allensung1226/townpass-assistant-models`](https://huggingface.co/allensung1226/townpass-assistant-models)。
+
+#### 4.10 獨立專案＋串接文件
+
+- 助理套件不 import 台北通的任何程式；台北通實作主機介面 `PortalAssistantHost`（路由、開 WebView、首頁分頁、標題列），其他每個串接點只有幾行。
+- 對官方檔案的改動從約 1,700 行減到約 200 行；完整列表見 [INTEGRATION.md](portal_assistant/INTEGRATION.md) 與 [docs/HOST_CHANGES.md](portal_assistant/docs/HOST_CHANGES.md)。
+- 已在乾淨的官方台北通（`e65b586`）上只照串接文件套用，成功建置並在 Android 模擬器上跑起助理與教學。
+
+---
+
+# 二、若使用 AI，需額外補充的項目（AI Usage Declaration）
+
+## 1. 使用到的 AI 模型
+
+**開發過程使用的 AI**
+
+- Claude：Claude Code（Claude Opus 5.5），用於程式撰寫、測試、文件與翻譯草稿；版面與封面的設計也有用 Claude 協助。
+- ChatGPT、Gemini：未使用。
+- 影像生成：未使用 AI 影像生成；企鵝圖案沿用程式設計節提供的圖片。
+
+**App 內實際執行的模型（自行架設／本地模型，全部在手機上執行）**
+
+| 用途 | 模型與版本 | 開發者、授權 |
 | --- | --- | --- |
-| held-out（102 案例，只報告） | 95，開錯頁 **0**（作品名規則之前 93） | 97，開錯頁 **0** |
-| dev 原本的 245 案例 | 242，開錯頁 **0** | 241，開錯頁 **0** |
-| dev 新增的作品名 18 題（「借魯冰花」與「借露營燈」這類） | 18 題全部照預期，開錯頁 **0** | 15，開錯頁 3（遊戲、夜市、煙火開成圖書） |
-| 多語 eval_i18n（5 種外語 96 句，有／無指定語言） | 96／96，開錯頁 **0** | 96／96，開錯頁 **0** |
-| 口語四組（中文口語 100、外語 held-out 125、口語 dev 216、報告 held-out 80）開錯頁合計 | **3** | 16 |
-| 每輪決策時間（手機秒數估計） | 約 0.1–0.2 秒 | 約 3–5 秒 |
-| 要下載的決策模型 | 0.13 GB | 2.15 GB |
+| 決策（預設） | 決策分類器 v2（`townpass-decision-e5-ce-v2-q8_0.gguf`，由 multilingual-e5-small 微調的 cross-encoder，q8_0，132 MB） | 本專案訓練（基底 Microsoft），MIT |
+| 語意檢索、FAQ 向量 | multilingual-e5-small（q8_0） | Microsoft，MIT |
+| 語音辨識 | Whisper small（q8_0） | OpenAI，MIT |
+| 語言判斷 | Whisper tiny（q8_0） | OpenAI，MIT |
+| 台語辨識 | Breeze-ASR-26（q4_0） | 聯發科技研究中心、陽明交通大學，Apache-2.0 |
+| 越南文辨識（Android） | PhoWhisper-base（q8_0） | VinAI，BSD-3-Clause |
+| 決策（建置選項，預設不載入） | Ministral-3-3B-Instruct-2512（Q4_K_M）；Gemma 4 E2B（Q4_0，只有 Android） | Mistral AI，Apache-2.0；Google，Gemma 授權 |
+| 頁面翻譯 | Google ML Kit on-device translation | Google |
 
-- 代價：分類器比較常把候選列出來讓使用者多按一下，held-out 少約 2 句；擁有者 2026-11-13 決定接受，改成 App 的預設。
-- 每輪秒數：決策 LLM 用手機實測的讀提示／生成速度換算；分類器**假設**每個候選 0.10 秒（約電腦單執行緒的 3 倍），**手機上還沒量**。
-- 越南文 vi_variants（20 句：不打聲調、口音、問句、否定；2026-11-08，Ministral）：11／20 → **19／20**（比對層），加上端到端修正後 20／20，開錯頁 0。
+選用原則：不使用中國開發的模型與工具；模型檔不放進 repo 或安裝檔，由使用者同意後下載。
 
-### 需求型說法（電腦評估，分類器模式，2026-11-16）
+## 2. 使用範圍
 
-「我家門口的燈晚上不會亮」「手頭有點緊想找補助」這類只說情況、不說服務名稱的句子。開發集 `eval_need_dev.json`；封存保留集由另一位撰寫者寫好封存（v2，只報告、不拿來調）。
-數字來自 [AI_CURRENT_RULES.md](docs/AI_CURRENT_RULES.md) 第 2、3、8 節與 [AI_DECISION_CLASSIFIER.md](docs/AI_DECISION_CLASSIFIER.md) 第 14 節。
+- **程式碼產生**：助理部分（`portal_assistant/` 與台北通上的串接點）約 90% 由 AI 產生，經人工審查與測試；官方台北通 App 原始碼不計。
+  - App 端：引導教學、頁面探測、按住輸入／選擇、頁面翻譯、模型下載。
+  - 後端：決策流程、檢索與比對、地址分層比對、HTTP 端點。
+  - 原生：Android（Kotlin）與 iPhone（Swift）的模型伺服器啟動與生命週期。
+- **文字生成**：README、規格、規則文件與開發紀錄；**英、日、越、印尼、菲律賓文的介面與教學文字是 AI 翻譯草稿**，尚待母語者審閱。
+- **測試案例生成**：Python 與 Flutter 單元測試、widget 測試、教學流程重播測試；開發用評估句。
+- **資料清洗與整理**：內政部路名資料、鄉鎮市區清單的整理腳本（[scripts/build_address_data.py](portal_assistant/scripts/build_address_data.py) 等）；市府 FAQ 向量索引的建置腳本。
+- **模型訓練**：決策分類器的訓練資料產生與微調流程。
 
-| 評估集 | 改版前（main d857dd4） | 現在 |
-| --- | --- | --- |
-| need 開發集：服務請求到得了正確頁面（開或列出，125 句） | 約 48% | **87.2%**（109） |
-| need 開發集：需求清楚的句子直接開對（37 句） | 18 | **26** |
-| need 開發集：開錯頁 | 3 | **0** |
-| 封存單句集：到得了（104 句服務請求） | 56 | **85** |
-| 封存單句集：開錯頁 | 15 | **9** |
-| 封存多輪（70 輪）通過 | 23 | **37** |
-| 封存 FAQ 題（60 題）：給了 FAQ／相關 | 29／24 | **35／30** |
-| 既有各評估集（dev、held-out、多語、口語四組） | — | 新的開錯頁 0（報告 held-out 多 1 頁：「我要去區公所辦東西」開到臨櫃叫號，擁有者接受） |
+## 3. AI 產生內容如何被驗證或修改
 
-- 代價：教學頁判斷 dev 104 → 98、held-out 47 → 39（少的只變成列出，不開錯；擁有者 2026-11-16 接受）；電腦上每句分類 47 → 61 ms，手機還沒量。
-- Android 模擬器端對端（2026-11-16）：App 從 HF 下載 v2 並通過 SHA-256 驗證，回覆都在 1.8 秒內，分類器模式總記憶體約 1.7 GB。
+- **人工審查**：團隊對 AI 產生的程式與文件做大致的審查與測試，每次 commit 都經團隊成員同意。
+- **規則先行**：所有行為規則寫在 [docs/AI_CURRENT_RULES.md](portal_assistant/docs/AI_CURRENT_RULES.md)，每次改行為先改規則並寫明原因，再改程式。
+- **自動測試**：Python 656 個、Flutter 847 個測試（助理套件 675、台北通 172）；教學流程在示範網站錄製後重播驗證；規則互相干擾由碰撞測試自動檢查。
+- **評估集與封存保留集**：開發集用來調整；保留集由另一位撰寫者撰寫並封存，只用來報告，不拿來調規則；「開錯頁」必須維持不增加。
+- **實機驗證**：Android 模擬器與實機（vivo）、iPhone 17／17 Pro Max 實測，問題記錄後修正再測。
+- **安全**：WebView 只在服務網域上注入與讀取；後端只綁 `127.0.0.1`，檢查 Origin、Content-Type 與欄位白名單；模型檔下載後檢查 SHA-256。
 
-### 語音與語言
+## 4. 與 AI 相關的限制或風險
 
-| 項目 | 數字 | 來源 |
-| --- | --- | --- |
-| 語言判斷（tiny q8_0，4 執行緒，手機） | 每段約 **0.19 秒**；整段流程中文一句 2.05 → **1.48 秒**；中文選單下的日文／英文語言正確 7/10 → 8/10、3.34 → 1.34 秒 | [AI_LANGUAGE_GATE.md](docs/AI_LANGUAGE_GATE.md) |
-| 中文被判成別的語言（FLEURS＋合成指令 300 段） | ≥ 0.8 只有 1 段（0.3%） | 同上 |
-| 台語：Breeze-ASR-26 對 Whisper small（Common Voice nan-tw 固定 100 段） | 保留服務詞 **32／50 對 6／50**、每段 CER 中位數 0.67 對 1.00、非請求句被誤導航 0／50 | [AI_TAIWANESE_SPEECH_PLAN.md](docs/AI_TAIWANESE_SPEECH_PLAN.md) §10 |
-| 台語自動判斷（閘門分類器，held-out，門檻 0.5） | 台語召回 **69%**（580 段）；華語台灣腔誤送 5.4%（925 段）、華語 FLEURS 1.7%、其他語言 14% | 同上 §12 |
-| 台語文字規則補漏（small 對台語錄音） | 「不像華語」50%、「App 不認得」90%；對我們自己的請求句只有 0.6%／8% 會多跑一次 | 同上 §13 |
-| 越南文：PhoWhisper 對 Whisper small（合成越南文指令 168 句） | 答對 113 → **158**；字錯率 32.5% → **7.8%**；只看擁有者的測法（Google 翻譯語音、越南文選單）**28／42 → 40／42**；開錯頁 0 | [AI_VIETNAMESE.md](docs/AI_VIETNAMESE.md) §7 |
-| 越南文朗讀句（FLEURS 60 段） | 字錯率 32.4%（small）→ 13.9%（PhoWhisper-small） | 同上 §3 |
+- **模型可能判斷錯誤**：語音辨識或決策可能聽錯、選錯頁面，所以只有把握夠高才直接開頁，其他情況列出選項讓使用者選；助理不替使用者送出、付款或同意。
+- **台語與外語辨識仍有限制**：台語自動判斷約七成召回；外語介面文字是 AI 草稿，可能不自然或有誤。
+- **AI 產生的程式碼可能遺留問題**：已用測試、評估與實機驗證降低風險，但無法保證沒有遺漏；Release 版本與正式台北通環境尚未驗證。
+- **資料與授權**：示範用的服務網頁、mock 帳號與 JSON 不代表已取得正式台北通登入或政府 API 的授權；政府開放資料依授權條款註明出處。
+- **敏感資料**：App 的錄音不存檔、不上傳；開發過程中未將使用者個資、帳號密碼或未公開的金鑰輸入 AI。
 
-### 手機速度（Android 實測，vivo V2511）
+---
 
-- 中文一句：約 **1.5 秒**辨識。決策 LLM 模式下決策 **2–5 秒**（Gemma 快、Ministral 準）；預設的分類器模式**還沒在實機上量**（電腦評估估計每輪 0.1–0.2 秒，見上）。
-- 台語：Breeze q8_0 實測約 **4 秒**（3.4–4.4 秒）；現在用的 q4_0 在雲端 ARM 測速（`ci/arm-bench-whisper` 分支）推估每段 3.6–4.2 秒，是三種量化裡最快的，手機上還沒量。華語偶爾會多跑一次台語模型，慢約 3 秒。
-- 越南文：PhoWhisper-base 在手機上還沒量，電腦上約 1.4 秒。
-- 第一次啟動要載模型約 1–2 分鐘，並在背景建語意索引約 1 分鐘（之後有快取）。
-- 分類器模式在 Android 上到 2026-11-13 只在模擬器上跑過端到端（下載分類器、開頁；找到的 5 個問題已修正並在模擬器上重現驗證），模擬器的秒數不能代表手機。
+# 三、串接到台北通
 
-### 手機實測（iPhone）
+完整說明在 **[INTEGRATION.md](portal_assistant/INTEGRATION.md)**：
 
-- **iPhone 17 Pro Max（2026-11-13，分類器模式，雲端 CI 建置後側載）**：App 內下載模型、中文語音、鎖定與切到背景再回來（iOS 收回的埠約 1 秒內重新 bind）、台語 q4_0 載入約 **0.8 秒**，沒有閃退。
-  台語的記憶體很緊（載入要約 2.1 GB，iOS 給這個 App 約 2.2 GB），所以載入前一律檢查，不夠就當中文聽。
-- **iPhone 17（2026-11-08，Ministral）**：決策模型用 Metal GPU，讀提示 282–505 tok/s（Android 約 50），一次決策約 **0.9 秒**。
+- 最快的做法：把 `portal_assistant/` 放到台北通 repo 根目錄，執行 `portal_assistant/integration/apply.ps1`（或 `apply.sh`），再 `pub get`、`build_runner`。
+- 主機介面 `PortalAssistantHost`：台北通的實作在 [integration/files/lib/util/town_pass_assistant_host.dart](portal_assistant/integration/files/lib/util/town_pass_assistant_host.dart)。
+- 23 個串接點：每個官方檔案一份 patch（[integration/patches/](portal_assistant/integration/patches/)），文件逐一寫明位置、加什麼、為什麼、不加會怎樣。
+- 台北通要提供的東西：服務網域、WebView bridge（既有的訊息名稱與資料語意完全沒改）、建置開關、權限、模型下載來源、原生建置步驟。
+- 對原台北通架構的修改：[docs/HOST_CHANGES.md](portal_assistant/docs/HOST_CHANGES.md)。
 
-### 測試
-
-Python 517 個單元測試、Flutter 611 個（2026-11-13）；教學流程 177 條重播；`extract_guide_strings.py --check` 檢查 6 語（中、英、日、越、印、菲）教學文字缺漏。
-
-## 怎麼跑
-
-看是哪種手機選腳本；兩邊是同一份程式、同一個開關（`--dart-define=ASSISTANT_ON_DEVICE=true`，腳本已帶好）。
-
-| 手機 | 電腦 | 建置、安裝、啟動 |
-| --- | --- | --- |
-| Android | Windows（adb） | `scripts\run_assistant_on_device.ps1 -DeviceId <id>` |
-| iPhone | Mac＋Xcode | `scripts/run_assistant_on_device.sh --push-models`（第一次；之後不加） |
-
-兩邊都要 FVM（Flutter 3.47.6 鎖在 `.fvmrc`），模型檔放在 repo 外：由開發者推到手機，或讓 App 第一次打開助理時下載（使用者同意才下載）。
-
-**Android**：Windows、Android SDK（Platform 36、NDK 29）、JDK 17、Python 3.11+、adb；手機 7 GB 以上記憶體可以下載全部模型（7 GB 以下只有核心＋分類器）；
-模型預設在 `D:\TownPassAssistant\models\...`（見 `scripts/prepare_assistant_models.ps1`）。
-
-```powershell
-fvm install
-fvm flutter pub get --enforce-lockfile
-fvm dart run build_runner build --delete-conflicting-outputs   # 產生檔不在 Git，每次 clone 後都要
-
-.\scripts\build_assistant_native.ps1                           # llama-server、whisper-server 的 .so（不在 Git）
-
-# 第一次或換模型時推模型（也可以不推，讓 App 自己下載）；預設推決策分類器、Ministral、Whisper small、tiny、e5 與 FAQ 索引
-.\scripts\push_assistant_models.ps1 -DeviceId <id> `
-    -Taiwanese  D:\TownPassAssistant\models\taiwanese\ggml-breeze-asr-26-q4_0.bin `
-    -Vietnamese D:\TownPassAssistant\models\vietnamese\ggml-phowhisper-base-q8_0.bin
-
-.\scripts\run_assistant_on_device.ps1 -DeviceId <id>                           # 引導介面、決策分類器（預設）
-.\scripts\run_assistant_on_device.ps1 -DeviceId <id> -DecisionModel ministral  # 用 Ministral 決策
-.\scripts\run_assistant_on_device.ps1 -DeviceId <id> -DecisionModel gemma      # 用 Gemma 決策
-.\scripts\run_assistant_on_device.ps1 -DeviceId <id> -Chat                     # 聊天面板
-```
-
-**iPhone**：Mac＋Xcode；模型放在 `~/Library/Application Support/TownPassAssistant/models`（見 `scripts/push_assistant_models_ios.sh`）。
-
-```bash
-fvm install && fvm flutter pub get --enforce-lockfile
-fvm dart run build_runner build --delete-conflicting-outputs
-scripts/setup_ios_on_device.sh                       # 原生框架放進 ios/OnDevice/（不進 git）
-scripts/run_assistant_on_device.sh --push-models     # 第一次：建置、安裝、推模型、啟動（手機要解鎖）
-scripts/run_assistant_on_device.sh --chat            # 聊天面板
-```
-
-iPhone 有決策分類器（預設）與 Ministral（`--decision-model ministral`），沒有 Gemma，越南文用 Whisper small。一鍵腳本是 2026-11-10 新加的、還沒在 Mac 上實跑；手動步驟見 [docs/AI_ON_DEVICE_IOS.md](docs/AI_ON_DEVICE_IOS.md)。
-沒有 Mac 時：`ci/ios-build` 分支用 GitHub Actions 建置未簽章的 iPhone App，再自己側載（說明在該分支的 `docs/IOS_BUILD_WITHOUT_MAC.md`）；2026-11-13 的 iPhone 實測就是這樣建置的。
-
-- 完整的開發者指南（目錄、模型清單、改東西的流程、評估指令、目前限制）：[ASSISTANT_README.md](ASSISTANT_README.md)。
-- 電腦上開發（Ollama ＋ Python，模擬器，不用手機）：[docs/TEAM_LOCAL_SETUP.md](docs/TEAM_LOCAL_SETUP.md)。
-- 看記錄：`adb logcat -s TownPassAssistant python.stdout`；`timing speech` 行有語言判斷結果與耗時，`timing turn` 行有決策耗時。
-- 完全關掉助理：`--dart-define=ASSISTANT_ENABLED=false`。
-- iPhone 版已在 iPhone 17 上以 release 實機驗證（2026-11-08–09，Ministral），2026-11-13 在 iPhone 17 Pro Max 上驗證分類器模式（雲端 CI 建置）；Android 以 Debug APK 實機驗證（決策 LLM 模式；分類器預設還沒上實機），Release 尚未驗證。
-
-## 專案結構
-
-Flutter App 維持在 repo 根目錄，官方目錄不搬動（見 [AGENTS.md](AGENTS.md)）；助理的部分用粗體標出。
+# 四、專案結構與文件
 
 | 位置 | 內容 |
 | --- | --- |
-| `lib/` | 官方 App（GetX、`page/`、`service/`、`util/`） |
-| **`lib/page/guided_assistant/`** | 引導助理：控制器、教學內容 `model/guides/`、頁面探測 `web/`、按住提問 `widget/` |
-| **`lib/page/assistant/`** | 聊天面板、`assistant_texts.dart`（介面文字 6 語） |
-| **`lib/service/`**（新增部分） | 後端連線、頁面翻譯、語言選單、建議句、動作執行 |
-| **`lib/util/tp_web_view.dart`** | WebView：翻譯注入、頁內換頁 |
-| **`assistant_backend/`** | Python 後端：`workflow.py`（流程）、`server.py`（HTTP、檢索、模型呼叫）、`classifier.py`（決策分類器）、`book_title.py`（只說作品名的借書）、`decision.py`（文法限制、沒有決策模型時的規則）、`asr_server.py`（語音、語言判斷、台語／越南文路徑）、`registry.py`／`phonetic.py`／`semantic.py`／`faq.py`／`emergency.py`／`i18n.py`／`vietnamese.py`／`indonesian.py`／`places.py`／`taiwanese_gate.py`／`plausibility.py`、`models.py`（模型下載與分級）、`liveness.py`（模型沒回應時不久等）、`device_main.py`（手機啟動）、`evaluate.py` 等評估、`test_*.py` |
-| **`assets/assistant/`** | `capabilities.json`、`capabilities_i18n.json`、`capability_examples.json`、`guide_*.json`、`models.json`（下載清單：大小、SHA-256、來源、授權） |
-| **`assets/i18n/`** | `app_strings.json`（App 文字預翻）、`guide/*.json`（教學文字 6 語） |
-| **`android/app/src/ondevice/`** | Kotlin：啟動各模型伺服器、CPU 綁定、分類器／Gemma／台語／越南文、停住或結束時重新啟動 |
-| **`ios/Runner/OnDeviceAssistant.swift`、`ios/native/`、`ios/scripts/`** | iPhone：在 App 內以執行緒啟動各模型伺服器、鎖定後重新 bind、記憶體額度檢查、Xcode 內嵌階段 |
-| **`scripts/`** | 建置原生程式庫、推模型、評估、抽字串 |
-| **`tool/guide_audit/`** | 教學流程錄製與重播（Node ＋ Chrome） |
-| **`docs/`** | 規則、技術總覽、各實驗紀錄、團隊待辦；`docs/images/` 是本頁的截圖 |
-
-## 文件索引
+| [INTEGRATION.md](portal_assistant/INTEGRATION.md)、[integration/](portal_assistant/integration/) | 串接文件、patches、要新增的檔案、套用腳本 |
+| [app/](portal_assistant/app/) | Flutter 套件 `townpass_portal_assistant`：引導助理、聊天面板、頁面翻譯、主機介面；資源與測試 |
+| [backend/](portal_assistant/backend/) | Python 後端：流程、檢索、決策分類器、語音與語言判斷、選項與地址比對、評估與測試 |
+| [native/](portal_assistant/native/) | Android（Kotlin、Gradle、原生伺服器建置）與 iPhone（建置與內嵌腳本） |
+| [scripts/](portal_assistant/scripts/) | 建置、推模型、評估、抽字串、資料整理、連結檢查 |
+| [tools/](portal_assistant/tools/) | 教學流程錄製與重播（guide_audit）、翻譯審閱、煙霧測試 |
+| [docs/](portal_assistant/docs/) | 規則、技術總覽、各實驗與決策紀錄 |
 
 | 主題 | 文件 |
 | --- | --- |
-| 先讀 | [ASSISTANT_README.md](ASSISTANT_README.md)（開發指南）、[AI_CURRENT_RULES.md](docs/AI_CURRENT_RULES.md)（行為規則唯一準則）、[AI_TECHNICAL_OVERVIEW.md](docs/AI_TECHNICAL_OVERVIEW.md)（技術總覽）、[AI_DECISION_FLOW.md](docs/AI_DECISION_FLOW.md)（從語音／打字到回覆） |
-| 語音 | [AI_LANGUAGE_GATE.md](docs/AI_LANGUAGE_GATE.md)（語言閘門）、[AI_ASR_ABLATION.md](docs/AI_ASR_ABLATION.md)（語音辨識消融）、[AI_TAIWANESE_SPEECH_PLAN.md](docs/AI_TAIWANESE_SPEECH_PLAN.md)（台語辨識與朗讀）、[AI_TAIWANESE_RECORDING_SCRIPT.md](docs/AI_TAIWANESE_RECORDING_SCRIPT.md)（台語錄音稿）、[AI_VIETNAMESE.md](docs/AI_VIETNAMESE.md)（越南文） |
-| 多語 | [AI_MULTILINGUAL_PLAN.md](docs/AI_MULTILINGUAL_PLAN.md)、[AI_INDONESIAN.md](docs/AI_INDONESIAN.md)（印尼文）、[AI_FILIPINO.md](docs/AI_FILIPINO.md)（菲律賓文） |
-| 檢索與決策 | [AI_DECISION_CLASSIFIER.md](docs/AI_DECISION_CLASSIFIER.md)（決策分類器，預設）、[AI_FAQ_RAG.md](docs/AI_FAQ_RAG.md)（市府 FAQ 檢索）、[AI_COLLOQUIAL_MATCHING_EXPERIMENT.md](docs/AI_COLLOQUIAL_MATCHING_EXPERIMENT.md)（口語對頁面）、[AI_DECISION_MODEL_ABLATION_PLAN.md](docs/AI_DECISION_MODEL_ABLATION_PLAN.md)、[SPEED_LIBRARY_EXPERIMENT.md](docs/SPEED_LIBRARY_EXPERIMENT.md)、[AI_TOOL_CALLING_PLAN.md](docs/AI_TOOL_CALLING_PLAN.md) |
-| 介面與教學 | [AI_GUIDED_MERGE_PLAN.md](docs/AI_GUIDED_MERGE_PLAN.md)（引導式助理）、[AI_FORM_PREFILL_PLAN.md](docs/AI_FORM_PREFILL_PLAN.md)（表單預填）、[AI_VOICE_UI_PLAN.md](docs/AI_VOICE_UI_PLAN.md)、[GUIDE_AUDIT_TEAM_REQUESTS.md](docs/GUIDE_AUDIT_TEAM_REQUESTS.md) |
-| 裝置端與服務覆蓋 | [AI_ON_DEVICE_PLAN.md](docs/AI_ON_DEVICE_PLAN.md)、[AI_ON_DEVICE_IOS.md](docs/AI_ON_DEVICE_IOS.md)（iPhone）、[AI_MODEL_DOWNLOAD.md](docs/AI_MODEL_DOWNLOAD.md)（App 內下載與分級）、[AI_SERVICE_COVERAGE_PLAN.md](docs/AI_SERVICE_COVERAGE_PLAN.md)、[AI_ALL_FEATURES_ROLLOUT_PLAN.md](docs/AI_ALL_FEATURES_ROLLOUT_PLAN.md)、[AI_EXPANSION_IMPLEMENTATION.md](docs/AI_EXPANSION_IMPLEMENTATION.md)、[FEATURE_AVAILABILITY_20261104.md](docs/FEATURE_AVAILABILITY_20261104.md) |
-| 圖書助理（第一階段） | [AI_PHASE1_IMPLEMENTATION.md](docs/AI_PHASE1_IMPLEMENTATION.md)、[AI_LIBRARY_IMPLEMENTATION_STEPS.md](docs/AI_LIBRARY_IMPLEMENTATION_STEPS.md) |
-| 進度、測試與團隊 | [AI_ASSISTANT_PROGRESS.md](docs/AI_ASSISTANT_PROGRESS.md)、[AI_ASSISTANT_TEST_REPORT_20261107.md](docs/AI_ASSISTANT_TEST_REPORT_20261107.md)、[TEAM_TASKS_AFTER_MERGE.md](docs/TEAM_TASKS_AFTER_MERGE.md)、[AI_AGENT_HANDOFF.md](docs/AI_AGENT_HANDOFF.md)、[TEAM_LOCAL_SETUP.md](docs/TEAM_LOCAL_SETUP.md) |
-| 官方與同步 | [UPSTREAM_README.md](docs/UPSTREAM_README.md)（官方專案說明）、[DEVELOPMENT.md](docs/DEVELOPMENT.md)、[UPSTREAM_SYNC_20261103.md](docs/UPSTREAM_SYNC_20261103.md)、[AGENTS.md](AGENTS.md) |
+| 行為規則（唯一準則） | [docs/AI_CURRENT_RULES.md](portal_assistant/docs/AI_CURRENT_RULES.md) |
+| 技術總覽、決策流程 | [docs/AI_TECHNICAL_OVERVIEW.md](portal_assistant/docs/AI_TECHNICAL_OVERVIEW.md)、[docs/AI_DECISION_FLOW.md](portal_assistant/docs/AI_DECISION_FLOW.md) |
+| 決策分類器、FAQ | [docs/AI_DECISION_CLASSIFIER.md](portal_assistant/docs/AI_DECISION_CLASSIFIER.md)、[docs/AI_FAQ_RAG.md](portal_assistant/docs/AI_FAQ_RAG.md) |
+| 語音、台語、多語 | [docs/AI_LANGUAGE_GATE.md](portal_assistant/docs/AI_LANGUAGE_GATE.md)、[docs/AI_TAIWANESE_SPEECH_PLAN.md](portal_assistant/docs/AI_TAIWANESE_SPEECH_PLAN.md)、[docs/AI_MULTILINGUAL_PLAN.md](portal_assistant/docs/AI_MULTILINGUAL_PLAN.md) |
+| 手機端、模型下載 | [docs/AI_ON_DEVICE_PLAN.md](portal_assistant/docs/AI_ON_DEVICE_PLAN.md)、[docs/AI_ON_DEVICE_IOS.md](portal_assistant/docs/AI_ON_DEVICE_IOS.md)、[docs/AI_MODEL_DOWNLOAD.md](portal_assistant/docs/AI_MODEL_DOWNLOAD.md) |
+| 地址資料 | [docs/AI_ADDRESS_DATA.md](portal_assistant/docs/AI_ADDRESS_DATA.md) |
+| 評估數字、手機速度與開發細節 | [docs/PROJECT_DETAILS.md](portal_assistant/docs/PROJECT_DETAILS.md) |
+| 開發指南、協作規範 | [ASSISTANT_README.md](ASSISTANT_README.md)、[AGENTS.md](AGENTS.md) |
 
-目前狀態與限制（2026-11-13）：外語介面與教學文字是 AI 翻譯草稿，待母語者校對；台語只有辨識、朗讀用中文；
-泰文已換成菲律賓文（2026-11-11，翻譯是 AI 草稿，待母語者審閱，[docs/AI_FILIPINO.md](docs/AI_FILIPINO.md)）；印尼文的比對已優化（2026-11-11），印尼文專用語音模型尚未接進 App。
-預設的決策分類器還沒在 Android 實機上量速度與記憶體。待辦有台語朗讀、iPhone 的 Gemma 與越南文模型，Android Release 未驗證。詳見 [docs/TEAM_TASKS_AFTER_MERGE.md](docs/TEAM_TASKS_AFTER_MERGE.md)。
+# 授權與致謝
 
-## 授權
-
-- 本 repository 的程式沿用上游 TownPass 的 [GPL-3.0](LICENSE)；保留原作者與來源聲明，對外散布時依 GPL-3.0 條款處理。
-- 模型檔**不在 repo、不在 APK**，由 App 在使用者同意後從原作者與團隊的 Hugging Face 下載，或由開發者推到手機，授權依各模型：決策分類器（MIT，本專案由 multilingual-e5-small 微調）、Ministral（Apache-2.0）、Gemma（Gemma 授權）、Whisper（MIT）、Breeze-ASR-26（Apache-2.0；散布時要附授權全文與「轉成 ggml、量化成 q4_0」的說明）、PhoWhisper（BSD-3，保留著作權聲明）、multilingual-e5-small（MIT）、ML Kit（Google 條款）。
-- 示範用的網頁服務、mock 帳號與 JSON 不代表已取得正式台北通登入或政府 API 的授權。
-
-## 致謝
-
-- 臺北市政府資訊局開源的 [TownPass](https://github.com/taipei-doit/TownPass) 與 [TownPass-Services](https://github.com/taipei-doit/TownPass-Services)：本專案建立在官方 App 架構與示範網頁服務之上，網頁服務未修改、未打包。
-- 資料：臺北市資料大平台〈[臺北市市政網站整合平台之常見問答](https://data.taipei/dataset/detail?id=203f1657-bb4a-45a7-b25f-279b63136645)〉（市府 FAQ 8,121 筆的來源）。
-- 模型與工具：Mistral AI（Ministral 3）、Google（Gemma 4、ML Kit）、OpenAI（Whisper）、聯發科技研究中心與陽明交通大學（Breeze-ASR-26）、VinAI（PhoWhisper）、Microsoft（multilingual-e5-small，也是決策分類器的基底）、[llama.cpp](https://github.com/ggml-org/llama.cpp)、[whisper.cpp](https://github.com/ggml-org/whisper.cpp)、[Chaquopy](https://chaquo.com/chaquopy/)、Unihan 資料庫。
-- README 的版面參考了 taipei-doit 2025 年作品 [Carbon Notebook](https://github.com/taipei-doit/townpass2025-carbon-notebook) 的結構；內容與設計為本專案自行撰寫。
+- 本 repository 的程式沿用上游 TownPass 的 [GPL-3.0](LICENSE)；保留原作者與來源聲明。
+- 模型檔不在 repo、不在安裝檔，授權依各模型（見上表與 [models.json](portal_assistant/app/assets/assistant/models.json)）。
+- 政府開放資料依「政府資料開放授權條款－第 1 版」使用並註明出處。
+- 感謝臺北市政府資訊局開源的 [TownPass](https://github.com/taipei-doit/TownPass) 與 [TownPass-Services](https://github.com/taipei-doit/TownPass-Services)；
+  資料：臺北市資料大平台、內政部戶政司、內政部國土測繪中心；
+  模型與工具：OpenAI（Whisper）、Microsoft（multilingual-e5-small）、聯發科技研究中心與陽明交通大學（Breeze-ASR-26）、VinAI（PhoWhisper）、Mistral AI、Google（Gemma、ML Kit）、
+  [llama.cpp](https://github.com/ggml-org/llama.cpp)、[whisper.cpp](https://github.com/ggml-org/whisper.cpp)、[Chaquopy](https://chaquo.com/chaquopy/)、Unihan 資料庫。

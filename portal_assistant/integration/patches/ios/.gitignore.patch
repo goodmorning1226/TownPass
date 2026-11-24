@@ -1,0 +1,11 @@
+diff --git a/ios/.gitignore b/ios/.gitignore
+index 7a7f987..4fab30f 100644
+--- a/ios/.gitignore
++++ b/ios/.gitignore
+@@ -32,3 +32,6 @@ Runner/GeneratedPluginRegistrant.*
+ !default.mode2v3
+ !default.pbxuser
+ !default.perspectivev3
++
++# On-device assistant frameworks (portal_assistant/native/ios/setup_ios_on_device.sh), not in git
++OnDevice/

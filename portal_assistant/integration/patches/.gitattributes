@@ -1,0 +1,5 @@
+# The patches are applied byte for byte with `git apply` (apply.ps1 / apply.sh):
+# keep their LF line endings on every checkout, and do not flag the leading space
+# of diff context lines (blank lines, tab-indented Xcode lines) as whitespace errors.
+# Written by make_patches.py.
+* -text -whitespace

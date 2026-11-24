@@ -1,0 +1,13 @@
+diff --git a/ios/Runner/Info.plist b/ios/Runner/Info.plist
+index 8a02575..8cacd43 100644
+--- a/ios/Runner/Info.plist
++++ b/ios/Runner/Info.plist
+@@ -75,6 +75,8 @@
+ 			<key>LocationTemporaryUsageKey</key>
+ 			<string>TownPass 需要精確定位權限才可正常使用</string>
+ 		</dict>
++		<key>NSMicrophoneUsageDescription</key>
++		<string>TownPass 助理需要麥克風，才能用說話描述你想使用的服務</string>
+ 		<key>NSCameraUsageDescription</key>
+         <string>This app needs camera access to scan QR codes</string>
+         <key>NSPhotoLibraryUsageDescription</key>

@@ -1,0 +1,16 @@
+diff --git a/.gitignore b/.gitignore
+index 680ec4d..b339abe 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -88,4 +88,9 @@ app.*.map.json
+ !/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages
+ 
+ # FVM Version Cache
+-.fvm/
+\ No newline at end of file
++.fvm/
++
++# Portal assistant: on-device native build output in the App's Android project
++# (portal_assistant/native/android/build_assistant_native.ps1); the rest is in
++# portal_assistant/.gitignore.
++**/android/app/assistant-native/

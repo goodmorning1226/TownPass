@@ -3,7 +3,7 @@ import Foundation
 import UIKit
 import os
 
-/// Runs the local service assistant inside the iOS App (docs/AI_ON_DEVICE_IOS.md),
+/// Runs the local service assistant inside the iOS App (portal_assistant/docs/AI_ON_DEVICE_IOS.md),
 /// the iOS twin of android/.../OnDeviceAssistant.kt. Same loopback endpoints, so
 /// the Flutter side and the HTTP contract do not change:
 ///
@@ -17,12 +17,12 @@ import os
 ///
 /// iOS cannot start child processes, so each native server's main() runs on its
 /// own thread in the App process. The frameworks (LlamaServer, WhisperServer,
-/// Python) are not linked: ios/scripts/embed_on_device_assistant.sh copies them in
+/// Python) are not linked: portal_assistant/native/ios/embed_on_device_assistant.sh copies them in
 /// when ios/OnDevice/ holds them, and they are opened here with dlopen, so builds
 /// without them are unchanged. Model files are not in the App:
-/// scripts/push_assistant_models_ios.sh copies them to Documents/models.
+/// portal_assistant/scripts/push_assistant_models_ios.sh copies them to Documents/models.
 ///
-/// Started from Dart (lib/service/assistant_on_device.dart) only in builds made
+/// Started from Dart (portal_assistant/app/lib/service/assistant_on_device.dart) only in builds made
 /// with --dart-define=ASSISTANT_ON_DEVICE=true.
 final class OnDeviceAssistant {
   static let shared = OnDeviceAssistant()
@@ -33,9 +33,9 @@ final class OnDeviceAssistant {
   static let faqModelFile = "multilingual-e5-small-q8_0.gguf"
   static let faqIndexDir = "faq_rag"
   /// Breeze-ASR-26 q8_0 (Taiwanese speech -> Mandarin characters), loaded on the
-  /// first Taiwanese clip (docs/AI_TAIWANESE_SPEECH_PLAN.md), as on Android.
+  /// first Taiwanese clip (portal_assistant/docs/AI_TAIWANESE_SPEECH_PLAN.md), as on Android.
   static let taiwaneseAsrFile = "ggml-whisper-taiwanese.bin"
-  /// Option B' (docs/AI_DECISION_CLASSIFIER.md section 12, opt-in with
+  /// Option B' (portal_assistant/docs/AI_DECISION_CLASSIFIER.md section 12, opt-in with
   /// --dart-define=ASSISTANT_DECISION_MODEL=classifier): no decision model at all; this
   /// cross-encoder (fine-tuned from Microsoft multilingual-e5-small, MIT, 132 MB) scores
   /// the candidate pages. Same file and port as Android's OnDeviceAssistant.kt.
@@ -57,7 +57,7 @@ final class OnDeviceAssistant {
   /// 1,327 MB after loading and one clip. The 1,000 also covered whisper.cpp re-creating its
   /// self-attention KV cache at 4x (+240 MiB) on the first temperature fallback with
   /// best_of 2; the server now runs with -bo 1 and the backend asks best_of 1, so that
-  /// never happens (docs/AI_TAIWANESE_ABLATION.md section 14). q8_0 under this rule needs
+  /// never happens (portal_assistant/docs/AI_TAIWANESE_ABLATION.md section 14). q8_0 under this rule needs
   /// 1,579 + 750 + 256 MB: the 2,247 MB budget that aborted on 2026-11-13 is refused.
   private static let taiwaneseOverhead: UInt64 = 750 << 20
   private static let taiwaneseMargin: UInt64 = 256 << 20
@@ -129,7 +129,7 @@ final class OnDeviceAssistant {
   /// A launch of this WhisperServer build ended while a whisper-server was being restarted
   /// (probably a crash while it freed its model): no more in-App restarts with this build.
   private var restartUnsafe = false
-  /// townpass_whisper_server_stop(port) (ios/native/whisper-server-ios.patch, frameworks
+  /// townpass_whisper_server_stop(port) (portal_assistant/native/ios/whisper-server-ios.patch, frameworks
   /// built from 2026-11-13): stops one whisper-server, whose main() then frees its model
   /// and returns; runServer's loop runs it again. Older frameworks do not have it.
   private typealias WhisperStop = @convention(c) (Int32) -> Int32
@@ -145,7 +145,7 @@ final class OnDeviceAssistant {
       guard let self else { return }
       switch call.method {
       case "start":
-        // The build's ASSISTANT_DECISION_MODEL, sent by lib/service/assistant_on_device.dart.
+        // The build's ASSISTANT_DECISION_MODEL, sent by portal_assistant/app/lib/service/assistant_on_device.dart.
         let arguments = call.arguments as? [String: Any]
         let decisionModel = arguments?["decision_model"] as? String ?? "classifier"
         DispatchQueue.global(qos: .userInitiated).async {
@@ -284,7 +284,7 @@ final class OnDeviceAssistant {
   }
 
   /// Which servers answer now ("status" from Dart, which waits for ready after the
-  /// App comes back: lib/service/assistant_on_device.dart). ready: Python's two
+  /// App comes back: portal_assistant/app/lib/service/assistant_on_device.dart). ready: Python's two
   /// listeners and every start-up server answer; the Taiwanese server (first use
   /// only) is listed but not required. Nothing launched (not started yet, no
   /// model files) is ready too: there is nothing to wait for.
@@ -354,7 +354,7 @@ final class OnDeviceAssistant {
   /// requests get the usual "not ready yet" replies until they answer.
   /// decisionModel: "classifier" (default since 2026-11-13, option B': no decision
   /// model, the decision classifier instead) or "ministral"; anything else counts as
-  /// "ministral" (Dart sends only known values: lib/service/assistant_on_device.dart).
+  /// "ministral" (Dart sends only known values: portal_assistant/app/lib/service/assistant_on_device.dart).
   func start(decisionModel: String = "classifier") -> String {
     lock.lock()
     defer { lock.unlock() }
@@ -382,10 +382,10 @@ final class OnDeviceAssistant {
     let python = "\(frameworks)/Python.framework/Python"
     let backend = "\(resources)/assistant_backend"
     guard fileManager.fileExists(atPath: python), fileManager.fileExists(atPath: backend) else {
-      return "not embedded: build with ios/OnDevice/ (scripts/setup_ios_on_device.sh)"
+      return "not embedded: build with ios/OnDevice/ (portal_assistant/native/ios/setup_ios_on_device.sh)"
     }
     // Without the model files (not downloaded yet) Python still starts, so the App
-    // can show and run the download (docs/AI_MODEL_DOWNLOAD.md); ensureServer then
+    // can show and run the download (portal_assistant/docs/AI_MODEL_DOWNLOAD.md); ensureServer then
     // starts each server once its file is in place. Pushed files work as before.
 
     // Everything the servers and Python print goes to one log the Mac can copy
@@ -755,7 +755,7 @@ final class OnDeviceAssistant {
   }
 
   /// Starts a start-up server whose model file arrived after launch: the App downloads
-  /// the models (docs/AI_MODEL_DOWNLOAD.md) and device_main.Activator calls this through
+  /// the models (portal_assistant/docs/AI_MODEL_DOWNLOAD.md) and device_main.Activator calls this through
   /// serverStarter with "decision", "multilingual", "gate", "embedding" or "classifier"
   /// (option B' builds only), on a backend
   /// thread. Waits until the model has loaded. Returns "ready" (also when it already
@@ -970,7 +970,7 @@ final class OnDeviceAssistant {
     let argv = ([name] + server.arguments).map { strdup($0) }
     // When iOS reclaims a suspended App's listening socket, llama-server and
     // whisper-server bind the same port again by themselves, keeping the model
-    // loaded (ios/native/llama-server-rebind.patch, whisper-server-ios.patch).
+    // loaded (portal_assistant/native/ios/llama-server-rebind.patch, whisper-server-ios.patch).
     // Unpatched whisper-server returned from main() instead and reloaded its model
     // on every resume (Breeze: 1.6 GB). A server that still exits is run again once
     // the App is active: every server, the decision model and e5 included (until
@@ -1010,7 +1010,7 @@ final class OnDeviceAssistant {
   private typealias PyEvalSaveThread = @convention(c) () -> OpaquePointer?
 
   /// Starts CPython with the App's copy of the standard library and
-  /// assistant_backend, then device_main.start(...). Returns an error text, or nil.
+  /// portal_assistant/backend, then device_main.start(...). Returns an error text, or nil.
   private func startPython(
     library: String, home: String, backend: String, support: String, arguments: [String]
   ) -> String? {

@@ -127,4 +127,4 @@
 兩者仍須新增受控 Adapter，不是模型裝好就能自動填入現有網頁。
 正式交易與空入口先停用，回覆清楚原因；不可把回到首頁或顯示完成視窗當作任務成功。
 
-完整架構、契約、確認流程與驗收方式見 [Tool Calling 計畫書](AI_TOOL_CALLING_PLAN.md)。
+完整架構、契約、確認流程與驗收方式見 [Tool Calling 計畫書](../portal_assistant/docs/AI_TOOL_CALLING_PLAN.md)。

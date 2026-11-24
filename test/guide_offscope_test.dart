@@ -2,18 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:town_pass/page/guided_assistant/guide_target.dart';
-import 'package:town_pass/page/guided_assistant/guided_assistant_controller.dart';
-import 'package:town_pass/page/guided_assistant/model/assistant_settings.dart';
-import 'package:town_pass/page/guided_assistant/model/guide_content.dart';
-import 'package:town_pass/page/guided_assistant/model/guides/guide_registry.dart';
-import 'package:town_pass/page/guided_assistant/web/web_guide_probe.dart';
-import 'package:town_pass/page/guided_assistant/web/web_page_state.dart';
-import 'package:town_pass/page/guided_assistant/widget/guided_assistant_host.dart';
+import 'package:townpass_portal_assistant/page/guided_assistant/guide_target.dart';
+import 'package:townpass_portal_assistant/page/guided_assistant/guided_assistant_controller.dart';
+import 'package:townpass_portal_assistant/page/guided_assistant/model/assistant_settings.dart';
+import 'package:townpass_portal_assistant/page/guided_assistant/model/guide_content.dart';
+import 'package:townpass_portal_assistant/page/guided_assistant/model/guides/guide_registry.dart';
+import 'package:townpass_portal_assistant/page/guided_assistant/web/web_guide_probe.dart';
+import 'package:townpass_portal_assistant/page/guided_assistant/web/web_page_state.dart';
+import 'package:townpass_portal_assistant/page/guided_assistant/widget/guided_assistant_host.dart';
 import 'package:town_pass/page/perk/perk_view.dart';
-import 'package:town_pass/service/assistant_action_executor.dart';
-import 'package:town_pass/service/assistant_page_tracker.dart';
-import 'package:town_pass/service/assistant_speaker.dart';
+import 'package:townpass_portal_assistant/service/assistant_action_executor.dart';
+import 'package:townpass_portal_assistant/service/assistant_page_tracker.dart';
+import 'package:townpass_portal_assistant/service/assistant_speaker.dart';
 import 'package:town_pass/util/tp_route.dart';
 
 /// The dimmed area lets every touch through (B), and the small 「你離開了…」
@@ -712,7 +712,7 @@ void main() {
     });
 
     // ------------------------------------------------------------------
-    // docs/AI_CURRENT_RULES.md section 5 (2026-11-13): a guide the user
+    // portal_assistant/docs/AI_CURRENT_RULES.md section 5 (2026-11-13): a guide the user
     // ends is gone everywhere; leaving without ending pauses it.
 
     const pace = Duration(milliseconds: 600);

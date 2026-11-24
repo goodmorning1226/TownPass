@@ -14,7 +14,6 @@ import 'package:town_pass/page/city_service_edit/city_service_edit_view.dart';
 import 'package:town_pass/page/city_service_edit/city_service_edit_view_controller.dart';
 import 'package:town_pass/page/feedback/feedback_view.dart';
 import 'package:town_pass/page/feedback/feedback_view_controller.dart';
-import 'package:town_pass/page/guided_assistant/assistant_settings_view.dart';
 import 'package:town_pass/page/invoice_receipt/invoice_receipt_view.dart';
 import 'package:town_pass/page/language/language_view.dart';
 import 'package:town_pass/page/language/language_view_controller.dart';
@@ -35,13 +34,13 @@ import 'package:town_pass/page/subscription/subscription_view.dart';
 import 'package:town_pass/page/suspend_account/suspend_account_controller.dart';
 import 'package:town_pass/page/suspend_account/suspend_account_view.dart';
 import 'package:town_pass/util/tp_web_view.dart';
+import 'package:townpass_portal_assistant/townpass_portal_assistant.dart';
 
 abstract class TPRoute {
   static const String main = '/';
   static const String account = '/account';
   static const String activityList = '/activity_list';
   static const String activityDetail = '/activity_detail';
-  static const String assistantSettings = '/assistant_settings';
   static const String basicInfo = '/basic_info';
   static const String basicInfoEdit = '/basic_info_edit';
   static const String feedback = '/feedback';
@@ -187,10 +186,8 @@ abstract class TPRoute {
       name: activityDetail,
       page: () => const ActivityDetailView(),
     ),
-    GetPage(
-      name: assistantSettings,
-      page: () => const AssistantSettingsView(),
-    ),
+    // Portal assistant: AI 助理設定.
+    ...PortalAssistant.pages,
   ];
 
   static Future openUri({required String uri, String? forceTitle}) async {

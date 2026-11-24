@@ -1,0 +1,41 @@
+diff --git a/lib/page/account/account_view.dart b/lib/page/account/account_view.dart
+index 7168229..c6065b9 100644
+--- a/lib/page/account/account_view.dart
++++ b/lib/page/account/account_view.dart
+@@ -7,7 +7,9 @@ import 'package:town_pass/page/account/widget/account_view_footer.dart';
+ import 'package:town_pass/util/tp_colors.dart';
+ import 'package:town_pass/util/tp_route.dart';
+ import 'package:town_pass/util/tp_setting_list.dart';
++import 'package:town_pass/util/town_pass_assistant_host.dart';
+ import 'package:town_pass/util/tp_text.dart';
++import 'package:townpass_portal_assistant/townpass_portal_assistant.dart';
+ 
+ class AccountView extends GetView<AccountViewController> {
+   const AccountView({super.key});
+@@ -39,7 +41,7 @@ class AccountView extends GetView<AccountViewController> {
+                         behavior: HitTestBehavior.opaque,
+                         onTap: () async => await Get.toNamed(TPRoute.setting)?.then((value) => controller.syncAccount()),
+                         child: Semantics(
+-                          label: '設定',
++                          label: PageTranslation.instance.label('設定'),
+                           child: Assets.svg.iconSettings.svg(),
+                         ),
+                       ),
+@@ -57,7 +59,7 @@ class AccountView extends GetView<AccountViewController> {
+                         behavior: HitTestBehavior.opaque,
+                         onTap: () async => await Get.toNamed(TPRoute.setting)?.then((value) => controller.syncAccount()),
+                         child: Semantics(
+-                          label: '設定',
++                          label: PageTranslation.instance.label('設定'),
+                           child: Assets.svg.iconSettings.svg(),
+                         ),
+                       ),
+@@ -79,6 +81,8 @@ class AccountView extends GetView<AccountViewController> {
+                       onTap: () {},
+                     ),
+                     TPSettingListTile.space(),
++                    // Portal assistant: AI 助理設定.
++                    ...TownPassAssistantHost.accountTiles(),
+                     TPSettingListTile.navigate(
+                       title: '功能教學',
+                       onTap: () async => await TPRoute.openUri(

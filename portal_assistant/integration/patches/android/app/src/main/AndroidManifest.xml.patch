@@ -1,0 +1,24 @@
+diff --git a/android/app/src/main/AndroidManifest.xml b/android/app/src/main/AndroidManifest.xml
+index 771d33a..a873524 100644
+--- a/android/app/src/main/AndroidManifest.xml
++++ b/android/app/src/main/AndroidManifest.xml
+@@ -1,6 +1,8 @@
+ <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
++    <!-- Assistant hold-to-talk; audio is kept in memory and sent only to the local backend. -->
++    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+     <application
+         android:label="Town Pass"
+         android:name="${applicationName}"
+@@ -47,6 +49,10 @@
+ 
+          In particular, this is used by the Flutter engine in io.flutter.plugin.text.ProcessTextPlugin. -->
+     <queries>
++        <!-- Assistant read-aloud uses the system text-to-speech service. -->
++        <intent>
++            <action android:name="android.intent.action.TTS_SERVICE" />
++        </intent>
+         <intent>
+             <action android:name="android.intent.action.PROCESS_TEXT"/>
+             <data android:mimeType="text/plain"/>

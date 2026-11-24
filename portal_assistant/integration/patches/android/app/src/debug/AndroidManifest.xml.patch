@@ -1,0 +1,10 @@
+diff --git a/android/app/src/debug/AndroidManifest.xml b/android/app/src/debug/AndroidManifest.xml
+index 399f698..3b36a11 100644
+--- a/android/app/src/debug/AndroidManifest.xml
++++ b/android/app/src/debug/AndroidManifest.xml
+@@ -4,4 +4,5 @@
+          to allow setting breakpoints, to provide hot reload, etc.
+     -->
+     <uses-permission android:name="android.permission.INTERNET"/>
++    <application android:networkSecurityConfig="@xml/assistant_network_security" />
+ </manifest>

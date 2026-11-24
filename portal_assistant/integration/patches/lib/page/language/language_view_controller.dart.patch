@@ -1,0 +1,34 @@
+diff --git a/lib/page/language/language_view_controller.dart b/lib/page/language/language_view_controller.dart
+index fb76ff2..ee93a98 100644
+--- a/lib/page/language/language_view_controller.dart
++++ b/lib/page/language/language_view_controller.dart
+@@ -1,19 +1,17 @@
+ import 'package:get/get.dart';
++import 'package:townpass_portal_assistant/townpass_portal_assistant.dart';
+ 
+-enum Language {
+-  traditionalChinese,
+-  english,
+-  ;
+-}
+-
++/// Page language (PageTranslation): the App's pages are shown in the chosen
++/// language; the assistant's navigation in another language also switches it.
+ class LanguageViewController extends GetxController {
+-  List<Language> get languageList => [
+-        Language.traditionalChinese,
+-        Language.english,
+-      ];
++  List<String> get languageList => PageTranslation.languages.keys.toList();
+ 
+-  // TODO: update preference, update locale
+-  void onIndexChange(int index) {
++  int get currentIndex => languageList
++      .indexOf(PageTranslation.instance.language.value)
++      .clamp(0, languageList.length - 1);
+ 
++  void onIndexChange(int index) {
++    if (index < 0 || index >= languageList.length) return;
++    PageTranslation.instance.setLanguage(languageList[index]);
+   }
+ }

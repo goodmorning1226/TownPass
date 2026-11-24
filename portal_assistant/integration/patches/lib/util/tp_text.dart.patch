@@ -1,0 +1,25 @@
+diff --git a/lib/util/tp_text.dart b/lib/util/tp_text.dart
+index 8dbab56..f966b2c 100644
+--- a/lib/util/tp_text.dart
++++ b/lib/util/tp_text.dart
+@@ -1,6 +1,7 @@
+ import 'package:flutter/gestures.dart';
+ import 'package:flutter/material.dart';
+ import 'package:town_pass/util/tp_text_span.dart';
++import 'package:townpass_portal_assistant/townpass_portal_assistant.dart';
+ 
+ export 'package:town_pass/util/tp_text_styles.dart';
+ 
+@@ -194,8 +195,11 @@ class TPText extends StatelessWidget {
+         null => null,
+       };
+ 
++  // Portal assistant: plain texts follow the page language (PageTranslation).
+   @override
+-  Widget build(BuildContext context) {
++  Widget build(BuildContext context) => PageTranslation.buildText(context, data, _build);
++
++  Widget _build(String? data) {
+     return Text.rich(
+       switch (textSpan) {
+         InlineSpan textSpan => TPTextSpan(

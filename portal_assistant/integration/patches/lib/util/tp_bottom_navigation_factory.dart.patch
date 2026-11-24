@@ -1,0 +1,35 @@
+diff --git a/lib/util/tp_bottom_navigation_factory.dart b/lib/util/tp_bottom_navigation_factory.dart
+index 8bb4958..be64e6e 100644
+--- a/lib/util/tp_bottom_navigation_factory.dart
++++ b/lib/util/tp_bottom_navigation_factory.dart
+@@ -5,24 +5,26 @@ import 'package:town_pass/page/city_service/city_service_view.dart';
+ import 'package:town_pass/page/home/home_view.dart';
+ import 'package:town_pass/page/perk/perk_view.dart';
+ import 'package:town_pass/util/extension/svg_gen_image.dart';
++import 'package:townpass_portal_assistant/townpass_portal_assistant.dart';
+ 
+ class TPBottomNavigationFactory {
++  /// Labels follow the page language (portal assistant; read inside MainView's Obx).
+   static List<BottomNavigationBarItem> get barItemList => [
+         BottomNavigationBarItem(
+           icon: Assets.svg.iconTabbarServiceDefault.icon(),
+-          label: '服務',
++          label: PageTranslation.instance.label('服務'),
+         ),
+         BottomNavigationBarItem(
+           icon: Assets.svg.iconTabbarHomeDefault.icon(),
+-          label: '首頁',
++          label: PageTranslation.instance.label('首頁'),
+         ),
+         BottomNavigationBarItem(
+           icon: Assets.svg.iconTabbarCouponDefault.icon(),
+-          label: '優惠',
++          label: PageTranslation.instance.label('優惠'),
+         ),
+         BottomNavigationBarItem(
+           icon: Assets.svg.iconTabbarAccountDefault.icon(),
+-          label: '帳務',
++          label: PageTranslation.instance.label('帳務'),
+         ),
+       ];
+ 

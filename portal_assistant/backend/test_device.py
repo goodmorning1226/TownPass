@@ -1,0 +1,1640 @@
+"""On-device adapters: llama-server (OpenAI-style) decisions and whisper-server speech."""
+import json
+import re
+import threading
+import time
+import unittest
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from unittest.mock import patch
+
+import server
+from asr_server import WhisperCppRecognizer, language_code
+from server import Assistant, AssistantError
+from test_server import FakeCatalog
+from test_transcription import wav_bytes
+
+
+def fresh_speech_state(test):
+    """Each test starts without liveness memory and with a short retry pause. The fake servers
+    get ephemeral ports that the OS hands out again, so a port that an earlier test's server
+    answered or failed on (liveness keeps both, process-wide) must not change how a new
+    server on it is treated: in the full suite a later test was refused at once ("speech
+    model not answering"). asr_server.RETRY_PAUSE_S (1 s on the phone) only slows tests."""
+    import liveness
+    liveness.reset()
+    test.addCleanup(liveness.reset)
+    pause = patch("asr_server.RETRY_PAUSE_S", 0.05)
+    pause.start()
+    test.addCleanup(pause.stop)
+
+
+def serve(handler):
+    httpd = ThreadingHTTPServer(("127.0.0.1", 0), handler)
+    threading.Thread(target=httpd.serve_forever, daemon=True).start()
+    return httpd, f"http://127.0.0.1:{httpd.server_address[1]}"
+
+
+class FakeLlamaServer(BaseHTTPRequestHandler):
+    requests = []
+    content = json.dumps({"name": "cancel", "arguments": {}})
+
+    def log_message(self, *args):
+        pass
+
+    def do_POST(self):
+        body = json.loads(self.rfile.read(int(self.headers["Content-Length"])))
+        FakeLlamaServer.requests.append((self.path, body))
+        data = json.dumps({"choices": [{"message": {"content": FakeLlamaServer.content}}],
+                           "usage": {"prompt_tokens": 321},
+                           "timings": {"cache_n": 300, "prompt_n": 21, "prompt_ms": 812.4,
+                                       "predicted_n": 18, "predicted_ms": 1503.6}}).encode()
+        self.send_response(200)
+        self.send_header("Content-Length", str(len(data)))
+        self.end_headers()
+        self.wfile.write(data)
+
+
+class LlamaServerModelTests(unittest.TestCase):
+    def setUp(self):
+        fresh_speech_state(self)
+        FakeLlamaServer.requests = []
+        self.httpd, url = serve(FakeLlamaServer)
+        self.addCleanup(self.httpd.shutdown)
+        for name, value in (("MODEL_API", "openai"), ("MODEL_URL", url)):
+            patcher = patch.object(server, name, value)
+            patcher.start()
+            self.addCleanup(patcher.stop)
+        self.assistant = Assistant(catalog=FakeCatalog())
+
+    def test_same_messages_and_schema_go_to_the_openai_endpoint(self):
+        tools = [server.tool("cancel", "取消")]
+        messages = [{"role": "user", "content": "x"}]
+        result = self.assistant._model_call(messages, tools)
+        path, body = FakeLlamaServer.requests[0]
+        self.assertEqual(path, "/v1/chat/completions")
+        self.assertEqual(body["messages"], messages)
+        self.assertEqual(body["temperature"], 0)
+        self.assertEqual(body["response_format"]["json_schema"]["schema"], server.proposal_schema(tools))
+        self.assertEqual(result["message"]["tool_calls"][0]["function"]["name"], "cancel")
+        self.assertEqual(result["prompt_eval_count"], 321)  # metrics keep working
+
+    def test_turn_metrics_show_where_the_model_time_went(self):
+        tools = [server.tool("cancel", "取消")]
+        result = self.assistant._model_call([{"role": "user", "content": "x"}], tools)
+        self.assertEqual(result["timing"], {"prompt_tokens": 21, "cached_tokens": 300, "prompt_ms": 812,
+                                            "generated_tokens": 18, "generate_ms": 1504})
+        self.assertEqual(server.ollama_timing({"prompt_eval_count": 5, "prompt_eval_duration": 2_000_000,
+                                               "eval_count": 3, "eval_duration": 1_500_000})["prompt_ms"], 2)
+        self.assertIsNone(server.llama_timing(None))
+
+    def test_warm_up_loads_speech_then_caches_the_decision_policy(self):
+        import device_main
+        from decision import CAPABILITY_POLICY, INSTRUCTIONS
+        heard = []
+
+        class Recognizer:
+            def transcribe(self, frames, language="zh", automatic_taiwanese=True):
+                heard.append((len(frames), automatic_taiwanese))
+                return {"text": ""}
+        device_main.warm_up(Recognizer(), server.MODEL_URL, limit_s=5)
+        self.assertEqual(heard, [(32000, False)])  # one second of 16 kHz PCM16, no Taiwanese
+        from decision import system_prompt
+        from decision import POLICIES
+        systems = [body["messages"][0]["content"] for _, body in FakeLlamaServer.requests[-len(POLICIES):]]
+        self.assertEqual(systems, [system_prompt(task) for task in POLICIES])  # every prompt cache
+        self.assertEqual(FakeLlamaServer.requests[-1][1]["max_tokens"], 1)
+        heard.clear()
+        device_main.warm_up(None, server.MODEL_URL, limit_s=5)  # phone recogniser: no Whisper
+        self.assertEqual(heard, [])
+
+    def test_consecutive_user_messages_are_merged_for_the_chat_template(self):
+        messages = [{"role": "system", "content": "policy"}, {"role": "user", "content": "evidence"},
+                    {"role": "user", "content": "tools"}, {"role": "user", "content": "retry"}]
+        self.assistant._model_call(messages, [server.tool("cancel", "取消")])
+        sent = FakeLlamaServer.requests[0][1]["messages"]
+        self.assertEqual([m["role"] for m in sent], ["system", "user"])
+        self.assertEqual(sent[1]["content"], "evidence\n\ntools\n\nretry")
+        self.assertEqual(len(messages), 4)  # the caller's list is not changed
+
+    def test_malformed_or_missing_model_reply_is_a_retryable_error(self):
+        FakeLlamaServer.content = "not json"
+        self.addCleanup(setattr, FakeLlamaServer, "content", json.dumps({"name": "cancel", "arguments": {}}))
+        with self.assertRaisesRegex(AssistantError, "手機上的決策模型"):
+            self.assistant._model_call([], [server.tool("cancel", "取消")])
+        self.httpd.shutdown()
+        self.httpd.server_close()
+        with self.assertRaisesRegex(AssistantError, "尚未就緒"):
+            self.assistant._model_call([], [server.tool("cancel", "取消")])
+
+
+class FakeWhisperServer(BaseHTTPRequestHandler):
+    seen = []
+    reply = {}
+
+    def log_message(self, *args):
+        pass
+
+    def do_POST(self):
+        body = self.rfile.read(int(self.headers["Content-Length"]))
+        FakeWhisperServer.seen.append((self.path, self.headers["Content-Type"], body))
+        data = json.dumps(FakeWhisperServer.reply).encode()
+        self.send_response(200)
+        self.send_header("Content-Length", str(len(data)))
+        self.end_headers()
+        self.wfile.write(data)
+
+
+def loud_frames(seconds=1.0):
+    return wav_bytes(seconds)[44:].replace(b"\x00\x01", b"\x00\x20")  # PCM16 ~0.25 full scale
+
+
+class WhisperCppRecognizerTests(unittest.TestCase):
+    def setUp(self):
+        fresh_speech_state(self)
+        FakeWhisperServer.seen = []
+        self.httpd, url = serve(FakeWhisperServer)
+        self.addCleanup(self.httpd.shutdown)
+        self.recognizer = WhisperCppRecognizer(url)
+
+    def test_clip_and_vocabulary_prompt_are_posted_as_multipart(self):
+        FakeWhisperServer.reply = {"text": "我要借書", "segments": [
+            {"text": "我要借書", "tokens": [1, 2, 3, 4], "avg_logprob": -0.2, "no_speech_prob": 0.01}]}
+        result = self.recognizer.transcribe(loud_frames())
+        path, content_type, body = FakeWhisperServer.seen[0]
+        self.assertEqual(path, "/inference")
+        self.assertTrue(content_type.startswith("multipart/form-data; boundary="))
+        self.assertIn(b'name="response_format"\r\n\r\nverbose_json', body)
+        self.assertIn(b'name="language"\r\n\r\nzh', body)
+        self.assertIn(self.recognizer.prompt.encode(), body)
+        self.assertIn(b"RIFF", body)
+        self.assertEqual(result["text"], "我要借書")
+        self.assertEqual(result["status"], "clear")
+        self.assertEqual(result["alternatives"], [])
+
+    def test_segments_are_joined_and_confidence_gates_apply(self):
+        FakeWhisperServer.reply = {"segments": [
+            {"text": "我要", "tokens": [1, 2], "avg_logprob": -0.2, "no_speech_prob": 0.1},
+            {"text": "繳水費", "tokens": [3, 4, 5, 6], "avg_logprob": -0.8, "no_speech_prob": 0.4}]}
+        result = self.recognizer.transcribe(loud_frames())
+        self.assertEqual(result["text"], "我要繳水費")
+        self.assertAlmostEqual(result["avg_logprob"], -0.6)  # token-weighted
+        self.assertEqual(result["no_speech_prob"], 0.4)  # the least certain segment
+        self.assertEqual(result["status"], "unsure")
+
+    def test_short_clips_encode_only_their_length(self):
+        FakeWhisperServer.reply = {"segments": [{"text": "借書", "tokens": [1], "avg_logprob": -0.1, "no_speech_prob": 0}]}
+        self.recognizer.transcribe(loud_frames(2.0))
+        self.assertIn(b'name="audio_ctx"\r\n\r\n256', FakeWhisperServer.seen[0][2])  # 4 s, the floor
+        self.assertEqual(WhisperCppRecognizer.audio_context(10), 600)
+        self.assertEqual(WhisperCppRecognizer.audio_context(30), 1500)  # never beyond the window
+
+    def test_silence_never_reaches_the_model(self):
+        result = self.recognizer.transcribe(b"\x00\x00" * 16000)
+        self.assertEqual((result["status"], result.get("reason")), ("unclear", "silence"))
+        self.assertEqual(FakeWhisperServer.seen, [])
+
+    def test_empty_reply_is_unclear(self):
+        FakeWhisperServer.reply = {"text": "", "segments": []}
+        self.assertEqual(self.recognizer.transcribe(loud_frames())["status"], "unclear")
+
+
+if __name__ == "__main__":
+    unittest.main()
+
+
+class PromptLayoutTests(unittest.TestCase):
+    def test_fixed_text_first_no_repeated_schema_and_compact_json(self):
+        from decision import CAPABILITY_POLICY, INSTRUCTIONS
+        seen = []
+
+        def model(messages, tools):
+            seen.append(messages)
+            return {"message": {"tool_calls": [{"function": {"name": "request_clarification", "arguments": {}}}]}}
+        Assistant(catalog=FakeCatalog(), model_call=model).turn({"request_id": "layout-1", "text": "我要繳水費"})
+        system, evidence, tools = seen[0]  # evidence and tools stay separate messages
+        self.assertEqual(system["content"], CAPABILITY_POLICY + "\n" + INSTRUCTIONS["capability"])
+        for message in (evidence, tools):
+            self.assertNotIn("output_schema", message["content"])
+            self.assertNotIn(chr(92) + "u", message["content"])  # Chinese is not escaped
+            self.assertNotIn('", "', message["content"])  # compact JSON separators
+            self.assertNotIn('": ', message["content"])
+        self.assertEqual(json.loads(evidence["content"])["original_text"], "我要繳水費")
+        offered = json.loads(tools["content"])
+        self.assertEqual(list(offered), ["options", "answer"])  # lettered options
+        self.assertEqual([(o["choice"], o["tool"], o["arguments"]) for o in offered["options"]],
+                         [("A", "select_capability", {"capability_id": "fees.water"}), ("B", "request_clarification", {})])
+
+    def test_library_prompt_leaves_out_repeated_evidence_and_keeps_descriptions(self):
+        seen = []
+
+        def model(messages, tools):
+            seen.append(messages)
+            return {"message": {"tool_calls": [{"function": {"choice": "C"}}]}}
+        result = Assistant(catalog=FakeCatalog(), model_call=model).turn({"request_id": "layout-2", "text": "我想看底層邏輯"})
+        self.assertEqual(result["destination"], {"kind": "detail", "book_id": "lib-book-3"})
+        evidence = json.loads(seen[0][1]["content"])["retrieval"]
+        self.assertEqual(evidence, {"service_evidence": "domain_or_catalog", "query": "底層邏輯", "search_type": "book_name",
+                                    "book_candidates": [{"title": "底層邏輯", "author": "劉潤著"}],
+                                    "unique_exact_id": "lib-book-3"})
+        options = json.loads(seen[0][2]["content"])["options"]
+        self.assertEqual(list(options), ["A", "B", "C"])
+        self.assertTrue(options["B"].startswith("locate_library_book(query=底層邏輯, search_type=book_name): Search "))
+        self.assertTrue(options["C"].startswith("open_library_book(book_id=lib-book-3): Open the verified"))
+
+    def test_lettered_choice_maps_back_and_validation_is_unchanged(self):
+        from decision import choice_options, choice_tool, from_choice, with_arguments
+        tools = [server.tool("select_capability", "x", {"capability_id": {"type": "string",
+                             "enum": ["fees.water", "fees.tax"]}}, ["capability_id"]),
+                 server.tool("request_clarification", "y")]
+        options = choice_options(tools)
+        self.assertEqual([o["choice"] for o in options], ["A", "B", "C"])
+        self.assertEqual(server.proposal_schema([choice_tool(options)])["properties"]["choice"]["enum"], ["A", "B", "C"])
+        picked = with_arguments(from_choice({"function": {"choice": "B"}}, options))
+        self.assertEqual(server.validate_call(picked, tools), ("select_capability", {"capability_id": "fees.tax"}))
+        self.assertEqual(server.validate_call(with_arguments(from_choice({"function": {"choice": "C"}}, options)), tools),
+                         ("request_clarification", {}))
+        with self.assertRaises(AssistantError):  # a letter that is not offered
+            server.validate_call(with_arguments(from_choice({"function": {"choice": "Z"}}, options)), tools)
+
+    def test_a_tool_without_arguments_is_just_its_name_and_validation_is_unchanged(self):
+        from decision import with_arguments
+        tools = [server.tool("select_capability", "x", {"capability_id": {"type": "string", "enum": ["fees.water"]}},
+                             ["capability_id"]), server.tool("request_clarification", "y")]
+        branches = server.proposal_schema(tools)["anyOf"]
+        self.assertEqual([sorted(b["properties"]) for b in branches], [["arguments", "name"], ["name"]])
+        bare = with_arguments({"function": {"name": "request_clarification"}})
+        self.assertEqual(server.validate_call(bare, tools), ("request_clarification", {}))
+        for forged in ({"name": "select_capability"},  # its argument is required
+                       {"name": "select_capability", "arguments": {"capability_id": "fees.tax"}},
+                       {"name": "submit_payment"}):
+            with self.assertRaises(AssistantError):
+                server.validate_call(with_arguments({"function": forged}), tools)
+
+
+CRLF = bytes([13, 10])
+
+
+def field(name, value):
+    """A multipart form field as whisper-server receives it."""
+    return f'name="{name}"'.encode() + CRLF + CRLF + value.encode()
+
+
+class MultilingualSpeechTests(unittest.TestCase):
+    """The language is decided from detection, never forced against it
+    (portal_assistant/docs/AI_LANGUAGE_GATE.md, portal_assistant/docs/AI_MULTILINGUAL_PLAN.md). Fake whisper-servers
+    answer like Whisper: detection from `detected`/`probabilities`, and a decode in
+    language L writes `speech[L]` (text, avg log-prob); a decode in a language that
+    was not spoken is a translation with a lower score."""
+
+    def setUp(self):
+        fresh_speech_state(self)  # also for the Taiwanese and Vietnamese tests (they call this setUp)
+        self.calls = []
+        self.detected = {"gate": "chinese", "multi": "chinese"}  # what each fake detects
+        self.probabilities = {}  # language_probabilities each fake reports
+        self.server_speech = {}  # per-server overrides of speech (the Taiwanese model)
+        self.speech = {"zh": ("我要借這個月新到的書", -0.1), "en": ("I want to borrow a new book", -0.7),
+                       "ja": ("今月の新しい本を借りたい", -0.8), "vi": ("tôi muốn mượn sách", -0.9),
+                       "id": ("saya mau pinjam buku", -0.9), "tl": ("gusto kong humiram ng libro", -0.9)}
+        test = self
+
+        def fake(name):
+            class Handler(BaseHTTPRequestHandler):
+                def log_message(self, *args):
+                    pass
+
+                def do_POST(self):
+                    body = self.rfile.read(int(self.headers["Content-Length"]))
+                    fields = dict(re.findall(rb'name="(\w+)"\r\n\r\n([^\r]*)\r\n', body))
+                    language = fields.get(b"language", b"").decode()
+                    test.calls.append((name, language, fields.get(b"detect_language") == b"true", body))
+                    reply = {}
+                    if language == "auto":
+                        reply["language"] = test.detected[name]
+                        if name in test.probabilities:
+                            reply["language_probabilities"] = test.probabilities[name]
+                        language = language_code(test.detected[name], default="zh")
+                    if fields.get(b"detect_language") != b"true":
+                        text, logprob = test.server_speech.get(name, {}).get(
+                            language, test.speech.get(language, ("", -9.0)))
+                        reply["segments"] = [{"text": text, "tokens": [1, 2], "avg_logprob": logprob,
+                                              "no_speech_prob": 0.0}]
+                    data = json.dumps(reply).encode()
+                    self.send_response(200)
+                    self.send_header("Content-Length", str(len(data)))
+                    self.end_headers()
+                    self.wfile.write(data)
+            return Handler
+        self.fake = fake
+        self.urls = {}
+        for name in ("zh", "multi", "gate"):
+            httpd, self.urls[name] = serve(fake(name))
+            self.addCleanup(httpd.server_close)
+            self.addCleanup(httpd.shutdown)
+        self.recognizer = WhisperCppRecognizer(self.urls["zh"], multi_url=self.urls["multi"])
+
+    def with_gate(self, probabilities, one_model=True):
+        """Recogniser with the language gate (and Whisper small for every language)."""
+        self.probabilities["gate"] = probabilities
+        self.detected["gate"] = max(probabilities, key=probabilities.get)
+        url = self.urls["multi"] if one_model else self.urls["zh"]
+        self.recognizer = WhisperCppRecognizer(url, multi_url=self.urls["multi"], gate_url=self.urls["gate"])
+        return self.recognizer
+
+    def requests(self):
+        """(server, language, detect only) of each request, without the gate's priming decode."""
+        return [(name, language, detect) for name, language, detect, body in self.calls
+                if not (name == "gate" and not detect)]
+
+    # --- the language gate --------------------------------------------------
+
+    def test_gate_heard_chinese_one_decode_in_chinese(self):
+        recognizer = self.with_gate({"zh": 0.95, "en": 0.02})
+        result = recognizer.transcribe(loud_frames(), "zh")
+        self.assertEqual(self.requests(), [("gate", "auto", True), ("multi", "zh", False)])
+        self.assertEqual((result["language"], result["gate_language"], result["gate_confidence"]), ("zh", "zh", 0.95))
+        self.assertIsInstance(result["gate_ms"], int)
+        self.assertIn(field("prompt", recognizer.prompt), self.calls[-1][3])  # the Chinese vocabulary prompt
+
+    def test_gate_is_primed_once_with_a_short_audio_context(self):
+        from asr_server import GATE_CTX
+        recognizer = self.with_gate({"zh": 0.95})
+        recognizer.transcribe(loud_frames(), "zh")
+        recognizer.transcribe(loud_frames(), "zh")
+        gate = [(language, detect, body) for name, language, detect, body in self.calls if name == "gate"]
+        self.assertEqual([(language, detect) for language, detect, _ in gate],
+                         [("en", False), ("auto", True), ("auto", True)])  # one priming decode
+        self.assertIn(field("audio_ctx", str(GATE_CTX)), gate[0][2])
+        self.assertIn(field("no_language_probabilities", "false"), gate[1][2])
+
+    def test_chinese_speech_with_english_chosen_is_not_translated(self):
+        # Owner, 2026-11-08: the menu on English, Chinese speech came back in English.
+        recognizer = self.with_gate({"zh": 0.9, "en": 0.06})
+        result = recognizer.transcribe(loud_frames(), "en")
+        self.assertEqual((result["language"], result["text"]), ("zh", "我要借這個月新到的書"))
+        self.assertEqual(self.requests(), [("gate", "auto", True), ("multi", "zh", False)])
+        self.assertEqual(result["language_confidence"], 0.9)
+
+    def test_japanese_speech_with_chinese_chosen_is_not_translated(self):
+        # "nani ga dekiru" with Chinese chosen came back as the translation 何能做到.
+        self.speech["ja"], self.speech["zh"] = ("何ができる", -0.3), ("何能做到", -0.6)
+        recognizer = self.with_gate({"ja": 0.86, "zh": 0.1})
+        result = recognizer.transcribe(loud_frames(), "zh")
+        self.assertEqual((result["language"], result["text"]), ("ja", "何ができる"))
+        self.assertEqual(self.requests()[1:], [("multi", "ja", False)])
+
+    def test_gate_needs_more_certainty_to_leave_the_chosen_language(self):
+        from asr_server import CLEAR_LANGUAGE, GATE_SWITCH
+        between = round((CLEAR_LANGUAGE + GATE_SWITCH) / 2, 2)
+        recognizer = self.with_gate({"ja": between, "zh": 0.1})
+        recognizer.transcribe(loud_frames(), "ja")  # agrees with the menu: trusted
+        self.assertEqual(self.requests(), [("gate", "auto", True), ("multi", "ja", False)])
+        self.calls.clear()
+        # Another language at that level: not followed, since tiny is wrongly sure for
+        # some short Chinese clips. The gate leans to it (FOREIGN_LEAD, 2026-11-13), so
+        # Whisper small detects first; it hears Chinese, and the clip takes the usual
+        # Chinese path (here: clear long Chinese, kept as is).
+        result = recognizer.transcribe(loud_frames(), "zh")
+        self.assertEqual((self.requests(), result["language"]),
+                         ([("gate", "auto", True), ("multi", "auto", True), ("multi", "zh", False)], "zh"))
+
+    def test_unsure_gate_lets_whisper_small_decide(self):
+        # Short Japanese: tiny unsure and leaning to Chinese. The Chinese pass runs first
+        # (as without a gate), small detects zh/ja unsure, Japanese is decoded too and its
+        # better score wins over the Chinese translation.
+        self.speech["ja"], self.speech["zh"] = ("こんにちは", -0.25), ("你好", -0.7)
+        self.probabilities["multi"] = {"zh": 0.5, "ja": 0.4}
+        recognizer = self.with_gate({"zh": 0.45, "ja": 0.3, "en": 0.2})
+        result = recognizer.transcribe(loud_frames(), "zh")
+        self.assertEqual(self.requests(), [("gate", "auto", True), ("multi", "zh", False),
+                                           ("multi", "auto", False), ("multi", "ja", False)])
+        self.assertEqual((result["language"], result["text"], result["candidates"]), ("ja", "こんにちは", ["zh", "ja"]))
+        # Leaning to another of our languages under FOREIGN_LEAD: still Chinese first.
+        self.calls.clear()
+        recognizer = self.with_gate({"en": 0.25, "zh": 0.2, "ja": 0.2})
+        recognizer.transcribe(loud_frames(), "zh")
+        self.assertEqual(self.requests()[1], ("multi", "zh", False))
+        # Another menu, the gate leaning to English (unsure): Whisper small detects and
+        # decodes as before; short Chinese, equally unsure, scores better and is kept.
+        self.speech["zh"], self.speech["ja"] = ("你好", -0.15), ("ニーハオ", -0.9)
+        recognizer = self.with_gate({"en": 0.45, "ja": 0.3, "zh": 0.2})
+        result = recognizer.transcribe(loud_frames(), "ja")
+        self.assertEqual((result["language"], result["gate_language"]), ("zh", "en"))  # logged, not followed
+
+    def test_unsure_gate_leaning_to_another_language_lets_whisper_small_detect_first(self):
+        # 2026-11-13, menu 中文: a short foreign clip with the gate leaning to its language
+        # (unsure) was decoded in Chinese first and the "translation" kept. Now Whisper
+        # small detects first; sure of a foreign language, that language is decoded, not Chinese.
+        self.speech["zh"], self.speech["en"] = ("黑貓怎麼行", -0.6), ("all nouns", -0.3)
+        self.detected["multi"], self.probabilities["multi"] = "english", {"en": 0.9, "zh": 0.05}
+        recognizer = self.with_gate({"en": 0.655, "zh": 0.2})
+        result = recognizer.transcribe(loud_frames(), "zh")
+        self.assertEqual(self.requests(), [("gate", "auto", True), ("multi", "auto", True), ("multi", "en", False)])
+        self.assertEqual((result["language"], result["text"], result["language_confidence"]), ("en", "all nouns", 0.9))
+        self.assertIn(field("temperature_inc", "0") + CRLF, self.calls[-1][3])  # after a detection: no retries
+        # Small sure of another foreign language than the gate's: small's language only
+        # (decoding the gate's too let "Xin chào" come out as English on the tuning clips).
+        self.speech["ja"] = ("こんにちは", -0.2)
+        self.detected["multi"], self.probabilities["multi"] = "japanese", {"ja": 0.8, "en": 0.1}
+        self.calls.clear()
+        result = recognizer.transcribe(loud_frames(), "zh")
+        self.assertEqual(self.requests()[1:], [("multi", "auto", True), ("multi", "ja", False)])
+        self.assertEqual((result["language"], result["candidates"]), ("ja", ["ja"]))
+        # Small hears Chinese, or is not sure of a foreign language (under CLEAR_LANGUAGE):
+        # the usual Chinese path (Chinese first, then its check), as before. On the tuning
+        # clips such clips were mostly Mandarin or Taiwanese (portal_assistant/docs/AI_LANGUAGE_GATE.md section 11).
+        for detected, probabilities in (("chinese", {"zh": 0.646, "en": 0.2}), ("english", {"en": 0.45, "es": 0.3})):
+            self.detected["multi"], self.probabilities["multi"] = detected, probabilities
+            self.speech["zh"] = ("我要借這個月新到的書", -0.1)
+            self.calls.clear()
+            result = recognizer.transcribe(loud_frames(), "zh")
+            self.assertEqual((self.requests()[1:], result["language"]),
+                             ([("multi", "auto", True), ("multi", "zh", False)], "zh"), detected)
+
+    def test_unclear_chinese_that_does_not_read_like_mandarin_is_checked_once(self):
+        # iPhone, 2026-11-13: gate zh 0.993, the Chinese decode unsure with plausibility
+        # -6.19. Such a decode gets one detection-only pass; small hears English.
+        self.speech["zh"], self.speech["en"] = ("溫刀揮袖促", -0.8), ("one two three", -0.3)
+        self.detected["multi"], self.probabilities["multi"] = "english", {"en": 0.85, "zh": 0.1}
+        recognizer = self.with_gate({"zh": 0.993})
+        result = recognizer.transcribe(loud_frames(), "zh")
+        self.assertEqual(self.requests(), [("gate", "auto", True), ("multi", "zh", False),
+                                           ("multi", "auto", True), ("multi", "en", False)])
+        self.assertEqual((result["language"], result["text"]), ("en", "one two three"))
+        # Small hears Chinese: the Chinese decode stays, nothing more is decoded.
+        self.calls.clear()
+        self.detected["multi"], self.probabilities["multi"] = "chinese", {"zh": 0.9}
+        result = recognizer.transcribe(loud_frames(), "zh")
+        self.assertEqual((result["language"], result["text"], result["language_confidence"]), ("zh", "溫刀揮袖促", 0.993))
+        self.assertEqual(self.requests()[1:], [("multi", "zh", False), ("multi", "auto", True)])
+        # Clear, or reading like Mandarin (short commands too): no extra pass.
+        for text, logprob in (("溫刀揮袖促", -0.1), ("我要借這個月新到的書", -0.7), ("借書", -0.7)):
+            self.speech["zh"] = (text, logprob)
+            self.calls.clear()
+            recognizer.transcribe(loud_frames(), "zh")
+            self.assertEqual(self.requests()[1:], [("multi", "zh", False)], text)
+        for name, value in (("PLAUSIBILITY_UNSURE", None), ("DOUBTFUL_CHINESE_CHECK", False)):  # off
+            with patch(f"asr_server.{name}", value):
+                self.speech["zh"] = ("溫刀揮袖促", -0.8)
+                self.calls.clear()
+                recognizer.transcribe(loud_frames(), "zh")
+                self.assertEqual(self.requests()[1:], [("multi", "zh", False)], name)
+
+    def test_extra_passes_have_no_temperature_fallback(self):
+        self.speech["zh"] = ("你好", -0.7)  # unsure: checked further
+        self.probabilities["multi"] = {"zh": 0.5, "ja": 0.4}
+        recognizer = self.with_gate({"zh": 0.45, "ja": 0.4})
+        recognizer.transcribe(loud_frames(), "zh")
+        passes = [body for name, language, detect, body in self.calls if name == "multi"]
+        self.assertEqual(len(passes), 3)
+        self.assertIn(field("temperature_inc", "0.4"), passes[0])  # the clip's first decode
+        for body in passes[1:]:  # second opinions: no retries
+            self.assertIn(field("temperature_inc", "0") + CRLF, body)
+
+    def test_a_transcript_in_the_wrong_script_loses(self):
+        # Whisper in Chinese mode writing English letters is not a Chinese transcript.
+        self.speech["zh"], self.speech["en"] = ("what can you do", -0.1), ("what can you do", -0.3)
+        self.detected["multi"], self.probabilities["multi"] = "english", {"en": 0.5, "zh": 0.45}
+        recognizer = self.with_gate({"zh": 0.5, "en": 0.45})
+        self.assertEqual(recognizer.transcribe(loud_frames(), "zh")["language"], "en")
+
+    def test_detection_outside_our_languages(self):
+        # Malay counts for Indonesian (the nearest of ours). Thai and Lao are not ours
+        # any more (Filipino replaced Thai, 2026-11-11): like Korean, the chosen
+        # language is decoded.
+        self.detected["multi"], self.probabilities["multi"] = "lao", {"lo": 0.7, "th": 0.2}
+        recognizer = self.with_gate({"lo": 0.7, "th": 0.2})
+        result = recognizer.transcribe(loud_frames(), "en")
+        self.assertEqual((result["language"], self.requests()[-1]), ("en", ("multi", "en", False)))
+        self.calls.clear()
+        self.detected["multi"], self.probabilities["multi"] = "chinese", {}
+        recognizer = self.with_gate({"ms": 0.5, "id": 0.4})
+        self.assertEqual(recognizer.transcribe(loud_frames(), "zh")["language"], "id")
+        # Korean: none of ours is a candidate, so the chosen language is decoded.
+        self.calls.clear()
+        self.detected["multi"], self.probabilities["multi"] = "korean", {"ko": 0.9}
+        recognizer = self.with_gate({"ko": 0.9, "ja": 0.05})
+        self.assertEqual((recognizer.transcribe(loud_frames(), "vi")["language"], self.requests()[-1]),
+                         ("vi", ("multi", "vi", False)))
+        self.assertEqual(recognizer.transcribe(loud_frames(), "auto")["language"], "zh")
+
+    # --- Vietnamese and Indonesian (RIVALS) -------------------------------------
+
+    def test_vietnamese_heard_as_indonesian_is_checked_in_vietnamese(self):
+        # Owner, 2026-11-08: "Tôi muốn mượn sách" with Vietnamese chosen came back as
+        # Indonesian. Malay and Javanese fold into Indonesian and make the gate sure;
+        # the Indonesian decode reads as unmarked Vietnamese, so Vietnamese is decoded too.
+        self.speech["id"], self.speech["vi"] = ("Toi muon muon sach", -0.5), ("Tôi muốn mượn sách", -0.3)
+        recognizer = self.with_gate({"ms": 0.5, "id": 0.35, "vi": 0.02})
+        result = recognizer.transcribe(loud_frames(), "vi")
+        self.assertEqual(self.requests(), [("gate", "auto", True), ("multi", "id", False), ("multi", "vi", False)])
+        self.assertEqual((result["language"], result["text"], result["candidates"]), ("vi", "Tôi muốn mượn sách", ["id", "vi"]))
+        vi_body = [body for name, language, detect, body in self.calls if language == "vi"][0]
+        self.assertIn(field("temperature_inc", "0") + CRLF, vi_body)  # a second opinion: no retries
+
+    def test_indonesian_stays_indonesian_with_vietnamese_chosen(self):
+        # The menu alone is no reason for a Vietnamese decode (Whisper forced into the
+        # menu language writes a plausible translation).
+        self.speech["id"], self.speech["vi"] = ("saya mau pinjam buku", -0.2), ("Tôi muốn mượn sách", -0.1)
+        recognizer = self.with_gate({"id": 0.9})
+        self.assertEqual(recognizer.transcribe(loud_frames(), "vi")["language"], "id")
+        self.assertEqual(self.requests()[1:], [("multi", "id", False)])
+        # When it is decoded (a real chance), a worse-scoring Vietnamese text loses.
+        self.speech["vi"] = ("Xay mau binh búc", -0.9)
+        recognizer = self.with_gate({"id": 0.85, "vi": 0.1})
+        self.assertEqual(recognizer.transcribe(loud_frames(), "vi")["language"], "id")
+        # Without Vietnamese letters a "Vietnamese" transcript loses even when it scores better.
+        self.speech["vi"] = ("saya mau pinjam buku", -0.1)
+        recognizer = self.with_gate({"vi": 0.7, "id": 0.2})
+        result = recognizer.transcribe(loud_frames(), "vi")
+        self.assertEqual((result["language"], result["text"]), ("id", "saya mau pinjam buku"))
+
+    def test_rival_only_with_a_real_chance_or_chosen(self):
+        recognizer = self.with_gate({"id": 0.9, "vi": 0.05})
+        recognizer.transcribe(loud_frames(), "en")
+        self.assertEqual(self.requests(), [("gate", "auto", True), ("multi", "id", False)])
+        self.calls.clear()
+        recognizer = self.with_gate({"id": 0.85, "vi": 0.12})  # 12 %: a real chance
+        recognizer.transcribe(loud_frames(), "en")
+        self.assertEqual(self.requests()[1:], [("multi", "id", False), ("multi", "vi", False)])
+        self.calls.clear()
+        recognizer = self.with_gate({"vi": 0.95})  # Vietnamese, clear and with its letters
+        self.assertEqual(recognizer.transcribe(loud_frames(), "vi")["language"], "vi")
+        self.assertEqual(self.requests()[1:], [("multi", "vi", False)])
+
+    def test_vietnamese_from_whisper_small_is_checked_too(self):
+        # No gate: small detects Indonesian (clear), Vietnamese was chosen.
+        self.detected["multi"] = "indonesian"
+        self.probabilities["multi"] = {"id": 0.7, "vi": 0.2}
+        self.speech["id"], self.speech["vi"] = ("Toi muon muon sach", -0.5), ("Tôi muốn mượn sách", -0.3)
+        result = self.recognizer.transcribe(loud_frames(), "vi")
+        self.assertEqual(self.requests(), [("multi", "auto", False), ("multi", "vi", False)])
+        self.assertEqual((result["language"], result["language_confidence"]), ("vi", 0.2))
+        # A Vietnamese detection whose text has no Vietnamese letters is redone in Vietnamese.
+        self.calls.clear()
+        self.detected["multi"], self.probabilities["multi"] = "vietnamese", {"vi": 0.9}
+        self.speech["vi"] = ("Toi muon muon sach", -0.3)
+        result = self.recognizer.transcribe(loud_frames(), "vi")
+        self.assertEqual([language for _, language, _ in self.requests()], ["auto", "vi"])
+
+    # --- Filipino and Indonesian (RIVALS, portal_assistant/docs/AI_FILIPINO.md) ------------------
+
+    def test_filipino_heard_as_indonesian_is_checked_in_filipino(self):
+        # Both are Latin script without letters of their own: a real chance of the other
+        # language decodes it too, and the better transcript is kept.
+        self.speech["id"], self.speech["tl"] = ("gus to kong mag bayad ng tubig", -0.8), ("gusto kong magbayad ng tubig", -0.3)
+        recognizer = self.with_gate({"id": 0.85, "tl": 0.12})
+        result = recognizer.transcribe(loud_frames(), "tl")
+        self.assertEqual(self.requests()[1:], [("multi", "id", False), ("multi", "tl", False)])
+        self.assertEqual((result["language"], result["text"]), ("tl", "gusto kong magbayad ng tubig"))
+        # The Indonesian text reads as Filipino (common words): checked even without a chance.
+        self.calls.clear()
+        recognizer = self.with_gate({"id": 0.9})
+        self.assertEqual(recognizer.transcribe(loud_frames(), "tl")["language"], "tl")
+        self.assertEqual(self.requests()[1:], [("multi", "id", False), ("multi", "tl", False)])
+
+    def test_indonesian_stays_indonesian_with_filipino_chosen(self):
+        self.speech["id"], self.speech["tl"] = ("saya mau pinjam buku", -0.2), ("gusto kong humiram ng libro", -0.6)
+        recognizer = self.with_gate({"id": 0.9})
+        self.assertEqual(recognizer.transcribe(loud_frames(), "tl")["language"], "id")
+        self.assertEqual(self.requests()[1:], [("multi", "id", False)])  # the menu alone is no reason
+        recognizer = self.with_gate({"id": 0.8, "tl": 0.15})
+        self.assertEqual(recognizer.transcribe(loud_frames(), "tl")["language"], "id")  # decoded, scores worse
+
+    def test_vietnamese_script(self):
+        from asr_server import script_fits
+        self.assertTrue(script_fits("Tôi muốn mượn sách", "vi"))
+        self.assertTrue(script_fits("đi", "vi"))
+        self.assertFalse(script_fits("Toi muon muon sach", "vi"))
+        self.assertTrue(script_fits("saya mau pinjam buku", "id"))
+
+    def test_gate_also_serves_other_languages_without_an_auto_pass(self):
+        self.detected["multi"] = "english"
+        recognizer = self.with_gate({"en": 0.97})
+        result = recognizer.transcribe(loud_frames(), "en")
+        self.assertEqual(self.requests(), [("gate", "auto", True), ("multi", "en", False)])
+        self.assertEqual(result["text"], "I want to borrow a new book")
+
+    def test_gate_with_a_separate_chinese_model(self):
+        recognizer = self.with_gate({"zh": 0.95}, one_model=False)
+        self.assertEqual(recognizer.transcribe(loud_frames(), "en")["language"], "zh")
+        self.assertEqual(self.requests()[-1], ("zh", "zh", False))
+
+    def test_gate_failure_falls_back_to_the_previous_behaviour(self):
+        recognizer = self.with_gate({"zh": 0.95})
+        recognizer.gate_url = "http://127.0.0.1:9"  # nothing listens
+        # A gate that never answered is waited for as if still loading (READY_WAIT_S, 60 s on
+        # the phone); a short wait tests the same fallback.
+        with patch("asr_server.READY_WAIT_S", 2):
+            result = recognizer.transcribe(loud_frames(), "zh")
+        self.assertEqual((result["language"], [r[0] for r in self.requests()]), ("zh", ["multi"]))
+        self.assertNotIn("gate_language", result)
+
+    def test_no_gate_without_a_multilingual_model(self):
+        recognizer = WhisperCppRecognizer(self.urls["zh"], gate_url=self.urls["gate"])
+        self.assertIsNone(recognizer.gate_url)
+        self.assertEqual(recognizer.transcribe(loud_frames(), "en")["language"], "en")
+        self.assertEqual(self.requests(), [("zh", "en", False)])
+
+    def test_language_choices_that_are_not_detectable_skip_the_gate(self):
+        # e.g. Taiwanese (feat/taiwanese-asr) is an explicit choice: no gate, no checks.
+        import asr_server
+        recognizer = self.with_gate({"ja": 0.99})
+        with patch.object(asr_server, "language_code", lambda value, default="zh": "nan"):
+            recognizer.transcribe(loud_frames(), "nan")
+        self.assertEqual([r[0] for r in self.requests()], ["multi"])
+
+    # --- without a gate -------------------------------------------------------
+
+    def test_each_language_goes_to_its_model(self):
+        result = self.recognizer.transcribe(loud_frames(), "zh")
+        self.assertEqual((self.requests(), result["language"]), ([("zh", "zh", False)], "zh"))
+        self.assertIn(field("prompt", self.recognizer.prompt), self.calls[-1][3])
+        self.calls.clear()
+        self.detected["multi"] = "english"
+        result = self.recognizer.transcribe(loud_frames(), "en")
+        self.assertEqual((self.requests(), result["language"]), ([("multi", "auto", False)], "en"))
+        self.assertIn(field("prompt", "") + CRLF, self.calls[-1][3])  # no Chinese vocabulary prompt
+        self.assertEqual(result["status"], "unsure")  # -0.7: no Chinese-script check for English
+
+    def test_auto_detects_and_chinese_is_redone_by_the_chinese_model(self):
+        result = self.recognizer.transcribe(loud_frames(), "auto")
+        self.assertEqual((self.requests(), result["language"]), ([("multi", "auto", False), ("zh", "zh", False)], "zh"))
+
+    def test_chinese_speech_with_english_chosen_follows_detection(self):
+        # Formerly the chosen language won when it had >= 5 % (CHOSEN_LANGUAGE_MIN),
+        # and Whisper translated the Chinese into English.
+        self.probabilities["multi"] = {"zh": 0.9, "en": 0.06}
+        result = self.recognizer.transcribe(loud_frames(), "en")
+        self.assertEqual((result["language"], result["language_confidence"]), ("zh", 0.9))
+        self.assertNotIn(("multi", "en", False), self.requests())
+
+    def test_unsure_auto_pass_decodes_the_runner_up_and_keeps_the_better(self):
+        # Short Japanese detected as Chinese at 0.5: the Japanese decode scores better.
+        self.speech["ja"], self.speech["zh"] = ("こんにちは", -0.25), ("你好", -0.7)
+        self.probabilities["multi"] = {"zh": 0.5, "ja": 0.4}
+        result = self.recognizer.transcribe(loud_frames(), "ja")
+        self.assertEqual(self.requests(), [("multi", "auto", False), ("zh", "zh", False), ("multi", "ja", False)])
+        self.assertEqual((result["language"], result["text"]), ("ja", "こんにちは"))
+
+    def test_another_language_in_chinese_mode_is_detected_not_rejected(self):
+        self.speech["zh"] = ("I want to borrow a book", -0.2)  # Whisper writes the English it heard
+        self.detected["multi"], self.speech["en"] = "english", ("I want to borrow a book", -0.2)
+        result = self.recognizer.transcribe(loud_frames(), "zh")
+        self.assertEqual((result["language"], result["status"]), ("en", "clear"))
+        self.assertEqual(self.requests(), [("zh", "zh", False), ("multi", "auto", False)])
+
+    def test_unsure_chinese_characters_for_english_speech_are_redetected(self):
+        # Whisper small in Chinese mode may write "I want to lend a book" as unsure characters.
+        self.speech["zh"], self.speech["en"] = ("愛旺特蘭德布克", -1.2), ("I want to lend a book", -0.2)
+        self.detected["multi"] = "english"
+        result = self.recognizer.transcribe(loud_frames(), "zh")
+        self.assertEqual((result["language"], result["text"], result["status"]),
+                         ("en", "I want to lend a book", "clear"))
+
+    def test_unsure_detection_after_latin_letters_keeps_the_better_decode(self):
+        # "what can you do" with Chinese chosen was detected as Japanese at low
+        # confidence and came back in Japanese (owner, 2026-11-08).
+        self.speech["zh"] = ("what can you do", -0.3)
+        self.speech["ja"], self.speech["en"] = ("何ができますか", -0.6), ("what can you do", -0.2)
+        self.detected["multi"] = "japanese"
+        self.probabilities["multi"] = {"ja": 0.41, "en": 0.38, "zh": 0.1}
+        result = self.recognizer.transcribe(loud_frames(), "zh")
+        self.assertEqual((result["language"], result["text"]), ("en", "what can you do"))
+        self.assertEqual(result["language_confidence"], 0.38)
+
+    def test_short_chinese_that_was_another_language_is_redone(self):
+        # "nani ga dekiru" with Chinese chosen came back as the translation 何能做到.
+        self.speech["zh"], self.speech["ja"] = ("何能做到", -0.3), ("何ができる", -0.2)
+        self.detected["multi"] = "japanese"
+        self.probabilities["multi"] = {"ja": 0.86, "zh": 0.1}
+        result = self.recognizer.transcribe(loud_frames(), "zh")
+        self.assertEqual((result["language"], result["text"], result["language_confidence"]), ("ja", "何ができる", 0.86))
+        self.assertEqual(self.requests(), [("zh", "zh", False), ("multi", "auto", True), ("multi", "ja", False)])
+        # Short Chinese detected as Chinese stays, and long clear Chinese is not checked.
+        self.calls.clear()
+        self.detected["multi"], self.probabilities["multi"] = "chinese", {"zh": 0.9, "ja": 0.05}
+        self.assertEqual(self.recognizer.transcribe(loud_frames(), "zh")["text"], "何能做到")
+        self.calls.clear()
+        self.speech["zh"] = ("我要繳這個月的水費帳單", -0.1)
+        self.recognizer.transcribe(loud_frames(), "zh")
+        self.assertEqual(self.requests(), [("zh", "zh", False)])
+
+    def test_japanese_in_latin_letters_is_redone_with_a_japanese_prompt(self):
+        from asr_server import SCRIPT_PROMPTS
+        self.detected["multi"] = "japanese"
+        self.speech["ja"] = ("nani ka dekiru", -0.3)
+        result = self.recognizer.transcribe(loud_frames(), "ja")
+        self.assertEqual((self.requests(), result["language"]), ([("multi", "auto", False), ("multi", "ja", False)], "ja"))
+        self.assertIn(field("prompt", SCRIPT_PROMPTS["ja"]), self.calls[-1][3])
+        self.calls.clear()
+        self.speech["ja"] = ("何ができる", -0.3)  # already in Japanese script: once
+        self.recognizer.transcribe(loud_frames(), "ja")
+        self.assertEqual(self.requests(), [("multi", "auto", False)])
+
+    def test_detection_outside_our_languages_without_a_gate(self):
+        self.detected["multi"] = "lao"  # not ours (Thai was replaced by Filipino): the chosen language
+        result = self.recognizer.transcribe(loud_frames(), "en")
+        self.assertEqual((self.requests(), result["language"]), ([("multi", "auto", False), ("multi", "en", False)], "en"))
+        self.calls.clear()
+        self.detected["multi"] = "tagalog"  # Filipino is ours, Whisper's "tl"
+        self.speech["tl"] = ("gusto kong humiram ng libro", -0.3)
+        result = self.recognizer.transcribe(loud_frames(), "auto")
+        self.assertEqual((result["language"], result["text"]), ("tl", "gusto kong humiram ng libro"))
+        self.calls.clear()
+        self.detected["multi"], self.probabilities["multi"] = "korean", {"ko": 0.9}
+        self.assertEqual(self.recognizer.transcribe(loud_frames(), "id")["language"], "id")
+
+    def test_one_multilingual_model_for_everything_and_simplified_becomes_traditional(self):
+        self.recognizer = WhisperCppRecognizer(self.urls["multi"], multi_url=self.urls["multi"])
+        self.speech["zh"] = ("我要缴水费", -0.1)  # Whisper small writes Simplified
+        result = self.recognizer.transcribe(loud_frames(), "auto")
+        self.assertEqual((self.requests(), result["language"], result["text"]),
+                         ([("multi", "auto", False)], "zh", "我要繳水費"))
+
+    def test_without_a_multilingual_model_chinese_does_everything(self):
+        self.recognizer.multi_url = None
+        result = self.recognizer.transcribe(loud_frames(), "auto")
+        self.assertEqual((self.requests(), result["language"]), ([("zh", "zh", False)], "zh"))
+
+    def test_language_codes(self):
+        from asr_server import language_code
+        self.assertEqual([language_code(v) for v in ("en-US", "ja", "english", "", None, "xx", "AUTO", "th-TH",
+                                                      "tl", "fil-PH", "tagalog", "Filipino")],
+                         ["en", "ja", "en", "zh", "zh", "zh", "auto", "zh", "tl", "tl", "tl", "tl"])
+
+    def test_language_scores_and_candidates(self):
+        from asr_server import CLEAR_LANGUAGE, candidate_languages, language_scores
+        self.assertEqual(language_scores({"language": "lao", "language_probabilities": {"lo": 0.5, "th": 0.3}}), {})
+        self.assertEqual(language_scores({"language": "tagalog", "language_probabilities": {"tl": 0.6, "id": 0.2}}),
+                         {"tl": 0.6, "id": 0.2})
+        self.assertEqual(language_scores({"language": "korean", "language_probabilities": {"ko": 0.8, "ja": 0.05}}),
+                         {"ja": 0.05})
+        self.assertEqual(language_scores({"language": "japanese"}), {"ja": 1.0})  # no probabilities: as detected
+        self.assertEqual(candidate_languages({"zh": CLEAR_LANGUAGE, "en": 0.3}, "en"), ["zh"])
+        # Unsure: the two likeliest and the chosen language.
+        self.assertEqual(candidate_languages({"zh": 0.5, "ja": 0.3, "en": 0.1}, "en"), ["zh", "ja", "en"])
+        self.assertEqual(candidate_languages({"zh": 0.5, "ja": 0.3}, "ja"), ["zh", "ja"])
+        self.assertEqual(candidate_languages({"zh": 0.5, "ja": 0.05}, "ja"), ["zh", "ja"])
+        self.assertEqual(candidate_languages({"ja": 0.05}, "vi"), ["vi"])  # none of ours is a candidate
+        self.assertEqual(candidate_languages({}, "vi"), ["vi"])
+        self.assertEqual(candidate_languages({}, "auto"), ["zh"])
+
+
+class TaiwaneseSpeechTests(unittest.TestCase):
+    """台語 (portal_assistant/docs/AI_TAIWANESE_SPEECH_PLAN.md section 10): an explicit choice, heard by
+    a Taiwanese model started on first use, without the vocabulary prompt; the
+    result is Chinese. Without the model the clip is heard as Chinese, with a notice."""
+
+    def setUp(self):
+        MultilingualSpeechTests.setUp(self)
+        self.detected["nan"], self.server_speech["nan"] = "chinese", {"zh": ("我要繳水費", -0.2)}
+        nan, self.nan_url = serve(self.fake("nan"))
+        self.addCleanup(nan.server_close)
+        self.addCleanup(nan.shutdown)
+        self.starts = []
+        self.state = "ready"
+
+        def starter():
+            self.starts.append(self.state)
+            return self.state
+        from device_main import taiwanese_provider
+        port = int(self.nan_url.rstrip("/").rsplit(":", 1)[1])
+        self.recognizer.taiwanese = taiwanese_provider(port, starter)
+
+    def models(self):
+        return [name for name, *_ in self.calls]
+
+    def test_taiwanese_uses_its_model_without_a_prompt_and_answers_in_chinese(self):
+        result = self.recognizer.transcribe(loud_frames(), "nan")
+        self.assertEqual((self.models(), result["language"], result["text"]), (["nan"], "zh", "我要繳水費"))
+        body = self.calls[0][3]
+        self.assertIn(field("prompt", "") + CRLF, body)  # no Chinese vocabulary prompt
+        self.assertNotIn(self.recognizer.prompt.encode(), body)
+        self.assertIn(field("language", "zh"), body)
+        self.assertEqual((result["requested_language"], result["speech_model"]), ("nan", "taiwanese"))
+        self.assertNotIn("notice", result)
+        self.assertIsNone(result["language_confidence"])
+
+    def test_missing_model_falls_back_to_chinese_with_a_notice(self):
+        from device_main import taiwanese_provider
+        port = int(self.nan_url.rstrip("/").rsplit(":", 1)[1])
+        for state in ("missing", "memory", "failed"):
+            self.calls.clear()
+            self.state = state
+            # A new provider each time: "memory" and "failed" pause the next asks (BoundedStarter).
+            self.recognizer.taiwanese = taiwanese_provider(port, lambda: self.state)
+            result = self.recognizer.transcribe(loud_frames(), "nan")
+            self.assertEqual((self.models(), result["language"], result["notice"]), (["zh"], "zh", state))
+            self.assertIn(field("prompt", self.recognizer.prompt), self.calls[0][3])  # the normal Chinese request
+            self.assertNotIn("speech_model", result)
+
+    def test_unknown_states_and_errors_are_failures(self):
+        self.state = "weird"
+        self.assertEqual(self.recognizer.transcribe(loud_frames(), "nan")["notice"], "failed")
+
+        def broken():
+            raise RuntimeError("no java")
+        self.recognizer.taiwanese = broken
+        self.assertEqual(self.recognizer.transcribe(loud_frames(), "nan")["notice"], "failed")
+        self.recognizer.taiwanese = None  # e.g. phone recogniser builds: no Taiwanese hook
+        self.assertEqual(self.recognizer.transcribe(loud_frames(), "nan")["notice"], "missing")
+
+    def test_warm_up_tone_never_starts_the_taiwanese_model(self):
+        # A sine tone used to pass the Taiwanese gate and load Breeze (1.7 GB) at idle.
+        import array
+        import math
+        tone = array.array("h", (int(3000 * math.sin(i * 0.05)) for i in range(16000))).tobytes()
+        self.speech["zh"] = ("嗚嗚嗚", -1.3)  # unknown, unsure text: would otherwise go to Breeze
+        result = self.recognizer.transcribe(tone, "zh", automatic_taiwanese=False)
+        self.assertEqual((result["language"], self.starts), ("zh", []))
+        self.assertNotIn("nan", self.models())
+
+    def test_model_is_started_only_for_taiwanese_clips(self):
+        self.recognizer.transcribe(loud_frames(), "zh")  # long clear Chinese: one pass
+        self.assertEqual(self.models(), ["zh"])
+        self.assertIn(field("prompt", self.recognizer.prompt), self.calls[0][3])
+        for language in ("en", "auto", "ja"):
+            self.recognizer.transcribe(loud_frames(), language)
+        self.detected["multi"] = "chinese"  # detection never picks Taiwanese
+        result = self.recognizer.transcribe(loud_frames(), "auto")
+        self.assertEqual((result["language"], self.starts), ("zh", []))
+        self.assertNotIn("nan", self.models())
+        self.recognizer.transcribe(loud_frames(), "nan")
+        self.assertEqual(self.starts, ["ready"])
+
+    def test_taiwanese_never_uses_the_gate_or_the_checks(self):
+        self.recognizer.gate_url = self.urls["gate"]
+        self.probabilities["gate"] = {"ja": 0.99}
+        self.recognizer.transcribe(loud_frames(), "nan")
+        self.assertEqual(self.models(), ["nan"])
+        # Without its model: one plain Chinese decode, even for a short or unsure
+        # text (no short-text probe, no detection) and with the gate available.
+        self.calls.clear()
+        self.state = "missing"
+        self.speech["zh"] = ("你好", -0.8)
+        result = self.recognizer.transcribe(loud_frames(), "nan")
+        self.assertEqual((self.models(), result["language"], result["notice"]), (["zh"], "zh", "missing"))
+        self.assertNotIn("gate_language", result)
+
+    def test_silence_does_not_load_the_model(self):
+        result = self.recognizer.transcribe(bytes(32000), "nan")
+        self.assertEqual((result["status"], self.starts, self.calls), ("unclear", [], []))
+
+    def test_language_codes(self):
+        from asr_server import SPEECH_LANGUAGES, language_code
+        self.assertEqual([language_code(v) for v in ("nan", "nan-TW", "Taiwanese", "hokkien", "zh-TW")],
+                         ["nan", "nan", "nan", "nan", "zh"])
+        self.assertIn("nan", SPEECH_LANGUAGES)
+
+    def test_provider_reports_the_app_state(self):
+        from device_main import taiwanese_provider
+        self.assertEqual(taiwanese_provider(8776, lambda: "ready")(), ("http://127.0.0.1:8776", None))
+        self.assertEqual(taiwanese_provider(8776, lambda: "missing")(), (None, "missing"))
+
+
+class AutoTaiwaneseTests(unittest.TestCase):
+    """Taiwanese heard automatically from the language gate (portal_assistant/docs/AI_TAIWANESE_SPEECH_PLAN.md
+    section 12): menu 中文 or 自動, taiwanese_gate's score at the threshold sends the clip to
+    the Taiwanese model; a second check and a same-speaker rule below it."""
+
+    def setUp(self):
+        TaiwaneseSpeechTests.setUp(self)
+        import taiwanese_gate
+        self.recognizer = self.with_gate({"zh": 0.7, "ko": 0.2})
+        self.recognizer.taiwanese = self.provider()
+        self.assertIsNotNone(self.recognizer.taiwanese_model)
+        self.assertIsNotNone(self.recognizer.mandarin)
+        self.score = 0.9
+        scorer = patch("taiwanese_gate.score", side_effect=lambda *_: self.score)
+        scorer.start()
+        self.addCleanup(scorer.stop)
+
+    with_gate = MultilingualSpeechTests.with_gate
+    requests = MultilingualSpeechTests.requests
+    models = TaiwaneseSpeechTests.models
+
+    def gate_says(self, probabilities):
+        self.probabilities["gate"], self.detected["gate"] = probabilities, max(probabilities, key=probabilities.get)
+
+    def small_says(self, detected, probabilities):
+        self.detected["multi"], self.probabilities["multi"] = detected, probabilities
+
+    def provider(self, port=None, delay=0.0):
+        from device_main import taiwanese_provider
+
+        def starter():
+            self.starts.append(self.state)
+            time.sleep(delay)
+            return self.state
+        return taiwanese_provider(port or int(self.nan_url.rstrip("/").rsplit(":", 1)[1]), starter)
+
+    def heard(self, menu="zh"):
+        self.calls.clear()
+        return self.recognizer.transcribe(loud_frames(), menu)
+
+    def decodes(self):
+        return [name for name, language, detect, _ in self.calls if not detect and name != "gate"]
+
+    def test_the_device_recogniser_loads_the_fitted_model(self):
+        recognizer = WhisperCppRecognizer(self.urls["multi"], multi_url=self.urls["multi"],
+                                          gate_url=self.urls["gate"], taiwanese=self.provider())
+        self.assertEqual(recognizer.taiwanese_model["threshold"], 0.5)
+        self.assertIsNone(WhisperCppRecognizer(self.urls["multi"]).taiwanese_model)  # no hook, no model
+
+    def test_gate_score_at_the_threshold_goes_to_the_taiwanese_model(self):
+        for menu in ("zh", "auto"):
+            self.recognizer.taiwanese_until = 0.0
+            result = self.heard(menu)
+            self.assertEqual(self.decodes(), ["nan"], menu)
+            body = self.calls[-1][3]
+            self.assertIn(field("prompt", "") + CRLF, body)
+            self.assertIn(field("audio_ctx", "500"), body)
+            self.assertEqual((result["language"], result["text"], result["speech_model"]), ("zh", "我要繳水費", "taiwanese"))
+            self.assertEqual((result["taiwanese_route"], result["taiwanese_score"]), ("gate", 0.9))
+            self.assertNotIn("notice", result)
+
+    def test_a_gate_sure_of_another_language_skips_taiwanese_entirely(self):
+        # The owner's Vietnamese clip with the menu on 中文: gate vi 0.925, Taiwanese score 0.713.
+        self.probabilities["gate"] = {"vi": 0.925, "zh": 0.03}
+        self.detected["gate"] = "vietnamese"
+        self.score = 0.713
+        result = self.heard("zh")
+        self.assertEqual((self.decodes(), result["language"], result["text"]), (["multi"], "vi", "tôi muốn mượn sách"))
+        self.assertIn(field("language", "vi"), self.calls[-1][3])
+        self.assertEqual((result["taiwanese_route"], result["taiwanese_score"], result["plausibility"]), (None, None, None))
+        self.assertEqual(self.starts, [])  # the Taiwanese model was not even started
+        # Also with 自動, and when the gate's verdict is the sticky rule's or the plausibility rule's turn.
+        self.recognizer.taiwanese_until = time.monotonic() + 100
+        result = self.heard("auto")
+        self.assertEqual((self.decodes(), result["language"], result["taiwanese_route"]), (["multi"], "vi", None))
+
+    def test_every_menu_hears_taiwanese_unless_another_language_was_picked(self):
+        # The owner's clips were taken with the menu on vi / en: the rules still apply.
+        from server import Assistant
+        self.recognizer.known_text = Assistant(FakeCatalog(), lambda *_: None).workflow.known_text
+        for menu in ("vi", "en", "ja"):
+            self.recognizer.taiwanese_until = 0.0
+            result = self.heard(menu)  # gate zh 0.7 (unsure of another language), score 0.9
+            self.assertEqual((self.decodes(), result["taiwanese_route"], result["language"]), (["nan"], "gate", "zh"), menu)
+        # Menu vi, the gate unsure, Whisper small decodes Chinese that the App does not know: Breeze.
+        self.score = 0.1
+        self.detected["multi"] = "chinese"
+        self.speech["zh"] = ("竟然放第一是從事進來", -0.6)
+        self.server_speech["nan"] = {"zh": ("你在做什麼", -0.2)}
+        self.recognizer.taiwanese_until = 0.0
+        result = self.heard("vi")
+        self.assertEqual((result["language"], result["text"], result["taiwanese_route"]), ("zh", "你在做什麼", "unknown"))
+        self.assertIn("nan", self.decodes())
+        # Menu vi and the gate sure of Vietnamese: Vietnamese, nothing Taiwanese.
+        self.probabilities["gate"], self.detected["gate"] = {"vi": 0.9}, "vietnamese"
+        self.score = 0.9
+        result = self.heard("vi")
+        self.assertEqual((self.decodes(), result["language"], result["taiwanese_route"]), (["multi"], "vi", None))
+        # "Picked" includes a gate only leaning to another of our languages (2026-11-13):
+        # Whisper small detects first under every menu, and picks English here.
+        self.speech["zh"] = ("我要借這個月新到的書", -0.1)
+        self.gate_says({"en": 0.6, "zh": 0.2})
+        self.small_says("english", {"en": 0.9})
+        for menu in ("zh", "ja", "auto", "vi"):
+            self.recognizer.taiwanese_until = 0.0
+            result = self.heard(menu)
+            self.assertEqual((result["language"], result["taiwanese_route"]), ("en", None), menu)
+            self.assertNotIn("nan", self.models(), menu)
+        # Small does not pick another of ours (Korean): the Taiwanese verdict applies.
+        self.small_says("korean", {"ko": 0.8, "en": 0.1})
+        for menu in ("zh", "ja", "auto", "vi"):
+            self.recognizer.taiwanese_until = 0.0
+            self.assertEqual(self.heard(menu)["taiwanese_route"], "gate", menu)
+        # A tuple restricts the menus; () turns the automatic part off.
+        self.probabilities["gate"], self.detected["gate"] = {"zh": 0.7, "ko": 0.2}, "chinese"
+        with patch("asr_server.AUTO_TAIWANESE_MENUS", ("zh", "auto")):
+            self.recognizer.taiwanese_until = 0.0
+            self.assertNotIn("taiwanese_route", self.heard("en"))
+            self.recognizer.taiwanese_until = 0.0
+            self.assertEqual(self.heard("zh")["taiwanese_route"], "gate")
+        result = self.heard("nan")  # 台語 chosen: no gate, its model
+        self.assertEqual((self.models(), result["taiwanese_route"]), (["nan"], "chosen"))
+
+    def test_below_the_threshold_a_clear_chinese_decode_stays(self):
+        self.score = 0.4
+        result = self.heard()
+        self.assertEqual(self.decodes(), ["multi"])
+        self.assertEqual((result["text"], result["taiwanese_route"], result["taiwanese_score"]),
+                         ("我要借這個月新到的書", None, 0.4))
+        self.assertNotIn("speech_model", result)
+
+    def test_second_check_redoes_an_unsure_chinese_decode_and_keeps_the_better(self):
+        self.score = 0.4
+        self.speech["zh"] = ("我要借這個月新到的書", -0.7)  # unsure
+        result = self.heard()
+        self.assertEqual(self.decodes(), ["multi", "nan"])
+        self.assertIn(field("temperature_inc", "0"), self.calls[-1][3])  # no retries on a second opinion
+        self.assertEqual((result["text"], result["taiwanese_route"], result["speech_model"]),
+                         ("我要繳水費", "recheck", "taiwanese"))
+        self.server_speech["nan"] = {"zh": ("嗯", -1.5)}  # worse: the Chinese decode is kept
+        self.recognizer.taiwanese_until = 0.0
+        result = self.heard()
+        self.assertEqual((result["text"], result["taiwanese_route"]), ("我要借這個月新到的書", None))
+        self.score = 0.2  # below the second check
+        self.heard()
+        self.assertEqual(self.decodes(), ["multi"])
+
+    def test_second_check_can_be_turned_off(self):
+        self.score = 0.4
+        self.speech["zh"] = ("我要借這個月新到的書", -0.7)
+        with patch("asr_server.TAIWANESE_RECHECK_SCORE", None):
+            self.heard()
+        self.assertEqual(self.decodes(), ["multi"])
+
+    def test_same_speaker_lower_threshold_until_clear_mandarin(self):
+        self.assertEqual(self.heard()["taiwanese_route"], "gate")
+        self.score = 0.4
+        self.assertEqual(self.heard()["taiwanese_route"], "sticky")  # same speaker, lower threshold
+        self.score = 0.2
+        result = self.heard()  # clear Mandarin: someone else
+        self.assertEqual((self.decodes(), result["taiwanese_route"]), (["multi"], None))
+        self.score = 0.4
+        self.assertEqual(self.heard()["taiwanese_route"], None)  # back to TAIWANESE_GATE_SCORE
+        with patch("asr_server.TAIWANESE_STICKY_SCORE", None):
+            self.score = 0.9
+            self.heard()
+            self.score = 0.4
+            self.assertIsNone(self.heard()["taiwanese_route"])
+
+    def test_sticky_rule_ends_after_a_while(self):
+        self.heard()
+        self.recognizer.taiwanese_until -= 10_000  # long ago
+        self.score = 0.4
+        self.assertIsNone(self.heard()["taiwanese_route"])
+
+    def test_sticky_rule_ends_with_a_clip_the_gate_is_sure_is_another_language(self):
+        # 2026-11-13: Taiwanese, then English the gate is sure of (no Taiwanese rule ran,
+        # so the lower threshold stayed), then English the gate only leans to: Breeze.
+        self.assertEqual(self.heard()["taiwanese_route"], "gate")
+        self.assertGreater(self.recognizer.taiwanese_until, time.monotonic())
+        self.gate_says({"en": 0.95})
+        self.score = 0.4
+        result = self.heard()
+        self.assertEqual((result["language"], self.decodes()), ("en", ["multi"]))
+        self.assertEqual(self.recognizer.taiwanese_until, 0.0)  # someone else
+        self.gate_says({"en": 0.6, "zh": 0.3})
+        self.small_says("english", {"en": 0.9})
+        result = self.heard()
+        self.assertEqual((result["language"], result["taiwanese_route"]), ("en", None))
+        self.assertNotIn("nan", self.models())
+
+    def test_sticky_rule_only_when_the_gate_leans_to_chinese_or_a_language_outside_ours(self):
+        self.assertEqual(self.heard()["taiwanese_route"], "gate")  # the lower threshold starts
+        self.score = 0.4
+        self.gate_says({"ko": 0.5, "zh": 0.3})  # outside ours: the lower threshold
+        self.assertEqual(self.heard()["taiwanese_route"], "sticky")
+        self.gate_says({"en": 0.6, "zh": 0.3})  # leaning to English: 0.4 is under TAIWANESE_GATE_SCORE
+        self.small_says("korean", {"ko": 0.9})  # even when small then hears no language of ours
+        result = self.heard()
+        self.assertNotIn("nan", self.models())
+        self.assertIsNone(result["taiwanese_route"])
+        self.assertEqual(result["language"], "zh")  # small picked no language of ours: the usual Chinese path
+
+    def test_a_gate_leaning_to_another_language_lets_whisper_small_detect_before_taiwanese(self):
+        # 2026-11-13, menu 中文: "Hello" with the gate at en 0.505 and a Taiwanese score of
+        # 0.83 went straight to Breeze, which wrote 哈囉.
+        self.gate_says({"en": 0.6, "zh": 0.2})
+        self.score = 0.8
+        self.small_says("english", {"en": 0.9, "zh": 0.05})
+        result = self.heard()
+        self.assertEqual(self.requests(), [("gate", "auto", True), ("multi", "auto", True), ("multi", "en", False)])
+        self.assertEqual((result["language"], result["text"], result["taiwanese_route"]),
+                         ("en", "I want to borrow a new book", None))
+        self.assertEqual(self.starts, [])  # the Taiwanese model was not even started
+        # Small hears Korean or Chinese (not another of ours), or English but not sure of it
+        # (under CLEAR_LANGUAGE; on the tuning clips such clips were mostly Taiwanese): Breeze, as before.
+        for detected, probabilities in (("korean", {"ko": 0.7, "en": 0.1}), ("chinese", {"zh": 0.8, "en": 0.1}),
+                                        ("english", {"en": 0.45, "es": 0.3})):
+            self.small_says(detected, probabilities)
+            self.recognizer.taiwanese_until = 0.0
+            result = self.heard()
+            self.assertEqual(self.requests(), [("gate", "auto", True), ("multi", "auto", True), ("nan", "zh", False)],
+                             detected)
+            self.assertEqual((result["taiwanese_route"], result["speech_model"], result["text"]),
+                             ("gate", "taiwanese", "我要繳水費"), detected)
+        # Under FOREIGN_LEAD the gate's verdict is taken directly, as before.
+        self.gate_says({"en": 0.25, "zh": 0.2, "ko": 0.2})
+        self.recognizer.taiwanese_until = 0.0
+        self.assertEqual((self.heard()["taiwanese_route"], self.decodes()), ("gate", ["nan"]))
+
+    def test_threshold_constant_is_the_one_used(self):
+        self.score = 0.6
+        self.assertEqual(self.heard()["taiwanese_route"], "gate")
+        with patch("asr_server.TAIWANESE_GATE_SCORE", 0.85):
+            self.recognizer.taiwanese_until = 0.0
+            self.assertIsNone(self.heard()["taiwanese_route"])
+
+    def test_a_missing_taiwanese_model_takes_the_usual_path_silently(self):
+        # Never downloaded (optional, off by default): the gate scores ~5 % of Mandarin as
+        # Taiwanese, so these clips are not refused (rules section 4, 2026-11-16).
+        self.state = "missing"
+        result = self.heard()
+        self.assertEqual((self.decodes(), result["language"], result["text"]), (["multi"], "zh", "我要借這個月新到的書"))
+        self.assertNotIn("notice", result)
+
+    def test_a_gate_sure_of_taiwanese_never_gets_a_chinese_guess_without_its_model(self):
+        # iPhone 2026-11-16: memory 12 times, gate scores 0.80-0.90 decoded as strange Chinese.
+        for state in ("memory", "failed"):
+            self.recognizer.taiwanese = self.provider()
+            self.state = state
+            result = self.heard()
+            self.assertEqual(self.decodes(), [], state)  # no Chinese decode at all
+            self.assertEqual((result["text"], result["status"], result["notice"], result["notice_reason"]),
+                             ("", "unclear", "taiwanese_unavailable", state))
+            self.assertEqual((result["language"], result["taiwanese_route"], result["taiwanese_score"]),
+                             ("zh", "withheld", 0.9))
+            self.assertNotIn("speech_model", result)
+
+    def test_a_loading_taiwanese_model_is_waited_for_and_then_used(self):
+        import device_main
+        with patch.object(device_main.BoundedStarter, "WAIT_S", 0.2),                 patch("asr_server.TAIWANESE_LOAD_WAIT_S", 5.0), patch("asr_server.TAIWANESE_POLL_S", 0.05):
+            self.recognizer.taiwanese = self.provider(delay=0.8)
+            started = time.monotonic()
+            result = self.heard()
+        self.assertGreaterEqual(time.monotonic() - started, 0.7)
+        self.assertEqual((self.decodes(), result["text"], result["speech_model"]), (["nan"], "我要繳水費", "taiwanese"))
+        self.assertEqual(result["taiwanese_route"], "gate")
+        self.assertIn(field("best_of", "1"), self.calls[-1][3])  # one decoder (TAIWANESE_BEST_OF)
+
+    def test_a_model_still_loading_after_the_wait_is_explained(self):
+        import device_main
+        with patch.object(device_main.BoundedStarter, "WAIT_S", 0.1),                 patch("asr_server.TAIWANESE_LOAD_WAIT_S", 0.5), patch("asr_server.TAIWANESE_POLL_S", 0.05):
+            self.recognizer.taiwanese = self.provider(delay=3.0)
+            started = time.monotonic()
+            result = self.heard()
+            self.assertLess(time.monotonic() - started, 2.0)
+        self.assertEqual((self.decodes(), result["text"], result["notice_reason"]), ([], "", "loading"))
+
+    def test_a_taiwanese_server_that_stops_answering_is_not_held_off(self):
+        # iOS reclaimed its port or it is restarting: the clip asks the App once more, says so,
+        # and the next clip tries the server again (no liveness hold, no BoundedStarter pause).
+        import liveness
+        liveness.reset()
+        self.addCleanup(liveness.reset)
+        self.recognizer.taiwanese = self.provider(port=9)  # the App says ready, nothing listens
+        with patch("liveness.AFTER_READY_WAIT_S", 0.1), patch("asr_server.TAIWANESE_POLL_S", 0.05):
+            started = time.monotonic()
+            result = self.heard()
+            # Seconds, not READY_WAIT_S (60 s); a refused connect alone takes ~2 s on Windows.
+            self.assertLess(time.monotonic() - started, 10.0)
+            self.assertEqual((self.decodes(), result["text"], result["notice_reason"]), ([], "", "unreachable"))
+            self.assertEqual(self.starts, ["ready", "ready"])  # asked again within the clip
+            self.assertFalse(liveness.down("http://127.0.0.1:9"))
+            self.starts.clear()
+            self.heard()
+            self.assertEqual(self.starts, ["ready", "ready"])  # the next clip tries again
+            self.recognizer.taiwanese = self.provider()  # bound again
+            result = self.heard()
+        self.assertEqual((self.decodes(), result["speech_model"]), (["nan"], "taiwanese"))
+
+    def test_the_gate_hearing_mandarin_is_not_affected(self):
+        self.state = "memory"
+        self.score = 0.2  # under every threshold
+        result = self.heard()
+        self.assertEqual((self.decodes(), result["text"]), (["multi"], "我要借這個月新到的書"))
+        self.assertNotIn("notice", result)
+        self.assertEqual(self.starts, [])  # the Taiwanese model is not even asked for
+
+    def test_only_just_sure_clear_text_the_app_knows_is_kept_without_the_model(self):
+        # Owner, 2026-11-16: gate scores just over 0.5 (iPhone: 0.56-0.65) with a clear decode the
+        # App knows keep the Chinese decode (TAIWANESE_KEEP_KNOWN_BELOW); anything else is withheld.
+        self.state = "memory"
+        self.recognizer.known_text = lambda text: text == "我要借這個月新到的書"
+        with patch("asr_server.TAIWANESE_KEEP_KNOWN_BELOW", 0.7):
+            self.score = 0.6
+            result = self.heard()
+            self.assertEqual((self.decodes(), result["text"]), (["multi"], "我要借這個月新到的書"))
+            self.assertNotIn("notice", result)
+            self.recognizer.known_text = lambda text: False  # clear, but not known to the App
+            self.assertEqual(self.heard()["notice_reason"], "memory")
+            self.recognizer.known_text = lambda text: True
+            self.speech["zh"] = ("我要借這個月新到的書", -0.9)  # known, but not clear
+            self.assertEqual(self.heard()["notice_reason"], "memory")
+            self.speech["zh"] = ("我要借這個月新到的書", -0.1)
+            self.score = 0.8  # sure: no exception
+            result = self.heard()
+            self.assertEqual((self.decodes(), result["notice_reason"]), ([], "memory"))
+        with patch("asr_server.TAIWANESE_KEEP_KNOWN_BELOW", None):
+            self.score = 0.6
+            self.assertEqual(self.heard()["notice_reason"], "memory")
+
+    def test_below_the_threshold_only_clear_chinese_is_kept_without_the_model(self):
+        # The same-speaker rule (0.3-0.5): the gate is not sure (TAIWANESE_MARGINAL_WITHHOLD).
+        self.state = "memory"
+        self.score = 0.4
+        self.recognizer.taiwanese_until = time.monotonic() + 60  # just after a Taiwanese clip
+        result = self.heard()
+        self.assertEqual((self.decodes(), result["text"]), (["multi"], "我要借這個月新到的書"))  # clear Mandarin
+        self.assertNotIn("notice", result)
+        self.speech["zh"] = ("溫刀揮袖促", -0.82)  # not clear
+        self.recognizer.taiwanese_until = time.monotonic() + 60
+        result = self.heard()
+        self.assertEqual((result["text"], result["notice"], result["notice_reason"]),
+                         ("", "taiwanese_unavailable", "memory"))
+        with patch("asr_server.TAIWANESE_MARGINAL_WITHHOLD", None):
+            self.recognizer.taiwanese_until = time.monotonic() + 60
+            self.assertEqual(self.heard()["text"], "溫刀揮袖促")
+
+    def test_off_without_a_gate_or_with_no_menus(self):
+        with patch("asr_server.AUTO_TAIWANESE_MENUS", ()):
+            self.assertNotIn("taiwanese_route", self.heard())
+        self.recognizer.gate_url = None  # no gate: no score, only the plausibility rule remains
+        result = self.heard()
+        self.assertEqual((self.decodes(), result["taiwanese_route"], result["taiwanese_score"]), (["multi"], None, None))
+
+    # --- "very strange Chinese is Taiwanese" (section 13) -------------------------
+
+    def test_implausible_chinese_goes_to_the_taiwanese_model_whatever_the_gate_said(self):
+        self.score = 0.09  # the owner's clip: gate zh 0.997, Taiwanese score 0.089
+        self.speech["zh"] = ("溫刀揮袖促", -0.82)  # 阮兜火燒厝 heard as Chinese, unsure
+        self.server_speech["nan"] = {"zh": ("我家失火了", -0.3)}
+        result = self.heard()
+        self.assertEqual(self.decodes(), ["multi", "nan"])
+        self.assertEqual((result["text"], result["taiwanese_route"], result["speech_model"]),
+                         ("我家失火了", "implausible", "taiwanese"))
+        self.assertLess(result["plausibility"], -5)  # of the kept text; logged
+        self.speech["zh"] = ("溫刀揮袖促", -0.1)  # the same text called clear: still implausible (< PLAUSIBILITY_LOW)
+        self.recognizer.taiwanese_until = 0.0
+        self.assertEqual(self.heard()["taiwanese_route"], "implausible")
+        self.recognizer.gate_url = None  # no gate at all: the rule still applies
+        self.recognizer.taiwanese_until = 0.0
+        self.assertEqual((self.heard()["taiwanese_route"], self.decodes()), ("implausible", ["multi", "nan"]))
+
+    def test_plausible_and_short_commands_never_trigger(self):
+        self.score = 0.1
+        for text, logprob in (("借書", -0.1), ("下一頁", -0.1), ("第二個", -0.1), ("取消", -0.1), ("我要繳水費", -0.1),
+                              ("我要借這個月新到的書", -0.7), ("借書", -0.7)):  # unsure but readable: no
+            self.speech["zh"] = (text, logprob)
+            result = self.heard()
+            self.assertEqual((self.decodes(), result["taiwanese_route"]), (["multi"], None), text)
+            self.assertGreater(result["plausibility"], -6.0, text)
+
+    def test_the_better_transcript_is_kept_by_plausibility(self):
+        self.score = 0.1
+        self.speech["zh"] = ("溫刀揮袖促", -0.3)
+        self.server_speech["nan"] = {"zh": ("呵呵呵呵呵", -0.1)}  # Taiwanese model no better: the Chinese text stays
+        result = self.heard()
+        self.assertEqual((self.decodes(), result["text"], result["taiwanese_route"]), (["multi", "nan"], "溫刀揮袖促", None))
+
+    def test_other_scripts_and_other_languages_are_not_rechecked(self):
+        self.score = 0.1
+        self.speech["zh"] = ("I hate you", -0.9)  # Latin letters: the language check, not the Taiwanese model
+        self.detected["multi"] = "english"
+        self.probabilities["multi"] = {"en": 0.9}
+        result = self.heard()  # (the gate was sure of Chinese, so the text stays as decoded)
+        self.assertEqual((self.decodes(), result["taiwanese_route"]), (["multi"], None))
+        self.assertIsNone(result["plausibility"])
+        self.recognizer.gate_url = None  # without a gate the language check finds English
+        result = self.heard()
+        self.assertNotIn("nan", self.decodes())
+        self.assertEqual((result["language"], result["plausibility"]), ("en", None))
+
+    def test_text_the_app_does_not_know_goes_to_the_taiwanese_model(self):
+        # The owner's clip: 哩欸賽藂薩 heard as 「竟然放第一是從事進來」 (common bigrams).
+        from server import Assistant
+        self.recognizer.known_text = Assistant(FakeCatalog(), lambda *_: None).workflow.known_text
+        self.score = 0.1
+        for logprob in (-0.6, -0.1):  # unsure, and clear: the App knows neither
+            self.speech["zh"] = ("竟然放第一是從事進來", logprob)
+            self.server_speech["nan"] = {"zh": ("你在做什麼", -0.2)}
+            self.recognizer.taiwanese_until = 0.0
+            result = self.heard()
+            self.assertEqual(self.decodes(), ["multi", "nan"], logprob)
+            self.assertEqual((result["text"], result["taiwanese_route"]), ("你在做什麼", "unknown"))
+        for text in ("我要解釋", "借龜兔賽跑", "第二個", "下一頁", "取消", "我要繳水費", "繳水廢", "你好", "謝謝你喔"):  # known
+            self.speech["zh"] = (text, -0.6)
+            self.recognizer.taiwanese_until = 0.0
+            self.assertEqual((self.heard()["taiwanese_route"], self.decodes()), (None, ["multi"]), text)
+        with patch("asr_server.UNKNOWN_TO_TAIWANESE", "unsure"):
+            self.speech["zh"] = ("竟然放第一是從事進來", -0.1)  # clear: only unsure text would go
+            self.assertEqual((self.heard()["taiwanese_route"], self.decodes()), (None, ["multi"]))
+            self.speech["zh"] = ("竟然放第一是從事進來", -0.6)
+            self.assertEqual(self.heard()["taiwanese_route"], "unknown")
+        with patch("asr_server.UNKNOWN_TO_TAIWANESE", None):
+            self.recognizer.taiwanese_until = 0.0
+            self.assertEqual((self.heard()["taiwanese_route"], self.decodes()), (None, ["multi"]))
+        self.recognizer.known_text = None  # no callback (computer backend): off
+        self.assertEqual((self.heard()["taiwanese_route"], self.decodes()), (None, ["multi"]))
+
+    def test_the_transcript_the_app_knows_wins(self):
+        from server import Assistant
+        self.recognizer.known_text = Assistant(FakeCatalog(), lambda *_: None).workflow.known_text
+        self.score = 0.1
+        # Whisper small: a clear, well-formed Mandarin sentence the App does not know;
+        # the Taiwanese model: an unsure service request. The known one wins.
+        self.speech["zh"] = ("我問過律師跟法律人", -0.1)
+        self.server_speech["nan"] = {"zh": ("我要繳水費", -0.6)}
+        result = self.heard()
+        self.assertEqual((self.decodes(), result["text"], result["taiwanese_route"]), (["multi", "nan"], "我要繳水費", "unknown"))
+        # Neither known: plausibility, then status decide (Mandarin small talk stays).
+        self.server_speech["nan"] = {"zh": ("溫刀揮袖促", -0.1)}
+        self.recognizer.taiwanese_until = 0.0
+        result = self.heard()
+        self.assertEqual((result["text"], result["taiwanese_route"]), ("我問過律師跟法律人", None))
+
+    def test_device_known_text_adds_the_faq(self):
+        import device_main
+
+        class Faq:
+            def __init__(self, confidence):
+                self.confidence = confidence
+
+            def search(self, text, k=3):
+                return self.confidence, []
+
+        class Backend:
+            def __init__(self, faq):
+                self.faq = faq
+                from server import Assistant
+                self.workflow = Assistant(FakeCatalog(), lambda *_: None).workflow
+        self.assertTrue(device_main.known_text(Backend(Faq("medium")))("垃圾車幾點會來"))
+        self.assertFalse(device_main.known_text(Backend(Faq("none")))("垃圾車幾點會來"))
+        self.assertFalse(device_main.known_text(Backend(None))("垃圾車幾點會來"))  # FAQ not loaded yet
+        self.assertTrue(device_main.known_text(Backend(None))("借書"))
+        with patch("device_main.KNOWN_FAQ_CONFIDENCE", None):
+            self.assertFalse(device_main.known_text(Backend(Faq("high")))("垃圾車幾點會來"))
+        with patch("device_main.KNOWN_FAQ_CONFIDENCE", "high"):
+            self.assertFalse(device_main.known_text(Backend(Faq("medium")))("垃圾車幾點會來"))
+
+    def test_plausibility_rules_can_be_turned_off(self):
+        self.score = 0.1
+        self.speech["zh"] = ("溫刀揮袖促", -0.82)
+        with patch("asr_server.PLAUSIBILITY_LOW", None), patch("asr_server.PLAUSIBILITY_UNSURE", None):
+            result = self.heard()
+        self.assertEqual((self.decodes(), result["taiwanese_route"]), (["multi"], None))
+        with patch("asr_server.PLAUSIBILITY_LOW", None):  # the unsure rule alone still catches it
+            self.assertEqual(self.heard()["taiwanese_route"], "implausible")
+        self.speech["zh"] = ("溫刀揮袖促", -0.1)  # clear: only PLAUSIBILITY_LOW applies
+        with patch("asr_server.PLAUSIBILITY_LOW", None):
+            self.recognizer.taiwanese_until = 0.0
+            self.assertIsNone(self.heard()["taiwanese_route"])
+
+
+class VietnameseSpeechTests(unittest.TestCase):
+    """Vietnamese (portal_assistant/docs/AI_VIETNAMESE.md): an optional Vietnamese model, started on
+    first use, makes every Vietnamese decode, without a prompt and with the full
+    encoder window; the language is still detected as before. Without it the
+    multilingual model decodes Vietnamese as before."""
+
+    def setUp(self):
+        MultilingualSpeechTests.setUp(self)
+        self.detected["vi"], self.server_speech["vi"] = "vietnamese", {"vi": ("tôi muốn đóng tiền nước", -0.2)}
+        vi, self.vi_url = serve(self.fake("vi"))
+        self.addCleanup(vi.server_close)
+        self.addCleanup(vi.shutdown)
+        self.starts = []
+        self.state = "ready"
+
+        def starter():
+            self.starts.append(self.state)
+            return self.state
+        from device_main import vietnamese_provider
+        self.port = int(self.vi_url.rstrip("/").rsplit(":", 1)[1])
+        self.hook = vietnamese_provider(self.port, starter)
+        self.recognizer.vietnamese = self.hook
+
+    requests = MultilingualSpeechTests.requests
+
+    def test_detected_vietnamese_is_decoded_by_its_model(self):
+        self.detected["multi"] = "vietnamese"
+        result = self.recognizer.transcribe(loud_frames(), "vi")
+        # Menu on Vietnamese: a detection-only pass, then the Vietnamese model (MENU_OVER_CHINESE).
+        self.assertEqual(self.requests(), [("multi", "auto", True), ("vi", "vi", False)])
+        self.assertEqual((result["language"], result["text"], result["speech_model"]),
+                         ("vi", "tôi muốn đóng tiền nước", "vietnamese"))
+        body = self.calls[-1][3]
+        self.assertIn(field("prompt", "") + CRLF, body)
+        self.assertIn(field("audio_ctx", "1500"), body)
+        self.assertEqual(set(self.starts), {"ready"})  # asked on use; the App starts it once
+
+    def test_with_the_gate_sure_of_vietnamese_one_decode_by_its_model(self):
+        self.recognizer.gate_url = self.urls["gate"]
+        self.probabilities["gate"], self.detected["gate"] = {"vi": 0.95}, "vietnamese"
+        result = self.recognizer.transcribe(loud_frames(), "zh")
+        self.assertEqual(self.requests(), [("gate", "auto", True), ("vi", "vi", False)])
+        self.assertEqual((result["language"], result["speech_model"]), ("vi", "vietnamese"))
+
+    def test_without_the_model_vietnamese_is_decoded_as_before(self):
+        self.detected["multi"] = "vietnamese"
+        for state in ("missing", "memory", "failed"):
+            self.calls.clear()
+            self.state = state
+            result = self.recognizer.transcribe(loud_frames(), "vi")
+            # The file is not on the phone: the probe, then Whisper small decodes Vietnamese.
+            self.assertEqual((self.requests(), result["text"]),
+                             ([("multi", "auto", True), ("multi", "vi", False)], "tôi muốn mượn sách"))
+            self.assertNotIn("speech_model", result)
+        self.recognizer.vietnamese = None  # no hook at all (e.g. no multilingual model): as before
+        self.calls.clear()
+        self.assertEqual(self.recognizer.transcribe(loud_frames(), "vi")["text"], "tôi muốn mượn sách")
+        self.assertEqual(self.requests(), [("multi", "auto", False)])
+
+    def test_a_broken_server_falls_back_to_the_multilingual_model(self):
+        self.detected["multi"] = "vietnamese"
+        from device_main import vietnamese_provider
+        self.recognizer.vietnamese = vietnamese_provider(1, lambda: "ready")  # nothing listens on port 1
+        with patch("asr_server.READY_WAIT_S", 2):  # never answered: the loading wait, shortened
+            result = self.recognizer.transcribe(loud_frames(), "vi")
+        self.assertEqual((result["language"], result["text"]), ("vi", "tôi muốn mượn sách"))
+        self.assertNotIn("speech_model", result)
+
+    def test_other_languages_never_start_it(self):
+        self.recognizer.transcribe(loud_frames(), "zh")
+        for language, detected in (("en", "english"), ("auto", "japanese"), ("ja", "japanese")):
+            self.detected["multi"] = detected
+            self.recognizer.transcribe(loud_frames(), language)
+        self.assertEqual(self.starts, [])
+        self.assertNotIn("vi", [name for name, *_ in self.calls])
+
+    def test_provider_reports_the_app_state(self):
+        from device_main import vietnamese_provider
+        self.assertEqual(vietnamese_provider(8777, lambda: "ready")(), ("http://127.0.0.1:8777", None))
+        self.assertEqual(vietnamese_provider(8777, lambda: "missing")(), (None, "missing"))
+
+    # --- the Vietnamese menu against a Chinese gate verdict (MENU_OVER_CHINESE) ---
+
+    def gated(self, gate_scores, small_scores, chinese=("你所屬的大貴", -0.713)):
+        self.recognizer.gate_url = self.urls["gate"]
+        self.probabilities["gate"], self.detected["gate"] = gate_scores, max(gate_scores, key=gate_scores.get)
+        self.probabilities["multi"], self.detected["multi"] = small_scores, max(small_scores, key=small_scores.get)
+        self.speech["zh"] = chinese
+        return self.recognizer
+
+    def test_owner_case_gate_sure_of_chinese_short_unsure_translation_becomes_vietnamese(self):
+        # Phone log 2026-11-08: 1.4 s of Vietnamese, gate zh 0.993, Chinese decode of 4
+        # characters at -0.713 (unsure), 32 s of retries. Expected: Vietnamese, no retries.
+        self.gated({"zh": 0.993, "vi": 0.004}, {"zh": 0.70, "vi": 0.04})
+        result = self.recognizer.transcribe(loud_frames(), "vi")
+        self.assertEqual((result["language"], result["text"], result["speech_model"]),
+                         ("vi", "tôi muốn đóng tiền nước", "vietnamese"))
+        self.assertEqual(self.requests(), [("gate", "auto", True), ("multi", "auto", True),
+                                           ("zh", "zh", False), ("vi", "vi", False)])
+        for name, language, detect, body in self.calls[1:]:  # no temperature retries after the gate
+            self.assertIn(field("temperature_inc", "0"), body, (name, language))
+        self.assertEqual(result["candidates"], ["zh", "vi"])
+
+    def test_small_detects_vietnamese_one_vietnamese_decode(self):
+        self.gated({"zh": 0.94, "vi": 0.06}, {"vi": 0.91, "zh": 0.07})
+        result = self.recognizer.transcribe(loud_frames(), "vi")
+        self.assertEqual((result["language"], result["speech_model"]), ("vi", "vietnamese"))
+        self.assertEqual(self.requests(), [("gate", "auto", True), ("multi", "auto", True), ("vi", "vi", False)])
+
+    def test_clear_longer_chinese_stays_chinese_with_the_vietnamese_menu(self):
+        # FLEURS zh-001 (2026-11-08): PhoWhisper wrote confident Vietnamese for Chinese
+        # audio; a clear Chinese decode of more than SHORT_TEXT characters is kept.
+        self.gated({"zh": 0.992}, {"zh": 0.91, "ja": 0.01}, chinese=("蓋甲等元素屬於金屬", -0.425))
+        result = self.recognizer.transcribe(loud_frames(), "vi")
+        self.assertEqual((result["language"], result["text"]), ("zh", "蓋甲等元素屬於金屬"))
+        self.assertEqual(self.requests(), [("gate", "auto", True), ("multi", "auto", True), ("zh", "zh", False)])
+        self.assertNotIn("speech_model", result)
+        self.assertEqual(self.starts, [])
+
+    def test_other_menus_keep_the_gate(self):
+        self.gated({"zh": 0.993}, {"zh": 0.70})
+        for menu in ("zh", "auto", "en"):
+            self.calls.clear()
+            result = self.recognizer.transcribe(loud_frames(), menu)
+            self.assertEqual((result["language"], self.requests()), ("zh", [("gate", "auto", True), ("zh", "zh", False)]), menu)
+
+
+class OutputConstraintTests(unittest.TestCase):
+    def test_lettered_choice_gets_an_exact_grammar_other_schemas_keep_response_format(self):
+        from server import output_constraint
+        grammar = output_constraint({"type": "object", "properties": {"choice": {"type": "string",
+                                     "enum": ["A", "B"]}}, "required": ["choice"]})["grammar"]
+        self.assertEqual(grammar, 'root ::= "{\\"choice\\":" ("\\"A\\"" | "\\"B\\"") "}"')
+        other = output_constraint({"type": "object", "properties": {"capability_id": {"enum": ["x"]}}})
+        self.assertIn("response_format", other)
+
+
+class DecisionModelTests(unittest.TestCase):
+    """TOWNPASS_DECISION_MODEL (portal_assistant/docs/AI_DECISION_MODEL_ABLATION_PLAN.md section 8):
+    Ministral stays the default; "gemma" only changes the reported model."""
+
+    @staticmethod
+    def probe(value):
+        import os
+        import subprocess
+        import sys
+        env = {k: v for k, v in os.environ.items() if k != "TOWNPASS_DECISION_MODEL"}
+        if value is not None:
+            env["TOWNPASS_DECISION_MODEL"] = value
+        code = ("import json, decision, server; print(json.dumps([decision.DECISION_MODEL, server.MODEL, "
+                "decision.system_prompt('capability'), decision.system_prompt('library')]))")
+        out = subprocess.run([sys.executable, "-X", "utf8", "-c", code], env=env, capture_output=True, text=True,
+                             encoding="utf-8", cwd=os.path.dirname(os.path.abspath(__file__)), check=True).stdout
+        return json.loads(out)
+
+    def test_default_is_ministral(self):
+        self.assertEqual(self.probe(None)[:2], ["ministral", "ministral-3:3b"])
+        self.assertEqual(self.probe("unknown")[1], "ministral-3:3b")
+
+    def test_gemma_reports_its_model_with_the_same_prompts(self):
+        gemma, ministral = self.probe("gemma"), self.probe(None)
+        self.assertEqual(gemma[:2], ["gemma", "gemma4:e2b"])
+        self.assertEqual(gemma[2:], ministral[2:])
+
+    def test_device_configure_sets_the_decision_model(self):
+        import os
+        import device_main
+        with patch.dict(os.environ, {}, clear=False):
+            device_main.configure(8771, 8772, decision_model="gemma")
+            self.assertEqual(os.environ["TOWNPASS_DECISION_MODEL"], "gemma")
+            device_main.configure(8771, 8772)
+            self.assertEqual(os.environ["TOWNPASS_DECISION_MODEL"], "ministral")
+
+
+class ListenerTests(unittest.TestCase):
+    """iOS takes a suspended App's listening sockets; device_main opens them again."""
+
+    class Hello(BaseHTTPRequestHandler):
+        def log_message(self, *args):
+            pass
+
+        def do_GET(self):
+            self.send_response(200)
+            self.send_header("Content-Length", "2")
+            self.end_headers()
+            self.wfile.write(b"ok")
+
+    @staticmethod
+    def free_port():
+        import socket
+        with socket.socket() as probe:
+            probe.bind(("127.0.0.1", 0))
+            return probe.getsockname()[1]
+
+    def get(self, port):
+        import urllib.request
+        with urllib.request.urlopen(f"http://127.0.0.1:{port}/", timeout=3) as reply:
+            return reply.read()
+
+    def test_a_lost_listening_socket_is_opened_again_on_the_same_port(self):
+        import threading
+        import device_main
+        port = self.free_port()
+        listener = device_main.Listener(port, self.Hello).open()
+        stop = threading.Event()
+        watcher = threading.Thread(target=device_main.watch, args=([listener],), kwargs={"interval": 0.1, "stop": stop})
+        watcher.start()
+        self.addCleanup(lambda: (stop.set(), watcher.join(), listener.server.shutdown(), listener.server.server_close()))
+        self.assertEqual(self.get(port), b"ok")
+        lost = listener.server
+        lost.socket.close()  # what the system does to a suspended iOS App
+        self.assertFalse(listener.alive())
+        for _ in range(50):
+            if listener.server is not lost and listener.alive():
+                break
+            threading.Event().wait(0.1)
+        self.assertIsNot(listener.server, lost)
+        self.assertEqual(self.get(port), b"ok")
+
+    def test_a_working_listener_is_left_alone(self):
+        import threading
+        import device_main
+        listener = device_main.Listener(self.free_port(), self.Hello).open()
+        self.addCleanup(lambda: (listener.server.shutdown(), listener.server.server_close()))
+        stop = threading.Event()
+        watcher = threading.Thread(target=device_main.watch, args=([listener],), kwargs={"interval": 0.05, "stop": stop})
+        server = listener.server
+        watcher.start()
+        threading.Event().wait(0.3)
+        stop.set()
+        watcher.join()
+        self.assertIs(listener.server, server)
+
+
+class NativeStarterTests(unittest.TestCase):
+    """iOS hands Python a C function that starts the Taiwanese whisper-server."""
+
+    def test_the_app_function_is_called_and_its_state_returned(self):
+        import ctypes
+        import device_main
+        calls = []
+
+        @ctypes.CFUNCTYPE(ctypes.c_char_p)
+        def app_starter():
+            calls.append(1)
+            return b"ready"
+
+        address = ctypes.cast(app_starter, ctypes.c_void_p).value
+        provide = device_main.taiwanese_provider(8776, device_main.native_starter(address))
+        self.assertEqual(provide(), ("http://127.0.0.1:8776", None))
+        self.assertEqual(calls, [1])
+
+    def test_a_missing_model_is_reported_not_raised(self):
+        import ctypes
+        import device_main
+
+        @ctypes.CFUNCTYPE(ctypes.c_char_p)
+        def app_starter():
+            return b"missing"
+
+        address = ctypes.cast(app_starter, ctypes.c_void_p).value
+        provide = device_main.taiwanese_provider(8776, device_main.native_starter(address))
+        self.assertEqual(provide(), (None, "missing"))
