@@ -143,7 +143,7 @@ Android 不受影響：`AssistantOnDevice.start` 在 Android 不啟用，`settle
 
 **原因**
 
-1. **rebind patch 沒有作用**（在電腦上用同一版 cpp-httplib 重現，`D:\TownPassAssistant\ios-resume\rebind\harness.cpp`）：
+1. **rebind patch 沒有作用**（在電腦上用同一版 cpp-httplib 重現，`<工作資料夾>\ios-resume\rebind\harness.cpp`）：
    iOS 收回 socket 後 `accept()` 失敗，cpp-httplib 把 server 標成 `is_decommissioned`；之後 `bind_to_port()` 一進去就因為這個旗標失敗，
    patch 每秒重試、共 3,600 次，**port 關一小時**，執行緒又沒有結束，`runServer` 也不會重跑。llama.cpp b12182（cpp-httplib 0.65）與 whisper.cpp v1.9.5（0.20）都一樣。
    修正：重新 bind 前先 `stop()`（只清掉旗標，socket 已經關了）；重現程式改了以後第 1 秒就 bound again。
@@ -171,7 +171,7 @@ Android 不受影響：`AssistantOnDevice.start` 在 Android 不啟用，`settle
 
 ## 台語：不改用華語、記憶體、紀錄檔（2026-11-16，branch `feat/need-style-assistant`，Swift 尚待 CI 編譯與 iPhone 實測）
 
-**紀錄**（擁有者，iPhone 17 Pro Max，`D:\TownPassAssistant\ios-resume\logs\taiwanese-20261116\`）：
+**紀錄**（擁有者，iPhone 17 Pro Max，`<工作資料夾>\ios-resume\logs\taiwanese-20261116\`）：
 
 1. **前一次使用期間**（`.prev.log`，17:31–17:44）：台語模型 12 次都沒有載入，每次都是
    `taiwanese speech: needs 1847 MB + 256 MB margin; app budget 1942–2103 MB … address space short`（回 `memory`）。
@@ -213,7 +213,7 @@ POSIX 的 `O_APPEND` 保證每次 `write` 前先移到檔尾，Python 直接寫 
 ## 切到別的 App 回來講話閃退（2026-11-18，branch `fix/mic-and-resume-crash`，Swift 與 native 尚待 CI 編譯與 iPhone 實測）
 
 **現象**（擁有者，iPhone 17 Pro Max，iOS 27.0.1，App 0.0.12）：切到別的 App 再切回來，一講話 App 就閃退。
-crash log：`D:\TownPassAssistant\ios-resume\logs\crash-20261118\Runner-2026-11-18-010906.ips`（分析 `ANALYSIS.md`）。閃退那一次的 App 紀錄已被覆蓋（當時只保留 2 次）。
+crash log：`<工作資料夾>\ios-resume\logs\crash-20261118\Runner-2026-11-18-010906.ips`（分析 `ANALYSIS.md`）。閃退那一次的 App 紀錄已被覆蓋（當時只保留 2 次）。
 
 **crash log 看到的**
 
@@ -223,7 +223,7 @@ crash log：`D:\TownPassAssistant\ios-resume\logs\crash-20261118\Runner-2026-11-
 - 同時執行緒 84：Python → `OnDeviceAssistant.restartServer` → `restart(_:failing:)` 正在等 server 回應：後端判定 whisper-multilingual 出錯，請 App 重啟，
   `townpass_whisper_server_stop` 讓 main 結束並釋放模型。執行緒 1 是 Metal residency set 的背景執行緒，在 `usleep`，沒有拿鎖。
 
-**原因（讀 whisper.cpp v1.9.5 原始碼，`D:\TownPassAssistant\native-src\whisper.cpp`）**
+**原因（讀 whisper.cpp v1.9.5 原始碼，`<工作資料夾>\native-src\whisper.cpp`）**
 
 1. **重複釋放**（最符合 crash log 的解釋）：`whisper_full_with_state` 在溫度重試、解碼器變多時重建 KV self 快取（`src/whisper.cpp` 約 7317 行）：
    先釋放舊的，再配置新的（Whisper small、best_of 2 時放大 4 倍，約 75 MB 的 Metal 緩衝區）；**配置失敗時呼叫 `whisper_free_state(state)` 並回 -7，但 `ctx->state` 還指著它**。

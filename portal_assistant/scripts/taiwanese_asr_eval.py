@@ -3,7 +3,8 @@
 Public test clips only (no recordings of our own, no TAT): the adi-gov-tw
 Taiwan-Tongues-ASR-CE Hokkien set, which repackages Common Voice nan-tw clips
 (CC0) under TRAIL-D v0.1 (free use, local evaluation allowed). Audio stays
-under D:\\TownPassAssistant\\models\\taiwanese\\eval-data, never in the repo.
+under %TOWNPASS_PORTAL_ASSISTANT_WORK%\\models\\taiwanese\\eval-data, never in the repo
+(portal_assistant/docs/TEAM_LOCAL_SETUP.md section 3.1).
 
   prepare     test split (all) + train clips whose reference names a service word -> 16 kHz wav + manifest
   transcribe  one model config through a host whisper-server and asr_server.WhisperCppRecognizer
@@ -36,19 +37,20 @@ import urllib.request
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "backend"))
+sys.path.insert(0, str(ROOT / "scripts"))
+from work_env import path_with_msys, work_dir, work_path  # noqa: E402
 
-DATA = pathlib.Path(r"D:\TownPassAssistant\models\taiwanese\eval-data")
+DATA = work_path("models", "taiwanese", "eval-data")
 SOURCE = DATA / "adi-hokkien"
 WAV = DATA / "wav"
 RESULTS = DATA / "results"
 MANIFEST = DATA / "manifest.json"
 # Mandarin / English / Japanese FLEURS clips (CC BY 4.0) prepared by another agent;
 # read only. References come from the FLEURS tsv files, matched by sample count.
-FLEURS_WAV = pathlib.Path(r"D:\TownPassAssistant\eval-data\langgate\fleurs")
+FLEURS_WAV = work_path("eval-data", "langgate", "fleurs")
 FLEURS_TSV = DATA / "fleurs-cmn"
 FLEURS_MANIFEST = DATA / "manifest_fleurs.json"
-SERVER = pathlib.Path(r"D:\TownPassAssistant\native-src\whisper.cpp\build-host\bin\whisper-server.exe")
-MSYS = r"C:\msys64\ucrt64\bin"
+SERVER = work_path("native-src", "whisper.cpp", "build-host", "bin", "whisper-server.exe")
 PORT = 8901
 SERVICE_LIMIT = 150
 
@@ -240,7 +242,7 @@ def transcribe(args):
     with socket.socket() as probe:
         if probe.connect_ex(("127.0.0.1", PORT)) == 0:
             raise SystemExit(f"port {PORT} is in use")
-    env = {**os.environ, "PATH": MSYS + os.pathsep + os.environ.get("PATH", "")}
+    env = {**os.environ, "PATH": path_with_msys()}
     # The App's launch arguments (OnDeviceAssistant.kt): -t <threads> -l zh.
     log = open(RESULTS / f"{args.name}.server.log", "w", encoding="utf-8")
     process = subprocess.Popen([str(SERVER), "-m", args.model, "--host", "127.0.0.1", "--port", str(PORT),
@@ -532,6 +534,7 @@ def main():
     sub.add_parser("report")
     sub.add_parser("routing")
     args = parser.parse_args()
+    work_dir()  # stops with a clear message when TOWNPASS_PORTAL_ASSISTANT_WORK is not set
     {"prepare": prepare, "prepare-fleurs": prepare_fleurs, "transcribe": transcribe, "decide": decide, "report": report, "routing": routing}[args.command](args)
 
 

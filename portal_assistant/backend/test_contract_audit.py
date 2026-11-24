@@ -1,5 +1,5 @@
 """App <-> backend contract fixes after the 2026-11-16 audit (portal_assistant/docs/AI_CURRENT_RULES.md
-sections 3, 5 and 7; D:\\TownPassAssistant\\need-impl\\contract-audit\\AUDIT.md), over real
+sections 3, 5 and 7; %TOWNPASS_PORTAL_ASSISTANT_WORK%\\need-impl\\contract-audit\\AUDIT.md), over real
 HTTP like the App (server.make_handler). Sentences are written here."""
 import json
 import pathlib

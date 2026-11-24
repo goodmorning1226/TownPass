@@ -72,7 +72,7 @@
 用來取代「決策模型速度研究」以電腦比例推算的手機數字（`.model-study/summarize.py` 的 `phone_s_pcratio`）。
 
 **做法**
-- llama-bench 用 App 同一份 llama.cpp b12182 原始碼、同一組旗標（NDK 29.0.13113456、android-28、`-DGGML_CPU_ARM_ARCH=armv8.6-a+dotprod+i8mm+fp16`、`-DGGML_CPU_KLEIDIAI=ON`、OpenMP/llamafile 關閉），另外建在 `D:\TownPassAssistant\model-study\build-android-arm64-bench-b12182`，沒有動 `android/app/assistant-native`。
+- llama-bench 用 App 同一份 llama.cpp b12182 原始碼、同一組旗標（NDK 29.0.13113456、android-28、`-DGGML_CPU_ARM_ARCH=armv8.6-a+dotprod+i8mm+fp16`、`-DGGML_CPU_KLEIDIAI=ON`、OpenMP/llamafile 關閉），另外建在 `<工作資料夾>\model-study\build-android-arm64-bench-b12182`，沒有動 `android/app/assistant-native`。
 - 模型推到 `/data/local/tmp/bench/`（Ministral Q4_K_M 從 App 的模型資料夾複製一份，原檔沒動），測完整個資料夾已刪除。
 - CPU 綁定比照 `OnDeviceAssistant.llamaCpuArgs()`：讀提示 5 執行緒綁中核＋大核（`0xf8`），生成 3 執行緒綁最快 3 核（cpu7、3、4 → `0x98`），`--cpu-strict 1`。
 - 「讀提示」用 `-p 180`、「生成」用 `-n 8`，兩者都先填 260 token 的上下文（`-d 260`），每項重複 3 次。
@@ -134,15 +134,15 @@ Ministral Q4_K_S、Q4_0 這次沒有測（手機使用時間已超出預定，�
 
 ## 8. Gemma 調整與 App 選項（2026-11-08）
 
-分支 `exp/gemma-decision`（從 `feat/asr-ablation` `defa7de` 開出，worktree `D:\github\TownPass-gemma`，未提交）。
-模型：Gemma 4 E2B-it Q4_0（`ggml-org/gemma-4-E2B-it-GGUF`，2.84 GB，`D:\TownPassAssistant\model-study\dl-gemma4-e2b-q4_0\gemma-4-E2B-it-Q4_0.gguf`）；對照 Ministral 3B Q4_K_M（App 現行）。
+分支 `exp/gemma-decision`（從 `feat/asr-ablation` `defa7de` 開出，worktree `TownPass-gemma`，未提交）。
+模型：Gemma 4 E2B-it Q4_0（`ggml-org/gemma-4-E2B-it-GGUF`，2.84 GB，`<工作資料夾>\model-study\dl-gemma4-e2b-q4_0\gemma-4-E2B-it-Q4_0.gguf`）；對照 Ministral 3B Q4_K_M（App 現行）。
 
 **怎麼測**（兩個模型同一台電腦、同一套程式）
 - 沿用第 5 節「速度研究」的 `.model-study/run_variant.py` 做法，改成：llama-server b12182（Vulkan 版，`-ngl 99`）用手機的參數 `-c 6144 -np 3 --cache-ram 0 --reasoning off`；
   另開一個 e5 嵌入伺服器，所以 FAQ 與語意檢索都開著（和推了 FAQ 的手機一樣）；先送三個系統提示暖機（同 `device_main.warm_up`）；每次評估先把後端程式複製一份再跑，評估中改程式不會混進去。
 - 每次決策的 token 數取自後端的 `timing turn` 記錄（`TOWNPASS_TIMING_LOG=1`）。「新讀」是扣掉提示快取後真正要讀的 token。
 - 電腦用 GPU 只是為了跑得快；token 數和手機相同，手機秒數用第 7 節的乾淨實測速度估（Ministral 讀 49.8、生成 5.1 tok/s；Gemma 讀 114.3、生成 7.8 tok/s）。
-- 評估腳本與原始結果：`D:\TownPassAssistant\model-study\gemma-decision-2026-11-08\`（`run_eval.py`、`summarize.py`、`results\`）。
+- 評估腳本與原始結果：`<工作資料夾>\model-study\gemma-decision-2026-11-08\`（`run_eval.py`、`summarize.py`、`results\`）。
 
 **第 1 步：只用 dev（190）和多語 dev（46）調 Gemma**
 
@@ -197,7 +197,7 @@ Gemma 4 的對話模板有獨立的 system 角色（`<|turn>system`），所以�
 **如果擁有者決定接受（仍要手機實測）**
 
 App 選項已寫好並驗證過，存成一份 patch，沒有套用在分支上：
-`D:\TownPassAssistant\model-study\gemma-decision-2026-11-08\gemma-app-option.patch`。內容：
+`<工作資料夾>\model-study\gemma-decision-2026-11-08\gemma-app-option.patch`。內容：
 - `run_assistant_on_device.ps1 -DecisionModel gemma`（預設 `ministral`）→ 環境變數 `TOWNPASS_DECISION_MODEL` → Gradle 的 `assistant_decision_model` 資源值。
 - `OnDeviceAssistant.kt`：選 gemma 時載入 `gemma-4-E2B-it-Q4_0.gguf`，llama-server 參數和 Ministral 相同（`-c 6144 -np 3 --cache-ram 0 --reasoning off`；Gemma 4 不需要其他旗標）；
   手機上沒有 Gemma 檔就記一筆警告、改用 Ministral。
@@ -206,10 +206,10 @@ App 選項已寫好並驗證過，存成一份 patch，沒有套用在分支上�
 - 驗證：Python 測試 215 項通過（新增 3 項：預設是 Ministral、Gemma 只換模型名稱、`configure` 設定變數）、`fvm flutter analyze`（23 項 info，和 `feat/asr-ablation` 相同）、
   `fvm flutter test` 119 項通過、`fvm flutter build apk --debug`（on-device、arm64、`TOWNPASS_DECISION_MODEL=gemma`，參數同 `run_assistant_on_device.ps1`）成功；沒有安裝到手機。
 
-套用並安裝（在 `D:\github\TownPass-gemma`，手機接好且沒有別人在用時）：
+套用並安裝（在 `TownPass-gemma` worktree，手機接好且沒有別人在用時）：
 
 ```powershell
-git apply D:\TownPassAssistant\model-study\gemma-decision-2026-11-08\gemma-app-option.patch
+git apply <工作資料夾>\model-study\gemma-decision-2026-11-08\gemma-app-option.patch
 fvm dart run build_runner build --delete-conflicting-outputs
 # android\app\assistant-native\jniLibs 要先有 build_assistant_native.ps1 的輸出（此 worktree 已從 TownPass-asr 複製）
 .\scripts\push_assistant_models.ps1 -DecisionModel gemma      # 第一次約 2.84 GB

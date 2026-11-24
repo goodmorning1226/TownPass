@@ -1,7 +1,7 @@
 """Check llama-server's multilingual-e5-small embeddings against PyTorch.
 
 Usage: python -I portal_assistant/rag_handoff/reference/verify_e5_gguf.py <HF model dir> <server URL> [<server URL> ...]
-Needs torch + transformers (e.g. D:/TownPassAssistant/convert-venv). The server
+Needs torch + transformers (e.g. %TOWNPASS_PORTAL_ASSISTANT_WORK%\\convert-venv). The server
 runs `llama-server --embedding --pooling mean -m multilingual-e5-small-*.gguf`.
 Reference: the model card's recipe, mean pooling over the attention mask + L2.
 Prints the cosine between the two vectors per sentence; the index is valid

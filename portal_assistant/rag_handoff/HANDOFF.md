@@ -4,9 +4,9 @@
 > on-device, Chinese-FAQ semantic search into the app, without needing to
 > reason about the index / model pipeline.
 >
-> **Source workspace** — `C:\Users\reg94\Desktop\Taipeicodefest2026`
-> (Python dev scratchpad; stays separate from the Flutter repo).
-> **This handoff** — `C:\Users\reg94\Desktop\Taipeicodefest2026\rag_handoff\`
+> **Source workspace** — `Taipeicodefest2026`
+> (a teammate's local Python dev scratchpad; stays separate from the Flutter repo).
+> **This handoff** — `Taipeicodefest2026\rag_handoff\`
 
 ---
 

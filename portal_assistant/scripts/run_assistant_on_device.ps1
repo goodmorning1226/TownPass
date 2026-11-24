@@ -26,7 +26,8 @@ param([string]$DeviceId, [switch]$Release, [ValidateSet("whisper", "system")][st
 # an error when output is redirected, so failures are detected by exit codes instead.
 $ErrorActionPreference = "Continue"
 $root = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)  # the App: this script is in portal_assistant/scripts
-$sdk = if ($env:ANDROID_HOME) { $env:ANDROID_HOME } else { "D:\Android\Sdk" }
+. (Join-Path $PSScriptRoot "work_env.ps1")
+$sdk = Get-AndroidSdk  # ANDROID_HOME, ANDROID_SDK_ROOT or %LOCALAPPDATA%\Android\Sdk
 $adb = Join-Path $sdk "platform-tools\adb.exe"
 $devices = @(& $adb devices | Select-String '^\S+\s+device$' | ForEach-Object { ($_ -split '\s+')[0] })
 if (-not $DeviceId) {

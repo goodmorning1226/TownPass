@@ -83,7 +83,7 @@
 
 ## 5. 語言偵測準確度（電腦，FLEURS 測試集 CC BY 4.0，每個語言 40 段）
 
-錄音放在 `D:\TownPassAssistant\eval-data\langgate`（不在 repo）。每段取完整、3 秒、1.5 秒三種長度（從聲音開始處切），
+錄音放在 `<工作資料夾>\eval-data\langgate`（不在 repo）。每段取完整、3 秒、1.5 秒三種長度（從聲音開始處切），
 另外加上 140 段合成的台灣華語指令（乾淨 70、加雜音 70）。tiny q8_0，`audio_ctx 256`，與手機相同。
 
 ### 中文被判成我們的其他語言（會拖慢或翻錯中文）
@@ -162,23 +162,25 @@ whisper-server 沒有開放 `max_tokens`；要真正限制長度，需要修改 
 
 ## 8. 安裝
 
+（`<工作資料夾>`、`<裝置序號>` 的意思見 [TEAM_LOCAL_SETUP.md](TEAM_LOCAL_SETUP.md) 第 3.1 節。）
+
 模型（OpenAI Whisper tiny，MIT，whisper.cpp 官方轉檔）：
 
 ```powershell
 Invoke-WebRequest https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-tiny-q8_0.bin `
-  -OutFile D:\TownPassAssistant\models\asr-ablation\ggml-tiny-q8_0.bin
+  -OutFile <工作資料夾>\models\asr-ablation\ggml-tiny-q8_0.bin
 ```
 
 推到手機並安裝（`push_assistant_models.ps1` 預設會推閘門，固定檔名 `ggml-whisper-langid.bin`）：
 
 ```powershell
-$env:ANDROID_SERIAL = "10AF8403R5001SP"
-.\scripts\push_assistant_models.ps1 -DeviceId 10AF8403R5001SP -DecisionModel gemma `
-  -Taiwanese D:\TownPassAssistant\models\taiwanese\ggml-breeze-asr-26-q8_0.bin
-.\scripts\run_assistant_on_device.ps1 -DeviceId 10AF8403R5001SP -DecisionModel gemma
+$env:ANDROID_SERIAL = "<裝置序號>"
+.\scripts\push_assistant_models.ps1 -DeviceId <裝置序號> -DecisionModel gemma `
+  -Taiwanese <工作資料夾>\models\taiwanese\ggml-breeze-asr-26-q8_0.bin
+.\scripts\run_assistant_on_device.ps1 -DeviceId <裝置序號> -DecisionModel gemma
 ```
 
-- 不要閘門：`.\scripts\push_assistant_models.ps1 -DeviceId 10AF8403R5001SP -LanguageGate ""`（從手機刪掉），重開 App。
+- 不要閘門：`.\scripts\push_assistant_models.ps1 -DeviceId <裝置序號> -LanguageGate ""`（從手機刪掉），重開 App。
   沒有這個檔案時，App 不啟動閘門，辨識流程和沒有閘門時一樣（仍然用新的語言規則）。
 - 閘門 server：`127.0.0.1:8775`，4 個執行緒，在多語模型之後啟動。需要多語模型（`ggml-whisper-multilingual.bin`）。
 - 記憶體：依 whisper.cpp 啟動記錄的配置約 190 MB（模型 43 MB、解碼緩衝 96 MB 等），沒有實測 RSS。

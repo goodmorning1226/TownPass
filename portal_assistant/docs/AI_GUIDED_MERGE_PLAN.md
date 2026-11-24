@@ -4,7 +4,7 @@
 
 | 項目 | 內容 |
 | --- | --- |
-| 我們（OURS） | `feat/asr-ablation` @ `0e090e9`（worktree `D:\github\TownPass-asr`） |
+| 我們（OURS） | `feat/asr-ablation` @ `0e090e9`（worktree `TownPass-asr`） |
 | 隊友（THEIRS） | `origin/feat/guided-assistant-mock`，從共同祖先 `06f4018` 起 6 個提交（`8d71c41`、`11050f0`、`a2ba4e8`（merge）、`5cdfdbb`、`6c442a0`、`3e454c4`） |
 | 共同祖先 | `06f4018`（`git merge-base` 確認） |
 | 決定 | 合併。**畫面與操作方式用隊友的設計**（助理面板、任務卡、企鵝卡、真實頁面上的步驟光圈）；**我們現有的功能全部保留**，並延伸到他們的功能上 |

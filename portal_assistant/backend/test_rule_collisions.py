@@ -22,7 +22,7 @@ Known collisions are ceilings (per rule) that may only go down, like test_colloq
 ceilings: adding a service, a keyword or a rule runs the probes again, and a new collision fails
 with its X, its rule and its similarity. When a fix removes collisions, lower the ceiling to the
 new count (the test says so) and drop the fixed keys from KNOWN.
-The full sorted list: python rule-audit/collisions.py (D:\\TownPassAssistant\\need-impl\\rule-audit).
+The full sorted list: python rule-audit/collisions.py (%TOWNPASS_PORTAL_ASSISTANT_WORK%\\need-impl\\rule-audit).
 """
 import json
 import math

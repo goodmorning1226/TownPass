@@ -1,7 +1,7 @@
 # TownPass assistant test brief (shared by all test agents)
 
 You are black-box testing the TownPass city-service assistant (Taipei city app) through the same HTTP
-API the Flutter App calls. Repo: C:/Users/reg94/Documents/GitHub/TownPass (branch feat/asr-ablation).
+API the Flutter App calls. Repo: the team's TownPass checkout (branch feat/asr-ablation).
 Do NOT edit any repo file, do NOT commit, do NOT stop or start servers. Only write your own output files.
 
 ## How the assistant works (enough to judge results)
@@ -21,7 +21,7 @@ Do NOT edit any repo file, do NOT commit, do NOT stop or start servers. Only wri
   lib-book-4 The winners (Fredrik Backman); lib-book-5 歡迎光臨錢天堂：神奇柑仔店大圖鑑; lib-book-6 神奇柑仔店15 冒牌的長髮公主餅乾.
 
 ## Tool
-python C:/Users/reg94/AppData/Local/Temp/claude/22db0b40399fb74b/edebda6c-36b7-4186-9b0f-b933ff7c6c4c/scratchpad/assistant_test/ask.py --port <PORT> [--session S] [--resolution R --choice N] [--context JSON] "<text>"
+python <scratchpad>/assistant_test/ask.py --port <PORT> [--session S] [--resolution R --choice N] [--context JSON] "<text>"
 - Prints one JSON line: status, kind, action, destination, route, model_calls, elapsed_ms, resolution_id,
   choices, language, message. Use the same --session for multi-turn; pass --resolution/--choice to pick an option.
 - Set PYTHONIOENCODING=utf-8. The model runs on a shared CPU with other testers: a turn can take 5–120 s.
@@ -50,6 +50,6 @@ Taiwanese as English"), and say when a cause is a guess.
 2. <results dir>/<NAME>.md — short findings: totals per verdict; a table of every FAIL/CONCERN
    (input → observed → expected); grouped problems with likely root cause and evidence (file:line where possible);
    what you could NOT test.
-Results dir: C:/Users/reg94/AppData/Local/Temp/claude/22db0b40399fb74b/edebda6c-36b7-4186-9b0f-b933ff7c6c4c/scratchpad/assistant_test/results
+Results dir: <scratchpad>/assistant_test/results
 Write the JSON incrementally (rewrite the file after each few cases) so partial results survive.
 Final reply to the orchestrator: verdict totals and the top 5 problems, nothing else.

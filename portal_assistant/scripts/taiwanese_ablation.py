@@ -3,7 +3,8 @@
 Accuracy vs memory/speed for smaller Taiwanese models than Breeze-ASR-26 q8_0. Same
 public clips as portal_assistant/docs/AI_TAIWANESE_SPEECH_PLAN.md section 10 (adi-gov-tw repackaging of
 Common Voice nan-tw, CC0 / TRAIL-D; no TAT, no recordings of our own). Audio, model
-files and results stay under D:\\TownPassAssistant\\taiwanese-ablation, never in the repo.
+files and results stay under %TOWNPASS_PORTAL_ASSISTANT_WORK%\\taiwanese-ablation, never in the repo
+(portal_assistant/docs/TEAM_LOCAL_SETUP.md section 3.1).
 
 Clip sets (taiwanese_asr_eval.MANIFEST, 473 clips):
   heldout  the fixed 100 of section 10 (50 test + 50 service, seed 20261108): reporting only
@@ -43,18 +44,18 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "scripts"))
 sys.path.insert(0, str(ROOT / "backend"))
 import taiwanese_asr_eval as base  # noqa: E402  (manifest, CER helpers, service words)
+from work_env import path_with_msys, work_dir, work_path  # noqa: E402
 
-WORK = pathlib.Path(r"D:\TownPassAssistant\taiwanese-ablation")
+WORK = work_path("taiwanese-ablation")
 RESULTS = WORK / "results"
 DATA = WORK / "data"
 MODELS = WORK / "models"
-OLD = pathlib.Path(r"D:\TownPassAssistant\models\taiwanese")
-WHISPER_BIN = pathlib.Path(r"D:\TownPassAssistant\native-src\whisper.cpp\build-host\bin")
-LLAMA = pathlib.Path(r"D:\TownPassAssistant\model-study\build-host-b12182\bin\llama-server.exe")
-E5 = pathlib.Path(r"D:\TownPassAssistant\models\faq-e5\multilingual-e5-small-q8_0.gguf")
-CLASSIFIER = pathlib.Path(r"D:\TownPassAssistant\decision-classifier\models\townpass-decision-e5-ce-v1-q8_0.gguf")
-CATALOG = pathlib.Path(r"D:\TownPassAssistant\classifier-app\cache\library_catalog.json")
-MSYS = r"C:\msys64\ucrt64\bin"
+OLD = work_path("models", "taiwanese")
+WHISPER_BIN = work_path("native-src", "whisper.cpp", "build-host", "bin")
+LLAMA = work_path("model-study", "build-host-b12182", "bin", "llama-server.exe")
+E5 = work_path("models", "faq-e5", "multilingual-e5-small-q8_0.gguf")
+CLASSIFIER = work_path("decision-classifier", "models", "townpass-decision-e5-ce-v1-q8_0.gguf")
+CATALOG = work_path("classifier-app", "cache", "library_catalog.json")
 WHISPER_PORT, E5_PORT, CLS_PORT = 9021, 9023, 9024
 THREADS = 6  # section 10 and the vivo bench (-t 6)
 CALIBRATION_CLIP = base.WAV / "test" / "test-000000104.wav"  # tw104, section 9.4
@@ -74,9 +75,9 @@ CANDIDATES = {
                           arch="large-v2", by="MediaTek Research + NYCU (TW)", licence="Apache-2.0", app=True),
     "breeze26-q3_k": dict(model=MODELS / "ggml-breeze-asr-26-q3_k.bin", path="taiwanese", output="mandarin",
                           arch="large-v2", by="MediaTek Research + NYCU (TW)", licence="Apache-2.0", app=True),
-    "small-prompt": dict(model=pathlib.Path(r"D:\TownPassAssistant\models\asr-ablation\ggml-small-q8_0.bin"),
+    "small-prompt": dict(model=work_path("models", "asr-ablation", "ggml-small-q8_0.bin"),
                          path="zh-prompt", output="mandarin", arch="small", by="OpenAI (US)", licence="MIT", app=True),
-    "small-noprompt": dict(model=pathlib.Path(r"D:\TownPassAssistant\models\asr-ablation\ggml-small-q8_0.bin"),
+    "small-noprompt": dict(model=work_path("models", "asr-ablation", "ggml-small-q8_0.bin"),
                            path="zh-noprompt", output="mandarin", arch="small", by="OpenAI (US)", licence="MIT",
                            app=True),
     "linshoufan-small-q8_0": dict(model=OLD / "ggml-linshoufan-whisper-small-nan-tw-q8_0.bin", path="taiwanese",
@@ -313,7 +314,7 @@ def transcribe(args):
         return
     if not port_free(WHISPER_PORT):
         raise SystemExit(f"port {WHISPER_PORT} is in use")
-    env = {**os.environ, "PATH": MSYS + os.pathsep + os.environ.get("PATH", "")}
+    env = {**os.environ, "PATH": path_with_msys()}
     log_path = RESULTS / f"{args.name}.{args.clips}.server.log"
     log = open(log_path, "w", encoding="utf-8")
     started = time.monotonic()
@@ -373,7 +374,7 @@ TIMING = re.compile(r"whisper_print_timings:\s+(load|mel|sample|encode|decode|ba
 def cli_timing(args):
     """whisper-cli on tw104 with the vivo bench flags (section 9.4), no prompt: 1 warm-up + N runs."""
     spec = CANDIDATES[args.name]
-    env = {**os.environ, "PATH": MSYS + os.pathsep + os.environ.get("PATH", "")}
+    env = {**os.environ, "PATH": path_with_msys()}
     report = {"name": args.name, "clip": str(CALIBRATION_CLIP), "threads": args.threads}
     for ctx in (316, 500):
         runs = []
@@ -697,6 +698,7 @@ def main():
     sub.add_parser("prepare-fresh")
     sub.add_parser("prepare-mandarin")
     args = parser.parse_args()
+    work_dir()  # stops with a clear message when TOWNPASS_PORTAL_ASSISTANT_WORK is not set
     {"transcribe": transcribe, "cli-timing": cli_timing, "decide": decide, "report": report,
      "oracle": oracle, "prepare-fresh": prepare_fresh,
      "prepare-mandarin": prepare_mandarin}[args.command](args)

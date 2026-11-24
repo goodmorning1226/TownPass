@@ -44,13 +44,13 @@ FAQ 層的回覆依最高分分三段（門檻依據見第 6 節）：
 取得與轉換（模型檔放在 repo 外）：
 
 1. 下載：`huggingface_hub.snapshot_download('intfloat/multilingual-e5-small')`，revision `614241f622f53c4eeff9890bdc4f31cfecc418b3`，
-   放在 `D:\TownPassAssistant\source\multilingual-e5-small`（`model.safetensors` 470,641,600 bytes）。
+   放在 `<工作資料夾>\source\multilingual-e5-small`（`model.safetensors` 470,641,600 bytes）。
 2. 轉換：llama.cpp b12182 的 `convert_hf_to_gguf.py` 對「BertModel + XLM-RoBERTa SentencePiece 詞表」會停在
    `BPE pre-tokenizer was not recognized`。[portal_assistant/scripts/convert_e5_gguf.py](../scripts/convert_e5_gguf.py) 只把詞表寫入換成轉換器內建的
    XLM-RoBERTa SentencePiece 版本（不套用 XLM-R 的位置偏移，這個 checkpoint 是 BERT 位置），其餘不變：
    `python -s -E portal_assistant/scripts/convert_e5_gguf.py <llama.cpp> <HF 資料夾> <out.gguf> q8_0`（需 sentencepiece、protobuf）。
    `portal_assistant/scripts/prepare_assistant_models.ps1` 第 3 步會自動下載與轉換。
-3. 產出：`D:\TownPassAssistant\models\device\multilingual-e5-small-q8_0.gguf` 132,441,760 bytes，
+3. 產出：`<工作資料夾>\models\device\multilingual-e5-small-q8_0.gguf` 132,441,760 bytes，
    sha256 `1d76aaf0627f8385090b4027fcd3827861e7d51f1e27c9f0f479551b6da810d3`。另轉了 F16（242,361,632 bytes）僅供比對。
 4. 向量比對：[portal_assistant/rag_handoff/reference/verify_e5_gguf.py](../rag_handoff/reference/verify_e5_gguf.py) 以 PyTorch（transformers 5.2.1、torch 2.15.0）
    按模型卡做 mean pooling + L2，與 llama-server 的向量比對 20 句（中文 query／passage、英日越印尼泰、單字、超長句）：
@@ -226,9 +226,9 @@ dev 差 1 題（基線 181）屬模型輸出的正常變動，非本次改動。
   與本文件到 `006e43c`，重新安裝 bge 資料夾與 `onnxruntime tokenizers numpy`。（注意：使用者規定不得使用中國開發的模型，bge 不應再使用。）
 - 刪除新增檔：`portal_assistant/scripts/convert_e5_gguf.py`、`portal_assistant/scripts/build_faq_index.py`、`portal_assistant/rag_handoff/reference/verify_e5_gguf.py`、
   `portal_assistant/rag_handoff/tuning/{e5_graded1-3,multilingual,to_grade,sweep_result_bge}.json`、`multilingual.py`。
-  repo 外：`D:\TownPassAssistant\models\device\multilingual-e5-small-q8_0.gguf`、`D:\TownPassAssistant\models\faq-e5\`、
-  `D:\TownPassAssistant\faq-e5-index\`、`D:\TownPassAssistant\source\multilingual-e5-small\`、`%LOCALAPPDATA%\TownPassAssistant\faq_rag`、
-  `D:\TownPassAssistant\native-src\llama.cpp\build-host\`。
+  repo 外：`<工作資料夾>\models\device\multilingual-e5-small-q8_0.gguf`、`<工作資料夾>\models\faq-e5\`、
+  `<工作資料夾>\faq-e5-index\`、`<工作資料夾>\source\multilingual-e5-small\`、`%LOCALAPPDATA%\TownPassAssistant\faq_rag`、
+  `<工作資料夾>\native-src\llama.cpp\build-host\`。
 
 ## 9. 台北通常見問答（App 自身的 Q&A）
 

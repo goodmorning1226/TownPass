@@ -10,11 +10,13 @@
 #
 #   portal_assistant/native/ios/build_ios_whisper_server.sh [whisper.cpp-dir] [out-dir]
 #
-# whisper.cpp-dir (default ~/Library/Application Support/TownPassAssistant/native-src/whisper.cpp)
-# is a checkout of tag v1.9.5. out-dir defaults to that folder's ../ios-out.
+# whisper.cpp-dir (default <work>/native-src/whisper.cpp) is a checkout of tag v1.9.5.
+# out-dir defaults to that folder's ../ios-out.
+# (<work> is $TOWNPASS_PORTAL_ASSISTANT_WORK when set, else ~/Library/Application Support/TownPassAssistant)
 set -euo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"  # portal_assistant/native/ios: the patches and entry files
-SRC="${1:-$HOME/Library/Application Support/TownPassAssistant/native-src/whisper.cpp}"
+WORK_DIR="${TOWNPASS_PORTAL_ASSISTANT_WORK:-$HOME/Library/Application Support/TownPassAssistant}"  # portal_assistant/docs/TEAM_LOCAL_SETUP.md 3.1
+SRC="${1:-$WORK_DIR/native-src/whisper.cpp}"
 OUT="${2:-$SRC/../ios-out}"
 BUILD="$SRC/build-ios"
 

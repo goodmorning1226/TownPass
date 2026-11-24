@@ -1,7 +1,7 @@
 """Early rules that can be switched off one at a time, for evaluation only.
 
 portal_assistant/docs/AI_CURRENT_RULES.md sections 2 and 8 (2026-11-16, the rule-interference report): every rule
-that decides a turn before semantic retrieval or the classifier (D:\\TownPassAssistant\\need-impl\\
+that decides a turn before semantic retrieval or the classifier (%TOWNPASS_PORTAL_ASSISTANT_WORK%\\need-impl\\
 rule-audit\\interference.md) has a name here. TOWNPASS_DISABLE_RULES=listing_sound,sound_fallback
 switches those off, so the evaluation can measure what each rule changes on the dev sets.
 Empty by default: the App never sets it, and nothing behaves differently without it.

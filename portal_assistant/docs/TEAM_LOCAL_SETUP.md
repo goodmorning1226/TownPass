@@ -123,6 +123,33 @@ Python 測試不需要語音模型或 faster-whisper（語音部分用假的辨�
 Flutter 建置會處理被忽略的 Android wrapper 本機檔案；不要因缺少 wrapper 或 Windows 平台而 `flutter create .` 重建專案。
 若 SDK 的 junction／symlink 失敗，先核對 FVM cache 與權限，再依 `docs/DEVELOPMENT.md` 排錯；不要無條件開管理員模式或複製別台機器的 .fvm。
 
+### 3.1 本機路徑：工作資料夾、MSYS2、Android SDK、裝置序號
+
+模型、評估資料、原生原始碼（llama.cpp／whisper.cpp）與研究輸出都很大，放在 repo 外的**工作資料夾**。
+文件寫 `<工作資料夾>\models\device` 時，`<工作資料夾>` 就是下面 `TOWNPASS_PORTAL_ASSISTANT_WORK` 指的資料夾，子路徑照寫；
+腳本與程式也只讀這個變數，不寫死任何一台電腦的路徑。
+
+| 變數 | 意義 | 沒設時 |
+| --- | --- | --- |
+| `TOWNPASS_PORTAL_ASSISTANT_WORK` | 工作資料夾，例如 `<工作資料夾>\models\device`、`<工作資料夾>\native-src`、`<工作資料夾>\eval-data`；選空間夠大、沒有中文與 OneDrive 同步的短路徑 | 要用到它的腳本會停下來，說明要設這個變數，或改傳哪些參數 |
+| `TOWNPASS_PORTAL_ASSISTANT_MSYS_BIN` | MSYS2 UCRT64 的 `bin` 資料夾（用 MSYS2 gcc 建的電腦版 whisper.cpp 需要它的 DLL） | 靠 PATH 找 DLL |
+
+設成使用者層級（只影響目前的 Windows 使用者，不必管理員；設完重開終端與 IDE）：
+
+```powershell
+[Environment]::SetEnvironmentVariable('TOWNPASS_PORTAL_ASSISTANT_WORK', '<工作資料夾>', 'User')
+[Environment]::SetEnvironmentVariable('TOWNPASS_PORTAL_ASSISTANT_MSYS_BIN', '<MSYS2安裝目錄>\ucrt64\bin', 'User')   # 選用
+```
+
+只在目前終端試用：`$env:TOWNPASS_PORTAL_ASSISTANT_WORK = '<工作資料夾>'`。
+
+- Android SDK：腳本依序用 `ANDROID_HOME`、`ANDROID_SDK_ROOT`，都沒設時用 Android Studio 預設的 `%LOCALAPPDATA%\Android\Sdk`。
+- `<裝置序號>`：`adb devices` 列出的序號。腳本的 `-DeviceId` 預設讀 `ANDROID_SERIAL`；兩者都空時，只接一台裝置就用那一台。
+  Windows PowerShell 5.1 的 `$env:ANDROID_SERIAL = ""` 會把變數刪掉，效果等於沒設。
+- FAQ 索引與快取照舊放在每台電腦通用的 `%LOCALAPPDATA%\TownPassAssistant\`；Mac 的 iOS 腳本預設
+  `~/Library/Application Support/TownPassAssistant/`，有設 `TOWNPASS_PORTAL_ASSISTANT_WORK` 時改用工作資料夾（`native-src/`、`models/`）。
+- 後端與建置用的其他 `TOWNPASS_*` 執行期變數（例如 `TOWNPASS_FAQ_DIR`）是另一回事，名稱不變。
+
 ## 4. 決策模型下載與啟動
 
 本專案固定使用 **Mistral AI `ministral-3:3b`**；模型跑在電腦，不在手機。
@@ -176,7 +203,7 @@ FAQ 檢索（選用，工具呼叫找不到服務時回答臺北市府常見問�
 
 ```powershell
 # 另開一個視窗，保持執行（llama-server.exe 為 llama.cpp b12182 的 Windows 版）
-llama-server.exe -m D:\TownPassAssistant\models\device\multilingual-e5-small-q8_0.gguf --embedding --pooling mean --host 127.0.0.1 --port 8774 -c 2048 -np 4 -b 512 -ub 512 --no-webui
+llama-server.exe -m <工作資料夾>\models\device\multilingual-e5-small-q8_0.gguf --embedding --pooling mean --host 127.0.0.1 --port 8774 -c 2048 -np 4 -b 512 -ub 512 --no-webui
 # 索引 3 個檔案（約 19 MB）放在：
 New-Item -ItemType Directory -Force "$env:LOCALAPPDATA\TownPassAssistant\faq_rag"
 ```
@@ -204,7 +231,7 @@ New-Item -ItemType Directory -Force "$env:LOCALAPPDATA\TownPassAssistant\faq_rag
 
    ```powershell
    .\scripts\convert_breeze_asr.ps1                              # 預設放在 %LOCALAPPDATA%\TownPassAssistant
-   .\scripts\convert_breeze_asr.ps1 -Root D:\TownPassAssistant   # 也可指定空間較大的磁碟
+   .\scripts\convert_breeze_asr.ps1 -Root <工作資料夾>   # 也可指定空間較大的磁碟
    ```
 
    只下載推論檔案，不下載官方 repo 中的 optimizer 狀態與 pickle 檔。完成時會印出轉換結果資料夾，

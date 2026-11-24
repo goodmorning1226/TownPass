@@ -111,7 +111,7 @@ skill 本身：[`portal_assistant/skills/townpass-add-service/SKILL.md`](../skil
 ## 6. 演練紀錄與模型建議的依據
 
 2026-11-24 在暫時的 worktree（分支 `drill/fake-service`，從這次的工作複製）用**假服務**演練，演練完分支與 worktree 都刪掉。逐項紀錄在 repo 外
-`D:\TownPassAssistant\integration-plan\stage2_eval\drill_skips.txt`。
+`<工作資料夾>\integration-plan\stage2_eval\drill_skips.txt`。
 
 1. **照 skill 從頭做（Claude Sonnet 5.5 子 agent，情況 A、沒有教學）**：假服務 `sportsVenue`「運動場地預約」（示範網域上不存在的 `/sports-venue/`）。
    骨架剛產生時 `check_service.py` 8 個失敗；填完後只剩「沒有封存保留句」。它回報的問題都已修進 skill 與工具：

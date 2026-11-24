@@ -359,7 +359,7 @@ Python 517 個單元測試、Flutter 611 個（2026-11-13）；教學流程 177 
 兩邊都要 FVM（Flutter 3.47.6 鎖在 `.fvmrc`），模型檔放在 repo 外：由開發者推到手機，或讓 App 第一次打開助理時下載（使用者同意才下載）。
 
 **Android**：Windows、Android SDK（Platform 36、NDK 29）、JDK 17、Python 3.11+、adb；手機 7 GB 以上記憶體可以下載全部模型（7 GB 以下只有核心＋分類器）；
-模型預設在 `D:\TownPassAssistant\models\...`（見 `portal_assistant/scripts/prepare_assistant_models.ps1`）。
+模型預設在 `<工作資料夾>\models\...`（`<工作資料夾>` 是環境變數 `TOWNPASS_PORTAL_ASSISTANT_WORK`，見 [TEAM_LOCAL_SETUP.md](TEAM_LOCAL_SETUP.md) 第 3.1 節與 `portal_assistant/scripts/prepare_assistant_models.ps1`）。
 
 ```powershell
 fvm install
@@ -370,8 +370,8 @@ fvm dart run build_runner build --delete-conflicting-outputs   # 產生檔不在
 
 # 第一次或換模型時推模型（也可以不推，讓 App 自己下載）；預設推決策分類器、Ministral、Whisper small、tiny、e5 與 FAQ 索引
 .\scripts\push_assistant_models.ps1 -DeviceId <id> `
-    -Taiwanese  D:\TownPassAssistant\models\taiwanese\ggml-breeze-asr-26-q4_0.bin `
-    -Vietnamese D:\TownPassAssistant\models\vietnamese\ggml-phowhisper-base-q8_0.bin
+    -Taiwanese  <工作資料夾>\models\taiwanese\ggml-breeze-asr-26-q4_0.bin `
+    -Vietnamese <工作資料夾>\models\vietnamese\ggml-phowhisper-base-q8_0.bin
 
 .\scripts\run_assistant_on_device.ps1 -DeviceId <id>                           # 引導介面、決策分類器（預設）
 .\scripts\run_assistant_on_device.ps1 -DeviceId <id> -DecisionModel ministral  # 用 Ministral 決策

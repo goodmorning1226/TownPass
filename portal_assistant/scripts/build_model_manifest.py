@@ -6,6 +6,8 @@ portal_assistant/scripts/push_assistant_models.ps1 pushes. Files from the origin
 their Hugging Face URL (their size and SHA-256 matched those listings on
 2026-11-10); our own conversions and the FAQ index have only a path, served
 from the manifest's team_url (or TOWNPASS_MODEL_BASE_URL on the phone).
+Local files are under TOWNPASS_PORTAL_ASSISTANT_WORK (portal_assistant/docs/TEAM_LOCAL_SETUP.md
+section 3.1), except the FAQ index in %LOCALAPPDATA%/TownPassAssistant/faq_rag.
 The decision classifier (id "classifier", ASSISTANT_DECISION_MODEL=classifier,
 portal_assistant/docs/AI_DECISION_CLASSIFIER.md) is one of ours too: it is offered from team_url only
 once the owner has uploaded it there; until then test it with a local mirror
@@ -19,8 +21,12 @@ import hashlib
 import json
 import os
 import pathlib
+import sys
 
-MODELS = r"D:\TownPassAssistant\models"
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+from work_env import work_dir  # noqa: E402
+
+MODELS = "models"  # relative paths below are under TOWNPASS_PORTAL_ASSISTANT_WORK (local_path)
 FAQ = os.path.join(os.environ.get("LOCALAPPDATA", ""), "TownPassAssistant", "faq_rag")
 HF = "https://huggingface.co"
 
@@ -51,14 +57,14 @@ FILES = [
      f"{HF}/mistralai/Ministral-3-3B-Instruct-2512-GGUF/resolve/main/Ministral-3-3B-Instruct-2512-Q4_K_M.gguf",
      {"server": "decision", "decision_model": "ministral", "license": "Apache-2.0 (Mistral AI)"}),
     ("gemma", "gemma-4-E2B-it-Q4_0.gguf", "decision",
-     r"D:\TownPassAssistant\model-study\dl-gemma4-e2b-q4_0\gemma-4-E2B-it-Q4_0.gguf", "decision/gemma-4-E2B-it-Q4_0.gguf",
+     r"model-study\dl-gemma4-e2b-q4_0\gemma-4-E2B-it-Q4_0.gguf", "decision/gemma-4-E2B-it-Q4_0.gguf",
      f"{HF}/ggml-org/gemma-4-E2B-it-GGUF/resolve/main/gemma-4-E2B-it-Q4_0.gguf",
      {"server": "decision", "decision_model": "gemma", "platforms": ["android"], "license": "Gemma Terms of Use (Google)"}),
     # Option B' (portal_assistant/docs/AI_DECISION_CLASSIFIER.md sections 10-12): the decision classifier
     # replaces the decision model (ASSISTANT_DECISION_MODEL=classifier); 132 MB, so
     # every tier gets it (models.Downloads.parts_for_phone).
     ("classifier", "townpass-decision-e5-ce-v2-q8_0.gguf", "decision",
-     r"D:\TownPassAssistant\decision-classifier\models\townpass-decision-e5-ce-v2-q8_0.gguf",
+     r"decision-classifier\models\townpass-decision-e5-ce-v2-q8_0.gguf",
      "decision/townpass-decision-e5-ce-v2-q8_0.gguf", None,
      {"server": "classifier", "decision_model": "classifier", "platforms": ["android", "ios"],
       "license": "MIT (cross-encoder fine-tuned by this project from Microsoft multilingual-e5-small; GGUF q8_0)"}),
@@ -96,6 +102,11 @@ SUPERSEDED = [
 ]
 
 
+def local_path(local):
+    """A FILES local path on this computer: relative ones are under TOWNPASS_PORTAL_ASSISTANT_WORK."""
+    return local if os.path.isabs(local) else os.path.join(work_dir(), local.replace("\\", os.sep))
+
+
 def sha256(path):
     digest = hashlib.sha256()
     with open(path, "rb") as f:
@@ -112,6 +123,7 @@ def main():
     args = parser.parse_args()
     files = []
     for file_id, name, part, local, path, url, extra in FILES:
+        local = local_path(local)
         entry = {"id": file_id, "name": name, "part": part, "size": os.path.getsize(local),
                  "sha256": sha256(local), "path": path}
         if url:

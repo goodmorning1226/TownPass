@@ -238,7 +238,7 @@
 
 ### 9.1 產出的檔案
 
-全部在 `D:\TownPassAssistant\models\taiwanese\`（不在 repo 裡）。轉檔用 whisper.cpp **v1.9.5**（commit `d1be6fd`，和 App 用的同一版）的
+全部在 `<工作資料夾>\models\taiwanese\`（不在 repo 裡）。轉檔用 whisper.cpp **v1.9.5**（commit `d1be6fd`，和 App 用的同一版）的
 `models/convert-h5-to-ggml.py`（HF → ggml f16），再用同一版自己建置的 `whisper-quantize.exe` 量化。
 
 | 檔案 | 來源（Hugging Face，固定版本） | 大小（位元組） | SHA-256 |
@@ -307,7 +307,7 @@ alexachang 這個模型是唯一「台語聲音 → 華語漢字」的 small 級
 - alexachang 的輸出最像通順的華語，但 tw075 幾乎沒辨識到，tw026 有一個亂碼字；而且可能看過這些段落（9.2 節）。
 - linshoufan 的輸出見 9.2 節，全是台羅。
 
-### 9.4 手機速度（vivo V2511，Snapdragon 7 Gen 4，序號 10AF8403R5001SP）
+### 9.4 手機速度（vivo V2511，Snapdragon 7 Gen 4）
 
 做法：`portal_assistant/scripts/taiwanese_asr_bench.ps1`。手機上用專案已建置的 whisper.cpp v1.9.5 arm64 `whisper-cli`（和 App 的 `libwhisper_server.so` 同一份程式庫），
 放在 `/data/local/tmp/twasr`，跑完已刪除。每個模型先跑 1 次暖機，再跑 5 次，每次是獨立的程序；「每段時間」＝總時間－載入時間。
@@ -348,19 +348,21 @@ alexachang 這個模型是唯一「台語聲音 → 華語漢字」的 small 級
 
 ### 9.5 怎麼重現
 
-1. 下載（用既有的 `D:\TownPassAssistant\convert-venv`，裡面有 torch、transformers、huggingface_hub）：
+（`<工作資料夾>`、`<裝置序號>` 的意思見 [TEAM_LOCAL_SETUP.md](TEAM_LOCAL_SETUP.md) 第 3.1 節。）
+
+1. 下載（用既有的 `<工作資料夾>\convert-venv`，裡面有 torch、transformers、huggingface_hub）：
    `snapshot_download('<repo>', revision='<上表的版本>', allow_patterns=['*.json','*.txt','*.safetensors','README.md'])`
    （alexachang 要改成 `pytorch_model.bin`，並補上 whisper-small 的 `vocab.json`、`added_tokens.json`）。
-2. 轉檔：`python -I D:\TownPassAssistant\native-src\whisper.cpp\models\convert-h5-to-ggml.py <模型資料夾> D:\TownPassAssistant\native-src\openai-whisper <輸出資料夾>`
+2. 轉檔：`python -I <工作資料夾>\native-src\whisper.cpp\models\convert-h5-to-ggml.py <模型資料夾> <工作資料夾>\native-src\openai-whisper <輸出資料夾>`
    （openai-whisper 只用來取 mel filter 表，同 `prepare_assistant_models.ps1`）。
-3. 量化：`D:\TownPassAssistant\native-src\whisper.cpp\build-host\bin\whisper-quantize.exe ggml-model.bin <輸出檔> q8_0`（或 `q4_k`）。
-4. 電腦上試聽：同資料夾的 `whisper-cli.exe`（`cmake --build build-host --target whisper-cli`，PATH 要加 `C:\msys64\ucrt64\bin`）。
+3. 量化：`<工作資料夾>\native-src\whisper.cpp\build-host\bin\whisper-quantize.exe ggml-model.bin <輸出檔> q8_0`（或 `q4_k`）。
+4. 電腦上試聽：同資料夾的 `whisper-cli.exe`（`cmake --build build-host --target whisper-cli`，PATH 要加 MSYS2 UCRT64 的 `bin`，即 `TOWNPASS_PORTAL_ASSISTANT_MSYS_BIN`）。
 5. 手機速度：
    ```powershell
    .\scripts\taiwanese_asr_bench.ps1 -Clip <16 kHz wav> -Models <ggml 檔>,<ggml 檔> [-NoPrompt]
    ```
    腳本會設定 `ANDROID_SERIAL`、force-stop App、等電池降到 35 °C 以下、量完刪除 `/data/local/tmp/twasr` 並重新開啟 App。
-   結果在 `D:\TownPassAssistant\models\taiwanese\bench-prompt\`、`bench-noprompt\`（每次的輸出、whisper 計時、`summary.json`）。
+   結果在 `<工作資料夾>\models\taiwanese\bench-prompt\`、`bench-noprompt\`（每次的輸出、whisper 計時、`summary.json`）。
 
 ### 9.6 還沒做、待決定
 
@@ -379,7 +381,7 @@ alexachang 這個模型是唯一「台語聲音 → 華語漢字」的 small 級
 
 - 來源：Hugging Face `adi-gov-tw/Taiwan-Tongues-ASR-CE-dataset-hokkien`（版本 `ffcc36b`，不必登入）。裡面是 Common Voice nan-tw 的片段（原本 CC0），
   重新打包時附上 TRAIL v0.1 授權。TRAIL-D 第四節寫「資料集可自由使用、再分發、修改」，所以可以在本機評估。沒有用 TAT。
-- 放在 `D:\TownPassAssistant\models\taiwanese\eval-data\`（`adi-hokkien\` 是原始 tar、LICENSE、README，`wav\` 是轉好的 16 kHz 單聲道檔），**不在 repo 裡**。
+- 放在 `<工作資料夾>\models\taiwanese\eval-data\`（`adi-hokkien\` 是原始 tar、LICENSE、README，`wav\` 是轉好的 16 kHz 單聲道檔），**不在 repo 裡**。
 - 兩組：
   - **測試組**：test 分割的全部 323 段（大多是單詞或俗語，不是服務請求，所以**不應該導航**）。
   - **服務詞組**：train 分割裡參考文字含服務詞的 150 段（例如「繳稅」「警察局」「新店區公所」「明仔載市政府有活動，汝敢欲參加」）。
@@ -451,14 +453,14 @@ CER（整理後）4.7、每段平均 19 秒；服務詞組 20 段裡一半變成
 ### 10.5 推到手機與安裝
 
 ```powershell
-cd D:\github\TownPass-taigi
+cd <repo 根目錄>
 # 模型（-Taiwanese 不給就會從手機刪掉；-Chinese 也一樣，有在用 ggml-whisper-chinese.bin 時要一起給）
-.\scripts\push_assistant_models.ps1 -DeviceId 10AF8403R5001SP -Taiwanese D:\TownPassAssistant\models\taiwanese\ggml-breeze-asr-26-q8_0.bin
+.\scripts\push_assistant_models.ps1 -DeviceId <裝置序號> -Taiwanese <工作資料夾>\models\taiwanese\ggml-breeze-asr-26-q8_0.bin
 # App（裝置端版，建置後安裝並重新開啟）
-.\scripts\run_assistant_on_device.ps1 -DeviceId 10AF8403R5001SP
+.\scripts\run_assistant_on_device.ps1 -DeviceId <裝置序號>
 ```
 
-已經建好的除錯版 APK（`build\app\outputs\flutter-apk\app-debug.apk`）也可以直接用 `adb -s 10AF8403R5001SP install -r` 安裝。
+已經建好的除錯版 APK（`build\app\outputs\flutter-apk\app-debug.apk`）也可以直接用 `adb -s <裝置序號> install -r` 安裝。
 logcat 標籤 `TownPassAssistant` 會出現 `taiwanese speech loaded in … ms`。
 
 ### 10.6 驗證與還沒做的
@@ -484,7 +486,7 @@ logcat 標籤 `TownPassAssistant` 會出現 `taiwanese speech loaded in … ms`�
 依擁有者的優先順序調整，**這一節的電腦運算在中途暫停**：Whisper small 的語言偵測跑完台語 100 段與華語 32 段（共 160 段中的 131 段）；
 華語 FLEURS 的 Whisper small 中文辨識與 Breeze 辨識都還沒跑，所以**華語 CER 的變化、華語被誤送到 Breeze 的比例（A2、A3）還不知道**。
 
-**資料**：台語是第 10 節的固定 100 段。華語、英語、日語用另一個工作準備好的 FLEURS 片段（`D:\TownPassAssistant\eval-data\langgate\fleurs`，只讀，CC BY 4.0）。
+**資料**：台語是第 10 節的固定 100 段。華語、英語、日語用另一個工作準備好的 FLEURS 片段（`<工作資料夾>\eval-data\langgate\fleurs`，只讀，CC BY 4.0）。
 參考文字從 FLEURS 的 tsv 依樣本數對應（同樣長度的句子不只一句時，取最接近兩個模型輸出的那一句）。FLEURS 是 8–15 秒的朗讀新聞句，比服務請求長很多。
 
 **目前看到的**
@@ -548,7 +550,7 @@ logcat 標籤 `TownPassAssistant` 會出現 `taiwanese speech loaded in … ms`�
 
 每段都用整段，再從聲音開始處切 3 秒與 1.5 秒（比錄音短的才切）。閘門請求和 App 完全一樣（`WhisperCppRecognizer._gate`：先以 audio_ctx 256 暖機，`-t 4 -l auto`）；
 電腦上每段偵測中位數 0.10 秒。擬合時華語樣本權重 2（誤送華語的代價較高）。
-音檔與閘門輸出在 `D:\TownPassAssistant\models\taiwanese\eval-data\`（`adi-zhtw\`、`gate\gate.jsonl`），不在 repo。
+音檔與閘門輸出在 `<工作資料夾>\models\taiwanese\eval-data\`（`adi-zhtw\`、`gate\gate.jsonl`），不在 repo。
 
 ### 12.3 held-out 結果：被判成台語的比例
 
@@ -570,7 +572,7 @@ logcat 標籤 `TownPassAssistant` 會出現 `taiwanese speech loaded in … ms`�
 
 ### 12.4 各變體在 held-out 上的模擬
 
-（2026-11-08 擁有者決定停止這項量測，表格未完成。部分資料保留在 `D:\TownPassAssistant\models\taiwanese\eval-data\gate\`：
+（2026-11-08 擁有者決定停止這項量測，表格未完成。部分資料保留在 `<工作資料夾>\models\taiwanese\eval-data\gate\`：
 `gate.jsonl`（tiny 判斷結果）、`decode-small.jsonl`（1,599 段，完整）、`decode-breeze.jsonl`（774 段，未完成）。
 要補完：`python -X utf8 portal_assistant/scripts\taiwanese_gate_classifier.py decode --model breeze --whole`，再執行 `simulate`。）
 
@@ -623,7 +625,7 @@ python -X utf8 portal_assistant/scripts\taiwanese_gate_classifier.py simulate   
 
 ## 14. 台語模型拿不到時不偷偷改用華語（2026-11-16，`feat/need-style-assistant`）
 
-**現象**（擁有者，iPhone 17 Pro Max，`D:\TownPassAssistant\ios-resume\logs\taiwanese-20261116\`）：用了一陣子後 App 額度降到約 2.0 GB，台語模型 12 次都因記憶體不夠沒載入（回 `memory`），
+**現象**（擁有者，iPhone 17 Pro Max，`<工作資料夾>\ios-resume\logs\taiwanese-20261116\`）：用了一陣子後 App 額度降到約 2.0 GB，台語模型 12 次都因記憶體不夠沒載入（回 `memory`），
 同一段期間閘門台語分數 0.80–0.90 的片段都被華語模型解碼，畫面出現奇怪的中文，沒有任何提示。原本的寫法是「自動判斷的台語，模型拿不到就走一般路徑、不提示」（第 12 節）。
 
 **規則**（[現行規則](AI_CURRENT_RULES.md) 第 4、5、7 節；程式 `asr_server.py` `_taiwanese_decode`、`_withhold`）：
@@ -643,7 +645,7 @@ python -X utf8 portal_assistant/scripts\taiwanese_gate_classifier.py simulate   
   `device_main.BoundedStarter` 只在 App 回 `memory` 時 60 秒內不再問（`MEMORY_S`），`failed`（載入沒完成、伺服器死掉）仍是 5 分鐘，`missing` 每句都問。
 - 一段錄音裡第一次查到的原因會記住（`self.unavailable`），之後的第二次檢查不再問 App。
 
-**評估**（電腦，lang-fix 的調整用錄音與請求快取，`D:\TownPassAssistant\taiwanese-ablation\scripts-20261116\evalA\`；選單中文；閘門 tiny q8_0、small q8_0、Breeze q4_0；
+**評估**（電腦，lang-fix 的調整用錄音與請求快取，`<工作資料夾>\taiwanese-ablation\scripts-20261116\evalA\`；選單中文；閘門 tiny q8_0、small q8_0、Breeze q4_0；
 台語的 hook 直接回 `ready`、`memory` 或 `missing`。完整 FLEURS 華語不跑，同第 11 節）：
 
 | | 模型可用：舊 → 新 | 模型記憶體不足：舊（改用華語） | 新（不含例外） | **新（含 0.68 例外）** |

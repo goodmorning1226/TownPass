@@ -162,7 +162,7 @@ Common Voice zh-TW test 隨機 40 段（台灣腔華語，CC0／TRAIL-D）：
 
 ## 8. 手機上的時間：ARM 雲端量測（已準備，未推送）
 
-worktree `D:\github\TownPass-armwhisper`，分支 `ci/arm-bench-whisper`（從 `ci/arm-bench` `a9f3b30` 開出），**沒有 commit、沒有 push**：
+worktree `TownPass-armwhisper`，分支 `ci/arm-bench-whisper`（從 `ci/arm-bench` `a9f3b30` 開出），**沒有 commit、沒有 push**：
 - `.github/workflows/arm-bench-whisper.yml`：`ubuntu-24.04-arm`，whisper.cpp v1.9.5，App 的 Android 編譯參數。
 - `portal_assistant/scripts/arm_bench_whisper.sh`：在雲端機器上從原作者的 Hugging Face 權重（完整 commit hash）現轉 Whisper small、Breeze-26 q8_0／q4_K／q5_0／q5_K／q4_0／q3_K、momo small、TSukiLen medium，
   同 vivo 的參數跑 tw104（`-ac 316`、`-ac 500`，暖機＋5 次），`/usr/bin/time -v` 量峰值 RSS。不下載、不上傳我們的檔案。
@@ -234,10 +234,10 @@ Whisper small 對台語保留服務詞只有 5–7/50（Breeze 32/50），華語
 ## 13. 重現
 
 ```powershell
-cd D:\github\TownPass-tablation
+cd <repo 根目錄>
 # 模型：Breeze f16 + 量化（第 9.5 節的方式），小模型轉檔與 LoRA 合併
-D:\TownPassAssistant\convert-venv\Scripts\python.exe -I D:\TownPassAssistant\taiwanese-ablation\scripts\download.py
-D:\TownPassAssistant\convert-venv\Scripts\python.exe -I D:\TownPassAssistant\taiwanese-ablation\scripts\merge_lora_and_convert.py
+<工作資料夾>\convert-venv\Scripts\python.exe -I <工作資料夾>\taiwanese-ablation\scripts\download.py
+<工作資料夾>\convert-venv\Scripts\python.exe -I <工作資料夾>\taiwanese-ablation\scripts\merge_lora_and_convert.py
 python -X utf8 portal_assistant/scripts\taiwanese_ablation.py prepare-fresh
 python -X utf8 portal_assistant/scripts\taiwanese_ablation.py prepare-mandarin
 python -X utf8 portal_assistant/scripts\taiwanese_ablation.py transcribe breeze26-q4_0 --clips heldout   # 每個候選、每個集合
@@ -246,7 +246,7 @@ python -X utf8 portal_assistant/scripts\taiwanese_ablation.py decide     # e5 :9
 python -X utf8 portal_assistant/scripts\taiwanese_ablation.py report     # results\report.json
 ```
 
-依序執行的批次：`D:\TownPassAssistant\taiwanese-ablation\scripts\run_all.sh`、`run_after.sh`、`run_mandarin.sh`。
+依序執行的批次：`<工作資料夾>\taiwanese-ablation\scripts\run_all.sh`、`run_after.sh`、`run_mandarin.sh`。
 檔案：模型 `taiwanese-ablation\models\`（含 Breeze f16 3.1 GB，可刪）、權重 `source\`、音檔 `wav\`、參考與標籤 `data\`、結果 `results\`（每段 JSONL、`*.meta.json`、`*.cli-timing.json`、`decisions.json`、`report.json`）。
 復原：刪除本文件與 `portal_assistant/scripts/taiwanese_ablation.py`（本分支只新增這兩個檔案）。
 
@@ -255,10 +255,10 @@ python -X utf8 portal_assistant/scripts\taiwanese_ablation.py report     # resul
 背景：iPhone 用了一陣子後 App 額度約 2.0 GB，載入前要「檔案＋1,000 MB＋256 MB」＝2,104 MB，台語 12 次都載不起來（[iOS](AI_ON_DEVICE_IOS.md)「台語：不改用華語、記憶體、紀錄檔」）。
 問題：同一個 q4_0，有沒有 whisper-server 設定能降低峰值記憶體、又不影響準確度。
 
-**怎麼量**：電腦版 whisper.cpp v1.9.5 `whisper-server`（CPU，MSYS2 UCRT64），`D:\TownPassAssistant\models\taiwanese\ggml-breeze-asr-26-q4_0.bin`（與 App 同一檔），
+**怎麼量**：電腦版 whisper.cpp v1.9.5 `whisper-server`（CPU，MSYS2 UCRT64），`<工作資料夾>\models\taiwanese\ggml-breeze-asr-26-q4_0.bin`（與 App 同一檔），
 請求走 `asr_server.WhisperCppRecognizer` 的台語路徑（`-l zh`、不送提示、`audio_ctx` ≥ 500、溫度重試 0.4）。資料是第 2 節的 held-out 100、dev 50、mandarin 40
 （沒有用其他資料）。記憶體：`psutil` 的 working set（RSS）與 private bytes（commit），載入後與全部跑完各讀一次（含峰值）。
-腳本：`D:\TownPassAssistant\taiwanese-ablation\scripts-20261116\tw_memory_bench.py`；結果：`D:\TownPassAssistant\taiwanese-ablation\results-memory-20261116\`。
+腳本：`<工作資料夾>\taiwanese-ablation\scripts-20261116\tw_memory_bench.py`；結果：`<工作資料夾>\taiwanese-ablation\results-memory-20261116\`。
 同時有其他程式在跑，秒數只當參考。
 
 | 設定 | 資料 | 華語 CER | 台語漢字 CER | 保留服務詞 | 聽不清／迴圈 | 載入後 RSS | 峰值 RSS | 峰值 commit |

@@ -6,7 +6,8 @@
 #
 #   portal_assistant/scripts/push_assistant_models_ios.sh <device-id> [models-dir]
 #
-# models-dir (default ~/Library/Application Support/TownPassAssistant/models) holds:
+# models-dir (default <work>/models; <work> is $TOWNPASS_PORTAL_ASSISTANT_WORK when set,
+# else ~/Library/Application Support/TownPassAssistant) holds:
 #   device/Ministral-3-3B-Instruct-2512-Q4_K_M.gguf   decision model (required)
 #   ios/ggml-small-q8_0.bin   -> ggml-whisper-multilingual.bin  (speech, optional)
 #   ios/ggml-tiny-q8_0.bin    -> ggml-whisper-langid.bin        (language gate, optional)
@@ -17,7 +18,8 @@
 # The phone must be unlocked. Unchanged files are copied again (devicectl has no sync).
 set -euo pipefail
 DEVICE="${1:?usage: $0 <device-id> [models-dir]}"
-MODELS="${2:-$HOME/Library/Application Support/TownPassAssistant/models}"
+WORK_DIR="${TOWNPASS_PORTAL_ASSISTANT_WORK:-$HOME/Library/Application Support/TownPassAssistant}"  # portal_assistant/docs/TEAM_LOCAL_SETUP.md 3.1
+MODELS="${2:-$WORK_DIR/models}"
 BUNDLE="${TOWNPASS_BUNDLE_ID:-com.example.townpass}"
 
 push() {

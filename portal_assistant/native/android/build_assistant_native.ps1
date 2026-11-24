@@ -4,9 +4,11 @@
 # They are executables named lib*.so so Android extracts them to the app's
 # native library directory, the only app location it allows to execute.
 # Output: android/app/assistant-native/jniLibs/<abi>/ (git-ignored build output).
+# -Source defaults to TOWNPASS_PORTAL_ASSISTANT_WORK\native-src (portal_assistant/docs/TEAM_LOCAL_SETUP.md
+# section 3.1); the Android SDK is ANDROID_HOME, ANDROID_SDK_ROOT or %LOCALAPPDATA%\Android\Sdk.
 param(
     [string]$Ndk = "",
-    [string]$Source = "D:\TownPassAssistant\native-src",
+    [string]$Source = "$env:TOWNPASS_PORTAL_ASSISTANT_WORK\native-src",
     [string[]]$Abi = @("arm64-v8a", "x86_64"),
     # Target: AI phones from the last two years (Snapdragon 8 Gen 3 / 8 Elite,
     # Dimensity 9300+, Tensor G4+), all with int8 matrix multiply (i8mm), which
@@ -16,10 +18,12 @@ param(
 # Native tools write progress to stderr; Windows PowerShell 5.1 would treat that as
 # an error when output is redirected, so failures are detected by exit codes instead.
 $ErrorActionPreference = "Continue"
+. (Join-Path $PSScriptRoot "..\..\scripts\work_env.ps1")
+Assert-PortalAssistantWork $PSBoundParameters @("Source")
 $LlamaTag = "b12182"
 $WhisperTag = "v1.9.5"
 $Root = Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $PSScriptRoot))  # the App: this script is in portal_assistant/native/android
-$Sdk = if ($env:ANDROID_HOME) { $env:ANDROID_HOME } else { "D:\Android\Sdk" }
+$Sdk = Get-AndroidSdk
 if (-not $Ndk) {
     # Use the NDK the app itself pins (android/app/build.gradle ndkVersion).
     $pinned = (Select-String -Path "$Root\android\app\build.gradle" -Pattern 'ndkVersion\s*=\s*"([^"]+)"').Matches[0].Groups[1].Value

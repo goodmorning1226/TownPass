@@ -5,11 +5,13 @@
 # audio_ctx from the clip length, 6 threads. The App is stopped meanwhile so
 # it does not compete for CPU or memory.
 # Usage: .\scripts\asr_benchmark.ps1 -Models breeze-q5_0,large-v3-turbo-q5_0
+# Models and the whisper-cli build are under TOWNPASS_PORTAL_ASSISTANT_WORK (portal_assistant/docs/TEAM_LOCAL_SETUP.md
+# section 3.1). -DeviceId defaults to ANDROID_SERIAL; with neither, the only connected device is used.
 param(
-    [string]$DeviceId = "10AF8403R5001SP",
+    [string]$DeviceId = $env:ANDROID_SERIAL,
     [string[]]$Models = @("breeze-q5_0"),
     [string[]]$Conditions = @("clean", "noisy"),
-    [string]$Bench = "D:\TownPassAssistant\asr-bench",
+    [string]$Bench = "$env:TOWNPASS_PORTAL_ASSISTANT_WORK\asr-bench",
     [int]$Threads = 6,
     # Vocabulary prompt budget in tokens (App: 200; 0 = no prompt) and a fixed
     # encoder context (0 = from the longest clip, as the App does per clip).
@@ -20,19 +22,28 @@ param(
 )
 $ErrorActionPreference = "Continue"
 $root = Split-Path -Parent $PSScriptRoot
-$adb = "D:\Android\Sdk\platform-tools\adb.exe"
+. (Join-Path $PSScriptRoot "work_env.ps1")
+Assert-PortalAssistantWork -Always
+$work = $env:TOWNPASS_PORTAL_ASSISTANT_WORK
+$sdk = Get-AndroidSdk
+$adb = Join-Path $sdk "platform-tools\adb.exe"
+if (-not $DeviceId) {
+    $devices = @(& $adb devices | Select-String '^\S+\s+device$' | ForEach-Object { ($_ -split '\s+')[0] })
+    if ($devices.Count -ne 1) { throw "Connect one authorized Android device, or specify -DeviceId (or ANDROID_SERIAL)." }
+    $DeviceId = $devices[0]
+}
 $files = @{
-    "breeze-q5_0"          = "D:\TownPassAssistant\models\device\ggml-breeze-asr-25-q5_0.bin"
+    "breeze-q5_0"          = "$work\models\device\ggml-breeze-asr-25-q5_0.bin"
     # Formats with ARM i8mm repacked kernels in whisper.cpp (q5_0 has none).
-    "breeze-q8_0"          = "D:\TownPassAssistant\models\device\ggml-breeze-asr-25-q8_0.bin"
-    "breeze-q5_k"          = "D:\TownPassAssistant\models\device\ggml-breeze-asr-25-q5_k.bin"
-    "breeze-q4_k"          = "D:\TownPassAssistant\models\device\ggml-breeze-asr-25-q4_k.bin"
-    "small-q8_0"           = "D:\TownPassAssistant\models\asr-ablation\ggml-small-q8_0.bin"
-    "large-v3-turbo-q5_0"  = "D:\TownPassAssistant\models\asr-ablation\ggml-large-v3-turbo-q5_0.bin"
-    "medium-q5_0"          = "D:\TownPassAssistant\models\asr-ablation\ggml-medium-q5_0.bin"
-    "small-q5_1"           = "D:\TownPassAssistant\models\asr-ablation\ggml-small-q5_1.bin"
-    "base-q5_1"            = "D:\TownPassAssistant\models\asr-ablation\ggml-base-q5_1.bin"
-    "tiny-q5_1"            = "D:\TownPassAssistant\models\asr-ablation\ggml-tiny-q5_1.bin"
+    "breeze-q8_0"          = "$work\models\device\ggml-breeze-asr-25-q8_0.bin"
+    "breeze-q5_k"          = "$work\models\device\ggml-breeze-asr-25-q5_k.bin"
+    "breeze-q4_k"          = "$work\models\device\ggml-breeze-asr-25-q4_k.bin"
+    "small-q8_0"           = "$work\models\asr-ablation\ggml-small-q8_0.bin"
+    "large-v3-turbo-q5_0"  = "$work\models\asr-ablation\ggml-large-v3-turbo-q5_0.bin"
+    "medium-q5_0"          = "$work\models\asr-ablation\ggml-medium-q5_0.bin"
+    "small-q5_1"           = "$work\models\asr-ablation\ggml-small-q5_1.bin"
+    "base-q5_1"            = "$work\models\asr-ablation\ggml-base-q5_1.bin"
+    "tiny-q5_1"            = "$work\models\asr-ablation\ggml-tiny-q5_1.bin"
 }
 $remote = "/data/local/tmp/asr"
 $state = (& $adb -s $DeviceId get-state 2>$null)
@@ -41,9 +52,9 @@ if ($state -ne "device") { throw "Phone $DeviceId is '$state'; reconnect USB and
 & $adb -s $DeviceId shell "mkdir -p $remote/models $remote/clips"
 
 # Binary (stripped) and the App's vocabulary prompt.
-$strip = (Get-ChildItem "D:\Android\Sdk\ndk\29.0.13113456\toolchains\llvm\prebuilt" -Directory | Select-Object -First 1).FullName + "\bin\llvm-strip.exe"
+$strip = (Get-ChildItem (Join-Path $sdk "ndk\29.0.13113456\toolchains\llvm\prebuilt") -Directory | Select-Object -First 1).FullName + "\bin\llvm-strip.exe"
 $cli = Join-Path $Bench "whisper-cli"
-Copy-Item "D:\TownPassAssistant\native-src\whisper.cpp\build-android-arm64-v8a\bin\whisper-cli" $cli -Force
+Copy-Item "$work\native-src\whisper.cpp\build-android-arm64-v8a\bin\whisper-cli" $cli -Force
 & $strip $cli
 & $adb -s $DeviceId push $cli "$remote/whisper-cli" | Out-Null
 & $adb -s $DeviceId shell "chmod 755 $remote/whisper-cli"

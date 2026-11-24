@@ -7,7 +7,7 @@ Sources (all ours or Taipei City Government FAQ text already shipped with the Ap
     features, example requests, guide texts)
   - portal_assistant/backend/evaluate.py request sentences and eval_colloquial.json (everyday requests)
   - Common Voice zh-TW sentences (CC0) from the Taiwan-Tongues zhtw train.tsv, minus any sentence
-    also in its test split (D:\TownPassAssistant\models\taiwanese\eval-data\adi-zhtw); skipped when absent
+    also in its test split (%TOWNPASS_PORTAL_ASSISTANT_WORK%\models\taiwanese\eval-data\adi-zhtw); skipped when absent
 Only Han characters count; runs of them are sentences, '^' and '$' mark their ends.
 Counts are capped so the file stays small: characters seen >= MIN_CHAR times, bigrams
 seen >= MIN_BIGRAM times (about 40 k entries, ~0.5 MB).
@@ -27,6 +27,9 @@ import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "backend"))
+sys.path.insert(0, str(ROOT / "scripts"))
+from work_env import work_dir_or_none  # noqa: E402
+
 OUT = ROOT / "backend" / "data" / "mandarin_bigrams.json"
 MIN_CHAR = 3
 MIN_BIGRAM = 5
@@ -63,8 +66,9 @@ def texts(with_eval=True):
 def common_voice_sentences():
     """Distinct Common Voice zh-TW train sentences (CC0), none from the test split."""
     import csv
-    folder = pathlib.Path(r"D:\TownPassAssistant\models\taiwanese\eval-data\adi-zhtw")
-    if not (folder / "train.tsv").exists():
+    work = work_dir_or_none()  # TOWNPASS_PORTAL_ASSISTANT_WORK; unset: skipped like a missing folder
+    folder = work / "models" / "taiwanese" / "eval-data" / "adi-zhtw" if work else None
+    if folder is None or not (folder / "train.tsv").exists():
         return []
     def sentences(name):
         with open(folder / name, encoding="utf-8", newline="") as handle:

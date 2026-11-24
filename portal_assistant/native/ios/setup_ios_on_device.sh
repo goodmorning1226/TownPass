@@ -5,15 +5,16 @@
 #
 #   portal_assistant/native/ios/setup_ios_on_device.sh [native-dir]
 #
-# native-dir (default ~/Library/Application Support/TownPassAssistant/native-src)
-# must hold:
+# native-dir (default <work>/native-src) must hold:
 #   ios-out/LlamaServer.xcframework    llama.cpp b12182 llama-server, main() exported
 #                                      as townpass_llama_server (ios-out/wrap/llama_entry.cpp)
 #   ios-out/WhisperServer.xcframework  whisper.cpp v1.9.5 whisper-server, main() exported
 #                                      as townpass_whisper_server
 #   python-ios-3.13-*/Python.xcframework  CPython 3.13 for iOS (BeeWare Python-Apple-support)
+# (<work> is $TOWNPASS_PORTAL_ASSISTANT_WORK when set, else ~/Library/Application Support/TownPassAssistant)
 set -euo pipefail
-NATIVE="${1:-$HOME/Library/Application Support/TownPassAssistant/native-src}"
+WORK_DIR="${TOWNPASS_PORTAL_ASSISTANT_WORK:-$HOME/Library/Application Support/TownPassAssistant}"  # portal_assistant/docs/TEAM_LOCAL_SETUP.md 3.1
+NATIVE="${1:-$WORK_DIR/native-src}"
 ROOT="$(cd "$(dirname "$0")/../../.." && pwd)"  # the App: this script is in portal_assistant/native/ios
 OUT="$ROOT/ios/OnDevice"
 PYTHON="$(ls -d "$NATIVE"/python-ios-3.13-*/Python.xcframework 2>/dev/null | sort | tail -1)"

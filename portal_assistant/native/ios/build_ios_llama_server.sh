@@ -7,11 +7,13 @@
 #
 #   portal_assistant/native/ios/build_ios_llama_server.sh [llama.cpp-dir] [out-dir]
 #
-# llama.cpp-dir (default ~/Library/Application Support/TownPassAssistant/native-src/llama.cpp)
-# is a checkout of tag b12182. out-dir defaults to that folder's ../ios-out.
+# llama.cpp-dir (default <work>/native-src/llama.cpp) is a checkout of tag b12182.
+# out-dir defaults to that folder's ../ios-out.
+# (<work> is $TOWNPASS_PORTAL_ASSISTANT_WORK when set, else ~/Library/Application Support/TownPassAssistant)
 set -euo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"  # portal_assistant/native/ios: the patches and entry files
-SRC="${1:-$HOME/Library/Application Support/TownPassAssistant/native-src/llama.cpp}"
+WORK_DIR="${TOWNPASS_PORTAL_ASSISTANT_WORK:-$HOME/Library/Application Support/TownPassAssistant}"  # portal_assistant/docs/TEAM_LOCAL_SETUP.md 3.1
+SRC="${1:-$WORK_DIR/native-src/llama.cpp}"
 OUT="${2:-$SRC/../ios-out}"
 BUILD="$SRC/build-ios"
 

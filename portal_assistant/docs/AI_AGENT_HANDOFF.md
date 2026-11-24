@@ -113,7 +113,7 @@ git diff --check
 語音串線需另啟 `portal_assistant/scripts/start_asr.ps1`；Python 單元測試用假的辨識服務，不需模型。測試用的暫時後端請用其他端口（如 8766／8771），
 不要停掉使用者自己開著的 8765／8770 視窗。
 Hot reload 不會更新 Python 程式；有新 asset／dart-define 時 Stop 再 Run。
-依賴不升級；不要將目前電腦的 `D:\Android`、Gradle mirror、emulator DLL workaround 當別人必備配置。
+依賴不升級；不要將目前電腦的 Android SDK 路徑、Gradle mirror、emulator DLL workaround 當別人必備配置。
 修改完回報具體結果、未驗證項目與手動測試步驟；commit／push 依當次使用者授權，不推測已有永久授權。
 
 ## 可直接貼給下一個 Agent 的 Prompt

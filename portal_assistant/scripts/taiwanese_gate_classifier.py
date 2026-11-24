@@ -7,12 +7,12 @@ probabilities (log scale) and the clip length decides whether a clip goes to the
 Taiwanese model. Only coefficients are stored (portal_assistant/backend/data/taiwanese_gate.json);
 no new model file.
 
-Public clips only, under D:\\TownPassAssistant\\models\\taiwanese\\eval-data (never in the repo):
+Public clips only, under %TOWNPASS_PORTAL_ASSISTANT_WORK%\\models\\taiwanese\\eval-data (never in the repo):
   Taiwanese  Common Voice nan-tw via adi-gov-tw Taiwan-Tongues hokkien (CC0 / TRAIL-D):
              train split for fitting, test split for reporting
   Mandarin   Common Voice zh-TW via adi-gov-tw Taiwan-Tongues zhtw (Taiwan accent; CC0 / TRAIL-D):
              train split for fitting, test split for reporting;
-             FLEURS cmn (Mainland accent, CC BY 4.0), read-only from D:\\TownPassAssistant\\eval-data\\langgate
+             FLEURS cmn (Mainland accent, CC BY 4.0), read-only from %TOWNPASS_PORTAL_ASSISTANT_WORK%\\eval-data\\langgate
   Others     FLEURS en/ja/vi/id/th from the same folder: even files fit, odd files report
 Every clip is used whole and cut to 3 s and 1.5 s from where the voice starts.
 
@@ -43,15 +43,16 @@ import wave
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "backend"))
+sys.path.insert(0, str(ROOT / "scripts"))
+from work_env import path_with_msys, work_dir, work_path  # noqa: E402
 
-DATA = pathlib.Path(r"D:\TownPassAssistant\models\taiwanese\eval-data")
+DATA = work_path("models", "taiwanese", "eval-data")
 HOKKIEN = DATA / "adi-hokkien"
 ZHTW = DATA / "adi-zhtw"
-FLEURS = pathlib.Path(r"D:\TownPassAssistant\eval-data\langgate\fleurs")
+FLEURS = work_path("eval-data", "langgate", "fleurs")
 OUT = DATA / "gate"
-TINY = pathlib.Path(r"D:\TownPassAssistant\models\asr-ablation\ggml-tiny-q8_0.bin")
-SERVER = pathlib.Path(r"D:\TownPassAssistant\native-src\whisper.cpp\build-host\bin\whisper-server.exe")
-MSYS = r"C:\msys64\ucrt64\bin"
+TINY = work_path("models", "asr-ablation", "ggml-tiny-q8_0.bin")
+SERVER = work_path("native-src", "whisper.cpp", "build-host", "bin", "whisper-server.exe")
 PORT = 8902
 COEFFICIENTS = ROOT / "backend" / "data" / "taiwanese_gate.json"
 PER_SET = 400  # Common Voice clips per language and split
@@ -162,7 +163,7 @@ def collect(args):
     with socket.socket() as probe:
         if probe.connect_ex(("127.0.0.1", PORT)) == 0:
             raise SystemExit(f"port {PORT} is in use")
-    env = {**os.environ, "PATH": MSYS + os.pathsep + os.environ.get("PATH", "")}
+    env = {**os.environ, "PATH": path_with_msys()}
     log = open(OUT / "gate.server.log", "w", encoding="utf-8")
     # The App's gate (OnDeviceAssistant.kt): -t 4 -l auto.
     process = subprocess.Popen([str(SERVER), "-m", str(TINY), "--host", "127.0.0.1", "--port", str(PORT),
@@ -221,8 +222,8 @@ def rows():
     return [json.loads(l) for l in (OUT / "gate.jsonl").read_text(encoding="utf-8").splitlines() if l.strip()]
 
 
-SMALL = pathlib.Path(r"D:\TownPassAssistant\models\asr-ablation\ggml-small-q8_0.bin")
-BREEZE = pathlib.Path(r"D:\TownPassAssistant\models\taiwanese\ggml-breeze-asr-26-q8_0.bin")
+SMALL = work_path("models", "asr-ablation", "ggml-small-q8_0.bin")
+BREEZE = work_path("models", "taiwanese", "ggml-breeze-asr-26-q8_0.bin")
 
 
 def decode(args):
@@ -246,7 +247,7 @@ def decode(args):
     print(f"{args.model}: {len(wanted)} clips", flush=True)
     if not wanted:
         return
-    env = {**os.environ, "PATH": MSYS + os.pathsep + os.environ.get("PATH", "")}
+    env = {**os.environ, "PATH": path_with_msys()}
     log = open(OUT / f"decode-{args.model}.server.log", "w", encoding="utf-8")
     path = BREEZE if args.model == "breeze" else SMALL
     process = subprocess.Popen([str(SERVER), "-m", str(path), "--host", "127.0.0.1", "--port", str(PORT),
@@ -528,6 +529,7 @@ def main():
     r = sub.add_parser("report")
     r.add_argument("--thresholds", default="0.5,0.7,0.8,0.9,0.95,0.98")
     args = parser.parse_args()
+    work_dir()  # stops with a clear message when TOWNPASS_PORTAL_ASSISTANT_WORK is not set
     {"collect": collect, "decode": decode, "fit": fit, "report": report, "simulate": simulate}[args.command](args)
 
 

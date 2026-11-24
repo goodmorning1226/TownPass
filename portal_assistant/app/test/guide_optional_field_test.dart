@@ -40,7 +40,7 @@ import 'support/test_host.dart';
 /// The JavaScript part runs the App's real probe script
 /// ([WebPageSpec.scriptWith]) in Node with a small DOM stand-in, as
 /// portal_assistant/app/test/guide_field_commit_test.dart does. The real-page and Android checks
-/// are in D:\TownPassAssistant\small-fixes-20261124\PROGRESS.md.
+/// are in %TOWNPASS_PORTAL_ASSISTANT_WORK%\small-fixes-20261124\PROGRESS.md.
 
 // ------------------------------------------------------------ page script
 

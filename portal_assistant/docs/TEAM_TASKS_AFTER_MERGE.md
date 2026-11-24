@@ -109,7 +109,7 @@
 
 ### T14 決策速度
 - 手機實測決策約 9–10 秒，語音 1.3–2.8 秒。已完成的實驗：
-  - 縮短圖書提示（`exp/speed-library`，`D:\github\TownPass-s3`）：每次圖書請求少 30% token、約省 1.2 秒，準確率不變，**尚未併入**。
+  - 縮短圖書提示（`exp/speed-library`，`TownPass-s3`）：每次圖書請求少 30% token、約省 1.2 秒，準確率不變，**尚未併入**。
   - 快取位置、單字母輸出、量化版本與小模型：實驗中（部分結果因評估程式被誤停要重跑）。
   - 換決策模型：規劃在 `portal_assistant/docs/AI_DECISION_MODEL_ABLATION_PLAN.md`，尚未實作。
 - 「外語先翻中文再決策」實驗（`exp/pivot-translation`）：用開源翻譯時沒有比較好，要先收集 ML Kit 在手機上的實際翻譯再決定（`docs/PIVOT_TRANSLATION_EXPERIMENT.md`，在該分支）。

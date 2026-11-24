@@ -6,27 +6,32 @@
 # phone is deleted at the end. Waits until the battery is below -MaxTempC before each model.
 # -NoPrompt drops the Chinese vocabulary prompt (portal_assistant/docs/AI_TAIWANESE_SPEECH_PLAN.md section 9).
 # Usage: .\scripts\taiwanese_asr_bench.ps1 -Clip D:\...\clip.wav -Models D:\...\a.bin,D:\...\b.bin [-NoPrompt]
+# -Out and -Cli default to TOWNPASS_PORTAL_ASSISTANT_WORK (portal_assistant/docs/TEAM_LOCAL_SETUP.md section 3.1).
+# -DeviceId defaults to ANDROID_SERIAL; with neither, adb uses the only connected device.
 param(
-    [string]$DeviceId = "10AF8403R5001SP",
+    [string]$DeviceId = $env:ANDROID_SERIAL,
     [Parameter(Mandatory)][string]$Clip,      # 16 kHz mono 16-bit wav
     [Parameter(Mandatory)][string[]]$Models,  # ggml files
     [int]$Runs = 5,                           # measured runs (one warm-up run is added)
     [int]$Threads = 6,
     [double]$MaxTempC = 35,
     [switch]$NoPrompt,                        # without the Chinese vocabulary prompt
-    [string]$Out = "D:\TownPassAssistant\models\taiwanese\bench",
-    [string]$Cli = "D:\TownPassAssistant\native-src\whisper.cpp\build-android-arm64-v8a\bin\whisper-cli"
+    [string]$Out = "$env:TOWNPASS_PORTAL_ASSISTANT_WORK\models\taiwanese\bench",
+    [string]$Cli = "$env:TOWNPASS_PORTAL_ASSISTANT_WORK\native-src\whisper.cpp\build-android-arm64-v8a\bin\whisper-cli"
 )
 $ErrorActionPreference = "Continue"
-$env:ANDROID_SERIAL = $DeviceId  # an emulator may also be attached
-$adb = "D:\Android\Sdk\platform-tools\adb.exe"
+. (Join-Path $PSScriptRoot "work_env.ps1")
+Assert-PortalAssistantWork $PSBoundParameters @("Out", "Cli")
+if ($DeviceId) { $env:ANDROID_SERIAL = $DeviceId }  # an emulator may also be attached
+$sdk = Get-AndroidSdk
+$adb = Join-Path $sdk "platform-tools\adb.exe"
 $remote = "/data/local/tmp/twasr"
 $root = Split-Path -Parent $PSScriptRoot
-if ((& $adb get-state 2>$null) -ne "device") { throw "Phone $DeviceId is not connected." }
+if ((& $adb get-state 2>$null) -ne "device") { throw "Phone $DeviceId is not connected (with several devices attached, pass -DeviceId or set ANDROID_SERIAL)." }
 New-Item -ItemType Directory -Force $Out | Out-Null
 
 # Binary (stripped copy), clip and the App's vocabulary prompt.
-$strip = (Get-ChildItem "D:\Android\Sdk\ndk\*\toolchains\llvm\prebuilt\*\bin\llvm-strip.exe" | Select-Object -First 1).FullName
+$strip = (Get-ChildItem (Join-Path $sdk "ndk\*\toolchains\llvm\prebuilt\*\bin\llvm-strip.exe") | Select-Object -First 1).FullName
 Copy-Item $Cli "$Out\whisper-cli" -Force
 & $strip "$Out\whisper-cli"
 python -I -c "import sys; sys.path.insert(0, r'$root\backend'); from asr_server import vocabulary_prompt; open(r'$Out\prompt.txt', 'w', encoding='utf-8', newline='').write('' if '$NoPrompt' == 'True' else vocabulary_prompt())"

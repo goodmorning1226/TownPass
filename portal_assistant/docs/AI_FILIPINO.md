@@ -1,7 +1,7 @@
 # 菲律賓文取代泰文（2026-11-11）
 
 擁有者 2026-11-11 決定「只改泰文」：泰文拿掉、由菲律賓文（Filipino／Tagalog）取代；越南文、印尼文不動。
-分支 `feat/filipino`（worktree `D:\github\TownPass-fil`，以 `00a8733` 為基礎），**還沒提交**。
+分支 `feat/filipino`（worktree `TownPass-fil`，以 `00a8733` 為基礎），**還沒提交**。
 規則以 `portal_assistant/docs/AI_CURRENT_RULES.md` 第 4 節為準；本文說明做法、數字與限制。
 
 > **所有菲律賓文文字都是 AI 草稿**：回覆、介面、教學 1,134 句、App 字串 272 句、功能名稱與關鍵字、口語例句、評估題目。
@@ -73,7 +73,7 @@
   與菲律賓人常用的說法（brownout、amilyar、barangay）；英文關鍵字在菲律賓文模式下照樣比對。
   申訴表單、借書預約清單、帳務設定、票夾、登出等 9 項的名稱改得比較具體（「Apela sa multa sa trapiko」而不是「Apela sa traffic ticket」）。
 - `assistant/capability_examples.json`：泰文 2 句拿掉，22 頁加 26 句菲律賓文口語例句。寫例句時沒有看保留集；`test_colloquial` 的相似度檢查
-  發現 2 句太像保留集，之後我用只印自己例句分數的檢查（`D:\TownPassAssistant\filipino\scripts\blind_overlap.py`）再改了 4 句，全部低於 0.4。
+  發現 2 句太像保留集，之後我用只印自己例句分數的檢查（`<工作資料夾>\filipino\scripts\blind_overlap.py`）再改了 4 句，全部低於 0.4。
 - `assistant/capabilities.json`：語言頁的功能描述「泰文」→「菲律賓文」。
 - `i18n/guide/*.json`（1,134 句）、`i18n/app_strings.json`（272 句）：`th` 換成 `tl`；「泰文」這個鍵換成「菲律賓文」（5 種語言）。
 - `semantic_tuning.json`（調參集）：7 句泰文換成菲律賓文。
@@ -100,7 +100,7 @@
 ## 4. 翻譯是怎麼做的
 
 - 教學、App 字串由 5 個 agent 平行草擬（各約 250–340 句），以中文原句為準、英文與印尼文為參考；每句檢查 placeholder（`{fee}`、`{page:確認}`…）、
-  換行數、前後空白都和英文一樣，沒有泰文字（`D:\TownPassAssistant\filipino\translate\check.py`，5 份都 0 個問題）。
+  換行數、前後空白都和英文一樣，沒有泰文字（`<工作資料夾>\filipino\translate\check.py`，5 份都 0 個問題）。
 - 風格：Google／Android 菲律賓文介面的寫法，用 mo／iyong 稱呼使用者，「I-tap ang …」；po 只用在打招呼、道謝、道歉這類句子；
   菲律賓人常用的英文外來字照用（app、online、QR code、OTP、i-download）。
 - 介面、回覆、緊急訊息、功能名稱與關鍵字是我（主 agent）寫的。
@@ -109,14 +109,14 @@
 
 ### 5.1 測試資料與流程
 
-- `D:\TownPassAssistant\filipino\audio\`（不在 repo）：50 句菲律賓文（40 句服務請求、10 句非請求：打招呼、列功能、取消、否定、閒聊），
+- `<工作資料夾>\filipino\audio\`（不在 repo）：50 句菲律賓文（40 句服務請求、10 句非請求：打招呼、列功能、取消、否定、閒聊），
   兩種合成語音：gTTS `tl`（Google 翻譯的聲音，和擁有者測越南文的方法相同）與 edge-tts `fil-PH-BlessicaNeural`（Microsoft）；共 100 段，中位數 2.6 秒。
   選單用「菲律賓文」與「自動偵測」各跑一次，共 200 次。這 50 句是我寫的**開發集**，調整時用過。
 - 另外 20 句印尼文（gTTS `id`），選單用印尼文、菲律賓文、自動各跑一次，看印尼文會不會被當成菲律賓文。
 - 流程和手機相同：Whisper tiny q8_0 語言閘門（`audio_ctx 256`）→ `asr_server.WhisperCppRecognizer`（Whisper small q8_0）→ `server.clean_transcript`
   → 後端回合（Ollama `ministral-3:3b`、e5、FAQ），語言欄位用辨識結果的語言。whisper.cpp v1.9.5 `whisper-server`（電腦版），
   計分同 `eval_colloquial.py`。秒數是電腦上同時跑別的評估時量的，只能看相對值。
-- 腳本：`D:\TownPassAssistant\filipino\scripts\`（`speechset.py`、`synth.py`、`speech_eval.py`）。
+- 腳本：`<工作資料夾>\filipino\scripts\`（`speechset.py`、`synth.py`、`speech_eval.py`）。
 
 ### 5.2 語言判斷
 

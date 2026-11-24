@@ -21,7 +21,7 @@ import 'package:townpass_portal_assistant/page/guided_assistant/model/input_form
 /// ([WebPageSpec.scriptWith], [WebFieldInput.insertScript]) in Node with a
 /// small DOM stand-in (inputs, focus, the listeners the watcher adds). The
 /// real-browser and Android checks are in
-/// D:\TownPassAssistant\need-impl\PROGRESS.md (引導輸入與任務卡).
+/// %TOWNPASS_PORTAL_ASSISTANT_WORK%\need-impl\PROGRESS.md (引導輸入與任務卡).
 
 /// Minimal DOM: elements with tag / type / value / focus, simple selectors
 /// (tag, #id, .class, [name="x"], comma lists; anything else matches

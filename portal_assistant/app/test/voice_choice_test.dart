@@ -31,7 +31,7 @@ import 'support/test_host.dart';
 ///
 /// The page scripts (web_choice_input.dart) run in Node with a small DOM
 /// stand-in, as in portal_assistant/app/test/guide_field_commit_test.dart; the same scripts were
-/// also run on the real demo pages in Chrome (D:\TownPassAssistant\
+/// also run on the real demo pages in Chrome (%TOWNPASS_PORTAL_ASSISTANT_WORK%\
 /// small-fixes-20261124\PROGRESS.md).
 
 // ------------------------------------------------------------ page scripts

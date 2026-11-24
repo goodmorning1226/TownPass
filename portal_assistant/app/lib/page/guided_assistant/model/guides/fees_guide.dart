@@ -36,7 +36,7 @@ const _view = "(qa('.tab-view').find(inView) || null)";
 /// tell). On the demo site 查詢 still reaches result/ without 繳費編號 for
 /// fee-1 (公司登記費), fee-3 (地政登記規費), fee-8 (國/社宅租金維管費),
 /// fee-9 (聯合醫院醫療費) and fee-12 (快閃購繳款)
-/// (D:\TownPassAssistant\small-fixes-20261124\optional\inventory\
+/// (%TOWNPASS_PORTAL_ASSISTANT_WORK%\small-fixes-20261124\optional\inventory\
 /// fees_leave_one_out.txt); the real site may differ. Every other fee field,
 /// and 繳費編號 of every other fee type, is required.
 const _optionalPay =

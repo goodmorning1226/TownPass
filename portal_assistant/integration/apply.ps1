@@ -3,7 +3,7 @@ Puts the portal assistant into a TownPass checkout (portal_assistant/INTEGRATION
 
     portal_assistant\integration\apply.ps1            # apply into the repository that holds portal_assistant\
     portal_assistant\integration\apply.ps1 -Check     # only report what would happen
-    portal_assistant\integration\apply.ps1 -Target D:\TownPass
+    portal_assistant\integration\apply.ps1 -Target ..\TownPass   # another checkout
 
 The target is a git checkout of TownPass (official baseline e65b586 or a
 version whose files still match the patches) with this portal_assistant\

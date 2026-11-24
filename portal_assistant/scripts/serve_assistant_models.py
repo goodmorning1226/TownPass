@@ -18,14 +18,14 @@ import pathlib
 import sys
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
-from build_model_manifest import FILES  # noqa: E402  (the same local paths)
+from build_model_manifest import FILES, local_path  # noqa: E402  (the same local paths)
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 
 
 def routes():
     manifest = json.loads((ROOT / "app" / "assets" / "assistant" / "models.json").read_text(encoding="utf-8"))
-    local = {file_id: path for file_id, _, _, path, _, _, _ in FILES}
+    local = {file_id: local_path(path) for file_id, _, _, path, _, _, _ in FILES}
     return {"/" + e["path"]: local[e["id"]] for e in manifest["files"] if e["id"] in local}
 
 

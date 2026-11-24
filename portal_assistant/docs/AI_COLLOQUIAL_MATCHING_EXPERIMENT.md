@@ -3,7 +3,7 @@
 > **2026-11-08 已採用 B＋D**（不含 A），在分支 `feat/colloquial-bd`（從 `feat/asr-ablation` `3c8db7d` 開出），預設開啟；
 > 每個已串接頁都補了例句。採用時的改動與最終結果見第 9 節。第 1–8 節是當時的實驗紀錄，保留原樣。
 
-分支 `exp/colloquial-matching`（從 `feat/asr-ablation` `defa7de` 開出，工作資料夾 `D:\github\TownPass-colloq`），
+分支 `exp/colloquial-matching`（從 `feat/asr-ablation` `defa7de` 開出，worktree `TownPass-colloq`），
 實驗本身提交為 `e65e6a2`（開關全部關閉）。
 只在電腦上測：Ollama `ministral-3:3b`、e5（multilingual-e5-small q8_0，llama-server）、FAQ 開啟。沒有動手機。
 
@@ -177,7 +177,7 @@ B 的例句只來自 dev 那一半或我自己寫的句子；**held-out 那 27 �
 ## 9. 採用：B＋D（2026-11-08）
 
 負責人 2026-11-08 決定採用 B（每頁例句、例句相似度減 0.05、語意領先 ≥ 0.08 直接列候選）與 D（未串接頁不搶常用詞、收窄圖書流程），
-**不採用 A**。分支 `feat/colloquial-bd`，從 `origin/feat/asr-ablation` `3c8db7d` 開出（工作資料夾 `D:\github\TownPass-bd`）；
+**不採用 A**。分支 `feat/colloquial-bd`，從 `origin/feat/asr-ablation` `3c8db7d` 開出（worktree `TownPass-bd`）；
 實驗本身先在 `exp/colloquial-matching` 提交為 `e65e6a2`（開關全關，保存紀錄）。
 
 ### 9.1 合併時做了什麼

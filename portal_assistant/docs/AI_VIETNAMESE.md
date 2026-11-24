@@ -79,7 +79,7 @@
 
 - **FLEURS 越南文測試集**（Google，CC BY 4.0）
   - 從 Hugging Face `google/fleurs` 的 `vi_vn/test` 串流下載前 80 段，用前 60 段。平均每段 12.7 秒，是朗讀的新聞句。
-  - `D:\TownPassAssistant\eval-data\langgate\fleurs\vi` 已有 40 段，但沒有原文，而且長度無法唯一對應到原文，所以沒有用。
+  - `<工作資料夾>\eval-data\langgate\fleurs\vi` 已有 40 段，但沒有原文，而且長度無法唯一對應到原文，所以沒有用。
 - **Common Voice 越南文**：要登入，沒有用。
 - **服務指令類的越南文錄音**：沒有找到 CC 授權的，依指示也沒有用合成語音。所以**沒有量到短指令**（2–4 秒）的準確度。
 - 計分
@@ -203,14 +203,16 @@
 
 ### 5.2 越南文模型（選用）
 
-1. 轉檔。用既有的 `D:\TownPassAssistant\convert-venv`，結果已經放在 `D:\TownPassAssistant\models\vietnamese\`。
+（`<工作資料夾>`、`<裝置序號>` 的意思見 [TEAM_LOCAL_SETUP.md](TEAM_LOCAL_SETUP.md) 第 3.1 節。）
+
+1. 轉檔。用既有的 `<工作資料夾>\convert-venv`，結果已經放在 `<工作資料夾>\models\vietnamese\`。
 
    ```powershell
-   $py = "D:\TownPassAssistant\convert-venv\Scripts\python.exe"
-   & $py -I -c "from huggingface_hub import snapshot_download; snapshot_download('vinai/PhoWhisper-small', revision='a86b604c346caf7148c37512eafe783a16420adb', local_dir=r'D:\TownPassAssistant\models\vietnamese\src\PhoWhisper-small', allow_patterns=['*.json','*.txt','pytorch_model.bin','README.md'])"
-   & $py -I D:\TownPassAssistant\native-src\whisper.cpp\models\convert-h5-to-ggml.py D:\TownPassAssistant\models\vietnamese\src\PhoWhisper-small D:\TownPassAssistant\native-src\openai-whisper D:\TownPassAssistant\models\vietnamese\f16-PhoWhisper-small
-   $env:PATH = "C:\msys64\ucrt64\bin;$env:PATH"
-   D:\TownPassAssistant\native-src\whisper.cpp\build-host\bin\whisper-quantize.exe D:\TownPassAssistant\models\vietnamese\f16-PhoWhisper-small\ggml-model.bin D:\TownPassAssistant\models\vietnamese\ggml-phowhisper-small-q8_0.bin q8_0
+   $py = "<工作資料夾>\convert-venv\Scripts\python.exe"
+   & $py -I -c "from huggingface_hub import snapshot_download; snapshot_download('vinai/PhoWhisper-small', revision='a86b604c346caf7148c37512eafe783a16420adb', local_dir=r'<工作資料夾>\models\vietnamese\src\PhoWhisper-small', allow_patterns=['*.json','*.txt','pytorch_model.bin','README.md'])"
+   & $py -I <工作資料夾>\native-src\whisper.cpp\models\convert-h5-to-ggml.py <工作資料夾>\models\vietnamese\src\PhoWhisper-small <工作資料夾>\native-src\openai-whisper <工作資料夾>\models\vietnamese\f16-PhoWhisper-small
+   $env:PATH = "$env:TOWNPASS_PORTAL_ASSISTANT_MSYS_BIN;$env:PATH"
+   <工作資料夾>\native-src\whisper.cpp\build-host\bin\whisper-quantize.exe <工作資料夾>\models\vietnamese\f16-PhoWhisper-small\ggml-model.bin <工作資料夾>\models\vietnamese\ggml-phowhisper-small-q8_0.bin q8_0
    ```
 
    PhoWhisper-base 同樣步驟：把 `PhoWhisper-small`／`a86b604…` 換成 `PhoWhisper-base`／`7ebdb9e88f5cc5271fb88f4d642c82ff9388650e`，輸出 `ggml-phowhisper-base-q8_0.bin`。
@@ -218,9 +220,9 @@
 2. 推到手機（要等第 4 節的程式提交並建置 App 之後；推檔腳本會刪掉沒帶旗標的選用模型，所以台語模型要一起帶）：
 
    ```powershell
-   $env:ANDROID_SERIAL = "10AF8403R5001SP"
-   .\scripts\push_assistant_models.ps1 -DeviceId 10AF8403R5001SP -DecisionModel gemma -Taiwanese <台語模型檔> -Vietnamese D:\TownPassAssistant\models\vietnamese\ggml-phowhisper-base-q8_0.bin
-   .\scripts\run_assistant_on_device.ps1 -DeviceId 10AF8403R5001SP -DecisionModel gemma
+   $env:ANDROID_SERIAL = "<裝置序號>"
+   .\scripts\push_assistant_models.ps1 -DeviceId <裝置序號> -DecisionModel gemma -Taiwanese <台語模型檔> -Vietnamese <工作資料夾>\models\vietnamese\ggml-phowhisper-base-q8_0.bin
+   .\scripts\run_assistant_on_device.ps1 -DeviceId <裝置序號> -DecisionModel gemma
    ```
 
 3. 不用了：`-Vietnamese ""` 再推一次，然後重開 App。
@@ -245,7 +247,7 @@
 
 ### 7.1 測試資料與流程
 
-- `D:\TownPassAssistant\eval-data\vi-tts\`（不在 repo）：50 句，其中 40 句服務請求（圖書、水費、停車費、報案、取號、語言、個人資料…）、
+- `<工作資料夾>\eval-data\vi-tts\`（不在 repo）：50 句，其中 40 句服務請求（圖書、水費、停車費、報案、取號、語言、個人資料…）、
   10 句非請求（問候、閒聊、「有哪些功能」、否定、取消）。每句兩種合成語音：gTTS（Google 翻譯的越南文語音，擁有者的測法）與 edge-tts `vi-VN-NamMinhNeural`，
   共 100 段，0.8–3.4 秒。選單各用「越南文」與「自動」跑一次，每個版本 200 次。
 - 流程和手機完全相同：語言閘門（tiny q8_0，App 的參數）→ `asr_server.WhisperCppRecognizer` → `clean_transcript`／`speech_resolution` → `Assistant.turn`（Ollama ministral-3:3b、e5、FAQ），語言欄位用辨識結果的語言。

@@ -1,5 +1,5 @@
 // UX quick wins in the assistant (portal_assistant/docs/AI_CURRENT_RULES.md sections 3, 5 and
-// 7, 2026-11-16; study D:\TownPassAssistant\ux-study\REPORT.md section E).
+// 7, 2026-11-16; study %TOWNPASS_PORTAL_ASSISTANT_WORK%\ux-study\REPORT.md section E).
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';

@@ -18,13 +18,13 @@
 
 ## 2. 測試資料與做法
 
-- **開發集**（`D:\TownPassAssistant\indonesian\tools\devset.py`，不在 repo）：這次新寫的，寫的時候沒有看保留集。
+- **開發集**（`<工作資料夾>\indonesian\tools\devset.py`，不在 repo）：這次新寫的，寫的時候沒有看保留集。
   - 口說 162 句：已串接服務的請求 143 句（帳單、圖書、警政、取號、申辦、陳情、災情、帳號與 App 設定…），用一般口語寫
     （「Mau bayar air」「Gimana caranya…」「Tolong bayarin…」「…nggak?」「pinjem」「rusun」「SPP」），另有 19 句非請求（問候、列功能、否定、取消、閒聊），
     其中「Bukan bayar air, tapi bayar parkir」算請求（要停車費）。
   - 打字 35 句：聊天縮寫與錯字（「gmn cara byr air」「sy mau pinjem buku」「ambil no antrian」「ganti no hp sy」「parkr」）。
   - 打字評估：口說句的原文＋打字句共 197 句，帶語言欄位（像語音）與不帶（後端自己判斷語言）各跑一次。
-- **合成語音**（`D:\TownPassAssistant\indonesian\audio\`，不在 repo）：口說 162 句各兩種聲音，gTTS（Google 翻譯的印尼文語音，擁有者的測法）
+- **合成語音**（`<工作資料夾>\indonesian\audio\`，不在 repo）：口說 162 句各兩種聲音，gTTS（Google 翻譯的印尼文語音，擁有者的測法）
   與 edge-tts `id-ID-ArdiNeural`，轉成 16 kHz 單聲道；選單用「印尼文」與「自動」各跑一次，共 648 段，其中請求 576 段。
 - **流程和手機相同**：語言閘門（Whisper tiny q8_0）→ `asr_server.WhisperCppRecognizer`（Whisper small q8_0，App 的參數）→ `server.clean_transcript`
   → `POST /v1/assistant/turns`，語言欄位用辨識出的語言。電腦上的 whisper.cpp `whisper-server`（`build-host`），Ollama `ministral-3:3b`、自己的 e5（:8784）、FAQ 開啟。
@@ -152,7 +152,7 @@ Whisper small＋原本的程式（`00a8733`），576 段請求：
 - Whisper small 的錯誤多半是：字連寫或拆開（「sewarusun」「Pinjembu Kudong」）、h 不見（「tagian」）、偶爾變英文（「Jack History」「book」），
   以及自動選單下少數段落變成重複迴圈（一段 gTTS「Pinjem buku dong」被判成中文，寫出一長串「五點、五點…」）。前兩種新的比對已能容忍一部分。
 - 印尼文模型的接法照越南文（`asr_server._decode` 的越南文分支）：判定為印尼文的解碼才交給它，不加提示句、完整 1500 窗口、只解一次不重試；
-  語言判斷仍由閘門與 Whisper small 決定。這次只在評估腳本裡這樣接（`D:\TownPassAssistant\indonesian\tools\speech_eval.py --vi-model`），**App 與後端程式都沒有改**。
+  語言判斷仍由閘門與 Whisper small 決定。這次只在評估腳本裡這樣接（`<工作資料夾>\indonesian\tools\speech_eval.py --vi-model`），**App 與後端程式都沒有改**。
 - 速度（電腦，同時有別人的 llama-server 在跑，只能看相對值）：同樣 10 段 gTTS，交替送出，Whisper small（依長度）中位數 1.5 秒、
   印尼文模型（1500）5.8 秒，約慢 4 倍；Whisper small 有一段溫度重試跑到 35 秒。
   手機上估計（不是實測）：結構和 Whisper small 相同，照越南文第 3.4 節的推算，3 秒的指令約 2.5–3.5 秒，比現在多 1.5–2.5 秒。
@@ -168,8 +168,8 @@ Whisper small＋原本的程式（`00a8733`），576 段請求：
 | cahya/whisper-small-id | Cahya Wirawan | 只寫「cc」 | Common Voice 11、FLEURS、TITML，**以及 MagicData（北京的資料公司）** | 授權不明、訓練資料含中國公司的資料，**沒有下載** |
 | TheRains/*（Whisper small／base 微調） | 個人帳號 | Apache-2.0 | Common Voice 9、YouTube | 沒有試；YouTube 資料授權不明 |
 
-轉檔：`D:\TownPassAssistant\convert-venv` 下載（固定版本）→ whisper.cpp `models/convert-h5-to-ggml.py` → `whisper-quantize q8_0`，
-結果在 `D:\TownPassAssistant\indonesian\models\ggml-whisper-small-id-anggiatm-q8_0.bin`（264 MB，和 Whisper small q8_0 一樣大）。沒有放進 repo，也沒有推到手機。
+轉檔：`<工作資料夾>\convert-venv` 下載（固定版本）→ whisper.cpp `models/convert-h5-to-ggml.py` → `whisper-quantize q8_0`，
+結果在 `<工作資料夾>\indonesian\models\ggml-whisper-small-id-anggiatm-q8_0.bin`（264 MB，和 Whisper small q8_0 一樣大）。沒有放進 repo，也沒有推到手機。
 
 ### 6.3 Whisper small 加印尼文提示句
 

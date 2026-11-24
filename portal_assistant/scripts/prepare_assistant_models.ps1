@@ -8,14 +8,17 @@
 #     GGUF q8_0 for llama-server --embedding (portal_assistant/docs/AI_FAQ_RAG.md). The FAQ index itself
 #     is built on the computer with portal_assistant/scripts/build_faq_index.py.
 # Output: <Root>\models\device\  (outside the repository). Push with push_assistant_models.ps1.
+# -Root and -Source default to TOWNPASS_PORTAL_ASSISTANT_WORK (portal_assistant/docs/TEAM_LOCAL_SETUP.md section 3.1).
 param(
-    [string]$Root = "D:\TownPassAssistant",
-    [string]$Source = "D:\TownPassAssistant\native-src",
+    [string]$Root = "$env:TOWNPASS_PORTAL_ASSISTANT_WORK",
+    [string]$Source = "$env:TOWNPASS_PORTAL_ASSISTANT_WORK\native-src",
     [ValidateSet("q8_0", "q5_k", "q4_k", "q5_0")][string]$AsrQuant = "q8_0"
 )
 # Native tools write progress to stderr; Windows PowerShell 5.1 would treat that as
 # an error when output is redirected, so failures are detected by exit codes instead.
 $ErrorActionPreference = "Continue"
+. (Join-Path $PSScriptRoot "work_env.ps1")
+Assert-PortalAssistantWork $PSBoundParameters @("Root", "Source")
 $WhisperRepoTag = "v20250625"  # openai/whisper, only for its mel filter table
 $py = Join-Path $Root "convert-venv\Scripts\python.exe"
 $breeze = Join-Path $Root "source\Breeze-ASR-25"
@@ -49,7 +52,7 @@ if (-not (Test-Path $asr)) {
     $hostBuild = Join-Path $Source "whisper.cpp\build-host"
     $quantize = Join-Path $hostBuild "bin\whisper-quantize.exe"
     if (-not (Test-Path $quantize)) {
-        $sdkCmake = Get-ChildItem "D:\Android\Sdk\cmake" -Directory | Sort-Object Name | Select-Object -Last 1
+        $sdkCmake = Get-ChildItem (Join-Path (Get-AndroidSdk) "cmake") -Directory | Sort-Object Name | Select-Object -Last 1
         $cmake = Join-Path $sdkCmake.FullName "bin\cmake.exe"
         $ninja = Join-Path $sdkCmake.FullName "bin\ninja.exe"
         & $cmake -S (Join-Path $Source "whisper.cpp") -B $hostBuild -G Ninja "-DCMAKE_MAKE_PROGRAM=$ninja" `

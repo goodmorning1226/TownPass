@@ -189,7 +189,7 @@ python -X utf8 portal_assistant/scripts/review_translations.py results.json --un
 
 App 用 `portal_assistant/scripts/run_assistant_on_device.ps1` 裝第二階段的版本（debug）。設定 → 語言 換成英文、越南文、日文，
 各從「帳單」→「水費」開兩次（第一次＝這個語言第一次開這頁的 WebView；第二次＝返回後再開），每次在 1 秒、4 秒截圖
-（`D:\TownPassAssistant\page-translation\emu\p2_<語言>_<first|second>_<1s|4s>.png`，並排圖 `p2_<語言>_tile.png`）：
+（`<工作資料夾>\page-translation\emu\p2_<語言>_<first|second>_<1s|4s>.png`，並排圖 `p2_<語言>_tile.png`）：
 
 | 語言 | 第一次 1 秒 | 第一次 4 秒 | 第二次 1 秒／4 秒 | 已知的錯誤 |
 | --- | --- | --- | --- | --- |
@@ -318,11 +318,11 @@ App 用 `portal_assistant/scripts/run_assistant_on_device.ps1` 裝第二階段�
   不送 ML Kit；手機存過的錯誤翻譯不用、不進注入的字典；`keep` 清單；腳本拿到 `keep`；22 個標題五種語言都有預翻；`TPAppBar` 顯示預翻的標題；
   `labels` 只比對整串、不進 `touches`／`protect`；`glossary.json` 版本 2。`translation_script_test.dart` 兩處改成新的 `add(config.dictionary, config.keep)`。
   `fvm flutter test` 665 個全過（main 654 個＋這次 11 個）；`fvm flutter analyze` 23 issues＝7 個上游 warning＋16 info（和 main 一樣）。
-- 電腦（Chromium，開發用，不在 repo；`D:\TownPassAssistant\page-translation\`）：
+- 電腦（Chromium，開發用，不在 repo；`<工作資料夾>\page-translation\`）：
   - `names\check_keep.py`（新）：水費頁上加入「日本語」「 繁體中文 」文字、按鈕、`title` 屬性，並故意在字典裡放錯誤的翻譯——全部維持原樣、
     沒有遮罩、沒有單獨送給 App；旁邊的字照常翻；「本頁提供<b>日本語</b>版」整句照常翻。7 項全過。
   - `check_behaviour.py`：ALL OK。`measure_flash.py`：第一次與第二次開、站內換頁、返回，顯示中文的幀都是 0；第二次開送 App 0 次（`names\after_names.json`）。
-- Android 模擬器（`TownPass_API_35`，debug APK，2026-11-15；截圖在 `D:\TownPassAssistant\page-translation\emu\names_*.png`）：
+- Android 模擬器（`TownPass_API_35`，debug APK，2026-11-15；截圖在 `<工作資料夾>\page-translation\emu\names_*.png`）：
   - 英文：設定 → 語言 的清單是 繁體中文／English／日本語／Tiếng Việt／Bahasa Indonesia／Filipino，標題「Language」（`names_lang_en.png`）；
     越南文下清單一樣、標題「Ngôn ngữ」。
   - 帳單 → 水費：上方標題英文「Payment items」、越南文「Khoản thanh toán」（`names_title_vi.png`），頁面內容和第 8.4 節一樣全部翻好。

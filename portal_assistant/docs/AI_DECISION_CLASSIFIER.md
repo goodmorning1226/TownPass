@@ -1,8 +1,8 @@
 # 決策分類器實驗（Route 1：cross-encoder 取代決策 LLM）
 
-日期：2026-11-11～12。分支 `exp/decision-classifier`（worktree `D:\github\TownPass-cls`，基於 `00a8733`，commit `94bdc10`）。
+日期：2026-11-11～12。分支 `exp/decision-classifier`（worktree `TownPass-cls`，基於 `00a8733`，commit `94bdc10`）。
 **2026-11-12 起選項 B′ 是 App 的選項**（`-DecisionModel classifier`，分支 `feat/classifier-decision`，第 12 節），規則寫進 `AI_CURRENT_RULES.md` 第 6–7 節；下面第 1–11 節是電腦實驗的紀錄。
-資料、模型、紀錄在 repo 外：`D:\TownPassAssistant\decision-classifier\`；訓練環境 `D:\TownPassAssistant\train-venv`。
+資料、模型、紀錄在 repo 外：`<工作資料夾>\decision-classifier\`；訓練環境 `<工作資料夾>\train-venv`。
 預設行為完全不變；只有 `TOWNPASS_DECISION_BACKEND=classifier`（或 App 的 `ASSISTANT_DECISION_MODEL=classifier`）才啟用。
 
 ## 1. 結論
@@ -20,7 +20,7 @@
 
 ## 2. 可行性（llama.cpp b12182）
 
-- 原始碼 `D:\TownPassAssistant\native-src\llama.cpp` 就是 b12182（`fd27b20`），與 `dl-llamacpp-b12182-win-cpu` 執行檔同版。
+- 原始碼 `<工作資料夾>\native-src\llama.cpp` 就是 b12182（`fd27b20`），與 `dl-llamacpp-b12182-win-cpu` 執行檔同版。
 - 轉換器支援的 sequence-classification／reranker 架構：`BertForSequenceClassification`、`XLMRobertaForSequenceClassification`、`RobertaForSequenceClassification`、`DistilBertForSequenceClassification`、`ModernBertForSequenceClassification`、`NeoBERTForSequenceClassification`（另有 Qwen3 系列 reranker，不用）。
 - llama.cpp 的 rank pooling（`llama-graph.cpp`）怎麼算分數：
   - 取第一個 token 的隱藏層 → （有 `cls` 就 dense＋活化）→ `cls.output` 線性層 → **分數 = 第一個輸出**。
@@ -157,7 +157,7 @@ v3 的修正來自兩句 dev：「有沒有比較多人借的書」原本開到�
 - Gemma 4 E2B Q4_0：llama-server b12182 CPU（:8974，`-c 6144 -np 3 --cache-ram 0 --reasoning off -t 8`，`TOWNPASS_MODEL_API=openai`）。
 - 分類器：:8972（CPU `-t 4`）；它的圖書／教學決策仍用 Ollama Ministral。
 
-原始結果在 `D:\TownPassAssistant\decision-classifier\results\{ministral,gemma,classifier_v1,classifier_v2,classifier_v3}\`（`summarize.py` 產生摘要）。
+原始結果在 `<工作資料夾>\decision-classifier\results\{ministral,gemma,classifier_v1,classifier_v2,classifier_v3}\`（`summarize.py` 產生摘要）。
 
 **evaluate.py 與多語（案例數）**
 
@@ -244,7 +244,7 @@ v3 的修正來自兩句 dev：「有沒有比較多人借的書」原本開到�
 | --- | --- | --- |
 | (1) Ministral 3B Q4_K_M | 手機同一份檔案，llama-server b12182 Vulkan `-ngl 99`，手機參數 `-c 6144 -np 3 --cache-ram 0 --reasoning off`；程式是本 worktree 的預設（LLM） | `ministral_ls` |
 | (1′) 同上，經 Ollama | `ministral-3:3b` | `ministral_ollama` |
-| (2) 分類器 v3＋Gemma g_v2 | 能力用分類器；圖書與教學用 Gemma 4 E2B Q4_0，`TOWNPASS_GEMMA_PROMPT=lean,answer,mapdesc,prefill,sure`，含 Gemma 代理的圖書規則。程式是本 worktree 與 `TownPass-gtune` 兩份 diff 合在 `D:\TownPassAssistant\decision-classifier\combo` 的副本；gtune 沒有動 | `cls_gemma_v2` |
+| (2) 分類器 v3＋Gemma g_v2 | 能力用分類器；圖書與教學用 Gemma 4 E2B Q4_0，`TOWNPASS_GEMMA_PROMPT=lean,answer,mapdesc,prefill,sure`，含 Gemma 代理的圖書規則。程式是本 worktree 與 `TownPass-gtune` 兩份 diff 合在 `<工作資料夾>\decision-classifier\combo` 的副本；gtune 沒有動 | `cls_gemma_v2` |
 | (3) 選項 B | `classifier_only`，教學用預設步驟 | `optionB` |
 | (3′) 選項 B′ | 同上，教學用關鍵字規則 | `optionB_kw` |
 
@@ -326,7 +326,7 @@ v3 的修正來自兩句 dev：「有沒有比較多人借的書」原本開到�
   - 新增：`portal_assistant/backend/classifier.py`、`portal_assistant/backend/test_classifier.py`、本文件。
   - 修改：`portal_assistant/backend/workflow.py`、`portal_assistant/backend/server.py`。
   - `.model-study/` 不是本實驗產生的，沒有動。
-- `D:\TownPassAssistant\decision-classifier\`：
+- `<工作資料夾>\decision-classifier\`：
   - `portal_assistant/scripts\`：sources、collect、leakage、build_pairs、train、tune、score_dev_server、run_eval.sh、summarize、bench_latency、feasibility_dummy，以及第 10 節用的 run_setup.py、summarize2.py。
   - `combo\`：第 10 節設定 (2) 用的合併副本（本 worktree＋`TownPass-gtune` 的 diff，未提交、不是 git 歷史）。
   - `data\`、`models\`、`results\`、`logs\`、`cache\`（語意索引與圖書館藏副本）。
@@ -369,7 +369,7 @@ v3 的修正來自兩句 dev：「有沒有比較多人借的書」原本開到�
 
 ### 12.3 電腦評估（2026-11-12，同一台電腦、一次只跑一組，自己的 port 8981–8983）
 
-工具：`D:\TownPassAssistant\classifier-app\run_eval.py`（改自第 10 節的 run_setup.py）、`summarize.py`；結果在 `D:\TownPassAssistant\classifier-app\results\`。
+工具：`<工作資料夾>\classifier-app\run_eval.py`（改自第 10 節的 run_setup.py）、`summarize.py`；結果在 `<工作資料夾>\classifier-app\results\`。
 e5 用 `build-host-b12182` 的 llama-server（CPU）；分類器同上、`-t 4`；決策 LLM 是 Ollama `ministral-3:3b`（:11434）。每組先把程式複製一份快照再跑。
 
 - (a0) `feat/assistant-languages`（`da2f8a5`）原樣，預設 Ministral。
@@ -498,7 +498,7 @@ e5 和「書名」「物品」兩個錨點的相似度差，書名 −0.019～+0
 
 ### 13.4 評估（電腦，port 9061–9063，一次一組；同時另一個代理在用模擬器，秒數只供參考）
 
-工具：`D:\TownPassAssistant\book-title\run_eval.py`、`summarize.py`（改自 `classifier-app`，只改 port 與路徑）；結果在 `D:\TownPassAssistant\book-title\results\`。
+工具：`<工作資料夾>\book-title\run_eval.py`、`summarize.py`（改自 `classifier-app`，只改 port 與路徑）；結果在 `<工作資料夾>\book-title\results\`。
 before＝`7292732` 的程式＋本分支的 `evaluate.py`（含新題目）；after＝本分支。
 
 **(b) 分類器模式（B′）**（evaluate：通過案例；答對輪數／要多按一下／沒開頁／**開錯**；口語：答對／列出／沒找到／**開錯**）
@@ -545,7 +545,7 @@ before 與第 12 節之後的整合基準（`classifier-app\results\next_compare
 
 ## 14. 分類器 v2（2026-11-16，需求型步驟 7、7b；規則見 `AI_CURRENT_RULES.md` 第 2、3、6、8 節）
 
-- **App 從 2026-11-16 起下載 v2**（擁有者決定；團隊 HF `allensung1226/townpass-assistant-models` 的 `decision/`，commit 8c9b9a8f）。採用的模型：`D:\TownPassAssistant\decision-classifier\models\townpass-decision-e5-ce-v2-q8_0.gguf`
+- **App 從 2026-11-16 起下載 v2**（擁有者決定；團隊 HF `allensung1226/townpass-assistant-models` 的 `decision/`，commit 8c9b9a8f）。採用的模型：`<工作資料夾>\decision-classifier\models\townpass-decision-e5-ce-v2-q8_0.gguf`
   （＝`townpass-decision-e5-ce-v2-ep2-q8_0.gguf`；132,441,120 bytes，SHA-256 `fd51639891dcdc6f906699a177a316f91c4381ffca00602e24428bd421fe1abd`；
   HF 格式 `models\e5-ce-v2\epoch2`）。訓練資料 `data\v2\pairs_train.jsonl`（91,804 組），訓練紀錄 `logs\v2\train-e5-v2.log`。
   v2 的預設門檻在 `classifier.DEFAULT_THRESHOLDS_V2`（關鍵字 0.40、只靠語意直接開 0.60，擁有者 2026-11-16）。
@@ -556,5 +556,5 @@ before 與第 12 節之後的整合基準（`classifier-app\results\next_compare
 - 後端兩版都能跑：`classifier.VERSION` 跟著 `MODEL_NAME`，`TOWNPASS_CLASSIFIER_VERSION=1／2` 可以指定。電腦評估：
   `llama-server -m townpass-decision-e5-ce-v2-q8_0.gguf --reranking --pooling rank ...`（參數同 v1）＋ `TOWNPASS_CLASSIFIER_VERSION=2`。
 - **換版（2026-11-16 已做，主 session）**：v2 檔已上傳團隊 HF，並改了 7 個位置：`portal_assistant/app/assets/assistant/models.json` classifier 那一筆（name、sha256、path；size 相同）、`portal_assistant/backend/classifier.py` 的 `MODEL_NAME`（`VERSION` 預設因此是 2）、`OnDeviceAssistant.kt` 的 `CLASSIFIER_MODEL_FILE`、`OnDeviceAssistant.swift` 的 `classifierModelFile`、`portal_assistant/scripts/build_model_manifest.py`、`portal_assistant/scripts/push_assistant_models.ps1` 的預設檔名、`portal_assistant/backend/test_classifier_app.py` 的檔名斷言（v1 專屬的測試用 `test_classifier.pin_v1` 固定成 v1）。手機上已下載 v1 的人會再下載一次 132 MB；舊檔原本不會自動刪除，2026-11-16 起列在 models.json 的 `superseded`，啟動、下載完成、刪除模型時刪掉（`portal_assistant/docs/AI_MODEL_DOWNLOAD.md` 第 4 節；改回 v1 時要把 v2 的檔名加進 `portal_assistant/scripts/build_model_manifest.py` 的 `SUPERSEDED`）。
-- **復原**：回到 v1：把 7 個位置改回 v1 的檔名（`portal_assistant/app/assets/assistant/models.json` classifier 那一筆的 name／sha256／path、`portal_assistant/backend/classifier.py` 的 `MODEL_NAME`、`OnDeviceAssistant.kt` 的 `CLASSIFIER_MODEL_FILE`、`OnDeviceAssistant.swift` 的 `classifierModelFile`、`portal_assistant/scripts/build_model_manifest.py`、`portal_assistant/scripts/push_assistant_models.ps1`、`portal_assistant/backend/test_classifier_app.py`），電腦上也可以設 `TOWNPASS_CLASSIFIER_VERSION=1`，就是 v1 的行為；v2 的程式差異在 `D:\TownPassAssistant\need-impl\step7.patch`
+- **復原**：回到 v1：把 7 個位置改回 v1 的檔名（`portal_assistant/app/assets/assistant/models.json` classifier 那一筆的 name／sha256／path、`portal_assistant/backend/classifier.py` 的 `MODEL_NAME`、`OnDeviceAssistant.kt` 的 `CLASSIFIER_MODEL_FILE`、`OnDeviceAssistant.swift` 的 `classifierModelFile`、`portal_assistant/scripts/build_model_manifest.py`、`portal_assistant/scripts/push_assistant_models.ps1`、`portal_assistant/backend/test_classifier_app.py`），電腦上也可以設 `TOWNPASS_CLASSIFIER_VERSION=1`，就是 v1 的行為；v2 的程式差異在 `<工作資料夾>\need-impl\step7.patch`
   與 `step7b.patch`（`git apply -R`）。只想關掉只靠語意直接開：`TOWNPASS_CLASSIFIER_T_SEMANTIC_OPEN=1.01`。

@@ -1,6 +1,6 @@
 # 圖書決策 prompt 縮短實驗
 
-日期：2026-11-07。分支 `exp/speed-library`（自 `feat/asr-ablation` `2bcf698`），worktree `D:\github\TownPass-s3`。
+日期：2026-11-07。分支 `exp/speed-library`（自 `feat/asr-ablation` `2bcf698`），worktree `TownPass-s3`。
 尚未 commit、未上手機；以電腦 Ollama `ministral-3:3b`（Q4_K_M，temperature 0）評估。
 
 ## 1. 目的與量法

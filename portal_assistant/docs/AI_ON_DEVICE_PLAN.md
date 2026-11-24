@@ -37,7 +37,7 @@
 ```powershell
 # 1. 用 NDK 建置 llama-server / whisper-server（輸出到 android/app/assistant-native/，已 gitignore）
 .\scripts\build_assistant_native.ps1
-# 2. 下載 Ministral GGUF；把 Breeze-ASR-25 轉成 ggml 並量化為 q5_0（輸出到 D:\TownPassAssistant\models\device）
+# 2. 下載 Ministral GGUF；把 Breeze-ASR-25 轉成 ggml 並量化為 q5_0（輸出到 <工作資料夾>\models\device，`<工作資料夾>` 見 TEAM_LOCAL_SETUP.md 第 3.1 節）
 .\scripts\prepare_assistant_models.ps1
 # 3. 接上手機（USB 偵錯），推送模型（約 3.3 GB，只需一次）
 .\scripts\push_assistant_models.ps1
