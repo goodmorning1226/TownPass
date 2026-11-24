@@ -12,6 +12,7 @@ import 'package:townpass_portal_assistant/page/guided_assistant/model/assistant_
 import 'package:townpass_portal_assistant/page/guided_assistant/model/guide_i18n.dart';
 import 'package:townpass_portal_assistant/page/guided_assistant/web/web_page_state.dart';
 import 'package:townpass_portal_assistant/page/guided_assistant/widget/guided_assistant_host.dart';
+import 'package:townpass_portal_assistant/service/assistant_catalog_data.dart';
 import 'package:townpass_portal_assistant/service/assistant_model_download.dart';
 import 'package:townpass_portal_assistant/service/assistant_on_device.dart';
 import 'package:townpass_portal_assistant/service/assistant_readiness.dart';
@@ -50,6 +51,9 @@ abstract final class PortalAssistant {
   /// the end of its service initialisation (after its own services).
   static Future<void> init(PortalAssistantHost host) async {
     PortalAssistantHost.instance = host;
+    // The service origins and the catalogue's suggestions (data files read
+    // synchronously later: page tracking, translation, opening pages).
+    await AssistantCatalogData.load();
     // Pages keep the language of the last assistant navigation (or Settings).
     await PageTranslation.instance.load();
     // The guided assistant's pre-translated texts (portal_assistant/app/assets/i18n/guide/).

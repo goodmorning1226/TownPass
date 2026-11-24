@@ -1,31 +1,37 @@
 import 'package:townpass_portal_assistant/page/guided_assistant/model/guide_content.dart';
 import 'package:townpass_portal_assistant/page/guided_assistant/model/guide_page.dart';
+// BEGIN GENERATED guide imports (portal_assistant/scripts/sync_guide_lists.py)
 import 'package:townpass_portal_assistant/page/guided_assistant/model/guides/citizen_report_guide.dart';
-import 'package:townpass_portal_assistant/page/guided_assistant/model/guides/coupon_wallet_guide.dart';
 import 'package:townpass_portal_assistant/page/guided_assistant/model/guides/counter_calling_guide.dart';
+import 'package:townpass_portal_assistant/page/guided_assistant/model/guides/coupon_wallet_guide.dart';
 import 'package:townpass_portal_assistant/page/guided_assistant/model/guides/disaster_report_guide.dart';
 import 'package:townpass_portal_assistant/page/guided_assistant/model/guides/district_office_guide.dart';
 import 'package:townpass_portal_assistant/page/guided_assistant/model/guides/fees_guide.dart';
 import 'package:townpass_portal_assistant/page/guided_assistant/model/guides/library_guide.dart';
 import 'package:townpass_portal_assistant/page/guided_assistant/model/guides/police_report_guide.dart';
 import 'package:townpass_portal_assistant/page/guided_assistant/model/guides/subscription_guide.dart';
+// END GENERATED guide imports
 
 /// Every service page with pre-written teaching components.
 ///
-/// To add a page: write `guides/<id>_guide.dart` with a `GuidePage`, add
-/// portal_assistant/app/assets/assistant/`guide_<id>.json`, then add its import above and ONE
-/// line (the page, with a comment naming it) below. Keep one page per line
-/// so parallel edits do not collide.
+/// To add a page: write `guides/<id>_guide.dart` with a `GuidePage` named
+/// `<id in camelCase>Page`, portal_assistant/app/assets/assistant/`guide_<id>.json`
+/// and portal_assistant/app/assets/i18n/guide/`<id>.json`, then run
+/// `python -X utf8 portal_assistant/scripts/sync_guide_lists.py`: it writes the
+/// imports above, the list below and GuideI18n.sections (existing pages keep
+/// their order, a new page goes last; `--check` fails when they are out of step).
 final List<GuidePage> guidePages = [
+  // BEGIN GENERATED guide pages (portal_assistant/scripts/sync_guide_lists.py)
   libraryPage, // 圖書借閱
   feesPage, // 繳費
   counterCallingPage, // 臨櫃叫號
   disasterReportPage, // 災情通報
-  policeReportPage, // 線上報案／報案紀錄
+  policeReportPage, // 線上報案
   citizenReportPage, // 有話要說
   districtOfficePage, // 申辦服務
-  couponWalletPage, // 優惠／票夾
+  couponWalletPage, // 優惠票夾
   subscriptionPage, // 訂閱
+  // END GENERATED guide pages
 ];
 
 GuidePage? guidePageById(String id) {

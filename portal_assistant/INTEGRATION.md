@@ -121,8 +121,9 @@
 
 ### 4.2 服務網域與 WebView
 
-- 服務網域：`https://taipei-pass-service.vercel.app`（官方示範服務）。只在這個網域上：注入翻譯腳本、接受 `townpassTranslate` 呼叫、回報頁面路徑給助理、跑教學探測。
-  目前寫在 `AssistantPageTracker.serviceHost`、`app/assets/assistant/capabilities.json` 的路徑與 `AssistantActionExecutor`；改成正式網域時這三處要一起改（第二階段會改成資料檔）。
+- 服務網域：白名單 `app/assets/assistant/service_origins.json`（目前只有官方示範服務 `https://taipei-pass-service.vercel.app`，也是 `default`）。只在這些網域上：注入翻譯腳本、接受 `townpassTranslate` 呼叫、回報頁面路徑給助理、跑教學探測，助理也只開這些網域的頁面。
+  改成正式網域、或新服務放在台北通自己的網域時，**只改這一個檔**（App、後端、預翻腳本、教學稽核工具都讀它；某個服務在別的網域時，它的 `navigation` 加 `"origin"`）。
+  改完跑 `python -X utf8 portal_assistant/scripts/check_service.py --all --routes`（每個頁面都在白名單內、路徑在網站的路由表裡）。
 - 既有的 bridge（`flutterObject.postMessage({name, data})`、`TPWebMessageListener` 的 `userinfo`、`launch_map`、`phone_call`、`1999agree`、`location`、`deviceinfo`、`open_link`、`notify`、`qr_code_scan`）**完全沒改**。
 - 助理只新增一個 JavaScript handler：`townpassTranslate`（`window.flutter_inappwebview.callHandler('townpassTranslate', [中文字串…])`，回傳譯文陣列；只服務網域可用）。
   教學探測與頁內換頁用 `evaluateJavascript` 讀頁面、用網頁自己的路由換頁；**不修改、不送出表單**，最後一步一律由使用者自己按。

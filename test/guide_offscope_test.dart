@@ -23,7 +23,8 @@ const home = '/library-service/';
 const search = '/library-service/keyword-search';
 const detail = '/library-service/book-detail/lib-book-5';
 const otherService = '/subscription-service/';
-const host = 'https://${AssistantPageTracker.serviceHost}';
+// The default service origin (service_origins.json, loaded by flutter_test_config.dart).
+final host = 'https://${AssistantPageTracker.serviceHost}';
 
 class _SilentSpeaker extends AssistantSpeaker {
   @override

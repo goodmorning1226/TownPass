@@ -88,10 +88,12 @@ void main() {
   );
 
   test('translation script runs only on the service host main frame', () {
+    // Any allowed service origin (service_origins.json, 2026-11-24); `host`
+    // alone when an older caller passes no `hosts`.
     expect(
       script,
       contains(
-        "if (location.protocol !== 'https:' || location.host !== config.host) return;",
+        "if (location.protocol !== 'https:' || (config.hosts || [config.host]).indexOf(location.host) < 0) return;",
       ),
     );
     expect(script, contains('if (window.top !== window) return;'));
@@ -108,6 +110,11 @@ void main() {
     final source = AssistantWebSession.translationSource('en', {'水費': 'Water bill'});
     expect(source, startsWith(';'));
     expect(source, contains('"host":"${AssistantPageTracker.serviceHost}"'));
+    expect(
+      source,
+      contains('"hosts":["${AssistantPageTracker.serviceHost}"]'),
+    );
+    expect(AssistantPageTracker.serviceHost, isNotEmpty); // loaded (test config)
     expect(source, contains('"language":"en"'));
     expect(source, contains('"dictionary":{"水費":"Water bill"}'));
     expect(source, contains('"keep":[]'));

@@ -98,9 +98,9 @@ MESSAGES = {
 }
 
 # The App page offered (not opened) after the number: the building-fire form, unless the sentence
-# names another fire form (workflow._emergency_offer, rules section 1, 2026-11-17).
-OFFER = {"fire": "disasterReport.form.D-4-1"}
-FIRE_FORMS = "disasterReport.form.D-4-"
+# names another fire form (workflow._emergency_offer, rules section 1, 2026-11-17). Data since
+# 2026-11-24 (stage 2): capabilities.json "emergency": {"kind": "fire"} marks the fire forms and
+# "default": true the building fire (registry.emergency_forms).
 
 # Words that contain an emergency word but are not one (rules section 1, 2026-11-17; the rule-collision
 # test found them): a fire lane or hydrant is not a fire; a button or a screen that 沒反應 is not a

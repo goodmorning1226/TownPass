@@ -16,12 +16,12 @@ import registry as matching
 PAGE_SIZE = 8  # categories or pages per screen; more than this goes to the next page
 OTHER = "other"
 # The 常用 row: pages the user opened recently on this phone (the App sends their ids,
-# newest first), then these defaults (繳水費, 借書, 臨櫃叫號; 停車費 only fills in when a page
-# named like a category is left out, 2026-11-16); at most FREQUENT_SIZE.
-FREQUENT_DEFAULT = ("fees.water", "library", "reservation", "fees.parking")
+# newest first), then the defaults: the capabilities with "frequent_default" in that order
+# (繳水費, 借書, 臨櫃叫號; 停車費 only fills in when a page named like a category is left out,
+# 2026-11-16); at most FREQUENT_SIZE. The App's start pages ("list_last": 首頁, 服務總覽, 起始頁面,
+# 置頂) come last inside their category, as in the old flat list. Both are data in
+# capabilities.json since 2026-11-24 (stage 2; were FREQUENT_DEFAULT and LAST here).
 FREQUENT_SIZE = 3
-# The App's start pages come last inside their category, as in the old flat list.
-LAST = ("app.home", "app.services", "start_page", "pinned")
 _SPLIT = re.compile(r"\s*(?:與|和|及|、|,|，|&|＆|・|/|／|\band\b|\bdan\b|\bat\b|\bvà\b)\s*", re.I)
 
 # "有什麼 X／有哪些 X" decides the listing's scope by X (rules section 2, 2026-11-17): the sentence shapes
@@ -67,6 +67,8 @@ class Menu:
             self.groups.append(other)
             self.by_id[OTHER] = other
         self._order = {entry["id"]: index for index, entry in enumerate(registry.entries)}
+        self.frequent_default = registry.frequent_default()
+        self.last = registry.list_last()
 
     def group_of(self, entry):
         """The entry's category: its own group, else its hub's by id prefix, else other."""
@@ -85,7 +87,7 @@ class Menu:
         hub = self.by_id.get(group, {}).get("hub")
         found = [entry for entry in self.registry.entries
                  if self.group_of(entry) == group and (all_entries or entry["enabled"])]
-        return sorted(found, key=lambda e: (e["id"] != hub, e["id"] in LAST, self._order[e["id"]]))
+        return sorted(found, key=lambda e: (e["id"] != hub, e["id"] in self.last, self._order[e["id"]]))
 
     def visible(self, all_entries=False):
         """Categories with at least one page to show, in order."""
@@ -101,7 +103,7 @@ class Menu:
         page 臨櫃叫號 beside the category 臨櫃叫號 could not be told apart, and saying the name
         picks the category), so the row may have fewer than FREQUENT_SIZE."""
         chosen = []
-        for entry_id in [*(recent or ()), *FREQUENT_DEFAULT]:
+        for entry_id in [*(recent or ()), *self.frequent_default]:
             entry = self.registry.by_id.get(entry_id) if isinstance(entry_id, str) else None
             if (entry and entry["enabled"] and entry_id not in chosen
                     and not self.names_category(self.registry.title(entry, language), language)):

@@ -1,12 +1,20 @@
 """Collect the App's own Chinese display strings for the bundled page translations.
 
 Writes portal_assistant/app/assets/i18n/app_strings.json: {"version", "source", "strings": {zh: {en, ja, vi, id, tl}}} (tl = Filipino).
-Existing translations are kept; new strings get empty translations to fill in;
-strings no longer in the App are dropped. Interpolated Dart strings ('$x') and
-the assistant's own texts (already in the reply language) are skipped.
+Existing translations are kept; new strings get empty translations to fill in.
+Entries no longer found in the App are kept and only listed (2026-11-24: the file also
+holds hand-added common page words such as 上一步, 全部, 確定, which no Dart literal
+has; the old behaviour of dropping them would have lost 46 reviewed entries).
+Interpolated Dart strings ('$x') and the assistant's own texts (already in the reply
+language) are skipped. The App is the host's lib/ (TownPass); the assistant package
+(portal_assistant/app) has its own texts (gt(), AssistantTexts) and is not scanned.
 
-Usage: python -X utf8 portal_assistant/scripts/extract_app_strings.py
+Usage:
+  python -X utf8 portal_assistant/scripts/extract_app_strings.py           # add new strings
+  python -X utf8 portal_assistant/scripts/extract_app_strings.py --check   # exit 1 when an App string
+                                                                           # is missing or untranslated
 """
+import sys
 import json
 import pathlib
 import re
@@ -55,20 +63,34 @@ def mock_strings():
 
 
 def main():
+    check = "--check" in sys.argv
     old = json.loads(OUT.read_text(encoding="utf-8"))["strings"] if OUT.exists() else {}
+    found = dart_strings() | mock_strings()
     strings = {}
-    for text in sorted(dart_strings() | mock_strings()):
+    for text in sorted(found | set(old)):
         kept = old.get(text, {})
         strings[text] = {code: kept.get(code, "") for code in LANGUAGES}
+    added = sorted(found - set(old))
+    untranslated = sorted(text for text in found if not all(strings[text][code] for code in LANGUAGES))
+    unused = len(set(old) - found)
+    for text in added:
+        print(f"new: {text}")
+    for text in untranslated:
+        if text not in added:
+            print(f"untranslated: {text}")
+    print(f"{len(found)} App strings, {len(added)} new, {len(untranslated)} untranslated; "
+          f"{unused} kept entries not in the App's code (common page words)")
+    if check:
+        return 1 if added or untranslated else 0
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(json.dumps({
         "version": 1,
         "source": "TownPass App strings (lib/, assets/mock_data/); translations reviewed by speakers pending (Filipino tl: AI drafts 2026-11-11)",
         "strings": strings,
     }, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
-    missing = sum(1 for value in strings.values() for code in LANGUAGES if not value[code])
-    print(f"{len(strings)} strings, {missing} translations missing -> {OUT.relative_to(ROOT)}")
+    print(f"-> {OUT.relative_to(ROOT)}")
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

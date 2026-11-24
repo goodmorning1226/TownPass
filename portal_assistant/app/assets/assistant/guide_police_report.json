@@ -10,6 +10,7 @@
   ],
   "title": "線上報案",
   "default_goal": "submit_report",
+  "continue_to_default": true,
   "capability_goals": {
     "police.online": [
       "submit_report",

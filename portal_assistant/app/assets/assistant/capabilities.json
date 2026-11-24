@@ -580,7 +580,8 @@
       "navigation": {
         "type": "tab",
         "index": 1
-      }
+      },
+      "list_last": true
     },
     {
       "id": "app.services",
@@ -599,7 +600,8 @@
       "navigation": {
         "type": "tab",
         "index": 0
-      }
+      },
+      "list_last": true
     },
     {
       "id": "app.perks",
@@ -735,7 +737,8 @@
           "/account",
           "/setting"
         ]
-      }
+      },
+      "list_last": true
     },
     {
       "id": "pinned",
@@ -756,7 +759,8 @@
         "type": "native",
         "route": "/service_edit",
         "parents": []
-      }
+      },
+      "list_last": true
     },
     {
       "id": "messages",
@@ -1121,6 +1125,18 @@
         "path": "/counter-calling/",
         "parents": [],
         "query": {}
+      },
+      "frequent_default": 3,
+      "suggest": {
+        "order": 3,
+        "text": {
+          "zh": "臨櫃叫號",
+          "en": "Counter queue",
+          "ja": "窓口の順番待ち",
+          "vi": "Lấy số thứ tự tại quầy",
+          "id": "Nomor antrean loket",
+          "tl": "Numero ng pila sa counter"
+        }
       }
     },
     {
@@ -1438,6 +1454,18 @@
         "path": "/library-service/",
         "parents": [],
         "query": {}
+      },
+      "frequent_default": 2,
+      "suggest": {
+        "order": 1,
+        "text": {
+          "zh": "我要借書",
+          "en": "I want to borrow a book",
+          "ja": "本を借りたい",
+          "vi": "Tôi muốn mượn sách",
+          "id": "Saya mau pinjam buku",
+          "tl": "Gusto kong humiram ng libro"
+        }
       }
     },
     {
@@ -1790,7 +1818,8 @@
       "pay_words": [
         "停車",
         "路邊"
-      ]
+      ],
+      "frequent_default": 4
     },
     {
       "id": "fees.water",
@@ -1816,7 +1845,19 @@
       },
       "pay_words": [
         "水"
-      ]
+      ],
+      "frequent_default": 1,
+      "suggest": {
+        "order": 2,
+        "text": {
+          "zh": "我要繳水費",
+          "en": "Pay my water bill",
+          "ja": "水道料金を払いたい",
+          "vi": "Tôi muốn trả tiền nước",
+          "id": "Bayar tagihan air",
+          "tl": "Magbayad ng bill sa tubig"
+        }
+      }
     },
     {
       "id": "fees.tax",
@@ -2801,6 +2842,10 @@
         ],
         "query": {},
         "in_page": true
+      },
+      "emergency": {
+        "kind": "fire",
+        "default": true
       }
     },
     {
@@ -2825,6 +2870,9 @@
         ],
         "query": {},
         "in_page": true
+      },
+      "emergency": {
+        "kind": "fire"
       }
     },
     {
@@ -2849,6 +2897,9 @@
         ],
         "query": {},
         "in_page": true
+      },
+      "emergency": {
+        "kind": "fire"
       }
     },
     {
@@ -2872,6 +2923,9 @@
         ],
         "query": {},
         "in_page": true
+      },
+      "emergency": {
+        "kind": "fire"
       }
     },
     {

@@ -19,7 +19,8 @@ import 'package:town_pass/util/tp_route.dart';
 /// The coupon guide (coupon_wallet) runs right on the native 優惠 tab: its
 /// WebView is tracked like a TPWebView, but only while that tab shows.
 
-const host = 'https://${AssistantPageTracker.serviceHost}';
+// The default service origin (service_origins.json, loaded by flutter_test_config.dart).
+final host = 'https://${AssistantPageTracker.serviceHost}';
 const perks = {'kind': 'capability', 'id': 'app.perks'};
 const couponList = {'kind': 'capability', 'id': 'coupon.list'};
 const servicesTab = 0;

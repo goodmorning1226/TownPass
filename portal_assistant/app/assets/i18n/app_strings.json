@@ -751,6 +751,13 @@
    "id": "Kelola otorisasi",
    "tl": "Pamamahala ng pahintulot"
   },
+  "授權與資料來源": {
+   "en": "Licenses and data sources",
+   "ja": "ライセンスとデータの出典",
+   "vi": "Giấy phép và nguồn dữ liệu",
+   "id": "Lisensi dan sumber data",
+   "tl": "Mga lisensya at pinagmulan ng datos"
+  },
   "探索臺北": {
    "en": "Explore Taipei",
    "ja": "台北を探索",
@@ -1800,6 +1807,13 @@
    "vi": "Không bỏ lỡ giấy báo thuế, mang theo chứng nhận nộp thuế bên mình No Worry Missing Tax Bills Out on Payment Period. Carry Tax Payment Certificates at Hand.",
    "id": "Tak lewatkan tagihan pajak, bukti pembayaran selalu di tangan No Worry Missing Tax Bills Out on Payment Period. Carry Tax Payment Certificates at Hand.",
    "tl": "Huwag Makaligtaan ang Tax Bill sa Panahon ng Pagbabayad. Dalhin Kahit Saan ang mga Sertipiko ng Pagbabayad ng Buwis."
+  },
+  "關於": {
+   "en": "About",
+   "ja": "このアプリについて",
+   "vi": "Giới thiệu",
+   "id": "Tentang",
+   "tl": "Tungkol sa app"
   },
   "關閉": {
    "en": "Close",

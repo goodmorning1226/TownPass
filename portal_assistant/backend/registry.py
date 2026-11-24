@@ -100,6 +100,22 @@ class Registry:
             normalized(term) for term in [entry["title"], *entry["keywords"], *(entry.get("pay_words") or []),
                                           *entry.get("features", [])]) if v] for entry in self.entries}
 
+    def frequent_default(self):
+        """The 常用 row's default pages: "frequent_default" (1, 2, ...) in that order (menu.py)."""
+        found = [entry for entry in self.entries if isinstance(entry.get("frequent_default"), int)]
+        return tuple(entry["id"] for entry in sorted(found, key=lambda e: e["frequent_default"]))
+
+    def list_last(self):
+        """The App's start pages, listed last ("list_last": 首頁, 服務總覽, 起始頁面, 置頂)."""
+        return frozenset(entry["id"] for entry in self.entries if entry.get("list_last"))
+
+    def emergency_forms(self, kind):
+        """(default, forms) offered under an emergency number (rules section 1): the capabilities
+        with "emergency": {"kind": kind}, in catalogue order, and the one marked "default"."""
+        forms = [entry for entry in self.entries if (entry.get("emergency") or {}).get("kind") == kind]
+        default = next((entry for entry in forms if entry["emergency"].get("default")), None)
+        return default, forms
+
     def title(self, entry, language="zh"):
         """The entry's name in a language; the Chinese title when there is none."""
         return (self.i18n.get(entry["id"], {}).get(language) or {}).get("title") or entry["title"]

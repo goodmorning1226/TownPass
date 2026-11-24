@@ -302,7 +302,8 @@ App 內「設定 → 關於 → 授權與資料來源」列出上述資料與每
 **開發過程使用的 AI**
 
 - Claude：Claude Code（Claude Opus 5.5），用於程式撰寫、測試、文件與翻譯草稿；版面與封面的設計也有用 Claude 協助。
-- ChatGPT、Gemini：未使用。
+- ChatGPT：少量使用，用來討論部分設計與實作方向；整體方向與功能由團隊自行構想與設計。
+- Gemini：未使用。
 - 影像生成：未使用 AI 影像生成；企鵝圖案沿用程式設計節提供的圖片。
 
 **App 內實際執行的模型（自行架設／本地模型，全部在手機上執行）**
@@ -322,6 +323,7 @@ App 內「設定 → 關於 → 授權與資料來源」列出上述資料與每
 
 ## 2. 使用範圍
 
+- **設計討論**：用 ChatGPT 與 Claude 討論部分設計與實作方向；產品方向、要做哪些功能與使用者體驗由團隊自行決定。
 - **程式碼產生**：助理部分（`portal_assistant/` 與台北通上的串接點）約 90% 由 AI 產生，經人工審查與測試；官方台北通 App 原始碼不計。
   - App 端：引導教學、頁面探測、按住輸入／選擇、頁面翻譯、模型下載。
   - 後端：決策流程、檢索與比對、地址分層比對、HTTP 端點。
@@ -357,7 +359,7 @@ App 內「設定 → 關於 → 授權與資料來源」列出上述資料與每
 - 最快的做法：把 `portal_assistant/` 放到台北通 repo 根目錄，執行 `portal_assistant/integration/apply.ps1`（或 `apply.sh`），再 `pub get`、`build_runner`。
 - 主機介面 `PortalAssistantHost`：台北通的實作在 [integration/files/lib/util/town_pass_assistant_host.dart](integration/files/lib/util/town_pass_assistant_host.dart)。
 - 23 個串接點：每個官方檔案一份 patch（[integration/patches/](integration/patches/)），文件逐一寫明位置、加什麼、為什麼、不加會怎樣。
-- 台北通要提供的東西：服務網域、WebView bridge（既有的訊息名稱與資料語意完全沒改）、建置開關、權限、模型下載來源、原生建置步驟。
+- 台北通要提供的東西：服務網域（白名單 [app/assets/assistant/service_origins.json](app/assets/assistant/service_origins.json)）、WebView bridge（既有的訊息名稱與資料語意完全沒改）、建置開關、權限、模型下載來源、原生建置步驟。
 - 對原台北通架構的修改：[docs/HOST_CHANGES.md](docs/HOST_CHANGES.md)。
 
 # 四、專案結構與文件
@@ -369,7 +371,8 @@ App 內「設定 → 關於 → 授權與資料來源」列出上述資料與每
 | [backend/](backend/) | Python 後端：流程、檢索、決策分類器、語音與語言判斷、選項與地址比對、評估與測試 |
 | [native/](native/) | Android（Kotlin、Gradle、原生伺服器建置）與 iPhone（建置與內嵌腳本） |
 | [scripts/](scripts/) | 建置、推模型、評估、抽字串、資料整理、連結檢查 |
-| [tools/](tools/) | 教學流程錄製與重播（guide_audit）、翻譯審閱、煙霧測試 |
+| [tools/](tools/) | 教學流程錄製與重播（guide_audit）、分類器訓練腳本（classifier）、翻譯審閱、煙霧測試 |
+| [skills/](skills/) | agent skill：新增或修改服務（townpass-add-service）與人工測試範本 |
 | [docs/](docs/) | 規則、技術總覽、各實驗與決策紀錄 |
 
 | 主題 | 文件 |
@@ -380,6 +383,7 @@ App 內「設定 → 關於 → 授權與資料來源」列出上述資料與每
 | 語音、台語、多語 | [docs/AI_LANGUAGE_GATE.md](docs/AI_LANGUAGE_GATE.md)、[docs/AI_TAIWANESE_SPEECH_PLAN.md](docs/AI_TAIWANESE_SPEECH_PLAN.md)、[docs/AI_MULTILINGUAL_PLAN.md](docs/AI_MULTILINGUAL_PLAN.md) |
 | 手機端、模型下載 | [docs/AI_ON_DEVICE_PLAN.md](docs/AI_ON_DEVICE_PLAN.md)、[docs/AI_ON_DEVICE_IOS.md](docs/AI_ON_DEVICE_IOS.md)、[docs/AI_MODEL_DOWNLOAD.md](docs/AI_MODEL_DOWNLOAD.md) |
 | 地址資料 | [docs/AI_ADDRESS_DATA.md](docs/AI_ADDRESS_DATA.md) |
+| 新增或修改服務（agent skill：建議模型、prompt、驗收） | [docs/SKILL_GUIDE.md](docs/SKILL_GUIDE.md)、[skills/townpass-add-service/SKILL.md](skills/townpass-add-service/SKILL.md)、[docs/NEW_SERVICE_HOLDOUT.md](docs/NEW_SERVICE_HOLDOUT.md) |
 | 評估數字、手機速度與開發細節 | [docs/PROJECT_DETAILS.md](docs/PROJECT_DETAILS.md) |
 | 開發指南、協作規範 | [ASSISTANT_README.md](../ASSISTANT_README.md)、[AGENTS.md](../AGENTS.md) |
 

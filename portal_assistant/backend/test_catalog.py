@@ -50,9 +50,13 @@ class DataTests(unittest.TestCase):
         missing = [e["id"] for e in REGISTRY.entries if e["enabled"] and e.get("group") not in known]
         self.assertEqual(missing, [])
 
-    def test_twelve_categories_with_names_in_every_language(self):
+    def test_categories_with_names_in_every_language(self):
+        # Every category but "other" holds a connected page, and every connected page has a
+        # category (derived from the data instead of a count, 2026-11-24, stage 2).
         shown = [g for g in REGISTRY.groups if g["id"] != menu.OTHER]
-        self.assertEqual(len(shown), 12)
+        catalogue = menu.Menu(REGISTRY)
+        used = {catalogue.group_of(e) for e in REGISTRY.entries if e["enabled"]}
+        self.assertEqual(used, {g["id"] for g in shown})
         self.assertEqual([g["order"] for g in shown], sorted(g["order"] for g in shown))
         for group in REGISTRY.groups:
             for language in LANGUAGES:
@@ -81,7 +85,8 @@ class DataTests(unittest.TestCase):
         self.assertEqual(catalogue.items("bills")[0]["id"], "app.bills")
         account = [e["id"] for e in catalogue.items("account")]
         self.assertEqual(account[0], "account")
-        self.assertEqual(set(account[-4:]), set(menu.LAST))
+        self.assertEqual(set(account[-4:]), set(REGISTRY.list_last()))
+        self.assertEqual(REGISTRY.list_last(), {"app.home", "app.services", "start_page", "pinned"})
 
     def test_new_texts_exist_in_every_language(self):
         for key in ("see_all", "fallback_unsure", "fallback_unclear", "out_of_scope", "second_miss",
@@ -187,16 +192,20 @@ class CatalogueTests(unittest.TestCase):
 
     def test_all_entries_shows_other_and_disconnected_pages(self):
         result = turn(self.app, "App 有哪些功能")
-        self.assertEqual(result["listing"]["total"], 13)
+        catalogue = menu.Menu(REGISTRY)
+        self.assertEqual(result["listing"]["total"], len({catalogue.group_of(e) for e in REGISTRY.entries}))
+        self.assertGreater(result["listing"]["total"], len(catalogue.visible()))  # "other" is added
         self.assertFalse(any(c.get("group_id") == "frequent" for c in result["choices"]))
 
     def test_see_everything_is_the_connected_catalogue(self):
+        catalogue = menu.Menu(REGISTRY)
+        connected = len({catalogue.group_of(e) for e in REGISTRY.entries if e["enabled"]})
         for text, language in (("看全部功能", "zh"), ("See everything", "en"), ("すべての機能を見る", "ja"),
                                ("Xem tất cả chức năng", "vi"), ("Lihat semua fitur", "id"),
                                ("Tingnan lahat ng serbisyo", "tl")):
             result = turn(self.app, text, language=language)
             self.assertEqual((result["kind"], result["level"], result["listing"]["total"]),
-                             ("capability_list", 1, 12), text)
+                             ("capability_list", 1, connected), text)
 
 
 class FallbackTests(unittest.TestCase):

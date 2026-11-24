@@ -3,6 +3,7 @@
 // MainViewController, TPText, TownPassAssistantHost), and the copies the
 // package keeps of TownPass's design tokens (host/assistant_ui.dart). The
 // rest of the assistant's tests are in portal_assistant/app/test.
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -16,6 +17,7 @@ import 'package:town_pass/service/account_service.dart';
 import 'package:town_pass/service/device_service.dart';
 import 'package:town_pass/service/package_service.dart';
 import 'package:town_pass/service/shared_preferences_service.dart';
+import 'package:town_pass/util/tp_bottom_navigation_factory.dart';
 import 'package:town_pass/util/tp_colors.dart';
 import 'package:town_pass/util/tp_route.dart';
 import 'package:town_pass/util/tp_text.dart';
@@ -49,6 +51,47 @@ import '../portal_assistant/app/test/guided_assistant_test.dart'
 
 void main() {
   group('TownPass as the host', () {
+    // Every native page the assistant may open is a registered TownPass route
+    // (2026-11-24, stage 2: a new native service with a missing route would only
+    // fail on the phone, PortalAssistantHost.hasRoute refusing it).
+    test(
+      'every native navigation in capabilities.json is a registered route',
+      () {
+        final catalog = jsonDecode(
+          File('portal_assistant/app/assets/assistant/capabilities.json')
+              .readAsStringSync(),
+        ) as Map<String, dynamic>;
+        const host = TownPassAssistantHost();
+        final names = {for (final page in TPRoute.page) page.name};
+        final checked = <String>[];
+        for (final entry in (catalog['capabilities'] as List).cast<Map>()) {
+          final navigation = entry['navigation'] as Map?;
+          if (entry['enabled'] != true || navigation == null) continue;
+          if (navigation['type'] == 'tab') {
+            expect(
+              navigation['index'],
+              inInclusiveRange(
+                0,
+                TPBottomNavigationFactory.barItemList.length - 1,
+              ),
+              reason: entry['id'] as String,
+            );
+            continue;
+          }
+          if (navigation['type'] != 'native') continue;
+          for (final route in [
+            ...(navigation['parents'] as List? ?? []),
+            navigation['route'],
+          ]) {
+            expect(names, contains(route), reason: '${entry['id']}: $route');
+            expect(host.hasRoute(route as String), isTrue, reason: route);
+          }
+          checked.add(entry['id'] as String);
+        }
+        expect(checked, isNotEmpty);
+      },
+    );
+
     test('routes, tabs and the assistant settings page', () {
       const host = TownPassAssistantHost();
       expect(PortalAssistantHost.instance, isA<TownPassAssistantHost>());

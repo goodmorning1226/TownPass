@@ -8,7 +8,8 @@ const puppeteer = require('puppeteer-core');
 
 // The Flutter package (portal_assistant/app): guides, assets and replay fixtures.
 const ROOT = path.resolve(__dirname, '..', '..', 'app');
-const BASE = 'https://taipei-pass-service.vercel.app';
+// The default service origin (app/assets/assistant/service_origins.json).
+const BASE = JSON.parse(fs.readFileSync(path.join(ROOT, 'assets', 'assistant', 'service_origins.json'), 'utf8')).default;
 const CHROME =
   process.env.CHROME_PATH ||
   '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';

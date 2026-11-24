@@ -9,6 +9,7 @@
   ],
   "title": "申辦服務",
   "default_goal": "submit",
+  "continue_to_default": true,
   "capability_goals": {
     "districtOffice.progress": [
       "check_progress",

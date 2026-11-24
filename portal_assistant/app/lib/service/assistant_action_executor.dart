@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:townpass_portal_assistant/host/assistant_assets.dart';
 import 'package:townpass_portal_assistant/host/assistant_web_view.dart';
 import 'package:townpass_portal_assistant/host/portal_assistant_host.dart';
+import 'package:townpass_portal_assistant/service/assistant_catalog_data.dart';
 
 class AssistantActionExecutor {
   static Uri destinationUri(Map<String, dynamic> destination) {
@@ -42,9 +43,23 @@ class AssistantActionExecutor {
       default:
         throw const FormatException('助理提出未支援的頁面，未執行操作。');
     }
+    // The book pages are on the default service origin (service_origins.json).
+    return _onOrigin(
+      AssistantCatalogData.origins.defaultOrigin,
+      path,
+      query,
+    );
+  }
+
+  /// [path] and [query] on [origin] (an allowed service origin).
+  static Uri _onOrigin(Uri? origin, String path, Map<String, String>? query) {
+    if (origin == null) {
+      throw const FormatException('服務網域不在允許清單，未開啟頁面。');
+    }
     return Uri(
-      scheme: 'https',
-      host: 'taipei-pass-service.vercel.app',
+      scheme: origin.scheme,
+      host: origin.host,
+      port: origin.hasPort ? origin.port : null,
       path: path,
       queryParameters: query,
     );
@@ -123,30 +138,30 @@ class AssistantActionExecutor {
         if (navigation['type'] != 'web') {
           throw const FormatException('不支援的導覽方式。');
         }
-        uri = Uri(
-          scheme: 'https',
-          host: 'taipei-pass-service.vercel.app',
-          path: navigation['path'] as String,
-          queryParameters:
-              (navigation['query'] as Map?)?.cast<String, String>().isEmpty ==
+        // Its own allowed origin, else the default (service_origins.json).
+        final origin = AssistantCatalogData.origins.forNavigation(navigation);
+        uri = _onOrigin(
+          origin,
+          navigation['path'] as String,
+          (navigation['query'] as Map?)?.cast<String, String>().isEmpty ==
                   false
               ? (navigation['query'] as Map).cast<String, String>()
               : null,
         );
         parents = (navigation['parents'] as List? ?? [])
-            .map(
-              (path) => Uri(
-                scheme: 'https',
-                host: uri.host,
-                path: path as String,
-              ).toString(),
-            )
+            .map((path) => _onOrigin(origin, path as String, null).toString())
             .toList();
         inPage = navigation['in_page'] == true && parents.isNotEmpty;
       } else {
         uri = destinationUri(destination);
         if (destination['kind'] != 'home') {
-          parents = ['https://taipei-pass-service.vercel.app/library-service/'];
+          parents = [
+            _onOrigin(
+              AssistantCatalogData.origins.defaultOrigin,
+              '/library-service/',
+              null,
+            ).toString(),
+          ];
         }
       }
       if (isCurrent?.call() == false) return;

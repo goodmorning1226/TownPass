@@ -302,8 +302,8 @@ class Scanner:
         """Whether what the rule does is not what X names. said: the rule's answer (pages, or a kind)."""
         if rule in ("listing", "listing_sound", "listing_similar") and said == "catalogue":
             # The catalogue, for X that names pages; not when X only names the App's start pages
-            # (服務總覽, all services, 置頂: "what services are there" asks for the list, workflow.LIST_LAST).
-            return any(page not in workflow.LIST_LAST for page in phrase.pages)
+            # (服務總覽, all services, 置頂: "what services are there" asks for the list, "list_last").
+            return any(page not in self.registry.list_last() for page in phrase.pages)
         if rule in ("cancel_sound", "page_sound", "ordinal_sound"):
             return True  # a cancel / a page turn / an option, for X that names pages
         if rule in ("library_howto", "library_cue", "library_title", "book_sound"):

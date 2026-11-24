@@ -8,6 +8,7 @@
   ],
   "title": "有話要說",
   "default_goal": "submit_report",
+  "continue_to_default": true,
   "capability_goals": {
     "reportIssue.progress": [
       "open_case",

@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
+import 'package:townpass_portal_assistant/service/assistant_catalog_data.dart';
 import 'package:townpass_portal_assistant/service/assistant_speech_language.dart';
 import 'package:townpass_portal_assistant/service/page_translation.dart';
 
@@ -99,43 +100,27 @@ abstract final class AssistantTexts {
   static List<AssistantSuggestion> suggestionsFor(String language) =>
       suggestions[language] ?? suggestions['zh']!;
 
-  static const suggestions = <String, List<AssistantSuggestion>>{
-    'zh': [
-      (text: '有哪些功能', capability: null),
-      (text: '我要借書', capability: 'library'),
-      (text: '我要繳水費', capability: 'fees.water'),
-      (text: '臨櫃叫號', capability: 'reservation'),
-    ],
-    'en': [
-      (text: 'What can you do?', capability: null),
-      (text: 'I want to borrow a book', capability: 'library'),
-      (text: 'Pay my water bill', capability: 'fees.water'),
-      (text: 'Counter queue', capability: 'reservation'),
-    ],
-    'ja': [
-      (text: 'どんな機能がありますか', capability: null),
-      (text: '本を借りたい', capability: 'library'),
-      (text: '水道料金を払いたい', capability: 'fees.water'),
-      (text: '窓口の順番待ち', capability: 'reservation'),
-    ],
-    'vi': [
-      (text: 'Bạn có những chức năng gì?', capability: null),
-      (text: 'Tôi muốn mượn sách', capability: 'library'),
-      (text: 'Tôi muốn trả tiền nước', capability: 'fees.water'),
-      (text: 'Lấy số thứ tự tại quầy', capability: 'reservation'),
-    ],
-    'id': [
-      (text: 'Ada fitur apa saja?', capability: null),
-      (text: 'Saya mau pinjam buku', capability: 'library'),
-      (text: 'Bayar tagihan air', capability: 'fees.water'),
-      (text: 'Nomor antrean loket', capability: 'reservation'),
-    ],
-    'tl': [
-      (text: 'Ano ang mga kaya mong gawin?', capability: null),
-      (text: 'Gusto kong humiram ng libro', capability: 'library'),
-      (text: 'Magbayad ng bill sa tubig', capability: 'fees.water'),
-      (text: 'Numero ng pila sa counter', capability: 'reservation'),
-    ],
+  /// The examples: "what can you do" first, then each capability's own
+  /// `suggest` in capabilities.json (AssistantCatalogData; 2026-11-24, stage 2:
+  /// data instead of code, so a new service can be suggested without a code edit).
+  static Map<String, List<AssistantSuggestion>> get suggestions => {
+    for (final MapEntry(key: language, value: listing)
+        in _listingSuggestion.entries)
+      language: [
+        (text: listing, capability: null),
+        for (final s in AssistantCatalogData.suggestions[language] ?? const [])
+          (text: s.text, capability: s.capability),
+      ],
+  };
+
+  /// "What can you do" in each language (the function catalogue, no capability).
+  static const _listingSuggestion = <String, String>{
+    'zh': '有哪些功能',
+    'en': 'What can you do?',
+    'ja': 'どんな機能がありますか',
+    'vi': 'Bạn có những chức năng gì?',
+    'id': 'Ada fitur apa saja?',
+    'tl': 'Ano ang mga kaya mong gawin?',
   };
 
   static const _texts = <String, Map<String, String>>{

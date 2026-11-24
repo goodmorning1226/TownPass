@@ -114,8 +114,8 @@ PREV_PAGE_WORDS = ("上一頁", "前一頁")
 LIST_SIZE = menu.PAGE_SIZE
 # Listing order (owner, 2026-11-08): microservices first (their sub-pages after the
 # main pages), then the App's own pages, then account and settings, and last the
-# App's start pages, which rarely help: home, all services, start page, pinned.
-LIST_LAST = ("app.home", "app.services", "start_page", "pinned")
+# App's start pages, which rarely help: home, all services, start page, pinned
+# (capabilities.json "list_last" since 2026-11-24, registry.list_last).
 CANCEL_WORDS = ("取消", "返回", "算了", "不用了", "不要了")
 # A whole sentence of cancel words, repeated or with particles ("算了吧", "算了不用了",
 # "不用了謝謝", "好，取消"; rules section 3, 2026-11-13). Anything else after them
@@ -920,13 +920,14 @@ class Workflow:
     def _emergency_offer(self, kind, text, language="zh"):
         """The page offered under the number (rules section 1, 2026-11-17): for a fire, the fire form the
         sentence names (its keywords, else the semantic index when it is ready), else the building fire."""
-        default = self.registry.by_id.get(emergency.OFFER.get(kind, ""))
+        default, offered = self.registry.emergency_forms(kind)
         if kind != "fire":
             return default
+        offered = {entry["id"] for entry in offered}
         from server import positive_text
         positive = positive_text(text) if language == "zh" else i18n.positive_text(text, language)
         found = self.registry.search(positive) if language == "zh" else self.registry.search_language(positive, language)
-        forms = [m["entry"] for m in found if m["entry"]["id"].startswith(emergency.FIRE_FORMS) and m["entry"]["enabled"]]
+        forms = [m["entry"] for m in found if m["entry"]["id"] in offered and m["entry"]["enabled"]]
         if forms:
             return forms[0]
         index = getattr(self.owner, "semantic", None)
@@ -935,7 +936,7 @@ class Workflow:
                 ranked = index.search(positive, language=language)
             except Exception:  # noqa: BLE001 - the number does not wait for retrieval
                 ranked = []
-            forms = [entry for _, entry in ranked if entry["id"].startswith(emergency.FIRE_FORMS) and entry["enabled"]]
+            forms = [entry for _, entry in ranked if entry["id"] in offered and entry["enabled"]]
             if forms:
                 return forms[0]
         return default
@@ -1120,9 +1121,9 @@ class Workflow:
             # whose one page retrieval had named (2026-11-11 speech test, portal_assistant/docs/AI_FILIPINO.md).
             # Opened when sure (a keyword of two words, or one word with at most one other
             # content word); otherwise the model decides, and when it only asks for more,
-            # the page is listed for the user to choose (below). Start pages (LIST_LAST) are
+            # the page is listed for the user to choose (below). Start pages ("list_last") are
             # never opened this way: "what services are there" asks for the list, not 服務總覽.
-            if (entries[0]["id"] not in LIST_LAST
+            if (not entries[0].get("list_last")
                     and i18n.filipino_sure(i18n.positive_text(text, language), matches[0]["evidence"])):
                 self._trace("filipino_keyword", [entries[0]["id"]])
                 rule_switches.hit("foreign_direct")

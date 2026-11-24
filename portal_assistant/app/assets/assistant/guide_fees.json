@@ -16,6 +16,7 @@
   ],
   "title": "繳費",
   "default_goal": "confirm_pay",
+  "continue_to_default": true,
   "capability_goals": {
     "fees.history": [
       "filter_history"

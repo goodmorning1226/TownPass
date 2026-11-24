@@ -25,12 +25,14 @@ import classifier  # noqa: E402  (TOWNPASS_DECISION_BACKEND: the decision classi
 import liveness  # noqa: E402  (which local model servers answer; no long waits for a dead one)
 import rule_switches  # noqa: E402  (evaluation only: early rules switched off / traced)
 import decision  # noqa: E402  (TOWNPASS_DECISION_MODEL: Ministral by default, or Gemma)
+import origins  # noqa: E402  (service_origins.json: the demo site's mock data)
 
 # Ollama tag and the reported model name; llama-server (the phone) serves the file
 # OnDeviceAssistant.kt loaded for the same TOWNPASS_DECISION_MODEL. With no decision
 # model at all (classifier_only, option B'), the classifier's name.
 MODEL = classifier.MODEL_NAME if classifier.ONLY else "gemma4:e2b" if decision.GEMMA else "ministral-3:3b"
-CATALOG_URL = "https://taipei-pass-service.vercel.app/mock/library/library_book_list.json"
+# The demo library catalogue, on the default service origin (service_origins.json).
+CATALOG_URL = origins.default() + "/mock/library/library_book_list.json"
 CATALOG_VERSION = "570531a9244c3dba1e1f09907468ca55875ccc4b1af6fe1e5115cfdb2252f4ac"
 CONTRACT = 3  # 3: optional request "context" (page/last action hint)
 # Model downloads on the phone (models.py; GET /v1/models is the status).

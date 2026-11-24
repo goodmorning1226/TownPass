@@ -25,6 +25,9 @@ matches its pre-translation, and ML Kit translates it on the phone again):
 
     python -X utf8 portal_assistant/scripts/extract_service_strings.py
     python -X utf8 portal_assistant/scripts/extract_service_strings.py --check   # exit 1 when out of date
+    python -X utf8 portal_assistant/scripts/extract_service_strings.py --check --only-path /a/ /b
+        # only those pages: exit 1 when one of their texts is not pre-translated
+        # (exit 2 when Playwright or the network is missing; check_service.py --strings)
 
 Only the first screen of each page is read (no taps, dialogs or lists that
 need data); those texts are translated by ML Kit on the phone.
@@ -39,7 +42,11 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 OUT = ROOT / "app" / "assets" / "i18n" / "service_strings.json"
 APP = ROOT / "app" / "assets" / "i18n" / "app_strings.json"
 LANGUAGES = ("en", "ja", "vi", "id", "tl")
-HOST = "taipei-pass-service.vercel.app"
+# The service origins (app/assets/assistant/service_origins.json): pages open on their
+# capability's navigation.origin, else the default.
+ORIGINS = json.loads((ROOT / "app" / "assets" / "assistant" / "service_origins.json").read_text(encoding="utf-8"))
+DEFAULT_ORIGIN = ORIGINS["default"].rstrip("/")
+HOSTS = [o["origin"].split("://", 1)[1].rstrip("/") for o in ORIGINS["origins"]]
 HAN = re.compile(r"[\u3400-\u9fff]")
 # The site's route table as built by Vite: {path:…,meta:{title:"繳費項目"}}.
 ROUTE_TITLE = re.compile(r'meta:\{[^{}]*?title:"([^"\\]+)"')
@@ -50,9 +57,21 @@ BRIDGE = ("window.__asked = []; window.flutter_inappwebview = { callHandler: (n,
 
 
 def page_paths():
+    """The enabled web pages as URLs (origin + path), sorted."""
     caps = json.loads((ROOT / "app" / "assets" / "assistant" / "capabilities.json").read_text(encoding="utf-8"))
-    return sorted({c["navigation"]["path"] for c in caps["capabilities"]
+    return sorted({(c["navigation"].get("origin") or DEFAULT_ORIGIN).rstrip("/") + c["navigation"]["path"]
+                   for c in caps["capabilities"]
                    if c.get("enabled") and (c.get("navigation") or {}).get("type") == "web"})
+
+
+def url_of(page):
+    """A URL, or a path on the default origin."""
+    return page if "://" in page else DEFAULT_ORIGIN + page
+
+
+def label(url):
+    """How a page is named in the report: its path on the default origin, else the URL."""
+    return url[len(DEFAULT_ORIGIN):] if url.startswith(DEFAULT_ORIGIN + "/") else url
 
 
 def collect(paths):
@@ -60,12 +79,13 @@ def collect(paths):
 
     src = (ROOT / "app" / "lib" / "host" / "assistant_web_view.dart").read_text(encoding="utf-8")
     body = re.search(r"const _translationScript = r'''(.*?)''';", src, re.S).group(1).strip()
-    config = {"host": HOST, "language": "en", "dictionary": {}, "coverMs": 1500}
+    config = {"host": DEFAULT_ORIGIN.split("://", 1)[1], "hosts": HOSTS, "language": "en", "dictionary": {},
+              "coverMs": 1500}
     found = {}
     scripts = []
 
     def keep_script(response):
-        if response.url.startswith(f"https://{HOST}/") and response.url.split("?")[0].endswith(".js"):
+        if any(response.url.startswith(f"https://{host}/") for host in HOSTS)                 and response.url.split("?")[0].endswith(".js"):
             try:
                 scripts.append(response.text())
             except Exception:
@@ -77,8 +97,10 @@ def collect(paths):
         context.add_init_script(BRIDGE + body + "(" + json.dumps(config) + ");")
         context.on("response", keep_script)
         for path in paths:
+            url = url_of(path)
+            path = label(url)
             page = context.new_page()
-            page.goto(f"https://{HOST}{path}", wait_until="networkidle")
+            page.goto(url, wait_until="networkidle")
             page.wait_for_timeout(800)
             for text in page.evaluate("() => window.__asked"):
                 found.setdefault(text, set()).add(path)
@@ -102,8 +124,17 @@ def route_titles(scripts):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--check", action="store_true", help="only report; exit 1 when the file is out of date")
+    parser.add_argument("--only-path", nargs="+", metavar="PATH",
+                        help="with --check: read only these pages and report only their texts that are not "
+                             "pre-translated (check_service.py; texts dropped elsewhere are not judged)")
     args = parser.parse_args()
-    found = collect(page_paths())
+    if args.only_path and not args.check:
+        parser.error("--only-path is for --check (writing needs every page)")
+    try:
+        found = collect(args.only_path or page_paths())
+    except Exception as error:  # noqa: BLE001 - no browser or no network: exit 2, the caller notes it
+        print(f"could not read the service pages: {error.__class__.__name__}: {error}".splitlines()[0])
+        sys.exit(2)
     app = set(json.loads(APP.read_text(encoding="utf-8"))["strings"])
     texts = sorted(t for t in found if t not in app)
     existing = json.loads(OUT.read_text(encoding="utf-8")) if OUT.exists() else {}
@@ -114,6 +145,10 @@ def main():
     empty = sum(1 for t in strings for code in LANGUAGES if not strings[t][code])
     print(f"{len(strings)} texts, {len(added)} new, {len(dropped)} dropped, {empty} translations to fill")
     if args.check:
+        for text in added:
+            print(f"not pre-translated: {text}")
+        if args.only_path:
+            sys.exit(1 if added else 0)
         sys.exit(1 if added or dropped else 0)
     OUT.write_text(json.dumps({"version": 1, "source": existing.get("source", SOURCE), "strings": strings},
                               ensure_ascii=False, indent=1) + "\n", encoding="utf-8")

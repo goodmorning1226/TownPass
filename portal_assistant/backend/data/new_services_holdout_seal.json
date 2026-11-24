@@ -1,0 +1,12 @@
+{
+ "version": 1,
+ "seals": [
+  {
+   "date": "2026-11-24",
+   "writer": "empty file created with stage 2 (no items yet)",
+   "sha256": "c7cc50a204d69f4c23012dc5602b4b625655efacc1d53a5a4c1b3a105427c9a3",
+   "items": 0,
+   "per_service": {}
+  }
+ ]
+}

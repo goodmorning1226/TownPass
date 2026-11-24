@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:get/get.dart';
+import 'package:townpass_portal_assistant/service/assistant_catalog_data.dart';
 import 'package:townpass_portal_assistant/service/assistant_page_tracker.dart';
 import 'package:townpass_portal_assistant/service/page_translation.dart';
 
@@ -105,7 +106,7 @@ class AssistantWebSession {
     Map<String, String> dictionary, {
     List<String> keep = const [],
   }) =>
-      ';${_translationScript.trim()}(${jsonEncode({'host': AssistantPageTracker.serviceHost, 'language': language, 'dictionary': dictionary, 'keep': keep, 'coverMs': translationCoverMs})});';
+      ';${_translationScript.trim()}(${jsonEncode({'host': AssistantPageTracker.serviceHost, 'hosts': AssistantCatalogData.origins.hosts, 'language': language, 'dictionary': dictionary, 'keep': keep, 'coverMs': translationCoverMs})});';
 
   /// How long (ms) an untranslated text is hidden before it is shown in
   /// Chinese while its translation is still on the way.
@@ -199,9 +200,7 @@ class AssistantWebSession {
   }
 
   static bool _translatable(Uri? url) =>
-      url != null &&
-      url.scheme == 'https' &&
-      url.host == AssistantPageTracker.serviceHost;
+      AssistantCatalogData.origins.allows(url);
 
   /// The main frame's URL, kept from the navigation callbacks so the
   /// translation handler does not ask the WebView for it on every batch.
@@ -249,7 +248,7 @@ class AssistantWebSession {
           keep: translation.keptTexts,
         ),
         injectionTime: UserScriptInjectionTime.AT_DOCUMENT_START,
-        allowedOriginRules: {'https://${AssistantPageTracker.serviceHost}'},
+        allowedOriginRules: AssistantCatalogData.origins.originStrings,
         forMainFrameOnly: true,
       ),
     ];
@@ -407,8 +406,9 @@ class AssistantWebSession {
 
 /// Injected into a service page (see AssistantWebSession._userScripts and
 /// _translatePage): `(function (config) {...})` called with
-/// `{host, language, dictionary, keep, coverMs}`. It only runs in the main frame of
-/// `https://<host>` and once per document (a second injection adds its
+/// `{host, hosts, language, dictionary, keep, coverMs}`. It only runs in the main frame of
+/// `https://<one of hosts>` (service_origins.json; `host`, the default, when `hosts` is
+/// missing) and once per document (a second injection adds its
 /// dictionary and rescans).
 ///
 /// Each Chinese text node and visible attribute (`placeholder`, `title`,
@@ -434,7 +434,7 @@ class AssistantWebSession {
 /// attributes (e.g. `data-tp-placeholder`).
 const _translationScript = r'''
 (function (config) {
-  if (location.protocol !== 'https:' || location.host !== config.host) return;
+  if (location.protocol !== 'https:' || (config.hosts || [config.host]).indexOf(location.host) < 0) return;
   if (window.top !== window) return;
   if (window.__townpassTranslate) {
     window.__townpassTranslate.add(config.dictionary, config.keep);

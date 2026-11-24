@@ -1,4 +1,4 @@
-# 助理現行規則（2026-11-16；第 9 節結構規則 2026-11-24）
+# 助理現行規則（2026-11-16；第 9 節結構規則 2026-11-24；第 10 節新增服務 2026-11-24）
 
 這份是助理行為的**唯一準則**。其他文件裡和這裡衝突的舊規則（例如「一律候選確認」「語音要問『是這句嗎？』」「語言選單是偏好、偵測不確定就用選單語言」）都以這裡為準。
 規則改了就改這份，再改程式與測試。每條後面是做這件事的程式位置。
@@ -662,7 +662,7 @@ App 上看起來重複，也很難找到想要的；研究第 D 節）：
     **App 從 2026-11-16 起下載 v2**（團隊 HF `allensung1226/townpass-assistant-models` 的 `decision/townpass-decision-e5-ce-v2-q8_0.gguf`，commit 8c9b9a8f；`MODEL_NAME` 是 v2，所以 `VERSION` 預設是 2）。回到 v1：把 7 個位置改回 v1 的檔名（`portal_assistant/app/assets/assistant/models.json` classifier 那一筆的 name／sha256／path、`portal_assistant/backend/classifier.py` 的 `MODEL_NAME`、`OnDeviceAssistant.kt` 的 `CLASSIFIER_MODEL_FILE`、`OnDeviceAssistant.swift` 的 `classifierModelFile`、`portal_assistant/scripts/build_model_manifest.py`、`portal_assistant/scripts/push_assistant_models.ps1`、`portal_assistant/backend/test_classifier_app.py`），電腦上也可以設 `TOWNPASS_CLASSIFIER_VERSION=1`（`portal_assistant/docs/AI_DECISION_CLASSIFIER.md` 第 14 節）。
   - 候選文件：v1 的文件＋中文 need；外語請求是「該語言的名稱（關鍵字）— 該語言的 need | 中文名稱：關鍵字；功能」（菲律賓文用自己的名稱，v1 用英文）。
     FAQ 題目也是候選（「常見問答：題目（分類）」，第 3 節 A4）；偽候選是「問功能」與「閒聊」（v1 是「問功能」與「打招呼」）。
-  - 訓練資料（`D:\TownPassAssistant\decision-classifier\data\v2\`，`portal_assistant/scripts\build_v2.py`、`rebuild_faq_v2.py`、`filter_v2.py`）：v1 的合成句、`capability_examples.json`（含需求型例句）、
+  - 訓練資料（`D:\TownPassAssistant\decision-classifier\data\v2\`，`portal_assistant/tools/classifier/build_v2.py`（2026-11-24 從 repo 外複製進來，第 10 節）、`rebuild_faq_v2.py`、`filter_v2.py`）：v1 的合成句、`capability_examples.json`（含需求型例句）、
     每個功能的 need（中文與 5 種外語，當成正例查詢）、目錄名稱與關鍵字、新寫的困難負例（沒電了、排隊、借錢、書的固定詞、狗／公園等 142 句；寫的時候只參考開發集的錯誤類型，沒有看句子）、
     閒聊與問功能各數十句、市府 FAQ 題目 2,400 題（改寫成口語，當 FAQ 候選的正例；同一主題、同一分類的相近題也算正例，負例只取別的分類）；
     共 9,741 個查詢、91,804 組、正例 9,599 組。**每個查詢和每一組評估集的字對重疊都 < 0.4**（第 8 節；因此丟掉 946 個查詢，其中和封存集重疊的 10 個只記數目）。
@@ -823,3 +823,58 @@ App 上看起來重複，也很難找到想要的；研究第 D 節）：
 6. **Xcode target 的檔案留在 `ios/Runner/`**（`OnDeviceAssistant.swift`、`Runner.entitlements`），副本在 `integration/files/`，由台北通的測試比對（擁有者 2026-11-24 決定；原因：這台沒有 Mac 驗證專案檔）。
 7. **測試**：套件自己的測試在 `portal_assistant/app/test`（`cd portal_assistant/app && fvm flutter test`）；需要真正台北通畫面（帳戶頁、`MainViewController`、`TPText`、`TPWebView`）的
    在台北通的 `test/`。兩邊都要跑，總數不能少。
+
+## 10. 新增或修改服務（2026-11-24，第二階段）
+
+原因：加一個服務要動十幾個檔（目錄、5 種外語、例句、教學三個檔、預翻、評估集），以前沒有測試擋的缺口有 14 項
+（navigation 的路徑或原生路由不存在、服務網域不在白名單、預翻沒重抽、教學 Dart 與 JSON 只比了部分欄位、評估集沒有新服務的案例、測試裡寫死筆數…，
+`D:\TownPassAssistant\expansion-plan\PLAN.md` 第 1、3 節），都要靠人記得。擁有者 2026-11-17 決定：資料檔維持現狀，用「骨架＋完整性檢查」保證一致，缺漏一律變成測試失敗。
+操作手冊是 skill `portal_assistant/skills/townpass-add-service/SKILL.md`（說明書 `portal_assistant/docs/SKILL_GUIDE.md`）。
+
+1. **完整性檢查**：`python -X utf8 portal_assistant/scripts/check_service.py <id>`（`--all` 每個服務；`--full` 再加 `--routes` 網站路由表、`--strings` 服務頁預翻、`--collisions` 規則碰撞），
+   後端測試 `test_service_completeness.py` 對每個服務跑不需要網路的部分，並用假服務逐項證明每一項都抓得到。檢查項目：
+   - 目錄：id 唯一、格式（`x.y`）；**前綴慣例**：`x.y` 屬於服務 `x`（`registry.service_key`／`ancestors`、`menu.group_of`、`guide.page_for`、`evaluate.service_of` 都靠前綴），
+     新服務的根不是既有的功能、也不是既有的家族（`fees.*`、`app.*`）時要先加總頁或不用點；`/library-service` 下的頁一定是 `library`／`library.*`，`/counter-calling` 下的一定是 `reservation`／`reservation.*`，反過來也一樣（圖書、指名區公所的規則靠這兩個前綴，維持程式）。
+     title、keywords（已串接至少一個）、need（第 6 節）、category、group（或跟著總頁）、mode（demo／local）、未串接要寫 reason；沒有 `new_service.py` 留下的 TODO。
+   - 6 種語言：`capabilities_i18n.json` 的 en、ja、vi、id、tl 都有 title、keywords、need。
+   - 例句：中文 ≥ 8 句需求型；**新服務**每種外語 ≥ 3 句；新服務的例句與 need（所有語言）和每一組評估集（開發、保留、封存）的字對重疊都 < 0.4。
+     檢查只說是哪一組，**不印出評估句**（寫例句時不能看評估句）。2026-11-24 以前的服務照原本的規則（重疊由 `test_colloquial` 的上限管）。
+   - navigation 真的開得到：web 的網域在 `service_origins.json`（下一點）、路徑是頁面追蹤會回報的格式、`--routes` 時路徑在網站的路由表裡（近似比對：最上層路由＋一層子路由）；
+     native 的每一個 route（含 parents）都在台北通的 `TPRoute.page`（Python 掃 `lib/util/tp_route.dart`，台北通的 `test/portal_assistant_integration_test.dart` 用真的 `TPRoute.page` 再驗一次）；tab 的 index 存在。
+   - 教學：處理這個服務的教學頁，`guide_<page>.json` 和 `<page>_guide.dart` **所有共用欄位**一致（元件的 id、title、description、keywords、requires；名稱、預設目標、capabilities、capability_goals、entry_goals、capability_done、預設頁面；
+     `portal_assistant/scripts/guide_dart.py`，Python 的 `test_guide` 與 Dart 的 `guided_assistant_test` 兩邊都比）；`assets/i18n/guide/<page>.json` 存在；教學清單和檔案一致（下一點）；新的教學頁在 `guide_eval.json` 至少 2 句。
+   - 評估：**新服務**在 evaluate dev ≥ 3、eval_i18n ≥ 2、口語 dev ≥ 3、need dev ≥ 3 句；`eval_new_services_holdout.json` 有 ≥ 10 句由獨立撰寫者寫的封存句（第 5 點）；開發句和封存句的重疊 < 0.4（只報數目）。
+   - 預翻（`--strings`）：`extract_app_strings.py --check`（台北通 `lib/` 與 mock 資料裡每一句都有 5 種外語）、`extract_guide_strings.py --check`、`extract_service_strings.py --check --only-path <服務的頁>`（要 Playwright 與網路；沒有時跳過並註明）。
+     `extract_app_strings.py` 改成**不刪**檔案裡已有、但程式裡找不到的句子（2026-11-24；原因：檔案裡有 46 句手加的常用頁面字，例如上一步、全部、確定，照原本的寫法重抽會全部刪掉）。
+     這次檢查找到 2 句沒有預翻的 App 字（設定頁的「關於」「授權與資料來源」），已補上 5 種外語（AI 草稿）。
+   - 規則碰撞（`--collisions`）：`test_rule_collisions` 沒有新的碰撞（第 8 節）。
+   - 2026-11-24 已有的 109 個服務與 9 個教學頁列在 `portal_assistant/backend/data/service_baseline.json`，照原本的規則；這份清單**不能增加**（測試鎖住雜湊）。
+2. **教學清單由程式產生**：Dart 不能在執行時列檔，所以 `guidePages`（含 import）與 `GuideI18n.sections` 由 `portal_assistant/scripts/sync_guide_lists.py` 依檔案產生
+   （三個檔都在才算教學頁；已有的頁維持順序，新的排最後），`--check` 在測試裡跑。
+3. **測試不寫死筆數**：目錄筆數（109／86）、分類數（12、13）改成從資料推出（每一筆都合法、每個分類都有頁面），加服務不用改測試。
+4. **寫死的地方改成資料**（行為不變；改前、改後的開發集、保留集與封存集評估逐題相同，只看總數與是否相同，`D:\TownPassAssistant\integration-plan\stage2_eval\`）：
+   - **服務網域白名單** `portal_assistant/app/assets/assistant/service_origins.json`（擁有者 2026-11-17：之後的服務可能在台北通自己的網域）：`default` 與 `origins`。
+     App（`AssistantCatalogData`，`PortalAssistant.init` 一開始載入）的頁面追蹤、服務頁翻譯（腳本收 `hosts`、Android 的 `allowedOriginRules`、`townpassTranslate` 只接受這些網域）、
+     助理開頁（`navigation.origin`，沒寫就是 `default`；不在白名單的**一律開不了**）、後端的示範資料網址（`origins.py`：台北通問答、圖書館藏）、
+     `extract_service_strings.py`、`tools/guide_audit/lib.js` 都讀這一份。頁面只回報路徑，所以兩個網域不能有同樣的路徑（`check_service.py` 檢查）。
+     還沒載入時沒有任何網域（不追蹤、不翻譯、不開頁）。
+   - `capabilities.json` 的欄位：`frequent_default`（常用列的預設，1、2、3…；水費、圖書借閱、臨櫃叫號、停車費）、`list_last: true`（起始頁類排最後、不靠菲律賓文單字直接開：首頁、服務總覽、起始頁面、置頂）、
+     `suggest`（聊天面板的建議句：`order` 與 6 種語言的 `text`；圖書借閱、水費、臨櫃叫號；第一句「有哪些功能」不是功能，留在程式）、
+     `emergency`（緊急時列出的表單：`{"kind": "fire"}`，建築物火災另加 `"default": true`；第 1 節）。
+     引導介面的起始建議句（`guide_content.dart` 的 `starterChips`）**留在程式**：裡面有解釋、FAQ 這類不是功能的句子，翻譯走教學的字串表（`extract_guide_strings.py`）。
+   - `guide_<page>.json` 的 `continue_to_default: true`（表單型的教學：說了某一步、沒問問題時接著教到這頁的目標；災情、繳費、申辦、陳情、報案），原本是 `guide.CONTINUE_TO_DEFAULT`。
+5. **分類器政策**（擁有者 2026-11-17 決定第 3 點；原因：規則文件沒有寫新服務要不要重訓分類器，也沒有寫怎麼量）：
+   - 新服務**先不重訓**：分類器 v2 的候選文件（名稱、關鍵字、need、外語）在執行時從目錄組出，新服務零樣本就會被打分（第 6 節）。
+   - **但一定要量**：新服務的開發集案例（evaluate dev、eval_i18n、口語 dev、need dev）在分類器模式跑評估，報告新服務的到得了、直接開對、開錯；
+     Ministral 模式有 Ollama 浮動，可以另外報告，不當關卡。
+   - **重訓的條件**：某個新服務在開發集「到得了」< 80%，**或**上次訓練（v2，2026-11-16）之後累積 5 個新服務（`service_baseline.json` 以外的已串接服務 ≥ 5；重訓後在這裡記下新的起點）。
+     「直接開對明顯低於同類服務」只記在交付說明，由擁有者判斷。不到條件就不重訓。
+   - 重訓照 v2 流程，腳本在 `portal_assistant/tools/classifier/`（`build_v2.py` → `rebuild_faq_v2.py` → `filter_v2.py` → `train.py` → 轉 q8_0 GGUF → `run_setup.py`／`score_dev_server.py` 評估；說明在該資料夾的 README）。
+     訓練資料與模型放在 repo 外（`TOWNPASS_CLASSIFIER_WORK`），每個訓練查詢和每一組評估集（開發、保留、封存、`eval_new_services_holdout.json`）的字對重疊 < 0.4，開發集只用來選 epoch 與門檻。
+     換模型照第 6 節的「7 個位置」改；**上傳 HF 要擁有者同意**。重訓前後都跑完整評估（開錯頁不能增加，保留集只報告）。
+6. **新服務的保留句**（擁有者 2026-11-17 決定第 4 點；原因：開發集是實作的 agent 自己寫、自己調的，需要一組沒看過規則與例句的人寫的句子才誠實）：
+   每加一個服務，由**獨立撰寫者**（沒看過規則文件、例句、開發集；可以是另一位人員，或另開一個只拿到服務說明的 agent）寫 10–20 句，加進
+   `portal_assistant/backend/eval_new_services_holdout.json`（和 `eval_need_holdout.json` 同格式，`meta.sealed` 有值，`eval_need.py` 自動只印總數），
+   由撰寫者跑 `python -X utf8 portal_assistant/scripts/seal_holdout.py --writer "..."` 封存（雜湊記在 `backend/data/new_services_holdout_seal.json`）。
+   **只用來報告**：實作的 agent 不讀句子、不拿來調；句子被拿去調整就作廢重寫。`check_service.py` 只數筆數、驗雜湊。流程在 `portal_assistant/docs/NEW_SERVICE_HOLDOUT.md`。
+   關卡：既有的評估集沒有新的開錯頁；新服務的開發句開錯為 0；緊急案例照舊回專線。

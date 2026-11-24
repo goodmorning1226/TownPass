@@ -8,6 +8,7 @@
   ],
   "title": "災情通報",
   "default_goal": "send_report",
+  "continue_to_default": true,
   "capability_goals": {
     "disasterReport.form.*": [
       "send_report",

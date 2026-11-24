@@ -1,3 +1,4 @@
+import json
 import time
 import unittest
 
@@ -42,8 +43,12 @@ class WorkflowTests(unittest.TestCase):
 
     def test_registry_and_pagination(self):
         registry = Registry()
-        self.assertEqual(len(registry.entries), 109)
-        self.assertEqual(sum(e['enabled'] for e in registry.entries), 86)
+        # Derived from the data, not counted by hand (2026-11-24, stage 2: a new service must not
+        # need a test edit): every catalogue entry is loaded, and exactly the connected ones navigate.
+        raw = json.loads(registry.path.read_text(encoding='utf-8'))['capabilities']
+        self.assertEqual([e['id'] for e in registry.entries], [e['id'] for e in raw])
+        self.assertEqual([e['id'] for e in registry.entries if e['enabled']],
+                         [e['id'] for e in raw if e.get('navigation')])
         first = self.turn('有哪些功能')
         second = self.turn('下一頁', resolution_id=first['resolution_id'])
         self.assertEqual(first['kind'], 'capability_list')

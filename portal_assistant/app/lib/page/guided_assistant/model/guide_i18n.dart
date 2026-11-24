@@ -34,6 +34,7 @@ abstract final class GuideI18n {
   static const sections = [
     'ui',
     'content',
+    // BEGIN GENERATED guide sections (portal_assistant/scripts/sync_guide_lists.py)
     'library',
     'fees',
     'counter_calling',
@@ -43,6 +44,7 @@ abstract final class GuideI18n {
     'district_office',
     'coupon_wallet',
     'subscription',
+    // END GENERATED guide sections
   ];
 
   static const folder = 'assets/i18n/guide';

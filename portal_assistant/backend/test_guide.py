@@ -59,14 +59,37 @@ class GuidePlannerTests(unittest.TestCase):
         self.assertEqual(plan('看一下', 'fees.history'), ['filter_history'])
 
     def test_app_has_the_same_components(self):
-        """The App's pre-written steps (guides/<page>_guide.dart) use the same
-        ids, titles and prerequisites as each page's shared file."""
+        """The App's pre-written steps (guides/<page>_guide.dart) agree with each page's shared
+        file on every shared field (2026-11-24, stage 2; was id, title and requires only):
+        components (id, title, description, keywords, requires), title/pageName, default goal,
+        capabilities, capability_goals, entry_goals, capability_done and the default capability.
+        The same comparison runs in portal_assistant/scripts/check_service.py and, from the Dart
+        side, in app/test/guided_assistant_test.dart."""
+        import sys
+        sys.path.insert(0, str(ROOT / 'scripts'))
+        import guide_dart
         for page, spec in self.planner.pages.items():
             dart = (ROOT / f'app/lib/page/guided_assistant/model/guides/{page}_guide.dart').read_text(encoding='utf-8')
-            found = re.findall(r"id: '(\w+)',\s*title: '([^']+)',[\s\S]*?requires: const \[([^\]]*)\]", dart)
-            app = [(i, t, [r.strip().strip("'") for r in reqs.split(',') if r.strip()]) for i, t, reqs in found]
-            shared = [(c['id'], c['title'], c['requires']) for c in spec['components']]
-            self.assertEqual(app, shared, page)
+            self.assertEqual(guide_dart.compare(spec, dart), [], page)
+            self.assertEqual(len(guide_dart.read_guide(dart)['components']), len(spec['components']), page)
+
+    def test_the_comparison_finds_a_difference(self):
+        import copy
+        import sys
+        sys.path.insert(0, str(ROOT / 'scripts'))
+        import guide_dart
+        spec = self.planner.pages['subscription']
+        dart = (ROOT / 'app/lib/page/guided_assistant/model/guides/subscription_guide.dart').read_text(encoding='utf-8')
+        for change in (lambda s: s['components'][0].update(description='別的說明'),
+                       lambda s: s['components'][1]['keywords'].append('多的關鍵字'),
+                       lambda s: s['components'][1].update(requires=[]),
+                       lambda s: s.update(default_goal='pick_topic'),
+                       lambda s: s['capabilities'].append('subscription.items'),
+                       lambda s: s.update(title='別的名稱'),
+                       lambda s: s['components'].pop()):
+            changed = copy.deepcopy(spec)
+            change(changed)
+            self.assertNotEqual(guide_dart.compare(changed, dart), [])
 
 
 class GuideWorkflowTests(unittest.TestCase):

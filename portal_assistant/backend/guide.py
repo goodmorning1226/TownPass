@@ -50,9 +50,9 @@ MAX_CANDIDATES = 14
 PAIR_CANDIDATES = 5
 PAIR = "+"
 
-# Pages whose steps are one form: a step the user names without asking a
-# question (水淹到馬路了 → 勾選災情狀況) goes on to the page's own goal.
-CONTINUE_TO_DEFAULT = {"disaster_report", "fees", "district_office", "citizen_report", "police_report"}
+# Pages whose steps are one form ("continue_to_default": true in guide_<page>.json; was a
+# list here until 2026-11-24, stage 2): a step the user names without asking a question
+# (水淹到馬路了 → 勾選災情狀況) goes on to the page's own goal.
 
 
 def for_capability(mapping, cap):
@@ -212,7 +212,7 @@ class GuidePlanner:
             later = [] if HELP.search(text) or question or stays else \
                 [g for g in sorted(everything, key=lambda c: -everything[c])
                  if g != top and (allowed is None or g in allowed) and top in self.closure(page, g)]
-            if not later and page in CONTINUE_TO_DEFAULT and not question and not HELP.search(text) and \
+            if not later and spec.get("continue_to_default") and not question and not HELP.search(text) and \
                     top in self.closure(page, default):
                 later = [default]
             return self._result(page, [*entry, top, *later[:1]], done), "guide_keyword"

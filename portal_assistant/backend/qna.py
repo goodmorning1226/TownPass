@@ -27,8 +27,10 @@ import time
 import urllib.request
 
 import faq
+import origins
 
-DEFAULT_URL = "https://taipei-pass-service.vercel.app/mock/qna_list.json"
+# The demo site's 台北通 questions, on the default service origin (service_origins.json).
+DEFAULT_URL = origins.default() + "/mock/qna_list.json"
 DEPARTMENT = "台北通"
 SOURCE = "townpass_qna"
 SOURCE_NOTE = "資料來源：台北通常見問答。"

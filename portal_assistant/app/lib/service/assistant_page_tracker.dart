@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:townpass_portal_assistant/host/portal_assistant_host.dart';
+import 'package:townpass_portal_assistant/service/assistant_catalog_data.dart';
 
 /// Where the user is, reported to the assistant backend as a hint only
 /// (contract 3). Only a route name, a TownPass service path or a tab index
@@ -14,7 +15,8 @@ class AssistantPageTracker {
     : _currentTab = currentTab ?? _mainTab;
 
   static final instance = AssistantPageTracker();
-  static const serviceHost = 'taipei-pass-service.vercel.app';
+  /// The default service origin's host (assets/assistant/service_origins.json).
+  static String get serviceHost => AssistantCatalogData.origins.defaultHost;
   static final _path = RegExp(r'^/[A-Za-z0-9/_\-.]{0,200}$');
 
   final int? Function() _currentTab;
@@ -77,9 +79,10 @@ class AssistantPageTracker {
     return null;
   }
 
-  /// The path of a TownPass service page; other sites are reported as null.
+  /// The path of a page on an allowed service origin (service_origins.json);
+  /// other sites are reported as null.
   static String? servicePath(Uri? url) {
-    if (url == null || url.scheme != 'https' || url.host != serviceHost) {
+    if (url == null || !AssistantCatalogData.origins.allows(url)) {
       return null;
     }
     return _path.hasMatch(url.path) ? url.path : null;
