@@ -69,7 +69,7 @@ Android cleartext 例外只放在 debug、只涵蓋 loopback 與模擬器宿主�
 ## 資料與決策契約
 
 從既有服務的公開圖書 JSON 讀取書目，核對固定資料雜湊；資料更新時停止詳情直達，
-提示使用原入口，避免錯書。書目查核來源及雜湊見 [工作清單](../docs/AI_LIBRARY_IMPLEMENTATION_STEPS.md)。
+提示使用原入口，避免錯書。書目查核來源及雜湊見 [工作清單](../docs/history/AI_LIBRARY_IMPLEMENTATION_STEPS.md)（歷史紀錄）。
 服務名稱／同義詞、否定與修正、欄位線索先過濾，再檢索少量書目。
 Ministral 只做最後的語意工具決策。
 
@@ -130,7 +130,7 @@ App 與後端需一起更新；舊的仍執行中之 Python 服務須重新啟�
   答案的「資料來源」附註、範圍句、「開啟頁面」選項由來源決定；項目有 `published_at` 時答案下多一行「資料日期：YYYY-MM-DD」。
   新增來源：skill [`townpass-add-qa`](../skills/townpass-add-qa/SKILL.md)，檢查 `python -X utf8 portal_assistant/scripts/check_qa_source.py --all`。
 
-完整新增能力、未串接範圍與裝置測試見 [全功能實作紀錄](../docs/AI_EXPANSION_IMPLEMENTATION.md)。
+完整新增能力、未串接範圍與裝置測試見 [全功能實作紀錄](../docs/history/AI_EXPANSION_IMPLEMENTATION.md)（歷史紀錄）。
 
 要改為區網實機連線時，需指定 `--host` 並透過環境變數提供至少 24 字的 `TOWNPASS_ASSISTANT_TOKEN`，
 App 以 `ASSISTANT_TOKEN` 帶入。這僅為開發配對，正式環境仍需 HTTPS、完整認證、流量限制與部署服務。
@@ -156,4 +156,4 @@ dev 集（`evaluate.CASES`）開發時調過，held-out 集（[eval_holdout.py](
 被模型回成補問；已改為單一精確命中且停用時，程式直接回目錄內的原因、不呼叫模型。預期沒有放寬。
 語料是開發回歸集，包含省略「書」的未知對象、非書籍借用與歧義案例，
 會用於修正檢索與提示，不能冒充獨立保留集正確率。`test_evaluate.py` 只離線檢查案例集與判定邏輯。
-完整交付狀態及限制見 [實作紀錄](../docs/AI_PHASE1_IMPLEMENTATION.md)。
+完整交付狀態及限制見 [實作紀錄](../docs/history/AI_PHASE1_IMPLEMENTATION.md)（歷史紀錄）。

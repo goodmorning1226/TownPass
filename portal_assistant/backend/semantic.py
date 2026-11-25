@@ -7,7 +7,7 @@ features; each translated title and keywords) using the same
 multilingual-e5-small embedding server as the FAQ layer (faq.py), and keeps
 each entry's best score. The workflow consults it only after keyword
 retrieval found nothing, and the model may then only offer the candidates or
-ask for clarification (portal_assistant/docs/AI_SERVICE_COVERAGE_PLAN.md section 8).
+ask for clarification (portal_assistant/docs/history/AI_SERVICE_COVERAGE_PLAN.md section 8).
 
 The vectors (~500 x 384) are built once from the catalogue and cached in a
 file keyed by a hash of the passage texts and of the embedding model's output
@@ -41,7 +41,7 @@ ENABLED = os.environ.get("TOWNPASS_SEMANTIC", "1") == "1"
 # absolute cosine does not separate requests from chatter. The score used is
 # the "lift": an entry's best cosine minus the mean of all entries' best
 # cosines for the same query. Tuned on evaluate.py's dev cases that reach this
-# layer and semantic_tuning.json (portal_assistant/docs/AI_SERVICE_COVERAGE_PLAN.md section 8):
+# layer and semantic_tuning.json (portal_assistant/docs/history/AI_SERVICE_COVERAGE_PLAN.md section 8):
 # lift >= 0.04 keeps 18 of 29 paraphrases with the right service among the
 # candidates and 7 of 41 non-requests (which the model should then decline).
 # Specific to multilingual-e5-small and this catalogue; re-tune if either changes.

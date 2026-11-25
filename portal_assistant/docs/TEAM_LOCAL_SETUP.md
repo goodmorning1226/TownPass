@@ -1,9 +1,12 @@
 # 新成員與 Agent：從 clone 到地端助理開發／模擬器測試
 
-更新：2026-11-06。主要支援流程是 Windows + Android；macOS／Linux 可沿用 Flutter、Python、Ollama 流程，但 `.ps1` 是 Windows 腳本，iOS 尚未驗證。
-先讀 [AGENTS.md](../../AGENTS.md)。這是團隊 fork 的建置指南，不是官方認證或正式政府 API 串接指南。
+最初寫於 2026-11-06；2026-11-25 更新第 1 節（取得程式）與第 3.1 節（本機路徑）。主要支援流程是 Windows + Android；macOS／Linux 可沿用 Flutter、Python、Ollama 流程，但 `.ps1` 是 Windows 腳本。
+先讀 [AGENTS.md](../../AGENTS.md)。這是團隊的建置指南，不是官方認證或正式政府 API 串接指南。
 
-助理目前可以：文字或**按住說話**描述需求 → 電腦上的模型決定 → 開啟 App 原本的服務頁面。
+這份講的是**電腦上開發**的流程（後端與模型在電腦上，方便改程式與評估）；App 的預設是全部在手機上執行，
+步驟見 [README](../README.md) 第 3 節、iPhone 見 [AI_ON_DEVICE_IOS.md](AI_ON_DEVICE_IOS.md)。
+
+電腦開發時：文字或**按住說話**描述需求 → 電腦上的模型決定 → 開啟 App 原本的服務頁面。
 執行時電腦要開三樣東西，手機（模擬器或實機）只連其中一個：
 
 | 在哪裡跑 | 程式 | 端口 | 必要性 |
@@ -13,31 +16,29 @@
 | 電腦 | 語音辨識 `portal_assistant/backend/asr_server.py` + Breeze-ASR-25 | 8770（只給主後端用） | 選用；沒開時只能打字 |
 | 模擬器／手機 | TownPass App | — | 必要 |
 
-## 1. 取得正確分支與文件
+## 1. 取得程式與文件
 
-本功能分支為 `feat/ai-assistant-plan`，origin 為 `goodmorning1226/TownPass`。
-**本機 commit 不等於已發布：請專案擁有者先確認該分支及最新 commit 已推到遠端。**
-若遠端還沒有這份文件，不要 clone 官方 upstream 後以為已含助理，也不要要求 agent 自己重做。
-
-分支已發布後，在你選定的資料夾執行，例如：
+repository 根目錄就是已經接好助理的台北通 App，clone 下來就能建置。在你選定的資料夾執行：
 
 ```powershell
-git clone --branch feat/ai-assistant-plan https://github.com/goodmorning1226/TownPass.git
-Set-Location TownPass
-git branch --show-current
+git clone https://github.com/taipei-doit/townpass2026-microservice-portal-assistant.git
+Set-Location townpass2026-microservice-portal-assistant
 git log -1 --oneline
 git status --short
 ```
+
+團隊開發用的是團隊 fork（`goodmorning1226/TownPass`）的 `main`，做法相同。
+不要 clone 官方 upstream（taipei-doit/TownPass）後以為已含助理，也不要要求 agent 自己重做。
 
 Agent 第一次先告訴你這些檔案的**實際完整路徑**：
 
 | 檔案／目錄 | 用途 |
 | --- | --- |
 | `AGENTS.md` | 修改規範、官方架構與版本要求 |
-| `portal_assistant/docs/AI_ASSISTANT_PROGRESS.md` | 最新進度、功能檔案樹、已測與未測項目 |
-| `portal_assistant/docs/AI_AGENT_HANDOFF.md` | 技術交接、不可遺失的要求、接續實作順序 |
-| `portal_assistant/docs/AI_VOICE_UI_PLAN.md` | 全螢幕介面、語音、頁面狀態的設計與實測紀錄 |
-| `portal_assistant/docs/AI_ALL_FEATURES_ROLLOUT_PLAN.md` | 全功能分期實作計畫 |
+| `portal_assistant/docs/AI_CURRENT_RULES.md` | 助理行為的唯一準則（每條附程式位置） |
+| `portal_assistant/docs/AI_TECHNICAL_OVERVIEW.md` | 技術總覽：模型、比對、門檻、速度與驗證 |
+| `portal_assistant/docs/README.md` | 文件索引（現行文件、做法與實驗紀錄、歷史文件） |
+| `portal_assistant/INTEGRATION.md` | 助理怎麼接進台北通、每個串接點的理由 |
 | `portal_assistant/backend/README.md` | 後端契約（含語音端點）與腳本用法 |
 | `portal_assistant/app/assets/assistant/capabilities.json` | App 與後端共用功能目錄、可用狀態及固定導航 |
 | `portal_assistant/app/lib/page/assistant/`、`portal_assistant/app/lib/service/assistant_*` | Flutter 介面、狀態、HTTP、錄音與導航 |
@@ -370,12 +371,12 @@ Android Studio 選 `lib/main.dart` 的 Flutter Run configuration、裝置選正�
 | 小聲或吵雜時說 | 音量條偏低時提示「聲音有點小」；若出現「我聽到「…」，是這句嗎？」，點正確選項才送出 |
 | 關閉語音服務後再說話 | 「語音辨識服務未啟動，請改用鍵盤」，鍵盤照常可用 |
 
-詳細清單見 `portal_assistant/docs/AI_EXPANSION_IMPLEMENTATION.md` 與 `portal_assistant/docs/AI_VOICE_UI_PLAN.md`。agent 若無權操作裝置，列出待使用者執行項目，不聲稱完成實測。
+現行行為以 `portal_assistant/docs/AI_CURRENT_RULES.md` 為準（早期的完整清單在 `portal_assistant/docs/history/`，只當紀錄）。agent 若無權操作裝置，列出待使用者執行項目，不聲稱完成實測。
 
 ## 9. 新成員交給自己 Agent 的 Prompt
 
 ```text
-請協助我建置並理解剛 clone 的 TownPass fork（地端服務助理，分支 feat/ai-assistant-plan）。先找 repo 根目錄，讀 AGENTS.md、portal_assistant/docs/TEAM_LOCAL_SETUP.md、portal_assistant/docs/AI_ASSISTANT_PROGRESS.md 和 portal_assistant/docs/AI_AGENT_HANDOFF.md，確認分支與最新 commit；若缺功能分支或文件先說明，不自行重做。
+請協助我建置並理解剛 clone 的台北通（已接好地端服務助理，助理在 portal_assistant/）。先找 repo 根目錄，讀 AGENTS.md、portal_assistant/docs/TEAM_LOCAL_SETUP.md、portal_assistant/docs/AI_CURRENT_RULES.md 和 portal_assistant/docs/README.md，確認最新 commit；若缺文件先說明，不自行重做。
 
 1. 先 inventory 我電腦的 Git、FVM/Flutter、JDK、Android SDK/Studio、Python、Ollama、NVIDIA GPU 與剩餘磁碟空間，缺少的才依官方來源協助安裝；使用 .fvmrc 與 pubspec.lock 的版本，不整包升級，不照抄別人電腦的絕對路徑、Gradle mirror 或 DLL workaround。
 2. 告訴我文件、Flutter 助理程式、後端、語音服務、能力目錄和測試檔在本機的完整路徑。跑 pub get、build_runner、Flutter 與 Python 測試並回報結果。

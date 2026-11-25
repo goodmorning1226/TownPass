@@ -51,7 +51,7 @@ class RelaunchNeeded(OSError):
 # Near-silent audio is rejected instead, which stops Whisper inventing text.
 MIN_RMS = 0.003
 # Confidence gates, calibrated on clean, quiet+noisy and noise-only clips
-# (portal_assistant/docs/AI_VOICE_UI_PLAN.md). Noise alone gives no_speech_prob >= 0.9 and
+# (portal_assistant/docs/history/AI_VOICE_UI_PLAN.md). Noise alone gives no_speech_prob >= 0.9 and
 # avg log-prob <= -1.5; garbled quiet speech sits around -0.5 to -0.8.
 UNCLEAR_NO_SPEECH = 0.6
 UNCLEAR_LOGPROB = -1.0
@@ -60,7 +60,7 @@ UNSURE_LOGPROB = -0.45
 HYPOTHESES = 5
 
 
-# Speech languages (portal_assistant/docs/AI_MULTILINGUAL_PLAN.md): code -> whisper.cpp's full name.
+# Speech languages (portal_assistant/docs/history/AI_MULTILINGUAL_PLAN.md): code -> whisper.cpp's full name.
 # Filipino replaced Thai on 2026-11-11 (portal_assistant/docs/AI_FILIPINO.md); Whisper calls it Tagalog,
 # "tl", and so does the App.
 LANGUAGES = {"zh": "chinese", "en": "english", "ja": "japanese", "vi": "vietnamese",

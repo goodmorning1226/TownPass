@@ -281,7 +281,7 @@ def field(name, value):
 
 class MultilingualSpeechTests(unittest.TestCase):
     """The language is decided from detection, never forced against it
-    (portal_assistant/docs/AI_LANGUAGE_GATE.md, portal_assistant/docs/AI_MULTILINGUAL_PLAN.md). Fake whisper-servers
+    (portal_assistant/docs/AI_LANGUAGE_GATE.md, portal_assistant/docs/history/AI_MULTILINGUAL_PLAN.md). Fake whisper-servers
     answer like Whisper: detection from `detected`/`probabilities`, and a decode in
     language L writes `speech[L]` (text, avg log-prob); a decode in a language that
     was not spoken is a translation with a lower score."""
@@ -1513,7 +1513,7 @@ class OutputConstraintTests(unittest.TestCase):
 
 
 class DecisionModelTests(unittest.TestCase):
-    """TOWNPASS_DECISION_MODEL (portal_assistant/docs/AI_DECISION_MODEL_ABLATION_PLAN.md section 8):
+    """TOWNPASS_DECISION_MODEL (portal_assistant/docs/history/AI_DECISION_MODEL_ABLATION_PLAN.md section 8):
     Ministral stays the default; "gemma" only changes the reported model."""
 
     @staticmethod

@@ -1,5 +1,7 @@
 # 語音辨識消融實驗（先做中文）
 
+> **開發紀錄**：文中的分支、commit、「還沒提交」「尚未實作」是寫的當時的狀態；採用的做法都已合進目前的程式。現行規則以 [AI_CURRENT_RULES.md](AI_CURRENT_RULES.md) 為準，文件索引見 [README.md](README.md)。
+
 分支：`feat/asr-ablation`。目標：在裝置端拿掉或換掉 Whisper（Breeze-ASR-25）時，服務結果仍然一樣準。
 固定不動的部分：決策模型、後端流程與 HTTP 契約。只替換「語音 → 文字」這一段，以及文字進入後端之前的修正。
 

@@ -56,7 +56,7 @@ class AssistantSpeaker {
     } catch (_) {}
   }
 
-  /// Voice locale per reply language (portal_assistant/docs/AI_MULTILINGUAL_PLAN.md).
+  /// Voice locale per reply language (portal_assistant/docs/history/AI_MULTILINGUAL_PLAN.md).
   static const locales = {
     'zh': 'zh-TW',
     'en': 'en-US',

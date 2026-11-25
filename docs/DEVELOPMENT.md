@@ -1,9 +1,11 @@
 # TownPass 開發與官方同步
 
+> **本 fork 的開發紀錄**：文中的分支、remote、待辦與版本是寫的當時的狀態。助理的說明從 [README](../README.md) 開始，文件索引見 [README.md](README.md)。
+
 所有 agent 修改前先讀根目錄 [AGENTS.md](../AGENTS.md)。本文件是本 fork 的操作紀錄，
 不是官方認證，也不是正式 API 串接規格。
 
-地端助理的新成員入口：[clone 後建置](../portal_assistant/docs/TEAM_LOCAL_SETUP.md)、[最新進度與功能檔案架構](../portal_assistant/docs/AI_ASSISTANT_PROGRESS.md)、[Agent 交接](../portal_assistant/docs/AI_AGENT_HANDOFF.md)。
+地端助理的新成員入口：[clone 後建置](../portal_assistant/docs/TEAM_LOCAL_SETUP.md)、[最新進度與功能檔案架構](../portal_assistant/docs/history/AI_ASSISTANT_PROGRESS.md)、[Agent 交接](../portal_assistant/docs/history/AI_AGENT_HANDOFF.md)。
 
 ## 來源及分支
 
@@ -98,17 +100,17 @@ App 路由、WebView bridge object／訊息名稱、帳號 JSON schema 不任意
 
 第一階段使用非中國開發的 Ministral 3 3B，沿用原圖書頁面。
 啟動方式見 [助理後端 README](../portal_assistant/backend/README.md)，
-驗證結果與未完成範圍見 [第一階段實作紀錄](../portal_assistant/docs/AI_PHASE1_IMPLEMENTATION.md)。
+驗證結果與未完成範圍見 [第一階段實作紀錄](../portal_assistant/docs/history/AI_PHASE1_IMPLEMENTATION.md)。
 Debug 預設有右下角泡泡；可用 `--dart-define=ASSISTANT_ENABLED=false` 停用。
 Release 預設不啟用，正式 API 尚未串接。
-後續擴充依 [全功能助理分步計畫](../portal_assistant/docs/AI_ALL_FEATURES_ROLLOUT_PLAN.md)，
+後續擴充依 [全功能助理分步計畫](../portal_assistant/docs/history/AI_ALL_FEATURES_ROLLOUT_PLAN.md)，
 先完成目錄與一般對話，再做共同模糊確認及原頁面返回層級。
-第一批擴充已加入，範圍、限制及裝置驗收清單見 [全功能實作紀錄](../portal_assistant/docs/AI_EXPANSION_IMPLEMENTATION.md)。
+第一批擴充已加入，範圍、限制及裝置驗收清單見 [全功能實作紀錄](../portal_assistant/docs/history/AI_EXPANSION_IMPLEMENTATION.md)。
 
 ## 助理裝置端與多語交付紀錄（2026-11-07）
 
 依 AGENTS.md 第 7 節整理。只列 commit 訊息與 docs 中**有記錄**的數字；查不到的寫「未記錄」。
-決策流程的現況見 [AI_DECISION_FLOW.md](../portal_assistant/docs/AI_DECISION_FLOW.md)。
+決策流程的現況見 [AI_DECISION_FLOW.md](../portal_assistant/docs/history/AI_DECISION_FLOW.md)。
 
 ### 基線與分支
 
@@ -135,7 +137,7 @@ Release 預設不啟用，正式 API 尚未串接。
 | `b9fc9f9` Whisper small＋選代號 | 手機只跑一個 Whisper small q8_0（中文、外語、偵測）；中文轉繁體；模型只回 `{"choice":"A"}` | 回覆契約不變；手機模型檔名固定，`push_assistant_models.ps1 -Chinese` 可另推中文模型 | Python 112 通過（Flutter 未記錄）；dev 181/184（3 題為補問）、held-out 95/102、0 開錯服務、0 意外導航；合成語音 70 句 Whisper small 直接送出正確 56/70；vivo 語音＋決策 3.5–8.9 秒 | 真人錄音；吵雜環境 | 語音：改用 `feat/asr-breeze-q8`；決策格式：`decision.py` 的常數 `DECISION_FORMAT` 改回 `"tools"`（程式修改，不是環境變數） |
 | `1bf64d7` 讀音指令與 fallback | 清單開著時「下夜／弟二個／去笑」可當下一頁、第幾個、取消；找不到前把讀音相近的服務交給模型（只能列選項或補問）；選定語言改為「優先」；預設跟手機語言；選單改 MenuAnchor | 無新欄位；App 語音語言預設值改變 | 測試數與評估：未記錄（commit 有新增測試） | 實機語音 | `git revert 1bf64d7` |
 | `006e43c` 頁面跟隨語言 | 原生 `TPText` 與服務網頁以 ML Kit 在手機上翻譯；頁面語言 = 最近一次助理導航的語言；「設定 → 語言」可切換 | **新增依賴 `google_mlkit_translation` 0.15.1**（`pubspec.yaml`、`pubspec.lock` 變動）；`tp_text.dart`、`tp_web_view.dart`、語言頁改變；只翻台北通服務網域 | 測試數：未記錄 | 翻譯品質、整頁耗時、iOS | `git revert 006e43c`（含 pubspec 與 lock）；暫時：設定中選中文即恢復原文 |
-| `0ba2230` 更多服務＋意圖 fallback | 功能目錄 70 → 109 項（86 項可用）；`limited`（頁面可開但動作未串接，會說明）；`navigation.in_page`（網頁內換頁）；版本 B 預設開啟；App 字串預先翻譯；外語讀音鍵、日／泰文腳本提示 | 目錄新增欄位 `limited`、`navigation.in_page`，`WebViewArgument.assistantInPage`；新資產 `portal_assistant/app/assets/i18n/app_strings.json`；契約仍為 3 | `eval_colloquial.json` 100 句：B 50 vs A 40 答對、兩版各 1 次開錯頁；B 的 dev 188/190、held-out 97/102、多語 46/46、0 開錯服務（[AI_SERVICE_COVERAGE_PLAN.md](../portal_assistant/docs/AI_SERVICE_COVERAGE_PLAN.md) 第 6–7 節）；Python／Flutter 測試數：未記錄 | 網頁內換頁「完成，待實機驗證」；地圖類頁 `NoApiKeys` 維持停用 | 意圖 fallback：`TOWNPASS_INTENT_FALLBACK=0`；其餘 `git revert 0ba2230` |
+| `0ba2230` 更多服務＋意圖 fallback | 功能目錄 70 → 109 項（86 項可用）；`limited`（頁面可開但動作未串接，會說明）；`navigation.in_page`（網頁內換頁）；版本 B 預設開啟；App 字串預先翻譯；外語讀音鍵、日／泰文腳本提示 | 目錄新增欄位 `limited`、`navigation.in_page`，`WebViewArgument.assistantInPage`；新資產 `portal_assistant/app/assets/i18n/app_strings.json`；契約仍為 3 | `eval_colloquial.json` 100 句：B 50 vs A 40 答對、兩版各 1 次開錯頁；B 的 dev 188/190、held-out 97/102、多語 46/46、0 開錯服務（[AI_SERVICE_COVERAGE_PLAN.md](../portal_assistant/docs/history/AI_SERVICE_COVERAGE_PLAN.md) 第 6–7 節）；Python／Flutter 測試數：未記錄 | 網頁內換頁「完成，待實機驗證」；地圖類頁 `NoApiKeys` 維持停用 | 意圖 fallback：`TOWNPASS_INTENT_FALLBACK=0`；其餘 `git revert 0ba2230` |
 | `d639e91` 讀音判斷功能列表＋面板多語 | `listing_by_sound`（「你有甚麼樣子的功能」等，先比讀音再問模型）；外語功能列表句型；助理面板文字 6 種語言（`assistant_texts.dart`），跟隨頁面語言；外語 held-out 集 125 句（`eval_foreign_holdout.json`）；否定句計分；評估期望值更新（路燈可接受災情表單 `D-1-3`、`reportIssue.progress` 改為可開啟）；表單預填規劃（`AI_FORM_PREFILL_PLAN.md`、`form_prefill_fields.json`）；`.gitignore` 加 `**/android/build/`，不再追蹤產生的 `problems-report.html` | 無新欄位；App 錯誤與提示文字改依語言顯示。評估期望值改變，前後數字不能直接相比 | `eval_colloquial` 的「列出功能」類 15 → 17/23；外語 held-out 125 句的結果、Python／Flutter 測試數：未記錄 | 面板外語文案未經母語者校對 | `git revert d639e91` |
 | 已 stage、未提交：FAQ 改用 multilingual-e5-small | FAQ 模型由 bge-small-zh（ONNX）改為 Microsoft multilingual-e5-small（GGUF q8_0，llama-server `--embedding`，:8774）；門檻改為 ≥0.915 直接回答、0.88–0.915 列選項；手機版另開 embedding 伺服器；新增 `faq_rag.json`、轉換與建索引腳本 | 契約與 `workflow.py` 不變；電腦不再需要 onnxruntime／tokenizers；新環境變數 `TOWNPASS_FAQ_EMBED_URL`；索引需重建 | 依 staged 版 [AI_FAQ_RAG.md](../portal_assistant/docs/AI_FAQ_RAG.md) 第 6 節：Python 140 通過（有索引與 :8774 時；基線 134 過、1 略過）；dev 182/184、held-out 95/102、i18n 46/46、0 開錯服務；q8_0 與 PyTorch 向量 cosine 最低 0.99978 | 手機上未建置、未執行；多語 FAQ 效果有限（該文件 6.3 節） | 尚未提交；暫停可停掉 :8774 或改 `TOWNPASS_FAQ_DIR`；手機用 `push_assistant_models.ps1 -FaqModel ""` 移除檔案 |
 

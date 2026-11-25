@@ -88,7 +88,7 @@ class Registry:
         self.by_id = {entry["id"]: entry for entry in self.entries}
         if len(self.by_id) != len(self.entries):
             raise ValueError("Duplicate capability IDs")
-        # Names and keywords in other languages (portal_assistant/docs/AI_MULTILINGUAL_PLAN.md), next to the catalogue.
+        # Names and keywords in other languages (portal_assistant/docs/history/AI_MULTILINGUAL_PLAN.md), next to the catalogue.
         names = path.with_name("capabilities_i18n.json")
         self.i18n = json.loads(names.read_text(encoding="utf-8"))["capabilities"] if names.exists() else {}
         unknown = set(self.i18n) - set(self.by_id)

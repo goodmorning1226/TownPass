@@ -13,8 +13,8 @@ Open source is a key driver of technological progress and social development. Th
 
 For this fork's on-device AI assistant, start with [ASSISTANT_README.md](../ASSISTANT_README.md)
 (what it does, architecture, how to run it on a phone), then [team setup](../portal_assistant/docs/TEAM_LOCAL_SETUP.md),
-[current progress and feature files](../portal_assistant/docs/AI_ASSISTANT_PROGRESS.md), and
-[agent handoff](../portal_assistant/docs/AI_AGENT_HANDOFF.md). Read [AGENTS.md](../AGENTS.md) before changing code.
+[current progress and feature files](../portal_assistant/docs/history/AI_ASSISTANT_PROGRESS.md), and
+[agent handoff](../portal_assistant/docs/history/AI_AGENT_HANDOFF.md). Read [AGENTS.md](../AGENTS.md) before changing code.
 These additions describe this fork; the upstream introduction and guides remain below.
 
 We highly recommend to read through our [document](https://tpe-guideline.web.app/en/docs/) for more detail.

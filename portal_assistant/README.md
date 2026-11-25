@@ -211,7 +211,7 @@ ASSISTANT_SPEECH=whisper
 | 4.4 | 語音地址分層比對 | 說一次完整地址，依序比對縣市 → 區 → 路名，校正語音辨識的錯字後填入；縣市／區／地址三格的下拉一次填好 | 內政部戶政司〈全國路名資料〉（[data.gov.tw 35321](https://data.gov.tw/dataset/35321)），CSV，115 年版；內政部國土測繪中心〈鄉鎮市區清單〉（[data.gov.tw 102011](https://data.gov.tw/dataset/102011)），API；均為政府資料開放授權條款第 1 版，事先整理進 App |
 | 4.5 | 台語自動辨識 | 不用切選單：語言判斷後自動交給台語模型（Breeze-ASR-26），辨識成中文字再走原本流程 | 無政府資料 |
 | 4.6 | 多語介面與頁面即時翻譯 | 7 種語言；講什麼語言，助理、教學卡片、App 畫面與服務網頁一起換（預翻字串＋ML Kit 離線翻譯） | 無政府資料 |
-| 4.7 | 市府 FAQ | 從市府常見問答 8,121 筆找答案；分數不夠就不回答，不亂答 | 臺北市資料大平台〈[臺北市市政網站整合平台之常見問答](https://data.taipei/dataset/detail?id=203f1657-bb4a-45a7-b25f-279b63136645)〉，政府資料開放授權條款第 1 版；事先轉成手機上的向量索引 |
+| 4.7 | 市府 FAQ、台北通常見問答 | 從市府常見問答 8,121 筆與台北通的常見問答找答案；分數不夠就不回答，不亂答 | 臺北市資料大平台〈[臺北市市政網站整合平台之常見問答](https://data.taipei/dataset/detail?id=203f1657-bb4a-45a7-b25f-279b63136645)〉，政府資料開放授權條款第 1 版；事先轉成手機上的向量索引。台北通常見問答在執行時從服務網站讀取，不存進 App 與 repo |
 | 4.8 | 緊急回應 | 失火、受困、自殺、家暴等緊急詞（6 種語言）在所有流程之前直接回 119／110／113／1925／1995 等專線，不經模型 | 無，為專案整理的詞表 |
 | 4.9 | 離線模型下載 | 模型不包在 App 裡；使用者同意後下載，依手機記憶體分級，可暫停、續傳、檢查 SHA-256 | 無政府資料（模型來源與授權見 [app/assets/assistant/models.json](app/assets/assistant/models.json)） |
 | 4.10 | 獨立專案＋串接文件 | 助理整包放在 `portal_assistant/`，透過主機介面與 23 個串接點接進台北通；已在乾淨的官方台北通上照文件實測 | 無 |
@@ -272,10 +272,12 @@ App 內「設定 → 關於 → 授權與資料來源」列出上述資料與每
 - 預翻好的字串直接用，其餘用 Google ML Kit 離線翻譯；翻譯時保留原文，教學用原文找按鈕。
 - 越南文的聲調與南北口音、印尼文的聊天縮寫、菲律賓文夾英文都有專門處理。外語文字目前是 AI 翻譯草稿，待母語者審閱。
 
-#### 4.7 市府 FAQ
+#### 4.7 市府 FAQ、台北通常見問答
 
 - 「大包垃圾要怎麼丟」「身分證掉了怎麼辦」→ 從市府常見問答 8,121 筆（e5 向量，手機上約 19 MB 索引）找答案；查詢前先把口語詞補成 FAQ 用詞。
-- 分數夠高直接回答，接近時列出最接近的問題讓使用者選，以下不回答；答案過長截斷並提示洽 1999。
+- 台北通 App 本身的常見問題從台北通的常見問答找。這份資料在執行時從服務網站讀取（來源沒有標示授權，所以文字不存進 App 與 repo），答案下面可以直接開啟台北通的常見問答頁面。
+- 分數夠高直接回答，接近時列出最接近的問題讓使用者選，以下不回答；答案照原文顯示、不經模型改寫，過長截斷並提示洽 1999。
+- 問答來源登記在 [app/assets/assistant/qa_sources.json](app/assets/assistant/qa_sources.json)；新增或更新來源用 agent skill（[docs/QA_SKILL_GUIDE.md](docs/QA_SKILL_GUIDE.md)）。
 
 #### 4.8 緊急回應
 
@@ -337,7 +339,7 @@ App 內「設定 → 關於 → 授權與資料來源」列出上述資料與每
 
 - **人工審查**：團隊對 AI 產生的程式與文件做大致的審查與測試，每次 commit 都經團隊成員同意。
 - **規則先行**：所有行為規則寫在 [docs/AI_CURRENT_RULES.md](docs/AI_CURRENT_RULES.md)，每次改行為先改規則並寫明原因，再改程式。
-- **自動測試**：Python 656 個、Flutter 847 個測試（助理套件 675、台北通 172）；教學流程在示範網站錄製後重播驗證；規則互相干擾由碰撞測試自動檢查。
+- **自動測試**：Python 710 個、Flutter 854 個測試（助理套件 681、台北通 173）；教學流程在示範網站錄製後重播驗證；規則互相干擾由碰撞測試自動檢查。
 - **評估集與封存保留集**：開發集用來調整；保留集由另一位撰寫者撰寫並封存，只用來報告，不拿來調規則；「開錯頁」必須維持不增加。
 - **實機驗證**：Android 模擬器與實機（vivo）、iPhone 17／17 Pro Max 實測，問題記錄後修正再測。
 - **安全**：WebView 只在服務網域上注入與讀取；後端只綁 `127.0.0.1`，檢查 Origin、Content-Type 與欄位白名單；模型檔下載後檢查 SHA-256。
@@ -374,14 +376,15 @@ App 內「設定 → 關於 → 授權與資料來源」列出上述資料與每
 | [scripts/](scripts/) | 建置、推模型、評估、抽字串、資料整理、連結檢查 |
 | [tools/](tools/) | 教學流程錄製與重播（guide_audit）、分類器訓練腳本（classifier）、翻譯審閱、煙霧測試 |
 | [skills/](skills/) | agent skill：新增或修改服務（townpass-add-service）、新增或更新問答來源（townpass-add-qa）與人工測試範本 |
-| [docs/](docs/) | 規則、技術總覽、各實驗與決策紀錄 |
+| [docs/](docs/README.md) | 規則、技術總覽、做法與實驗紀錄（[索引](docs/README.md)）；[docs/history/](docs/history/README.md) 是開發初期已被取代的計畫與報告，只當紀錄 |
 
 | 主題 | 文件 |
 | --- | --- |
 | 行為規則（唯一準則） | [docs/AI_CURRENT_RULES.md](docs/AI_CURRENT_RULES.md) |
-| 技術總覽、決策流程 | [docs/AI_TECHNICAL_OVERVIEW.md](docs/AI_TECHNICAL_OVERVIEW.md)、[docs/AI_DECISION_FLOW.md](docs/AI_DECISION_FLOW.md) |
+| 文件索引 | [docs/README.md](docs/README.md) |
+| 技術總覽 | [docs/AI_TECHNICAL_OVERVIEW.md](docs/AI_TECHNICAL_OVERVIEW.md) |
 | 決策分類器、FAQ | [docs/AI_DECISION_CLASSIFIER.md](docs/AI_DECISION_CLASSIFIER.md)、[docs/AI_FAQ_RAG.md](docs/AI_FAQ_RAG.md) |
-| 語音、台語、多語 | [docs/AI_LANGUAGE_GATE.md](docs/AI_LANGUAGE_GATE.md)、[docs/AI_TAIWANESE_SPEECH_PLAN.md](docs/AI_TAIWANESE_SPEECH_PLAN.md)、[docs/AI_MULTILINGUAL_PLAN.md](docs/AI_MULTILINGUAL_PLAN.md) |
+| 語音、台語、多語 | [docs/AI_LANGUAGE_GATE.md](docs/AI_LANGUAGE_GATE.md)、[docs/AI_TAIWANESE_SPEECH_PLAN.md](docs/AI_TAIWANESE_SPEECH_PLAN.md)、[docs/AI_VIETNAMESE.md](docs/AI_VIETNAMESE.md)、[docs/AI_PAGE_TRANSLATION.md](docs/AI_PAGE_TRANSLATION.md) |
 | 手機端、模型下載 | [docs/AI_ON_DEVICE_PLAN.md](docs/AI_ON_DEVICE_PLAN.md)、[docs/AI_ON_DEVICE_IOS.md](docs/AI_ON_DEVICE_IOS.md)、[docs/AI_MODEL_DOWNLOAD.md](docs/AI_MODEL_DOWNLOAD.md) |
 | 地址資料 | [docs/AI_ADDRESS_DATA.md](docs/AI_ADDRESS_DATA.md) |
 | 新增或修改服務（agent skill：建議模型、prompt、驗收） | [docs/SKILL_GUIDE.md](docs/SKILL_GUIDE.md)、[skills/townpass-add-service/SKILL.md](skills/townpass-add-service/SKILL.md)、[docs/NEW_SERVICE_HOLDOUT.md](docs/NEW_SERVICE_HOLDOUT.md) |

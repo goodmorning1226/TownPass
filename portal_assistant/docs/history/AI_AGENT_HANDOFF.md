@@ -1,9 +1,11 @@
 # 給接續實作 Agent 的交接文件
 
-交接日期：2026-11-06。先閱讀根目錄 [AGENTS.md](../../AGENTS.md)，再讀
+> **歷史文件**（已被取代，只當紀錄）：內容是寫的當時的狀態，有些做法後來改掉了。現行規則以 [AI_CURRENT_RULES.md](../AI_CURRENT_RULES.md) 為準，索引見 [README.md](README.md)。
+
+交接日期：2026-11-06。先閱讀根目錄 [AGENTS.md](../../../AGENTS.md)，再讀
 [最新進度與功能檔案架構](AI_ASSISTANT_PROGRESS.md)、[全功能分步計畫](AI_ALL_FEATURES_ROLLOUT_PLAN.md)
 、[本批實作與人工驗收](AI_EXPANSION_IMPLEMENTATION.md)
-及 [介面與語音規劃](AI_VOICE_UI_PLAN.md)。新機先走 [TEAM_LOCAL_SETUP.md](TEAM_LOCAL_SETUP.md)。
+及 [介面與語音規劃](AI_VOICE_UI_PLAN.md)。新機先走 [TEAM_LOCAL_SETUP.md](../TEAM_LOCAL_SETUP.md)。
 若文件有差異，以使用者最新要求、目前原始碼／測試及最新進度為準；第一階段文件是歷史，不是全部當前行為。
 
 ## 產品目標與不可遺失的要求
@@ -119,7 +121,7 @@ Hot reload 不會更新 Python 程式；有新 asset／dart-define 時 Stop 再 
 ## 可直接貼給下一個 Agent 的 Prompt
 
 ```text
-請接續此 TownPass fork 的地端服務助理開發。先讀 AGENTS.md、portal_assistant/docs/AI_ASSISTANT_PROGRESS.md、portal_assistant/docs/AI_AGENT_HANDOFF.md、portal_assistant/docs/AI_VOICE_UI_PLAN.md、portal_assistant/docs/AI_ALL_FEATURES_ROLLOUT_PLAN.md，再檢查 Git 分支、status 與目前程式，不覆蓋未提交工作。
+請接續此 TownPass fork 的地端服務助理開發。先讀 AGENTS.md、portal_assistant/docs/history/AI_ASSISTANT_PROGRESS.md、portal_assistant/docs/history/AI_AGENT_HANDOFF.md、portal_assistant/docs/history/AI_VOICE_UI_PLAN.md、portal_assistant/docs/history/AI_ALL_FEATURES_ROLLOUT_PLAN.md，再檢查 Git 分支、status 與目前程式，不覆蓋未提交工作。
 
 現況：決策模型 ministral-3:3b（Ollama）、Python 標準函式庫主後端（contract 3，含頁面狀態 context）、Flutter/GetX 與原 WebView；70 項目錄、41 項允許導頁。全螢幕「助理」介面與按住說話已完成，語音用地端 Breeze-ASR-25（faster-whisper 獨立服務 :8770，權重在 repo 外）。表單預填、正式交易、其他語言與台語尚未完成；語音在吵雜環境的辨識率有保留待辦。
 

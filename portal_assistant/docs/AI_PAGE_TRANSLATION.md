@@ -1,5 +1,7 @@
 # 服務頁翻譯：不先閃中文、翻得對（2026-11-13～14）
 
+> **開發紀錄**：文中的分支、commit、「還沒提交」「尚未實作」是寫的當時的狀態；採用的做法都已合進目前的程式。現行規則以 [AI_CURRENT_RULES.md](AI_CURRENT_RULES.md) 為準，文件索引見 [README.md](README.md)。
+
 規則在 `portal_assistant/docs/AI_CURRENT_RULES.md` 第 4 節「服務頁翻譯不先閃中文」與「服務頁翻譯的品質」；這份文件記錄原因、做法與量測。
 
 - 第 1～5 節：不先閃中文，分支 `fix/page-translation-no-flash`（從 main `9757438`）。

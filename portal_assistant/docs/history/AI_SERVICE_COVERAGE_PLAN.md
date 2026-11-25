@@ -1,16 +1,18 @@
 # 其餘微服務串接助理規劃
 
+> **歷史文件**（已被取代，只當紀錄）：內容是寫的當時的狀態，有些做法後來改掉了。現行規則以 [AI_CURRENT_RULES.md](../AI_CURRENT_RULES.md) 為準，索引見 [README.md](README.md)。
+
 日期：2026-11-07。分支 `feat/asr-ablation`（`1bf64d7`）。
-依據：[capabilities.json](../app/assets/assistant/capabilities.json)、[我的服務設定](../../lib/page/city_service/model/my_service_model.dart)、
+依據：[capabilities.json](../../app/assets/assistant/capabilities.json)、[我的服務設定](../../../lib/page/city_service/model/my_service_model.dart)、
 官方 TownPass-Services 的 `src/router/index.ts` 與各 view（main 分支，2026-11-07 讀取），
-以及 [FEATURE_AVAILABILITY_20261104.md](../../docs/FEATURE_AVAILABILITY_20261104.md)、[AI_ALL_FEATURES_ROLLOUT_PLAN.md](AI_ALL_FEATURES_ROLLOUT_PLAN.md)。
+以及 [FEATURE_AVAILABILITY_20261104.md](../../../docs/FEATURE_AVAILABILITY_20261104.md)、[AI_ALL_FEATURES_ROLLOUT_PLAN.md](AI_ALL_FEATURES_ROLLOUT_PLAN.md)。
 
 範圍：有實際頁面或資料、但助理目前停用或還沒收錄的功能。
 14 個網址空白的服務入口（網路投票、疫苗預約、動物園等）沒有目的地，仍維持停用並說明原因。
 
 ## 1. 關鍵限制：WebView 冷開子頁會丟失 store
 
-助理開網頁時，WebView 依序 `loadUrl` 父頁與目標頁（[tp_web_view.dart](../../lib/util/tp_web_view.dart)）。
+助理開網頁時，WebView 依序 `loadUrl` 父頁與目標頁（[tp_web_view.dart](../../../lib/util/tp_web_view.dart)）。
 每次 `loadUrl` 都是整頁重新載入，Pinia store 會被清空。
 因此只有「自己載入資料」的子頁可以直接深連結；依賴父頁初始化 store 的子頁會是空的。
 
@@ -86,7 +88,7 @@ Vue Router 會在同一頁內換頁，store 保留）。不修改、不打包官
 ## 3. FAQ（RAG）改用 multilingual-e5-small
 
 - **呼叫時機不變**：只有台北通的功能／書目檢索失敗時才查 FAQ。
-  共三處（[workflow.py](../backend/workflow.py)）：沒有命中任何功能或書目（`no_match`）、
+  共三處（[workflow.py](../../backend/workflow.py)）：沒有命中任何功能或書目（`no_match`）、
   功能決策回 `request_clarification`、圖書決策回 `request_clarification` 或 `unsupported`。
   新的「讀音近似」判斷在 FAQ 之前；選到功能、候選確認、問候、功能列表都不查 FAQ。
 - **模型**：Microsoft `intfloat/multilingual-e5-small`（MIT，約 118M 參數）。
@@ -145,7 +147,7 @@ Vue Router 會在同一頁內換頁，store 保留）。不修改、不打包官
 
 ### 8.1 設計
 
-- 新模組 [portal_assistant/backend/semantic.py](../backend/semantic.py)（`CatalogIndex`）：功能目錄 109 項，每項多段
+- 新模組 [portal_assistant/backend/semantic.py](../../backend/semantic.py)（`CatalogIndex`）：功能目錄 109 項，每項多段
   `passage:` 文字——標題；標題＋關鍵字；標題＋features（有才加）；capabilities_i18n.json 每種語言的標題＋關鍵字，
   去重後共 799 段 × 384 維。查詢以 `query: <文字>` 向量化，每項取各段最高 cosine。
 - 沿用 FAQ 的 e5 伺服器與用戶端（`faq.embed_texts`、前綴、L2 正規化、`TOWNPASS_FAQ_EMBED_URL`），沒有另開伺服器。
@@ -172,7 +174,7 @@ Vue Router 會在同一頁內換頁，store 保留）。不修改、不打包官
 ### 8.2 門檻與理由
 
 只用 evaluate.py 的 dev 題中真的走到這一層的句子（9 句，全為不該列服務的句子）與自寫的
-[semantic_tuning.json](../backend/semantic_tuning.json)（107 句：中文與五種外語的換句話說、閒聊、範圍外；
+[semantic_tuning.json](../../backend/semantic_tuning.json)（107 句：中文與五種外語的換句話說、閒聊、範圍外；
 未看 eval_colloquial.json 與 eval_foreign_holdout.json）。以實際流程篩出會走到這一層的 70 句（正例 29、負例 41）。
 
 e5 的 cosine 擠在很窄的高分區，**絕對分數分不開**：
@@ -277,7 +279,7 @@ eval_colloquial.py 的計分修正：外語回覆的候選與「尚未串接」�
 - **建議預設開啟**：dev／held-out／多語不變、0 開錯服務、0 次對非服務句列出服務；外語 held-out 服務類 27 → 41（+14），
   colloquial +3；代價是只在有候選時多一次模型呼叫。中文換句話說幾乎沒有改善，需要另做（例如關鍵字命中但模型拒絕、
   或圖書流程判定非書籍時，也查語意候選）。
-- 測試：[portal_assistant/backend/test_semantic.py](../backend/test_semantic.py)（假 embedding 函式，不需模型）：
+- 測試：[portal_assistant/backend/test_semantic.py](../../backend/test_semantic.py)（假 embedding 函式，不需模型）：
   伺服器連不上時不作用、列候選、不會直接開頁、請說清楚時進入意圖 fallback、外語、否定、快取。
 - 回復：刪除 `semantic.py`、`semantic_tuning.json`、`test_semantic.py`，還原 workflow.py／server.py／device_main.py／
   eval_colloquial.py 的對應段落，或直接設 `TOWNPASS_SEMANTIC=0`。

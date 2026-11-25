@@ -1,5 +1,7 @@
 # 整併後待辦與分工（2026-11-08）
 
+> **歷史文件**（已被取代，只當紀錄）：內容是寫的當時的狀態，有些做法後來改掉了。現行規則以 [AI_CURRENT_RULES.md](../AI_CURRENT_RULES.md) 為準，索引見 [README.md](README.md)。
+
 > 助理現行規則以 `portal_assistant/docs/AI_CURRENT_RULES.md` 為準。
 
 分支：`feat/asr-ablation`，`348e628`（已 push）。給團隊分工用：每一項都可以獨立認領，
@@ -17,7 +19,7 @@
 | 找不到時：讀音比對 → 語意檢索（C 版）→ 問模型（B 版）→ FAQ | 主線 | 電腦評估過；C 版、FAQ 在手機上**未驗證** |
 | 市府 FAQ 8,121 筆（e5）＋台北通常見問答（執行時下載） | rag-integrate＋主線 | 電腦評估過；手機未驗證 |
 | 引導助理（企鵝、任務卡、光圈、新手教學、設定頁） | `feat/guided-assistant-mock`（到 `46a89c8`） | **預設關閉**：`--dart-define=ASSISTANT_GUIDED=true` 才出現 |
-| 助理測試報告（904 句） | reg941125 | 見 `portal_assistant/docs/AI_ASSISTANT_TEST_REPORT_20261107.md` |
+| 助理測試報告（904 句） | reg941125 | 見 `portal_assistant/docs/history/AI_ASSISTANT_TEST_REPORT_20261107.md` |
 
 最新評估（電腦、Ollama ministral-3:3b）：dev 188/190、held-out 97/102、開錯服務 0、多語 46/46；
 外語 held-out 服務請求 41/75（含讓使用者確認）。測試：Python 211、Flutter 115 全過。
@@ -51,7 +53,7 @@
 
 ## 2. P1：引導助理和我們的功能接起來
 
-規劃在 `portal_assistant/docs/AI_GUIDED_MERGE_PLAN.md`（第 3–8 步）。使用者看到的是引導助理的設計，我們的功能要在底下全部保留。
+規劃在 `portal_assistant/docs/history/AI_GUIDED_MERGE_PLAN.md`（第 3–8 步）。使用者看到的是引導助理的設計，我們的功能要在底下全部保留。
 
 ### T3 兩個控制器合併成一個核心（規劃第 3 步）
 - **問題**：引導助理的控制器是照舊版程式寫的：不送說話語言（外語都當中文辨識）、不送 `resolution_id`（說「第二個」「下一頁」失效）、
@@ -99,7 +101,7 @@
 - 「算了，不用了」「Never mind, forget it」要跑完模型才回「沒找到」；「我不想收到推播通知」被否定過濾清空（報告 4.6）。
 
 ### T12 幫忙填欄位（第 3 批）
-- 規劃與決定在 `portal_assistant/docs/AI_FORM_PREFILL_PLAN.md`（先做陳情 R-99）；欄位對照 `portal_assistant/docs/form_prefill_fields.json`。還沒開始實作。
+- 規劃與決定在 `portal_assistant/docs/history/AI_FORM_PREFILL_PLAN.md`（先做陳情 R-99）；欄位對照 `portal_assistant/docs/history/form_prefill_fields.json`。還沒開始實作。
 
 ## 4. P2：驗證與效能
 
@@ -111,7 +113,7 @@
 - 手機實測決策約 9–10 秒，語音 1.3–2.8 秒。已完成的實驗：
   - 縮短圖書提示（`exp/speed-library`，`TownPass-s3`）：每次圖書請求少 30% token、約省 1.2 秒，準確率不變，**尚未併入**。
   - 快取位置、單字母輸出、量化版本與小模型：實驗中（部分結果因評估程式被誤停要重跑）。
-  - 換決策模型：規劃在 `portal_assistant/docs/AI_DECISION_MODEL_ABLATION_PLAN.md`，尚未實作。
+  - 換決策模型：規劃在 `portal_assistant/docs/history/AI_DECISION_MODEL_ABLATION_PLAN.md`，尚未實作。
 - 「外語先翻中文再決策」實驗（`exp/pivot-translation`）：用開源翻譯時沒有比較好，要先收集 ML Kit 在手機上的實際翻譯再決定（`docs/PIVOT_TRANSLATION_EXPERIMENT.md`，在該分支）。
 
 ### T14b iPhone 版補齊（2026-11-10，需要 Mac）

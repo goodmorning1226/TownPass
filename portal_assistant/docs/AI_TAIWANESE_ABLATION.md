@@ -1,5 +1,7 @@
 # 台語語音模型消融：準確度對記憶體與速度（2026-11-13）
 
+> **開發紀錄**：文中的分支、commit、「還沒提交」「尚未實作」是寫的當時的狀態；採用的做法都已合進目前的程式。現行規則以 [AI_CURRENT_RULES.md](AI_CURRENT_RULES.md) 為準，文件索引見 [README.md](README.md)。
+
 狀態：電腦上的實驗（分支 `exp/taiwanese-ablation`，從 `feat/classifier-decision` `375fc35` 開出），**App 的預設與程式都沒有改**。
 手機不在身邊，所以手機秒數是推估；ARM 雲端量測準備在分支 `ci/arm-bench-whisper`（未推送）。
 背景：[台語語音規劃](AI_TAIWANESE_SPEECH_PLAN.md) 第 9–13 節、[iOS](AI_ON_DEVICE_IOS.md)「記憶體（台語）」、[現行規則](AI_CURRENT_RULES.md) 第 4、6、7 節。

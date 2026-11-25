@@ -117,7 +117,7 @@ def system_prompt(task):
     return POLICIES[task] + "\n" + INSTRUCTIONS[task]
 
 
-# Decision model (portal_assistant/docs/AI_DECISION_MODEL_ABLATION_PLAN.md section 8): "ministral"
+# Decision model (portal_assistant/docs/history/AI_DECISION_MODEL_ABLATION_PLAN.md section 8): "ministral"
 # (default, Ministral 3B) or "gemma" (Gemma 4 E2B, opt-in on the phone). Both get
 # the same messages and the same {"choice":"X"} grammar: the Gemma-specific
 # variants tried on dev (190) and multilingual dev (46) on 2026-11-08 - a bare
@@ -160,7 +160,7 @@ def choice_options(tools):
 def options_view(task, options):
     """The options as the model sees them. Library: one line per letter,
     {"A": "tool(key=value): description"}, ~25% fewer option tokens than the
-    list of objects (portal_assistant/docs/SPEED_LIBRARY_EXPERIMENT.md). The full descriptions
+    list of objects (portal_assistant/docs/history/SPEED_LIBRARY_EXPERIMENT.md). The full descriptions
     stay: without them, or shortened, the model opened the library for "借XYZ"."""
     if task != "library":
         return options

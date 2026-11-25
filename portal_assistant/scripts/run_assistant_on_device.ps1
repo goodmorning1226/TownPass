@@ -6,10 +6,10 @@
 # -Speech system: the phone's own on-device speech recogniser instead of Whisper
 # (portal_assistant/docs/AI_ASR_ABLATION.md); the Whisper model is then not used.
 # -Chat: the chat-only assistant instead of the guided one (penguin, task card,
-#   highlights), which is the default (ASSISTANT_GUIDED; portal_assistant/docs/AI_GUIDED_MERGE_PLAN.md)
+#   highlights), which is the default (ASSISTANT_GUIDED; portal_assistant/docs/history/AI_GUIDED_MERGE_PLAN.md)
 # -DecisionModel gemma: Gemma 4 E2B instead of Ministral 3B as the decision model
 #   (opt-in; push it first with push_assistant_models.ps1 -DecisionModel gemma;
-#   portal_assistant/docs/AI_DECISION_MODEL_ABLATION_PLAN.md section 8). -DecisionModel ministral: Ministral 3B.
+#   portal_assistant/docs/history/AI_DECISION_MODEL_ABLATION_PLAN.md section 8). -DecisionModel ministral: Ministral 3B.
 # -DecisionModel classifier (the default since 2026-11-13): no decision model at all (option B',
 #   portal_assistant/docs/AI_DECISION_CLASSIFIER.md section 12): the 132 MB decision classifier decides
 #   pages, rules decide library requests and guides. The App downloads it (use

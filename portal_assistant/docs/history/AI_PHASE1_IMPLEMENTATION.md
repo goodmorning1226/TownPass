@@ -1,5 +1,7 @@
 # 圖書助理第一階段實作紀錄
 
+> **歷史文件**（已被取代，只當紀錄）：內容是寫的當時的狀態，有些做法後來改掉了。現行規則以 [AI_CURRENT_RULES.md](../AI_CURRENT_RULES.md) 為準，索引見 [README.md](README.md)。
+
 日期：2026-11-05。分支：`feat/ai-assistant-plan`，基線 `e4fbd3c`。
 本次未 push、未變更 main、未升級 Flutter 或套件。
 後續 General、模糊確認與正常返回的規劃見 [全功能分步計畫](AI_ALL_FEATURES_ROLLOUT_PLAN.md)，
@@ -110,7 +112,7 @@ Debug APK 已重新建置通過；此修正需要更新 App，僅重啟後端或
 這次只修改後端及測試，App 契約不變，不需重裝 APK；全功能模糊候選確認及返回層級仍依後續計畫。
 
 先在專案根目錄執行 `portal_assistant/scripts/start_assistant.ps1`，再開 Android 裝置並執行 `portal_assistant/scripts/run_assistant_android.ps1`。
-詳細命令、Android Studio 注意事項與 API 契約見 [後端 README](../backend/README.md)。
+詳細命令、Android Studio 注意事項與 API 契約見 [後端 README](../../backend/README.md)。
 
 回復原介面：以 `--dart-define=ASSISTANT_ENABLED=false` 啟動。
 後端可按 Ctrl+C 停止；要取消 USB 轉送可用 `adb -s <device-id> reverse --remove tcp:8765`。

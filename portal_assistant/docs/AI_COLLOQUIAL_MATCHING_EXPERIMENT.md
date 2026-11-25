@@ -1,5 +1,7 @@
 # 日常說法對到頁面：三個版本的比較（2026-11-08）
 
+> **開發紀錄**：文中的分支、commit、「還沒提交」「尚未實作」是寫的當時的狀態；採用的做法都已合進目前的程式。現行規則以 [AI_CURRENT_RULES.md](AI_CURRENT_RULES.md) 為準，文件索引見 [README.md](README.md)。
+
 > **2026-11-08 已採用 B＋D**（不含 A），在分支 `feat/colloquial-bd`（從 `feat/asr-ablation` `3c8db7d` 開出），預設開啟；
 > 每個已串接頁都補了例句。採用時的改動與最終結果見第 9 節。第 1–8 節是當時的實驗紀錄，保留原樣。
 
@@ -7,7 +9,7 @@
 實驗本身提交為 `e65e6a2`（開關全部關閉）。
 只在電腦上測：Ollama `ministral-3:3b`、e5（multilingual-e5-small q8_0，llama-server）、FAQ 開啟。沒有動手機。
 
-對應 [TEAM_TASKS_AFTER_MERGE.md](TEAM_TASKS_AFTER_MERGE.md) 的 T2。所有新做法都用環境變數開關，**預設全部關閉**，
+對應 [TEAM_TASKS_AFTER_MERGE.md](history/TEAM_TASKS_AFTER_MERGE.md) 的 T2。所有新做法都用環境變數開關，**預設全部關閉**，
 關閉時行為與原本相同（基線就是用關閉的狀態量的）。
 
 ## 1. 先說結論
@@ -31,7 +33,7 @@
 | **`eval_colloquial_dev.json`（新）** | 186 | 調整用 |
 | **`eval_colloquial_report_holdout.json`（新）** | 80 | 只報告 |
 
-新的兩份來自測試報告（`portal_assistant/docs/assistant_test_20261107/results/*.json`）中 FAIL／CONCERN 的單一需求說法（共 266 句，去重後；
+新的兩份來自測試報告（`portal_assistant/docs/history/assistant_test_20261107/results/*.json`）中 FAIL／CONCERN 的單一需求說法（共 266 句，去重後；
 組合需求、緊急求救、台羅、菲律賓文沒有收）。期望頁面由人工從報告的 expected 對到功能代號；災情的句子對到最具體的表單，
 帳務類也接受「帳務」分頁（與 `eval_colloquial.json` 相同慣例）。另收 10 句「不是 App 服務」的句子（護照、機車駕照、叫計程車…），什麼都不該開。
 

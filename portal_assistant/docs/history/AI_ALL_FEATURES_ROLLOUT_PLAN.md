@@ -1,9 +1,11 @@
 # TownPass 全功能助理分步實作計畫
 
+> **歷史文件**（已被取代，只當紀錄）：內容是寫的當時的狀態，有些做法後來改掉了。現行規則以 [AI_CURRENT_RULES.md](../AI_CURRENT_RULES.md) 為準，索引見 [README.md](README.md)。
+
 日期：2026-11-05。狀態：已實作第一批共用能力與可用頁面導覽，裝置驗收待使用者執行。
 沿用非中國開發的 `ministral-3:3b`、Flutter／GetX、原服務頁面與官方 WebView bridge。
-實作須遵守 [AGENTS.md](../../AGENTS.md)。現況見 [第一階段紀錄](AI_PHASE1_IMPLEMENTATION.md) 與
-[功能查核](../../docs/FEATURE_AVAILABILITY_20261104.md)；各服務上線前須重新驗證可用性。
+實作須遵守 [AGENTS.md](../../../AGENTS.md)。現況見 [第一階段紀錄](AI_PHASE1_IMPLEMENTATION.md) 與
+[功能查核](../../../docs/FEATURE_AVAILABILITY_20261104.md)；各服務上線前須重新驗證可用性。
 
 本文件為全功能擴充的新規劃主檔。涉及一般對話、模糊確認與返回路徑時，以本文件取代
 第一階段「直接 deep link」「多筆直接搜尋」「零精確匹配直接首頁」的簡化策略。

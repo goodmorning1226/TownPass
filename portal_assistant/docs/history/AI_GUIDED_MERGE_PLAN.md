@@ -1,5 +1,7 @@
 # 引導式助理（隊友 UI）與我們助理功能的合併規劃
 
+> **歷史文件**（已被取代，只當紀錄）：內容是寫的當時的狀態，有些做法後來改掉了。現行規則以 [AI_CURRENT_RULES.md](../AI_CURRENT_RULES.md) 為準，索引見 [README.md](README.md)。
+
 日期：2026-11-07。只做分析與規劃，沒有改 App 程式、沒有提交、沒有操作手機。
 
 | 項目 | 內容 |
@@ -9,7 +11,7 @@
 | 共同祖先 | `06f4018`（`git merge-base` 確認） |
 | 決定 | 合併。**畫面與操作方式用隊友的設計**（助理面板、任務卡、企鵝卡、真實頁面上的步驟光圈）；**我們現有的功能全部保留**，並延伸到他們的功能上 |
 
-> 開工前注意：撰寫本文件期間，worktree 有**正在進行、尚未提交**的修改（`portal_assistant/docs/AI_DECISION_FLOW.md`、`docs/DEVELOPMENT.md`、
+> 開工前注意：撰寫本文件期間，worktree 有**正在進行、尚未提交**的修改（`portal_assistant/docs/history/AI_DECISION_FLOW.md`、`docs/DEVELOPMENT.md`、
 > `portal_assistant/backend/workflow.py`、`server.py`、`evaluate.py`、`test_faq.py`，以及 `portal_assistant/app/lib/bean/assistant_result.dart`
 > （新增 `action`、`contentLanguage`）、`assistant_view_controller.dart`、`assistant_service.dart`、`page_translation.dart`、
 > `test/assistant_test.dart`，未追蹤的 `.model-study/`）。內容是外語 FAQ（後端回 `translate_for_faq`，App 翻成中文再問，

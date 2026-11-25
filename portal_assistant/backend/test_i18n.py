@@ -1,4 +1,4 @@
-"""Requests in en / ja / vi / id / tl (portal_assistant/docs/AI_MULTILINGUAL_PLAN.md, version 2; Filipino since 2026-11-11)."""
+"""Requests in en / ja / vi / id / tl (portal_assistant/docs/history/AI_MULTILINGUAL_PLAN.md, version 2; Filipino since 2026-11-11)."""
 import json
 import unittest
 
