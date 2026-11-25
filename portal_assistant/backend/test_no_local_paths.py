@@ -1,20 +1,20 @@
-"""No machine-specific paths or device serials in portal_assistant/ (portal_assistant/docs/TEAM_LOCAL_SETUP.md
-section 3.1, 2026-11-25): the folder is handed over on its own, so other people must be able to use its
-scripts and docs.
+"""No machine-specific paths or device serials anywhere in the repository (portal_assistant/docs/TEAM_LOCAL_SETUP.md
+section 3.1, 2026-11-25): the whole app tree is handed over (portal_assistant/ and the TownPass app around
+it, owner 2026-11-25), so other people must be able to use its scripts and docs.
 
 Instead of one computer's folders: TOWNPASS_PORTAL_ASSISTANT_WORK (code) or <工作資料夾> (docs) for the work
 folder, TOWNPASS_PORTAL_ASSISTANT_MSYS_BIN for MSYS2, ANDROID_HOME / ANDROID_SDK_ROOT for the Android SDK,
-ANDROID_SERIAL (scripts) or <裝置序號> (docs) for a phone. Every git-tracked text file is scanned except
-integration/patches/ (generated from the official files by make_patches.py). The patterns are joined from
-pieces so this file does not match itself.
+ANDROID_SERIAL (scripts) or <裝置序號> (docs) for a phone. Every git-tracked text file of the repository is
+scanned except portal_assistant/integration/patches/ (generated from the official files by make_patches.py).
+The patterns are joined from pieces so this file does not match itself.
 """
 import pathlib
 import re
 import subprocess
 import unittest
 
-ROOT = pathlib.Path(__file__).resolve().parents[1]  # portal_assistant/
-SKIP = ("integration/patches/",)
+ROOT = pathlib.Path(__file__).resolve().parents[2]  # the repository root (this file is in portal_assistant/backend/)
+SKIP = ("portal_assistant/integration/patches/",)
 SEP = r"[\\/]+"  # D:\x, D:/x and D:\\x (inside a non-raw Python string)
 FORBIDDEN = {
     "work folder (use TOWNPASS_PORTAL_ASSISTANT_WORK or <工作資料夾>)": "D:" + SEP + "Town" + "Pass" + "Assistant",
@@ -70,7 +70,7 @@ class NoLocalPathsTest(unittest.TestCase):
                 continue
             scanned += 1
             problems += findings(name, text)
-        self.assertGreater(scanned, 100, "too few files scanned: is ROOT the portal_assistant folder?")
+        self.assertGreater(scanned, 100, "too few files scanned: is ROOT the repository root?")
         self.assertEqual(problems, [], "machine-specific paths (portal_assistant/docs/TEAM_LOCAL_SETUP.md "
                                        "section 3.1):\n  " + "\n  ".join(problems))
 

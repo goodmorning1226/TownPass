@@ -149,6 +149,9 @@ Flutter 建置會處理被忽略的 Android wrapper 本機檔案；不要因缺�
 - FAQ 索引與快取照舊放在每台電腦通用的 `%LOCALAPPDATA%\TownPassAssistant\`；Mac 的 iOS 腳本預設
   `~/Library/Application Support/TownPassAssistant/`，有設 `TOWNPASS_PORTAL_ASSISTANT_WORK` 時改用工作資料夾（`native-src/`、`models/`）。
 - 後端與建置用的其他 `TOWNPASS_*` 執行期變數（例如 `TOWNPASS_FAQ_DIR`）是另一回事，名稱不變。
+- 後端測試 `portal_assistant/backend/test_no_local_paths.py` 掃整個 repo 追蹤中的文字檔（只排除 `portal_assistant/integration/patches/` 這種產生檔），
+  出現某台電腦的資料夾（工作資料夾、使用者資料夾、MSYS2、Android SDK、repo 所在的資料夾）或手機序號就失敗（2026-11-25 起從只掃 `portal_assistant/`
+  擴大到整個 repo；原因：推市府的是整個 App）。文件裡用上面的 `<工作資料夾>`、`<裝置序號>`，worktree 只寫名稱。
 
 ## 4. 決策模型下載與啟動
 

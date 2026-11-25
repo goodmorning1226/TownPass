@@ -95,7 +95,7 @@ fvm dart run build_runner build --delete-conflicting-outputs   # 產生檔不在
 
 ### Android（Windows）
 
-需要：Android SDK（Platform 36、NDK 29）、JDK 17、Python 3.11+、adb；模型檔在 repo 外（預設 `D:\TownPassAssistant\models\...`，見 `portal_assistant/scripts/prepare_assistant_models.ps1`）。
+需要：Android SDK（Platform 36、NDK 29）、JDK 17、Python 3.11+、adb；模型檔在 repo 外的工作資料夾（環境變數 `TOWNPASS_PORTAL_ASSISTANT_WORK`，見 `portal_assistant/docs/TEAM_LOCAL_SETUP.md` 第 3.1 節；預設 `<工作資料夾>\models\...`，見 `portal_assistant/scripts/prepare_assistant_models.ps1`）。
 
 ```powershell
 # 原生程式庫（llama-server、whisper-server 的 .so，不在 Git）
@@ -103,8 +103,8 @@ fvm dart run build_runner build --delete-conflicting-outputs   # 產生檔不在
 
 # 把模型推到手機（只在第一次或換模型時）
 .\scripts\push_assistant_models.ps1 -DeviceId <id> `
-    -Taiwanese  D:\TownPassAssistant\models\taiwanese\ggml-breeze-asr-26-q4_0.bin `
-    -Vietnamese D:\TownPassAssistant\models\vietnamese\ggml-phowhisper-base-q8_0.bin
+    -Taiwanese  $env:TOWNPASS_PORTAL_ASSISTANT_WORK\models\taiwanese\ggml-breeze-asr-26-q4_0.bin `
+    -Vietnamese $env:TOWNPASS_PORTAL_ASSISTANT_WORK\models\vietnamese\ggml-phowhisper-base-q8_0.bin
 # 預設一併推：決策分類器、Ministral（一律推）、Whisper small、tiny（語言判斷）、e5 與 FAQ 索引；-DecisionModel gemma 另推 Gemma
 
 # 建置、安裝、啟動

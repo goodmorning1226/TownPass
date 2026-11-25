@@ -114,7 +114,7 @@ Release 預設不啟用，正式 API 尚未串接。
 
 | 項目 | 內容 |
 | --- | --- |
-| 工作分支 | `feat/asr-ablation`（worktree `D:\github\TownPass-asr`） |
+| 工作分支 | `feat/asr-ablation`（worktree `TownPass-asr`） |
 | 基線 | `feat/on-device-assistant` 的 `06f4018`（兩分支的 merge-base） |
 | 目前 HEAD | `d639e91`（2026-11-07 21:17）；本機的 `origin/feat/asr-ablation` 追蹤分支在 `0ba2230`，HEAD 領先 1 個 commit（未推送） |
 | 工作區 | FAQ 改用 multilingual-e5-small 的修改**已 stage、未提交**（見下表最後一列）；`.model-study/` 未追蹤 |
