@@ -1,0 +1,35 @@
+diff --git a/lib/page/basic_info_edit/basic_info_edit_view.dart b/lib/page/basic_info_edit/basic_info_edit_view.dart
+index ab3451f..a76e903 100644
+--- a/lib/page/basic_info_edit/basic_info_edit_view.dart
++++ b/lib/page/basic_info_edit/basic_info_edit_view.dart
+@@ -5,6 +5,7 @@ import 'package:town_pass/util/tp_app_bar.dart';
+ import 'package:town_pass/util/tp_button.dart';
+ import 'package:town_pass/util/tp_colors.dart';
+ import 'package:town_pass/util/tp_text.dart';
++import 'package:townpass_portal_assistant/townpass_portal_assistant.dart';
+ 
+ class BasicInfoEditView extends GetView<BasicInfoEditViewController> {
+   const BasicInfoEditView({super.key});
+@@ -47,18 +48,19 @@ class BasicInfoEditView extends GetView<BasicInfoEditViewController> {
+                     ),
+                   ),
+                   const SizedBox(height: 8),
+-                  TextFormField(
++                  // Obx (portal assistant): the hint follows the page language.
++                  Obx(() => TextFormField(
+                     controller: controller.controller,
+                     validator: controller.arg.validator,
+                     decoration: InputDecoration(
+-                      hintText: '請輸入新${controller.arg.title}',
++                      hintText: PageTranslation.instance.label('請輸入新${controller.arg.title}'),
+                       border: OutlineInputBorder(
+                         borderSide: const BorderSide(color: TPColors.primary500, width: 2.0),
+                         borderRadius: BorderRadius.circular(25.0),
+                       ),
+                     ),
+                     keyboardType: controller.arg.keyboardType,
+-                  ),
++                  )),
+                 ],
+               ),
+             ),

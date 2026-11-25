@@ -1,8 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:town_pass/service/page_translation.dart';
 import 'package:town_pass/util/tp_text_span.dart';
+import 'package:townpass_portal_assistant/townpass_portal_assistant.dart';
 
 export 'package:town_pass/util/tp_text_styles.dart';
 
@@ -192,34 +191,25 @@ class TPText extends StatelessWidget {
   }) : data = null;
 
   TapGestureRecognizer? get gestureRecognizer => switch (onTap) {
-    GestureTapCallback onTap => TapGestureRecognizer()..onTap = onTap,
-    null => null,
-  };
+        GestureTapCallback onTap => TapGestureRecognizer()..onTap = onTap,
+        null => null,
+      };
 
+  // Portal assistant: plain texts follow the page language (PageTranslation).
   @override
-  Widget build(BuildContext context) {
-    final text = data;
-    if (text == null || !PageTranslationScope.enabledOf(context)) {
-      return _build(text);
-    }
-    // Plain texts follow the page language (PageTranslation); rebuilt when
-    // the language changes or a translation arrives.
-    return Obx(() {
-      final translation = PageTranslation.instance;
-      translation.revision.value;
-      translation.language.value;
-      return _build(translation.display(text));
-    });
-  }
+  Widget build(BuildContext context) => PageTranslation.buildText(context, data, _build);
 
-  Widget _build(String? text) {
+  Widget _build(String? data) {
     return Text.rich(
       switch (textSpan) {
         InlineSpan textSpan => TPTextSpan(
-          children: [textSpan],
-          recognizer: gestureRecognizer,
-        ),
-        null => TPTextSpan(text: text, recognizer: gestureRecognizer),
+            children: [textSpan],
+            recognizer: gestureRecognizer,
+          ),
+        null => TPTextSpan(
+            text: data,
+            recognizer: gestureRecognizer,
+          ),
       },
       key: key,
       strutStyle: strutStyle,
@@ -236,9 +226,9 @@ class TPText extends StatelessWidget {
       selectionColor: selectionColor,
       style: switch (style) {
         TextStyle style => switch (color) {
-          Color color => style.copyWith(color: color),
-          null => style,
-        },
+            Color color => style.copyWith(color: color),
+            null => style,
+          },
         null => TextStyle(color: color),
       },
     );
@@ -257,7 +247,10 @@ Size textSize(
   TextHeightBehavior? textHeightBehavior,
 }) {
   final TextPainter textPainter = TextPainter(
-    text: TPTextSpan(text: text, style: style),
+    text: TPTextSpan(
+      text: text,
+      style: style,
+    ),
     textAlign: textAlign,
     textDirection: textDirection,
     textScaler: textScaler,
@@ -265,7 +258,10 @@ Size textSize(
     strutStyle: strutStyle,
     textWidthBasis: textWidthBasis,
     textHeightBehavior: textHeightBehavior,
-  )..layout(minWidth: 0, maxWidth: double.infinity);
+  )..layout(
+      minWidth: 0,
+      maxWidth: double.infinity,
+    );
 
   return textPainter.size;
 }

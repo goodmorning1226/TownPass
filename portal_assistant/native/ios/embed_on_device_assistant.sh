@@ -1,0 +1,86 @@
+#!/bin/bash
+# Xcode build phase "Embed On-Device Assistant" (portal_assistant/docs/AI_ON_DEVICE_IOS.md).
+#
+# When ios/OnDevice/ holds the native frameworks (portal_assistant/native/ios/setup_ios_on_device.sh),
+# copies into the App: LlamaServer.framework, WhisperServer.framework,
+# Python.framework with its standard library (python/), and the assistant
+# backend's Python sources (portal_assistant/backend/). Without ios/OnDevice/, or for
+# the simulator (the frameworks are iPhone-only), it does nothing and the App is
+# built exactly as before; the assistant then uses ASSISTANT_BASE_URL as usual.
+set -Eeuo pipefail
+# Name the failing command in Xcode's output (a failed build phase shows only its exit code).
+trap 'echo "error: On-device assistant: line $LINENO failed: $BASH_COMMAND" >&2' ERR
+
+ON_DEVICE="$PROJECT_DIR/OnDevice"
+if [ ! -d "$ON_DEVICE/Python.xcframework" ] || [ ! -d "$ON_DEVICE/LlamaServer.xcframework" ] \
+    || [ ! -d "$ON_DEVICE/WhisperServer.xcframework" ]; then
+  echo "On-device assistant: ios/OnDevice not set up; skipped"
+  exit 0
+fi
+if [ "${EFFECTIVE_PLATFORM_NAME:-}" != "-iphoneos" ]; then
+  echo "On-device assistant: iPhone builds only; skipped for ${EFFECTIVE_PLATFORM_NAME:-unknown}"
+  exit 0
+fi
+
+APP="$CODESIGNING_FOLDER_PATH"
+FRAMEWORKS="$APP/Frameworks"
+mkdir -p "$FRAMEWORKS"
+
+sign() {
+  if [ -n "${EXPANDED_CODE_SIGN_IDENTITY:-}" ] && [ "${CODE_SIGNING_ALLOWED:-YES}" != "NO" ]; then
+    /usr/bin/codesign --force --sign "$EXPANDED_CODE_SIGN_IDENTITY" ${OTHER_CODE_SIGN_FLAGS:-} \
+      --timestamp=none --preserve-metadata=identifier,entitlements,flags "$1"
+  fi
+}
+
+echo "On-device assistant: frameworks"
+for name in LlamaServer WhisperServer Python; do
+  rsync -a --delete "$ON_DEVICE/$name.xcframework/ios-arm64/$name.framework/" "$FRAMEWORKS/$name.framework/"
+  sign "$FRAMEWORKS/$name.framework"
+done
+
+# Python's standard library, with each extension module (.so) turned into a
+# framework as iOS requires (Python-Apple-support's own helper).
+# shellcheck source=/dev/null
+echo "On-device assistant: python standard library"
+# Unsigned builds (CI, flutter build ios --no-codesign) have no signing identity, but
+# BeeWare's utils.sh signs every extension module with it: sign those ad hoc then
+# (Sideloadly/AltStore re-sign the whole App when installing it).
+if [ -z "${EXPANDED_CODE_SIGN_IDENTITY:-}" ]; then
+  export EXPANDED_CODE_SIGN_IDENTITY="-"
+  export EXPANDED_CODE_SIGN_IDENTITY_NAME="ad hoc"
+fi
+export EXPANDED_CODE_SIGN_IDENTITY_NAME="${EXPANDED_CODE_SIGN_IDENTITY_NAME:-$EXPANDED_CODE_SIGN_IDENTITY}"
+# utils.sh is BeeWare's and not written for `set -u`.
+set +u
+source "$ON_DEVICE/Python.xcframework/build/utils.sh"
+install_python OnDevice/Python.xcframework
+set -u
+# Not needed on the phone; keeps the App smaller.
+for unused in test idlelib tkinter turtledemo ensurepip lib2to3 pydoc_data; do
+  rm -rf "$APP/python/lib/python3."*/"$unused"
+done
+
+# Python on iOS has no CA certificates: the backend's HTTPS downloads (library
+# catalogue, Q&A list) verify against Apple's root certificates, exported from
+# this Mac; OnDeviceAssistant.swift points SSL_CERT_FILE at them.
+echo "On-device assistant: certificates"
+/usr/bin/security find-certificate -a -p /System/Library/Keychains/SystemRootCertificates.keychain \
+  > "$APP/python/cacert.pem"
+
+# The backend, as Android packages it (portal_assistant/native/android/assistant.gradle,
+# chaquopy): portal_assistant/backend/ and portal_assistant/app/assets/assistant/ without
+# tests and evaluation data, into the App bundle's portal_assistant/backend/ (the folder
+# OnDeviceAssistant.swift starts the backend from; its name is unchanged).
+echo "On-device assistant: backend"
+BACKEND="$APP/assistant_backend"
+rm -rf "$BACKEND"
+mkdir -p "$BACKEND"
+REPO="$PROJECT_DIR/.."
+rsync -a --prune-empty-dirs \
+  --exclude 'test_*.py' --exclude 'evaluate.py' --exclude 'eval_holdout.py' --exclude 'eval_sound.py' \
+  --exclude 'eval_guides.py' --exclude 'evaluation.json' --exclude 'data/guide_eval*.json' \
+  --exclude 'README.md' --exclude '__pycache__' --exclude '*.pyc' --exclude 'models/' \
+  "$REPO/portal_assistant/backend/" "$BACKEND/"
+rsync -a "$REPO/portal_assistant/app/assets/assistant/" "$BACKEND/"
+echo "On-device assistant: embedded frameworks, Python and assistant_backend"

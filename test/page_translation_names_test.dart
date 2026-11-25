@@ -7,13 +7,13 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:town_pass/page/language/language_view.dart';
 import 'package:town_pass/page/language/language_view_controller.dart';
-import 'package:town_pass/service/page_glossary.dart';
-import 'package:town_pass/service/page_translation.dart';
+import 'package:townpass_portal_assistant/service/page_glossary.dart';
+import 'package:townpass_portal_assistant/service/page_translation.dart';
 import 'package:town_pass/util/tp_app_bar.dart';
 import 'package:town_pass/util/tp_text.dart';
-import 'package:town_pass/util/tp_web_view.dart';
+import 'package:townpass_portal_assistant/host/assistant_web_view.dart';
 
-// docs/AI_CURRENT_RULES.md section 4 (語言名稱不翻、頁面標題與短標籤先查表,
+// portal_assistant/docs/AI_CURRENT_RULES.md section 4 (語言名稱不翻、頁面標題與短標籤先查表,
 // 2026-11-15): a language's own name is never translated, in native screens
 // or service pages; page titles and short labels are looked up before ML Kit.
 void main() {
@@ -104,7 +104,7 @@ void main() {
     });
 
     test('the page script gets the list and never asks for these', () {
-      final source = TPWebView.translationSource(
+      final source = AssistantWebSession.translationSource(
         'en',
         {'水費': 'Water bill'},
         keep: ['日本語', '繁體中文'],
@@ -179,7 +179,7 @@ void main() {
 
   group('page titles and short labels', () {
     // The <title> of every page of the service site's route table
-    // (scripts/extract_service_strings.py collects them).
+    // (portal_assistant/scripts/extract_service_strings.py collects them).
     const titles = [
       '繳費項目',
       '搜尋繳費項目',
@@ -285,7 +285,7 @@ void main() {
 
     test('the bundled glossary: version 2, keep list and labels', () async {
       final data = jsonDecode(
-        await rootBundle.loadString('assets/i18n/glossary.json'),
+        await rootBundle.loadString('packages/townpass_portal_assistant/assets/i18n/glossary.json'),
       ) as Map;
       expect(data['version'], 2);
       expect(data['keep'], containsAll(['繁體中文', '日本語']));

@@ -33,5 +33,5 @@ Runner/GeneratedPluginRegistrant.*
 !default.pbxuser
 !default.perspectivev3
 
-# On-device assistant frameworks (scripts/setup_ios_on_device.sh), not in git
+# On-device assistant frameworks (portal_assistant/native/ios/setup_ios_on_device.sh), not in git
 OnDevice/

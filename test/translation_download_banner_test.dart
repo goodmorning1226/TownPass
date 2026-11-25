@@ -2,19 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:town_pass/page/assistant/assistant_texts.dart';
-import 'package:town_pass/page/guided_assistant/guide_target.dart';
-import 'package:town_pass/page/guided_assistant/guided_assistant_controller.dart';
-import 'package:town_pass/page/guided_assistant/web/web_guide_probe.dart';
-import 'package:town_pass/page/guided_assistant/web/web_page_state.dart';
-import 'package:town_pass/page/guided_assistant/widget/guided_assistant_host.dart';
+import 'package:townpass_portal_assistant/page/assistant/assistant_texts.dart';
+import 'package:townpass_portal_assistant/page/guided_assistant/guide_target.dart';
+import 'package:townpass_portal_assistant/page/guided_assistant/guided_assistant_controller.dart';
+import 'package:townpass_portal_assistant/page/guided_assistant/web/web_guide_probe.dart';
+import 'package:townpass_portal_assistant/page/guided_assistant/web/web_page_state.dart';
+import 'package:townpass_portal_assistant/page/guided_assistant/widget/guided_assistant_host.dart';
 import 'package:town_pass/page/main/main_view_controller.dart';
-import 'package:town_pass/service/assistant_action_executor.dart';
-import 'package:town_pass/service/assistant_speaker.dart';
-import 'package:town_pass/service/page_translation.dart';
+import 'package:townpass_portal_assistant/service/assistant_action_executor.dart';
+import 'package:townpass_portal_assistant/service/assistant_speaker.dart';
+import 'package:townpass_portal_assistant/service/page_translation.dart';
 import 'package:town_pass/service/shared_preferences_service.dart';
 
-// docs/AI_CURRENT_RULES.md section 4 (服務頁翻譯, 2026-11-14): the first use
+// portal_assistant/docs/AI_CURRENT_RULES.md section 4 (服務頁翻譯, 2026-11-14): the first use
 // of a page language downloads its ML Kit model (tens of seconds); the
 // guided assistant's host says so on top of every page, like the chat one.
 

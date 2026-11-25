@@ -15,8 +15,7 @@ import 'package:town_pass/util/tp_text.dart';
 class SubscriptionWidget extends StatelessWidget {
   const SubscriptionWidget({super.key});
 
-  List<SubscriptionItem> get subscriptionList =>
-      Get.find<SubscriptionService>().itemList;
+  List<SubscriptionItem> get subscriptionList => Get.find<SubscriptionService>().itemList;
 
   @override
   Widget build(BuildContext context) {
@@ -42,8 +41,7 @@ class SubscriptionWidget extends StatelessWidget {
                   behavior: HitTestBehavior.opaque,
                   onTap: () async {
                     await TPRoute.openUri(
-                      uri:
-                          'https://taipei-pass-service.vercel.app/subscription',
+                      uri: 'https://taipei-pass-service.vercel.app/subscription',
                     );
                   },
                   child: Row(
@@ -51,10 +49,7 @@ class SubscriptionWidget extends StatelessWidget {
                       Assets.svg.iconSettings.svg(
                         width: 20,
                         height: 20,
-                        colorFilter: const ColorFilter.mode(
-                          TPColors.grayscale600,
-                          BlendMode.srcIn,
-                        ),
+                        colorFilter: const ColorFilter.mode(TPColors.grayscale600, BlendMode.srcIn),
                       ),
                       const SizedBox(width: 8),
                       const TPText(
@@ -87,10 +82,7 @@ class SubscriptionWidget extends StatelessWidget {
                       Assets.svg.iconArrowRight.svg(
                         width: 20,
                         height: 20,
-                        colorFilter: const ColorFilter.mode(
-                          TPColors.grayscale600,
-                          BlendMode.srcIn,
-                        ),
+                        colorFilter: const ColorFilter.mode(TPColors.grayscale600, BlendMode.srcIn),
                       ),
                     ],
                   ),
@@ -103,16 +95,15 @@ class SubscriptionWidget extends StatelessWidget {
         Obx(
           () => switch (subscriptionList.isEmpty) {
             true => Container(
-              padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 24),
-              color: TPColors.primary50,
-              child: Row(
-                children: [
-                  Assets.svg.illustrationsBookingS.svg(width: 54, height: 46),
-                  const SizedBox(width: 16),
-                  // Expanded: longer translated text wraps instead of
-                  // overflowing the row (PageTranslation).
-                  Expanded(
-                    child: Column(
+                padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 24),
+                color: TPColors.primary50,
+                child: Row(
+                  children: [
+                    Assets.svg.illustrationsBookingS.svg(width: 54, height: 46),
+                    const SizedBox(width: 16),
+                    // Expanded (portal assistant): longer translated text wraps
+                    // instead of overflowing the row (PageTranslation).
+                    Expanded(child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const TPText(
@@ -141,30 +132,25 @@ class SubscriptionWidget extends StatelessWidget {
                           },
                         ),
                       ],
-                    ),
-                  ),
-                ],
+                    )),
+                  ],
+                ),
               ),
-            ),
             false => ColoredBox(
-              color: TPColors.white,
-              child: ListView.separated(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12.0,
-                  vertical: 12.0,
+                color: TPColors.white,
+                child: ListView.separated(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 12.0),
+                  itemCount: subscriptionList.length,
+                  separatorBuilder: (_, __) => const TPLine.horizontal(
+                    margin: EdgeInsets.symmetric(vertical: 12.0),
+                  ),
+                  itemBuilder: (_, index) => SubscriptionItemWidget(item: subscriptionList[index]),
                 ),
-                itemCount: subscriptionList.length,
-                separatorBuilder: (_, __) => const TPLine.horizontal(
-                  margin: EdgeInsets.symmetric(vertical: 12.0),
-                ),
-                itemBuilder: (_, index) =>
-                    SubscriptionItemWidget(item: subscriptionList[index]),
               ),
-            ),
           },
-        ),
+        )
       ],
     );
   }

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:town_pass/service/page_translation.dart';
+import 'package:townpass_portal_assistant/service/page_translation.dart';
 import 'package:town_pass/util/tp_text.dart';
-import 'package:town_pass/util/tp_web_view.dart';
+import 'package:townpass_portal_assistant/host/assistant_web_view.dart';
 
-// docs/AI_CURRENT_RULES.md section 4 (服務頁翻譯, 2026-11-13): cached
+// portal_assistant/docs/AI_CURRENT_RULES.md section 4 (服務頁翻譯, 2026-11-13): cached
 // translations are shown without a Chinese first frame, in native TPText and
 // (through the injected dictionary) on service pages.
 void main() {
@@ -68,7 +68,7 @@ void main() {
         'page_language_cache_ja': '{"水費":"水道料金"}',
       });
       await translation.setLanguage('ja');
-      final source = TPWebView.translationSource(
+      final source = AssistantWebSession.translationSource(
         'ja',
         translation.dictionary(),
       );

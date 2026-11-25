@@ -1,0 +1,130 @@
+diff --git a/lib/util/tp_web_view.dart b/lib/util/tp_web_view.dart
+index 3ccbfa6..42d51f8 100644
+--- a/lib/util/tp_web_view.dart
++++ b/lib/util/tp_web_view.dart
+@@ -9,14 +9,19 @@ import 'package:town_pass/gen/assets.gen.dart';
+ import 'package:town_pass/util/tp_app_bar.dart';
+ import 'package:town_pass/util/tp_colors.dart';
+ import 'package:town_pass/util/web_message_handler/tp_web_message_listener.dart';
++import 'package:townpass_portal_assistant/townpass_portal_assistant.dart';
+ 
+ class WebViewArgument {
+   final String? url;
+   final String? forceTitle;
+ 
++  /// Portal assistant: the pages it opens and its callbacks (AssistantWebSession).
++  final AssistantWebRequest? assistant;
++
+   const WebViewArgument({
+     this.url,
+     this.forceTitle,
++    this.assistant,
+   });
+ }
+ 
+@@ -26,29 +31,56 @@ class WebViewArgument {
+ /// ```
+ /// Get.toNamed(TPRoute.webView, arguments: url);
+ /// ```
+-class TPWebView extends StatelessWidget {
++class TPWebView extends StatefulWidget {
+   final TPAppBarController? titleController;
+ 
+-  TPWebView({
++  const TPWebView({
+     super.key,
+     this.titleController,
+   });
+ 
+-  String get url => (Get.arguments as WebViewArgument?)?.url ?? '';
++  @override
++  State<TPWebView> createState() => _TPWebViewState();
++}
++
++// A State (portal assistant): the arguments and the assistant's session stay
++// with the page for as long as it is open.
++class _TPWebViewState extends State<TPWebView> {
++  late final WebViewArgument? pageArgument = Get.arguments as WebViewArgument?;
++
++  String get url => pageArgument?.url ?? '';
+ 
+-  String? get forceTitle => (Get.arguments as WebViewArgument?)?.forceTitle;
++  String? get forceTitle => pageArgument?.forceTitle;
+ 
+   final TPAppBarController _defaultTitleController = TPAppBarController();
+ 
+-  TPAppBarController get appBarController => titleController ?? _defaultTitleController;
++  TPAppBarController get appBarController => widget.titleController ?? _defaultTitleController;
+ 
+   final Rxn<InAppWebViewController> webViewController = Rxn<InAppWebViewController>();
+ 
+   final RxBool canGoBack = RxBool(false);
+ 
++  /// Portal assistant: page tracking, page translation and the assistant's
++  /// navigation (portal_assistant/INTEGRATION.md, hook TPWebView).
++  late final AssistantWebSession assistant = AssistantWebSession(
++    url: url,
++    request: pageArgument?.assistant,
++    isMounted: () => mounted,
++    onCanGoBack: (value) => canGoBack.value = value,
++  );
++
++  @override
++  void dispose() {
++    assistant.dispose();
++    super.dispose();
++  }
++
+   @override
+   Widget build(BuildContext context) {
+-    return Scaffold(
++    return PopScope(
++      canPop: assistant.canPop,
++      onPopInvokedWithResult: (didPop, _) => assistant.onPopInvoked(didPop, webViewController.value),
++      child: Scaffold(
+       appBar: TPAppBar(
+         backgroundColor: TPColors.primary500,
+         foregroundColor: TPColors.white,
+@@ -56,7 +88,7 @@ class TPWebView extends StatelessWidget {
+           () => switch (canGoBack.value) {
+             true => IconButton(
+                 icon: Assets.svg.expand.svg(),
+-                onPressed: () async => await webViewController.value?.goBack(),
++                onPressed: () async => await assistant.back(webViewController.value),
+                 style: const ButtonStyle(
+                   iconSize: WidgetStatePropertyAll<double>(24),
+                 ),
+@@ -77,15 +109,23 @@ class TPWebView extends StatelessWidget {
+         controller: appBarController,
+       ),
+       body: TPInAppWebView(
++        key: assistant.viewKey,
++        initialUserScripts: assistant.initialUserScripts,
++        onLoadStart: assistant.onLoadStart,
++        onLoadStop: assistant.onLoadStop,
++        onReceivedError: assistant.onReceivedError,
++        onReceivedHttpError: assistant.onReceivedHttpError,
+         onWebViewCreated: (controller) {
+           webViewController.value = controller;
++          assistant.onWebViewCreated(controller);
+           try {
+-            controller.loadUrl(urlRequest: URLRequest(url: WebUri(url)));
++            controller.loadUrl(urlRequest: URLRequest(url: WebUri(assistant.firstUrl)));
+           } catch (_) {
+             controller.loadData(data: _failedToLoadUrlData(url: url));
+           }
+         },
+-        onUpdateVisitedHistory: (_, __, ___) async {
++        onUpdateVisitedHistory: (_, visitedUrl, _) async {
++          assistant.onVisited(visitedUrl);
+           canGoBack.value = await webViewController.value?.canGoBack() ?? false;
+         },
+         onTitleChanged: (_, title) {
+@@ -100,6 +140,7 @@ class TPWebView extends StatelessWidget {
+         },
+         onCloseWindow: (_) => Get.back(),
+       ),
++      ),
+     );
+   }
+ }

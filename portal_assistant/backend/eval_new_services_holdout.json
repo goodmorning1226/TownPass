@@ -1,0 +1,18 @@
+{
+ "meta": {
+  "name": "new_services_holdout",
+  "sealed": "2026-11-24",
+  "usage": "report-only; held-out sentences for services added after 2026-11-24, written by an independent writer who has not seen the rules, examples or dev sets (portal_assistant/docs/NEW_SERVICE_HOLDOUT.md). Never used for tuning keywords, examples, prompts, thresholds or classifier training; sentences are not read while developing.",
+  "intent_values": [
+   "service",
+   "faq",
+   "none",
+   "vague",
+   "listing",
+   "multi",
+   "unsupported",
+   "emergency"
+  ]
+ },
+ "items": []
+}

@@ -1,0 +1,35 @@
+{
+ "source": "city_faq",
+ "written_by": "Team-written questions that already existed on 2026-11-25 (rules section 11): positives = portal_assistant/rag_handoff/tuning/extras.json 'positives' (the handoff's real sentences, with their FAQ ids); negatives = extras.json 'real_smoke' (8) + the first 4 'general_knowledge' and the first 4 'app_command' of tuning/neg.json. Chosen by that rule, not by their scores.",
+ "positives": [
+  {"text": "學齡前視力檢查要錢嗎", "expected_ids": ["9142457"]},
+  {"text": "房屋拆掉了還要繳稅嗎", "expected_ids": ["9266496"]},
+  {"text": "水費逾期未繳怎麼辦", "expected_ids": ["4903605"]},
+  {"text": "新冠疫苗跟流感疫苗可以一起打嗎", "expected_ids": ["9285552"]},
+  {"text": "低收入戶補助怎麼申請", "expected_ids": ["7652908"]},
+  {"text": "離婚登記要帶什麼", "expected_ids": ["4899244"]},
+  {"text": "實價登錄是什麼", "expected_ids": ["4906196"]},
+  {"text": "捷運遺失物", "expected_ids": ["4897787"]},
+  {"text": "白石湖怎麼去", "expected_ids": ["4908272"]},
+  {"text": "考績乙等要怎麼申訴", "expected_ids": ["4897595"]},
+  {"text": "借的書什麼時候要還", "expected_ids": ["4904778"]}
+ ],
+ "negatives": [
+  {"text": "今天天氣怎麼樣"},
+  {"text": "幫我寫一首情詩"},
+  {"text": "我想訂機票去東京"},
+  {"text": "鳳梨披薩好吃嗎"},
+  {"text": "台北有什麼好吃的"},
+  {"text": "基隆港的歷史"},
+  {"text": "台北市長是誰"},
+  {"text": "新北市戶籍遷入"},
+  {"text": "紅燒肉怎麼煮比較好吃"},
+  {"text": "蒸魚要蒸幾分鐘"},
+  {"text": "綠豆湯怎麼煮才會爛"},
+  {"text": "一百二十乘以十五是多少"},
+  {"text": "幫我打電話給女兒"},
+  {"text": "把字體放大一點"},
+  {"text": "播放鄧麗君的歌"},
+  {"text": "幫我訂明天晚上的餐廳"}
+ ]
+}

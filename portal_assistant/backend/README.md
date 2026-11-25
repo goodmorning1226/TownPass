@@ -1,0 +1,159 @@
+# 地端服務助理
+
+模型固定使用 **Mistral AI `ministral-3:3b`**。不使用 Qwen，也不在失敗時改呼叫其他模型或雲端。
+主後端採 Python 3.11+ 標準函式庫，與 Flutter 分開啟動，無須 pip 安裝套件；
+選用的語音辨識服務（`asr_server.py`）另需 faster-whisper；
+選用的臺北市府 FAQ 檢索（[faq.py](faq.py)）另需 llama.cpp 的 `llama-server`（embedding 模式）與 repo 外的模型及索引檔，見下方「FAQ 檢索」。
+這是本機開發服務，不是正式上線的多使用者 API。
+
+## 啟動
+
+先確認 Ollama 正在執行，`ollama list` 中有 `ministral-3:3b`，並啟動 Android 模擬器或接上 USB 實機。
+
+**一鍵啟動（建議）**，在專案根目錄：
+
+```powershell
+.\portal_assistant\scripts\start_all.ps1 -Model '<轉換後的 Breeze-ASR-25 資料夾>' -DeviceId <裝置ID>
+```
+
+它會依序檢查 Ollama 與模型、在各自視窗開主後端（:8765）與語音辨識（:8770，已在跑就沿用）、
+等到都正常、替模擬器開電腦麥克風，最後執行 App；任何一步失敗會直接說明原因。
+不給 `-Model`（也沒設 `TOWNPASS_ASR_MODEL`）時只能打字並會提示；`-NoVoice` 刻意不開語音，`-SkipApp` 只啟動並檢查服務。
+開出來的服務視窗要保持開著，關掉就會停止；修改 Python 程式後要關掉該視窗再啟動一次。
+
+**手動逐步啟動**（各開一個 PowerShell，保留視窗）：
+
+1. 主後端：
+
+   ```powershell
+   .\portal_assistant\scripts\start_assistant.ps1
+   ```
+
+   亦可直接 `python portal_assistant/backend/server.py`。預設只監聽 `127.0.0.1:8765`。
+
+2. 語音辨識（選用，按住說話需要；模型轉換見 [TEAM_LOCAL_SETUP.md](../docs/TEAM_LOCAL_SETUP.md) 5.1）：
+
+   ```powershell
+   .\portal_assistant\scripts\start_asr.ps1 -Model '<轉換後的 Breeze-ASR-25 資料夾>'
+   ```
+
+   約 30–40 秒載入，只監聽 `127.0.0.1:8770`。沒開時 App 的語音會回「語音辨識服務未啟動」，打字不受影響。
+
+3. App：
+
+   ```powershell
+   .\portal_assistant\scripts\run_assistant_android.ps1
+   ```
+
+   只有一台已授權裝置時會自動選擇；多台時以 `-DeviceId` 指定。
+   腳本透過 `adb reverse tcp:8765 tcp:8765` 讓 App 的 loopback 連到電腦，
+   因此不用開放 Ollama、Windows 防火牆或把模型暴露到學校網路。
+   模擬器也可用 `--dart-define=ASSISTANT_BASE_URL=http://10.0.2.2:8765`。
+
+Debug 預設顯示助理；release 預設停用。可用 `--dart-define=ASSISTANT_ENABLED=false` 回復原 App 操作。
+Android cleartext 例外只放在 debug、只涵蓋 loopback 與模擬器宿主位址，沒有放寬 release 網路設定。
+重新開啟模擬器／重插 USB 後可能需要重跑 reverse。Android Studio 按 Run 時，後端與 reverse 也要保持可用。
+
+## 可以試的輸入
+
+- 「我要借書」：原圖書首頁。
+- 「我要借底層邏輯」：核實後開原書籍詳情，提示選冊次、取書館。
+- 「我要借神奇柑仔店」：先列候選，選擇冊次後才開原書籍詳情。
+- 「第二本」：只有上一輪有展示選項的同一 session 才接受。
+- 沒有對應到已知書目：開原圖書首頁，讓使用者自行搜尋，不導向空搜尋結果。
+- 「不要借書，幫我掛號」：不開圖書，不假裝支援掛號。
+
+不替使用者按預約／借閱，也沒有正式圖書館會員或交易 API。
+原頁面的示範預約只更新網頁資料，不等於正式借閱。
+
+## 資料與決策契約
+
+從既有服務的公開圖書 JSON 讀取書目，核對固定資料雜湊；資料更新時停止詳情直達，
+提示使用原入口，避免錯書。書目查核來源及雜湊見 [工作清單](../docs/AI_LIBRARY_IMPLEMENTATION_STEPS.md)。
+服務名稱／同義詞、否定與修正、欄位線索先過濾，再檢索少量書目。
+Ministral 只做最後的語意工具決策。
+
+本機測試發現空參數原生 tool call 不穩定，故使用 Ollama **JSON Schema 約束的工具提案**：
+`{name, arguments}` → 白名單與 enum 驗證 → App 再驗證目的地 → 既有 WebView。
+這不是把模型文字當程式執行；不接受任意 URL、JS、未知 ID 或提交工具。
+提案 schema 以 `anyOf` 把每個工具名稱綁定自己的參數；通常一次推論，輸出格式錯誤最多一次修正（圖書與一般服務流程相同）；忙碌時拒絕並提示重試，不建立無限 agent loop。
+模型閒置 30 分鐘後才卸載（約占 3 GB VRAM），可用環境變數 `TOWNPASS_ASSISTANT_KEEP_ALIVE` 改為其他 Ollama 時長，如 `5m`。
+每次回覆都帶 `metrics`（耗時、模型呼叫次數、prompt token）；App 不讀這個欄位。
+地端模型載入可能較慢，App 提供取消；關閉面板／返回後遲到回覆不會跳頁。
+
+API：`GET /health`、`GET /v1/assistant/capabilities`、`POST /v1/assistant/turns`。
+POST 接受 `text`、`request_id`、選填 `session_id`、`resolution_id`、`choice_id`、`context`，回 contract 3、示範標記、回覆類型、目的地、指引及選項。
+`context`（contract 3 新增）是 App 回報的頁面與上一次助理導航結果：`page` 為 `{type: tab, index}`、`{type: native, route}` 或 `{type: web, path}`（只含 TownPass 服務路徑，不含網域與 query），
+`last_action` 為 `{destination, result: opened|failed|cancelled, age_seconds}`，搜尋只回報類型不含關鍵字。
+後端自行把頁面對應到目錄能力（[page_context.py](page_context.py)），App 不能指定能力 ID；格式不符的部分直接丟棄，不影響該次請求。
+狀態只當提示：模型看到目前服務名稱與上次動作，歧義候選把目前服務排前面，但不會因此導航或略過確認。
+`POST /v1/assistant/transcriptions`（語音）：body 為 16 kHz 單聲道 16-bit WAV（0.3–30 秒），標頭 `Content-Type: audio/wav` 與 `X-Request-Id`。
+後端驗證格式後轉送本機語音服務（[asr_server.py](asr_server.py)，預設 `http://127.0.0.1:8770`，可用 `TOWNPASS_ASR_URL` 改），
+回 `{contract_version, request_id, text}`；App 把文字顯示為使用者訊息，再當成一般 turn 送出。
+語音服務未啟動回 503、沒聽清楚回 422，訊息都提示改用鍵盤。錄音不存檔、不記錄。
+`asr_server.py` 是獨立程序（需 faster-whisper），主後端仍只用標準函式庫；啟動與模型轉換見 [TEAM_LOCAL_SETUP.md](../docs/TEAM_LOCAL_SETUP.md) 5.1。
+舊 App 不送 `context` 仍可使用；新 App 對舊（contract 2）後端會被拒收，兩端需一起更新。
+一般問候與功能列表無須模型；操作意圖先檢索共用功能目錄，再讓模型在候選內決策。
+候選選擇須同時攜帶該輪 session／resolution；`choice_id` 是本輪選項號碼，不是任意功能或書籍 ID。
+App 與後端需一起更新；舊的仍執行中之 Python 服務須重新啟動。
+此階段不提供草稿提交、付款、action result 稽核或正式會員登入端點。
+共用候選只存記憶體，5 分鐘過期、最多 128 組；舊圖書上下文保留 15 分鐘；不記錄使用者輸入或憑證。
+`/health` 只表示服務與能力設定存在，不保證模型或網頁當時可用。
+
+### FAQ 檢索（第二層）
+
+每輪的順序：問候／功能列表等模板 → **工具呼叫**（功能目錄與書目檢索後，模型在候選內選工具）→
+工具呼叫沒找到服務時查 **FAQ** → 兩者都沒有就回「沒有找到相關的服務或 FAQ 內容」（`action: "no_related"`）。
+「沒找到服務」指：目錄與書目都沒命中，或模型回 `request_clarification`／`unsupported`。
+已命中且選到功能、候選確認、未串接功能的原因說明、取消，都不會查 FAQ。
+
+- 資料：8,121 筆臺北市府 FAQ，以 Microsoft **intfloat/multilingual-e5-small**（MIT，GGUF q8_0）編碼，餘弦相似度取前 3 筆。
+  查詢向量由 llama.cpp `llama-server --embedding --pooling mean` 計算（電腦與手機同一套 llama.cpp）；
+  FAQ 以 `passage: [機關] 問題` 建索引，查詢加 `query: `。
+  回答原文照列，不經模型改寫，附「資料來源：機關」與「本服務僅涵蓋臺北市政府 FAQ。」；超過 600 字截斷並提示洽 1999。
+- 信心（2026-11-07 以 363 句標註資料重新校正，見 [AI_FAQ_RAG.md](../docs/AI_FAQ_RAG.md) 第 6 節）：
+  - 最高分 ≥ 0.915：直接回答，其他相近 FAQ 列為「相關問答」選項。
+  - 0.88–0.915：不直接回答，回「你是不是想問以下的問題？」並列出分數 ≥ 0.88 的問題（最多 3 題），使用者選了才顯示答案。
+  - < 0.88：視為沒找到。
+  門檻只適用此模型與索引，換模型或資料需用 `portal_assistant/rag_handoff/tuning/sweep.py` 重新校正。少於 4 個字元的輸入不查 FAQ。
+- 選項為 `kind: "reply"`、`action: "faq_answer"`，選擇規則與其他候選相同（session、resolution、5 分鐘、防重播）。
+- 安裝：見 [AI_FAQ_RAG.md](../docs/AI_FAQ_RAG.md) 第 3 節。執行時需要：
+  - 索引（`embeddings.bin`、`metadata.json`、`model_info.json`，約 19 MB）放在 `%LOCALAPPDATA%\TownPassAssistant\faq_rag`，或以 `TOWNPASS_FAQ_DIR` 指定；
+  - embedding 伺服器：`llama-server -m multilingual-e5-small-q8_0.gguf --embedding --pooling mean --port 8774`，
+    或以 `TOWNPASS_FAQ_EMBED_URL` 指定位址。有 numpy 時用 numpy 計分，沒有時以純 Python 計分（手機）。
+- 沒有索引時啟動訊息顯示 `faq=off` 及原因；索引在但伺服器沒開時顯示 `faq=8121` 並提示伺服器未就緒，查詢一律視為沒找到。
+  兩種情況助理都照常運作。`/health` 的 `faq_entries` 為載入筆數（0 表示關閉）。
+- 手機端：`OnDeviceAssistant.kt` 在 :8774 另開一個 embedding 模式的 llama-server（2 執行緒），模型與索引由
+  `portal_assistant/scripts/push_assistant_models.ps1` 推送；沒推送就沒有 FAQ 層。決策紀錄見 [AI_FAQ_RAG.md](../docs/AI_FAQ_RAG.md)。
+- **問答來源**（2026-11-25，規則第 11 節）：市府 FAQ、台北通常見問答與之後的來源都登記在
+  [`qa_sources.json`](../app/assets/assistant/qa_sources.json)（[qa_sources.py](qa_sources.py) 讀；[qna.py](qna.py) 載入執行時下載與小型檔案的來源並和市府 FAQ 合併）。
+  答案的「資料來源」附註、範圍句、「開啟頁面」選項由來源決定；項目有 `published_at` 時答案下多一行「資料日期：YYYY-MM-DD」。
+  新增來源：skill [`townpass-add-qa`](../skills/townpass-add-qa/SKILL.md)，檢查 `python -X utf8 portal_assistant/scripts/check_qa_source.py --all`。
+
+完整新增能力、未串接範圍與裝置測試見 [全功能實作紀錄](../docs/AI_EXPANSION_IMPLEMENTATION.md)。
+
+要改為區網實機連線時，需指定 `--host` 並透過環境變數提供至少 24 字的 `TOWNPASS_ASSISTANT_TOKEN`，
+App 以 `ASSISTANT_TOKEN` 帶入。這僅為開發配對，正式環境仍需 HTTPS、完整認證、流量限制與部署服務。
+目前建議使用 USB／adb reverse，保持後端與 Ollama 只監聽本機。
+
+## 驗證
+
+```powershell
+python -m unittest discover -s portal_assistant/backend -v
+fvm flutter test
+(cd portal_assistant/app && fvm flutter test)   # the assistant package's own tests
+fvm flutter analyze
+fvm flutter build apk --debug
+```
+
+`evaluate.py` 是 contract 3 的 live-model 評估：後端啟動後執行 `python portal_assistant/backend/evaluate.py`（`--set dev|holdout|all`）。
+dev 集（`evaluate.CASES`）開發時調過，held-out 集（[eval_holdout.py](eval_holdout.py)）不得拿來調整，後者才是誠實估計。
+每輪分成 correct、safe_miss（沒開頁）、less_specific（對的服務、較上層的頁）、wrong_service、unexpected_navigation，並由回覆 metrics 的 `route`／`candidates` 分開報檢索召回與決策正確率。退出碼只看 dev 集。
+它透過 HTTP 呼叫本機 Ministral，檢查回覆 kind、目的地與候選生命週期（選擇、取消、換題、跨 session 與重播），
+輸出被 Git 忽略的 `evaluation.json`；不經過 App，不導航、不預約。
+`--list` 只列案例，`--only <category>` 只跑指定類別；全部通過退出碼 0，有失敗為 1，後端或目錄不符為 2。
+2026-11-07：dev 184/184；held-out 95/102（開錯服務 0、不該開頁卻開 0；兩輪新寫說法通過 9/19、7/13）。原先 10 個失敗是「目錄內未串接的功能」（如掛號）
+被模型回成補問；已改為單一精確命中且停用時，程式直接回目錄內的原因、不呼叫模型。預期沒有放寬。
+語料是開發回歸集，包含省略「書」的未知對象、非書籍借用與歧義案例，
+會用於修正檢索與提示，不能冒充獨立保留集正確率。`test_evaluate.py` 只離線檢查案例集與判定邏輯。
+完整交付狀態及限制見 [實作紀錄](../docs/AI_PHASE1_IMPLEMENTATION.md)。

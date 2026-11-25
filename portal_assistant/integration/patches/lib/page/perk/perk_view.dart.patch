@@ -1,0 +1,41 @@
+diff --git a/lib/page/perk/perk_view.dart b/lib/page/perk/perk_view.dart
+index 2de4869..dacde73 100644
+--- a/lib/page/perk/perk_view.dart
++++ b/lib/page/perk/perk_view.dart
+@@ -5,10 +5,14 @@ import 'package:town_pass/gen/assets.gen.dart';
+ import 'package:town_pass/util/tp_app_bar.dart';
+ import 'package:town_pass/util/tp_route.dart';
+ import 'package:town_pass/util/tp_web_view.dart';
++import 'package:townpass_portal_assistant/townpass_portal_assistant.dart';
+ 
+ class PerkView extends StatelessWidget {
+   const PerkView({super.key});
+ 
++  /// This page's tab on the App's first page (TPBottomNavigationFactory).
++  static const tabIndex = 2;
++
+   @override
+   Widget build(BuildContext context) {
+     return Scaffold(
+@@ -34,12 +38,20 @@ class PerkView extends StatelessWidget {
+           ),
+         ],
+       ),
+-      body: TPInAppWebView(
++      // Portal assistant: lets the guided assistant read this tab's page (read only).
++      body: AssistantTabWebPage(
++        tabIndex: tabIndex,
++        builder: (page) => TPInAppWebView(
++        key: page.viewKey,
+         onWebViewCreated: (controller) {
++          page.controller = controller;
+           controller.loadUrl(
+             urlRequest: URLRequest(url: WebUri('https://taipei-pass-service.vercel.app/coupon/')),
+           );
+         },
++        onLoadStop: (_, url) => page.track(url),
++        onUpdateVisitedHistory: (_, url, _) => page.track(url),
++      ),
+       ),
+     );
+   }

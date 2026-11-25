@@ -1,0 +1,9 @@
+{
+ "meta": {
+  "name": "new_qa_holdout",
+  "sealed": "2026-11-25",
+  "usage": "Held-out questions for the Q&A sources added after 2026-11-25 (portal_assistant/docs/NEW_QA_HOLDOUT.md, rules section 11). Written by an independent writer who has not seen the rules, the dev questions or the source's items; sealed with portal_assistant/scripts/seal_holdout.py --set qa. REPORT ONLY: never read, print or tune on these questions (eval_faq_relevance.py --cases prints totals only). Same item format as eval_faq_relevance.json plus expected_source.",
+  "fields": ["id", "language", "question", "keywords", "answer_topic", "expected_source"]
+ },
+ "items": []
+}

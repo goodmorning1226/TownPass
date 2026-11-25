@@ -68,8 +68,16 @@
 | `lib/util/` | 共用 UI、路由、WebView、跨功能工具與訊息橋接。 |
 | `lib/gen/` | FlutterGen 自動產生的資源介面，不手改輸出。 |
 | `assets/`、`fonts/` | 資源與目前明確標示的 mock 資料。 |
+| `portal_assistant/` | 微服務入口整合助理（本 fork 新增）：Flutter 套件 `app/`（`townpass_portal_assistant`，path 相依）、Python 後端 `backend/`、原生 `native/`、`scripts/`、`tools/`、`docs/`（助理規則 `docs/AI_CURRENT_RULES.md`）、串接文件 `INTEGRATION.md` 與 `integration/`。 |
 
 - 沿用 GetX 的 state、route、service injection 與現有 controller 生命週期。
+- 助理（`portal_assistant/`，團隊規則，2026-11-24）：套件不 import `package:town_pass/...`；需要台北通的地方走主機介面
+  `PortalAssistantHost`，台北通的實作在 `lib/util/town_pass_assistant_host.dart`。官方檔案只放幾行掛點，
+  邏輯放在套件；改了官方檔案要重產 `portal_assistant/integration/`（`make_patches.py`）並更新
+  `portal_assistant/INTEGRATION.md` 與 `portal_assistant/docs/HOST_CHANGES.md`。助理行為規則以
+  `portal_assistant/docs/AI_CURRENT_RULES.md` 為準（第 9 節是結構規則）。
+  根目錄 `README.md` 由 `portal_assistant/README.md` 產生（黑客松範本，擁有者 2026-11-24 決定首頁直接放這份）：
+  只改 `portal_assistant/README.md`，再跑 `python -X utf8 portal_assistant/scripts/sync_root_readme.py`（`--check` 檢查是否同步）。
   新頁面依現有 `TPRoute`／`GetPage`／bindings 模式註冊。
 - 未在任務範圍明確要求時，不換成 Riverpod、Bloc、另一套路由或整套新的分層架構；
   不大量搬移／重新命名官方目錄。確有必要時先記錄決策、相容影響及遷移步驟。
@@ -124,6 +132,7 @@ fvm flutter --version
 fvm flutter pub get
 fvm flutter analyze
 fvm flutter test
+(cd portal_assistant/app && fvm flutter test)   # 助理套件自己的測試
 fvm flutter build apk --debug
 fvm flutter devices
 # 選擇本次實際列出的 Android 裝置 ID，不照抄過期 ID。

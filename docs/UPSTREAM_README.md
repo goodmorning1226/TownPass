@@ -12,9 +12,9 @@ Open source is a key driver of technological progress and social development. Th
 # Getting Started
 
 For this fork's on-device AI assistant, start with [ASSISTANT_README.md](../ASSISTANT_README.md)
-(what it does, architecture, how to run it on a phone), then [team setup](TEAM_LOCAL_SETUP.md),
-[current progress and feature files](AI_ASSISTANT_PROGRESS.md), and
-[agent handoff](AI_AGENT_HANDOFF.md). Read [AGENTS.md](../AGENTS.md) before changing code.
+(what it does, architecture, how to run it on a phone), then [team setup](../portal_assistant/docs/TEAM_LOCAL_SETUP.md),
+[current progress and feature files](../portal_assistant/docs/AI_ASSISTANT_PROGRESS.md), and
+[agent handoff](../portal_assistant/docs/AI_AGENT_HANDOFF.md). Read [AGENTS.md](../AGENTS.md) before changing code.
 These additions describe this fork; the upstream introduction and guides remain below.
 
 We highly recommend to read through our [document](https://tpe-guideline.web.app/en/docs/) for more detail.
@@ -28,7 +28,7 @@ Here are some quick setup guide.
 - [XCode](https://developer.apple.com/xcode/) (for iOS; not yet verified in this fork)
 - For the local AI assistant: Python 3.11+ and [Ollama](https://ollama.com/) with `ministral-3:3b`; voice input additionally needs `faster-whisper` (see the setup guide)
 
-Full step-by-step setup, including the emulator and voice, is in [docs/TEAM_LOCAL_SETUP.md](TEAM_LOCAL_SETUP.md).
+Full step-by-step setup, including the emulator and voice, is in [portal_assistant/docs/TEAM_LOCAL_SETUP.md](../portal_assistant/docs/TEAM_LOCAL_SETUP.md).
 
 ## Build the Project
 
@@ -52,7 +52,7 @@ Run from the repository root.
    ``` bash
    fvm flutter analyze
    fvm flutter test
-   python -m unittest discover -s assistant_backend -p 'test*.py'
+   python -m unittest discover -s portal_assistant/backend -p 'test*.py'
    fvm flutter build apk --debug
    ```
 

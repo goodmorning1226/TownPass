@@ -1,0 +1,3 @@
+# Flutter package build output
+.dart_tool/
+build/
