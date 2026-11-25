@@ -1,5 +1,5 @@
 import 'package:get/get.dart';
-import 'package:town_pass/service/page_translation.dart';
+import 'package:townpass_portal_assistant/townpass_portal_assistant.dart';
 
 /// Page language (PageTranslation): the App's pages are shown in the chosen
 /// language; the assistant's navigation in another language also switches it.

@@ -5,24 +5,25 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:town_pass/service/assistant_speech_language.dart';
-import 'package:town_pass/service/page_translation.dart';
+import 'package:townpass_portal_assistant/service/assistant_speech_language.dart';
+import 'package:townpass_portal_assistant/service/page_translation.dart';
 import 'package:town_pass/util/tp_text.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:get/get.dart';
 import 'package:town_pass/util/tp_route.dart';
 import 'package:town_pass/util/tp_web_view.dart';
-import 'package:town_pass/bean/assistant_result.dart';
-import 'package:town_pass/page/assistant/assistant_texts.dart';
-import 'package:town_pass/page/assistant/assistant_view_controller.dart';
-import 'package:town_pass/page/assistant/widget/assistant_host.dart';
-import 'package:town_pass/service/assistant_action_executor.dart';
-import 'package:town_pass/service/assistant_page_tracker.dart';
-import 'package:town_pass/service/assistant_recent_inputs.dart';
-import 'package:town_pass/service/assistant_recorder.dart';
-import 'package:town_pass/service/assistant_speaker.dart';
-import 'package:town_pass/service/assistant_service.dart';
-import 'package:town_pass/service/assistant_system_speech.dart';
+import 'package:townpass_portal_assistant/bean/assistant_result.dart';
+import 'package:townpass_portal_assistant/page/assistant/assistant_texts.dart';
+import 'package:townpass_portal_assistant/page/assistant/assistant_view_controller.dart';
+import 'package:townpass_portal_assistant/page/assistant/widget/assistant_host.dart';
+import 'package:townpass_portal_assistant/service/assistant_action_executor.dart';
+import 'package:townpass_portal_assistant/service/assistant_page_tracker.dart';
+import 'package:townpass_portal_assistant/service/assistant_recent_inputs.dart';
+import 'package:townpass_portal_assistant/service/assistant_recorder.dart';
+import 'package:townpass_portal_assistant/service/assistant_speaker.dart';
+import 'package:townpass_portal_assistant/service/assistant_service.dart';
+import 'package:townpass_portal_assistant/service/assistant_system_speech.dart';
+import 'package:townpass_portal_assistant/host/assistant_web_view.dart';
 
 class PendingService extends AssistantService {
   final response = Completer<AssistantResult>();
@@ -412,7 +413,7 @@ void main() {
         'book_id': 'lib-book-3',
       }, (_) {});
       await tester.pumpAndSettle();
-      expect(argument!.assistantNavigation, [
+      expect(argument!.assistant!.navigation, [
         'https://taipei-pass-service.vercel.app/library-service/',
         'https://taipei-pass-service.vercel.app/library-service/book-detail/lib-book-3',
       ]);
@@ -1136,7 +1137,7 @@ void main() {
   test(
     '台語 is an explicit choice: kept, sent, and answered in Chinese',
     () async {
-      // docs/AI_TAIWANESE_SPEECH_PLAN.md section 10.
+      // portal_assistant/docs/AI_TAIWANESE_SPEECH_PLAN.md section 10.
       expect(AssistantSpeechLanguage.systemDefault('nan'), 'auto');
       expect(AssistantSpeechLanguage.of('nan').label, '台語（測試）');
       expect(AssistantSpeechLanguage.textLanguage('nan'), 'zh');
@@ -1719,10 +1720,10 @@ void main() {
   });
 
   test('A service page reloads only when it holds no Chinese to translate', () {
-    expect(TPWebView.reloadsFor('zh', 'en'), isFalse); // translated in place
-    expect(TPWebView.reloadsFor('en', 'zh'), isTrue); // original restored
-    expect(TPWebView.reloadsFor('en', 'ja'), isTrue); // English -> Japanese
-    expect(TPWebView.reloadsFor('ja', 'ja'), isFalse);
+    expect(AssistantWebSession.reloadsFor('zh', 'en'), isFalse); // translated in place
+    expect(AssistantWebSession.reloadsFor('en', 'zh'), isTrue); // original restored
+    expect(AssistantWebSession.reloadsFor('en', 'ja'), isTrue); // English -> Japanese
+    expect(AssistantWebSession.reloadsFor('ja', 'ja'), isFalse);
   });
 
   test('Requests that opened a page come first in the suggestions', () async {
@@ -1761,7 +1762,7 @@ void main() {
 
   test('Suggestions lead only to enabled catalog capabilities', () {
     final catalog = jsonDecode(
-      File('assets/assistant/capabilities.json').readAsStringSync(),
+      File('portal_assistant/app/assets/assistant/capabilities.json').readAsStringSync(),
     ) as Map<String, dynamic>;
     final enabled = {
       for (final entry in catalog['capabilities'] as List)

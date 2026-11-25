@@ -1,8 +1,4 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
-import 'package:town_pass/service/page_translation.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:town_pass/gen/assets.gen.dart';
@@ -14,39 +10,9 @@ import 'package:town_pass/service/package_service.dart';
 import 'package:town_pass/service/shared_preferences_service.dart';
 import 'package:town_pass/service/subscription_service.dart';
 import 'package:town_pass/util/tp_colors.dart';
-import 'package:town_pass/util/tp_data_licenses.dart';
 import 'package:town_pass/util/tp_route.dart';
-import 'package:town_pass/page/assistant/assistant_view_controller.dart';
-import 'package:town_pass/page/assistant/widget/assistant_host.dart';
-import 'package:town_pass/page/guided_assistant/guided_assistant_controller.dart';
-import 'package:town_pass/page/guided_assistant/model/guide_i18n.dart';
-import 'package:town_pass/service/assistant_model_download.dart';
-import 'package:town_pass/service/assistant_on_device.dart';
-import 'package:town_pass/service/assistant_readiness.dart';
-import 'package:town_pass/service/assistant_recorder.dart';
-import 'package:town_pass/service/assistant_service.dart';
-import 'package:town_pass/page/guided_assistant/web/web_page_state.dart';
-import 'package:town_pass/page/guided_assistant/widget/guided_assistant_host.dart';
-
-const assistantEnabled = bool.fromEnvironment(
-  'ASSISTANT_ENABLED',
-  defaultValue: kDebugMode,
-);
-
-/// The guided assistant is the default (owner, 2026-11-08): step-by-step guides
-/// on the real service pages; it asks the model for service requests and falls
-/// back to the pre-written rules when the backend cannot be reached.
-/// `--dart-define=ASSISTANT_GUIDED=false` brings back the chat-only assistant
-/// (docs/TEAM_TASKS_AFTER_MERGE.md T3-T5 list what it still lacks there).
-/// `--dart-define=ASSISTANT_OFFLINE=true` makes the guided assistant never
-/// call the backend.
-const assistantGuided = bool.fromEnvironment(
-  'ASSISTANT_GUIDED',
-  defaultValue: true,
-);
-const assistantOffline = bool.fromEnvironment('ASSISTANT_OFFLINE');
-const _useMock = assistantEnabled && assistantGuided;
-const _useModel = assistantEnabled && !assistantGuided;
+import 'package:town_pass/util/town_pass_assistant_host.dart';
+import 'package:townpass_portal_assistant/townpass_portal_assistant.dart';
 
 const _transparentStatusBar = SystemUiOverlayStyle(
   statusBarColor: Colors.transparent,
@@ -59,7 +25,6 @@ void main() async {
   // );
 
   await initServices();
-  if (assistantEnabled) TPDataLicenses.register();
 
   SystemChrome.setSystemUIOverlayStyle(_transparentStatusBar);
 
@@ -70,55 +35,13 @@ Future<void> initServices() async {
   await Get.putAsync<AccountService>(() async => await AccountService().init());
   await Get.putAsync<DeviceService>(() async => await DeviceService().init());
   await Get.putAsync<PackageService>(() async => await PackageService().init());
-  await Get.putAsync<SharedPreferencesService>(
-    () async => await SharedPreferencesService().init(),
-  );
-  await Get.putAsync<GeoLocatorService>(
-    () async => await GeoLocatorService().init(),
-  );
-  await Get.putAsync<NotificationService>(
-    () async => await NotificationService().init(),
-  );
+  await Get.putAsync<SharedPreferencesService>(() async => await SharedPreferencesService().init());
+  await Get.putAsync<GeoLocatorService>(() async => await GeoLocatorService().init());
+  await Get.putAsync<NotificationService>(() async => await NotificationService().init());
 
   Get.put<SubscriptionService>(SubscriptionService());
-  // Pages keep the language of the last assistant navigation (or Settings).
-  await PageTranslation.instance.load();
-  // The guided assistant's pre-translated texts (assets/i18n/guide/).
-  if (_useMock) await GuideI18n.load();
-  // iOS builds with ASSISTANT_ON_DEVICE=true run the backend and models on the
-  // phone (docs/AI_ON_DEVICE_IOS.md); not awaited: the models load behind it.
-  if (assistantEnabled && !assistantOffline) {
-    unawaited(AssistantOnDevice.start());
-    // On-device builds (Android and iPhone) download their models in the App
-    // when the user agrees (docs/AI_MODEL_DOWNLOAD.md).
-    if (AssistantOnDevice.requested) {
-      Get.put<AssistantModelDownload>(
-        AssistantModelDownload(),
-        permanent: true,
-      );
-      // The models load for up to a minute after launch: the waiting line says
-      // so until they answer (AssistantReadiness).
-      AssistantReadiness.watch(AssistantService());
-    }
-  }
-  if (_useMock) {
-    Get.put<WebPageState>(WebPageState(), permanent: true);
-    Get.put<GuidedAssistantController>(
-      assistantOffline
-          ? GuidedAssistantController()
-          : GuidedAssistantController(
-              service: AssistantService(),
-              recorder: AssistantRecorder(),
-            ),
-      permanent: true,
-    );
-  }
-  if (_useModel) {
-    Get.put<AssistantViewController>(
-      AssistantViewController(),
-      permanent: true,
-    );
-  }
+  // Portal assistant (portal_assistant/INTEGRATION.md): page language, models, guides.
+  await PortalAssistant.init(const TownPassAssistantHost());
 }
 
 class MyApp extends StatelessWidget {
@@ -154,40 +77,10 @@ class MyApp extends StatelessWidget {
         NotificationService.requestPermission();
       },
       getPages: TPRoute.page,
-      navigatorObservers: [
-        if (_useModel)
-          AssistantNavigationObserver(Get.find<AssistantViewController>()),
-        if (_useMock)
-          GuidedNavigationObserver(Get.find<GuidedAssistantController>()),
-      ],
-      routingCallback: (routing) {
-        if (_useModel && Get.isRegistered<AssistantViewController>()) {
-          Get.find<AssistantViewController>().routeChanged(
-            routing?.current ?? '',
-          );
-        }
-        if (_useMock && Get.isRegistered<GuidedAssistantController>()) {
-          Get.find<GuidedAssistantController>().routeChanged(
-            routing?.current ?? '',
-          );
-        }
-      },
-      builder: (context, child) {
-        final page = child ?? const SizedBox.shrink();
-        if (_useMock) {
-          return GuidedAssistantHost(
-            controller: Get.find<GuidedAssistantController>(),
-            child: page,
-          );
-        }
-        if (_useModel) {
-          return AssistantHost(
-            controller: Get.find<AssistantViewController>(),
-            child: page,
-          );
-        }
-        return page;
-      },
+      // Portal assistant: follows the routes and draws above every page.
+      navigatorObservers: PortalAssistant.navigatorObservers,
+      routingCallback: PortalAssistant.routingCallback,
+      builder: PortalAssistant.builder,
     );
   }
 }

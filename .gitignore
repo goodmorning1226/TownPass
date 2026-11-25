@@ -45,6 +45,9 @@ migrate_working_dir/
 # Gradle build output for the Android project (reports, intermediates)
 **/android/build/
 
+# Local build settings for --dart-define-from-file=.env (copy .env.example); never commit.
+/.env
+
 # iOS/XCode related
 **/ios/**/*.mode1v3
 **/ios/**/*.mode2v3
@@ -94,14 +97,7 @@ app.*.map.json
 # FVM Version Cache
 .fvm/
 
-# Generated local assistant evaluation output
-/assistant_backend/evaluation.json
-
-# On-device assistant native build output (scripts/build_assistant_native.ps1)
+# Portal assistant: on-device native build output in the App's Android project
+# (portal_assistant/native/android/build_assistant_native.ps1); the rest is in
+# portal_assistant/.gitignore.
 **/android/app/assistant-native/
-
-# Former FAQ RAG assets (bge ONNX, ~117 MB). The e5 GGUF and index live outside the repo, see docs/AI_FAQ_RAG.md
-/rag_handoff/assets/
-
-# Guide audit harness (tool/guide_audit, npm install there)
-/tool/guide_audit/node_modules/

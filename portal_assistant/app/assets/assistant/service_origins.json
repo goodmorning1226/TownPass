@@ -1,0 +1,11 @@
+{
+ "version": 1,
+ "_comment": "The service origins (https://host, no path) the assistant may open, track, translate and guide on (portal_assistant/docs/AI_CURRENT_RULES.md section 9, 2026-11-24). Read by the App (AssistantServiceOrigins: page tracker, action executor, page translation, the translation handler's allowed origins), the backend (qna/library mock data), the pre-translation script and tools/guide_audit. A capability's web navigation opens on its own 'origin' (navigation.origin) or else on 'default'; an origin not listed here never opens (portal_assistant/scripts/check_service.py and the tests fail). Pages report only their path to the backend, so two origins must not share a path.",
+ "default": "https://taipei-pass-service.vercel.app",
+ "origins": [
+  {
+   "origin": "https://taipei-pass-service.vercel.app",
+   "name": "TownPass-Services demo site (taipei-doit/TownPass-Services)"
+  }
+ ]
+}

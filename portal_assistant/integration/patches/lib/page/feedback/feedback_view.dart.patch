@@ -1,0 +1,76 @@
+diff --git a/lib/page/feedback/feedback_view.dart b/lib/page/feedback/feedback_view.dart
+index 6a0e71c..840563d 100644
+--- a/lib/page/feedback/feedback_view.dart
++++ b/lib/page/feedback/feedback_view.dart
+@@ -9,6 +9,7 @@ import 'package:town_pass/util/tp_button.dart';
+ import 'package:town_pass/util/tp_colors.dart';
+ import 'package:town_pass/util/tp_line.dart';
+ import 'package:town_pass/util/tp_text.dart';
++import 'package:townpass_portal_assistant/townpass_portal_assistant.dart';
+ import 'package:url_launcher/url_launcher_string.dart';
+ 
+ class FeedbackView extends GetView<FeedbackViewController> {
+@@ -116,13 +117,14 @@ class FeedbackView extends GetView<FeedbackViewController> {
+                     const SizedBox(height: 13),
+                     SizedBox(
+                       height: 223,
+-                      child: TextField(
++                      // Obx (portal assistant): the hint follows the page language.
++                      child: Obx(() => TextField(
+                         controller: controller.controller,
+                         decoration: InputDecoration(
+                           enabledBorder: const OutlineInputBorder(borderSide: BorderSide(color: TPColors.grayscale500)),
+                           focusedBorder: const OutlineInputBorder(borderSide: BorderSide(color: TPColors.grayscale500)),
+                           hintStyle: TPTextStyles.bodyRegular.copyWith(color: TPColors.grayscale400),
+-                          hintText: '請描述建議與問題',
++                          hintText: PageTranslation.instance.label('請描述建議與問題'),
+                           contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                         ),
+                         onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
+@@ -130,7 +132,7 @@ class FeedbackView extends GetView<FeedbackViewController> {
+                         expands: true,
+                         keyboardType: TextInputType.multiline,
+                         maxLines: null,
+-                      ),
++                      )),
+                     ),
+                     const SizedBox(height: 13),
+                     Row(
+@@ -139,22 +141,23 @@ class FeedbackView extends GetView<FeedbackViewController> {
+                         Assets.svg.iconInfo.svg(height: 24, width: 24),
+                         const SizedBox(width: 8),
+                         Flexible(
+-                          child: RichText(
++                          // Obx (portal assistant): the spans follow the page language.
++                          child: Obx(() => RichText(
+                             text: TextSpan(
+-                              text: '若您對市政府有任何建議或問題請至',
++                              text: PageTranslation.instance.label('若您對市政府有任何建議或問題請至'),
+                               style: const TextStyle(color: TPColors.grayscale700),
+                               children: [
+                                 TextSpan(
+-                                  text: '有話要說',
++                                  text: PageTranslation.instance.label('有話要說'),
+                                   style: const TextStyle(
+                                     decoration: TextDecoration.underline,
+                                     color: TPColors.primary500,
+                                   ),
+                                   recognizer: TapGestureRecognizer()..onTap = () {},
+                                 ),
+-                                const TextSpan(text: '，若系統操作上有任何問題請'),
++                                TextSpan(text: PageTranslation.instance.label('，若系統操作上有任何問題請')),
+                                 TextSpan(
+-                                  text: '打客服電話 ${controller.contactPhoneNumber}',
++                                  text: PageTranslation.instance.label('打客服電話 ${controller.contactPhoneNumber}'),
+                                   style: const TextStyle(
+                                     decoration: TextDecoration.underline,
+                                     color: TPColors.primary500,
+@@ -166,7 +169,7 @@ class FeedbackView extends GetView<FeedbackViewController> {
+                                 ),
+                               ],
+                             ),
+-                          ),
++                          )),
+                         ),
+                       ],
+                     ),

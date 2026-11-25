@@ -1,0 +1,24 @@
+diff --git a/lib/page/home/widget/subscription/subscription_widget.dart b/lib/page/home/widget/subscription/subscription_widget.dart
+index b0c5168..46eb956 100644
+--- a/lib/page/home/widget/subscription/subscription_widget.dart
++++ b/lib/page/home/widget/subscription/subscription_widget.dart
+@@ -101,7 +101,9 @@ class SubscriptionWidget extends StatelessWidget {
+                   children: [
+                     Assets.svg.illustrationsBookingS.svg(width: 54, height: 46),
+                     const SizedBox(width: 16),
+-                    Column(
++                    // Expanded (portal assistant): longer translated text wraps
++                    // instead of overflowing the row (PageTranslation).
++                    Expanded(child: Column(
+                       crossAxisAlignment: CrossAxisAlignment.start,
+                       children: [
+                         const TPText(
+@@ -130,7 +132,7 @@ class SubscriptionWidget extends StatelessWidget {
+                           },
+                         ),
+                       ],
+-                    ),
++                    )),
+                   ],
+                 ),
+               ),

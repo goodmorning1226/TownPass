@@ -21,7 +21,7 @@ import flutter_local_notifications
     }
 
     GeneratedPluginRegistrant.register(with: engineBridge.pluginRegistry)
-    // On-device assistant (opt-in build, docs/AI_ON_DEVICE_IOS.md): started by Dart.
+    // On-device assistant (opt-in build, portal_assistant/docs/AI_ON_DEVICE_IOS.md): started by Dart.
     if let registrar = engineBridge.pluginRegistry.registrar(forPlugin: "OnDeviceAssistant") {
       OnDeviceAssistant.shared.register(with: registrar.messenger())
     }

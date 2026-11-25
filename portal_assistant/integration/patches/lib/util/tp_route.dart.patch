@@ -1,0 +1,21 @@
+diff --git a/lib/util/tp_route.dart b/lib/util/tp_route.dart
+index 264aba6..e4679be 100644
+--- a/lib/util/tp_route.dart
++++ b/lib/util/tp_route.dart
+@@ -34,6 +34,7 @@ import 'package:town_pass/page/subscription/subscription_view.dart';
+ import 'package:town_pass/page/suspend_account/suspend_account_controller.dart';
+ import 'package:town_pass/page/suspend_account/suspend_account_view.dart';
+ import 'package:town_pass/util/tp_web_view.dart';
++import 'package:townpass_portal_assistant/townpass_portal_assistant.dart';
+ 
+ abstract class TPRoute {
+   static const String main = '/';
+@@ -185,6 +186,8 @@ abstract class TPRoute {
+       name: activityDetail,
+       page: () => const ActivityDetailView(),
+     ),
++    // Portal assistant: AI 助理設定.
++    ...PortalAssistant.pages,
+   ];
+ 
+   static Future openUri({required String uri, String? forceTitle}) async {

@@ -11,7 +11,7 @@ class MainActivity: FlutterActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // On-device assistant builds include OnDeviceAssistant (src/ondevice); other
+        // On-device assistant builds include OnDeviceAssistant (portal_assistant/native/android); other
         // builds do not have the class and this does nothing.
         try {
             Class.forName("com.example.townpass.OnDeviceAssistant")
@@ -27,7 +27,7 @@ class MainActivity: FlutterActivity() {
         // App is built with ASSISTANT_SPEECH=system).
         systemSpeech = SystemSpeech(this, flutterEngine.dartExecutor.binaryMessenger)
         // On-device builds: the "status" channel the App asks after coming back from the
-        // background (lib/service/assistant_on_device.dart OnDeviceResume).
+        // background (portal_assistant/app/lib/service/assistant_on_device.dart OnDeviceResume).
         try {
             Class.forName("com.example.townpass.OnDeviceAssistant")
                 .getMethod("register", BinaryMessenger::class.java)

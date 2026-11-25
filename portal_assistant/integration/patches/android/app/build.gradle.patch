@@ -1,0 +1,12 @@
+diff --git a/android/app/build.gradle b/android/app/build.gradle
+index c7f6b01..e2c6a26 100644
+--- a/android/app/build.gradle
++++ b/android/app/build.gradle
+@@ -70,3 +70,7 @@ flutter {
+ dependencies {
+     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.5'
+ }
++
++// Portal assistant: the phone speech recogniser and the opt-in on-device build
++// (portal_assistant/INTEGRATION.md).
++apply from: "../../portal_assistant/native/android/assistant.gradle"

@@ -371,7 +371,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "/bin/bash \"$PROJECT_DIR/scripts/embed_on_device_assistant.sh\"\n";
+			shellScript = "/bin/bash \"$PROJECT_DIR/../portal_assistant/native/ios/embed_on_device_assistant.sh\"\n";
 		};
 		D228745C15620308D779F1D2 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
