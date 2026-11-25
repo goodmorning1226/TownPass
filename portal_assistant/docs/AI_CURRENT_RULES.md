@@ -1,4 +1,4 @@
-# 助理現行規則（2026-11-16；第 9 節結構規則 2026-11-24；第 10 節新增服務 2026-11-24）
+# 助理現行規則（2026-11-16；第 9 節結構規則 2026-11-24；第 10 節新增服務 2026-11-24；第 11 節問答來源 2026-11-25）
 
 這份是助理行為的**唯一準則**。其他文件裡和這裡衝突的舊規則（例如「一律候選確認」「語音要問『是這句嗎？』」「語言選單是偏好、偵測不確定就用選單語言」）都以這裡為準。
 規則改了就改這份，再改程式與測試。每條後面是做這件事的程式位置。
@@ -136,7 +136,7 @@
 ## 3. 找不到時的順序
 
 緊急 → 取消／換頁／第幾個（含讀音） → 指名但沒有頁面的區公所／戶政（2026-11-13，第 2 節） → 關鍵字檢索 → 模型決策 → 讀音比對 → 語意檢索（含口語例句，`capability_examples.json`）
-→ 問模型意圖（列出功能、打招呼、市政問題、請補充） → FAQ（市府 8,121 筆＋台北通常見問答；外語先翻中文再查） → 沒找到（下面的三層）。
+→ 問模型意圖（列出功能、打招呼、市政問題、請補充） → FAQ（市府 8,121 筆＋台北通常見問答，來源登記在 `qa_sources.json`，第 11 節；外語先翻中文再查） → 沒找到（下面的三層）。
 只對到未串接的功能時，FAQ 排在「尚未串接」之前（第 2 節）。
 
 **圖書決策沒有結論就接著找、否定、借錢**（2026-11-16，研究 A0；原因：句子只要有「找／看／借」就先進圖書決策，沒有結論時不做語意檢索，
@@ -878,3 +878,61 @@ App 上看起來重複，也很難找到想要的；研究第 D 節）：
    由撰寫者跑 `python -X utf8 portal_assistant/scripts/seal_holdout.py --writer "..."` 封存（雜湊記在 `backend/data/new_services_holdout_seal.json`）。
    **只用來報告**：實作的 agent 不讀句子、不拿來調；句子被拿去調整就作廢重寫。`check_service.py` 只數筆數、驗雜湊。流程在 `portal_assistant/docs/NEW_SERVICE_HOLDOUT.md`。
    關卡：既有的評估集沒有新的開錯頁；新服務的開發句開錯為 0；緊急案例照舊回專線。
+7. **新服務有自己的問答**（2026-11-25）：服務頁之外的問答（服務網站的 FAQ、團隊寫的說明）不是加進 `capabilities.json`，而是第 11 節的問答來源，照 skill `townpass-add-qa` 做。
+
+## 11. 問答來源（2026-11-25，第三階段）
+
+原因：第二個問答來源（台北通常見問答）的網址、ID 前綴、來源說明、更新間隔與上限都寫死在 `portal_assistant/backend/qna.py`，
+答案的附註寫死在 `workflow.py`，要加第三個來源只能改程式，也沒有地方記授權與資料日期；沒有可重複的做法（擁有者 2026-11-25 核准的第三階段規劃）。
+操作手冊是 skill `portal_assistant/skills/townpass-add-qa/SKILL.md`（說明書 `portal_assistant/docs/QA_SKILL_GUIDE.md`）。
+
+1. **來源登記表** `portal_assistant/app/assets/assistant/qa_sources.json`：後端（`qa_sources.py`；`faq.py`、`qna.py`、`workflow.py` 都從這裡讀）、App 的授權頁、
+   `check_qa_source.py` 都讀這一份（和 `service_origins.json` 一樣放在助理的資源資料夾，手機打包在後端旁邊）。每個來源：
+   - `id`、`id_prefix`（市府 FAQ 的數字 id 沒有前綴，**只有它可以空**；其他來源的前綴不能重複、也不能是另一個的開頭，例如 `qna:`）；
+   - `kind`：`bundled-index`（事先用 e5 建好的索引，和模型一起下載，`models.json` 記 SHA-256；`index_dir`、`models`、`build`）、
+     `runtime-fetch`（執行時下載：`origin`＋`path`，`origin` 是 `default` 或 `service_origins.json` 裡的網域，**不寫死主機**；在記憶體與 repo 外的快取）、
+     `bundled-file`（2026-11-25 新增：小型、可以放進 repo 的問答檔，和登記表放在同一個資料夾，啟動時在背景編碼；原因：團隊自己寫的少量問答放 HF 要上傳、放網站要另外部署，都不必要）。
+     `bundled-index` 目前只有市府 FAQ；第二個要改程式（`faq.load_default` 只載一個索引），先問擁有者。
+   - `parser`：`city-faq`（索引的 metadata 列）、`townpass-qna`（qna_list.json）、`generic`（`{"items": [{id, question, answer, department, category, published_at}]}`）；
+   - 6 種語言的 `names`（名稱）、`source_note`（答案下的「資料來源」，可以有 `{department}`）、`answer_note`（接在後面的一句）；中文沿用原本的字（「資料來源：{機關}。本服務僅涵蓋臺北市政府 FAQ。」
+     「資料來源：台北通常見問答。更多說明可開啟 App 的「常見問答」頁面。」），**外語是 AI 草稿**，要母語者審；
+   - `open_capability`（答案下多一個開那一頁的選項，例如 `qna`）、`license`（下一點）、更新與重試間隔、上限（大小、題數、題目與答案長度）、關掉的環境變數。
+   「你是不是想問」的範圍句由來源組成：只有市府 FAQ 時「本服務僅涵蓋臺北市政府 FAQ。」，有其他來源時「本服務涵蓋臺北市政府 FAQ 與台北通常見問答。」（`texts`）。
+   **行為不變**：兩個既有來源搬進登記表，檢索、合併、去重、同分時來源的順序（問答來源在前、照登記表順序）、背景載入、逾時、contract 3、回覆種類與 action 都和以前一樣
+   （改前、改後與改前再跑一次的評估逐題相同，`<工作資料夾>\integration-plan\stage3_eval\`）。
+2. **授權**：
+   - 授權清楚是開放授權、或是團隊自己寫的資料，才可以建索引和模型一起下載（`bundled-index`）或放進 repo（`bundled-file`）：`license.store_text_in_repo: true`。
+   - 沒有授權或授權不清楚：**只能 `runtime-fetch`**，文字**永遠不進 repo、測試、fixture、文件**（只在執行時的記憶體與 repo 外的快取）；開發集用自己寫的問法，不抄原題目。
+   - 沒有 `license`（`name`、`url`、`store_text_in_repo`）的來源，檢查失敗。授權的事實**不能自己編**：不知道就寫 unknown、只能 runtime-fetch，並列為擁有者的問題。
+     市府 FAQ：2026-11-25 由主 session 從臺北市資料大平台的資料集 API 查證（資料集〈臺北市市政網站整合平台之常見問答〉，提供機關臺北市政府資訊局，
+     授權「依政府資料開放授權條款-第1版」，不定期更新）；這個授權要求顯名，所以登記表記下提供機關、資料集名稱與網址、授權與 `https://data.gov.tw/license`、查證日期
+     （開放資料缺這幾項時 `check_qa_source.py` 失敗）。台北通常見問答的來源 repo 沒有授權條款（`AI_FAQ_RAG.md` 第 9.1 節）。
+   - App 的「授權與資料來源」頁列出每個來源的授權；開放資料一律列出它的顯名（提供機關、資料集、授權）；其他來源和 `models.json` 已經列出的同一段授權文字不重複列（`AssistantDataLicenses`）。
+   - **不能存放的來源的頁面不預翻**（2026-11-25，擁有者決定；原因：台北通常見問答的來源 repo 沒有授權，而整個 App 會公開；檢查發現服務頁預翻
+     `service_strings.json` 收了 23 句 `/qna`、`/qna/categories` 頁上的問答文字）：`extract_service_strings.py` 不讀不能存放的來源的 `open_capability` 頁與它底下的頁
+     （`excluded_paths()`，由登記表算出，檔案記在 `excluded_pages`），那 23 句已刪；這些頁在外語時改由手機上的 ML Kit 翻譯。
+     `test_qa_source_checks` 檢查預翻不讀那些頁、檔案的 `excluded_pages` 正確，`check_qa_source.py` 用執行時下載的內容掃 repo（只報檔名與數目），找到就失敗（沒有上限）。
+3. **資料日期**：保留每一筆的 `published_at`（YYYY-MM-DD）。**答案下面在知道日期時多一行「資料日期：YYYY-MM-DD」**（6 種語言的文字在 `texts.data_date`；
+   FAQ 內容是中文、App 翻譯整個回覆，所以送中文那一行；沒有日期或日期格式不對就不加）。台北通常見問答沒有日期，不顯示。
+   市府 FAQ：repo 的 `faq_rag.json` 每筆都有日期，但手機下載的索引 `metadata.json`（2026-11-07 建）沒有這個欄位，`build_faq_index.py` 從這次起會寫進去；
+   要讓手機顯示得重建 metadata、更新 `models.json` 的雜湊並上傳 HF（**要擁有者同意**），在那之前市府 FAQ 的答案不顯示日期（行為不變）。
+   檢查列出超過 **5 年**（`freshness.stale_years`）的項目讓人複查，**只列出、不擋、不自動刪**。選 5 年的原因：小型來源（服務自己的、團隊寫的）在服務改版時應該一起改，
+   5 年都沒更新的項目值得人看一次；市府 FAQ 的日期以 2026-11-25 算，超過 2／3／5／10 年的有 90％／83％／75％／45％，用哪個門檻都是大多數，
+   這個數字本身就是給擁有者的資訊，比 10 年更早提醒、又不像 2–3 年把幾乎全部列出。
+   **擁有者 2026-11-25 決定**：只列出、不擋、答案不加個別提醒；README 的限制寫「市府 FAQ 有不少舊資料，答案以官方網站為準」。
+   手機顯示市府 FAQ 的資料日期（重建 metadata、models.json 雜湊、上傳 HF）**這次不做**。
+4. **新增或修改問答來源**（skill `townpass-add-qa`）：先決定情況（(a) 市府 FAQ 新版、(b) 微服務自己的問答、(c) 團隊寫的少量問答）、授權與 kind，再登記，
+   `python -X utf8 portal_assistant/scripts/check_qa_source.py <id>`（`--all` 每個來源）檢查：登記表格式、授權、前綴、6 語文字、來源網域在白名單、`open_capability` 存在、
+   和其他來源的重複率、題目和每一組評估集（開發、保留、封存）的字對重疊（只說是哪一組，不印評估句）、每個來源 ≥ 10 句團隊自己寫的正例與 ≥ 10 句負例
+   （`portal_assistant/backend/data/qa_dev/<id>.json`）；有 e5 伺服器時再檢查：正例的第一名是這個來源（有寫 id 時是那幾題）、**每一句負例在每個來源都 < 0.88**、
+   加了這個來源以後每一組評估集（含封存集，只報數目）的 FAQ 結果沒有被它搶走或多出新的 FAQ、「先找服務、找不到才 FAQ」的順序不變；最後列出過期的項目。
+   2026-11-25 已有的兩個來源照當時量到的數目當上限（`portal_assistant/backend/data/qa_baseline.json`，只能減少，測試鎖住雜湊）。
+5. **新來源的保留句**：和第 10 節第 6 點相同，由獨立撰寫者寫 10–20 句（`portal_assistant/backend/eval_new_qa_holdout.json`，`seal_holdout.py --set qa` 封存），
+   只用來報告；流程在 `portal_assistant/docs/NEW_QA_HOLDOUT.md`。
+6. **分類器政策**：和第 10 節第 5 點相同，**先不重訓**：v2 的 FAQ 候選文字「常見問答：題目（分類）」在執行時從題目組出，新來源零樣本就會被打分。
+   **一定要量**：在分類器模式跑 FAQ 相關的開發集（need 開發集的 FAQ 型問題、`eval_faq_relevance.json` 只報總數）與新來源的開發題，報告有沒有給到 FAQ、給的是不是對的來源。
+   重訓條件和服務相同：新來源的開發正例在分類器模式下「給到這個來源的題目」< 80%，或 2026-11-16 之後累積 5 個新來源（`qa_baseline.json` 以外）；
+   新服務與新來源分開算。重訓與上傳 HF 要擁有者同意。
+   **既有來源的現況**（2026-11-25 第一次量，分類器 v2，各來源的開發題 `backend/data/qa_dev/`）：市府 FAQ 10／11；台北通常見問答 7／12（58%：直接回答 6、選項裡有 1；
+   另外 1 句回答了別的問答、2 句列出的選項沒有它、2 句直接開了服務頁）。擁有者 2026-11-25 決定**只記錄、不重訓**（原因：這是第三階段之前就有的行為，改前改後評估逐題相同；
+   80% 是給新來源的標準）。之後加新來源或重訓時一起再看這兩個數字。

@@ -24,12 +24,11 @@ import emergency
 import faq as faq_index
 import i18n
 import menu
-import qna
+import qa_sources
 import registry as matching
 import rule_switches
 import semantic
 from decision import decide
-from faq import SCOPE_NOTE
 from guide import GuidePlanner
 from page_context import current_root, model_view
 from phonetic import each_near, exact_homophone, rank_books, term_matches
@@ -170,7 +169,8 @@ def sound_ordinal(text):
 # retrieval (portal_assistant/rag_handoff/HANDOFF.md section 7), so they skip it.
 FAQ_MIN_CHARS = 4
 FAQ_ANSWER_LIMIT = 600
-QNA_PAGE_NOTE = "更多說明可開啟 App 的「常見問答」頁面。"
+# The App Q&A's page note, now qa_sources.json's answer_note of that source (rules section 11).
+QNA_PAGE_NOTE = qa_sources.text(qa_sources.get("townpass_qna"), "answer_note")
 
 # Fallback tiers (rules section 3, 2026-11-16; the study's section C). When nothing
 # decided the turn, a clue (keyword pages the decision turned down, the semantic top
@@ -416,21 +416,37 @@ class Workflow:
 
     @staticmethod
     def _faq_text(entry):
+        """【question】, the answer, then the source's note (qa_sources.json, rules section 11):
+        "資料來源：<機關>。本服務僅涵蓋臺北市政府 FAQ。" for the city FAQ, "資料來源：台北通常見問答。
+        更多說明可開啟 App 的「常見問答」頁面。" for the App's own Q&A. The FAQ content is
+        Chinese (the App translates the reply for other languages), so the notes are too.
+        An item with a published_at shows its data date right under the answer ("資料日期：
+        YYYY-MM-DD", 2026-11-25, rules section 11); items without one are worded as before."""
         answer = entry["answer"].strip()
         if len(answer) > FAQ_ANSWER_LIMIT:
             answer = answer[:FAQ_ANSWER_LIMIT].rstrip() + "…（內容較長，完整說明請洽 1999 或該機關網站）"
-        if qna.is_qna(entry):
-            return f"【{entry['question'].strip()}】\n{answer}\n{qna.SOURCE_NOTE}{QNA_PAGE_NOTE}"
-        return f"【{entry['question'].strip()}】\n{answer}\n資料來源：{entry['department']}。{SCOPE_NOTE}"
+        source = qa_sources.source_of(entry)
+        note = (qa_sources.text(source, "source_note").format(department=entry.get("department") or "")
+                + qa_sources.text(source, "answer_note"))
+        dated = qa_sources.date_line(entry)
+        return f"【{entry['question'].strip()}】\n{answer}\n" + (f"{dated}\n" if dated else "") + note
+
+    @staticmethod
+    def _scope(hits):
+        """The scope sentence under offered FAQ questions, from the hits' sources."""
+        return qa_sources.scope_note([qa_sources.source_of(hit) for hit in hits])
 
     def _qna_page(self, payload, entry):
-        """An answer from the App's own Q&A also offers its 常見問答 page, as a choice."""
-        page = self.registry.by_id.get("qna")
-        if not qna.is_qna(entry) or not page or not page["enabled"]:
+        """An answer from a source with an App page (open_capability, e.g. the App's own Q&A and
+        its 常見問答 page) also offers that page, as a choice."""
+        source = qa_sources.source_of(entry)
+        page = self.registry.by_id.get(source.get("open_capability") or "")
+        if not page or not page["enabled"]:
             return []
         if payload.get("language", "zh") != "zh":
             return self._cap_items([page], payload["language"])
-        return [{"title": f"開啟「{page['title']}」頁面", "subtitle": qna.DEPARTMENT, "entry_id": page["id"]}]
+        return [{"title": f"開啟「{page['title']}」頁面", "subtitle": source.get("department") or "",
+                 "entry_id": page["id"]}]
 
     def _faq(self, payload, text, strict=False):
         """Second layer: Taipei FAQ when tool calling found no service. With classifier v2 the
@@ -490,7 +506,7 @@ class Workflow:
             if not choices:
                 return self.reply(payload, message, action="faq_answer")
         else:
-            scope = qna.SCOPE_NOTE if any(qna.is_qna(hit) for hit in hits) else SCOPE_NOTE
+            scope = self._scope(hits)
             message = f"你是不是想問以下的問題？請選擇一題，我再顯示答案。{scope}"
             # None of them: 看全部功能 (rules section 3, 2026-11-16). Chinese like the FAQ
             # content (the App translates it with the rest for another language).
@@ -1763,8 +1779,7 @@ class Workflow:
                 options += self._cap_items([item], language)
             else:
                 options.append({"title": item["question"].strip(), "subtitle": item["department"], "faq_id": item["id"]})
-        scope = (qna.SCOPE_NOTE if any(qna.is_qna(h) for _, kind, h in items if kind == "faq") else SCOPE_NOTE) \
-            if has_faq else ""
+        scope = self._scope([h for _, kind, h in items if kind == "faq"]) if has_faq else ""
         if has_page and has_faq:
             message = "你是不是要找這些？可以選服務，或選一題看答案。" + scope
         elif has_faq:

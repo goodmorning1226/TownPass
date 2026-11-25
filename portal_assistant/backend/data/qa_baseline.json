@@ -1,0 +1,90 @@
+{
+ "version": 1,
+ "date": "2026-11-25",
+ "_comment": "The Q&A sources that existed on 2026-11-25 (rules section 11) and the numbers portal_assistant/scripts/check_qa_source.py measured for them then (e5 q8_0, the 2026-11-07 index, the TownPass Q&A as fetched that day). They are ceilings: a number may only go down. New sources are not added here (backend/test_qa_source_checks.py locks this file's hash): they follow the new-source rules (0 overlaps, every positive first, every negative below 0.88, a sealed held-out set and a manual test list). eval_changes counts the evaluation sentences (sealed sets included, counts only) whose first e5 hit at >= 0.88 is this source. Approved by the owner 2026-11-25. Texts of a source whose licence does not allow storing them have no ceiling: any found in the project fails (the 23 TownPass Q&A page texts of service_strings.json were removed 2026-11-25).",
+ "sources": {
+  "city_faq": {
+   "dev_overlap": {
+    "eval_colloquial_dev.json": 1,
+    "eval_holdout.HOLDOUT": 1,
+    "guide_eval.json": 1,
+    "guide_eval_baseline.json": 1,
+    "guide_eval_given_dev.json": 1,
+    "guide_eval_holdout.json": 1,
+    "guide_eval_holdout_baseline.json": 1,
+    "rag_handoff/smoke_tests.json": 18,
+    "rag_handoff/tuning/extras.json": 19,
+    "rag_handoff/tuning/multilingual.json": 6,
+    "rag_handoff/tuning/neg.json": 9,
+    "semantic_tuning.json": 1
+   },
+   "duplicates": 4,
+   "eval_changes": {
+    "eval_colloquial.json": 9,
+    "eval_colloquial_dev.json": 61,
+    "eval_colloquial_report_holdout.json": 16,
+    "eval_faq_relevance.json": 41,
+    "eval_foreign_holdout.json": 1,
+    "eval_holdout.HOLDOUT": 11,
+    "eval_need_dev.json": 31,
+    "eval_need_holdout.json": 41,
+    "eval_need_multi.json": 2,
+    "evaluate.CASES": 37,
+    "guide_eval.json": 27,
+    "guide_eval_baseline.json": 27,
+    "guide_eval_catalog.json": 3,
+    "guide_eval_given_dev.json": 27,
+    "guide_eval_given_holdout.json": 11,
+    "guide_eval_holdout.json": 13,
+    "guide_eval_holdout_baseline.json": 13,
+    "rag_handoff/smoke_tests.json": 8,
+    "rag_handoff/tuning/extras.json": 10,
+    "rag_handoff/tuning/multilingual.json": 6,
+    "rag_handoff/tuning/neg.json": 10,
+    "rag_handoff/tuning/pos1.json": 32,
+    "rag_handoff/tuning/pos2.json": 32,
+    "rag_handoff/tuning/pos3.json": 30,
+    "rag_handoff/tuning/pos4.json": 31,
+    "semantic_tuning.json": 11
+   },
+   "eval_overlap": {
+    "eval_holdout.HOLDOUT": 1,
+    "eval_need_dev.json": 1,
+    "guide_eval_given_holdout.json": 1,
+    "guide_eval_holdout.json": 1,
+    "guide_eval_holdout_baseline.json": 1
+   },
+   "negatives_high": 2,
+   "positives_wrong": 4
+  },
+  "townpass_qna": {
+   "dev_overlap": {
+    "eval_holdout.HOLDOUT": 1,
+    "evaluate.CASES": 3,
+    "guide_eval_holdout.json": 1,
+    "guide_eval_holdout_baseline.json": 1,
+    "rag_handoff/smoke_tests.json": 7,
+    "rag_handoff/tuning/extras.json": 9,
+    "rag_handoff/tuning/multilingual.json": 4,
+    "rag_handoff/tuning/neg.json": 5,
+    "semantic_tuning.json": 1
+   },
+   "duplicates": 4,
+   "eval_changes": {
+    "eval_colloquial.json": 1,
+    "eval_colloquial_dev.json": 2,
+    "eval_holdout.HOLDOUT": 1,
+    "eval_need_multi.json": 1,
+    "guide_eval.json": 6,
+    "guide_eval_baseline.json": 6,
+    "guide_eval_given_dev.json": 6,
+    "guide_eval_given_holdout.json": 1,
+    "guide_eval_holdout.json": 1,
+    "guide_eval_holdout_baseline.json": 1
+   },
+   "eval_overlap": {},
+   "negatives_high": 1,
+   "positives_wrong": 1
+  }
+ }
+}

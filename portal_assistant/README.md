@@ -348,6 +348,7 @@ App 內「設定 → 關於 → 授權與資料來源」列出上述資料與每
 - **台語與外語辨識仍有限制**：台語自動判斷約七成召回；外語介面文字是 AI 草稿，可能不自然或有誤。
 - **AI 產生的程式碼可能遺留問題**：已用測試、評估與實機驗證降低風險，但無法保證沒有遺漏；Release 版本與正式台北通環境尚未驗證。
 - **資料與授權**：示範用的服務網頁、mock 帳號與 JSON 不代表已取得正式台北通登入或政府 API 的授權；政府開放資料依授權條款註明出處。
+- **FAQ 的時效**：市府 FAQ 有不少舊資料，答案以官方網站為準。
 - **敏感資料**：App 的錄音不存檔、不上傳；開發過程中未將使用者個資、帳號密碼或未公開的金鑰輸入 AI。
 
 ---
@@ -372,7 +373,7 @@ App 內「設定 → 關於 → 授權與資料來源」列出上述資料與每
 | [native/](native/) | Android（Kotlin、Gradle、原生伺服器建置）與 iPhone（建置與內嵌腳本） |
 | [scripts/](scripts/) | 建置、推模型、評估、抽字串、資料整理、連結檢查 |
 | [tools/](tools/) | 教學流程錄製與重播（guide_audit）、分類器訓練腳本（classifier）、翻譯審閱、煙霧測試 |
-| [skills/](skills/) | agent skill：新增或修改服務（townpass-add-service）與人工測試範本 |
+| [skills/](skills/) | agent skill：新增或修改服務（townpass-add-service）、新增或更新問答來源（townpass-add-qa）與人工測試範本 |
 | [docs/](docs/) | 規則、技術總覽、各實驗與決策紀錄 |
 
 | 主題 | 文件 |
@@ -384,6 +385,7 @@ App 內「設定 → 關於 → 授權與資料來源」列出上述資料與每
 | 手機端、模型下載 | [docs/AI_ON_DEVICE_PLAN.md](docs/AI_ON_DEVICE_PLAN.md)、[docs/AI_ON_DEVICE_IOS.md](docs/AI_ON_DEVICE_IOS.md)、[docs/AI_MODEL_DOWNLOAD.md](docs/AI_MODEL_DOWNLOAD.md) |
 | 地址資料 | [docs/AI_ADDRESS_DATA.md](docs/AI_ADDRESS_DATA.md) |
 | 新增或修改服務（agent skill：建議模型、prompt、驗收） | [docs/SKILL_GUIDE.md](docs/SKILL_GUIDE.md)、[skills/townpass-add-service/SKILL.md](skills/townpass-add-service/SKILL.md)、[docs/NEW_SERVICE_HOLDOUT.md](docs/NEW_SERVICE_HOLDOUT.md) |
+| 新增或更新問答來源（agent skill：授權、登記表、檢查、驗收） | [docs/QA_SKILL_GUIDE.md](docs/QA_SKILL_GUIDE.md)、[skills/townpass-add-qa/SKILL.md](skills/townpass-add-qa/SKILL.md)、[docs/NEW_QA_HOLDOUT.md](docs/NEW_QA_HOLDOUT.md) |
 | 評估數字、手機速度與開發細節 | [docs/PROJECT_DETAILS.md](docs/PROJECT_DETAILS.md) |
 | 開發指南、協作規範 | [ASSISTANT_README.md](../ASSISTANT_README.md)、[AGENTS.md](../AGENTS.md) |
 

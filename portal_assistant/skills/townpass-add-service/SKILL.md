@@ -20,6 +20,9 @@ description: Add a new microservice (a TownPass-Services web page or a native Ap
 | C. 幫既有服務加教學 | 0、1、3、6、7（教學字串）、8（guide_eval）、10–13 |
 | D. 改既有服務（名稱、關鍵字、need、例句、navigation、教學） | 0、1、3，改到的那幾步，再 7–13 |
 
+**服務也有自己的問答**（服務網站上的 FAQ、團隊寫的說明）：問答不是加進 `capabilities.json`，而是問答來源。這個 skill 做完服務頁以後，
+接著用 [`townpass-add-qa`](../townpass-add-qa/SKILL.md)（情況 b），把來源的 `open_capability` 指向這個服務（規則第 10 節第 7 點、第 11 節）。
+
 ## 0. 開工
 
 1. 讀 `AGENTS.md`、`portal_assistant/docs/AI_CURRENT_RULES.md`（至少第 1、2、5、6、8、9、10 節）、本檔。

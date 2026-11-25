@@ -46,6 +46,82 @@ void main() {
     expect(missing, hasLength(1));
   });
 
+  test('every Q&A source licence is listed once (qa_sources.json, rules section 11)', () async {
+    final manifest = jsonEncode({
+      'files': [
+        {'name': 'faq.bin', 'license': 'Open data licence X'},
+      ],
+    });
+    final sources = jsonEncode({
+      'sources': [
+        {
+          'names': {'zh': '市府問答'},
+          'license': {
+            'name': 'Open data licence X',
+            'url': null,
+            'store_text_in_repo': true,
+          },
+        },
+        {
+          'names': {'zh': '網站問答'},
+          'license': {
+            'name': 'None: no licence',
+            'url': 'https://example.org/qa',
+            'store_text_in_repo': false,
+          },
+        },
+        {
+          'names': {'zh': '沒有授權欄位'},
+        },
+        'not a map',
+      ],
+    });
+    final entries = await AssistantDataLicenses.entries(
+      () async => manifest,
+      loadSources: () async => sources,
+    ).toList();
+    expect(entries.map((e) => e.packages.single), [
+      '內政部 全國路名資料',
+      '助理模型與資料：faq.bin',
+      '助理問答資料：網站問答', // the city licence is already listed by models.json
+    ]);
+    final text = entries.last.paragraphs.map((p) => p.text).join('\n');
+    expect(text, contains('None: no licence'));
+    expect(text, contains('https://example.org/qa'));
+    expect(text, contains(AssistantDataLicenses.runtimeOnlyNote));
+  });
+
+  test(
+    'the real Q&A sources: the city FAQ with its attribution and the App Q&A, once each',
+    () async {
+      final entries = await AssistantDataLicenses.entries(
+        () async => await rootBundleString('assets/assistant/models.json'),
+        loadSources: () async =>
+            await rootBundleString('assets/assistant/qa_sources.json'),
+      ).toList();
+      final packages = entries.map((e) => e.packages.single).toList();
+      expect(packages.where((p) => p == '助理問答資料：台北通常見問答'), hasLength(1));
+      expect(packages.where((p) => p == '助理問答資料：臺北市政府 FAQ'), hasLength(1));
+      final city = entries
+          .firstWhere((e) => e.packages.single == '助理問答資料：臺北市政府 FAQ')
+          .paragraphs
+          .map((p) => p.text)
+          .join('\n');
+      // 政府資料開放授權條款第1版 asks for the provider and the dataset to be named.
+      expect(city, contains('臺北市政府資訊局'));
+      expect(city, contains('臺北市市政網站整合平台之常見問答'));
+      expect(city, contains('政府資料開放授權條款第1版'));
+      expect(city, contains('https://data.gov.tw/license'));
+      expect(city, contains('https://data.taipei/dataset/detail?id='));
+      // A broken sources file leaves the other entries.
+      final broken = await AssistantDataLicenses.entries(
+        () async => await rootBundleString('assets/assistant/models.json'),
+        loadSources: () async => 'not json',
+      ).toList();
+      expect(broken.length, entries.length - 2);
+    },
+  );
+
   test('the real manifest gives every listed file a licence', () async {
     final entries = await AssistantDataLicenses.entries(
       () async => await rootBundleString('assets/assistant/models.json'),

@@ -5,7 +5,8 @@ Usage (repo root):
   python -X utf8 portal_assistant/scripts/build_faq_index.py portal_assistant/rag_handoff/reference/faq_rag.json <out dir> [--url http://127.0.0.1:8774] [--text dept_question]
 
 Writes <out dir>/embeddings.bin (float32 LE [N, D], L2-normalised),
-metadata.json ([{id, question, answer, department, category}] by row) and
+metadata.json ([{id, question, answer, department, category, published_at}] by row;
+published_at only when the dataset has it, since 2026-11-25) and
 model_info.json. Each FAQ is embedded as "passage: " + its text; --text picks
 the text (portal_assistant/docs/AI_FAQ_RAG.md section 6 compares them):
   question               the question only
@@ -71,7 +72,10 @@ def main():
     if sys.byteorder == "big":
         flat.byteswap()
     (out / "embeddings.bin").write_bytes(flat.tobytes())
-    metadata = [{key: entry[key] for key in ("id", "question", "answer", "department", "category")} for entry in data]
+    # published_at (YYYY-MM-DD) is kept when the dataset has it: the answer then shows its data date
+    # (rules section 11, 2026-11-25). Indexes built before that have no published_at.
+    metadata = [{**{key: entry[key] for key in ("id", "question", "answer", "department", "category")},
+                 **({"published_at": entry["published_at"]} if entry.get("published_at") else {})} for entry in data]
     (out / "metadata.json").write_text(json.dumps(metadata, ensure_ascii=False, indent=1), encoding="utf-8")
     info = {"model": MODEL, "gguf": args.gguf, "runtime": "llama.cpp llama-server --embedding --pooling mean",
             "query_prefix": QUERY_PREFIX, "passage_prefix": PASSAGE_PREFIX, "text": args.text,

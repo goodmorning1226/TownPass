@@ -5,6 +5,7 @@ skill 本身：[`portal_assistant/skills/townpass-add-service/SKILL.md`](../skil
 規則：[AI_CURRENT_RULES.md](AI_CURRENT_RULES.md) 第 10 節。人工測試範本：[MANUAL_TEST_TEMPLATE.md](../skills/townpass-add-service/MANUAL_TEST_TEMPLATE.md)。
 
 這份給**使用 skill 的人**：要選哪個模型、怎麼下 prompt、做完怎麼驗收、哪些事要擁有者同意。
+服務有自己的問答（網站上的 FAQ、團隊寫的說明），或要更新市府 FAQ：用問答來源的 skill，說明書是 [QA_SKILL_GUIDE.md](QA_SKILL_GUIDE.md)。
 
 ## 1. 建議的模型
 

@@ -31,6 +31,10 @@ matches its pre-translation, and ML Kit translates it on the phone again):
 
 Only the first screen of each page is read (no taps, dialogs or lists that
 need data); those texts are translated by ML Kit on the phone.
+
+Pages of a Q&A source whose text may not be stored (qa_sources.json; today the TownPass
+Q&A page /qna and the pages under it) are never read, and the file records them as
+excluded_pages (rules section 11, 2026-11-25): their texts are translated by ML Kit.
 """
 import argparse
 import json
@@ -56,12 +60,39 @@ BRIDGE = ("window.__asked = []; window.flutter_inappwebview = { callHandler: (n,
           " window.__asked.push(...texts); return Promise.resolve(texts.map(() => null)); } };")
 
 
+def excluded_paths():
+    """Pages never read (rules section 11, 2026-11-25): the page of a Q&A source whose text may
+    not be stored in the repository (qa_sources.json: store_text_in_repo false, open_capability),
+    and every page under it. The TownPass Q&A page (/qna) shows that source's questions and
+    answers, whose repository has no licence; those texts are translated by ML Kit on the phone."""
+    caps = {c["id"]: c for c in json.loads((ROOT / "app" / "assets" / "assistant" / "capabilities.json").read_text(
+        encoding="utf-8"))["capabilities"]}
+    sources = json.loads((ROOT / "app" / "assets" / "assistant" / "qa_sources.json").read_text(encoding="utf-8"))
+    found = set()
+    for source in sources["sources"]:
+        page = caps.get(source.get("open_capability") or "")
+        if (source.get("license") or {}).get("store_text_in_repo") is not False or not page:
+            continue
+        navigation = page.get("navigation") or {}
+        if navigation.get("type") == "web" and navigation.get("path"):
+            found.add(navigation["path"].rstrip("/") or "/")
+    return sorted(found)
+
+
+def is_excluded(path, excluded=None):
+    """Whether a page path (or URL on a service origin) is one of excluded_paths() or under one."""
+    path = label(url_of(path)).split("?")[0].rstrip("/") or "/"
+    return any(path == e or path.startswith(e + "/") for e in (excluded_paths() if excluded is None else excluded))
+
+
 def page_paths():
-    """The enabled web pages as URLs (origin + path), sorted."""
+    """The enabled web pages as URLs (origin + path), sorted; excluded_paths() left out."""
     caps = json.loads((ROOT / "app" / "assets" / "assistant" / "capabilities.json").read_text(encoding="utf-8"))
+    excluded = excluded_paths()
     return sorted({(c["navigation"].get("origin") or DEFAULT_ORIGIN).rstrip("/") + c["navigation"]["path"]
                    for c in caps["capabilities"]
-                   if c.get("enabled") and (c.get("navigation") or {}).get("type") == "web"})
+                   if c.get("enabled") and (c.get("navigation") or {}).get("type") == "web"
+                   and not is_excluded(c["navigation"]["path"], excluded)})
 
 
 def url_of(page):
@@ -130,8 +161,14 @@ def main():
     args = parser.parse_args()
     if args.only_path and not args.check:
         parser.error("--only-path is for --check (writing needs every page)")
+    excluded = excluded_paths()
+    only = [p for p in args.only_path or [] if not is_excluded(p, excluded)]
+    for path in sorted(set(args.only_path or []) - set(only)):
+        print(f"not read (its texts may not be stored, rules section 11): {path}", file=sys.stderr)
+    if args.only_path and not only:
+        sys.exit(0)
     try:
-        found = collect(args.only_path or page_paths())
+        found = collect(only or page_paths())
     except Exception as error:  # noqa: BLE001 - no browser or no network: exit 2, the caller notes it
         print(f"could not read the service pages: {error.__class__.__name__}: {error}".splitlines()[0])
         sys.exit(2)
@@ -149,9 +186,12 @@ def main():
             print(f"not pre-translated: {text}")
         if args.only_path:
             sys.exit(1 if added else 0)
-        sys.exit(1 if added or dropped else 0)
-    OUT.write_text(json.dumps({"version": 1, "source": existing.get("source", SOURCE), "strings": strings},
-                              ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+        stale_exclusion = existing.get("excluded_pages") != excluded
+        if stale_exclusion:
+            print(f"excluded_pages in the file is not {excluded}: re-run without --check")
+        sys.exit(1 if added or dropped or stale_exclusion else 0)
+    OUT.write_text(json.dumps({"version": 1, "source": existing.get("source", SOURCE), "excluded_pages": excluded,
+                               "strings": strings}, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
 
 
 if __name__ == "__main__":

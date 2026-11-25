@@ -1,0 +1,78 @@
+{
+ "version": 1,
+ "_comment": "The assistant's Q&A sources (portal_assistant/docs/AI_CURRENT_RULES.md section 11, 2026-11-25). Read by the backend (qa_sources.py: faq.py, qna.py, workflow.py), the App's licence page (AssistantDataLicenses) and portal_assistant/scripts/check_qa_source.py. kind: bundled-index (a pre-built e5 index downloaded with the models, models.json; only open-licensed data), runtime-fetch (fetched while the assistant runs from origin + path, kept in memory and a cache outside the repo; its text is never stored in the repo, tests, fixtures or docs), bundled-file (a small Q&A file next to this one, embedded at startup; only text the project may store). origin is 'default' or an origin listed in service_origins.json, never a host written here. Texts in en, ja, vi, id and tl are AI drafts unless noted; the zh texts are the assistant's existing wording. The answer text itself stays in the source's language (Chinese); the App translates a reply for other languages.",
+ "freshness": {
+  "stale_years": 5,
+  "_comment": "check_qa_source.py lists items whose published_at is more than stale_years old for human review (rules section 11); an answer shows its data date when published_at is known."
+ },
+ "texts": {
+  "scope_only": {"zh": "本服務僅涵蓋{names}。", "en": "This service covers only the {names}.", "ja": "このサービスは{names}のみを対象としています。", "vi": "Dịch vụ này chỉ bao gồm {names}.", "id": "Layanan ini hanya mencakup {names}.", "tl": "Saklaw lamang ng serbisyong ito ang {names}."},
+  "scope_many": {"zh": "本服務涵蓋{names}。", "en": "This service covers the {names}.", "ja": "このサービスは{names}を対象としています。", "vi": "Dịch vụ này bao gồm {names}.", "id": "Layanan ini mencakup {names}.", "tl": "Saklaw ng serbisyong ito ang {names}."},
+  "and": {"zh": "與", "en": " and ", "ja": "と", "vi": " và ", "id": " dan ", "tl": " at "},
+  "list_separator": {"zh": "、", "en": ", ", "ja": "、", "vi": ", ", "id": ", ", "tl": ", "},
+  "data_date": {"zh": "資料日期：{date}", "en": "Data date: {date}", "ja": "データの日付：{date}", "vi": "Ngày dữ liệu: {date}", "id": "Tanggal data: {date}", "tl": "Petsa ng datos: {date}"}
+ },
+ "sources": [
+  {
+   "id": "city_faq",
+   "id_prefix": "",
+   "kind": "bundled-index",
+   "index_dir": "faq_rag",
+   "models": ["faq-embeddings", "faq-metadata", "faq-model-info"],
+   "build": {
+    "converter": "portal_assistant/rag_handoff/reference/build_rag_dataset.py",
+    "dataset": "portal_assistant/rag_handoff/reference/faq_rag.json",
+    "indexer": "portal_assistant/scripts/build_faq_index.py",
+    "text": "dept_question"
+   },
+   "parser": "city-faq",
+   "department": null,
+   "names": {"zh": "臺北市政府 FAQ", "en": "Taipei City Government FAQ", "ja": "台北市政府FAQ", "vi": "Câu hỏi thường gặp của Chính quyền thành phố Đài Bắc", "id": "FAQ Pemerintah Kota Taipei", "tl": "FAQ ng Pamahalaang Lungsod ng Taipei"},
+   "source_note": {"zh": "資料來源：{department}。", "en": "Source: {department}.", "ja": "出典：{department}。", "vi": "Nguồn: {department}.", "id": "Sumber: {department}.", "tl": "Pinagmulan: {department}."},
+   "answer_note": {"zh": "本服務僅涵蓋臺北市政府 FAQ。", "en": "This service covers only the Taipei City Government FAQ.", "ja": "このサービスは台北市政府FAQのみを対象としています。", "vi": "Dịch vụ này chỉ bao gồm Câu hỏi thường gặp của Chính quyền thành phố Đài Bắc.", "id": "Layanan ini hanya mencakup FAQ Pemerintah Kota Taipei.", "tl": "Saklaw lamang ng serbisyong ito ang FAQ ng Pamahalaang Lungsod ng Taipei."},
+   "open_capability": null,
+   "license": {
+    "name": "政府資料開放授權條款第1版",
+    "url": "https://data.gov.tw/license",
+    "provider": "臺北市政府資訊局",
+    "dataset_title": "臺北市市政網站整合平台之常見問答",
+    "dataset_url": "https://data.taipei/dataset/detail?id=203f1657-bb4a-45a7-b25f-279b63136645",
+    "verified": "2026-11-25",
+    "store_text_in_repo": true,
+    "models_json_license": "Taipei City FAQ, Open Government Data License v1.0 (data.taipei)",
+    "_comment": "Verified 2026-11-25 from the data.taipei dataset API (dataset 203f1657-bb4a-45a7-b25f-279b63136645: license_name 依政府資料開放授權條款-第1版, org 資訊局 = 臺北市政府資訊局, updated irregularly). The licence asks for an attribution notice: the licence page shows provider, dataset, licence and both links. models_json_license is the shorter text models.json gives the index files."
+   },
+   "limits": {"max_items": 20000, "max_question": 500, "max_answer": 10000}
+  },
+  {
+   "id": "townpass_qna",
+   "id_prefix": "qna:",
+   "kind": "runtime-fetch",
+   "origin": "default",
+   "path": "/mock/qna_list.json",
+   "parser": "townpass-qna",
+   "department": "台北通",
+   "label": "TownPass",
+   "names": {"zh": "台北通常見問答", "en": "TownPass FAQ", "ja": "TownPass よくある質問", "vi": "Câu hỏi thường gặp TownPass", "id": "Pertanyaan umum TownPass", "tl": "FAQ ng TownPass"},
+   "source_note": {"zh": "資料來源：台北通常見問答。", "en": "Source: TownPass FAQ.", "ja": "出典：TownPass よくある質問。", "vi": "Nguồn: Câu hỏi thường gặp TownPass.", "id": "Sumber: Pertanyaan umum TownPass.", "tl": "Pinagmulan: FAQ ng TownPass."},
+   "answer_note": {"zh": "更多說明可開啟 App 的「常見問答」頁面。", "en": "For more, open the app's FAQ page.", "ja": "詳しくはアプリの「よくある質問」ページをご覧ください。", "vi": "Xem thêm ở trang Câu hỏi thường gặp của ứng dụng.", "id": "Untuk lebih lanjut, buka halaman Pertanyaan umum di aplikasi.", "tl": "Para sa higit pa, buksan ang pahina ng FAQ sa app."},
+   "open_capability": "qna",
+   "license": {
+    "name": "None: the source repository (taipei-doit/TownPass-Services) has no licence",
+    "url": null,
+    "store_text_in_repo": false,
+    "_comment": "Fetched at runtime only; never stored in the repo, tests, fixtures or docs (portal_assistant/docs/AI_FAQ_RAG.md section 9.1)."
+   },
+   "env": {"off": "TOWNPASS_QNA", "url": "TOWNPASS_QNA_URL", "cache": "TOWNPASS_QNA_CACHE"},
+   "cache_name": "qna_cache.json",
+   "refresh_s": 86400,
+   "retry_fetch_s": 1800,
+   "retry_embed_s": 60,
+   "startup_wait_s": 300,
+   "fetch_timeout_s": 10,
+   "embed_timeout_s": 30,
+   "embed_batch": 16,
+   "limits": {"max_bytes": 1048576, "max_items": 200, "max_question": 200, "max_answer": 2000}
+  }
+ ]
+}

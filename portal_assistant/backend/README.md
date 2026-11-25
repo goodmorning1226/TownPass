@@ -125,6 +125,10 @@ App 與後端需一起更新；舊的仍執行中之 Python 服務須重新啟�
   兩種情況助理都照常運作。`/health` 的 `faq_entries` 為載入筆數（0 表示關閉）。
 - 手機端：`OnDeviceAssistant.kt` 在 :8774 另開一個 embedding 模式的 llama-server（2 執行緒），模型與索引由
   `portal_assistant/scripts/push_assistant_models.ps1` 推送；沒推送就沒有 FAQ 層。決策紀錄見 [AI_FAQ_RAG.md](../docs/AI_FAQ_RAG.md)。
+- **問答來源**（2026-11-25，規則第 11 節）：市府 FAQ、台北通常見問答與之後的來源都登記在
+  [`qa_sources.json`](../app/assets/assistant/qa_sources.json)（[qa_sources.py](qa_sources.py) 讀；[qna.py](qna.py) 載入執行時下載與小型檔案的來源並和市府 FAQ 合併）。
+  答案的「資料來源」附註、範圍句、「開啟頁面」選項由來源決定；項目有 `published_at` 時答案下多一行「資料日期：YYYY-MM-DD」。
+  新增來源：skill [`townpass-add-qa`](../skills/townpass-add-qa/SKILL.md)，檢查 `python -X utf8 portal_assistant/scripts/check_qa_source.py --all`。
 
 完整新增能力、未串接範圍與裝置測試見 [全功能實作紀錄](../docs/AI_EXPANSION_IMPLEMENTATION.md)。
 

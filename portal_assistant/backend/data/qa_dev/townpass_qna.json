@@ -1,0 +1,32 @@
+{
+ "source": "townpass_qna",
+ "written_by": "Team-written paraphrases that already existed on 2026-11-25 (portal_assistant/docs/AI_FAQ_RAG.md sections 9.4 and 9.5, own wording; the source's own question text is never stored, rules section 11). No expected_ids: the first hit must be from this source. Negatives: the out-of-scope ones of section 9.4 (the city-FAQ topics there are city positives, not negatives) + two of rag_handoff/smoke_tests.json 'no_match' + the first 4 'chitchat' of rag_handoff/tuning/neg.json.",
+ "positives": [
+  {"text": "台北通有實體卡嗎"},
+  {"text": "可以申請實體卡片嗎"},
+  {"text": "優惠券怎麼用"},
+  {"text": "台北通要怎麼登入"},
+  {"text": "手機驗證說我生日錯誤"},
+  {"text": "一定要實名認證嗎"},
+  {"text": "註冊會員一直沒收到審核通知"},
+  {"text": "怎麼取消第三方授權"},
+  {"text": "一般會員跟金質會員差在哪"},
+  {"text": "台北通支援哪些手機"},
+  {"text": "我用悠遊付註冊的帳號怎麼登入"},
+  {"text": "怎麼領優惠券"}
+ ],
+ "negatives": [
+  {"text": "今天天氣怎麼樣"},
+  {"text": "鳳梨披薩好吃嗎"},
+  {"text": "台北市長是誰"},
+  {"text": "我想訂機票去東京"},
+  {"text": "醫院在哪裡"},
+  {"text": "幫我寫一首情詩"},
+  {"text": "台北有什麼好吃的"},
+  {"text": "基隆港的歷史"},
+  {"text": "早安啊大家好"},
+  {"text": "你好你好"},
+  {"text": "你是誰啊"},
+  {"text": "你會做什麼事情"}
+ ]
+}

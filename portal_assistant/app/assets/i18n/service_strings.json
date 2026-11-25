@@ -1,6 +1,9 @@
 {
  "version": 1,
  "source": "TownPass service pages and their page titles (scripts/extract_service_strings.py, 2026-11-14; titles 2026-11-15); translations are AI drafts (en, ja, vi, id, tl), to be reviewed by native speakers",
+ "excluded_pages": [
+  "/qna"
+ ],
  "strings": {
   "0筆結果": {
    "en": "0 results",
@@ -169,34 +172,6 @@
    "vi": "Xin chào, vui lòng điền thông tin đăng ký dưới đây",
    "id": "Hai, silakan isi data permohonan berikut",
    "tl": "Hi, pakisagutan ang sumusunod na impormasyon ng aplikasyon"
-  },
-  "Q & A • 常見問題": {
-   "en": "Q & A • FAQ",
-   "ja": "Q & A • よくある質問",
-   "vi": "Q & A • Câu hỏi thường gặp",
-   "id": "Q & A • Pertanyaan Umum",
-   "tl": "Q & A • Mga Madalas Itanong"
-  },
-  "一定需要實名認證才能加入台北通會員？Does signing up for TaipeiPASS membership require real name verification?": {
-   "en": "Does signing up for TaipeiPASS membership require real-name verification?",
-   "ja": "TaipeiPASS会員になるには、必ず実名認証が必要ですか？",
-   "vi": "Có bắt buộc xác thực danh tính mới được gia nhập thành viên TaipeiPASS không?",
-   "id": "Apakah verifikasi nama asli wajib untuk menjadi anggota TaipeiPASS?",
-   "tl": "Kailangan ba ng real-name verification para maging miyembro ng TaipeiPASS?"
-  },
-  "下載台北通App，方能使用優惠，點選「優惠」主題，點選「優惠券」即可查看所有優惠商家。看到喜歡的優惠，可以按「+我的票夾」領取優惠或直接點立即使用票券。詳細操作請查看操作步驟。": {
-   "en": "Download the TaipeiPASS app to use the offers. Tap the “Offers” topic, then “Coupons” to see all participating merchants. When you find an offer you like, tap “+My Ticket Wallet” to claim it, or tap Use Now to use the ticket right away. See the step-by-step guide for details.",
-   "ja": "TaipeiPASSアプリをダウンロードすると特典をご利用いただけます。「特典」をタップし、「クーポン」を選ぶと、すべての特典加盟店を確認できます。気に入った特典があれば「+マイチケットホルダー」をタップして受け取るか、そのままチケットを今すぐ使用できます。詳しい操作は操作手順をご確認ください。",
-   "vi": "Tải ứng dụng TaipeiPASS để sử dụng ưu đãi: chọn chủ đề “Ưu đãi”, chọn “Phiếu giảm giá” để xem tất cả cửa hàng có ưu đãi. Thấy ưu đãi yêu thích, bạn có thể nhấn “+Ví vé của tôi” để nhận hoặc nhấn dùng vé ngay. Xem hướng dẫn chi tiết tại các bước thao tác.",
-   "id": "Unduh aplikasi TaipeiPASS untuk menggunakan promo. Pilih tema “Promo”, lalu pilih “Kupon” untuk melihat semua toko yang memberi promo. Jika ada promo yang Anda suka, tekan “+Dompet tiket saya” untuk mengambilnya atau langsung gunakan tiketnya. Untuk detailnya, lihat langkah-langkah penggunaan.",
-   "tl": "I-download ang TaipeiPASS App para magamit ang mga diskwento. Piliin ang “Diskwento”, pagkatapos ang “Kupon” para makita ang lahat ng tindahang may diskwento. Kung may gusto kang alok, pindutin ang “+ Aking ticket wallet” para kunin ito, o gamitin agad ang tiket. Para sa detalye, tingnan ang mga hakbang."
-  },
-  "下載安裝": {
-   "en": "Download",
-   "ja": "ダウンロード・インストール",
-   "vi": "Tải và cài đặt",
-   "id": "Unduh & instal",
-   "tl": "I-download at i-install"
   },
   "中山地政事務所": {
    "en": "Zhongshan Land Office",
@@ -422,13 +397,6 @@
    "id": "Sistem laporan polisi online kota/kabupaten lain",
    "tl": "Online na pag-uulat sa pulis ng ibang lungsod/county"
   },
-  "出現此錯誤訊息，多數是您留存於電信公司的生日資料有錯誤或缺漏。請您先致電電信公司客服查詢相關會員資料。若和電信公司比對資料無誤，請您來電1999(外縣市02-27208889)轉8585將有專人為您服務。": {
-   "en": "This error message usually means the birth date on file with your telecom provider is incorrect or missing. Please first call your telecom provider's customer service to check your member information. If the information matches, please call 1999 (02-27208889 from outside Taipei City) ext. 8585 for assistance.",
-   "ja": "このエラーメッセージが表示される場合、多くは通信会社に登録されている生年月日に誤りや欠落があります。まず通信会社のカスタマーサービスに会員情報をご確認ください。通信会社の情報と一致している場合は、1999（台北市外からは02-27208889）にお電話のうえ、内線8585へおつなぎください。担当者が対応いたします。",
-   "vi": "Thông báo lỗi này phần lớn là do dữ liệu ngày sinh bạn lưu tại công ty viễn thông bị sai hoặc thiếu. Vui lòng gọi tổng đài chăm sóc khách hàng của công ty viễn thông để kiểm tra thông tin thành viên. Nếu đối chiếu với công ty viễn thông mà thông tin không sai, vui lòng gọi 1999 (từ huyện/thành phố khác gọi 02-27208889) nhánh 8585 để được nhân viên chuyên trách hỗ trợ.",
-   "id": "Pesan kesalahan ini biasanya muncul karena data tanggal lahir Anda di operator seluler salah atau tidak lengkap. Silakan hubungi layanan pelanggan operator seluler untuk memeriksa data Anda. Jika data sudah sesuai dengan operator, hubungi 1999 (dari luar Kota Taipei 02-27208889) ekstensi 8585 dan petugas akan membantu Anda.",
-   "tl": "Kapag lumabas ang error na ito, kadalasan ay mali o kulang ang petsa ng kapanganakan mo na nakatala sa telecom company. Tawagan muna ang customer service ng telecom company para suriin ang iyong impormasyon. Kung tama ang datos, tumawag sa 1999 (mula sa labas ng Taipei: 02-27208889) ext. 8585 at may tutulong sa iyo."
-  },
   "出生日期": {
    "en": "Date of Birth",
    "ja": "生年月日",
@@ -498,13 +466,6 @@
    "vi": "Quầy Bo'ai|Số 903",
    "id": "Loket Bo'ai|No. 903",
    "tl": "Bo'ai Counter|Blg. 903"
-  },
-  "卡證": {
-   "en": "Cards",
-   "ja": "カード・証明書",
-   "vi": "Thẻ/giấy tờ",
-   "id": "Kartu",
-   "tl": "Mga card at ID"
   },
   "危險物品火災": {
    "en": "Hazardous Materials Fire",
@@ -582,27 +543,6 @@
    "vi": "Có thể định vị trực tiếp hoặc nhập địa chỉ đầy đủ",
    "id": "Gunakan lokasi saat ini atau masukkan alamat lengkap",
    "tl": "Gamitin ang lokasyon mo o ilagay ang buong address"
-  },
-  "台北通官方網站": {
-   "en": "TaipeiPASS Official Website",
-   "ja": "TaipeiPASS公式サイト",
-   "vi": "Trang web chính thức TaipeiPASS",
-   "id": "Situs resmi TaipeiPASS",
-   "tl": "Opisyal na website ng TaipeiPASS"
-  },
-  "台北通帳號授權使用市府其他數位平台，可以取消使用授權嗎？'ve authorized my TaipeiPASS account to access other digital platforms of the city government. Can I cancel the authorization?": {
-   "en": "I've authorized my TaipeiPASS account to access other digital platforms of the city government. Can I cancel the authorization?",
-   "ja": "TaipeiPASSアカウントで市政府の他のデジタルプラットフォームの利用を許可した場合、その許可を取り消すことはできますか？",
-   "vi": "Tài khoản TaipeiPASS đã được ủy quyền sử dụng các nền tảng số khác của chính quyền thành phố, có thể hủy ủy quyền không?",
-   "id": "Akun TaipeiPASS saya telah diberi izin untuk digunakan di platform digital lain milik pemerintah kota. Bisakah izin tersebut dibatalkan?",
-   "tl": "Maaari ko bang kanselahin ang awtorisasyon ng TaipeiPASS account ko sa ibang digital platform ng pamahalaang lungsod?"
-  },
-  "台北通會員分為一般會員與金質會員（實名認證會員），建議您申請金質會員享有完整服務。": {
-   "en": "TaipeiPASS members are either general members or Gold members (real-name verified members). We recommend applying for Gold membership to enjoy the full range of services.",
-   "ja": "TaipeiPASS会員には一般会員とゴールド会員（実名認証会員）があります。すべてのサービスをご利用いただけるゴールド会員へのお申し込みをおすすめします。",
-   "vi": "Thành viên TaipeiPASS gồm thành viên thường và thành viên Vàng (thành viên đã xác thực danh tính); bạn nên đăng ký thành viên Vàng để sử dụng đầy đủ dịch vụ.",
-   "id": "Anggota TaipeiPASS terdiri dari anggota biasa dan anggota Emas (anggota dengan verifikasi nama asli). Kami sarankan Anda mendaftar sebagai anggota Emas untuk menikmati layanan lengkap.",
-   "tl": "May dalawang uri ng miyembro ang TaipeiPASS: ordinaryong miyembro at Gold member (may real-name verification). Inirerekomendang mag-apply bilang Gold member para sa buong serbisyo."
   },
   "周邊服務": {
    "en": "Nearby services",
@@ -687,13 +627,6 @@
    "vi": "Thiệt hại do đất đá",
    "id": "Bencana tanah dan batu",
    "tl": "Pinsala dulot ng lupa at bato"
-  },
-  "在台北通特約商家消費時，出示APP優惠券畫面即可享有專屬優惠。超簡單使用方式，請參考操作步驟。": {
-   "en": "When shopping at TaipeiPASS partner merchants, show the coupon screen in the app to enjoy exclusive offers. It's easy: see the step-by-step guide.",
-   "ja": "TaipeiPASS提携店でお買い物の際、アプリのクーポン画面を提示すると専用特典を受けられます。簡単な使い方は操作手順をご覧ください。",
-   "vi": "Khi mua sắm tại các cửa hàng đối tác của TaipeiPASS, chỉ cần xuất trình màn hình phiếu giảm giá trên ứng dụng là được hưởng ưu đãi riêng. Cách dùng rất đơn giản, vui lòng xem các bước thao tác.",
-   "id": "Saat berbelanja di toko mitra TaipeiPASS, tunjukkan layar kupon di aplikasi untuk mendapatkan promo khusus. Cara pakainya sangat mudah, lihat langkah-langkah penggunaan.",
-   "tl": "Kapag bumili sa partner store ng TaipeiPASS, ipakita ang kupon sa APP para makuha ang espesyal na diskwento. Para sa madaling paraan ng paggamit, tingnan ang mga hakbang."
   },
   "地政事務所": {
    "en": "Land Office",
@@ -785,20 +718,6 @@
    "vi": "Thất bại",
    "id": "Gagal",
    "tl": "Nabigo"
-  },
-  "如何使用優惠券？How can I access the coupons?": {
-   "en": "How can I access the coupons?",
-   "ja": "クーポンの使い方は？",
-   "vi": "Làm thế nào để sử dụng phiếu giảm giá?",
-   "id": "Bagaimana cara menggunakan kupon?",
-   "tl": "Paano gamitin ang kupon?"
-  },
-  "如何獲得優惠券？ How can I obtain the discount coupons?": {
-   "en": "How can I obtain the discount coupons?",
-   "ja": "クーポンの入手方法は？",
-   "vi": "Làm thế nào để nhận phiếu giảm giá?",
-   "id": "Bagaimana cara mendapatkan kupon?",
-   "tl": "Paano makakuha ng kupon?"
   },
   "如尚有其他問題，請洽臺北e大客服專線(02)2932-0212分機341": {
    "en": "For other questions, please contact the Taipei e-University customer service line at (02)2932-0212 ext. 341",
@@ -898,20 +817,6 @@
    "id": "Kasus selesai (1)",
    "tl": "Sarado na ang kaso (1)"
   },
-  "已透過市民服務大平台或身分驗證申請註冊加入會員，超過時間沒有收到審核通知，怎麼辦？What should I do if I applied for membership through Citizen Grand Platform or Identity Verification Procedure but have not received the results of evaluation by the expected deadline?": {
-   "en": "What should I do if I applied for membership through the Citizen Grand Platform or identity verification but have not received the review result by the expected deadline?",
-   "ja": "市民サービスプラットフォームまたは本人確認手続きで会員登録を申請しましたが、期限を過ぎても審査結果の通知が届きません。どうすればよいですか？",
-   "vi": "Tôi đã đăng ký thành viên qua Nền tảng Dịch vụ Thị dân hoặc xác minh danh tính nhưng quá thời gian vẫn chưa nhận được thông báo xét duyệt, phải làm sao?",
-   "id": "Saya sudah mendaftar menjadi anggota melalui Platform Layanan Warga atau verifikasi identitas, tetapi belum menerima pemberitahuan hasil peninjauan setelah batas waktu. Apa yang harus saya lakukan?",
-   "tl": "Nag-apply ako bilang miyembro sa Citizen Service Platform o sa identity verification pero lampas na sa takdang oras at wala pa akong natatanggap na resulta. Ano ang dapat kong gawin?"
-  },
-  "已透過悠遊付註冊台北通會員，請問如何登入？I have signed up for EasyWallet. How do I log in?": {
-   "en": "I signed up for TaipeiPASS through EasyWallet. How do I log in?",
-   "ja": "EasyWalletでTaipeiPASS会員に登録しました。どのようにログインすればよいですか？",
-   "vi": "Tôi đã đăng ký thành viên TaipeiPASS qua EasyWallet, làm thế nào để đăng nhập?",
-   "id": "Saya sudah mendaftar sebagai anggota TaipeiPASS melalui EasyWallet. Bagaimana cara masuk?",
-   "tl": "Nakapag-sign up na ako sa TaipeiPASS gamit ang EasyWallet. Paano ako mag-log in?"
-  },
   "已過期": {
    "en": "Expired",
    "ja": "期限切れ",
@@ -925,13 +830,6 @@
    "vi": "Lịch sử thanh toán",
    "id": "Riwayat pembayaran",
    "tl": "Kasaysayan ng bayad"
-  },
-  "帳單": {
-   "en": "Bills",
-   "ja": "請求書",
-   "vi": "Hóa đơn",
-   "id": "Tagihan",
-   "tl": "Bill"
   },
   "帳單明細": {
    "en": "Bill details",
@@ -1072,13 +970,6 @@
    "vi": "Tất cả hạng mục",
    "id": "Semua item",
    "tl": "Lahat ng item"
-  },
-  "手機門號驗證出現身分證字號正確，生日錯誤的錯誤訊息。這是什麼意思?During mobile phone verification, it says that my ID number is correct but my birth date info is wrong. What does this mean?": {
-   "en": "During mobile phone verification, it says my ID number is correct but my birth date is wrong. What does this mean?",
-   "ja": "携帯電話番号の認証で「身分証番号は正しいが、生年月日が誤っている」というエラーメッセージが表示されます。どういう意味ですか？",
-   "vi": "Khi xác minh số điện thoại di động, xuất hiện thông báo lỗi số thẻ căn cước đúng nhưng ngày sinh sai. Điều này có nghĩa là gì?",
-   "id": "Saat verifikasi nomor ponsel, muncul pesan bahwa nomor identitas benar tetapi tanggal lahir salah. Apa artinya?",
-   "tl": "Sa mobile number verification, sinasabing tama ang ID number ko pero mali ang petsa ng kapanganakan. Ano ang ibig sabihin nito?"
   },
   "打開定位服務來允許“城市通”確認您的位置": {
    "en": "Turn on location services to allow “TownPass” to confirm your location",
@@ -1324,13 +1215,6 @@
    "vi": "Không tìm thấy hạng mục đăng ký nào",
    "id": "Tidak ditemukan item permohonan terkait",
    "tl": "Walang nahanap na kaugnay na aplikasyon"
-  },
-  "查看其他常見問題": {
-   "en": "View other FAQs",
-   "ja": "その他のよくある質問を見る",
-   "vi": "Xem các câu hỏi thường gặp khác",
-   "id": "Lihat pertanyaan umum lainnya",
-   "tl": "Tingnan ang iba pang madalas itanong"
   },
   "桃園市": {
    "en": "Taoyuan City",
@@ -1611,20 +1495,6 @@
    "vi": "Thông tin dịch vụ đăng ký",
    "id": "Data layanan permohonan",
    "tl": "Impormasyon ng aplikasyon"
-  },
-  "登入註冊": {
-   "en": "Log In / Sign Up",
-   "ja": "ログイン・登録",
-   "vi": "Đăng nhập / Đăng ký",
-   "id": "Masuk / Daftar",
-   "tl": "Mag-log in / Mag-register"
-  },
-  "登入註冊常見問題": {
-   "en": "Login & Sign-up FAQ",
-   "ja": "ログイン・登録に関するよくある質問",
-   "vi": "Câu hỏi thường gặp về đăng nhập, đăng ký",
-   "id": "Pertanyaan umum masuk / daftar",
-   "tl": "FAQ sa pag-log in at pag-register"
   },
   "目前無繳費紀錄": {
    "en": "No payment records",
@@ -2123,13 +1993,6 @@
    "id": "Aktifkan layanan lokasi",
    "tl": "Paki-enable ang location service"
   },
-  "請您登入": {
-   "en": "Please log in",
-   "ja": "ログインしてください",
-   "vi": "Vui lòng đăng nhập",
-   "id": "Silakan masuk",
-   "tl": "Paki-log in"
-  },
   "請至現場確認申辦櫃檯並抽號碼牌": {
    "en": "Please confirm the application counter on site and take a queue number",
    "ja": "現地で申請窓口を確認し、整理券をお取りください",
@@ -2199,13 +2062,6 @@
    "vi": "Vui lòng nhập email",
    "id": "Masukkan email",
    "tl": "Ilagay ang e-mail"
-  },
-  "請透過登入市民服務大平台-線上進度查詢服務進度，或致電客服(1999外縣市02-27208889)轉8585。\n身分證驗證：致電客服(1999外縣市02-27208889)轉8585。": {
-   "en": "Please check the progress by logging in to the Citizen Grand Platform's online progress inquiry, or call customer service (1999, or 02-27208889 from outside Taipei City) ext. 8585.\nID verification: call customer service (1999, or 02-27208889 from outside Taipei City) ext. 8585.",
-   "ja": "市民サービスプラットフォームにログインし「オンライン進捗照会」で進捗をご確認いただくか、カスタマーサービス（1999、台北市外からは02-27208889）にお電話のうえ内線8585へおつなぎください。\n身分証認証：カスタマーサービス（1999、台北市外からは02-27208889）にお電話のうえ内線8585へおつなぎください。",
-   "vi": "Vui lòng đăng nhập Nền tảng Dịch vụ Thị dân - Tra cứu tiến độ trực tuyến để kiểm tra tiến độ, hoặc gọi tổng đài (1999, từ huyện/thành phố khác gọi 02-27208889) nhánh 8585.\nXác minh thẻ căn cước: gọi tổng đài (1999, từ huyện/thành phố khác gọi 02-27208889) nhánh 8585.",
-   "id": "Silakan masuk ke Platform Layanan Warga - Cek Progres Online untuk melihat progres layanan, atau hubungi layanan pelanggan (1999, dari luar Kota Taipei 02-27208889) ekstensi 8585.\nVerifikasi kartu identitas: hubungi layanan pelanggan (1999, dari luar Kota Taipei 02-27208889) ekstensi 8585.",
-   "tl": "Tingnan ang progreso sa pamamagitan ng pag-log in sa Citizen Service Platform - Online Progress Inquiry, o tumawag sa customer service (1999; mula sa labas ng Taipei 02-27208889) ext. 8585.\nID verification: tumawag sa customer service (1999; mula sa labas ng Taipei 02-27208889) ext. 8585."
   },
   "請選擇地點": {
    "en": "Select a location",
@@ -2353,13 +2209,6 @@
    "vi": "3 năm gần đây",
    "id": "3 tahun terakhir",
    "tl": "Nakaraang 3 taon"
-  },
-  "透過悠遊付APP註冊完成的台北通會員將取得一組帳號及密碼，如您忘記當初設定的密碼，請透過「忘記密碼」功能進行密碼變更。": {
-   "en": "TaipeiPASS members who registered through the EasyWallet app receive an account and password. If you forgot the password you set, please use the “Forgot Password” function to change it.",
-   "ja": "EasyWalletアプリで登録したTaipeiPASS会員には、アカウントとパスワードが発行されます。設定したパスワードをお忘れの場合は、「パスワードを忘れた場合」機能からパスワードを変更してください。",
-   "vi": "Thành viên TaipeiPASS đăng ký qua ứng dụng EasyWallet sẽ có một tài khoản và mật khẩu; nếu bạn quên mật khẩu đã đặt, vui lòng đổi mật khẩu bằng chức năng “Quên mật khẩu”.",
-   "id": "Anggota TaipeiPASS yang mendaftar melalui aplikasi EasyWallet akan mendapatkan akun dan kata sandi. Jika Anda lupa kata sandi, gunakan fitur “Lupa kata sandi” untuk mengubahnya.",
-   "tl": "Ang mga miyembro ng TaipeiPASS na nag-register sa EasyWallet APP ay may account at password. Kung nakalimutan mo ang password, gamitin ang “Nakalimutan ang Password” para palitan ito."
   },
   "通報": {
    "en": "Report",
@@ -2626,13 +2475,6 @@
    "vi": "Lượt xem: 500",
    "id": "Jumlah dilihat: 500",
    "tl": "Bilang ng pagtingin: 500"
-  },
-  "，就可以在會員中心的「安全性」-「授權第三方應用」列表中，選擇取消特定服務的授權。": {
-   "en": ", you can cancel the authorization of a specific service in the “Authorized Third-Party Apps” list under “Security” in the Member Center.",
-   "ja": "、会員センターの「セキュリティ」-「サードパーティアプリの認可」一覧から、特定サービスの認可を取り消すことができます。",
-   "vi": ", bạn có thể vào danh sách “Bảo mật” - “Ủy quyền ứng dụng bên thứ ba” trong Trung tâm thành viên để hủy ủy quyền cho từng dịch vụ.",
-   "id": ", lalu Anda dapat membatalkan izin layanan tertentu di daftar “Keamanan” - “Otorisasi Aplikasi Pihak Ketiga” di Pusat Anggota.",
-   "tl": ", maaari mo nang kanselahin ang awtorisasyon ng partikular na serbisyo sa listahang “Seguridad” - “Mga Awtorisadong Third-party App” sa Member Center."
   }
  }
 }

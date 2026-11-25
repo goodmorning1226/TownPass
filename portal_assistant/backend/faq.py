@@ -68,7 +68,11 @@ def expand(text):
 
 HIGH_CONF = 0.915
 MEDIUM_CONF = 0.88
-SCOPE_NOTE = "本服務僅涵蓋臺北市政府 FAQ。"
+# The city FAQ is the primary source of qa_sources.json (2026-11-25, rules section 11): its
+# scope sentence and index folder come from there ("本服務僅涵蓋臺北市政府 FAQ。", faq_rag).
+import qa_sources  # noqa: E402
+SCOPE_NOTE = qa_sources.scope_note([])
+INDEX_DIR = (qa_sources.primary() or {}).get("index_dir") or "faq_rag"
 # The encoder accepts 512 positions; assistant requests are <= 500 chars.
 MAX_QUERY_CHARS = 500
 
@@ -77,7 +81,7 @@ def default_dir():
     configured = os.environ.get("TOWNPASS_FAQ_DIR")
     if configured:
         return pathlib.Path(configured)
-    return pathlib.Path(os.environ.get("LOCALAPPDATA", pathlib.Path.home())) / "TownPassAssistant" / "faq_rag"
+    return pathlib.Path(os.environ.get("LOCALAPPDATA", pathlib.Path.home())) / "TownPassAssistant" / INDEX_DIR
 
 
 def default_url():

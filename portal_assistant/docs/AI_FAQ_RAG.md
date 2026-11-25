@@ -301,3 +301,15 @@ dev 差 1 題（基線 181）屬模型輸出的正常變動，非本次改動。
   **未在手機上驗證**（Chaquopy 的 SSL 憑證、暫存目錄位置、速度）。編碼 10 題約一次 embedding 請求。
 - 關閉：環境變數 `TOWNPASS_QNA=0`（電腦於啟動後端前設定；手機可在 `device_main.configure` 加上）；
   `TOWNPASS_QNA_URL` 可改來源。回復：刪除 `qna.py`、`test_qna.py`，還原 `workflow.py`、`server.py`、`device_main.py` 與本節。
+
+## 10. 問答來源登記表（2026-11-25，第三階段）
+
+規則：[AI_CURRENT_RULES.md](AI_CURRENT_RULES.md) 第 11 節；操作手冊：skill [`townpass-add-qa`](../skills/townpass-add-qa/SKILL.md)、說明書 [QA_SKILL_GUIDE.md](QA_SKILL_GUIDE.md)。
+
+- 市府 FAQ（`city_faq`，bundled-index）與台北通常見問答（`townpass_qna`，runtime-fetch）的網址、前綴、附註、間隔、上限、授權搬進
+  `portal_assistant/app/assets/assistant/qa_sources.json`；`qna.py` 可以載入任意多個 runtime-fetch／bundled-file 來源，`CombinedIndex` 照登記順序合併
+  （同分時問答來源在前、市府 FAQ 在後，和第 9.2 節相同）。改前、改後與改前再跑一次的評估逐題相同（`<工作資料夾>\integration-plan\stage3_eval\`）。
+- 本節第 6、9 節自寫的正例與負例，整理成每個來源的開發題 `portal_assistant/backend/data/qa_dev/<id>.json`（台北通只放我們自己的問法，不放原題目），
+  `portal_assistant/scripts/check_qa_source.py` 用它們檢查分數；2026-11-25 量到的數目當上限（`backend/data/qa_baseline.json`）。
+- 資料日期：`build_faq_index.py` 從這次起把 `published_at` 寫進 `metadata.json`；手機目前下載的索引（2026-11-07 建）沒有這個欄位，所以市府 FAQ 的答案還不顯示日期，
+  要重建 metadata、更新 `models.json` 的雜湊並上傳 HF（要擁有者同意）。

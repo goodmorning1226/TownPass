@@ -1,0 +1,12 @@
+{
+ "version": 1,
+ "seals": [
+  {
+   "date": "2026-11-25",
+   "writer": "Empty file sealed by the stage-3 implementer on 2026-11-25 (no items yet: no Q&A source added after 2026-11-25)",
+   "sha256": "c8951479b2d4b5d76ca86bfd05ae56a4d792428dcf2b130f07f8c2a977775ec7",
+   "items": 0,
+   "per_source": {}
+  }
+ ]
+}

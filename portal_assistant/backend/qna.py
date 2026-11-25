@@ -1,4 +1,5 @@
-"""TownPass App Q&A (台北通常見問答) next to the Taipei FAQ, fetched at runtime.
+"""Q&A sources next to the Taipei FAQ: the TownPass App Q&A (台北通常見問答) and any other
+runtime or bundled-file source of qa_sources.json (2026-11-25, stage 3; rules section 11).
 
 The official web service publishes the App's own questions (login, card,
 coupons, ...) as qna_list.json. That repository has no licence, so its text
@@ -6,14 +7,18 @@ is never stored in this repo: it is downloaded while the assistant runs, kept
 in memory and, optionally, in a cache file outside the repo (the system temp
 directory; TOWNPASS_QNA_CACHE overrides) that is refreshed at most once a day.
 Offline, or when the file has an unexpected shape, the layer has no items and
-the assistant answers as before.
+the assistant answers as before. Every source's address, parser, id prefix,
+intervals and limits come from qa_sources.json (qa_sources.py); the module
+constants below are the TownPass source's values, kept for callers and tests.
 
 The questions are embedded ("passage: " texts) with the same e5 embedding
-server as faq.py; CombinedIndex searches both and merges hits by score, with
-the same interface as faq.FaqIndex.search, so workflow.py needs no new path.
-Loading and refreshing run in background threads and never block a turn.
+server as faq.py; CombinedIndex searches the city FAQ and every loaded source and
+merges hits by score, with the same interface as faq.FaqIndex.search, so
+workflow.py needs no new path. Loading and refreshing run in background threads
+and never block a turn.
 
-TOWNPASS_QNA=0 turns the layer off; TOWNPASS_QNA_URL overrides the source.
+TOWNPASS_QNA=0 turns the layer off; TOWNPASS_QNA_URL overrides the TownPass source;
+TOWNPASS_QA_SOURCES_OFF=<id>,<id> turns single sources off.
 """
 import heapq
 import html
@@ -27,28 +32,37 @@ import time
 import urllib.request
 
 import faq
-import origins
+import qa_sources
 
+TOWNPASS = qa_sources.get("townpass_qna")
+_LIMITS = TOWNPASS["limits"]
 # The demo site's 台北通 questions, on the default service origin (service_origins.json).
-DEFAULT_URL = origins.default() + "/mock/qna_list.json"
-DEPARTMENT = "台北通"
-SOURCE = "townpass_qna"
-SOURCE_NOTE = "資料來源：台北通常見問答。"
+DEFAULT_URL = qa_sources.url(TOWNPASS)
+DEPARTMENT = TOWNPASS["department"]
+SOURCE = TOWNPASS["id"]
+SOURCE_NOTE = qa_sources.text(TOWNPASS, "source_note")
 # Replaces faq.SCOPE_NOTE when App questions are among the offered ones.
-SCOPE_NOTE = "本服務涵蓋臺北市政府 FAQ 與台北通常見問答。"
-ID_PREFIX = "qna:"  # keeps App ids apart from the city FAQ's numeric ids
-REFRESH_S = 24 * 3600
-RETRY_FETCH_S = 1800    # after a failed download
-RETRY_EMBED_S = 60      # after the embedding server did not answer
-STARTUP_WAIT_S = 300    # the phone starts the embedding server after the backend
-FETCH_TIMEOUT = 10
-MAX_BYTES = 1 << 20
-MAX_ITEMS = 200
-MAX_QUESTION = 200
-MAX_ANSWER = 2000
-EMBED_BATCH = 16
+SCOPE_NOTE = qa_sources.scope_note([qa_sources.primary(), TOWNPASS])
+ID_PREFIX = TOWNPASS["id_prefix"]  # keeps App ids apart from the city FAQ's numeric ids
+REFRESH_S = TOWNPASS["refresh_s"]
+RETRY_FETCH_S = TOWNPASS["retry_fetch_s"]    # after a failed download
+RETRY_EMBED_S = TOWNPASS["retry_embed_s"]    # after the embedding server did not answer
+STARTUP_WAIT_S = TOWNPASS["startup_wait_s"]  # the phone starts the embedding server after the backend
+FETCH_TIMEOUT = TOWNPASS["fetch_timeout_s"]
+MAX_BYTES = _LIMITS["max_bytes"]
+MAX_ITEMS = _LIMITS["max_items"]
+MAX_QUESTION = _LIMITS["max_question"]
+MAX_ANSWER = _LIMITS["max_answer"]
+EMBED_BATCH = TOWNPASS["embed_batch"]
 # Passages are embedded in the background: a busy CPU may take longer than a query's 5 s.
-EMBED_TIMEOUT = 30
+EMBED_TIMEOUT = TOWNPASS["embed_timeout_s"]
+# Defaults for a source of qa_sources.json that leaves a value out (the TownPass values).
+DEFAULTS = {"refresh_s": REFRESH_S, "retry_fetch_s": RETRY_FETCH_S, "retry_embed_s": RETRY_EMBED_S,
+            "startup_wait_s": STARTUP_WAIT_S, "fetch_timeout_s": FETCH_TIMEOUT, "embed_timeout_s": EMBED_TIMEOUT,
+            "embed_batch": EMBED_BATCH}
+LIMITS = {"max_bytes": MAX_BYTES, "max_items": MAX_ITEMS, "max_question": MAX_QUESTION, "max_answer": MAX_ANSWER}
+MAX_CATEGORY = 40
+MAX_KEY = 40
 
 _ANCHOR = re.compile(r"<a\b[^>]*?href\s*=\s*[\"'](https?://[^\"'<>\s]+)[\"'][^>]*>(.*?)</a\s*>", re.I | re.S)
 _BREAK = re.compile(r"<\s*(?:br|/p|/div|/li)\b[^>]*>", re.I)
@@ -59,15 +73,39 @@ def enabled():
     return os.environ.get("TOWNPASS_QNA", "1") != "0"
 
 
+def source_enabled(source):
+    """A source can be turned off by its own variable (env.off) or TOWNPASS_QA_SOURCES_OFF."""
+    off = (source.get("env") or {}).get("off")
+    if off and os.environ.get(off, "1") == "0":
+        return False
+    return source["id"] not in {s.strip() for s in os.environ.get("TOWNPASS_QA_SOURCES_OFF", "").split(",")}
+
+
+def runtime_sources(registry=None):
+    """The sources this module loads: runtime-fetch and bundled-file, in registry order."""
+    return [s for s in qa_sources.sources(registry) if s["kind"] in ("runtime-fetch", "bundled-file")]
+
+
 def is_qna(entry):
     return entry.get("source") == SOURCE
 
 
-def default_cache():
-    configured = os.environ.get("TOWNPASS_QNA_CACHE")
+def setting(source, name):
+    return source.get(name, DEFAULTS[name])
+
+
+def limit(source, name):
+    return (source.get("limits") or {}).get(name, LIMITS[name])
+
+
+def default_cache(source=None):
+    source = source or TOWNPASS
+    variable = (source.get("env") or {}).get("cache")
+    configured = os.environ.get(variable) if variable else None
     if configured:
         return pathlib.Path(configured)
-    return pathlib.Path(tempfile.gettempdir()) / "TownPassAssistant" / "qna_cache.json"
+    name = source.get("cache_name") or f"qa_{source['id']}_cache.json"
+    return pathlib.Path(tempfile.gettempdir()) / "TownPassAssistant" / name
 
 
 def clean(text, limit):
@@ -81,42 +119,99 @@ def clean(text, limit):
     return text[:limit].rstrip()
 
 
-def parse(document):
-    """Entries from qna_list.json ({"data": [{"name", "list": [{id, category, name, content}]}]}).
+def _key(raw_id, count):
+    key = re.sub(r"[^\w.-]", "", str(raw_id))[:MAX_KEY] if isinstance(raw_id, (str, int)) and not isinstance(
+        raw_id, bool) else ""
+    return key or str(count + 1)
 
-    Anything else yields no entries; malformed items are skipped one by one.
-    """
+
+def _parse_townpass(document, source):
+    """qna_list.json ({"data": [{"name", "list": [{id, category, name, content}]}]})."""
     if not isinstance(document, dict) or not isinstance(document.get("data"), list):
         return []
+    max_items, max_question, max_answer = (limit(source, "max_items"), limit(source, "max_question"),
+                                           limit(source, "max_answer"))
     entries, seen = [], set()
     for group in document["data"]:
         if not isinstance(group, dict) or not isinstance(group.get("list"), list):
             continue
         for item in group["list"]:
-            if len(entries) >= MAX_ITEMS:
+            if len(entries) >= max_items:
                 return entries
             if not isinstance(item, dict):
                 continue
-            question = clean(item.get("name"), MAX_QUESTION)
-            answer = clean(item.get("content"), MAX_ANSWER)
+            question = clean(item.get("name"), max_question)
+            answer = clean(item.get("content"), max_answer)
             raw_id = item.get("id")
-            key = re.sub(r"[^\w.-]", "", raw_id)[:40] if isinstance(raw_id, str) else ""
+            key = re.sub(r"[^\w.-]", "", raw_id)[:MAX_KEY] if isinstance(raw_id, str) else ""
             key = key or str(len(entries) + 1)
             if not question or not answer or key in seen:
                 continue
             seen.add(key)
-            category = clean(item.get("category"), 40) or clean(group.get("name"), 40)
-            entries.append({"id": ID_PREFIX + key, "question": question, "answer": answer,
-                            "department": DEPARTMENT, "category": category, "source": SOURCE})
+            category = clean(item.get("category"), MAX_CATEGORY) or clean(group.get("name"), MAX_CATEGORY)
+            entries.append({"id": source["id_prefix"] + key, "question": question, "answer": answer,
+                            "department": source["department"], "category": category, "source": source["id"]})
     return entries
 
 
-def download(url, timeout=FETCH_TIMEOUT):
+def _parse_rows(document, source):
+    """generic ({"items": [...]} or a list) and city-faq (a list of index metadata rows): each
+    item {id?, question, answer, department?, category?, published_at?}."""
+    rows = document.get("items") if isinstance(document, dict) else document
+    if not isinstance(rows, list):
+        return []
+    max_items, max_question, max_answer = (limit(source, "max_items"), limit(source, "max_question"),
+                                           limit(source, "max_answer"))
+    entries, seen = [], set()
+    for item in rows:
+        if len(entries) >= max_items:
+            break
+        if not isinstance(item, dict):
+            continue
+        question = clean(item.get("question"), max_question)
+        answer = clean(item.get("answer"), max_answer)
+        key = _key(item.get("id"), len(entries))
+        if not question or not answer or key in seen:
+            continue
+        seen.add(key)
+        entry = {"id": source["id_prefix"] + key, "question": question, "answer": answer,
+                 "department": clean(item.get("department"), MAX_CATEGORY) or source.get("department") or "",
+                 "category": clean(item.get("category"), MAX_CATEGORY), "source": source["id"]}
+        date = qa_sources.published(item)
+        if date:
+            entry["published_at"] = date
+        entries.append(entry)
+    return entries
+
+
+PARSERS = {"townpass-qna": _parse_townpass, "generic": _parse_rows, "city-faq": _parse_rows}
+
+
+def parse(document, source=None):
+    """Entries of a source's document by its parser (default: the TownPass source).
+
+    Anything else yields no entries; malformed items are skipped one by one.
+    """
+    source = source or TOWNPASS
+    return PARSERS[source["parser"]](document, source)
+
+
+def download(url, timeout=FETCH_TIMEOUT, max_bytes=None):
+    max_bytes = MAX_BYTES if max_bytes is None else max_bytes
     request = urllib.request.Request(url, headers={"User-Agent": "TownPass-Assistant/1",
                                                    "Accept": "application/json"})
     with urllib.request.urlopen(request, timeout=timeout) as response:
-        body = response.read(MAX_BYTES + 1)
-    if len(body) > MAX_BYTES:
+        body = response.read(max_bytes + 1)
+    if len(body) > max_bytes:
+        raise ValueError("Q&A file too large")
+    return json.loads(body.decode("utf-8"))
+
+
+def read_file(path, max_bytes=None):
+    """A bundled-file source's document (the same size limit as a download)."""
+    max_bytes = MAX_BYTES if max_bytes is None else max_bytes
+    body = pathlib.Path(path).read_bytes()
+    if len(body) > max_bytes:
         raise ValueError("Q&A file too large")
     return json.loads(body.decode("utf-8"))
 
@@ -128,16 +223,23 @@ def passage(entry):
 
 
 class QnaIndex:
-    """The App's Q&A in memory; empty until a background load succeeds."""
+    """One source's Q&A in memory; empty until a background load succeeds."""
 
-    def __init__(self, url=None, embed_url=None, fetch=None, embed=None, cache=None, clock=time.time):
+    def __init__(self, url=None, embed_url=None, fetch=None, embed=None, cache=None, clock=time.time, source=None):
         """fetch: url -> parsed JSON; embed: prefixed texts -> normalised vectors (both for tests).
-        cache: a path, or False for none."""
-        self.url = url or os.environ.get("TOWNPASS_QNA_URL", DEFAULT_URL)
+        cache: a path, or False for none. source: a qa_sources.json entry (default: TownPass)."""
+        self.source = source or TOWNPASS
+        bundled = self.source["kind"] == "bundled-file"
+        variable = (self.source.get("env") or {}).get("url")
+        self.url = url or (os.environ.get(variable) if variable else None) or (
+            str(qa_sources.file_path(self.source)) if bundled else qa_sources.url(self.source))
         self.embed_url = embed_url or faq.default_url()
-        self._fetch = fetch or download
-        self._embed = embed or (lambda texts: faq.embed_texts(self.embed_url, texts, timeout=EMBED_TIMEOUT))
-        self.cache = default_cache() if cache is None else cache
+        max_bytes = limit(self.source, "max_bytes")
+        self._fetch = fetch or ((lambda target: read_file(target, max_bytes)) if bundled else (
+            lambda target: download(target, setting(self.source, "fetch_timeout_s"), max_bytes)))
+        timeout = setting(self.source, "embed_timeout_s")
+        self._embed = embed or (lambda texts: faq.embed_texts(self.embed_url, texts, timeout=timeout))
+        self.cache = (False if bundled else default_cache(self.source)) if cache is None else cache
         self.clock = clock
         self.entries, self.vectors, self.by_id = [], [], {}
         self.fetched_at = None
@@ -145,6 +247,7 @@ class QnaIndex:
         self._pending = None  # fetched entries still waiting for embeddings
         self._lock = threading.Lock()
         self._thread = None
+        self.label = self.source.get("label") or qa_sources.text(self.source, "names", "en")
 
     @property
     def count(self):
@@ -155,8 +258,9 @@ class QnaIndex:
             return None
         try:
             stored = json.loads(pathlib.Path(self.cache).read_text(encoding="utf-8"))
-            if stored.get("url") == self.url and 0 <= now - float(stored["fetched_at"]) < REFRESH_S:
-                return float(stored["fetched_at"]), parse(stored["document"])
+            if stored.get("url") == self.url and 0 <= now - float(stored["fetched_at"]) < setting(self.source,
+                                                                                                    "refresh_s"):
+                return float(stored["fetched_at"]), parse(stored["document"], self.source)
         except (OSError, ValueError, KeyError, TypeError, AttributeError):
             pass
         return None
@@ -184,35 +288,37 @@ class QnaIndex:
                     document = self._fetch(self.url)
                 except (OSError, ValueError, UnicodeError) as exc:
                     # Keeps what is in memory (if this process fetched earlier); none otherwise.
-                    print(f"Q&A: TownPass Q&A not fetched ({type(exc).__name__}); retry later", flush=True)
-                    self.next_try = now + RETRY_FETCH_S
+                    print(f"Q&A: {self.label} Q&A not fetched ({type(exc).__name__}); retry later", flush=True)
+                    self.next_try = now + setting(self.source, "retry_fetch_s")
                     return "fetch_failed"
-                entries = parse(document)
+                entries = parse(document, self.source)
                 if entries:
                     self._write_cache(now, document)
                 self._pending = (now, entries)
         fetched_at, entries = self._pending
+        batch = setting(self.source, "embed_batch")
         try:
             vectors = []
-            for start in range(0, len(entries), EMBED_BATCH):
-                vectors += self._embed([passage(e) for e in entries[start:start + EMBED_BATCH]])
+            for start in range(0, len(entries), batch):
+                vectors += self._embed([passage(e) for e in entries[start:start + batch]])
             if len(vectors) != len(entries):
                 raise ValueError("vector count")
         except (OSError, ValueError, KeyError) as exc:
             print(f"Q&A: embedding server not ready ({type(exc).__name__}); retry later", flush=True)
-            self.next_try = now + RETRY_EMBED_S
+            self.next_try = now + setting(self.source, "retry_embed_s")
             return "embed_failed"
         with self._lock:
             self.entries, self.vectors = entries, [[float(x) for x in v] for v in vectors]
             self.by_id = {e["id"]: e for e in entries}
             self.fetched_at = fetched_at
         self._pending = None
-        self.next_try = fetched_at + REFRESH_S
-        print(f"Q&A: {len(entries)} TownPass questions loaded", flush=True)
+        self.next_try = fetched_at + setting(self.source, "refresh_s")
+        print(f"Q&A: {len(entries)} {self.label} questions loaded", flush=True)
         return "ok"
 
-    def load(self, wait_s=STARTUP_WAIT_S, pause_s=5.0):
+    def load(self, wait_s=None, pause_s=5.0):
         """Startup load: retries while the embedding server is still starting."""
+        wait_s = setting(self.source, "startup_wait_s") if wait_s is None else wait_s
         deadline = time.monotonic() + wait_s
         state = self.refresh()
         while state == "embed_failed" and time.monotonic() + pause_s < deadline:
@@ -225,7 +331,8 @@ class QnaIndex:
         with self._lock:
             if self._thread is not None and self._thread.is_alive():
                 return False
-            self._thread = threading.Thread(target=target or self.refresh, name="assistant-qna", daemon=True)
+            name = "assistant-qna" if self.source is TOWNPASS else f"assistant-qa-{self.source['id']}"
+            self._thread = threading.Thread(target=target or self.refresh, name=name, daemon=True)
             self._thread.start()
             return True
 
@@ -247,14 +354,20 @@ def _question_key(question):
 
 
 class _Ids:
-    """by_id over both sources, without copying the city FAQ's dictionary."""
+    """by_id over every source, without copying the city FAQ's dictionary: an id with a
+    source's prefix belongs to that source, any other id to the city FAQ."""
 
-    def __init__(self, city, qna):
-        self.city, self.qna = city, qna
+    def __init__(self, city, indexes):
+        self.city = city
+        # Longest prefix first, so a prefix that starts another one cannot take its ids.
+        self.indexes = sorted((i for i in indexes if i.source.get("id_prefix")),
+                              key=lambda i: -len(i.source["id_prefix"]))
 
     def get(self, key, default=None):
-        if isinstance(key, str) and key.startswith(ID_PREFIX):
-            return self.qna.by_id.get(key, default)
+        if isinstance(key, str):
+            for index in self.indexes:
+                if key.startswith(index.source["id_prefix"]):
+                    return index.by_id.get(key, default)
         return self.city.by_id.get(key, default) if self.city is not None else default
 
     def __contains__(self, key):
@@ -262,16 +375,20 @@ class _Ids:
 
 
 class CombinedIndex:
-    """The city FAQ (faq.FaqIndex or None) and the App Q&A behind FaqIndex's interface."""
+    """The city FAQ (faq.FaqIndex or None) and the Q&A sources behind FaqIndex's interface.
+
+    qna: one QnaIndex (the TownPass App Q&A) or a list of them, in qa_sources.json order."""
 
     def __init__(self, city, qna, embed=None):
-        self.city, self.qna = city, qna
+        self.city = city
+        self.indexes = list(qna) if isinstance(qna, (list, tuple)) else [qna]
+        self.qna = self.indexes[0]
         self._embed = embed
-        self.by_id = _Ids(city, qna)
+        self.by_id = _Ids(city, self.indexes)
 
     @property
     def count(self):
-        return (self.city.count if self.city is not None else 0) + self.qna.count
+        return (self.city.count if self.city is not None else 0) + sum(index.count for index in self.indexes)
 
     def embed(self, text):
         if self._embed is not None:
@@ -285,11 +402,15 @@ class CombinedIndex:
         top = heapq.nlargest(min(k, self.city.count), range(self.city.count), key=lambda i: float(scores[i]))
         return [{"score": round(float(scores[i]), 4), **self.city.metadata[i]} for i in top]
 
+    def _loaded(self):
+        for index in self.indexes:
+            index.refresh_if_due()
+        return any(index.count for index in self.indexes)
+
     def search(self, text, k=3):
-        """(confidence, hits) as faq.FaqIndex.search, over both sources by score."""
-        self.qna.refresh_if_due()
-        if not self.qna.count:
-            # Unchanged city behaviour while the App Q&A is not loaded.
+        """(confidence, hits) as faq.FaqIndex.search, over every source by score."""
+        if not self._loaded():
+            # Unchanged city behaviour while no Q&A source is loaded.
             return self.city.search(text, k) if self.city is not None else ("none", [])
         hits = self._merged(text, k)
         if hits is None:
@@ -297,9 +418,8 @@ class CombinedIndex:
         return faq.band(hits[0]["score"]), [hit for hit in hits if hit["score"] >= faq.MEDIUM_CONF]
 
     def top(self, text, k=5):
-        """The k closest entries of both sources, whatever their score (faq.FaqIndex.top)."""
-        self.qna.refresh_if_due()
-        if not self.qna.count:
+        """The k closest entries of every source, whatever their score (faq.FaqIndex.top)."""
+        if not self._loaded():
             return self.city.top(text, k) if self.city is not None else []
         return self._merged(text, k) or []
 
@@ -312,10 +432,11 @@ class CombinedIndex:
         except (OSError, ValueError, KeyError) as exc:
             print(f"FAQ: embedding server unavailable ({type(exc).__name__})", flush=True)
             return None
-        # App items first, so they win ties; the city FAQ repeats some of them
-        # (資訊局, other punctuation), and a repeated question is shown once.
+        # Q&A sources first (registry order), so they win ties; the city FAQ repeats some App
+        # items (資訊局, other punctuation), and a repeated question is shown once.
         merged, seen = [], set()
-        for hit in sorted(self.qna.hits(vector, k) + (self._city_hits(vector, 2 * k) if self.city is not None else []),
+        found = [hit for index in self.indexes for hit in index.hits(vector, k)]
+        for hit in sorted(found + (self._city_hits(vector, 2 * k) if self.city is not None else []),
                           key=lambda hit: -hit["score"]):
             key = _question_key(hit["question"])
             if key not in seen:
@@ -324,10 +445,17 @@ class CombinedIndex:
         return merged[:k]
 
 
-def with_qna(city):
-    """city (or None) combined with the App Q&A, loading in the background; city when turned off."""
+def with_qna(city, registry=None):
+    """city (or None) combined with the Q&A sources of qa_sources.json, loading in the
+    background; city when they are turned off."""
     if not enabled():
         return city
-    qna = QnaIndex()
-    qna.start(qna.load)
-    return CombinedIndex(city, qna)
+    indexes = []
+    for source in runtime_sources(registry):
+        if source_enabled(source):
+            index = QnaIndex(source=source)
+            index.start(index.load)
+            indexes.append(index)
+    if not indexes:
+        return city
+    return CombinedIndex(city, indexes)
