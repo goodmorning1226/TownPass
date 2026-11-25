@@ -1,7 +1,7 @@
 # 沒有 Mac 也能測 iPhone 版（2026-11-11）
 
 用 GitHub 的雲端 Mac 編出 `.ipa`，再從 Windows 用 Sideloadly 裝到自己的 iPhone。只在分支 `ci/ios-build` 上，不進 main、也不送官方。
-模型由 App 自己從 Hugging Face 下載（[AI_MODEL_DOWNLOAD.md](AI_MODEL_DOWNLOAD.md)），不需要 Mac 推檔案。
+模型由 App 自己從 Hugging Face 下載（[AI_MODEL_DOWNLOAD.md](../portal_assistant/docs/AI_MODEL_DOWNLOAD.md)），不需要 Mac 推檔案。
 
 為什麼不用 xtool 或虛擬機：xtool 只支援 SwiftPM 專案，不能編 Flutter App；macOS 的授權只允許裝在 Apple 硬體上，
 Windows 上的 macOS 虛擬機違反授權，而且沒有 GPU、USB 接 iPhone 不穩。
@@ -10,9 +10,9 @@ Windows 上的 macOS 虛擬機違反授權，而且沒有 GPU、USB 接 iPhone �
 
 `.github/workflows/ios-build.yml`：推到 `ci/ios-build` 就會在 GitHub 的 macOS 編譯機上執行（公開 repo 不收費）：
 
-1. 下載 llama.cpp b12182、whisper.cpp v1.9.5，套用 `ios/native/` 的 patch，編成 LlamaServer／WhisperServer framework（`scripts/build_ios_*_server.sh`；結果會快取，之後的編譯較快）。
+1. 下載 llama.cpp b12182、whisper.cpp v1.9.5，套用 `portal_assistant/native/ios/` 的 patch，編成 LlamaServer／WhisperServer framework（`portal_assistant/native/ios/build_ios_*_server.sh`；結果會快取，之後的編譯較快）。
 2. 下載 BeeWare Python-Apple-support 最新的 3.13 版 Python framework。
-3. `scripts/setup_ios_on_device.sh` 放進 `ios/OnDevice/`，`flutter build ios --release --no-codesign`（`ASSISTANT_ON_DEVICE=true`），包成未簽章的 `TownPass-assistant-unsigned.ipa`。
+3. `portal_assistant/native/ios/setup_ios_on_device.sh` 放進 `ios/OnDevice/`，`flutter build ios --release --no-codesign`（`ASSISTANT_ON_DEVICE=true`），包成未簽章的 `TownPass-assistant-unsigned.ipa`。
 
 要測新版本：把要測的分支合進 `ci/ios-build` 再推上去。
 完成後到 GitHub 的 repo → Actions → 該次執行 → Artifacts，下載 `TownPass-assistant-unsigned-ipa`（保留 14 天），解壓出 `.ipa`。

@@ -1,7 +1,7 @@
 # Builds an unsigned iPhone .ipa of the on-device assistant on a GitHub macOS runner,
 # for testing from a Windows PC without a Mac (docs/IOS_BUILD_WITHOUT_MAC.md).
 # The .ipa is then signed and installed with Sideloadly; the App downloads its
-# models itself (docs/AI_MODEL_DOWNLOAD.md).
+# models itself (portal_assistant/docs/AI_MODEL_DOWNLOAD.md).
 #
 # Runs on pushes to the ci/ios-build branch only (and by hand). Not meant for main
 # or for upstream: it changes nothing in the App.
@@ -58,7 +58,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ${{ env.NATIVE }}/ios-out
-          key: ios-native-${{ env.LLAMA_TAG }}-${{ env.WHISPER_TAG }}-${{ hashFiles('ios/native/**', 'scripts/build_ios_llama_server.sh', 'scripts/build_ios_whisper_server.sh') }}
+          key: ios-native-${{ env.LLAMA_TAG }}-${{ env.WHISPER_TAG }}-${{ hashFiles('portal_assistant/native/ios/**') }}
 
       - name: Build LlamaServer and WhisperServer frameworks
         if: steps.native.outputs.cache-hit != 'true'
@@ -68,8 +68,8 @@ jobs:
           mkdir -p "$NATIVE"
           git clone --depth 1 --branch "$LLAMA_TAG" https://github.com/ggml-org/llama.cpp "$NATIVE/llama.cpp"
           git clone --depth 1 --branch "$WHISPER_TAG" https://github.com/ggml-org/whisper.cpp "$NATIVE/whisper.cpp"
-          scripts/build_ios_llama_server.sh "$NATIVE/llama.cpp" "$NATIVE/ios-out"
-          scripts/build_ios_whisper_server.sh "$NATIVE/whisper.cpp" "$NATIVE/ios-out"
+          portal_assistant/native/ios/build_ios_llama_server.sh "$NATIVE/llama.cpp" "$NATIVE/ios-out"
+          portal_assistant/native/ios/build_ios_whisper_server.sh "$NATIVE/whisper.cpp" "$NATIVE/ios-out"
 
       # CPython for iOS from BeeWare's Python-Apple-support (the newest 3.13 build).
       - name: Python framework
@@ -89,7 +89,7 @@ jobs:
       - name: Put the frameworks in ios/OnDevice
         run: |
           mkdir -p "$LOGS"; exec > >(tee "$LOGS/setup.log") 2>&1
-          scripts/setup_ios_on_device.sh "$NATIVE"
+          portal_assistant/native/ios/setup_ios_on_device.sh "$NATIVE"
 
       - name: Flutter packages and generated code
         run: |
