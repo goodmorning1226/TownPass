@@ -1,7 +1,9 @@
 # 助理全螢幕介面、語音與頁面狀態規劃
 
+> **歷史文件**（已被取代，只當紀錄）：內容是寫的當時的狀態，有些做法後來改掉了。現行規則以 [AI_CURRENT_RULES.md](../AI_CURRENT_RULES.md) 為準，索引見 [README.md](README.md)。
+
 日期：2026-11-06。狀態：規劃已與使用者確認，尚未實作。
-沿用 `ministral-3:3b`、Python 後端、Flutter／GetX、原 WebView 與 [AGENTS.md](../../AGENTS.md)。
+沿用 `ministral-3:3b`、Python 後端、Flutter／GetX、原 WebView 與 [AGENTS.md](../../../AGENTS.md)。
 保留候選確認、取消／遲到回覆防護，以及「新的助理導航先清除舊服務歷史」。
 本文件補充 [全功能分步計畫](AI_ALL_FEATURES_ROLLOUT_PLAN.md)，不取代其中的目錄、候選與返回規則。
 

@@ -1,5 +1,7 @@
 # 第一階段：助理泡泡與原圖書頁面整合工作清單
 
+> **歷史文件**（已被取代，只當紀錄）：內容是寫的當時的狀態，有些做法後來改掉了。現行規則以 [AI_CURRENT_RULES.md](../AI_CURRENT_RULES.md) 為準，索引見 [README.md](README.md)。
+
 更新日期：2026-11-05。對應 [實作計畫書](AI_TOOL_CALLING_PLAN.md) 最新修訂。
 本文件保留最初分步規劃；現行實作使用 Ministral，完成狀態及測試結果以
 [實作紀錄](AI_PHASE1_IMPLEMENTATION.md) 為準。未勾選項目不可當成已驗證。

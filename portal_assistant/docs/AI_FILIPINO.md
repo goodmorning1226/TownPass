@@ -1,5 +1,7 @@
 # 菲律賓文取代泰文（2026-11-11）
 
+> **開發紀錄**：文中的分支、commit、「還沒提交」「尚未實作」是寫的當時的狀態；採用的做法都已合進目前的程式。現行規則以 [AI_CURRENT_RULES.md](AI_CURRENT_RULES.md) 為準，文件索引見 [README.md](README.md)。
+
 擁有者 2026-11-11 決定「只改泰文」：泰文拿掉、由菲律賓文（Filipino／Tagalog）取代；越南文、印尼文不動。
 分支 `feat/filipino`（worktree `TownPass-fil`，以 `00a8733` 為基礎），**還沒提交**。
 規則以 `portal_assistant/docs/AI_CURRENT_RULES.md` 第 4 節為準；本文說明做法、數字與限制。

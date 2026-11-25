@@ -1,5 +1,7 @@
 # 第 3 批：引導完成任務（表單預填）規劃
 
+> **歷史文件**（已被取代，只當紀錄）：內容是寫的當時的狀態，有些做法後來改掉了。現行規則以 [AI_CURRENT_RULES.md](../AI_CURRENT_RULES.md) 為準，索引見 [README.md](README.md)。
+
 日期：2026-11-07。分支 `feat/asr-ablation`（`0ba2230`）。只做規劃，尚未改程式。
 依據：官方 TownPass-Services main（`3274852a`，2026-11-07 讀取）的表單 view 與共用元件、
 部署站 `taipei-pass-service.vercel.app`（`assets/index-DwgpGSZE.js`；`form.json`、`disaster_reporting.json`、

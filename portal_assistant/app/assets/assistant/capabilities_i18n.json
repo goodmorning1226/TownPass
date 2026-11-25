@@ -1,6 +1,6 @@
 {
  "version": 1,
- "status": "draft 2026-11-07 (Filipino tl: AI draft 2026-11-11, replaced Thai), to be reviewed by speakers of each language (docs/AI_MULTILINGUAL_PLAN.md, docs/AI_FILIPINO.md); \"need\" (one sentence: the need the page solves) in every language: AI draft 2026-11-16 (need-style step 6), to be reviewed by speakers",
+ "status": "draft 2026-11-07 (Filipino tl: AI draft 2026-11-11, replaced Thai), to be reviewed by speakers of each language (docs/history/AI_MULTILINGUAL_PLAN.md, docs/AI_FILIPINO.md); \"need\" (one sentence: the need the page solves) in every language: AI draft 2026-11-16 (need-style step 6), to be reviewed by speakers",
  "languages": ["en", "ja", "vi", "id", "tl"],
  "capabilities": {
   "app.home": {

@@ -416,25 +416,24 @@ Flutter App 維持在 repo 根目錄，官方目錄不搬動（見 [AGENTS.md](.
 | **`ios/Runner/OnDeviceAssistant.swift`、`portal_assistant/native/ios/`** | iPhone：在 App 內以執行緒啟動各模型伺服器、鎖定後重新 bind、記憶體額度檢查、Xcode 內嵌階段 |
 | **`portal_assistant/scripts/`** | 建置原生程式庫、推模型、評估、抽字串 |
 | **`portal_assistant/tools/guide_audit/`** | 教學流程錄製與重播（Node ＋ Chrome） |
-| **`portal_assistant/docs/`** | 規則、技術總覽、各實驗紀錄、團隊待辦；`portal_assistant/docs/images/` 是本頁的截圖 |
+| **`portal_assistant/docs/`** | 規則、技術總覽、做法與實驗紀錄（[索引](README.md)）；`history/` 是已被取代的早期文件，`images/` 是本頁的截圖 |
 
 ## 文件索引
 
 | 主題 | 文件 |
 | --- | --- |
-| 先讀 | [ASSISTANT_README.md](../../ASSISTANT_README.md)（開發指南）、[AI_CURRENT_RULES.md](AI_CURRENT_RULES.md)（行為規則唯一準則）、[AI_TECHNICAL_OVERVIEW.md](AI_TECHNICAL_OVERVIEW.md)（技術總覽）、[AI_DECISION_FLOW.md](AI_DECISION_FLOW.md)（從語音／打字到回覆） |
+| 先讀 | [ASSISTANT_README.md](../../ASSISTANT_README.md)（開發指南）、[AI_CURRENT_RULES.md](AI_CURRENT_RULES.md)（行為規則唯一準則）、[AI_TECHNICAL_OVERVIEW.md](AI_TECHNICAL_OVERVIEW.md)（技術總覽）、[README.md](README.md)（文件索引） |
 | 語音 | [AI_LANGUAGE_GATE.md](AI_LANGUAGE_GATE.md)（語言閘門）、[AI_ASR_ABLATION.md](AI_ASR_ABLATION.md)（語音辨識消融）、[AI_TAIWANESE_SPEECH_PLAN.md](AI_TAIWANESE_SPEECH_PLAN.md)（台語辨識與朗讀）、[AI_TAIWANESE_RECORDING_SCRIPT.md](AI_TAIWANESE_RECORDING_SCRIPT.md)（台語錄音稿）、[AI_VIETNAMESE.md](AI_VIETNAMESE.md)（越南文） |
-| 多語 | [AI_MULTILINGUAL_PLAN.md](AI_MULTILINGUAL_PLAN.md)、[AI_INDONESIAN.md](AI_INDONESIAN.md)（印尼文）、[AI_FILIPINO.md](AI_FILIPINO.md)（菲律賓文） |
-| 檢索與決策 | [AI_DECISION_CLASSIFIER.md](AI_DECISION_CLASSIFIER.md)（決策分類器，預設）、[AI_FAQ_RAG.md](AI_FAQ_RAG.md)（市府 FAQ 檢索）、[AI_COLLOQUIAL_MATCHING_EXPERIMENT.md](AI_COLLOQUIAL_MATCHING_EXPERIMENT.md)（口語對頁面）、[AI_DECISION_MODEL_ABLATION_PLAN.md](AI_DECISION_MODEL_ABLATION_PLAN.md)、[SPEED_LIBRARY_EXPERIMENT.md](SPEED_LIBRARY_EXPERIMENT.md)、[AI_TOOL_CALLING_PLAN.md](AI_TOOL_CALLING_PLAN.md) |
-| 介面與教學 | [AI_GUIDED_MERGE_PLAN.md](AI_GUIDED_MERGE_PLAN.md)（引導式助理）、[AI_FORM_PREFILL_PLAN.md](AI_FORM_PREFILL_PLAN.md)（表單預填）、[AI_VOICE_UI_PLAN.md](AI_VOICE_UI_PLAN.md)、[GUIDE_AUDIT_TEAM_REQUESTS.md](GUIDE_AUDIT_TEAM_REQUESTS.md) |
-| 裝置端與服務覆蓋 | [AI_ON_DEVICE_PLAN.md](AI_ON_DEVICE_PLAN.md)、[AI_ON_DEVICE_IOS.md](AI_ON_DEVICE_IOS.md)（iPhone）、[AI_MODEL_DOWNLOAD.md](AI_MODEL_DOWNLOAD.md)（App 內下載與分級）、[AI_SERVICE_COVERAGE_PLAN.md](AI_SERVICE_COVERAGE_PLAN.md)、[AI_ALL_FEATURES_ROLLOUT_PLAN.md](AI_ALL_FEATURES_ROLLOUT_PLAN.md)、[AI_EXPANSION_IMPLEMENTATION.md](AI_EXPANSION_IMPLEMENTATION.md)、[FEATURE_AVAILABILITY_20261104.md](../../docs/FEATURE_AVAILABILITY_20261104.md) |
-| 圖書助理（第一階段） | [AI_PHASE1_IMPLEMENTATION.md](AI_PHASE1_IMPLEMENTATION.md)、[AI_LIBRARY_IMPLEMENTATION_STEPS.md](AI_LIBRARY_IMPLEMENTATION_STEPS.md) |
-| 進度、測試與團隊 | [AI_ASSISTANT_PROGRESS.md](AI_ASSISTANT_PROGRESS.md)、[AI_ASSISTANT_TEST_REPORT_20261107.md](AI_ASSISTANT_TEST_REPORT_20261107.md)、[TEAM_TASKS_AFTER_MERGE.md](TEAM_TASKS_AFTER_MERGE.md)、[AI_AGENT_HANDOFF.md](AI_AGENT_HANDOFF.md)、[TEAM_LOCAL_SETUP.md](TEAM_LOCAL_SETUP.md) |
+| 多語 | [AI_INDONESIAN.md](AI_INDONESIAN.md)（印尼文）、[AI_FILIPINO.md](AI_FILIPINO.md)（菲律賓文）、[AI_PAGE_TRANSLATION.md](AI_PAGE_TRANSLATION.md)（服務頁翻譯） |
+| 檢索與決策 | [AI_DECISION_CLASSIFIER.md](AI_DECISION_CLASSIFIER.md)（決策分類器，預設）、[AI_FAQ_RAG.md](AI_FAQ_RAG.md)（市府 FAQ 檢索）、[AI_COLLOQUIAL_MATCHING_EXPERIMENT.md](AI_COLLOQUIAL_MATCHING_EXPERIMENT.md)（口語對頁面） |
+| 裝置端與開發環境 | [AI_ON_DEVICE_PLAN.md](AI_ON_DEVICE_PLAN.md)、[AI_ON_DEVICE_IOS.md](AI_ON_DEVICE_IOS.md)（iPhone）、[AI_MODEL_DOWNLOAD.md](AI_MODEL_DOWNLOAD.md)（App 內下載與分級）、[TEAM_LOCAL_SETUP.md](TEAM_LOCAL_SETUP.md)（電腦開發） |
+| 擴充 | [SKILL_GUIDE.md](SKILL_GUIDE.md)（新增服務）、[QA_SKILL_GUIDE.md](QA_SKILL_GUIDE.md)（新增問答來源） |
+| 歷史文件（已被取代，只當紀錄） | [history/](history/README.md)：早期的計畫、交接、進度、2026-11-07 全面測試報告；[FEATURE_AVAILABILITY_20261104.md](../../docs/FEATURE_AVAILABILITY_20261104.md) |
 | 官方與同步 | [UPSTREAM_README.md](../../docs/UPSTREAM_README.md)（官方專案說明）、[DEVELOPMENT.md](../../docs/DEVELOPMENT.md)、[UPSTREAM_SYNC_20261103.md](../../docs/UPSTREAM_SYNC_20261103.md)、[AGENTS.md](../../AGENTS.md) |
 
 目前狀態與限制（2026-11-13）：外語介面與教學文字是 AI 翻譯草稿，待母語者校對；台語只有辨識、朗讀用中文；
 泰文已換成菲律賓文（2026-11-11，翻譯是 AI 草稿，待母語者審閱，[portal_assistant/docs/AI_FILIPINO.md](AI_FILIPINO.md)）；印尼文的比對已優化（2026-11-11），印尼文專用語音模型尚未接進 App。
-預設的決策分類器還沒在 Android 實機上量速度與記憶體。待辦有台語朗讀、iPhone 的 Gemma 與越南文模型，Android Release 未驗證。詳見 [portal_assistant/docs/TEAM_TASKS_AFTER_MERGE.md](TEAM_TASKS_AFTER_MERGE.md)。
+預設的決策分類器還沒在 Android 實機上量速度與記憶體。待辦有台語朗讀、iPhone 的 Gemma 與越南文模型，Android Release 未驗證。最新的限制見 [README](../README.md)「二、AI 使用聲明」第 4 節。
 
 ## 授權
 

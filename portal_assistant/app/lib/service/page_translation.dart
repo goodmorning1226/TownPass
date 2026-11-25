@@ -14,7 +14,7 @@ import 'package:townpass_portal_assistant/host/assistant_assets.dart';
 /// language of the assistant's last navigation, or the one chosen in
 /// Settings > Language. Pages are written in Chinese; other languages are
 /// translated on the phone with ML Kit (Google; each language model is about
-/// 30 MB, downloaded once). portal_assistant/docs/AI_MULTILINGUAL_PLAN.md section 10.
+/// 30 MB, downloaded once). portal_assistant/docs/history/AI_MULTILINGUAL_PLAN.md section 10.
 class PageTranslation {
   PageTranslation._();
 

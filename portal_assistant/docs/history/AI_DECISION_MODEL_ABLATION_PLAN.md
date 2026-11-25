@@ -1,5 +1,7 @@
 # 決策模型消融實驗規劃（只規劃，尚未實作）
 
+> **歷史文件**（已被取代，只當紀錄）：內容是寫的當時的狀態，有些做法後來改掉了。現行規則以 [AI_CURRENT_RULES.md](../AI_CURRENT_RULES.md) 為準，索引見 [README.md](README.md)。
+
 日期：2026-11-07。分支 `feat/asr-ablation`（`53ad4b0`）。
 目的：找比現在的 Ministral 3B（Mistral AI，Q4_K_M）**更快**、**準確率接近**的決策模型。
 現行模型只當對照，不重新測；不使用中國開發的模型。

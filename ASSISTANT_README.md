@@ -3,7 +3,7 @@
 這是 TownPass（台北通）fork 加上的**全程在手機上執行**的 AI 助理：聽懂你說的話（中文、台語、英文、日文、越南文、印尼文、菲律賓文），
 幫你打開對的市政服務頁面、回答市府 FAQ，並在服務頁面上一步步教你操作。沒有雲端模型，錄音不離開手機。
 
-- 分支：`main`（team fork `goodmorning1226/TownPass`；含 iPhone 版 `feat/ios-on-device`）。Android 與 iPhone 都全程在手機上跑。
+- 位置：repository 根目錄是已經接好助理的台北通 App；助理本身在 `portal_assistant/`，接進其他台北通版本的方式見 [portal_assistant/INTEGRATION.md](portal_assistant/INTEGRATION.md)。Android 與 iPhone 都全程在手機上跑。
 - 行為規則：[portal_assistant/docs/AI_CURRENT_RULES.md](portal_assistant/docs/AI_CURRENT_RULES.md)（唯一準則）。
 - 技術細節：[portal_assistant/docs/AI_TECHNICAL_OVERVIEW.md](portal_assistant/docs/AI_TECHNICAL_OVERVIEW.md)。
 - 改程式之前先讀 [AGENTS.md](AGENTS.md)。
@@ -177,7 +177,9 @@ portal_assistant/scripts/run_assistant_on_device.sh --chat            # 聊天�
 4. 測試：`python -X utf8 -m unittest discover -s portal_assistant/backend -p "test*.py"`、`fvm flutter analyze`、`fvm flutter test`（repo 根目錄與 `portal_assistant/app` 各一次）、`python portal_assistant/scripts\extract_guide_strings.py --check`。
 5. commit 要經擁有者同意；一個 commit 解決一件事。
 
-## 7. 目前狀態與限制（2026-11-13）
+## 7. 狀態與限制（2026-11-13 的紀錄）
+
+下面的數字與待辦是 2026-11-13 的狀態；最新的限制與風險見 [README](README.md)「二、AI 使用聲明」第 4 節。
 
 - 決策預設是**決策分類器**（2026-11-13 起，`portal_assistant/docs/AI_DECISION_CLASSIFIER.md` 第 10–13 節、`portal_assistant/docs/AI_CURRENT_RULES.md` 第 6 節）。電腦評估，分類器對 Ministral：
   held-out 95 對 97（作品名規則之後；之前 93），開錯頁都是 0；多語 96/96 對 96/96；口語四組開錯頁合計 3 對 16；
@@ -188,5 +190,5 @@ portal_assistant/scripts/run_assistant_on_device.sh --chat            # 聊天�
 - 外語介面與教學文字是 AI 翻譯草稿，待母語者校對。
 - App 內下載模型：電腦上的測試與實際下載都過了，iPhone 17 Pro Max 上走過下載（2026-11-13），Android 實機還沒走過完整流程；全部模型都可以直接下載（原作者的 Hugging Face，與團隊的 `allensung1226/townpass-assistant-models`）。
 - 泰文已換成菲律賓文（2026-11-11，App 代碼 `tl`；翻譯是 AI 草稿，待母語者審閱，`portal_assistant/docs/AI_FILIPINO.md`）；印尼文比對已優化（2026-11-11，`portal_assistant/docs/AI_INDONESIAN.md`），印尼文專用語音模型尚未接進 App。
-- 測試：Python 517 個、Flutter 611 個（2026-11-13）。
-- 待辦：分類器模式的 Android 實機速度與記憶體、台語朗讀、iPhone 的 Gemma 與越南文模型、Android Release 未驗證。詳見 `portal_assistant/docs/TEAM_TASKS_AFTER_MERGE.md`。
+- 測試：Python 517 個、Flutter 611 個（2026-11-13）；2026-11-25 是 Python 710 個、Flutter 854 個。
+- 待辦（當時）：分類器模式的 Android 實機速度與記憶體、台語朗讀、iPhone 的 Gemma 與越南文模型、Android Release 未驗證。

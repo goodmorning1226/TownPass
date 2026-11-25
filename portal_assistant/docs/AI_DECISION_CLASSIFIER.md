@@ -1,5 +1,7 @@
 # 決策分類器實驗（Route 1：cross-encoder 取代決策 LLM）
 
+> **開發紀錄**：文中的分支、commit、「還沒提交」「尚未實作」是寫的當時的狀態；採用的做法都已合進目前的程式。現行規則以 [AI_CURRENT_RULES.md](AI_CURRENT_RULES.md) 為準，文件索引見 [README.md](README.md)。
+
 日期：2026-11-11～12。分支 `exp/decision-classifier`（worktree `TownPass-cls`，基於 `00a8733`，commit `94bdc10`）。
 **2026-11-12 起選項 B′ 是 App 的選項**（`-DecisionModel classifier`，分支 `feat/classifier-decision`，第 12 節），規則寫進 `AI_CURRENT_RULES.md` 第 6–7 節；下面第 1–11 節是電腦實驗的紀錄。
 資料、模型、紀錄在 repo 外：`<工作資料夾>\decision-classifier\`；訓練環境 `<工作資料夾>\train-venv`。

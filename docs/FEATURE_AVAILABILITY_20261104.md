@@ -1,5 +1,7 @@
 # TownPass 現有功能查核
 
+> **本 fork 的開發紀錄**：文中的分支、remote、待辦與版本是寫的當時的狀態。助理的說明從 [README](../README.md) 開始，文件索引見 [README.md](README.md)。
+
 查核日期：2026-11-04。Flutter 基線：`e4fbd3cef9c9a0a7926e03ec6f7bbd072f5f5045`。
 服務範例原始碼基線：`3274852a94504b4fdaecc82ff3a9fda8342557f6`。
 
@@ -127,4 +129,4 @@
 兩者仍須新增受控 Adapter，不是模型裝好就能自動填入現有網頁。
 正式交易與空入口先停用，回覆清楚原因；不可把回到首頁或顯示完成視窗當作任務成功。
 
-完整架構、契約、確認流程與驗收方式見 [Tool Calling 計畫書](../portal_assistant/docs/AI_TOOL_CALLING_PLAN.md)。
+完整架構、契約、確認流程與驗收方式見 [Tool Calling 計畫書](../portal_assistant/docs/history/AI_TOOL_CALLING_PLAN.md)。

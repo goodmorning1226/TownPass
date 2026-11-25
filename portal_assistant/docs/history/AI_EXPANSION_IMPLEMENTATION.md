@@ -1,5 +1,7 @@
 # 全功能助理：第一批實作紀錄
 
+> **歷史文件**（已被取代，只當紀錄）：內容是寫的當時的狀態，有些做法後來改掉了。現行規則以 [AI_CURRENT_RULES.md](../AI_CURRENT_RULES.md) 為準，索引見 [README.md](README.md)。
+
 2026-11-05，分支 `feat/ai-assistant-plan`，App 基線 `e4fbd3c`。
 沿用 Flutter/GetX、TPRoute、原生頁面與既有 WebView bridge；模型仍為 `ministral-3:3b`。
 
@@ -23,7 +25,7 @@
 
 ## 使用者裝置驗收
 
-後端啟動方式見 [README](../backend/README.md)。本批有新增 App asset，請 Stop 後重新 Run，單純 hot reload 不足。
+後端啟動方式見 [README](../../backend/README.md)。本批有新增 App asset，請 Stop 後重新 Run，單純 hot reload 不足。
 
 | 輸入／操作 | 預期 |
 | --- | --- |

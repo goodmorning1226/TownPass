@@ -823,6 +823,11 @@ App 上看起來重複，也很難找到想要的；研究第 D 節）：
 6. **Xcode target 的檔案留在 `ios/Runner/`**（`OnDeviceAssistant.swift`、`Runner.entitlements`），副本在 `integration/files/`，由台北通的測試比對（擁有者 2026-11-24 決定；原因：這台沒有 Mac 驗證專案檔）。
 7. **測試**：套件自己的測試在 `portal_assistant/app/test`（`cd portal_assistant/app && fvm flutter test`）；需要真正台北通畫面（帳戶頁、`MainViewController`、`TPText`、`TPWebView`）的
    在台北通的 `test/`。兩邊都要跑，總數不能少。
+8. **文件分三類**（2026-11-25，擁有者同意推市府前整理文件；原因：早期的計畫、交接、進度和現行文件混在一起，讀的人分不出哪份過時）：
+   - 現行文件（規則、總覽、skill 說明書、開發環境）放 `portal_assistant/docs/`，列在索引 `portal_assistant/docs/README.md`；內容過時就直接更新。
+   - 做法與實驗紀錄（為什麼這樣做、試過什麼、數字）也放 `portal_assistant/docs/`，開頭寫日期，並在標題下加「開發紀錄」註記（文中的分支與「未提交」是當時的狀態）。
+   - 被取代的計畫、交接、進度、一次性的測試報告搬到 `portal_assistant/docs/history/`，加進 `history/README.md` 的表（日期、內容、現在看哪裡），標題下加「歷史文件」註記。
+     搬的時候一起改所有引用（Markdown 連結、程式註解與文件裡的路徑），跑 `python -X utf8 portal_assistant/scripts/check_links.py`。
 
 ## 10. 新增或修改服務（2026-11-24，第二階段）
 

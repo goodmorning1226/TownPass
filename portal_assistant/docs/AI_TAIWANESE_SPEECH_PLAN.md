@@ -1,11 +1,13 @@
 # 台語語音規劃（V8）：辨識與朗讀
 
+> **開發紀錄**：文中的分支、commit、「還沒提交」「尚未實作」是寫的當時的狀態；採用的做法都已合進目前的程式。現行規則以 [AI_CURRENT_RULES.md](AI_CURRENT_RULES.md) 為準，文件索引見 [README.md](README.md)。
+
 狀態：2026-11-08 調查。第 1–8 節是調查與建議；第 9 節是同日完成的模型轉檔與手機速度實測；
 第 10 節是電腦上的公開測試集評估，以及 App 的「台語（測試）」選項（branch `feat/taiwanese-asr`，尚未在手機上驗收）；
 第 11 節比較「台語放進自動判斷」與「台語只能手動選」（只做了一部分，已暫停）；
 第 12 節是**現在 App 的做法**：台語自動辨識（語言閘門上的分類器），第 13 節是「中文聽起來很怪就當台語」的補救規則（commit `d63bf32` 起）。
 文中「待實測」的數字都是推估，要等第 6 節的評估跑完才算數。
-相關文件：[語音消融](AI_ASR_ABLATION.md)、[多國語言](AI_MULTILINGUAL_PLAN.md)、[裝置端執行](AI_ON_DEVICE_PLAN.md)、[介面與語音](AI_VOICE_UI_PLAN.md) V8。
+相關文件：[語音消融](AI_ASR_ABLATION.md)、[多國語言](history/AI_MULTILINGUAL_PLAN.md)、[裝置端執行](AI_ON_DEVICE_PLAN.md)、[介面與語音](history/AI_VOICE_UI_PLAN.md) V8。
 
 ## 1. 目標
 
@@ -134,7 +136,7 @@
 | BreezyVoice-Taigi、GPT-SoVITS 台語版（[KaedeTai](https://huggingface.co/KaedeTai/gpt-sovits-tw)）、CosyVoice／Qwen-TTS 合成資料集 | 基底分別是阿里巴巴 CosyVoice、RVC-Boss GPT-SoVITS（中國） | — | — | **不符合條件** |
 
 句子的台語文字由會說台語的人寫，或由我先擬稿再請他校對（和外語文案的做法一樣）。
-錄好的音檔以「訊息代碼」命名（對應 [多國語言](AI_MULTILINGUAL_PLAN.md) 第 2 節的訊息代碼＋參數），放在 `assets/`，App 依代碼播放。
+錄好的音檔以「訊息代碼」命名（對應 [多國語言](history/AI_MULTILINGUAL_PLAN.md) 第 2 節的訊息代碼＋參數），放在 `assets/`，App 依代碼播放。
 有參數的句子（例如「正在開啟〈服務名稱〉」），固定部分用台語錄音，參數部分照決定的 (C) 用華語念。
 
 ### 4.2 (B) 之後：手機上的台語 TTS
@@ -166,7 +168,7 @@
 
 ## 5. 程式要改的地方（概略，實作時再細化）
 
-- 語言選單加「台語」（`nan-TW`）。依 [多國語言](AI_MULTILINGUAL_PLAN.md) 第 5 節，`language` 欄位是新增的選填欄位，舊版不受影響。
+- 語言選單加「台語」（`nan-TW`）。依 [多國語言](history/AI_MULTILINGUAL_PLAN.md) 第 5 節，`language` 欄位是新增的選填欄位，舊版不受影響。
 - 後端選台語時，換成 Breeze-26 的 whisper-server（Whisper small 可以先停），並用 `-l zh`。之後全部走中文流程，包括讀音修正。
 - 自動語言偵測不會選到台語；台語只能手動選（已決定）。
 - 朗讀：有台語錄音的代碼就播錄音，沒有就用華語系統 TTS。

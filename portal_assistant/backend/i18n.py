@@ -1,4 +1,4 @@
-"""Languages other than Chinese (portal_assistant/docs/AI_MULTILINGUAL_PLAN.md, version 2).
+"""Languages other than Chinese (portal_assistant/docs/history/AI_MULTILINGUAL_PLAN.md, version 2).
 
 Chinese keeps its own rules and texts in workflow.py unchanged; this module
 supplies the same rules and replies for en / ja / vi / id / tl (Filipino; it

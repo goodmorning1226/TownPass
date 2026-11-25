@@ -1,7 +1,9 @@
 # 助理決策流程：從語音／打字到回覆
 
+> **歷史文件**（已被取代，只當紀錄）：內容是寫的當時的狀態，有些做法後來改掉了。現行規則以 [AI_CURRENT_RULES.md](../AI_CURRENT_RULES.md) 為準，索引見 [README.md](README.md)。
+
 本文件說明 `feat/asr-ablation` 分支（`d639e91`，2026-11-07）一句話從輸入到開啟頁面的完整流程。
-標「已 stage、未提交」的部分（FAQ 改用 multilingual-e5-small）只在工作區，還沒有 commit。各項交付紀錄見 [DEVELOPMENT.md](../../docs/DEVELOPMENT.md) 的「助理裝置端與多語交付紀錄」。
+標「已 stage、未提交」的部分（FAQ 改用 multilingual-e5-small）只在工作區，還沒有 commit。各項交付紀錄見 [DEVELOPMENT.md](../../../docs/DEVELOPMENT.md) 的「助理裝置端與多語交付紀錄」。
 
 程式位置：
 
@@ -90,7 +92,7 @@ App：原生頁（TPRoute）／網頁（TPWebView，必要時網頁內換頁）
 3. 讀音修正**只用於中文**；書名、作者、已經看得懂的句子不改寫。
 4. App 把最後的文字當成使用者訊息，走打字流程。
 
-評估（[AI_ASR_ABLATION.md](AI_ASR_ABLATION.md)）：
+評估（[AI_ASR_ABLATION.md](../AI_ASR_ABLATION.md)）：
 - `eval_sound.py`（人工合成錯字）：完全同音的句子兩組各 47、53 句，自動改對 45、51 句，其餘列為選項；自動改錯 0。不相關句子 0 句被自動改寫。
 - `eval_asr.py` 70 句合成語音：Whisper small 直接送出正確 56/70，0 開錯服務、0 意外導航。
 - 手機（vivo V2511）語音＋決策 3.5–8.9 秒。真人錄音尚未評估。
@@ -116,7 +118,7 @@ App：原生頁（TPRoute）／網頁（TPWebView，必要時網頁內換頁）
 | 7 | 讀音 fallback | 什麼都沒命中，句中某段讀音像某個服務詞（≥0.8；兩字詞要更高） | 交給模型，模型只能 `confirm_candidates`（「聽起來像是以下服務」）或補問 | 導航 | `test_phonetic.py`；單獨的評估數字未記錄 |
 | 8 | 讀音判斷功能列表 | 什麼都沒命中，讀音接近「你有什麼功能」等句（≥0.72），在問模型之前 | 顯示功能列表 | 導航 | `eval_colloquial` 的「列出功能」類 15 → 17/23（`d639e91`） |
 | 9 | 意圖 fallback（版本 B） | 什麼都沒命中；`TOWNPASS_INTENT_FALLBACK` 預設開啟，設 `0` 關閉 | 模型沒有導航工具，只能選：列出功能、問候、市政問題（轉 FAQ）、補問 | 導航 | `eval_colloquial.json` 100 句：B 50 vs A 40 答對，兩版各 1 次開錯頁（[AI_SERVICE_COVERAGE_PLAN.md](AI_SERVICE_COVERAGE_PLAN.md) 第 7 節） |
-| 10 | FAQ | 中文、4 字以上；服務決策補問、圖書決策補問／不支援、意圖判為市政問題，或最後沒命中時 | 分數 ≥0.85 顯示 FAQ 原文答案；0.69–0.85 列最多 3 題讓使用者選；<0.69 視為沒有 | 改寫答案、導航；已提交版本在手機上沒有這一層 | bge：363 句門檻校正，答錯 33 → 0；smoke 19/19。已 stage、未提交的 e5 版門檻為 0.915／0.88，可在手機執行（未實機驗證），dev 182/184、held-out 95/102（[AI_FAQ_RAG.md](AI_FAQ_RAG.md)） |
+| 10 | FAQ | 中文、4 字以上；服務決策補問、圖書決策補問／不支援、意圖判為市政問題，或最後沒命中時 | 分數 ≥0.85 顯示 FAQ 原文答案；0.69–0.85 列最多 3 題讓使用者選；<0.69 視為沒有 | 改寫答案、導航；已提交版本在手機上沒有這一層 | bge：363 句門檻校正，答錯 33 → 0；smoke 19/19。已 stage、未提交的 e5 版門檻為 0.915／0.88，可在手機執行（未實機驗證），dev 182/184、held-out 95/102（[AI_FAQ_RAG.md](../AI_FAQ_RAG.md)） |
 | 11 | 沒有找到 | 以上都沒有結果 | 回「抱歉，目前沒有找到相關的服務或 FAQ 內容…1999」（`action: no_related`） | — | — |
 
 ## 4. 決策模型
@@ -138,7 +140,7 @@ App：原生頁（TPRoute）／網頁（TPWebView，必要時網頁內換頁）
 
 模型只輸出 `{"choice":"A"}`（格式由模型伺服器以 JSON schema 強制），後端對回原本的工具與參數。
 
-| 做法 | 依據（[AI_ASR_ABLATION.md](AI_ASR_ABLATION.md)） |
+| 做法 | 依據（[AI_ASR_ABLATION.md](../AI_ASR_ABLATION.md)） |
 | --- | --- |
 | 固定政策放前面、不重複 output_schema、精簡 JSON | prompt token 693 → 484（−30%），dev 184/184、held-out 94/102 |
 | 證據與選項維持兩則訊息 | 合併成一則時 dev 掉到 168/184 |

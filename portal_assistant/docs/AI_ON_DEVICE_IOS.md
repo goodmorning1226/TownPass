@@ -1,5 +1,7 @@
 # iOS 地端助理（2026-11-08）
 
+> **開發紀錄**：文中的分支、commit、「還沒提交」「尚未實作」是寫的當時的狀態；採用的做法都已合進目前的程式。現行規則以 [AI_CURRENT_RULES.md](AI_CURRENT_RULES.md) 為準，文件索引見 [README.md](README.md)。
+
 iPhone 上直接跑助理的後端與模型，不需要電腦上的 LAN 後端。架構和 Android 的地端版（`portal_assistant/docs/AI_ON_DEVICE_PLAN.md`）相同：
 同樣的 loopback 埠與 HTTP 契約，所以 Flutter 端（`AssistantService`）不用改。
 

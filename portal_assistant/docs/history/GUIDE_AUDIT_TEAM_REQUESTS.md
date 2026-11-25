@@ -1,5 +1,7 @@
 # 引導教學檢查：需要組員協助的事項（2026-11-08）
 
+> **歷史文件**（已被取代，只當紀錄）：內容是寫的當時的狀態，有些做法後來改掉了。現行規則以 [AI_CURRENT_RULES.md](../AI_CURRENT_RULES.md) 為準，索引見 [README.md](README.md)。
+
 分支：`feat/asr-ablation`（`5469106` 已 push）。
 
 我們用 `portal_assistant/tools/guide_audit/` 在示範網站上，照「只做教學卡片說的事」逐一走過所有教學流程，總共錄了 177 條以上，再把錄下來的頁面狀態丟進真正的教學邏輯重播。找到的 33 個教學問題都已修在各頁的 `guides/*_guide.dart`，`portal_assistant/app/test/guide_replay/` 裡沒有任何略過的測試。

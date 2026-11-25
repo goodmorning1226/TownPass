@@ -3,6 +3,8 @@
 本文件適用於本 repository 全部目錄，供人員及 AI coding agents 在修改前閱讀。
 這是本 fork 的工作規約，不是官方發布的 AGENTS.md，也不保證任何 PR 必然被官方接受。
 目標是維持官方相容性、保護既有修改，並使變更可審查及可驗證。
+本 repository 也以單一 commit 放在市府的 repo（taipei-doit/townpass2026-microservice-portal-assistant），那裡沒有開發歷史；
+下文的 `origin`（團隊 fork）、`upstream`（官方 TownPass）與分支命名是團隊開發時的設定。
 
 ## 1. 依據與優先順序
 

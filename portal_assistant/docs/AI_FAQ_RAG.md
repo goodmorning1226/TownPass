@@ -1,5 +1,7 @@
 # 臺北市府 FAQ 檢索（RAG）整合紀錄
 
+> **開發紀錄**：文中的分支、commit、「還沒提交」「尚未實作」是寫的當時的狀態；採用的做法都已合進目前的程式。現行規則以 [AI_CURRENT_RULES.md](AI_CURRENT_RULES.md) 為準，文件索引見 [README.md](README.md)。
+
 日期：2026-11-07。最初整合於分支 `rag-integrate`（自 `feat/on-device-assistant` 的 `06f4018` 分出）；
 本次模型更換於 `feat/faq-e5`（自 `feat/asr-ablation` 的 `006e43c` 分出，未提交）。
 資料來源：`portal_assistant/rag_handoff/HANDOFF.md`（FAQ 資料製作者提供）與 `portal_assistant/rag_handoff/reference/faq_rag.json`（`origin/rag-integrate` 的 `766209b`，8,121 筆）。

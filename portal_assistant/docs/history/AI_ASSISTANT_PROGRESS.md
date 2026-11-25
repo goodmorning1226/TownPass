@@ -1,5 +1,7 @@
 # TownPass 地端助理：進度與功能檔案架構
 
+> **歷史文件**（已被取代，只當紀錄）：內容是寫的當時的狀態，有些做法後來改掉了。現行規則以 [AI_CURRENT_RULES.md](../AI_CURRENT_RULES.md) 為準，索引見 [README.md](README.md)。
+
 更新：2026-11-05。工作分支：`feat/ai-assistant-plan`。
 本次功能開發起點：`e4fbd3c`；官方同步紀錄：`e65b586771b67334e7a21c2aa9c6e80060e4f827`。
 這是本 fork 的實作紀錄，不是官方相容認證。本輪 commit ID 以 `git log -1` 取得，避免在 commit 本身寫入循環引用的 hash。
@@ -54,7 +56,7 @@
 
 ## 台語：不改用華語、記憶體、紀錄檔（2026-11-16～17，`feat/need-style-assistant`，未 commit）
 
-規則：[現行規則](AI_CURRENT_RULES.md) 第 4、5、7 節；細節與評估：[台語規劃](AI_TAIWANESE_SPEECH_PLAN.md) 第 14 節、[台語消融](AI_TAIWANESE_ABLATION.md) 第 14 節、[iOS](AI_ON_DEVICE_IOS.md) 同名一節。
+規則：[現行規則](../AI_CURRENT_RULES.md) 第 4、5、7 節；細節與評估：[台語規劃](../AI_TAIWANESE_SPEECH_PLAN.md) 第 14 節、[台語消融](../AI_TAIWANESE_ABLATION.md) 第 14 節、[iOS](../AI_ON_DEVICE_IOS.md) 同名一節。
 
 **做了什麼**
 - A（不偷偷改用華語）：閘門台語分數 ≥ 0.5、模型載入中就等（最多 25 秒）；記憶體不足、沒啟動成功、連不上時不輸出華語結果，App 說明原因（6 語，422 `code: taiwanese_unavailable`）。

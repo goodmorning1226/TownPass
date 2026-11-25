@@ -1,5 +1,7 @@
 # TownPass 地端 AI Tool Calling 實作計畫書
 
+> **歷史文件**（已被取代，只當紀錄）：內容是寫的當時的狀態，有些做法後來改掉了。現行規則以 [AI_CURRENT_RULES.md](../AI_CURRENT_RULES.md) 為準，索引見 [README.md](README.md)。
+
 初版：2026-11-04；本次修訂：2026-11-05。
 後續全功能擴充以 [全功能分步計畫](AI_ALL_FEATURES_ROLLOUT_PLAN.md) 為準：包含 General 回覆、
 服務與內部功能聯合檢索、模糊候選確認，以及符合原操作層級的返回路徑。
@@ -7,11 +9,11 @@
 
 狀態：第一階段實作與驗收。依使用者要求改採非中國開發的 **Mistral AI Ministral 3 3B**；
 Qwen 的舊測試僅屬歷史，不作為現行執行設定。實際啟動與驗證狀態見
-[實作紀錄](AI_PHASE1_IMPLEMENTATION.md) 與 [後端操作指南](../backend/README.md)。
+[實作紀錄](AI_PHASE1_IMPLEMENTATION.md) 與 [後端操作指南](../../backend/README.md)。
 
 適用專案：本 fork 的 TownPass Flutter App。程式查核基線為
 `e4fbd3cef9c9a0a7926e03ec6f7bbd072f5f5045`；官方同步基線見
-[開發指南](../../docs/DEVELOPMENT.md)。實作前須閱讀 [AGENTS.md](../../AGENTS.md)。
+[開發指南](../../../docs/DEVELOPMENT.md)。實作前須閱讀 [AGENTS.md](../../../AGENTS.md)。
 這是團隊提出的擴充方案，不是官方發布或認證的 AI 架構。
 
 ## 1. 目標與第一版範圍
@@ -34,7 +36,7 @@ Qwen 的舊測試僅屬歷史，不作為現行執行設定。實際啟動與驗
 第一階段以「泡泡文字輸入 → 圖書首頁／搜尋／詳情 → 下一步指引」形成完整流程，
 不先同時擴充 5–10 種服務。詳細步驟與圖書測試案例見
 [第一階段實作工作清單](AI_LIBRARY_IMPLEMENTATION_STEPS.md)。
-其他服務沿用相同能力契約逐項擴充；現況見 [現有功能查核](../../docs/FEATURE_AVAILABILITY_20261104.md)。
+其他服務沿用相同能力契約逐項擴充；現況見 [現有功能查核](../../../docs/FEATURE_AVAILABILITY_20261104.md)。
 每個入口依能力目錄標示正式／示範／待驗證／未實作，不能把畫面存在當成業務完成。
 語音、跨服務表單預填與正式 API 串接放在圖書階段驗收後。
 
