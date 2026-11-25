@@ -99,19 +99,19 @@ fvm dart run build_runner build --delete-conflicting-outputs   # 產生檔不在
 
 ```powershell
 # 原生程式庫（llama-server、whisper-server 的 .so，不在 Git）
-.\scripts\build_assistant_native.ps1
+.\portal_assistant\native\android\build_assistant_native.ps1
 
 # 把模型推到手機（只在第一次或換模型時）
-.\scripts\push_assistant_models.ps1 -DeviceId <id> `
+.\portal_assistant\scripts\push_assistant_models.ps1 -DeviceId <id> `
     -Taiwanese  $env:TOWNPASS_PORTAL_ASSISTANT_WORK\models\taiwanese\ggml-breeze-asr-26-q4_0.bin `
     -Vietnamese $env:TOWNPASS_PORTAL_ASSISTANT_WORK\models\vietnamese\ggml-phowhisper-base-q8_0.bin
 # 預設一併推：決策分類器、Ministral（一律推）、Whisper small、tiny（語言判斷）、e5 與 FAQ 索引；-DecisionModel gemma 另推 Gemma
 
 # 建置、安裝、啟動
-.\scripts\run_assistant_on_device.ps1 -DeviceId <id>                           # 引導介面、決策分類器（預設）
-.\scripts\run_assistant_on_device.ps1 -DeviceId <id> -DecisionModel ministral  # 用 Ministral 決策
-.\scripts\run_assistant_on_device.ps1 -DeviceId <id> -DecisionModel gemma      # 用 Gemma 決策
-.\scripts\run_assistant_on_device.ps1 -DeviceId <id> -Chat                     # 聊天面板
+.\portal_assistant\scripts\run_assistant_on_device.ps1 -DeviceId <id>                           # 引導介面、決策分類器（預設）
+.\portal_assistant\scripts\run_assistant_on_device.ps1 -DeviceId <id> -DecisionModel ministral  # 用 Ministral 決策
+.\portal_assistant\scripts\run_assistant_on_device.ps1 -DeviceId <id> -DecisionModel gemma      # 用 Gemma 決策
+.\portal_assistant\scripts\run_assistant_on_device.ps1 -DeviceId <id> -Chat                     # 聊天面板
 ```
 
 - 第一次啟動要載模型（約 1–2 分鐘），並在背景建語意索引（約 1 分鐘，之後有快取）。

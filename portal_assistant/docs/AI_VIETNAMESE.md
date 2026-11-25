@@ -221,8 +221,8 @@
 
    ```powershell
    $env:ANDROID_SERIAL = "<裝置序號>"
-   .\scripts\push_assistant_models.ps1 -DeviceId <裝置序號> -DecisionModel gemma -Taiwanese <台語模型檔> -Vietnamese <工作資料夾>\models\vietnamese\ggml-phowhisper-base-q8_0.bin
-   .\scripts\run_assistant_on_device.ps1 -DeviceId <裝置序號> -DecisionModel gemma
+   .\portal_assistant\scripts\push_assistant_models.ps1 -DeviceId <裝置序號> -DecisionModel gemma -Taiwanese <台語模型檔> -Vietnamese <工作資料夾>\models\vietnamese\ggml-phowhisper-base-q8_0.bin
+   .\portal_assistant\scripts\run_assistant_on_device.ps1 -DeviceId <裝置序號> -DecisionModel gemma
    ```
 
 3. 不用了：`-Vietnamese ""` 再推一次，然後重開 App。

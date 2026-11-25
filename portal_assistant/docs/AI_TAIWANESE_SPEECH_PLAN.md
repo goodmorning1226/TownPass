@@ -359,7 +359,7 @@ alexachang 這個模型是唯一「台語聲音 → 華語漢字」的 small 級
 4. 電腦上試聽：同資料夾的 `whisper-cli.exe`（`cmake --build build-host --target whisper-cli`，PATH 要加 MSYS2 UCRT64 的 `bin`，即 `TOWNPASS_PORTAL_ASSISTANT_MSYS_BIN`）。
 5. 手機速度：
    ```powershell
-   .\scripts\taiwanese_asr_bench.ps1 -Clip <16 kHz wav> -Models <ggml 檔>,<ggml 檔> [-NoPrompt]
+   .\portal_assistant\scripts\taiwanese_asr_bench.ps1 -Clip <16 kHz wav> -Models <ggml 檔>,<ggml 檔> [-NoPrompt]
    ```
    腳本會設定 `ANDROID_SERIAL`、force-stop App、等電池降到 35 °C 以下、量完刪除 `/data/local/tmp/twasr` 並重新開啟 App。
    結果在 `<工作資料夾>\models\taiwanese\bench-prompt\`、`bench-noprompt\`（每次的輸出、whisper 計時、`summary.json`）。
@@ -455,9 +455,9 @@ CER（整理後）4.7、每段平均 19 秒；服務詞組 20 段裡一半變成
 ```powershell
 cd <repo 根目錄>
 # 模型（-Taiwanese 不給就會從手機刪掉；-Chinese 也一樣，有在用 ggml-whisper-chinese.bin 時要一起給）
-.\scripts\push_assistant_models.ps1 -DeviceId <裝置序號> -Taiwanese <工作資料夾>\models\taiwanese\ggml-breeze-asr-26-q8_0.bin
+.\portal_assistant\scripts\push_assistant_models.ps1 -DeviceId <裝置序號> -Taiwanese <工作資料夾>\models\taiwanese\ggml-breeze-asr-26-q8_0.bin
 # App（裝置端版，建置後安裝並重新開啟）
-.\scripts\run_assistant_on_device.ps1 -DeviceId <裝置序號>
+.\portal_assistant\scripts\run_assistant_on_device.ps1 -DeviceId <裝置序號>
 ```
 
 已經建好的除錯版 APK（`build\app\outputs\flutter-apk\app-debug.apk`）也可以直接用 `adb -s <裝置序號> install -r` 安裝。

@@ -366,17 +366,17 @@ fvm install
 fvm flutter pub get --enforce-lockfile
 fvm dart run build_runner build --delete-conflicting-outputs   # 產生檔不在 Git，每次 clone 後都要
 
-.\scripts\build_assistant_native.ps1                           # llama-server、whisper-server 的 .so（不在 Git）
+.\portal_assistant\native\android\build_assistant_native.ps1                           # llama-server、whisper-server 的 .so（不在 Git）
 
 # 第一次或換模型時推模型（也可以不推，讓 App 自己下載）；預設推決策分類器、Ministral、Whisper small、tiny、e5 與 FAQ 索引
-.\scripts\push_assistant_models.ps1 -DeviceId <id> `
+.\portal_assistant\scripts\push_assistant_models.ps1 -DeviceId <id> `
     -Taiwanese  <工作資料夾>\models\taiwanese\ggml-breeze-asr-26-q4_0.bin `
     -Vietnamese <工作資料夾>\models\vietnamese\ggml-phowhisper-base-q8_0.bin
 
-.\scripts\run_assistant_on_device.ps1 -DeviceId <id>                           # 引導介面、決策分類器（預設）
-.\scripts\run_assistant_on_device.ps1 -DeviceId <id> -DecisionModel ministral  # 用 Ministral 決策
-.\scripts\run_assistant_on_device.ps1 -DeviceId <id> -DecisionModel gemma      # 用 Gemma 決策
-.\scripts\run_assistant_on_device.ps1 -DeviceId <id> -Chat                     # 聊天面板
+.\portal_assistant\scripts\run_assistant_on_device.ps1 -DeviceId <id>                           # 引導介面、決策分類器（預設）
+.\portal_assistant\scripts\run_assistant_on_device.ps1 -DeviceId <id> -DecisionModel ministral  # 用 Ministral 決策
+.\portal_assistant\scripts\run_assistant_on_device.ps1 -DeviceId <id> -DecisionModel gemma      # 用 Gemma 決策
+.\portal_assistant\scripts\run_assistant_on_device.ps1 -DeviceId <id> -Chat                     # 聊天面板
 ```
 
 **iPhone**：Mac＋Xcode；模型放在 `~/Library/Application Support/TownPassAssistant/models`（見 `portal_assistant/scripts/push_assistant_models_ios.sh`）。

@@ -13,7 +13,7 @@
 **一鍵啟動（建議）**，在專案根目錄：
 
 ```powershell
-.\scripts\start_all.ps1 -Model '<轉換後的 Breeze-ASR-25 資料夾>' -DeviceId <裝置ID>
+.\portal_assistant\scripts\start_all.ps1 -Model '<轉換後的 Breeze-ASR-25 資料夾>' -DeviceId <裝置ID>
 ```
 
 它會依序檢查 Ollama 與模型、在各自視窗開主後端（:8765）與語音辨識（:8770，已在跑就沿用）、
@@ -26,7 +26,7 @@
 1. 主後端：
 
    ```powershell
-   .\scripts\start_assistant.ps1
+   .\portal_assistant\scripts\start_assistant.ps1
    ```
 
    亦可直接 `python portal_assistant/backend/server.py`。預設只監聽 `127.0.0.1:8765`。
@@ -34,7 +34,7 @@
 2. 語音辨識（選用，按住說話需要；模型轉換見 [TEAM_LOCAL_SETUP.md](../docs/TEAM_LOCAL_SETUP.md) 5.1）：
 
    ```powershell
-   .\scripts\start_asr.ps1 -Model '<轉換後的 Breeze-ASR-25 資料夾>'
+   .\portal_assistant\scripts\start_asr.ps1 -Model '<轉換後的 Breeze-ASR-25 資料夾>'
    ```
 
    約 30–40 秒載入，只監聽 `127.0.0.1:8770`。沒開時 App 的語音會回「語音辨識服務未啟動」，打字不受影響。
@@ -42,7 +42,7 @@
 3. App：
 
    ```powershell
-   .\scripts\run_assistant_android.ps1
+   .\portal_assistant\scripts\run_assistant_android.ps1
    ```
 
    只有一台已授權裝置時會自動選擇；多台時以 `-DeviceId` 指定。

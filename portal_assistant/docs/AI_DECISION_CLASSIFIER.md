@@ -29,7 +29,7 @@
 - 輸入格式：e5 的 GGUF 是 SentencePiece（t5 型）、add_bos/eos/sep 皆為真，llama-server 組成 `<s> 請求 </s></s> 候選 </s>`，與 HF 的 XLM-R pair 編碼相同。
 - 轉換用團隊既有的 `portal_assistant/scripts/convert_e5_gguf.py`。直接用 b12182 的 BERT 轉換器會停在 "BPE pre-tokenizer was not recognized"；這支包裝改用 XLM-R 的 SentencePiece 詞表。
 - 驗證：
-  - 隨機頭的假模型：llama-server 分數與 PyTorch「CLS→線性」相差 ≤ 0.003（`portal_assistant/scripts/feasibility_dummy.py`）。
+  - 隨機頭的假模型：llama-server 分數與 PyTorch「CLS→線性」相差 ≤ 0.003（`<工作資料夾>\decision-classifier\scripts\feasibility_dummy.py`）。
   - 訓練好的 q8_0 對 dev 3,561 組：平均 logit 差 0.021、最大 0.70、相關 0.99992。
 - 啟動：`llama-server -m townpass-decision-e5-ce-v1-q8_0.gguf --reranking --pooling rank --host 127.0.0.1 --port 8972 -c 2048 -np 4 -b 512 -ub 512 -t 4 --no-webui`。GGUF 沒有寫 pooling type，所以要加 `--pooling rank`。
 - Q4_0（`llama-quantize`）是 122 MB，只比 q8_0 小 8%（嵌入表佔大部分），不值得，沒有評估。
@@ -55,7 +55,7 @@
 
 ## 4. 訓練資料與洩漏檢查
 
-**來源**（`portal_assistant/scripts/sources.py`）
+**來源**（`portal_assistant/tools/classifier/sources.py`）
 - **合成句** 3,756 句（`data/synthetic/group1-5.jsonl`，依 `data/synthetic/BRIEF.txt` 撰寫）。撰寫者被禁止開啟 `portal_assistant/backend/`（評估集都在那裡）。
   - 109 個功能每個 24 句正例：中 12、英 3、日 2、越 2、印尼 2、菲律賓 2、泰 1；另有 2–4 句近似但不是該功能的句子。
   - 列功能 120 句、打招呼 92 句。
@@ -65,13 +65,13 @@
 - **dev**：只用來選門檻、epoch 與決策邏輯，沒有拿來訓練。evaluate.py dev 169 句、eval_i18n 53、eval_colloquial_dev 186、semantic_tuning 107 → 498 個請求。
 - **held-out**：從不用於訓練或調整，只做洩漏檢查與報告。evaluate.py holdout、eval_foreign_holdout.json、eval_colloquial_report_holdout.json，以及 eval_colloquial.json（檔案說明寫明是 held-out，也一併保護）→ 387 句。
 
-**洩漏檢查**（`portal_assistant/scripts/leakage.py`，結果 `data/leakage.json`）
+**洩漏檢查**（`portal_assistant/tools/classifier/leakage.py`，結果 `data/leakage.json`）
 - 規則：只要對任何一句 held-out 符合下列任一條就刪：正規化後相同；字元相似度（difflib）≥ 0.8；e5 cosine（`query:` 前綴，q8_0）> 0.92。
 - 6,342 個不同句子中**刪除 1,357 句**：cosine 1,351、字元 5、完全相同 1。
 - 從訓練移除的：合成 886、capability_examples 215、目錄詞 177。另有 256 句 dev 句子也達門檻（dev 不參與訓練，只用於調整）。
 - e5 的 cosine 普遍偏高，0.92 會刪掉不少只是同類需求的不同說法，是保守做法。
 
-**配對**（`portal_assistant/scripts/collect.py`、`portal_assistant/scripts/build_pairs.py`）
+**配對**（`<工作資料夾>\decision-classifier\scripts\collect.py`、`<工作資料夾>\decision-classifier\scripts\build_pairs.py`）
 - 每個請求先在程序內跑一次真的後端：worktree 程式、e5 語意索引開著；決策改成「記錄並回請補充」，讓流程繼續往下。這樣記下的是 LLM 實際會看到的每個決策點與候選。
 - 每個請求的候選 = 這些候選 ∪ 正確答案 ∪ 語意索引前 5 名 ∪ 隨機 2 個，再加上兩個意圖假候選（列功能、打招呼）。
 - 訓練：4,852 個請求 → 43,641 組，正例 4,345。
@@ -80,7 +80,7 @@
 
 ## 5. 訓練與整合
 
-**訓練**（`portal_assistant/scripts/train.py`；torch 2.14.1+cu126、transformers 4.57.6，RTX 4060）
+**訓練**（`portal_assistant/tools/classifier/train.py`；torch 2.14.1+cu126、transformers 4.57.6，RTX 4060）
 - 開始時 GPU 剩約 3 GB，所以**凍結 96M 的詞嵌入表**，只訓練 21M 本體＋頭，佔約 1.5 GB。
 - 設定：CLS → Linear(384,1)、token type 全 0、BCE（pos_weight 2）、AdamW lr 4e-5（頭 1e-3）、warmup 10%、batch 32、max_len 96、fp16、4 epoch（每 epoch 約 6 分鐘）。
 - dev AUC：
@@ -90,7 +90,7 @@
   | 全部 | 0.927 | 0.938 | 0.946 | 0.947 |
   | 只看服務 | 0.898 | 0.917 | 0.925 | 0.926 |
 
-- 依 dev 決策模擬選 **epoch2**。模擬用 `portal_assistant/scripts/tune.py`，直接呼叫 worktree 的 `classifier.Classifier`，所以和執行時的邏輯相同。
+- 依 dev 決策模擬選 **epoch2**。模擬用 `<工作資料夾>\decision-classifier\scripts\tune.py`，直接呼叫 worktree 的 `classifier.Classifier`，所以和執行時的邏輯相同。
 - 模型：`models\e5-ce-v1\epoch2`（HF）、`models\townpass-decision-e5-ce-v1-q8_0.gguf`（132 MB）、`-f16.gguf`（242 MB）。
 
 **整合**（`TOWNPASS_DECISION_BACKEND=classifier`）
@@ -188,7 +188,7 @@ v3 的修正來自兩句 dev：「有沒有比較多人借的書」原本開到�
 
 **乾淨量測**（2026-11-12 00:16 左右）
 - 當時只有 Ollama 閒置（GPU 上載著模型、沒有請求）和我的 e5 伺服器在跑，CPU 使用率約 6%。
-- 工具：`portal_assistant/scripts/bench_latency.py`，dev 298 個決策點各跑 3 次，結果在 `results\latency.jsonl`。
+- 工具：`<工作資料夾>\decision-classifier\scripts\bench_latency.py`，dev 298 個決策點各跑 3 次，結果在 `results\latency.jsonl`。
 
 | 設定（i7-14700HX，q8_0） | 每次決策中位數 | p90 | 1 個候選 | 2 個 | 4 個 |
 | --- | --- | --- | --- | --- | --- |
@@ -234,7 +234,7 @@ v3 的修正來自兩句 dev：「有沒有比較多人借的書」原本開到�
 
 ### 10.1 三種設定的比較（2026-11-12，電腦，同一套測法）
 
-**測法**：`portal_assistant/scripts/run_setup.py`，全部用我自己的 port（後端 8971、分類器 8972、e5 8973、決策 LLM 8974），一次只跑一個設定。
+**測法**：`portal_assistant/tools/classifier/run_setup.py`，全部用我自己的 port（後端 8971、分類器 8972、e5 8973、決策 LLM 8974），一次只跑一個設定。
 - 每次先把程式複製一份快照再跑；決策 LLM 先用三個系統提示暖機（同 `device_main.warm_up`）；後端開 `TOWNPASS_TIMING_LOG=1`。
 - 跑的集合：evaluate.py dev 與 held-out（held-out 只報告）、eval_i18n.py（有、無 `--send-language` 各一次）、四組口語集、eval_guides.py。
 - 教學用 `--end-to-end`：在程序內跑完整的 `Assistant.turn`，因為只有這樣選項 B 的教學規則才會被用到。dev 用 `data/guide_eval.json`，held-out 用 `guide_eval_holdout.json`（只報告）。
@@ -327,10 +327,10 @@ v3 的修正來自兩句 dev：「有沒有比較多人借的書」原本開到�
   - 修改：`portal_assistant/backend/workflow.py`、`portal_assistant/backend/server.py`。
   - `.model-study/` 不是本實驗產生的，沒有動。
 - `<工作資料夾>\decision-classifier\`：
-  - `portal_assistant/scripts\`：sources、collect、leakage、build_pairs、train、tune、score_dev_server、run_eval.sh、summarize、bench_latency、feasibility_dummy，以及第 10 節用的 run_setup.py、summarize2.py。
+  - `scripts\`：sources、collect、leakage、build_pairs、train、tune、score_dev_server、run_eval.sh、summarize、bench_latency、feasibility_dummy，以及第 10 節用的 run_setup.py、summarize2.py（sources、leakage、train、score_dev_server、run_setup 的重現版在 repo 的 `portal_assistant/tools/classifier/`）。
   - `combo\`：第 10 節設定 (2) 用的合併副本（本 worktree＋`TownPass-gtune` 的 diff，未提交、不是 git 歷史）。
   - `data\`、`models\`、`results\`、`logs\`、`cache\`（語意索引與圖書館藏副本）。
-- 重跑評估：先開 e5 :8973 與分類器 :8972，再 `bash portal_assistant/scripts/run_eval.sh <名稱> TOWNPASS_DECISION_BACKEND=classifier`，最後 `python -X utf8 portal_assistant/scripts/summarize.py <名稱>`。
+- 重跑評估：先開 e5 :8973 與分類器 :8972，再 `bash <工作資料夾>/decision-classifier/scripts/run_eval.sh <名稱> TOWNPASS_DECISION_BACKEND=classifier`，最後 `python -X utf8 <工作資料夾>/decision-classifier/scripts/summarize.py <名稱>`。
 - 復原：刪除 `classifier.py`、`test_classifier.py`、本文件，再 `git checkout portal_assistant/backend/workflow.py portal_assistant/backend/server.py`。
 
 ## 12. App 選項：選項 B′ 給手機實測（2026-11-12，分支 `feat/classifier-decision`）
@@ -345,7 +345,7 @@ v3 的修正來自兩句 dev：「有沒有比較多人借的書」原本開到�
 
 | 平台 | 指令 |
 | --- | --- |
-| Android（Windows） | `.\scripts\run_assistant_on_device.ps1 -DecisionModel classifier [-ModelBaseUrl http://127.0.0.1:8899]` |
+| Android（Windows） | `.\portal_assistant\scripts\run_assistant_on_device.ps1 -DecisionModel classifier [-ModelBaseUrl http://127.0.0.1:8899]` |
 | iPhone（Mac） | `portal_assistant/scripts/run_assistant_on_device.sh --decision-model classifier`（**還沒在 Mac 上編譯過**） |
 | 直接建置 | `--dart-define=ASSISTANT_DECISION_MODEL=classifier`（Android 的 Gradle 也接受 `TOWNPASS_DECISION_MODEL=classifier`） |
 
@@ -550,8 +550,8 @@ before 與第 12 節之後的整合基準（`classifier-app\results\next_compare
   HF 格式 `models\e5-ce-v2\epoch2`）。訓練資料 `data\v2\pairs_train.jsonl`（91,804 組），訓練紀錄 `logs\v2\train-e5-v2.log`。
   v2 的預設門檻在 `classifier.DEFAULT_THRESHOLDS_V2`（關鍵字 0.40、只靠語意直接開 0.60，擁有者 2026-11-16）。
 - 沒有採用的版本：`e5-ce-v2a`（FAQ 只認得幾乎一樣的字）、`e5-ce-v2c`（加「幫我開X」模板句，開發集多開錯頁）；
-  步驟 7b 為教學頁對試的 `e5-ce-v2d`（拿掉 FAQ 題目對頁面的負例＋教學說法，`portal_assistant/scripts\augment_guides_v2.py`）、`e5-ce-v2e`（只加教學說法）、
-  `e5-ce-v2f`（只加步驟層級的說法，`portal_assistant/scripts\augment_guides_v2f.py`）：教學頁對 106／107／94，但 v2d、v2e 在開發集多開錯 4–8 頁、門檻擋不掉（原因見規則第 2 節），
+  步驟 7b 為教學頁對試的 `e5-ce-v2d`（拿掉 FAQ 題目對頁面的負例＋教學說法，`<工作資料夾>\decision-classifier\scripts\augment_guides_v2.py`）、`e5-ce-v2e`（只加教學說法）、
+  `e5-ce-v2f`（只加步驟層級的說法，`<工作資料夾>\decision-classifier\scripts\augment_guides_v2f.py`）：教學頁對 106／107／94，但 v2d、v2e 在開發集多開錯 4–8 頁、門檻擋不掉（原因見規則第 2 節），
   擁有者接受 v2 的教學頁對 −6（104 → 98）。
 - 後端兩版都能跑：`classifier.VERSION` 跟著 `MODEL_NAME`，`TOWNPASS_CLASSIFIER_VERSION=1／2` 可以指定。電腦評估：
   `llama-server -m townpass-decision-e5-ce-v2-q8_0.gguf --reranking --pooling rank ...`（參數同 v1）＋ `TOWNPASS_CLASSIFIER_VERSION=2`。

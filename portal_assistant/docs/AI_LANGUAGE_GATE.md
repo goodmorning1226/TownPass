@@ -175,12 +175,12 @@ Invoke-WebRequest https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml
 
 ```powershell
 $env:ANDROID_SERIAL = "<裝置序號>"
-.\scripts\push_assistant_models.ps1 -DeviceId <裝置序號> -DecisionModel gemma `
+.\portal_assistant\scripts\push_assistant_models.ps1 -DeviceId <裝置序號> -DecisionModel gemma `
   -Taiwanese <工作資料夾>\models\taiwanese\ggml-breeze-asr-26-q8_0.bin
-.\scripts\run_assistant_on_device.ps1 -DeviceId <裝置序號> -DecisionModel gemma
+.\portal_assistant\scripts\run_assistant_on_device.ps1 -DeviceId <裝置序號> -DecisionModel gemma
 ```
 
-- 不要閘門：`.\scripts\push_assistant_models.ps1 -DeviceId <裝置序號> -LanguageGate ""`（從手機刪掉），重開 App。
+- 不要閘門：`.\portal_assistant\scripts\push_assistant_models.ps1 -DeviceId <裝置序號> -LanguageGate ""`（從手機刪掉），重開 App。
   沒有這個檔案時，App 不啟動閘門，辨識流程和沒有閘門時一樣（仍然用新的語言規則）。
 - 閘門 server：`127.0.0.1:8775`，4 個執行緒，在多語模型之後啟動。需要多語模型（`ggml-whisper-multilingual.bin`）。
 - 記憶體：依 whisper.cpp 啟動記錄的配置約 190 MB（模型 43 MB、解碼緩衝 96 MB 等），沒有實測 RSS。

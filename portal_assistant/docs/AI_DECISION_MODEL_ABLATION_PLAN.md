@@ -212,8 +212,8 @@ App 選項已寫好並驗證過，存成一份 patch，沒有套用在分支上�
 git apply <工作資料夾>\model-study\gemma-decision-2026-11-08\gemma-app-option.patch
 fvm dart run build_runner build --delete-conflicting-outputs
 # android\app\assistant-native\jniLibs 要先有 build_assistant_native.ps1 的輸出（此 worktree 已從 TownPass-asr 複製）
-.\scripts\push_assistant_models.ps1 -DecisionModel gemma      # 第一次約 2.84 GB
-.\scripts\run_assistant_on_device.ps1 -DecisionModel gemma
+.\portal_assistant\scripts\push_assistant_models.ps1 -DecisionModel gemma      # 第一次約 2.84 GB
+.\portal_assistant\scripts\run_assistant_on_device.ps1 -DecisionModel gemma
 ```
 
 確認：`adb logcat -s TownPassAssistant` 應看到 `model :8771 (gemma4:e2b)`；如果看到 `missing gemma-4-E2B-it-Q4_0.gguf`，表示檔案沒推上去，App 會用 Ministral。
@@ -221,8 +221,8 @@ fvm dart run build_runner build --delete-conflicting-outputs
 換回 Ministral：
 
 ```powershell
-.\scripts\run_assistant_on_device.ps1                         # 預設就是 Ministral
-.\scripts\push_assistant_models.ps1 -RemoveGemma              # 可選：刪掉手機上的 Gemma 檔，省 2.84 GB
+.\portal_assistant\scripts\run_assistant_on_device.ps1                         # 預設就是 Ministral
+.\portal_assistant\scripts\push_assistant_models.ps1 -RemoveGemma              # 可選：刪掉手機上的 Gemma 檔，省 2.84 GB
 ```
 
 不想留這個選項：`git apply -R` 同一份 patch。授權：Gemma 4 的散布條款要在採用前再核對一次（第 2 節）。

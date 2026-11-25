@@ -182,7 +182,7 @@ Invoke-RestMethod http://127.0.0.1:11434/api/tags
 終端 A：位於 repo 根目錄並保留執行中：
 
 ```powershell
-.\scripts\start_assistant.ps1
+.\portal_assistant\scripts\start_assistant.ps1
 ```
 
 等價於 `python portal_assistant/backend/server.py`。若 PowerShell 封鎖腳本，可直接用 Python 命令，不需把全機 execution policy 改成 Unrestricted。
@@ -233,8 +233,8 @@ New-Item -ItemType Directory -Force "$env:LOCALAPPDATA\TownPassAssistant\faq_rag
 2. 一次性下載與轉換（約 3.1 GB 下載；另建隔離 venv 安裝 CPU 版 torch／transformers，只用於轉換，不影響全域 Python）：
 
    ```powershell
-   .\scripts\convert_breeze_asr.ps1                              # 預設放在 %LOCALAPPDATA%\TownPassAssistant
-   .\scripts\convert_breeze_asr.ps1 -Root <工作資料夾>   # 也可指定空間較大的磁碟
+   .\portal_assistant\scripts\convert_breeze_asr.ps1                              # 預設放在 %LOCALAPPDATA%\TownPassAssistant
+   .\portal_assistant\scripts\convert_breeze_asr.ps1 -Root <工作資料夾>   # 也可指定空間較大的磁碟
    ```
 
    只下載推論檔案，不下載官方 repo 中的 optimizer 狀態與 pickle 檔。完成時會印出轉換結果資料夾，
@@ -247,20 +247,20 @@ New-Item -ItemType Directory -Force "$env:LOCALAPPDATA\TownPassAssistant\faq_rag
    curl.exe -L -C - --retry 5 -o "$dir\model.safetensors.part" https://huggingface.co/MediaTek-Research/Breeze-ASR-25/resolve/main/model.safetensors
    (Get-FileHash "$dir\model.safetensors.part" -Algorithm SHA256).Hash   # 應為 C5D952B3BC03EA277209AFF0EF5B5C4C055D74449FF794C02D8F4E315FDEF6B6
    Move-Item "$dir\model.safetensors.part" "$dir\model.safetensors"
-   .\scripts\convert_breeze_asr.ps1 -Root '<Root>'                # 已有的檔案會沿用，再執行轉換
+   .\portal_assistant\scripts\convert_breeze_asr.ps1 -Root '<Root>'                # 已有的檔案會沿用，再執行轉換
    ```
 
    雜湊不一致就刪除重下，不要用來轉換。
 3. 終端 B（保持開啟，載入約 40 秒）：
 
    ```powershell
-   .\scripts\start_asr.ps1 -Model '<轉換結果資料夾>'
+   .\portal_assistant\scripts\start_asr.ps1 -Model '<轉換結果資料夾>'
    Invoke-RestMethod http://127.0.0.1:8770/health
    ```
 
    成功會顯示 `TownPass ASR: http://127.0.0.1:8770 | model=breeze-asr-25-ct2-float16 | cuda/int8_float16`。
-   沒有 NVIDIA GPU：`.\scripts\start_asr.ps1 -Model '<資料夾>' -Device cpu -ComputeType int8`（較慢）。
-   備案模型：`.\scripts\start_asr.ps1 -Model medium -ComputeType float16`，faster-whisper 會自動下載 OpenAI Whisper-medium（Systran 轉換版，約 1.5 GB）。
+   沒有 NVIDIA GPU：`.\portal_assistant\scripts\start_asr.ps1 -Model '<資料夾>' -Device cpu -ComputeType int8`（較慢）。
+   備案模型：`.\portal_assistant\scripts\start_asr.ps1 -Model medium -ComputeType float16`，faster-whisper 會自動下載 OpenAI Whisper-medium（Systran 轉換版，約 1.5 GB）。
 4. 只監聽 127.0.0.1:8770。App 不直接連它，而是經主後端 `/v1/assistant/transcriptions` 轉送，
    因此 adb reverse 仍只需要 8765。錄音只在記憶體處理，手機與電腦都不存檔、不記錄。
 
@@ -311,7 +311,7 @@ adb -s <實際device_serial> emu avd hostmicon
 替模擬器開電腦麥克風，最後執行 App。任何一步失敗會直接說原因，不會漏開語音服務：
 
 ```powershell
-.\scripts\start_all.ps1 -Model '<轉換結果資料夾>' -DeviceId <實際Android_device_id>
+.\portal_assistant\scripts\start_all.ps1 -Model '<轉換結果資料夾>' -DeviceId <實際Android_device_id>
 ```
 
 沒給 `-Model`（也沒設 `TOWNPASS_ASR_MODEL` 環境變數）時只能打字，腳本會明確提示；`-NoVoice` 刻意不開語音，
@@ -320,13 +320,13 @@ adb -s <實際device_serial> emu avd hostmicon
 手動逐步啟動：保持 Ollama、主後端（及選用的語音辨識）與 Android 都在執行。終端 C：
 
 ```powershell
-.\scripts\run_assistant_android.ps1
+.\portal_assistant\scripts\run_assistant_android.ps1
 ```
 
 單一已授權裝置會自動選；多台：
 
 ```powershell
-.\scripts\run_assistant_android.ps1 -DeviceId <實際Android_device_id>
+.\portal_assistant\scripts\run_assistant_android.ps1 -DeviceId <實際Android_device_id>
 ```
 
 腳本做 health 檢查、`adb reverse tcp:8765 tcp:8765`，再 `fvm flutter run`。

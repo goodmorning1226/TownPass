@@ -36,13 +36,13 @@
 
 ```powershell
 # 1. 用 NDK 建置 llama-server / whisper-server（輸出到 android/app/assistant-native/，已 gitignore）
-.\scripts\build_assistant_native.ps1
+.\portal_assistant\native\android\build_assistant_native.ps1
 # 2. 下載 Ministral GGUF；把 Breeze-ASR-25 轉成 ggml 並量化為 q5_0（輸出到 <工作資料夾>\models\device，`<工作資料夾>` 見 TEAM_LOCAL_SETUP.md 第 3.1 節）
-.\scripts\prepare_assistant_models.ps1
+.\portal_assistant\scripts\prepare_assistant_models.ps1
 # 3. 接上手機（USB 偵錯），推送模型（約 3.3 GB，只需一次）
-.\scripts\push_assistant_models.ps1
+.\portal_assistant\scripts\push_assistant_models.ps1
 # 4. 建置並執行裝置端版本（不需要電腦上的後端、Ollama 或語音服務）
-.\scripts\run_assistant_on_device.ps1
+.\portal_assistant\scripts\run_assistant_on_device.ps1
 ```
 
 - 首次啟動時，Chaquopy 會解壓 Python（模擬器約 4 秒）。模型載入期間，請求會收到「手機上的決策模型尚未就緒」。

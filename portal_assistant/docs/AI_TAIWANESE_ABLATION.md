@@ -164,9 +164,9 @@ Common Voice zh-TW test 隨機 40 段（台灣腔華語，CC0／TRAIL-D）：
 
 worktree `TownPass-armwhisper`，分支 `ci/arm-bench-whisper`（從 `ci/arm-bench` `a9f3b30` 開出），**沒有 commit、沒有 push**：
 - `.github/workflows/arm-bench-whisper.yml`：`ubuntu-24.04-arm`，whisper.cpp v1.9.5，App 的 Android 編譯參數。
-- `portal_assistant/scripts/arm_bench_whisper.sh`：在雲端機器上從原作者的 Hugging Face 權重（完整 commit hash）現轉 Whisper small、Breeze-26 q8_0／q4_K／q5_0／q5_K／q4_0／q3_K、momo small、TSukiLen medium，
+- 該分支的 `scripts/arm_bench_whisper.sh`：在雲端機器上從原作者的 Hugging Face 權重（完整 commit hash）現轉 Whisper small、Breeze-26 q8_0／q4_K／q5_0／q5_K／q4_0／q3_K、momo small、TSukiLen medium，
   同 vivo 的參數跑 tw104（`-ac 316`、`-ac 500`，暖機＋5 次），`/usr/bin/time -v` 量峰值 RSS。不下載、不上傳我們的檔案。
-- `portal_assistant/scripts/arm_bench_whisper_report.py`：用 vivo 實測的三個模型校正成手機秒數（用假資料測過表格）。
+- 該分支的 `scripts/arm_bench_whisper_report.py`：用 vivo 實測的三個模型校正成手機秒數（用假資料測過表格）。
 - `portal_assistant/docs/AI_DECISION_MODEL_ARM_BENCH.md` 加了「Whisper」一節。
 - 推送後才會跑（雲端機器磁碟約 14 GB，Breeze 原始權重 6.2 GB＋f16 3.1 GB，工作流先清出空間；**沒有實跑過**，第一次可能要修）。
 

@@ -112,7 +112,7 @@ Android 實機測試（手機接上後）：
 
 ```powershell
 python -X utf8 portal_assistant/scripts\serve_assistant_models.py          # 另開終端，從這台電腦提供模型
-.\scripts\run_assistant_on_device.ps1 -DeviceId <id> -ModelBaseUrl http://127.0.0.1:8899   # 會自動 adb reverse
+.\portal_assistant\scripts\run_assistant_on_device.ps1 -DeviceId <id> -ModelBaseUrl http://127.0.0.1:8899   # 會自動 adb reverse
 adb -s <id> shell rm -r /sdcard/Android/data/com.example.townpass/files/models             # 先清掉手機上的模型再測
 ```
 
