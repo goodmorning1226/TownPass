@@ -24,7 +24,7 @@
 > 在官方 App 架構上加了一個離線的 AI 助理。官方專案說明見 [docs/UPSTREAM_README.md](../../docs/UPSTREAM_README.md)，
 > 改程式之前請先讀 [AGENTS.md](../../AGENTS.md)。
 >
-> **助理是一個獨立專案 [`portal_assistant/`](../)**：完整說明（含黑客松要求的專案簡介、架構、安裝、功能與 AI 使用聲明）見
+> **助理是台北通的一個微服務，程式整包放在 [`portal_assistant/`](../)**：完整說明（含黑客松要求的專案簡介、架構、安裝、功能與 AI 使用聲明）見
 > [portal_assistant/README.md](../README.md)；接進一份官方台北通的方法見 [portal_assistant/INTEGRATION.md](../INTEGRATION.md)。
 
 **English summary.** This fork of Taipei City Government's open-source TownPass app adds a municipal-service
@@ -108,7 +108,7 @@ Developer guide: [ASSISTANT_README.md](../../ASSISTANT_README.md).
 - 預設介面就是引導模式：企鵝的**任務卡**寫這一步要做什麼、**光圈**標出要按的地方、可以朗讀或暫停，在**真實的官方服務頁面**上教學（頁面不修改、不打包，用網頁自己的換頁機制在頁內切換）。
 - 教學要填欄位時，「按住提問」變成「**按住輸入**」：用講的說電話號碼，就轉成數字填進欄位，依欄位型別轉格式（電話、Email、金額、日期、時間、身分證、車牌、文字），可以「復原」，**不會按送出**。
 - 最後一步永遠是使用者自己按；完成後企鵝會說明「這是示範網站，沒有真的送出」。
-- 教學流程以 `portal_assistant/tools/guide_audit/` 在示範網站錄製 182 條重播驗證；教學文字 1,267 句，6 種語言（中、英、日、越、印、菲）。
+- 教學流程以 `portal_assistant/tools/guide_audit/` 在示範網站錄製 181 條重播驗證；教學文字 1,267 句，6 種語言（中、英、日、越、印、菲）。
 
 <details>
 <summary>完整的圖書借閱 5 步驟（7 張截圖）</summary>
@@ -346,7 +346,7 @@ flowchart LR
 
 ### 測試
 
-Python 710 個單元測試、Flutter 1,043 個（助理套件 865、台北通 178；2026-11-26）；教學流程 182 條重播；`extract_guide_strings.py --check` 檢查 6 語（中、英、日、越、印、菲）教學文字缺漏。
+Python 710 個單元測試、Flutter 1,043 個（助理套件 865、台北通 178；2026-11-26）；教學流程 181 條重播；`extract_guide_strings.py --check` 檢查 6 語（中、英、日、越、印、菲）教學文字缺漏。
 
 ## 怎麼跑
 
