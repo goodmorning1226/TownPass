@@ -127,7 +127,7 @@ alexachang 台語模型（訓練資料不明，只當對照）、ViWhisper（資
 - 介面文字：`assistant_texts.dart`（6 語）、教學文字 `portal_assistant/app/assets/i18n/guide/*.json`（1,267 句，以中文原句查表，`extract_guide_strings.py --check` 檢查缺漏）。
 - **語言跟隨**：選單、語音判出的語言、打字語言任一改變，助理文字、建議句、教學卡片、按鈕文字、設定頁、App 畫面與服務網頁一起換；頁面語言只到這次關 App；講話把握 ≥ 0.8 才改選單並記住。
 - **頁面翻譯**：`portal_assistant/app/assets/i18n/app_strings.json` 預翻字串優先，其餘用 ML Kit；服務頁的腳本在文件一開始注入，帶著目前語言的字典，有翻譯的字在畫出來前就換掉，其餘每 20 句一批同時送給 App（`portal_assistant/docs/AI_CURRENT_RULES.md` 第 4 節「服務頁翻譯」）；翻譯時保留原文（`window.__townpassOriginal`、`data-tp-placeholder`），教學光圈用原文找按鈕。
-- **引導助理**：企鵝、任務卡、光圈、新手教學、頁面探測（`web_guide_probe.dart` 讀頁面狀態）；教學流程以 `portal_assistant/tools/guide_audit/` 在示範網站錄製 182 條重播驗證。
+- **引導助理**：企鵝、任務卡、光圈、新手教學、頁面探測（`web_guide_probe.dart` 讀頁面狀態）；教學流程以 `portal_assistant/tools/guide_audit/` 在示範網站錄製 181 條重播驗證。
 - **按住提問／按住輸入**：每頁都有；教學要填欄位時改為語音填欄位，依欄位型別轉格式（電話、Email、金額、日期、時間、身分證、車牌、文字），原生 setter＋input/change 事件寫入 Vue 表單，可復原，不送出。
 - 功能選單排序：微服務 → 子頁 → App 頁 → 帳號設定 → 起始頁類；◀ ▶ 換頁不經模型。
 - 建議句：預設建議，有效輸入後換成使用者最近 4 筆請求（`AssistantRecentInputs`）。

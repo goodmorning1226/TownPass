@@ -247,6 +247,12 @@ void main() {
         AssistantSpeechLanguage.systemDefault(),
       ).label;
       expect(find.text('教學模式・$language'), findsOneWidget);
+      // The mode and language sit under the title (2026-11-26: on the right
+      // they squeezed the title into one word per line in English).
+      expect(
+        tester.getCenter(find.text('教學模式・$language')).dy,
+        greaterThan(tester.getCenter(find.text('AI 助理設定')).dy),
+      );
       // Between 訂閱 and 功能教學.
       final y = tester.getCenter(find.text('AI 助理設定')).dy;
       expect(y, greaterThan(tester.getCenter(find.text('訂閱')).dy));
@@ -287,6 +293,9 @@ void main() {
       // The rows around it still follow the language (pre-translated, never ML Kit).
       expect(find.text(translation.preset('訂閱', 'en')!), findsOneWidget);
       expect(asked, isNot(contains('訂閱')));
+      // The row's title is pre-translated like the settings page's (not ML Kit's "Ai Assistant Settings").
+      expect(find.text('AI assistant settings'), findsOneWidget);
+      expect(asked, isNot(contains('AI 助理設定')));
       // Let the delayed save of learned translations run.
       await tester.pump(const Duration(seconds: 10));
     });

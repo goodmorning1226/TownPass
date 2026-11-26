@@ -49,7 +49,9 @@ class TownPassAssistantHost extends PortalAssistantHost {
   PreferredSizeWidget appBar({required String title}) => TPAppBar(title: title);
 
   /// AI 助理設定 (new) on the account page (AccountView), followed by a space,
-  /// while the guided assistant runs: its mode and language.
+  /// while the guided assistant runs: its mode and language under the title
+  /// (2026-11-26: on the right they squeezed the title into one word per line
+  /// in English).
   static List<TPSettingListTile> accountTiles() {
     if (!PortalAssistant.guidedAvailable) return const [];
     final assistant = PortalAssistant.guided;
@@ -69,7 +71,7 @@ class TownPassAssistantHost extends PortalAssistantHost {
             SettingsTag(SettingsTexts.newTag),
           ],
         ),
-        content: TPText(
+        subtitle: TPText(
           assistant.settingsSummary,
           style: TPTextStyles.bodyRegular,
           color: TPColors.grayscale500,

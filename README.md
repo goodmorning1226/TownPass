@@ -8,8 +8,8 @@
 
 【2026臺北秋季程式設計節-城市通微服務大黑客松】第一名得獎團隊：尖銳吉吉如綠豆冰
 
-> 助理放在 `portal_assistant/` 資料夾，是一個**可以整包接進台北通（TownPass）App 的獨立專案**：
-> 助理的 Flutter 套件、手機上執行的 Python 後端、原生模型伺服器與文件都在這裡；台北通只要照
+> 助理是台北通（TownPass）App 裡的一個**微服務**：依附台北通執行，透過台北通的頁面、路由與 WebView，帶使用者找到並用好其他微服務。
+> 程式整包放在 `portal_assistant/` 資料夾（Flutter 套件、手機上執行的 Python 後端、原生模型伺服器與文件）；台北通只要照
 > **[串接文件 INTEGRATION.md](portal_assistant/INTEGRATION.md)** 改幾個檔（每處只有幾行，程式碼在 [integration/](portal_assistant/integration/)）。
 > 本 repository 的根目錄就是一份已經接好的台北通 App（官方 [taipei-doit/TownPass](https://github.com/taipei-doit/TownPass) 的 fork），可以直接建置執行。
 
@@ -17,8 +17,8 @@
 recordings never leave the device. Speak Mandarin, Taiwanese Hokkien, English, Japanese, Vietnamese, Indonesian or
 Filipino (or type), and it opens the right TownPass service page; on forms it teaches step by step on the real service
 page (task cards, highlight halos, fill fields and pick options by voice, skip optional fields), and the whole app and
-the service pages follow the user's language. It is packaged as a standalone folder that plugs into TownPass through a
-small host interface and 24 short hooks documented in [INTEGRATION.md](portal_assistant/INTEGRATION.md).
+the service pages follow the user's language. It is a microservice of the TownPass app: its code is packaged in one folder that plugs into TownPass
+through a small host interface and 24 short hooks documented in [INTEGRATION.md](portal_assistant/INTEGRATION.md).
 
 ## 目錄
 
@@ -223,7 +223,7 @@ ASSISTANT_SPEECH=whisper
 | 4.7 | 市府 FAQ、台北通常見問答 | 從市府常見問答 8,121 筆與台北通的常見問答找答案；分數不夠就不回答，不亂答 | 臺北市資料大平台〈[臺北市市政網站整合平台之常見問答](https://data.taipei/dataset/detail?id=203f1657-bb4a-45a7-b25f-279b63136645)〉，政府資料開放授權條款第 1 版；事先轉成手機上的向量索引。台北通常見問答在執行時從服務網站讀取，不存進 App 與 repo |
 | 4.8 | 緊急回應 | 失火、受困、自殺、家暴等緊急詞（6 種語言）在所有流程之前直接回 119／110／113／1925／1995 等專線，不經模型 | 無，為專案整理的詞表 |
 | 4.9 | 離線模型下載 | 模型不包在 App 裡；使用者同意後下載，依手機記憶體分級，可暫停、續傳、檢查 SHA-256 | 無政府資料（模型來源與授權見 [app/assets/assistant/models.json](portal_assistant/app/assets/assistant/models.json)） |
-| 4.10 | 獨立專案＋串接文件 | 助理整包放在 `portal_assistant/`，透過主機介面與 24 個串接點接進台北通；已在乾淨的官方台北通上照文件實測 | 無 |
+| 4.10 | 整包串接的微服務 | 助理是台北通的微服務，程式整包放在 `portal_assistant/`，透過主機介面與 24 個串接點接進台北通；已在乾淨的官方台北通上照文件實測 | 無 |
 
 App 內「設定 → 關於 → 授權與資料來源」列出上述資料與每個模型的出處和授權。
 
@@ -328,7 +328,7 @@ App 內「設定 → 關於 → 授權與資料來源」列出上述資料與每
 - 第一次打開助理時問「下載離線助理（約 X GB）」，使用者同意才下載；依手機總記憶體分級，可暫停、續傳、檢查 SHA-256。
 - 我們自己轉檔或訓練的檔案放在團隊的 Hugging Face [`allensung1226/townpass-assistant-models`](https://huggingface.co/allensung1226/townpass-assistant-models)。
 
-#### 4.10 獨立專案＋串接文件
+#### 4.10 整包串接的微服務
 
 - 助理套件不 import 台北通的任何程式；台北通實作主機介面 `PortalAssistantHost`（路由、開 WebView、首頁分頁、標題列），其他每個串接點只有幾行。
 - 對官方檔案的改動從約 1,700 行減到約 250 行（新增 246、刪除 77，不含 4 個新增檔案）；完整列表見 [INTEGRATION.md](portal_assistant/INTEGRATION.md) 與 [docs/HOST_CHANGES.md](portal_assistant/docs/HOST_CHANGES.md)。
