@@ -1421,7 +1421,7 @@ class GuidedAssistantController extends GetxController {
       return;
     }
     final g = active.guide;
-    final n = active.currentTodo(web).clamp(1, g.stepCount);
+    final n = active.currentTodo(_panelPageOf(active)).clamp(1, g.stepCount);
     final ask = Replies.switchAsk(g.title, n, g.shortName, other.shortName);
     _say(
       _bot(
@@ -1468,6 +1468,8 @@ class GuidedAssistantController extends GetxController {
     _measureOnly = alone;
     if (!resuming) web.resetLatches();
     if (!resuming) _lastScopeUrl = null;
+    // A new run starts from its first step; resuming keeps where it was.
+    if (!resuming) _lastReadGuide = null;
     // A bar from the previous task would name this guide's page before it
     // even opened: start over (it waits [offScopeDelay] again).
     _offScopeTimer?.cancel();
@@ -1539,14 +1541,31 @@ class GuidedAssistantController extends GetxController {
     return t != null && t.currentStep(web) >= t.guide.steps.length;
   }
 
-  /// Answer to "下一步要做什麼？".
+  /// Answer to "下一步要做什麼？" (asked in the assistant panel: the step the
+  /// card showed, [_panelPageOf]).
   String? get stepDetail {
     final t = _activeTask;
     if (t == null) return null;
-    if (allStepsDone) return gt(t.guide.doneDetail);
-    final detail = currentStep?.detail(web);
-    return detail == null ? null : gt(detail);
+    final s = _panelPageOf(t);
+    final i = t.currentStep(s);
+    if (i >= t.guide.steps.length) return gt(t.guide.doneDetail);
+    return gt(t.guide.steps[i].detail(s));
   }
+
+  /// The page as last read while the steps ran ([_stepRunning]), for the
+  /// guide it was read for. The page is not read while the assistant panel
+  /// is open or the user is away from the guide's page, and the probe then
+  /// empties the snapshot ([WebGuideProbe.stop]): counted on that, every
+  /// guide looked back at step 1 (water bill: card 2/6, panel 1/6;
+  /// portal_assistant/docs/AI_CURRENT_RULES.md section 5, 2026-11-25).
+  late final _LastReadPage _lastRead = _LastReadPage(web);
+  Guide? _lastReadGuide;
+
+  /// The page the assistant panel describes [t] on (目前任務 步驟 i / n, the
+  /// task list, 下一步要做什麼): the live page while the steps run on it,
+  /// otherwise the page as the last card saw it.
+  WebPageState _panelPageOf(GuideTask t) =>
+      !_stepRunning && identical(_lastReadGuide, t.guide) ? _lastRead : web;
 
   /// A guide is under way: waiting at its 要不要開始引導 card, running a
   /// step or paused. Ended, finished or no task: false.
@@ -1628,7 +1647,7 @@ class GuidedAssistantController extends GetxController {
     final t = task.value;
     if (t == null) return const [];
     final g = t.guide;
-    final p = t.currentTodo(web);
+    final p = t.currentTodo(_panelPageOf(t));
     return [
       for (var i = 0; i < g.todos.length; i++)
         _line(
@@ -1662,7 +1681,7 @@ class GuidedAssistantController extends GetxController {
   String get currentTodoText {
     final t = task.value;
     if (t == null) return '';
-    final p = t.currentTodo(web);
+    final p = t.currentTodo(_panelPageOf(t));
     return gt(p < t.guide.todos.length ? t.guide.todos[p].text : '全部完成');
   }
 
@@ -1758,6 +1777,11 @@ class GuidedAssistantController extends GetxController {
         _stepRunning &&
         t.guide.currentStep(web) >= t.guide.steps.length) {
       task.value = t.copyWith(stepsDone: true);
+    }
+    // What the card shows now, for the assistant panel ([_panelPageOf]).
+    if (t != null && _stepRunning) {
+      _lastRead.seen = web.now;
+      _lastReadGuide = t.guide;
     }
     if (_measureOnly &&
         t != null &&
@@ -2139,10 +2163,12 @@ class GuidedAssistantController extends GetxController {
       case TaskStatus.finished:
         return gt('引導完成');
       default:
-        if (allStepsDone) return gt('引導完成');
+        // The step the card shows, also with the panel open ([_panelPageOf]).
+        final s = _panelPageOf(t);
+        if (t.currentStep(s) >= t.guide.steps.length) return gt('引導完成');
         final n = t.guide.stepCount;
         return gt('步驟 {i} / {n}', {
-          'i': t.currentTodo(web).clamp(1, n),
+          'i': t.currentTodo(s).clamp(1, n),
           'n': n,
         });
     }
@@ -3397,4 +3423,23 @@ class GuidedNavigationObserver extends NavigatorObserver {
   @override
   void didRemove(Route<dynamic> route, Route<dynamic>? previousRoute) =>
       _active(previousRoute);
+}
+
+/// The page as the last card saw it ([GuidedAssistantController._panelPageOf]):
+/// that snapshot, with the live latches and skipped fields (跳過 said in the
+/// panel counts at once).
+class _LastReadPage extends WebPageState {
+  _LastReadPage(this.live);
+
+  final WebPageState live;
+  WebSnapshot seen = const WebSnapshot();
+
+  @override
+  WebSnapshot get now => seen;
+
+  @override
+  bool latched(String key) => live.latched(key);
+
+  @override
+  bool isSkipped(String key) => live.isSkipped(key);
 }
