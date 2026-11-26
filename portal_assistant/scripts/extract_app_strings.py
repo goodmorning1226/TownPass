@@ -44,6 +44,32 @@ def dart_strings():
     return found
 
 
+# The demo user's own data (name, address): never pre-translated (rules section 4,
+# 設定清單的列也跟著語言, 2026-11-26). An entry found only there is removed from the file
+# and --check fails while one is present.
+PERSONAL_MOCKS = ("account.json",)
+
+
+def personal_strings():
+    found = set()
+
+    def walk(value):
+        if isinstance(value, str):
+            if CHINESE.search(value):
+                found.add(value)
+        elif isinstance(value, dict):
+            for item in value.values():
+                walk(item)
+        elif isinstance(value, list):
+            for item in value:
+                walk(item)
+    for name in PERSONAL_MOCKS:
+        path = APP_ROOT / "assets" / "mock_data" / name
+        if path.exists():
+            walk(json.loads(path.read_text(encoding="utf-8")))
+    return found
+
+
 def mock_strings():
     found = set()
 
@@ -58,6 +84,8 @@ def mock_strings():
             for item in value:
                 walk(item)
     for path in sorted((APP_ROOT / "assets" / "mock_data").glob("*.json")):
+        if path.name in PERSONAL_MOCKS:
+            continue
         walk(json.loads(path.read_text(encoding="utf-8")))
     return found
 
@@ -66,6 +94,11 @@ def main():
     check = "--check" in sys.argv
     old = json.loads(OUT.read_text(encoding="utf-8"))["strings"] if OUT.exists() else {}
     found = dart_strings() | mock_strings()
+    # The demo user's data that nothing else in the App shows.
+    personal = sorted((personal_strings() - found) & set(old))
+    for text in personal:
+        print(f"personal (removed): {text}")
+    old = {text: value for text, value in old.items() if text not in personal}
     strings = {}
     for text in sorted(found | set(old)):
         kept = old.get(text, {})
@@ -81,7 +114,7 @@ def main():
     print(f"{len(found)} App strings, {len(added)} new, {len(untranslated)} untranslated; "
           f"{unused} kept entries not in the App's code (common page words)")
     if check:
-        return 1 if added or untranslated else 0
+        return 1 if added or untranslated or personal else 0
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(json.dumps({
         "version": 1,

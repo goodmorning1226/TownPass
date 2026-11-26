@@ -91,7 +91,7 @@
 | 5 | `lib/util/tp_text.dart` (+4 −1) | `TPText.build` | `build` 改成 `PageTranslation.buildText(context, data, _build)`，原本的內容移到 `_build(String? data)` | App 的文字跟著頁面語言（英、日、越、印、菲） | 切換語言後原生頁面仍是中文 |
 | 6 | `lib/util/tp_bottom_navigation_factory.dart` (+6 −4) | `barItemList` 四個 `label` | `PageTranslation.instance.label('服務')` 等 | 底部分頁標籤跟著語言 | 分頁標籤仍是中文 |
 | 7 | `lib/page/perk/perk_view.dart` (+12 −1) | `body: TPInAppWebView(...)` | 外面包 `AssistantTabWebPage(tabIndex: 2, builder: (page) => ...)`，WebView 加 `key: page.viewKey`、記下 `controller`、`onLoadStop`／`onUpdateVisitedHistory` 呼叫 `page.track` | 「優惠」分頁本身是服務網頁，票券與優惠券教學要讀它 | 優惠券教學在分頁上不動 |
-| 8 | `lib/page/account/account_view.dart` (+6 −2) | 「訂閱」那一列之後；兩個「設定」圖示的 `Semantics.label` | `...TownPassAssistantHost.accountTiles(),`；`PageTranslation.instance.label('設定')` | 帳戶頁的「AI 助理設定」入口（教學／一般模式、語言） | 沒有設定入口（設定仍可從助理面板進） |
+| 8 | `lib/page/account/account_view.dart` (+8 −4) | 「訂閱」那一列之後；兩個「設定」圖示的 `Semantics.label`；使用者姓名的 `TPText` | `...TownPassAssistantHost.accountTiles(),`；`PageTranslation.instance.label('設定')`；姓名外面包 `PageTranslationScope(enabled: false, child: ...)` | 帳戶頁的「AI 助理設定」入口（教學／一般模式、語言）；使用者的姓名不被翻譯（`TPText` 會跟著語言翻） | 沒有設定入口（設定仍可從助理面板進） |
 | 9 | `lib/page/setting/setting_view.dart` (+9) | 「停用帳號」之後 | 「關於 → 授權與資料來源」（`showLicensePage`） | 路名資料（政府資料開放授權）與模型授權要能看到，助理會登記這些來源 | 授權條款要求的出處無處顯示 |
 | 10 | `lib/page/language/language_view.dart`、`language_view_controller.dart` (+17 −24) | 語言清單與 `onIndexChange` | 語言清單改為 `PageTranslation.languages`，選了就 `PageTranslation.instance.setLanguage`（官方原本是空的 TODO） | 「設定 → 語言」真的切換頁面語言 | 語言頁維持原本只有兩項且沒有作用 |
 | 11 | `lib/page/basic_info_edit/basic_info_edit_view.dart` (+5 −3) | `TextFormField` | 用 `Obx` 包住、`hintText` 改 `PageTranslation.instance.label(...)` | 提示文字跟著語言 | 提示仍是中文 |
@@ -107,6 +107,7 @@
 | 21 | `ios/Runner.xcodeproj/project.pbxproj` (+23) | Runner target | 加入 `OnDeviceAssistant.swift`、`CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements`、建置階段「Embed On-Device Assistant」（執行 `../portal_assistant/native/ios/embed_on_device_assistant.sh`） | Swift 原生程式、較大的記憶體額度、把 Python 與後端放進 App | iPhone 地端模式不能用（一般建置不受影響：沒有 `ios/OnDevice/` 時內嵌腳本直接略過） |
 | 22 | `ios/Runner/Info.plist` (+2) | 權限說明 | `NSMicrophoneUsageDescription` | iOS 要求麥克風用途說明 | 按住說話時 App 會被系統終止 |
 | 23 | `ios/.gitignore` (+2) | 檔尾 | `OnDevice/` | iOS 原生框架（`setup_ios_on_device.sh` 產生）不進 git | 大型框架出現在 git status |
+| 24 | `lib/util/tp_setting_list.dart` (+17 −16) | `TPSettingListTile` 的 `display`、`navigate`、`header`、`switchButton` 共 8 處 `.text(...)` | 標題、副標與值都改成 `title.assistantPreset((t) => t.text(...))`（只查 App 自己的預翻字典，不送 ML Kit） | 帳戶、設定、基本資料、語言、App 起始頁、停用帳號的清單列跟著頁面語言；使用者自己的資料（姓名、地址、電話等）不會被翻 | 這些清單列一直是中文 |
 
 ## 4. 台北通要提供的東西
 

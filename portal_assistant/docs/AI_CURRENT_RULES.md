@@ -343,6 +343,16 @@ App 上看起來重複，也很難找到想要的；研究第 D 節）：
   - **短標籤**（`glossary.json` 的 `labels`）：抽取工具到不了的畫面（對話框、點進去才有的頁）上的短標題、按鈕，整串剛好是這個字時用表裡的翻譯；
     **只比對整串，不保護句子裡的用詞**（「使用」當按鈕是 Use，句子裡的「使用」照常翻）。詞彙表版本改成 2。
   - 以上翻譯都是 **AI 草稿，要請母語者審**。（`PageTranslation.keeps`、`PageGlossary.keeps`／`whole`、`assistant_web_view.dart` 的 `config.keep`；`portal_assistant/docs/AI_PAGE_TRANSLATION.md` 第 11 節）
+- **設定清單的列也跟著語言**（2026-11-25，擁有者同意；原因：帳戶、設定、基本資料、語言、App 起始頁、停用帳號的清單列由官方的 `TPSettingList` 用純 `Text` 畫，
+  沒有經過翻譯，切成英文後整頁還是中文；這些字其實都已經預翻好了）：
+  - 列的**標題、副標與右側的值**都**只查 App 自己的檔案**（`PageTranslation.buildPresetText`：不翻的字、預翻、詞彙表整串），**絕不送 ML Kit、也不用手機學到的翻譯**：
+    列上常有使用者自己的資料——值是身分證、生日、email、電話、中文地址，基本資料頁第一列的**標題就是姓名**——翻了會錯；
+    介面文字（每一列的名稱、「首頁>訂閱」「未設定」）都在預翻字典裡，照樣會翻。新加的列名由 `extract_app_strings.py --check` 要求補進字典。
+  - **示範帳號的個人資料不進預翻字典**（2026-11-26；原因：模擬器上基本資料頁的姓名與地址被翻成英文，查出 `extract_app_strings.py` 把 `assets/mock_data/account.json` 的姓名、地址也收進了字典）：
+    抽字串時略過 `account.json`，只從它來的字從字典刪掉，`--check` 遇到就失敗。
+  - **帳戶頁頂端的使用者姓名不翻**（2026-11-26，擁有者同意；原因：模擬器上「金大森」被 ML Kit 翻成「Jin Da-sen」；姓名用官方的 `TPText`，而 `TPText` 一律跟著語言）：
+    姓名外面包 `PageTranslationScope(enabled: false)`（`lib/page/account/account_view.dart`，第 8 個串接點）；電話等不含中文的值本來就不會被翻。
+  - 官方檔案 `lib/util/tp_setting_list.dart` 只加掛點（第 24 個串接點，`INTEGRATION.md`），樣式不變。（`PageTranslation.buildPresetText`；台北通測試 `test/setting_list_translation_test.dart`、`test/portal_assistant_integration_test.dart` 的姓名測試）
 - **越南文**（2026-11-08，`portal_assistant/docs/AI_VIETNAMESE.md`）：手機上有 `ggml-whisper-vietnamese.bin`（建議 PhoWhisper-base，選用）時，判定為越南文的錄音改由它聽（不加提示句、編碼器用完整 30 秒窗口、只解一次不重試）；第一次用到才載入，沒有檔案就跟原本一樣用 Whisper small。越南文不加提示句（實測反而變差）。
   選單選越南文時，閘門說「中文」一律不算數，改由 Whisper small 只偵測語言再決定；small 也說中文但把握不到九成、而且中文很短或不清楚時，再用越南文模型聽一次取較好的（`asr_server.MENU_OVER_CHINESE`）。閘門的台語判定在越南文選單下也要等這次偵測沒選到越南文才採用。
   比對：不打聲調、聲調聽錯、南北口音（d/gi/r/v、ch/tr、s/x、字尾 n/ng、c/t）都能對到；只靠口音合併或單音節沒聲調對到的，一律列出來讓使用者選；只對到**一個**已串接頁面而且不是靠口音時直接開，不問模型（`portal_assistant/backend/vietnamese.py`、`workflow._handle_language`）。
