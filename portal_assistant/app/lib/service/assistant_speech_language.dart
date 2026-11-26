@@ -3,7 +3,7 @@ import 'dart:ui' show PlatformDispatcher;
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// A speech input language offered in the assistant's language menu
-/// (portal_assistant/docs/AI_MULTILINGUAL_PLAN.md). [code] is what the backend's X-Language
+/// (portal_assistant/docs/history/AI_MULTILINGUAL_PLAN.md). [code] is what the backend's X-Language
 /// header expects; 'auto' lets the multilingual Whisper detect it.
 class AssistantSpeechLanguage {
   final String code;

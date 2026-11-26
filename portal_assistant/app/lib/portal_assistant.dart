@@ -33,7 +33,7 @@ const assistantEnabled = bool.fromEnvironment(
 /// on the real service pages; it asks the model for service requests and falls
 /// back to the pre-written rules when the backend cannot be reached.
 /// `--dart-define=ASSISTANT_GUIDED=false` brings back the chat-only assistant
-/// (portal_assistant/docs/TEAM_TASKS_AFTER_MERGE.md T3-T5 list what it still
+/// (portal_assistant/docs/history/TEAM_TASKS_AFTER_MERGE.md T3-T5 list what it still
 /// lacks there). `--dart-define=ASSISTANT_OFFLINE=true` makes the guided
 /// assistant never call the backend.
 const assistantGuided = bool.fromEnvironment(

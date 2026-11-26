@@ -525,7 +525,7 @@ class Assistant:
             raise AssistantError("請輸入最多 500 字的需求。")
         from page_context import parse
         context = parse(payload.get("context"), self.workflow.registry)
-        # Optional "language" (portal_assistant/docs/AI_MULTILINGUAL_PLAN.md): the speech language, or
+        # Optional "language" (portal_assistant/docs/history/AI_MULTILINGUAL_PLAN.md): the speech language, or
         # "auto"/absent to tell it from the typed text; Chinese otherwise.
         import i18n
         requested = payload.get("language")
@@ -981,7 +981,7 @@ def make_handler(assistant, token=""):
                 return self.reply(422, {"error": "錄音格式不正確，請再說一次，或改用鍵盤。"})
             try:
                 from asr_server import language_code
-                # The App's chosen speech language (portal_assistant/docs/AI_MULTILINGUAL_PLAN.md); default Chinese.
+                # The App's chosen speech language (portal_assistant/docs/history/AI_MULTILINGUAL_PLAN.md); default Chinese.
                 language = language_code(self.headers.get("X-Language"))
                 request = urllib.request.Request(ASR_URL, data=audio, headers={
                     "Content-Type": "audio/wav", "X-Language": language})

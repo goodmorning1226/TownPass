@@ -1,5 +1,7 @@
 # 印尼文：對得到、聽得準（2026-11-11）
 
+> **開發紀錄**：文中的分支、commit、「還沒提交」「尚未實作」是寫的當時的狀態；採用的做法都已合進目前的程式。現行規則以 [AI_CURRENT_RULES.md](AI_CURRENT_RULES.md) 為準，文件索引見 [README.md](README.md)。
+
 任務：讓印尼文請求更常到正確的服務，開錯頁不能增加。做法照越南文（`portal_assistant/docs/AI_VIETNAMESE.md`）：
 用 gTTS 做合成語音開發集，分開量「聽寫錯」與「比對錯」，先改比對，聽寫是瓶頸才換辨識模型。
 規則以 `portal_assistant/docs/AI_CURRENT_RULES.md` 第 4 節「印尼文」為準。**全部改動都還沒提交**，以 `feat/indonesian` 的 `00a8733` 為基礎。

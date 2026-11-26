@@ -42,7 +42,7 @@ if (assistantOnDevice) {
     def assistantWhisper = (project.findProperty("townpass.speech") ?: System.getenv("TOWNPASS_SPEECH")
         ?: dartDefines["ASSISTANT_SPEECH"] ?: "whisper").toString() != "system"
     // TOWNPASS_DECISION_MODEL=gemma (or ASSISTANT_DECISION_MODEL=gemma): Gemma 4 E2B
-    // instead of Ministral 3B as the decision model (portal_assistant/docs/AI_DECISION_MODEL_ABLATION_PLAN.md
+    // instead of Ministral 3B as the decision model (portal_assistant/docs/history/AI_DECISION_MODEL_ABLATION_PLAN.md
     // section 8); ministral: Ministral 3B. Default classifier (since 2026-11-13): no decision
     // model at all, the decision classifier instead (option B', portal_assistant/docs/AI_DECISION_CLASSIFIER.md
     // section 12; portal_assistant/docs/AI_CURRENT_RULES.md section 6).

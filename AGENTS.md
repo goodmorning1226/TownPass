@@ -3,6 +3,8 @@
 本文件適用於本 repository 全部目錄，供人員及 AI coding agents 在修改前閱讀。
 這是本 fork 的工作規約，不是官方發布的 AGENTS.md，也不保證任何 PR 必然被官方接受。
 目標是維持官方相容性、保護既有修改，並使變更可審查及可驗證。
+本 repository 也以單一 commit 放在市府的 repo（taipei-doit/townpass2026-microservice-portal-assistant），那裡沒有開發歷史；
+下文的 `origin`（團隊 fork）、`upstream`（官方 TownPass）與分支命名是團隊開發時的設定。
 
 ## 1. 依據與優先順序
 
@@ -68,7 +70,7 @@
 | `lib/util/` | 共用 UI、路由、WebView、跨功能工具與訊息橋接。 |
 | `lib/gen/` | FlutterGen 自動產生的資源介面，不手改輸出。 |
 | `assets/`、`fonts/` | 資源與目前明確標示的 mock 資料。 |
-| `portal_assistant/` | 微服務入口整合助理（本 fork 新增）：Flutter 套件 `app/`（`townpass_portal_assistant`，path 相依）、Python 後端 `backend/`、原生 `native/`、`scripts/`、`tools/`、`docs/`（助理規則 `docs/AI_CURRENT_RULES.md`）、串接文件 `INTEGRATION.md` 與 `integration/`。 |
+| `portal_assistant/` | 微服務入口整合助理（本 fork 新增）：Flutter 套件 `app/`（`townpass_portal_assistant`，path 相依）、Python 後端 `backend/`、原生 `native/`、`scripts/`、`tools/`、`docs/`（助理規則 `docs/AI_CURRENT_RULES.md`）、agent skill `skills/`、市府 FAQ 資料與建置腳本 `rag_handoff/`、串接文件 `INTEGRATION.md` 與 `integration/`。 |
 
 - 沿用 GetX 的 state、route、service injection 與現有 controller 生命週期。
 - 助理（`portal_assistant/`，團隊規則，2026-11-24）：套件不 import `package:town_pass/...`；需要台北通的地方走主機介面
@@ -133,6 +135,7 @@ fvm flutter pub get
 fvm flutter analyze
 fvm flutter test
 (cd portal_assistant/app && fvm flutter test)   # 助理套件自己的測試
+python -X utf8 -m unittest discover -s portal_assistant/backend -p "test_*.py"   # 助理後端
 fvm flutter build apk --debug
 fvm flutter devices
 # 選擇本次實際列出的 Android 裝置 ID，不照抄過期 ID。

@@ -20,7 +20,7 @@ import 'package:townpass_portal_assistant/service/page_translation.dart';
 
 import 'support/test_host.dart';
 
-/// The guided assistant in the six languages (portal_assistant/docs/AI_GUIDED_MERGE_PLAN.md
+/// The guided assistant in the six languages (portal_assistant/docs/history/AI_GUIDED_MERGE_PLAN.md
 /// section 8): the translation tables, the lookup, the UI following the
 /// conversation language, and the probe reading the page's original text.
 

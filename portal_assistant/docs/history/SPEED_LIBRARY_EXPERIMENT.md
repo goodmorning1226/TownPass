@@ -1,5 +1,7 @@
 # 圖書決策 prompt 縮短實驗
 
+> **歷史文件**（已被取代，只當紀錄）：內容是寫的當時的狀態，有些做法後來改掉了。現行規則以 [AI_CURRENT_RULES.md](../AI_CURRENT_RULES.md) 為準，索引見 [README.md](README.md)。
+
 日期：2026-11-07。分支 `exp/speed-library`（自 `feat/asr-ablation` `2bcf698`），worktree `TownPass-s3`。
 尚未 commit、未上手機；以電腦 Ollama `ministral-3:3b`（Q4_K_M，temperature 0）評估。
 

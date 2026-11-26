@@ -27,7 +27,7 @@
 # Decision model: Ministral 3B is always pushed (the default). -DecisionModel gemma
 # also pushes Gemma 4 E2B (-GemmaModel, ggml-org/gemma-4-E2B-it-GGUF Q4_0, 2.84 GB)
 # for an App built with run_assistant_on_device.ps1 -DecisionModel gemma
-# (portal_assistant/docs/AI_DECISION_MODEL_ABLATION_PLAN.md section 8). Ministral stays on the phone,
+# (portal_assistant/docs/history/AI_DECISION_MODEL_ABLATION_PLAN.md section 8). Ministral stays on the phone,
 # so switching back only needs a default build. -RemoveGemma deletes the Gemma file.
 # -DecisionModel classifier also pushes the decision classifier (-ClassifierModel, 132 MB)
 # for an App built with run_assistant_on_device.ps1 -DecisionModel classifier (option B',

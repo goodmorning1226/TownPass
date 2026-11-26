@@ -1,4 +1,4 @@
-"""HTTP evaluation of requests in en / ja / vi / id / tl (portal_assistant/docs/AI_MULTILINGUAL_PLAN.md; Filipino
+"""HTTP evaluation of requests in en / ja / vi / id / tl (portal_assistant/docs/history/AI_MULTILINGUAL_PLAN.md; Filipino
 replaced Thai on 2026-11-11, portal_assistant/docs/AI_FILIPINO.md).
 
 Same judge and outcome classes as evaluate.py; the sentences are drafts written

@@ -18,7 +18,7 @@ recordings never leave the device. Speak Mandarin, Taiwanese Hokkien, English, J
 Filipino (or type), and it opens the right TownPass service page; on forms it teaches step by step on the real service
 page (task cards, highlight halos, fill fields and pick options by voice, skip optional fields), and the whole app and
 the service pages follow the user's language. It is packaged as a standalone folder that plugs into TownPass through a
-small host interface and 23 short hooks documented in [INTEGRATION.md](portal_assistant/INTEGRATION.md).
+small host interface and 24 short hooks documented in [INTEGRATION.md](portal_assistant/INTEGRATION.md).
 
 ## 目錄
 
@@ -27,6 +27,7 @@ small host interface and 23 short hooks documented in [INTEGRATION.md](portal_as
   - [2. 系統架構](#2-系統架構--system-architecture)
   - [3. 安裝與執行方式](#3-安裝與執行方式--installation--run)
   - [4. 功能說明](#4-功能說明--features)
+  - [5. 用 agent skill 擴充](#5-用-agent-skill-擴充--extension)
 - [二、AI 使用聲明](#二若使用-ai需額外補充的項目ai-usage-declaration)
 - [三、串接到台北通](#三串接到台北通)
 - [四、專案結構與文件](#四專案結構與文件)
@@ -40,11 +41,12 @@ small host interface and 23 short hooks documented in [INTEGRATION.md](portal_as
 
 ### 專案目的與想解決的問題
 
-台北通有上百項服務，但很多人不是找不到服務，而是找不到**選單**：
+台北通有很多好用的服務，但很多人不是找不到服務，而是找不到**選單**：
 
-- **長輩**：看不清小字、不知道「繳費」在哪一層、不習慣打字，但很會講。
-- **移工、新住民、旅客**：介面和服務名稱都是中文；就算會一點中文，也不知道「規費」「巨大垃圾」是什麼。
-- **第一次用的人**：知道要借書，卻不知道要先搜尋、選分館、再預約；表單上哪幾格一定要填也不清楚。
+- **長輩**：不習慣看字、不知道「繳費」在哪一層、不習慣打字；有些人聽得懂華語、也看得懂中文字，卻只會講台語。
+- **移工、新住民、旅客**：介面和服務名稱都是中文；就算會一點中文，也不知道「規費」「陳情」是什麼。
+- **第一次用的人、數位使用能力較低的人**：台北通的微服務很多，想借書，卻根本不知道要從哪裡找到借書的頁面；
+  進去之後也不知道要選哪些東西（先搜尋、選分館、再預約），表單上哪幾格一定要填也不清楚。
 
 我們的目標是讓使用者**用講的**就能用到台北通的微服務：說一句話，助理打開對的服務頁面；
 需要填表時，在**真正的服務頁面**上一步步教，欄位與選項都能用說的填，頁面也翻成使用者講的語言。同時堅持三個原則：
@@ -95,17 +97,21 @@ flowchart LR
     subgraph phone["手機（Android／iPhone）：全部在裝置上執行"]
         direction TB
         subgraph host["台北通 App（Flutter）"]
-            tp["官方頁面、TPWebView、路由<br/>23 個串接點＋主機介面 PortalAssistantHost"]
+            tp["官方頁面、TPWebView、路由<br/>24 個串接點＋主機介面 PortalAssistantHost"]
             pkg["助理套件 townpass_portal_assistant<br/>引導教學、按住提問／輸入／選擇<br/>頁面翻譯（預翻＋ML Kit）"]
         end
         backend["Python 後端 :8765<br/>（Android：Chaquopy；iPhone：內嵌 CPython）<br/>緊急 → 指令 → 關鍵字 → 決策分類器 → 讀音 → 語意 → FAQ<br/>選項與地址比對"]
-        subgraph speech["語音：whisper.cpp whisper-server"]
-            direction TB
-            tiny["Whisper tiny<br/>語言判斷約 0.2 秒"]
-            small["Whisper small<br/>中、英、日、越、印、菲"]
-            breeze["Breeze-ASR-26<br/>台語，第一次用到才載入"]
+        subgraph speech["語音（whisper.cpp）"]
+            direction LR
+            tiny["Whisper tiny<br/>判斷語言 0.2 秒"]
+            breeze["Breeze-ASR-26<br/>台語"]
+            small["Whisper small<br/>中、英、日、印、菲"]
+            pho["PhoWhisper<br/>越南文（Android）"]
+            tiny -->|台語| breeze
+            tiny -->|其他| small
+            tiny -->|越南文| pho
         end
-        subgraph text["文字：llama.cpp llama-server"]
+        subgraph text["文字（llama.cpp）"]
             direction TB
             cls["決策分類器<br/>multilingual-e5-small 微調"]
             e5["multilingual-e5-small<br/>語意檢索、FAQ 向量"]
@@ -118,14 +124,15 @@ flowchart LR
     tp <--> pkg
     pkg -->|錄音／文字| backend
     backend -->|開頁、選項、回答| pkg
-    backend --> speech
+    backend -->|錄音| speech
     backend --> text
     tp -->|WebView| web
     data -.->|事先整理成 App 內資料| backend
     hf -.->|下載並檢查 SHA-256| phone
 ```
 
-一句話的旅程：按住說話 → 語言判斷（0.2 秒）→ 用該語言的模型聽成文字 → 後端規則優先、分類器只替候選頁打分 →
+一句話的旅程：按住說話 → Whisper tiny 判斷語言（0.2 秒）→ 依語言交給一個模型聽成文字（台語給 Breeze-ASR-26、Android 上的越南文給 PhoWhisper、其他給 Whisper small；
+中文結果讀起來不像華語或 App 認不得時，再讓 Breeze 聽一次，留比較合理的那份）→ 後端規則優先、分類器只替候選頁打分 →
 開頁、列出 2–4 個選項或回答。只有一個明確選項、而且分數夠高才直接開；其他情況列出來讓使用者選，不亂開。
 更細的流程見 [docs/AI_TECHNICAL_OVERVIEW.md](portal_assistant/docs/AI_TECHNICAL_OVERVIEW.md)，行為規則的唯一準則是 [docs/AI_CURRENT_RULES.md](portal_assistant/docs/AI_CURRENT_RULES.md)。
 
@@ -148,7 +155,7 @@ flowchart LR
 - **Flutter**：用 [FVM](https://fvm.app/) 安裝 `.fvmrc` 指定的 3.47.6（Dart 3.13.5），不要用電腦全域的 Flutter。
 - **Python**：3.11 或以上（電腦上跑後端與測試；手機上的 Python 由建置流程打包）。
 - **Android**：Android SDK（Platform 36、NDK 29）、JDK 17、adb；實機建議 7 GB 以上記憶體（以下只下載核心模型）。
-- **iPhone**（選用）：Mac＋Xcode；沒有 Mac 時可用 GitHub Actions 建置未簽章版本再側載。
+- **iPhone**（選用）：Mac＋Xcode；沒有 Mac 時，團隊 fork 的 `ci/ios-build` 分支有 GitHub Actions 建置未簽章版本再側載的做法（workflow 與 `docs/IOS_BUILD_WITHOUT_MAC.md`，不包含在市府 repository）。
 - **Node.js**（選用）：v18 或以上，只有教學流程錄製工具 [tools/guide_audit/](portal_assistant/tools/guide_audit/) 需要。
 
 步驟說明（Android，Windows PowerShell，在 repository 根目錄執行）：
@@ -207,18 +214,48 @@ ASSISTANT_SPEECH=whisper
 
 | 功能編號 | 功能名稱 | 簡述 | 資料來源描述（若為政府資料） |
 | --- | --- | --- | --- |
-| 4.1 | 說話就開服務 | 按住說一句話或打字，助理直接打開對的服務頁；只有一個明確選項才直接開，否則列出 2–4 個候選或 12 類功能目錄 | 無，為專案整理的功能目錄（109 項）與口語例句（602 句） |
+| 4.1 | 說話就開服務 | 按住說一句話或打字，助理直接打開對的服務頁；只有一個明確選項才直接開，否則列出 2–4 個候選或 12 類功能目錄 | 無，為專案整理的功能目錄（109 項）與口語例句（1,400 句，中文 1,080） |
 | 4.2 | 引導教學 | 企鵝任務卡＋光圈，在真實的服務頁上一步步教（9 種服務）；打字的欄位打完才進下一步；非必填欄位也教，可「跳過這格」 | 無，為專案撰寫的教學內容（6 種語言） |
 | 4.3 | 按住輸入、按住選擇 | 欄位用說的填（依欄位轉成電話、日期、身分證等格式）；下拉、單選、勾選、清單用說的選；都可以復原，不會替使用者送出 | 無 |
 | 4.4 | 語音地址分層比對 | 說一次完整地址，依序比對縣市 → 區 → 路名，校正語音辨識的錯字後填入；縣市／區／地址三格的下拉一次填好 | 內政部戶政司〈全國路名資料〉（[data.gov.tw 35321](https://data.gov.tw/dataset/35321)），CSV，115 年版；內政部國土測繪中心〈鄉鎮市區清單〉（[data.gov.tw 102011](https://data.gov.tw/dataset/102011)），API；均為政府資料開放授權條款第 1 版，事先整理進 App |
 | 4.5 | 台語自動辨識 | 不用切選單：語言判斷後自動交給台語模型（Breeze-ASR-26），辨識成中文字再走原本流程 | 無政府資料 |
 | 4.6 | 多語介面與頁面即時翻譯 | 7 種語言；講什麼語言，助理、教學卡片、App 畫面與服務網頁一起換（預翻字串＋ML Kit 離線翻譯） | 無政府資料 |
-| 4.7 | 市府 FAQ | 從市府常見問答 8,121 筆找答案；分數不夠就不回答，不亂答 | 臺北市資料大平台〈[臺北市市政網站整合平台之常見問答](https://data.taipei/dataset/detail?id=203f1657-bb4a-45a7-b25f-279b63136645)〉，政府資料開放授權條款第 1 版；事先轉成手機上的向量索引 |
+| 4.7 | 市府 FAQ、台北通常見問答 | 從市府常見問答 8,121 筆與台北通的常見問答找答案；分數不夠就不回答，不亂答 | 臺北市資料大平台〈[臺北市市政網站整合平台之常見問答](https://data.taipei/dataset/detail?id=203f1657-bb4a-45a7-b25f-279b63136645)〉，政府資料開放授權條款第 1 版；事先轉成手機上的向量索引。台北通常見問答在執行時從服務網站讀取，不存進 App 與 repo |
 | 4.8 | 緊急回應 | 失火、受困、自殺、家暴等緊急詞（6 種語言）在所有流程之前直接回 119／110／113／1925／1995 等專線，不經模型 | 無，為專案整理的詞表 |
 | 4.9 | 離線模型下載 | 模型不包在 App 裡；使用者同意後下載，依手機記憶體分級，可暫停、續傳、檢查 SHA-256 | 無政府資料（模型來源與授權見 [app/assets/assistant/models.json](portal_assistant/app/assets/assistant/models.json)） |
-| 4.10 | 獨立專案＋串接文件 | 助理整包放在 `portal_assistant/`，透過主機介面與 23 個串接點接進台北通；已在乾淨的官方台北通上照文件實測 | 無 |
+| 4.10 | 獨立專案＋串接文件 | 助理整包放在 `portal_assistant/`，透過主機介面與 24 個串接點接進台北通；已在乾淨的官方台北通上照文件實測 | 無 |
 
 App 內「設定 → 關於 → 授權與資料來源」列出上述資料與每個模型的出處和授權。
+
+### 目前串接的服務
+
+功能目錄（[app/assets/assistant/capabilities.json](portal_assistant/app/assets/assistant/capabilities.json)）共 109 項，其中 **86 項已串接**：
+說了會直接打開、或列在候選裡讓使用者點。服務頁是台北通的示範站（TownPass-Services），其中 9 種有引導教學（見 4.2）。
+
+| 類別 | 已串接的服務 |
+| --- | --- |
+| 繳費與帳單（13） | 停車費、水費、地方稅、學雜費、國／社宅租金維管費、聯醫醫療費、平價住宅維護費、公訓處自費課程、其他繳費、帳務、帳務紀錄、掃描繳費、繳費查詢 |
+| 圖書館（5） | 圖書借閱、圖書點閱排行榜、圖書公告、我的借閱紀錄、圖書預約清單 |
+| 臨櫃叫號（11） | 臨櫃叫號，以及 10 個單位：地政事務所、戶政事務所、區公所、稅捐分處、就業服務站各 2 處 |
+| 申辦（12） | 申辦服務，以及 11 種表單：交通違規申訴 4 種、健保費與保險費補助、被害人補助、原住民慰問金與獎勵金等 |
+| 災情通報（15） | 災情通報，以及 14 個類別：電力、路燈、橋梁、土石流、火災等 |
+| 警政（3） | 警政服務、線上報案、報案紀錄 |
+| 陳情與案件查詢（5） | 有話要說、陳情分類、申辦案件進度、陳情案件進度、警政案件進度 |
+| 優惠、訊息與訂閱（7） | 優惠、優惠列表、票夾、訊息、活動資訊、訂閱總覽、訂閱項目 |
+| 常見問答（2） | 常見問答、常見問答分類 |
+| 帳號與 App（13） | 首頁、服務總覽、我的服務與置頂、帳號、設定、基本資料、App 起始頁面、手機載具、意見回饋、語言；通知提醒設定、歷程與授權管理、停用帳號（頁面能開，但動作在示範站還沒串接，助理會說明） |
+
+**有入口、但還沒串接的 23 項**（說到時助理會說明原因、不會亂開頁）。原因都在服務端，不是助理做不到：
+
+| 原因 | 項目 |
+| --- | --- |
+| 示範站沒有這個服務的頁面或資料 | 網路投票、意見調查、里辦服務、親子館、寵物安心遛、愛遊動物園、民生物資 |
+| 沒有正式的服務入口或 API | 疫苗預約、聯醫掛號、台北電台、簡單森呼吸、災情案件進度、用水服務（可改用水費頁） |
+| 需要正式的帳號登入或帳務功能 | 快速登入、登出、我的帳務設定 |
+| 地圖金鑰、定位或外部網域還沒驗證 | 找地點、圖書館地圖、市政資訊儀表板 |
+| 其他 | 市政新聞（原入口還沒接上）、1999（服務清單的入口是空的，而且助理不替使用者撥號）、冊次與取書館的自動預填、陳情表單的自動預填（表單沒有提供可以安全預填的介面；使用者可以照教學、用「按住輸入／選擇」自己填） |
+
+每一項的原因寫在 `capabilities.json` 的 `reason` 欄位；服務端補上頁面或 API 後，照第 5 節的 skill 串接。
 
 ### 各功能詳細說明
 
@@ -266,7 +303,7 @@ App 內「設定 → 關於 → 授權與資料來源」列出上述資料與每
 
 - 不用切選單：語言判斷模型（Whisper tiny）的輸出上加了一個小分類器，分數夠高就交給台語模型 **Breeze-ASR-26**（聯發科技研究中心＋陽明交大，Apache-2.0）。
 - 中文結果不像華語、或 App 認不出那句話時，也會交給台語模型再聽一次，留比較好的那份。
-- 台語模型無法使用時不會用華語硬聽，而是說明原因。目前只有辨識，朗讀用中文。
+- 台語模型下載了但暫時不能用（記憶體不足、還沒啟動）時，不會用華語硬聽，而是說明原因；沒下載台語模型時照華語處理。目前只有辨識，朗讀用中文。
 
 #### 4.6 多語介面與頁面即時翻譯
 
@@ -274,10 +311,12 @@ App 內「設定 → 關於 → 授權與資料來源」列出上述資料與每
 - 預翻好的字串直接用，其餘用 Google ML Kit 離線翻譯；翻譯時保留原文，教學用原文找按鈕。
 - 越南文的聲調與南北口音、印尼文的聊天縮寫、菲律賓文夾英文都有專門處理。外語文字目前是 AI 翻譯草稿，待母語者審閱。
 
-#### 4.7 市府 FAQ
+#### 4.7 市府 FAQ、台北通常見問答
 
 - 「大包垃圾要怎麼丟」「身分證掉了怎麼辦」→ 從市府常見問答 8,121 筆（e5 向量，手機上約 19 MB 索引）找答案；查詢前先把口語詞補成 FAQ 用詞。
-- 分數夠高直接回答，接近時列出最接近的問題讓使用者選，以下不回答；答案過長截斷並提示洽 1999。
+- 台北通 App 本身的常見問題從台北通的常見問答找。這份資料在執行時從服務網站讀取（來源沒有標示授權，所以文字不存進 App 與 repo），答案下面可以直接開啟台北通的常見問答頁面。
+- 分數夠高直接回答，接近時列出最接近的問題讓使用者選，以下不回答；答案照原文顯示、不經模型改寫，過長截斷並提示洽 1999。
+- 問答來源登記在 [app/assets/assistant/qa_sources.json](portal_assistant/app/assets/assistant/qa_sources.json)；新增或更新來源用 agent skill（[docs/QA_SKILL_GUIDE.md](portal_assistant/docs/QA_SKILL_GUIDE.md)）。
 
 #### 4.8 緊急回應
 
@@ -292,8 +331,29 @@ App 內「設定 → 關於 → 授權與資料來源」列出上述資料與每
 #### 4.10 獨立專案＋串接文件
 
 - 助理套件不 import 台北通的任何程式；台北通實作主機介面 `PortalAssistantHost`（路由、開 WebView、首頁分頁、標題列），其他每個串接點只有幾行。
-- 對官方檔案的改動從約 1,700 行減到約 200 行；完整列表見 [INTEGRATION.md](portal_assistant/INTEGRATION.md) 與 [docs/HOST_CHANGES.md](portal_assistant/docs/HOST_CHANGES.md)。
+- 對官方檔案的改動從約 1,700 行減到約 250 行（新增 246、刪除 77，不含 4 個新增檔案）；完整列表見 [INTEGRATION.md](portal_assistant/INTEGRATION.md) 與 [docs/HOST_CHANGES.md](portal_assistant/docs/HOST_CHANGES.md)。
 - 已在乾淨的官方台北通（`e65b586`）上只照串接文件套用，成功建置並在 Android 模擬器上跑起助理與教學。
+
+## 5. 用 agent skill 擴充 / Extension
+
+台北通的微服務會一直增加。為了讓接手的人不必先讀懂整個專案，我們把「加一個服務」和「加一個問答來源」各做成一個 agent skill：
+把步驟、規則和自我檢查寫成 agent 照著做的操作手冊，再配上自動檢查與人工測試清單。在 repo 根目錄開啟 Claude Code，
+複製說明書裡的 prompt 範本、把服務名稱和網址填進去，agent 就會一步步做完；人只要做最後的檢查與決定。
+
+| | 新增或修改服務 `townpass-add-service` | 新增或更新問答來源 `townpass-add-qa` |
+| --- | --- | --- |
+| 適用情況 | 新的網頁服務、新的 App 原生頁、幫既有服務加教學、修改既有服務 | 市府 FAQ 的新版資料、微服務自己的問答、團隊寫的少量問答 |
+| 要填的資料 | `capabilities.json` 一筆（名稱、關鍵字、需求說明、網址或原生路由）、5 種外語、口語例句；有表單的服務再加教學（步驟、頁面探針、6 種語言的卡片文字）與頁面預翻 | `qa_sources.json` 一筆（位置、授權、6 種語言的來源說明）、團隊寫的問答檔、開發題（正例與負例各 10 句以上） |
+| 自動檢查 | `check_service.py`：目錄、6 種語言、例句數與重疊、網域白名單、路由、教學、預翻、評估案例、保留句、人工測試清單 | `check_qa_source.py`：登記表格式、授權與文字能不能存、網域、和評估集的重疊、e5 分數、保留題、人工測試清單 |
+| 建議模型 | 有教學：Claude Opus 5.5 或 Fable 5.2；只加資料：至少 Claude Sonnet 5.5 | 市府 FAQ 新版：最高等級，而且擁有者在場；其他：至少 Claude Sonnet 5.5 |
+| 說明書 | [docs/SKILL_GUIDE.md](portal_assistant/docs/SKILL_GUIDE.md) | [docs/QA_SKILL_GUIDE.md](portal_assistant/docs/QA_SKILL_GUIDE.md) |
+
+- **不用改程式架構**：服務與問答都是資料。分類器的候選文字在執行時從目錄組出，新服務不必重訓就會被打分；
+  但一定要量，新服務在開發集的「到得了」低於八成、或累積 5 個新服務時，才建議重訓（要擁有者同意）。
+- **評估不倒退**：開發用的句子由 agent 自己寫；另請一位沒看過規則與例句的撰寫者寫保留句並封存，只用來報告。既有評估集的「開錯頁」不能增加。
+- **給人照著點的測試清單**：最後產生 `MANUAL_TEST_<id>.md`，列出要說的句子、預期打開的頁面、教學每一步該看到什麼，讓人在手機上照著驗收。
+- **演練過**：兩個 skill 都用假的服務、假的問答來源讓 Claude Sonnet 5.5 從頭照做，也故意逐步漏做，確認檢查抓得到；沒抓到的已補上檢查。
+- **人要決定的事**：commit、push、加服務網域、上傳模型、判斷資料的授權，都要擁有者同意。服務網頁本身的開發（在 TownPass-Services）與正式 API 的授權不在 skill 的範圍內。
 
 ---
 
@@ -339,7 +399,7 @@ App 內「設定 → 關於 → 授權與資料來源」列出上述資料與每
 
 - **人工審查**：團隊對 AI 產生的程式與文件做大致的審查與測試，每次 commit 都經團隊成員同意。
 - **規則先行**：所有行為規則寫在 [docs/AI_CURRENT_RULES.md](portal_assistant/docs/AI_CURRENT_RULES.md)，每次改行為先改規則並寫明原因，再改程式。
-- **自動測試**：Python 656 個、Flutter 847 個測試（助理套件 675、台北通 172）；教學流程在示範網站錄製後重播驗證；規則互相干擾由碰撞測試自動檢查。
+- **自動測試**：Python 710 個、Flutter 1,043 個測試（助理套件 865、台北通 178）；教學流程在示範網站錄製後重播驗證；規則互相干擾由碰撞測試自動檢查。
 - **評估集與封存保留集**：開發集用來調整；保留集由另一位撰寫者撰寫並封存，只用來報告，不拿來調規則；「開錯頁」必須維持不增加。
 - **實機驗證**：Android 模擬器與實機（vivo）、iPhone 17／17 Pro Max 實測，問題記錄後修正再測。
 - **安全**：WebView 只在服務網域上注入與讀取；後端只綁 `127.0.0.1`，檢查 Origin、Content-Type 與欄位白名單；模型檔下載後檢查 SHA-256。
@@ -348,7 +408,7 @@ App 內「設定 → 關於 → 授權與資料來源」列出上述資料與每
 
 - **模型可能判斷錯誤**：語音辨識或決策可能聽錯、選錯頁面，所以只有把握夠高才直接開頁，其他情況列出選項讓使用者選；助理不替使用者送出、付款或同意。
 - **台語與外語辨識仍有限制**：台語自動判斷約七成召回；外語介面文字是 AI 草稿，可能不自然或有誤。
-- **AI 產生的程式碼可能遺留問題**：已用測試、評估與實機驗證降低風險，但無法保證沒有遺漏；Release 版本與正式台北通環境尚未驗證。
+- **AI 產生的程式碼可能遺留問題**：已用測試、評估與實機驗證降低風險，但無法保證沒有遺漏；Android 的 Release 版本與正式台北通環境尚未驗證（iPhone 實測用的是 release 建置）。
 - **資料與授權**：示範用的服務網頁、mock 帳號與 JSON 不代表已取得正式台北通登入或政府 API 的授權；政府開放資料依授權條款註明出處。
 - **FAQ 的時效**：市府 FAQ 有不少舊資料，答案以官方網站為準。
 - **敏感資料**：App 的錄音不存檔、不上傳；開發過程中未將使用者個資、帳號密碼或未公開的金鑰輸入 AI。
@@ -361,7 +421,7 @@ App 內「設定 → 關於 → 授權與資料來源」列出上述資料與每
 
 - 最快的做法：把 `portal_assistant/` 放到台北通 repo 根目錄，執行 `portal_assistant/integration/apply.ps1`（或 `apply.sh`），再 `pub get`、`build_runner`。
 - 主機介面 `PortalAssistantHost`：台北通的實作在 [integration/files/lib/util/town_pass_assistant_host.dart](portal_assistant/integration/files/lib/util/town_pass_assistant_host.dart)。
-- 23 個串接點：每個官方檔案一份 patch（[integration/patches/](portal_assistant/integration/patches/)），文件逐一寫明位置、加什麼、為什麼、不加會怎樣。
+- 24 個串接點（25 個 patch，語言頁兩個檔算一個串接點）：每個官方檔案一份 patch（[integration/patches/](portal_assistant/integration/patches/)），文件逐一寫明位置、加什麼、為什麼、不加會怎樣。
 - 台北通要提供的東西：服務網域（白名單 [app/assets/assistant/service_origins.json](portal_assistant/app/assets/assistant/service_origins.json)）、WebView bridge（既有的訊息名稱與資料語意完全沒改）、建置開關、權限、模型下載來源、原生建置步驟。
 - 對原台北通架構的修改：[docs/HOST_CHANGES.md](portal_assistant/docs/HOST_CHANGES.md)。
 
@@ -376,14 +436,15 @@ App 內「設定 → 關於 → 授權與資料來源」列出上述資料與每
 | [scripts/](portal_assistant/scripts/) | 建置、推模型、評估、抽字串、資料整理、連結檢查 |
 | [tools/](portal_assistant/tools/) | 教學流程錄製與重播（guide_audit）、分類器訓練腳本（classifier）、翻譯審閱、煙霧測試 |
 | [skills/](portal_assistant/skills/) | agent skill：新增或修改服務（townpass-add-service）、新增或更新問答來源（townpass-add-qa）與人工測試範本 |
-| [docs/](portal_assistant/docs/) | 規則、技術總覽、各實驗與決策紀錄 |
+| [docs/](portal_assistant/docs/README.md) | 規則、技術總覽、做法與實驗紀錄（[索引](portal_assistant/docs/README.md)）；[docs/history/](portal_assistant/docs/history/README.md) 是開發初期已被取代的計畫與報告，只當紀錄 |
 
 | 主題 | 文件 |
 | --- | --- |
 | 行為規則（唯一準則） | [docs/AI_CURRENT_RULES.md](portal_assistant/docs/AI_CURRENT_RULES.md) |
-| 技術總覽、決策流程 | [docs/AI_TECHNICAL_OVERVIEW.md](portal_assistant/docs/AI_TECHNICAL_OVERVIEW.md)、[docs/AI_DECISION_FLOW.md](portal_assistant/docs/AI_DECISION_FLOW.md) |
+| 文件索引 | [docs/README.md](portal_assistant/docs/README.md) |
+| 技術總覽 | [docs/AI_TECHNICAL_OVERVIEW.md](portal_assistant/docs/AI_TECHNICAL_OVERVIEW.md) |
 | 決策分類器、FAQ | [docs/AI_DECISION_CLASSIFIER.md](portal_assistant/docs/AI_DECISION_CLASSIFIER.md)、[docs/AI_FAQ_RAG.md](portal_assistant/docs/AI_FAQ_RAG.md) |
-| 語音、台語、多語 | [docs/AI_LANGUAGE_GATE.md](portal_assistant/docs/AI_LANGUAGE_GATE.md)、[docs/AI_TAIWANESE_SPEECH_PLAN.md](portal_assistant/docs/AI_TAIWANESE_SPEECH_PLAN.md)、[docs/AI_MULTILINGUAL_PLAN.md](portal_assistant/docs/AI_MULTILINGUAL_PLAN.md) |
+| 語音、台語、多語 | [docs/AI_LANGUAGE_GATE.md](portal_assistant/docs/AI_LANGUAGE_GATE.md)、[docs/AI_TAIWANESE_SPEECH_PLAN.md](portal_assistant/docs/AI_TAIWANESE_SPEECH_PLAN.md)、[docs/AI_VIETNAMESE.md](portal_assistant/docs/AI_VIETNAMESE.md)、[docs/AI_PAGE_TRANSLATION.md](portal_assistant/docs/AI_PAGE_TRANSLATION.md) |
 | 手機端、模型下載 | [docs/AI_ON_DEVICE_PLAN.md](portal_assistant/docs/AI_ON_DEVICE_PLAN.md)、[docs/AI_ON_DEVICE_IOS.md](portal_assistant/docs/AI_ON_DEVICE_IOS.md)、[docs/AI_MODEL_DOWNLOAD.md](portal_assistant/docs/AI_MODEL_DOWNLOAD.md) |
 | 地址資料 | [docs/AI_ADDRESS_DATA.md](portal_assistant/docs/AI_ADDRESS_DATA.md) |
 | 新增或修改服務（agent skill：建議模型、prompt、驗收） | [docs/SKILL_GUIDE.md](portal_assistant/docs/SKILL_GUIDE.md)、[skills/townpass-add-service/SKILL.md](portal_assistant/skills/townpass-add-service/SKILL.md)、[docs/NEW_SERVICE_HOLDOUT.md](portal_assistant/docs/NEW_SERVICE_HOLDOUT.md) |

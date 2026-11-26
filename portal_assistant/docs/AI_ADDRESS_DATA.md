@@ -10,7 +10,7 @@
 | `portal_assistant/backend/data/address_districts.json` | 22 個縣市、368 個鄉鎮市區（名稱照內政部） | 4,891 bytes |
 | `portal_assistant/backend/data/address_roads.json` | 縣市 → 鄉鎮市區 → 路名（每區的路名用逗號接成一個字串），35,740 筆 | 398,816 bytes（約 0.4 MB） |
 
-兩個檔案跟著後端打包：Android 是 Chaquopy 的 `srcDir "../../assistant_backend"`，iPhone 是 `portal_assistant/native/ios/embed_on_device_assistant.sh`。
+兩個檔案跟著後端打包：Android 是 Chaquopy 打包 `portal_assistant/backend/`（`portal_assistant/native/android/assistant.gradle`），iPhone 是 `portal_assistant/native/ios/embed_on_device_assistant.sh`。
 它們**不是** Flutter 資源（App 本身不讀），所以只多佔一份約 0.4 MB（擁有者 2026-11-24 決定：放進 App，但不要多打包一份 Flutter 資源）。
 沒有路名檔時只比對到「區」，路名照原文。
 

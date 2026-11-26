@@ -252,6 +252,44 @@ void main() {
       expect(y, greaterThan(tester.getCenter(find.text('訂閱')).dy));
       expect(y, lessThan(tester.getCenter(find.text('功能教學')).dy));
     });
+
+    // portal_assistant/docs/AI_CURRENT_RULES.md section 4 (設定清單的列也跟著語言, 2026-11-25):
+    // the user's own name is never translated (the emulator showed 金大森 as "Jin Da-sen").
+    testWidgets('the user\'s name on the account page is not translated', (tester) async {
+      final translation = PageTranslation.instance;
+      final asked = <String>[];
+      translation.translator = (text, language) async {
+        asked.add(text);
+        return 'MT($text)';
+      };
+      addTearDown(translation.reset);
+      // The App's own dictionary (the rows are translated from it only).
+      await tester.runAsync(() async {
+        await translation.load();
+        await translation.setLanguage('en');
+      });
+      Get.put(AccountService());
+      Get.put(DeviceService());
+      Get.put(PackageService());
+      Get.put(AccountViewController()).name.value = '金大森';
+      // Wide enough for the English footer in the test font (every glyph is a full square).
+      tester.view.physicalSize = const Size(800, 1400);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      await tester.pumpWidget(const MaterialApp(home: AccountView()));
+      await tester.pump(const Duration(milliseconds: 100));
+      await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 50)));
+      await tester.pump(const Duration(milliseconds: 100));
+
+      expect(find.text('金大森'), findsOneWidget);
+      expect(find.text('MT(金大森)'), findsNothing);
+      expect(asked, isNot(contains('金大森')));
+      // The rows around it still follow the language (pre-translated, never ML Kit).
+      expect(find.text(translation.preset('訂閱', 'en')!), findsOneWidget);
+      expect(asked, isNot(contains('訂閱')));
+      // Let the delayed save of learned translations run.
+      await tester.pump(const Duration(seconds: 10));
+    });
   });
 
   group('home ask', () {

@@ -1,5 +1,7 @@
 # 多國語言規劃（V7）：Whisper 版與 no-Whisper 版
 
+> **歷史文件**（已被取代，只當紀錄）：內容是寫的當時的狀態，有些做法後來改掉了。現行規則以 [AI_CURRENT_RULES.md](../AI_CURRENT_RULES.md) 為準，索引見 [README.md](README.md)。
+
 狀態：2026-11-07 規劃，尚未實作。本文件取代 `AI_VOICE_UI_PLAN.md` 第 6 節中「外語先翻成中文再走原流程」的做法，原因見第 2 節。
 目前 App 本身沒有多語系架構（只有 `intl` 套件），各服務頁面（TownPass-Services 網頁、原生頁）也不在本 repo。
 

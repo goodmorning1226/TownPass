@@ -91,7 +91,7 @@ REQUEST_CUE = re.compile(r"我要|我想|想要|要|幫我|幫忙|請|麻煩|打
 # offer them or ask for clarification. Chance matches score at most ~0.74
 # (好吃嗎 ~ 抽號碼 0.65, 動電源 ~ 動物園 0.72).
 # Version B: ask the model what kind of message an unmatched request is
-# (portal_assistant/docs/AI_SERVICE_COVERAGE_PLAN.md; A/B evaluated with eval_colloquial.json).
+# (portal_assistant/docs/history/AI_SERVICE_COVERAGE_PLAN.md; A/B evaluated with eval_colloquial.json).
 INTENT_FALLBACK = os.environ.get("TOWNPASS_INTENT_FALLBACK", "1") == "1"
 # Version C: semantic retrieval over the catalogue (semantic.py) before the intent fallback.
 SEMANTIC_MIN_CHARS = 2
@@ -311,7 +311,7 @@ class Workflow:
         tools = tools_for(context)
         # Do not expose a keyword miss as `library=false`: the model must decide
         # intent, not mistake a lexical retrieval flag for semantic ground truth.
-        # Fields that repeat other evidence are left out (portal_assistant/docs/SPEED_LIBRARY_EXPERIMENT.md,
+        # Fields that repeat other evidence are left out (portal_assistant/docs/history/SPEED_LIBRARY_EXPERIMENT.md,
         # ~30 fewer prompt tokens): library_candidate (service_evidence says it), the
         # cleaned text when it equals the request, an action object equal to the query,
         # and empty lists. unique_exact_id stays, even when null: dropping it made the

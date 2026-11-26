@@ -59,11 +59,12 @@ Developer guide: [ASSISTANT_README.md](../../ASSISTANT_README.md).
 
 ## 為什麼做這件事
 
-台北通有上百項服務，但很多人不是找不到服務，是找不到**選單**：
+台北通有很多好用的服務，但很多人不是找不到服務，是找不到**選單**：
 
-- **長輩**：看不清小字、不知道「繳費」在哪一層、不習慣打字，但很會講。
-- **移工、新住民、旅客**：介面是中文，服務名稱更是中文；就算會一點中文，也不知道「規費」「巨大垃圾」是什麼。
-- **第一次用的人**：知道要借書，卻不知道借書要先搜尋、選分館、再預約。
+- **長輩**：不習慣看字、不知道「繳費」在哪一層、不習慣打字；有些人聽得懂華語、也看得懂中文字，卻只會講台語。
+- **移工、新住民、旅客**：介面是中文，服務名稱更是中文；就算會一點中文，也不知道「規費」「陳情」是什麼。
+- **第一次用的人、數位使用能力較低的人**：台北通的微服務很多，想借書，卻根本不知道要從哪裡找到借書的頁面；
+  進去之後也不知道要選哪些東西（先搜尋、選分館、再預約）。
 
 所以我們把助理做成「用講的」：按住說一句話，助理直接打開對的頁面，必要時一步步教你在**真正的服務頁面**上操作，
 頁面文字也翻成你講的語言。而且全部在手機上跑：
@@ -107,7 +108,7 @@ Developer guide: [ASSISTANT_README.md](../../ASSISTANT_README.md).
 - 預設介面就是引導模式：企鵝的**任務卡**寫這一步要做什麼、**光圈**標出要按的地方、可以朗讀或暫停，在**真實的官方服務頁面**上教學（頁面不修改、不打包，用網頁自己的換頁機制在頁內切換）。
 - 教學要填欄位時，「按住提問」變成「**按住輸入**」：用講的說電話號碼，就轉成數字填進欄位，依欄位型別轉格式（電話、Email、金額、日期、時間、身分證、車牌、文字），可以「復原」，**不會按送出**。
 - 最後一步永遠是使用者自己按；完成後企鵝會說明「這是示範網站，沒有真的送出」。
-- 教學流程以 `portal_assistant/tools/guide_audit/` 在示範網站錄製 177 條重播驗證；教學文字 1,134 句，6 種語言（中、英、日、越、印、菲）。
+- 教學流程以 `portal_assistant/tools/guide_audit/` 在示範網站錄製 182 條重播驗證；教學文字 1,267 句，6 種語言（中、英、日、越、印、菲）。
 
 <details>
 <summary>完整的圖書借閱 5 步驟（7 張截圖）</summary>
@@ -134,10 +135,10 @@ Developer guide: [ASSISTANT_README.md](../../ASSISTANT_README.md).
     <td width="33%"><img src="images/taiwanese-emergency.png" alt="助理面板語言顯示台語，用語音說「我家失火了」，助理回覆請撥打 119 並列出災情表單選項" width="100%"></td>
     <td valign="top">
       <ul>
-        <li>台語<b>不用切選單</b>：語言判斷模型（Whisper tiny）回傳 99 種語言的機率，台語的分布和華語不一樣，我們在上面加了一個 104 個係數的小分類器；分數夠高就交給台語模型。</li>
+        <li>台語<b>不用切選單</b>：語言判斷模型（Whisper tiny）回傳 99 種語言的機率，台語的分布和華語不一樣，我們在上面加了一個 92 個係數（91 個語言機率＋錄音長度）的小邏輯迴歸分類器；分數夠高就交給台語模型。</li>
         <li>閘門漏掉的，用文字再補：中文結果<b>不像華語</b>（台灣華語字元 bigram 模型）或 <b>App 認不出那句話</b>，就交給台語模型再聽一次，留比較好的那份。</li>
         <li>台語模型是聯發科技研究中心＋陽明交大的 <b>Breeze-ASR-26</b>（Apache-2.0），每支手機都用 q4_0（848 MB，iPhone 的 Metal 上約 1.43 GB），第一次用到才載入；輸出中文字，之後走原本的中文流程。</li>
-        <li>iPhone 載入前先對照 iOS 給單一 App 的記憶體額度（檔案＋1,000 MB，再留 256 MB），不夠就不載入、台語片段當中文聽，不會閃退；iPhone 17 Pro Max 實機載入約 0.8 秒。</li>
+        <li>iPhone 載入前先對照 iOS 給單一 App 的記憶體額度（檔案＋750 MB，再留 256 MB），不夠就不載入、不會閃退，並說明台語模型暫時不能用；iPhone 17 Pro Max 實機載入約 0.8 秒。</li>
         <li>手動「台語（測試）」選項保留；說過一次台語後 5 分鐘內門檻降到 0.3。</li>
         <li>限制：目前只有辨識，朗讀用中文。</li>
       </ul>
@@ -159,7 +160,7 @@ Developer guide: [ASSISTANT_README.md](../../ASSISTANT_README.md).
         <li>越南文專用 <b>PhoWhisper</b>（VinAI，BSD-3）；比對不打聲調、聲調聽錯、南北口音（d/gi/r/v、ch/tr、s/x、字尾 n/ng）都能對到。</li>
         <li><b>印尼文</b>（2026-11-11 優化）：聊天縮寫與口語寫法（sy、yg、gmn、pinjem…）先換成標準寫法再比對，句尾「…nggak?」是問句不是拒絕。</li>
         <li><b>菲律賓文</b>（2026-11-11 取代泰文，代碼 <code>tl</code>）：夾英文（Taglish）照樣比對，e／i、o／u 與西班牙拼法不分；翻譯是 AI 草稿，待母語者審閱。</li>
-        <li>外語標題與關鍵字 5 種語言（英、日、越、印、菲）、口語例句 602 句（含中文）；外語 FAQ 先翻成中文再查，答案再翻回來。</li>
+        <li>外語標題與關鍵字 5 種語言（英、日、越、印、菲）、口語例句 1,400 句（6 種語言，中文 1,080 句）；外語 FAQ 先翻成中文再查，答案再翻回來。</li>
       </ul>
     </td>
   </tr>
@@ -172,7 +173,7 @@ Developer guide: [ASSISTANT_README.md](../../ASSISTANT_README.md).
     <td width="33%"><img src="images/faq-bulk-waste.png" alt="打字問「大型垃圾要丟哪」，助理列出三題臺北市政府環保局的 FAQ 讓使用者選" width="100%"></td>
     <td valign="top">
       <ul>
-        <li>「大包垃圾要怎麼丟」「身分證掉了怎麼辦」→ 從<b>市府 FAQ 8,121 筆</b>（e5 向量，手機上 22 MB 索引）和台北通常見問答找答案。資料來源：臺北市資料大平台〈<a href="https://data.taipei/dataset/detail?id=203f1657-bb4a-45a7-b25f-279b63136645">臺北市市政網站整合平台之常見問答</a>〉。</li>
+        <li>「大包垃圾要怎麼丟」「身分證掉了怎麼辦」→ 從<b>市府 FAQ 8,121 筆</b>（e5 向量，手機上約 19 MB 索引）和台北通常見問答找答案。資料來源：臺北市資料大平台〈<a href="https://data.taipei/dataset/detail?id=203f1657-bb4a-45a7-b25f-279b63136645">臺北市市政網站整合平台之常見問答</a>〉。</li>
         <li>查詢前先把口語詞補成 FAQ 用詞：大包垃圾／舊家具 → 巨大垃圾 大型廢棄物；身分證掉了 → 遺失 補發；敬老卡 → 敬老悠遊卡。</li>
         <li>cosine ≥ 0.915 直接回答；≥ 0.88 列出最接近的問題讓使用者選；以下不回，不亂答。答案超過 600 字截斷並提示洽 1999。</li>
       </ul>
@@ -235,7 +236,7 @@ flowchart LR
 ```
 
 1. **錄音 → 語言判斷 → 辨識**：tiny 先判斷語言（0.2 秒），再用該語言的模型聽成文字。台語不用切選單：閘門分類器、或「中文不像華語／App 認不出」時交給 Breeze 再聽一次。
-2. **文字 → 決定**：後端依序找：緊急詞 → 取消／換頁／第幾個 → 指名但沒有頁面的區公所／戶政 → 功能關鍵字 → 決策 → 讀音相似（Unihan 台灣讀音，折疊 zh/z、l/n、ing/in 等）→ 語意相似（e5 ＋ 602 句口語例句）→ 意圖 → FAQ。都沒有時**不開頁**：有線索就列 2–4 個可能的頁面＋「看全部功能」，沒有線索（模糊、打招呼、閒聊）就給 12 類的功能目錄（第一列是常用），謝謝只回一句（2026-11-16）。
+2. **文字 → 決定**：後端依序找：緊急詞 → 取消／換頁／第幾個 → 指名但沒有頁面的區公所／戶政 → 功能關鍵字 → 決策 → 讀音相似（Unihan 台灣讀音，折疊 zh/z、l/n、ing/in 等）→ 語意相似（e5 ＋ 1,400 句口語例句）→ 意圖 → FAQ。都沒有時**不開頁**：有線索就列 2–4 個可能的頁面＋「看全部功能」，沒有線索（模糊、打招呼、閒聊）就給 12 類的功能目錄（第一列是常用），謝謝只回一句（2026-11-16）。
    問「有什麼 X」時由 X 決定範圍：功能／服務給整個目錄，分類（例如「有什麼補助」）給那一類，其他照一般流程；緊急詞永遠先回專線，句子同時在講申請補助時另外列出相關頁面。台語模型無法使用時不再改用華語硬聽，而是說明原因；模糊規則會不會誤觸發，由 `test_rule_collisions.py` 用目錄的詞自動檢查（2026-11-17）。
    預設的「決策」與「意圖」由**決策分類器**替每個候選頁打分：只有一個已串接頁面、分數夠高、沒有別的服務接近時才直接開（沒有關鍵字、只靠語意的清楚需求也一樣），其餘列出讓使用者選，常見問答和服務頁混在同一個清單；圖書（確定的書、館藏、只說作品名的「借小王子」）用規則，教學用教學自己的關鍵字規則；分類器沒回應時一律列出候選，不猜。
    選 Ministral／Gemma 時改由決策 LLM 在 A／B／C 候選中選一個（GBNF 文法硬性限制，只能輸出 `{"choice":"X"}`，6 個 token）。
@@ -269,7 +270,7 @@ flowchart LR
 - **模型下載**：模型不包在 App 裡；第一次打開助理時問「下載離線助理（約 X GB）」，使用者同意才下載，可暫停、續傳、檢查 SHA-256。
   Whisper、Ministral、Gemma 從原作者的 Hugging Face 下載；我們自己轉檔或訓練的檔案（決策分類器、e5、FAQ 索引、Breeze、PhoWhisper）放團隊的 Hugging Face [`allensung1226/townpass-assistant-models`](https://huggingface.co/allensung1226/townpass-assistant-models)。
   依手機總記憶體分級：7 GB 以上全部（台語 q4_0 可選）；7 GB 以下只有核心；**決策分類器每個等級都下載**，所以預設的決策模型只要 0.13 GB（Ministral 2.15 GB）。開發者用 adb／devicectl 推的檔案照樣有效（[AI_MODEL_DOWNLOAD.md](AI_MODEL_DOWNLOAD.md)）。
-- **檢索資料**：`capabilities.json` 109 項功能（86 項可開）、5 種外語的標題與關鍵字、602 句口語例句、Unihan 台灣讀音表（2 萬多字）、市府 FAQ 8,121 筆的 e5 索引、內政部的全國 368 個鄉鎮市區名稱（區公所不開到別區）。
+- **檢索資料**：`capabilities.json` 109 項功能（86 項可開）、5 種外語的標題與關鍵字、1,400 句口語例句、Unihan 台灣讀音表（2 萬多字）、市府 FAQ 8,121 筆的 e5 索引、內政部的全國 368 個鄉鎮市區名稱（區公所不開到別區）。
 - **原則**：**不用中國開發的模型與工具**（CosyVoice、sherpa-onnx、GPT-SoVITS、FunASR 等一律不用）；**官方 TownPass-Services 網頁不修改、不複製、不打包**，App 透過網頁自己的換頁機制（History API）在頁面內切換；模型檔不放進 repo 也不放進 APK，由 App 在使用者同意後下載，或由開發者自己推到手機。
 - 評估過但不採用：Breeze-ASR-25（中文，5.4 秒太慢）、Breeze-ASR-26 q8_0／q4_K（換成 q4_0：和 q8_0 一樣準、檔案約一半，ARM 上三種裡最快）、Whisper medium／large-turbo（太慢）、bge 向量模型（換成 e5）、ViWhisper（訓練資料授權不明）、alexachang 台語模型（訓練資料不明，只當對照）。
 
@@ -345,7 +346,7 @@ flowchart LR
 
 ### 測試
 
-Python 517 個單元測試、Flutter 611 個（2026-11-13）；教學流程 177 條重播；`extract_guide_strings.py --check` 檢查 6 語（中、英、日、越、印、菲）教學文字缺漏。
+Python 710 個單元測試、Flutter 1,043 個（助理套件 865、台北通 178；2026-11-26）；教學流程 182 條重播；`extract_guide_strings.py --check` 檢查 6 語（中、英、日、越、印、菲）教學文字缺漏。
 
 ## 怎麼跑
 
@@ -416,25 +417,24 @@ Flutter App 維持在 repo 根目錄，官方目錄不搬動（見 [AGENTS.md](.
 | **`ios/Runner/OnDeviceAssistant.swift`、`portal_assistant/native/ios/`** | iPhone：在 App 內以執行緒啟動各模型伺服器、鎖定後重新 bind、記憶體額度檢查、Xcode 內嵌階段 |
 | **`portal_assistant/scripts/`** | 建置原生程式庫、推模型、評估、抽字串 |
 | **`portal_assistant/tools/guide_audit/`** | 教學流程錄製與重播（Node ＋ Chrome） |
-| **`portal_assistant/docs/`** | 規則、技術總覽、各實驗紀錄、團隊待辦；`portal_assistant/docs/images/` 是本頁的截圖 |
+| **`portal_assistant/docs/`** | 規則、技術總覽、做法與實驗紀錄（[索引](README.md)）；`history/` 是已被取代的早期文件，`images/` 是本頁的截圖 |
 
 ## 文件索引
 
 | 主題 | 文件 |
 | --- | --- |
-| 先讀 | [ASSISTANT_README.md](../../ASSISTANT_README.md)（開發指南）、[AI_CURRENT_RULES.md](AI_CURRENT_RULES.md)（行為規則唯一準則）、[AI_TECHNICAL_OVERVIEW.md](AI_TECHNICAL_OVERVIEW.md)（技術總覽）、[AI_DECISION_FLOW.md](AI_DECISION_FLOW.md)（從語音／打字到回覆） |
+| 先讀 | [ASSISTANT_README.md](../../ASSISTANT_README.md)（開發指南）、[AI_CURRENT_RULES.md](AI_CURRENT_RULES.md)（行為規則唯一準則）、[AI_TECHNICAL_OVERVIEW.md](AI_TECHNICAL_OVERVIEW.md)（技術總覽）、[README.md](README.md)（文件索引） |
 | 語音 | [AI_LANGUAGE_GATE.md](AI_LANGUAGE_GATE.md)（語言閘門）、[AI_ASR_ABLATION.md](AI_ASR_ABLATION.md)（語音辨識消融）、[AI_TAIWANESE_SPEECH_PLAN.md](AI_TAIWANESE_SPEECH_PLAN.md)（台語辨識與朗讀）、[AI_TAIWANESE_RECORDING_SCRIPT.md](AI_TAIWANESE_RECORDING_SCRIPT.md)（台語錄音稿）、[AI_VIETNAMESE.md](AI_VIETNAMESE.md)（越南文） |
-| 多語 | [AI_MULTILINGUAL_PLAN.md](AI_MULTILINGUAL_PLAN.md)、[AI_INDONESIAN.md](AI_INDONESIAN.md)（印尼文）、[AI_FILIPINO.md](AI_FILIPINO.md)（菲律賓文） |
-| 檢索與決策 | [AI_DECISION_CLASSIFIER.md](AI_DECISION_CLASSIFIER.md)（決策分類器，預設）、[AI_FAQ_RAG.md](AI_FAQ_RAG.md)（市府 FAQ 檢索）、[AI_COLLOQUIAL_MATCHING_EXPERIMENT.md](AI_COLLOQUIAL_MATCHING_EXPERIMENT.md)（口語對頁面）、[AI_DECISION_MODEL_ABLATION_PLAN.md](AI_DECISION_MODEL_ABLATION_PLAN.md)、[SPEED_LIBRARY_EXPERIMENT.md](SPEED_LIBRARY_EXPERIMENT.md)、[AI_TOOL_CALLING_PLAN.md](AI_TOOL_CALLING_PLAN.md) |
-| 介面與教學 | [AI_GUIDED_MERGE_PLAN.md](AI_GUIDED_MERGE_PLAN.md)（引導式助理）、[AI_FORM_PREFILL_PLAN.md](AI_FORM_PREFILL_PLAN.md)（表單預填）、[AI_VOICE_UI_PLAN.md](AI_VOICE_UI_PLAN.md)、[GUIDE_AUDIT_TEAM_REQUESTS.md](GUIDE_AUDIT_TEAM_REQUESTS.md) |
-| 裝置端與服務覆蓋 | [AI_ON_DEVICE_PLAN.md](AI_ON_DEVICE_PLAN.md)、[AI_ON_DEVICE_IOS.md](AI_ON_DEVICE_IOS.md)（iPhone）、[AI_MODEL_DOWNLOAD.md](AI_MODEL_DOWNLOAD.md)（App 內下載與分級）、[AI_SERVICE_COVERAGE_PLAN.md](AI_SERVICE_COVERAGE_PLAN.md)、[AI_ALL_FEATURES_ROLLOUT_PLAN.md](AI_ALL_FEATURES_ROLLOUT_PLAN.md)、[AI_EXPANSION_IMPLEMENTATION.md](AI_EXPANSION_IMPLEMENTATION.md)、[FEATURE_AVAILABILITY_20261104.md](../../docs/FEATURE_AVAILABILITY_20261104.md) |
-| 圖書助理（第一階段） | [AI_PHASE1_IMPLEMENTATION.md](AI_PHASE1_IMPLEMENTATION.md)、[AI_LIBRARY_IMPLEMENTATION_STEPS.md](AI_LIBRARY_IMPLEMENTATION_STEPS.md) |
-| 進度、測試與團隊 | [AI_ASSISTANT_PROGRESS.md](AI_ASSISTANT_PROGRESS.md)、[AI_ASSISTANT_TEST_REPORT_20261107.md](AI_ASSISTANT_TEST_REPORT_20261107.md)、[TEAM_TASKS_AFTER_MERGE.md](TEAM_TASKS_AFTER_MERGE.md)、[AI_AGENT_HANDOFF.md](AI_AGENT_HANDOFF.md)、[TEAM_LOCAL_SETUP.md](TEAM_LOCAL_SETUP.md) |
+| 多語 | [AI_INDONESIAN.md](AI_INDONESIAN.md)（印尼文）、[AI_FILIPINO.md](AI_FILIPINO.md)（菲律賓文）、[AI_PAGE_TRANSLATION.md](AI_PAGE_TRANSLATION.md)（服務頁翻譯） |
+| 檢索與決策 | [AI_DECISION_CLASSIFIER.md](AI_DECISION_CLASSIFIER.md)（決策分類器，預設）、[AI_FAQ_RAG.md](AI_FAQ_RAG.md)（市府 FAQ 檢索）、[AI_COLLOQUIAL_MATCHING_EXPERIMENT.md](AI_COLLOQUIAL_MATCHING_EXPERIMENT.md)（口語對頁面） |
+| 裝置端與開發環境 | [AI_ON_DEVICE_PLAN.md](AI_ON_DEVICE_PLAN.md)、[AI_ON_DEVICE_IOS.md](AI_ON_DEVICE_IOS.md)（iPhone）、[AI_MODEL_DOWNLOAD.md](AI_MODEL_DOWNLOAD.md)（App 內下載與分級）、[TEAM_LOCAL_SETUP.md](TEAM_LOCAL_SETUP.md)（電腦開發） |
+| 擴充 | [SKILL_GUIDE.md](SKILL_GUIDE.md)（新增服務）、[QA_SKILL_GUIDE.md](QA_SKILL_GUIDE.md)（新增問答來源） |
+| 歷史文件（已被取代，只當紀錄） | [history/](history/README.md)：早期的計畫、交接、進度、2026-11-07 全面測試報告；[FEATURE_AVAILABILITY_20261104.md](../../docs/FEATURE_AVAILABILITY_20261104.md) |
 | 官方與同步 | [UPSTREAM_README.md](../../docs/UPSTREAM_README.md)（官方專案說明）、[DEVELOPMENT.md](../../docs/DEVELOPMENT.md)、[UPSTREAM_SYNC_20261103.md](../../docs/UPSTREAM_SYNC_20261103.md)、[AGENTS.md](../../AGENTS.md) |
 
 目前狀態與限制（2026-11-13）：外語介面與教學文字是 AI 翻譯草稿，待母語者校對；台語只有辨識、朗讀用中文；
 泰文已換成菲律賓文（2026-11-11，翻譯是 AI 草稿，待母語者審閱，[portal_assistant/docs/AI_FILIPINO.md](AI_FILIPINO.md)）；印尼文的比對已優化（2026-11-11），印尼文專用語音模型尚未接進 App。
-預設的決策分類器還沒在 Android 實機上量速度與記憶體。待辦有台語朗讀、iPhone 的 Gemma 與越南文模型，Android Release 未驗證。詳見 [portal_assistant/docs/TEAM_TASKS_AFTER_MERGE.md](TEAM_TASKS_AFTER_MERGE.md)。
+預設的決策分類器還沒在 Android 實機上量速度與記憶體。待辦有台語朗讀、iPhone 的 Gemma 與越南文模型，Android Release 未驗證。最新的限制見 [README](../README.md)「二、若使用 AI，需額外補充的項目」的「4. 與 AI 相關的限制或風險」。
 
 ## 授權
 

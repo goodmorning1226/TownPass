@@ -103,7 +103,7 @@ skill 本身：[`portal_assistant/skills/townpass-add-qa/SKILL.md`](../skills/to
 
 ## 6. 演練紀錄與模型建議的依據
 
-2026-11-25～26 在暫時的 worktree（分支 `drill/fake-qa`，從這次的工作複製）用**假來源**演練，演練完分支與 worktree 都刪掉。逐項紀錄在 repo 外
+2026-11-25 在暫時的 worktree（分支 `drill/fake-qa`，從這次的工作複製）用**假來源**演練，演練完分支與 worktree 都刪掉。逐項紀錄在 repo 外
 `<工作資料夾>\integration-plan\stage3_eval\`（`drill_implementer_report.txt`、`drill_skips.txt`、`drill_skips_rerun.txt`）。
 
 1. **照 skill 從頭做（Claude Sonnet 5.5 子 agent，情況 c）**：假來源 `sports_center_qa`「運動中心常見問答（演練用）」，12 題自己編的問答（bundled-file、團隊寫的授權）、

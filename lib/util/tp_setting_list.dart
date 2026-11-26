@@ -7,6 +7,7 @@ import 'package:town_pass/util/tp_colors.dart';
 import 'package:town_pass/util/tp_line.dart';
 import 'package:town_pass/util/tp_switch.dart';
 import 'package:town_pass/util/tp_text.dart';
+import 'package:townpass_portal_assistant/townpass_portal_assistant.dart';
 
 class TPSettingList extends StatelessWidget {
   final List<TPSettingListTile> children;
@@ -120,18 +121,18 @@ class TPSettingListTile extends StatelessWidget {
       onTap: () => onTap?.call(),
       onLongPress: () => onLongPress?.call(),
       leading: leading,
-      title: title.text(
+      title: title.assistantPreset((t) => t.text(
         style: TPTextStyles.h3Regular,
         color: TPColors.grayscale700,
-      ),
-      subtitle: subtitle?.text(
+      )),
+      subtitle: subtitle?.assistantPreset((t) => t.text(
         style: TPTextStyles.bodyRegular,
         color: TPColors.grayscale700,
-      ),
-      content: content.text(
+      )),
+      content: content.assistantPreset((t) => t.text(
         style: TPTextStyles.bodyRegular,
         color: TPColors.grayscale500,
-      ),
+      )),
       trailing: trailing,
     );
   }
@@ -148,18 +149,18 @@ class TPSettingListTile extends StatelessWidget {
       onTap: () => onTap?.call(),
       onLongPress: () => onLongPress?.call(),
       leading: leading,
-      title: title.text(
+      title: title.assistantPreset((t) => t.text(
         style: TPTextStyles.h3Regular,
         color: TPColors.grayscale700,
-      ),
-      subtitle: subtitle?.text(
+      )),
+      subtitle: subtitle?.assistantPreset((t) => t.text(
         style: TPTextStyles.bodyRegular,
         color: TPColors.grayscale700,
-      ),
-      content: content?.text(
+      )),
+      content: content?.assistantPreset((t) => t.text(
         style: TPTextStyles.bodyRegular,
         color: TPColors.grayscale500,
-      ),
+      )),
       trailing: Assets.svg.iconExpand.svg(),
     );
   }
@@ -176,10 +177,10 @@ class TPSettingListTile extends StatelessWidget {
       backgroundColor: background ?? TPColors.transparent,
       onTap: () => onTap?.call(),
       onLongPress: () => onLongPress?.call(),
-      title: title.text(
+      title: title.assistantPreset((t) => t.text(
         style: TPTextStyles.h3SemiBold,
         color: TPColors.grayscale700,
-      ),
+      )),
     );
   }
 
@@ -196,10 +197,10 @@ class TPSettingListTile extends StatelessWidget {
       backgroundColor: background,
       onTap: () => onTap?.call(),
       onLongPress: () => onLongPress?.call(),
-      title: title.text(
+      title: title.assistantPreset((t) => t.text(
         style: TPTextStyles.h3Regular,
         color: TPColors.grayscale700,
-      ),
+      )),
       trailing: TPSwitch(controller: controller),
     );
   }

@@ -1,6 +1,7 @@
 # 地端服務助理
 
-模型固定使用 **Mistral AI `ministral-3:3b`**。不使用 Qwen，也不在失敗時改呼叫其他模型或雲端。
+電腦開發時預設用 Ollama 的 **Mistral AI `ministral-3:3b`** 做決策；設 `TOWNPASS_DECISION_BACKEND=classifier_only` 改用 App 預設的決策分類器（`classifier.py`，`portal_assistant/docs/AI_DECISION_CLASSIFIER.md` 第 11–12 節）。
+不使用中國開發的模型，也不在失敗時改呼叫其他模型或雲端。
 主後端採 Python 3.11+ 標準函式庫，與 Flutter 分開啟動，無須 pip 安裝套件；
 選用的語音辨識服務（`asr_server.py`）另需 faster-whisper；
 選用的臺北市府 FAQ 檢索（[faq.py](faq.py)）另需 llama.cpp 的 `llama-server`（embedding 模式）與 repo 外的模型及索引檔，見下方「FAQ 檢索」。
@@ -69,9 +70,9 @@ Android cleartext 例外只放在 debug、只涵蓋 loopback 與模擬器宿主�
 ## 資料與決策契約
 
 從既有服務的公開圖書 JSON 讀取書目，核對固定資料雜湊；資料更新時停止詳情直達，
-提示使用原入口，避免錯書。書目查核來源及雜湊見 [工作清單](../docs/AI_LIBRARY_IMPLEMENTATION_STEPS.md)。
+提示使用原入口，避免錯書。書目查核來源及雜湊見 [工作清單](../docs/history/AI_LIBRARY_IMPLEMENTATION_STEPS.md)（歷史紀錄）。
 服務名稱／同義詞、否定與修正、欄位線索先過濾，再檢索少量書目。
-Ministral 只做最後的語意工具決策。
+決策模型（App 預設是決策分類器，電腦開發預設是 Ministral）只在候選內做最後的決定。
 
 本機測試發現空參數原生 tool call 不穩定，故使用 Ollama **JSON Schema 約束的工具提案**：
 `{name, arguments}` → 白名單與 enum 驗證 → App 再驗證目的地 → 既有 WebView。
@@ -102,9 +103,8 @@ App 與後端需一起更新；舊的仍執行中之 Python 服務須重新啟�
 
 ### FAQ 檢索（第二層）
 
-每輪的順序：問候／功能列表等模板 → **工具呼叫**（功能目錄與書目檢索後，模型在候選內選工具）→
-工具呼叫沒找到服務時查 **FAQ** → 兩者都沒有就回「沒有找到相關的服務或 FAQ 內容」（`action: "no_related"`）。
-「沒找到服務」指：目錄與書目都沒命中，或模型回 `request_clarification`／`unsupported`。
+每輪的順序：緊急 → 指令（取消、換頁、第幾個）→ 關鍵字 → 決策 → 讀音 → 語意 → 意圖 → **FAQ**；
+都對不到時不開頁：有線索就列 2–4 個可能的頁面，沒有線索就給 12 類的功能目錄（完整規則見 `portal_assistant/docs/AI_CURRENT_RULES.md` 第 3 節）。
 已命中且選到功能、候選確認、未串接功能的原因說明、取消，都不會查 FAQ。
 
 - 資料：8,121 筆臺北市府 FAQ，以 Microsoft **intfloat/multilingual-e5-small**（MIT，GGUF q8_0）編碼，餘弦相似度取前 3 筆。
@@ -123,14 +123,14 @@ App 與後端需一起更新；舊的仍執行中之 Python 服務須重新啟�
     或以 `TOWNPASS_FAQ_EMBED_URL` 指定位址。有 numpy 時用 numpy 計分，沒有時以純 Python 計分（手機）。
 - 沒有索引時啟動訊息顯示 `faq=off` 及原因；索引在但伺服器沒開時顯示 `faq=8121` 並提示伺服器未就緒，查詢一律視為沒找到。
   兩種情況助理都照常運作。`/health` 的 `faq_entries` 為載入筆數（0 表示關閉）。
-- 手機端：`OnDeviceAssistant.kt` 在 :8774 另開一個 embedding 模式的 llama-server（2 執行緒），模型與索引由
-  `portal_assistant/scripts/push_assistant_models.ps1` 推送；沒推送就沒有 FAQ 層。決策紀錄見 [AI_FAQ_RAG.md](../docs/AI_FAQ_RAG.md)。
+- 手機端：`OnDeviceAssistant.kt` 在 :8774 另開一個 embedding 模式的 llama-server（2 執行緒），模型與索引由 App 依
+  `models.json` 下載（核心模型的一部分；開發時也可以用 `portal_assistant/scripts/push_assistant_models.ps1` 推送）。決策紀錄見 [AI_FAQ_RAG.md](../docs/AI_FAQ_RAG.md)。
 - **問答來源**（2026-11-25，規則第 11 節）：市府 FAQ、台北通常見問答與之後的來源都登記在
   [`qa_sources.json`](../app/assets/assistant/qa_sources.json)（[qa_sources.py](qa_sources.py) 讀；[qna.py](qna.py) 載入執行時下載與小型檔案的來源並和市府 FAQ 合併）。
   答案的「資料來源」附註、範圍句、「開啟頁面」選項由來源決定；項目有 `published_at` 時答案下多一行「資料日期：YYYY-MM-DD」。
   新增來源：skill [`townpass-add-qa`](../skills/townpass-add-qa/SKILL.md)，檢查 `python -X utf8 portal_assistant/scripts/check_qa_source.py --all`。
 
-完整新增能力、未串接範圍與裝置測試見 [全功能實作紀錄](../docs/AI_EXPANSION_IMPLEMENTATION.md)。
+完整新增能力、未串接範圍與裝置測試見 [全功能實作紀錄](../docs/history/AI_EXPANSION_IMPLEMENTATION.md)（歷史紀錄）。
 
 要改為區網實機連線時，需指定 `--host` 並透過環境變數提供至少 24 字的 `TOWNPASS_ASSISTANT_TOKEN`，
 App 以 `ASSISTANT_TOKEN` 帶入。這僅為開發配對，正式環境仍需 HTTPS、完整認證、流量限制與部署服務。
@@ -156,4 +156,4 @@ dev 集（`evaluate.CASES`）開發時調過，held-out 集（[eval_holdout.py](
 被模型回成補問；已改為單一精確命中且停用時，程式直接回目錄內的原因、不呼叫模型。預期沒有放寬。
 語料是開發回歸集，包含省略「書」的未知對象、非書籍借用與歧義案例，
 會用於修正檢索與提示，不能冒充獨立保留集正確率。`test_evaluate.py` 只離線檢查案例集與判定邏輯。
-完整交付狀態及限制見 [實作紀錄](../docs/AI_PHASE1_IMPLEMENTATION.md)。
+完整交付狀態及限制見 [實作紀錄](../docs/history/AI_PHASE1_IMPLEMENTATION.md)（歷史紀錄）。

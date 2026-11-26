@@ -4,7 +4,7 @@ The guided assistant (portal_assistant/app/lib/page/guided_assistant/) is writte
 text it shows goes through `gt()` (model/guide_i18n.dart), which looks the
 Chinese text up in portal_assistant/app/assets/i18n/guide/<section>.json and shows it in the
 conversation language (zh, en, ja, vi, id, tl = Filipino). Chinese stays the source and the
-fallback. portal_assistant/docs/AI_GUIDED_MERGE_PLAN.md section 8.
+fallback. portal_assistant/docs/history/AI_GUIDED_MERGE_PLAN.md section 8.
 
 Each section file is {"version", "status", "section", "strings": {zh: {en, ja,
 vi, id, tl}}}. Existing translations are kept, new texts get empty

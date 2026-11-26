@@ -1,5 +1,7 @@
 # 語言閘門：不再把別的語言「翻」成選單語言（2026-11-08）
 
+> **開發紀錄**：文中的分支、commit、「還沒提交」「尚未實作」是寫的當時的狀態；採用的做法都已合進目前的程式。現行規則以 [AI_CURRENT_RULES.md](AI_CURRENT_RULES.md) 為準，文件索引見 [README.md](README.md)。
+
 分支 `feat/language-gate`（從 `origin/feat/asr-ablation` 的 `3c8db7d` 開出）。手機 vivo V2511，Whisper small q8_0。
 
 ## 1. 問題

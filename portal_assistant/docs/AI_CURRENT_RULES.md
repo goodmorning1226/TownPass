@@ -1,4 +1,4 @@
-# 助理現行規則（2026-11-16；第 9 節結構規則 2026-11-24；第 10 節新增服務 2026-11-24；第 11 節問答來源 2026-11-25）
+# 助理現行規則（2026-11-16；第 4、5 節部分 2026-11-26；第 9 節結構規則 2026-11-24／25；第 10 節新增服務 2026-11-24；第 11 節問答來源 2026-11-25）
 
 這份是助理行為的**唯一準則**。其他文件裡和這裡衝突的舊規則（例如「一律候選確認」「語音要問『是這句嗎？』」「語言選單是偏好、偵測不確定就用選單語言」）都以這裡為準。
 規則改了就改這份，再改程式與測試。每條後面是做這件事的程式位置。
@@ -343,6 +343,16 @@ App 上看起來重複，也很難找到想要的；研究第 D 節）：
   - **短標籤**（`glossary.json` 的 `labels`）：抽取工具到不了的畫面（對話框、點進去才有的頁）上的短標題、按鈕，整串剛好是這個字時用表裡的翻譯；
     **只比對整串，不保護句子裡的用詞**（「使用」當按鈕是 Use，句子裡的「使用」照常翻）。詞彙表版本改成 2。
   - 以上翻譯都是 **AI 草稿，要請母語者審**。（`PageTranslation.keeps`、`PageGlossary.keeps`／`whole`、`assistant_web_view.dart` 的 `config.keep`；`portal_assistant/docs/AI_PAGE_TRANSLATION.md` 第 11 節）
+- **設定清單的列也跟著語言**（2026-11-25，擁有者同意；原因：帳戶、設定、基本資料、語言、App 起始頁、停用帳號的清單列由官方的 `TPSettingList` 用純 `Text` 畫，
+  沒有經過翻譯，切成英文後整頁還是中文；這些字其實都已經預翻好了）：
+  - 列的**標題、副標與右側的值**都**只查 App 自己的檔案**（`PageTranslation.buildPresetText`：不翻的字、預翻、詞彙表整串），**絕不送 ML Kit、也不用手機學到的翻譯**：
+    列上常有使用者自己的資料——值是身分證、生日、email、電話、中文地址，基本資料頁第一列的**標題就是姓名**——翻了會錯；
+    介面文字（每一列的名稱、「首頁>訂閱」「未設定」）都在預翻字典裡，照樣會翻。新加的列名由 `extract_app_strings.py --check` 要求補進字典。
+  - **示範帳號的個人資料不進預翻字典**（2026-11-26；原因：模擬器上基本資料頁的姓名與地址被翻成英文，查出 `extract_app_strings.py` 把 `assets/mock_data/account.json` 的姓名、地址也收進了字典）：
+    抽字串時略過 `account.json`，只從它來的字從字典刪掉，`--check` 遇到就失敗。
+  - **帳戶頁頂端的使用者姓名不翻**（2026-11-26，擁有者同意；原因：模擬器上「金大森」被 ML Kit 翻成「Jin Da-sen」；姓名用官方的 `TPText`，而 `TPText` 一律跟著語言）：
+    姓名外面包 `PageTranslationScope(enabled: false)`（`lib/page/account/account_view.dart`，第 8 個串接點）；電話等不含中文的值本來就不會被翻。
+  - 官方檔案 `lib/util/tp_setting_list.dart` 只加掛點（第 24 個串接點，`INTEGRATION.md`），樣式不變。（`PageTranslation.buildPresetText`；台北通測試 `test/setting_list_translation_test.dart`、`test/portal_assistant_integration_test.dart` 的姓名測試）
 - **越南文**（2026-11-08，`portal_assistant/docs/AI_VIETNAMESE.md`）：手機上有 `ggml-whisper-vietnamese.bin`（建議 PhoWhisper-base，選用）時，判定為越南文的錄音改由它聽（不加提示句、編碼器用完整 30 秒窗口、只解一次不重試）；第一次用到才載入，沒有檔案就跟原本一樣用 Whisper small。越南文不加提示句（實測反而變差）。
   選單選越南文時，閘門說「中文」一律不算數，改由 Whisper small 只偵測語言再決定；small 也說中文但把握不到九成、而且中文很短或不清楚時，再用越南文模型聽一次取較好的（`asr_server.MENU_OVER_CHINESE`）。閘門的台語判定在越南文選單下也要等這次偵測沒選到越南文才採用。
   比對：不打聲調、聲調聽錯、南北口音（d/gi/r/v、ch/tr、s/x、字尾 n/ng、c/t）都能對到；只靠口音合併或單音節沒聲調對到的，一律列出來讓使用者選；只對到**一個**已串接頁面而且不是靠口音時直接開，不問模型（`portal_assistant/backend/vietnamese.py`、`workflow._handle_language`）。
@@ -591,7 +601,7 @@ App 上看起來重複，也很難找到想要的；研究第 D 節）：
   （`widget/guide_card_layout.dart`、`guided_assistant_host.dart` `_guideCard`、`GuideCard.brief`；測試 `portal_assistant/app/test/guide_card_layout_test.dart`，含每一步都有 6 種語言的精簡重點）
 - **剛打開 App、模型還在載入**（2026-11-11，Android 與 iPhone 都遇到第一句失敗）：請求不再立刻回「尚未就緒」，
   而是等語音模型（最多 60 秒）或決策模型（最多 75 秒；分類器模式等分類器，不等 LLM）載好再處理；等待時顯示「模型載入中，好了會自動回答…」。
-  使用者先開口時，預熱讓出模型（剩下的預熱不做）。（`asr_server._post`、`server._model_reply`、`device_main.warm_up`、`AssistantReadiness`）
+  使用者先開口時，預熱讓出模型（剩下的預熱不做）。（`asr_server._post`、`server.model_reply`、`device_main.warm_up`、`AssistantReadiness`）
 - **回到前景、模型伺服器沒回應時不再一直等**（2026-11-13，iPhone 鎖定或切到背景後「助理連線中」很久、接著「正在幫你找」一直沒有回答）：
   上面「最多 60／75 秒」的等待**只用在 App 剛打開、模型還沒回應過的時候**。模型回應過以後才連不上（iOS 收回了它的 socket、它停住了），
   每次只再等幾秒（`liveness.AFTER_READY_WAIT_S`）；請求逾時或連不上後，這個模型在 30 秒內直接當作沒有回應，不再逐次等待。
@@ -629,6 +639,16 @@ App 上看起來重複，也很難找到想要的；研究第 D 節）：
 - **離線（飛航模式）**：模型、FAQ、語意檢索都在手機上，照常運作；圖書館藏清單在網路上，離線時用上次下載並存在手機上的副本，
   一份都沒有時只有找書不能用，其他請求不受影響。服務頁本身是網頁，離線時打不開。（`server.Catalog`）
 
+- **助理面板顯示的是教學卡片的那一步**（2026-11-25，擁有者同意的待辦；原因：stage 1 的模擬器測試看到水費教學卡片已經是第 2/6 步，
+  打開助理面板，「目前任務」卻寫第 1/6 步。面板打開時頁面不讀（`_shouldRead`），探針停下會把頁面快照清空（`WebGuideProbe.stop`），
+  面板就用空白的頁面重算，每個教學都退回第 1 步；用全部 181 份錄製資料重播，面板關著時 0 筆不一致，打開時 141 份退回）：
+  - 步驟在頁面上跑著的時候（`_stepRunning`），記下最後讀到的頁面；面板打開、或使用者暫時離開教學頁時，面板的「目前任務」步驟 i / n、
+    任務清單（看全部）、「下一步要做什麼」、換教學時問的「目前在第幾步」都照這份頁面算，和最後一張卡片一致。
+    已勾的條件（`latched`）與「跳過這格」照即時的狀態（在面板裡說「跳過」也立刻算進去）。
+  - 開始新的教學時清掉；暫停後接著做保留。頁面上的卡片、光圈照舊只看即時的頁面。
+  （`GuidedAssistantController._panelPageOf`；測試 `portal_assistant/app/test/guide_step_number_test.dart`：每份錄製資料的每個畫面，
+  卡片的步驟與面板一致，面板打開後也一樣）
+
 ## 6. 模型與資料
 
 - 全部在手機上跑：決策分類器（預設，見下）、或 Ministral 3B（`-DecisionModel ministral`）、Gemma 4 E2B（`-DecisionModel gemma`，只有 Android）、Whisper small（語音）、Whisper tiny（語言判斷）、Breeze-ASR-26（台語）、PhoWhisper-base（越南文）、e5（檢索）。
@@ -653,11 +673,11 @@ App 上看起來重複，也很難找到想要的；研究第 D 節）：
     （94／113 對 96／116，同一版例句），所以不用。代價：沒有要開頁的開發句拿到語意候選 34 → 40／48（只會列出，見第 2 節）；
     語意索引由約 1,400 段變成約 2,850 段：第一次建索引的時間約加倍（電腦 8 → 16–22 秒，之後用快取），每次比對多一倍的迴圈
     （電腦每次約 +25 ms；同一句在同一回合只算一次，`CatalogIndex.recent`），手機沒有量。
-  - 分類器：v1（townpass-decision-e5-ce-v1，App 現在下載的檔案）訓練時候選文件沒有 need，**v1 的文件不加 need**（`classifier.NEED`，v1 預設關，
+  - 分類器：v1（townpass-decision-e5-ce-v1，2026-11-16 以前 App 下載的檔案）訓練時候選文件沒有 need，**v1 的文件不加 need**（`classifier.NEED`，v1 預設關，
     `TOWNPASS_CLASSIFIER_NEED=1` 只供實驗）；原因：開發集上把 need 加進文件、不重新訓練時，evaluate dev 261 → 257 案、口語開發集直接開對 155 → 133、多開錯 1 頁，need 開發集開錯 3 → 4（到得了 94 → 100 是因為列出變多）。
     **分類器 v2**（2026-11-16，步驟 7，下一條）訓練時把 need 放進文件，`classifier.NEED` 在 v2 預設打開。
 - **分類器 v2**（townpass-decision-e5-ce-v2-q8_0.gguf，2026-11-16，步驟 7，研究 A3；同一個基底 multilingual-e5-small（Microsoft，MIT）、同樣 132 MB、同樣的 llama-server 參數）：
-  - **兩版都能跑，版本跟著模型檔**：`classifier.VERSION` 預設看 App 下載的檔名（`MODEL_NAME`，現在是 v1），`TOWNPASS_CLASSIFIER_VERSION=1／2` 可以指定（電腦評估用）；
+  - **兩版都能跑，版本跟著模型檔**：`classifier.VERSION` 預設看 App 下載的檔名（`MODEL_NAME`，現在是 v2），`TOWNPASS_CLASSIFIER_VERSION=1／2` 可以指定（電腦評估用）；
     候選文件、偽候選與門檻都跟著版本（`DEFAULT_THRESHOLDS`／`DEFAULT_THRESHOLDS_V2`），v1 的行為不變。**擁有者 2026-11-16 決定 App 改用 v2**（原因：需求型請求到得了 78 → 87%、FAQ 型給 FAQ 變多、開錯頁變少；代價是教學頁對 −6，見第 2 節）：
     **App 從 2026-11-16 起下載 v2**（團隊 HF `allensung1226/townpass-assistant-models` 的 `decision/townpass-decision-e5-ce-v2-q8_0.gguf`，commit 8c9b9a8f；`MODEL_NAME` 是 v2，所以 `VERSION` 預設是 2）。回到 v1：把 7 個位置改回 v1 的檔名（`portal_assistant/app/assets/assistant/models.json` classifier 那一筆的 name／sha256／path、`portal_assistant/backend/classifier.py` 的 `MODEL_NAME`、`OnDeviceAssistant.kt` 的 `CLASSIFIER_MODEL_FILE`、`OnDeviceAssistant.swift` 的 `classifierModelFile`、`portal_assistant/scripts/build_model_manifest.py`、`portal_assistant/scripts/push_assistant_models.ps1`、`portal_assistant/backend/test_classifier_app.py`），電腦上也可以設 `TOWNPASS_CLASSIFIER_VERSION=1`（`portal_assistant/docs/AI_DECISION_CLASSIFIER.md` 第 14 節）。
   - 候選文件：v1 的文件＋中文 need；外語請求是「該語言的名稱（關鍵字）— 該語言的 need | 中文名稱：關鍵字；功能」（菲律賓文用自己的名稱，v1 用英文）。
@@ -823,6 +843,11 @@ App 上看起來重複，也很難找到想要的；研究第 D 節）：
 6. **Xcode target 的檔案留在 `ios/Runner/`**（`OnDeviceAssistant.swift`、`Runner.entitlements`），副本在 `integration/files/`，由台北通的測試比對（擁有者 2026-11-24 決定；原因：這台沒有 Mac 驗證專案檔）。
 7. **測試**：套件自己的測試在 `portal_assistant/app/test`（`cd portal_assistant/app && fvm flutter test`）；需要真正台北通畫面（帳戶頁、`MainViewController`、`TPText`、`TPWebView`）的
    在台北通的 `test/`。兩邊都要跑，總數不能少。
+8. **文件分三類**（2026-11-25，擁有者同意推市府前整理文件；原因：早期的計畫、交接、進度和現行文件混在一起，讀的人分不出哪份過時）：
+   - 現行文件（規則、總覽、skill 說明書、開發環境）放 `portal_assistant/docs/`，列在索引 `portal_assistant/docs/README.md`；內容過時就直接更新。
+   - 做法與實驗紀錄（為什麼這樣做、試過什麼、數字）也放 `portal_assistant/docs/`，開頭寫日期，並在標題下加「開發紀錄」註記（文中的分支與「未提交」是當時的狀態）。
+   - 被取代的計畫、交接、進度、一次性的測試報告搬到 `portal_assistant/docs/history/`，加進 `history/README.md` 的表（日期、內容、現在看哪裡），標題下加「歷史文件」註記。
+     搬的時候一起改所有引用（Markdown 連結、程式註解與文件裡的路徑），跑 `python -X utf8 portal_assistant/scripts/check_links.py`。
 
 ## 10. 新增或修改服務（2026-11-24，第二階段）
 
