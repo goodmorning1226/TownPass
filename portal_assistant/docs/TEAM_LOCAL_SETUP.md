@@ -188,16 +188,15 @@ Invoke-RestMethod http://127.0.0.1:11434/api/tags
 
 等價於 `python portal_assistant/backend/server.py`。若 PowerShell 封鎖腳本，可直接用 Python 命令，不需把全機 execution policy 改成 Unrestricted。
 成功會顯示 `http://127.0.0.1:8765` 與 `model=ministral-3:3b`。
-Python 後端會讀取 `../assets/assistant/capabilities.json`，因此要 clone 完整 repo，不能只複製 server.py。
+Python 後端會讀取 `portal_assistant/app/assets/assistant/capabilities.json`，因此要 clone 完整 repo，不能只複製 server.py。
 
 另一個終端驗證：
 
 ```powershell
 Invoke-RestMethod http://127.0.0.1:8765/health
-fvm dart run portal_assistant/tools/smoke_assistant.dart
 ```
 
-health 應含 contract_version 3、registry_version 1 與模型名稱；只能確認設定，smoke 才會實際經 Dart client 呼叫模型。
+health 應含 contract_version 3、registry_version 1 與模型名稱；這只確認設定。App 到後端的實際呼叫由 `fvm flutter test`（App 端的 client 測試）與下面的人工測試確認。
 首次推論可能要等模型載入。錯誤時分別確認 Ollama :11434、Python :8765 與遠端示範書目網路，避免誤改成 timeout 無上限。
 目前圖書與其他 WebView 仍需要網際網路取得示範資料／頁面；「地端模型」不等於整個 App 可離線。
 
@@ -351,16 +350,16 @@ Android Studio 選 `lib/main.dart` 的 Flutter Run configuration、裝置選正�
 - Python 修改需停止該後端再重啟；改目錄資源需同步重啟主後端、語音服務（辨識提示詞取自目錄）與 App。Ollama 不需每次重下模型。
 - 每批先測規則／widget，再做 wire／模型測試，最後給使用者人工操作表。不要把遠端 mock 當正式交易。
 - 指令：`fvm flutter analyze`、`fvm flutter test`、`python -m unittest discover -s portal_assistant/backend -p 'test*.py'`、`fvm flutter build apk --debug`、`git diff --check`。
-- 本輪基線 Python 74、Flutter 44 通過；analyze 有 7 warning／16 info（零 error），不得刪測試或全域放寬 lint 換成假綠燈。
+- 2026-11-26 的基線：Python 710、Flutter 1,043（助理套件 865、台北通 178）通過；不得刪測試或全域放寬 lint 換成假綠燈。
 - 後端與 Ollama 啟動後可跑 `python portal_assistant/backend/evaluate.py` 做 contract 3 模型評估（dev 184 個＋held-out 102 個）；dev 是調過的開發集，held-out 才是誠實估計，且不得拿來調整。
 - 原開發機使用的 Gradle mirror／emulator workaround 是本機排障，不要自動設定到每個 clone。下載失敗時先保留完整錯誤並定位網路／倉庫問題。
-- 尚未完成：正式 API、缺金鑰地圖、欄位預填、其他語言與台語、語音在吵雜環境的辨識率。開發方向看交接文件，不補假功能來通過展示。
+- 尚未完成：正式 API、缺金鑰的地圖、冊次／取書館與陳情表單的自動預填、語音在吵雜環境的辨識率。現行規則看 `portal_assistant/docs/AI_CURRENT_RULES.md`，不補假功能來通過展示。
 - Commit 與 push 依專案擁有者當次同意；commit 訊息不加 AI 共同作者標記。
 
 人工第一輪（文字）：你好（不跳頁）、有哪些功能 → 下一頁、案件進度（先選候選）、借底層羅輯（先確認）、借神奇柑仔店（先選冊）、詳情返回總覽。
 導航重點：案件進度 → 助理開圖書 → 按叉叉／圖書首頁按 Android 返回，應到 App 主畫面，不能回到舊案件頁。
 
-人工第一輪（語音，需第 5.1 節與麥克風）：
+人工第一輪（語音，需第 5.1 節與麥克風；這張表是 `ASSISTANT_GUIDED=false` 的聊天面板，App 預設的引導介面是企鵝與「按住提問」）：
 
 | 操作 | 預期 |
 | --- | --- |

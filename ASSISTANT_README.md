@@ -57,8 +57,8 @@
 | 位置 | 內容 |
 | --- | --- |
 | `portal_assistant/backend/` | Python 後端：`workflow.py`（流程）、`server.py`（HTTP、檢索、模型呼叫）、`classifier.py`（決策分類器）、`book_title.py`（只說作品名的借書）、`decision.py`（文法限制的決策、沒有決策模型時的規則）、`asr_server.py`（語音、語言判斷、台語／越南文路徑）、`registry.py`／`phonetic.py`／`semantic.py`／`faq.py`／`qna.py`／`emergency.py`／`i18n.py`／`vietnamese.py`／`indonesian.py`／`places.py`／`taiwanese_gate.py`／`plausibility.py`、`models.py`（模型下載與分級）、`liveness.py`、`device_main.py`（手機啟動）、`evaluate.py` 等評估、`test_*.py` |
-| `portal_assistant/app/assets/assistant/` | `capabilities.json`（109 項功能、關鍵字、導覽方式）、`capabilities_i18n.json`（5 種外語：英、日、越、印、菲）、`capability_examples.json`（602 句口語例句）、`guide_*.json`（教學入口）、`models.json`（模型下載清單） |
-| `portal_assistant/app/assets/i18n/` | `app_strings.json`（App 文字預翻）、`guide/*.json`（1,134 句教學文字，6 語：中、英、日、越、印、菲） |
+| `portal_assistant/app/assets/assistant/` | `capabilities.json`（109 項功能、關鍵字、導覽方式）、`capabilities_i18n.json`（5 種外語：英、日、越、印、菲）、`capability_examples.json`（1,400 句口語例句，中文 1,080）、`guide_*.json`（教學入口）、`models.json`（模型下載清單） |
+| `portal_assistant/app/assets/i18n/` | `app_strings.json`（App 文字預翻）、`guide/*.json`（1,267 句教學文字，6 語：中、英、日、越、印、菲） |
 | `portal_assistant/app/lib/page/assistant/` | 聊天面板、`assistant_texts.dart`（介面文字 6 語） |
 | `portal_assistant/app/lib/page/guided_assistant/` | 引導助理：控制器、教學內容 `model/guides/`、頁面探測 `web/`、按住提問 `widget/` |
 | `portal_assistant/app/lib/service/` | 後端連線、頁面翻譯、語言選單、建議句、動作執行 |
@@ -67,7 +67,7 @@
 | `ios/Runner/OnDeviceAssistant.swift`、`portal_assistant/native/ios/` | iPhone：在 App 內以執行緒啟動各模型伺服器、鎖定後重新 bind、記憶體額度檢查、Xcode 內嵌階段 |
 | `portal_assistant/scripts/` | 建置、推模型、評估、抽字串 |
 | `portal_assistant/tools/guide_audit/` | 教學流程錄製與重播（Node＋Chrome） |
-| `portal_assistant/docs/` | 規則、技術總覽、各實驗紀錄、團隊待辦 `TEAM_TASKS_AFTER_MERGE.md` |
+| `portal_assistant/docs/` | 規則、技術總覽、做法與實驗紀錄（索引 `portal_assistant/docs/README.md`；`history/` 是已被取代的計畫與當時的待辦） |
 
 ## 4. 怎麼跑起來（看是哪種手機）
 
@@ -130,9 +130,9 @@ portal_assistant/scripts/run_assistant_on_device.sh --chat            # 聊天�
 
 - 模型放在 Mac 的 `~/Library/Application Support/TownPassAssistant/models`（目錄見 `portal_assistant/scripts/push_assistant_models_ios.sh`）；推模型時手機要解鎖。
 - iPhone 有決策分類器（預設）與 Ministral（`--decision-model ministral`），沒有 Gemma，越南文用 Whisper small（沒有 PhoWhisper）。
-- 台語用 Breeze q4_0（848 MB，Metal 上約 1.43 GB）；載入前對照 iOS 給單一 App 的記憶體額度（檔案＋1,000 MB，再留 256 MB），不夠就不載入、台語片段當中文聽，不會閃退。
+- 台語用 Breeze q4_0（848 MB，Metal 上約 1.43 GB）；載入前對照 iOS 給單一 App 的記憶體額度（檔案＋750 MB，再留 256 MB），不夠就不載入、不會閃退；這時不改用華語硬聽，而是說明台語模型暫時不能用、請改用華語或打字（華語結果清楚且 App 認得時照常用）。
 - 2026-11-13 在 iPhone 17 Pro Max 實測（分類器模式，雲端 CI 建置後側載）：App 內下載模型、中文語音、鎖定與切到背景再回來（iOS 收回的埠約 1 秒內重新 bind）、台語 q4_0 載入約 0.8 秒，都正常。
-- 沒有 Mac 時：`ci/ios-build` 分支用 GitHub Actions 建置未簽章的 App 再側載（說明在該分支的 `docs/IOS_BUILD_WITHOUT_MAC.md`）。
+- 沒有 Mac 時：團隊 fork 的 `ci/ios-build` 分支用 GitHub Actions 建置未簽章的 App 再側載（workflow 與說明 `docs/IOS_BUILD_WITHOUT_MAC.md` 都在該分支，不包含在市府 repository）。
 - 記錄：App 的 `Library/Caches/on_device_assistant.log`。
 - `run_assistant_on_device.sh` 是 2026-11-10 加的一鍵腳本，還沒在 Mac 上實跑；有問題時照 `portal_assistant/docs/AI_ON_DEVICE_IOS.md` 的手動三步驟。
 
@@ -158,7 +158,7 @@ portal_assistant/scripts/run_assistant_on_device.sh --chat            # 聊天�
 ## 6. 改東西的流程
 
 1. 行為規則先改 `portal_assistant/docs/AI_CURRENT_RULES.md`，再改程式與測試。
-2. 新增功能：`capabilities.json` 加項目與關鍵字 → `capabilities_i18n.json` 加 5 語 → `capability_examples.json` 加 3–5 句例句 → 需要教學就加 `guide_*.json` 入口與 `model/guides/`。
+2. 新增或修改服務：用 agent skill `townpass-add-service`（`portal_assistant/docs/SKILL_GUIDE.md`）：`capabilities.json` 加項目與關鍵字 → `capabilities_i18n.json` 加 5 語 → `capability_examples.json` 加例句（中文至少 8 句、每種外語至少 3 句，`check_service.py` 會檢查）→ 需要教學就加 `guide_*.json` 入口與 `model/guides/`。
 3. 改了功能清單、提示或模型後，跑完整評估（電腦、Ollama）：
 
    ```powershell
@@ -179,7 +179,7 @@ portal_assistant/scripts/run_assistant_on_device.sh --chat            # 聊天�
 
 ## 7. 狀態與限制（2026-11-13 的紀錄）
 
-下面的數字與待辦是 2026-11-13 的狀態；最新的限制與風險見 [README](README.md)「二、AI 使用聲明」第 4 節。
+下面的數字與待辦是 2026-11-13 的狀態；最新的限制與風險見 [README](README.md)「二、若使用 AI，需額外補充的項目」的「4. 與 AI 相關的限制或風險」。
 
 - 決策預設是**決策分類器**（2026-11-13 起，`portal_assistant/docs/AI_DECISION_CLASSIFIER.md` 第 10–13 節、`portal_assistant/docs/AI_CURRENT_RULES.md` 第 6 節）。電腦評估，分類器對 Ministral：
   held-out 95 對 97（作品名規則之後；之前 93），開錯頁都是 0；多語 96/96 對 96/96；口語四組開錯頁合計 3 對 16；
@@ -190,5 +190,5 @@ portal_assistant/scripts/run_assistant_on_device.sh --chat            # 聊天�
 - 外語介面與教學文字是 AI 翻譯草稿，待母語者校對。
 - App 內下載模型：電腦上的測試與實際下載都過了，iPhone 17 Pro Max 上走過下載（2026-11-13），Android 實機還沒走過完整流程；全部模型都可以直接下載（原作者的 Hugging Face，與團隊的 `allensung1226/townpass-assistant-models`）。
 - 泰文已換成菲律賓文（2026-11-11，App 代碼 `tl`；翻譯是 AI 草稿，待母語者審閱，`portal_assistant/docs/AI_FILIPINO.md`）；印尼文比對已優化（2026-11-11，`portal_assistant/docs/AI_INDONESIAN.md`），印尼文專用語音模型尚未接進 App。
-- 測試：Python 517 個、Flutter 611 個（2026-11-13）；2026-11-25 是 Python 710 個、Flutter 854 個。
+- 測試：Python 517 個、Flutter 611 個（2026-11-13）；2026-11-26 是 Python 710 個、Flutter 1,043 個（助理套件 865、台北通 178）。
 - 待辦（當時）：分類器模式的 Android 實機速度與記憶體、台語朗讀、iPhone 的 Gemma 與越南文模型、Android Release 未驗證。

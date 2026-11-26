@@ -70,7 +70,7 @@
 | `lib/util/` | 共用 UI、路由、WebView、跨功能工具與訊息橋接。 |
 | `lib/gen/` | FlutterGen 自動產生的資源介面，不手改輸出。 |
 | `assets/`、`fonts/` | 資源與目前明確標示的 mock 資料。 |
-| `portal_assistant/` | 微服務入口整合助理（本 fork 新增）：Flutter 套件 `app/`（`townpass_portal_assistant`，path 相依）、Python 後端 `backend/`、原生 `native/`、`scripts/`、`tools/`、`docs/`（助理規則 `docs/AI_CURRENT_RULES.md`）、串接文件 `INTEGRATION.md` 與 `integration/`。 |
+| `portal_assistant/` | 微服務入口整合助理（本 fork 新增）：Flutter 套件 `app/`（`townpass_portal_assistant`，path 相依）、Python 後端 `backend/`、原生 `native/`、`scripts/`、`tools/`、`docs/`（助理規則 `docs/AI_CURRENT_RULES.md`）、agent skill `skills/`、市府 FAQ 資料與建置腳本 `rag_handoff/`、串接文件 `INTEGRATION.md` 與 `integration/`。 |
 
 - 沿用 GetX 的 state、route、service injection 與現有 controller 生命週期。
 - 助理（`portal_assistant/`，團隊規則，2026-11-24）：套件不 import `package:town_pass/...`；需要台北通的地方走主機介面
@@ -135,6 +135,7 @@ fvm flutter pub get
 fvm flutter analyze
 fvm flutter test
 (cd portal_assistant/app && fvm flutter test)   # 助理套件自己的測試
+python -X utf8 -m unittest discover -s portal_assistant/backend -p "test_*.py"   # 助理後端
 fvm flutter build apk --debug
 fvm flutter devices
 # 選擇本次實際列出的 Android 裝置 ID，不照抄過期 ID。

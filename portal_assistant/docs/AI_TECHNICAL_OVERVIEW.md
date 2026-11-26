@@ -1,4 +1,4 @@
-# 台北一點就通！微服務入口整合助理：技術總覽（2026-11-08）
+# 台北一點就通！微服務入口整合助理：技術總覽（2026-11-08 初版，2026-11-26 更新）
 
 一份就看完的技術說明：用了哪些模型、文字怎麼篩選與比對、每一層的規則與門檻、速度與驗證方式。
 行為規則以 `portal_assistant/docs/AI_CURRENT_RULES.md` 為準；本文說明「怎麼做到」。各節末尾標出程式位置。
@@ -6,19 +6,19 @@
 ## 1. 整體架構
 
 ```
-手機（Android，全部在裝置上執行，不連雲端模型）
+手機（Android 與 iPhone，全部在裝置上執行，不連雲端模型）
 ├─ Flutter App（GetX）：引導助理（預設）／聊天面板、按住提問、WebView 服務頁、ML Kit 頁面翻譯
-├─ Chaquopy Python 後端 :8765（portal_assistant/backend/）：對話流程、檢索、決策、FAQ
+├─ Python 後端 :8765（Android：Chaquopy；iPhone：內嵌 CPython；portal_assistant/backend/）：對話流程、檢索、決策、FAQ
 ├─ llama-server b12182 :8778：決策分類器（2026-11-13 起預設，`--reranking`；portal_assistant/docs/AI_DECISION_CLASSIFIER.md）
 ├─ llama-server :8771：決策 LLM（選項：Ministral 3B，或 Gemma 4 E2B；預設不載入）
 ├─ llama-server :8774：e5 向量模型（FAQ 與語意檢索）
 ├─ whisper-server v1.9.5 :8773：Whisper small（6 種語言辨識：中、英、日、越、印尼、菲律賓）
 ├─ whisper-server :8775：Whisper tiny（語言判斷，約 0.2 秒）
 ├─ whisper-server :8776：Breeze-ASR-26 q4_0（台語，第一次用到才啟動）
-└─ whisper-server :8777：PhoWhisper-base（越南文，第一次用到才啟動）
+└─ whisper-server :8777：PhoWhisper-base（越南文，只有 Android，第一次用到才啟動）
 ```
 
-- 網路只用來抓資料：圖書館藏清單、台北通常見問答（示範網站），以及第一次下載 ML Kit 翻譯檔。
+- 網路只用來抓資料：圖書館藏清單、台北通常見問答（示範網站）、第一次下載 ML Kit 翻譯檔，以及使用者同意後下載模型。
 - 設計原則：**不用中國開發的模型與工具**；官方 TownPass-Services 網頁不修改、不打包，App 透過網頁自己的換頁機制（History API）在頁面內切換。
 
 程式：`portal_assistant/native/android/ondevice/kotlin/.../OnDeviceAssistant.kt`（啟動各伺服器、CPU 綁定）、`portal_assistant/backend/device_main.py`。
@@ -41,7 +41,7 @@
 alexachang 台語模型（訓練資料不明，只當對照）、ViWhisper（資料授權不明）、越南文 Whisper 提示詞（反而變差）。
 中資工具（CosyVoice、sherpa-onnx、GPT-SoVITS、FunASR）一律不用。
 
-文件：`AI_DECISION_MODEL_ABLATION_PLAN.md`、`AI_ASR_ABLATION.md`、`AI_LANGUAGE_GATE.md`、`AI_TAIWANESE_SPEECH_PLAN.md`、`AI_VIETNAMESE.md`、`AI_FILIPINO.md`、`AI_FAQ_RAG.md`。
+文件：`AI_DECISION_CLASSIFIER.md`、`history/AI_DECISION_MODEL_ABLATION_PLAN.md`、`AI_ASR_ABLATION.md`、`AI_LANGUAGE_GATE.md`、`AI_TAIWANESE_SPEECH_PLAN.md`、`AI_VIETNAMESE.md`、`AI_FILIPINO.md`、`AI_FAQ_RAG.md`。
 
 ## 3. 語音：從錄音到文字
 
@@ -58,7 +58,7 @@ alexachang 台語模型（訓練資料不明，只當對照）、ViWhisper（資
 6. **品質判定**：`no_speech_prob` 與平均 log-prob 分成 clear／unsure／unclear（unclear：no_speech > 0.6 或 logprob < −1.0；unsure：> 0.3 或 < −0.45）。
 7. **額外解碼不重試**：第二次以後的解碼 `temperature_inc 0`，避免重複迴圈拖到十幾秒。
 8. **簡體轉繁體**：Whisper small 常寫簡體，用 Unihan 對照表轉回。
-9. **台語**：手動選「台語（測試）」時整段交給 Breeze；自動判斷台語的分類器（看 tiny 的機率分布，門檻 0.85，華語誤判 ≤ 2%）實作中。
+9. **台語**（2026-11-08 起自動，任何選單語言都判斷）：沒有判成英／日／越／印／菲時，語言閘門（tiny）的語言機率交給邏輯迴歸分類器（`taiwanese_gate.py`、`data/taiwanese_gate.json`），分數 ≥ 0.5 就改由 Breeze-ASR-26 解碼（held-out：台語召回約 69%，台灣腔華語誤送約 5%）；說過台語後 5 分鐘內門檻降到 0.3；中文結果不像華語、或 App 認不出那句話時，也交給 Breeze 再聽一次，留較好的一份。台語模型下載了但暫時不能用時不改用華語硬聽，而是說明原因。手動「台語（測試）」保留，整段交給 Breeze。
 
 程式：`portal_assistant/backend/asr_server.py`（`transcribe`、`_gate`、`_decide`、`_rivals`、`_check_chinese`、`judge`）。
 
@@ -85,7 +85,9 @@ alexachang 台語模型（訓練資料不明，只當對照）、ViWhisper（資
 - **通用詞不搶頁**：未串接功能只靠「路燈、公園、疫苗」等通用詞命中、而句子還有其他內容時，不直接回「未串接」，改走語意檢索；語意把已串接的頁排第一就一起列出。
 - **圖書流程**只在句中有借／書／冊（不含手冊）／館／閱／寫的／作者／ISBN 時進入。
 
-### 4.5 決策模型（第 3 層）
+### 4.5 決策（第 3 層）
+- **預設（App）是決策分類器 v2**：由 multilingual-e5-small 微調的 cross-encoder 替每個候選（頁面、FAQ、「問功能」等偽候選）打分，規則決定直接開、列出 2–4 個或請補充；分數門檻與規則見 `AI_CURRENT_RULES.md` 第 2、3、6 節，做法見 `AI_DECISION_CLASSIFIER.md`。
+- 下面是選 Ministral 3B／Gemma 4 E2B（`-DecisionModel ministral`／`gemma`，電腦開發時的預設）時的 LLM 做法：
 - 檢索到的候選做成 **A／B／C 字母選項**，模型只能輸出 `{"choice":"X"}`，用 GBNF 文法硬性限制（6 個 token，比 JSON schema 少一半，且不會多出 ```json 圍欄）。
 - 工具：`select_capability`（開頁）、`confirm_candidates`（列出讓使用者選）、`request_clarification`、`cancel`、`unsupported`；圖書另有 `open_library`、`locate_library_book`、`open_library_book`。
 - 模型選項之外的任何輸出都被 `validate_call` 擋下，不會開頁。
@@ -100,32 +102,32 @@ alexachang 台語模型（訓練資料不明，只當對照）、ViWhisper（資
 - **日文**：假名→羅馬字，清濁音折疊（ka／ga），比對羅馬字；**越南文**去聲調、折疊 d/gi/r/v、ch/tr、s/x、字尾 n/ng/nh；英文含複數容錯；**菲律賓文**照拉丁字母整詞比對，英文關鍵字也算（Taglish）。
 
 ### 4.7 語意檢索（第 5 層，C 版＋口語例句）
-- e5 把每個功能做成多段 passage：標題、標題＋關鍵字、功能描述、各語言標題＋關鍵字（菲律賓文的段落只給菲律賓文的請求計分，`semantic.OWN_LANGUAGE_ONLY`），加上 `capability_examples.json` 的 **464 句口語例句**（每個已串接頁至少 3 句）。索引在手機背景建好後快取（1,263 段，約 1.9 MB）。
+- e5 把每個功能做成多段 passage：標題、標題＋關鍵字、功能描述、各語言標題＋關鍵字（菲律賓文的段落只給菲律賓文的請求計分，`semantic.OWN_LANGUAGE_ONLY`），加上每個功能的需求說明（need）與 `capability_examples.json` 的 **1,400 句口語例句**。索引在手機背景建好後快取（約 2,850 段，約 4.4 MB）。
 - 查詢以 cosine 相似度打分，取每頁最高分；例句分數先減 0.05，避免閒聊被當請求。
-- 最高分比「基準分」高出 ≥ 0.04 才算有候選；領先 ≥ 0.08 時不問模型直接列出（單一且已串接則直接開）；介於其間交給模型確認，模型只能「列出」或「請補充」，不能直接開。
+- 最高分比「基準分」高出 ≥ 0.03 才算有候選（2026-11-16 起，原本 0.04）；直接開、列出或請補充由分類器分數與規則決定（`AI_CURRENT_RULES.md` 第 2 節）；選 LLM 時，領先 ≥ 0.08 直接列出，介於其間交給模型確認，模型只能「列出」或「請補充」，不能直接開。
 - 否定句以去掉否定部分後的文字查詢（e5 不懂否定）。
 
-### 4.8 意圖判斷（第 6 層，B 版）
-前面都找不到時問模型一次：列出功能、打招呼、市政問題、請補充。「請補充」時再往 FAQ。
+### 4.8 意圖判斷（第 6 層）
+前面都找不到時判斷意圖（列出功能、打招呼、市政問題、請補充）：預設由分類器的偽候選打分（「問功能」≥ 0.85 先打分，同一次打分接著給問意圖用），選 Ministral／Gemma 時才問模型一次。「請補充」時再往 FAQ。
 
 ### 4.9 FAQ（第 7 層）
-- 市府 FAQ 8,121 筆（e5 向量，手機上 22 MB 索引）＋台北通常見問答（執行時從示範網站抓）。
+- 市府 FAQ 8,121 筆（e5 向量，手機上約 19 MB 索引）＋台北通常見問答（執行時從示範網站抓，文字不存進 App 與 repo）；來源登記在 `qa_sources.json`。
 - 查詢前先把口語詞補成 FAQ 用詞（大包垃圾／舊家具 → 巨大垃圾 大型廢棄物；身分證掉了 → 遺失 補發；敬老卡 → 敬老悠遊卡…）。
-- cosine ≥ 0.915 直接回答；≥ 0.88 列出最接近的問題讓使用者選；以下不回。答案超過 600 字截斷並提示洽 1999。
+- 預設（分類器 v2）：FAQ 的前 5 名（e5 ≥ 0.80）和頁面一起打分，最多列 4 個，最好的 FAQ 一定留一個位置；直接回答要分類器 ≥ 0.80、e5 ≥ 0.915，而且比每個頁面都高（`AI_CURRENT_RULES.md` 第 3 節）。選 LLM 時照 e5：cosine ≥ 0.915 直接回答；≥ 0.88 列出最接近的問題讓使用者選；以下不回。答案照原文顯示，超過 600 字截斷並提示洽 1999。
 - 外語：App 先用 ML Kit 翻成中文再查，答案再翻回使用者語言。
 
 ### 4.10 都沒有
-回「沒有找到相關服務或 FAQ，可換個說法、問有哪些功能，或撥 1999」。**不開頁**。
+**不開頁**。有線索就列 2–4 個可能的頁面（最後一個固定是「看全部功能」），沒有線索就給 12 類的功能目錄；同一個對話連續第二次找不到時，再加上 1999 市民熱線（`AI_CURRENT_RULES.md` 第 3 節）。
 
 程式：`workflow.py`（`_handle`、`_list`、`_semantic_fallback`、`_intent_fallback`、`_faq`、`_offer_services`）、`registry.py`、`phonetic.py`、`semantic.py`、`faq.py`、`qna.py`、`i18n.py`、`vietnamese.py`、`server.py`（`retrieve`、`output_constraint`、`validate_call`）。
 
 ## 5. 多語言與介面
 
 - 支援：中文、台語（只辨識，朗讀用中文）、英文、日文、越南文、印尼文、菲律賓文（2026-11-11 取代泰文；App 代碼 `tl`，朗讀 `fil-PH`，ML Kit `TranslateLanguage.tagalog`；翻譯是 AI 草稿，`portal_assistant/docs/AI_FILIPINO.md`）。
-- 介面文字：`assistant_texts.dart`（6 語）、教學文字 `portal_assistant/app/assets/i18n/guide/*.json`（1,134 句，以中文原句查表，`extract_guide_strings.py --check` 檢查缺漏）。
+- 介面文字：`assistant_texts.dart`（6 語）、教學文字 `portal_assistant/app/assets/i18n/guide/*.json`（1,267 句，以中文原句查表，`extract_guide_strings.py --check` 檢查缺漏）。
 - **語言跟隨**：選單、語音判出的語言、打字語言任一改變，助理文字、建議句、教學卡片、按鈕文字、設定頁、App 畫面與服務網頁一起換；頁面語言只到這次關 App；講話把握 ≥ 0.8 才改選單並記住。
 - **頁面翻譯**：`portal_assistant/app/assets/i18n/app_strings.json` 預翻字串優先，其餘用 ML Kit；服務頁的腳本在文件一開始注入，帶著目前語言的字典，有翻譯的字在畫出來前就換掉，其餘每 20 句一批同時送給 App（`portal_assistant/docs/AI_CURRENT_RULES.md` 第 4 節「服務頁翻譯」）；翻譯時保留原文（`window.__townpassOriginal`、`data-tp-placeholder`），教學光圈用原文找按鈕。
-- **引導助理**：企鵝、任務卡、光圈、新手教學、頁面探測（`web_guide_probe.dart` 讀頁面狀態）；教學流程以 `portal_assistant/tools/guide_audit/` 在示範網站錄製 177 條重播驗證。
+- **引導助理**：企鵝、任務卡、光圈、新手教學、頁面探測（`web_guide_probe.dart` 讀頁面狀態）；教學流程以 `portal_assistant/tools/guide_audit/` 在示範網站錄製 182 條重播驗證。
 - **按住提問／按住輸入**：每頁都有；教學要填欄位時改為語音填欄位，依欄位型別轉格式（電話、Email、金額、日期、時間、身分證、車牌、文字），原生 setter＋input/change 事件寫入 Vue 表單，可復原，不送出。
 - 功能選單排序：微服務 → 子頁 → App 頁 → 帳號設定 → 起始頁類；◀ ▶ 換頁不經模型。
 - 建議句：預設建議，有效輸入後換成使用者最近 4 筆請求（`AssistantRecentInputs`）。
@@ -145,12 +147,12 @@ alexachang 台語模型（訓練資料不明，只當對照）、ViWhisper（資
 
 ## 7. 驗證方式
 
-- **評估集**（電腦，Ollama ministral-3:3b）：dev 190、held-out 102、多語 46、中文口語 100、外語 held-out 125、口語 dev 186、報告 held-out 80。
+- **評估集**（電腦評估，分類器模式與 Ministral 都跑）：evaluate dev 263、held-out 102、多語 eval_i18n 96、中文口語 100、外語 held-out 125、口語 dev 216、報告 held-out 80、need 開發集 178、need 封存 170、多輪 30、FAQ 相關性 60。
   held-out 類只用來報告，不拿來調規則；**開錯頁必須維持不增加**。
-- 最新：dev 187–188/190、held-out 97/102、多語 46/46、開錯頁 0（dev／held-out）。
+- 分類器模式（App 預設，2026-11-13）：held-out 95/102、多語 96/96、開錯頁 0；完整數字見 `PROJECT_DETAILS.md`「數字」一節。
 - 語音：FLEURS（CC BY 4.0）、Common Voice nan-tw（CC0）等公開錄音評估語言判斷、字錯誤率、服務詞保留率；手機上以 `adb` 量每段時間。
-- 測試：Python 約 300 個、Flutter 555 個；教學重播測試；`extract_guide_strings.py --check`。
-- 開發紀錄與數據：`docs/` 各份 `AI_*.md`、`TEAM_TASKS_AFTER_MERGE.md`。
+- 測試：Python 710 個、Flutter 1,043 個（助理套件 865、台北通 178；2026-11-26）；教學重播測試；`extract_guide_strings.py --check`。
+- 開發紀錄與數據：`docs/` 各份 `AI_*.md`（索引 `README.md`）；早期的計畫與待辦在 `history/`。
 
 ## 8. 安全與隱私
 

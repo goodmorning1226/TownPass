@@ -1,4 +1,4 @@
-# 助理現行規則（2026-11-16；第 9 節結構規則 2026-11-24；第 10 節新增服務 2026-11-24；第 11 節問答來源 2026-11-25）
+# 助理現行規則（2026-11-16；第 4、5 節部分 2026-11-26；第 9 節結構規則 2026-11-24／25；第 10 節新增服務 2026-11-24；第 11 節問答來源 2026-11-25）
 
 這份是助理行為的**唯一準則**。其他文件裡和這裡衝突的舊規則（例如「一律候選確認」「語音要問『是這句嗎？』」「語言選單是偏好、偵測不確定就用選單語言」）都以這裡為準。
 規則改了就改這份，再改程式與測試。每條後面是做這件事的程式位置。
@@ -601,7 +601,7 @@ App 上看起來重複，也很難找到想要的；研究第 D 節）：
   （`widget/guide_card_layout.dart`、`guided_assistant_host.dart` `_guideCard`、`GuideCard.brief`；測試 `portal_assistant/app/test/guide_card_layout_test.dart`，含每一步都有 6 種語言的精簡重點）
 - **剛打開 App、模型還在載入**（2026-11-11，Android 與 iPhone 都遇到第一句失敗）：請求不再立刻回「尚未就緒」，
   而是等語音模型（最多 60 秒）或決策模型（最多 75 秒；分類器模式等分類器，不等 LLM）載好再處理；等待時顯示「模型載入中，好了會自動回答…」。
-  使用者先開口時，預熱讓出模型（剩下的預熱不做）。（`asr_server._post`、`server._model_reply`、`device_main.warm_up`、`AssistantReadiness`）
+  使用者先開口時，預熱讓出模型（剩下的預熱不做）。（`asr_server._post`、`server.model_reply`、`device_main.warm_up`、`AssistantReadiness`）
 - **回到前景、模型伺服器沒回應時不再一直等**（2026-11-13，iPhone 鎖定或切到背景後「助理連線中」很久、接著「正在幫你找」一直沒有回答）：
   上面「最多 60／75 秒」的等待**只用在 App 剛打開、模型還沒回應過的時候**。模型回應過以後才連不上（iOS 收回了它的 socket、它停住了），
   每次只再等幾秒（`liveness.AFTER_READY_WAIT_S`）；請求逾時或連不上後，這個模型在 30 秒內直接當作沒有回應，不再逐次等待。
@@ -646,7 +646,7 @@ App 上看起來重複，也很難找到想要的；研究第 D 節）：
     任務清單（看全部）、「下一步要做什麼」、換教學時問的「目前在第幾步」都照這份頁面算，和最後一張卡片一致。
     已勾的條件（`latched`）與「跳過這格」照即時的狀態（在面板裡說「跳過」也立刻算進去）。
   - 開始新的教學時清掉；暫停後接著做保留。頁面上的卡片、光圈照舊只看即時的頁面。
-  （`GuidedAssistantController._panelPage`；測試 `portal_assistant/app/test/guide_step_number_test.dart`：每份錄製資料的每個畫面，
+  （`GuidedAssistantController._panelPageOf`；測試 `portal_assistant/app/test/guide_step_number_test.dart`：每份錄製資料的每個畫面，
   卡片的步驟與面板一致，面板打開後也一樣）
 
 ## 6. 模型與資料
@@ -673,11 +673,11 @@ App 上看起來重複，也很難找到想要的；研究第 D 節）：
     （94／113 對 96／116，同一版例句），所以不用。代價：沒有要開頁的開發句拿到語意候選 34 → 40／48（只會列出，見第 2 節）；
     語意索引由約 1,400 段變成約 2,850 段：第一次建索引的時間約加倍（電腦 8 → 16–22 秒，之後用快取），每次比對多一倍的迴圈
     （電腦每次約 +25 ms；同一句在同一回合只算一次，`CatalogIndex.recent`），手機沒有量。
-  - 分類器：v1（townpass-decision-e5-ce-v1，App 現在下載的檔案）訓練時候選文件沒有 need，**v1 的文件不加 need**（`classifier.NEED`，v1 預設關，
+  - 分類器：v1（townpass-decision-e5-ce-v1，2026-11-16 以前 App 下載的檔案）訓練時候選文件沒有 need，**v1 的文件不加 need**（`classifier.NEED`，v1 預設關，
     `TOWNPASS_CLASSIFIER_NEED=1` 只供實驗）；原因：開發集上把 need 加進文件、不重新訓練時，evaluate dev 261 → 257 案、口語開發集直接開對 155 → 133、多開錯 1 頁，need 開發集開錯 3 → 4（到得了 94 → 100 是因為列出變多）。
     **分類器 v2**（2026-11-16，步驟 7，下一條）訓練時把 need 放進文件，`classifier.NEED` 在 v2 預設打開。
 - **分類器 v2**（townpass-decision-e5-ce-v2-q8_0.gguf，2026-11-16，步驟 7，研究 A3；同一個基底 multilingual-e5-small（Microsoft，MIT）、同樣 132 MB、同樣的 llama-server 參數）：
-  - **兩版都能跑，版本跟著模型檔**：`classifier.VERSION` 預設看 App 下載的檔名（`MODEL_NAME`，現在是 v1），`TOWNPASS_CLASSIFIER_VERSION=1／2` 可以指定（電腦評估用）；
+  - **兩版都能跑，版本跟著模型檔**：`classifier.VERSION` 預設看 App 下載的檔名（`MODEL_NAME`，現在是 v2），`TOWNPASS_CLASSIFIER_VERSION=1／2` 可以指定（電腦評估用）；
     候選文件、偽候選與門檻都跟著版本（`DEFAULT_THRESHOLDS`／`DEFAULT_THRESHOLDS_V2`），v1 的行為不變。**擁有者 2026-11-16 決定 App 改用 v2**（原因：需求型請求到得了 78 → 87%、FAQ 型給 FAQ 變多、開錯頁變少；代價是教學頁對 −6，見第 2 節）：
     **App 從 2026-11-16 起下載 v2**（團隊 HF `allensung1226/townpass-assistant-models` 的 `decision/townpass-decision-e5-ce-v2-q8_0.gguf`，commit 8c9b9a8f；`MODEL_NAME` 是 v2，所以 `VERSION` 預設是 2）。回到 v1：把 7 個位置改回 v1 的檔名（`portal_assistant/app/assets/assistant/models.json` classifier 那一筆的 name／sha256／path、`portal_assistant/backend/classifier.py` 的 `MODEL_NAME`、`OnDeviceAssistant.kt` 的 `CLASSIFIER_MODEL_FILE`、`OnDeviceAssistant.swift` 的 `classifierModelFile`、`portal_assistant/scripts/build_model_manifest.py`、`portal_assistant/scripts/push_assistant_models.ps1`、`portal_assistant/backend/test_classifier_app.py`），電腦上也可以設 `TOWNPASS_CLASSIFIER_VERSION=1`（`portal_assistant/docs/AI_DECISION_CLASSIFIER.md` 第 14 節）。
   - 候選文件：v1 的文件＋中文 need；外語請求是「該語言的名稱（關鍵字）— 該語言的 need | 中文名稱：關鍵字；功能」（菲律賓文用自己的名稱，v1 用英文）。

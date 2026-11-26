@@ -29,28 +29,28 @@
 
 | patch | 新增／刪除行 | 內容 |
 | --- | --- | --- |
-| `.gitignore.patch` | +5 −1 | 檔尾加 `**/android/app/assistant-native/`（−1 是官方檔尾沒有換行） |
+| `.gitignore.patch` | +6 −1 | 檔尾加 `**/android/app/assistant-native/`（−1 是官方檔尾沒有換行） |
 | `pubspec.yaml.patch` | +3 | path 相依 `townpass_portal_assistant` |
 | `lib/main.dart.patch` | +8 | 兩個 import、`PortalAssistant.init`、`GetMaterialApp` 的三個參數 |
 | `lib/util/tp_route.dart.patch` | +3 | import、`...PortalAssistant.pages` |
-| `lib/util/tp_web_view.dart.patch` | +45 −9 | import、`WebViewArgument.assistant`、StatefulWidget、`AssistantWebSession` 與 `dispose`、`PopScope`、WebView 回呼轉給工作階段、返回鍵 |
-| `lib/util/tp_text.dart.patch` | +4 −1 | import、`build` → `PageTranslation.buildText(context, data, _build)` |
+| `lib/util/tp_web_view.dart.patch` | +50 −9 | import、`WebViewArgument.assistant`、StatefulWidget、`AssistantWebSession` 與 `dispose`、`PopScope`、WebView 回呼轉給工作階段、返回鍵 |
+| `lib/util/tp_text.dart.patch` | +5 −1 | import、`build` → `PageTranslation.buildText(context, data, _build)` |
 | `lib/util/tp_setting_list.dart.patch` | +17 −16 | import、8 處 `.text(...)` 改成 `assistantPreset((t) => t.text(...))`，樣式不變 |
 | `lib/util/tp_bottom_navigation_factory.dart.patch` | +6 −4 | import、四個分頁標籤用 `PageTranslation.instance.label` |
-| `lib/page/perk/perk_view.dart.patch` | +12 −1 | import、`tabIndex`、`AssistantTabWebPage` 包住 WebView |
+| `lib/page/perk/perk_view.dart.patch` | +13 −1 | import、`tabIndex`、`AssistantTabWebPage` 包住 WebView |
 | `lib/page/account/account_view.dart.patch` | +8 −4 | 兩個 import、`...TownPassAssistantHost.accountTiles()`、「設定」圖示的無障礙標籤跟著語言、姓名不翻譯（`PageTranslationScope(enabled: false)`） |
 | `lib/page/setting/setting_view.dart.patch` | +9 | 「關於」與「授權與資料來源」 |
-| `lib/page/language/language_view.dart.patch` | +7 −13 | 語言清單來自 `PageTranslation.languages`，顯示目前的語言 |
-| `lib/page/language/language_view_controller.dart.patch` | +10 −11 | `languageList`、`currentIndex`、`onIndexChange` → `PageTranslation.instance.setLanguage` |
+| `lib/page/language/language_view.dart.patch` | +7 −14 | 語言清單來自 `PageTranslation.languages`，顯示目前的語言 |
+| `lib/page/language/language_view_controller.dart.patch` | +10 −12 | `languageList`、`currentIndex`、`onIndexChange` → `PageTranslation.instance.setLanguage` |
 | `lib/page/basic_info_edit/basic_info_edit_view.dart.patch` | +5 −3 | 輸入框提示跟著語言（`Obx` ＋ `label`） |
 | `lib/page/feedback/feedback_view.dart.patch` | +12 −9 | 意見欄位提示與下方說明跟著語言 |
 | `lib/page/home/widget/subscription/subscription_widget.dart.patch` | +4 −2 | 說明文字外面包 `Expanded`（譯文換行） |
 | `android/settings.gradle.patch` | +2 | `com.chaquo.python` 17.2.0 `apply false` |
-| `android/app/build.gradle.patch` | +3 | `apply from: "../../portal_assistant/native/android/assistant.gradle"` |
+| `android/app/build.gradle.patch` | +4 | `apply from: "../../portal_assistant/native/android/assistant.gradle"` |
 | `android/app/src/main/AndroidManifest.xml.patch` | +6 | `RECORD_AUDIO`、`TTS_SERVICE` 查詢 |
 | `android/app/src/debug/AndroidManifest.xml.patch` | +1 | debug 網路安全設定 |
-| `android/app/src/main/kotlin/com/example/townpass/MainActivity.kt.patch` | +33 −1 | 反射啟動 `OnDeviceAssistant`、建立 `SystemSpeech`、註冊地端狀態 channel |
-| `ios/.gitignore.patch` | +2 | `OnDevice/` |
+| `android/app/src/main/kotlin/com/example/townpass/MainActivity.kt.patch` | +35 −1 | 反射啟動 `OnDeviceAssistant`、建立 `SystemSpeech`、註冊地端狀態 channel |
+| `ios/.gitignore.patch` | +3 | `OnDevice/` |
 | `ios/Runner.xcodeproj/project.pbxproj.patch` | +23 | `OnDeviceAssistant.swift` 加入 Runner、`CODE_SIGN_ENTITLEMENTS`（三個建置設定）、「Embed On-Device Assistant」建置階段 |
 | `ios/Runner/AppDelegate.swift.patch` | +4 | 註冊 `OnDeviceAssistant` |
 | `ios/Runner/Info.plist.patch` | +2 | `NSMicrophoneUsageDescription` |
@@ -64,7 +64,11 @@
 
 - `README.md`（fork 的說明）、`AGENTS.md`、`agent.md`、`ASSISTANT_README.md`、`docs/`（fork 的開發紀錄）。
 - `test/widget_test.dart`：官方範本的計數器測試換成帳務頁開啟付款網頁的測試（官方範本在台北通本來就跑不過）。
-- `.gitignore` 的 `**/android/.kotlin/`、`**/android/build/`（Android 建置輸出）。
+- `.gitignore` 的 `**/android/.kotlin/`、`**/android/build/`（Android 建置輸出）、`.fvm/`，以及 `/.env`（`--dart-define-from-file=.env` 的本機設定，不進 git）。
+  `/.env` 不在串接的 patch 裡：用 `.env` 帶設定的台北通要自己在 `.gitignore` 加這一行。
+- `.env.example`：建置開關的範例（README 第 3 節）；串接時可以一起複製，不是必要。
+- `.claude/skills/`：Claude Code 找 skill 用的鏡像，由 `python -X utf8 portal_assistant/scripts/sync_skill.py` 從 `portal_assistant/skills/` 產生，不要直接改。
+- `pubspec.lock`：加了套件的相依後由 `fvm flutter pub get` 更新（+95 行）；串接到別的台北通版本時在那邊重新產生，不照抄。
 - `test/` 裡的助理整合測試（`portal_assistant_integration_test.dart`、`assistant_test.dart` 等）與 `test/flutter_test_config.dart`（測試時註冊 `TownPassAssistantHost`）。
 
 ## 4. 更新這份清單

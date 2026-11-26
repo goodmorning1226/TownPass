@@ -15,6 +15,8 @@ iPhone（全部在 App 行程內，不連雲端模型）
 └─ LlamaServer.framework --embedding：:8774 multilingual-e5-small（FAQ 與語意檢索，選用）
 ```
 
+（上圖是 2026-11-08 的架構。2026-11-13 起預設的決策是 :8778 決策分類器，另有 :8776 Breeze-ASR-26（台語）；現在的架構見 [AI_TECHNICAL_OVERVIEW.md](AI_TECHNICAL_OVERVIEW.md) 第 1 節。）
+
 iOS 不能開子行程，所以每個 native server 的 `main()` 以函式匯出（`townpass_llama_server`、`townpass_whisper_server`），
 在 App 內各開一條執行緒跑。框架用 `dlopen` 開啟、不在連結階段相依，所以沒有設定地端的建置完全不變。
 
@@ -29,7 +31,7 @@ iOS 不能開子行程，所以每個 native server 的 `main()` 以函式匯出
 - `ios/OnDevice/` 沒有框架、或建置模擬器時，Xcode 的「Embed On-Device Assistant」階段直接略過，App 與以前相同。
 - 模型也可以讓 App 自己下載（branch `feat/model-download`，[AI_MODEL_DOWNLOAD.md](AI_MODEL_DOWNLOAD.md)）：
   沒有任何模型時 Python 仍會啟動，助理畫面顯示「下載離線助理」；檔案下載好後 `ensureServer` 啟動對應的 server，不用重開 App。
-  這部分的 Swift 還沒在 Mac 上編譯過。
+  （2026-11-08 時這部分的 Swift 還沒在 Mac 上編譯過；2026-11-13 起已用雲端 CI 建置，並在 iPhone 17 Pro Max 上走過 App 內下載，見 [AI_MODEL_DOWNLOAD.md](AI_MODEL_DOWNLOAD.md)。）
 
 ## 建置與安裝
 
@@ -66,7 +68,7 @@ Android 從 2026-11-10 起也認 `--dart-define=ASSISTANT_ON_DEVICE=true`（`and
 | `ggml-whisper-multilingual.bin` | Whisper small q8_0（ggerganov/whisper.cpp），MIT | 253 MB | 語音 |
 | `ggml-whisper-langid.bin` | Whisper tiny q8_0，MIT | 42 MB | 選用 |
 | `ggml-whisper-taiwanese.bin` | Breeze-ASR-26（MediaTek Research＋陽明交大），Apache-2.0；官方權重以 whisper.cpp `convert-h5-to-ggml.py` 轉換、`whisper-quantize` q4_0（2026-11-13 起；原本 q8_0 1.66 GB） | 848 MB | 台語（選用） |
-| `multilingual-e5-small-q8_0.gguf`＋`faq_rag/` | Microsoft，MIT（`prepare_assistant_models.ps1`、`build_faq_index.py`） | 132 MB＋22 MB | 選用 |
+| `multilingual-e5-small-q8_0.gguf`＋`faq_rag/` | Microsoft，MIT（`prepare_assistant_models.ps1`、`build_faq_index.py`） | 132 MB＋約 19 MB | 選用 |
 
 紀錄：`Library/Caches/on_device_assistant.log`（Python 與各 server 的輸出，只有數字與檔名），可用
 `xcrun devicectl device copy from --domain-type appDataContainer --domain-identifier com.example.townpass --source Library/Caches/on_device_assistant.log --destination <檔案>` 取回。
@@ -95,7 +97,7 @@ Android 從 2026-11-10 起也認 `--dart-define=ASSISTANT_ON_DEVICE=true`（`and
   現在台語啟動前同時檢查 App 額度與手機實際可用記憶體（需要 = 檔案大小＋600 MB，保留 400 MB），不夠就回 `memory`（台語片段當中文並提示），不再閃退。
   台語 q8_0 要 12 GB 的機型：iPhone 17 Pro Max（實體 11695 MB）啟動後手機約有 2.8 GB 可用，夠載入。
 - 暖機的測試音不載入台語模型（`transcribe(..., automatic_taiwanese=False)`，團隊在 asr-ablation 的修正）；llama-server 以 `/health` 200 判斷載完，台語等所有啟動模型載完才載入。
-- e5 與 FAQ 索引：`portal_assistant/scripts/convert_e5_gguf.py` 轉 q8_0（132 MB），`portal_assistant/scripts/build_faq_index.py` 以 Mac 上的 llama-server 建 8,121 筆索引（22 MB）；
+- e5 與 FAQ 索引：`portal_assistant/scripts/convert_e5_gguf.py` 轉 q8_0（132 MB），`portal_assistant/scripts/build_faq_index.py` 以 Mac 上的 llama-server 建 8,121 筆索引（約 19 MB）；
   手機上 `faq embed :8774`、`timing faq-load entries=8121`。
 
 ## 鎖定與背景（2026-11-10，branch `fix/ios-resume`，尚待 iPhone 實測）

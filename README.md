@@ -155,7 +155,7 @@ flowchart LR
 - **Flutter**：用 [FVM](https://fvm.app/) 安裝 `.fvmrc` 指定的 3.47.6（Dart 3.13.5），不要用電腦全域的 Flutter。
 - **Python**：3.11 或以上（電腦上跑後端與測試；手機上的 Python 由建置流程打包）。
 - **Android**：Android SDK（Platform 36、NDK 29）、JDK 17、adb；實機建議 7 GB 以上記憶體（以下只下載核心模型）。
-- **iPhone**（選用）：Mac＋Xcode；沒有 Mac 時可用 GitHub Actions 建置未簽章版本再側載。
+- **iPhone**（選用）：Mac＋Xcode；沒有 Mac 時，團隊 fork 的 `ci/ios-build` 分支有 GitHub Actions 建置未簽章版本再側載的做法（workflow 與 `docs/IOS_BUILD_WITHOUT_MAC.md`，不包含在市府 repository）。
 - **Node.js**（選用）：v18 或以上，只有教學流程錄製工具 [tools/guide_audit/](portal_assistant/tools/guide_audit/) 需要。
 
 步驟說明（Android，Windows PowerShell，在 repository 根目錄執行）：
@@ -214,7 +214,7 @@ ASSISTANT_SPEECH=whisper
 
 | 功能編號 | 功能名稱 | 簡述 | 資料來源描述（若為政府資料） |
 | --- | --- | --- | --- |
-| 4.1 | 說話就開服務 | 按住說一句話或打字，助理直接打開對的服務頁；只有一個明確選項才直接開，否則列出 2–4 個候選或 12 類功能目錄 | 無，為專案整理的功能目錄（109 項）與口語例句（602 句） |
+| 4.1 | 說話就開服務 | 按住說一句話或打字，助理直接打開對的服務頁；只有一個明確選項才直接開，否則列出 2–4 個候選或 12 類功能目錄 | 無，為專案整理的功能目錄（109 項）與口語例句（1,400 句，中文 1,080） |
 | 4.2 | 引導教學 | 企鵝任務卡＋光圈，在真實的服務頁上一步步教（9 種服務）；打字的欄位打完才進下一步；非必填欄位也教，可「跳過這格」 | 無，為專案撰寫的教學內容（6 種語言） |
 | 4.3 | 按住輸入、按住選擇 | 欄位用說的填（依欄位轉成電話、日期、身分證等格式）；下拉、單選、勾選、清單用說的選；都可以復原，不會替使用者送出 | 無 |
 | 4.4 | 語音地址分層比對 | 說一次完整地址，依序比對縣市 → 區 → 路名，校正語音辨識的錯字後填入；縣市／區／地址三格的下拉一次填好 | 內政部戶政司〈全國路名資料〉（[data.gov.tw 35321](https://data.gov.tw/dataset/35321)），CSV，115 年版；內政部國土測繪中心〈鄉鎮市區清單〉（[data.gov.tw 102011](https://data.gov.tw/dataset/102011)），API；均為政府資料開放授權條款第 1 版，事先整理進 App |
@@ -303,7 +303,7 @@ App 內「設定 → 關於 → 授權與資料來源」列出上述資料與每
 
 - 不用切選單：語言判斷模型（Whisper tiny）的輸出上加了一個小分類器，分數夠高就交給台語模型 **Breeze-ASR-26**（聯發科技研究中心＋陽明交大，Apache-2.0）。
 - 中文結果不像華語、或 App 認不出那句話時，也會交給台語模型再聽一次，留比較好的那份。
-- 台語模型無法使用時不會用華語硬聽，而是說明原因。目前只有辨識，朗讀用中文。
+- 台語模型下載了但暫時不能用（記憶體不足、還沒啟動）時，不會用華語硬聽，而是說明原因；沒下載台語模型時照華語處理。目前只有辨識，朗讀用中文。
 
 #### 4.6 多語介面與頁面即時翻譯
 
@@ -331,7 +331,7 @@ App 內「設定 → 關於 → 授權與資料來源」列出上述資料與每
 #### 4.10 獨立專案＋串接文件
 
 - 助理套件不 import 台北通的任何程式；台北通實作主機介面 `PortalAssistantHost`（路由、開 WebView、首頁分頁、標題列），其他每個串接點只有幾行。
-- 對官方檔案的改動從約 1,700 行減到約 200 行；完整列表見 [INTEGRATION.md](portal_assistant/INTEGRATION.md) 與 [docs/HOST_CHANGES.md](portal_assistant/docs/HOST_CHANGES.md)。
+- 對官方檔案的改動從約 1,700 行減到約 250 行（新增 246、刪除 77，不含 4 個新增檔案）；完整列表見 [INTEGRATION.md](portal_assistant/INTEGRATION.md) 與 [docs/HOST_CHANGES.md](portal_assistant/docs/HOST_CHANGES.md)。
 - 已在乾淨的官方台北通（`e65b586`）上只照串接文件套用，成功建置並在 Android 模擬器上跑起助理與教學。
 
 ## 5. 用 agent skill 擴充 / Extension
@@ -399,7 +399,7 @@ App 內「設定 → 關於 → 授權與資料來源」列出上述資料與每
 
 - **人工審查**：團隊對 AI 產生的程式與文件做大致的審查與測試，每次 commit 都經團隊成員同意。
 - **規則先行**：所有行為規則寫在 [docs/AI_CURRENT_RULES.md](portal_assistant/docs/AI_CURRENT_RULES.md)，每次改行為先改規則並寫明原因，再改程式。
-- **自動測試**：Python 710 個、Flutter 854 個測試（助理套件 681、台北通 173）；教學流程在示範網站錄製後重播驗證；規則互相干擾由碰撞測試自動檢查。
+- **自動測試**：Python 710 個、Flutter 1,043 個測試（助理套件 865、台北通 178）；教學流程在示範網站錄製後重播驗證；規則互相干擾由碰撞測試自動檢查。
 - **評估集與封存保留集**：開發集用來調整；保留集由另一位撰寫者撰寫並封存，只用來報告，不拿來調規則；「開錯頁」必須維持不增加。
 - **實機驗證**：Android 模擬器與實機（vivo）、iPhone 17／17 Pro Max 實測，問題記錄後修正再測。
 - **安全**：WebView 只在服務網域上注入與讀取；後端只綁 `127.0.0.1`，檢查 Origin、Content-Type 與欄位白名單；模型檔下載後檢查 SHA-256。
@@ -408,7 +408,7 @@ App 內「設定 → 關於 → 授權與資料來源」列出上述資料與每
 
 - **模型可能判斷錯誤**：語音辨識或決策可能聽錯、選錯頁面，所以只有把握夠高才直接開頁，其他情況列出選項讓使用者選；助理不替使用者送出、付款或同意。
 - **台語與外語辨識仍有限制**：台語自動判斷約七成召回；外語介面文字是 AI 草稿，可能不自然或有誤。
-- **AI 產生的程式碼可能遺留問題**：已用測試、評估與實機驗證降低風險，但無法保證沒有遺漏；Release 版本與正式台北通環境尚未驗證。
+- **AI 產生的程式碼可能遺留問題**：已用測試、評估與實機驗證降低風險，但無法保證沒有遺漏；Android 的 Release 版本與正式台北通環境尚未驗證（iPhone 實測用的是 release 建置）。
 - **資料與授權**：示範用的服務網頁、mock 帳號與 JSON 不代表已取得正式台北通登入或政府 API 的授權；政府開放資料依授權條款註明出處。
 - **FAQ 的時效**：市府 FAQ 有不少舊資料，答案以官方網站為準。
 - **敏感資料**：App 的錄音不存檔、不上傳；開發過程中未將使用者個資、帳號密碼或未公開的金鑰輸入 AI。
@@ -421,7 +421,7 @@ App 內「設定 → 關於 → 授權與資料來源」列出上述資料與每
 
 - 最快的做法：把 `portal_assistant/` 放到台北通 repo 根目錄，執行 `portal_assistant/integration/apply.ps1`（或 `apply.sh`），再 `pub get`、`build_runner`。
 - 主機介面 `PortalAssistantHost`：台北通的實作在 [integration/files/lib/util/town_pass_assistant_host.dart](portal_assistant/integration/files/lib/util/town_pass_assistant_host.dart)。
-- 24 個串接點：每個官方檔案一份 patch（[integration/patches/](portal_assistant/integration/patches/)），文件逐一寫明位置、加什麼、為什麼、不加會怎樣。
+- 24 個串接點（25 個 patch，語言頁兩個檔算一個串接點）：每個官方檔案一份 patch（[integration/patches/](portal_assistant/integration/patches/)），文件逐一寫明位置、加什麼、為什麼、不加會怎樣。
 - 台北通要提供的東西：服務網域（白名單 [app/assets/assistant/service_origins.json](portal_assistant/app/assets/assistant/service_origins.json)）、WebView bridge（既有的訊息名稱與資料語意完全沒改）、建置開關、權限、模型下載來源、原生建置步驟。
 - 對原台北通架構的修改：[docs/HOST_CHANGES.md](portal_assistant/docs/HOST_CHANGES.md)。
 
