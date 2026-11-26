@@ -16,7 +16,7 @@ recordings never leave the device. Speak Mandarin, Taiwanese Hokkien, English, J
 Filipino (or type), and it opens the right TownPass service page; on forms it teaches step by step on the real service
 page (task cards, highlight halos, fill fields and pick options by voice, skip optional fields), and the whole app and
 the service pages follow the user's language. It is packaged as a standalone folder that plugs into TownPass through a
-small host interface and 23 short hooks documented in [INTEGRATION.md](INTEGRATION.md).
+small host interface and 24 short hooks documented in [INTEGRATION.md](INTEGRATION.md).
 
 ## 目錄
 
@@ -95,7 +95,7 @@ flowchart LR
     subgraph phone["手機（Android／iPhone）：全部在裝置上執行"]
         direction TB
         subgraph host["台北通 App（Flutter）"]
-            tp["官方頁面、TPWebView、路由<br/>23 個串接點＋主機介面 PortalAssistantHost"]
+            tp["官方頁面、TPWebView、路由<br/>24 個串接點＋主機介面 PortalAssistantHost"]
             pkg["助理套件 townpass_portal_assistant<br/>引導教學、按住提問／輸入／選擇<br/>頁面翻譯（預翻＋ML Kit）"]
         end
         backend["Python 後端 :8765<br/>（Android：Chaquopy；iPhone：內嵌 CPython）<br/>緊急 → 指令 → 關鍵字 → 決策分類器 → 讀音 → 語意 → FAQ<br/>選項與地址比對"]
@@ -221,7 +221,7 @@ ASSISTANT_SPEECH=whisper
 | 4.7 | 市府 FAQ、台北通常見問答 | 從市府常見問答 8,121 筆與台北通的常見問答找答案；分數不夠就不回答，不亂答 | 臺北市資料大平台〈[臺北市市政網站整合平台之常見問答](https://data.taipei/dataset/detail?id=203f1657-bb4a-45a7-b25f-279b63136645)〉，政府資料開放授權條款第 1 版；事先轉成手機上的向量索引。台北通常見問答在執行時從服務網站讀取，不存進 App 與 repo |
 | 4.8 | 緊急回應 | 失火、受困、自殺、家暴等緊急詞（6 種語言）在所有流程之前直接回 119／110／113／1925／1995 等專線，不經模型 | 無，為專案整理的詞表 |
 | 4.9 | 離線模型下載 | 模型不包在 App 裡；使用者同意後下載，依手機記憶體分級，可暫停、續傳、檢查 SHA-256 | 無政府資料（模型來源與授權見 [app/assets/assistant/models.json](app/assets/assistant/models.json)） |
-| 4.10 | 獨立專案＋串接文件 | 助理整包放在 `portal_assistant/`，透過主機介面與 23 個串接點接進台北通；已在乾淨的官方台北通上照文件實測 | 無 |
+| 4.10 | 獨立專案＋串接文件 | 助理整包放在 `portal_assistant/`，透過主機介面與 24 個串接點接進台北通；已在乾淨的官方台北通上照文件實測 | 無 |
 
 App 內「設定 → 關於 → 授權與資料來源」列出上述資料與每個模型的出處和授權。
 
@@ -419,7 +419,7 @@ App 內「設定 → 關於 → 授權與資料來源」列出上述資料與每
 
 - 最快的做法：把 `portal_assistant/` 放到台北通 repo 根目錄，執行 `portal_assistant/integration/apply.ps1`（或 `apply.sh`），再 `pub get`、`build_runner`。
 - 主機介面 `PortalAssistantHost`：台北通的實作在 [integration/files/lib/util/town_pass_assistant_host.dart](integration/files/lib/util/town_pass_assistant_host.dart)。
-- 23 個串接點：每個官方檔案一份 patch（[integration/patches/](integration/patches/)），文件逐一寫明位置、加什麼、為什麼、不加會怎樣。
+- 24 個串接點：每個官方檔案一份 patch（[integration/patches/](integration/patches/)），文件逐一寫明位置、加什麼、為什麼、不加會怎樣。
 - 台北通要提供的東西：服務網域（白名單 [app/assets/assistant/service_origins.json](app/assets/assistant/service_origins.json)）、WebView bridge（既有的訊息名稱與資料語意完全沒改）、建置開關、權限、模型下載來源、原生建置步驟。
 - 對原台北通架構的修改：[docs/HOST_CHANGES.md](docs/HOST_CHANGES.md)。
 

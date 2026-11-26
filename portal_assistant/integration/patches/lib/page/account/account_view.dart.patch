@@ -1,5 +1,5 @@
 diff --git a/lib/page/account/account_view.dart b/lib/page/account/account_view.dart
-index 7168229..c6065b9 100644
+index 7168229..78ddc57 100644
 --- a/lib/page/account/account_view.dart
 +++ b/lib/page/account/account_view.dart
 @@ -7,7 +7,9 @@ import 'package:town_pass/page/account/widget/account_view_footer.dart';
@@ -12,7 +12,18 @@ index 7168229..c6065b9 100644
  
  class AccountView extends GetView<AccountViewController> {
    const AccountView({super.key});
-@@ -39,7 +41,7 @@ class AccountView extends GetView<AccountViewController> {
+@@ -30,16 +32,16 @@ class AccountView extends GetView<AccountViewController> {
+                     TPSettingListTile.listTile(
+                       excludeFromSemantics: true,
+                       leading: Assets.svg.iconPerson.svg(),
+-                      title: TPText(
++                      title: PageTranslationScope(enabled: false, child: TPText(
+                         controller.name.value,
+                         style: TPTextStyles.h2Regular,
+                         color: TPColors.grayscale800,
+-                      ),
++                      )),
+                       trailing: GestureDetector(
                          behavior: HitTestBehavior.opaque,
                          onTap: () async => await Get.toNamed(TPRoute.setting)?.then((value) => controller.syncAccount()),
                          child: Semantics(

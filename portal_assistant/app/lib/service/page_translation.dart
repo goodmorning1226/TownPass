@@ -40,6 +40,29 @@ class PageTranslation {
     });
   }
 
+  /// [buildText] for a value that may be the user's own data (a name, an
+  /// address, a phone number): only the App's own files translate it
+  /// ([preset]: kept texts, pre-translated strings, whole glossary terms);
+  /// never ML Kit or translations learned on this phone. Interface texts such
+  /// as 「未設定」 are pre-translated, so they still follow the language
+  /// (portal_assistant/docs/AI_CURRENT_RULES.md section 4, 設定清單的列也跟著語言).
+  static Widget buildPresetText(
+    BuildContext context,
+    String? text,
+    Widget Function(String? text) build,
+  ) {
+    if (text == null || !PageTranslationScope.enabledOf(context)) {
+      return build(text);
+    }
+    return Obx(() {
+      final translation = PageTranslation.instance;
+      translation.revision.value;
+      final target = translation.language.value;
+      if (target == original) return build(text);
+      return build(translation.preset(text, target) ?? text);
+    });
+  }
+
   /// The pages' own language: shown untranslated.
   static const original = 'zh';
 
@@ -513,4 +536,19 @@ class PageTranslationScope extends InheritedWidget {
   @override
   bool updateShouldNotify(PageTranslationScope oldWidget) =>
       enabled != oldWidget.enabled;
+}
+
+/// Host hook for plain texts built where there is no BuildContext (the
+/// factories of TownPass's TPSettingList): `title.assistantPreset((t) =>
+/// t.text(...))`. portal_assistant/docs/AI_CURRENT_RULES.md section 4
+/// (設定清單的列也跟著語言).
+extension AssistantTranslatedString on String {
+  /// [build] with this text translated from the App's own files only
+  /// ([PageTranslation.buildPresetText]): the rows' labels are pre-translated,
+  /// while a row may also show the user's own data (a name as a title, an
+  /// address as a value), which must never go to ML Kit.
+  Widget assistantPreset(Widget Function(String text) build) => Builder(
+    builder: (context) =>
+        PageTranslation.buildPresetText(context, this, (t) => build(t ?? this)),
+  );
 }

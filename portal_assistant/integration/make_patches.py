@@ -28,6 +28,7 @@ PATCHED = [
     'lib/util/tp_route.dart',
     'lib/util/tp_web_view.dart',
     'lib/util/tp_text.dart',
+    'lib/util/tp_setting_list.dart',
     'lib/util/tp_bottom_navigation_factory.dart',
     'lib/page/perk/perk_view.dart',
     'lib/page/account/account_view.dart',

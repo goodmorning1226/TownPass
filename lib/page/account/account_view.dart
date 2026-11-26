@@ -32,11 +32,11 @@ class AccountView extends GetView<AccountViewController> {
                     TPSettingListTile.listTile(
                       excludeFromSemantics: true,
                       leading: Assets.svg.iconPerson.svg(),
-                      title: TPText(
+                      title: PageTranslationScope(enabled: false, child: TPText(
                         controller.name.value,
                         style: TPTextStyles.h2Regular,
                         color: TPColors.grayscale800,
-                      ),
+                      )),
                       trailing: GestureDetector(
                         behavior: HitTestBehavior.opaque,
                         onTap: () async => await Get.toNamed(TPRoute.setting)?.then((value) => controller.syncAccount()),

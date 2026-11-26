@@ -13,4 +13,4 @@ export 'portal_assistant.dart';
 export 'service/assistant_page_tracker.dart'
     show AssistantPageTracker, AssistantTabWebPage, AssistantWebPage;
 export 'service/page_translation.dart'
-    show PageTranslation, PageTranslationScope;
+    show AssistantTranslatedString, PageTranslation, PageTranslationScope;
